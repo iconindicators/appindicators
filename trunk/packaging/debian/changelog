@@ -1,0 +1,7 @@
+indicator-ppa-download-statistics (1.0.0-1) precise; urgency=low
+
+  * Initial release.  
+  * Tested on Ubuntu and Lubuntu.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Jul 2012 09:19:54 +1000
+

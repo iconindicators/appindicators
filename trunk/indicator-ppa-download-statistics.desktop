@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=PPA Download Statistics Indicator
+Comment=Launchpad PPA download statistics indicator applet
+Exec=/usr/share/indicator-ppa-download-statistics/indicator-ppa-download-statistics.py
+Terminal=false
+StartupNotify=true
+Type=Application
+Categories=Utility;
+Icon=indicator-ppa-download-statistics
+
