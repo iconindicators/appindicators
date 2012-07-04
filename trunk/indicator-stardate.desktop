@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Stardate Indicator
+Comment=Star Trek stardate indicator applet
+Exec=/usr/share/indicator-stardate/indicator-stardate.py
+Terminal=false
+StartupNotify=true
+Type=Application
+Categories=Utility;
+Icon=indicator-stardate

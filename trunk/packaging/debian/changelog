@@ -1,0 +1,44 @@
+indicator-stardate (1.0.4-1) precise; urgency=low
+
+  * Icon for Elementary theme incorrectly set at 46 (should have been 48).
+  * Icons in Elementary theme should have been in Lubuntu.
+  * New icons for Elementary (used by Xubuntu).
+  * Lubuntu/Xubuntu:
+     User needs to manually remove spurious directory: /usr/share/icons/elementary/status/48/untitled
+     then rebuild the image cache: sudo gtk-update-icon-cache -f /usr/share/icons/elementary
+  * If 'Gtk Warning: Unable to locate theme engine in module_path: "pixmap"' appears on execution,
+    install "sudo apt-get install gtk2-engines-pixbuf".
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 25 Jun 2012 22:36:53 +1000
+
+
+indicator-stardate (1.0.3-1) precise; urgency=low
+
+  * Put in detection of Unity to handle the case where python-appindicator is installed
+    but should not be used (Lubuntu) and GTK icon used instead.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 25 Jun 2012 13:23:13 +1000
+
+
+indicator-stardate (1.0.2-1) precise; urgency=low
+
+  * Updated package to install icons for Lubuntu and Ubuntu.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 24 Jun 2012 23:50:28 +1000
+
+
+indicator-stardate (1.0.1-1) precise; urgency=low
+
+  * Somewhat tested (on Lubuntu).
+  * Trying to figure out PPA!
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 24 Jun 2012 22:15:28 +1000
+
+
+indicator-stardate (1.0.0-1) precise; urgency=low
+
+  * Initial release.  
+  * Untested!
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 23 Jun 2012 13:15:28 +1000
+
