@@ -1,3 +1,10 @@
+indicator-stardate (1.0.5-1) precise; urgency=low
+
+  * Now included example.py in the release to demonstrate the use of the stardate API.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
 indicator-stardate (1.0.4-1) precise; urgency=low
 
   * Icon for Elementary theme incorrectly set at 46 (should have been 48).

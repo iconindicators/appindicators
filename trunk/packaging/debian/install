@@ -19,5 +19,6 @@ icons/ubuntu-mono-light/indicator-stardate.svg usr/share/icons/ubuntu-mono-light
 icons/ubuntu-mono-light/indicator-stardate.svg usr/share/icons/ubuntu-mono-light/apps/24
 icons/ubuntu-mono-light/indicator-stardate.svg usr/share/icons/ubuntu-mono-light/apps/48
 indicator-stardate.desktop usr/share/applications
+src/example.py usr/share/indicator-stardate
 src/indicator-stardate.py usr/share/indicator-stardate
 src/stardate.py usr/share/indicator-stardate
