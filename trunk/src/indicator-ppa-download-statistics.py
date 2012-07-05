@@ -24,7 +24,7 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.04/c/appindicator/index.html
 
 
-#Note: In Lubuntu, when hovering over edit/remove (or their respective submenus) get the following warning:
+#Note: In Lubuntu, when hovering over edit/remove (or their respective submenus) during a menu rebuild, the following warning occurs:
 # GtkWarning: IA__gtk_widget_event: assertion `WIDGET_REALIZED_FOR_EVENT (widget, event)' failed
 
 
@@ -53,7 +53,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.0"
+    VERSION = "1.0.1"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
     DESKTOP_PATH = "/usr/share/applications/" + NAME + ".desktop"
@@ -92,7 +92,7 @@ class IndicatorPPADownloadStatistics:
             self.indicator = appindicator.Indicator( IndicatorPPADownloadStatistics.NAME, "", appindicator.CATEGORY_APPLICATION_STATUS )
             self.buildMenu()
             self.indicator.set_status( appindicator.STATUS_ACTIVE )
-            self.indicator.set_label( "PPA" )
+            self.indicator.set_label( " PPA " )
         else:
             self.buildMenu()
             self.statusicon = gtk.StatusIcon()

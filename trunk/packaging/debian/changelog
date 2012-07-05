@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.1-1) precise; urgency=low
+
+  * Put in spacing either side of the "PPA" text for Ubuntu Unity.  
+  * Updated comment for a warning on Lubuntu.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
 indicator-ppa-download-statistics (1.0.0-1) precise; urgency=low
 
   * Initial release.  
