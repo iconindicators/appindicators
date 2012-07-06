@@ -92,7 +92,7 @@ class IndicatorPPADownloadStatistics:
             self.indicator = appindicator.Indicator( IndicatorPPADownloadStatistics.NAME, "", appindicator.CATEGORY_APPLICATION_STATUS )
             self.buildMenu()
             self.indicator.set_status( appindicator.STATUS_ACTIVE )
-            self.indicator.set_label( " PPA " )
+            self.indicator.set_label( "PPA" )
         else:
             self.buildMenu()
             self.statusicon = gtk.StatusIcon()
@@ -102,61 +102,28 @@ class IndicatorPPADownloadStatistics:
 
 
     def main( self ):
+        self.updateMenu()
         self.requestPPADownloadAndMenuRefresh()
         gobject.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh ) # Auto update every 6 hours.
         gtk.main()
 
 
     def buildMenu( self ):
-        numberOfPPAs = len( self.ppas )
-        oneOrMorePPAsExist = numberOfPPAs > 0
-
         menu = gtk.Menu()
 
-        # Create the list of PPA's, if we have any.
-        if( oneOrMorePPAsExist ):
-            for key in self.getSortedPPAKeys():
-                menuItem = gtk.MenuItem( key )
-                menu.append( menuItem )
-
-                if self.showSubmenu == True:
-                    subMenu = gtk.Menu()
-                    subMenuItem = gtk.MenuItem( "(no information)" )
-                    subMenu.append( subMenuItem )
-                    menuItem.set_submenu( subMenu )
-                else:
-                    menuItem = gtk.MenuItem( "   (no information)" )
-                    menu.append( menuItem )
-
-            menu.append( gtk.SeparatorMenuItem() )
+        menu.append( gtk.SeparatorMenuItem() )
 
         self.addMenuItem = gtk.MenuItem( "Add a PPA" )
         self.addMenuItem.connect( "activate", self.onAdd )
         menu.append( self.addMenuItem )
 
         self.editMenuItem = gtk.MenuItem( "Edit a PPA" )
-        self.editMenuItem.set_sensitive( oneOrMorePPAsExist )
         menu.append( self.editMenuItem )
-        if( oneOrMorePPAsExist ):
-            subMenu = gtk.Menu()
-            self.editMenuItem.set_submenu( subMenu )
-            for key in self.getSortedPPAKeys():
-                subMenuItem = gtk.MenuItem( key )
-                subMenuItem.set_name( key )
-                subMenuItem.connect( "activate", self.onEdit )
-                subMenu.append( subMenuItem )
+        self.editMenuItem.set_submenu( gtk.Menu() ) # Dummy submenu needed so the update menu works.
 
         self.removeMenuItem = gtk.MenuItem( "Remove a PPA" )
-        self.removeMenuItem.set_sensitive( oneOrMorePPAsExist )
         menu.append( self.removeMenuItem )
-        if( oneOrMorePPAsExist ):
-            subMenu = gtk.Menu()
-            self.removeMenuItem.set_submenu( subMenu )
-            for key in self.getSortedPPAKeys():
-                subMenuItem = gtk.MenuItem( key )
-                subMenuItem.set_name( key )
-                subMenuItem.connect( "activate", self.onRemove )
-                subMenu.append( subMenuItem )
+        self.removeMenuItem.set_submenu( gtk.Menu() ) # Dummy submenu needed so the update menu works.
 
         showSubmenuMenuItem = gtk.CheckMenuItem( "Show as sub-menus" )
         showSubmenuMenuItem.set_active( self.showSubmenu )
@@ -185,9 +152,6 @@ class IndicatorPPADownloadStatistics:
 
 
     def updateMenu( self ):
-        numberOfPPAs = len( self.ppas )
-        oneOrMorePPAsExist = numberOfPPAs > 0
-
         if appindicatorImported == True:
             menu = self.indicator.get_menu()
         else:
@@ -195,14 +159,15 @@ class IndicatorPPADownloadStatistics:
 
         menu.hide() # Safety - hide the menu whilst it is being rebuilt.
 
-        # Remove all PPAs and data (and separator) from the menu.
-        for i in menu.get_children():
-            if i == self.addMenuItem:
+        # Remove all PPAs and data from the menu.
+        for item in menu.get_children():
+            if type( item ) == gtk.SeparatorMenuItem:
                 break
 
-            menu.remove( i )
+            menu.remove( item )
 
         # Add PPAs to the menu (including a separator at the end).
+        oneOrMorePPAsExist = len( self.ppas ) > 0
         if( oneOrMorePPAsExist ):
             position = 0
             for key in self.getSortedPPAKeys():
@@ -239,9 +204,6 @@ class IndicatorPPADownloadStatistics:
                             menuItem = gtk.MenuItem( "    " + item[ 0 ] + " (" + item[ 1 ] + "): " + str( item[ 2 ] ) )
                             menu.insert( menuItem, position )
                             position += 1
-
-            menu.insert( gtk.SeparatorMenuItem(), position )
-            position += 1
 
         # Update the edit menu.  Tried to set its submenu to None and rebuild, but kept getting GTK errors...so remove its children instead.
         self.editMenuItem.set_sensitive( oneOrMorePPAsExist )
