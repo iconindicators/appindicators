@@ -96,7 +96,6 @@ class IndicatorPPADownloadStatistics:
         else:
             self.buildMenu()
             self.statusicon = gtk.StatusIcon()
-            self.statusicon.set_from_stock( gtk.STOCK_ABOUT )
             self.statusicon.set_from_icon_name( IndicatorPPADownloadStatistics.NAME )
             self.statusicon.connect( "popup-menu", self.handleRightClick )
             self.statusicon.connect( "activate", self.handleLeftClick )
@@ -286,7 +285,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def getPPAKey( self, ppaList ):
-        return str( ppaList[ 0 ] ) + " | " + str( ppaList[ 1 ] ) + " | " + str( ppaList[ 2] ) + " | " + str( ppaList[ 3 ] )
+        return str( ppaList[ 0 ] ) + " | " + str( ppaList[ 1 ] ) + " | " + str( ppaList[ 2 ] ) + " | " + str( ppaList[ 3 ] )
 
 
     def handleLeftClick( self, icon ):
