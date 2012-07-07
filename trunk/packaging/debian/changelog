@@ -1,0 +1,21 @@
+indicator-virtual-box (1.0.1-1) precise; urgency=low
+
+  * The bold/italic tags are not being rendered in the menu to indicate a
+    running VM.  For now, will use "---" either side of the VM name.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 7 Jul 2012 12:38:10 +1000
+
+
+indicator-virtual-box (1.0.0-1) precise; urgency=low
+
+  * Initial release.
+  * Tested on Ubuntu but should work for Lubuntu/Xubuntu.
+  * Lubuntu/Xubuntu:
+     User needs to manually remove spurious directory: /usr/share/icons/elementary/status/48/untitled
+     then rebuild the image cache: sudo gtk-update-icon-cache -f /usr/share/icons/elementary
+  * If 'Gtk Warning: Unable to locate theme engine in module_path: "pixmap"' appears on execution,
+    install "sudo apt-get install gtk2-engines-pixbuf".
+  * The indicator will run without 'virtualbox' installed...but it'll do nothing useful!
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 7 Jul 2012 11:26:52 +1000
+
