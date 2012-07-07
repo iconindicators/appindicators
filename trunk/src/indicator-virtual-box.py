@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator to start/stop Virtual Box virtual machines.
+# Application indicator to start (and show running) Virtual Box virtual machines.
 
 
 # Unity appindicator does not support styles in menu items.
@@ -26,11 +26,11 @@
 #  menuItem.get_children()[ 0 ].set_markup( "<b><i>" + "item" + "</i></b>" )
 
 
-#TODO Let user specify sort order of VM names - alpha or what VBoxManage gives (matches UI list)
-
-
-#TODO Let user specify the left/right text of running VMs...or maybe non running VMs too.
-#Can we use an image menu item?
+# Ideas...
+#
+# Option to specify sort order of VM names - either alphabetical or what VBoxManage gives (matches UI list)
+#
+# Option to specify the pre/post menu text of running VMs and possibly non-running VMs too.
 
 
 appindicatorImported = True
@@ -52,7 +52,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.1"
+    VERSION = "1.0.2"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"

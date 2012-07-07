@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.2-1) precise; urgency=low
+
+  * Unity appindicator does not support stying in the menu items.
+    To indicate a running VM "---" is placed either side of the VM name.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 7 Jul 2012 18:59:21 +1000
+
+
 indicator-virtual-box (1.0.1-1) precise; urgency=low
 
   * The bold/italic tags are not being rendered in the menu to indicate a
