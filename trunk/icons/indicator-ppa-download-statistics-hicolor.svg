@@ -8,8 +8,8 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="79.808594"
-   height="40.160156"
+   width="69.808594"
+   height="30.16016"
    id="svg3020"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
@@ -24,8 +24,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4"
-     inkscape:cx="49.581404"
-     inkscape:cy="17.035446"
+     inkscape:cx="44.581404"
+     inkscape:cy="12.03545"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -36,10 +36,10 @@
      inkscape:window-maximized="1"
      showborder="true"
      inkscape:showpageshadow="false"
-     fit-margin-top="5"
-     fit-margin-bottom="5"
-     fit-margin-left="5"
-     fit-margin-right="5"
+     fit-margin-top="0"
+     fit-margin-bottom="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
      borderlayer="false" />
   <svg:metadata
      id="metadata3025">
@@ -66,12 +66,12 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Layer"
-     transform="translate(138.82303,-48.42787)" />
+     transform="translate(133.82303,-53.42787)" />
   <svg:g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-12.670221,-329.05316)">
+     transform="translate(-17.670221,-334.05316)">
     <svg:path
        inkscape:connector-curvature="0"
        id="path3008"

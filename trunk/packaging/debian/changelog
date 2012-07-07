@@ -4,8 +4,9 @@ indicator-ppa-download-statistics (1.0.1-1) precise; urgency=low
   * Removed incorrect setting of stock icon.
   * Simplified the menu build/update.
   * Updated comment for a warning on Lubuntu.
+  * Removed borders of icons.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 7 Jul 2012 20:14:36 +1000
 
 
 indicator-ppa-download-statistics (1.0.0-1) precise; urgency=low
