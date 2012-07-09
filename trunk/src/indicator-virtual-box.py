@@ -52,7 +52,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.2"
+    VERSION = "1.0.3"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
@@ -94,6 +94,10 @@ class IndicatorVirtualBox:
         menu = gtk.Menu()
 
         menu.append( gtk.SeparatorMenuItem() )
+
+        self.frontEndMenuItem = gtk.MenuItem( "Frontend" )
+        self.frontEndMenuItem.connect( "activate", self.onFrontEnd )
+        menu.append( self.frontEndMenuItem )
 
         refreshMenuItem = gtk.MenuItem( "Refresh" )
         refreshMenuItem.connect( "activate", self.onRefresh )
@@ -139,7 +143,7 @@ class IndicatorVirtualBox:
         position = 0
         if self.isVirtualBoxInstalled():
             virtualMachines = self.getVirtualMachines( False )
-            if virtualMachines is None:
+            if len( virtualMachines ) == 0 :
                 menu.insert( gtk.MenuItem( "(no virtual machines exist)" ), position )
                 position += 1
             else:
@@ -155,8 +159,10 @@ class IndicatorVirtualBox:
                     menu.insert( vmMenuItem, position )
                     position += 1
         else:
-            menu.insert( gtk.MenuItem( "(VBoxManage is not installed)" ), position )
+            menu.insert( gtk.MenuItem( "(VirtualBox is not installed)" ), position )
             position += 1
+
+        self.frontEndMenuItem.set_sensitive( self.isVirtualBoxInstalled( ) )
 
         menu.show_all()
 
@@ -175,6 +181,7 @@ class IndicatorVirtualBox:
             virtualMachines.append( vm )
 
         p.wait()
+
         return virtualMachines
 
 
@@ -185,6 +192,10 @@ class IndicatorVirtualBox:
 
     def onRefresh( self, widget ):
         gobject.idle_add( self.updateMenu )
+
+
+    def onFrontEnd( self, widget ):
+        subprocess.Popen( "VirtualBox &", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
 
 
     def onStartVirtualMachine( self, widget ):

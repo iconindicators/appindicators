@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.3-1) precise; urgency=low
+
+  * Added menu option to launch the GUI frontend.
+  * Fixed a bug when displaying a message when no virtual machines exist.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 Jul 2012 13:28:42 +1000
+
+
 indicator-virtual-box (1.0.2-1) precise; urgency=low
 
   * Unity appindicator does not support stying in the menu items.
@@ -26,4 +34,3 @@ indicator-virtual-box (1.0.0-1) precise; urgency=low
   * The indicator will run without 'virtualbox' installed...but it'll do nothing useful!
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 7 Jul 2012 11:26:52 +1000
-
