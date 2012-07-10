@@ -28,8 +28,6 @@
 
 # Ideas...
 #
-# Option to specify sort order of VM names - either alphabetical or what VBoxManage gives (matches UI list)
-#
 # Option to specify the pre/post menu text of running VMs and possibly non-running VMs too.
 
 
@@ -41,26 +39,34 @@ except:
 
 import gobject
 import gtk
+import json
+import locale
 import logging
 import os
 import shutil
 import subprocess
 import sys
 
+from functools import cmp_to_key
+
 
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.3"
+    VERSION = "1.0.4"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
     DESKTOP_PATH = "/usr/share/applications/" + NAME + ".desktop"
 
+    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_SORT_DEFAULT = "sortDefault"
+
 
     def __init__( self ):
         logging.basicConfig( file = sys.stderr, level = logging.INFO )
+        self.loadSettings()
 
         # One of the install dependencies for Debian/Ubuntu is that appindicator exists.
         # However the appindicator only works under Ubuntu Unity - we need to default to GTK icon if not running Unity (say Lubuntu).
@@ -103,6 +109,22 @@ class IndicatorVirtualBox:
         refreshMenuItem.connect( "activate", self.onRefresh )
         menu.append( refreshMenuItem )
 
+        sortMenuItem = gtk.MenuItem( "Sort" )
+        menu.append( sortMenuItem )
+
+        subMenu = gtk.Menu()
+        sortMenuItem.set_submenu( subMenu )
+
+        sortDefaultMenuItem = gtk.RadioMenuItem( None, "Default", False )
+        sortDefaultMenuItem.set_active( self.sortDefault )
+        sortDefaultMenuItem.connect( "activate", self.onSortDefault )
+        subMenu.append( sortDefaultMenuItem )
+
+        sortAlphabeticallyMenuItem = gtk.RadioMenuItem( sortDefaultMenuItem, "Alphabetically", False )
+        sortAlphabeticallyMenuItem.set_active( not self.sortDefault )
+        sortAlphabeticallyMenuItem.connect( "activate", self.onSortAlphabetically )
+        subMenu.append( sortAlphabeticallyMenuItem )
+
         autoStartMenuItem = gtk.CheckMenuItem( "Autostart" )
         autoStartMenuItem.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ) )
         autoStartMenuItem.connect( "activate", self.onAutoStart )
@@ -142,19 +164,19 @@ class IndicatorVirtualBox:
         # Add back in the refreshed list of VMs.
         position = 0
         if self.isVirtualBoxInstalled():
-            virtualMachines = self.getVirtualMachines( False )
-            if len( virtualMachines ) == 0 :
+            self.getVirtualMachines()
+            if len( self.virtualMachineNames ) == 0 :
                 menu.insert( gtk.MenuItem( "(no virtual machines exist)" ), position )
                 position += 1
             else:
-                virtualMachinesRunning = self.getVirtualMachines( True )
-                for vm in virtualMachines:
-                    if vm in virtualMachinesRunning:
-                        vmMenuItem = gtk.MenuItem( "--- " + vm[ 0 ] + " ---" )
+                for virtualMachineName in self.virtualMachineNames:
+                    virtualMachineInfo = self.virtualMachineInfos[ virtualMachineName ]
+                    if virtualMachineInfo[ 1 ] == True:
+                        vmMenuItem = gtk.MenuItem( "--- " + virtualMachineName + " ---" )
                     else:
-                        vmMenuItem = gtk.MenuItem( vm[ 0 ] )
+                        vmMenuItem = gtk.MenuItem( virtualMachineName )
 
-                    vmMenuItem.props.name = vm[ 0 ]
+                    vmMenuItem.props.name = virtualMachineName
                     vmMenuItem.connect( "activate", self.onStartVirtualMachine )
                     menu.insert( vmMenuItem, position )
                     position += 1
@@ -167,27 +189,53 @@ class IndicatorVirtualBox:
         menu.show_all()
 
 
-    def getVirtualMachines( self, isRunning ):
-        virtualMachines = []
-        command = "VBoxManage list "
-        if isRunning == True:
-            command += "runningvms"
-        else:
-            command += "vms"
+    def getVirtualMachines( self ):
+        self.virtualMachineNames = []
+        self.virtualMachineInfos = {}
 
-        p = subprocess.Popen( command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+        # Get a list of all virtual machines...
+        p = subprocess.Popen( "VBoxManage list vms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
         for line in p.stdout.readlines():
-            vm = line[ 1 : -2 ].split( "\" {" )
-            virtualMachines.append( vm )
+            info = line[ 1 : -2 ].split( "\" {" )
+
+            self.virtualMachineNames.append( info[ 0 ] )
+
+            # Create a hash entry:
+            #  key is the virtual machine name.
+            #  value is the virutal machine ID and a boolean indicating the running status (false for now).
+            self.virtualMachineInfos[ info[ 0 ] ] = [ info[ 1 ], False ]
 
         p.wait()
 
-        return virtualMachines
+        # Get a list of running virtual machines and adjust our information...
+        p = subprocess.Popen( "VBoxManage list runningvms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+        for line in p.stdout.readlines():
+            info = line[ 1 : -2 ].split( "\" {" )
+            del self.virtualMachineInfos[ info[ 0 ] ]
+            self.virtualMachineInfos[ info[ 0 ] ] = [ info[ 1 ], True ]
+
+        p.wait()
+
+        # Alphabetically sort...
+        if self.sortDefault == False:
+            self.virtualMachineNames = sorted( self.virtualMachineNames, key = cmp_to_key( locale.strcoll ) )
 
 
     def isVirtualBoxInstalled( self ):
         p = subprocess.Popen( "which VBoxManage", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
         return p.communicate()[ 0 ] != ''
+
+
+    def onSortDefault( self, widget ):
+        self.sortDefault = True
+        self.saveSettings()
+        self.onRefresh( widget )
+
+
+    def onSortAlphabetically( self, widget ):
+        self.sortDefault = False
+        self.saveSettings()
+        self.onRefresh( widget )
 
 
     def onRefresh( self, widget ):
@@ -199,23 +247,15 @@ class IndicatorVirtualBox:
 
 
     def onStartVirtualMachine( self, widget ):
-        vmName = widget.props.name
+        virtualMachineName = widget.props.name
+        if self.virtualMachineInfos.get( virtualMachineName )[ 1 ] == True:
+            self.showMessage( gtk.MESSAGE_WARNING, IndicatorVirtualBox.NAME, "\'" + virtualMachineName + "\' is already running!" )
+        else:
+            command = "VBoxManage startvm " + self.virtualMachineInfos.get( virtualMachineName )[ 0 ]
+            p = subprocess.Popen( command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+            p.wait()
 
-        virtualMachinesRunning = self.getVirtualMachines( True )
-        for vm in virtualMachinesRunning:
-            if vm[ 0 ] == vmName:
-                self.showMessage( gtk.MESSAGE_WARNING, IndicatorVirtualBox.NAME, "\'" + vmName + "\' is already running!" )
-                self.onRefresh( widget ) # Do an update as it's possible the menu is out of date.
-                return
-
-        virtualMachines = self.getVirtualMachines( False )
-        for vm in virtualMachines:
-            if vm[ 0 ] == vmName:
-                command = "VBoxManage startvm " + vm[ 1 ]
-                p = subprocess.Popen( command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-                p.wait()
-                self.onRefresh( widget )
-                return
+        self.onRefresh( widget )
 
 
     def showMessage( self, messageType, title, message ):
@@ -254,6 +294,35 @@ class IndicatorVirtualBox:
 
     def handleRightClick( self, icon, button, time ):
         self.menu.popup( None, None, gtk.status_icon_position_menu, button, time, self.statusicon )
+
+
+    def loadSettings( self ):
+        self.sortDefault = True
+
+        if os.path.isfile( IndicatorVirtualBox.SETTINGS_FILE ):
+            try:
+                with open( IndicatorVirtualBox.SETTINGS_FILE, 'r' ) as f:
+                    settings = json.load( f )
+
+                self.sortDefault = settings.get( IndicatorVirtualBox.SETTINGS_SORT_DEFAULT, self.sortDefault )
+
+            except Exception as e:
+                logging.exception( e )
+                logging.error( "Error reading settings: " + IndicatorVirtualBox.SETTINGS_FILE )
+
+
+    def saveSettings( self ):
+        try:
+            settings = {
+                IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault
+            }
+
+            with open( IndicatorVirtualBox.SETTINGS_FILE, 'w' ) as f:
+                f.write( json.dumps( settings ) )
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing settings: " + IndicatorVirtualBox.SETTINGS_FILE )
 
 
 if __name__ == "__main__":

@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.4-1) precise; urgency=low
+
+  * Added menu option to sort virtual machine names alphabetically or by default
+    (as given by VirtualBox).
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 10 Jul 2012 13:44:47 +1000
+
+
 indicator-virtual-box (1.0.3-1) precise; urgency=low
 
   * Added menu option to launch the GUI frontend.
