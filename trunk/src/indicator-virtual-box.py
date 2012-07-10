@@ -26,11 +26,6 @@
 #  menuItem.get_children()[ 0 ].set_markup( "<b><i>" + "item" + "</i></b>" )
 
 
-# Ideas...
-#
-# Option to specify the pre/post menu text of running VMs and possibly non-running VMs too.
-
-
 appindicatorImported = True
 try:
     import appindicator
@@ -54,19 +49,24 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.4"
+    VERSION = "1.0.5"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
     DESKTOP_PATH = "/usr/share/applications/" + NAME + ".desktop"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_BEFORE = "menuTextVirtualMachineRunningBefore"
+    SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_AFTER = "menuTextVirtualMachineRunningAfter"
+    SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE = "menuTextVirtualMachineNotRunningBefore"
+    SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER = "menuTextVirtualMachineNotRunningAfter"
     SETTINGS_SORT_DEFAULT = "sortDefault"
 
 
     def __init__( self ):
         logging.basicConfig( file = sys.stderr, level = logging.INFO )
         self.loadSettings()
+        self.dialog = None
 
         # One of the install dependencies for Debian/Ubuntu is that appindicator exists.
         # However the appindicator only works under Ubuntu Unity - we need to default to GTK icon if not running Unity (say Lubuntu).
@@ -108,6 +108,10 @@ class IndicatorVirtualBox:
         refreshMenuItem = gtk.MenuItem( "Refresh" )
         refreshMenuItem.connect( "activate", self.onRefresh )
         menu.append( refreshMenuItem )
+
+        menuTextMenuItem = gtk.MenuItem( "Set menu text" )
+        menuTextMenuItem.connect( "activate", self.onMenuText )
+        menu.append( menuTextMenuItem )
 
         sortMenuItem = gtk.MenuItem( "Sort" )
         menu.append( sortMenuItem )
@@ -172,9 +176,9 @@ class IndicatorVirtualBox:
                 for virtualMachineName in self.virtualMachineNames:
                     virtualMachineInfo = self.virtualMachineInfos[ virtualMachineName ]
                     if virtualMachineInfo[ 1 ] == True:
-                        vmMenuItem = gtk.MenuItem( "--- " + virtualMachineName + " ---" )
+                        vmMenuItem = gtk.MenuItem( self.menuTextVirtualMachineRunningBefore + virtualMachineName + self.menuTextVirtualMachineRunningAfter )
                     else:
-                        vmMenuItem = gtk.MenuItem( virtualMachineName )
+                        vmMenuItem = gtk.MenuItem( self.menuTextVirtualMachineNotRunningBefore + virtualMachineName + self.menuTextVirtualMachineNotRunningAfter )
 
                     vmMenuItem.props.name = virtualMachineName
                     vmMenuItem.connect( "activate", self.onStartVirtualMachine )
@@ -258,6 +262,66 @@ class IndicatorVirtualBox:
         self.onRefresh( widget )
 
 
+    def onMenuText( self, widget ):
+        if self.dialog is not None:
+            return
+
+        dialog = gtk.Dialog( "Set Menu Text", None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+
+        table = gtk.Table( 4, 2, False )
+        table.set_col_spacings( 5 )
+        table.set_row_spacings( 5 )
+
+        label = gtk.Label( "Text before (VM running)" )
+        label.set_alignment( 0, 0.5 )
+        table.attach( label, 0, 1, 0, 1 )
+
+        textRunningBefore = gtk.Entry()
+        textRunningBefore.set_text( self.menuTextVirtualMachineRunningBefore )
+        table.attach( textRunningBefore, 1, 2, 0, 1 )
+
+        label = gtk.Label( "Text after (VM running)" )
+        label.set_alignment( 0, 0.5 )
+        table.attach( label, 0, 1, 1, 2 )
+
+        textRunningAfter = gtk.Entry()
+        textRunningAfter.set_text( self.menuTextVirtualMachineRunningAfter )
+        table.attach( textRunningAfter, 1, 2, 1, 2 )
+
+        label = gtk.Label( "Text before (VM not running)" )
+        label.set_alignment( 0, 0.5 )
+        table.attach( label, 0, 1, 2, 3 )
+
+        textNotRunningBefore = gtk.Entry()
+        textNotRunningBefore.set_text( self.menuTextVirtualMachineNotRunningBefore )
+        table.attach( textNotRunningBefore, 1, 2, 2, 3 )
+
+        label = gtk.Label( "Text after (VM not running)" )
+        label.set_alignment( 0, 0.5 )
+        table.attach( label, 0, 1, 3, 4 )
+
+        textNotRunningAfter = gtk.Entry()
+        textNotRunningAfter.set_text( self.menuTextVirtualMachineNotRunningAfter )
+        table.attach( textNotRunningAfter, 1, 2, 3, 4 )
+
+        dialog.vbox.pack_start( table, True, True, 10 )
+        dialog.set_border_width( 10 )
+
+        dialog.show_all()
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            self.menuTextVirtualMachineRunningBefore = textRunningBefore.get_text()
+            self.menuTextVirtualMachineRunningAfter = textRunningAfter.get_text()
+            self.menuTextVirtualMachineNotRunningBefore = textNotRunningBefore.get_text()
+            self.menuTextVirtualMachineNotRunningAfter = textNotRunningAfter.get_text()
+
+            self.saveSettings()
+            self.onRefresh( widget )
+
+        dialog.destroy()
+        self.dialog = None
+
+
     def showMessage( self, messageType, title, message ):
         dialog = gtk.MessageDialog( None, 0, messageType, gtk.BUTTONS_OK, message )
         dialog.set_title( title )
@@ -298,12 +362,20 @@ class IndicatorVirtualBox:
 
     def loadSettings( self ):
         self.sortDefault = True
+        self.menuTextVirtualMachineRunningBefore = "--- "
+        self.menuTextVirtualMachineRunningAfter = " ---"
+        self.menuTextVirtualMachineNotRunningBefore = ""
+        self.menuTextVirtualMachineNotRunningAfter = ""
 
         if os.path.isfile( IndicatorVirtualBox.SETTINGS_FILE ):
             try:
                 with open( IndicatorVirtualBox.SETTINGS_FILE, 'r' ) as f:
                     settings = json.load( f )
 
+                self.menuTextVirtualMachineRunningBefore = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_BEFORE, self.menuTextVirtualMachineRunningBefore )
+                self.menuTextVirtualMachineRunningAfter = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_AFTER, self.menuTextVirtualMachineRunningAfter )
+                self.menuTextVirtualMachineNotRunningBefore = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE, self.menuTextVirtualMachineNotRunningBefore )
+                self.menuTextVirtualMachineNotRunningAfter = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER, self.menuTextVirtualMachineNotRunningAfter )
                 self.sortDefault = settings.get( IndicatorVirtualBox.SETTINGS_SORT_DEFAULT, self.sortDefault )
 
             except Exception as e:
@@ -314,6 +386,10 @@ class IndicatorVirtualBox:
     def saveSettings( self ):
         try:
             settings = {
+                IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_BEFORE: self.menuTextVirtualMachineRunningBefore,
+                IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_AFTER: self.menuTextVirtualMachineRunningAfter,
+                IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE: self.menuTextVirtualMachineNotRunningBefore,
+                IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER: self.menuTextVirtualMachineNotRunningAfter,
                 IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault
             }
 
