@@ -53,7 +53,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.1"
+    VERSION = "1.0.2"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
     DESKTOP_PATH = "/usr/share/applications/" + NAME + ".desktop"
@@ -308,7 +308,7 @@ class IndicatorPPADownloadStatistics:
         if add == False:
             title = "Edit PPA"
 
-        dialog = gtk.Dialog( title, None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+        self.dialog = gtk.Dialog( title, None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
 
         table = gtk.Table( 4, 2, False )
         table.set_col_spacings( 5 )
@@ -360,24 +360,24 @@ class IndicatorPPADownloadStatistics:
         architecturesCombobox.set_active( self.getIndexForArchitecture( existingArchitecture ) )
         table.attach( architecturesCombobox, 1, 2, 3, 4 )
 
-        dialog.vbox.pack_start( table, True, True, 10 )
-        dialog.set_border_width( 10 )
+        self.dialog.vbox.pack_start( table, True, True, 10 )
+        self.dialog.set_border_width( 10 )
 
         while True:
-            dialog.show_all()
-            response = dialog.run()
+            self.dialog.show_all()
+            response = self.dialog.run()
 
             if response == gtk.RESPONSE_CANCEL:
                 break
 
             if ppaOwner.get_text().strip() == "":
                 self.showMessage( gtk.MESSAGE_ERROR, "PPA owner cannot be empty." )
-                dialog.set_focus( ppaOwner )
+                self.dialog.set_focus( ppaOwner )
                 continue
 
             if ppa.get_text().strip() == "":
                 self.showMessage( gtk.MESSAGE_ERROR, "PPA cannot be empty." )
-                dialog.set_focus( ppa )
+                self.dialog.set_focus( ppa )
                 continue
 
             ppaList = [ ppaOwner.get_text().strip(), ppa.get_text().strip(), distributionsCombobox.get_active_text(), architecturesCombobox.get_active_text() ]
@@ -399,7 +399,7 @@ class IndicatorPPADownloadStatistics:
 
             break
 
-        dialog.destroy()
+        self.dialog.destroy()
         self.dialog = None
 
 

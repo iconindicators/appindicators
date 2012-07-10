@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.2-1) precise; urgency=low
+
+  * Fixed a bug where the add/edit dialog was not preventing other dialogs from
+    being launched.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 10 Jul 2012 21:49:42 +1000
+
+
 indicator-ppa-download-statistics (1.0.1-1) precise; urgency=low
 
   * Put in spacing either side of the "PPA" text for Ubuntu Unity.
@@ -15,4 +23,3 @@ indicator-ppa-download-statistics (1.0.0-1) precise; urgency=low
   * Tested on Ubuntu and Lubuntu.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Jul 2012 09:19:54 +1000
-
