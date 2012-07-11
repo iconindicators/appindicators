@@ -55,7 +55,7 @@ import math
 class Stardate:
 
     def __init__( self ):
-        self.API_VERSION = "Version 1.0 (2012-06-11)"
+        self.API_VERSION = "Version 1.3 (2012-06-11)"
 
         # Rates (in stardate units per day) for each stardate era. 
         self.stardateRates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
