@@ -1,8 +1,9 @@
 indicator-stardate (1.0.5-1) precise; urgency=low
 
   * Now included example.py in the release to demonstrate the use of the stardate API.
+  * Corrected the API version such that it matches the Java API version.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 11 Jul 2012 16:57:16 +1000
 
 
 indicator-stardate (1.0.4-1) precise; urgency=low
@@ -48,4 +49,3 @@ indicator-stardate (1.0.0-1) precise; urgency=low
   * Untested!
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 23 Jun 2012 13:15:28 +1000
-
