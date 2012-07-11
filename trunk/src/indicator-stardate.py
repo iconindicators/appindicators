@@ -163,11 +163,11 @@ class IndicatorStardate:
         autoStartMenuItem.connect( "activate", self.onAutoStart )
         self.menu.append( autoStartMenuItem )
 
-        aboutMenuItem = gtk.ImageMenuItem( stock_id=gtk.STOCK_ABOUT )
+        aboutMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_ABOUT )
         aboutMenuItem.connect( "activate", self.onAbout )
         self.menu.append( aboutMenuItem )
 
-        quitMenuItem = gtk.ImageMenuItem( stock_id=gtk.STOCK_QUIT )
+        quitMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_QUIT )
         quitMenuItem.connect( "activate", gtk.main_quit )
         self.menu.append( quitMenuItem )
 

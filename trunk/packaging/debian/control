@@ -9,5 +9,5 @@ X-Python-Version: >= 2.7
 Package: indicator-stardate
 Architecture: all
 Depends: ${misc:Depends}, ${python:Depends}, python-appindicator
-Description: Application indicator for *buntu.
+Description: Application indicator for Ubuntu.
 

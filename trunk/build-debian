@@ -29,9 +29,10 @@ rm -rf $BUILD
 
 mkdir -p $BUILD/$NAME-$VERSION
 cp $NAME.desktop $BUILD/$NAME-$VERSION
+cp build-debian $BUILD/$NAME-$VERSION
 
 mkdir -p $BUILD/$NAME-$VERSION/src
-cp src/python/example.py src/python/indicator-stardate.py src/python/stardate.py $BUILD/$NAME-$VERSION/src
+cp src/example.py src/indicator-stardate.py src/stardate.py $BUILD/$NAME-$VERSION/src
 
 mkdir -p $BUILD/$NAME-$VERSION/icons/elementary
 cp icons/indicator-stardate-elementary.svg $BUILD/$NAME-$VERSION/icons/elementary/indicator-stardate.svg
@@ -60,4 +61,4 @@ debuild -S -sa
 cd ..
 rm -rf $NAME-$VERSION
 
-echo "Now run from the build directory: dput ppa:thebernmeister/indicator-stardate indicator-stardate_${VERSION}-1_source.changes"
+echo "Now run from the build directory: dput ppa:thebernmeister/${NAME} ${NAME}_${VERSION}-1_source.changes"
