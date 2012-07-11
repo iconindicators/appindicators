@@ -82,7 +82,7 @@ class IndicatorStardate:
 
         # Use the stardate update period to set a refresh timer.
         # The stardate calculation and WHEN the stardate changes are not synchronised,
-        # so update at ten times speed (but no more than once per second).
+        # so update at ten times speed (but no less than once per second).
         period = int( self.stardate.getStardateFractionalPeriod() / 10 ) 
         if period < 1:
             period = 1
