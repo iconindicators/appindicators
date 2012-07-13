@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.3-1) precise; urgency=low
+
+  * Hide the menu during refresh (using popdown).
+  * Added the PPA for VirtualBox Indicator to the sample PPAs.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 13 Jul 2012 23:16:49 +1000
+
+
 indicator-ppa-download-statistics (1.0.2-1) precise; urgency=low
 
   * Fixed a bug where the add/edit dialog was not preventing other dialogs from

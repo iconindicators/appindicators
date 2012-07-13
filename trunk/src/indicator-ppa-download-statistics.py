@@ -53,7 +53,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.2"
+    VERSION = "1.0.3"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
     DESKTOP_PATH = "/usr/share/applications/" + NAME + ".desktop"
@@ -157,7 +157,7 @@ class IndicatorPPADownloadStatistics:
         else:
             menu = self.menu
 
-        menu.hide() # Safety - hide the menu whilst it is being rebuilt.
+        menu.popdown() # If we don't do this we get GTK complaints.
 
         # Remove all PPAs and data from the menu.
         for item in menu.get_children():
@@ -461,11 +461,14 @@ class IndicatorPPADownloadStatistics:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
         else:
-            # No properties file exists, so populate with default PPAs to give the user sample PPAs and an idea of the format.
+            # No properties file exists, so populate with sample PPAs to give the user an idea of the format.
+            ppaList = [ "thebernmeister", "indicator-ppa-download-statistics", "precise", "i386" ]
+            self.ppas[ self.getPPAKey( ppaList ) ] = ppaList
+
             ppaList = [ "thebernmeister", "indicator-stardate", "precise", "i386" ]
             self.ppas[ self.getPPAKey( ppaList ) ] = ppaList
 
-            ppaList = [ "thebernmeister", "indicator-ppa-download-statistics", "precise", "i386" ]
+            ppaList = [ "thebernmeister", "indicator-virtual-box", "precise", "i386" ]
             self.ppas[ self.getPPAKey( ppaList ) ] = ppaList
 
 
