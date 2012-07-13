@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator to start (and show running) Virtual Box virtual machines.
+# Application indicator to start (and show running) VirtualBox virtual machines.
 
 
 # Unity appindicator does not support styles in menu items.
@@ -49,7 +49,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.5"
+    VERSION = "1.0.6"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
@@ -101,9 +101,9 @@ class IndicatorVirtualBox:
 
         menu.append( gtk.SeparatorMenuItem() )
 
-        self.frontEndMenuItem = gtk.MenuItem( "Frontend" )
-        self.frontEndMenuItem.connect( "activate", self.onFrontEnd )
-        menu.append( self.frontEndMenuItem )
+        self.virtualBoxMenuItem = gtk.MenuItem( "VirtualBox" )
+        self.virtualBoxMenuItem.connect( "activate", self.onVirtualBox )
+        menu.append( self.virtualBoxMenuItem )
 
         refreshMenuItem = gtk.MenuItem( "Refresh" )
         refreshMenuItem.connect( "activate", self.onRefresh )
@@ -156,7 +156,7 @@ class IndicatorVirtualBox:
         else:
             menu = self.menu
 
-        menu.hide() # Safety - hide the menu whilst it is being rebuilt.
+        menu.popdown() # If we don't do this we get GTK complaints.
 
         # Remove all VMs from the menu.
         for item in menu.get_children():
@@ -188,7 +188,7 @@ class IndicatorVirtualBox:
             menu.insert( gtk.MenuItem( "(VirtualBox is not installed)" ), position )
             position += 1
 
-        self.frontEndMenuItem.set_sensitive( self.isVirtualBoxInstalled( ) )
+        self.virtualBoxMenuItem.set_sensitive( self.isVirtualBoxInstalled( ) )
 
         menu.show_all()
 
@@ -206,7 +206,7 @@ class IndicatorVirtualBox:
 
             # Create a hash entry:
             #  key is the virtual machine name.
-            #  value is the virutal machine ID and a boolean indicating the running status (false for now).
+            #  value is the virtual machine ID and a boolean indicating the running status (false for now).
             self.virtualMachineInfos[ info[ 0 ] ] = [ info[ 1 ], False ]
 
         p.wait()
@@ -246,7 +246,7 @@ class IndicatorVirtualBox:
         gobject.idle_add( self.updateMenu )
 
 
-    def onFrontEnd( self, widget ):
+    def onVirtualBox( self, widget ):
         subprocess.Popen( "VirtualBox &", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
 
 
