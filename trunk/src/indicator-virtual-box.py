@@ -49,7 +49,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.6"
+    VERSION = "1.0.7"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
@@ -61,6 +61,7 @@ class IndicatorVirtualBox:
     SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE = "menuTextVirtualMachineNotRunningBefore"
     SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER = "menuTextVirtualMachineNotRunningAfter"
     SETTINGS_SORT_DEFAULT = "sortDefault"
+    SETTINGS_USE_RADIO_INDICATOR = "useRadioIndicator"
 
 
     def __init__( self ):
@@ -175,8 +176,13 @@ class IndicatorVirtualBox:
             else:
                 for virtualMachineName in self.virtualMachineNames:
                     virtualMachineInfo = self.virtualMachineInfos[ virtualMachineName ]
-                    if virtualMachineInfo[ 1 ] == True:
-                        vmMenuItem = gtk.MenuItem( self.menuTextVirtualMachineRunningBefore + virtualMachineName + self.menuTextVirtualMachineRunningAfter )
+                    if virtualMachineInfo[ 1 ] == True: # VM is running...
+                        if self.useRadioIndicator == True:
+                            # For backward compatibility allow the user choose the radio indicator AND menu text.
+                            vmMenuItem = gtk.RadioMenuItem( None, self.menuTextVirtualMachineRunningBefore + virtualMachineName + self.menuTextVirtualMachineRunningAfter, False )
+                            vmMenuItem.set_active( True )
+                        else:
+                            vmMenuItem = gtk.MenuItem( self.menuTextVirtualMachineRunningBefore + virtualMachineName + self.menuTextVirtualMachineRunningAfter )
                     else:
                         vmMenuItem = gtk.MenuItem( self.menuTextVirtualMachineNotRunningBefore + virtualMachineName + self.menuTextVirtualMachineNotRunningAfter )
 
@@ -304,6 +310,10 @@ class IndicatorVirtualBox:
         textNotRunningAfter.set_text( self.menuTextVirtualMachineNotRunningAfter )
         table.attach( textNotRunningAfter, 1, 2, 3, 4 )
 
+        checkbox = gtk.CheckButton( "Use \"radio\" indicator for running VMs" )
+        checkbox.set_active( self.useRadioIndicator )
+        table.attach( checkbox, 0, 2, 4, 5 )
+
         dialog.vbox.pack_start( table, True, True, 10 )
         dialog.set_border_width( 10 )
 
@@ -314,6 +324,7 @@ class IndicatorVirtualBox:
             self.menuTextVirtualMachineRunningAfter = textRunningAfter.get_text()
             self.menuTextVirtualMachineNotRunningBefore = textNotRunningBefore.get_text()
             self.menuTextVirtualMachineNotRunningAfter = textNotRunningAfter.get_text()
+            self.useRadioIndicator = checkbox.get_active()
 
             self.saveSettings()
             self.onRefresh( widget )
@@ -361,11 +372,12 @@ class IndicatorVirtualBox:
 
 
     def loadSettings( self ):
-        self.sortDefault = True
-        self.menuTextVirtualMachineRunningBefore = "--- "
-        self.menuTextVirtualMachineRunningAfter = " ---"
+        self.menuTextVirtualMachineRunningBefore = ""
+        self.menuTextVirtualMachineRunningAfter = ""
         self.menuTextVirtualMachineNotRunningBefore = ""
         self.menuTextVirtualMachineNotRunningAfter = ""
+        self.sortDefault = True
+        self.useRadioIndicator = True
 
         if os.path.isfile( IndicatorVirtualBox.SETTINGS_FILE ):
             try:
@@ -377,6 +389,7 @@ class IndicatorVirtualBox:
                 self.menuTextVirtualMachineNotRunningBefore = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE, self.menuTextVirtualMachineNotRunningBefore )
                 self.menuTextVirtualMachineNotRunningAfter = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER, self.menuTextVirtualMachineNotRunningAfter )
                 self.sortDefault = settings.get( IndicatorVirtualBox.SETTINGS_SORT_DEFAULT, self.sortDefault )
+                self.useRadioIndicator = settings.get( IndicatorVirtualBox.SETTINGS_USE_RADIO_INDICATOR, self.useRadioIndicator )
 
             except Exception as e:
                 logging.exception( e )
@@ -390,7 +403,8 @@ class IndicatorVirtualBox:
                 IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_AFTER: self.menuTextVirtualMachineRunningAfter,
                 IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE: self.menuTextVirtualMachineNotRunningBefore,
                 IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER: self.menuTextVirtualMachineNotRunningAfter,
-                IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault
+                IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault,
+                IndicatorVirtualBox.SETTINGS_USE_RADIO_INDICATOR: self.useRadioIndicator
             }
 
             with open( IndicatorVirtualBox.SETTINGS_FILE, 'w' ) as f:

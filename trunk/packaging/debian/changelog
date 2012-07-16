@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.7-1) precise; urgency=low
+
+  * Added option to use the "radio" indicator to flag running VMs.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 16 Jul 2012 14:36:10 +1000
+
+
 indicator-virtual-box (1.0.6-1) precise; urgency=low
 
   * Hide the menu during refresh (using popdown). 
