@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Lunar Indicator
+Comment=Lunar indicator applet
+Exec=/usr/share/indicator-lunar/indicator-lunar.py
+Terminal=false
+StartupNotify=true
+Type=Application
+Categories=Utility;
+Icon=indicator-lunar

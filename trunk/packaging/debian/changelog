@@ -1,0 +1,27 @@
+indicator-lunar (1.0.3-1) precise; urgency=low
+
+  * Added distance from earth/sun and constellation information to the menu.
+  * Updated main icon to be a crescent.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 24 Jul 2012 9:55:08 +1000
+
+
+indicator-lunar (1.0.2-1) precise; urgency=low
+
+  * Added a generic icon to appear in the menu and unity search.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 24 Jul 2012 8:05:18 +1000
+
+
+indicator-lunar (1.0.1-1) precise; urgency=low
+
+  * Changed update rate to be hourly.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Jul 2012 23:20:57 +1000
+
+
+indicator-lunar (1.0.0-1) precise; urgency=low
+
+  * First release.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Jul 2012 20:50:17 +1000
