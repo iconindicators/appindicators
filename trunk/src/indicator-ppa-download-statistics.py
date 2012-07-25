@@ -24,10 +24,6 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.04/c/appindicator/index.html
 
 
-#Note: In Lubuntu, when hovering over edit/remove (or their respective submenus) during a menu rebuild, the following warning occurs:
-# GtkWarning: IA__gtk_widget_event: assertion `WIDGET_REALIZED_FOR_EVENT (widget, event)' failed
-
-
 appindicatorImported = True
 try:
     import appindicator
@@ -53,7 +49,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.3"
+    VERSION = "1.0.4"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
     DESKTOP_PATH = "/usr/share/applications/" + NAME + ".desktop"
@@ -461,14 +457,8 @@ class IndicatorPPADownloadStatistics:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
         else:
-            # No properties file exists, so populate with sample PPAs to give the user an idea of the format.
-            ppaList = [ "thebernmeister", "indicator-ppa-download-statistics", "precise", "i386" ]
-            self.ppas[ self.getPPAKey( ppaList ) ] = ppaList
-
-            ppaList = [ "thebernmeister", "indicator-stardate", "precise", "i386" ]
-            self.ppas[ self.getPPAKey( ppaList ) ] = ppaList
-
-            ppaList = [ "thebernmeister", "indicator-virtual-box", "precise", "i386" ]
+            # No properties file exists, so populate with a sample PPA to give the user an idea of the format.
+            ppaList = [ "thebernmeister", "ppa", "precise", "i386" ]
             self.ppas[ self.getPPAKey( ppaList ) ] = ppaList
 
 

@@ -1,3 +1,12 @@
+indicator-ppa-download-statistics (1.0.4-1) precise; urgency=low
+
+  * Changed the sample PPA to reflect the new single PPA.
+  * The GtkWarning 'IA__gtk_widget_event' no longer appears (fixed from previous release).
+  * Changed the build process to use a single PPA.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 25 Jul 2012 20:57:13 +1000
+
+
 indicator-ppa-download-statistics (1.0.3-1) precise; urgency=low
 
   * Hide the menu during refresh (using popdown).
