@@ -21,44 +21,44 @@
 # http://www.debian-administration.org/articles/336
 
 
-BUILD="build"
+BUILD_DIR="build"
 NAME="indicator-stardate"
-VERSION=1.0.5
+VERSION=1.0.6
 
-rm -rf $BUILD
+rm -rf $BUILD_DIR
 
-mkdir -p $BUILD/$NAME-$VERSION
-cp $NAME.desktop $BUILD/$NAME-$VERSION
-cp build-debian $BUILD/$NAME-$VERSION
+mkdir -p $BUILD_DIR/$NAME-$VERSION
+cp $NAME.desktop $BUILD_DIR/$NAME-$VERSION
+cp build-debian $BUILD_DIR/$NAME-$VERSION
 
-mkdir -p $BUILD/$NAME-$VERSION/src
-cp src/example.py src/indicator-stardate.py src/stardate.py $BUILD/$NAME-$VERSION/src
+mkdir -p $BUILD_DIR/$NAME-$VERSION/src
+cp src/example.py src/indicator-stardate.py src/stardate.py $BUILD_DIR/$NAME-$VERSION/src
 
-mkdir -p $BUILD/$NAME-$VERSION/icons/elementary
-cp icons/indicator-stardate-elementary.svg $BUILD/$NAME-$VERSION/icons/elementary/indicator-stardate.svg
+mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/elementary
+cp icons/indicator-stardate-elementary.svg $BUILD_DIR/$NAME-$VERSION/icons/elementary/indicator-stardate.svg
 
-mkdir -p $BUILD/$NAME-$VERSION/icons/hicolor
-cp icons/indicator-stardate-hicolor.svg $BUILD/$NAME-$VERSION/icons/hicolor/indicator-stardate.svg
+mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/hicolor
+cp icons/indicator-stardate-hicolor.svg $BUILD_DIR/$NAME-$VERSION/icons/hicolor/indicator-stardate.svg
 
-mkdir -p $BUILD/$NAME-$VERSION/icons/lubuntu
-cp icons/indicator-stardate-lubuntu.svg $BUILD/$NAME-$VERSION/icons/lubuntu/indicator-stardate.svg
+mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/lubuntu
+cp icons/indicator-stardate-lubuntu.svg $BUILD_DIR/$NAME-$VERSION/icons/lubuntu/indicator-stardate.svg
 
-mkdir -p $BUILD/$NAME-$VERSION/icons/ubuntu-mono-dark
-cp icons/indicator-stardate-ubuntu-mono-dark.svg $BUILD/$NAME-$VERSION/icons/ubuntu-mono-dark/indicator-stardate.svg
+mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-dark
+cp icons/indicator-stardate-ubuntu-mono-dark.svg $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-dark/indicator-stardate.svg
 
-mkdir -p $BUILD/$NAME-$VERSION/icons/ubuntu-mono-light
-cp icons/indicator-stardate-ubuntu-mono-light.svg $BUILD/$NAME-$VERSION/icons/ubuntu-mono-light/indicator-stardate.svg
+mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-light
+cp icons/indicator-stardate-ubuntu-mono-light.svg $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-light/indicator-stardate.svg
 
-cd $BUILD
+cd $BUILD_DIR
 tar -czf "${NAME}_${VERSION}.orig.tar.gz" $NAME-$VERSION
 cd ..
 
-mkdir -p $BUILD/$NAME-$VERSION/debian
-cp -r packaging/debian $BUILD/$NAME-$VERSION
+mkdir -p $BUILD_DIR/$NAME-$VERSION/debian
+cp -r packaging/debian $BUILD_DIR/$NAME-$VERSION
 
-cd $BUILD/$NAME-$VERSION
+cd $BUILD_DIR/$NAME-$VERSION
 debuild -S -sa 
 cd ..
 rm -rf $NAME-$VERSION
 
-echo "Now run from the build directory: dput ppa:thebernmeister/${NAME} ${NAME}_${VERSION}-1_source.changes"
+echo "Now run from the build directory: dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes"

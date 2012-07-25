@@ -1,3 +1,10 @@
+indicator-stardate (1.0.6-1) precise; urgency=low
+
+  * Changed the build process to use a single PPA.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 25 Jul 2012 21:03:17 +1000
+
+
 indicator-stardate (1.0.5-1) precise; urgency=low
 
   * Now included example.py in the release to demonstrate the use of the stardate API.
