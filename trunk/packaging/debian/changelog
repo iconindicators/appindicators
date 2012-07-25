@@ -1,3 +1,10 @@
+indicator-lunar (1.0.4-1) precise; urgency=low
+
+  * Changed the build process to use a single PPA.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 25 Jul 2012 20:50:52 +1000
+
+
 indicator-lunar (1.0.3-1) precise; urgency=low
 
   * Added distance from earth/sun and constellation information to the menu.
