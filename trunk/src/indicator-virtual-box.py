@@ -49,7 +49,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.7"
+    VERSION = "1.0.8"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"

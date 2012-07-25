@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.8-1) precise; urgency=low
+
+  * Changed the build process to use a single PPA.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 25 Jul 2012 21:05:21 +1000
+
+
 indicator-virtual-box (1.0.7-1) precise; urgency=low
 
   * Added option to use the "radio" indicator to flag running VMs.
