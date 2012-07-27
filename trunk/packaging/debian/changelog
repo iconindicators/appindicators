@@ -1,3 +1,14 @@
+indicator-virtual-box (1.0.9-1) precise; urgency=low
+
+  * On selecting a VM which is already running, the VM window is brough to the
+    front (using wmctrl).
+  * Removed the refresh menu item.  The list of VMs in the menu are now
+    automatically refreshed every 15 minutes.
+  * Fixed an issue where the indicator believes a VM is running but is in fact not.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 27 Jul 2012 11:27:33 +1000
+
+
 indicator-virtual-box (1.0.8-1) precise; urgency=low
 
   * Changed the build process to use a single PPA.

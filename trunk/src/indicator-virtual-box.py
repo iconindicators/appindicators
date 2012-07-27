@@ -49,7 +49,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.8"
+    VERSION = "1.0.9"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
@@ -94,6 +94,7 @@ class IndicatorVirtualBox:
 
     def main( self ):
         self.updateMenu()
+        gobject.timeout_add_seconds( 60 * 15, self.onRefresh ) # Auto update every 15 minutes.
         gtk.main()
 
 
@@ -105,10 +106,6 @@ class IndicatorVirtualBox:
         self.virtualBoxMenuItem = gtk.MenuItem( "VirtualBox" )
         self.virtualBoxMenuItem.connect( "activate", self.onVirtualBox )
         menu.append( self.virtualBoxMenuItem )
-
-        refreshMenuItem = gtk.MenuItem( "Refresh" )
-        refreshMenuItem.connect( "activate", self.onRefresh )
-        menu.append( refreshMenuItem )
 
         menuTextMenuItem = gtk.MenuItem( "Set menu text" )
         menuTextMenuItem.connect( "activate", self.onMenuText )
@@ -239,17 +236,18 @@ class IndicatorVirtualBox:
     def onSortDefault( self, widget ):
         self.sortDefault = True
         self.saveSettings()
-        self.onRefresh( widget )
+        self.onRefresh()
 
 
     def onSortAlphabetically( self, widget ):
         self.sortDefault = False
         self.saveSettings()
-        self.onRefresh( widget )
+        self.onRefresh()
 
 
-    def onRefresh( self, widget ):
+    def onRefresh( self ):
         gobject.idle_add( self.updateMenu )
+        return True # Must return true so that we continue to be called (http://www.pygtk.org/pygtk2reference/gobject-functions.html#function-gobject--timeout-add).
 
 
     def onVirtualBox( self, widget ):
@@ -258,14 +256,25 @@ class IndicatorVirtualBox:
 
     def onStartVirtualMachine( self, widget ):
         virtualMachineName = widget.props.name
+        self.getVirtualMachines()
         if self.virtualMachineInfos.get( virtualMachineName )[ 1 ] == True:
-            self.showMessage( gtk.MESSAGE_WARNING, IndicatorVirtualBox.NAME, "\'" + virtualMachineName + "\' is already running!" )
+            windowID = None
+            p = subprocess.Popen( "wmctrl -l", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+            for line in p.stdout.readlines():
+                if virtualMachineName in line:
+                    windowID = line[ 0 : line.find( " " ) ]
+    
+            p.wait()
+
+            if windowID is not None:
+                p = subprocess.Popen( "wmctrl -i -a " + windowID, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+                p.wait()
         else:
             command = "VBoxManage startvm " + self.virtualMachineInfos.get( virtualMachineName )[ 0 ]
             p = subprocess.Popen( command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
             p.wait()
 
-        self.onRefresh( widget )
+        self.onRefresh()
 
 
     def onMenuText( self, widget ):
@@ -327,7 +336,7 @@ class IndicatorVirtualBox:
             self.useRadioIndicator = checkbox.get_active()
 
             self.saveSettings()
-            self.onRefresh( widget )
+            self.onRefresh()
 
         dialog.destroy()
         self.dialog = None
