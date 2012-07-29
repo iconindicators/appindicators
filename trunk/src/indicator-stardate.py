@@ -39,7 +39,7 @@ class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.6"
+    VERSION = "1.0.7"
     ICON = "indicator-stardate"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
@@ -119,7 +119,7 @@ class IndicatorStardate:
         dialog.set_version( IndicatorStardate.VERSION )
         dialog.set_comments( IndicatorStardate.AUTHOR )
         dialog.set_license( "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0" )
-        dialog.set_website( "https://launchpad.net/~thebernmeister/+archive/indicator-stardate" )
+        dialog.set_website( "https://launchpad.net/~thebernmeister" )
         dialog.run()
         dialog.destroy()
 
