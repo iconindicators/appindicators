@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.5-1) precise; urgency=low
+
+  * Fixed the PPA URL in the About dialog.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 27 Jul 2012 23:14:06 +1000
+
+
 indicator-ppa-download-statistics (1.0.4-1) precise; urgency=low
 
   * Changed the sample PPA to reflect the new single PPA.

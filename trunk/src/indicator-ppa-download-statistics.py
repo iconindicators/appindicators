@@ -49,7 +49,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.4"
+    VERSION = "1.0.5"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
     DESKTOP_PATH = "/usr/share/applications/" + NAME + ".desktop"
@@ -263,7 +263,7 @@ class IndicatorPPADownloadStatistics:
         self.dialog.set_version( IndicatorPPADownloadStatistics.VERSION )
         self.dialog.set_comments( IndicatorPPADownloadStatistics.AUTHOR )
         self.dialog.set_license( "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0" )
-        self.dialog.set_website( "https://launchpad.net/~thebernmeister/+archive/indicator-ppa-download-statistics" )
+        self.dialog.set_website( "https://launchpad.net/~thebernmeister" )
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
