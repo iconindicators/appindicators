@@ -49,7 +49,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.9"
+    VERSION = "1.0.10"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
@@ -60,6 +60,7 @@ class IndicatorVirtualBox:
     SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_AFTER = "menuTextVirtualMachineRunningAfter"
     SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE = "menuTextVirtualMachineNotRunningBefore"
     SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER = "menuTextVirtualMachineNotRunningAfter"
+    SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     SETTINGS_SORT_DEFAULT = "sortDefault"
     SETTINGS_USE_RADIO_INDICATOR = "useRadioIndicator"
 
@@ -94,7 +95,7 @@ class IndicatorVirtualBox:
 
     def main( self ):
         self.updateMenu()
-        gobject.timeout_add_seconds( 60 * 15, self.onRefresh ) # Auto update every 15 minutes.
+        self.timeoutID = gobject.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
         gtk.main()
 
 
@@ -103,34 +104,13 @@ class IndicatorVirtualBox:
 
         menu.append( gtk.SeparatorMenuItem() )
 
-        self.virtualBoxMenuItem = gtk.MenuItem( "VirtualBox" )
-        self.virtualBoxMenuItem.connect( "activate", self.onVirtualBox )
+        self.virtualBoxMenuItem = gtk.MenuItem( "Launch VirtualBox" )
+        self.virtualBoxMenuItem.connect( "activate", self.onLaunchVirtualBox )
         menu.append( self.virtualBoxMenuItem )
 
-        menuTextMenuItem = gtk.MenuItem( "Set menu text" )
-        menuTextMenuItem.connect( "activate", self.onMenuText )
-        menu.append( menuTextMenuItem )
-
-        sortMenuItem = gtk.MenuItem( "Sort" )
-        menu.append( sortMenuItem )
-
-        subMenu = gtk.Menu()
-        sortMenuItem.set_submenu( subMenu )
-
-        sortDefaultMenuItem = gtk.RadioMenuItem( None, "Default", False )
-        sortDefaultMenuItem.set_active( self.sortDefault )
-        sortDefaultMenuItem.connect( "activate", self.onSortDefault )
-        subMenu.append( sortDefaultMenuItem )
-
-        sortAlphabeticallyMenuItem = gtk.RadioMenuItem( sortDefaultMenuItem, "Alphabetically", False )
-        sortAlphabeticallyMenuItem.set_active( not self.sortDefault )
-        sortAlphabeticallyMenuItem.connect( "activate", self.onSortAlphabetically )
-        subMenu.append( sortAlphabeticallyMenuItem )
-
-        autoStartMenuItem = gtk.CheckMenuItem( "Autostart" )
-        autoStartMenuItem.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ) )
-        autoStartMenuItem.connect( "activate", self.onAutoStart )
-        menu.append( autoStartMenuItem )
+        preferencesMenuItem = gtk.MenuItem( "Preferences" )
+        preferencesMenuItem.connect( "activate", self.onPreferences )
+        menu.append( preferencesMenuItem )
 
         aboutMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_ABOUT )
         aboutMenuItem.connect( "activate", self.onAbout )
@@ -197,24 +177,28 @@ class IndicatorVirtualBox:
 
 
     def getVirtualMachines( self ):
-        self.virtualMachineNames = []
-        self.virtualMachineInfos = {}
+        self.virtualMachineNames = [] # Order is that given by the VirtualBox UI.
+        self.virtualMachineInfos = {} # 'key' is the virtual machine name; 'value' is the virtual machine uuid and a boolean indicating the running status.
 
-        # Get a list of all virtual machines...
+        # Get the VM uuids and ordering from the VirtualBox UI...
+        p = subprocess.Popen( "grep GUI/SelectorVMPositions $HOME/.VirtualBox/VirtualBox.xml", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+        virtualMachineUUIDsSorted = list( p.communicate()[ 0 ].rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
+
+        # Get the VM names and uuids...
         p = subprocess.Popen( "VBoxManage list vms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+        uuidToName = {} # Used to map uuid to name.
         for line in p.stdout.readlines():
             info = line[ 1 : -2 ].split( "\" {" )
-
-            self.virtualMachineNames.append( info[ 0 ] )
-
-            # Create a hash entry:
-            #  key is the virtual machine name.
-            #  value is the virtual machine ID and a boolean indicating the running status (false for now).
             self.virtualMachineInfos[ info[ 0 ] ] = [ info[ 1 ], False ]
+            uuidToName[ info[ 1 ] ] = info[ 0 ]
 
         p.wait()
 
-        # Get a list of running virtual machines and adjust our information...
+        # Build a list of VM names, sorted by VirtualBox UI order.
+        for virtualMachineUUID in virtualMachineUUIDsSorted:
+            self.virtualMachineNames.append( uuidToName[ virtualMachineUUID ] )
+
+        # Determine which VMs are running.
         p = subprocess.Popen( "VBoxManage list runningvms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
         for line in p.stdout.readlines():
             info = line[ 1 : -2 ].split( "\" {" )
@@ -233,24 +217,12 @@ class IndicatorVirtualBox:
         return p.communicate()[ 0 ] != ''
 
 
-    def onSortDefault( self, widget ):
-        self.sortDefault = True
-        self.saveSettings()
-        self.onRefresh()
-
-
-    def onSortAlphabetically( self, widget ):
-        self.sortDefault = False
-        self.saveSettings()
-        self.onRefresh()
-
-
     def onRefresh( self ):
         gobject.idle_add( self.updateMenu )
         return True # Must return true so that we continue to be called (http://www.pygtk.org/pygtk2reference/gobject-functions.html#function-gobject--timeout-add).
 
 
-    def onVirtualBox( self, widget ):
+    def onLaunchVirtualBox( self, widget ):
         subprocess.Popen( "VirtualBox &", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
 
 
@@ -277,76 +249,115 @@ class IndicatorVirtualBox:
         self.onRefresh()
 
 
-    def onMenuText( self, widget ):
+    def onPreferences( self, widget ):
         if self.dialog is not None:
             return
 
-        dialog = gtk.Dialog( "Set Menu Text", None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+        self.dialog = gtk.Dialog( "Preferences", None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
 
-        table = gtk.Table( 4, 2, False )
+        table = gtk.Table( 13, 2, False )
         table.set_col_spacings( 5 )
         table.set_row_spacings( 5 )
 
-        label = gtk.Label( "Text before (VM running)" )
+        label = gtk.Label( "VM running:" )
         label.set_alignment( 0, 0.5 )
         table.attach( label, 0, 1, 0, 1 )
 
-        textRunningBefore = gtk.Entry()
-        textRunningBefore.set_text( self.menuTextVirtualMachineRunningBefore )
-        table.attach( textRunningBefore, 1, 2, 0, 1 )
-
-        label = gtk.Label( "Text after (VM running)" )
+        label = gtk.Label( "  Text before" )
         label.set_alignment( 0, 0.5 )
         table.attach( label, 0, 1, 1, 2 )
 
-        textRunningAfter = gtk.Entry()
-        textRunningAfter.set_text( self.menuTextVirtualMachineRunningAfter )
-        table.attach( textRunningAfter, 1, 2, 1, 2 )
+        textRunningBefore = gtk.Entry()
+        textRunningBefore.set_text( self.menuTextVirtualMachineRunningBefore )
+        table.attach( textRunningBefore, 1, 2, 1, 2 )
 
-        label = gtk.Label( "Text before (VM not running)" )
+        label = gtk.Label( "  Text after" )
         label.set_alignment( 0, 0.5 )
         table.attach( label, 0, 1, 2, 3 )
 
+        textRunningAfter = gtk.Entry()
+        textRunningAfter.set_text( self.menuTextVirtualMachineRunningAfter )
+        table.attach( textRunningAfter, 1, 2, 2, 3 )
+
+        table.attach( gtk.Label( "" ), 0, 2, 3, 4 ) # Couldn't figure out how to put in an empty line or padding!
+
+        label = gtk.Label( "VM not running:" )
+        label.set_alignment( 0, 0.5 )
+        table.attach( label, 0, 1, 4, 5 )
+
+        label = gtk.Label( "  Text before" )
+        label.set_alignment( 0, 0.5 )
+        table.attach( label, 0, 1, 5, 6 )
+
         textNotRunningBefore = gtk.Entry()
         textNotRunningBefore.set_text( self.menuTextVirtualMachineNotRunningBefore )
-        table.attach( textNotRunningBefore, 1, 2, 2, 3 )
+        table.attach( textNotRunningBefore, 1, 2, 5, 6 )
 
-        label = gtk.Label( "Text after (VM not running)" )
+        label = gtk.Label( "  Text after" )
         label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 3, 4 )
+        table.attach( label, 0, 1, 6, 7 )
 
         textNotRunningAfter = gtk.Entry()
         textNotRunningAfter.set_text( self.menuTextVirtualMachineNotRunningAfter )
-        table.attach( textNotRunningAfter, 1, 2, 3, 4 )
+        table.attach( textNotRunningAfter, 1, 2, 6, 7 )
 
-        checkbox = gtk.CheckButton( "Use \"radio\" indicator for running VMs" )
-        checkbox.set_active( self.useRadioIndicator )
-        table.attach( checkbox, 0, 2, 4, 5 )
+        table.attach( gtk.Label( "" ), 0, 2, 7, 8 ) # Couldn't figure out how to put in an empty line or padding!
 
-        dialog.vbox.pack_start( table, True, True, 10 )
-        dialog.set_border_width( 10 )
+        label = gtk.Label( "Refresh interval (minutes)" )
+        label.set_alignment( 0, 0.5 )
+        table.attach( label, 0, 1, 8, 9 )
 
-        dialog.show_all()
-        response = dialog.run()
+        spinner = gtk.SpinButton( gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) )
+        spinner.set_tooltip_text( "How often the list of VMs and their running status is automatically updated" )
+        table.attach( spinner, 1, 2, 8, 9 )
+
+        table.attach( gtk.Label( "" ), 0, 2, 9, 10 ) # Couldn't figure out how to put in an empty line or padding!
+
+        useRadioCheckbox = gtk.CheckButton( "Use a \"radio button\" to indicate a running VM" )
+        useRadioCheckbox.set_active( self.useRadioIndicator )
+        table.attach( useRadioCheckbox, 0, 2, 10, 11 )
+
+        sortAlphabeticallyCheckbox = gtk.CheckButton( "Sort VMs alphabetically" )
+        sortAlphabeticallyCheckbox.set_tooltip_text( "Unchecked will sort as per VirtualBox UI" )
+        sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
+        table.attach( sortAlphabeticallyCheckbox, 0, 2, 11, 12 )
+
+        autostartCheckbox = gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ) )
+        table.attach( autostartCheckbox, 0, 2, 12, 13 )
+
+        self.dialog.vbox.pack_start( table, True, True, 10 )
+        self.dialog.set_border_width( 10 )
+
+        self.dialog.show_all()
+        response = self.dialog.run()
         if response == gtk.RESPONSE_OK:
             self.menuTextVirtualMachineRunningBefore = textRunningBefore.get_text()
             self.menuTextVirtualMachineRunningAfter = textRunningAfter.get_text()
             self.menuTextVirtualMachineNotRunningBefore = textNotRunningBefore.get_text()
             self.menuTextVirtualMachineNotRunningAfter = textNotRunningAfter.get_text()
-            self.useRadioIndicator = checkbox.get_active()
+            self.useRadioIndicator = useRadioCheckbox.get_active()
+            self.sortDefault = not sortAlphabeticallyCheckbox.get_active()
+
+            self.refreshIntervalInMinutes = spinner.get_value_as_int()
+            gobject.source_remove( self.timeoutID )
+            self.timeoutID = gobject.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
 
             self.saveSettings()
-            self.onRefresh()
 
-        dialog.destroy()
+            if autostartCheckbox.get_active():
+                try:
+                    shutil.copy( IndicatorVirtualBox.DESKTOP_PATH, IndicatorVirtualBox.AUTOSTART_PATH )
+                except Exception as e:
+                    logging.exception( e )
+            else:
+                try:
+                    os.remove( IndicatorVirtualBox.AUTOSTART_PATH )
+                except: pass
+
+        self.dialog.destroy()
         self.dialog = None
-
-
-    def showMessage( self, messageType, title, message ):
-        dialog = gtk.MessageDialog( None, 0, messageType, gtk.BUTTONS_OK, message )
-        dialog.set_title( title )
-        dialog.run()
-        dialog.destroy()
+        self.onRefresh()
 
 
     def onAbout( self, widget ):
@@ -355,21 +366,10 @@ class IndicatorVirtualBox:
         dialog.set_version( IndicatorVirtualBox.VERSION )
         dialog.set_comments( IndicatorVirtualBox.AUTHOR )
         dialog.set_license( "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0" )
-        dialog.set_website( "https://launchpad.net/~thebernmeister/+archive/indicator-virtual-box" )
+        dialog.set_website( "https://launchpad.net/~thebernmeister" )
         dialog.run()
         dialog.destroy()
-
-
-    def onAutoStart( self, widget ):
-        if widget.active:
-            try:
-                shutil.copy( IndicatorVirtualBox.DESKTOP_PATH, IndicatorVirtualBox.AUTOSTART_PATH )
-            except Exception as e:
-                logging.exception( e )
-        else:
-            try:
-                os.remove( IndicatorVirtualBox.AUTOSTART_PATH )
-            except: pass
+        dialog = None
 
 
     def handleLeftClick( self, icon ):
@@ -385,6 +385,7 @@ class IndicatorVirtualBox:
         self.menuTextVirtualMachineRunningAfter = ""
         self.menuTextVirtualMachineNotRunningBefore = ""
         self.menuTextVirtualMachineNotRunningAfter = ""
+        self.refreshIntervalInMinutes = 15
         self.sortDefault = True
         self.useRadioIndicator = True
 
@@ -397,6 +398,7 @@ class IndicatorVirtualBox:
                 self.menuTextVirtualMachineRunningAfter = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_AFTER, self.menuTextVirtualMachineRunningAfter )
                 self.menuTextVirtualMachineNotRunningBefore = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE, self.menuTextVirtualMachineNotRunningBefore )
                 self.menuTextVirtualMachineNotRunningAfter = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER, self.menuTextVirtualMachineNotRunningAfter )
+                self.refreshIntervalInMinutes = settings.get( IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
                 self.sortDefault = settings.get( IndicatorVirtualBox.SETTINGS_SORT_DEFAULT, self.sortDefault )
                 self.useRadioIndicator = settings.get( IndicatorVirtualBox.SETTINGS_USE_RADIO_INDICATOR, self.useRadioIndicator )
 
@@ -412,6 +414,7 @@ class IndicatorVirtualBox:
                 IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_AFTER: self.menuTextVirtualMachineRunningAfter,
                 IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE: self.menuTextVirtualMachineNotRunningBefore,
                 IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER: self.menuTextVirtualMachineNotRunningAfter,
+                IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
                 IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault,
                 IndicatorVirtualBox.SETTINGS_USE_RADIO_INDICATOR: self.useRadioIndicator
             }

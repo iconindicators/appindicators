@@ -1,6 +1,20 @@
+indicator-virtual-box (1.0.10-1) precise; urgency=low
+
+  * Fixed the PPA URL in the About dialog.
+  * Consolidated all options into a preferences dialog.
+  * Default sort now matches that given by the VirtualBox UI (rather than VBoxManage).
+  * The update of the running status of the VMs in the menu is now configurable 
+    between 1 and 60 minutes.  Note that an update also occurs each time a VM
+    is started and when the preferences dialog is ok'd/cancelled.
+  * Big thanks to Pascal De Vuyst (https://launchpad.net/~pascal-devuyst) for
+    suggestions/patches for preferences and sorting!
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 27 Jul 2012 23:16:31 +1000
+
+
 indicator-virtual-box (1.0.9-1) precise; urgency=low
 
-  * On selecting a VM which is already running, the VM window is brough to the
+  * On selecting a VM which is already running, the VM window is brought to the
     front (using wmctrl).
   * Removed the refresh menu item.  The list of VMs in the menu are now
     automatically refreshed every 15 minutes.
