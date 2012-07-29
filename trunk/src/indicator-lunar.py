@@ -45,7 +45,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.4"
+    VERSION = "1.0.5"
     ICON = "indicator-lunar"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
@@ -92,6 +92,7 @@ class IndicatorLunar:
     def __init__( self ):
         logging.basicConfig( file = sys.stderr, level = logging.INFO )
         self.loadSettings()
+        self.dialog = None
 
         if pynotifyImported == True:
             pynotify.init( IndicatorLunar.NAME )
@@ -228,30 +229,9 @@ class IndicatorLunar:
 
         self.menu.append( gtk.SeparatorMenuItem() )
 
-        showPhaseMenuItem = gtk.CheckMenuItem( "Show phase" )
-        showPhaseMenuItem.set_active( self.showPhase )
-        showPhaseMenuItem.connect( "activate", self.onShowPhase )
-        self.menu.append( showPhaseMenuItem )
-
-        showIlluminationMenuItem = gtk.CheckMenuItem( "Show illumination" )
-        showIlluminationMenuItem.set_active( self.showIllumination )
-        showIlluminationMenuItem.connect( "activate", self.onShowIllumination )
-        self.menu.append( showIlluminationMenuItem )
-
-        showNorthernHemisphereViewMenuItem = gtk.CheckMenuItem( "Northern hemisphere view" )
-        showNorthernHemisphereViewMenuItem.set_active( self.showNorthernHemisphereView )
-        showNorthernHemisphereViewMenuItem.connect( "activate", self.onShowNorthernHemisphereView )
-        self.menu.append( showNorthernHemisphereViewMenuItem )
-
-        showHourlyWerewolfWarningMenuItem = gtk.CheckMenuItem( "Hourly werewolf warning" )
-        showHourlyWerewolfWarningMenuItem.set_active( self.showHourlyWerewolfWarning )
-        showHourlyWerewolfWarningMenuItem.connect( "activate", self.onShowHourlyWerewolfWarning )
-        self.menu.append( showHourlyWerewolfWarningMenuItem )
-
-        autoStartMenuItem = gtk.CheckMenuItem( "Autostart" )
-        autoStartMenuItem.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH ) )
-        autoStartMenuItem.connect( "activate", self.onAutoStart )
-        self.menu.append( autoStartMenuItem )
+        preferencesMenuItem = gtk.MenuItem( "Preferences" )
+        preferencesMenuItem.connect( "activate", self.onPreferences )
+        self.menu.append( preferencesMenuItem )
 
         aboutMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_ABOUT )
         aboutMenuItem.connect( "activate", self.onAbout )
@@ -278,45 +258,67 @@ class IndicatorLunar:
         dialog.set_version( IndicatorLunar.VERSION )
         dialog.set_comments( IndicatorLunar.AUTHOR + "\n\n" + "Calculations courtesy of PyEphem." )
         dialog.set_license( "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0" )
-        dialog.set_website( "https://launchpad.net/~thebernmeister/+archive/indicator-lunar" )
+        dialog.set_website( "https://launchpad.net/~thebernmeister" )
         dialog.run()
         dialog.destroy()
 
 
-    def onShowHourlyWerewolfWarning( self, widget ):
-        self.showHourlyWerewolfWarning = widget.active
-        self.saveSettings()
+    def onPreferences( self, widget ):
+        if self.dialog is not None:
+            return
+
+        self.dialog = gtk.Dialog( "Preferences", None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+
+        table = gtk.Table( 5, 1, False )
+        table.set_col_spacings( 5 )
+        table.set_row_spacings( 5 )
+
+        showPhaseCheckbox = gtk.CheckButton( "Show phase" )
+        showPhaseCheckbox.set_active( self.showPhase )
+        table.attach( showPhaseCheckbox, 0, 1, 0, 1 )
+
+        showIlluminationCheckbox = gtk.CheckButton( "Show illumination" )
+        showIlluminationCheckbox.set_active( self.showIllumination )
+        table.attach( showIlluminationCheckbox, 0, 1, 1, 2 )
+
+        showNorthernHemisphereViewCheckbox = gtk.CheckButton( "Northern hemisphere view" )
+        showNorthernHemisphereViewCheckbox.set_active( self.showNorthernHemisphereView )
+        table.attach( showNorthernHemisphereViewCheckbox, 0, 1, 2, 3 )
+
+        showHourlyWerewolfWarningCheckbox = gtk.CheckButton( "Hourly werewolf warning" )
+        showHourlyWerewolfWarningCheckbox.set_active( self.showHourlyWerewolfWarning )
+        showHourlyWerewolfWarningCheckbox.set_tooltip_text( "Screen notification on each hour during a full moon" )
+        table.attach( showHourlyWerewolfWarningCheckbox, 0, 1, 3, 4 )
+
+        autostartCheckbox = gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH ) )
+        table.attach( autostartCheckbox, 0, 1, 4, 5 )
+
+        self.dialog.vbox.pack_start( table, True, True, 10 )
+        self.dialog.set_border_width( 10 )
+
+        self.dialog.show_all()
+        response = self.dialog.run()
+        if response == gtk.RESPONSE_OK:
+            self.showPhase = showPhaseCheckbox.get_active()
+            self.showIllumination = showIlluminationCheckbox.get_active()
+            self.showNorthernHemisphereView = showNorthernHemisphereViewCheckbox.get_active()
+            self.showHourlyWerewolfWarning = showHourlyWerewolfWarningCheckbox.get_active()
+            self.saveSettings()
+
+            if autostartCheckbox.get_active():
+                try:
+                    shutil.copy( IndicatorLunar.DESKTOP_PATH, IndicatorLunar.AUTOSTART_PATH )
+                except Exception as e:
+                    logging.exception( e )
+            else:
+                try:
+                    os.remove( IndicatorLunar.AUTOSTART_PATH )
+                except: pass
+
+        self.dialog.destroy()
+        self.dialog = None
         self.update()
-
-
-    def onShowIllumination( self, widget ):
-        self.showIllumination = widget.active
-        self.saveSettings()
-        self.update()
-
-
-    def onShowNorthernHemisphereView( self, widget ):
-        self.showNorthernHemisphereView = widget.active
-        self.saveSettings()
-        self.update()
-
-
-    def onShowPhase( self, widget ):
-        self.showPhase = widget.active
-        self.saveSettings()
-        self.update()
-
-
-    def onAutoStart( self, widget ):
-        if widget.active:
-            try:
-                shutil.copy( IndicatorLunar.DESKTOP_PATH, IndicatorLunar.AUTOSTART_PATH )
-            except Exception as e:
-                logging.exception( e )
-        else:
-            try:
-                os.remove( IndicatorLunar.AUTOSTART_PATH )
-            except: pass
 
 
     def loadSettings( self ):

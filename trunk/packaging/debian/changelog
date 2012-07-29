@@ -1,3 +1,11 @@
+indicator-lunar (1.0.5-1) precise; urgency=low
+
+  * Consolidated all options into a preferences dialog.
+  * Fixed the PPA URL in the About dialog.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 27 Jul 2012 23:12:56 +1000
+
+
 indicator-lunar (1.0.4-1) precise; urgency=low
 
   * Changed the build process to use a single PPA.
