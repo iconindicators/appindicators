@@ -38,6 +38,7 @@ import json
 import logging
 import os
 import shutil
+import string
 import sys
 
 
@@ -45,7 +46,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.5"
+    VERSION = "1.0.6"
     ICON = "indicator-lunar"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
@@ -145,11 +146,50 @@ class IndicatorLunar:
             self.statusicon.set_from_icon_name( self.getIconNameForLunarPhase( lunarPhase ) )
             self.statusicon.set_tooltip( labelTooltip )
 
-        self.illuminationMenuItem.set_label( "Illumination: " + str( int( ephem.Moon( currentDateTime ).phase ) ) + "%" )
         self.phaseMenuItem.set_label( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] )
-        self.distanceToEarthMenuItem.set_label( "Distance to Earth: " + str( ephem.Moon( currentDateTime ).earth_distance ) + " AU" )
-        self.distanceToSunMenuItem.set_label( "Distance to Sun: " + str( ephem.Moon( currentDateTime ).sun_distance ) + " AU" )
+        self.illuminationMenuItem.set_label( "Illumination: " + str( int( ephem.Moon( currentDateTime ).phase ) ) + "%" )
+        self.distanceToEarthInKMMenuItem.set_label( "   Moon to Earth: " + str( int( round( ephem.Moon( currentDateTime ).earth_distance * ephem.meters_per_au / 1000 ) ) ) + " km" )
+        self.distanceToEarthInAUMenuItem.set_label( "   Moon to Earth: " + str( round( ephem.Moon( currentDateTime ).earth_distance, 4 ) ) + " AU" )
+        self.distanceToSunMenuItem.set_label( "   Moon to Sun: " + str( round( ephem.Moon( currentDateTime ).sun_distance, 3 ) )  + " AU" )
         self.constellationMenuItem.set_label( "Constellation: " + ephem.constellation( ephem.Moon( currentDateTime ) )[ 1 ] )
+
+        newMoonLabel = "   New: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_new_moon( ephem.now() ) ) ) )
+        firstQuarterLabel = "   First Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_first_quarter_moon( ephem.now() ) ) ) )
+        fullMoonLabel = "   Full: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_full_moon( ephem.now() ) ) ) )
+        thirdQuarterLabel = "   Third Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_last_quarter_moon( ephem.now() ) ) ) )
+        if lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS:
+            # third, new, first, full
+            self.nextMoonOneMenuItem.set_label( thirdQuarterLabel )
+            self.nextMoonTwoMenuItem.set_label( newMoonLabel )
+            self.nextMoonThreeMenuItem.set_label( firstQuarterLabel )
+            self.nextMoonFourMenuItem.set_label( fullMoonLabel )
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT:
+            # new, first, full, third
+            self.nextMoonOneMenuItem.set_label( newMoonLabel )
+            self.nextMoonTwoMenuItem.set_label( firstQuarterLabel )
+            self.nextMoonThreeMenuItem.set_label( fullMoonLabel )
+            self.nextMoonFourMenuItem.set_label( thirdQuarterLabel )
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT:
+            # first, full, third, new 
+            self.nextMoonOneMenuItem.set_label( firstQuarterLabel )
+            self.nextMoonTwoMenuItem.set_label( fullMoonLabel )
+            self.nextMoonThreeMenuItem.set_label( thirdQuarterLabel )
+            self.nextMoonFourMenuItem.set_label( newMoonLabel )
+        else: # lunarPhase == LUNAR_PHASE_FIRST_QUARTER or lunarPhase == LUNAR_PHASE_WAXING_GIBBOUS
+            # full, third, new, first
+            self.nextMoonOneMenuItem.set_label( fullMoonLabel )
+            self.nextMoonTwoMenuItem.set_label( thirdQuarterLabel )
+            self.nextMoonThreeMenuItem.set_label( newMoonLabel )
+            self.nextMoonFourMenuItem.set_label( firstQuarterLabel )
+
+        equinox = ephem.localtime( ephem.next_equinox( ephem.now() ) )
+        solstice = ephem.localtime( ephem.next_solstice( ephem.now() ) )
+        if equinox < solstice:
+            self.equinoxSolsticeOneMenuItem.set_label( "Equinox: " + self.trimFractionalSeconds( str( equinox ) ) )
+            self.equinoxSolsticeTwoMenuItem.set_label( "Solstice: " + self.trimFractionalSeconds( str( solstice ) ) )
+        else:
+            self.equinoxSolsticeOneMenuItem.set_label( "Solstice: " + self.trimFractionalSeconds( str( solstice ) ) )
+            self.equinoxSolsticeTwoMenuItem.set_label( "Equinox: " + self.trimFractionalSeconds( str( equinox ) ) )
 
         if pynotifyImported == True and self.showHourlyWerewolfWarning == True and lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON:
             pynotify.Notification( "Warning: Werewolves about!!!", "", IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_FULL_MOON ] ).show()
@@ -157,37 +197,41 @@ class IndicatorLunar:
         return True # Needed so the timer continues!
 
 
+    def trimFractionalSeconds( self, currentDateTimeString ):
+        return currentDateTimeString[ 0 : string.rfind( currentDateTimeString, ":" ) + 3 ]
+
+
     def calculateLunarPhase( self, currentDateTime ):
         nextFullMoonDate = ephem.next_full_moon( currentDateTime )
         nextNewMoonDate = ephem.next_new_moon( currentDateTime )
-        currentMoon = ephem.Moon( currentDateTime )
-        lunarPhase = None
+        currentMoonPhase = int( round( ephem.Moon( currentDateTime ).phase ) )
+        phase = None
         if nextFullMoonDate < nextNewMoonDate:
             # We are somewhere between a new moon and a full moon...
-            if( currentMoon.phase > 98 ):
-                lunarPhase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
-            elif currentMoon.phase <= 98 and currentMoon.phase > 60:
-                lunarPhase = IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS
-            elif currentMoon.phase <= 60 and currentMoon.phase >= 40:
-                lunarPhase = IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER
-            elif currentMoon.phase < 40 and currentMoon.phase >= 2:
-                lunarPhase = IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT
-            else: # currentMoon.phase < 2
-                lunarPhase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
+            if( currentMoonPhase > 99 ):
+                phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
+            elif currentMoonPhase <= 99 and currentMoonPhase > 50:
+                phase = IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS
+            elif currentMoonPhase == 50:
+                phase = IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER
+            elif currentMoonPhase < 50 and currentMoonPhase >= 1:
+                phase = IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT
+            else: # currentMoonPhase < 1
+                phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
         else:
             # We are somewhere between a full moon and the next new moon...
-            if( currentMoon.phase > 98 ):
-                lunarPhase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
-            elif currentMoon.phase <= 98 and currentMoon.phase > 60:
-                lunarPhase = IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS
-            elif currentMoon.phase <= 60 and currentMoon.phase >= 40:
-                lunarPhase = IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER
-            elif currentMoon.phase < 40 and currentMoon.phase >= 2:
-                lunarPhase = IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT
-            else: # currentMoon.phase < 2
-                lunarPhase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
+            if( currentMoonPhase > 99 ):
+                phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
+            elif currentMoonPhase <= 99 and currentMoonPhase > 50:
+                phase = IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS
+            elif currentMoonPhase == 50:
+                phase = IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER
+            elif currentMoonPhase < 50 and currentMoonPhase >= 1:
+                phase = IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT
+            else: # currentMoonPhase < 1
+                phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
 
-        return lunarPhase
+        return phase
 
 
     def getIconNameForLunarPhase( self, lunarPhase ):
@@ -218,14 +262,39 @@ class IndicatorLunar:
         self.illuminationMenuItem = gtk.MenuItem( "" )
         self.menu.append( self.illuminationMenuItem )
 
-        self.distanceToEarthMenuItem = gtk.MenuItem( "" )
-        self.menu.append( self.distanceToEarthMenuItem )
+        self.constellationMenuItem = gtk.MenuItem( "" )
+        self.menu.append( self.constellationMenuItem )
+
+        self.menu.append( gtk.MenuItem( "Distances:" ) )
+
+        self.distanceToEarthInKMMenuItem = gtk.MenuItem( "" )
+        self.menu.append( self.distanceToEarthInKMMenuItem )
+
+        self.distanceToEarthInAUMenuItem = gtk.MenuItem( "" )
+        self.menu.append( self.distanceToEarthInAUMenuItem )
 
         self.distanceToSunMenuItem = gtk.MenuItem( "" )
         self.menu.append( self.distanceToSunMenuItem )
 
-        self.constellationMenuItem = gtk.MenuItem( "" )
-        self.menu.append( self.constellationMenuItem )
+        self.menu.append( gtk.MenuItem( "Next Phases:" ) )
+
+        self.nextMoonOneMenuItem = gtk.MenuItem( "" )
+        self.menu.append( self.nextMoonOneMenuItem )
+
+        self.nextMoonTwoMenuItem = gtk.MenuItem( "" )
+        self.menu.append( self.nextMoonTwoMenuItem )
+
+        self.nextMoonThreeMenuItem = gtk.MenuItem( "" )
+        self.menu.append( self.nextMoonThreeMenuItem )
+
+        self.nextMoonFourMenuItem = gtk.MenuItem( "" )
+        self.menu.append( self.nextMoonFourMenuItem )
+
+        self.equinoxSolsticeOneMenuItem = gtk.MenuItem( "" )
+        self.menu.append( self.equinoxSolsticeOneMenuItem )
+
+        self.equinoxSolsticeTwoMenuItem = gtk.MenuItem( "" )
+        self.menu.append( self.equinoxSolsticeTwoMenuItem )
 
         self.menu.append( gtk.SeparatorMenuItem() )
 

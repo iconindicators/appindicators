@@ -1,3 +1,14 @@
+indicator-lunar (1.0.6-1) precise; urgency=low
+
+  * Adjusted phase calculations to precisely match definitions: Full moon is 100%,
+    new moon is 0 %, 1st/3rd quarter are 50%.  As a result, the icons/labels are
+    only present for a few hours, but overall it's mathematically correct!
+  * Added additional information to the menu including next phases and the next
+    solstice and equinox.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 3 Aug 2012 8:58:31 +1000
+
+
 indicator-lunar (1.0.5-1) precise; urgency=low
 
   * Consolidated all options into a preferences dialog.
