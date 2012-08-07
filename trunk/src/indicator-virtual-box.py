@@ -49,11 +49,12 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.10"
+    VERSION = "1.0.11"
     ICON = "indicator-virtual-box"
 
-    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
-    DESKTOP_PATH = "/usr/share/applications/" + NAME + ".desktop"
+    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+    DESKTOP_PATH = "/usr/share/applications/"
+    DESKTOP_FILE = NAME + ".desktop"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_BEFORE = "menuTextVirtualMachineRunningBefore"
@@ -323,7 +324,7 @@ class IndicatorVirtualBox:
         table.attach( sortAlphabeticallyCheckbox, 0, 2, 11, 12 )
 
         autostartCheckbox = gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ) )
+        autostartCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
         table.attach( autostartCheckbox, 0, 2, 12, 13 )
 
         self.dialog.vbox.pack_start( table, True, True, 10 )
@@ -345,14 +346,17 @@ class IndicatorVirtualBox:
 
             self.saveSettings()
 
+            if not os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ):
+                os.makedirs( IndicatorVirtualBox.AUTOSTART_PATH )
+
             if autostartCheckbox.get_active():
                 try:
-                    shutil.copy( IndicatorVirtualBox.DESKTOP_PATH, IndicatorVirtualBox.AUTOSTART_PATH )
+                    shutil.copy( IndicatorVirtualBox.DESKTOP_PATH + IndicatorVirtualBox.DESKTOP_FILE, IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
                 except Exception as e:
                     logging.exception( e )
             else:
                 try:
-                    os.remove( IndicatorVirtualBox.AUTOSTART_PATH )
+                    os.remove( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
                 except: pass
 
         self.dialog.destroy()
