@@ -49,10 +49,11 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.5"
+    VERSION = "1.0.6"
 
-    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
-    DESKTOP_PATH = "/usr/share/applications/" + NAME + ".desktop"
+    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+    DESKTOP_PATH = "/usr/share/applications/"
+    DESKTOP_FILE = NAME + ".desktop"
 
     DISTRIBUTIONS = [ "quantal", "precise", "oneiric", "natty", "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy" ]
     ARCHITECTURES = [ "amd64", "i386" ]
@@ -127,7 +128,7 @@ class IndicatorPPADownloadStatistics:
         menu.append( showSubmenuMenuItem )
 
         autoStartMenuItem = gtk.CheckMenuItem( "Autostart" )
-        autoStartMenuItem.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH ) )
+        autoStartMenuItem.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
         autoStartMenuItem.connect( "activate", self.onAutoStart )
         menu.append( autoStartMenuItem )
 
@@ -270,14 +271,17 @@ class IndicatorPPADownloadStatistics:
 
 
     def onAutoStart( self, widget ):
+        if not os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH ):
+            os.makedirs( IndicatorPPADownloadStatistics.AUTOSTART_PATH )
+
         if widget.active:
             try:
-                shutil.copy( IndicatorPPADownloadStatistics.DESKTOP_PATH, IndicatorPPADownloadStatistics.AUTOSTART_PATH )
+                shutil.copy( IndicatorPPADownloadStatistics.DESKTOP_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE, IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
             except Exception as e:
                 logging.exception( e )
         else:
             try:
-                os.remove( IndicatorPPADownloadStatistics.AUTOSTART_PATH )
+                os.remove( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
             except: pass
 
 
