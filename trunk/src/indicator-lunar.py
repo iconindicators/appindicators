@@ -46,11 +46,12 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.6"
+    VERSION = "1.0.7"
     ICON = "indicator-lunar"
 
-    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
-    DESKTOP_PATH = "/usr/share/applications/" + NAME + ".desktop"
+    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+    DESKTOP_PATH = "/usr/share/applications/"
+    DESKTOP_FILE = NAME + ".desktop"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_SHOW_HOURLY_WEREWOLF_WARNING = "showHourlyWerewolfWarning"
@@ -148,15 +149,15 @@ class IndicatorLunar:
 
         self.phaseMenuItem.set_label( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] )
         self.illuminationMenuItem.set_label( "Illumination: " + str( int( ephem.Moon( currentDateTime ).phase ) ) + "%" )
-        self.distanceToEarthInKMMenuItem.set_label( "   Moon to Earth: " + str( int( round( ephem.Moon( currentDateTime ).earth_distance * ephem.meters_per_au / 1000 ) ) ) + " km" )
-        self.distanceToEarthInAUMenuItem.set_label( "   Moon to Earth: " + str( round( ephem.Moon( currentDateTime ).earth_distance, 4 ) ) + " AU" )
-        self.distanceToSunMenuItem.set_label( "   Moon to Sun: " + str( round( ephem.Moon( currentDateTime ).sun_distance, 3 ) )  + " AU" )
+        self.distanceToEarthInKMMenuItem.set_label( "    Moon to Earth: " + str( int( round( ephem.Moon( currentDateTime ).earth_distance * ephem.meters_per_au / 1000 ) ) ) + " km" )
+        self.distanceToEarthInAUMenuItem.set_label( "    Moon to Earth: " + str( round( ephem.Moon( currentDateTime ).earth_distance, 4 ) ) + " AU" )
+        self.distanceToSunMenuItem.set_label( "    Moon to Sun: " + str( round( ephem.Moon( currentDateTime ).sun_distance, 3 ) )  + " AU" )
         self.constellationMenuItem.set_label( "Constellation: " + ephem.constellation( ephem.Moon( currentDateTime ) )[ 1 ] )
 
-        newMoonLabel = "   New: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_new_moon( ephem.now() ) ) ) )
-        firstQuarterLabel = "   First Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_first_quarter_moon( ephem.now() ) ) ) )
-        fullMoonLabel = "   Full: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_full_moon( ephem.now() ) ) ) )
-        thirdQuarterLabel = "   Third Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_last_quarter_moon( ephem.now() ) ) ) )
+        newMoonLabel = "    New: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_new_moon( ephem.now() ) ) ) )
+        firstQuarterLabel = "    First Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_first_quarter_moon( ephem.now() ) ) ) )
+        fullMoonLabel = "    Full: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_full_moon( ephem.now() ) ) ) )
+        thirdQuarterLabel = "    Third Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_last_quarter_moon( ephem.now() ) ) ) )
         if lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS:
             # third, new, first, full
             self.nextMoonOneMenuItem.set_label( thirdQuarterLabel )
@@ -360,7 +361,7 @@ class IndicatorLunar:
         table.attach( showHourlyWerewolfWarningCheckbox, 0, 1, 3, 4 )
 
         autostartCheckbox = gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH ) )
+        autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
         table.attach( autostartCheckbox, 0, 1, 4, 5 )
 
         self.dialog.vbox.pack_start( table, True, True, 10 )
@@ -375,14 +376,17 @@ class IndicatorLunar:
             self.showHourlyWerewolfWarning = showHourlyWerewolfWarningCheckbox.get_active()
             self.saveSettings()
 
+            if not os.path.exists( IndicatorLunar.AUTOSTART_PATH ):
+                os.makedirs( IndicatorLunar.AUTOSTART_PATH )
+
             if autostartCheckbox.get_active():
                 try:
-                    shutil.copy( IndicatorLunar.DESKTOP_PATH, IndicatorLunar.AUTOSTART_PATH )
+                    shutil.copy( IndicatorLunar.DESKTOP_PATH + IndicatorLunar.DESKTOP_FILE, IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except Exception as e:
                     logging.exception( e )
             else:
                 try:
-                    os.remove( IndicatorLunar.AUTOSTART_PATH )
+                    os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
 
         self.dialog.destroy()
