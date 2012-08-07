@@ -39,11 +39,12 @@ class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.7"
+    VERSION = "1.0.8"
     ICON = "indicator-stardate"
 
-    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" + NAME + ".desktop"
-    DESKTOP_PATH = "/usr/share/applications/" + NAME + ".desktop"
+    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+    DESKTOP_PATH = "/usr/share/applications/"
+    DESKTOP_FILE = NAME + ".desktop"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_SHOW_ISSUE = "showIssue"
@@ -131,14 +132,17 @@ class IndicatorStardate:
 
 
     def onAutoStart( self, widget ):
+        if not os.path.exists( IndicatorStardate.AUTOSTART_PATH ):
+            os.makedirs( IndicatorStardate.AUTOSTART_PATH )
+
         if widget.active:
             try:
-                shutil.copy( IndicatorStardate.DESKTOP_PATH, IndicatorStardate.AUTOSTART_PATH )
+                shutil.copy( IndicatorStardate.DESKTOP_PATH + IndicatorStardate.DESKTOP_FILE, IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
             except Exception as e:
                 logging.exception( e )
         else:
             try:
-                os.remove( IndicatorStardate.AUTOSTART_PATH )
+                os.remove( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
             except: pass
 
 
@@ -159,7 +163,7 @@ class IndicatorStardate:
         self.menu.append( showIssueMenuItem )
 
         autoStartMenuItem = gtk.CheckMenuItem( "Autostart" )
-        autoStartMenuItem.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH ) )
+        autoStartMenuItem.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
         autoStartMenuItem.connect( "activate", self.onAutoStart )
         self.menu.append( autoStartMenuItem )
 
