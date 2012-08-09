@@ -46,7 +46,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.8"
+    VERSION = "1.0.9"
     ICON = "indicator-lunar"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -154,10 +154,10 @@ class IndicatorLunar:
         self.distanceToSunMenuItem.set_label( "    Moon to Sun: " + str( round( ephem.Moon( currentDateTime ).sun_distance, 3 ) )  + " AU" )
         self.constellationMenuItem.set_label( "Constellation: " + ephem.constellation( ephem.Moon( currentDateTime ) )[ 1 ] )
 
-        newMoonLabel = "    New: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_new_moon( ephem.now() ) ) ) )
-        firstQuarterLabel = "    First Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_first_quarter_moon( ephem.now() ) ) ) )
-        fullMoonLabel = "    Full: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_full_moon( ephem.now() ) ) ) )
-        thirdQuarterLabel = "    Third Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_last_quarter_moon( ephem.now() ) ) ) )
+        newMoonLabel = "    New: " + self.trimFractionalSeconds( str( ephem.next_new_moon( ephem.now() ) ) )
+        firstQuarterLabel = "    First Quarter: " + self.trimFractionalSeconds( str( ephem.next_first_quarter_moon( ephem.now() ) ) )
+        fullMoonLabel = "    Full: " + self.trimFractionalSeconds( str( ephem.next_full_moon( ephem.now() ) ) )
+        thirdQuarterLabel = "    Third Quarter: " + self.trimFractionalSeconds( str( ephem.next_last_quarter_moon( ephem.now() ) ) )
         if lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS:
             # third, new, first, full
             self.nextMoonOneMenuItem.set_label( thirdQuarterLabel )
@@ -183,8 +183,8 @@ class IndicatorLunar:
             self.nextMoonThreeMenuItem.set_label( newMoonLabel )
             self.nextMoonFourMenuItem.set_label( firstQuarterLabel )
 
-        equinox = ephem.localtime( ephem.next_equinox( ephem.now() ) )
-        solstice = ephem.localtime( ephem.next_solstice( ephem.now() ) )
+        equinox = ephem.next_equinox( ephem.now() )
+        solstice = ephem.next_solstice( ephem.now() )
         if equinox < solstice:
             self.equinoxSolsticeOneMenuItem.set_label( "Equinox: " + self.trimFractionalSeconds( str( equinox ) ) )
             self.equinoxSolsticeTwoMenuItem.set_label( "Solstice: " + self.trimFractionalSeconds( str( solstice ) ) )

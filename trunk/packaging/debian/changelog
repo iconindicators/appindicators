@@ -1,3 +1,11 @@
+indicator-lunar (1.0.9-1) precise; urgency=low
+
+  * Noticed the dates for next phases were out by hours/days.  Removed the conversion
+    to localtime (ephem.localtime) and got better/closer reality.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 9 Aug 2012 20:10:27 +1000
+
+
 indicator-lunar (1.0.8-1) precise; urgency=low
 
   * Fixed a bug where the phase and illumination did not match due to rounding error.
