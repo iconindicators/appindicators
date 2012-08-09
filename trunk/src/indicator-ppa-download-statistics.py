@@ -51,7 +51,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.7"
+    VERSION = "1.0.8"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
@@ -356,14 +356,18 @@ class IndicatorPPADownloadStatistics:
 
         if len( self.ppas ) > 0:
             dataModel = gtk.ListStore( str )
-            for item in self.getPPAOwnersSorted():
+            ppaOwners = self.getPPAOwnersSorted()
+            for item in ppaOwners:
                 dataModel.append( [ item ] )
 
             ppaOwner = gtk.ComboBoxEntry( dataModel )
             ppaOwner.pack_start( gtk.CellRendererText(), True )
+
+            if add == False:
+                ppaOwner.set_active( self.getIndexForPPAOwner( ppaOwners, existingPPAOwner ) )
         else:
+            # There are no PPAs present, so we are adding the first PPA.
             ppaOwner = gtk.Entry()
-            ppaOwner.set_text( existingPPAOwner )
 
         table.attach( ppaOwner, 1, 2, 0, 1 )
 
@@ -373,14 +377,18 @@ class IndicatorPPADownloadStatistics:
 
         if len( self.ppas ) > 0:
             dataModel = gtk.ListStore( str )
-            for item in self.getPPANamesSorted():
+            ppaNames = self.getPPANamesSorted()
+            for item in ppaNames:
                 dataModel.append( [ item ] )
 
             ppaName = gtk.ComboBoxEntry( dataModel )        
             ppaName.pack_start( gtk.CellRendererText(), True )
+
+            if add == False:
+                ppaName.set_active( self.getIndexForPPAName( ppaNames, existingPPAName ) )
         else:
+            # There are no PPAs present, so we are adding the first PPA.
             ppaName = gtk.Entry()
-            ppaName.set_text( existingPPAName )
 
         table.attach( ppaName, 1, 2, 1, 2 )
 
@@ -475,6 +483,22 @@ class IndicatorPPADownloadStatistics:
     def getIndexForDistribution( self, distribution ):
         for i in range( len( IndicatorPPADownloadStatistics.DISTRIBUTIONS ) ):
             if IndicatorPPADownloadStatistics.DISTRIBUTIONS[ i ] == distribution:
+                return i
+
+        return -1 # Should never happen!
+
+
+    def getIndexForPPAOwner( self, ppaOwners, ppaOwner ):
+        for i in range( len( ppaOwners ) ):
+            if ppaOwners[ i ] == ppaOwner:
+                return i
+
+        return -1 # Should never happen!
+
+
+    def getIndexForPPAName( self, ppaNames, ppaName ):
+        for i in range( len( ppaNames ) ):
+            if ppaNames[ i ] == ppaName:
                 return i
 
         return -1 # Should never happen!
