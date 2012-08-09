@@ -1,3 +1,10 @@
+indicator-lunar (1.0.8-1) precise; urgency=low
+
+  * Fixed a bug where the phase and illumination did not match due to rounding error.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 9 Aug 2012 19:22:09 +1000
+
+
 indicator-lunar (1.0.7-1) precise; urgency=low
 
   * Handle the case where the directory ~/.config/autostart does not exist.

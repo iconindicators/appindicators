@@ -46,7 +46,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.7"
+    VERSION = "1.0.8"
     ICON = "indicator-lunar"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -132,9 +132,9 @@ class IndicatorLunar:
         lunarPhase = self.calculateLunarPhase( currentDateTime )
 
         if self.showIllumination == True and self.showPhase == True:
-            labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( int( ephem.Moon( currentDateTime ).phase ) ) + "%)"
+            labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( int( round( ephem.Moon( currentDateTime ).phase ) ) ) + "%)"
         elif self.showIllumination == True:
-            labelTooltip = str( int( ephem.Moon( currentDateTime ).phase ) ) + "%"
+            labelTooltip = str( int( round( ephem.Moon( currentDateTime ).phase ) ) ) + "%"
         elif self.showPhase == True:
             labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
         else:
@@ -148,7 +148,7 @@ class IndicatorLunar:
             self.statusicon.set_tooltip( labelTooltip )
 
         self.phaseMenuItem.set_label( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] )
-        self.illuminationMenuItem.set_label( "Illumination: " + str( int( ephem.Moon( currentDateTime ).phase ) ) + "%" )
+        self.illuminationMenuItem.set_label( "Illumination: " + str( int( round( ephem.Moon( currentDateTime ).phase ) ) ) + "%" )
         self.distanceToEarthInKMMenuItem.set_label( "    Moon to Earth: " + str( int( round( ephem.Moon( currentDateTime ).earth_distance * ephem.meters_per_au / 1000 ) ) ) + " km" )
         self.distanceToEarthInAUMenuItem.set_label( "    Moon to Earth: " + str( round( ephem.Moon( currentDateTime ).earth_distance, 4 ) ) + " AU" )
         self.distanceToSunMenuItem.set_label( "    Moon to Sun: " + str( round( ephem.Moon( currentDateTime ).sun_distance, 3 ) )  + " AU" )
