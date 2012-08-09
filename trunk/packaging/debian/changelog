@@ -1,3 +1,12 @@
+indicator-ppa-download-statistics (1.0.7-1) precise; urgency=low
+
+  * Add/Edit of PPAs shows current PPA owners/names to save typing.
+  * Selecting a PPA or PPA child from the menu launches the browser to the PPA page.
+  * Preferences now contained within a dialog.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 9 Aug 2012 16:19:39 +1000
+
+
 indicator-ppa-download-statistics (1.0.6-1) precise; urgency=low
 
   * Handle the case where the directory ~/.config/autostart does not exist.

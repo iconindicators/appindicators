@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays the download statistics of PPAs.
+# Application indicator to display PPA download statistics.
 
 
 # References:
@@ -37,8 +37,10 @@ import locale
 import logging
 import os
 import shutil
+import string
 import sys
 import threading
+import webbrowser
 
 from copy import deepcopy
 from launchpadlib.launchpad import Launchpad
@@ -49,7 +51,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.6"
+    VERSION = "1.0.7"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
@@ -60,6 +62,7 @@ class IndicatorPPADownloadStatistics:
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_PPAS = "ppas"
+    SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER = "allowMenuItemsToLaunchBrowser"
     SETTINGS_SHOW_SUBMENU = "showSubmenu"
 
 
@@ -122,15 +125,9 @@ class IndicatorPPADownloadStatistics:
         menu.append( self.removeMenuItem )
         self.removeMenuItem.set_submenu( gtk.Menu() ) # Dummy submenu needed so the update menu works.
 
-        showSubmenuMenuItem = gtk.CheckMenuItem( "Show as sub-menus" )
-        showSubmenuMenuItem.set_active( self.showSubmenu )
-        showSubmenuMenuItem.connect( "activate", self.onShowSubmenu )
-        menu.append( showSubmenuMenuItem )
-
-        autoStartMenuItem = gtk.CheckMenuItem( "Autostart" )
-        autoStartMenuItem.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
-        autoStartMenuItem.connect( "activate", self.onAutoStart )
-        menu.append( autoStartMenuItem )
+        preferencesMenuItem = gtk.MenuItem( "Preferences" )
+        preferencesMenuItem.connect( "activate", self.onPreferences )
+        menu.append( preferencesMenuItem )
 
         aboutMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_ABOUT )
         aboutMenuItem.connect( "activate", self.onAbout )
@@ -167,7 +164,7 @@ class IndicatorPPADownloadStatistics:
         oneOrMorePPAsExist = len( self.ppas ) > 0
         if( oneOrMorePPAsExist ):
             position = 0
-            for key in self.getSortedPPAKeys():
+            for key in self.getPPAKeysSorted():
                 menuItem = gtk.MenuItem( key )
                 menu.insert( menuItem, position )
                 position += 1
@@ -185,9 +182,15 @@ class IndicatorPPADownloadStatistics:
                     else:
                         for item in value:
                             subMenuItem = gtk.MenuItem( "   " + item[ 0 ] + " (" + item[ 1 ] + "): " + str( item[ 2 ] ) )
+                            subMenuItem.set_name( key )
+                            subMenuItem.connect( "activate", self.onPPA )
                             subMenu.append( subMenuItem )
                             menuItem.set_submenu( subMenu )
                 else:
+                    # When submenus are used, each time a PPA menu item is selected, the webpage is opened...so only provide the browser launch for non submenus (at the PPA level).
+                    menuItem.set_name( key )
+                    menuItem.connect( "activate", self.onPPA )
+
                     if value is None:
                         menuItem = gtk.MenuItem( "   (no information)" )
                         menu.insert( menuItem, position )
@@ -199,6 +202,8 @@ class IndicatorPPADownloadStatistics:
                     else:
                         for item in value:
                             menuItem = gtk.MenuItem( "    " + item[ 0 ] + " (" + item[ 1 ] + "): " + str( item[ 2 ] ) )
+                            menuItem.set_name( key )
+                            menuItem.connect( "activate", self.onPPA )
                             menu.insert( menuItem, position )
                             position += 1
 
@@ -211,7 +216,7 @@ class IndicatorPPADownloadStatistics:
         if( oneOrMorePPAsExist ):
             subMenu = gtk.Menu()
             self.editMenuItem.set_submenu( subMenu )
-            for key in self.getSortedPPAKeys():
+            for key in self.getPPAKeysSorted():
                 subMenuItem = gtk.MenuItem( key )
                 subMenuItem.set_name( key )
                 subMenuItem.connect( "activate", self.onEdit )
@@ -226,7 +231,7 @@ class IndicatorPPADownloadStatistics:
         if( oneOrMorePPAsExist ):
             subMenu = gtk.Menu()
             self.removeMenuItem.set_submenu( subMenu )
-            for key in self.getSortedPPAKeys():
+            for key in self.getPPAKeysSorted():
                 subMenuItem = gtk.MenuItem( key )
                 subMenuItem.set_name( key )
                 subMenuItem.connect( "activate", self.onRemove )
@@ -235,12 +240,32 @@ class IndicatorPPADownloadStatistics:
         menu.show_all()
 
 
-    def getSortedPPAKeys( self ):
+    def getPPAKeysSorted( self ):
         sortedKeys = [] 
         for key in self.ppas.keys():
             sortedKeys.append( key )
 
         return sorted( sortedKeys, cmp = locale.strcoll )
+
+
+    def getPPAOwnersSorted( self ):
+        sortedPPAOwners = [] 
+        for key in self.ppas.keys():
+            ppaOwner = self.ppas[ key ][ 0 ]
+            if ppaOwner not in sortedPPAOwners:
+                sortedPPAOwners.append( ppaOwner )
+
+        return sorted( sortedPPAOwners, cmp = locale.strcoll )
+
+
+    def getPPANamesSorted( self ):
+        sortedPPANames = [] 
+        for key in self.ppas.keys():
+            ppaName = self.ppas[ key ][ 1 ]
+            if ppaName not in sortedPPANames:
+                sortedPPANames.append( ppaName )
+
+        return sorted( sortedPPANames, cmp = locale.strcoll )
 
 
     def getPPAKey( self, ppaList ):
@@ -253,6 +278,23 @@ class IndicatorPPADownloadStatistics:
 
     def handleRightClick( self, icon, button, time ):
         self.menu.popup( None, None, gtk.status_icon_position_menu, button, time, self.statusicon )
+
+
+    def onPPA( self, widget ):
+        if self.allowMenuItemsToLaunchBrowser == False:
+            return
+
+        firstPipe = string.find( widget.props.name, "|" )
+        ppaOwner = widget.props.name[ 0 : firstPipe ].strip()
+
+        secondPipe = string.find( widget.props.name, "|", firstPipe + 1 )
+        ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
+
+        thirdPipe = string.find( widget.props.name, "|", secondPipe + 1 )
+        series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
+
+        url = "http://launchpad.net/~" + ppaOwner + "/+archive/" + ppaName + "?field.series_filter=" + series
+        webbrowser.open( url ) # This returns a boolean - I wanted to message the user on a false return value but popping up a message dialog causes a lock up!
 
 
     def onAbout( self, widget ):
@@ -285,12 +327,6 @@ class IndicatorPPADownloadStatistics:
             except: pass
 
 
-    def onShowSubmenu( self, widget ):
-        self.showSubmenu = widget.active
-        self.saveSettings()
-        self.updateMenu()
-
-
     def onAdd( self, widget ):
         self.addEditPPA( True, "", "", IndicatorPPADownloadStatistics.DISTRIBUTIONS[ 0 ], IndicatorPPADownloadStatistics.ARCHITECTURES[ 0 ] )
 
@@ -300,7 +336,7 @@ class IndicatorPPADownloadStatistics:
         self.addEditPPA( False, ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] )
 
 
-    def addEditPPA( self, add, existingPPAOwner, existingPPA, existingDistribution, existingArchitecture ):
+    def addEditPPA( self, add, existingPPAOwner, existingPPAName, existingDistribution, existingArchitecture ):
         if self.dialog is not None:
             return
 
@@ -318,47 +354,65 @@ class IndicatorPPADownloadStatistics:
         label.set_alignment( 0, 0.5 )
         table.attach( label, 0, 1, 0, 1 )
 
-        ppaOwner = gtk.Entry()
-        ppaOwner.set_text( existingPPAOwner )
+        if len( self.ppas ) > 0:
+            dataModel = gtk.ListStore( str )
+            for item in self.getPPAOwnersSorted():
+                dataModel.append( [ item ] )
+
+            ppaOwner = gtk.ComboBoxEntry( dataModel )
+            ppaOwner.pack_start( gtk.CellRendererText(), True )
+        else:
+            ppaOwner = gtk.Entry()
+            ppaOwner.set_text( existingPPAOwner )
+
         table.attach( ppaOwner, 1, 2, 0, 1 )
 
-        label = gtk.Label( "PPA" )
+        label = gtk.Label( "PPA Name" )
         label.set_alignment( 0, 0.5 )
         table.attach( label, 0, 1, 1, 2 )
 
-        ppa = gtk.Entry()
-        ppa.set_text( existingPPA )
-        table.attach( ppa, 1, 2, 1, 2 )
+        if len( self.ppas ) > 0:
+            dataModel = gtk.ListStore( str )
+            for item in self.getPPANamesSorted():
+                dataModel.append( [ item ] )
+
+            ppaName = gtk.ComboBoxEntry( dataModel )        
+            ppaName.pack_start( gtk.CellRendererText(), True )
+        else:
+            ppaName = gtk.Entry()
+            ppaName.set_text( existingPPAName )
+
+        table.attach( ppaName, 1, 2, 1, 2 )
 
         label = gtk.Label( "Distribution" )
         label.set_alignment( 0, 0.5 )
         table.attach( label, 0, 1, 2, 3 )
 
-        liststore = gtk.ListStore( str )
+        dataModel = gtk.ListStore( str )
         for item in IndicatorPPADownloadStatistics.DISTRIBUTIONS:
-            liststore.append( [ item ] )
+            dataModel.append( [ item ] )
 
-        cell = gtk.CellRendererText()
-        distributionsCombobox = gtk.ComboBox( liststore )
-        distributionsCombobox.pack_start( cell, True )
-        distributionsCombobox.add_attribute( cell, "text", 0 )
-        distributionsCombobox.set_active( self.getIndexForDistribution( existingDistribution ) )
-        table.attach( distributionsCombobox, 1, 2, 2, 3 )
+        textRenderer = gtk.CellRendererText()
+        distributions = gtk.ComboBox( dataModel )
+        distributions.pack_start( textRenderer, True )
+        distributions.add_attribute( textRenderer, "text", 0 )
+        distributions.set_active( self.getIndexForDistribution( existingDistribution ) )
+        table.attach( distributions, 1, 2, 2, 3 )
 
         label = gtk.Label( "Architecture" )
         label.set_alignment( 0, 0.5 )
         table.attach( label, 0, 1, 3, 4 )
 
-        liststore = gtk.ListStore( str )
+        dataModel = gtk.ListStore( str )
         for item in IndicatorPPADownloadStatistics.ARCHITECTURES:
-            liststore.append( [ item ] )
+            dataModel.append( [ item ] )
 
-        cell = gtk.CellRendererText()
-        architecturesCombobox = gtk.ComboBox( liststore )
-        architecturesCombobox.pack_start( cell, True )
-        architecturesCombobox.add_attribute( cell, "text", 0 )
-        architecturesCombobox.set_active( self.getIndexForArchitecture( existingArchitecture ) )
-        table.attach( architecturesCombobox, 1, 2, 3, 4 )
+        textRenderer = gtk.CellRendererText()
+        architectures = gtk.ComboBox( dataModel )
+        architectures.pack_start( textRenderer, True )
+        architectures.add_attribute( textRenderer, "text", 0 )
+        architectures.set_active( self.getIndexForArchitecture( existingArchitecture ) )
+        table.attach( architectures, 1, 2, 3, 4 )
 
         self.dialog.vbox.pack_start( table, True, True, 10 )
         self.dialog.set_border_width( 10 )
@@ -370,17 +424,24 @@ class IndicatorPPADownloadStatistics:
             if response == gtk.RESPONSE_CANCEL:
                 break
 
-            if ppaOwner.get_text().strip() == "":
+            if len( self.ppas ) > 0:
+                ppaOwnerValue = ppaOwner.get_active_text().strip()
+                ppaNameValue = ppaName.get_active_text().strip()
+            else:
+                ppaOwnerValue = ppaOwner.get_text().strip()
+                ppaNameValue = ppaName.get_text().strip()
+
+            if ppaOwnerValue == "":
                 self.showMessage( gtk.MESSAGE_ERROR, "PPA owner cannot be empty." )
                 self.dialog.set_focus( ppaOwner )
                 continue
 
-            if ppa.get_text().strip() == "":
+            if ppaNameValue == "":
                 self.showMessage( gtk.MESSAGE_ERROR, "PPA cannot be empty." )
-                self.dialog.set_focus( ppa )
+                self.dialog.set_focus( ppaName )
                 continue
 
-            ppaList = [ ppaOwner.get_text().strip(), ppa.get_text().strip(), distributionsCombobox.get_active_text(), architecturesCombobox.get_active_text() ]
+            ppaList = [ ppaOwnerValue, ppaNameValue, distributions.get_active_text(), architectures.get_active_text() ]
             key = self.getPPAKey( ppaList )
             if add == True:
                 if not self.ppas.has_key( key ):
@@ -390,7 +451,7 @@ class IndicatorPPADownloadStatistics:
                     self.requestPPADownloadAndMenuRefresh()
             else: # This is an edit
                 if not self.ppas.has_key( key ):
-                    oldKey = self.getPPAKey( [ existingPPAOwner, existingPPA, existingDistribution, existingArchitecture ] )
+                    oldKey = self.getPPAKey( [ existingPPAOwner, existingPPAName, existingDistribution, existingArchitecture ] )
                     del self.ppas[ oldKey ]
                     self.ppas[ key ] = ppaList
                     self.saveSettings()
@@ -440,7 +501,59 @@ class IndicatorPPADownloadStatistics:
         self.dialog = None
 
 
+    def onPreferences( self, widget ):
+        if self.dialog is not None:
+            return
+
+        self.dialog = gtk.Dialog( "Preferences", None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+
+        table = gtk.Table( 2, 1, False )
+        table.set_col_spacings( 5 )
+        table.set_row_spacings( 5 )
+
+        showAsSubmenusCheckbox = gtk.CheckButton( "Show as submenus" )
+        showAsSubmenusCheckbox.set_active( self.showSubmenu )
+        table.attach( showAsSubmenusCheckbox, 0, 1, 0, 1 )
+
+        allowMenuItemsToLaunchBrowserCheckbox = gtk.CheckButton( "Load PPA page on selection" )
+        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item launches the default web browser and loads the PPA home page." )
+        allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
+        table.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 1, 1, 2 )
+
+        autostartCheckbox = gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
+        table.attach( autostartCheckbox, 0, 1, 2, 3 )
+
+        self.dialog.vbox.pack_start( table, True, True, 10 )
+        self.dialog.set_border_width( 10 )
+
+        self.dialog.show_all()
+        response = self.dialog.run()
+        if response == gtk.RESPONSE_OK:
+            self.showSubmenu = showAsSubmenusCheckbox.get_active()
+            self.allowMenuItemsToLaunchBrowser = allowMenuItemsToLaunchBrowserCheckbox.get_active()
+            self.saveSettings()
+
+            if not os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH ):
+                os.makedirs( IndicatorPPADownloadStatistics.AUTOSTART_PATH )
+
+            if autostartCheckbox.get_active():
+                try:
+                    shutil.copy( IndicatorPPADownloadStatistics.DESKTOP_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE, IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
+                except Exception as e:
+                    logging.exception( e )
+            else:
+                try:
+                    os.remove( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
+                except: pass
+
+        self.dialog.destroy()
+        self.dialog = None
+        self.updateMenu()
+
+
     def loadSettings( self ):
+        self.allowMenuItemsToLaunchBrowser = True
         self.showSubmenu = False
         self.ppas = {}
 
@@ -455,6 +568,7 @@ class IndicatorPPADownloadStatistics:
                     key = self.getPPAKey( ppaList )
                     self.ppas[ key ] = ppaList
 
+                self.allowMenuItemsToLaunchBrowser = settings.get( IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER, self.allowMenuItemsToLaunchBrowser )
                 self.showSubmenu = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
 
             except Exception as e:
@@ -473,6 +587,7 @@ class IndicatorPPADownloadStatistics:
                 ppas.append( v )
 
             settings = {
+                IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER: self.allowMenuItemsToLaunchBrowser,
                 IndicatorPPADownloadStatistics.SETTINGS_PPAS: ppas,
                 IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU: self.showSubmenu
             }
