@@ -26,6 +26,9 @@
 #  menuItem.get_children()[ 0 ].set_markup( "<b><i>" + "item" + "</i></b>" )
 
 
+# Ubuntu 12.10 will likely ship with Python3: https://wiki.ubuntu.com/Python/3
+
+
 appindicatorImported = True
 try:
     import appindicator
