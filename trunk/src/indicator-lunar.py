@@ -18,6 +18,9 @@
 # Application indicator which displays lunar information.
 
 
+# Ubuntu 12.10 will likely ship with Python3: https://wiki.ubuntu.com/Python/3
+
+
 appindicatorImported = True
 try:
     import appindicator
