@@ -18,6 +18,9 @@
 # Application indicator which displays an icon and the current stardate.
 
 
+# Ubuntu 12.10 will likely ship with Python3: https://wiki.ubuntu.com/Python/3
+
+
 appindicatorImported = True
 try:
     import appindicator
