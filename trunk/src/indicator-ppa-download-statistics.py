@@ -24,6 +24,9 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.04/c/appindicator/index.html
 
 
+# Ubuntu 12.10 will likely ship with Python3: https://wiki.ubuntu.com/Python/3
+
+
 appindicatorImported = True
 try:
     import appindicator
