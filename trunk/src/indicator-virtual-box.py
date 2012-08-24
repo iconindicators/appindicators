@@ -26,7 +26,7 @@
 #  menuItem.get_children()[ 0 ].set_markup( "<b><i>" + "item" + "</i></b>" )
 
 
-# Ubuntu 12.10 will likely ship with Python3: https://wiki.ubuntu.com/Python/3
+# Will need to eventually port to Python 3 as Ubuntu 12.10 will ship with Python3: https://wiki.ubuntu.com/Python/3
 
 
 appindicatorImported = True
@@ -52,7 +52,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.11"
+    VERSION = "1.0.12"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -98,62 +98,25 @@ class IndicatorVirtualBox:
 
 
     def main( self ):
-        self.updateMenu()
         self.timeoutID = gobject.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
         gtk.main()
 
 
     def buildMenu( self ):
-        menu = gtk.Menu()
-
-        menu.append( gtk.SeparatorMenuItem() )
-
-        self.virtualBoxMenuItem = gtk.MenuItem( "Launch VirtualBox" )
-        self.virtualBoxMenuItem.connect( "activate", self.onLaunchVirtualBox )
-        menu.append( self.virtualBoxMenuItem )
-
-        preferencesMenuItem = gtk.MenuItem( "Preferences" )
-        preferencesMenuItem.connect( "activate", self.onPreferences )
-        menu.append( preferencesMenuItem )
-
-        aboutMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_ABOUT )
-        aboutMenuItem.connect( "activate", self.onAbout )
-        menu.append( aboutMenuItem )
-
-        quitMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_QUIT )
-        quitMenuItem.connect( "activate", gtk.main_quit )
-        menu.append( quitMenuItem )
-
-        menu.show_all()
-
-        if appindicatorImported == True:
-            self.indicator.set_menu( menu )
-        else:
-            self.menu = menu
-
-
-    def updateMenu( self ):
         if appindicatorImported == True:
             menu = self.indicator.get_menu()
         else:
             menu = self.menu
 
-        menu.popdown() # If we don't do this we get GTK complaints.
+        if menu is not None:
+            menu.popdown() # If we don't do this we get GTK complaints.
 
-        # Remove all VMs from the menu.
-        for item in menu.get_children():
-            if type( item ) == gtk.SeparatorMenuItem:
-                break
+        menu = gtk.Menu()
 
-            menu.remove( item )
-
-        # Add back in the refreshed list of VMs.
-        position = 0
         if self.isVirtualBoxInstalled():
             self.getVirtualMachines()
             if len( self.virtualMachineNames ) == 0 :
-                menu.insert( gtk.MenuItem( "(no virtual machines exist)" ), position )
-                position += 1
+                menu.append( gtk.MenuItem( "(no virtual machines exist)" ) )
             else:
                 for virtualMachineName in self.virtualMachineNames:
                     virtualMachineInfo = self.virtualMachineInfos[ virtualMachineName ]
@@ -169,13 +132,37 @@ class IndicatorVirtualBox:
 
                     vmMenuItem.props.name = virtualMachineName
                     vmMenuItem.connect( "activate", self.onStartVirtualMachine )
-                    menu.insert( vmMenuItem, position )
-                    position += 1
+                    menu.append( vmMenuItem )
         else:
             menu.insert( gtk.MenuItem( "(VirtualBox is not installed)" ), position )
-            position += 1
 
+        menu.append( gtk.SeparatorMenuItem() )
+
+        self.virtualBoxMenuItem = gtk.MenuItem( "Launch VirtualBox" )
+        self.virtualBoxMenuItem.connect( "activate", self.onLaunchVirtualBox )
         self.virtualBoxMenuItem.set_sensitive( self.isVirtualBoxInstalled( ) )
+        menu.append( self.virtualBoxMenuItem )
+
+        preferencesMenuItem = gtk.MenuItem( "Preferences" )
+        preferencesMenuItem.connect( "activate", self.onPreferences )
+        menu.append( preferencesMenuItem )
+
+        self.preferencesMenuItem = gtk.MenuItem( "Preferences" )
+        self.preferencesHandlerID = self.preferencesMenuItem.connect( "activate", self.onPreferences )
+        menu.append( self.preferencesMenuItem )
+
+        aboutMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_ABOUT )
+        aboutMenuItem.connect( "activate", self.onAbout )
+        menu.append( aboutMenuItem )
+
+        quitMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_QUIT )
+        quitMenuItem.connect( "activate", gtk.main_quit )
+        menu.append( quitMenuItem )
+
+        if appindicatorImported == True:
+            self.indicator.set_menu( menu )
+        else:
+            self.menu = menu
 
         menu.show_all()
 
@@ -183,6 +170,9 @@ class IndicatorVirtualBox:
     def getVirtualMachines( self ):
         self.virtualMachineNames = [] # Order is that given by the VirtualBox UI.
         self.virtualMachineInfos = {} # 'key' is the virtual machine name; 'value' is the virtual machine uuid and a boolean indicating the running status.
+
+        if not self.isVirtualBoxInstalled():
+            return
 
         # Get the VM uuids and ordering from the VirtualBox UI...
         p = subprocess.Popen( "grep GUI/SelectorVMPositions $HOME/.VirtualBox/VirtualBox.xml", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
@@ -222,7 +212,7 @@ class IndicatorVirtualBox:
 
 
     def onRefresh( self ):
-        gobject.idle_add( self.updateMenu )
+        gobject.idle_add( self.buildMenu )
         return True # Must return true so that we continue to be called (http://www.pygtk.org/pygtk2reference/gobject-functions.html#function-gobject--timeout-add).
 
 

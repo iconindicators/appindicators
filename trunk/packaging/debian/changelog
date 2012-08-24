@@ -1,3 +1,14 @@
+indicator-virtual-box (1.0.12-1) precise; urgency=low
+
+  * Noted that memory was leaking - strongly suspect it was due to removing/adding
+    menu items on each update.  As a result, the menu is now completely rebuilt on 
+    each update.  Unfortunately, if the preferences/about dialogs are showing
+    during an update, the warning "Trying to remove a child that doesn't believe
+    we're it's parent" is emitted, which appears to be benign.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 24 Aug 2012 17:29:37 +1000
+
+
 indicator-virtual-box (1.0.11-1) precise; urgency=low
 
   * Handle the case where the directory ~/.config/autostart does not exist.
