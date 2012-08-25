@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.13-1) precise; urgency=low
+
+  * Fixed the menu (incorrectly initialised) which caused a crash under GTK (non Unity).
+  * Removed duplicate preferences menu item.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 25 Aug 2012 11:22:02 +1000
+
+
 indicator-virtual-box (1.0.12-1) precise; urgency=low
 
   * Noted that memory was leaking - strongly suspect it was due to removing/adding
@@ -6,7 +14,7 @@ indicator-virtual-box (1.0.12-1) precise; urgency=low
     during an update, the warning "Trying to remove a child that doesn't believe
     we're it's parent" is emitted, which appears to be benign.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 24 Aug 2012 17:29:37 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 24 Aug 2012 17:29:37 +1000
 
 
 indicator-virtual-box (1.0.11-1) precise; urgency=low

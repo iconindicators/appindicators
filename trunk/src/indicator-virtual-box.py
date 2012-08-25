@@ -52,7 +52,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.12"
+    VERSION = "1.0.13"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -86,9 +86,11 @@ class IndicatorVirtualBox:
         # Create the status icon...either Unity or GTK.
         if appindicatorImported == True:
             self.indicator = appindicator.Indicator( IndicatorVirtualBox.NAME, IndicatorVirtualBox.ICON, appindicator.CATEGORY_APPLICATION_STATUS )
+            self.indicator.set_menu( gtk.Menu() ) # Set an empty menu to get things rolling...
             self.buildMenu()
             self.indicator.set_status( appindicator.STATUS_ACTIVE )
         else:
+            self.menu = gtk.Menu() # Set an empty menu to get things rolling...
             self.buildMenu()
             self.statusicon = gtk.StatusIcon()
             self.statusicon.set_from_icon_name( IndicatorVirtualBox.ICON )
@@ -108,9 +110,9 @@ class IndicatorVirtualBox:
         else:
             menu = self.menu
 
-        if menu is not None:
-            menu.popdown() # If we don't do this we get GTK complaints.
+        menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
 
+        # Create the new menu and populate...
         menu = gtk.Menu()
 
         if self.isVirtualBoxInstalled():
@@ -146,10 +148,6 @@ class IndicatorVirtualBox:
         preferencesMenuItem = gtk.MenuItem( "Preferences" )
         preferencesMenuItem.connect( "activate", self.onPreferences )
         menu.append( preferencesMenuItem )
-
-        self.preferencesMenuItem = gtk.MenuItem( "Preferences" )
-        self.preferencesHandlerID = self.preferencesMenuItem.connect( "activate", self.onPreferences )
-        menu.append( self.preferencesMenuItem )
 
         aboutMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_ABOUT )
         aboutMenuItem.connect( "activate", self.onAbout )
