@@ -1,3 +1,13 @@
+indicator-ppa-download-statistics (1.0.9-1) precise; urgency=low
+
+  * Constant removing/adding of menu items was leaking memory, so combined menu
+    build/rebuild methods.  Still get the (presumed benign) warning "Trying to 
+    remove a child that doesn't believe we're it's parent" warning.
+  * Now logs in once to LaunchPad - each login uses an excessive amount of memory.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 26 Aug 2012 16:02:52 +1000
+
+
 indicator-ppa-download-statistics (1.0.8-1) precise; urgency=low
 
   * Fixed a bug where the PPA owner/name was not preselected when editting.
