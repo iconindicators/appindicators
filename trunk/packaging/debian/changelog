@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.14-1) precise; urgency=low
+
+  * Addresses the case in which a VM which has been renamed/deleted and is selected 
+    in the menu but a refresh has not occurred.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 24 Sep 2012 19:58:31 +1000
+
+
 indicator-virtual-box (1.0.13-1) precise; urgency=low
 
   * Fixed the menu (incorrectly initialised) which caused a crash under GTK (non Unity).

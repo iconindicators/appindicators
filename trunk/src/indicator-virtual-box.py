@@ -52,7 +52,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.13"
+    VERSION = "1.0.14"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -221,24 +221,33 @@ class IndicatorVirtualBox:
     def onStartVirtualMachine( self, widget ):
         virtualMachineName = widget.props.name
         self.getVirtualMachines()
-        if self.virtualMachineInfos.get( virtualMachineName )[ 1 ] == True:
-            windowID = None
-            p = subprocess.Popen( "wmctrl -l", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-            for line in p.stdout.readlines():
-                if virtualMachineName in line:
-                    windowID = line[ 0 : line.find( " " ) ]
-    
-            p.wait()
+        if self.virtualMachineInfos.has_key( virtualMachineName ) == True: # It's possible the VM was renamed/deleted within VirtualBox but we've not refreshed yet to discover that change...
+            if self.virtualMachineInfos.get( virtualMachineName )[ 1 ] == True:
+                windowID = None
+                p = subprocess.Popen( "wmctrl -l", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+                for line in p.stdout.readlines():
+                    if virtualMachineName in line:
+                        windowID = line[ 0 : line.find( " " ) ]
 
-            if windowID is not None:
-                p = subprocess.Popen( "wmctrl -i -a " + windowID, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+                p.wait()
+
+                if windowID is not None:
+                    p = subprocess.Popen( "wmctrl -i -a " + windowID, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+                    p.wait()
+            else:
+                command = "VBoxManage startvm " + self.virtualMachineInfos.get( virtualMachineName )[ 0 ]
+                p = subprocess.Popen( command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
                 p.wait()
         else:
-            command = "VBoxManage startvm " + self.virtualMachineInfos.get( virtualMachineName )[ 0 ]
-            p = subprocess.Popen( command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-            p.wait()
+            self.showMessage( gtk.MESSAGE_ERROR, "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
 
         self.onRefresh()
+
+
+    def showMessage( self, messageType, message ):
+        dialog = gtk.MessageDialog( None, 0, messageType, gtk.BUTTONS_OK, message )
+        dialog.run()
+        dialog.destroy()
 
 
     def onPreferences( self, widget ):
