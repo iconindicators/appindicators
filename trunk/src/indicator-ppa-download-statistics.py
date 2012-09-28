@@ -220,7 +220,7 @@ class IndicatorPPADownloadStatistics:
 
     def getPPAKeysSorted( self ):
         sortedKeys = [] 
-        for key in self.ppas.keys():
+        for key in list( self.ppas.keys() ):
             sortedKeys.append( key )
 
         return sorted( sortedKeys, cmp = locale.strcoll )
@@ -228,7 +228,7 @@ class IndicatorPPADownloadStatistics:
 
     def getPPAOwnersSorted( self ):
         sortedPPAOwners = [] 
-        for key in self.ppas.keys():
+        for key in list( self.ppas.keys() ):
             ppaOwner = self.ppas[ key ][ 0 ]
             if ppaOwner not in sortedPPAOwners:
                 sortedPPAOwners.append( ppaOwner )
@@ -238,7 +238,7 @@ class IndicatorPPADownloadStatistics:
 
     def getPPANamesSorted( self ):
         sortedPPANames = [] 
-        for key in self.ppas.keys():
+        for key in list( self.ppas.keys() ):
             ppaName = self.ppas[ key ][ 1 ]
             if ppaName not in sortedPPANames:
                 sortedPPANames.append( ppaName )
@@ -430,13 +430,13 @@ class IndicatorPPADownloadStatistics:
             ppaList = [ ppaOwnerValue, ppaNameValue, distributions.get_active_text(), architectures.get_active_text() ]
             key = self.getPPAKey( ppaList )
             if add == True:
-                if not self.ppas.has_key( key ):
+                if key not in self.ppas:
                     self.ppas[ key ] = ppaList
                     self.saveSettings()
                     self.buildMenu() # Update the menu to immediately reflect the change...but still need to do a new download.
                     self.requestPPADownloadAndMenuRefresh()
             else: # This is an edit
-                if not self.ppas.has_key( key ):
+                if key not in self.ppas:
                     oldKey = self.getPPAKey( [ existingPPAOwner, existingPPAName, existingDistribution, existingArchitecture ] )
                     del self.ppas[ oldKey ]
                     self.ppas[ key ] = ppaList
@@ -585,7 +585,7 @@ class IndicatorPPADownloadStatistics:
     def saveSettings( self ):
         try:
             ppas = []
-            for k, v in self.ppas.iteritems():
+            for k, v in list( self.ppas.items() ):
                 ppas.append( v )
 
             settings = {
