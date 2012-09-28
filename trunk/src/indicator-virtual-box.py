@@ -221,7 +221,7 @@ class IndicatorVirtualBox:
     def onStartVirtualMachine( self, widget ):
         virtualMachineName = widget.props.name
         self.getVirtualMachines()
-        if self.virtualMachineInfos.has_key( virtualMachineName ) == True: # It's possible the VM was renamed/deleted within VirtualBox but we've not refreshed yet to discover that change...
+        if ( virtualMachineName in self.virtualMachineInfos ) == True: # It's possible the VM was renamed/deleted within VirtualBox but we've not refreshed yet to discover that change...
             if self.virtualMachineInfos.get( virtualMachineName )[ 1 ] == True:
                 windowID = None
                 p = subprocess.Popen( "wmctrl -l", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
