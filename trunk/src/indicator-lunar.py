@@ -18,7 +18,13 @@
 # Application indicator which displays lunar information.
 
 
-# Ubuntu 12.10 will likely ship with Python3: https://wiki.ubuntu.com/Python/3
+# The Python 3 version of Ephem needs to be packaged - http://pypi.python.org/pypi/ephem
+# Have sent a message to https://launchpad.net/~nilarimogard requesting a Python 3 version to be added.
+
+
+# Maybe consider switching back to local time and not use UTC:
+# http://my-other-life-as-programmer.blogspot.com.au/2011/09/python-computing-sunrise-sunset-times.html
+
 
 
 appindicatorImported = True
