@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.15-1) precise; urgency=low
+
+  * Changes for Python3 compatibility.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 28 Sep 2012 10:06:11 +1000
+
+
 indicator-virtual-box (1.0.14-1) precise; urgency=low
 
   * Addresses the case in which a VM which has been renamed/deleted and is selected 
