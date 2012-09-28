@@ -18,7 +18,11 @@
 # Application indicator which displays an icon and the current stardate.
 
 
-# Ubuntu 12.10 will likely ship with Python3: https://wiki.ubuntu.com/Python/3
+# Need to eventually port from PyGTK to PyGObject:
+# http://www.jeremyscheff.com/2012/02/some-notes-on-porting-from-pygtk-to-pygobject/
+# https://live.gnome.org/PyGObject/IntrospectionPorting
+# http://developer.gnome.org/pygobject/stable/index.html
+
 
 
 appindicatorImported = True
