@@ -18,15 +18,15 @@
 # Application indicator to start (and show running) VirtualBox virtual machines.
 
 
-# Unity appindicator does not support styles in menu items.
-# Therefore, cannot bold/italic a VM name when it is running (as originally intended).
+# Unity appindicator does not support styles in menu items, so cannot bold/italic
+# a VM name when it is running (as originally intended).
 # For reference, here is the original code (which works under GTK):
 #  menuItem = gtk.MenuItem( "" )
 #  menuItem.get_children()[ 0 ].set_use_markup( True )
 #  menuItem.get_children()[ 0 ].set_markup( "<b><i>" + "item" + "</i></b>" )
 
 
-# Will need to eventually port to Python 3 as Ubuntu 12.10 will ship with Python3: https://wiki.ubuntu.com/Python/3
+# TODO: Eventually port from PyGTK to PyGObject - https://live.gnome.org/PyGObject
 
 
 appindicatorImported = True
@@ -52,7 +52,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.14"
+    VERSION = "1.0.15"
     ICON = "indicator-virtual-box"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
