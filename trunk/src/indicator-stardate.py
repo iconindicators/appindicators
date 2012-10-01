@@ -18,11 +18,7 @@
 # Application indicator which displays an icon and the current stardate.
 
 
-# Need to eventually port from PyGTK to PyGObject:
-# http://www.jeremyscheff.com/2012/02/some-notes-on-porting-from-pygtk-to-pygobject/
-# https://live.gnome.org/PyGObject/IntrospectionPorting
-# http://developer.gnome.org/pygobject/stable/index.html
-
+# TODO: Eventually port from PyGTK to PyGObject - https://live.gnome.org/PyGObject
 
 
 appindicatorImported = True
@@ -46,7 +42,7 @@ class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.8"
+    VERSION = "1.0.9"
     ICON = "indicator-stardate"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -58,6 +54,7 @@ class IndicatorStardate:
 
 
     def __init__( self ):
+        self.dialog = None
         logging.basicConfig( file = sys.stderr, level = logging.INFO )
         self.loadSettings()
 
@@ -132,27 +129,6 @@ class IndicatorStardate:
         dialog.destroy()
 
 
-    def onShowIssue( self, widget ):
-        self.showIssue = widget.active
-        self.saveSettings()
-        self.update()
-
-
-    def onAutoStart( self, widget ):
-        if not os.path.exists( IndicatorStardate.AUTOSTART_PATH ):
-            os.makedirs( IndicatorStardate.AUTOSTART_PATH )
-
-        if widget.active:
-            try:
-                shutil.copy( IndicatorStardate.DESKTOP_PATH + IndicatorStardate.DESKTOP_FILE, IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
-            except Exception as e:
-                logging.exception( e )
-        else:
-            try:
-                os.remove( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
-            except: pass
-
-
     def buildMenu( self ):
         self.menu = gtk.Menu()
 
@@ -164,15 +140,9 @@ class IndicatorStardate:
             self.menu.append( self.stardateMenuItem )
             self.menu.append( gtk.SeparatorMenuItem() )
 
-        showIssueMenuItem = gtk.CheckMenuItem( "Show ISSUE" )
-        showIssueMenuItem.set_active( self.showIssue )
-        showIssueMenuItem.connect( "activate", self.onShowIssue )
-        self.menu.append( showIssueMenuItem )
-
-        autoStartMenuItem = gtk.CheckMenuItem( "Autostart" )
-        autoStartMenuItem.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
-        autoStartMenuItem.connect( "activate", self.onAutoStart )
-        self.menu.append( autoStartMenuItem )
+        preferencesMenuItem = gtk.MenuItem( "Preferences" )
+        preferencesMenuItem.connect( "activate", self.onPreferences )
+        self.menu.append( preferencesMenuItem )
 
         aboutMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_ABOUT )
         aboutMenuItem.connect( "activate", self.onAbout )
@@ -183,6 +153,51 @@ class IndicatorStardate:
         self.menu.append( quitMenuItem )
 
         self.menu.show_all()
+
+
+    def onPreferences( self, widget ):
+        if self.dialog is not None:
+            return
+
+        self.dialog = gtk.Dialog( "Preferences", None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+
+        table = gtk.Table( 2, 1, False )
+        table.set_col_spacings( 5 )
+        table.set_row_spacings( 5 )
+
+        showIssueCheckbox = gtk.CheckButton( "Show Issue" )
+        showIssueCheckbox.set_active( self.showIssue )
+        table.attach( showIssueCheckbox, 0, 1, 0, 1 )
+
+        autostartCheckbox = gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
+        table.attach( autostartCheckbox, 0, 1, 1, 2 )
+
+        self.dialog.vbox.pack_start( table, True, True, 10 )
+        self.dialog.set_border_width( 10 )
+
+        self.dialog.show_all()
+        response = self.dialog.run()
+        if response == gtk.RESPONSE_OK:
+            self.showIssue = showIssueCheckbox.get_active()
+            self.saveSettings()
+
+            if not os.path.exists( IndicatorStardate.AUTOSTART_PATH ):
+                os.makedirs( IndicatorStardate.AUTOSTART_PATH )
+
+            if autostartCheckbox.get_active():
+                try:
+                    shutil.copy( IndicatorStardate.DESKTOP_PATH + IndicatorStardate.DESKTOP_FILE, IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
+                except Exception as e:
+                    logging.exception( e )
+            else:
+                try:
+                    os.remove( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
+                except: pass
+
+        self.dialog.destroy()
+        self.dialog = None
+        self.update()
 
 
     def loadSettings( self ):

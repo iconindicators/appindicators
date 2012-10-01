@@ -1,8 +1,9 @@
 indicator-stardate (1.0.9-1) precise; urgency=low
 
   * Changes for Python3 compatibility.
+  * Added a preferences dialog.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 28 Sep 2012 10:06:11 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 28 Sep 2012 10:06:11 +1000    <----------------------------------------------Fix!
 
 
 indicator-stardate (1.0.8-1) precise; urgency=low
