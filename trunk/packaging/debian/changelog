@@ -1,3 +1,11 @@
+indicator-lunar (1.0.10-1) precise; urgency=low
+
+  * Switched back to using localtime!
+  * Added an option to start the werewolf warning at a particular illumination.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 9 Aug 2012 20:10:27 +1000<--------------------------------------- Update on release!
+
+
 indicator-lunar (1.0.9-1) precise; urgency=low
 
   * Noticed the dates for next phases were out by hours/days.  Removed the conversion

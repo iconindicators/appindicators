@@ -18,13 +18,7 @@
 # Application indicator which displays lunar information.
 
 
-# The Python 3 version of Ephem needs to be packaged - http://pypi.python.org/pypi/ephem
-# Have sent a message to https://launchpad.net/~nilarimogard requesting a Python 3 version to be added.
-
-
-# Maybe consider switching back to local time and not use UTC:
-# http://my-other-life-as-programmer.blogspot.com.au/2011/09/python-computing-sunrise-sunset-times.html
-
+# TODO: Waiting on a Python 3 version of Ephem (http://pypi.python.org/pypi/ephem) to be packaged at https://launchpad.net/~nilarimogard.
 
 
 appindicatorImported = True
@@ -55,7 +49,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.9"
+    VERSION = "1.0.10"
     ICON = "indicator-lunar"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -67,6 +61,7 @@ class IndicatorLunar:
     SETTINGS_SHOW_ILLUMINATION = "showIllumination"
     SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW = "showNorthernHemisphereView"
     SETTINGS_SHOW_PHASE = "showPhase"
+    SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
 
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
     LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
@@ -139,11 +134,12 @@ class IndicatorLunar:
     def update( self ):
         currentDateTime = datetime.datetime.now()
         lunarPhase = self.calculateLunarPhase( currentDateTime )
+        percentageIllumination = int( round( ephem.Moon( currentDateTime ).phase ) )
 
         if self.showIllumination == True and self.showPhase == True:
-            labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( int( round( ephem.Moon( currentDateTime ).phase ) ) ) + "%)"
+            labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( percentageIllumination ) + "%)"
         elif self.showIllumination == True:
-            labelTooltip = str( int( round( ephem.Moon( currentDateTime ).phase ) ) ) + "%"
+            labelTooltip = str( percentageIllumination ) + "%"
         elif self.showPhase == True:
             labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
         else:
@@ -157,16 +153,16 @@ class IndicatorLunar:
             self.statusicon.set_tooltip( labelTooltip )
 
         self.phaseMenuItem.set_label( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] )
-        self.illuminationMenuItem.set_label( "Illumination: " + str( int( round( ephem.Moon( currentDateTime ).phase ) ) ) + "%" )
+        self.illuminationMenuItem.set_label( "Illumination: " + str( percentageIllumination ) + "%" )
         self.distanceToEarthInKMMenuItem.set_label( "    Moon to Earth: " + str( int( round( ephem.Moon( currentDateTime ).earth_distance * ephem.meters_per_au / 1000 ) ) ) + " km" )
         self.distanceToEarthInAUMenuItem.set_label( "    Moon to Earth: " + str( round( ephem.Moon( currentDateTime ).earth_distance, 4 ) ) + " AU" )
         self.distanceToSunMenuItem.set_label( "    Moon to Sun: " + str( round( ephem.Moon( currentDateTime ).sun_distance, 3 ) )  + " AU" )
         self.constellationMenuItem.set_label( "Constellation: " + ephem.constellation( ephem.Moon( currentDateTime ) )[ 1 ] )
 
-        newMoonLabel = "    New: " + self.trimFractionalSeconds( str( ephem.next_new_moon( ephem.now() ) ) )
-        firstQuarterLabel = "    First Quarter: " + self.trimFractionalSeconds( str( ephem.next_first_quarter_moon( ephem.now() ) ) )
-        fullMoonLabel = "    Full: " + self.trimFractionalSeconds( str( ephem.next_full_moon( ephem.now() ) ) )
-        thirdQuarterLabel = "    Third Quarter: " + self.trimFractionalSeconds( str( ephem.next_last_quarter_moon( ephem.now() ) ) )
+        newMoonLabel = "    New: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_new_moon( ephem.now() ) ) ) )
+        firstQuarterLabel = "    First Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_first_quarter_moon( ephem.now() ) ) ) )
+        fullMoonLabel = "    Full: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_full_moon( ephem.now() ) ) ) )
+        thirdQuarterLabel = "    Third Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_last_quarter_moon( ephem.now() ) ) ) )
         if lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS:
             # third, new, first, full
             self.nextMoonOneMenuItem.set_label( thirdQuarterLabel )
@@ -192,8 +188,8 @@ class IndicatorLunar:
             self.nextMoonThreeMenuItem.set_label( newMoonLabel )
             self.nextMoonFourMenuItem.set_label( firstQuarterLabel )
 
-        equinox = ephem.next_equinox( ephem.now() )
-        solstice = ephem.next_solstice( ephem.now() )
+        equinox = ephem.localtime( ephem.next_equinox( ephem.now() ) )
+        solstice = ephem.localtime( ephem.next_solstice( ephem.now() ) )
         if equinox < solstice:
             self.equinoxSolsticeOneMenuItem.set_label( "Equinox: " + self.trimFractionalSeconds( str( equinox ) ) )
             self.equinoxSolsticeTwoMenuItem.set_label( "Solstice: " + self.trimFractionalSeconds( str( solstice ) ) )
@@ -201,8 +197,14 @@ class IndicatorLunar:
             self.equinoxSolsticeOneMenuItem.set_label( "Solstice: " + self.trimFractionalSeconds( str( solstice ) ) )
             self.equinoxSolsticeTwoMenuItem.set_label( "Equinox: " + self.trimFractionalSeconds( str( equinox ) ) )
 
-        if pynotifyImported == True and self.showHourlyWerewolfWarning == True and lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON:
-            pynotify.Notification( "Warning: Werewolves about!!!", "", IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_FULL_MOON ] ).show()
+        phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
+
+        if pynotifyImported == True and self.showHourlyWerewolfWarning == True and percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and phaseIsBetweenNewAndFullInclusive:
+            pynotify.Notification( "WARNING: Werewolves about!!!", "", IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_FULL_MOON ] ).show()
 
         return True # Needed so the timer continues!
 
@@ -348,30 +350,41 @@ class IndicatorLunar:
 
         self.dialog = gtk.Dialog( "Preferences", None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
 
-        table = gtk.Table( 5, 1, False )
+        table = gtk.Table( 6, 2, False )
         table.set_col_spacings( 5 )
         table.set_row_spacings( 5 )
 
         showPhaseCheckbox = gtk.CheckButton( "Show phase" )
         showPhaseCheckbox.set_active( self.showPhase )
-        table.attach( showPhaseCheckbox, 0, 1, 0, 1 )
+        table.attach( showPhaseCheckbox, 0, 2, 0, 1 )
 
         showIlluminationCheckbox = gtk.CheckButton( "Show illumination" )
         showIlluminationCheckbox.set_active( self.showIllumination )
-        table.attach( showIlluminationCheckbox, 0, 1, 1, 2 )
+        table.attach( showIlluminationCheckbox, 0, 2, 1, 2 )
 
         showNorthernHemisphereViewCheckbox = gtk.CheckButton( "Northern hemisphere view" )
         showNorthernHemisphereViewCheckbox.set_active( self.showNorthernHemisphereView )
-        table.attach( showNorthernHemisphereViewCheckbox, 0, 1, 2, 3 )
+        table.attach( showNorthernHemisphereViewCheckbox, 0, 2, 2, 3 )
 
         showHourlyWerewolfWarningCheckbox = gtk.CheckButton( "Hourly werewolf warning" )
         showHourlyWerewolfWarningCheckbox.set_active( self.showHourlyWerewolfWarning )
-        showHourlyWerewolfWarningCheckbox.set_tooltip_text( "Screen notification on each hour during a full moon" )
-        table.attach( showHourlyWerewolfWarningCheckbox, 0, 1, 3, 4 )
+        showHourlyWerewolfWarningCheckbox.set_tooltip_text( "Shows an hourly screen notification" )
+        table.attach( showHourlyWerewolfWarningCheckbox, 0, 2, 3, 4 )
+
+        label = gtk.Label( "  Illumination %" )
+        label.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        table.attach( label, 0, 1, 4, 5 )
+
+        spinner = gtk.SpinButton( gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 5, 0 ) )
+        spinner.set_tooltip_text( "The warning will appear from new moon to full moon once the specified illumination occurs" )
+        spinner.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        table.attach( spinner, 1, 2, 4, 5 )
+
+        showHourlyWerewolfWarningCheckbox.connect( "toggled", self.onShowHourlyWerewolfWarningCheckbox, label, spinner )
 
         autostartCheckbox = gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
-        table.attach( autostartCheckbox, 0, 1, 4, 5 )
+        table.attach( autostartCheckbox, 0, 2, 5, 6 )
 
         self.dialog.vbox.pack_start( table, True, True, 10 )
         self.dialog.set_border_width( 10 )
@@ -383,6 +396,7 @@ class IndicatorLunar:
             self.showIllumination = showIlluminationCheckbox.get_active()
             self.showNorthernHemisphereView = showNorthernHemisphereViewCheckbox.get_active()
             self.showHourlyWerewolfWarning = showHourlyWerewolfWarningCheckbox.get_active()
+            self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
             self.saveSettings()
 
             if not os.path.exists( IndicatorLunar.AUTOSTART_PATH ):
@@ -403,11 +417,17 @@ class IndicatorLunar:
         self.update()
 
 
+    def onShowHourlyWerewolfWarningCheckbox( self, source, spinner, label ):
+        label.set_sensitive( source.get_active() )
+        spinner.set_sensitive( source.get_active() )
+
+
     def loadSettings( self ):
         self.showHourlyWerewolfWarning = True
         self.showIllumination = True
         self.showNorthernHemisphereView = True
         self.showPhase = True
+        self.werewolfWarningStartIlluminationPercentage = 100
 
         if os.path.isfile( IndicatorLunar.SETTINGS_FILE ):
             try:
@@ -418,6 +438,7 @@ class IndicatorLunar:
                 self.showIllumination = settings.get( IndicatorLunar.SETTINGS_SHOW_ILLUMINATION, self.showIllumination )
                 self.showNorthernHemisphereView = settings.get( IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW, self.showNorthernHemisphereView )
                 self.showPhase = settings.get( IndicatorLunar.SETTINGS_SHOW_PHASE, self.showPhase )
+                self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
 
             except Exception as e:
                 logging.exception( e )
@@ -430,7 +451,8 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_SHOW_HOURLY_WEREWOLF_WARNING: self.showHourlyWerewolfWarning,
                 IndicatorLunar.SETTINGS_SHOW_ILLUMINATION: self.showIllumination,
                 IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW: self.showNorthernHemisphereView,
-                IndicatorLunar.SETTINGS_SHOW_PHASE: self.showPhase
+                IndicatorLunar.SETTINGS_SHOW_PHASE: self.showPhase,
+                IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage
             }
 
             with open( IndicatorLunar.SETTINGS_FILE, 'w' ) as f:
