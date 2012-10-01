@@ -16,15 +16,14 @@
 
 
 # Application indicator to display PPA download statistics.
-
-
+#
 # References:
 #  https://launchpad.net/+apidoc/1.0.html
 #  https://help.launchpad.net/API/launchpadlib
 #  http://developer.ubuntu.com/api/ubuntu-12.04/c/appindicator/index.html
 
 
-# Will need to eventually port to Python 3 as Ubuntu 12.10 will ship with Python3: https://wiki.ubuntu.com/Python/3
+# TODO: Eventually port from PyGTK to PyGObject - https://live.gnome.org/PyGObject
 
 
 appindicatorImported = True
@@ -54,7 +53,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.9"
+    VERSION = "1.0.10"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
@@ -509,7 +508,7 @@ class IndicatorPPADownloadStatistics:
 
         self.dialog = gtk.Dialog( "Preferences", None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
 
-        table = gtk.Table( 2, 1, False )
+        table = gtk.Table( 3, 1, False )
         table.set_col_spacings( 5 )
         table.set_row_spacings( 5 )
 

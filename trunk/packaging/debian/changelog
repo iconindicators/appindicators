@@ -1,8 +1,9 @@
 indicator-ppa-download-statistics (1.0.10-1) precise; urgency=low
 
   * Changes for Python3 compatibility.
+  * Fixed the table layout for the preferences (specified 2 rows when it should be 3).
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 28 Sep 2012 10:06:11 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 28 Sep 2012 10:06:11 +1000     <-------------------------------------------Fix!!!
 
 
 indicator-ppa-download-statistics (1.0.9-1) precise; urgency=low
