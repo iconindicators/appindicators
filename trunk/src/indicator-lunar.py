@@ -21,6 +21,9 @@
 # TODO: Waiting on a Python 3 version of Ephem (http://pypi.python.org/pypi/ephem) to be packaged at https://launchpad.net/~nilarimogard.
 
 
+# TODO: Eventually port from PyGTK to PyGObject - https://live.gnome.org/PyGObject
+
+
 appindicatorImported = True
 try:
     import appindicator
