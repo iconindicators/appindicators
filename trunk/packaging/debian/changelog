@@ -1,9 +1,13 @@
-indicator-virtual-box (1.0.15-1) precise; urgency=low
+indicator-virtual-box (1.0.15-1) quantal; urgency=low
 
-  * Changes for Python3 compatibility.
-  * Fixed a crash when VirtualBox was not installed.
+  * Changes for Python3 and PyGObject.
+  * Handle the case when VirtualBox is not installed.
+  * Handle the case when VirtualBox is installed but has not yet been run
+    (and so $HOME/.VirtualBox/VirtualBox.xml does not exist).
+  * Handle the case when the order of VMs has not been changed by the user
+    (use the order given by VBoxManage).
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 28 Sep 2012 10:06:11 +1000  <-------------------------------------------Fix
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 22 Oct 2012 17:05:01 +1000
 
 
 indicator-virtual-box (1.0.14-1) precise; urgency=low

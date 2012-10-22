@@ -26,7 +26,9 @@
 #  menuItem.get_children()[ 0 ].set_markup( "<b><i>" + "item" + "</i></b>" )
 
 
-# TODO: Eventually port from PyGTK to PyGObject - https://live.gnome.org/PyGObject
+# On Lubuntu 12.10 the following message appears when the indicator is executed:
+#   ERROR:root:Could not find any typelib for AppIndicator3
+# From https://kororaa.org/forums/viewtopic.php?f=7&t=220#p2343, it (hopefully) is safe to ignore.
 
 
 from functools import cmp_to_key
@@ -55,13 +57,14 @@ class IndicatorVirtualBox:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
     VERSION = "1.0.15"
-    ICON = "indicator-virtual-box"
+    ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
+    VIRTUAL_BOX_CONFIGURATION = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_BEFORE = "menuTextVirtualMachineRunningBefore"
@@ -98,7 +101,7 @@ class IndicatorVirtualBox:
             self.buildMenu()
             self.statusicon = Gtk.StatusIcon()
             self.statusicon.set_from_icon_name( IndicatorVirtualBox.ICON )
-            self.statusicon.set_tooltip( "Virtual Machines" )
+            self.statusicon.set_tooltip_text( "Virtual Machines" )
             self.statusicon.connect( "popup-menu", self.handleRightClick )
             self.statusicon.connect( "activate", self.handleLeftClick )
 
@@ -127,8 +130,7 @@ class IndicatorVirtualBox:
                     virtualMachineInfo = self.virtualMachineInfos[ virtualMachineName ]
                     if virtualMachineInfo[ 1 ] == True: # VM is running...
                         if self.useRadioIndicator == True:
-                            # For backward compatibility allow the user choose the radio indicator AND menu text.
-                            vmMenuItem = Gtk.RadioMenuItem( None, self.menuTextVirtualMachineRunningBefore + virtualMachineName + self.menuTextVirtualMachineRunningAfter, False )
+                            vmMenuItem = Gtk.RadioMenuItem.new_with_label( [], self.menuTextVirtualMachineRunningBefore + virtualMachineName + self.menuTextVirtualMachineRunningAfter )
                             vmMenuItem.set_active( True )
                         else:
                             vmMenuItem = Gtk.MenuItem( self.menuTextVirtualMachineRunningBefore + virtualMachineName + self.menuTextVirtualMachineRunningAfter )
@@ -138,15 +140,15 @@ class IndicatorVirtualBox:
                     vmMenuItem.props.name = virtualMachineName
                     vmMenuItem.connect( "activate", self.onStartVirtualMachine )
                     menu.append( vmMenuItem )
+
+            menu.append( Gtk.SeparatorMenuItem() )
+
+            self.virtualBoxMenuItem = Gtk.MenuItem( "Launch VirtualBox" )
+            self.virtualBoxMenuItem.connect( "activate", self.onLaunchVirtualBox )
+            menu.append( self.virtualBoxMenuItem )
         else:
             menu.insert( Gtk.MenuItem( "(VirtualBox is not installed)" ), 0 )
-
-        menu.append( Gtk.SeparatorMenuItem() )
-
-        self.virtualBoxMenuItem = Gtk.MenuItem( "Launch VirtualBox" )
-        self.virtualBoxMenuItem.connect( "activate", self.onLaunchVirtualBox )
-        self.virtualBoxMenuItem.set_sensitive( self.isVirtualBoxInstalled( ) )
-        menu.append( self.virtualBoxMenuItem )
+            menu.append( Gtk.SeparatorMenuItem() )
 
         preferencesMenuItem = Gtk.MenuItem( "Preferences" )
         preferencesMenuItem.connect( "activate", self.onPreferences )
@@ -168,50 +170,60 @@ class IndicatorVirtualBox:
         menu.show_all()
 
 
+    def isVirtualBoxInstalled( self ):
+        p = subprocess.Popen( "which VBoxManage", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+        # For Python3, need to apply decode to the output of subprocess...
+        # http://stackoverflow.com/questions/8652767/python3-subprocess-communicate-example
+        return p.communicate()[ 0 ].decode() != ''
+
+
     def getVirtualMachines( self ):
-        self.virtualMachineNames = [] # Order is that given by the VirtualBox UI.
-        self.virtualMachineInfos = {} # 'key' is the virtual machine name; 'value' is the virtual machine uuid and a boolean indicating the running status.
+        self.virtualMachineNames = [] # The sort order is given by the VirtualBox UI.
+        self.virtualMachineInfos = {} # 'key' is the virtual machine name; 'value' is the VM uuid and a boolean for the running status.
 
         if not self.isVirtualBoxInstalled():
             return
 
-        # Get the VM uuids and ordering from the VirtualBox UI...
-        p = subprocess.Popen( "grep GUI/SelectorVMPositions $HOME/.VirtualBox/VirtualBox.xml", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-        virtualMachineUUIDsSorted = list( p.communicate()[ 0 ].rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
-
-        # Get the VM names and uuids...
+        # Get the name and uuid of every VM...
         p = subprocess.Popen( "VBoxManage list vms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-        uuidToName = {} # Used to map uuid to name.
+        uuidToName = {} # Used (below) to map uuid to name.
         for line in p.stdout.readlines():
-            info = line[ 1 : -2 ].split( "\" {" )
+            info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
             self.virtualMachineInfos[ info[ 0 ] ] = [ info[ 1 ], False ]
             uuidToName[ info[ 1 ] ] = info[ 0 ]
+            self.virtualMachineNames.append( info[ 0 ] ) # Used (below) when sorting VMs by VirtualBox UI order.
 
         p.wait()
 
-        # Build a list of VM names, sorted by VirtualBox UI order.
-        for virtualMachineUUID in virtualMachineUUIDsSorted:
-            self.virtualMachineNames.append( uuidToName[ virtualMachineUUID ] )
-
-        # Determine which VMs are running.
+        # Determine which VMs are running...
         p = subprocess.Popen( "VBoxManage list runningvms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
         for line in p.stdout.readlines():
-            info = line[ 1 : -2 ].split( "\" {" )
+            info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
             del self.virtualMachineInfos[ info[ 0 ] ]
             self.virtualMachineInfos[ info[ 0 ] ] = [ info[ 1 ], True ]
 
         p.wait()
 
+        # Build a list of VM names, sorted by VirtualBox UI order (from the VirtualBox configuration file).  However...
+        # If VirtualBox is installed but has not been run, the configuration file probably won't exist.
+        # If the ordering of the VMs has not been changed in the VirtualBox GUI, the order section in the configuration file will not exist.
+        virtualMachineUUIDsSorted = []
+        if os.path.exists( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION ):
+            p = subprocess.Popen( "grep GUI/SelectorVMPositions " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+            try:
+                virtualMachineUUIDsSorted = list( p.communicate()[ 0 ].decode().rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
+            except: # The VM order has never been altered giving an empty result (and exception).
+                virtualMachineUUIDsSorted = []
+
+        # Build a list of VM names, sorted by VirtualBox UI order.
+        if len( virtualMachineUUIDsSorted ) > 0: # Will be empty if VirtualBox has not been run or the sort order has not been altered.
+            self.virtualMachineNames = []
+            for virtualMachineUUID in virtualMachineUUIDsSorted:
+                self.virtualMachineNames.append( uuidToName[ virtualMachineUUID ] )
+
         # Alphabetically sort...
         if self.sortDefault == False:
             self.virtualMachineNames = sorted( self.virtualMachineNames, key = cmp_to_key( locale.strcoll ) )
-
-
-    def isVirtualBoxInstalled( self ):
-        p = subprocess.Popen( "which VBoxManage", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-        # Need to apply decode to the output of subprocess for Python3...
-        # http://stackoverflow.com/questions/8652767/python3-subprocess-communicate-example
-        return p.communicate()[ 0 ].decode() != ''
 
 
     def onRefresh( self ):
@@ -384,11 +396,10 @@ class IndicatorVirtualBox:
 
 
     def handleLeftClick( self, icon ):
-        self.menu.popup( None, None, Gtk.status_icon_position_menu, 1, Gtk.get_current_event_time(), self.statusicon )
-
+        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
 
     def handleRightClick( self, icon, button, time ):
-        self.menu.popup( None, None, Gtk.status_icon_position_menu, button, time, self.statusicon )
+        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
     def loadSettings( self ):
