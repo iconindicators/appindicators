@@ -562,7 +562,7 @@ class IndicatorPPADownloadStatistics:
 
         if os.path.isfile( IndicatorPPADownloadStatistics.SETTINGS_FILE ):
             try:
-                with open( IndicatorPPADownloadStatistics.SETTINGS_FILE, 'r' ) as f:
+                with open( IndicatorPPADownloadStatistics.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
                 ppas = []
@@ -595,7 +595,7 @@ class IndicatorPPADownloadStatistics:
                 IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU: self.showSubmenu
             }
 
-            with open( IndicatorPPADownloadStatistics.SETTINGS_FILE, 'w' ) as f:
+            with open( IndicatorPPADownloadStatistics.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 
         except Exception as e:
