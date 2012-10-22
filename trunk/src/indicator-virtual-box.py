@@ -149,7 +149,7 @@ class IndicatorVirtualBox:
             menu.insert( Gtk.MenuItem( "(VirtualBox is not installed)" ), 0 )
             menu.append( Gtk.SeparatorMenuItem() )
 
-        preferencesMenuItem = Gtk.MenuItem( "Preferences" )
+        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
         preferencesMenuItem.connect( "activate", self.onPreferences )
         menu.append( preferencesMenuItem )
 
