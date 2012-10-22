@@ -207,7 +207,7 @@ class IndicatorStardate:
 
         if os.path.isfile( IndicatorStardate.SETTINGS_FILE ):
             try:
-                with open( IndicatorStardate.SETTINGS_FILE, 'r' ) as f:
+                with open( IndicatorStardate.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
                 self.showIssue = settings.get( IndicatorStardate.SETTINGS_SHOW_ISSUE, self.showIssue )
@@ -220,7 +220,7 @@ class IndicatorStardate:
     def saveSettings( self ):
         try:
             settings = { IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showIssue }
-            with open( IndicatorStardate.SETTINGS_FILE, 'w' ) as f:
+            with open( IndicatorStardate.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 
         except Exception as e:
