@@ -42,7 +42,6 @@ except:
 from gi.repository import Gtk
 from gi.repository import GObject as gobject
 
-import gi
 import json
 import locale
 import logging
