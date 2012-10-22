@@ -2,12 +2,11 @@ Source: indicator-stardate
 Maintainer: Bernard Giannetti <thebernmeister@hotmail.com>
 Section: python
 Priority: optional
-Build-Depends: python (>= 2.6), debhelper (>= 7)
+Build-Depends: python (>= 3.2), debhelper (>= 7)
 Standards-Version: 3.9.3
-X-Python-Version: >= 2.7
+X-Python-Version: >= 3.2
 
 Package: indicator-stardate
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, python-appindicator
-Description: Stardate indicator for Ubuntu.
-
+Depends: ${misc:Depends}, ${python3:Depends}, python-appindicator
+Description: Application indicator which displays the current stardate.

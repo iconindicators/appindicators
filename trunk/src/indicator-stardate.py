@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -15,21 +15,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays an icon and the current stardate.
-
-
-# TODO: Eventually port from PyGTK to PyGObject - https://live.gnome.org/PyGObject
+# Application indicator which displays the current stardate.
 
 
 appindicatorImported = True
 try:
-    import appindicator
+    from gi.repository import AppIndicator3 as appindicator
 except:
     appindicatorImported = False
 
+from gi.repository import Gtk
+from gi.repository import GObject as gobject
+
 import datetime
-import gobject
-import gtk
 import json
 import logging
 import os
@@ -43,7 +41,9 @@ class IndicatorStardate:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
     VERSION = "1.0.9"
-    ICON = "indicator-stardate"
+    ICON = NAME
+    LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
+    WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
@@ -71,11 +71,11 @@ class IndicatorStardate:
 
         # Create the status icon...either Unity or GTK.
         if appindicatorImported == True:
-            self.indicator = appindicator.Indicator( IndicatorStardate.NAME, IndicatorStardate.ICON, appindicator.CATEGORY_APPLICATION_STATUS )
-            self.indicator.set_status( appindicator.STATUS_ACTIVE )
+            self.indicator = appindicator.Indicator.new( IndicatorStardate.NAME, IndicatorStardate.ICON, appindicator.IndicatorCategory.APPLICATION_STATUS )
+            self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
             self.indicator.set_menu( self.menu )
         else:
-            self.statusicon = gtk.StatusIcon()
+            self.statusicon = Gtk.StatusIcon()
             self.statusicon.set_from_icon_name( IndicatorStardate.ICON )
             self.statusicon.connect( "popup-menu", self.handleRightClick )
             self.statusicon.connect( "activate", self.handleLeftClick )
@@ -92,9 +92,9 @@ class IndicatorStardate:
         if period < 1:
             period = 1
 
-        gobject.timeout_add_seconds( period, self.update )
+        gobject.timeout_add( period * 1000, self.update )
 
-        gtk.main()
+        Gtk.main()
 
 
     def update( self ):
@@ -104,52 +104,54 @@ class IndicatorStardate:
         if appindicatorImported == True:
             self.indicator.set_label( s )
         else:
-            self.statusicon.set_tooltip( "Stardate: " + s )
+            self.statusicon.set_tooltip_text( "Stardate: " + s )
             self.stardateMenuItem.set_label( "Stardate: " + s )
 
         return True # Needed so the timer continues!
 
 
     def handleLeftClick( self, icon ):
-        self.menu.popup( None, None, gtk.status_icon_position_menu, 1, gtk.get_current_event_time(), self.statusicon )
+        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
 
 
     def handleRightClick( self, icon, button, time ):
-        self.menu.popup( None, None, gtk.status_icon_position_menu, button, time, self.statusicon )
+        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
     def onAbout( self, widget ):
-        dialog = gtk.AboutDialog()
-        dialog.set_name( IndicatorStardate.NAME )
-        dialog.set_version( IndicatorStardate.VERSION )
+        dialog = Gtk.AboutDialog()
+        dialog.set_program_name( IndicatorStardate.NAME )
         dialog.set_comments( IndicatorStardate.AUTHOR )
-        dialog.set_license( "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0" )
-        dialog.set_website( "https://launchpad.net/~thebernmeister" )
+        dialog.set_website( IndicatorStardate.WEBSITE )
+        dialog.set_website_label( IndicatorStardate.WEBSITE )
+        dialog.set_version( IndicatorStardate.VERSION )
+        dialog.set_license( IndicatorStardate.LICENSE )
         dialog.run()
         dialog.destroy()
+        dialog = None
 
 
     def buildMenu( self ):
-        self.menu = gtk.Menu()
+        self.menu = Gtk.Menu()
 
         if appindicatorImported == False:
-            image = gtk.Image()
-            image.set_from_icon_name( IndicatorStardate.ICON, gtk.ICON_SIZE_MENU )
-            self.stardateMenuItem = gtk.ImageMenuItem()
+            image = Gtk.Image()
+            image.set_from_icon_name( IndicatorStardate.ICON, Gtk.IconSize.MENU )
+            self.stardateMenuItem = Gtk.ImageMenuItem()
             self.stardateMenuItem.set_image( image )
             self.menu.append( self.stardateMenuItem )
-            self.menu.append( gtk.SeparatorMenuItem() )
+            self.menu.append( Gtk.SeparatorMenuItem() )
 
-        preferencesMenuItem = gtk.MenuItem( "Preferences" )
+        preferencesMenuItem = Gtk.MenuItem( "Preferences" )
         preferencesMenuItem.connect( "activate", self.onPreferences )
         self.menu.append( preferencesMenuItem )
 
-        aboutMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_ABOUT )
+        aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
         aboutMenuItem.connect( "activate", self.onAbout )
         self.menu.append( aboutMenuItem )
 
-        quitMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_QUIT )
-        quitMenuItem.connect( "activate", gtk.main_quit )
+        quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
+        quitMenuItem.connect( "activate", Gtk.main_quit )
         self.menu.append( quitMenuItem )
 
         self.menu.show_all()
@@ -159,17 +161,17 @@ class IndicatorStardate:
         if self.dialog is not None:
             return
 
-        self.dialog = gtk.Dialog( "Preferences", None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
 
-        table = gtk.Table( 2, 1, False )
+        table = Gtk.Table( 2, 1, False )
         table.set_col_spacings( 5 )
         table.set_row_spacings( 5 )
 
-        showIssueCheckbox = gtk.CheckButton( "Show Issue" )
+        showIssueCheckbox = Gtk.CheckButton( "Show Issue" )
         showIssueCheckbox.set_active( self.showIssue )
         table.attach( showIssueCheckbox, 0, 1, 0, 1 )
 
-        autostartCheckbox = gtk.CheckButton( "Autostart" )
+        autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
         table.attach( autostartCheckbox, 0, 1, 1, 2 )
 
@@ -178,7 +180,7 @@ class IndicatorStardate:
 
         self.dialog.show_all()
         response = self.dialog.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             self.showIssue = showIssueCheckbox.get_active()
             self.saveSettings()
 
