@@ -142,7 +142,7 @@ class IndicatorStardate:
             self.menu.append( self.stardateMenuItem )
             self.menu.append( Gtk.SeparatorMenuItem() )
 
-        preferencesMenuItem = Gtk.MenuItem( "Preferences" )
+        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
         preferencesMenuItem.connect( "activate", self.onPreferences )
         self.menu.append( preferencesMenuItem )
 
