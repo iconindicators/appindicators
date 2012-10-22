@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -21,14 +21,19 @@
 # TODO: Waiting on a Python 3 version of Ephem (http://pypi.python.org/pypi/ephem) to be packaged at https://launchpad.net/~nilarimogard.
 
 
-# TODO: Eventually port from PyGTK to PyGObject - https://live.gnome.org/PyGObject
-
-
 appindicatorImported = True
 try:
-    import appindicator
+    from gi.repository import AppIndicator3 as appindicator
 except:
     appindicatorImported = False
+
+from gi.repository import Gtk
+from gi.repository import GObject as gobject
+
+import datetime
+import ephem
+import json
+import logging
 
 pynotifyImported = True
 try:
@@ -36,12 +41,6 @@ try:
 except:
     pynotifyImported = False
 
-import datetime
-import ephem
-import gobject
-import gtk
-import json
-import logging
 import os
 import shutil
 import string
@@ -53,7 +52,9 @@ class IndicatorLunar:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
     VERSION = "1.0.10"
-    ICON = "indicator-lunar"
+    ICON = NAME
+    LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
+    WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
@@ -119,19 +120,19 @@ class IndicatorLunar:
 
         # Create the status icon...either Unity or GTK.
         if appindicatorImported == True:
-            self.indicator = appindicator.Indicator( IndicatorLunar.NAME, "", appindicator.CATEGORY_APPLICATION_STATUS )
-            self.indicator.set_status( appindicator.STATUS_ACTIVE )
+            self.indicator = appindicator.Indicator.new( IndicatorLunar.NAME, "", appindicator.IndicatorCategory.APPLICATION_STATUS )
+            self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
             self.indicator.set_menu( self.menu )
         else:
-            self.statusicon = gtk.StatusIcon()
+            self.statusicon = Gtk.StatusIcon()
             self.statusicon.connect( "popup-menu", self.handleRightClick )
             self.statusicon.connect( "activate", self.handleLeftClick )
 
 
     def main( self ):
         self.update()
-        gobject.timeout_add_seconds( 60 * 60, self.update )
-        gtk.main()
+        gobject.timeout_add( 60 * 60 * 1000, self.update )
+        Gtk.main()
 
 
     def update( self ):
@@ -146,14 +147,14 @@ class IndicatorLunar:
         elif self.showPhase == True:
             labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
         else:
-            labelTooltip = None
+            labelTooltip = ""
 
         if appindicatorImported == True:
             self.indicator.set_icon( self.getIconNameForLunarPhase( lunarPhase ) )
-            self.indicator.set_label( labelTooltip )
+            self.indicator.set_label( labelTooltip, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
         else:
             self.statusicon.set_from_icon_name( self.getIconNameForLunarPhase( lunarPhase ) )
-            self.statusicon.set_tooltip( labelTooltip )
+            self.statusicon.set_tooltip_text( labelTooltip )
 
         self.phaseMenuItem.set_label( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] )
         self.illuminationMenuItem.set_label( "Illumination: " + str( percentageIllumination ) + "%" )
@@ -269,123 +270,125 @@ class IndicatorLunar:
 
 
     def buildMenu( self ):
-        self.menu = gtk.Menu()
+        self.menu = Gtk.Menu()
 
-        self.phaseMenuItem = gtk.MenuItem( "" )
+        self.phaseMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.phaseMenuItem )
 
-        self.illuminationMenuItem = gtk.MenuItem( "" )
+        self.illuminationMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.illuminationMenuItem )
 
-        self.constellationMenuItem = gtk.MenuItem( "" )
+        self.constellationMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.constellationMenuItem )
 
-        self.menu.append( gtk.MenuItem( "Distances:" ) )
+        self.menu.append( Gtk.MenuItem( "Distances:" ) )
 
-        self.distanceToEarthInKMMenuItem = gtk.MenuItem( "" )
+        self.distanceToEarthInKMMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.distanceToEarthInKMMenuItem )
 
-        self.distanceToEarthInAUMenuItem = gtk.MenuItem( "" )
+        self.distanceToEarthInAUMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.distanceToEarthInAUMenuItem )
 
-        self.distanceToSunMenuItem = gtk.MenuItem( "" )
+        self.distanceToSunMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.distanceToSunMenuItem )
 
-        self.menu.append( gtk.MenuItem( "Next Phases:" ) )
+        self.menu.append( Gtk.MenuItem( "Next Phases:" ) )
 
-        self.nextMoonOneMenuItem = gtk.MenuItem( "" )
+        self.nextMoonOneMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.nextMoonOneMenuItem )
 
-        self.nextMoonTwoMenuItem = gtk.MenuItem( "" )
+        self.nextMoonTwoMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.nextMoonTwoMenuItem )
 
-        self.nextMoonThreeMenuItem = gtk.MenuItem( "" )
+        self.nextMoonThreeMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.nextMoonThreeMenuItem )
 
-        self.nextMoonFourMenuItem = gtk.MenuItem( "" )
+        self.nextMoonFourMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.nextMoonFourMenuItem )
 
-        self.equinoxSolsticeOneMenuItem = gtk.MenuItem( "" )
+        self.equinoxSolsticeOneMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.equinoxSolsticeOneMenuItem )
 
-        self.equinoxSolsticeTwoMenuItem = gtk.MenuItem( "" )
+        self.equinoxSolsticeTwoMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.equinoxSolsticeTwoMenuItem )
 
-        self.menu.append( gtk.SeparatorMenuItem() )
+        self.menu.append( Gtk.SeparatorMenuItem() )
 
-        preferencesMenuItem = gtk.MenuItem( "Preferences" )
+        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
         preferencesMenuItem.connect( "activate", self.onPreferences )
         self.menu.append( preferencesMenuItem )
 
-        aboutMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_ABOUT )
+        aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
         aboutMenuItem.connect( "activate", self.onAbout )
         self.menu.append( aboutMenuItem )
 
-        quitMenuItem = gtk.ImageMenuItem( stock_id = gtk.STOCK_QUIT )
-        quitMenuItem.connect( "activate", gtk.main_quit )
+        quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
+        quitMenuItem.connect( "activate", Gtk.main_quit )
         self.menu.append( quitMenuItem )
 
         self.menu.show_all()
 
 
     def handleLeftClick( self, icon ):
-        self.menu.popup( None, None, gtk.status_icon_position_menu, 1, gtk.get_current_event_time(), self.statusicon )
-
+        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
 
     def handleRightClick( self, icon, button, time ):
-        self.menu.popup( None, None, gtk.status_icon_position_menu, button, time, self.statusicon )
+        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
     def onAbout( self, widget ):
-        dialog = gtk.AboutDialog()
-        dialog.set_name( IndicatorLunar.NAME )
-        dialog.set_version( IndicatorLunar.VERSION )
+        dialog = Gtk.AboutDialog()
+        dialog.set_program_name( IndicatorLunar.NAME )
         dialog.set_comments( IndicatorLunar.AUTHOR + "\n\n" + "Calculations courtesy of PyEphem." )
-        dialog.set_license( "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0" )
-        dialog.set_website( "https://launchpad.net/~thebernmeister" )
+        dialog.set_website( IndicatorLunar.WEBSITE )
+        dialog.set_website_label( IndicatorLunar.WEBSITE )
+        dialog.set_version( IndicatorLunar.VERSION )
+        dialog.set_license( IndicatorLunar.LICENSE )
         dialog.run()
         dialog.destroy()
+        dialog = None
 
 
     def onPreferences( self, widget ):
         if self.dialog is not None:
             return
 
-        self.dialog = gtk.Dialog( "Preferences", None, 0, ( gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK ) )
+        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
 
-        table = gtk.Table( 6, 2, False )
+        table = Gtk.Table( 6, 2, False )
         table.set_col_spacings( 5 )
         table.set_row_spacings( 5 )
 
-        showPhaseCheckbox = gtk.CheckButton( "Show phase" )
+        showPhaseCheckbox = Gtk.CheckButton( "Show phase" )
         showPhaseCheckbox.set_active( self.showPhase )
         table.attach( showPhaseCheckbox, 0, 2, 0, 1 )
 
-        showIlluminationCheckbox = gtk.CheckButton( "Show illumination" )
+        showIlluminationCheckbox = Gtk.CheckButton( "Show illumination" )
         showIlluminationCheckbox.set_active( self.showIllumination )
         table.attach( showIlluminationCheckbox, 0, 2, 1, 2 )
 
-        showNorthernHemisphereViewCheckbox = gtk.CheckButton( "Northern hemisphere view" )
+        showNorthernHemisphereViewCheckbox = Gtk.CheckButton( "Northern hemisphere view" )
         showNorthernHemisphereViewCheckbox.set_active( self.showNorthernHemisphereView )
         table.attach( showNorthernHemisphereViewCheckbox, 0, 2, 2, 3 )
 
-        showHourlyWerewolfWarningCheckbox = gtk.CheckButton( "Hourly werewolf warning" )
+        showHourlyWerewolfWarningCheckbox = Gtk.CheckButton( "Hourly werewolf warning" )
         showHourlyWerewolfWarningCheckbox.set_active( self.showHourlyWerewolfWarning )
         showHourlyWerewolfWarningCheckbox.set_tooltip_text( "Shows an hourly screen notification" )
         table.attach( showHourlyWerewolfWarningCheckbox, 0, 2, 3, 4 )
 
-        label = gtk.Label( "  Illumination %" )
+        label = Gtk.Label( "  Illumination %" )
         label.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
         table.attach( label, 0, 1, 4, 5 )
 
-        spinner = gtk.SpinButton( gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 5, 0 ) )
+        spinner = Gtk.SpinButton()
+        spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 5, 0 ) )
         spinner.set_tooltip_text( "The warning will appear from new moon to full moon once the specified illumination occurs" )
         spinner.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
         table.attach( spinner, 1, 2, 4, 5 )
 
         showHourlyWerewolfWarningCheckbox.connect( "toggled", self.onShowHourlyWerewolfWarningCheckbox, label, spinner )
 
-        autostartCheckbox = gtk.CheckButton( "Autostart" )
+        autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
         table.attach( autostartCheckbox, 0, 2, 5, 6 )
 
@@ -394,7 +397,7 @@ class IndicatorLunar:
 
         self.dialog.show_all()
         response = self.dialog.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             self.showPhase = showPhaseCheckbox.get_active()
             self.showIllumination = showIlluminationCheckbox.get_active()
             self.showNorthernHemisphereView = showNorthernHemisphereViewCheckbox.get_active()
@@ -434,7 +437,7 @@ class IndicatorLunar:
 
         if os.path.isfile( IndicatorLunar.SETTINGS_FILE ):
             try:
-                with open( IndicatorLunar.SETTINGS_FILE, 'r' ) as f:
+                with open( IndicatorLunar.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
                 self.showHourlyWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_HOURLY_WEREWOLF_WARNING, self.showHourlyWerewolfWarning )
@@ -458,7 +461,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage
             }
 
-            with open( IndicatorLunar.SETTINGS_FILE, 'w' ) as f:
+            with open( IndicatorLunar.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 
         except Exception as e:

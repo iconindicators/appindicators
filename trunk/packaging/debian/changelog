@@ -1,9 +1,10 @@
-indicator-lunar (1.0.10-1) precise; urgency=low
+indicator-lunar (1.0.10-1) quantal; urgency=low
 
+  * Changes for Python3 and PyGObject.
   * Switched back to using localtime!
   * Added an option to start the werewolf warning at a particular illumination.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 9 Aug 2012 20:10:27 +1000<--------------------------------------- Update on release!
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 22 Oct 2012 21:24:49 +1000
 
 
 indicator-lunar (1.0.9-1) precise; urgency=low
