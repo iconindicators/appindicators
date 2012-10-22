@@ -102,7 +102,7 @@ class IndicatorStardate:
         s = self.stardate.toStardateString( False, self.showIssue )
 
         if appindicatorImported == True:
-            self.indicator.set_label( s )
+            self.indicator.set_label( s, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
         else:
             self.statusicon.set_tooltip_text( "Stardate: " + s )
             self.stardateMenuItem.set_label( "Stardate: " + s )
