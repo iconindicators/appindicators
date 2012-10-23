@@ -1,6 +1,6 @@
 indicator-stardate (1.0.9-1) quantal; urgency=low
 
-  * Changes for Python3 and PyGObject.
+  * Changes for Python3 (but still runs as Python2) and PyGObject.
   * Added a preferences dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 22 Oct 2012 18:19:11 +1000
