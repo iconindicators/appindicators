@@ -1,6 +1,6 @@
 indicator-virtual-box (1.0.15-1) quantal; urgency=low
 
-  * Changes for Python3 and PyGObject.
+  * Changes for Python3 (but still runs as Python2) and PyGObject.
   * Handle the case when VirtualBox is not installed.
   * Handle the case when VirtualBox is installed but has not yet been run
     (and so $HOME/.VirtualBox/VirtualBox.xml does not exist).
