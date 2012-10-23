@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,9 @@
 # Application indicator which displays lunar information.
 
 
-# TODO: Waiting on a Python 3 version of Ephem (http://pypi.python.org/pypi/ephem) to be packaged at https://launchpad.net/~nilarimogard.
+# TODO: There is no Python3 version of Ephem (http://pypi.python.org/pypi/ephem).
+# I could attempt a PPA package of it but there is little point as the
+# PPA Download Statistics indicator is stuck on Python2 due to a dependency.
 
 
 appindicatorImported = True
