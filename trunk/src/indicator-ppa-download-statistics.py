@@ -33,6 +33,7 @@ try:
 except:
     appindicatorImported = False
 
+from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GObject as gobject
 from launchpadlib.launchpad import Launchpad
@@ -76,7 +77,7 @@ class IndicatorPPADownloadStatistics:
         self.request = False
         self.updateThread = None
 
-        gtk.gdk.threads_init()
+        Gdk.threads_init()
         gobject.threads_init()
         self.lock = threading.Lock()
 
@@ -98,7 +99,7 @@ class IndicatorPPADownloadStatistics:
             self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
             self.buildMenu()
             self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
-            self.indicator.set_label( "PPA" )
+            self.indicator.set_label( "PPA", "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
         else:
             self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
             self.buildMenu()
@@ -199,7 +200,7 @@ class IndicatorPPADownloadStatistics:
                 subMenuItem.connect( "activate", self.onRemove )
                 subMenu.append( subMenuItem )
 
-        preferencesMenuItem = Gtk.new_from_stock( Gtk.STOCK_PREFERENCES, None )
+        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
         preferencesMenuItem.connect( "activate", self.onPreferences )
         menu.append( preferencesMenuItem )
 
@@ -208,7 +209,7 @@ class IndicatorPPADownloadStatistics:
         menu.append( aboutMenuItem )
 
         quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        quitMenuItem.connect( "activate", gtk.main_quit )
+        quitMenuItem.connect( "activate", Gtk.main_quit )
         menu.append( quitMenuItem )
 
         if appindicatorImported == True:
