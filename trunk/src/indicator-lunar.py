@@ -29,19 +29,19 @@ try:
 except:
     appindicatorImported = False
 
-from gi.repository import Gtk
 from gi.repository import GObject as gobject
+from gi.repository import Gtk
+
+notifyImported = True
+try:
+    from gi.repository import Notify
+except:
+    notifyImported = False
 
 import datetime
 import ephem
 import json
 import logging
-
-pynotifyImported = True
-try:
-    import pynotify
-except:
-    pynotifyImported = False
 
 import os
 import shutil
@@ -106,8 +106,8 @@ class IndicatorLunar:
         self.loadSettings()
         self.dialog = None
 
-        if pynotifyImported == True:
-            pynotify.init( IndicatorLunar.NAME )
+        if notifyImported == True:
+            Notify.init( IndicatorLunar.NAME )
 
         # One of the install dependencies for Debian/Ubuntu is that appindicator exists.
         # However the appindicator only works under Ubuntu Unity - we need to default to GTK icon if not running Unity (say Lubuntu).
@@ -209,8 +209,8 @@ class IndicatorLunar:
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-        if pynotifyImported == True and self.showHourlyWerewolfWarning == True and percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and phaseIsBetweenNewAndFullInclusive:
-            pynotify.Notification( "WARNING: Werewolves about!!!", "", IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_FULL_MOON ] ).show()
+        if notifyImported == True and self.showHourlyWerewolfWarning == True and percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and phaseIsBetweenNewAndFullInclusive:
+            Notify.Notification.new( "WARNING: Werewolves about!!!", "", IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_FULL_MOON ] ).show()
 
         return True # Needed so the timer continues!
 
