@@ -22,7 +22,8 @@
 #  https://help.launchpad.net/API/launchpadlib
 #  http://developer.ubuntu.com/api/ubuntu-12.04/c/appindicator/index.html
 
-#TODO Will not work under Python3 as there is no version of launchpadlib...hopefully soon or by 13.04.
+
+#TODO There is no Python3 version of launchpadlib so until that happens, stick with Python2.
 
 
 from copy import deepcopy
@@ -34,8 +35,8 @@ except:
     appindicatorImported = False
 
 from gi.repository import Gdk
-from gi.repository import Gtk
 from gi.repository import GObject as gobject
+from gi.repository import Gtk
 from launchpadlib.launchpad import Launchpad
 from threading import Thread
 
