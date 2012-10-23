@@ -39,8 +39,8 @@ try:
 except:
     appindicatorImported = False
 
-from gi.repository import Gtk
 from gi.repository import GObject as gobject
+from gi.repository import Gtk
 
 import json
 import locale
