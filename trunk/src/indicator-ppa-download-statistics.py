@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -335,13 +335,10 @@ class IndicatorPPADownloadStatistics:
         table.attach( label, 0, 1, 0, 1 )
 
         if len( self.ppas ) > 0:
-            dataModel = gtk.ListStore( str )
+            ppaOwner = Gtk.ComboBoxText.new_with_entry()
             ppaOwners = self.getPPAOwnersSorted()
             for item in ppaOwners:
-                dataModel.append( [ item ] )
-
-            ppaOwner = Gtk.ComboBoxEntry( dataModel )
-            ppaOwner.pack_start( gtk.CellRendererText(), True )
+                ppaOwner.append_text( item )
 
             if add == False:
                 ppaOwner.set_active( self.getIndexForPPAOwner( ppaOwners, existingPPAOwner ) )
@@ -356,13 +353,10 @@ class IndicatorPPADownloadStatistics:
         table.attach( label, 0, 1, 1, 2 )
 
         if len( self.ppas ) > 0:
-            dataModel = Gtk.ListStore( str )
+            ppaName = Gtk.ComboBoxText.new_with_entry()
             ppaNames = self.getPPANamesSorted()
             for item in ppaNames:
-                dataModel.append( [ item ] )
-
-            ppaName = Gtk.ComboBoxEntry( dataModel )        
-            ppaName.pack_start( Gtk.CellRendererText(), True )
+                ppaName.append_text( item )
 
             if add == False:
                 ppaName.set_active( self.getIndexForPPAName( ppaNames, existingPPAName ) )
@@ -376,30 +370,22 @@ class IndicatorPPADownloadStatistics:
         label.set_alignment( 0, 0.5 )
         table.attach( label, 0, 1, 2, 3 )
 
-        dataModel = gtk.ListStore( str )
+        distributions = Gtk.ComboBoxText()
         for item in IndicatorPPADownloadStatistics.DISTRIBUTIONS:
-            dataModel.append( [ item ] )
+            distributions.append_text( item )
 
-        textRenderer = Gtk.CellRendererText()
-        distributions = Gtk.ComboBox( dataModel )
-        distributions.pack_start( textRenderer, True )
-        distributions.add_attribute( textRenderer, "text", 0 )
-        distributions.set_active( self.getIndexForDistribution( existingDistribution ) )
+        distributions.set_active( 0 )
         table.attach( distributions, 1, 2, 2, 3 )
 
         label = Gtk.Label( "Architecture" )
         label.set_alignment( 0, 0.5 )
         table.attach( label, 0, 1, 3, 4 )
 
-        dataModel = Gtk.ListStore( str )
+        architectures = Gtk.ComboBoxText()
         for item in IndicatorPPADownloadStatistics.ARCHITECTURES:
-            dataModel.append( [ item ] )
+            architectures.append_text( item )
 
-        textRenderer = Gtk.CellRendererText()
-        architectures = Gtk.ComboBox( dataModel )
-        architectures.pack_start( textRenderer, True )
-        architectures.add_attribute( textRenderer, "text", 0 )
-        architectures.set_active( self.getIndexForArchitecture( existingArchitecture ) )
+        architectures.set_active( 0 )
         table.attach( architectures, 1, 2, 3, 4 )
 
         self.dialog.vbox.pack_start( table, True, True, 10 )
@@ -409,7 +395,7 @@ class IndicatorPPADownloadStatistics:
             self.dialog.show_all()
             response = self.dialog.run()
 
-            if response == Gtk.RESPONSE_CANCEL:
+            if response == Gtk.ResponseType.CANCEL:
                 break
 
             if len( self.ppas ) > 0:
@@ -420,13 +406,13 @@ class IndicatorPPADownloadStatistics:
                 ppaNameValue = ppaName.get_text().strip()
 
             if ppaOwnerValue == "":
-                self.showMessage( Gtk.MESSAGE_ERROR, "PPA owner cannot be empty." )
-                self.dialog.set_focus( ppaOwner )
+                self.showMessage( Gtk.MessageType.ERROR, "PPA owner cannot be empty." )
+                ppaOwner.grab_focus()
                 continue
 
             if ppaNameValue == "":
-                self.showMessage( Gtk.MESSAGE_ERROR, "PPA cannot be empty." )
-                self.dialog.set_focus( ppaName )
+                self.showMessage( Gtk.MessageType.ERROR, "PPA cannot be empty." )
+                ppaName.grab_focus()
                 continue
 
             ppaList = [ ppaOwnerValue, ppaNameValue, distributions.get_active_text(), architectures.get_active_text() ]
@@ -435,7 +421,7 @@ class IndicatorPPADownloadStatistics:
                 if key not in self.ppas:
                     self.ppas[ key ] = ppaList
                     self.saveSettings()
-                    self.buildMenu() # Update the menu to immediately reflect the change...but still need to do a new download.
+                    self.buildMenu() # Update the menu to immediately reflect the change...still need to do a new download.
                     self.requestPPADownloadAndMenuRefresh()
             else: # This is an edit
                 if key not in self.ppas:
@@ -443,7 +429,7 @@ class IndicatorPPADownloadStatistics:
                     del self.ppas[ oldKey ]
                     self.ppas[ key ] = ppaList
                     self.saveSettings()
-                    self.buildMenu() # Update the menu to immediately reflect the change...but still need to do a new download.
+                    self.buildMenu() # Update the menu to immediately reflect the change...still need to do a new download.
                     self.requestPPADownloadAndMenuRefresh()
 
             break

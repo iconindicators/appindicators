@@ -1,6 +1,6 @@
 indicator-ppa-download-statistics (1.0.10-1) quantal; urgency=low
 
-  * Changes for Python3 and PyGObject.
+  * Changes for Python3 (but still runs as Python2) and PyGObject.
   * Fixed the table layout in preferences (was 2 rows when should have been 3).
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 22 Oct 2012 17:05:01 +1000
