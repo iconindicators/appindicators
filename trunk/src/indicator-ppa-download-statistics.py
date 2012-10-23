@@ -62,7 +62,7 @@ class IndicatorPPADownloadStatistics:
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
 
-    DISTRIBUTIONS = [ "quantal", "precise", "oneiric", "natty", "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy" ]
+    DISTRIBUTIONS = [ "raring", "quantal", "precise", "oneiric", "natty", "lucid", "hardy" ]
     ARCHITECTURES = [ "amd64", "i386" ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
@@ -580,7 +580,7 @@ class IndicatorPPADownloadStatistics:
                 logging.error( "Error reading settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
         else:
             # No properties file exists, so populate with a sample PPA to give the user an idea of the format.
-            ppaList = [ "thebernmeister", "ppa", "precise", "i386" ]
+            ppaList = [ "thebernmeister", "ppa", "quantal", "i386" ]
             self.ppas[ self.getPPAKey( ppaList ) ] = ppaList
 
 
