@@ -19,8 +19,7 @@
 
 
 # TODO: There is no Python3 version of Ephem (http://pypi.python.org/pypi/ephem).
-# I could attempt a PPA package of it but there is little point as the
-# PPA Download Statistics indicator is stuck on Python2 due to a dependency.
+# Will attempt to create a PPA package!
 
 
 # TODO: See if it's possible to automatically determine the computer's geographic
