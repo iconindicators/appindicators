@@ -23,6 +23,13 @@
 # PPA Download Statistics indicator is stuck on Python2 due to a dependency.
 
 
+# TODO: See if it's possible to automatically determine the computer's geographic
+# location...the Ubuntu installer manages to do it!
+# From this can determine sun/moon rise/set.
+# May need to poll the thing which tells us our location - maybe once per hour or day
+# to ensure all is good.
+
+
 appindicatorImported = True
 try:
     from gi.repository import AppIndicator3 as appindicator
