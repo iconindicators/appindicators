@@ -22,7 +22,8 @@
 #  https://help.launchpad.net/API/launchpadlib
 #  http://developer.ubuntu.com/api/ubuntu-12.04/c/appindicator/index.html
 #  https://help.launchpad.net/API/Hacking
-
+#  https://python-gtk-3-tutorial.readthedocs.org
+#  http://developer.gnome.org/gtk3/stable/index.html
 
 from copy import deepcopy
 
