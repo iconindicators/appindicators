@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -21,9 +21,7 @@
 #  https://launchpad.net/+apidoc/1.0.html
 #  https://help.launchpad.net/API/launchpadlib
 #  http://developer.ubuntu.com/api/ubuntu-12.04/c/appindicator/index.html
-
-
-#TODO There is no Python3 version of launchpadlib so until that happens, stick with Python2.
+#  https://help.launchpad.net/API/Hacking
 
 
 from copy import deepcopy
@@ -37,8 +35,8 @@ except:
 from gi.repository import Gdk
 from gi.repository import GObject as gobject
 from gi.repository import Gtk
-from launchpadlib.launchpad import Launchpad
 from threading import Thread
+from urllib.request import urlopen
 
 import json
 import locale
@@ -63,7 +61,7 @@ class IndicatorPPADownloadStatistics:
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
 
-    DISTRIBUTIONS = [ "raring", "quantal", "precise", "oneiric", "natty", "lucid", "hardy" ]
+    SERIES = [ "raring", "quantal", "precise", "oneiric", "natty", "lucid", "hardy" ]
     ARCHITECTURES = [ "amd64", "i386" ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
@@ -84,7 +82,6 @@ class IndicatorPPADownloadStatistics:
 
         logging.basicConfig( file = sys.stderr, level = logging.INFO )
         self.loadSettings()
-        self.launchpadAnonynmousLogin = Launchpad.login_anonymously( IndicatorPPADownloadStatistics.NAME, "production", "~/.launchpadlib/cache/" )
 
         # One of the install dependencies for Debian/Ubuntu is that appindicator exists.
         # However the appindicator only works under Ubuntu Unity.
@@ -226,17 +223,17 @@ class IndicatorPPADownloadStatistics:
         for key in list( self.ppas.keys() ):
             sortedKeys.append( key )
 
-        return sorted( sortedKeys, cmp = locale.strcoll )
+        return sorted( sortedKeys, key = locale.strxfrm )
 
 
-    def getPPAOwnersSorted( self ):
-        sortedPPAOwners = [] 
+    def getPPAUsersSorted( self ):
+        sortedPPAUsers = [] 
         for key in list( self.ppas.keys() ):
-            ppaOwner = self.ppas[ key ][ 0 ]
-            if ppaOwner not in sortedPPAOwners:
-                sortedPPAOwners.append( ppaOwner )
+            ppaUser = self.ppas[ key ][ 0 ]
+            if ppaUser not in sortedPPAUsers:
+                sortedPPAUsers.append( ppaUser )
 
-        return sorted( sortedPPAOwners, cmp = locale.strcoll )
+        return sorted( sortedPPAUsers, key = locale.strxfrm )
 
 
     def getPPANamesSorted( self ):
@@ -246,7 +243,7 @@ class IndicatorPPADownloadStatistics:
             if ppaName not in sortedPPANames:
                 sortedPPANames.append( ppaName )
 
-        return sorted( sortedPPANames, cmp = locale.strcoll )
+        return sorted( sortedPPANames, key = locale.strxfrm )
 
 
     def getPPAKey( self, ppaList ):
@@ -265,7 +262,7 @@ class IndicatorPPADownloadStatistics:
             return
 
         firstPipe = string.find( widget.props.name, "|" )
-        ppaOwner = widget.props.name[ 0 : firstPipe ].strip()
+        ppaUser = widget.props.name[ 0 : firstPipe ].strip()
 
         secondPipe = string.find( widget.props.name, "|", firstPipe + 1 )
         ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
@@ -273,7 +270,7 @@ class IndicatorPPADownloadStatistics:
         thirdPipe = string.find( widget.props.name, "|", secondPipe + 1 )
         series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
 
-        url = "http://launchpad.net/~" + ppaOwner + "/+archive/" + ppaName + "?field.series_filter=" + series
+        url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
         webbrowser.open( url ) # This returns a boolean - I wanted to message the user on a false return value but popping up a message dialog causes a lock up!
 
 
@@ -309,7 +306,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def onAdd( self, widget ):
-        self.addEditPPA( True, "", "", IndicatorPPADownloadStatistics.DISTRIBUTIONS[ 0 ], IndicatorPPADownloadStatistics.ARCHITECTURES[ 0 ] )
+        self.addEditPPA( True, "", "", IndicatorPPADownloadStatistics.SERIES[ 0 ], IndicatorPPADownloadStatistics.ARCHITECTURES[ 0 ] )
 
 
     def onEdit( self, widget ):
@@ -317,7 +314,7 @@ class IndicatorPPADownloadStatistics:
         self.addEditPPA( False, ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] )
 
 
-    def addEditPPA( self, add, existingPPAOwner, existingPPAName, existingDistribution, existingArchitecture ):
+    def addEditPPA( self, add, existingPPAUser, existingPPAName, existingSeries, existingArchitecture ):
         if self.dialog is not None:
             return
 
@@ -331,23 +328,23 @@ class IndicatorPPADownloadStatistics:
         table.set_col_spacings( 5 )
         table.set_row_spacings( 5 )
 
-        label = Gtk.Label( "PPA Owner" )
+        label = Gtk.Label( "PPA User" )
         label.set_alignment( 0, 0.5 )
         table.attach( label, 0, 1, 0, 1 )
 
         if len( self.ppas ) > 0:
-            ppaOwner = Gtk.ComboBoxText.new_with_entry()
-            ppaOwners = self.getPPAOwnersSorted()
-            for item in ppaOwners:
-                ppaOwner.append_text( item )
+            ppaUser = Gtk.ComboBoxText.new_with_entry()
+            ppaUsers = self.getPPAUsersSorted()
+            for item in ppaUsers:
+                ppaUser.append_text( item )
 
             if add == False:
-                ppaOwner.set_active( self.getIndexForPPAOwner( ppaOwners, existingPPAOwner ) )
+                ppaUser.set_active( self.getIndexForPPAUser( ppaUsers, existingPPAUser ) )
         else:
             # There are no PPAs present, so we are adding the first PPA.
-            ppaOwner = Gtk.Entry()
+            ppaUser = Gtk.Entry()
 
-        table.attach( ppaOwner, 1, 2, 0, 1 )
+        table.attach( ppaUser, 1, 2, 0, 1 )
 
         label = Gtk.Label( "PPA Name" )
         label.set_alignment( 0, 0.5 )
@@ -367,16 +364,16 @@ class IndicatorPPADownloadStatistics:
 
         table.attach( ppaName, 1, 2, 1, 2 )
 
-        label = Gtk.Label( "Distribution" )
+        label = Gtk.Label( "Series" )
         label.set_alignment( 0, 0.5 )
         table.attach( label, 0, 1, 2, 3 )
 
-        distributions = Gtk.ComboBoxText()
-        for item in IndicatorPPADownloadStatistics.DISTRIBUTIONS:
-            distributions.append_text( item )
+        series = Gtk.ComboBoxText()
+        for item in IndicatorPPADownloadStatistics.SERIES:
+            series.append_text( item )
 
-        distributions.set_active( 0 )
-        table.attach( distributions, 1, 2, 2, 3 )
+        series.set_active( 0 )
+        table.attach( series, 1, 2, 2, 3 )
 
         label = Gtk.Label( "Architecture" )
         label.set_alignment( 0, 0.5 )
@@ -400,23 +397,23 @@ class IndicatorPPADownloadStatistics:
                 break
 
             if len( self.ppas ) > 0:
-                ppaOwnerValue = ppaOwner.get_active_text().strip()
+                ppaUserValue = ppaUser.get_active_text().strip()
                 ppaNameValue = ppaName.get_active_text().strip()
             else:
-                ppaOwnerValue = ppaOwner.get_text().strip()
+                ppaUserValue = ppaUser.get_text().strip()
                 ppaNameValue = ppaName.get_text().strip()
 
-            if ppaOwnerValue == "":
-                self.showMessage( Gtk.MessageType.ERROR, "PPA owner cannot be empty." )
-                ppaOwner.grab_focus()
+            if ppaUserValue == "":
+                self.showMessage( Gtk.MessageType.ERROR, "PPA user cannot be empty." )
+                ppaUser.grab_focus()
                 continue
 
             if ppaNameValue == "":
-                self.showMessage( Gtk.MessageType.ERROR, "PPA cannot be empty." )
+                self.showMessage( Gtk.MessageType.ERROR, "PPA name cannot be empty." )
                 ppaName.grab_focus()
                 continue
 
-            ppaList = [ ppaOwnerValue, ppaNameValue, distributions.get_active_text(), architectures.get_active_text() ]
+            ppaList = [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ]
             key = self.getPPAKey( ppaList )
             if add == True:
                 if key not in self.ppas:
@@ -426,7 +423,7 @@ class IndicatorPPADownloadStatistics:
                     self.requestPPADownloadAndMenuRefresh()
             else: # This is an edit
                 if key not in self.ppas:
-                    oldKey = self.getPPAKey( [ existingPPAOwner, existingPPAName, existingDistribution, existingArchitecture ] )
+                    oldKey = self.getPPAKey( [ existingPPAUser, existingPPAName, existingSeries, existingArchitecture ] )
                     del self.ppas[ oldKey ]
                     self.ppas[ key ] = ppaList
                     self.saveSettings()
@@ -447,17 +444,17 @@ class IndicatorPPADownloadStatistics:
         return -1 # Should never happen!
 
 
-    def getIndexForDistribution( self, distribution ):
-        for i in range( len( IndicatorPPADownloadStatistics.DISTRIBUTIONS ) ):
-            if IndicatorPPADownloadStatistics.DISTRIBUTIONS[ i ] == distribution:
+    def getIndexForSeries( self, series ):
+        for i in range( len( IndicatorPPADownloadStatistics.SERIES ) ):
+            if IndicatorPPADownloadStatistics.SERIES[ i ] == series:
                 return i
 
         return -1 # Should never happen!
 
 
-    def getIndexForPPAOwner( self, ppaOwners, ppaOwner ):
-        for i in range( len( ppaOwners ) ):
-            if ppaOwners[ i ] == ppaOwner:
+    def getIndexForPPAUser( self, ppaUsers, ppaUser ):
+        for i in range( len( ppaUsers ) ):
+            if ppaUsers[ i ] == ppaUser:
                 return i
 
         return -1 # Should never happen!
@@ -591,23 +588,62 @@ class IndicatorPPADownloadStatistics:
             logging.error( "Error writing settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
 
 
+    # Get a list of the published binaries for each PPA and from that extract the ID for each binary
+    # which is then used to get the download count for each binary.  The ID is the number at the end of self_link.
+    # The published binary object looks like this...
+    #{
+    #    "total_size": 4, 
+    #    "start": 0, 
+    #    "entries": [
+    #    {
+    #        "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386", 
+    #        "removal_comment": null, 
+    #        "display_name": "indicator-lunar 1.0.9-1 in precise i386", 
+    #        "date_made_pending": null, 
+    #        "date_superseded": null, 
+    #        "priority_name": "OPTIONAL", 
+    #        "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"", 
+    #        "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302", 
+    #        "binary_package_version": "1.0.9-1", 
+    #        "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history", 
+    #        "component_name": "main", 
+    #        "status": "Published", 
+    #        "date_removed": null, 
+    #        "pocket": "Release", 
+    #        "date_published": "2012-08-09T10:30:49.572656+00:00", 
+    #        "removed_by_link": null, "section_name": "python", 
+    #        "date_created": "2012-08-09T10:27:31.762212+00:00", 
+    #        "binary_package_name": "indicator-lunar", 
+    #        "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa", 
+    #        "architecture_specific": false, 
+    #        "scheduled_deletion_date": null
+    #    }
+    #    {
+    #    ,... 
+    #}
     def getPPADownloadStatistics( self, ppas ):
         ppaDownloadStatistics = { }
         for ppaKey in ppas:
-            ppaOwner = ppas[ ppaKey ][ 0 ]
-            ppa = ppas[ ppaKey ][ 1 ]
-            dist = ppas[ ppaKey ][ 2 ]
-            arch = ppas[ ppaKey ][ 3 ]
+            ppaUser = ppas[ ppaKey ][ 0 ]
+            ppaName = ppas[ ppaKey ][ 1 ]
+            series = ppas[ ppaKey ][ 2 ]
+            architecture = ppas[ ppaKey ][ 3 ]
             try:
-                people = self.launchpadAnonynmousLogin.people[ ppaOwner ]
-                thePPA = people.getPPAByName( name = ppa )
-                url = "https://api.launchpad.net/1.0/ubuntu/" + dist + "/" + arch
-                for publishedBinaries in thePPA.getPublishedBinaries( status = "Published", distro_arch_series = url ):
+                url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + series + "/" + architecture
+                publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
+                totalSize = publishedBinaries[ "total_size" ]
+                for i in range( totalSize ):
+                    binaryPackageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
+                    binaryPackageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
+                    indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
+                    binaryPackageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
+                    url = "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/" + binaryPackageId + "?ws.op=getDownloadCount"
+                    downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
                     value = ppaDownloadStatistics.get( ppaKey )
                     if value is None:
-                        ppaDownloadStatistics[ ppaKey ] = [ [ publishedBinaries.binary_package_name, publishedBinaries.binary_package_version, publishedBinaries.getDownloadCount() ] ]
+                        ppaDownloadStatistics[ ppaKey ] = [ [ binaryPackageName, binaryPackageVersion, downloadCount ] ]
                     else:
-                        value.append( [ publishedBinaries.binary_package_name, publishedBinaries.binary_package_version, publishedBinaries.getDownloadCount() ] )
+                        value.append( [ binaryPackageName, binaryPackageVersion, downloadCount ] )
                         ppaDownloadStatistics[ ppaKey ] = value
 
             except Exception as e:
@@ -637,7 +673,7 @@ class IndicatorPPADownloadStatistics:
             self.request = True
 
         self.lock.release()
-        return True # Must return true so that we continue to be called (http://www.pygtk.org/pygtk2reference/gobject-functions.html#function-gobject--timeout-add).
+        return True 
 
 
 if __name__ == "__main__":
