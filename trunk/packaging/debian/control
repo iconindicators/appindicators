@@ -2,11 +2,11 @@ Source: indicator-virtual-box
 Maintainer: Bernard Giannetti <thebernmeister@hotmail.com>
 Section: python
 Priority: optional
-Build-Depends: python (>= 2.7), debhelper (>= 7)
+Build-Depends: python3 (>= 3.2), debhelper (>= 7)
 Standards-Version: 3.9.3
-X-Python-Version: >= 2.7
+X-Python3-Version: >= 3.2
 
 Package: indicator-virtual-box
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, python-appindicator, wmctrl
+Depends: ${misc:Depends}, ${python3:Depends}, python-appindicator, wmctrl
 Description: Application indicator to start (and show running) VirtualBox virtual machines.
