@@ -203,6 +203,19 @@ class IndicatorVirtualBox:
 
         p.wait()
 
+#	If the VB config file exists
+#		If the tag GUI/SelectorVMPositions exists
+#			This is VB 4.1 or earlier.
+#			Get the VM sort positions from this tag.
+#		Else If the tag GUI/GroupDefinitions exists
+#			This is VB 4.2.
+#			Get VM sort order and groups (somehow)!
+#			A VM created but not moved will only appear in MachineEntry.
+#	Else
+#		The tags GUI/SelectorVMPositions and GUI/GroupDefinitions are not present
+#		which means the sort order has not changed and no groups have been created.
+#		Get the sort order from VBoxManage.
+
         # Build a list of VM names, sorted by VirtualBox UI order (from the VirtualBox configuration file).  However...
         # If VirtualBox is installed but has not been run, the configuration file probably won't exist.
         # If the ordering of the VMs has not been changed in the VirtualBox GUI, the order section in the configuration file will not exist.
