@@ -450,8 +450,8 @@ class IndicatorVirtualBox:
         useRadioCheckbox.set_active( self.useRadioIndicator )
         table.attach( useRadioCheckbox, 0, 2, 10, 11 )
 
-        showAsSubmenusCheckbox = Gtk.CheckButton( "Show as submenus" )
-        showAsSubmenusCheckbox.set_tooltip_text( "Only applies if groups are present" )
+        showAsSubmenusCheckbox = Gtk.CheckButton( "Show groups as submenus" )
+        showAsSubmenusCheckbox.set_tooltip_text( "Unchecked will show groups using indents - ignored if groups are not present" )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         table.attach( showAsSubmenusCheckbox, 0, 2, 11, 12 )
 
