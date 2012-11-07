@@ -27,6 +27,13 @@
 # From this can determine sun/moon rise/set.
 # May need to poll the thing which tells us our location - maybe once per hour or day
 # to ensure all is good.
+# https://help.ubuntu.com/community/UbuntuTime
+# https://bugs.launchpad.net/ubuntu/+source/ubiquity/+bug/985913
+# http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+# http://www.twinsun.com/tz/tz-link.htm
+# http://askubuntu.com/questions/34925/organization-of-zoneinfo-folder
+# http://technostuff.blogspot.com.au/2012/10/get-geodata-latitude-longitude-etc-in.html
+# http://askubuntu.com/questions/31842/how-to-read-time-zone-information
 
 
 appindicatorImported = True
