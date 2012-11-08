@@ -22,20 +22,6 @@
 # Will attempt to create a PPA package!
 
 
-# TODO: See if it's possible to automatically determine the computer's geographic
-# location...the Ubuntu installer manages to do it!
-# From this can determine sun/moon rise/set.
-# May need to poll the thing which tells us our location - maybe once per hour or day
-# to ensure all is good.
-# https://help.ubuntu.com/community/UbuntuTime
-# https://bugs.launchpad.net/ubuntu/+source/ubiquity/+bug/985913
-# http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-# http://www.twinsun.com/tz/tz-link.htm
-# http://askubuntu.com/questions/34925/organization-of-zoneinfo-folder
-# http://technostuff.blogspot.com.au/2012/10/get-geodata-latitude-longitude-etc-in.html
-# http://askubuntu.com/questions/31842/how-to-read-time-zone-information
-
-
 from ephem.cities import _city_data
 
 appindicatorImported = True
@@ -154,7 +140,6 @@ class IndicatorLunar:
     def main( self ):
         self.update()
         gobject.timeout_add( 60 * 60 * 1000, self.update )
-#        gobject.timeout_add( 10000, self.update )
         Gtk.main()
 
 
@@ -422,88 +407,98 @@ class IndicatorLunar:
         notebook = Gtk.Notebook()
 
         # First tab - general settings.
-        table = Gtk.Table( 6, 2, False )
-        table.set_col_spacings( 5 )
-        table.set_row_spacings( 5 )
-        table.set_border_width( 10 )
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
 
         showPhaseCheckbox = Gtk.CheckButton( "Show phase" )
         showPhaseCheckbox.set_active( self.showPhase )
-        table.attach( showPhaseCheckbox, 0, 2, 0, 1 )
+        grid.attach( showPhaseCheckbox, 0, 0, 2, 1 )
 
         showIlluminationCheckbox = Gtk.CheckButton( "Show illumination" )
         showIlluminationCheckbox.set_active( self.showIllumination )
-        table.attach( showIlluminationCheckbox, 0, 2, 1, 2 )
+        grid.attach( showIlluminationCheckbox, 0, 1, 2, 1 )
 
         showNorthernHemisphereViewCheckbox = Gtk.CheckButton( "Northern hemisphere view" )
         showNorthernHemisphereViewCheckbox.set_active( self.showNorthernHemisphereView )
-        table.attach( showNorthernHemisphereViewCheckbox, 0, 2, 2, 3 )
+        grid.attach( showNorthernHemisphereViewCheckbox, 0, 2, 2, 1 )
 
         showHourlyWerewolfWarningCheckbox = Gtk.CheckButton( "Hourly werewolf warning" )
         showHourlyWerewolfWarningCheckbox.set_active( self.showHourlyWerewolfWarning )
-        showHourlyWerewolfWarningCheckbox.set_tooltip_text( "Shows an hourly screen notification" )
-        table.attach( showHourlyWerewolfWarningCheckbox, 0, 2, 3, 4 )
+        showHourlyWerewolfWarningCheckbox.set_tooltip_text( "Shows an hourly screen notification when approaching a full moon" )
+        grid.attach( showHourlyWerewolfWarningCheckbox, 0, 3, 2, 1 )
 
         label = Gtk.Label( "  Illumination %" )
         label.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
-        table.attach( label, 0, 1, 4, 5 )
+        label.set_margin_left( 15 )
+        grid.attach( label, 0, 4, 1, 1 )
 
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 5, 0 ) )
         spinner.set_tooltip_text( "The warning will start after the new moon (0%) and commence at the specified illumination" )
         spinner.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
-        table.attach( spinner, 1, 2, 4, 5 )
+        spinner.set_hexpand( True )
+        grid.attach( spinner, 1, 4, 1, 1 )
 
         showHourlyWerewolfWarningCheckbox.connect( "toggled", self.onShowHourlyWerewolfWarningCheckbox, label, spinner )
 
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
-        table.attach( autostartCheckbox, 0, 2, 5, 6 )
+        grid.attach( autostartCheckbox, 0, 5, 2, 1 )
 
-        notebook.append_page( table, Gtk.Label( "General" ) )
+        notebook.append_page( grid, Gtk.Label( "General" ) )
 
         # Second tab - location.
-        table = Gtk.Table( 4, 2, False )
-        table.set_col_spacings( 5 )
-        table.set_row_spacings( 5 )
-        table.set_border_width( 10 )
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
 
         label = Gtk.Label( "City" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 0, 1 )
+        label.set_halign( Gtk.Align.START )
+        grid.add( label )
 
-        cities = sorted( cities._city_data.keys(), key = locale.strxfrm )
+        global _city_data
+        cities = sorted( _city_data.keys(), key = locale.strxfrm )
         city = Gtk.ComboBoxText.new_with_entry()
+        city.set_hexpand( True ) # Only need to set this once and all objects will expand.
         for c in cities:
             city.append_text( c )
 
-        table.attach( city, 1, 2, 0, 1 )
+        grid.attach( city, 1, 0, 1, 1 )
 
         label = Gtk.Label( "Latitude (DD)" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 1, 2 )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 1, 1, 1 )
 
         latitude = Gtk.Entry()
-        table.attach( latitude, 1, 2, 1, 2 )
+        grid.attach( latitude, 1, 1, 1, 1 )
 
         label = Gtk.Label( "Longitude (DD)" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 2, 3 )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 2, 1, 1 )
 
         longitude = Gtk.Entry()
-        table.attach( longitude, 1, 2, 2, 3 )
+        grid.attach( longitude, 1, 2, 1, 1 )
 
         label = Gtk.Label( "Elevation (m)" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 3, 4 )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 3, 1, 1 )
 
         elevation = Gtk.Entry()
-        table.attach( elevation, 1, 2, 3, 4 )
+        grid.attach( elevation, 1, 3, 1, 1 )
 
         city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
         city.set_active( cities.index( self.cityName ) )
 
-        notebook.append_page( table, Gtk.Label( "Location" ) )
+        notebook.append_page( grid, Gtk.Label( "Location" ) )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -540,9 +535,10 @@ class IndicatorLunar:
 #TODO Do we need a reset for the canned values?
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
-        latitude.set_text( self.cities.get( city )[ 0 ] )
-        longitude.set_text( self.cities.get( city )[ 1 ] )
-        elevation.set_text( str( self.cities.get( city )[ 2 ] ) )
+        global _city_data
+        latitude.set_text( _city_data.get( city )[ 0 ] )
+        longitude.set_text( _city_data.get( city )[ 1 ] )
+        elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
 
 
     def onShowHourlyWerewolfWarningCheckbox( self, source, spinner, label ):
@@ -604,9 +600,9 @@ class IndicatorLunar:
     def saveSettings( self ):
         try:
             settings = {
-                IndicatorLunar.SETTINGS_CITY_ELEVATION: self.cityElevation,
-                IndicatorLunar.SETTINGS_CITY_LATITUDE: self.cityLatitude,
-                IndicatorLunar.SETTINGS_CITY_LONGITUDE: self.cityLongitude,
+                IndicatorLunar.SETTINGS_CITY_ELEVATION: _city_data.get( self.cityName )[ 2 ],
+                IndicatorLunar.SETTINGS_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
+                IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
                 IndicatorLunar.SETTINGS_SHOW_HOURLY_WEREWOLF_WARNING: self.showHourlyWerewolfWarning,
                 IndicatorLunar.SETTINGS_SHOW_ILLUMINATION: self.showIllumination,
