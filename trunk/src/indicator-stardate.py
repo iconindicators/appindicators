@@ -121,7 +121,7 @@ class IndicatorStardate:
     def onAbout( self, widget ):
         dialog = Gtk.AboutDialog()
         dialog.set_program_name( IndicatorStardate.NAME )
-        dialog.set_comments( IndicatorStardate.AUTHOR )
+        dialog.set_comments( IndicatorStardate.AUTHOR + "\n\nBased on STARDATES IN STAR TREK FAQ V1.6\n" )
         dialog.set_website( IndicatorStardate.WEBSITE )
         dialog.set_website_label( IndicatorStardate.WEBSITE )
         dialog.set_version( IndicatorStardate.VERSION )
@@ -163,22 +163,26 @@ class IndicatorStardate:
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
 
-        table = Gtk.Table( 2, 1, False )
-        table.set_col_spacings( 5 )
-        table.set_row_spacings( 5 )
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
 
         showIssueCheckbox = Gtk.CheckButton( "Show Issue" )
         showIssueCheckbox.set_active( self.showIssue )
-        table.attach( showIssueCheckbox, 0, 1, 0, 1 )
+        grid.attach( showIssueCheckbox, 0, 0, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
-        table.attach( autostartCheckbox, 0, 1, 1, 2 )
+        grid.attach( autostartCheckbox, 0, 1, 1, 1 )
 
-        self.dialog.vbox.pack_start( table, True, True, 10 )
-        self.dialog.set_border_width( 10 )
-
+        self.dialog.vbox.pack_start( grid, True, True, 0 )
+        self.dialog.set_border_width( 5 )
         self.dialog.show_all()
+
         response = self.dialog.run()
         if response == Gtk.ResponseType.OK:
             self.showIssue = showIssueCheckbox.get_active()
