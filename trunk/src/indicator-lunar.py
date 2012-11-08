@@ -36,6 +36,8 @@
 # http://askubuntu.com/questions/31842/how-to-read-time-zone-information
 
 
+from ephem.cities import _city_data
+
 appindicatorImported = True
 try:
     from gi.repository import AppIndicator3 as appindicator
@@ -54,11 +56,12 @@ except:
 import datetime
 import ephem
 import json
+import locale
 import logging
-
 import os
 import shutil
 import string
+import subprocess
 import sys
 
 
@@ -76,6 +79,10 @@ class IndicatorLunar:
     DESKTOP_FILE = NAME + ".desktop"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_CITY_ELEVATION = "cityElevation"
+    SETTINGS_CITY_LATITUDE = "cityLatitude"
+    SETTINGS_CITY_LONGITUDE = "cityLongitude"
+    SETTINGS_CITY_NAME = "cityName"
     SETTINGS_SHOW_HOURLY_WEREWOLF_WARNING = "showHourlyWerewolfWarning"
     SETTINGS_SHOW_ILLUMINATION = "showIllumination"
     SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW = "showNorthernHemisphereView"
@@ -147,6 +154,7 @@ class IndicatorLunar:
     def main( self ):
         self.update()
         gobject.timeout_add( 60 * 60 * 1000, self.update )
+#        gobject.timeout_add( 10000, self.update )
         Gtk.main()
 
 
@@ -206,6 +214,17 @@ class IndicatorLunar:
             self.nextMoonTwoMenuItem.set_label( thirdQuarterLabel )
             self.nextMoonThreeMenuItem.set_label( newMoonLabel )
             self.nextMoonFourMenuItem.set_label( firstQuarterLabel )
+
+        city = ephem.city( self.cityName )
+        self.previousMoonriseMenuItem.set_label( "    Previous " + self.trimFractionalSeconds( str( ephem.localtime( city.previous_rising( ephem.Moon() ) ) ) ) )
+        self.nextMoonriseMenuItem.set_label( "    Next " + self.trimFractionalSeconds( str( ephem.localtime( city.next_rising( ephem.Moon() ) ) ) ) )
+        self.previousMoonsetMenuItem.set_label( "    Previous " + self.trimFractionalSeconds( str( ephem.localtime( city.previous_setting( ephem.Moon() ) ) ) ) )
+        self.nextMoonsetMenuItem.set_label( "    Next " + self.trimFractionalSeconds( str( ephem.localtime( city.next_setting( ephem.Moon() ) ) ) ) )
+
+        self.previousSunriseMenuItem.set_label( "    Previous " + self.trimFractionalSeconds( str( ephem.localtime( city.previous_rising( ephem.Sun() ) ) ) ) )
+        self.nextSunriseMenuItem.set_label( "    Next " + self.trimFractionalSeconds( str( ephem.localtime( city.next_rising( ephem.Sun() ) ) ) ) )
+        self.previousSunsetMenuItem.set_label( "    Previous " + self.trimFractionalSeconds( str( ephem.localtime( city.previous_setting( ephem.Sun() ) ) ) ) )
+        self.nextSunsetMenuItem.set_label( "    Next " + self.trimFractionalSeconds( str( ephem.localtime( city.next_setting( ephem.Sun() ) ) ) ) )
 
         equinox = ephem.localtime( ephem.next_equinox( ephem.now() ) )
         solstice = ephem.localtime( ephem.next_solstice( ephem.now() ) )
@@ -307,7 +326,7 @@ class IndicatorLunar:
         self.distanceToSunMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.distanceToSunMenuItem )
 
-        self.menu.append( Gtk.MenuItem( "Next Phases:" ) )
+        self.menu.append( Gtk.MenuItem( "Next Moon Phases:" ) )
 
         self.nextMoonOneMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.nextMoonOneMenuItem )
@@ -320,6 +339,38 @@ class IndicatorLunar:
 
         self.nextMoonFourMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.nextMoonFourMenuItem )
+
+        self.menu.append( Gtk.MenuItem( "Moonrise:" ) )
+
+        self.previousMoonriseMenuItem = Gtk.MenuItem( "" )
+        self.menu.append( self.previousMoonriseMenuItem )
+
+        self.nextMoonriseMenuItem = Gtk.MenuItem( "" )
+        self.menu.append( self.nextMoonriseMenuItem )
+
+        self.menu.append( Gtk.MenuItem( "Moonset:" ) )
+
+        self.previousMoonsetMenuItem = Gtk.MenuItem( "" )
+        self.menu.append( self.previousMoonsetMenuItem )
+
+        self.nextMoonsetMenuItem = Gtk.MenuItem( "" )
+        self.menu.append( self.nextMoonsetMenuItem )
+
+        self.menu.append( Gtk.MenuItem( "Sunrise:" ) )
+
+        self.previousSunriseMenuItem = Gtk.MenuItem( "" )
+        self.menu.append( self.previousSunriseMenuItem )
+
+        self.nextSunriseMenuItem = Gtk.MenuItem( "" )
+        self.menu.append( self.nextSunriseMenuItem )
+
+        self.menu.append( Gtk.MenuItem( "Sunset:" ) )
+
+        self.previousSunsetMenuItem = Gtk.MenuItem( "" )
+        self.menu.append( self.previousSunsetMenuItem )
+
+        self.nextSunsetMenuItem = Gtk.MenuItem( "" )
+        self.menu.append( self.nextSunsetMenuItem )
 
         self.equinoxSolsticeOneMenuItem = Gtk.MenuItem( "" )
         self.menu.append( self.equinoxSolsticeOneMenuItem )
@@ -354,7 +405,7 @@ class IndicatorLunar:
     def onAbout( self, widget ):
         dialog = Gtk.AboutDialog()
         dialog.set_program_name( IndicatorLunar.NAME )
-        dialog.set_comments( IndicatorLunar.AUTHOR + "\n\n" + "Calculations courtesy of PyEphem." )
+        dialog.set_comments( IndicatorLunar.AUTHOR + "\n\n" + "Calculations courtesy of Ephem." )
         dialog.set_website( IndicatorLunar.WEBSITE )
         dialog.set_website_label( IndicatorLunar.WEBSITE )
         dialog.set_version( IndicatorLunar.VERSION )
@@ -368,11 +419,13 @@ class IndicatorLunar:
         if self.dialog is not None:
             return
 
-        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        notebook = Gtk.Notebook()
 
+        # First tab - general settings.
         table = Gtk.Table( 6, 2, False )
         table.set_col_spacings( 5 )
         table.set_row_spacings( 5 )
+        table.set_border_width( 10 )
 
         showPhaseCheckbox = Gtk.CheckButton( "Show phase" )
         showPhaseCheckbox.set_active( self.showPhase )
@@ -397,7 +450,7 @@ class IndicatorLunar:
 
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 5, 0 ) )
-        spinner.set_tooltip_text( "The warning will appear from new moon to full moon once the specified illumination occurs" )
+        spinner.set_tooltip_text( "The warning will start after the new moon (0%) and commence at the specified illumination" )
         spinner.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
         table.attach( spinner, 1, 2, 4, 5 )
 
@@ -407,11 +460,57 @@ class IndicatorLunar:
         autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
         table.attach( autostartCheckbox, 0, 2, 5, 6 )
 
-        self.dialog.vbox.pack_start( table, True, True, 10 )
-        self.dialog.set_border_width( 10 )
+        notebook.append_page( table, Gtk.Label( "General" ) )
 
+        # Second tab - location.
+        table = Gtk.Table( 4, 2, False )
+        table.set_col_spacings( 5 )
+        table.set_row_spacings( 5 )
+        table.set_border_width( 10 )
+
+        label = Gtk.Label( "City" )
+        label.set_alignment( 0, 0.5 )
+        table.attach( label, 0, 1, 0, 1 )
+
+        cities = sorted( cities._city_data.keys(), key = locale.strxfrm )
+        city = Gtk.ComboBoxText.new_with_entry()
+        for c in cities:
+            city.append_text( c )
+
+        table.attach( city, 1, 2, 0, 1 )
+
+        label = Gtk.Label( "Latitude (DD)" )
+        label.set_alignment( 0, 0.5 )
+        table.attach( label, 0, 1, 1, 2 )
+
+        latitude = Gtk.Entry()
+        table.attach( latitude, 1, 2, 1, 2 )
+
+        label = Gtk.Label( "Longitude (DD)" )
+        label.set_alignment( 0, 0.5 )
+        table.attach( label, 0, 1, 2, 3 )
+
+        longitude = Gtk.Entry()
+        table.attach( longitude, 1, 2, 2, 3 )
+
+        label = Gtk.Label( "Elevation (m)" )
+        label.set_alignment( 0, 0.5 )
+        table.attach( label, 0, 1, 3, 4 )
+
+        elevation = Gtk.Entry()
+        table.attach( elevation, 1, 2, 3, 4 )
+
+        city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
+        city.set_active( cities.index( self.cityName ) )
+
+        notebook.append_page( table, Gtk.Label( "Location" ) )
+
+        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog.vbox.pack_start( notebook, True, True, 0 )
+        self.dialog.set_border_width( 5 )
         self.dialog.show_all()
         response = self.dialog.run()
+#TODO Need to handle emtpy data
         if response == Gtk.ResponseType.OK:
             self.showPhase = showPhaseCheckbox.get_active()
             self.showIllumination = showIlluminationCheckbox.get_active()
@@ -438,12 +537,21 @@ class IndicatorLunar:
         self.update()
 
 
+#TODO Do we need a reset for the canned values?
+    def onCityChanged( self, combobox, latitude, longitude, elevation ):
+        city = combobox.get_active_text()
+        latitude.set_text( self.cities.get( city )[ 0 ] )
+        longitude.set_text( self.cities.get( city )[ 1 ] )
+        elevation.set_text( str( self.cities.get( city )[ 2 ] ) )
+
+
     def onShowHourlyWerewolfWarningCheckbox( self, source, spinner, label ):
         label.set_sensitive( source.get_active() )
         spinner.set_sensitive( source.get_active() )
 
 
     def loadSettings( self ):
+        self.getDefaultCity()
         self.showHourlyWerewolfWarning = True
         self.showIllumination = True
         self.showNorthernHemisphereView = True
@@ -455,20 +563,51 @@ class IndicatorLunar:
                 with open( IndicatorLunar.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
+                global _city_data
+                cityElevation = settings.get( IndicatorLunar.SETTINGS_CITY_ELEVATION, _city_data.get( self.cityName )[ 2 ] )
+                cityLatitude = settings.get( IndicatorLunar.SETTINGS_CITY_LATITUDE, _city_data.get( self.cityName )[ 0 ] )
+                cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
+                self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
                 self.showHourlyWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_HOURLY_WEREWOLF_WARNING, self.showHourlyWerewolfWarning )
                 self.showIllumination = settings.get( IndicatorLunar.SETTINGS_SHOW_ILLUMINATION, self.showIllumination )
                 self.showNorthernHemisphereView = settings.get( IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW, self.showNorthernHemisphereView )
                 self.showPhase = settings.get( IndicatorLunar.SETTINGS_SHOW_PHASE, self.showPhase )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
 
+                _city_data[ self.cityName ] = [ cityLatitude, cityLongitude, cityElevation ] # Insert/overwrite the cityName and information into the cities...
+
             except Exception as e:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorLunar.SETTINGS_FILE )
 
 
+    def getDefaultCity( self ):
+        try:
+            p = subprocess.Popen( "cat /etc/timezone", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+            timezone = p.communicate()[ 0 ].decode()
+            self.cityName = None
+            global _city_data
+            for city in _city_data.keys():
+                if city in timezone:
+                    self.cityName = city
+                    break
+
+            if self.cityName is None or self.cityName == "":
+                self.cityName = sorted( self.cities.keys(), key = locale.strxfrm )[ 0 ]
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error getting default cityName." )
+            self.cityName = sorted( self.cities.keys(), key = locale.strxfrm )[ 0 ]
+
+
     def saveSettings( self ):
         try:
             settings = {
+                IndicatorLunar.SETTINGS_CITY_ELEVATION: self.cityElevation,
+                IndicatorLunar.SETTINGS_CITY_LATITUDE: self.cityLatitude,
+                IndicatorLunar.SETTINGS_CITY_LONGITUDE: self.cityLongitude,
+                IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
                 IndicatorLunar.SETTINGS_SHOW_HOURLY_WEREWOLF_WARNING: self.showHourlyWerewolfWarning,
                 IndicatorLunar.SETTINGS_SHOW_ILLUMINATION: self.showIllumination,
                 IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW: self.showNorthernHemisphereView,
