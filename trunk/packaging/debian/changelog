@@ -3,7 +3,7 @@ indicator-lunar (1.0.10-1) quantal; urgency=low
   * Changes for Python3 (but still runs as Python2) and PyGObject.
   * Switched back to using localtime!
   * Added an option to start the werewolf warning at a particular illumination.
-  * Added location (sourced from /etc/timezone) to show sun/moon rise/set.
+  * Added location capability (sourced from /etc/timezone) to show sun/moon rise/set.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 22 Oct 2012 21:24:49 +1000
 
