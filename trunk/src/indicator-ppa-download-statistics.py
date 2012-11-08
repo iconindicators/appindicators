@@ -373,7 +373,11 @@ class IndicatorPPADownloadStatistics:
         for item in IndicatorPPADownloadStatistics.SERIES:
             series.append_text( item )
 
-        series.set_active( 0 )
+        if add == False:
+            series.set_active( self.getIndexForSeries( existingSeries ) )
+        else:
+            series.set_active( 0 )
+
         table.attach( series, 1, 2, 2, 3 )
 
         label = Gtk.Label( "Architecture" )
@@ -384,7 +388,11 @@ class IndicatorPPADownloadStatistics:
         for item in IndicatorPPADownloadStatistics.ARCHITECTURES:
             architectures.append_text( item )
 
-        architectures.set_active( 0 )
+        if add == False:
+            architectures.set_active( self.getIndexForArchitecture( existingArchitecture ) )
+        else:
+            architectures.set_active( 0 )
+
         table.attach( architectures, 1, 2, 3, 4 )
 
         self.dialog.vbox.pack_start( table, True, True, 10 )
