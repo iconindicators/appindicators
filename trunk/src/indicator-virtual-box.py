@@ -31,8 +31,6 @@
 # From https://kororaa.org/forums/viewtopic.php?f=7&t=220#p2343, it (hopefully) is safe to ignore.
 
 
-from functools import cmp_to_key
-
 appindicatorImported = True
 try:
     from gi.repository import AppIndicator3 as appindicator
