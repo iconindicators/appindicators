@@ -323,15 +323,17 @@ class IndicatorPPADownloadStatistics:
         if add == False:
             title = "Edit PPA"
 
-        self.dialog = Gtk.Dialog( title, None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-
-        table = Gtk.Table( 4, 2, False )
-        table.set_col_spacings( 5 )
-        table.set_row_spacings( 5 )
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
 
         label = Gtk.Label( "PPA User" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 0, 1 )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 1, 1 )
 
         if len( self.ppas ) > 0:
             ppaUser = Gtk.ComboBoxText.new_with_entry()
@@ -345,11 +347,12 @@ class IndicatorPPADownloadStatistics:
             # There are no PPAs present, so we are adding the first PPA.
             ppaUser = Gtk.Entry()
 
-        table.attach( ppaUser, 1, 2, 0, 1 )
+        ppaUser.set_hexpand( True ) # Only need to set this once and all objects will expand.
+        grid.attach( ppaUser, 1, 0, 1, 1 )
 
         label = Gtk.Label( "PPA Name" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 1, 2 )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 1, 1, 1 )
 
         if len( self.ppas ) > 0:
             ppaName = Gtk.ComboBoxText.new_with_entry()
@@ -363,11 +366,11 @@ class IndicatorPPADownloadStatistics:
             # There are no PPAs present, so we are adding the first PPA.
             ppaName = Gtk.Entry()
 
-        table.attach( ppaName, 1, 2, 1, 2 )
+        grid.attach( ppaName, 1, 1, 1, 1 )
 
         label = Gtk.Label( "Series" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 2, 3 )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 2, 1, 1 )
 
         series = Gtk.ComboBoxText()
         for item in IndicatorPPADownloadStatistics.SERIES:
@@ -378,11 +381,11 @@ class IndicatorPPADownloadStatistics:
         else:
             series.set_active( 0 )
 
-        table.attach( series, 1, 2, 2, 3 )
+        grid.attach( series, 1, 2, 1, 1 )
 
         label = Gtk.Label( "Architecture" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 3, 4 )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 3, 1, 1 )
 
         architectures = Gtk.ComboBoxText()
         for item in IndicatorPPADownloadStatistics.ARCHITECTURES:
@@ -393,10 +396,11 @@ class IndicatorPPADownloadStatistics:
         else:
             architectures.set_active( 0 )
 
-        table.attach( architectures, 1, 2, 3, 4 )
+        grid.attach( architectures, 1, 3, 1, 1 )
 
-        self.dialog.vbox.pack_start( table, True, True, 10 )
-        self.dialog.set_border_width( 10 )
+        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog.vbox.pack_start( grid, True, True, 0 )
+        self.dialog.set_border_width( 5 )
 
         while True:
             self.dialog.show_all()
@@ -502,29 +506,32 @@ class IndicatorPPADownloadStatistics:
         if self.dialog is not None:
             return
 
-        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-
-        table = Gtk.Table( 3, 1, False )
-        table.set_col_spacings( 5 )
-        table.set_row_spacings( 5 )
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show as submenus" )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
-        table.attach( showAsSubmenusCheckbox, 0, 1, 0, 1 )
+        grid.attach( showAsSubmenusCheckbox, 0, 0, 1, 1 )
 
         allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Load PPA page on selection" )
         allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item launches the default web browser and loads the PPA home page." )
         allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
-        table.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 1, 1, 2 )
+        grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 1, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
-        table.attach( autostartCheckbox, 0, 1, 2, 3 )
+        grid.attach( autostartCheckbox, 0, 2, 1, 1 )
 
-        self.dialog.vbox.pack_start( table, True, True, 10 )
-        self.dialog.set_border_width( 10 )
-
+        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog.vbox.pack_start( grid, True, True, 0 )
+        self.dialog.set_border_width( 5 )
         self.dialog.show_all()
+
         response = self.dialog.run()
         if response == Gtk.ResponseType.OK:
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
