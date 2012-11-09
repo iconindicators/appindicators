@@ -9,6 +9,7 @@ indicator-virtual-box (1.0.15-1) quantal; urgency=low
     (and so $HOME/.VirtualBox/VirtualBox.xml does not exist).
   * Handle the case when the order of VMs has not been changed by the user
     (use the order given by VBoxManage).
+  * Moved the preferences into a tabbed view.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 06 Nov 2012 18:45:52 +1000
 

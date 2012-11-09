@@ -383,89 +383,107 @@ class IndicatorVirtualBox:
         if self.dialog is not None:
             return
 
-        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        notebook = Gtk.Notebook()
 
-        table = Gtk.Table( 14, 2, False )
-        table.set_col_spacings( 5 )
-        table.set_row_spacings( 5 )
+        # First tab - display settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
 
         label = Gtk.Label( "VM running:" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 0, 1 )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 2, 1 )
 
         label = Gtk.Label( "  Text before" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 1, 2 )
+        label.set_halign( Gtk.Align.START )
+        label.set_margin_left( 15 )
+        grid.attach( label, 0, 1, 1, 1 )
 
         textRunningBefore = Gtk.Entry()
         textRunningBefore.set_text( self.menuTextVirtualMachineRunningBefore )
-        table.attach( textRunningBefore, 1, 2, 1, 2 )
+        textRunningBefore.set_hexpand( True )
+        grid.attach( textRunningBefore, 1, 1, 1, 1 )
 
         label = Gtk.Label( "  Text after" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 2, 3 )
+        label.set_halign( Gtk.Align.START )
+        label.set_margin_left( 15 )
+        grid.attach( label, 0, 2, 1, 1 )
 
         textRunningAfter = Gtk.Entry()
         textRunningAfter.set_text( self.menuTextVirtualMachineRunningAfter )
-        table.attach( textRunningAfter, 1, 2, 2, 3 )
-
-        table.attach( Gtk.Label( "" ), 0, 2, 3, 4 ) # Couldn't figure out how to put in an empty line or padding!
+        grid.attach( textRunningAfter, 1, 2, 1, 1 )
 
         label = Gtk.Label( "VM not running:" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 4, 5 )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 3, 2, 1 )
 
         label = Gtk.Label( "  Text before" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 5, 6 )
+        label.set_halign( Gtk.Align.START )
+        label.set_margin_left( 15 )
+        grid.attach( label, 0, 4, 1, 1 )
 
         textNotRunningBefore = Gtk.Entry()
         textNotRunningBefore.set_text( self.menuTextVirtualMachineNotRunningBefore )
-        table.attach( textNotRunningBefore, 1, 2, 5, 6 )
+        grid.attach( textNotRunningBefore, 1, 4, 1, 1 )
 
         label = Gtk.Label( "  Text after" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 6, 7 )
+        label.set_halign( Gtk.Align.START )
+        label.set_margin_left( 15 )
+        grid.attach( label, 0, 5, 1, 1 )
 
         textNotRunningAfter = Gtk.Entry()
         textNotRunningAfter.set_text( self.menuTextVirtualMachineNotRunningAfter )
-        table.attach( textNotRunningAfter, 1, 2, 6, 7 )
-
-        table.attach( Gtk.Label( "" ), 0, 2, 7, 8 ) # Couldn't figure out how to put in an empty line or padding!
-
-        label = Gtk.Label( "Refresh interval (minutes)" )
-        label.set_alignment( 0, 0.5 )
-        table.attach( label, 0, 1, 8, 9 )
-
-        spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) )
-        spinner.set_tooltip_text( "How often the list of VMs and their running status is automatically updated" )
-        table.attach( spinner, 1, 2, 8, 9 )
-
-        table.attach( Gtk.Label( "" ), 0, 2, 9, 10 ) # Couldn't figure out how to put in an empty line or padding!
+        grid.attach( textNotRunningAfter, 1, 5, 1, 1 )
 
         useRadioCheckbox = Gtk.CheckButton( "Use a \"radio button\" to indicate a running VM" )
         useRadioCheckbox.set_active( self.useRadioIndicator )
-        table.attach( useRadioCheckbox, 0, 2, 10, 11 )
+        grid.attach( useRadioCheckbox, 0, 6, 2, 1 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show groups as submenus" )
         showAsSubmenusCheckbox.set_tooltip_text( "Unchecked will show groups using indents - ignored if groups are not present" )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
-        table.attach( showAsSubmenusCheckbox, 0, 2, 11, 12 )
+        grid.attach( showAsSubmenusCheckbox, 0, 7, 2, 1 )
 
         sortAlphabeticallyCheckbox = Gtk.CheckButton( "Sort VMs alphabetically" )
         sortAlphabeticallyCheckbox.set_tooltip_text( "Unchecked will sort as per VirtualBox UI - ignored if groups are present" )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
-        table.attach( sortAlphabeticallyCheckbox, 0, 2, 12, 13 )
+        grid.attach( sortAlphabeticallyCheckbox, 0, 8, 2, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "Display" ) )
+
+        # Second tab - general settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        label = Gtk.Label( "Refresh interval (minutes)" )
+        grid.attach( label, 0, 0, 1, 1 )
+
+        spinner = Gtk.SpinButton()
+        spinner.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) )
+        spinner.set_tooltip_text( "How often the list of VMs and their running status is automatically updated" )
+        spinner.set_hexpand( True )
+        grid.attach( spinner, 1, 0, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
-        table.attach( autostartCheckbox, 0, 2, 13, 14 )
+        grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
-        self.dialog.vbox.pack_start( table, True, True, 10 )
-        self.dialog.set_border_width( 10 )
+        notebook.append_page( grid, Gtk.Label( "General" ) )
 
+        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog.vbox.pack_start( notebook, True, True, 0 )
+        self.dialog.set_border_width( 5 )
         self.dialog.show_all()
+
         response = self.dialog.run()
         if response == Gtk.ResponseType.OK:
             self.menuTextVirtualMachineRunningBefore = textRunningBefore.get_text()
