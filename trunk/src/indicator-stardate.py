@@ -17,6 +17,11 @@
 
 # Application indicator which displays the current stardate.
 
+# PyGObject, GTK+3 references:
+#  http://developer.gnome.org/pygobject
+#  http://developer.gnome.org/gtk3
+#  http://python-gtk-3-tutorial.readthedocs.org
+
 
 appindicatorImported = True
 try:
