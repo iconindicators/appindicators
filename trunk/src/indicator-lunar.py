@@ -21,8 +21,6 @@
 # TODO: There is no Python3 version of Ephem (http://pypi.python.org/pypi/ephem).
 # Will attempt to create a PPA package!
 
-#TODO Maybe (as an option) put indented menu items into subgroups.
-
 
 from ephem.cities import _city_data
 
@@ -75,6 +73,7 @@ class IndicatorLunar:
     SETTINGS_SHOW_ILLUMINATION = "showIllumination"
     SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW = "showNorthernHemisphereView"
     SETTINGS_SHOW_PHASE = "showPhase"
+    SETTINGS_SHOW_SUBMENU = "showSubmenu"
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
 
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
@@ -126,14 +125,14 @@ class IndicatorLunar:
         elif str( unityIsInstalled ).lower() != "Unity".lower():
             appindicatorImported = False
 
-        self.buildMenu()
-
         # Create the status icon...either Unity or GTK.
         if appindicatorImported == True:
             self.indicator = appindicator.Indicator.new( IndicatorLunar.NAME, "", appindicator.IndicatorCategory.APPLICATION_STATUS )
             self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
-            self.indicator.set_menu( self.menu )
+            self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
+#            self.indicator.set_menu( self.menu )
         else:
+            self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
             self.statusicon = Gtk.StatusIcon()
             self.statusicon.connect( "popup-menu", self.handleRightClick )
             self.statusicon.connect( "activate", self.handleLeftClick )
@@ -166,62 +165,7 @@ class IndicatorLunar:
             self.statusicon.set_from_icon_name( self.getIconNameForLunarPhase( lunarPhase ) )
             self.statusicon.set_tooltip_text( labelTooltip )
 
-        self.phaseMenuItem.set_label( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] )
-        self.illuminationMenuItem.set_label( "Illumination: " + str( percentageIllumination ) + "%" )
-        self.distanceToEarthInKMMenuItem.set_label( "    Moon to Earth: " + str( int( round( ephem.Moon( currentDateTime ).earth_distance * ephem.meters_per_au / 1000 ) ) ) + " km" )
-        self.distanceToEarthInAUMenuItem.set_label( "    Moon to Earth: " + str( round( ephem.Moon( currentDateTime ).earth_distance, 4 ) ) + " AU" )
-        self.distanceToSunMenuItem.set_label( "    Moon to Sun: " + str( round( ephem.Moon( currentDateTime ).sun_distance, 3 ) )  + " AU" )
-        self.constellationMenuItem.set_label( "Constellation: " + ephem.constellation( ephem.Moon( currentDateTime ) )[ 1 ] )
-
-        newMoonLabel = "    New: " + self.trimAndLocalise( ephem.next_new_moon( ephem.now() ) )
-        firstQuarterLabel = "    First Quarter: " + self.trimAndLocalise( ephem.next_first_quarter_moon( ephem.now() ) )
-        fullMoonLabel = "    Full: " + self.trimAndLocalise( ephem.next_full_moon( ephem.now() ) )
-        thirdQuarterLabel = "    Third Quarter: " + self.trimAndLocalise( ephem.next_last_quarter_moon( ephem.now() ) )
-        if lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS:
-            # third, new, first, full
-            self.nextMoonOneMenuItem.set_label( thirdQuarterLabel )
-            self.nextMoonTwoMenuItem.set_label( newMoonLabel )
-            self.nextMoonThreeMenuItem.set_label( firstQuarterLabel )
-            self.nextMoonFourMenuItem.set_label( fullMoonLabel )
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT:
-            # new, first, full, third
-            self.nextMoonOneMenuItem.set_label( newMoonLabel )
-            self.nextMoonTwoMenuItem.set_label( firstQuarterLabel )
-            self.nextMoonThreeMenuItem.set_label( fullMoonLabel )
-            self.nextMoonFourMenuItem.set_label( thirdQuarterLabel )
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT:
-            # first, full, third, new 
-            self.nextMoonOneMenuItem.set_label( firstQuarterLabel )
-            self.nextMoonTwoMenuItem.set_label( fullMoonLabel )
-            self.nextMoonThreeMenuItem.set_label( thirdQuarterLabel )
-            self.nextMoonFourMenuItem.set_label( newMoonLabel )
-        else: # lunarPhase == LUNAR_PHASE_FIRST_QUARTER or lunarPhase == LUNAR_PHASE_WAXING_GIBBOUS
-            # full, third, new, first
-            self.nextMoonOneMenuItem.set_label( fullMoonLabel )
-            self.nextMoonTwoMenuItem.set_label( thirdQuarterLabel )
-            self.nextMoonThreeMenuItem.set_label( newMoonLabel )
-            self.nextMoonFourMenuItem.set_label( firstQuarterLabel )
-
-        city = ephem.city( self.cityName )
-
-        self.setRiseSetLabel( self.previousMoonriseMenuItem, "    Previous ", city.previous_rising, ephem.Moon )
-        self.setRiseSetLabel( self.nextMoonriseMenuItem, "    Next ", city.next_rising, ephem.Moon )
-        self.setRiseSetLabel( self.previousMoonsetMenuItem, "    Previous ", city.previous_setting, ephem.Moon )
-        self.setRiseSetLabel( self.nextMoonsetMenuItem, "    Next ", city.next_setting, ephem.Moon )
-
-        self.setRiseSetLabel( self.previousSunriseMenuItem, "    Previous ", city.previous_rising, ephem.Sun )
-        self.setRiseSetLabel( self.nextSunriseMenuItem, "    Next ", city.next_rising, ephem.Sun )
-        self.setRiseSetLabel( self.previousSunsetMenuItem, "    Previous ", city.previous_setting, ephem.Sun )
-        self.setRiseSetLabel( self.nextSunsetMenuItem, "    Next ", city.next_setting, ephem.Sun )
-
-        equinox = ephem.next_equinox( ephem.now() )
-        solstice = ephem.next_solstice( ephem.now() )
-        if equinox < solstice:
-            self.equinoxSolsticeOneMenuItem.set_label( "Equinox: " + self.trimAndLocalise( equinox ) )
-            self.equinoxSolsticeTwoMenuItem.set_label( "Solstice: " + self.trimAndLocalise( solstice ) )
-        else:
-            self.equinoxSolsticeOneMenuItem.set_label( "Solstice: " + self.trimAndLocalise( solstice ) )
-            self.equinoxSolsticeTwoMenuItem.set_label( "Equinox: " + self.trimAndLocalise( equinox ) )
+        self.buildMenu( currentDateTime, lunarPhase, percentageIllumination )
 
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
@@ -235,11 +179,194 @@ class IndicatorLunar:
         return True # Needed so the timer continues!
 
 
-    def setRiseSetLabel( self, menuItem, message, risingSettingFunction, sunOrMoon ):
+    def buildMenu( self, currentDateTime, lunarPhase, percentageIllumination ):
+        if appindicatorImported == True:
+            menu = self.indicator.get_menu()
+        else:
+            menu = self.menu
+
+        menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
+
+        # Create the new menu and populate...
+        menu = Gtk.Menu()
+
+        if self.showSubmenu == True:
+            indent = ""
+        else:
+            indent = "    "
+
+        phaseMenuItem = Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] )
+        menu.append( phaseMenuItem )
+
+        illuminationMenuItem = Gtk.MenuItem( "Illumination: " + str( percentageIllumination ) + "%" )
+        menu.append( illuminationMenuItem )
+
+        constellationMenuItem = Gtk.MenuItem( "Constellation: " + ephem.constellation( ephem.Moon( currentDateTime ) )[ 1 ] )
+        menu.append( constellationMenuItem )
+
+        menuItem = Gtk.MenuItem( "Distances:" )
+        menu.append( menuItem )
+
+        distanceToEarthInKMMenuItem = Gtk.MenuItem( indent + "Moon to Earth: " + str( int( round( ephem.Moon( currentDateTime ).earth_distance * ephem.meters_per_au / 1000 ) ) ) + " km" )
+        distanceToEarthInAUMenuItem = Gtk.MenuItem( indent + "Moon to Earth: " + str( round( ephem.Moon( currentDateTime ).earth_distance, 4 ) ) + " AU" )
+        distanceToSunMenuItem = Gtk.MenuItem( indent + "Moon to Sun: " + str( round( ephem.Moon( currentDateTime ).sun_distance, 3 ) )  + " AU" )
+        if self.showSubmenu == True:
+            subMenu = Gtk.Menu()
+            subMenu.append( distanceToEarthInKMMenuItem )
+            subMenu.append( distanceToEarthInAUMenuItem )
+            subMenu.append( distanceToSunMenuItem )
+            menuItem.set_submenu( subMenu )
+        else:
+            menu.append( distanceToEarthInKMMenuItem )
+            menu.append( distanceToEarthInAUMenuItem )
+            menu.append( distanceToSunMenuItem )
+
+        menuItem = Gtk.MenuItem( "Next Moon Phases:" )
+        menu.append( menuItem )
+
+        newMoonLabel = indent + "New: " + self.trimAndLocalise( ephem.next_new_moon( ephem.now() ) )
+        firstQuarterLabel = indent + "First Quarter: " + self.trimAndLocalise( ephem.next_first_quarter_moon( ephem.now() ) )
+        fullMoonLabel = indent + "Full: " + self.trimAndLocalise( ephem.next_full_moon( ephem.now() ) )
+        thirdQuarterLabel = indent + "Third Quarter: " + self.trimAndLocalise( ephem.next_last_quarter_moon( ephem.now() ) )
+        if lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS:
+            # third, new, first, full
+            nextMoonOneMenuItem = Gtk.MenuItem( thirdQuarterLabel )
+            nextMoonTwoMenuItem = Gtk.MenuItem( newMoonLabel )
+            nextMoonThreeMenuItem = Gtk.MenuItem( firstQuarterLabel )
+            nextMoonFourMenuItem = Gtk.MenuItem( fullMoonLabel )
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT:
+            # new, first, full, third
+            nextMoonOneMenuItem = Gtk.MenuItem( newMoonLabel )
+            nextMoonTwoMenuItem = Gtk.MenuItem( firstQuarterLabel )
+            nextMoonThreeMenuItem = Gtk.MenuItem( fullMoonLabel )
+            nextMoonFourMenuItem = Gtk.MenuItem( thirdQuarterLabel )
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT:
+            # first, full, third, new 
+            nextMoonOneMenuItem = Gtk.MenuItem( firstQuarterLabel )
+            nextMoonTwoMenuItem = Gtk.MenuItem( fullMoonLabel )
+            nextMoonThreeMenuItem = Gtk.MenuItem( thirdQuarterLabel )
+            nextMoonFourMenuItem = Gtk.MenuItem( newMoonLabel )
+        else: # lunarPhase == LUNAR_PHASE_FIRST_QUARTER or lunarPhase == LUNAR_PHASE_WAXING_GIBBOUS
+            # full, third, new, first
+            nextMoonOneMenuItem = Gtk.MenuItem( fullMoonLabel )
+            nextMoonTwoMenuItem = Gtk.MenuItem( thirdQuarterLabel )
+            nextMoonThreeMenuItem = Gtk.MenuItem( newMoonLabel )
+            nextMoonFourMenuItem = Gtk.MenuItem( firstQuarterLabel )
+
+        if self.showSubmenu == True:
+            subMenu = Gtk.Menu()
+            subMenu.append( nextMoonOneMenuItem )
+            subMenu.append( nextMoonTwoMenuItem )
+            subMenu.append( nextMoonThreeMenuItem )
+            subMenu.append( nextMoonFourMenuItem )
+            menuItem.set_submenu( subMenu )
+        else:
+            menu.append( nextMoonOneMenuItem )
+            menu.append( nextMoonTwoMenuItem )
+            menu.append( nextMoonThreeMenuItem )
+            menu.append( nextMoonFourMenuItem )
+
+        city = ephem.city( self.cityName )
+
+        menuItem = Gtk.MenuItem( "Moonrise:" )
+        menu.append( menuItem )
+
+        previousMoonriseMenuItem = Gtk.MenuItem( self.getRiseSetText( indent + "Previous ", city.previous_rising, ephem.Moon ) )
+        nextMoonriseMenuItem = Gtk.MenuItem( self.getRiseSetText( indent + "Next ", city.next_rising, ephem.Moon ) )
+
+        if self.showSubmenu == True:
+            subMenu = Gtk.Menu()
+            subMenu.append( previousMoonriseMenuItem )
+            subMenu.append( nextMoonriseMenuItem )
+            menuItem.set_submenu( subMenu )
+        else:
+            menu.append( previousMoonriseMenuItem )
+            menu.append( nextMoonriseMenuItem )
+
+        menuItem = Gtk.MenuItem( "Moonset:" )
+        menu.append( menuItem )
+
+        previousMoonsetMenuItem = Gtk.MenuItem( self.getRiseSetText( indent + "Previous ", city.previous_setting, ephem.Moon ) )
+        nextMoonsetMenuItem = Gtk.MenuItem( self.getRiseSetText( indent + "Next ", city.next_setting, ephem.Moon ) )
+
+        if self.showSubmenu == True:
+            subMenu = Gtk.Menu()
+            subMenu.append( previousMoonsetMenuItem )
+            subMenu.append( nextMoonsetMenuItem )
+            menuItem.set_submenu( subMenu )
+        else:
+            menu.append( previousMoonsetMenuItem )
+            menu.append( nextMoonsetMenuItem )
+
+        menuItem = Gtk.MenuItem( "Sunrise:" )
+        menu.append( menuItem )
+
+        previousSunriseMenuItem = Gtk.MenuItem( self.getRiseSetText( indent + "Previous ", city.previous_rising, ephem.Sun ) )
+        nextSunriseMenuItem = Gtk.MenuItem( self.getRiseSetText( indent + "Next ", city.next_rising, ephem.Sun ) )
+
+        if self.showSubmenu == True:
+            subMenu = Gtk.Menu()
+            subMenu.append( previousSunriseMenuItem )
+            subMenu.append( nextSunriseMenuItem )
+            menuItem.set_submenu( subMenu )
+        else:
+            menu.append( previousSunriseMenuItem )
+            menu.append( nextSunriseMenuItem )
+
+        menuItem = Gtk.MenuItem( "Sunset:" )
+        menu.append( menuItem )
+
+        previousSunsetMenuItem = Gtk.MenuItem( self.getRiseSetText( indent + "Previous ", city.previous_setting, ephem.Sun ) )
+        nextSunsetMenuItem = Gtk.MenuItem( self.getRiseSetText( indent + "Next ", city.next_setting, ephem.Sun ) )
+
+        if self.showSubmenu == True:
+            subMenu = Gtk.Menu()
+            subMenu.append( previousSunsetMenuItem )
+            subMenu.append( nextSunsetMenuItem )
+            menuItem.set_submenu( subMenu )
+        else:
+            menu.append( previousSunsetMenuItem )
+            menu.append( nextSunsetMenuItem )
+
+        equinox = ephem.next_equinox( ephem.now() )
+        solstice = ephem.next_solstice( ephem.now() )
+        if equinox < solstice:
+            equinoxSolsticeOneMenuItem = Gtk.MenuItem( "Equinox: " + self.trimAndLocalise( equinox ) )
+            equinoxSolsticeTwoMenuItem = Gtk.MenuItem( "Solstice: " + self.trimAndLocalise( solstice ) )
+        else:
+            equinoxSolsticeOneMenuItem = Gtk.MenuItem( "Solstice: " + self.trimAndLocalise( solstice ) )
+            equinoxSolsticeTwoMenuItem = Gtk.MenuItem( "Equinox: " + self.trimAndLocalise( equinox ) )
+
+        menu.append( equinoxSolsticeOneMenuItem )
+        menu.append( equinoxSolsticeTwoMenuItem )
+
+        menu.append( Gtk.SeparatorMenuItem() )
+
+        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
+        preferencesMenuItem.connect( "activate", self.onPreferences )
+        menu.append( preferencesMenuItem )
+
+        aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
+        aboutMenuItem.connect( "activate", self.onAbout )
+        menu.append( aboutMenuItem )
+
+        quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
+        quitMenuItem.connect( "activate", Gtk.main_quit )
+        menu.append( quitMenuItem )
+
+        if appindicatorImported == True:
+            self.indicator.set_menu( menu )
+        else:
+            self.menu = menu
+
+        menu.show_all()
+
+
+    def getRiseSetText( self, message, risingSettingFunction, sunOrMoon ):
         try:
-            menuItem.set_label( message + self.trimAndLocalise( risingSettingFunction( sunOrMoon() ) ) )
+            return message + self.trimAndLocalise( risingSettingFunction( sunOrMoon() ) )
         except Exception as e:
-            menuItem.set_label( "    " + e.message )
+            return "    " + e.message
 
 
     def trimAndLocalise( self, value ):
@@ -302,100 +429,9 @@ class IndicatorLunar:
         return iconName
 
 
-    def buildMenu( self ):
-        self.menu = Gtk.Menu()
-
-        self.phaseMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.phaseMenuItem )
-
-        self.illuminationMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.illuminationMenuItem )
-
-        self.constellationMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.constellationMenuItem )
-
-        self.menu.append( Gtk.MenuItem( "Distances:" ) )
-
-        self.distanceToEarthInKMMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.distanceToEarthInKMMenuItem )
-
-        self.distanceToEarthInAUMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.distanceToEarthInAUMenuItem )
-
-        self.distanceToSunMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.distanceToSunMenuItem )
-
-        self.menu.append( Gtk.MenuItem( "Next Moon Phases:" ) )
-
-        self.nextMoonOneMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.nextMoonOneMenuItem )
-
-        self.nextMoonTwoMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.nextMoonTwoMenuItem )
-
-        self.nextMoonThreeMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.nextMoonThreeMenuItem )
-
-        self.nextMoonFourMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.nextMoonFourMenuItem )
-
-        self.menu.append( Gtk.MenuItem( "Moonrise:" ) )
-
-        self.previousMoonriseMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.previousMoonriseMenuItem )
-
-        self.nextMoonriseMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.nextMoonriseMenuItem )
-
-        self.menu.append( Gtk.MenuItem( "Moonset:" ) )
-
-        self.previousMoonsetMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.previousMoonsetMenuItem )
-
-        self.nextMoonsetMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.nextMoonsetMenuItem )
-
-        self.menu.append( Gtk.MenuItem( "Sunrise:" ) )
-
-        self.previousSunriseMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.previousSunriseMenuItem )
-
-        self.nextSunriseMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.nextSunriseMenuItem )
-
-        self.menu.append( Gtk.MenuItem( "Sunset:" ) )
-
-        self.previousSunsetMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.previousSunsetMenuItem )
-
-        self.nextSunsetMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.nextSunsetMenuItem )
-
-        self.equinoxSolsticeOneMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.equinoxSolsticeOneMenuItem )
-
-        self.equinoxSolsticeTwoMenuItem = Gtk.MenuItem( "" )
-        self.menu.append( self.equinoxSolsticeTwoMenuItem )
-
-        self.menu.append( Gtk.SeparatorMenuItem() )
-
-        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        preferencesMenuItem.connect( "activate", self.onPreferences )
-        self.menu.append( preferencesMenuItem )
-
-        aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
-        aboutMenuItem.connect( "activate", self.onAbout )
-        self.menu.append( aboutMenuItem )
-
-        quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        quitMenuItem.connect( "activate", Gtk.main_quit )
-        self.menu.append( quitMenuItem )
-
-        self.menu.show_all()
-
-
     def handleLeftClick( self, icon ):
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
+
 
     def handleRightClick( self, icon, button, time ):
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
@@ -520,9 +556,13 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
+        showAsSubmenusCheckbox = Gtk.CheckButton( "Show as submenus" )
+        showAsSubmenusCheckbox.set_active( self.showSubmenu )
+        grid.attach( showAsSubmenusCheckbox, 0, 0, 1, 1 )
+
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 0, 1, 1 )
+        grid.attach( autostartCheckbox, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "General" ) )
 
@@ -565,6 +605,7 @@ class IndicatorLunar:
             self.showIllumination = showIlluminationCheckbox.get_active()
             self.showNorthernHemisphereView = showNorthernHemisphereViewCheckbox.get_active()
             self.showHourlyWerewolfWarning = showHourlyWerewolfWarningCheckbox.get_active()
+            self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
             
             self.cityName = cityValue
@@ -627,6 +668,7 @@ class IndicatorLunar:
         self.showIllumination = True
         self.showNorthernHemisphereView = True
         self.showPhase = True
+        self.showSubmenu = False
         self.werewolfWarningStartIlluminationPercentage = 100
 
         if os.path.isfile( IndicatorLunar.SETTINGS_FILE ):
@@ -643,6 +685,7 @@ class IndicatorLunar:
                 self.showIllumination = settings.get( IndicatorLunar.SETTINGS_SHOW_ILLUMINATION, self.showIllumination )
                 self.showNorthernHemisphereView = settings.get( IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW, self.showNorthernHemisphereView )
                 self.showPhase = settings.get( IndicatorLunar.SETTINGS_SHOW_PHASE, self.showPhase )
+                self.showSubmenu = settings.get( IndicatorLunar.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
 
                 # Insert/overwrite the cityName and information into the cities...
@@ -684,6 +727,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_SHOW_ILLUMINATION: self.showIllumination,
                 IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW: self.showNorthernHemisphereView,
                 IndicatorLunar.SETTINGS_SHOW_PHASE: self.showPhase,
+                IndicatorLunar.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage
             }
 
