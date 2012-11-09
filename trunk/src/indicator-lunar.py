@@ -21,6 +21,8 @@
 # TODO: There is no Python3 version of Ephem (http://pypi.python.org/pypi/ephem).
 # Will attempt to create a PPA package!
 
+#TODO Maybe (as an option) put indented menu items into subgroups.
+
 
 from ephem.cities import _city_data
 
@@ -171,10 +173,10 @@ class IndicatorLunar:
         self.distanceToSunMenuItem.set_label( "    Moon to Sun: " + str( round( ephem.Moon( currentDateTime ).sun_distance, 3 ) )  + " AU" )
         self.constellationMenuItem.set_label( "Constellation: " + ephem.constellation( ephem.Moon( currentDateTime ) )[ 1 ] )
 
-        newMoonLabel = "    New: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_new_moon( ephem.now() ) ) ) )
-        firstQuarterLabel = "    First Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_first_quarter_moon( ephem.now() ) ) ) )
-        fullMoonLabel = "    Full: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_full_moon( ephem.now() ) ) ) )
-        thirdQuarterLabel = "    Third Quarter: " + self.trimFractionalSeconds( str( ephem.localtime( ephem.next_last_quarter_moon( ephem.now() ) ) ) )
+        newMoonLabel = "    New: " + self.trimAndLocalise( ephem.next_new_moon( ephem.now() ) )
+        firstQuarterLabel = "    First Quarter: " + self.trimAndLocalise( ephem.next_first_quarter_moon( ephem.now() ) )
+        fullMoonLabel = "    Full: " + self.trimAndLocalise( ephem.next_full_moon( ephem.now() ) )
+        thirdQuarterLabel = "    Third Quarter: " + self.trimAndLocalise( ephem.next_last_quarter_moon( ephem.now() ) )
         if lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS:
             # third, new, first, full
             self.nextMoonOneMenuItem.set_label( thirdQuarterLabel )
@@ -201,24 +203,25 @@ class IndicatorLunar:
             self.nextMoonFourMenuItem.set_label( firstQuarterLabel )
 
         city = ephem.city( self.cityName )
-        self.previousMoonriseMenuItem.set_label( "    Previous " + self.trimFractionalSeconds( str( ephem.localtime( city.previous_rising( ephem.Moon() ) ) ) ) )
-        self.nextMoonriseMenuItem.set_label( "    Next " + self.trimFractionalSeconds( str( ephem.localtime( city.next_rising( ephem.Moon() ) ) ) ) )
-        self.previousMoonsetMenuItem.set_label( "    Previous " + self.trimFractionalSeconds( str( ephem.localtime( city.previous_setting( ephem.Moon() ) ) ) ) )
-        self.nextMoonsetMenuItem.set_label( "    Next " + self.trimFractionalSeconds( str( ephem.localtime( city.next_setting( ephem.Moon() ) ) ) ) )
 
-        self.previousSunriseMenuItem.set_label( "    Previous " + self.trimFractionalSeconds( str( ephem.localtime( city.previous_rising( ephem.Sun() ) ) ) ) )
-        self.nextSunriseMenuItem.set_label( "    Next " + self.trimFractionalSeconds( str( ephem.localtime( city.next_rising( ephem.Sun() ) ) ) ) )
-        self.previousSunsetMenuItem.set_label( "    Previous " + self.trimFractionalSeconds( str( ephem.localtime( city.previous_setting( ephem.Sun() ) ) ) ) )
-        self.nextSunsetMenuItem.set_label( "    Next " + self.trimFractionalSeconds( str( ephem.localtime( city.next_setting( ephem.Sun() ) ) ) ) )
+        self.setRiseSetLabel( self.previousMoonriseMenuItem, "    Previous ", city.previous_rising, ephem.Moon )
+        self.setRiseSetLabel( self.nextMoonriseMenuItem, "    Next ", city.next_rising, ephem.Moon )
+        self.setRiseSetLabel( self.previousMoonsetMenuItem, "    Previous ", city.previous_setting, ephem.Moon )
+        self.setRiseSetLabel( self.nextMoonsetMenuItem, "    Next ", city.next_setting, ephem.Moon )
 
-        equinox = ephem.localtime( ephem.next_equinox( ephem.now() ) )
-        solstice = ephem.localtime( ephem.next_solstice( ephem.now() ) )
+        self.setRiseSetLabel( self.previousSunriseMenuItem, "    Previous ", city.previous_rising, ephem.Sun )
+        self.setRiseSetLabel( self.nextSunriseMenuItem, "    Next ", city.next_rising, ephem.Sun )
+        self.setRiseSetLabel( self.previousSunsetMenuItem, "    Previous ", city.previous_setting, ephem.Sun )
+        self.setRiseSetLabel( self.nextSunsetMenuItem, "    Next ", city.next_setting, ephem.Sun )
+
+        equinox = ephem.next_equinox( ephem.now() )
+        solstice = ephem.next_solstice( ephem.now() )
         if equinox < solstice:
-            self.equinoxSolsticeOneMenuItem.set_label( "Equinox: " + self.trimFractionalSeconds( str( equinox ) ) )
-            self.equinoxSolsticeTwoMenuItem.set_label( "Solstice: " + self.trimFractionalSeconds( str( solstice ) ) )
+            self.equinoxSolsticeOneMenuItem.set_label( "Equinox: " + self.trimAndLocalise( equinox ) )
+            self.equinoxSolsticeTwoMenuItem.set_label( "Solstice: " + self.trimAndLocalise( solstice ) )
         else:
-            self.equinoxSolsticeOneMenuItem.set_label( "Solstice: " + self.trimFractionalSeconds( str( solstice ) ) )
-            self.equinoxSolsticeTwoMenuItem.set_label( "Equinox: " + self.trimFractionalSeconds( str( equinox ) ) )
+            self.equinoxSolsticeOneMenuItem.set_label( "Solstice: " + self.trimAndLocalise( solstice ) )
+            self.equinoxSolsticeTwoMenuItem.set_label( "Equinox: " + self.trimAndLocalise( equinox ) )
 
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
@@ -230,6 +233,17 @@ class IndicatorLunar:
             Notify.Notification.new( "WARNING: Werewolves about!!!", "", IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_FULL_MOON ] ).show()
 
         return True # Needed so the timer continues!
+
+
+    def setRiseSetLabel( self, menuItem, message, risingSettingFunction, sunOrMoon ):
+        try:
+            menuItem.set_label( message + self.trimAndLocalise( risingSettingFunction( sunOrMoon() ) ) )
+        except Exception as e:
+            menuItem.set_label( "    " + e.message )
+
+
+    def trimAndLocalise( self, value ):
+        return self.trimFractionalSeconds( str( ephem.localtime( value ) ) )
 
 
     def trimFractionalSeconds( self, currentDateTimeString ):
@@ -390,7 +404,7 @@ class IndicatorLunar:
     def onAbout( self, widget ):
         dialog = Gtk.AboutDialog()
         dialog.set_program_name( IndicatorLunar.NAME )
-        dialog.set_comments( IndicatorLunar.AUTHOR + "\n\n" + "Calculations courtesy of Ephem." )
+        dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of Ephem.\n" )
         dialog.set_website( IndicatorLunar.WEBSITE )
         dialog.set_website_label( IndicatorLunar.WEBSITE )
         dialog.set_version( IndicatorLunar.VERSION )
@@ -406,7 +420,7 @@ class IndicatorLunar:
 
         notebook = Gtk.Notebook()
 
-        # First tab - general settings.
+        # First tab - display settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -446,11 +460,7 @@ class IndicatorLunar:
 
         showHourlyWerewolfWarningCheckbox.connect( "toggled", self.onShowHourlyWerewolfWarningCheckbox, label, spinner )
 
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 5, 2, 1 )
-
-        notebook.append_page( grid, Gtk.Label( "General" ) )
+        notebook.append_page( grid, Gtk.Label( "Display" ) )
 
         # Second tab - location.
         grid = Gtk.Grid()
@@ -468,6 +478,7 @@ class IndicatorLunar:
         global _city_data
         cities = sorted( _city_data.keys(), key = locale.strxfrm )
         city = Gtk.ComboBoxText.new_with_entry()
+        city.set_tooltip_text( "To reset the cities (with factory lat/long/elev), create a bogus city and restart the indicator" )
         city.set_hexpand( True ) # Only need to set this once and all objects will expand.
         for c in cities:
             city.append_text( c )
@@ -500,18 +511,65 @@ class IndicatorLunar:
 
         notebook.append_page( grid, Gtk.Label( "Location" ) )
 
+        # Third tab - general settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
+        grid.attach( autostartCheckbox, 0, 0, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "General" ) )
+
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
-        self.dialog.show_all()
-        response = self.dialog.run()
-#TODO Need to handle emtpy data
-        if response == Gtk.ResponseType.OK:
+
+        while True:
+            self.dialog.show_all()
+            response = self.dialog.run()
+
+            if response == Gtk.ResponseType.CANCEL:
+                break
+
+            cityValue = city.get_active_text()
+            if cityValue == "":
+                self.showMessage( Gtk.MessageType.ERROR, "City cannot be empty." )
+                city.grab_focus()
+                continue
+
+            latitudeValue = latitude.get_text().strip()
+            if latitudeValue == "" or not self.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
+                self.showMessage( Gtk.MessageType.ERROR, "Latitude must be a number between 90 and -90 inclusive." )
+                latitude.grab_focus()
+                continue
+
+            longitudeValue = longitude.get_text().strip()
+            if longitudeValue == "" or not self.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
+                self.showMessage( Gtk.MessageType.ERROR, "Longitude must be a number between 180 and -180 inclusive." )
+                longitude.grab_focus()
+                continue
+
+            elevationValue = elevation.get_text().strip()
+            if elevationValue == "" or not self.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
+                self.showMessage( Gtk.MessageType.ERROR, "Elevation must be a number number between 0 and 10000 inclusive." )
+                elevation.grab_focus()
+                continue
+
             self.showPhase = showPhaseCheckbox.get_active()
             self.showIllumination = showIlluminationCheckbox.get_active()
             self.showNorthernHemisphereView = showNorthernHemisphereViewCheckbox.get_active()
             self.showHourlyWerewolfWarning = showHourlyWerewolfWarningCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
+            
+            self.cityName = cityValue
+            _city_data[ self.cityName ] = ( str( latitudeValue ), str( longitudeValue ), float( elevationValue ) )
+
             self.saveSettings()
 
             if not os.path.exists( IndicatorLunar.AUTOSTART_PATH ):
@@ -527,18 +585,35 @@ class IndicatorLunar:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
 
+            self.update()
+
+            break
+
         self.dialog.destroy()
         self.dialog = None
-        self.update()
 
 
-#TODO Do we need a reset for the canned values?
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
         global _city_data
-        latitude.set_text( _city_data.get( city )[ 0 ] )
-        longitude.set_text( _city_data.get( city )[ 1 ] )
-        elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
+        if city != "" and _city_data.has_key( city ):
+            latitude.set_text( _city_data.get( city )[ 0 ] )
+            longitude.set_text( _city_data.get( city )[ 1 ] )
+            elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
+
+
+    def isNumber( self, string ):
+        try:
+            float( string )
+            return True
+        except ValueError:
+            return False
+
+
+    def showMessage( self, messageType, message ):
+        dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
+        dialog.run()
+        dialog.destroy()
 
 
     def onShowHourlyWerewolfWarningCheckbox( self, source, spinner, label ):
@@ -570,7 +645,8 @@ class IndicatorLunar:
                 self.showPhase = settings.get( IndicatorLunar.SETTINGS_SHOW_PHASE, self.showPhase )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
 
-                _city_data[ self.cityName ] = [ cityLatitude, cityLongitude, cityElevation ] # Insert/overwrite the cityName and information into the cities...
+                # Insert/overwrite the cityName and information into the cities...
+                _city_data[ self.cityName ] = ( str( cityLatitude ), str( cityLongitude ), float( cityElevation ) )
 
             except Exception as e:
                 logging.exception( e )
