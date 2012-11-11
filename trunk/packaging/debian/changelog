@@ -2,17 +2,13 @@ indicator-virtual-box (1.0.15-1) quantal; urgency=low
 
   * Changes for Python3 and PyGObject.
   * Now supports VirtualBox 4.2 and specifically groups.
-    If groups are present, alphabetical sorting has no effect.
-    If no groups are present, subMenus are not shown.
   * Handle the case when VirtualBox is not installed.
   * Handle the case when VirtualBox is installed but has not yet been run
     (and so $HOME/.VirtualBox/VirtualBox.xml does not exist).
-  * Handle the case when the order of VMs has not been changed by the user
-    (use the order given by VBoxManage).
   * Moved the preferences into a tabbed view.
   * Now uses a radio button to indicate a running VM as standard.
-    Removed the (legacy) option to show text before/after a running / not running VM.
-  * Added an option to show text before/after a group name.
+    Removed the (legacy) show text before/after a VM.
+  * Added option to show text before/after a group name.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 06 Nov 2012 18:45:52 +1000
 
