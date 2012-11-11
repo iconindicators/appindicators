@@ -31,6 +31,69 @@
 # From https://kororaa.org/forums/viewtopic.php?f=7&t=220#p2343, it (hopefully) is safe to ignore.
 
 
+#TODO
+#Create a bunch of VMs in 4.2
+#Create a VM and add to a group.
+#Create a VM with the same name as the VM in the group.
+#The new VM does not appear in the list.
+
+
+#I've noticed a bug myself and not sure if it's related to what you've observed.  
+#I'm finding that in 4.2 if I create a bunch of VMs, 
+#then create a VM and add to a group and then create a VM of the same name as that VM in the group, 
+#the last created VM does not appear.  
+#I thought I had managed to handle duplicate VM names...oh well.
+#
+#As for the things you've mentioned...
+#
+#I'm looking to see if I can reproduce...there are a lot of combinations (groups, no groups), 
+#not to mention 4.1 versus 4.2.  
+#What version of VB are you using?
+#
+#In terms of when alpha sort should apply: If there are no groups present (regardless of 4.1/4.2), 
+#then alpha sort makes sense.  
+#So yes, grey out the alpha sort option when groups are detected.
+#
+#If groups are present, then the user can have a flat view or a submenu view.  
+#In the flat view, I like the idea of [ ] around a group name - great idea!  
+#Also, nice catch on not showing the before/after text on group names.  
+#Not sure yet this happens only in the flat view or in the submenu view too but will investigate.  
+#I guess if groups are not present I could grey out the option to show in submenus too - make sense?
+#
+#I had tooltips on the alpha sort and submenu checkboxes to explain what happens...hoped it would do the trick!
+
+
+#> I have just read your first comment on Sort alphabetically, perhaps
+#> gray out the option "Sort VM alphabetically" if groups are present so
+#> it can't be clicked.
+
+#> > 1) The option Sort VM alphabetically doesn't seem to work anymore.
+
+#> > 2) Perhaps make the group name enclosed in square brackets [Group] in
+#> > flat menu to set it more apart from VMs, and text before/after not
+#> > running should not apply for these entries.
+
+
+#I've attached the latest.  
+#The group name now has [ ] either side of the name in the flat view.  
+#I've also removed the before/after text from the group name too.
+#
+#But...I'm now thinking to remove the before/after text completely.
+#
+#Originally when I created the indicator I didn't think to use a radio button.  
+#So I decided to just put in <<< >>> either side of the VM name.  
+#Later I realised I could use the radio button but noticed on Lubuntu the radio button looked terrible
+#and so I decided to keep the text option too...someone out there might be using it.
+#
+#But now testing on Lubuntu 12.10 the radio button doesn't look to bad...maybe it's because it's all now Python3/PyGobject.
+#
+#So I'm thinking to remove the text option ... agree?
+#
+#If that's the case, I might consider making the group name [ ] thing optional too.
+
+
+
+
 appindicatorImported = True
 try:
     from gi.repository import AppIndicator3 as appindicator
