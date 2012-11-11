@@ -364,8 +364,8 @@ class IndicatorVirtualBox:
         try:
             uuids = list( p.communicate()[ 0 ].decode().rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
             for uuid in uuids:
-                virtualMachineInfos = VirtualMachineInfo( "", False, uuid, 0 )
-                virtualMachineInfos.append( virtualMachineInfos )                
+                virtualMachineInfo = VirtualMachineInfo( "", False, uuid, 0 )
+                virtualMachineInfos.append( virtualMachineInfo )                
         except: # The VM order has never been altered giving an empty result (and exception).
             virtualMachineInfos = []
 
