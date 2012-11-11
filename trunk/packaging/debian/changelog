@@ -1,6 +1,7 @@
 indicator-ppa-download-statistics (1.0.10-1) quantal; urgency=low
 
   * Changes for Python3 and PyGObject.
+  * Dropped requirement for launchpadlib - now makes a direct call for statistics.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 24 Oct 2012 22:40:33 +1000
 
