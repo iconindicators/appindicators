@@ -9,4 +9,4 @@ X-Python3-Version: >= 3.2
 Package: indicator-virtual-box
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}, python-appindicator, wmctrl
-Description: Application indicator to start (and show running) VirtualBox virtual machines.
+Description: Application indicator which displays VirtualBox virtual machines.

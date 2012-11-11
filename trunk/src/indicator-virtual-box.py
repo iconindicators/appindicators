@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator to start (and show running) VirtualBox virtual machines.
+# Application indicator which displays VirtualBox virtual machines.
 
 
 # On Lubuntu 12.10 the following message appears when the indicator is executed:
@@ -23,77 +23,10 @@
 # From https://kororaa.org/forums/viewtopic.php?f=7&t=220#p2343, it (hopefully) is safe to ignore.
 
 
-# Have noticed that if a VM exists in a group there is another VM of the same name but not in a group
+# Have noticed that if a VM exists in a group and there is another VM of the same name but not in a group
 # and the group is then ungrouped, the VirtualBox UI doesn't handle it well...
 # ...the UI keeps the group and the VM within it (but removes all unique VMs from the group).
 # The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
-
-#TODO
-#Create a bunch of VMs in 4.2
-#Create a VM and add to a group.
-#Create a VM with the same name as the VM in the group.
-#The new VM does not appear in the list.
-#...after this test, ungroup and see what happens to the two same named vms.
-
-#Test with no groups and create two VMs with same name.
-
-
-
-
-#I've noticed a bug myself and not sure if it's related to what you've observed.  
-#I'm finding that in 4.2 if I create a bunch of VMs, 
-#then create a VM and add to a group and then create a VM of the same name as that VM in the group, 
-#the last created VM does not appear.  
-#I thought I had managed to handle duplicate VM names...oh well.
-#
-#As for the things you've mentioned...
-#
-#I'm looking to see if I can reproduce...there are a lot of combinations (groups, no groups), 
-#not to mention 4.1 versus 4.2.  
-#What version of VB are you using?
-#
-#In terms of when alpha sort should apply: If there are no groups present (regardless of 4.1/4.2), 
-#then alpha sort makes sense.  
-#So yes, grey out the alpha sort option when groups are detected.
-#
-#If groups are present, then the user can have a flat view or a submenu view.  
-#In the flat view, I like the idea of [ ] around a group name - great idea!  
-#Also, nice catch on not showing the before/after text on group names.  
-#Not sure yet this happens only in the flat view or in the submenu view too but will investigate.  
-#I guess if groups are not present I could grey out the option to show in submenus too - make sense?
-#
-#I had tooltips on the alpha sort and submenu checkboxes to explain what happens...hoped it would do the trick!
-
-
-#> I have just read your first comment on Sort alphabetically, perhaps
-#> gray out the option "Sort VM alphabetically" if groups are present so
-#> it can't be clicked.
-
-#> > 1) The option Sort VM alphabetically doesn't seem to work anymore.
-
-#> > 2) Perhaps make the group name enclosed in square brackets [Group] in
-#> > flat menu to set it more apart from VMs, and text before/after not
-#> > running should not apply for these entries.
-
-
-#I've attached the latest.  
-#The group name now has [ ] either side of the name in the flat view.  
-#I've also removed the before/after text from the group name too.
-#
-#But...I'm now thinking to remove the before/after text completely.
-#
-#Originally when I created the indicator I didn't think to use a radio button.  
-#So I decided to just put in <<< >>> either side of the VM name.  
-#Later I realised I could use the radio button but noticed on Lubuntu the radio button looked terrible
-#and so I decided to keep the text option too...someone out there might be using it.
-#
-#But now testing on Lubuntu 12.10 the radio button doesn't look to bad...maybe it's because it's all now Python3/PyGobject.
-#
-#So I'm thinking to remove the text option ... agree?
-#
-#If that's the case, I might consider making the group name [ ] thing optional too.
-#Maybe another option is only show in flat view?
-
 
 
 appindicatorImported = True
@@ -127,15 +60,13 @@ class IndicatorVirtualBox:
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
     VIRTUAL_BOX_CONFIGURATION = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
+
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
-    SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_BEFORE = "menuTextVirtualMachineRunningBefore"
-    SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_AFTER = "menuTextVirtualMachineRunningAfter"
-    SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE = "menuTextVirtualMachineNotRunningBefore"
-    SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER = "menuTextVirtualMachineNotRunningAfter"
+    SETTINGS_MENU_TEXT_GROUP_NAME_BEFORE = "menuTextGroupNameBefore"
+    SETTINGS_MENU_TEXT_GROUP_NAME_AFTER = "menuTextGroupNameAfter"
     SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     SETTINGS_SHOW_SUBMENU = "showSubmenu"
     SETTINGS_SORT_DEFAULT = "sortDefault"
-    SETTINGS_USE_RADIO_INDICATOR = "useRadioIndicator"
 
 
     def __init__( self ):
@@ -197,7 +128,7 @@ class IndicatorVirtualBox:
                             currentMenu = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
 
                         if virtualMachineInfo.isGroup:
-                            menuItem = Gtk.MenuItem( virtualMachineInfo.getName() )
+                            menuItem = Gtk.MenuItem( self.menuTextGroupNameBefore + virtualMachineInfo.getName() + self.menuTextGroupNameAfter )
 
                             currentMenu.append( menuItem )
                             subMenu = Gtk.Menu()
@@ -205,37 +136,30 @@ class IndicatorVirtualBox:
                             stack.append( currentMenu ) # Whatever we create next is a child of this group, so save the current menu.
                             currentMenu = subMenu
                         else:
-                            if virtualMachineInfo.isRunning:
-                                if self.useRadioIndicator == True:
-                                    menuItem = Gtk.RadioMenuItem.new_with_label( [], self.menuTextVirtualMachineRunningBefore + virtualMachineInfo.getName() + self.menuTextVirtualMachineRunningAfter )
-                                    menuItem.set_active( True )
-                                else:
-                                    menuItem = Gtk.MenuItem( self.menuTextVirtualMachineRunningBefore + virtualMachineInfo.getName() + self.menuTextVirtualMachineRunningAfter )
+                            if virtualMachineInfo.isRunning: # No need to check if this is a group...groups never "run"!
+                                menuItem = Gtk.RadioMenuItem.new_with_label( [], virtualMachineInfo.getName() )
+                                menuItem.set_active( True )
                             else:
-                                menuItem = Gtk.MenuItem( self.menuTextVirtualMachineNotRunningBefore + virtualMachineInfo.getName() + self.menuTextVirtualMachineNotRunningAfter )
-        
+                                menuItem = Gtk.MenuItem( virtualMachineInfo.getName() )
+
                             menuItem.props.name = virtualMachineInfo.getUUID()
                             menuItem.connect( "activate", self.onStartVirtualMachine )
                             currentMenu.append( menuItem )
                 else:
                     for virtualMachineInfo in self.virtualMachineInfos:
                         indent = "    " * virtualMachineInfo.getIndent()
-                        if virtualMachineInfo.isRunning:
-                            if self.useRadioIndicator == True:
-                                vmMenuItem = Gtk.RadioMenuItem.new_with_label( [], self.menuTextVirtualMachineRunningBefore + indent + virtualMachineInfo.getName() + self.menuTextVirtualMachineRunningAfter )
+                        if virtualMachineInfo.isGroup:
+                            vmMenuItem = Gtk.MenuItem( indent + self.menuTextGroupNameBefore + virtualMachineInfo.getName() + self.menuTextGroupNameAfter )
+                        else:
+                            if virtualMachineInfo.isRunning:
+                                vmMenuItem = Gtk.RadioMenuItem.new_with_label( [], indent + virtualMachineInfo.getName() )
                                 vmMenuItem.set_active( True )
                             else:
-                                vmMenuItem = Gtk.MenuItem( self.menuTextVirtualMachineRunningBefore + indent + virtualMachineInfo.getName() + self.menuTextVirtualMachineRunningAfter )
-                        else:
-                            if virtualMachineInfo.isGroup:
-                                vmMenuItem = Gtk.MenuItem( indent + "[ " + virtualMachineInfo.getName() + " ]" )
-                            else:
-                                vmMenuItem = Gtk.MenuItem( self.menuTextVirtualMachineNotRunningBefore + indent + virtualMachineInfo.getName() + self.menuTextVirtualMachineNotRunningAfter )
+                                vmMenuItem = Gtk.MenuItem( indent + virtualMachineInfo.getName() )
     
-                        if not virtualMachineInfo.isGroup:
                             vmMenuItem.props.name = virtualMachineInfo.getUUID()
                             vmMenuItem.connect( "activate", self.onStartVirtualMachine )
-    
+
                         menu.append( vmMenuItem )
 
             menu.append( Gtk.SeparatorMenuItem() )
@@ -475,7 +399,7 @@ class IndicatorVirtualBox:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        label = Gtk.Label( "VM running:" )
+        label = Gtk.Label( "Group:" )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 2, 1 )
 
@@ -484,55 +408,30 @@ class IndicatorVirtualBox:
         label.set_margin_left( 15 )
         grid.attach( label, 0, 1, 1, 1 )
 
-        textRunningBefore = Gtk.Entry()
-        textRunningBefore.set_text( self.menuTextVirtualMachineRunningBefore )
-        textRunningBefore.set_hexpand( True )
-        grid.attach( textRunningBefore, 1, 1, 1, 1 )
+        textGroupNameBefore = Gtk.Entry()
+        textGroupNameBefore.set_text( self.menuTextGroupNameBefore )
+        textGroupNameBefore.set_hexpand( True )
+        grid.attach( textGroupNameBefore, 1, 1, 1, 1 )
 
         label = Gtk.Label( "  Text after" )
         label.set_halign( Gtk.Align.START )
         label.set_margin_left( 15 )
         grid.attach( label, 0, 2, 1, 1 )
 
-        textRunningAfter = Gtk.Entry()
-        textRunningAfter.set_text( self.menuTextVirtualMachineRunningAfter )
-        grid.attach( textRunningAfter, 1, 2, 1, 1 )
-
-        label = Gtk.Label( "VM not running:" )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 3, 2, 1 )
-
-        label = Gtk.Label( "  Text before" )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_left( 15 )
-        grid.attach( label, 0, 4, 1, 1 )
-
-        textNotRunningBefore = Gtk.Entry()
-        textNotRunningBefore.set_text( self.menuTextVirtualMachineNotRunningBefore )
-        grid.attach( textNotRunningBefore, 1, 4, 1, 1 )
-
-        label = Gtk.Label( "  Text after" )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_left( 15 )
-        grid.attach( label, 0, 5, 1, 1 )
-
-        textNotRunningAfter = Gtk.Entry()
-        textNotRunningAfter.set_text( self.menuTextVirtualMachineNotRunningAfter )
-        grid.attach( textNotRunningAfter, 1, 5, 1, 1 )
-
-        useRadioCheckbox = Gtk.CheckButton( "Use a \"radio button\" to indicate a running VM" )
-        useRadioCheckbox.set_active( self.useRadioIndicator )
-        grid.attach( useRadioCheckbox, 0, 6, 2, 1 )
+        textGroupNameAfter = Gtk.Entry()
+        textGroupNameAfter.set_text( self.menuTextGroupNameAfter )
+        grid.attach( textGroupNameAfter, 1, 2, 1, 1 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show groups as submenus" )
-        showAsSubmenusCheckbox.set_tooltip_text( "Unchecked will show groups using indents - ignored if groups are not present" )
+        showAsSubmenusCheckbox.set_margin_top( 10 ) # Bit of padding from the item above.
+        showAsSubmenusCheckbox.set_tooltip_text( "Only applies when groups ARE present" )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
-        grid.attach( showAsSubmenusCheckbox, 0, 7, 2, 1 )
+        grid.attach( showAsSubmenusCheckbox, 0, 3, 2, 1 )
 
         sortAlphabeticallyCheckbox = Gtk.CheckButton( "Sort VMs alphabetically" )
-        sortAlphabeticallyCheckbox.set_tooltip_text( "Unchecked will sort as per VirtualBox UI - ignored if groups are present" )
+        sortAlphabeticallyCheckbox.set_tooltip_text( "Only applies when groups are NOT present" )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
-        grid.attach( sortAlphabeticallyCheckbox, 0, 8, 2, 1 )
+        grid.attach( sortAlphabeticallyCheckbox, 0, 4, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
@@ -567,11 +466,8 @@ class IndicatorVirtualBox:
 
         response = self.dialog.run()
         if response == Gtk.ResponseType.OK:
-            self.menuTextVirtualMachineRunningBefore = textRunningBefore.get_text()
-            self.menuTextVirtualMachineRunningAfter = textRunningAfter.get_text()
-            self.menuTextVirtualMachineNotRunningBefore = textNotRunningBefore.get_text()
-            self.menuTextVirtualMachineNotRunningAfter = textNotRunningAfter.get_text()
-            self.useRadioIndicator = useRadioCheckbox.get_active()
+            self.menuTextGroupNameBefore = textGroupNameBefore.get_text()
+            self.menuTextGroupNameAfter = textGroupNameAfter.get_text()
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.sortDefault = not sortAlphabeticallyCheckbox.get_active()
 
@@ -615,33 +511,28 @@ class IndicatorVirtualBox:
     def handleLeftClick( self, icon ):
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
 
+
     def handleRightClick( self, icon, button, time ):
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
     def loadSettings( self ):
-        self.menuTextVirtualMachineRunningBefore = ""
-        self.menuTextVirtualMachineRunningAfter = ""
-        self.menuTextVirtualMachineNotRunningBefore = ""
-        self.menuTextVirtualMachineNotRunningAfter = ""
+        self.menuTextGroupNameBefore = ""
+        self.menuTextGroupNameAfter = ""
         self.refreshIntervalInMinutes = 15
         self.showSubmenu = False
         self.sortDefault = True
-        self.useRadioIndicator = True
 
         if os.path.isfile( IndicatorVirtualBox.SETTINGS_FILE ):
             try:
                 with open( IndicatorVirtualBox.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
-                self.menuTextVirtualMachineRunningBefore = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_BEFORE, self.menuTextVirtualMachineRunningBefore )
-                self.menuTextVirtualMachineRunningAfter = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_AFTER, self.menuTextVirtualMachineRunningAfter )
-                self.menuTextVirtualMachineNotRunningBefore = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE, self.menuTextVirtualMachineNotRunningBefore )
-                self.menuTextVirtualMachineNotRunningAfter = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER, self.menuTextVirtualMachineNotRunningAfter )
+                self.menuTextGroupNameBefore = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_GROUP_NAME_BEFORE, self.menuTextGroupNameBefore )
+                self.menuTextGroupNameAfter = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_GROUP_NAME_AFTER, self.menuTextGroupNameAfter )
                 self.refreshIntervalInMinutes = settings.get( IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
                 self.showSubmenu = settings.get( IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
                 self.sortDefault = settings.get( IndicatorVirtualBox.SETTINGS_SORT_DEFAULT, self.sortDefault )
-                self.useRadioIndicator = settings.get( IndicatorVirtualBox.SETTINGS_USE_RADIO_INDICATOR, self.useRadioIndicator )
 
             except Exception as e:
                 logging.exception( e )
@@ -651,14 +542,11 @@ class IndicatorVirtualBox:
     def saveSettings( self ):
         try:
             settings = {
-                IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_BEFORE: self.menuTextVirtualMachineRunningBefore,
-                IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_RUNNING_AFTER: self.menuTextVirtualMachineRunningAfter,
-                IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_BEFORE: self.menuTextVirtualMachineNotRunningBefore,
-                IndicatorVirtualBox.SETTINGS_MENU_TEXT_VIRTUAL_MACHINE_NOT_RUNNING_AFTER: self.menuTextVirtualMachineNotRunningAfter,
+                IndicatorVirtualBox.SETTINGS_MENU_TEXT_GROUP_NAME_BEFORE: self.menuTextGroupNameBefore,
+                IndicatorVirtualBox.SETTINGS_MENU_TEXT_GROUP_NAME_AFTER: self.menuTextGroupNameAfter,
                 IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
                 IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
-                IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault,
-                IndicatorVirtualBox.SETTINGS_USE_RADIO_INDICATOR: self.useRadioIndicator
+                IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault
             }
 
             with open( IndicatorVirtualBox.SETTINGS_FILE, "w" ) as f:
