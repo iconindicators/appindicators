@@ -15,8 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator to display PPA download statistics.
-#
+# Application indicator which displays PPA download statistics.
+
+
 # References:
 #  https://launchpad.net/+apidoc/1.0.html
 #  https://help.launchpad.net/API/launchpadlib
