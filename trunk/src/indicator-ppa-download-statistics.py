@@ -44,7 +44,6 @@ import locale
 import logging
 import os
 import shutil
-import string
 import sys
 import threading
 import webbrowser
@@ -262,13 +261,13 @@ class IndicatorPPADownloadStatistics:
         if self.allowMenuItemsToLaunchBrowser == False:
             return
 
-        firstPipe = string.find( widget.props.name, "|" )
+        firstPipe = str.find( widget.props.name, "|" )
         ppaUser = widget.props.name[ 0 : firstPipe ].strip()
 
-        secondPipe = string.find( widget.props.name, "|", firstPipe + 1 )
+        secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
         ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
 
-        thirdPipe = string.find( widget.props.name, "|", secondPipe + 1 )
+        thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
         series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
 
         url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
