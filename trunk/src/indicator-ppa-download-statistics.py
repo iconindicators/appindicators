@@ -26,6 +26,7 @@
 #  https://python-gtk-3-tutorial.readthedocs.org
 #  http://developer.gnome.org/gtk3/stable/index.html
 
+
 from copy import deepcopy
 
 appindicatorImported = True
