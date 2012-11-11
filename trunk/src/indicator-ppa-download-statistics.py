@@ -253,6 +253,7 @@ class IndicatorPPADownloadStatistics:
     def handleLeftClick( self, icon ):
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
 
+
     def handleRightClick( self, icon, button, time ):
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
