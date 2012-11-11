@@ -162,7 +162,10 @@ class IndicatorVirtualBox:
                             else:
                                 vmMenuItem = Gtk.MenuItem( self.menuTextVirtualMachineRunningBefore + indent + virtualMachineInfo.getName() + self.menuTextVirtualMachineRunningAfter )
                         else:
-                            vmMenuItem = Gtk.MenuItem( self.menuTextVirtualMachineNotRunningBefore + indent + virtualMachineInfo.getName() + self.menuTextVirtualMachineNotRunningAfter )
+                            if virtualMachineInfo.isGroup:
+                                vmMenuItem = Gtk.MenuItem( indent + "[ " + virtualMachineInfo.getName() + " ]" )
+                            else:
+                                vmMenuItem = Gtk.MenuItem( self.menuTextVirtualMachineNotRunningBefore + indent + virtualMachineInfo.getName() + self.menuTextVirtualMachineNotRunningAfter )
     
                         if not virtualMachineInfo.isGroup:
                             vmMenuItem.props.name = virtualMachineInfo.getUUID()
