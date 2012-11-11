@@ -18,24 +18,26 @@
 # Application indicator to start (and show running) VirtualBox virtual machines.
 
 
-# Unity appindicator does not support styles in menu items, so cannot bold/italic
-# a VM name when it is running (as originally intended).
-# For reference, here is the original code (which works under GTK):
-#  menuItem = gtk.MenuItem( "" )
-#  menuItem.get_children()[ 0 ].set_use_markup( True )
-#  menuItem.get_children()[ 0 ].set_markup( "<b><i>" + "item" + "</i></b>" )
-
-
 # On Lubuntu 12.10 the following message appears when the indicator is executed:
 #   ERROR:root:Could not find any typelib for AppIndicator3
 # From https://kororaa.org/forums/viewtopic.php?f=7&t=220#p2343, it (hopefully) is safe to ignore.
 
+
+# Have noticed that if a VM exists in a group there is another VM of the same name but not in a group
+# and the group is then ungrouped, the VirtualBox UI doesn't handle it well...
+# ...the UI keeps the group and the VM within it (but removes all unique VMs from the group).
+# The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
 
 #TODO
 #Create a bunch of VMs in 4.2
 #Create a VM and add to a group.
 #Create a VM with the same name as the VM in the group.
 #The new VM does not appear in the list.
+#...after this test, ungroup and see what happens to the two same named vms.
+
+#Test with no groups and create two VMs with same name.
+
+
 
 
 #I've noticed a bug myself and not sure if it's related to what you've observed.  
@@ -90,7 +92,7 @@
 #So I'm thinking to remove the text option ... agree?
 #
 #If that's the case, I might consider making the group name [ ] thing optional too.
-
+#Maybe another option is only show in flat view?
 
 
 
@@ -285,27 +287,40 @@ class IndicatorVirtualBox:
             # Attempt to get the groups and UUIDs...
             grepString = "GUI/GroupDefinitions/"
             virtualMachineInfos = self.getVirtualMachinesFromConfigWithGroups( grepString, 0 )
-            if len( virtualMachineInfos ) == 0:
-                # There was no group data, so attempt to get sort order...
-                virtualMachineInfos = self.getVirtualMachinesFromConfigWithoutGroups()
-            elif len( virtualMachineInfos ) < len( self.virtualMachineInfos ):
-                # If a VM is created, added to a group, the group then removed/ungrouped, the GUI/GroupDefinitions remains, listing that VM.
-                # If another VM is created, the GUI/GroupDefinitions still only lists the original/first VM...giving an incorrect reading.
-                # When this happens ignore this data and defer to the backend.
-                # Unfortunately this situation is inconsistent...seems to occur intermittently!
-                virtualMachineInfos = []
-
             if len( virtualMachineInfos ) > 0:
-                # We have a list of group names and VM UUIDs OR a list of VM UUIDs...
-                # However the VM names are not present.
-                # Get the VM names from the list from the backend...
+                # There are VMs present but need to double check the count matches that from the backend.
+                # I've observed...
+                #
+                #    If a VM is added to a group and the group then removed/ungrouped, the GUI/GroupDefinition remains, listing that VM.
+                #    If another VM is created, the GUI/GroupDefinitions still only lists the original/first VM...giving an incorrect reading.
+                #
+                #    If a VM is created and added to a group and a VM is later created of the same name but not in a group
+                #    then new VM is not listed (and neither are subsequent VMs).
+                #
+                # So take what information the groups gave and then append to that the VMs which are missing (from the backend information).
                 for virtualMachineInfoFromBackEnd in self.virtualMachineInfos:
+                    found = False
                     for virtualMachineInfo in virtualMachineInfos:
                         if virtualMachineInfoFromBackEnd.getUUID() == virtualMachineInfo.getUUID():
-                            virtualMachineInfo.setName( virtualMachineInfoFromBackEnd.getName() )
+                            found = True
                             break
 
-                self.virtualMachineInfos = virtualMachineInfos
+                    if found == False:
+                        virtualMachineInfos.append( virtualMachineInfoFromBackEnd )
+            else:
+                # There was no group data, so attempt to get UI sort order...
+                virtualMachineInfos = self.getVirtualMachinesFromConfigWithoutGroups()
+
+            # We now have a list of group names and VM UUIDs OR a list of VM UUIDs...
+            # However the VM names are not present.
+            # Get the VM names from the list from the backend...
+            for virtualMachineInfoFromBackEnd in self.virtualMachineInfos:
+                for virtualMachineInfo in virtualMachineInfos:
+                    if virtualMachineInfoFromBackEnd.getUUID() == virtualMachineInfo.getUUID():
+                        virtualMachineInfo.setName( virtualMachineInfoFromBackEnd.getName() )
+                        break
+
+            self.virtualMachineInfos = virtualMachineInfos
 
         # Determine which VMs are running...
         p = subprocess.Popen( "VBoxManage list runningvms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
