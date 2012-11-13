@@ -98,7 +98,7 @@ class IndicatorStardate:
         if period < 1:
             period = 1
 
-        gobject.timeout_add( period * 1000, self.update )
+        gobject.timeout_add_seconds( period, self.update )
 
         Gtk.main()
 
