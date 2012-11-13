@@ -100,7 +100,7 @@ class IndicatorVirtualBox:
 
 
     def main( self ):
-        self.timeoutID = gobject.timeout_add( 1000 * 60 * self.refreshIntervalInMinutes, self.onRefresh )
+        self.timeoutID = gobject.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
         Gtk.main()
 
 
@@ -473,7 +473,7 @@ class IndicatorVirtualBox:
 
             self.refreshIntervalInMinutes = spinner.get_value_as_int()
             gobject.source_remove( self.timeoutID )
-            self.timeoutID = gobject.timeout_add( 1000 * 60 * self.refreshIntervalInMinutes, self.onRefresh )
+            self.timeoutID = gobject.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
 
             self.saveSettings()
 
