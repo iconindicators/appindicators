@@ -22,6 +22,10 @@
 # Will attempt to create a PPA package!
 
 
+# TODO When running ephem for python 3, check to see if we get the child menu warning.
+# If not, remove the gobject.timeout_add_seconds and self.updateLater from preferences and call self.update.
+
+
 from ephem.cities import _city_data
 
 appindicatorImported = True
@@ -138,88 +142,18 @@ class IndicatorLunar:
 
     def main( self ):
         self.update()
-        gobject.timeout_add( 60 * 60 * 1000, self.update )
+        gobject.timeout_add_seconds( 60 * 60, self.update )
         Gtk.main()
 
 
     def update( self ):
-        currentDateTime = datetime.datetime.now()
-        lunarPhase = self.calculateLunarPhase( currentDateTime )
-        percentageIllumination = int( round( ephem.Moon( currentDateTime ).phase ) )
-
+        lunarPhase = self.calculateLunarPhase()
 
         moon = ephem.Moon()
         moon.compute()
-        print( moon.phase )
-        print( moon.earth_distance )
-        print( moon.sun_distance )
-        print( ephem.constellation( moon ) )
-#        subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( planet )[ 1 ] ) )
-#        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( planet.earth_distance, 4 ) ) + " AU" ) )
-#        subMenu.append( Gtk.MenuItem( "Distance to Sun: " + str( round( planet.sun_distance, 4 ) ) + " AU" ) )
+        percentageIllumination = int( round( moon.phase ) )
 
-
-        city = ephem.city( 'Sydney' )
-        moon = ephem.Moon()
-        moon.compute()
-        city.next_rising( moon )
-        print( moon.phase )
-        print( moon.earth_distance )
-        print( moon.sun_distance )
-        print( ephem.constellation( moon ) )
-
-
-        sys.exit()
-
-        ###################
-
-        moon = ephem.Moon()
-        moon.compute()
-        print( moon.phase )
-
-        moon = ephem.Moon( ephem.now() )
-        print( moon.phase )
-
-        moon = ephem.Moon( ephem.now() )
-        print( moon.phase )
-
-        moon = ephem.Moon( ephem.now() )
-        moon.compute()
-        print( moon.phase )
-
-        city = ephem.city( 'Sydney' )
-        moon = ephem.Moon()
-        moon.compute( city )
-        print( moon.phase )
-        
-        city = ephem.city( 'Sydney' )
-        moon = ephem.Moon()
-        city.next_rising( moon )
-        moon.compute( city )
-        print( moon.phase )
-
-        ###################
-
-        city = ephem.city( 'Sydney' )
-        moon = ephem.Moon()
-        city.next_rising( moon )
-        print( moon.phase )
-
-        city = ephem.city( 'Sydney' )
-        moon = ephem.Moon()
-        moon.compute( city )
-        city.next_rising( moon )
-        print( moon.phase )
-
-        ###################
-
-        date = datetime.datetime.now()
-        moon = ephem.Moon( date )
-        print( moon.phase )
-
-        ###################
-
-#        sys.exit()
+        self.buildMenu( lunarPhase )
 
         if self.showIllumination == True and self.showPhase == True:
             labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( percentageIllumination ) + "%)"
@@ -237,8 +171,6 @@ class IndicatorLunar:
             self.statusicon.set_from_icon_name( self.getIconNameForLunarPhase( lunarPhase ) )
             self.statusicon.set_tooltip_text( labelTooltip )
 
-        self.buildMenu( lunarPhase, percentageIllumination )
-
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
@@ -254,7 +186,7 @@ class IndicatorLunar:
         return True # Needed so the timer continues!
 
 
-    def buildMenu( self, lunarPhase, percentageIllumination ):
+    def buildMenu( self, lunarPhase ):
         if appindicatorImported == True:
             menu = self.indicator.get_menu()
         else:
@@ -276,29 +208,26 @@ class IndicatorLunar:
 
         menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] ) )
 
-#TODO Illumination % and phase do not match!!!!
-#illuminationMenuItem = Gtk.MenuItem( "Illumination: " + str( percentageIllumination ) + "%" )
-
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
         menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
 
-        newMoonLabel = indent + "New: " + self.trimAndLocalise( ephem.next_new_moon( ephem.now() ) )
-        firstQuarterLabel = indent + "First Quarter: " + self.trimAndLocalise( ephem.next_first_quarter_moon( ephem.now() ) )
-        fullMoonLabel = indent + "Full: " + self.trimAndLocalise( ephem.next_full_moon( ephem.now() ) )
-        thirdQuarterLabel = indent + "Third Quarter: " + self.trimAndLocalise( ephem.next_last_quarter_moon( ephem.now() ) )
+        newMoonLabel = indent + "New: " + self.localiseAndTrim( ephem.next_new_moon( ephem.now() ) )
+        firstQuarterLabel = indent + "First Quarter: " + self.localiseAndTrim( ephem.next_first_quarter_moon( ephem.now() ) )
+        fullMoonLabel = indent + "Full: " + self.localiseAndTrim( ephem.next_full_moon( ephem.now() ) )
+        thirdQuarterLabel = indent + "Third Quarter: " + self.localiseAndTrim( ephem.next_last_quarter_moon( ephem.now() ) )
         if lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS:
             # third, new, first, full
-            self.appendToLunarMenu( menuItem.get_submenu(), thirdQuarterLabel, newMoonLabel, firstQuarterLabel, fullMoonLabel)
+            self.appendToLunarMenu( menuItem.get_submenu(), thirdQuarterLabel, newMoonLabel, firstQuarterLabel, fullMoonLabel )
         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT:
             # new, first, full, third
-            self.appendToLunarMenu( menuItem.get_submenu(), newMoonLabel, firstQuarterLabel, fullMoonLabel, thirdQuarterLabel)
+            self.appendToLunarMenu( menuItem.get_submenu(), newMoonLabel, firstQuarterLabel, fullMoonLabel, thirdQuarterLabel )
         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT:
             # first, full, third, new 
-            self.appendToLunarMenu( menuItem.get_submenu(), firstQuarterLabel, fullMoonLabel, thirdQuarterLabel, newMoonLabel)
+            self.appendToLunarMenu( menuItem.get_submenu(), firstQuarterLabel, fullMoonLabel, thirdQuarterLabel, newMoonLabel )
         else: # lunarPhase == LUNAR_PHASE_FIRST_QUARTER or lunarPhase == LUNAR_PHASE_WAXING_GIBBOUS
             # full, third, new, first
-            self.appendToLunarMenu( menuItem.get_submenu(), fullMoonLabel, thirdQuarterLabel, newMoonLabel, firstQuarterLabel)
+            self.appendToLunarMenu( menuItem.get_submenu(), fullMoonLabel, thirdQuarterLabel, newMoonLabel, firstQuarterLabel )
 
         # Sun
         menuItem = Gtk.MenuItem( "Sun" )
@@ -310,11 +239,11 @@ class IndicatorLunar:
         rising = city.next_rising( ephem.Sun() )
         setting = city.next_setting( ephem.Sun() )
         if rising > setting:
-            subMenu.append( Gtk.MenuItem( "Set: " + self.trimAndLocalise( setting ) ) )
-            subMenu.append( Gtk.MenuItem( "Rise: " + self.trimAndLocalise( rising ) ) )
+            subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( setting ) ) )
+            subMenu.append( Gtk.MenuItem( "Rise: " + self.localiseAndTrim( rising ) ) )
         else:
-            subMenu.append( Gtk.MenuItem( "Rise: " + self.trimAndLocalise( rising ) ) )
-            subMenu.append( Gtk.MenuItem( "Set: " + self.trimAndLocalise( setting ) ) )
+            subMenu.append( Gtk.MenuItem( "Rise: " + self.localiseAndTrim( rising ) ) )
+            subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( setting ) ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -322,11 +251,11 @@ class IndicatorLunar:
         equinox = ephem.next_equinox( ephem.now() )
         solstice = ephem.next_solstice( ephem.now() )
         if equinox < solstice:
-            subMenu.append( Gtk.MenuItem( "Equinox: " + self.trimAndLocalise( equinox ) ) )
-            subMenu.append( Gtk.MenuItem( "Solstice: " + self.trimAndLocalise( solstice ) ) )
+            subMenu.append( Gtk.MenuItem( "Equinox: " + self.localiseAndTrim( equinox ) ) )
+            subMenu.append( Gtk.MenuItem( "Solstice: " + self.localiseAndTrim( solstice ) ) )
         else:
-            subMenu.append( Gtk.MenuItem( "Solstice: " + self.trimAndLocalise( solstice ) ) ) 
-            subMenu.append( Gtk.MenuItem( "Equinox: " + self.trimAndLocalise( equinox ) ) )
+            subMenu.append( Gtk.MenuItem( "Solstice: " + self.localiseAndTrim( solstice ) ) ) 
+            subMenu.append( Gtk.MenuItem( "Equinox: " + self.localiseAndTrim( equinox ) ) )
 
         # Planets
         menu.append( Gtk.MenuItem( "Planets" ) )
@@ -376,52 +305,42 @@ class IndicatorLunar:
 
 
     def createPlanetSubmenu( self, planetMenuItem, city, planet ):
-        subMenu = Gtk.Menu()
-
         planet.compute()
-        print( planet.name, planet.phase )
-    
 
-        rising = city.next_rising( planet )
-        setting = city.next_setting( planet )
-        if rising > setting:
-            subMenu.append( Gtk.MenuItem( "Set: " + self.trimAndLocalise( setting ) ) )
-            subMenu.append( Gtk.MenuItem( "Rise: " + self.trimAndLocalise( rising ) ) )
-        else:
-            subMenu.append( Gtk.MenuItem( "Rise: " + self.trimAndLocalise( rising ) ) )
-            subMenu.append( Gtk.MenuItem( "Set: " + self.trimAndLocalise( setting ) ) )
-
+        subMenu = Gtk.Menu()
+        subMenu.append( Gtk.MenuItem( "Illumination: " + str( int( round( planet.phase ) ) ) + "%" ) )
         subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( planet )[ 1 ] ) )
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( planet.earth_distance, 4 ) ) + " AU" ) )
         subMenu.append( Gtk.MenuItem( "Distance to Sun: " + str( round( planet.sun_distance, 4 ) ) + " AU" ) )
-#        subMenu.append( Gtk.MenuItem( "Illumination: " + str( int( round( planet.phase ) ) ) + "%" ) )
-        subMenu.append( Gtk.MenuItem( "Illumination: " + str( planet.phase ) + "%" ) )
+
+        # Must compute the previous information (illumination, constellation, phase and so on BEFORE rising/setting).
+        # For some reason the values, most notably phase, are different (and wrong) if calculated AFTER rising/setting are calculated.
+        rising = city.next_rising( planet )
+        setting = city.next_setting( planet )
+        if rising > setting:
+            subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( setting ) ) )
+            subMenu.append( Gtk.MenuItem( "Rise: " + self.localiseAndTrim( rising ) ) )
+        else:
+            subMenu.append( Gtk.MenuItem( "Rise: " + self.localiseAndTrim( rising ) ) )
+            subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( setting ) ) )
 
         planetMenuItem.set_submenu( subMenu )
 
 
-    def trimAndLocalise( self, value ):
-        return self.trimFractionalSeconds( str( ephem.localtime( value ) ) )
+    # Takes a float and converts to local time, trims off fractional seconds and returns a string.
+    def localiseAndTrim( self, value ):
+        localtimeString = str( ephem.localtime( value ) )
+        return localtimeString[ 0 : string.rfind( localtimeString, ":" ) + 3 ]
 
 
-    def trimFractionalSeconds( self, currentDateTimeString ):
-        return currentDateTimeString[ 0 : string.rfind( currentDateTimeString, ":" ) + 3 ]
-
-
-    def calculateLunarPhase( self, currentDateTime ):
-        nextFullMoonDate = ephem.next_full_moon( currentDateTime )
-        nextNewMoonDate = ephem.next_new_moon( currentDateTime )
-        
+    def calculateLunarPhase( self ):
+        nextFullMoonDate = ephem.next_full_moon( ephem.now() )
+        nextNewMoonDate = ephem.next_new_moon( ephem.now() )
         moon = ephem.Moon()
-        city = ephem.city( self.cityName )
-        city.next_rising( moon )
-        currentMoonPhase = int( round( moon.phase ) )
-        print( "calculateLunarPhase" )
-        print( moon.phase, currentMoonPhase )
-        currentMoonPhase = int( round( ephem.Moon( currentDateTime ).phase ) )
-        print( currentMoonPhase )
+        moon.compute()
+        currentMoonPhase = int( round( ( moon.phase ) ) )
         phase = None
-        if nextFullMoonDate < nextNewMoonDate:
+        if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which one is before the other.
             # We are somewhere between a new moon and a full moon...
             if( currentMoonPhase > 99 ):
                 phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
@@ -660,12 +579,17 @@ class IndicatorLunar:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
 
-            self.update()
+            # If we call update directly, the menu gets rebuilt and GTK complains that the menu (which kicked off preferences) no longer exists. 
+            gobject.timeout_add_seconds( 1, self.updateLater )
 
             break
 
         self.dialog.destroy()
         self.dialog = None
+
+
+    def updateLater( self ):
+        self.update()
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
