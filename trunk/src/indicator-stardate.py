@@ -175,7 +175,7 @@ class IndicatorStardate:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showIssueCheckbox = Gtk.CheckButton( "Show Issue" )
+        showIssueCheckbox = Gtk.CheckButton( "Show ISSUE" )
         showIssueCheckbox.set_active( self.showIssue )
         grid.attach( showIssueCheckbox, 0, 0, 1, 1 )
 
