@@ -1,4 +1,4 @@
-indicator-virtual-box (1.0.15-1) quantal; urgency=low
+indicator-virtual-box (1.0.15-1) precise; urgency=low
 
   * Changes for Python3 and PyGObject.
   * Now supports VirtualBox 4.2 and specifically groups.
