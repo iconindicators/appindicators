@@ -655,7 +655,7 @@ class IndicatorPPADownloadStatistics:
                     binaryPackageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
                     indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
                     binaryPackageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
-                    url = "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/" + binaryPackageId + "?ws.op=getDownloadCount"
+                    url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "/+binarypub/" + binaryPackageId + "?ws.op=getDownloadCount"
                     downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
                     value = ppaDownloadStatistics.get( ppaKey )
                     if value is None:
