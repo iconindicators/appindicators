@@ -490,9 +490,10 @@ class IndicatorVirtualBox:
                     os.remove( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
                 except: pass
 
+            self.onRefresh()
+
         self.dialog.destroy()
         self.dialog = None
-        self.onRefresh()
 
 
     def onAbout( self, widget ):
