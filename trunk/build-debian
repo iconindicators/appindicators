@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-# References on how to build a Debian source file for PPA...
+# References for building a Debian package for PPA...
 # http://askubuntu.com/questions/27715/create-a-deb-package-from-scripts-or-binaries
 # http://askubuntu.com/questions/28562/how-do-i-create-a-ppa-for-a-working-program
 # http://askubuntu.com/questions/90764/how-do-i-create-a-deb-package-for-a-single-python-script

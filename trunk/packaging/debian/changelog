@@ -1,4 +1,4 @@
-indicator-stardate (1.0.9-1) quantal; urgency=low
+indicator-stardate (1.0.9-1) precise; urgency=low
 
   * Changes for Python3 and PyGObject.
   * Added a preferences dialog.
