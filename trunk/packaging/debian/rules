@@ -2,5 +2,3 @@
 
 %:
 	dh $@ --with python3
-
-
