@@ -18,8 +18,10 @@
 # Application indicator which displays lunar information.
 
 
-# TODO: There is no Python3 version of Ephem (http://pypi.python.org/pypi/ephem).
-# Will attempt to create a PPA package!
+# TODO: Have tried and failed to build a PPA for the Python 3 version of Ephem 
+# http://pypi.python.org/pypi/ephem
+# The PPA package builds but is missing the Python and compiled C library.
+# Until the PPA can be successfully built, will continue to use the existing Ephem PPA.
 
 
 from ephem.cities import _city_data
