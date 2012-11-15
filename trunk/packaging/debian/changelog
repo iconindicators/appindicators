@@ -9,6 +9,10 @@ indicator-virtual-box (1.0.15-1) precise; urgency=low
   * Now uses a radio button to indicate a running VM as standard.
     Removed the (legacy) show text before/after a VM.
   * Added option to show text before/after a group name.
+  * Known issue: If a VM exists in a group (and there is another VM of the same name
+    but not in a group) and you ungroup, the VM in the group is not removed from the
+    group.  This appears to be a bug in the VirtualBox UI and as such the indicator
+    displays the VM (from the group) alongside the other VMs.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 06 Nov 2012 18:45:52 +1000
 
