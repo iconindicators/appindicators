@@ -46,7 +46,7 @@ class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.9"
+    VERSION = "1.0.10"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -206,9 +206,10 @@ class IndicatorStardate:
                     os.remove( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
                 except: pass
 
+            self.update()
+
         self.dialog.destroy()
         self.dialog = None
-        self.update()
 
 
     def loadSettings( self ):
