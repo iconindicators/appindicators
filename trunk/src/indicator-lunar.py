@@ -22,10 +22,6 @@
 # Will attempt to create a PPA package!
 
 
-# TODO When running ephem for python 3, check to see if we get the child menu warning.
-# If not, remove the gobject.timeout_add_seconds and self.updateLater from preferences and call self.update.
-
-
 from ephem.cities import _city_data
 
 appindicatorImported = True
@@ -579,8 +575,7 @@ class IndicatorLunar:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
 
-            # If we call update directly, the menu gets rebuilt and GTK complains that the menu (which kicked off preferences) no longer exists. 
-            gobject.timeout_add_seconds( 1, self.updateLater )
+            gobject.idle_add( self.updateLater ) # Calling update directly rebuilds the menu but GTK complains that the menu (which kicked off preferences) no longer exists.
 
             break
 
@@ -588,6 +583,9 @@ class IndicatorLunar:
         self.dialog = None
 
 
+    # Used to kick off a single update.
+    # If we called update directly we get a warning about child missing in GTK.
+    # If we called update via idle_add, we'd get an infinite loop as update returns True.
     def updateLater( self ):
         self.update()
 
