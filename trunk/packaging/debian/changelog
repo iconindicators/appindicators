@@ -1,6 +1,10 @@
 indicator-stardate (1.0.10-1) precise; urgency=low
 
   * Added python3-gi to debian/control Depends (for Precise support).
+  * Swapped out python-appindicator for gir1.2-appindicator3-0.1 in debian/control
+    Depends.
+  * Simpler handling for creating the indicator - should hopefully sustain more
+    enviroments. 
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 16 Nov 2012 10:26:05 +1000
 

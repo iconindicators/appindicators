@@ -24,11 +24,10 @@
 #  http://python-gtk-3-tutorial.readthedocs.org
 
 
-appindicatorImported = True
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
-    appindicatorImported = False
+    pass
 
 from gi.repository import GObject as gobject
 from gi.repository import Gtk
@@ -46,7 +45,7 @@ class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.9"
+    VERSION = "1.0.10"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -64,27 +63,45 @@ class IndicatorStardate:
         logging.basicConfig( file = sys.stderr, level = logging.INFO )
         self.loadSettings()
 
-        # One of the install dependencies for Debian/Ubuntu is that appindicator exists.
-        # However the appindicator only works under Ubuntu Unity - we need to default to GTK icon if not running Unity (say Lubuntu).
-        global appindicatorImported
-        unityIsInstalled = os.getenv( "XDG_CURRENT_DESKTOP" )
-        if unityIsInstalled is None:
-            appindicatorImported = False
-        elif str( unityIsInstalled ).lower() != "Unity".lower():
-            appindicatorImported = False
-
-        self.buildMenu()
-
-        # Create the status icon...either Unity or GTK.
-        if appindicatorImported == True:
+        try:
+            self.appindicatorImported = True
             self.indicator = appindicator.Indicator.new( IndicatorStardate.NAME, IndicatorStardate.ICON, appindicator.IndicatorCategory.APPLICATION_STATUS )
             self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
+            self.buildMenu()
             self.indicator.set_menu( self.menu )
-        else:
+        except:
+            self.appindicatorImported = False            
+            self.buildMenu()
             self.statusicon = Gtk.StatusIcon()
             self.statusicon.set_from_icon_name( IndicatorStardate.ICON )
             self.statusicon.connect( "popup-menu", self.handleRightClick )
             self.statusicon.connect( "activate", self.handleLeftClick )
+
+
+    def buildMenu( self ):
+        self.menu = Gtk.Menu()
+
+        if self.appindicatorImported == False:
+            image = Gtk.Image()
+            image.set_from_icon_name( IndicatorStardate.ICON, Gtk.IconSize.MENU )
+            self.stardateMenuItem = Gtk.ImageMenuItem()
+            self.stardateMenuItem.set_image( image )
+            self.menu.append( self.stardateMenuItem )
+            self.menu.append( Gtk.SeparatorMenuItem() )
+
+        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
+        preferencesMenuItem.connect( "activate", self.onPreferences )
+        self.menu.append( preferencesMenuItem )
+
+        aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
+        aboutMenuItem.connect( "activate", self.onAbout )
+        self.menu.append( aboutMenuItem )
+
+        quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
+        quitMenuItem.connect( "activate", Gtk.main_quit )
+        self.menu.append( quitMenuItem )
+
+        self.menu.show_all()
 
 
     def main( self ):
@@ -107,7 +124,7 @@ class IndicatorStardate:
         self.stardate.setGregorian( datetime.datetime.now() )
         s = self.stardate.toStardateString( False, self.showIssue )
 
-        if appindicatorImported == True:
+        if self.appindicatorImported == True:
             self.indicator.set_label( s, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
         else:
             self.statusicon.set_tooltip_text( "Stardate: " + s )
@@ -135,32 +152,6 @@ class IndicatorStardate:
         dialog.run()
         dialog.destroy()
         dialog = None
-
-
-    def buildMenu( self ):
-        self.menu = Gtk.Menu()
-
-        if appindicatorImported == False:
-            image = Gtk.Image()
-            image.set_from_icon_name( IndicatorStardate.ICON, Gtk.IconSize.MENU )
-            self.stardateMenuItem = Gtk.ImageMenuItem()
-            self.stardateMenuItem.set_image( image )
-            self.menu.append( self.stardateMenuItem )
-            self.menu.append( Gtk.SeparatorMenuItem() )
-
-        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        preferencesMenuItem.connect( "activate", self.onPreferences )
-        self.menu.append( preferencesMenuItem )
-
-        aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
-        aboutMenuItem.connect( "activate", self.onAbout )
-        self.menu.append( aboutMenuItem )
-
-        quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        quitMenuItem.connect( "activate", Gtk.main_quit )
-        self.menu.append( quitMenuItem )
-
-        self.menu.show_all()
 
 
     def onPreferences( self, widget ):
