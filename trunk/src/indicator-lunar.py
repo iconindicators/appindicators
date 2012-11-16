@@ -26,11 +26,10 @@
 
 from ephem.cities import _city_data
 
-appindicatorImported = True
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
-    appindicatorImported = False
+    pass
 
 from gi.repository import GObject as gobject
 from gi.repository import Gtk
@@ -57,7 +56,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.10"
+    VERSION = "1.0.11"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -117,21 +116,13 @@ class IndicatorLunar:
         if notifyImported == True:
             Notify.init( IndicatorLunar.NAME )
 
-        # One of the install dependencies for Debian/Ubuntu is that appindicator exists.
-        # However the appindicator only works under Ubuntu Unity - we need to default to GTK icon if not running Unity (say Lubuntu).
-        global appindicatorImported
-        unityIsInstalled = os.getenv( "XDG_CURRENT_DESKTOP" )
-        if unityIsInstalled is None:
-            appindicatorImported = False
-        elif str( unityIsInstalled ).lower() != "Unity".lower():
-            appindicatorImported = False
-
-        # Create the status icon...either Unity or GTK.
-        if appindicatorImported == True:
+        try:
+            self.appindicatorImported = True
             self.indicator = appindicator.Indicator.new( IndicatorLunar.NAME, "", appindicator.IndicatorCategory.APPLICATION_STATUS )
             self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
             self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
-        else:
+        except:
+            self.appindicatorImported = False            
             self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
             self.statusicon = Gtk.StatusIcon()
             self.statusicon.connect( "popup-menu", self.handleRightClick )
@@ -162,7 +153,7 @@ class IndicatorLunar:
         else:
             labelTooltip = ""
 
-        if appindicatorImported == True:
+        if self.appindicatorImported == True:
             self.indicator.set_icon( self.getIconNameForLunarPhase( lunarPhase ) )
             self.indicator.set_label( labelTooltip, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
         else:
@@ -185,7 +176,7 @@ class IndicatorLunar:
 
 
     def buildMenu( self, lunarPhase ):
-        if appindicatorImported == True:
+        if self.appindicatorImported == True:
             menu = self.indicator.get_menu()
         else:
             menu = self.menu
@@ -287,7 +278,7 @@ class IndicatorLunar:
         quitMenuItem.connect( "activate", Gtk.main_quit )
         menu.append( quitMenuItem )
 
-        if appindicatorImported == True:
+        if self.appindicatorImported == True:
             self.indicator.set_menu( menu )
         else:
             self.menu = menu
