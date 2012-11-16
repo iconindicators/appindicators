@@ -1,11 +1,17 @@
 indicator-ppa-download-statistics (1.0.10-1) precise; urgency=low
 
+  * Added python3-gi to debian/control Depends (for Precise support).
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 16 Nov 2012 10:26:05 +1000
+
+
+indicator-ppa-download-statistics (1.0.10-1) precise; urgency=low
+
   * Changes for Python3 and PyGObject.
   * Dropped requirement for launchpadlib - now makes a direct call for statistics.
     Many thanks to Barry Warsaw (https://launchpad.net/~barry) for the suggestion
     and pointers in the right direction!
   * Added raring to series list and removed unsupported series.
-
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 24 Oct 2012 22:40:33 +1000
 
