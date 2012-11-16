@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.16-1) precise; urgency=low
+
+  * Added python3-gi to debian/control Depends (for Precise support).
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 16 Nov 2012 10:26:05 +1000
+
+
 indicator-virtual-box (1.0.15-1) precise; urgency=low
 
   * Changes for Python3 and PyGObject.
