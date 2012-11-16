@@ -1,5 +1,12 @@
 indicator-lunar (1.0.10-1) precise; urgency=low
 
+  * Added python3-gi to debian/control Depends (for Precise support).
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 16 Nov 2012 10:26:05 +1000
+
+
+indicator-lunar (1.0.10-1) precise; urgency=low
+
   * Changes for Python3 (but still runs as Python2) and PyGObject.
     Have to run as Python 2 since PPA won't/can't build a Python 3 version of Ephem.
   * Switched back to using localtime!
