@@ -29,11 +29,10 @@
 
 from copy import deepcopy
 
-appindicatorImported = True
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
-    appindicatorImported = False
+    pass
 
 from gi.repository import Gdk
 from gi.repository import GObject as gobject
@@ -55,7 +54,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.10"
+    VERSION = "1.0.11"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -85,22 +84,15 @@ class IndicatorPPADownloadStatistics:
         logging.basicConfig( file = sys.stderr, level = logging.INFO )
         self.loadSettings()
 
-        # One of the install dependencies for Debian/Ubuntu is that appindicator exists.
-        # However the appindicator only works under Ubuntu Unity.
-        global appindicatorImported
-        unityIsInstalled = os.getenv( "XDG_CURRENT_DESKTOP" )
-        if unityIsInstalled is None:
-            appindicatorImported = False
-        elif str( unityIsInstalled ).lower() != "Unity".lower():
-            appindicatorImported = False
-
-        if appindicatorImported == True:
+        try:
+            self.appindicatorImported = True
             self.indicator = appindicator.Indicator.new( IndicatorPPADownloadStatistics.NAME, "", appindicator.IndicatorCategory.APPLICATION_STATUS )
             self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
             self.buildMenu()
             self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
             self.indicator.set_label( "PPA", "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
-        else:
+        except:
+            self.appindicatorImported = False            
             self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
             self.buildMenu()
             self.statusicon = Gtk.StatusIcon()
@@ -116,7 +108,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def buildMenu( self ):
-        if appindicatorImported == True:
+        if self.appindicatorImported == True:
             menu = self.indicator.get_menu()
         else:
             menu = self.menu
@@ -212,7 +204,7 @@ class IndicatorPPADownloadStatistics:
         quitMenuItem.connect( "activate", Gtk.main_quit )
         menu.append( quitMenuItem )
 
-        if appindicatorImported == True:
+        if self.appindicatorImported == True:
             self.indicator.set_menu( menu )
         else:
             self.menu = menu
