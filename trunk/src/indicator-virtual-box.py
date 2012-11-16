@@ -29,11 +29,10 @@
 # The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
 
 
-appindicatorImported = True
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
-    appindicatorImported = False
+    pass
 
 from gi.repository import GObject as gobject
 from gi.repository import Gtk
@@ -51,7 +50,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.15"
+    VERSION = "1.0.16"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -74,22 +73,14 @@ class IndicatorVirtualBox:
         self.loadSettings()
         self.dialog = None
 
-        # One of the install dependencies for Debian/Ubuntu is that appindicator exists.
-        # However the appindicator only works under Ubuntu Unity - we need to default to GTK icon if not running Unity (say Lubuntu).
-        global appindicatorImported
-        unityIsInstalled = os.getenv( "XDG_CURRENT_DESKTOP" )
-        if unityIsInstalled is None:
-            appindicatorImported = False
-        elif str( unityIsInstalled ).lower() != "Unity".lower():
-            appindicatorImported = False
-
-        # Create the status icon...either Unity or GTK.
-        if appindicatorImported == True:
+        try:
+            self.appindicatorImported = True
             self.indicator = appindicator.Indicator.new( IndicatorVirtualBox.NAME, IndicatorVirtualBox.ICON, appindicator.IndicatorCategory.APPLICATION_STATUS )
             self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
             self.buildMenu()
             self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
-        else:
+        except:
+            self.appindicatorImported = False            
             self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
             self.buildMenu()
             self.statusicon = Gtk.StatusIcon()
@@ -105,7 +96,7 @@ class IndicatorVirtualBox:
 
 
     def buildMenu( self ):
-        if appindicatorImported == True:
+        if self.appindicatorImported == True:
             menu = self.indicator.get_menu()
         else:
             menu = self.menu
@@ -183,7 +174,7 @@ class IndicatorVirtualBox:
         quitMenuItem.connect( "activate", Gtk.main_quit )
         menu.append( quitMenuItem )
 
-        if appindicatorImported == True:
+        if self.appindicatorImported == True:
             self.indicator.set_menu( menu )
         else:
             self.menu = menu
