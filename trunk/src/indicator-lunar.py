@@ -568,19 +568,12 @@ class IndicatorLunar:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
 
-            gobject.idle_add( self.updateLater ) # Calling update directly rebuilds the menu but GTK complains that the menu (which kicked off preferences) no longer exists.
+            gobject.timeout_add_seconds( 1, self.update ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
 
             break
 
         self.dialog.destroy()
         self.dialog = None
-
-
-    # Used to kick off a single update.
-    # If we called update directly we get a warning about child missing in GTK.
-    # If we called update via idle_add, we'd get an infinite loop as update returns True.
-    def updateLater( self ):
-        self.update()
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
