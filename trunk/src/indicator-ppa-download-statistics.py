@@ -545,7 +545,7 @@ class IndicatorPPADownloadStatistics:
                     os.remove( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
                 except: pass
 
-                gobject.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
+            gobject.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
 
         self.dialog.destroy()
         self.dialog = None
