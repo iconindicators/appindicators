@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.13-1) precise; urgency=low
+
+  * Fixed warning when updating the menu and GTK complains of missing child.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 19 Nov 2012 21:12:59 +1000
+
+
 indicator-ppa-download-statistics (1.0.12-1) precise; urgency=low
 
   * Was only updating the menu for a specific case in the preferences...now fixed!

@@ -54,7 +54,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.12"
+    VERSION = "1.0.13"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -422,20 +422,18 @@ class IndicatorPPADownloadStatistics:
 
             ppaList = [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ]
             key = self.getPPAKey( ppaList )
-            if add == True:
-                if key not in self.ppas:
+            if key not in self.ppas: # If there is no change, there is nothing to do...
+                if add == True:
                     self.ppas[ key ] = ppaList
-                    self.saveSettings()
-                    self.buildMenu() # Update the menu to immediately reflect the change...still need to do a new download.
-                    self.requestPPADownloadAndMenuRefresh()
-            else: # This is an edit
-                if key not in self.ppas:
+                else: # This is an edit
                     oldKey = self.getPPAKey( [ existingPPAUser, existingPPAName, existingSeries, existingArchitecture ] )
                     del self.ppas[ oldKey ]
                     self.ppas[ key ] = ppaList
-                    self.saveSettings()
-                    self.buildMenu() # Update the menu to immediately reflect the change...still need to do a new download.
-                    self.requestPPADownloadAndMenuRefresh()
+
+                print( "hello")
+                self.saveSettings()
+                gobject.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
+                self.requestPPADownloadAndMenuRefresh()
 
             break
 
@@ -491,7 +489,7 @@ class IndicatorPPADownloadStatistics:
         if response == Gtk.ResponseType.OK:
             del self.ppas[ widget.props.name ]
             self.saveSettings()
-            self.buildMenu()
+            gobject.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
 
         self.dialog = None
 
@@ -549,7 +547,6 @@ class IndicatorPPADownloadStatistics:
 
         self.dialog.destroy()
         self.dialog = None
-
 
 
     def loadSettings( self ):
