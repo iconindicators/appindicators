@@ -1,3 +1,11 @@
+indicator-lunar (1.0.13-1) precise; urgency=low
+
+  * Now runs as Python 3 and requires python3-ephem (from same PPA).
+  * Kept getting GTK missing child warnings so put menu update back to how it was.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 20 Nov 2012 14:50:07 +1000
+
+
 indicator-lunar (1.0.12-1) precise; urgency=low
 
   * Changed how the update/menu was kicked off in the preferences - now simpler!

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -18,14 +18,6 @@
 # Application indicator which displays lunar information.
 
 
-# TODO: Have tried and failed to build a PPA for the Python 3 version of Ephem 
-# http://pypi.python.org/pypi/ephem
-# The PPA package builds but is missing the Python and compiled C library.
-# Until the PPA can be successfully built, will continue to use the existing Ephem PPA.
-
-
-from ephem.cities import _city_data
-
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -41,22 +33,29 @@ except:
     notifyImported = False
 
 import datetime
-import ephem
 import json
 import locale
 import logging
 import os
 import shutil
-import string
 import subprocess
 import sys
+
+try:
+    import ephem
+    from ephem.cities import _city_data
+except:
+    dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "You must also install python3-ephem!" )
+    dialog.set_title( "indicator-lunar" )
+    dialog.run()
+    sys.exit()
 
 
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.12"
+    VERSION = "1.0.13"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -319,7 +318,7 @@ class IndicatorLunar:
     # Takes a float and converts to local time, trims off fractional seconds and returns a string.
     def localiseAndTrim( self, value ):
         localtimeString = str( ephem.localtime( value ) )
-        return localtimeString[ 0 : string.rfind( localtimeString, ":" ) + 3 ]
+        return localtimeString[ 0 : localtimeString.rfind( ":" ) + 3 ]
 
 
     def calculateLunarPhase( self ):
@@ -568,8 +567,7 @@ class IndicatorLunar:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
 
-            gobject.timeout_add_seconds( 1, self.update ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
-
+            self.update()
             break
 
         self.dialog.destroy()
@@ -579,7 +577,7 @@ class IndicatorLunar:
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
         global _city_data
-        if city != "" and _city_data.has_key( city ):
+        if city != "" and city in _city_data:
             latitude.set_text( _city_data.get( city )[ 0 ] )
             longitude.set_text( _city_data.get( city )[ 1 ] )
             elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
