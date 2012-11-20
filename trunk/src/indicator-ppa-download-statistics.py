@@ -430,7 +430,6 @@ class IndicatorPPADownloadStatistics:
                     del self.ppas[ oldKey ]
                     self.ppas[ key ] = ppaList
 
-                print( "hello")
                 self.saveSettings()
                 gobject.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
                 self.requestPPADownloadAndMenuRefresh()
@@ -640,6 +639,9 @@ class IndicatorPPADownloadStatistics:
             try:
                 url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + series + "/" + architecture
                 publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
+                print( ppaKey )
+                print( publishedBinaries )
+                print()
                 totalSize = publishedBinaries[ "total_size" ]
                 for i in range( totalSize ):
                     binaryPackageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
