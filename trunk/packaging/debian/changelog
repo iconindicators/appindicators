@@ -6,7 +6,7 @@ indicator-ppa-download-statistics (1.0.14-1) precise; urgency=low
     download count is summed across all instances of that published binary.
     If a published binary is not architecture specific (such as Python), the
     download count is not summed (as it is assumed to be the same binary).
-	The version number is retained only if it is identical across all instances of
+    The version number is retained only if it is identical across all instances of
     a published binary.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 22 Nov 2012 10:49:03 +1000
