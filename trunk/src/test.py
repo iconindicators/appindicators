@@ -139,7 +139,8 @@ class IndicatorLunar:
         print( "Theme: " + self.getIconTheme() )
 
     def main( self ):
-        self.iii = 0
+        self.iii = -1
+        self.increasing = True
         self.update()
 #        gobject.timeout_add_seconds( 60 * 60, self.update )
         gobject.timeout_add_seconds( 1, self.update )
@@ -147,11 +148,26 @@ class IndicatorLunar:
 
 
     def update( self ):
+        if self.increasing == True:
+            self.iii += 1
+        else:
+            self.iii -= 1
+
+        if self.iii == 101:
+            self.iii = 100
+            self.increasing = False
+
+        if self.iii == -1:
+            self.iii = 0
+            self.increasing = True
+
         lunarPhase = self.calculateLunarPhase()
 
         moon = ephem.Moon()
         moon.compute()
-        percentageIllumination = int( round( moon.phase ) )
+#        percentageIllumination = int( round( moon.phase ) )
+
+        percentageIllumination = self.iii
 
         self.buildMenu( lunarPhase )
 
@@ -163,15 +179,6 @@ class IndicatorLunar:
             labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
         else:
             labelTooltip = ""
-
-
-        self.iii += 1
-        if self.iii == 50:
-            self.iii = 1
-        percentageIllumination = self.iii
-#        lunarPhase = IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER
-        lunarPhase = IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT
-
 
         self.createIconForLunarPhase( lunarPhase, percentageIllumination )
         if self.appindicatorImported == True:
@@ -197,8 +204,6 @@ class IndicatorLunar:
             phaseIsBetweenNewAndFullInclusive:
             print() # TODO Remove
 #            Notify.Notification.new( "WARNING: Werewolves about!!!", "", IndicatorLunar.SVG_FILE ).show()
-
-
 
 
 #Testing old stuff...delete.
@@ -420,9 +425,9 @@ class IndicatorLunar:
         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER:
             svg = self.getThirdQuarterMoonSVG( self.showNorthernHemisphereView )
         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT:
-            svg = self.getCrescentMoonSVG( illumination, lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT, self.showNorthernHemisphereView )
+            svg = self.getCrescentMoonSVG( illumination, lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT, self.showNorthernHemisphereView )
         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS:
-            svg = self.getGibbousMoonSVG( illumination, lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS, self.showNorthernHemisphereView )
+            svg = self.getGibbousMoonSVG( illumination, lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS, self.showNorthernHemisphereView )
 
         try:
             with open( IndicatorLunar.SVG_FILE, "w" ) as f:
@@ -432,8 +437,6 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
-
-        print(svg)
 
 
     def handleLeftClick( self, icon ):
@@ -737,39 +740,34 @@ class IndicatorLunar:
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
 
 
-#TODO!
-    def getGibbousMoonSVG( self, illumination, waxing, northernHemisphere ):
-        print()
-
-
-    def getCrescentMoonSVG( self, illumination, waxing, northernHemisphere ):
-        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-        if northernHemisphere == True:
-            x = str( 20 )
-            sweepFlag = str( 1 )
-        else:
+    def getGibbousMoonSVG( self, illumination, waning, northernHemisphere ):
+        if ( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
             x = str( 55 )
-            sweepFlag = str( 0 )
             sweepFlagCircle = str( 0 )
+            sweepFlagEllipse = str( 0 )
+        else:
+            x = str( 20 )
+            sweepFlagCircle = str( 1 )
             sweepFlagEllipse = str( 1 )
 
-#        radius = self.getMoonRadius()
-#        diameter = str( 2 * float( radius ) )
-#        svg = '<path id="' + str( illumination ) + '" d="M ' + x + ' 50 v-' + radius + ' a' + radius + ',' + radius + ' 0 0,' + sweepFlag + ' 0,' + diameter + ' z" fill="' + self.getColourForIconTheme() + '" />'
-#
-#        # http://en.wikipedia.org/wiki/Crescent
-#        ellipseRadiusX = float( radius ) * ( 1 - illumination / 50 )
-#        svg += '<ellipse cx="' + x + '" cy="50" rx="' + str( ellipseRadiusX ) + '" ry="' + str( radius ) + '" fill="red" />'
+        radius = self.getMoonRadius()
+        diameter = str( 2 * float( radius ) )
+        ellipseRadiusX = str( float( radius ) * ( illumination / 50 - 1 ) ) # http://en.wikipedia.org/wiki/Crescent
+        circle = 'a' + radius + ',' + radius + ' 0 0,' + sweepFlagCircle + ' 0,' + diameter
+        ellipse = 'a' + ellipseRadiusX + ',' + radius + ' 0 0,' + sweepFlagEllipse + ' 0,-' + diameter
+        svg = '<path d="M ' + x + ' 50 v-' + radius + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
+        return self.getSVGHeader( 75, 100 ) + svg + self.getSVGFooter()
 
 
-#        radius = self.getMoonRadius()
-#
-#        # http://en.wikipedia.org/wiki/Crescent
-#        ellipseRadiusX = float( radius ) * ( 1 - illumination / 50 )
-#        svg = '<mask id="Mask"><ellipse cx="' + x + '" cy="50" rx="' + str( ellipseRadiusX ) + '" ry="' + radius + '" fill="white" /></mask>'
-#
-#        diameter = str( 2 * float( radius ) )
-#        svg += '<path d="M ' + x + ' 50 v-' + radius + ' a' + radius + ',' + radius + ' 0 0,' + sweepFlag + ' 0,' + diameter + ' z" fill="' + self.getColourForIconTheme() + '" mask="url(#Mask)" />'
+    def getCrescentMoonSVG( self, illumination, waning, northernHemisphere ):
+        if ( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
+            x = str( 55 )
+            sweepFlagCircle = str( 0 )
+            sweepFlagEllipse = str( 1 )
+        else:
+            x = str( 20 )
+            sweepFlagCircle = str( 1 )
+            sweepFlagEllipse = str( 0 )
 
         radius = self.getMoonRadius()
         diameter = str( 2 * float( radius ) )
@@ -777,7 +775,6 @@ class IndicatorLunar:
         circle = 'a' + radius + ',' + radius + ' 0 0,' + sweepFlagCircle + ' 0,' + diameter
         ellipse = 'a' + ellipseRadiusX + ',' + radius + ' 0 0,' + sweepFlagEllipse + ' 0,-' + diameter
         svg = '<path d="M ' + x + ' 50 v-' + radius + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
-
         return self.getSVGHeader( 75, 100 ) + svg + self.getSVGFooter()
 
 
