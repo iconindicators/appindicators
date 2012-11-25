@@ -18,6 +18,14 @@
 # Application indicator which displays lunar information.
 
 
+# 
+# 
+# This version contains code to start from NOW and increase time by a certain amount to test the lunar phase/icon change. 
+# For debug purposes!!!
+# 
+# 
+
+
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
