@@ -24,6 +24,7 @@ except:
     pass
 
 from gi.repository import GObject as gobject
+from gi.repository import Gdk, GdkPixbuf
 from gi.repository import Gtk
 
 notifyImported = True
@@ -51,11 +52,14 @@ except:
     sys.exit()
 
 
+from datetime import timedelta   #TODO Remove ###################################################################################################################
+
+
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.13"
+    VERSION = "1.0.14"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -63,6 +67,8 @@ class IndicatorLunar:
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
+    SVG_ICON = "." + NAME + "-illumination-icon"
+    SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_CITY_ELEVATION = "cityElevation"
@@ -95,17 +101,6 @@ class IndicatorLunar:
         LUNAR_PHASE_WAXING_GIBBOUS : "Waxing Gibbous"
     }
 
-    LUNAR_PHASE_ICONS = {
-        LUNAR_PHASE_FULL_MOON : ICON + "-full-moon",
-        LUNAR_PHASE_WANING_GIBBOUS : ICON + "-waning-gibbous",
-        LUNAR_PHASE_THIRD_QUARTER : ICON + "-third-quarter",
-        LUNAR_PHASE_WANING_CRESCENT : ICON + "-waning-crescent",
-        LUNAR_PHASE_NEW_MOON : ICON + "-new-moon",
-        LUNAR_PHASE_WAXING_CRESCENT : ICON + "-waxing-crescent",
-        LUNAR_PHASE_FIRST_QUARTER : ICON + "-first-quarter",
-        LUNAR_PHASE_WAXING_GIBBOUS : ICON + "-waxing-gibbous"
-    }
-
 
     def __init__( self ):
         logging.basicConfig( file = sys.stderr, level = logging.INFO )
@@ -118,28 +113,41 @@ class IndicatorLunar:
         try:
             self.appindicatorImported = True
             self.indicator = appindicator.Indicator.new( IndicatorLunar.NAME, "", appindicator.IndicatorCategory.APPLICATION_STATUS )
+            self.indicator.set_icon_theme_path( os.getenv( "HOME" ) )
             self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
             self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
         except:
-            self.appindicatorImported = False            
+#TODO Need to set some additional icon theme path?
+            self.appindicatorImported = False
             self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
             self.statusicon = Gtk.StatusIcon()
             self.statusicon.connect( "popup-menu", self.handleRightClick )
             self.statusicon.connect( "activate", self.handleLeftClick )
 
+        print( "appIndicator imported: " + str( self.appindicatorImported ) )
+        print( "Theme: " + self.getIconTheme() )
 
     def main( self ):
+
+        self.now = datetime.datetime.now()
         self.update()
-        gobject.timeout_add_seconds( 60 * 60, self.update )
+#        gobject.timeout_add_seconds( 60 * 60, self.update )
+        gobject.timeout_add_seconds( 1, self.update )
         Gtk.main()
 
 
     def update( self ):
+        self.now = self.now + timedelta( hours = 17 )
+        
         lunarPhase = self.calculateLunarPhase()
 
-        moon = ephem.Moon()
-        moon.compute()
+        moon = ephem.Moon(self.now)
+        moon.compute(self.now)
+#        moon = ephem.Moon()
+#        moon.compute()
         percentageIllumination = int( round( moon.phase ) )
+
+        print( self.now, percentageIllumination, lunarPhase )
 
         self.buildMenu( lunarPhase )
 
@@ -152,11 +160,13 @@ class IndicatorLunar:
         else:
             labelTooltip = ""
 
+        self.createIconForLunarPhase( lunarPhase, percentageIllumination )
         if self.appindicatorImported == True:
-            self.indicator.set_icon( self.getIconNameForLunarPhase( lunarPhase ) )
+            self.indicator.set_icon( IndicatorLunar.SVG_ICON )
             self.indicator.set_label( labelTooltip, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
         else:
-            self.statusicon.set_from_icon_name( self.getIconNameForLunarPhase( lunarPhase ) )
+#TODO Test on Lubuntu 12.04
+            self.statusicon.set_from_file( IndicatorLunar.SVG_ICON )
             self.statusicon.set_tooltip_text( labelTooltip )
 
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
@@ -165,11 +175,12 @@ class IndicatorLunar:
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
+#TODO Make sure this works on Lubuntu 12.04/12.10
         if notifyImported == True and \
             self.showHourlyWerewolfWarning == True and \
             percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and \
             phaseIsBetweenNewAndFullInclusive:
-            Notify.Notification.new( "WARNING: Werewolves about!!!", "", IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_FULL_MOON ] ).show()
+            Notify.Notification.new( "WARNING: Werewolves about!!!", "", IndicatorLunar.SVG_FILE ).show()
 
         return True # Needed so the timer continues!
 
@@ -322,10 +333,14 @@ class IndicatorLunar:
 
 
     def calculateLunarPhase( self ):
-        nextFullMoonDate = ephem.next_full_moon( ephem.now() )
-        nextNewMoonDate = ephem.next_new_moon( ephem.now() )
-        moon = ephem.Moon()
-        moon.compute()
+        nextFullMoonDate = ephem.next_full_moon( self.now )
+        nextNewMoonDate = ephem.next_new_moon( self.now )
+        moon = ephem.Moon( self.now )
+        moon.compute( self.now )
+#        nextFullMoonDate = ephem.next_full_moon( ephem.now() )
+#        nextNewMoonDate = ephem.next_new_moon( ephem.now() )
+#        moon = ephem.Moon()
+#        moon.compute()
         currentMoonPhase = int( round( ( moon.phase ) ) )
         phase = None
         if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which one is before the other.
@@ -356,23 +371,33 @@ class IndicatorLunar:
         return phase
 
 
-    def getIconNameForLunarPhase( self, lunarPhase ):
-        iconName = IndicatorLunar.LUNAR_PHASE_ICONS[ lunarPhase ]
-        if self.showNorthernHemisphereView == True:
-            if lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS:
-                 iconName = IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ]
-            elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS:
-                 iconName = IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS ]
-            elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT:
-                 iconName = IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ]
-            elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT:
-                 iconName = IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT ]
-            elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER:
-                 iconName = IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER ]
-            elif lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER:
-                 iconName = IndicatorLunar.LUNAR_PHASE_ICONS[ IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ]
+    def createIconForLunarPhase( self, lunarPhase, illumination ):
+        if lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON:
+            svg = self.getNewMoonSVG()
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON:
+            svg = self.getFullMoonSVG()
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER:
+            svg = self.getFirstQuarterMoonSVG( self.showNorthernHemisphereView )
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER:
+            svg = self.getThirdQuarterMoonSVG( self.showNorthernHemisphereView )
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or \
+            lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT or \
+            lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS or \
+            lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS:
+            svg = self.getCrescentGibbousMoonSVG( 
+                illumination,
+                lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS, 
+                self.showNorthernHemisphereView,
+                lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT )
 
-        return iconName
+        try:
+            with open( IndicatorLunar.SVG_FILE, "w" ) as f:
+                f.write( svg )
+                f.close()
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
 
 
     def handleLeftClick( self, icon ):
@@ -674,6 +699,92 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
+
+
+    def getCrescentGibbousMoonSVG( self, illumination, waning, northernHemisphere, crescent ):
+        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
+        if ( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
+            sweepFlagCircle = str( 0 )
+            sweepFlagEllipse = str( 1 ) if crescent else str( 0 ) 
+        else:
+            sweepFlagCircle = str( 1 )
+            sweepFlagEllipse = str( 0 ) if crescent else str( 1 ) 
+
+        radius = self.getMoonRadius()
+        diameter = str( 2 * float( radius ) )
+
+        # http://en.wikipedia.org/wiki/Crescent
+        if crescent == True:
+            ellipseRadiusX = str( float( radius ) * ( 1 - illumination / 50 ) )
+        else:
+            ellipseRadiusX = str( float( radius ) * ( illumination / 50 - 1 ) )
+
+        circle = 'a' + radius + ',' + radius + ' 0 0,' + sweepFlagCircle + ' 0,' + diameter
+        ellipse = 'a' + ellipseRadiusX + ',' + radius + ' 0 0,' + sweepFlagEllipse + ' 0,-' + diameter
+        svg = '<path d="M 50 50 v-' + radius + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
+        return self.getSVGHeader() + svg + self.getSVGFooter()
+
+
+    def getFirstQuarterMoonSVG( self, northernHemisphere ):
+        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
+        if northernHemisphere == True:
+            sweepFlag = str( 1 )
+        else:
+            sweepFlag = str( 0 )
+
+        radius = self.getMoonRadius()
+        diameter = str( 2 * float( radius ) )
+        svg = '<path d="M 50 50 v-' + radius + ' a' + radius + ',' + radius + ' 0 0,' + sweepFlag + ' 0,' + diameter + ' z" fill="' + self.getColourForIconTheme() + '" />'
+        return self.getSVGHeader() + svg + self.getSVGFooter()
+
+
+    def getThirdQuarterMoonSVG( self, northernHemisphere ):
+        return self.getFirstQuarterMoonSVG( not northernHemisphere )
+
+
+    def getFullMoonSVG( self ):
+        svg = '<circle cx="50" cy="50" r="' + self.getMoonRadius() + '" fill="' + self.getColourForIconTheme() + '" />'
+        return self.getSVGHeader() + svg + self.getSVGFooter()
+
+
+    def getNewMoonSVG( self ):
+        svg = '<circle cx="50" cy="50" r="' + self.getMoonRadius() + '" fill="none" stroke="' + self.getColourForIconTheme() + '" stroke-width="2" />'
+        return self.getSVGHeader() + svg + self.getSVGFooter()
+
+
+    def getSVGHeader( self ):
+        return '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
+
+
+    def getSVGFooter( self ):
+        return '</svg>'
+
+
+    def getMoonRadius( self ):
+        # A radius of 50 is too big and 25 is too small, so choose half way!
+        return str( ( 50 - 25 ) / 2 + 25 )
+
+
+    def getColourForIconTheme( self ):
+        iconTheme = self.getIconTheme()
+        if iconTheme is None:
+            return "#fff200" # This is hicolor...make it the default.
+        elif iconTheme == "elementary":
+            return "#f4f4f4"
+        elif iconTheme == "lubuntu":
+            return "#5a5a5a"
+        elif iconTheme == "ubuntu-mono-dark":
+            return "#dfdbd2"
+        elif iconTheme == "ubuntu-mono-light":
+            return "#3c3c3c"
+        else:
+            return "#fff200" # This is hicolor...make it the default.
+
+
+#TODO Test this works on Lubuntu 12.04 and Lubuntu 12.10
+    def getIconTheme( self ):
+        return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
 if __name__ == "__main__":
