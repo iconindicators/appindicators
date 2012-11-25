@@ -830,8 +830,16 @@ class IndicatorLunar:
 
     def getColourForIconTheme( self ):
         iconTheme = self.getIconTheme()
-        if iconTheme == "ubuntu-mono-dark":
+        if iconTheme == "elementary":
+            return "#f4f4f4"
+        elif iconTheme == "lubuntu":
+            return "#5a5a5a"
+        elif iconTheme == "ubuntu-mono-dark":
             return "#dfdbd2"
+        elif iconTheme == "ubuntu-mono-light":
+            return "#3c3c3c"
+        else:
+            return ""  #TODO Need hicolor...but it has different colours.  Maybe make it one colour?
 
 
 #TODO Test this works on Lubuntu 12.04 and Lubuntu 12.10
