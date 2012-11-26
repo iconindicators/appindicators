@@ -18,21 +18,12 @@
 # Application indicator which displays lunar information.
 
 
-# 
-# 
-# This version contains code to start from NOW and increase time by a certain amount to test the lunar phase/icon change. 
-# For debug purposes!!!
-# 
-# 
-
-
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
     pass
 
 from gi.repository import GObject as gobject
-from gi.repository import Gdk, GdkPixbuf
 from gi.repository import Gtk
 
 notifyImported = True
@@ -60,8 +51,9 @@ except:
     sys.exit()
 
 
+###################################################################################################################
 from datetime import timedelta   #TODO Remove ###################################################################################################################
-
+###################################################################################################################
 
 class IndicatorLunar:
 
@@ -118,6 +110,12 @@ class IndicatorLunar:
         if notifyImported == True:
             Notify.init( IndicatorLunar.NAME )
 
+        # Attempt to create an AppIndicator3...if it fails, default to a GTK indicator.
+        # I've found that on Lubuntu 12.04 the AppIndicator3 gets created but does not work properly...
+        # ...the icon cannot be updated dynamically and tooltip/label does not display.
+        # The workaround for this is to force the GTK indicator to be created (as per the except below) for Lubuntu 12.04.
+        # For now ignore Lubuntu 12.04 (and presumably Xubuntu 12.04)...
+        # ...if a user screams, put in an option to allow the user to specify which indicator type to use.
         try:
             self.appindicatorImported = True
             self.indicator = appindicator.Indicator.new( IndicatorLunar.NAME, "", appindicator.IndicatorCategory.APPLICATION_STATUS )
@@ -125,19 +123,22 @@ class IndicatorLunar:
             self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
             self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
         except:
-#TODO Need to set some additional icon theme path?
             self.appindicatorImported = False
             self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
             self.statusicon = Gtk.StatusIcon()
             self.statusicon.connect( "popup-menu", self.handleRightClick )
             self.statusicon.connect( "activate", self.handleLeftClick )
 
-        print( "appIndicator imported: " + str( self.appindicatorImported ) )
-        print( "Theme: " + self.getIconTheme() )
+        print( "appIndicator imported: ", str( self.appindicatorImported ) )
+        print( "Theme: ", self.getIconTheme() )
+        print( "Desktop: ", os.getenv( "XDG_CURRENT_DESKTOP" ) )
+        print( "SVG Icon: ", IndicatorLunar.SVG_ICON )
+        print( "SVG File: ", IndicatorLunar.SVG_FILE )
+
 
     def main( self ):
 
-        self.now = datetime.datetime.now()
+        self.now = datetime.datetime.now()  ###################################################################################################################
         self.update()
 #        gobject.timeout_add_seconds( 60 * 60, self.update )
         gobject.timeout_add_seconds( 1, self.update )
@@ -145,17 +146,15 @@ class IndicatorLunar:
 
 
     def update( self ):
-        self.now = self.now + timedelta( hours = 17 )
+        self.now = self.now + timedelta( hours = 17 )###################################################################################################################
         
         lunarPhase = self.calculateLunarPhase()
 
-        moon = ephem.Moon(self.now)
-        moon.compute(self.now)
+        moon = ephem.Moon(self.now)###################################################################################################################
+        moon.compute(self.now)###################################################################################################################
 #        moon = ephem.Moon()
 #        moon.compute()
         percentageIllumination = int( round( moon.phase ) )
-
-        print( self.now, percentageIllumination, lunarPhase )
 
         self.buildMenu( lunarPhase )
 
@@ -173,8 +172,7 @@ class IndicatorLunar:
             self.indicator.set_icon( IndicatorLunar.SVG_ICON )
             self.indicator.set_label( labelTooltip, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
         else:
-#TODO Test on Lubuntu 12.04
-            self.statusicon.set_from_file( IndicatorLunar.SVG_ICON )
+            self.statusicon.set_from_file( IndicatorLunar.SVG_FILE )
             self.statusicon.set_tooltip_text( labelTooltip )
 
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
@@ -183,12 +181,12 @@ class IndicatorLunar:
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-#TODO Make sure this works on Lubuntu 12.04/12.10
         if notifyImported == True and \
             self.showHourlyWerewolfWarning == True and \
             percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and \
             phaseIsBetweenNewAndFullInclusive:
             Notify.Notification.new( "WARNING: Werewolves about!!!", "", IndicatorLunar.SVG_FILE ).show()
+
 
         return True # Needed so the timer continues!
 
@@ -341,10 +339,10 @@ class IndicatorLunar:
 
 
     def calculateLunarPhase( self ):
-        nextFullMoonDate = ephem.next_full_moon( self.now )
-        nextNewMoonDate = ephem.next_new_moon( self.now )
-        moon = ephem.Moon( self.now )
-        moon.compute( self.now )
+        nextFullMoonDate = ephem.next_full_moon( self.now )###################################################################################################################
+        nextNewMoonDate = ephem.next_new_moon( self.now )###################################################################################################################
+        moon = ephem.Moon( self.now )###################################################################################################################
+        moon.compute( self.now )###################################################################################################################
 #        nextFullMoonDate = ephem.next_full_moon( ephem.now() )
 #        nextNewMoonDate = ephem.next_new_moon( ephem.now() )
 #        moon = ephem.Moon()
@@ -778,19 +776,22 @@ class IndicatorLunar:
         iconTheme = self.getIconTheme()
         if iconTheme is None:
             return "#fff200" # This is hicolor...make it the default.
-        elif iconTheme == "elementary":
+        
+        if iconTheme == "elementary":
             return "#f4f4f4"
-        elif iconTheme == "lubuntu":
+        
+        if iconTheme == "lubuntu":
             return "#5a5a5a"
-        elif iconTheme == "ubuntu-mono-dark":
+        
+        if iconTheme == "ubuntu-mono-dark":
             return "#dfdbd2"
-        elif iconTheme == "ubuntu-mono-light":
+        
+        if iconTheme == "ubuntu-mono-light":
             return "#3c3c3c"
-        else:
-            return "#fff200" # This is hicolor...make it the default.
+
+        return "#fff200" # This is hicolor...make it the default.
 
 
-#TODO Test this works on Lubuntu 12.04 and Lubuntu 12.10
     def getIconTheme( self ):
         return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
