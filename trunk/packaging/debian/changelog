@@ -1,3 +1,16 @@
+indicator-lunar (1.0.14-1) precise; urgency=low
+
+  * Now creates the lunar phase icon on the fly for each percentage of illumination!
+  * Works on Ubuntu 12.04/12.10 and Lubuntu 12.10.  Untested on Xubuntu 12.04/12.10.
+  * On Lubuntu 12.04, the icon fails to update, the icon label/tooltip does not
+    display and menu seperators look odd.  This occurs because AppIndicator3
+    successfully creates the indicator but then quietly fails to update the icon and
+    so on.  The fix is to put in an override (to use GTK indicator)...which will
+    only be done if a user screams for it.  No idea if this occurs on Xubuntu 12.04.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 26 Nov 2012 10:01:40 +1000
+
+
 indicator-lunar (1.0.13-1) precise; urgency=low
 
   * Now runs as Python 3 and requires python3-ephem (from same PPA).
