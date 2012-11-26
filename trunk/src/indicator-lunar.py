@@ -51,10 +51,6 @@ except:
     sys.exit()
 
 
-###################################################################################################################
-from datetime import timedelta   #TODO Remove ###################################################################################################################
-###################################################################################################################
-
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
@@ -129,31 +125,18 @@ class IndicatorLunar:
             self.statusicon.connect( "popup-menu", self.handleRightClick )
             self.statusicon.connect( "activate", self.handleLeftClick )
 
-        print( "appIndicator imported: ", str( self.appindicatorImported ) )
-        print( "Theme: ", self.getIconTheme() )
-        print( "Desktop: ", os.getenv( "XDG_CURRENT_DESKTOP" ) )
-        print( "SVG Icon: ", IndicatorLunar.SVG_ICON )
-        print( "SVG File: ", IndicatorLunar.SVG_FILE )
-
 
     def main( self ):
-
-        self.now = datetime.datetime.now()  ###################################################################################################################
         self.update()
-#        gobject.timeout_add_seconds( 60 * 60, self.update )
-        gobject.timeout_add_seconds( 1, self.update )
+        gobject.timeout_add_seconds( 60 * 60, self.update )
         Gtk.main()
 
 
     def update( self ):
-        self.now = self.now + timedelta( hours = 17 )###################################################################################################################
-        
         lunarPhase = self.calculateLunarPhase()
 
-        moon = ephem.Moon(self.now)###################################################################################################################
-        moon.compute(self.now)###################################################################################################################
-#        moon = ephem.Moon()
-#        moon.compute()
+        moon = ephem.Moon()
+        moon.compute()
         percentageIllumination = int( round( moon.phase ) )
 
         self.buildMenu( lunarPhase )
@@ -186,7 +169,6 @@ class IndicatorLunar:
             percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and \
             phaseIsBetweenNewAndFullInclusive:
             Notify.Notification.new( "WARNING: Werewolves about!!!", "", IndicatorLunar.SVG_FILE ).show()
-
 
         return True # Needed so the timer continues!
 
@@ -339,14 +321,10 @@ class IndicatorLunar:
 
 
     def calculateLunarPhase( self ):
-        nextFullMoonDate = ephem.next_full_moon( self.now )###################################################################################################################
-        nextNewMoonDate = ephem.next_new_moon( self.now )###################################################################################################################
-        moon = ephem.Moon( self.now )###################################################################################################################
-        moon.compute( self.now )###################################################################################################################
-#        nextFullMoonDate = ephem.next_full_moon( ephem.now() )
-#        nextNewMoonDate = ephem.next_new_moon( ephem.now() )
-#        moon = ephem.Moon()
-#        moon.compute()
+        nextFullMoonDate = ephem.next_full_moon( ephem.now() )
+        nextNewMoonDate = ephem.next_new_moon( ephem.now() )
+        moon = ephem.Moon()
+        moon.compute()
         currentMoonPhase = int( round( ( moon.phase ) ) )
         phase = None
         if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which one is before the other.
