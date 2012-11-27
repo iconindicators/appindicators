@@ -55,7 +55,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.14"
+    VERSION = "1.0.15"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -199,22 +199,16 @@ class IndicatorLunar:
 
         menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
 
-        newMoonLabel = indent + "New: " + self.localiseAndTrim( ephem.next_new_moon( ephem.now() ) )
-        firstQuarterLabel = indent + "First Quarter: " + self.localiseAndTrim( ephem.next_first_quarter_moon( ephem.now() ) )
-        fullMoonLabel = indent + "Full: " + self.localiseAndTrim( ephem.next_full_moon( ephem.now() ) )
-        thirdQuarterLabel = indent + "Third Quarter: " + self.localiseAndTrim( ephem.next_last_quarter_moon( ephem.now() ) )
-        if lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS:
-            # third, new, first, full
-            self.appendToLunarMenu( menuItem.get_submenu(), thirdQuarterLabel, newMoonLabel, firstQuarterLabel, fullMoonLabel )
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT:
-            # new, first, full, third
-            self.appendToLunarMenu( menuItem.get_submenu(), newMoonLabel, firstQuarterLabel, fullMoonLabel, thirdQuarterLabel )
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT:
-            # first, full, third, new 
-            self.appendToLunarMenu( menuItem.get_submenu(), firstQuarterLabel, fullMoonLabel, thirdQuarterLabel, newMoonLabel )
-        else: # lunarPhase == LUNAR_PHASE_FIRST_QUARTER or lunarPhase == LUNAR_PHASE_WAXING_GIBBOUS
-            # full, third, new, first
-            self.appendToLunarMenu( menuItem.get_submenu(), fullMoonLabel, thirdQuarterLabel, newMoonLabel, firstQuarterLabel )
+        # Need to work out which phases occur by date rather than using the phase we calculate since the phase (illumination) rounds numbers
+        # and so we enter a phase earlier than what is official.
+        nextPhases = [ ]
+        nextPhases.append( [ self.localiseAndTrim( ephem.next_first_quarter_moon( ephem.now() ) ), "First Quarter: " ] )
+        nextPhases.append( [ self.localiseAndTrim( ephem.next_full_moon( ephem.now() ) ), "Full: " ] )
+        nextPhases.append( [ self.localiseAndTrim( ephem.next_last_quarter_moon( ephem.now() ) ), "Third Quarter: " ] )
+        nextPhases.append( [ self.localiseAndTrim( ephem.next_new_moon( ephem.now() ) ), "New: " ] )
+        nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
+        for phaseInformation in nextPhases:
+            menuItem.get_submenu().append( Gtk.MenuItem( phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
 
         # Sun
         menuItem = Gtk.MenuItem( "Sun" )
@@ -282,13 +276,6 @@ class IndicatorLunar:
             self.menu = menu
 
         menu.show_all()
-
-
-    def appendToLunarMenu( self, submenu, label1, label2, label3, label4 ):
-        submenu.append( Gtk.MenuItem( label1 ) )
-        submenu.append( Gtk.MenuItem( label2 ) )
-        submenu.append( Gtk.MenuItem( label3 ) )
-        submenu.append( Gtk.MenuItem( label4 ) )
 
 
     def createPlanetSubmenu( self, planetMenuItem, city, planet ):

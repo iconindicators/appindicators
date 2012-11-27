@@ -1,3 +1,11 @@
+indicator-lunar (1.0.15-1) precise; urgency=low
+
+  * The next phases of the moon were being dropped out before the phase actually
+    arrived!
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 28 Nov 2012 8:51:47 +1000
+
+
 indicator-lunar (1.0.14-1) precise; urgency=low
 
   * Now creates the lunar phase icon on the fly for each percentage of illumination!
