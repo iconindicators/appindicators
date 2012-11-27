@@ -54,7 +54,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.14"
+    VERSION = "1.0.15"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -230,6 +230,7 @@ class IndicatorPPADownloadStatistics:
         combinedPPADownloadStatistics = { }
 
         ppas = self.getPPAsSorted( False )
+        architectureIndependentPublishedBinaries = [ ] # Used to manage the download counts of architecture independent published binaries.
         for ppa in ppas:
             publishedBinaryInfos = self.ppaDownloadStatistics.get( ppa )
             if publishedBinaryInfos is None:
@@ -237,10 +238,12 @@ class IndicatorPPADownloadStatistics:
 
             combinedKey = ppa[ : ppa.find( " | ", ppa.find( " | " ) + 1 ) ] # The combined ppa is 'ppaUser | ppaName | series | architecture' stripped down to 'ppaUser | ppaName'.
             for publishedBinaryInfo in publishedBinaryInfos:
+                id = combinedKey + publishedBinaryInfo.getPackageName() + publishedBinaryInfo.getPackageVersion() # Used to record architecture independent published binary packages which have already been added.
                 if combinedKey not in combinedPPADownloadStatistics:
                     # This is the first occurrence of this combined PPA...
                     combinedPublishedBinaryInfo = PublishedBinaryInfo( publishedBinaryInfo.getPackageName(), publishedBinaryInfo.getPackageVersion(), publishedBinaryInfo.getDownloadCount(), publishedBinaryInfo.isArchitectureSpecific() )
                     combinedPPADownloadStatistics[ combinedKey ] = [ combinedPublishedBinaryInfo ]
+                    architectureIndependentPublishedBinaries.append( id )
                 else:
                     # This combined PPA already exists...see if a combined published binary exists which matches the current published binary...
                     combinedPublishedBinaryInfos = combinedPPADownloadStatistics.get( combinedKey )
@@ -248,12 +251,22 @@ class IndicatorPPADownloadStatistics:
                     for combinedPublishedBinaryInfo in combinedPublishedBinaryInfos:
                         if publishedBinaryInfo.getPackageName() == combinedPublishedBinaryInfo.getPackageName():
                             # Update the existing combined published binary...
-                            # Ignore if the architecture specific flag of publishedBinaryInfo does not match combinedPublishedBinaryInfo...hopefully this doesn't come back to bite!
+                            # Assume that the architecture specific flag of publishedBinaryInfo always matches that of the combinedPublishedBinaryInfo...
+                            # ...hopefully this doesn't come back to bite!
                             if publishedBinaryInfo.isArchitectureSpecific() == True:
                                 combinedPublishedBinaryInfo.setDownloadCount( publishedBinaryInfo.getDownloadCount() + combinedPublishedBinaryInfo.getDownloadCount( ) )
+                            else:
+                                # Noticed that architecture independent published binaries with the same name can have different version.
+                                # For example an older version release may exist for Natty but a newer release exists for Precise.
+                                # In this case the binaries (and their download counts) need to be uniquely counted.
+                                if not id in architectureIndependentPublishedBinaries:
+                                    # This published binary has not yet been added in, so add it's download count to the running total.
+                                    combinedPublishedBinaryInfo.setDownloadCount( publishedBinaryInfo.getDownloadCount() + combinedPublishedBinaryInfo.getDownloadCount( ) )
+                                    architectureIndependentPublishedBinaries.append( id )
 
                             # If the versions do not match then wipe...
-                            if combinedPublishedBinaryInfo.getPackageVersion() is not None:
+                            # The version will be none if we've previously wiped the version because of different versions being combined.
+                            if combinedPublishedBinaryInfo.getPackageVersion() is not None: 
                                 if publishedBinaryInfo.getPackageVersion() != combinedPublishedBinaryInfo.getPackageVersion():
                                     combinedPublishedBinaryInfo.setPackageVersion( None )
 
@@ -264,6 +277,7 @@ class IndicatorPPADownloadStatistics:
                     if not added:
                         combinedPublishedBinaryInfo = PublishedBinaryInfo( publishedBinaryInfo.getPackageName(), publishedBinaryInfo.getPackageVersion(), publishedBinaryInfo.getDownloadCount(), publishedBinaryInfo.isArchitectureSpecific() )
                         combinedPublishedBinaryInfos.append( combinedPublishedBinaryInfo )
+                        architectureIndependentPublishedBinaries.append( id )
 
         # Sort each list of published binaries...
         for key in combinedPPADownloadStatistics:
@@ -588,8 +602,8 @@ class IndicatorPPADownloadStatistics:
 
         combinaPPAsCheckbox = Gtk.CheckButton( "Combine PPAs" )
         toolTip = "Combines the statistics when the PPA user/name are the same.\n\n"
-        toolTip += "If a published binary is architecture specific (such as compiled C), the download count is summed across all instances of that published binary.\n\n"
-        toolTip += "If a published binary is not architecture specific (such as Python), the download count is not summed (as it is assumed to be the same binary).\n\n"
+        toolTip += "If a published binary is architecture specific (such as compiled C), the download counts are summed across all instances of that published binary.\n\n"
+        toolTip += "If a published binary is not architecture specific (such as Python), the download counts are only summed when the version of the binary is different.\n\n"
         toolTip += "The version number is retained only if it is identical across all instances of a published binary."
         combinaPPAsCheckbox.set_tooltip_text( toolTip )
         combinaPPAsCheckbox.set_active( self.combinePPAs )

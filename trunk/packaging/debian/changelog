@@ -1,3 +1,14 @@
+indicator-ppa-download-statistics (1.0.15-1) precise; urgency=low
+
+  * Modified the download counts for architecture independent binary packages.
+    If a binary package exists in two (or more) places but has different versions,
+    the download count for each binary package is counted (for the first instance
+    of a given version number).  This means that different versions are treated as
+    separate packages but are still combined under the common name.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 27 Nov 2012 22:28:25 +1000
+
+
 indicator-ppa-download-statistics (1.0.14-1) precise; urgency=low
 
   * Add a combine PPA option which combines the statistics when the PPA user/name
