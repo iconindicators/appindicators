@@ -347,10 +347,8 @@ class IndicatorLunar:
             svg = self.getNewMoonSVG()
         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON:
             svg = self.getFullMoonSVG()
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER:
-            svg = self.getFirstQuarterMoonSVG( self.showNorthernHemisphereView )
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER:
-            svg = self.getThirdQuarterMoonSVG( self.showNorthernHemisphereView )
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER or lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER:
+            svg = self.getQuarterMoonSVG( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER, self.showNorthernHemisphereView )
         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or \
             lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT or \
             lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS or \
@@ -696,9 +694,9 @@ class IndicatorLunar:
         return self.getSVGHeader() + svg + self.getSVGFooter()
 
 
-    def getFirstQuarterMoonSVG( self, northernHemisphere ):
+    def getQuarterMoonSVG( self, first, northernHemisphere ):
         # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-        if northernHemisphere == True:
+        if ( first == True and northernHemisphere == True ) or ( first == False and northernHemisphere == False ):
             sweepFlag = str( 1 )
         else:
             sweepFlag = str( 0 )
@@ -707,10 +705,6 @@ class IndicatorLunar:
         diameter = str( 2 * float( radius ) )
         svg = '<path d="M 50 50 v-' + radius + ' a' + radius + ',' + radius + ' 0 0,' + sweepFlag + ' 0,' + diameter + ' z" fill="' + self.getColourForIconTheme() + '" />'
         return self.getSVGHeader() + svg + self.getSVGFooter()
-
-
-    def getThirdQuarterMoonSVG( self, northernHemisphere ):
-        return self.getFirstQuarterMoonSVG( not northernHemisphere )
 
 
     def getFullMoonSVG( self ):
@@ -740,7 +734,7 @@ class IndicatorLunar:
     def getColourForIconTheme( self ):
         iconTheme = self.getIconTheme()
         if iconTheme is None:
-            return "#fff200" # This is hicolor...make it the default.
+            return "#fff200" # Use hicolor as a default.
         
         if iconTheme == "elementary":
             return "#f4f4f4"
@@ -754,7 +748,7 @@ class IndicatorLunar:
         if iconTheme == "ubuntu-mono-light":
             return "#3c3c3c"
 
-        return "#fff200" # This is hicolor...make it the default.
+        return "#fff200" # Use hicolor as a default
 
 
     def getIconTheme( self ):
