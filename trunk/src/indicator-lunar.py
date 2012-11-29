@@ -55,7 +55,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.15"
+    VERSION = "1.0.16"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -208,7 +208,7 @@ class IndicatorLunar:
         nextPhases.append( [ self.localiseAndTrim( ephem.next_new_moon( ephem.now() ) ), "New: " ] )
         nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
         for phaseInformation in nextPhases:
-            menuItem.get_submenu().append( Gtk.MenuItem( phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( indent + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
 
         # Sun
         menuItem = Gtk.MenuItem( "Sun" )
