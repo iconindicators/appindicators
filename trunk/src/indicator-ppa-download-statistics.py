@@ -54,7 +54,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.15"
+    VERSION = "1.0.16"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -62,7 +62,7 @@ class IndicatorPPADownloadStatistics:
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
 
-    SERIES = [ "raring", "quantal", "precise", "oneiric", "natty", "lucid", "hardy" ]
+    SERIES = [ "raring", "quantal", "precise", "oneiric", "lucid", "hardy" ]
     ARCHITECTURES = [ "amd64", "i386" ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
@@ -124,26 +124,23 @@ class IndicatorPPADownloadStatistics:
         if self.combinePPAs == True:
             ppaDownloadStatistics = self.getCombinedPPAs()
 
+        indent = "    "
         if self.showSubmenu == True:
             for ppa in ppas:
                 publishedBinaryInfos = ppaDownloadStatistics.get( ppa )
                 menuItem = Gtk.MenuItem( ppa )
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
-                if publishedBinaryInfos is None:
-                    subMenuItem = Gtk.MenuItem( "(no information)" )
-                    subMenu.append( subMenuItem )
-                    menuItem.set_submenu( subMenu )
-                elif len( publishedBinaryInfos ) == 0:
-                    subMenuItem = Gtk.MenuItem( "(error retrieving PPA)" )
+                if type( publishedBinaryInfos ) is str:
+                    subMenuItem = Gtk.MenuItem( publishedBinaryInfos )
                     subMenu.append( subMenuItem )
                     menuItem.set_submenu( subMenu )
                 else:
                     for publishedBinaryInfo in publishedBinaryInfos:
                         if publishedBinaryInfo.getPackageVersion() is None:
-                            subMenuItem = Gtk.MenuItem( "   " + publishedBinaryInfo.getPackageName() + ": " + str( publishedBinaryInfo.getDownloadCount() ) )
+                            subMenuItem = Gtk.MenuItem( indent + publishedBinaryInfo.getPackageName() + ": " + str( publishedBinaryInfo.getDownloadCount() ) )
                         else:
-                            subMenuItem = Gtk.MenuItem( "   " + publishedBinaryInfo.getPackageName() + " (" + publishedBinaryInfo.getPackageVersion() + "): " + str( publishedBinaryInfo.getDownloadCount() ) )
+                            subMenuItem = Gtk.MenuItem( indent + publishedBinaryInfo.getPackageName() + " (" + publishedBinaryInfo.getPackageVersion() + "): " + str( publishedBinaryInfo.getDownloadCount() ) )
 
                         subMenuItem.set_name( ppa )
                         subMenuItem.connect( "activate", self.onPPA )
@@ -156,18 +153,15 @@ class IndicatorPPADownloadStatistics:
                 menu.append( menuItem )
                 menuItem.set_name( ppa )
                 menuItem.connect( "activate", self.onPPA )
-                if publishedBinaryInfos is None:
-                    menuItem = Gtk.MenuItem( "   (no information)" )
-                    menu.append( menuItem )
-                elif len( publishedBinaryInfos ) == 0:
-                    menuItem = Gtk.MenuItem( "   (error retrieving PPA)" )
+                if type( publishedBinaryInfos ) is str:
+                    menuItem = Gtk.MenuItem( indent + publishedBinaryInfos )
                     menu.append( menuItem )
                 else:
                     for publishedBinaryInfo in publishedBinaryInfos:
                         if publishedBinaryInfo.getPackageVersion() is None:
-                            menuItem = Gtk.MenuItem( "    " + publishedBinaryInfo.getPackageName() + ": " + str( publishedBinaryInfo.getDownloadCount() ) )
+                            menuItem = Gtk.MenuItem( indent + publishedBinaryInfo.getPackageName() + ": " + str( publishedBinaryInfo.getDownloadCount() ) )
                         else:
-                            menuItem = Gtk.MenuItem( "    " + publishedBinaryInfo.getPackageName() + " (" + publishedBinaryInfo.getPackageVersion() + "): " + str( publishedBinaryInfo.getDownloadCount() ) )
+                            menuItem = Gtk.MenuItem( indent + publishedBinaryInfo.getPackageName() + " (" + publishedBinaryInfo.getPackageVersion() + "): " + str( publishedBinaryInfo.getDownloadCount() ) )
 
                         menuItem.set_name( ppa )
                         menuItem.connect( "activate", self.onPPA )
@@ -232,58 +226,66 @@ class IndicatorPPADownloadStatistics:
         ppas = self.getPPAsSorted( False )
         architectureIndependentPublishedBinaries = [ ] # Used to manage the download counts of architecture independent published binaries.
         for ppa in ppas:
+            combinedKey = ppa[ : ppa.find( " | ", ppa.find( " | " ) + 1 ) ] # The combined ppa is 'ppaUser | ppaName | series | architecture' stripped down to 'ppaUser | ppaName'.
             publishedBinaryInfos = self.ppaDownloadStatistics.get( ppa )
-            if publishedBinaryInfos is None:
+
+            if type( publishedBinaryInfos ) is str: # This is a string message (either 'no information' or 'error retrieving PPA'.
+                if combinedKey not in combinedPPADownloadStatistics:
+                    combinedPPADownloadStatistics[ combinedKey ] = publishedBinaryInfos # Only put in the string message if no other data exists.
+
                 continue
 
-            combinedKey = ppa[ : ppa.find( " | ", ppa.find( " | " ) + 1 ) ] # The combined ppa is 'ppaUser | ppaName | series | architecture' stripped down to 'ppaUser | ppaName'.
+            # Iterate over the published binary infos and combine...
             for publishedBinaryInfo in publishedBinaryInfos:
-                id = combinedKey + publishedBinaryInfo.getPackageName() + publishedBinaryInfo.getPackageVersion() # Used to record architecture independent published binary packages which have already been added.
+
+                # A key to record architecture independent published binary packages which have already been added.
+                id = combinedKey + publishedBinaryInfo.getPackageName() + publishedBinaryInfo.getPackageVersion()
+
                 if combinedKey not in combinedPPADownloadStatistics:
                     # This is the first occurrence of this combined PPA...
                     combinedPublishedBinaryInfo = PublishedBinaryInfo( publishedBinaryInfo.getPackageName(), publishedBinaryInfo.getPackageVersion(), publishedBinaryInfo.getDownloadCount(), publishedBinaryInfo.isArchitectureSpecific() )
                     combinedPPADownloadStatistics[ combinedKey ] = [ combinedPublishedBinaryInfo ]
                     architectureIndependentPublishedBinaries.append( id )
-                else:
-                    # This combined PPA already exists...see if a combined published binary exists which matches the current published binary...
-                    combinedPublishedBinaryInfos = combinedPPADownloadStatistics.get( combinedKey )
-                    added = False
-                    for combinedPublishedBinaryInfo in combinedPublishedBinaryInfos:
-                        if publishedBinaryInfo.getPackageName() == combinedPublishedBinaryInfo.getPackageName():
-                            # Update the existing combined published binary...
-                            # Assume that the architecture specific flag of publishedBinaryInfo always matches that of the combinedPublishedBinaryInfo...
-                            # ...hopefully this doesn't come back to bite!
-                            if publishedBinaryInfo.isArchitectureSpecific() == True:
+                    continue
+
+                # This combined PPA already exists...see if a combined published binary exists which matches the current published binary...
+                combinedPublishedBinaryInfos = combinedPPADownloadStatistics.get( combinedKey )
+                added = False
+                for combinedPublishedBinaryInfo in combinedPublishedBinaryInfos:
+                    if publishedBinaryInfo.getPackageName() == combinedPublishedBinaryInfo.getPackageName():
+                        # Update the existing combined published binary...
+                        # Assume that the architecture specific flag of publishedBinaryInfo always matches that of the combinedPublishedBinaryInfo.
+                        if publishedBinaryInfo.isArchitectureSpecific() == True:
+                            combinedPublishedBinaryInfo.setDownloadCount( publishedBinaryInfo.getDownloadCount() + combinedPublishedBinaryInfo.getDownloadCount( ) )
+                        else:
+                            # Architecture independent published binaries with the same name can have different versions.
+                            # For example an older version may exist for Natty but a newer version exists for Precise.
+                            # In this case the binaries (and their download counts) need to be uniquely counted.
+                            if not id in architectureIndependentPublishedBinaries:
+                                # This published binary has not yet been added in, so add it's download count to the running total.
                                 combinedPublishedBinaryInfo.setDownloadCount( publishedBinaryInfo.getDownloadCount() + combinedPublishedBinaryInfo.getDownloadCount( ) )
-                            else:
-                                # Noticed that architecture independent published binaries with the same name can have different version.
-                                # For example an older version release may exist for Natty but a newer release exists for Precise.
-                                # In this case the binaries (and their download counts) need to be uniquely counted.
-                                if not id in architectureIndependentPublishedBinaries:
-                                    # This published binary has not yet been added in, so add it's download count to the running total.
-                                    combinedPublishedBinaryInfo.setDownloadCount( publishedBinaryInfo.getDownloadCount() + combinedPublishedBinaryInfo.getDownloadCount( ) )
-                                    architectureIndependentPublishedBinaries.append( id )
+                                architectureIndependentPublishedBinaries.append( id )
 
-                            # If the versions do not match then wipe...
-                            # The version will be none if we've previously wiped the version because of different versions being combined.
-                            if combinedPublishedBinaryInfo.getPackageVersion() is not None: 
-                                if publishedBinaryInfo.getPackageVersion() != combinedPublishedBinaryInfo.getPackageVersion():
-                                    combinedPublishedBinaryInfo.setPackageVersion( None )
+                        # If the versions do not match then wipe...
+                        if combinedPublishedBinaryInfo.getPackageVersion() is not None: 
+                            if publishedBinaryInfo.getPackageVersion() != combinedPublishedBinaryInfo.getPackageVersion():
+                                combinedPublishedBinaryInfo.setPackageVersion( None )
 
-                            added = True
-                            break
+                        added = True
+                        break
 
-                    # This published binary has not yet been added, so append...
-                    if not added:
-                        combinedPublishedBinaryInfo = PublishedBinaryInfo( publishedBinaryInfo.getPackageName(), publishedBinaryInfo.getPackageVersion(), publishedBinaryInfo.getDownloadCount(), publishedBinaryInfo.isArchitectureSpecific() )
-                        combinedPublishedBinaryInfos.append( combinedPublishedBinaryInfo )
-                        architectureIndependentPublishedBinaries.append( id )
+                # This published binary has not yet been added, so append...
+                if not added:
+                    combinedPublishedBinaryInfo = PublishedBinaryInfo( publishedBinaryInfo.getPackageName(), publishedBinaryInfo.getPackageVersion(), publishedBinaryInfo.getDownloadCount(), publishedBinaryInfo.isArchitectureSpecific() )
+                    combinedPublishedBinaryInfos.append( combinedPublishedBinaryInfo )
+                    architectureIndependentPublishedBinaries.append( id )
 
         # Sort each list of published binaries...
         for key in combinedPPADownloadStatistics:
             combinedPublishedBinaries = combinedPPADownloadStatistics.get( key )
-            combinedPublishedBinariesNew = sorted( combinedPublishedBinaries, key=lambda combinedPublishedBinary: combinedPublishedBinary.packageName )
-            combinedPPADownloadStatistics[ key ] = combinedPublishedBinariesNew
+            if type( combinedPublishedBinaries ) is PublishedBinaryInfo:
+                combinedPublishedBinariesNew = sorted( combinedPublishedBinaries, key=lambda combinedPublishedBinary: combinedPublishedBinary.packageName )
+                combinedPPADownloadStatistics[ key ] = combinedPublishedBinariesNew
 
         return combinedPPADownloadStatistics        
 
@@ -675,8 +677,11 @@ class IndicatorPPADownloadStatistics:
                 logging.error( "Error reading settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
         else:
             # No properties file exists, so populate with a sample PPA to give the user an idea of the format.
-            ppaList = [ "thebernmeister", "ppa", "quantal", "i386" ]
+            ppaList = [ "thebernmeister", "ppa", "precise", "i386" ]
             self.ppaInfos[ self.getPPAKey( ppaList ) ] = PPAInfo( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
+
+        for key in self.ppaInfos:
+            self.ppaDownloadStatistics[ key ] = "(no information)"
 
 
     def saveSettings( self ):
@@ -744,6 +749,10 @@ class IndicatorPPADownloadStatistics:
                 url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + series + "/" + architecture
                 publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
                 numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
+                if numberOfPublishedBinaries == 0:
+                    ppaDownloadStatistics[ key ] = "(no information)"
+                    continue
+
                 for i in range( numberOfPublishedBinaries ):
                     binaryPackageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
                     binaryPackageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
@@ -761,7 +770,7 @@ class IndicatorPPADownloadStatistics:
                         ppaDownloadStatistics[ key ] = publishedBinaryInfos
 
             except Exception as e:
-                ppaDownloadStatistics[ key ] = [ ]
+                ppaDownloadStatistics[ key ] = "(error retrieving PPA)"
 
         self.lock.acquire()
 

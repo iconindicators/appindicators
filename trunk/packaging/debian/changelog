@@ -1,3 +1,13 @@
+indicator-ppa-download-statistics (1.0.16-1) precise; urgency=low
+
+  * When PPAs were combined, the "no information" message was shown regardless
+    if the situation was no information or an error in downloading the PPA.
+  * Removed natty from the list of PPAs.
+  * Changed the sample PPA series to Precise as it's supported for 5 years. 
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 1 Dec 2012 11:44:24 +1000
+
+
 indicator-ppa-download-statistics (1.0.15-1) precise; urgency=low
 
   * Modified the download counts for architecture independent binary packages.
