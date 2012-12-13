@@ -55,7 +55,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.16"
+    VERSION = "1.0.17"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -133,13 +133,13 @@ class IndicatorLunar:
 
 
     def update( self ):
-        lunarPhase = self.calculateLunarPhase()
+        ephemNow = ephem.now()
 
-        moon = ephem.Moon()
-        moon.compute()
+        lunarPhase = self.calculateLunarPhase( ephemNow )
+        moon = ephem.Moon( ephemNow )
         percentageIllumination = int( round( moon.phase ) )
 
-        self.buildMenu( lunarPhase )
+        self.buildMenu( lunarPhase, ephemNow )
 
         if self.showIllumination == True and self.showPhase == True:
             labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( percentageIllumination ) + "%)"
@@ -173,39 +173,33 @@ class IndicatorLunar:
         return True # Needed so the timer continues!
 
 
-    def buildMenu( self, lunarPhase ):
+    def buildMenu( self, lunarPhase, ephemNow ):
         if self.appindicatorImported == True:
             menu = self.indicator.get_menu()
         else:
             menu = self.menu
 
         menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
-
-        # Create the new menu and populate...
         menu = Gtk.Menu()
-
         city = ephem.city( self.cityName )
         indent = "    "
 
         # Moon
         menuItem = Gtk.MenuItem( "Moon" )
         menu.append( menuItem )
-
-        self.createPlanetSubmenu( menuItem, city, ephem.Moon() )
-
-        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] ) )
-
+        self.createPlanetSubmenu( menuItem, city, ephem.Moon( ephemNow ) )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-
+        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] ) )
+        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
 
         # Need to work out which phases occur by date rather than using the phase we calculate since the phase (illumination) rounds numbers
         # and so we enter a phase earlier than what is official.
         nextPhases = [ ]
-        nextPhases.append( [ self.localiseAndTrim( ephem.next_first_quarter_moon( ephem.now() ) ), "First Quarter: " ] )
-        nextPhases.append( [ self.localiseAndTrim( ephem.next_full_moon( ephem.now() ) ), "Full: " ] )
-        nextPhases.append( [ self.localiseAndTrim( ephem.next_last_quarter_moon( ephem.now() ) ), "Third Quarter: " ] )
-        nextPhases.append( [ self.localiseAndTrim( ephem.next_new_moon( ephem.now() ) ), "New: " ] )
+        nextPhases.append( [ self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) ), "First Quarter: " ] )
+        nextPhases.append( [ self.localiseAndTrim( ephem.next_full_moon( ephemNow ) ), "Full: " ] )
+        nextPhases.append( [ self.localiseAndTrim( ephem.next_last_quarter_moon( ephemNow ) ), "Third Quarter: " ] )
+        nextPhases.append( [ self.localiseAndTrim( ephem.next_new_moon( ephemNow ) ), "New: " ] )
         nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
         for phaseInformation in nextPhases:
             menuItem.get_submenu().append( Gtk.MenuItem( indent + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
@@ -217,8 +211,14 @@ class IndicatorLunar:
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
 
-        rising = city.next_rising( ephem.Sun() )
-        setting = city.next_setting( ephem.Sun() )
+        sun = ephem.Sun( ephemNow )
+
+        subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( sun )[ 1 ] ) )
+        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( sun.earth_distance, 4 ) ) + " AU" ) )
+
+        subMenu.append( Gtk.SeparatorMenuItem() )
+        rising = city.next_rising( sun )
+        setting = city.next_setting( sun )
         if rising > setting:
             subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( setting ) ) )
             subMenu.append( Gtk.MenuItem( "Rise: " + self.localiseAndTrim( rising ) ) )
@@ -229,8 +229,8 @@ class IndicatorLunar:
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Solstice/Equinox
-        equinox = ephem.next_equinox( ephem.now() )
-        solstice = ephem.next_solstice( ephem.now() )
+        equinox = ephem.next_equinox( ephemNow )
+        solstice = ephem.next_solstice( ephemNow )
         if equinox < solstice:
             subMenu.append( Gtk.MenuItem( "Equinox: " + self.localiseAndTrim( equinox ) ) )
             subMenu.append( Gtk.MenuItem( "Solstice: " + self.localiseAndTrim( solstice ) ) )
@@ -242,14 +242,14 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( "Planets" ) )
 
         planets = [
-            [ "Mercury", ephem.Mercury() ], 
-            [ "Venus", ephem.Venus() ], 
-            [ "Mars", ephem.Mars() ], 
-            [ "Jupiter", ephem.Jupiter() ], 
-            [ "Saturn", ephem.Saturn() ], 
-            [ "Uranus", ephem.Uranus() ], 
-            [ "Neptune", ephem.Neptune() ], 
-            [ "Pluto", ephem.Pluto() ] ]
+            [ "Mercury", ephem.Mercury( ephemNow ) ], 
+            [ "Venus", ephem.Venus( ephemNow ) ], 
+            [ "Mars", ephem.Mars( ephemNow ) ], 
+            [ "Jupiter", ephem.Jupiter( ephemNow ) ], 
+            [ "Saturn", ephem.Saturn( ephemNow ) ], 
+            [ "Uranus", ephem.Uranus( ephemNow ) ], 
+            [ "Neptune", ephem.Neptune( ephemNow ) ], 
+            [ "Pluto", ephem.Pluto( ephemNow ) ] ]
 
         for planet in planets:
             menuItem = Gtk.MenuItem( indent + planet[ 0 ] )
@@ -279,13 +279,12 @@ class IndicatorLunar:
 
 
     def createPlanetSubmenu( self, planetMenuItem, city, planet ):
-        planet.compute()
-
         subMenu = Gtk.Menu()
         subMenu.append( Gtk.MenuItem( "Illumination: " + str( int( round( planet.phase ) ) ) + "%" ) )
         subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( planet )[ 1 ] ) )
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( planet.earth_distance, 4 ) ) + " AU" ) )
         subMenu.append( Gtk.MenuItem( "Distance to Sun: " + str( round( planet.sun_distance, 4 ) ) + " AU" ) )
+        subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Must compute the previous information (illumination, constellation, phase and so on BEFORE rising/setting).
         # For some reason the values, most notably phase, are different (and wrong) if calculated AFTER rising/setting are calculated.
@@ -307,11 +306,10 @@ class IndicatorLunar:
         return localtimeString[ 0 : localtimeString.rfind( ":" ) + 3 ]
 
 
-    def calculateLunarPhase( self ):
-        nextFullMoonDate = ephem.next_full_moon( ephem.now() )
-        nextNewMoonDate = ephem.next_new_moon( ephem.now() )
-        moon = ephem.Moon()
-        moon.compute()
+    def calculateLunarPhase( self, ephemNow ):
+        nextFullMoonDate = ephem.next_full_moon( ephemNow )
+        nextNewMoonDate = ephem.next_new_moon( ephemNow )
+        moon = ephem.Moon( ephemNow )
         currentMoonPhase = int( round( ( moon.phase ) ) )
         phase = None
         if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which one is before the other.
@@ -671,55 +669,73 @@ class IndicatorLunar:
 
 
     def getCrescentGibbousMoonSVG( self, illumination, waning, northernHemisphere, crescent ):
-        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-        if ( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
-            sweepFlagCircle = str( 0 )
-            sweepFlagEllipse = str( 1 ) if crescent else str( 0 ) 
-        else:
-            sweepFlagCircle = str( 1 )
-            sweepFlagEllipse = str( 0 ) if crescent else str( 1 ) 
-
-        radius = self.getMoonRadius()
-        diameter = str( 2 * float( radius ) )
+        radius = float( self.getMoonRadius() )
+        diameter = 2 * radius
 
         # http://en.wikipedia.org/wiki/Crescent
         if crescent == True:
-            ellipseRadiusX = str( float( radius ) * ( 1 - illumination / 50 ) )
+            ellipseRadiusX = radius * ( 1 - illumination / 50 )
         else:
-            ellipseRadiusX = str( float( radius ) * ( illumination / 50 - 1 ) )
+            ellipseRadiusX = radius * ( illumination / 50 - 1 )
 
-        circle = 'a' + radius + ',' + radius + ' 0 0,' + sweepFlagCircle + ' 0,' + diameter
-        ellipse = 'a' + ellipseRadiusX + ',' + radius + ' 0 0,' + sweepFlagEllipse + ' 0,-' + diameter
-        svg = '<path d="M 50 50 v-' + radius + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
-        return self.getSVGHeader() + svg + self.getSVGFooter()
+        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
+        if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
+            sweepFlagCircle = str( 0 )
+            sweepFlagEllipse = str( 1 ) if crescent else str( 0 )
+        else:
+            sweepFlagCircle = str( 1 )
+            sweepFlagEllipse = str( 0 ) if crescent else str( 1 )
+
+        if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
+            x = 50
+        else:
+            # Northern and waxing OR southern and waning...
+            if crescent == True:
+                x = ( 50 - radius )
+            else:
+                x = ( 50 - radius ) + abs( ellipseRadiusX ) # Gibbous
+
+        circle = 'a' + str( radius ) + ',' + str( radius ) + ' 0 0,' + sweepFlagCircle + ' 0,' + str( diameter )
+        ellipse = 'a' + str( ellipseRadiusX ) + ',' + str( radius ) + ' 0 0,' + sweepFlagEllipse + ' 0,-' + str( diameter )
+        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
+
+        if crescent == True:
+            width = radius + 2 * ( 50 - radius )
+        else:
+            width = radius + abs( ellipseRadiusX ) + 2 * ( 50 - radius ) # Gibbous
+
+        return self.getSVGHeader( width ) + svg + self.getSVGFooter()
 
 
     def getQuarterMoonSVG( self, first, northernHemisphere ):
+        radius = float( self.getMoonRadius() )
+        diameter = 2 * radius
+
         # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-        if ( first == True and northernHemisphere == True ) or ( first == False and northernHemisphere == False ):
+        if( first == True and northernHemisphere == True ) or ( first == False and northernHemisphere == False ):
+            x = 50 - radius
             sweepFlag = str( 1 )
         else:
+            x = 50
             sweepFlag = str( 0 )
 
-        radius = self.getMoonRadius()
-        diameter = str( 2 * float( radius ) )
-        svg = '<path d="M 50 50 v-' + radius + ' a' + radius + ',' + radius + ' 0 0,' + sweepFlag + ' 0,' + diameter + ' z" fill="' + self.getColourForIconTheme() + '" />'
-        return self.getSVGHeader() + svg + self.getSVGFooter()
+        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' a' + str( radius ) + ',' + str( radius ) + ' 0 0,' + sweepFlag + ' 0,' + str( diameter ) + ' z" fill="' + self.getColourForIconTheme() + '" />'
+        return self.getSVGHeader( ( 50 - radius ) + 50 ) + svg + self.getSVGFooter()
 
 
     def getFullMoonSVG( self ):
         svg = '<circle cx="50" cy="50" r="' + self.getMoonRadius() + '" fill="' + self.getColourForIconTheme() + '" />'
-        return self.getSVGHeader() + svg + self.getSVGFooter()
+        return self.getSVGHeader( 100 ) + svg + self.getSVGFooter()
 
 
     def getNewMoonSVG( self ):
         svg = '<circle cx="50" cy="50" r="' + self.getMoonRadius() + '" fill="none" stroke="' + self.getColourForIconTheme() + '" stroke-width="2" />'
-        return self.getSVGHeader() + svg + self.getSVGFooter()
+        return self.getSVGHeader( 100 ) + svg + self.getSVGFooter()
 
 
-    def getSVGHeader( self ):
+    def getSVGHeader( self, width ):
         return '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' + str( width ) + ' 100">'
 
 
     def getSVGFooter( self ):
@@ -727,24 +743,23 @@ class IndicatorLunar:
 
 
     def getMoonRadius( self ):
-        # A radius of 50 is too big and 25 is too small, so choose half way!
-        return str( ( 50 - 25 ) / 2 + 25 )
+        return str( ( 50 - 25 ) / 2 + 25 ) # A radius of 50 is too big and 25 is too small, so choose half way!
 
 
     def getColourForIconTheme( self ):
         iconTheme = self.getIconTheme()
         if iconTheme is None:
             return "#fff200" # Use hicolor as a default.
-        
+
         if iconTheme == "elementary":
             return "#f4f4f4"
-        
+
         if iconTheme == "lubuntu":
             return "#5a5a5a"
-        
+
         if iconTheme == "ubuntu-mono-dark":
             return "#dfdbd2"
-        
+
         if iconTheme == "ubuntu-mono-light":
             return "#3c3c3c"
 
@@ -756,5 +771,4 @@ class IndicatorLunar:
 
 
 if __name__ == "__main__":
-    indicator = IndicatorLunar()
-    indicator.main()
+    IndicatorLunar().main()
