@@ -47,6 +47,7 @@ import os
 import shutil
 import sys
 import threading
+import time
 import webbrowser
 
 
@@ -54,7 +55,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.16"
+    VERSION = "1.0.17"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -239,13 +240,13 @@ class IndicatorPPADownloadStatistics:
             for publishedBinaryInfo in publishedBinaryInfos:
 
                 # A key to record architecture independent published binary packages which have already been added.
-                id = combinedKey + publishedBinaryInfo.getPackageName() + publishedBinaryInfo.getPackageVersion()
+                id_ = combinedKey + publishedBinaryInfo.getPackageName() + publishedBinaryInfo.getPackageVersion() # id is a reserved keyword!
 
                 if combinedKey not in combinedPPADownloadStatistics:
                     # This is the first occurrence of this combined PPA...
                     combinedPublishedBinaryInfo = PublishedBinaryInfo( publishedBinaryInfo.getPackageName(), publishedBinaryInfo.getPackageVersion(), publishedBinaryInfo.getDownloadCount(), publishedBinaryInfo.isArchitectureSpecific() )
                     combinedPPADownloadStatistics[ combinedKey ] = [ combinedPublishedBinaryInfo ]
-                    architectureIndependentPublishedBinaries.append( id )
+                    architectureIndependentPublishedBinaries.append( id_ )
                     continue
 
                 # This combined PPA already exists...see if a combined published binary exists which matches the current published binary...
@@ -261,10 +262,10 @@ class IndicatorPPADownloadStatistics:
                             # Architecture independent published binaries with the same name can have different versions.
                             # For example an older version may exist for Natty but a newer version exists for Precise.
                             # In this case the binaries (and their download counts) need to be uniquely counted.
-                            if not id in architectureIndependentPublishedBinaries:
+                            if not id_ in architectureIndependentPublishedBinaries:
                                 # This published binary has not yet been added in, so add it's download count to the running total.
                                 combinedPublishedBinaryInfo.setDownloadCount( publishedBinaryInfo.getDownloadCount() + combinedPublishedBinaryInfo.getDownloadCount( ) )
-                                architectureIndependentPublishedBinaries.append( id )
+                                architectureIndependentPublishedBinaries.append( id_ )
 
                         # If the versions do not match then wipe...
                         if combinedPublishedBinaryInfo.getPackageVersion() is not None: 
@@ -278,7 +279,7 @@ class IndicatorPPADownloadStatistics:
                 if not added:
                     combinedPublishedBinaryInfo = PublishedBinaryInfo( publishedBinaryInfo.getPackageName(), publishedBinaryInfo.getPackageVersion(), publishedBinaryInfo.getDownloadCount(), publishedBinaryInfo.isArchitectureSpecific() )
                     combinedPublishedBinaryInfos.append( combinedPublishedBinaryInfo )
-                    architectureIndependentPublishedBinaries.append( id )
+                    architectureIndependentPublishedBinaries.append( id_ )
 
         # Sort each list of published binaries...
         for key in combinedPPADownloadStatistics:
@@ -482,7 +483,7 @@ class IndicatorPPADownloadStatistics:
 
         grid.attach( architectures, 1, 3, 1, 1 )
 
-        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog = Gtk.Dialog( title, None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( grid, True, True, 0 )
         self.dialog.set_border_width( 5 )
 
@@ -677,7 +678,7 @@ class IndicatorPPADownloadStatistics:
                 logging.error( "Error reading settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
         else:
             # No properties file exists, so populate with a sample PPA to give the user an idea of the format.
-            ppaList = [ "thebernmeister", "ppa", "precise", "i386" ]
+            ppaList = [ "thebernmeister", "ppa", "precise", "amd64" ]
             self.ppaInfos[ self.getPPAKey( ppaList ) ] = PPAInfo( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
 
         for key in self.ppaInfos:
@@ -740,37 +741,20 @@ class IndicatorPPADownloadStatistics:
     #}
     def getPPADownloadStatistics( self, ppaInfos ):
         ppaDownloadStatistics = { }
+        threads = []
         for key in ppaInfos:
             ppaUser = ppaInfos[ key ].getUser()
             ppaName = ppaInfos[ key ].getName()
             series = ppaInfos[ key ].getSeries()
             architecture = ppaInfos[ key ].getArchitecture()
-            try:
-                url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + series + "/" + architecture
-                publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
-                numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
-                if numberOfPublishedBinaries == 0:
-                    ppaDownloadStatistics[ key ] = "(no information)"
-                    continue
 
-                for i in range( numberOfPublishedBinaries ):
-                    binaryPackageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
-                    binaryPackageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
-                    architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
-                    indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
-                    binaryPackageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
-                    url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "/+binarypub/" + binaryPackageId + "?ws.op=getDownloadCount"
-                    downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
-                    publishedBinaryInfo = PublishedBinaryInfo( binaryPackageName, binaryPackageVersion, downloadCount, architectureSpecific )
-                    publishedBinaryInfos = ppaDownloadStatistics.get( key )
-                    if publishedBinaryInfos is None:
-                        ppaDownloadStatistics[ key ] = [ publishedBinaryInfo ]
-                    else:
-                        publishedBinaryInfos.append( publishedBinaryInfo )
-                        ppaDownloadStatistics[ key ] = publishedBinaryInfos
+            t = Thread( target = self.getPublishedBinaries, args = ( key, ppaUser, ppaName, series, architecture, ppaDownloadStatistics ), )
+            time.sleep( 0.5 ) # Space out the requests...
+            threads.append( t )
+            t.start()
 
-            except Exception as e:
-                ppaDownloadStatistics[ key ] = "(error retrieving PPA)"
+        for t in threads:
+            t.join()
 
         self.lock.acquire()
 
@@ -784,6 +768,60 @@ class IndicatorPPADownloadStatistics:
             self.lock.release()
 
         gobject.idle_add( self.buildMenu )
+
+
+    def getPublishedBinaries( self, key, ppaUser, ppaName, series, architecture, ppaDownloadStatistics ):
+        threads = []
+        try:
+            url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + series + "/" + architecture
+            publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
+            numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
+            if numberOfPublishedBinaries == 0:
+                self.lock.acquire()
+                ppaDownloadStatistics[ key ] = "(no information)"
+                self.lock.release()
+            else:
+                for i in range( numberOfPublishedBinaries ):
+                    binaryPackageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
+                    binaryPackageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
+                    architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
+                    indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
+                    binaryPackageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
+
+                    t = Thread( target = self.getDownloadCount, args = ( key, ppaUser, ppaName, binaryPackageName, binaryPackageVersion, architectureSpecific, binaryPackageId, ppaDownloadStatistics ), )
+                    time.sleep( 0.5 ) # Space out the requests...
+                    threads.append( t )
+                    t.start()
+
+                for t in threads:
+                    t.join()
+
+        except Exception:
+            self.lock.acquire()
+            ppaDownloadStatistics[ key ] = "(error retrieving PPA)"
+            self.lock.release()
+
+
+    def getDownloadCount( self, key, ppaUser, ppaName, binaryPackageName, binaryPackageVersion, architectureSpecific, binaryPackageId, ppaDownloadStatistics ):
+        try:
+            url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "/+binarypub/" + binaryPackageId + "?ws.op=getDownloadCount"
+            downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
+            publishedBinaryInfo = PublishedBinaryInfo( binaryPackageName, binaryPackageVersion, downloadCount, architectureSpecific )
+            publishedBinaryInfos = ppaDownloadStatistics.get( key )
+            if publishedBinaryInfos is None:
+                self.lock.acquire()
+                ppaDownloadStatistics[ key ] = [ publishedBinaryInfo ]
+                self.lock.release()
+            else:
+                self.lock.acquire()
+                publishedBinaryInfos.append( publishedBinaryInfo )
+                ppaDownloadStatistics[ key ] = publishedBinaryInfos
+                self.lock.release()
+
+        except Exception:
+            self.lock.acquire()
+            ppaDownloadStatistics[ key ] = "(error retrieving PPA)"
+            self.lock.release()
 
 
     def requestPPADownloadAndMenuRefresh( self ):
@@ -874,5 +912,4 @@ class PublishedBinaryInfo:
 
 
 if __name__ == "__main__":
-    indicator = IndicatorPPADownloadStatistics()
-    indicator.main()
+    IndicatorPPADownloadStatistics().main()
