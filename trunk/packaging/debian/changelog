@@ -1,3 +1,12 @@
+indicator-ppa-download-statistics (1.0.18-1) precise; urgency=low
+
+  * Using threads for each statistic sometimes results in the package names being
+    out of (alphabetical) order...now fixed.
+  * Added logging to exceptions.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 20 Dec 2012 13:17:50 +1000
+
+
 indicator-ppa-download-statistics (1.0.17-1) precise; urgency=low
 
   * Fixed the add/edit PPA dialog to show the correct title (was erroneously

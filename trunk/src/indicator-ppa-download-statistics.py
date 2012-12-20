@@ -55,7 +55,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.17"
+    VERSION = "1.0.18"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -285,7 +285,7 @@ class IndicatorPPADownloadStatistics:
         for key in combinedPPADownloadStatistics:
             combinedPublishedBinaries = combinedPPADownloadStatistics.get( key )
             if type( combinedPublishedBinaries ) is PublishedBinaryInfo:
-                combinedPublishedBinariesNew = sorted( combinedPublishedBinaries, key=lambda combinedPublishedBinary: combinedPublishedBinary.packageName )
+                combinedPublishedBinariesNew = sorted( combinedPublishedBinaries, key = lambda combinedPublishedBinary: combinedPublishedBinary.packageName )
                 combinedPPADownloadStatistics[ key ] = combinedPublishedBinariesNew
 
         return combinedPPADownloadStatistics        
@@ -796,7 +796,11 @@ class IndicatorPPADownloadStatistics:
                 for t in threads:
                     t.join()
 
-        except Exception:
+                # The thread responses may not come back in order, so need to sort the packages...
+                ppaDownloadStatistics[ key ] = sorted( ppaDownloadStatistics.get( key ), key = lambda publishedBinaryInfo: publishedBinaryInfo.packageName )
+
+        except Exception as e:
+            logging.exception( e )
             self.lock.acquire()
             ppaDownloadStatistics[ key ] = "(error retrieving PPA)"
             self.lock.release()
@@ -818,7 +822,8 @@ class IndicatorPPADownloadStatistics:
                 ppaDownloadStatistics[ key ] = publishedBinaryInfos
                 self.lock.release()
 
-        except Exception:
+        except Exception as e:
+            logging.exception( e )
             self.lock.acquire()
             ppaDownloadStatistics[ key ] = "(error retrieving PPA)"
             self.lock.release()
