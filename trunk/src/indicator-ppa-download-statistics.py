@@ -682,7 +682,7 @@ class IndicatorPPADownloadStatistics:
             self.ppaInfos[ self.getPPAKey( ppaList ) ] = PPAInfo( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
 
         for key in self.ppaInfos:
-            self.ppaDownloadStatistics[ key ] = "(no information)"
+            self.ppaDownloadStatistics[ key ] = "(downloading data...)"
 
 
     def saveSettings( self ):
