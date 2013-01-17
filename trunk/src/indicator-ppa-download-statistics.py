@@ -55,7 +55,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.18"
+    VERSION = "1.0.19"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -781,17 +781,28 @@ class IndicatorPPADownloadStatistics:
                 ppaDownloadStatistics[ key ] = "(no information)"
                 self.lock.release()
             else:
+                # The results are returned in lots of 75...so need to retrieve each lot after the first 75.
+                index = 0
+                resultPage = 1
+                resultsPerUrl = 75
                 for i in range( numberOfPublishedBinaries ):
-                    binaryPackageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
-                    binaryPackageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
-                    architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
-                    indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
-                    binaryPackageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
+                    if i == ( resultPage * resultsPerUrl ):
+                        newURL = url + "&ws.start=" + str( resultPage * resultsPerUrl )
+                        publishedBinaries = json.loads( urlopen( newURL ).read().decode( "utf8" ) )
+                        resultPage += 1
+                        index = 0
+
+                    binaryPackageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
+                    binaryPackageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
+                    architectureSpecific = publishedBinaries[ "entries" ][ index ][ "architecture_specific" ]
+                    indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
+                    binaryPackageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
 
                     t = Thread( target = self.getDownloadCount, args = ( key, ppaUser, ppaName, binaryPackageName, binaryPackageVersion, architectureSpecific, binaryPackageId, ppaDownloadStatistics ), )
                     time.sleep( 0.5 ) # Space out the requests...
                     threads.append( t )
                     t.start()
+                    index += 1
 
                 for t in threads:
                     t.join()
