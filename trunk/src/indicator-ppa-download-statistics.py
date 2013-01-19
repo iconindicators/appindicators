@@ -40,6 +40,7 @@ from gi.repository import Gtk
 from threading import Thread
 from urllib.request import urlopen
 
+import itertools
 import json
 import locale
 import logging
@@ -69,8 +70,12 @@ class IndicatorPPADownloadStatistics:
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_PPAS = "ppas"
     SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER = "allowMenuItemsToLaunchBrowser"
+    SETTINGS_SORT_BY_DOWNLOAD = "sortByDownload"
+    SETTINGS_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
     SETTINGS_COMBINE_PPAS = "combinePPAs"
     SETTINGS_SHOW_SUBMENU = "showSubmenu"
+
+    DOWNLOADING_DATA = "(downloading data...)"
 
 
     def __init__( self ):
@@ -122,8 +127,12 @@ class IndicatorPPADownloadStatistics:
         # Add PPAs to the menu...
         ppas = self.getPPAsSorted( self.combinePPAs )
         ppaDownloadStatistics = self.ppaDownloadStatistics
+
         if self.combinePPAs == True:
             ppaDownloadStatistics = self.getCombinedPPAs()
+
+        if self.sortByDownload == True:
+            ppaDownloadStatistics = self.getClippedPPAs( ppas, ppaDownloadStatistics )
 
         indent = "    "
         if self.showSubmenu == True:
@@ -223,14 +232,13 @@ class IndicatorPPADownloadStatistics:
 
     def getCombinedPPAs( self ):
         combinedPPADownloadStatistics = { }
-
         ppas = self.getPPAsSorted( False )
         architectureIndependentPublishedBinaries = [ ] # Used to manage the download counts of architecture independent published binaries.
         for ppa in ppas:
             combinedKey = ppa[ : ppa.find( " | ", ppa.find( " | " ) + 1 ) ] # The combined ppa is 'ppaUser | ppaName | series | architecture' stripped down to 'ppaUser | ppaName'.
             publishedBinaryInfos = self.ppaDownloadStatistics.get( ppa )
 
-            if type( publishedBinaryInfos ) is str: # This is a string message (either 'no information' or 'error retrieving PPA'.
+            if type( publishedBinaryInfos ) is str: # This is a string message (either 'downloading data' or 'no information' or 'error retrieving PPA').
                 if combinedKey not in combinedPPADownloadStatistics:
                     combinedPPADownloadStatistics[ combinedKey ] = publishedBinaryInfos # Only put in the string message if no other data exists.
 
@@ -289,6 +297,20 @@ class IndicatorPPADownloadStatistics:
                 combinedPPADownloadStatistics[ key ] = combinedPublishedBinariesNew
 
         return combinedPPADownloadStatistics        
+
+
+    def getClippedPPAs( self, ppas, ppaDownloadStatistics ):
+        clippedPPADownloadStatistics = { }
+        for ppa in ppas:
+            publishedBinaryInfos = ppaDownloadStatistics.get( ppa )
+            if type( publishedBinaryInfos ) is str: # This is a string message (either 'downloading data' or 'no information' or 'error retrieving PPA').
+                clippedPPADownloadStatistics[ ppa ] = publishedBinaryInfos
+                continue
+
+            publishedBinaryInfosSortedByDownloadCount = sorted( ppaDownloadStatistics.get( ppa ), key = lambda publishedBinaryInfo: publishedBinaryInfo.downloadCount, reverse = True )
+            clippedPPADownloadStatistics[ ppa ] = publishedBinaryInfosSortedByDownloadCount[ : self.sortByDownloadAmount ]
+
+        return clippedPPADownloadStatistics        
 
 
     def getPPAsSorted( self, combined ):
@@ -591,6 +613,9 @@ class IndicatorPPADownloadStatistics:
         if self.dialog is not None:
             return
 
+        notebook = Gtk.Notebook()
+
+        # First tab - display settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -601,7 +626,7 @@ class IndicatorPPADownloadStatistics:
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show as submenus" )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
-        grid.attach( showAsSubmenusCheckbox, 0, 0, 1, 1 )
+        grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
         combinaPPAsCheckbox = Gtk.CheckButton( "Combine PPAs" )
         toolTip = "Combines the statistics when the PPA user/name are the same.\n\n"
@@ -610,19 +635,51 @@ class IndicatorPPADownloadStatistics:
         toolTip += "The version number is retained only if it is identical across all instances of a published binary."
         combinaPPAsCheckbox.set_tooltip_text( toolTip )
         combinaPPAsCheckbox.set_active( self.combinePPAs )
-        grid.attach( combinaPPAsCheckbox, 0, 1, 1, 1 )
+        grid.attach( combinaPPAsCheckbox, 0, 1, 2, 1 )
+
+        sortByDownloadCheckbox = Gtk.CheckButton( "Sort By Download" )
+        sortByDownloadCheckbox.set_tooltip_text( "Sort by download within each PPA." )
+        sortByDownloadCheckbox.set_active( self.sortByDownload )
+        grid.attach( sortByDownloadCheckbox, 0, 2, 2, 1 )
+
+        label = Gtk.Label( "  Clip Amount" )
+        label.set_sensitive( sortByDownloadCheckbox.get_active() )
+        label.set_margin_left( 15 )
+        grid.attach( label, 0, 3, 1, 1 )
+
+        spinner = Gtk.SpinButton()
+        spinner.set_adjustment( Gtk.Adjustment( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) )
+        spinner.set_tooltip_text( "Limit the number of entries when sorting by download." )
+        spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
+        spinner.set_hexpand( True )
+        grid.attach( spinner, 1, 3, 1, 1 )
+
+        sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
+
+        notebook.append_page( grid, Gtk.Label( "Display" ) )
+
+        # Second  tab - general settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
+        grid.attach( autostartCheckbox, 0, 0, 1, 1 )
 
         allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Load PPA page on selection" )
         allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item launches the default web browser and loads the PPA home page." )
         allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
-        grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 2, 1, 1 )
+        grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 1, 1, 1 )
 
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 3, 1, 1 )
+        notebook.append_page( grid, Gtk.Label( "General" ) )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( grid, True, True, 0 )
+        self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.show_all()
 
@@ -630,6 +687,8 @@ class IndicatorPPADownloadStatistics:
         if response == Gtk.ResponseType.OK:
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinaPPAsCheckbox.get_active()
+            self.sortByDownload = sortByDownloadCheckbox.get_active()
+            self.sortByDownloadAmount = spinner.get_value_as_int()
             self.allowMenuItemsToLaunchBrowser = allowMenuItemsToLaunchBrowserCheckbox.get_active()
             self.saveSettings()
 
@@ -652,8 +711,15 @@ class IndicatorPPADownloadStatistics:
         self.dialog = None
 
 
+    def onClipByDownloadCheckbox( self, source, spinner, label ):
+        label.set_sensitive( source.get_active() )
+        spinner.set_sensitive( source.get_active() )
+
+
     def loadSettings( self ):
         self.allowMenuItemsToLaunchBrowser = True
+        self.sortByDownload = False
+        self.sortByDownloadAmount = 3
         self.combinePPAs = False
         self.showSubmenu = False
         self.ppaInfos = { }
@@ -670,6 +736,8 @@ class IndicatorPPADownloadStatistics:
                     self.ppaInfos[ key ] = PPAInfo( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
 
                 self.allowMenuItemsToLaunchBrowser = settings.get( IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER, self.allowMenuItemsToLaunchBrowser )
+                self.sortByDownload = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD, self.sortByDownload )
+                self.sortByDownloadAmount = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT, self.sortByDownloadAmount )
                 self.combinePPAs = settings.get( IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS, self.combinePPAs )
                 self.showSubmenu = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
 
@@ -682,7 +750,7 @@ class IndicatorPPADownloadStatistics:
             self.ppaInfos[ self.getPPAKey( ppaList ) ] = PPAInfo( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
 
         for key in self.ppaInfos:
-            self.ppaDownloadStatistics[ key ] = "(downloading data...)"
+            self.ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.DOWNLOADING_DATA
 
 
     def saveSettings( self ):
@@ -694,6 +762,8 @@ class IndicatorPPADownloadStatistics:
             settings = {
                 IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER: self.allowMenuItemsToLaunchBrowser,
                 IndicatorPPADownloadStatistics.SETTINGS_PPAS: ppas,
+                IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD: self.sortByDownload,
+                IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT: self.sortByDownloadAmount,
                 IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS: self.combinePPAs,
                 IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU: self.showSubmenu
             }

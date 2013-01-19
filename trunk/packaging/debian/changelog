@@ -2,6 +2,8 @@ indicator-ppa-download-statistics (1.0.19-1) precise; urgency=low
 
   * Now handles the retrieval of result sets larger than 75.
   * Changed the initial (no information...) text to (downloading data...).
+  * Added option to sort within each PPA by download amount (and truncate the
+    results).
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 17 Jan 2013 16:30:00 +1000
 
