@@ -4,6 +4,7 @@ indicator-ppa-download-statistics (1.0.19-1) precise; urgency=low
   * Changed the initial (no information...) text to (downloading data...).
   * Added option to sort within each PPA by download amount (and truncate the
     results).
+  * Thanks to Boaz Dodin for spotting the bug and suggesting the truncate/sort. 
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 17 Jan 2013 16:30:00 +1000
 
