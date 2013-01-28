@@ -34,7 +34,7 @@ try:
 except:
     pass
 
-from gi.repository import GObject as gobject
+from gi.repository import GLib
 from gi.repository import Gtk
 
 import json
@@ -50,7 +50,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.16"
+    VERSION = "1.0.17"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -91,7 +91,7 @@ class IndicatorVirtualBox:
 
 
     def main( self ):
-        self.timeoutID = gobject.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
+        self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
         Gtk.main()
 
 
@@ -312,7 +312,7 @@ class IndicatorVirtualBox:
 
 
     def onRefresh( self ):
-        gobject.idle_add( self.buildMenu )
+        GLib.idle_add( self.buildMenu )
         return True # Must return true so that we continue to be called (http://www.pygtk.org/pygtk2reference/gobject-functions.html#function-gi--timeout-add).
 
 
@@ -463,8 +463,8 @@ class IndicatorVirtualBox:
             self.sortDefault = not sortAlphabeticallyCheckbox.get_active()
 
             self.refreshIntervalInMinutes = spinner.get_value_as_int()
-            gobject.source_remove( self.timeoutID )
-            self.timeoutID = gobject.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
+            GLib.source_remove( self.timeoutID )
+            self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
 
             self.saveSettings()
 

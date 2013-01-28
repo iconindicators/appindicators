@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.17-1) precise; urgency=low
+
+  * Replaced deprecated GObject calls with GLib.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 17 Jan 2013 16:30:00 +1000   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
 indicator-virtual-box (1.0.16-1) precise; urgency=low
 
   * Added python3-gi to debian/control Depends (for Precise support).
