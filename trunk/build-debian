@@ -23,7 +23,7 @@
 
 BUILD_DIR="build"
 NAME="indicator-stardate"
-VERSION=1.0.10
+VERSION=1.0.11
 
 rm -rf $BUILD_DIR
 

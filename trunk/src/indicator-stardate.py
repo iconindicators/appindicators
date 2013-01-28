@@ -29,7 +29,7 @@ try:
 except:
     pass
 
-from gi.repository import GObject as gobject
+from gi.repository import GLib
 from gi.repository import Gtk
 
 import datetime
@@ -45,7 +45,7 @@ class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.10"
+    VERSION = "1.0.11"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -115,7 +115,7 @@ class IndicatorStardate:
         if period < 1:
             period = 1
 
-        gobject.timeout_add_seconds( period, self.update )
+        GLib.timeout_add_seconds( period, self.update )
 
         Gtk.main()
 
