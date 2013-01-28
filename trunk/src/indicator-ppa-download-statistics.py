@@ -34,8 +34,7 @@ try:
 except:
     pass
 
-from gi.repository import Gdk
-from gi.repository import GObject as gobject
+from gi.repository import GLib
 from gi.repository import Gtk
 from threading import Thread
 from urllib.request import urlopen
@@ -56,7 +55,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.19"
+    VERSION = "1.0.20"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -76,6 +75,7 @@ class IndicatorPPADownloadStatistics:
     SETTINGS_SHOW_SUBMENU = "showSubmenu"
 
     DOWNLOADING_DATA = "(downloading data...)"
+    ERROR_RETRIEVING_PPA = "(error retrieving PPA)"
 
 
     def __init__( self ):
@@ -84,8 +84,7 @@ class IndicatorPPADownloadStatistics:
         self.request = False
         self.updateThread = None
 
-        Gdk.threads_init()
-        gobject.threads_init()
+        GLib.threads_init()
         self.lock = threading.Lock()
 
         logging.basicConfig( file = sys.stderr, level = logging.INFO )
@@ -110,7 +109,7 @@ class IndicatorPPADownloadStatistics:
 
     def main( self ):
         self.requestPPADownloadAndMenuRefresh()
-        gobject.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh ) # Auto update every 6 hours.
+        GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh ) # Auto update every 6 hours.
         Gtk.main()
 
 
@@ -544,7 +543,7 @@ class IndicatorPPADownloadStatistics:
                     self.ppaInfos[ key ] = PPAInfo( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
 
                 self.saveSettings()
-                gobject.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
+                GLib.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
                 self.requestPPADownloadAndMenuRefresh()
 
             break
@@ -601,7 +600,7 @@ class IndicatorPPADownloadStatistics:
         if response == Gtk.ResponseType.OK:
             del self.ppaInfos[ widget.props.name ]
             self.saveSettings()
-            gobject.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
+            GLib.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
 
             if self.combinePPAs == True: # Only makes sense to do a download if PPAs are combined...
                 self.requestPPADownloadAndMenuRefresh()
@@ -705,7 +704,7 @@ class IndicatorPPADownloadStatistics:
                     os.remove( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
                 except: pass
 
-            gobject.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
+            GLib.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
 
         self.dialog.destroy()
         self.dialog = None
@@ -837,7 +836,7 @@ class IndicatorPPADownloadStatistics:
         else:
             self.lock.release()
 
-        gobject.idle_add( self.buildMenu )
+        GLib.idle_add( self.buildMenu )
 
 
     def getPublishedBinaries( self, key, ppaUser, ppaName, series, architecture, ppaDownloadStatistics ):
@@ -883,7 +882,7 @@ class IndicatorPPADownloadStatistics:
         except Exception as e:
             logging.exception( e )
             self.lock.acquire()
-            ppaDownloadStatistics[ key ] = "(error retrieving PPA)"
+            ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.ERROR_RETRIEVING_PPA
             self.lock.release()
 
 
@@ -906,7 +905,7 @@ class IndicatorPPADownloadStatistics:
         except Exception as e:
             logging.exception( e )
             self.lock.acquire()
-            ppaDownloadStatistics[ key ] = "(error retrieving PPA)"
+            ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.ERROR_RETRIEVING_PPA
             self.lock.release()
 
 
