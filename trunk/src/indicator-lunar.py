@@ -31,7 +31,7 @@ try:
 except:
     pass
 
-from gi.repository import GObject as gobject
+from gi.repository import GLib
 from gi.repository import Gtk
 
 notifyImported = True
@@ -63,7 +63,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.17"
+    VERSION = "1.0.18"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -136,7 +136,7 @@ class IndicatorLunar:
 
     def main( self ):
         self.update()
-        gobject.timeout_add_seconds( 60 * 60, self.update )
+        GLib.timeout_add_seconds( 60 * 60, self.update )
         Gtk.main()
 
 
