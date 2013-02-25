@@ -826,7 +826,6 @@ class IndicatorPPADownloadStatistics:
             t.join()
 
         self.lock.acquire()
-
         self.ppaDownloadStatistics = ppaDownloadStatistics
         self.updateThread = None
         if self.request == True:
@@ -841,14 +840,12 @@ class IndicatorPPADownloadStatistics:
 
     def getPublishedBinaries( self, key, ppaUser, ppaName, series, architecture, ppaDownloadStatistics ):
         threads = []
+        url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + series + "/" + architecture
         try:
-            url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + series + "/" + architecture
             publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
             numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
             if numberOfPublishedBinaries == 0:
-                self.lock.acquire()
                 ppaDownloadStatistics[ key ] = "(no information)"
-                self.lock.release()
             else:
                 # The results are returned in lots of 75...so need to retrieve each lot after the first 75.
                 index = 0
@@ -887,20 +884,22 @@ class IndicatorPPADownloadStatistics:
 
 
     def getDownloadCount( self, key, ppaUser, ppaName, binaryPackageName, binaryPackageVersion, architectureSpecific, binaryPackageId, ppaDownloadStatistics ):
+        url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "/+binarypub/" + binaryPackageId + "?ws.op=getDownloadCount"
         try:
-            url = "https://api.launchpad.net/1.0/~" + ppaUser + "/+archive/" + ppaName + "/+binarypub/" + binaryPackageId + "?ws.op=getDownloadCount"
             downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
-            publishedBinaryInfo = PublishedBinaryInfo( binaryPackageName, binaryPackageVersion, downloadCount, architectureSpecific )
-            publishedBinaryInfos = ppaDownloadStatistics.get( key )
-            if publishedBinaryInfos is None:
-                self.lock.acquire()
-                ppaDownloadStatistics[ key ] = [ publishedBinaryInfo ]
-                self.lock.release()
+            self.lock.acquire()
+            if str( downloadCount ).isnumeric():
+                publishedBinaryInfo = PublishedBinaryInfo( binaryPackageName, binaryPackageVersion, downloadCount, architectureSpecific )
+                publishedBinaryInfos = ppaDownloadStatistics.get( key )
+                if publishedBinaryInfos is None:
+                    ppaDownloadStatistics[ key ] = [ publishedBinaryInfo ]
+                elif ppaDownloadStatistics[ key ] != IndicatorPPADownloadStatistics.ERROR_RETRIEVING_PPA: # If we had an error before, don't overwrite it.
+                    publishedBinaryInfos.append( publishedBinaryInfo )
+                    ppaDownloadStatistics[ key ] = publishedBinaryInfos
             else:
-                self.lock.acquire()
-                publishedBinaryInfos.append( publishedBinaryInfo )
-                ppaDownloadStatistics[ key ] = publishedBinaryInfos
-                self.lock.release()
+                ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.ERROR_RETRIEVING_PPA
+
+            self.lock.release()
 
         except Exception as e:
             logging.exception( e )
@@ -911,7 +910,6 @@ class IndicatorPPADownloadStatistics:
 
     def requestPPADownloadAndMenuRefresh( self ):
         self.lock.acquire()
-
         if self.updateThread is None:
             self.updateThread = Thread( target = self.getPPADownloadStatistics, args = ( deepcopy( self.ppaInfos ), ) )
             self.updateThread.start()
