@@ -18,22 +18,30 @@ import datetime
 import stardate
 
 # Exercise the Stardate API.
-
+now = datetime.datetime.now()
 currentStardate = stardate.Stardate()
-
 print( "Stardate API version: " + currentStardate.getVersion() )
 
-stardateIssue = -28
-stardateInteger = 6857
-stardateFraction = 59
-currentStardate.setStardate( stardateIssue, stardateInteger, stardateFraction )
-print( "Stardate [" + str( stardateIssue ) + "] " + str( stardateInteger ) + "." + str( stardateFraction ) + " = " + currentStardate.toGregorianString() )
+# Test 'classic' stardate.
+currentStardate.setGregorian( now )
+print( str( now.year ) + "/" + str( now.month ) + "/" + str( now.day ) + " " + 
+       str( now.hour ) + ":" + str( now.minute ) + ":" + str( now.second ) + " (y/m/d h:m:s) = " + 
+       currentStardate.toStardateString( True ) + " 'classic'" )
 
-gregorianYear = 2012
-gregorianMonth = 6
-gregorianDay = 11
-gregorianHour = 16
-gregorianMinute = 49
-gregorianSecond = 20
-currentStardate.setGregorian( datetime.datetime( gregorianYear, gregorianMonth, gregorianDay, gregorianHour, gregorianMinute, gregorianSecond ) )
-print( "Gregorian " + str( gregorianYear ) + "/" + str( gregorianMonth ) + "/" + str( gregorianDay ) + " " + str( gregorianHour ) + ":" + str( gregorianMinute ) + ":" + str( gregorianSecond ) + " (y/m/d h:m:s) = " + currentStardate.toStardateString( False, True ) )
+currentStardate.setStardateClassic( currentStardate.getStardateIssue(), currentStardate.getStardateInteger(), currentStardate.getStardateFraction() )
+print( "[" + str( currentStardate.getStardateIssue() ) + "] " + 
+       str( currentStardate.getStardateInteger() ) + "." + 
+       str( currentStardate.getStardateFraction() ) + " 'classic' = " + 
+       currentStardate.toGregorianString() )
+
+# Test '2009 revised' stardate.
+currentStardate.setClassic( False )
+currentStardate.setGregorian( now )
+print( str( now.year ) + "/" + str( now.month ) + "/" + str( now.day ) + " " + 
+       str( now.hour ) + ":" + str( now.minute ) + ":" + str( now.second ) + " (y/m/d h:m:s) = " + 
+       currentStardate.toStardateString( True ) + " '2009 revised'" )
+
+currentStardate.setStardate2009Revised( currentStardate.getStardateInteger(), currentStardate.getStardateFraction() )
+print( str( currentStardate.getStardateInteger() ) + "." + 
+       str( currentStardate.getStardateFraction() ) + " '2009 revised' = " + 
+       currentStardate.toGregorianString() )
