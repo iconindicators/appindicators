@@ -112,7 +112,7 @@ class Stardate:
         return self.classic
 
 
-    # Sets a Gregorian date/time object for conversion to a ('classic' and '2009 revised') stardate.
+    # Sets a Gregorian date/time object for conversion to a ('classic' or '2009 revised') stardate.
     # Note the 'classic' status must be set PRIOR to setting the Gregorian date/time.
     #
     #  gregorianDateTime A Gregorian date/time to be converted to a stardate (1900 <= year <= 9500).
@@ -131,8 +131,7 @@ class Stardate:
         return True
 
 
-    # Sets a 'classic' issue/integer/fraction for conversion to a Gregorian date/time.
-    # This stardate format is the Andrew Main version.
+    # Sets a 'classic' stardate for conversion to a Gregorian date/time.
     #
     # Rules:
     #  issue <= 19: 0 <= integer <= 9999, fraction >= 0. 
@@ -158,8 +157,7 @@ class Stardate:
         return True
 
 
-    # Sets an '2009 revised' integer/fraction for conversion to a Gregorian date/time.
-    # This stardate format is revised version for the 2009 movie.
+    # Sets a '2009 revised' stardate for conversion to a Gregorian date/time.
     #
     #  integer The integer part of a stardate.
     #  fraction The fractional part of a stardate.
@@ -180,15 +178,15 @@ class Stardate:
     def getStardateIssue( self ): return self.stardateIssue
 
 
-    # Returns the current ('classic' and '2009 revised') stardate integer value.
+    # Returns the current ('classic' or '2009 revised') stardate integer value.
     def getStardateInteger( self ): return self.stardateInteger
 
 
-    # Returns the current ('classic' and '2009 revised') stardate fraction value.
+    # Returns the current ('classic' or '2009 revised') stardate fraction value.
     def getStardateFraction( self ): return self.stardateFraction
 
 
-    # Returns the current value of the ('classic' and '2009 revised') stardate in string format.
+    # Returns the current value of the ('classic' or '2009 revised') stardate in string format.
     #
     #  showIssue If true, the issue part of the 'classic' stardate will be included.
     def toStardateString( self, showIssue ):
