@@ -55,6 +55,7 @@ class IndicatorStardate:
     DESKTOP_FILE = NAME + ".desktop"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_SHOW_CLASSIC = "showClassic"
     SETTINGS_SHOW_ISSUE = "showIssue"
 
 
@@ -121,8 +122,9 @@ class IndicatorStardate:
 
 
     def update( self ):
+        self.stardate.setClassic( self.showClassic )
         self.stardate.setGregorian( datetime.datetime.now() )
-        s = self.stardate.toStardateString( False, self.showIssue )
+        s = self.stardate.toStardateString( self.showIssue )
 
         if self.appindicatorImported == True:
             self.indicator.set_label( s, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
@@ -166,13 +168,23 @@ class IndicatorStardate:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
+        showClassicCheckbox = Gtk.CheckButton( "'classic' Stardate" )
+        showClassicCheckbox.set_active( self.showClassic )
+        showClassicCheckbox.set_tooltip_text( "Checked: 'classic' conversion is used (STARDATES IN STAR TREK FAQ V1.6 by Andrew Main).\n\nUnchecked: '2009 revised' conversion is used (http://en.wikipedia.org/wiki/Stardate)." )
+        grid.attach( showClassicCheckbox, 0, 0, 2, 1 )
+
         showIssueCheckbox = Gtk.CheckButton( "Show ISSUE" )
         showIssueCheckbox.set_active( self.showIssue )
-        grid.attach( showIssueCheckbox, 0, 0, 1, 1 )
+        showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
+        showIssueCheckbox.set_margin_left( 15 )
+        showIssueCheckbox.set_tooltip_text( "Show the ISSUE of the stardate" )
+        grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
+
+        showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox )
 
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 1, 1, 1 )
+        grid.attach( autostartCheckbox, 0, 2, 2, 1 )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( grid, True, True, 0 )
@@ -181,6 +193,7 @@ class IndicatorStardate:
 
         response = self.dialog.run()
         if response == Gtk.ResponseType.OK:
+            self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
             self.saveSettings()
 
@@ -203,7 +216,12 @@ class IndicatorStardate:
         self.dialog = None
 
 
+    def onShowClassicCheckbox( self, source, showIssueCheckbox ):
+        showIssueCheckbox.set_sensitive( source.get_active() )
+
+
     def loadSettings( self ):
+        self.showClassic = True
         self.showIssue = True
 
         if os.path.isfile( IndicatorStardate.SETTINGS_FILE ):
@@ -220,7 +238,10 @@ class IndicatorStardate:
 
     def saveSettings( self ):
         try:
-            settings = { IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showIssue }
+            settings = {
+                IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showClassic,
+                IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showIssue
+            }
             with open( IndicatorStardate.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 
@@ -230,5 +251,4 @@ class IndicatorStardate:
 
 
 if __name__ == "__main__":
-    indicator = IndicatorStardate()
-    indicator.main()
+    IndicatorStardate().main()
