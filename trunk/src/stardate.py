@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -93,8 +93,8 @@ class Stardate:
 
     # Gets the period (in seconds) between updates/changes to the current stardate.
     def getStardateFractionalPeriod( self ):
-        if self.classic == True:
-            return ( 1.0 / ( self.stardateRates[ self.index ] / 24.0 / 60.0 / 60.0 ) / 10.0 )
+        if self.classic:
+            return int( 1.0 / ( self.stardateRates[ self.index ] / 24.0 / 60.0 / 60.0 ) / 10.0 )
         else:
             return ( 24 * 60 * 60 )
 
@@ -115,15 +115,15 @@ class Stardate:
     # Sets a Gregorian date/time object for conversion to a ('classic' and '2009 revised') stardate.
     # Note the 'classic' status must be set PRIOR to setting the Gregorian date/time.
     #
-    #  gregorianDateTime A Gregorian date/time which will be converted to a stardate, such that 1900 <= year <= 9500.
+    #  gregorianDateTime A Gregorian date/time to be converted to a stardate (1900 <= year <= 9500).
     #
-    # Returns true on success; false otherwise (year value is out of range).
+    # Returns true on success; false if the year value is out of range.
     def setGregorian( self, gregorianDateTime ):
         if ( gregorianDateTime.year < 1900 ) or ( gregorianDateTime.year > 9500 ):
             return False
 
         self.gregorianDateTime = gregorianDateTime
-        if self.classic == True:
+        if self.classic:
             self.__gregorianToStardateClassic()
         else:
             self.__gregorianToStardate2009Revised()

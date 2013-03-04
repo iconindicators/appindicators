@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ import stardate
 
 # Exercise the Stardate API.
 now = datetime.datetime.now()
-currentStardate = stardate.Stardate()
+currentStardate = stardate.Stardate() # By default, 'classic' will be used.
 print( "Stardate API version: " + currentStardate.getVersion() )
 
 # Test 'classic' stardate.
@@ -35,7 +35,7 @@ print( "[" + str( currentStardate.getStardateIssue() ) + "] " +
        currentStardate.toGregorianString() )
 
 # Test '2009 revised' stardate.
-currentStardate.setClassic( False )
+currentStardate.setClassic( False ) # Now using '2009 revised'.
 currentStardate.setGregorian( now )
 print( str( now.year ) + "/" + str( now.month ) + "/" + str( now.day ) + " " + 
        str( now.hour ) + ":" + str( now.minute ) + ":" + str( now.second ) + " (y/m/d h:m:s) = " + 
