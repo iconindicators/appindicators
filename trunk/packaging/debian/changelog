@@ -5,8 +5,11 @@ indicator-stardate (1.0.11-1) precise; urgency=low
     Depends.
   * Simpler handling for creating the indicator - should hopefully sustain more
     enviroments. 
+  * Major change to API - now supports two types of conversion:
+      1) 'classic' (STARDATES IN STAR TREK FAQ V1.6 by Andrew Main),
+      2) '2009 revised' (http://en.wikipedia.org/wiki/Stardate).
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 16 Nov 2012 10:26:05 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 5 Mar 2013 01:07:41 +1000
 
 
 indicator-stardate (1.0.10-1) precise; urgency=low
