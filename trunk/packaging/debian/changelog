@@ -1,8 +1,10 @@
 indicator-lunar (1.0.18-1) precise; urgency=low
 
-  * Replaced deprecated GObject calls with GLib. 
+  * Replaced deprecated GObject calls with GLib.
+  * Fixed a bug: if a city (from the timezone) was not found, the default crashed.
+    Also added a feature to strip "_" from timezones such as America/New_York.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 13 Dec 2012 16:11:23 +1000   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 5 Feb 2013 17:16:54 +1000
 
 
 indicator-lunar (1.0.17-1) precise; urgency=low
