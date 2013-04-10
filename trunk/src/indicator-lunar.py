@@ -31,8 +31,7 @@ try:
 except:
     pass
 
-from gi.repository import GLib
-from gi.repository import Gtk
+from gi.repository import GLib, Gtk
 
 notifyImported = True
 try:
@@ -40,14 +39,7 @@ try:
 except:
     notifyImported = False
 
-import datetime
-import json
-import locale
-import logging
-import os
-import shutil
-import subprocess
-import sys
+import datetime, json, locale, logging, os, shutil, subprocess, sys
 
 try:
     import ephem
@@ -63,7 +55,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.18"
+    VERSION = "1.0.19"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -391,6 +383,7 @@ class IndicatorLunar:
         dialog.set_website_label( IndicatorLunar.WEBSITE )
         dialog.set_version( IndicatorLunar.VERSION )
         dialog.set_license( IndicatorLunar.LICENSE )
+        dialog.set_icon_name( Gtk.STOCK_ABOUT )
         dialog.run()
         dialog.destroy()
         dialog = None
@@ -511,6 +504,7 @@ class IndicatorLunar:
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
+        self.dialog.set_icon_name( IndicatorLunar.ICON )
 
         while True:
             self.dialog.show_all()
@@ -746,12 +740,10 @@ class IndicatorLunar:
             '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' + str( width ) + ' 100">'
 
 
-    def getSVGFooter( self ):
-        return '</svg>'
+    def getSVGFooter( self ): return '</svg>'
 
 
-    def getMoonRadius( self ):
-        return str( ( 50 - 25 ) / 2 + 25 ) # A radius of 50 is too big and 25 is too small, so choose half way!
+    def getMoonRadius( self ): return str( ( 50 - 25 ) / 2 + 25 ) # A radius of 50 is too big and 25 is too small, so choose half way!
 
 
     def getColourForIconTheme( self ):
@@ -774,9 +766,7 @@ class IndicatorLunar:
         return "#fff200" # Use hicolor as a default
 
 
-    def getIconTheme( self ):
-        return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
+    def getIconTheme( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
-if __name__ == "__main__":
-    IndicatorLunar().main()
+if __name__ == "__main__": IndicatorLunar().main()
