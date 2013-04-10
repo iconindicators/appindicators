@@ -1,8 +1,9 @@
 indicator-virtual-box (1.0.17-1) precise; urgency=low
 
   * Replaced deprecated GObject calls with GLib.
+  * Icons for Preferences/About now show for Lubuntu/Xubuntu.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 17 Jan 2013 16:30:00 +1000   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 10 Apr 2013 16:30:00 +1000
 
 
 indicator-virtual-box (1.0.16-1) precise; urgency=low

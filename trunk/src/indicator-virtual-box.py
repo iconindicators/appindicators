@@ -34,16 +34,8 @@ try:
 except:
     pass
 
-from gi.repository import GLib
-from gi.repository import Gtk
-
-import json
-import locale
-import logging
-import os
-import shutil
-import subprocess
-import sys
+from gi.repository import GLib, Gtk
+import json, locale, logging, os, shutil, subprocess, sys
 
 
 class IndicatorVirtualBox:
@@ -453,6 +445,7 @@ class IndicatorVirtualBox:
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
+        self.dialog.set_icon_name( IndicatorVirtualBox.ICON )
         self.dialog.show_all()
 
         response = self.dialog.run()
@@ -495,6 +488,7 @@ class IndicatorVirtualBox:
         dialog.set_website_label( IndicatorVirtualBox.WEBSITE )
         dialog.set_version( IndicatorVirtualBox.VERSION )
         dialog.set_license( IndicatorVirtualBox.LICENSE )
+        dialog.set_icon_name( Gtk.STOCK_ABOUT )
         dialog.run()
         dialog.destroy()
         dialog = None
@@ -587,6 +581,4 @@ class VirtualMachineInfo:
         return self.isRunning
 
 
-if __name__ == "__main__":
-    indicator = IndicatorVirtualBox()
-    indicator.main()
+if __name__ == "__main__": IndicatorVirtualBox().main()
