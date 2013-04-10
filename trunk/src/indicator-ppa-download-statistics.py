@@ -46,7 +46,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.21"
+    VERSION = "1.0.22"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -499,6 +499,7 @@ class IndicatorPPADownloadStatistics:
         self.dialog = Gtk.Dialog( title, None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( grid, True, True, 0 )
         self.dialog.set_border_width( 5 )
+        self.dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
 
         while True:
             self.dialog.show_all()
