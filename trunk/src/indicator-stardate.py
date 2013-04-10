@@ -29,23 +29,15 @@ try:
 except:
     pass
 
-from gi.repository import GLib
-from gi.repository import Gtk
-
-import datetime
-import json
-import logging
-import os
-import shutil
-import stardate
-import sys
+from gi.repository import GLib, Gtk
+import datetime, json, logging, os, shutil, stardate, sys
 
 
 class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.11"
+    VERSION = "1.0.12"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -151,6 +143,7 @@ class IndicatorStardate:
         dialog.set_website_label( IndicatorStardate.WEBSITE )
         dialog.set_version( IndicatorStardate.VERSION )
         dialog.set_license( IndicatorStardate.LICENSE )
+        dialog.set_icon_name( Gtk.STOCK_ABOUT )
         dialog.run()
         dialog.destroy()
         dialog = None
@@ -168,16 +161,16 @@ class IndicatorStardate:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showClassicCheckbox = Gtk.CheckButton( "'classic' Stardate" )
+        showClassicCheckbox = Gtk.CheckButton( "Use 'classic' conversion" )
         showClassicCheckbox.set_active( self.showClassic )
-        showClassicCheckbox.set_tooltip_text( "Checked: 'classic' conversion is used (STARDATES IN STAR TREK FAQ V1.6 by Andrew Main).\n\nUnchecked: '2009 revised' conversion is used (http://en.wikipedia.org/wiki/Stardate)." )
+        showClassicCheckbox.set_tooltip_text( "Stardate 'classic' is based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main.\n\nOtherwise the 2009 revised conversion is used (http://en.wikipedia.org/wiki/Stardate)." )
         grid.attach( showClassicCheckbox, 0, 0, 2, 1 )
 
         showIssueCheckbox = Gtk.CheckButton( "Show ISSUE" )
         showIssueCheckbox.set_active( self.showIssue )
         showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
         showIssueCheckbox.set_margin_left( 15 )
-        showIssueCheckbox.set_tooltip_text( "Show the ISSUE of the stardate" )
+        showIssueCheckbox.set_tooltip_text( "Show the ISSUE of the stardate (only applies to 'classic')" )
         grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
 
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox )
@@ -189,6 +182,7 @@ class IndicatorStardate:
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( grid, True, True, 0 )
         self.dialog.set_border_width( 5 )
+        self.dialog.set_icon_name( IndicatorStardate.ICON )
         self.dialog.show_all()
 
         response = self.dialog.run()
@@ -250,5 +244,4 @@ class IndicatorStardate:
             logging.error( "Error writing settings: " + IndicatorStardate.SETTINGS_FILE )
 
 
-if __name__ == "__main__":
-    IndicatorStardate().main()
+if __name__ == "__main__": IndicatorStardate().main()

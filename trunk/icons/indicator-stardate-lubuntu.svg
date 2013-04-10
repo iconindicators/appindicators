@@ -8,12 +8,12 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="159.20621"
-   height="249.60236"
+   width="250"
+   height="250"
    id="svg3020"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="indicator-stardate-elementary.svg">
+   sodipodi:docname="indicator-stardate-lubuntu.svg">
   <svg:defs
      id="defs3022" />
   <sodipodi:namedview
@@ -23,23 +23,31 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8284271"
-     inkscape:cx="30.644167"
-     inkscape:cy="155.32147"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="-3.1218755"
+     inkscape:cy="147.4428"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
-     showgrid="false"
-     inkscape:window-width="1400"
-     inkscape:window-height="1000"
+     showgrid="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1056"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="24"
      inkscape:window-maximized="1"
-     showborder="false"
+     showborder="true"
      inkscape:showpageshadow="false"
      fit-margin-top="20"
      fit-margin-bottom="20"
      fit-margin-left="10"
-     fit-margin-right="10" />
+     fit-margin-right="10">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3108"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
   <svg:metadata
      id="metadata3025">
     <RDF>
@@ -64,15 +72,15 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Layer"
-     transform="translate(163.74881,-105.62431)" />
+     transform="translate(163.74881,-105.22667)" />
   <svg:g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(12.25556,-386.2496)">
+     transform="translate(12.25556,-385.85196)">
     <svg:path
        style="fill:#5a5a5a;fill-opacity:1;stroke:none"
-       d="M 136.95065,603.35363 C 128.61202,586.37123 120.1196,569.44436 111.11767,552.809 106.34118,545.62917 101.90658,536.47864 93.16059,533.63629 77.361721,531.99036 63.823814,542.90148 52.475107,552.44778 31.6163,571.146 14.414898,593.46139 -2.2555598,615.85196 1.1906968,581.19462 9.4318963,547.27954 15.437322,513.03029 c 6.134699,-28.40758 16.082516,-55.82992 26.60636,-82.85896 4.189149,-8.60544 7.626,-19.38168 16.902091,-23.73725 9.579587,-1.5141 16.355403,6.59365 20.834354,13.26449 14.964231,25.31493 26.701563,54.36594 36.300503,82.21333 2.6193,6.11734 6.21245,18.20065 8.07728,24.54296 3.36122,11.43157 4.28774,17.33044 6.34721,29.13131 3.44478,15.77177 3.60075,31.90613 6.44553,47.76746 z"
+       d="m 182.95065,603.35363 c -8.33863,-16.9824 -16.83105,-33.90927 -25.83298,-50.54463 -4.77649,-7.17983 -9.21109,-16.33036 -17.95708,-19.17271 -15.79887,-1.64593 -29.33678,9.26519 -40.68548,18.81149 -20.85881,18.69822 -38.060212,41.01361 -54.73067,63.40418 3.446257,-34.65734 11.687456,-68.57242 17.692882,-102.82167 6.134699,-28.40758 16.082516,-55.82992 26.60636,-82.85896 4.189149,-8.60544 7.626,-19.38168 16.902088,-23.73725 9.57959,-1.5141 16.35541,6.59365 20.83436,13.26449 14.96423,25.31493 26.70156,54.36594 36.3005,82.21333 2.6193,6.11734 6.21245,18.20065 8.07728,24.54296 3.36122,11.43157 4.28774,17.33044 6.34721,29.13131 3.44478,15.77177 3.60075,31.90613 6.44553,47.76746 z"
        id="path8-3-9"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccccccccscc" />

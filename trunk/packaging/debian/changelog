@@ -1,3 +1,13 @@
+indicator-stardate (1.0.12-1) precise; urgency=low
+
+  * Revised the icons to fill in a square boundary - no longer stretched on
+    Lubuntu/Xubuntu.
+  * Updated labels/tooltips on Preferences.
+  * Icons for Preferences/About now show for Lubuntu/Xubuntu.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 5 Mar 2013 01:07:41 +1000
+
+
 indicator-stardate (1.0.11-1) precise; urgency=low
 
   * Added python3-gi to debian/control Depends (for Precise support).
