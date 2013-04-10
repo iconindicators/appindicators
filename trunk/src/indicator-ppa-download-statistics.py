@@ -34,28 +34,19 @@ try:
 except:
     pass
 
-from gi.repository import GLib
-from gi.repository import Gtk
+from gi.repository import GLib, Gtk
 from threading import Thread
 from urllib.request import urlopen
 
-import itertools
-import json
-import locale
-import logging
-import os
-import shutil
-import sys
-import threading
-import time
-import webbrowser
+import itertools, json, locale, logging, os, shutil, sys, threading, time, webbrowser
 
 
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
-    VERSION = "1.0.20"
+    ICON = NAME
+    VERSION = "1.0.21"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -102,7 +93,7 @@ class IndicatorPPADownloadStatistics:
             self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
             self.buildMenu()
             self.statusicon = Gtk.StatusIcon()
-            self.statusicon.set_from_icon_name( IndicatorPPADownloadStatistics.NAME )
+            self.statusicon.set_from_icon_name( IndicatorPPADownloadStatistics.ICON )
             self.statusicon.connect( "popup-menu", self.handleRightClick )
             self.statusicon.connect( "activate", self.handleLeftClick )
 
@@ -392,6 +383,7 @@ class IndicatorPPADownloadStatistics:
         self.dialog.set_website_label( IndicatorPPADownloadStatistics.WEBSITE )
         self.dialog.set_version( IndicatorPPADownloadStatistics.VERSION )
         self.dialog.set_license( IndicatorPPADownloadStatistics.LICENSE )
+        self.dialog.set_icon_name( Gtk.STOCK_ABOUT )
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
@@ -680,6 +672,7 @@ class IndicatorPPADownloadStatistics:
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
+        self.dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
         self.dialog.show_all()
 
         response = self.dialog.run()
@@ -994,5 +987,4 @@ class PublishedBinaryInfo:
         return self.__str__()
 
 
-if __name__ == "__main__":
-    IndicatorPPADownloadStatistics().main()
+if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
