@@ -29,6 +29,10 @@
 # The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
 
 
+
+#TODO When selecting Launch VB from the indicator menu, check to see if it's running (if possible) and switch to it.
+
+
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
