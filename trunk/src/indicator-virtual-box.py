@@ -426,7 +426,70 @@ class IndicatorVirtualBox:
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
-        # Second tab - general settings.
+
+#VBoxManage startvm
+        # Second tab - custom execution settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+#        label = Gtk.Label( "Refresh interval (minutes)" )
+#        grid.attach( label, 0, 0, 1, 1 )
+
+        numberOfColumns = 0
+        for virtualMachineInfo in self.virtualMachineInfos:
+            if numberOfColumns < virtualMachineInfo.getIndent():
+                numberOfColumns = virtualMachineInfo.getIndent()
+
+        numberOfColumns += 1
+
+        tree = Gtk.TreeView()
+
+        column = Gtk.TreeViewColumn()
+        column.set_title( "Virtual Machines" )
+
+        cell = Gtk.CellRendererText()
+        column.pack_start( cell, True )
+        column.add_attribute( cell, "text", 0 )
+
+#http://www.mail-archive.com/pygtk@daa.com.au/msg15494.html
+#http://zetcode.com/gui/pygtk/advancedwidgets/
+#http://www.pygtk.org/pygtk2tutorial/ch-TreeViewWidget.html
+#http://zetcode.com/tutorials/gtktutorial/gtktreeview/
+#http://python-gtk-3-tutorial.readthedocs.org/en/latest/treeview.html
+
+
+#        treestore = Gtk.TreeStore( * ( [str] * numberOfColumns ) )
+        treestore = Gtk.TreeStore( str )
+        indent = 0
+        parent = None
+        for virtualMachineInfo in self.virtualMachineInfos:
+            print( indent, virtualMachineInfo.getIndent(), virtualMachineInfo.getName(), virtualMachineInfo.isGroup )
+            if virtualMachineInfo.getIndent() == indent:
+                parent = treestore.append( None, [ virtualMachineInfo.getName() ] )
+            else:
+                treestore.append( parent, [ virtualMachineInfo.getName() ] )
+
+            tree.append_column( column )
+            tree.set_model( treestore )
+
+        spinner = Gtk.SpinButton()
+        spinner.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) )
+        spinner.set_tooltip_text( "How often the list of VMs and their running status is automatically updated" )
+        spinner.set_hexpand( True )
+        grid.attach( spinner, 1, 0, 1, 1 )
+
+        autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
+        grid.attach( autostartCheckbox, 0, 1, 2, 1 )
+
+        notebook.append_page( tree, Gtk.Label( "Custom" ) )
+
+        # Third tab - general settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
