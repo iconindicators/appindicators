@@ -29,10 +29,6 @@
 # The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
 
 
-
-#TODO When selecting Launch VB from the indicator menu, check to see if it's running (if possible) and switch to it.
-
-
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -46,7 +42,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.17"
+    VERSION = "1.0.18"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -313,7 +309,15 @@ class IndicatorVirtualBox:
 
 
     def onLaunchVirtualBox( self, widget ):
-        subprocess.Popen( "VirtualBox &", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+        p = subprocess.Popen( 'wmctrl -l | grep "Oracle VM VirtualBox Manager"', shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+        result = p.communicate()[ 0 ].decode()
+        p.wait()
+        if result == "":
+            subprocess.Popen( "VirtualBox &", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+        else:
+            windowID = result[ 0 : result.find( " " ) ]
+            p = subprocess.Popen( "wmctrl -i -a " + windowID, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+            p.wait()
 
 
     def onStartVirtualMachine( self, widget ):

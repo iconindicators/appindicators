@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.18-1) precise; urgency=low
+
+  * Now checks if the VirtualBox manager is running before launching...and if it is
+    running, brings to front.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 15 Apr 2013 10:38:13 +1000
+
+
 indicator-virtual-box (1.0.17-1) precise; urgency=low
 
   * Replaced deprecated GObject calls with GLib.
