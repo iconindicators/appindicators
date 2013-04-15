@@ -469,13 +469,25 @@ class IndicatorVirtualBox:
         parent = None
         for virtualMachineInfo in self.virtualMachineInfos:
             print( indent, virtualMachineInfo.getIndent(), virtualMachineInfo.getName(), virtualMachineInfo.isGroup )
-            if virtualMachineInfo.getIndent() == indent:
-                parent = treestore.append( None, [ virtualMachineInfo.getName() ] )
-            else:
-                treestore.append( parent, [ virtualMachineInfo.getName() ] )
+#             if virtualMachineInfo.getIndent() == indent:
+#                 parent = treestore.append( None, [ virtualMachineInfo.getName() ] )
+#             else:
+#                 treestore.append( parent, [ virtualMachineInfo.getName() ] )
 
-            tree.append_column( column )
-            tree.set_model( treestore )
+#         tree.append_column( column )
+#         tree.set_model( treestore )
+
+# 0 0 New group True
+# 0 1 New group 3 True
+# 0 2 C False
+# 0 1 A False
+# 0 1 AA False
+# 0 1 AAA False
+# 0 0 New group 2 True
+# 0 1 B False
+# 0 1 D False
+# 0 0 E False
+# 0 0 F False
 
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) )
