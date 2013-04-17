@@ -103,7 +103,7 @@ class IndicatorVirtualBox:
                 menu.append( Gtk.MenuItem( "(no virtual machines exist)" ) )
             else:
                 if self.showSubmenu == True:
-                    stack = []
+                    stack = [ ]
                     currentMenu = menu
                     for i in range( len( self.virtualMachineInfos ) ):
                         virtualMachineInfo = self.virtualMachineInfos[ i ]
@@ -462,54 +462,44 @@ class IndicatorVirtualBox:
 #http://zetcode.com/tutorials/gtktutorial/gtktreeview/
 #http://python-gtk-3-tutorial.readthedocs.org/en/latest/treeview.html
 
-
 #        treestore = Gtk.TreeStore( * ( [str] * numberOfColumns ) )
         treestore = Gtk.TreeStore( str )
         index = 0
         parent = None
-        self.buildTreeOfVMs( index, treestore, parent )
-#        for virtualMachineInfo in self.virtualMachineInfos:
-#            print( indent, virtualMachineInfo.getIndent(), virtualMachineInfo.getName(), virtualMachineInfo.isGroup )
-#            if virtualMachineInfo.getIndent() == indent:
-#                parent = treestore.append( parent, [ virtualMachineInfo.getName() ] )
-#             else:
-#                 treestore.append( parent, [ virtualMachineInfo.getName() ] )
+        stack = [ ]
+        for i in range( len( self.virtualMachineInfos ) ):
+            virtualMachineInfo = self.virtualMachineInfos[ i ]
+            if virtualMachineInfo.getIndent() < len( stack ):
+                parent = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
+
+            if virtualMachineInfo.isGroup:
+                stack.append( parent )
+                parent = treestore.append( parent, [ virtualMachineInfo.getName() ] )
+            else:
+                if virtualMachineInfo.isRunning: # No need to check if this is a group...groups never "run"!
+                    menuItem = Gtk.RadioMenuItem.new_with_label( [], virtualMachineInfo.getName() )
+                    menuItem.set_active( True )
+                else:
+                    menuItem = Gtk.MenuItem( virtualMachineInfo.getName() )
+
+# 0 New group True
+# 1 New group 3 True
+# 2 C False
+# 1 A False
+# 1 AA False
+# 1 AAA False
+# 0 New group 2 True
+# 1 B False
+# 1 D False
+# 0 New group 3 True
+# 1 Q False
+# 0 E False
+# 0 F False
 
 #         tree.append_column( column )
 #         tree.set_model( treestore )
 
 
-#0 0 New group True
-#0 1 New group 2 True
-#0 2 B False
-#0 2 C False
-#0 2 D False
-#0 1 A False
-#0 1 E False
-#0 0 New group 2 True
-#0 1 Z False
-#0 1 X False
-#0 1 Y False
-#0 0 TurnKey Drupal6 False
-#0 0 WinXP False
-#0 0 Windows XP Chinese False
-#0 0 WinXP Chinese False
-#0 0 Google App Engine False
-#0 0 Subversion Repository False
-#0 0 Lubuntu 12.10 False
-#0 0 Lubuntu 12.04 False
-
-# 0 0 New group True
-# 0 1 New group 3 True
-# 0 2 C False
-# 0 1 A False
-# 0 1 AA False
-# 0 1 AAA False
-# 0 0 New group 2 True
-# 0 1 B False
-# 0 1 D False
-# 0 0 E False
-# 0 0 F False
 
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) )
@@ -585,10 +575,13 @@ class IndicatorVirtualBox:
         self.dialog = None
 
 
-    def buildTreeOfVMs( self, index, treestore, parent ):
+    def buildTreeOfVMs( self, index, treestore, parent, indentOfParent ):
         virtualMachineInfo = self.virtualMachineInfos[ index ]
         print( index, virtualMachineInfo.getIndent(), virtualMachineInfo.getName(), virtualMachineInfo.isGroup )
-        if ( index + 1 ) == len( self.virtualMachineInfos ): return
+#         if ( index + 1 ) == len( self.virtualMachineInfos ): return
+
+        if virtualMachineInfo.isGroup:
+            parent = treestore.append( parent, [ virtualMachineInfo.getName() ] )
 
         self.buildTreeOfVMs( index + 1, parent )
 #            if virtualMachineInfo.getIndent() == indent:
@@ -599,6 +592,37 @@ class IndicatorVirtualBox:
 #         tree.append_column( column )
 #         tree.set_model( treestore )
 
+#0 0 New group True
+#0 1 New group 2 True
+#0 2 B False
+#0 2 C False
+#0 2 D False
+#0 1 A False
+#0 1 E False
+#0 0 New group 2 True
+#0 1 Z False
+#0 1 X False
+#0 1 Y False
+#0 0 TurnKey Drupal6 False
+#0 0 WinXP False
+#0 0 Windows XP Chinese False
+#0 0 WinXP Chinese False
+#0 0 Google App Engine False
+#0 0 Subversion Repository False
+#0 0 Lubuntu 12.10 False
+#0 0 Lubuntu 12.04 False
+
+# 0 0 New group True
+# 0 1 New group 3 True
+# 0 2 C False
+# 0 1 A False
+# 0 1 AA False
+# 0 1 AAA False
+# 0 0 New group 2 True
+# 0 1 B False
+# 0 1 D False
+# 0 0 E False
+# 0 0 F False
         
 
     def onAbout( self, widget ):
