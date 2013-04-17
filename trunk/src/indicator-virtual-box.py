@@ -465,17 +465,39 @@ class IndicatorVirtualBox:
 
 #        treestore = Gtk.TreeStore( * ( [str] * numberOfColumns ) )
         treestore = Gtk.TreeStore( str )
-        indent = 0
+        index = 0
         parent = None
-        for virtualMachineInfo in self.virtualMachineInfos:
-            print( indent, virtualMachineInfo.getIndent(), virtualMachineInfo.getName(), virtualMachineInfo.isGroup )
-#             if virtualMachineInfo.getIndent() == indent:
-#                 parent = treestore.append( None, [ virtualMachineInfo.getName() ] )
+        self.buildTreeOfVMs( index, treestore, parent )
+#        for virtualMachineInfo in self.virtualMachineInfos:
+#            print( indent, virtualMachineInfo.getIndent(), virtualMachineInfo.getName(), virtualMachineInfo.isGroup )
+#            if virtualMachineInfo.getIndent() == indent:
+#                parent = treestore.append( parent, [ virtualMachineInfo.getName() ] )
 #             else:
 #                 treestore.append( parent, [ virtualMachineInfo.getName() ] )
 
 #         tree.append_column( column )
 #         tree.set_model( treestore )
+
+
+#0 0 New group True
+#0 1 New group 2 True
+#0 2 B False
+#0 2 C False
+#0 2 D False
+#0 1 A False
+#0 1 E False
+#0 0 New group 2 True
+#0 1 Z False
+#0 1 X False
+#0 1 Y False
+#0 0 TurnKey Drupal6 False
+#0 0 WinXP False
+#0 0 Windows XP Chinese False
+#0 0 WinXP Chinese False
+#0 0 Google App Engine False
+#0 0 Subversion Repository False
+#0 0 Lubuntu 12.10 False
+#0 0 Lubuntu 12.04 False
 
 # 0 0 New group True
 # 0 1 New group 3 True
@@ -562,6 +584,22 @@ class IndicatorVirtualBox:
         self.dialog.destroy()
         self.dialog = None
 
+
+    def buildTreeOfVMs( self, index, treestore, parent ):
+        virtualMachineInfo = self.virtualMachineInfos[ index ]
+        print( index, virtualMachineInfo.getIndent(), virtualMachineInfo.getName(), virtualMachineInfo.isGroup )
+        if ( index + 1 ) == len( self.virtualMachineInfos ): return
+
+        self.buildTreeOfVMs( index + 1, parent )
+#            if virtualMachineInfo.getIndent() == indent:
+#                parent = treestore.append( parent, [ virtualMachineInfo.getName() ] )
+#             else:
+#                 treestore.append( parent, [ virtualMachineInfo.getName() ] )
+
+#         tree.append_column( column )
+#         tree.set_model( treestore )
+
+        
 
     def onAbout( self, widget ):
         dialog = Gtk.AboutDialog()
