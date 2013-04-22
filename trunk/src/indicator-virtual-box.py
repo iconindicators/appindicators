@@ -426,8 +426,6 @@ class IndicatorVirtualBox:
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
-
-#VBoxManage startvm
         # Second tab - custom execution settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -437,81 +435,51 @@ class IndicatorVirtualBox:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-#        label = Gtk.Label( "Refresh interval (minutes)" )
-#        grid.attach( label, 0, 0, 1, 1 )
-
-        numberOfColumns = 0
-        for virtualMachineInfo in self.virtualMachineInfos:
-            if numberOfColumns < virtualMachineInfo.getIndent():
-                numberOfColumns = virtualMachineInfo.getIndent()
-
-        numberOfColumns += 1
-
-        tree = Gtk.TreeView()
-
-        column = Gtk.TreeViewColumn()
-        column.set_title( "Virtual Machines" )
-
-        cell = Gtk.CellRendererText()
-        column.pack_start( cell, True )
-        column.add_attribute( cell, "text", 0 )
-
 #http://www.mail-archive.com/pygtk@daa.com.au/msg15494.html
 #http://zetcode.com/gui/pygtk/advancedwidgets/
 #http://www.pygtk.org/pygtk2tutorial/ch-TreeViewWidget.html
 #http://zetcode.com/tutorials/gtktutorial/gtktreeview/
 #http://python-gtk-3-tutorial.readthedocs.org/en/latest/treeview.html
 
-#        treestore = Gtk.TreeStore( * ( [str] * numberOfColumns ) )
-        treestore = Gtk.TreeStore( str )
-        index = 0
-        parent = None
         stack = [ ]
-        for i in range( len( self.virtualMachineInfos ) ):
-            virtualMachineInfo = self.virtualMachineInfos[ i ]
+        store = Gtk.TreeStore( str )
+        parent = None
+        for virtualMachineInfo in self.virtualMachineInfos:
             if virtualMachineInfo.getIndent() < len( stack ):
                 parent = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
-
+    
             if virtualMachineInfo.isGroup:
                 stack.append( parent )
-                parent = treestore.append( parent, [ virtualMachineInfo.getName() ] )
+                parent = store.append( parent, [ virtualMachineInfo.getName() ] )
             else:
-                if virtualMachineInfo.isRunning: # No need to check if this is a group...groups never "run"!
-                    menuItem = Gtk.RadioMenuItem.new_with_label( [], virtualMachineInfo.getName() )
-                    menuItem.set_active( True )
-                else:
-                    menuItem = Gtk.MenuItem( virtualMachineInfo.getName() )
+                store.append( parent, [ virtualMachineInfo.getName() ] )
 
-# 0 New group True
-# 1 New group 3 True
-# 2 C False
-# 1 A False
-# 1 AA False
-# 1 AAA False
-# 0 New group 2 True
-# 1 B False
-# 1 D False
-# 0 New group 3 True
-# 1 Q False
-# 0 E False
-# 0 F False
+#         print_rows( store, store.get_iter_first(), "" )
 
-#         tree.append_column( column )
-#         tree.set_model( treestore )
+        tree = Gtk.TreeView( store )
+        tree.set_hexpand( True )
 
+        tree.append_column( Gtk.TreeViewColumn( "Virtual Machine", Gtk.CellRendererText(), text = 0 ) )
 
+#        treestore = Gtk.TreeStore( * ( [str] * numberOfColumns ) )
 
-        spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) )
-        spinner.set_tooltip_text( "How often the list of VMs and their running status is automatically updated" )
-        spinner.set_hexpand( True )
-        grid.attach( spinner, 1, 0, 1, 1 )
+        grid.attach( tree, 0, 0, 2, 1 )
+
+        label = Gtk.Label( "Start Command" )
+        label.set_halign( Gtk.Align.START )
+        label.set_margin_left( 15 )
+        grid.attach( label, 0, 1, 1, 1 )
+
+#VBoxManage startvm
+        textGroupNameBefore = Gtk.Entry()
+#         textGroupNameBefore.set_text( self.menuTextGroupNameBefore )
+        grid.attach( textGroupNameBefore, 1, 1, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
-        notebook.append_page( tree, Gtk.Label( "Custom" ) )
+        notebook.append_page( grid, Gtk.Label( "Virtual Machines" ) )
 
         # Third tab - general settings.
         grid = Gtk.Grid()
@@ -574,56 +542,6 @@ class IndicatorVirtualBox:
         self.dialog.destroy()
         self.dialog = None
 
-
-    def buildTreeOfVMs( self, index, treestore, parent, indentOfParent ):
-        virtualMachineInfo = self.virtualMachineInfos[ index ]
-        print( index, virtualMachineInfo.getIndent(), virtualMachineInfo.getName(), virtualMachineInfo.isGroup )
-#         if ( index + 1 ) == len( self.virtualMachineInfos ): return
-
-        if virtualMachineInfo.isGroup:
-            parent = treestore.append( parent, [ virtualMachineInfo.getName() ] )
-
-        self.buildTreeOfVMs( index + 1, parent )
-#            if virtualMachineInfo.getIndent() == indent:
-#                parent = treestore.append( parent, [ virtualMachineInfo.getName() ] )
-#             else:
-#                 treestore.append( parent, [ virtualMachineInfo.getName() ] )
-
-#         tree.append_column( column )
-#         tree.set_model( treestore )
-
-#0 0 New group True
-#0 1 New group 2 True
-#0 2 B False
-#0 2 C False
-#0 2 D False
-#0 1 A False
-#0 1 E False
-#0 0 New group 2 True
-#0 1 Z False
-#0 1 X False
-#0 1 Y False
-#0 0 TurnKey Drupal6 False
-#0 0 WinXP False
-#0 0 Windows XP Chinese False
-#0 0 WinXP Chinese False
-#0 0 Google App Engine False
-#0 0 Subversion Repository False
-#0 0 Lubuntu 12.10 False
-#0 0 Lubuntu 12.04 False
-
-# 0 0 New group True
-# 0 1 New group 3 True
-# 0 2 C False
-# 0 1 A False
-# 0 1 AA False
-# 0 1 AAA False
-# 0 0 New group 2 True
-# 0 1 B False
-# 0 1 D False
-# 0 0 E False
-# 0 0 F False
-        
 
     def onAbout( self, widget ):
         dialog = Gtk.AboutDialog()
@@ -690,12 +608,14 @@ class IndicatorVirtualBox:
 
 class VirtualMachineInfo:
 
+# TODO Pass in autostart and assign!
     def __init__( self, name, isGroup, uuid, indent ):
         self.name = name
         self.isGroup = isGroup
         self.uuid = uuid
         self.indent = indent
         self.isRunning = False
+        self.autoStart = False
 
 
     def getName( self ):
@@ -704,6 +624,14 @@ class VirtualMachineInfo:
 
     def setName( self, name ):
         self.name = name
+
+
+    def getAutoStart( self ):
+        return self.autoStart
+
+
+    def setAutoStart( self, autoStart ):
+        self.autoStart = autoStart
 
 
     def isGroup( self ):
@@ -726,4 +654,35 @@ class VirtualMachineInfo:
         return self.isRunning
 
 
-if __name__ == "__main__": IndicatorVirtualBox().main()
+def print_rows(store, treeiter, indent):
+    while treeiter != None:
+        print( indent + str(store[treeiter][:]) )
+        if store.iter_has_child(treeiter):
+            childiter = store.iter_children(treeiter)
+            print_rows(store, childiter, indent + "\t")
+        treeiter = store.iter_next(treeiter)
+
+
+if __name__ == "__main__": 
+
+#     ivb = IndicatorVirtualBox()
+#     ivb.getVirtualMachines()
+#     stack = [ ]
+#     store = Gtk.TreeStore( str, bool, int )
+#     parent = None
+#     for virtualMachineInfo in ivb.virtualMachineInfos:
+#         if virtualMachineInfo.getIndent() < len( stack ):
+#             parent = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
+# 
+#         if virtualMachineInfo.isGroup:
+#             stack.append( parent )
+#             parent = store.append( parent, [ virtualMachineInfo.getName(), virtualMachineInfo.isGroup, virtualMachineInfo.getIndent() ] )
+#         else:
+#             store.append( parent, [ virtualMachineInfo.getName(), virtualMachineInfo.isGroup, virtualMachineInfo.getIndent() ] )
+
+#     print_rows( store, store.get_iter_first(), "" )
+
+#     for virtualMachineInfo in ivb.virtualMachineInfos:
+#         print( virtualMachineInfo.getName(), virtualMachineInfo.getIndent() )
+
+    IndicatorVirtualBox().main()
