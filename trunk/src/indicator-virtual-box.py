@@ -58,6 +58,7 @@ class IndicatorVirtualBox:
     SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     SETTINGS_SHOW_SUBMENU = "showSubmenu"
     SETTINGS_SORT_DEFAULT = "sortDefault"
+    SETTINGS_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
 
 
     def __init__( self ):
@@ -72,7 +73,7 @@ class IndicatorVirtualBox:
             self.buildMenu()
             self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
         except:
-            self.appindicatorImported = False            
+            self.appindicatorImported = False
             self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
             self.buildMenu()
             self.statusicon = Gtk.StatusIcon()
@@ -130,6 +131,15 @@ class IndicatorVirtualBox:
                             currentMenu.append( menuItem )
                 else:
                     for virtualMachineInfo in self.virtualMachineInfos:
+# TODO Remove
+#                         if virtualMachineInfo.getName() == "E":
+#                             virtualMachineInfo.setAutoStart( True )
+#                             virtualMachineInfo.setStartCommand( "start command for %VM% E" )
+#                         
+#                         if virtualMachineInfo.getName() == "W":
+#                             virtualMachineInfo.setAutoStart( True )
+#                             virtualMachineInfo.setStartCommand( "start command for %VM% W" )
+# TODO Remove
                         indent = "    " * virtualMachineInfo.getIndent()
                         if virtualMachineInfo.isGroup:
                             vmMenuItem = Gtk.MenuItem( indent + self.menuTextGroupNameBefore + virtualMachineInfo.getName() + self.menuTextGroupNameAfter )
@@ -426,7 +436,7 @@ class IndicatorVirtualBox:
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
-        # Second tab - custom execution settings.
+        # Second tab - Custom VM settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -435,14 +445,8 @@ class IndicatorVirtualBox:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-#http://www.mail-archive.com/pygtk@daa.com.au/msg15494.html
-#http://zetcode.com/gui/pygtk/advancedwidgets/
-#http://www.pygtk.org/pygtk2tutorial/ch-TreeViewWidget.html
-#http://zetcode.com/tutorials/gtktutorial/gtktreeview/
-#http://python-gtk-3-tutorial.readthedocs.org/en/latest/treeview.html
-
         stack = [ ]
-        store = Gtk.TreeStore( str, str, str )
+        store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon or None for autostart of VM, VM start command, VM/Group UUID.
         parent = None
         for virtualMachineInfo in self.virtualMachineInfos:
             if virtualMachineInfo.getIndent() < len( stack ):
@@ -450,51 +454,23 @@ class IndicatorVirtualBox:
 
             if virtualMachineInfo.isGroup:
                 stack.append( parent )
-                parent = store.append( parent, [ virtualMachineInfo.getName(), None, "" ] )
-#                parent = store.append( parent, [ virtualMachineInfo.getName(), "", "" ] )
+                parent = store.append( parent, [ virtualMachineInfo.getName(), None, "", virtualMachineInfo.getUUID() ] )
             else:
                 if virtualMachineInfo.getAutoStart():
-                    store.append( parent, [ virtualMachineInfo.getName(), Gtk.STOCK_APPLY, "" ] )
+                    store.append( parent, [ virtualMachineInfo.getName(), Gtk.STOCK_APPLY, virtualMachineInfo.getStartCommand(), virtualMachineInfo.getUUID() ] )
                 else:
-                    store.append( parent, [ virtualMachineInfo.getName(), None, "" ] )
-#                store.append( parent, [ virtualMachineInfo.getName(), str( virtualMachineInfo.getAutoStart() ), "" ] )
-
-#         print_rows( store, store.get_iter_first(), "" )
+                    store.append( parent, [ virtualMachineInfo.getName(), None, virtualMachineInfo.getStartCommand(), virtualMachineInfo.getUUID() ] )
 
         tree = Gtk.TreeView( store )
         tree.set_hexpand( True )
 
         tree.append_column( Gtk.TreeViewColumn( "Virtual Machine", Gtk.CellRendererText(), text = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Autostart", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
-#        tree.append_column( Gtk.TreeViewColumn( "Autostart", Gtk.CellRendererText(), text = 1 ) )
         tree.append_column( Gtk.TreeViewColumn( "Start Command", Gtk.CellRendererText(), text = 2 ) )
-
-#        treestore = Gtk.TreeStore( * ( [str] * numberOfColumns ) )
-
+        tree.set_tooltip_text( "Double click to edit a VM's properties" )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        tree.connect( "row-activated", self.onVMDoubleClick )
         grid.attach( tree, 0, 0, 2, 1 )
-
-        hbox = Gtk.Box( spacing = 6 )
-
-        editButton = Gtk.Button( "Edit" )
-        hbox.pack_start( editButton, True, True, 0 )
-#        editButton.set_sensitive( combobox.get_model().iter_n_children( None ) > 0 )
-#        editButton.connect( "clicked", self.onAdd, editButton, removeButton, combobox, usernameEntry, passwordEntry, protocolEntry, serverEntry, portEntry, urlEntry )
-
-        grid.attach( hbox, 0, 1, 1, 1 )
-        
-#        label = Gtk.Label( "Start Command" )
-#        label.set_halign( Gtk.Align.START )
-#        grid.attach( label, 0, 1, 1, 1 )
-
-#VBoxManage startvm
-#        textGroupNameBefore = Gtk.Entry()
-#         textGroupNameBefore.set_text( self.menuTextGroupNameBefore )
-#        grid.attach( textGroupNameBefore, 1, 1, 1, 1 )
-
-#        autostartVMCheckbox = Gtk.CheckButton( "Autostart" )
-#        autostartVMCheckbox.set_tooltip_text( "Run the VM when the indicator starts" )
-#        autostartVMCheckbox.set_active(  )
-#        grid.attach( autostartVMCheckbox, 0, 2, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Virtual Machines" ) )
 
@@ -540,6 +516,8 @@ class IndicatorVirtualBox:
             GLib.source_remove( self.timeoutID )
             self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
 
+            self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
+
             self.saveSettings()
 
             if not os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ):
@@ -559,6 +537,100 @@ class IndicatorVirtualBox:
 
         self.dialog.destroy()
         self.dialog = None
+
+
+    def updateVirtualMachinePreferences( self, store, treeiter ):
+        while treeiter != None:
+            if store[ treeiter ][ 3 ] != "": # UUID is not empty, so this is a VM and not a group...
+#                 self.virtualMachinePreferences[ store[ treeiter ][ 3 ] ] = [ store[ treeiter ][ 1 ], store[ treeiter ][ 2 ] ]
+                print( store[ treeiter ][ 3 ], store[ treeiter ][ 1 ], store[ treeiter ][ 2 ] )
+
+            if store.iter_has_child( treeiter ):
+                childiter = store.iter_children( treeiter )
+                self.updateVirtualMachinePreferences( store, childiter )
+
+            treeiter = store.iter_next( treeiter )
+
+
+    def onVMDoubleClick( self, tree, rowNumber, treeViewColumn ):
+        model, treeiter = tree.get_selection().get_selected()
+
+        if treeiter == None: return
+
+        if model[ treeiter ][ 3 ] == "": return # The 4th element is the UUID for a VM/group.  If the UUID is empty, this is a group.
+
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        label = Gtk.Label( "Start Command" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 1, 1 )
+
+        startCommand = Gtk.Entry()
+        if model[ treeiter ][ 2 ] is not None: startCommand.set_text( model[ treeiter ][ 2 ] )
+        startCommand.set_tooltip_text( "The terminal command to start the VM such as\n\t'VBoxManage startvm %VM%' or\n\t'VBoxHeadless --startvm %VM% --vrde off'" )
+        startCommand.set_hexpand( True ) # Only need to set this once and all objects will expand.
+        grid.attach( startCommand, 1, 0, 1, 1 )
+
+        autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_tooltip_text( "Run the VM when the indicator starts" )
+        autostartCheckbox.set_active( model[ treeiter ][ 1 ] is not None and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
+        grid.attach( autostartCheckbox, 0, 1, 2, 1 )
+
+        dialog = Gtk.Dialog( "VM Properties", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( grid, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorVirtualBox.ICON )
+
+        while True:
+            dialog.show_all()
+            response = dialog.run()
+
+            if response == Gtk.ResponseType.CANCEL:
+                break
+
+            if startCommand.get_text().strip() == "":
+                self.showMessage( Gtk.MessageType.ERROR, "The start command cannot be empty." )
+                startCommand.grab_focus()
+                continue
+
+            if not "%VM%" in startCommand.get_text().strip():
+                self.showMessage( Gtk.MessageType.ERROR, "The start command must contain %VM% which is substituted for the VM name/id." )
+                startCommand.grab_focus()
+                continue
+
+            # Ideally I'd like to do this...
+            #
+            #    if autostartCheckbox.get_active():
+            #        model[ treeiter ][ 1 ] = Gtk.STOCK_APPLY
+            #    else:
+            #        model[ treeiter ][ 1 ] = None
+            #
+            #    model[ treeiter ][ 2 ] = startCommand.get_text().strip()
+            #
+            # But due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
+            # So this is the workaround...
+            if autostartCheckbox.get_active():
+                model.set_value( treeiter, 1, Gtk.STOCK_APPLY )
+                model[ treeiter ][ 2 ] = startCommand.get_text().strip()
+            else:
+                model.insert_after( None, treeiter, [ model[ treeiter ][ 0 ], None, startCommand.get_text().strip(), model[ treeiter ][ 3 ] ] )
+                model.remove( treeiter )
+
+            break
+
+        dialog.destroy()
+
+
+    def showMessage( self, messageType, message ):
+        dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
+        dialog.run()
+        dialog.destroy()
 
 
     def onAbout( self, widget ):
@@ -589,6 +661,7 @@ class IndicatorVirtualBox:
         self.refreshIntervalInMinutes = 15
         self.showSubmenu = False
         self.sortDefault = True
+        self.virtualMachinePreferences = { } # Key is VM UUID; value is [ start command, autostart ]
 
         if os.path.isfile( IndicatorVirtualBox.SETTINGS_FILE ):
             try:
@@ -600,6 +673,7 @@ class IndicatorVirtualBox:
                 self.refreshIntervalInMinutes = settings.get( IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
                 self.showSubmenu = settings.get( IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
                 self.sortDefault = settings.get( IndicatorVirtualBox.SETTINGS_SORT_DEFAULT, self.sortDefault )
+                self.virtualMachinePreferences = settings.get( IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES, self.virtualMachinePreferences )
 
             except Exception as e:
                 logging.exception( e )
@@ -613,7 +687,8 @@ class IndicatorVirtualBox:
                 IndicatorVirtualBox.SETTINGS_MENU_TEXT_GROUP_NAME_AFTER: self.menuTextGroupNameAfter,
                 IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
                 IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
-                IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault
+                IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault,
+                IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences
             }
 
             with open( IndicatorVirtualBox.SETTINGS_FILE, "w" ) as f:
@@ -626,7 +701,6 @@ class IndicatorVirtualBox:
 
 class VirtualMachineInfo:
 
-# TODO Pass in autostart and assign!
     def __init__( self, name, isGroup, uuid, indent ):
         self.name = name
         self.isGroup = isGroup
@@ -634,6 +708,7 @@ class VirtualMachineInfo:
         self.indent = indent
         self.isRunning = False
         self.autoStart = False
+        self.startCommand = None
 
 
     def getName( self ):
@@ -642,6 +717,14 @@ class VirtualMachineInfo:
 
     def setName( self, name ):
         self.name = name
+
+
+    def getStartCommand( self ):
+        return self.startCommand
+
+
+    def setStartCommand( self, startCommand ):
+        self.startCommand = startCommand
 
 
     def getAutoStart( self ):
@@ -672,4 +755,16 @@ class VirtualMachineInfo:
         return self.isRunning
 
 
+# TODO Remove!
+#             print_rows( tree.get_model(), tree.get_model().get_iter_first(), "" )
+
+def print_rows(store, treeiter, indent):
+    while treeiter != None:
+        print( indent + str(store[treeiter][:]) )
+        if store.iter_has_child(treeiter):
+            childiter = store.iter_children(treeiter)
+            print_rows(store, childiter, indent + "\t")
+        treeiter = store.iter_next(treeiter)
+  
+        
 if __name__ == "__main__": IndicatorVirtualBox().main()
