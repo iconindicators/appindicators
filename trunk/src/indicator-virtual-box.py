@@ -442,17 +442,22 @@ class IndicatorVirtualBox:
 #http://python-gtk-3-tutorial.readthedocs.org/en/latest/treeview.html
 
         stack = [ ]
-        store = Gtk.TreeStore( str )
+        store = Gtk.TreeStore( str, str, str )
         parent = None
         for virtualMachineInfo in self.virtualMachineInfos:
             if virtualMachineInfo.getIndent() < len( stack ):
                 parent = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
-    
+
             if virtualMachineInfo.isGroup:
                 stack.append( parent )
-                parent = store.append( parent, [ virtualMachineInfo.getName() ] )
+                parent = store.append( parent, [ virtualMachineInfo.getName(), None, "" ] )
+#                parent = store.append( parent, [ virtualMachineInfo.getName(), "", "" ] )
             else:
-                store.append( parent, [ virtualMachineInfo.getName() ] )
+                if virtualMachineInfo.getAutoStart():
+                    store.append( parent, [ virtualMachineInfo.getName(), Gtk.STOCK_APPLY, "" ] )
+                else:
+                    store.append( parent, [ virtualMachineInfo.getName(), None, "" ] )
+#                store.append( parent, [ virtualMachineInfo.getName(), str( virtualMachineInfo.getAutoStart() ), "" ] )
 
 #         print_rows( store, store.get_iter_first(), "" )
 
@@ -460,24 +465,36 @@ class IndicatorVirtualBox:
         tree.set_hexpand( True )
 
         tree.append_column( Gtk.TreeViewColumn( "Virtual Machine", Gtk.CellRendererText(), text = 0 ) )
+        tree.append_column( Gtk.TreeViewColumn( "Autostart", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
+#        tree.append_column( Gtk.TreeViewColumn( "Autostart", Gtk.CellRendererText(), text = 1 ) )
+        tree.append_column( Gtk.TreeViewColumn( "Start Command", Gtk.CellRendererText(), text = 2 ) )
 
 #        treestore = Gtk.TreeStore( * ( [str] * numberOfColumns ) )
 
         grid.attach( tree, 0, 0, 2, 1 )
 
-        label = Gtk.Label( "Start Command" )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_left( 15 )
-        grid.attach( label, 0, 1, 1, 1 )
+        hbox = Gtk.Box( spacing = 6 )
+
+        editButton = Gtk.Button( "Edit" )
+        hbox.pack_start( editButton, True, True, 0 )
+#        editButton.set_sensitive( combobox.get_model().iter_n_children( None ) > 0 )
+#        editButton.connect( "clicked", self.onAdd, editButton, removeButton, combobox, usernameEntry, passwordEntry, protocolEntry, serverEntry, portEntry, urlEntry )
+
+        grid.attach( hbox, 0, 1, 1, 1 )
+        
+#        label = Gtk.Label( "Start Command" )
+#        label.set_halign( Gtk.Align.START )
+#        grid.attach( label, 0, 1, 1, 1 )
 
 #VBoxManage startvm
-        textGroupNameBefore = Gtk.Entry()
+#        textGroupNameBefore = Gtk.Entry()
 #         textGroupNameBefore.set_text( self.menuTextGroupNameBefore )
-        grid.attach( textGroupNameBefore, 1, 1, 1, 1 )
+#        grid.attach( textGroupNameBefore, 1, 1, 1, 1 )
 
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 1, 2, 1 )
+#        autostartVMCheckbox = Gtk.CheckButton( "Autostart" )
+#        autostartVMCheckbox.set_tooltip_text( "Run the VM when the indicator starts" )
+#        autostartVMCheckbox.set_active(  )
+#        grid.attach( autostartVMCheckbox, 0, 2, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Virtual Machines" ) )
 
@@ -499,9 +516,10 @@ class IndicatorVirtualBox:
         spinner.set_hexpand( True )
         grid.attach( spinner, 1, 0, 1, 1 )
 
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 1, 2, 1 )
+        autostartIndicatorCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartIndicatorCheckbox.set_tooltip_text( "Run the indicator automatically" )
+        autostartIndicatorCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
+        grid.attach( autostartIndicatorCheckbox, 0, 1, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "General" ) )
 
@@ -527,7 +545,7 @@ class IndicatorVirtualBox:
             if not os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ):
                 os.makedirs( IndicatorVirtualBox.AUTOSTART_PATH )
 
-            if autostartCheckbox.get_active():
+            if autostartIndicatorCheckbox.get_active():
                 try:
                     shutil.copy( IndicatorVirtualBox.DESKTOP_PATH + IndicatorVirtualBox.DESKTOP_FILE, IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
                 except Exception as e:
@@ -654,35 +672,4 @@ class VirtualMachineInfo:
         return self.isRunning
 
 
-def print_rows(store, treeiter, indent):
-    while treeiter != None:
-        print( indent + str(store[treeiter][:]) )
-        if store.iter_has_child(treeiter):
-            childiter = store.iter_children(treeiter)
-            print_rows(store, childiter, indent + "\t")
-        treeiter = store.iter_next(treeiter)
-
-
-if __name__ == "__main__": 
-
-#     ivb = IndicatorVirtualBox()
-#     ivb.getVirtualMachines()
-#     stack = [ ]
-#     store = Gtk.TreeStore( str, bool, int )
-#     parent = None
-#     for virtualMachineInfo in ivb.virtualMachineInfos:
-#         if virtualMachineInfo.getIndent() < len( stack ):
-#             parent = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
-# 
-#         if virtualMachineInfo.isGroup:
-#             stack.append( parent )
-#             parent = store.append( parent, [ virtualMachineInfo.getName(), virtualMachineInfo.isGroup, virtualMachineInfo.getIndent() ] )
-#         else:
-#             store.append( parent, [ virtualMachineInfo.getName(), virtualMachineInfo.isGroup, virtualMachineInfo.getIndent() ] )
-
-#     print_rows( store, store.get_iter_first(), "" )
-
-#     for virtualMachineInfo in ivb.virtualMachineInfos:
-#         print( virtualMachineInfo.getName(), virtualMachineInfo.getIndent() )
-
-    IndicatorVirtualBox().main()
+if __name__ == "__main__": IndicatorVirtualBox().main()
