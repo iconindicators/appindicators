@@ -766,5 +766,5 @@ def print_rows(store, treeiter, indent):
             print_rows(store, childiter, indent + "\t")
         treeiter = store.iter_next(treeiter)
   
-        
+#TODO Check what wctrl does for a headless kickoff        
 if __name__ == "__main__": IndicatorVirtualBox().main()
