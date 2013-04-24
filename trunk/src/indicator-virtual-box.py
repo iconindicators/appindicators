@@ -29,6 +29,10 @@
 # The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
 
 
+#TODO Check what wctrl does for a headless kickoff     
+#TODO When refreshing the list of VMs, don't run the VM a second time...only autorun on startup!
+   
+
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -131,15 +135,6 @@ class IndicatorVirtualBox:
                             currentMenu.append( menuItem )
                 else:
                     for virtualMachineInfo in self.virtualMachineInfos:
-# TODO Remove
-#                         if virtualMachineInfo.getName() == "E":
-#                             virtualMachineInfo.setAutoStart( True )
-#                             virtualMachineInfo.setStartCommand( "start command for %VM% E" )
-#                         
-#                         if virtualMachineInfo.getName() == "W":
-#                             virtualMachineInfo.setAutoStart( True )
-#                             virtualMachineInfo.setStartCommand( "start command for %VM% W" )
-# TODO Remove
                         indent = "    " * virtualMachineInfo.getIndent()
                         if virtualMachineInfo.isGroup:
                             vmMenuItem = Gtk.MenuItem( indent + self.menuTextGroupNameBefore + virtualMachineInfo.getName() + self.menuTextGroupNameAfter )
@@ -190,7 +185,7 @@ class IndicatorVirtualBox:
 
 
     def getVirtualMachines( self ):
-        self.virtualMachineInfos = [] # A list of VirtualBox items.
+        self.virtualMachineInfos = [ ] # A list of VirtualBox items.
 
         if not self.isVirtualBoxInstalled():
             return
@@ -252,6 +247,13 @@ class IndicatorVirtualBox:
         # Alphabetically sort...
         if self.sortDefault == False and not self.groupsExist():
             self.virtualMachineInfos = sorted( self.virtualMachineInfos, key = lambda virtualMachineInfo: virtualMachineInfo.name )
+
+        # Add to each VM the VM properties (such as autostart and the start command).
+        for uuid in self.virtualMachinePreferences:
+            virtualMachineInfo = self.getVirtualMachineInfo( uuid )
+            if virtualMachineInfo is not None:
+                virtualMachineInfo.setAutoStart( self.virtualMachinePreferences[ uuid ][ 0 ] == Gtk.STOCK_APPLY )
+                virtualMachineInfo.setStartCommand( self.virtualMachinePreferences[ uuid ][ 1 ] )
 
 
     def groupsExist( self ):
@@ -446,7 +448,7 @@ class IndicatorVirtualBox:
         grid.set_margin_bottom( 10 )
 
         stack = [ ]
-        store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon or None for autostart of VM, VM start command, VM/Group UUID.
+        store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon (Gtk.STOCK_APPLY) or None for autostart of VM, VM start command, VM/Group UUID.
         parent = None
         for virtualMachineInfo in self.virtualMachineInfos:
             if virtualMachineInfo.getIndent() < len( stack ):
@@ -542,8 +544,7 @@ class IndicatorVirtualBox:
     def updateVirtualMachinePreferences( self, store, treeiter ):
         while treeiter != None:
             if store[ treeiter ][ 3 ] != "": # UUID is not empty, so this is a VM and not a group...
-#                 self.virtualMachinePreferences[ store[ treeiter ][ 3 ] ] = [ store[ treeiter ][ 1 ], store[ treeiter ][ 2 ] ]
-                print( store[ treeiter ][ 3 ], store[ treeiter ][ 1 ], store[ treeiter ][ 2 ] )
+                self.virtualMachinePreferences[ store[ treeiter ][ 3 ] ] = [ store[ treeiter ][ 1 ], store[ treeiter ][ 2 ] ]
 
             if store.iter_has_child( treeiter ):
                 childiter = store.iter_children( treeiter )
@@ -661,7 +662,7 @@ class IndicatorVirtualBox:
         self.refreshIntervalInMinutes = 15
         self.showSubmenu = False
         self.sortDefault = True
-        self.virtualMachinePreferences = { } # Key is VM UUID; value is [ start command, autostart ]
+        self.virtualMachinePreferences = { } # Store information about VMs, not groups. Key is VM UUID; value is [ autostart (bool), start command (str) ]
 
         if os.path.isfile( IndicatorVirtualBox.SETTINGS_FILE ):
             try:
@@ -708,7 +709,7 @@ class VirtualMachineInfo:
         self.indent = indent
         self.isRunning = False
         self.autoStart = False
-        self.startCommand = None
+        self.startCommand = "VBoxManage startvm %VM%"
 
 
     def getName( self ):
@@ -755,16 +756,4 @@ class VirtualMachineInfo:
         return self.isRunning
 
 
-# TODO Remove!
-#             print_rows( tree.get_model(), tree.get_model().get_iter_first(), "" )
-
-def print_rows(store, treeiter, indent):
-    while treeiter != None:
-        print( indent + str(store[treeiter][:]) )
-        if store.iter_has_child(treeiter):
-            childiter = store.iter_children(treeiter)
-            print_rows(store, childiter, indent + "\t")
-        treeiter = store.iter_next(treeiter)
-  
-#TODO Check what wctrl does for a headless kickoff        
 if __name__ == "__main__": IndicatorVirtualBox().main()

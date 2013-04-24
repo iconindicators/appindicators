@@ -2,6 +2,9 @@ indicator-virtual-box (1.0.18-1) precise; urgency=low
 
   * Now checks if the VirtualBox manager is running before launching...and if it is
     running, brings to front.
+  * Can now customise the launch command for a VM, allowing VBoxHeadless to be
+    called instead of VBoxManage.
+  * Can now set a VM to automatically start when the indicator starts.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 15 Apr 2013 10:38:13 +1000
 
