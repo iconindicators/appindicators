@@ -30,7 +30,11 @@
 
 
 #TODO Check what wctrl does for a headless kickoff.     
-#TODO When refreshing the list of VMs, don't run the VM a second time...only autorun on startup!
+
+#TODO When refreshing the list of VMs, don't run the VM a second time...only autorun on startup!  
+#Maybe do it at the end of the buildMenu...make sure the menu appears and does not "hang" waiting for VMs to start up.
+#Maybe have a separate method kicked off (once and first time) at the end of buildMenu using a thread.
+
 #TODO What happens if the start command is bad...can we capture the output and message box the user?
    
 
