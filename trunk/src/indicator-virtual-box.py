@@ -29,8 +29,9 @@
 # The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
 
 
-#TODO Check what wctrl does for a headless kickoff     
+#TODO Check what wctrl does for a headless kickoff.     
 #TODO When refreshing the list of VMs, don't run the VM a second time...only autorun on startup!
+#TODO What happens if the start command is bad...can we capture the output and message box the user?
    
 
 try:
