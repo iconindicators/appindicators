@@ -29,15 +29,6 @@
 # The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
 
 
-#TODO Check what wctrl does for a headless kickoff.     
-
-#TODO When refreshing the list of VMs, don't run the VM a second time...only autorun on startup!  
-#Maybe do it at the end of the buildMenu...make sure the menu appears and does not "hang" waiting for VMs to start up.
-#Maybe have a separate method kicked off (once and first time) at the end of buildMenu using a thread.
-
-#TODO What happens if the start command is bad...can we capture the output and message box the user?
-   
-
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -54,6 +45,7 @@ class IndicatorVirtualBox:
     VERSION = "1.0.18"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
+    LOG = IndicatorVirtualBox.NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -71,7 +63,12 @@ class IndicatorVirtualBox:
 
 
     def __init__( self ):
-        logging.basicConfig( file = sys.stderr, level = logging.INFO )
+        logging.basicConfig( filename = IndicatorVirtualBox.LOG, 
+                             filemode = "a", 
+                             format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
+                             datefmt = "%H:%M:%S", level = logging.DEBUG )
+
+        self.firstTime = True
         self.loadSettings()
         self.dialog = None
 
@@ -98,6 +95,19 @@ class IndicatorVirtualBox:
 
 
     def buildMenu( self ):
+        if self.firstTime:
+            self.firstTime = False
+            self.getVirtualMachines()
+            for virtualMachineInfo in self.virtualMachineInfos:
+                if virtualMachineInfo.getAutoStart():
+                    try:
+                        startCommand = virtualMachineInfo.getStartCommand().replace( "%VM%", virtualMachineInfo.getUUID() ) + " &"
+                        p = subprocess.Popen( startCommand, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+                        p.wait()
+                    except Exception as e:
+                        logging.exception( e )
+                        self.showMessage( Gtk.MessageType.ERROR, "The VM '" + virtualMachineInfo.getName() + "' could not be started - check the log file: " + IndicatorVirtualBox.LOG )
+
         if self.appindicatorImported == True:
             menu = self.indicator.get_menu()
         else:
@@ -358,12 +368,15 @@ class IndicatorVirtualBox:
 
                 p.wait()
 
-                if windowID is not None:
+                if windowID is None:
+                    self.showMessage( Gtk.MessageType.ERROR, "The VM is running but its window could not be found - perhaps it is running headless" )
+                else:                    
+                    # If the VM is running headless then there will be no window to display...
                     p = subprocess.Popen( "wmctrl -i -a " + windowID, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
                     p.wait()
         else:
-            command = "VBoxManage startvm " + virtualMachineUUID
-            p = subprocess.Popen( command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+            startCommand = virtualMachineInfo.getStartCommand().replace( "%VM%", virtualMachineUUID ) + " &"
+            p = subprocess.Popen( startCommand, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
             p.wait()
 
         self.onRefresh()
