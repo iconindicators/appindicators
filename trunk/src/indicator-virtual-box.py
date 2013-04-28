@@ -45,7 +45,7 @@ class IndicatorVirtualBox:
     VERSION = "1.0.18"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
-    LOG = IndicatorVirtualBox.NAME + ".log"
+    LOG = NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
