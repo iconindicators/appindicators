@@ -407,6 +407,7 @@ class IndicatorVirtualBox:
 
     def onPreferences( self, widget ):
         if self.dialog is not None:
+            self.dialog.present()
             return
 
         notebook = Gtk.Notebook()
