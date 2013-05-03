@@ -55,7 +55,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.19"
+    VERSION = "1.0.20"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -640,12 +640,12 @@ class IndicatorLunar:
                     break
 
             if self.cityName is None or self.cityName == "":
-                self.cityName = sorted( self.cities.keys(), key = locale.strxfrm )[ 0 ]
+                self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
 
         except Exception as e:
             logging.exception( e )
             logging.error( "Error getting default cityName." )
-            self.cityName = sorted( self.cities.keys(), key = locale.strxfrm )[ 0 ]
+            self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
 
 
     def saveSettings( self ):
