@@ -18,10 +18,11 @@
 # Application indicator which displays the current stardate.
 
 
-# PyGObject, GTK+3 references:
+# References:
 #  http://developer.gnome.org/pygobject
 #  http://developer.gnome.org/gtk3
 #  http://python-gtk-3-tutorial.readthedocs.org
+#  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
 try:
@@ -30,6 +31,7 @@ except:
     pass
 
 from gi.repository import GLib, Gtk
+
 import datetime, json, logging, os, shutil, stardate, sys
 
 
@@ -37,9 +39,10 @@ class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.12"
+    VERSION = "1.0.13"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
+    LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -52,8 +55,12 @@ class IndicatorStardate:
 
 
     def __init__( self ):
+        logging.basicConfig( filename = IndicatorStardate.LOG, 
+                             filemode = "a", 
+                             format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
+                             datefmt = "%H:%M:%S", level = logging.DEBUG )
+
         self.dialog = None
-        logging.basicConfig( file = sys.stderr, level = logging.INFO )
         self.loadSettings()
 
         try:
@@ -109,7 +116,6 @@ class IndicatorStardate:
             period = 1
 
         GLib.timeout_add_seconds( period, self.update )
-
         Gtk.main()
 
 
@@ -136,21 +142,26 @@ class IndicatorStardate:
 
 
     def onAbout( self, widget ):
-        dialog = Gtk.AboutDialog()
-        dialog.set_program_name( IndicatorStardate.NAME )
-        dialog.set_comments( IndicatorStardate.AUTHOR + "\n\nBased on STARDATES IN STAR TREK FAQ V1.6\n" )
-        dialog.set_website( IndicatorStardate.WEBSITE )
-        dialog.set_website_label( IndicatorStardate.WEBSITE )
-        dialog.set_version( IndicatorStardate.VERSION )
-        dialog.set_license( IndicatorStardate.LICENSE )
-        dialog.set_icon_name( Gtk.STOCK_ABOUT )
-        dialog.run()
-        dialog.destroy()
-        dialog = None
+        if self.dialog is not None:
+            self.dialog.present()
+            return
+
+        self.dialog = Gtk.AboutDialog()
+        self.dialog.set_program_name( IndicatorStardate.NAME )
+        self.dialog.set_comments( IndicatorStardate.AUTHOR + "\n\nBased on STARDATES IN STAR TREK FAQ V1.6\n" )
+        self.dialog.set_website( IndicatorStardate.WEBSITE )
+        self.dialog.set_website_label( IndicatorStardate.WEBSITE )
+        self.dialog.set_version( IndicatorStardate.VERSION )
+        self.dialog.set_license( IndicatorStardate.LICENSE )
+        self.dialog.set_icon_name( Gtk.STOCK_ABOUT )
+        self.dialog.run()
+        self.dialog.destroy()
+        self.dialog = None
 
 
     def onPreferences( self, widget ):
         if self.dialog is not None:
+            self.dialog.present()
             return
 
         grid = Gtk.Grid()
