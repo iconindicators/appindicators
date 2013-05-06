@@ -1,3 +1,13 @@
+indicator-ppa-download-statistics (1.0.23-1) precise; urgency=low
+
+  * Now logs to a file in the user's HOME directory.
+  * Attempt to bring about/preferences to front.
+  * Placed autostart preference at bottom of preferences dialog to be consistent
+    with other indicators.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 4 Apr 2013 09:31:37 +1000
+
+
 indicator-ppa-download-statistics (1.0.22-1) precise; urgency=low
 
   * Icons for Add/Edit now show for Lubuntu/Xubuntu.

@@ -19,13 +19,22 @@
 
 
 # References:
-#  https://launchpad.net/+apidoc/1.0.html
-#  https://help.launchpad.net/API/launchpadlib
-#  http://developer.ubuntu.com/api/ubuntu-12.04/c/appindicator/index.html
-#  https://help.launchpad.net/API/Hacking
-#  https://python-gtk-3-tutorial.readthedocs.org
-#  http://developer.gnome.org/gtk3/stable/index.html
+#  http://developer.gnome.org/pygobject
+#  http://developer.gnome.org/gtk3
+#  http://python-gtk-3-tutorial.readthedocs.org
+#  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
+#  http://launchpad.net/+apidoc
+#  http://help.launchpad.net/API/launchpadlib
+#  http://help.launchpad.net/API/Hacking
 
+
+# TODO
+# DOUBLE CHECK - MAKE SURE IT IS SAFE TO REUSE SELF.DIALOG.
+# WHAT IF WE LAUNCH PREFERENCES AND THEN ANOTHER DIALOG FROM THAT?  
+# WHAT THEN IF THE USER INVOKES THE PREFERENCES DIALOG FROM THE MENU?
+# WHAT ABOUT ADDING OR EDITING AND/OR PREFERENCES AT THE SAME TIME?
+
+# TODO Perhaps whilst the update is happening, the menu items should be disabled?
 
 from copy import deepcopy
 
@@ -46,8 +55,9 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.22"
+    VERSION = "1.0.23"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
+    LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -78,7 +88,11 @@ class IndicatorPPADownloadStatistics:
         GLib.threads_init()
         self.lock = threading.Lock()
 
-        logging.basicConfig( file = sys.stderr, level = logging.INFO )
+        logging.basicConfig( filename = IndicatorPPADownloadStatistics.LOG, 
+                             filemode = "a", 
+                             format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
+                             datefmt = "%H:%M:%S", level = logging.DEBUG )
+
         self.loadSettings()
 
         try:
@@ -374,6 +388,7 @@ class IndicatorPPADownloadStatistics:
 
     def onAbout( self, widget ):
         if self.dialog is not None:
+            self.dialog.present()
             return
 
         self.dialog = Gtk.AboutDialog()
@@ -415,6 +430,7 @@ class IndicatorPPADownloadStatistics:
 
     def addEditPPA( self, add, existingPPAUser, existingPPAName, existingSeries, existingArchitecture ):
         if self.dialog is not None:
+            self.dialog.present()
             return
 
         title = "Add a PPA"
@@ -585,6 +601,7 @@ class IndicatorPPADownloadStatistics:
 
     def onRemove( self, widget ):
         if self.dialog is not None:
+            self.dialog.present()
             return
 
         self.dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, "Remove the PPA '" + widget.props.name + "'?" )
@@ -603,6 +620,7 @@ class IndicatorPPADownloadStatistics:
 
     def onPreferences( self, widget ):
         if self.dialog is not None:
+            self.dialog.present()
             return
 
         notebook = Gtk.Notebook()
@@ -616,7 +634,7 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showAsSubmenusCheckbox = Gtk.CheckButton( "Show as submenus" )
+        showAsSubmenusCheckbox = Gtk.CheckButton( "Show as PPAs submenus" )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
@@ -659,14 +677,14 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 0, 1, 1 )
-
         allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Load PPA page on selection" )
         allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item launches the default web browser and loads the PPA home page." )
         allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
-        grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 1, 1, 1 )
+        grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 0, 1, 1 )
+
+        autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
+        grid.attach( autostartCheckbox, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "General" ) )
 
@@ -810,15 +828,15 @@ class IndicatorPPADownloadStatistics:
             ppaName = ppaInfos[ key ].getName()
             series = ppaInfos[ key ].getSeries()
             architecture = ppaInfos[ key ].getArchitecture()
-
+ 
             t = Thread( target = self.getPublishedBinaries, args = ( key, ppaUser, ppaName, series, architecture, ppaDownloadStatistics ), )
             time.sleep( 0.5 ) # Space out the requests...
             threads.append( t )
             t.start()
-
+ 
         for t in threads:
             t.join()
-
+ 
         self.lock.acquire()
         self.ppaDownloadStatistics = ppaDownloadStatistics
         self.updateThread = None
