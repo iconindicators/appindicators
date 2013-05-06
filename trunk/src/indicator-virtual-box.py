@@ -18,6 +18,13 @@
 # Application indicator which displays/controls VirtualBox virtual machines.
 
 
+# References:
+#  http://developer.gnome.org/pygobject
+#  http://developer.gnome.org/gtk3
+#  http://python-gtk-3-tutorial.readthedocs.org
+#  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
+
+
 # On Lubuntu 12.10 the following message appears when the indicator is executed:
 #   ERROR:root:Could not find any typelib for AppIndicator3
 # From https://kororaa.org/forums/viewtopic.php?f=7&t=220#p2343, it (hopefully) is safe to ignore.
@@ -29,12 +36,19 @@
 # The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
 
 
+# TODO
+# DOUBLE CHECK - MAKE SURE IT IS SAFE TO REUSE SELF.DIALOG.
+# WHAT IF WE LAUNCH PREFERENCES AND THEN ANOTHER DIALOG FROM THAT?  
+# WHAT THEN IF THE USER INVOKES THE PREFERENCES DIALOG FROM THE MENU?
+
+
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
     pass
 
 from gi.repository import GLib, Gtk
+
 import json, locale, logging, os, shutil, subprocess, sys
 
 
@@ -45,7 +59,7 @@ class IndicatorVirtualBox:
     VERSION = "1.0.18"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
-    LOG = NAME + ".log"
+    LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -96,18 +110,17 @@ class IndicatorVirtualBox:
 
     def buildMenu( self ):
         if self.firstTime:
+            # Run designated VMs on startup...
             self.firstTime = False
             self.getVirtualMachines()
             for virtualMachineInfo in self.virtualMachineInfos:
                 if virtualMachineInfo.getAutoStart():
-                    try:
-                        startCommand = virtualMachineInfo.getStartCommand().replace( "%VM%", virtualMachineInfo.getUUID() ) + " &"
-                        p = subprocess.Popen( startCommand, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-                        p.wait()
-                    except Exception as e:
-                        logging.exception( e )
-                        self.showMessage( Gtk.MessageType.ERROR, "The VM '" + virtualMachineInfo.getName() + "' could not be started - check the log file: " + IndicatorVirtualBox.LOG )
+                    # Create a dummy widget (radio button) and use that to kick off the start VM function...
+                    radioButton = Gtk.RadioButton.new_with_label_from_widget( None, "" )                    
+                    radioButton.props.name = virtualMachineInfo.getUUID()
+                    self.onStartVirtualMachine( radioButton )
 
+        # Build menu as normal...
         if self.appindicatorImported == True:
             menu = self.indicator.get_menu()
         else:
@@ -263,7 +276,7 @@ class IndicatorVirtualBox:
         if self.sortDefault == False and not self.groupsExist():
             self.virtualMachineInfos = sorted( self.virtualMachineInfos, key = lambda virtualMachineInfo: virtualMachineInfo.name )
 
-        # Add to each VM the VM properties (such as autostart and the start command).
+        # Add to each VM its properties (autostart and the start command).
         for uuid in self.virtualMachinePreferences:
             virtualMachineInfo = self.getVirtualMachineInfo( uuid )
             if virtualMachineInfo is not None:
@@ -348,6 +361,7 @@ class IndicatorVirtualBox:
 
 
     def onStartVirtualMachine( self, widget ):
+        print(type(widget))
         self.getVirtualMachines() # Refresh the VMs as the list could have changed (deletion, creation, rename) since the last refresh.
 
         virtualMachineUUID = widget.props.name
@@ -378,8 +392,19 @@ class IndicatorVirtualBox:
             startCommand = virtualMachineInfo.getStartCommand().replace( "%VM%", virtualMachineUUID ) + " &"
             p = subprocess.Popen( startCommand, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
             p.wait()
+#TODO Given we add a & to the end of the start command, the process returns immediately...
+# ...rebuilding the menu which calls VB will not pick up yet if the VM is actually running.
+# ...So how to handle this?
+# ...Wait some time before doing the refresh?
+# ...Poll until the VM is found running?
+# ...How about when running multiple VMs (either on startup or from a user being click happy)?            
+            
 
-        self.onRefresh()
+#TODO On startup, we kick off startup VMs and then call onRefresh after each of those VMs is started...
+# ...rebuilding the menu each time...
+# and that's before the menu is built first time!
+# Need some other way to flag whether or not to do a rebuild of the menu.
+#         self.onRefresh()
 
 
     def getVirtualMachineInfo( self, virtualMachineUUID ):
@@ -432,6 +457,7 @@ class IndicatorVirtualBox:
 
         textGroupNameBefore = Gtk.Entry()
         textGroupNameBefore.set_text( self.menuTextGroupNameBefore )
+        textGroupNameBefore.set_tooltip_text( "If any groups are present, this text will appear BEFORE each group name" )
         textGroupNameBefore.set_hexpand( True )
         grid.attach( textGroupNameBefore, 1, 1, 1, 1 )
 
@@ -442,17 +468,20 @@ class IndicatorVirtualBox:
 
         textGroupNameAfter = Gtk.Entry()
         textGroupNameAfter.set_text( self.menuTextGroupNameAfter )
+        textGroupNameAfter.set_tooltip_text( "If any groups are present, this text will appear AFTER each group name" )
         grid.attach( textGroupNameAfter, 1, 2, 1, 1 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show groups as submenus" )
         showAsSubmenusCheckbox.set_margin_top( 10 ) # Bit of padding from the item above.
         showAsSubmenusCheckbox.set_tooltip_text( "Only applies when groups ARE present" )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
+        showAsSubmenusCheckbox.set_sensitive( self.groupsExist() )
         grid.attach( showAsSubmenusCheckbox, 0, 3, 2, 1 )
 
         sortAlphabeticallyCheckbox = Gtk.CheckButton( "Sort VMs alphabetically" )
         sortAlphabeticallyCheckbox.set_tooltip_text( "Only applies when groups are NOT present" )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
+        sortAlphabeticallyCheckbox.set_sensitive( not self.groupsExist() )
         grid.attach( sortAlphabeticallyCheckbox, 0, 4, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
@@ -654,17 +683,21 @@ class IndicatorVirtualBox:
 
 
     def onAbout( self, widget ):
-        dialog = Gtk.AboutDialog()
-        dialog.set_program_name( IndicatorVirtualBox.NAME )
-        dialog.set_comments( IndicatorVirtualBox.AUTHOR )
-        dialog.set_website( IndicatorVirtualBox.WEBSITE )
-        dialog.set_website_label( IndicatorVirtualBox.WEBSITE )
-        dialog.set_version( IndicatorVirtualBox.VERSION )
-        dialog.set_license( IndicatorVirtualBox.LICENSE )
-        dialog.set_icon_name( Gtk.STOCK_ABOUT )
-        dialog.run()
-        dialog.destroy()
-        dialog = None
+        if self.dialog is not None:
+            self.dialog.present()
+            return
+
+        self.dialog = Gtk.AboutDialog()
+        self.dialog.set_program_name( IndicatorVirtualBox.NAME )
+        self.dialog.set_comments( IndicatorVirtualBox.AUTHOR )
+        self.dialog.set_website( IndicatorVirtualBox.WEBSITE )
+        self.dialog.set_website_label( IndicatorVirtualBox.WEBSITE )
+        self.dialog.set_version( IndicatorVirtualBox.VERSION )
+        self.dialog.set_license( IndicatorVirtualBox.LICENSE )
+        self.dialog.set_icon_name( Gtk.STOCK_ABOUT )
+        self.dialog.run()
+        self.dialog.destroy()
+        self.dialog = None
 
 
     def handleLeftClick( self, icon ):
