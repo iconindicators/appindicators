@@ -1,7 +1,7 @@
 indicator-stardate (1.0.13-1) precise; urgency=low
 
   * Now logs to a file in the user's HOME directory.
-  * Force about/preferences to front.
+  * Attempt to bring about/preferences to front.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 4 Apr 2013 09:30:47 +1000
 
