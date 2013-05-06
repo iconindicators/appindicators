@@ -1,6 +1,8 @@
 indicator-lunar (1.0.20-1) precise; urgency=low
 
   * Seems the bug fixed to handle a missing city was not quite fixed!
+  * Now logs to a file in the user's HOME directory.
+  * Attempt to bring about/preferences to front.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 4 May 2013 1:34:14 +1000
 

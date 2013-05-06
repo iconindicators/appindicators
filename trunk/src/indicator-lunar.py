@@ -18,6 +18,12 @@
 # Application indicator which displays lunar information.
 
 
+# References:
+#  http://developer.gnome.org/pygobject
+#  http://developer.gnome.org/gtk3
+#  http://python-gtk-3-tutorial.readthedocs.org
+#  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
+
 
 #TODO
 # Have noticed that the submenus appear as a single space after a certain amount of time.
@@ -58,6 +64,7 @@ class IndicatorLunar:
     VERSION = "1.0.20"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
+    LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -99,7 +106,11 @@ class IndicatorLunar:
 
 
     def __init__( self ):
-        logging.basicConfig( file = sys.stderr, level = logging.INFO )
+        logging.basicConfig( filename = IndicatorLunar.LOG, 
+                             filemode = "a", 
+                             format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
+                             datefmt = "%H:%M:%S", level = logging.DEBUG )
+
         self.loadSettings()
         self.dialog = None
 
@@ -376,21 +387,26 @@ class IndicatorLunar:
 
 
     def onAbout( self, widget ):
-        dialog = Gtk.AboutDialog()
-        dialog.set_program_name( IndicatorLunar.NAME )
-        dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of Ephem.\n" )
-        dialog.set_website( IndicatorLunar.WEBSITE )
-        dialog.set_website_label( IndicatorLunar.WEBSITE )
-        dialog.set_version( IndicatorLunar.VERSION )
-        dialog.set_license( IndicatorLunar.LICENSE )
-        dialog.set_icon_name( Gtk.STOCK_ABOUT )
-        dialog.run()
-        dialog.destroy()
-        dialog = None
+        if self.dialog is not None:
+            self.dialog.present()
+            return
+
+        self.dialog = Gtk.AboutDialog()
+        self.dialog.set_program_name( IndicatorLunar.NAME )
+        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of Ephem.\n" )
+        self.dialog.set_website( IndicatorLunar.WEBSITE )
+        self.dialog.set_website_label( IndicatorLunar.WEBSITE )
+        self.dialog.set_version( IndicatorLunar.VERSION )
+        self.dialog.set_license( IndicatorLunar.LICENSE )
+        self.dialog.set_icon_name( Gtk.STOCK_ABOUT )
+        self.dialog.run()
+        self.dialog.destroy()
+        self.dialog = None
 
 
     def onPreferences( self, widget ):
         if self.dialog is not None:
+            self.dialog.present()
             return
 
         notebook = Gtk.Notebook()
@@ -418,7 +434,7 @@ class IndicatorLunar:
 
         showHourlyWerewolfWarningCheckbox = Gtk.CheckButton( "Hourly werewolf warning" )
         showHourlyWerewolfWarningCheckbox.set_active( self.showHourlyWerewolfWarning )
-        showHourlyWerewolfWarningCheckbox.set_tooltip_text( "Shows an hourly screen notification when approaching a full moon" )
+        showHourlyWerewolfWarningCheckbox.set_tooltip_text( "Show an hourly screen notification at full moon" )
         grid.attach( showHourlyWerewolfWarningCheckbox, 0, 3, 2, 1 )
 
         label = Gtk.Label( "  Illumination %" )
@@ -428,7 +444,7 @@ class IndicatorLunar:
 
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 5, 0 ) )
-        spinner.set_tooltip_text( "The warning will start after the new moon (0%) and commence at the specified illumination" )
+        spinner.set_tooltip_text( "The warning commence at the specified illumination (after a new moon, 0%, has occurred)" )
         spinner.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
         spinner.set_hexpand( True )
         grid.attach( spinner, 1, 4, 1, 1 )
