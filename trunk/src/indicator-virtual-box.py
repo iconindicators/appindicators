@@ -110,7 +110,7 @@ class IndicatorVirtualBox:
 
     def buildMenu( self ):
         if self.firstTime:
-            # Run designated VMs on startup...
+            # On startup, run VMs (as specified in the settings)...
             self.firstTime = False
             self.getVirtualMachines()
             for virtualMachineInfo in self.virtualMachineInfos:
@@ -118,7 +118,7 @@ class IndicatorVirtualBox:
                     # Create a dummy widget (radio button) and use that to kick off the start VM function...
                     radioButton = Gtk.RadioButton.new_with_label_from_widget( None, "" )                    
                     radioButton.props.name = virtualMachineInfo.getUUID()
-                    self.onStartVirtualMachine( radioButton )
+                    self.onStartVirtualMachine( radioButton, False )
 
         # Build menu as normal...
         if self.appindicatorImported == True:
@@ -132,7 +132,7 @@ class IndicatorVirtualBox:
         menu = Gtk.Menu()
         if self.isVirtualBoxInstalled():
             self.getVirtualMachines()
-            if len( self.virtualMachineInfos ) == 0 :
+            if len( self.virtualMachineInfos ) == 0:
                 menu.append( Gtk.MenuItem( "(no virtual machines exist)" ) )
             else:
                 if self.showSubmenu == True:
@@ -159,7 +159,7 @@ class IndicatorVirtualBox:
                                 menuItem = Gtk.MenuItem( virtualMachineInfo.getName() )
 
                             menuItem.props.name = virtualMachineInfo.getUUID()
-                            menuItem.connect( "activate", self.onStartVirtualMachine )
+                            menuItem.connect( "activate", self.onStartVirtualMachine, True )
                             currentMenu.append( menuItem )
                 else:
                     for virtualMachineInfo in self.virtualMachineInfos:
@@ -174,7 +174,7 @@ class IndicatorVirtualBox:
                                 vmMenuItem = Gtk.MenuItem( indent + virtualMachineInfo.getName() )
     
                             vmMenuItem.props.name = virtualMachineInfo.getUUID()
-                            vmMenuItem.connect( "activate", self.onStartVirtualMachine )
+                            vmMenuItem.connect( "activate", self.onStartVirtualMachine, True )
 
                         menu.append( vmMenuItem )
 
@@ -283,6 +283,16 @@ class IndicatorVirtualBox:
                 virtualMachineInfo.setAutoStart( self.virtualMachinePreferences[ uuid ][ 0 ] == Gtk.STOCK_APPLY )
                 virtualMachineInfo.setStartCommand( self.virtualMachinePreferences[ uuid ][ 1 ] )
 
+# TODO
+# If we set the running flag for a VM when it's started, the subsequent refresh which calls the build Menu 
+# which calls get VMs (and running VMs) will clear out the running flag because that VM hasn't started running yet!
+
+# TODO
+# What happens for VMs on auto start?
+# If each VM is kicked off, do we wait/sleep for all of them to start...maybe wait 10 sec for each?
+# Wait 10 sec between starting each one?
+# Wait 10 sec for each before doing a refresh?
+
 
     def groupsExist( self ):
         for virtualMachineInfo in self.virtualMachineInfos:
@@ -360,9 +370,8 @@ class IndicatorVirtualBox:
             p.wait()
 
 
-    def onStartVirtualMachine( self, widget ):
-        print(type(widget))
-        self.getVirtualMachines() # Refresh the VMs as the list could have changed (deletion, creation, rename) since the last refresh.
+    def onStartVirtualMachine( self, widget, doRefresh ):
+        if doRefresh: self.getVirtualMachines() # Refresh the VMs as the list could have changed (deletion, creation, rename) since the last refresh.
 
         virtualMachineUUID = widget.props.name
         virtualMachineInfo = self.getVirtualMachineInfo( virtualMachineUUID )
@@ -384,27 +393,21 @@ class IndicatorVirtualBox:
 
                 if windowID is None:
                     self.showMessage( Gtk.MessageType.ERROR, "The VM is running but its window could not be found - perhaps it is running headless" )
-                else:                    
+                else:
                     # If the VM is running headless then there will be no window to display...
                     p = subprocess.Popen( "wmctrl -i -a " + windowID, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
                     p.wait()
         else:
-            startCommand = virtualMachineInfo.getStartCommand().replace( "%VM%", virtualMachineUUID ) + " &"
-            p = subprocess.Popen( startCommand, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-            p.wait()
-#TODO Given we add a & to the end of the start command, the process returns immediately...
-# ...rebuilding the menu which calls VB will not pick up yet if the VM is actually running.
-# ...So how to handle this?
-# ...Wait some time before doing the refresh?
-# ...Poll until the VM is found running?
-# ...How about when running multiple VMs (either on startup or from a user being click happy)?            
-            
+            try:
+                startCommand = virtualMachineInfo.getStartCommand().replace( "%VM%", virtualMachineInfo.getUUID() ) + " &"
+                p = subprocess.Popen( startCommand, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+                p.wait()
+                virtualMachineInfo.setRunning()
+            except Exception as e:
+                self.showMessage( Gtk.MessageType.ERROR, "The VM '" + virtualMachineInfo.getName() + "' could not be started - check the log file: " + IndicatorVirtualBox.LOG )
+                logging.exception( e )
 
-#TODO On startup, we kick off startup VMs and then call onRefresh after each of those VMs is started...
-# ...rebuilding the menu each time...
-# and that's before the menu is built first time!
-# Need some other way to flag whether or not to do a rebuild of the menu.
-#         self.onRefresh()
+        if doRefresh: self.onRefresh()
 
 
     def getVirtualMachineInfo( self, virtualMachineUUID ):
