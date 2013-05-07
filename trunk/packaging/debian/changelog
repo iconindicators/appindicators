@@ -4,6 +4,7 @@ indicator-ppa-download-statistics (1.0.23-1) precise; urgency=low
   * Attempt to bring about/preferences to front.
   * Placed autostart preference at bottom of preferences dialog to be consistent
     with other indicators.
+  * Removed redundant onAutoStart function.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 4 Apr 2013 09:31:37 +1000
 

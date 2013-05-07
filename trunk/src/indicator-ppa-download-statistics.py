@@ -28,16 +28,6 @@
 #  http://help.launchpad.net/API/Hacking
 
 
-# TODO
-# DOUBLE CHECK - MAKE SURE IT IS SAFE TO REUSE SELF.DIALOG.
-# WHAT IF WE LAUNCH PREFERENCES AND THEN ANOTHER DIALOG FROM THAT?  
-# WHAT THEN IF THE USER INVOKES THE PREFERENCES DIALOG FROM THE MENU?
-# WHAT ABOUT ADDING OR EDITING AND/OR PREFERENCES AT THE SAME TIME?
-
-# TODO Perhaps whilst the update is happening, the menu items should be disabled?
-# What happens if a dialog is already open???
-
-
 from copy import deepcopy
 
 try:
