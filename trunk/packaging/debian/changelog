@@ -3,7 +3,9 @@ indicator-virtual-box (1.0.18-1) precise; urgency=low
   * Only brings up one VirtualBox manager at a time.
   * User can customise the launch command for a VM, allowing VBoxHeadless to be
     used instead of VBoxManage.
-  * User can set a VM to automatically start when the indicator starts.
+  * User can set a VM to automatically start when the indicator starts.  Each VM
+    will start up before the indicator displays, with a five second delay between
+    each VM.
   * Now logs to a file in the user's HOME directory.
   * Attempt to bring about/preferences to front.
 
