@@ -49,7 +49,7 @@ except:
 
 from gi.repository import GLib, Gtk
 
-import json, locale, logging, os, shutil, subprocess, sys
+import json, locale, logging, os, shutil, subprocess, sys, time
 
 
 class IndicatorVirtualBox:
@@ -66,6 +66,7 @@ class IndicatorVirtualBox:
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
     VIRTUAL_BOX_CONFIGURATION = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
+    VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS = 5
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_MENU_TEXT_GROUP_NAME_BEFORE = "menuTextGroupNameBefore"
@@ -82,10 +83,19 @@ class IndicatorVirtualBox:
                              format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
                              datefmt = "%H:%M:%S", level = logging.DEBUG )
 
-        self.firstTime = True
         self.loadSettings()
         self.dialog = None
 
+        # Start up VMs...
+        self.getVirtualMachines()
+        for virtualMachineInfo in self.virtualMachineInfos:
+            if virtualMachineInfo.getAutoStart():
+                # Create a dummy widget (radio button) and use that to kick off the start VM function...
+                radioButton = Gtk.RadioButton.new_with_label_from_widget( None, "" )                    
+                radioButton.props.name = virtualMachineInfo.getUUID()
+                self.onStartVirtualMachine( radioButton, False )
+
+        # Create the indicator...
         try:
             self.appindicatorImported = True
             self.indicator = appindicator.Indicator.new( IndicatorVirtualBox.NAME, IndicatorVirtualBox.ICON, appindicator.IndicatorCategory.APPLICATION_STATUS )
@@ -109,18 +119,6 @@ class IndicatorVirtualBox:
 
 
     def buildMenu( self ):
-        if self.firstTime:
-            # On startup, run VMs (as specified in the settings)...
-            self.firstTime = False
-            self.getVirtualMachines()
-            for virtualMachineInfo in self.virtualMachineInfos:
-                if virtualMachineInfo.getAutoStart():
-                    # Create a dummy widget (radio button) and use that to kick off the start VM function...
-                    radioButton = Gtk.RadioButton.new_with_label_from_widget( None, "" )                    
-                    radioButton.props.name = virtualMachineInfo.getUUID()
-                    self.onStartVirtualMachine( radioButton, False )
-
-        # Build menu as normal...
         if self.appindicatorImported == True:
             menu = self.indicator.get_menu()
         else:
@@ -283,16 +281,6 @@ class IndicatorVirtualBox:
                 virtualMachineInfo.setAutoStart( self.virtualMachinePreferences[ uuid ][ 0 ] == Gtk.STOCK_APPLY )
                 virtualMachineInfo.setStartCommand( self.virtualMachinePreferences[ uuid ][ 1 ] )
 
-# TODO
-# If we set the running flag for a VM when it's started, the subsequent refresh which calls the build Menu 
-# which calls get VMs (and running VMs) will clear out the running flag because that VM hasn't started running yet!
-
-# TODO
-# What happens for VMs on auto start?
-# If each VM is kicked off, do we wait/sleep for all of them to start...maybe wait 10 sec for each?
-# Wait 10 sec between starting each one?
-# Wait 10 sec for each before doing a refresh?
-
 
     def groupsExist( self ):
         for virtualMachineInfo in self.virtualMachineInfos:
@@ -402,7 +390,12 @@ class IndicatorVirtualBox:
                 startCommand = virtualMachineInfo.getStartCommand().replace( "%VM%", virtualMachineInfo.getUUID() ) + " &"
                 p = subprocess.Popen( startCommand, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
                 p.wait()
-                virtualMachineInfo.setRunning()
+
+                # Since the start command returns immediately, the running status (from VBoxManage) may not be updated as yet.
+                # Pause after kicking off the VM to give VBoxManage a chance to catch up...
+                # ...then when the indicator is updated, we (hopefully) will be updated correctly!
+                time.sleep( IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS )
+
             except Exception as e:
                 self.showMessage( Gtk.MessageType.ERROR, "The VM '" + virtualMachineInfo.getName() + "' could not be started - check the log file: " + IndicatorVirtualBox.LOG )
                 logging.exception( e )
