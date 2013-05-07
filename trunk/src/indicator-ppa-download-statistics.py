@@ -35,6 +35,8 @@
 # WHAT ABOUT ADDING OR EDITING AND/OR PREFERENCES AT THE SAME TIME?
 
 # TODO Perhaps whilst the update is happening, the menu items should be disabled?
+# What happens if a dialog is already open???
+
 
 from copy import deepcopy
 
@@ -402,21 +404,6 @@ class IndicatorPPADownloadStatistics:
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
-
-
-    def onAutoStart( self, widget ):
-        if not os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH ):
-            os.makedirs( IndicatorPPADownloadStatistics.AUTOSTART_PATH )
-
-        if widget.active:
-            try:
-                shutil.copy( IndicatorPPADownloadStatistics.DESKTOP_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE, IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
-            except Exception as e:
-                logging.exception( e )
-        else:
-            try:
-                os.remove( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
-            except: pass
 
 
     def onAdd( self, widget ):
