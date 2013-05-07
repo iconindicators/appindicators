@@ -453,7 +453,7 @@ class IndicatorVirtualBox:
 
         textGroupNameBefore = Gtk.Entry()
         textGroupNameBefore.set_text( self.menuTextGroupNameBefore )
-        textGroupNameBefore.set_tooltip_text( "If any groups are present, this text will appear BEFORE each group name" )
+        textGroupNameBefore.set_tooltip_text( "If groups are present, this text will appear BEFORE each group name" )
         textGroupNameBefore.set_hexpand( True )
         grid.attach( textGroupNameBefore, 1, 1, 1, 1 )
 
@@ -464,18 +464,18 @@ class IndicatorVirtualBox:
 
         textGroupNameAfter = Gtk.Entry()
         textGroupNameAfter.set_text( self.menuTextGroupNameAfter )
-        textGroupNameAfter.set_tooltip_text( "If any groups are present, this text will appear AFTER each group name" )
+        textGroupNameAfter.set_tooltip_text( "If groups are present, this text will appear AFTER each group name" )
         grid.attach( textGroupNameAfter, 1, 2, 1, 1 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show groups as submenus" )
         showAsSubmenusCheckbox.set_margin_top( 10 ) # Bit of padding from the item above.
-        showAsSubmenusCheckbox.set_tooltip_text( "Only applies when groups ARE present" )
+        showAsSubmenusCheckbox.set_tooltip_text( "Applies when groups ARE present" )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         showAsSubmenusCheckbox.set_sensitive( self.groupsExist() )
         grid.attach( showAsSubmenusCheckbox, 0, 3, 2, 1 )
 
         sortAlphabeticallyCheckbox = Gtk.CheckButton( "Sort VMs alphabetically" )
-        sortAlphabeticallyCheckbox.set_tooltip_text( "Only applies when groups are NOT present" )
+        sortAlphabeticallyCheckbox.set_tooltip_text( "Applies when groups are NOT present" )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
         sortAlphabeticallyCheckbox.set_sensitive( not self.groupsExist() )
         grid.attach( sortAlphabeticallyCheckbox, 0, 4, 2, 1 )
