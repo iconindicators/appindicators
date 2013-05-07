@@ -36,12 +36,6 @@
 # The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
 
 
-# TODO
-# DOUBLE CHECK - MAKE SURE IT IS SAFE TO REUSE SELF.DIALOG.
-# WHAT IF WE LAUNCH PREFERENCES AND THEN ANOTHER DIALOG FROM THAT?  
-# WHAT THEN IF THE USER INVOKES THE PREFERENCES DIALOG FROM THE MENU?
-
-
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -627,6 +621,7 @@ class IndicatorVirtualBox:
         autostartCheckbox.set_active( model[ treeiter ][ 1 ] is not None and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
+        # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
         dialog = Gtk.Dialog( "VM Properties", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
