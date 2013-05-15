@@ -523,11 +523,12 @@ class IndicatorPPADownloadStatistics:
             if key not in self.ppaInfos: # If there is no change, there is nothing to do...
                 if add == True:
                     self.ppaInfos[ key ] = PPAInfo( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
-                else: # This is an edit
+                else: # This is an edit...we are 'renaming' the PPA key, but the PPA download data is still present under the old key!
                     oldKey = self.getPPAKey( [ existingPPAUser, existingPPAName, existingSeries, existingArchitecture ] )
                     del self.ppaInfos[ oldKey ]
                     self.ppaInfos[ key ] = PPAInfo( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
 
+                self.setToDownloadingData()
                 self.saveSettings()
                 GLib.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
                 self.requestPPADownloadAndMenuRefresh()
@@ -587,15 +588,14 @@ class IndicatorPPADownloadStatistics:
         if response == Gtk.ResponseType.OK:
             del self.ppaInfos[ widget.props.name ]
             self.saveSettings()
+            self.setToDownloadingData()
             GLib.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
-
-            if self.combinePPAs == True: # Only makes sense to do a download if PPAs are combined...
-                self.requestPPADownloadAndMenuRefresh()
+            self.requestPPADownloadAndMenuRefresh()
 
         self.dialog = None
-
-
     def onPreferences( self, widget ):
+
+
         if self.dialog is not None:
             self.dialog.present()
             return
@@ -737,8 +737,15 @@ class IndicatorPPADownloadStatistics:
             ppaList = [ "thebernmeister", "ppa", "precise", "amd64" ]
             self.ppaInfos[ self.getPPAKey( ppaList ) ] = PPAInfo( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
 
+        self.setToDownloadingData()
+
+
+    # Initialises the 'download' data for each PPA as the string 'downloading data'.
+    def setToDownloadingData( self ):    
+        self.lock.acquire()
         for key in self.ppaInfos:
             self.ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.DOWNLOADING_DATA
+        self.lock.release()
 
 
     def saveSettings( self ):
