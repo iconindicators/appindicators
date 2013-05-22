@@ -61,7 +61,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.20"
+    VERSION = "1.0.21"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -106,13 +106,14 @@ class IndicatorLunar:
 
 
     def __init__( self ):
-        logging.basicConfig( filename = IndicatorLunar.LOG, 
-                             filemode = "a", 
-                             format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
-                             datefmt = "%H:%M:%S", level = logging.DEBUG )
+        filehandler = logging.FileHandler( filename = IndicatorLunar.LOG, mode = "a", delay = True )
+        logging.basicConfig( format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
+                             datefmt = "%H:%M:%S", level = logging.DEBUG,
+                             handlers = [ filehandler ] )
 
-        self.loadSettings()
         self.dialog = None
+        self.nextUpdateInSeconds = 0
+        self.loadSettings()
 
         if notifyImported == True:
             Notify.init( IndicatorLunar.NAME )
@@ -139,7 +140,7 @@ class IndicatorLunar:
 
     def main( self ):
         self.update()
-        GLib.timeout_add_seconds( 60 * 60, self.update )
+        GLib.timeout_add_seconds( self.nextUpdateInSeconds, self.update )
         Gtk.main()
 
 
@@ -185,6 +186,8 @@ class IndicatorLunar:
 
 
     def buildMenu( self, lunarPhase, ephemNow ):
+        nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
+
         if self.appindicatorImported == True:
             menu = self.indicator.get_menu()
         else:
@@ -198,7 +201,7 @@ class IndicatorLunar:
         # Moon
         menuItem = Gtk.MenuItem( "Moon" )
         menu.append( menuItem )
-        self.createPlanetSubmenu( menuItem, city, ephem.Moon( ephemNow ) )
+        self.createPlanetSubmenu( menuItem, city, ephem.Moon( ephemNow ), nextUpdates )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] ) )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
@@ -214,6 +217,11 @@ class IndicatorLunar:
         nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
         for phaseInformation in nextPhases:
             menuItem.get_submenu().append( Gtk.MenuItem( indent + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
+
+        nextUpdates.append( ephem.next_first_quarter_moon( ephemNow ) )
+        nextUpdates.append( ephem.next_full_moon( ephemNow ) )
+        nextUpdates.append( ephem.next_last_quarter_moon( ephemNow ) )
+        nextUpdates.append( ephem.next_new_moon( ephemNow ) )
 
         # Sun
         menuItem = Gtk.MenuItem( "Sun" )
@@ -237,6 +245,9 @@ class IndicatorLunar:
             subMenu.append( Gtk.MenuItem( "Rise: " + self.localiseAndTrim( rising ) ) )
             subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( setting ) ) )
 
+        nextUpdates.append( rising )
+        nextUpdates.append( setting )
+
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Solstice/Equinox
@@ -248,6 +259,9 @@ class IndicatorLunar:
         else:
             subMenu.append( Gtk.MenuItem( "Solstice: " + self.localiseAndTrim( solstice ) ) ) 
             subMenu.append( Gtk.MenuItem( "Equinox: " + self.localiseAndTrim( equinox ) ) )
+
+        nextUpdates.append( equinox )
+        nextUpdates.append( solstice )
 
         # Planets
         menu.append( Gtk.MenuItem( "Planets" ) )
@@ -264,7 +278,7 @@ class IndicatorLunar:
 
         for planet in planets:
             menuItem = Gtk.MenuItem( indent + planet[ 0 ] )
-            self.createPlanetSubmenu( menuItem, city, planet[ 1 ] )
+            self.createPlanetSubmenu( menuItem, city, planet[ 1 ], nextUpdates )
             menu.append( menuItem )
 
         menu.append( Gtk.SeparatorMenuItem() )
@@ -288,8 +302,12 @@ class IndicatorLunar:
 
         menu.show_all()
 
+        # Work out when to do the next update...
+        nextUpdates.sort()
+        self.nextUpdateInSeconds = ( ephem.localtime( nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds()
 
-    def createPlanetSubmenu( self, planetMenuItem, city, planet ):
+
+    def createPlanetSubmenu( self, planetMenuItem, city, planet, nextUpdates ):
         subMenu = Gtk.Menu()
         subMenu.append( Gtk.MenuItem( "Illumination: " + str( int( round( planet.phase ) ) ) + "%" ) )
         subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( planet )[ 1 ] ) )
@@ -309,6 +327,9 @@ class IndicatorLunar:
             subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( setting ) ) )
 
         planetMenuItem.set_submenu( subMenu )
+
+        nextUpdates.append( rising )
+        nextUpdates.append( setting )
 
 
     # Takes a float and converts to local time, trims off fractional seconds and returns a string.
