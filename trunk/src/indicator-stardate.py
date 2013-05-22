@@ -39,7 +39,7 @@ class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.13"
+    VERSION = "1.0.14"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -55,10 +55,10 @@ class IndicatorStardate:
 
 
     def __init__( self ):
-        logging.basicConfig( filename = IndicatorStardate.LOG, 
-                             filemode = "a", 
-                             format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
-                             datefmt = "%H:%M:%S", level = logging.DEBUG )
+        filehandler = logging.FileHandler( filename = IndicatorStardate.LOG, mode = "a", delay = True )
+        logging.basicConfig( format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
+                             datefmt = "%H:%M:%S", level = logging.DEBUG,
+                             handlers = [ filehandler ] )
 
         self.dialog = None
         self.loadSettings()

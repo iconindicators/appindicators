@@ -1,3 +1,10 @@
+indicator-stardate (1.0.14-1) precise; urgency=low
+
+  * Only create the log file when needed.  Thanks to dvrc (dvrc.contact@gmail.com).
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 22 May 2013 20:29:57 +1000
+
+
 indicator-stardate (1.0.13-1) precise; urgency=low
 
   * Now logs to a file in the user's HOME directory.
