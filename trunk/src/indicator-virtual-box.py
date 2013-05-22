@@ -50,7 +50,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.18"
+    VERSION = "1.0.19"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -72,10 +72,10 @@ class IndicatorVirtualBox:
 
 
     def __init__( self ):
-        logging.basicConfig( filename = IndicatorVirtualBox.LOG, 
-                             filemode = "a", 
-                             format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
-                             datefmt = "%H:%M:%S", level = logging.DEBUG )
+        filehandler = logging.FileHandler( filename = IndicatorVirtualBox.LOG, mode = "a", delay = True )
+        logging.basicConfig( format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
+                             datefmt = "%H:%M:%S", level = logging.DEBUG,
+                             handlers = [ filehandler ] )
 
         self.loadSettings()
         self.dialog = None
