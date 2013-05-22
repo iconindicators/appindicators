@@ -47,7 +47,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.24"
+    VERSION = "1.0.25"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -80,10 +80,10 @@ class IndicatorPPADownloadStatistics:
         GLib.threads_init()
         self.lock = threading.Lock()
 
-        logging.basicConfig( filename = IndicatorPPADownloadStatistics.LOG, 
-                             filemode = "a", 
-                             format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
-                             datefmt = "%H:%M:%S", level = logging.DEBUG )
+        filehandler = logging.FileHandler( filename = IndicatorPPADownloadStatistics.LOG, mode = "a", delay = True )
+        logging.basicConfig( format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
+                             datefmt = "%H:%M:%S", level = logging.DEBUG,
+                             handlers = [ filehandler ] )
 
         self.loadSettings()
 

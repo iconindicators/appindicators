@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.25-1) precise; urgency=low
+
+  * Only create the log file when needed.  Thanks to dvrc (dvrc.contact@gmail.com).
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 22 May 2013 20:19:17 +1000
+
+
 indicator-ppa-download-statistics (1.0.24-1) precise; urgency=low
 
   * Fixed a bug when a PPA was changed and the PPA download data was still
