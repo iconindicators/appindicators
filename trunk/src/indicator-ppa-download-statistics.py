@@ -56,7 +56,7 @@ class IndicatorPPADownloadStatistics:
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
 
-    SERIES = [ "saucy", "raring", "quantal", "precise" ]
+    SERIES = [ "saucy", "raring", "quantal", "precise", "oneiric", "natty", "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy", "gutsy", "feisty", "edgy", "dapper", "breezy", "hoary", "warty" ]
     ARCHITECTURES = [ "amd64", "i386" ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
@@ -67,8 +67,10 @@ class IndicatorPPADownloadStatistics:
     SETTINGS_COMBINE_PPAS = "combinePPAs"
     SETTINGS_SHOW_SUBMENU = "showSubmenu"
 
-    DOWNLOADING_DATA = "(downloading data...)"
-    ERROR_RETRIEVING_PPA = "(error retrieving PPA)"
+    MESSAGE_DOWNLOADING_DATA = "(downloading data...)"
+    MESSAGE_ERROR_RETRIEVING_PPA = "(error retrieving PPA)"
+    MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE = "(multiple messages - uncombine PPAs)"
+    MESSAGE_NO_INFORMATION = "(no information)"
 
 
     def __init__( self ):
@@ -234,10 +236,19 @@ class IndicatorPPADownloadStatistics:
             combinedKey = ppa[ : ppa.find( " | ", ppa.find( " | " ) + 1 ) ] # The combined ppa is 'ppaUser | ppaName | series | architecture' stripped down to 'ppaUser | ppaName'.
             publishedBinaryInfos = self.ppaDownloadStatistics.get( ppa )
 
-            if type( publishedBinaryInfos ) is str: # This is a string message (either 'downloading data' or 'no information' or 'error retrieving PPA').
-                if combinedKey not in combinedPPADownloadStatistics:
-                    combinedPPADownloadStatistics[ combinedKey ] = publishedBinaryInfos # Only put in the string message if no other data exists.
+            if type( publishedBinaryInfos ) is str: # This is a string message (either 'downloading data' or something else).
+                if publishedBinaryInfos == IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA:
+                    combinedPPADownloadStatistics[ combinedKey ] = publishedBinaryInfos
+                else:
+                    combinedPPADownloadStatistics[ combinedKey ] = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
+                continue
+
+            # We have a list of statistics.
+            # If a string message has previously been added, substitute a message telling the user there are multiple messages...
+            # At this point we will never get the "downloading" message as it's handled above.
+            if combinedKey in combinedPPADownloadStatistics and type( combinedPPADownloadStatistics[ combinedKey ] ) is str:
+                combinedPPADownloadStatistics[ combinedKey ] = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
                 continue
 
             # Iterate over the published binary infos and combine...
@@ -744,7 +755,7 @@ class IndicatorPPADownloadStatistics:
     def setToDownloadingData( self ):    
         self.lock.acquire()
         for key in self.ppaInfos:
-            self.ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.DOWNLOADING_DATA
+            self.ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
         self.lock.release()
 
 
@@ -841,7 +852,7 @@ class IndicatorPPADownloadStatistics:
             publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
             numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
             if numberOfPublishedBinaries == 0:
-                ppaDownloadStatistics[ key ] = "(no information)"
+                ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.MESSAGE_NO_INFORMATION
             else:
                 # The results are returned in lots of 75...so need to retrieve each lot after the first 75.
                 index = 0
@@ -875,7 +886,7 @@ class IndicatorPPADownloadStatistics:
         except Exception as e:
             logging.exception( e )
             self.lock.acquire()
-            ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.ERROR_RETRIEVING_PPA
+            ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
             self.lock.release()
 
 
@@ -889,18 +900,18 @@ class IndicatorPPADownloadStatistics:
                 publishedBinaryInfos = ppaDownloadStatistics.get( key )
                 if publishedBinaryInfos is None:
                     ppaDownloadStatistics[ key ] = [ publishedBinaryInfo ]
-                elif ppaDownloadStatistics[ key ] != IndicatorPPADownloadStatistics.ERROR_RETRIEVING_PPA: # If we had an error before, don't overwrite it.
+                elif ppaDownloadStatistics[ key ] != IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA: # If we had an error before, don't overwrite it.
                     publishedBinaryInfos.append( publishedBinaryInfo )
                     ppaDownloadStatistics[ key ] = publishedBinaryInfos
             else:
-                ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.ERROR_RETRIEVING_PPA
+                ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
 
             self.lock.release()
 
         except Exception as e:
             logging.exception( e )
             self.lock.acquire()
-            ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.ERROR_RETRIEVING_PPA
+            ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
             self.lock.release()
 
 
