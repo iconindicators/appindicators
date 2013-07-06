@@ -1,8 +1,11 @@
 indicator-ppa-download-statistics (1.0.25-1) precise; urgency=low
 
+  * Added a new message type when PPAs are combined.  When anything other than
+    statistics appear in the resultset, write out a warning message to the user
+    so the user can uncombine PPAs to see individual messages.
   * Only create the log file when needed.  Thanks to dvrc (dvrc.contact@gmail.com).
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 22 May 2013 20:19:17 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 5 Jul 2013 20:19:17 +1000
 
 
 indicator-ppa-download-statistics (1.0.24-1) precise; urgency=low
