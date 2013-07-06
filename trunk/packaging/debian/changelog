@@ -2,7 +2,7 @@ indicator-stardate (1.0.14-1) precise; urgency=low
 
   * Only create the log file when needed.  Thanks to dvrc (dvrc.contact@gmail.com).
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 22 May 2013 20:29:57 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 5 Jul 2013 20:29:57 +1000
 
 
 indicator-stardate (1.0.13-1) precise; urgency=low
