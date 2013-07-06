@@ -3,7 +3,7 @@ indicator-lunar (1.0.21-1) precise; urgency=low
   * Only updates when the next rise/set/phase/etc is due.
   * Only create the log file when needed.  Thanks to dvrc (dvrc.contact@gmail.com).
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 22 May 2013 20:17:12 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 5 Jul 2013 20:17:12 +1000
 
 
 indicator-lunar (1.0.20-1) precise; urgency=low
