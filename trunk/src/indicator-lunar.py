@@ -61,7 +61,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.21"
+    VERSION = "1.0.22"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -112,7 +112,7 @@ class IndicatorLunar:
                              handlers = [ filehandler ] )
 
         self.dialog = None
-        self.nextUpdateInSeconds = 0
+        self.nextUpdateInSeconds = int( 0 )
         self.loadSettings()
 
         if notifyImported == True:
@@ -304,7 +304,7 @@ class IndicatorLunar:
 
         # Work out when to do the next update...
         nextUpdates.sort()
-        self.nextUpdateInSeconds = ( ephem.localtime( nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds()
+        self.nextUpdateInSeconds = int ( ( ephem.localtime( nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() ) # Needs to be an integer when passed to GLib.timeout_add_seconds.
 
 
     def createPlanetSubmenu( self, planetMenuItem, city, planet, nextUpdates ):
