@@ -1,3 +1,11 @@
+indicator-lunar (1.0.24-1) precise; urgency=low
+
+  * Fixed another update bug: the timeout call was not being refreshed on each
+    update with the correct amount.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 2 Aug 2013 9:06:18 +1000
+
+
 indicator-lunar (1.0.23-1) precise; urgency=low
 
   * The update sometimes occurred slightly earlier than when appropriate, likely

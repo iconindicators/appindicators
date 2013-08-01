@@ -61,7 +61,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.23"
+    VERSION = "1.0.24"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -112,7 +112,6 @@ class IndicatorLunar:
                              handlers = [ filehandler ] )
 
         self.dialog = None
-        self.nextUpdateInSeconds = int( 0 )
         self.loadSettings()
 
         if notifyImported == True:
@@ -140,7 +139,6 @@ class IndicatorLunar:
 
     def main( self ):
         self.update()
-        GLib.timeout_add_seconds( self.nextUpdateInSeconds, self.update )
         Gtk.main()
 
 
@@ -181,8 +179,6 @@ class IndicatorLunar:
             percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and \
             phaseIsBetweenNewAndFullInclusive:
             Notify.Notification.new( "WARNING: Werewolves about!!!", "", IndicatorLunar.SVG_FILE ).show()
-
-        return True # Needed so the timer continues!
 
 
     def buildMenu( self, lunarPhase, ephemNow ):
@@ -304,9 +300,13 @@ class IndicatorLunar:
 
         # Work out when to do the next update...
         # Need to pass an integer to GLib.timeout_add_seconds.
-        # Added 10 second buffer because the update sometimes happened fractionally earlier than when due.
+        # Add a 10 second buffer because the update sometimes happened fractionally earlier (due to truncating the fractional time component).
         nextUpdates.sort()
-        self.nextUpdateInSeconds = int ( ( ephem.localtime( nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() ) + 10
+        nextUpdateInSeconds = int ( ( ephem.localtime( nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() ) + 10
+        if nextUpdateInSeconds < 60: # Ensure the update period is positive and not too frequent...
+            nextUpdateInSeconds = 60
+
+        GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
 
 
     def createPlanetSubmenu( self, planetMenuItem, city, planet, nextUpdates ):
