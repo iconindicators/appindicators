@@ -183,10 +183,13 @@ class IndicatorLunar:
             self.showHourlyWerewolfWarning and \
             percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and \
             phaseIsBetweenNewAndFullInclusive:
+
+            # The notification must have a non-empty summary. 
+            summary = self.werewolfWarningTextSummary
             if self.werewolfWarningTextSummary == "":
-              Notify.Notification.new( " ", self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show() # The notification needs a non-empty summary.
-            else:
-              Notify.Notification.new( self.werewolfWarningTextSummary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
+                summary = " "
+
+            Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
 
 
     def buildMenu( self, lunarPhase, ephemNow ):
