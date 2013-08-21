@@ -119,7 +119,7 @@ class IndicatorLunar:
         self.dialog = None
         self.loadSettings()
 
-        if notifyImported == True:
+        if notifyImported:
             Notify.init( IndicatorLunar.NAME )
 
         # Attempt to create an AppIndicator3...if it fails, default to a GTK indicator.
@@ -156,17 +156,17 @@ class IndicatorLunar:
 
         self.buildMenu( lunarPhase, ephemNow )
 
-        if self.showIllumination == True and self.showPhase == True:
+        if self.showIllumination and self.showPhase:
             labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( percentageIllumination ) + "%)"
-        elif self.showIllumination == True:
+        elif self.showIllumination:
             labelTooltip = str( percentageIllumination ) + "%"
-        elif self.showPhase == True:
+        elif self.showPhase:
             labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
         else:
             labelTooltip = ""
 
         self.createIconForLunarPhase( lunarPhase, percentageIllumination )
-        if self.appindicatorImported == True:
+        if self.appindicatorImported:
             self.indicator.set_icon( IndicatorLunar.SVG_ICON )
             self.indicator.set_label( labelTooltip, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
         else:
@@ -179,8 +179,8 @@ class IndicatorLunar:
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-        if notifyImported == True and \
-            self.showHourlyWerewolfWarning == True and \
+        if notifyImported and \
+            self.showHourlyWerewolfWarning and \
             percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and \
             phaseIsBetweenNewAndFullInclusive:
             if self.werewolfWarningTextSummary == "":
@@ -192,7 +192,7 @@ class IndicatorLunar:
     def buildMenu( self, lunarPhase, ephemNow ):
         nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
-        if self.appindicatorImported == True:
+        if self.appindicatorImported:
             menu = self.indicator.get_menu()
         else:
             menu = self.menu
@@ -299,7 +299,7 @@ class IndicatorLunar:
         quitMenuItem.connect( "activate", Gtk.main_quit )
         menu.append( quitMenuItem )
 
-        if self.appindicatorImported == True:
+        if self.appindicatorImported:
             self.indicator.set_menu( menu )
         else:
             self.menu = menu
@@ -770,7 +770,7 @@ class IndicatorLunar:
         diameter = 2 * radius
 
         # http://en.wikipedia.org/wiki/Crescent
-        if crescent == True:
+        if crescent:
             ellipseRadiusX = radius * ( 1 - illumination / 50 )
         else:
             ellipseRadiusX = radius * ( illumination / 50 - 1 )
@@ -787,7 +787,7 @@ class IndicatorLunar:
             x = 50
         else:
             # Northern and waxing OR southern and waning...
-            if crescent == True:
+            if crescent:
                 x = ( 50 - radius )
             else:
                 x = ( 50 - radius ) + abs( ellipseRadiusX ) # Gibbous
@@ -796,7 +796,7 @@ class IndicatorLunar:
         ellipse = 'a' + str( ellipseRadiusX ) + ',' + str( radius ) + ' 0 0,' + sweepFlagEllipse + ' 0,-' + str( diameter )
         svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
 
-        if crescent == True:
+        if crescent:
             width = radius + 2 * ( 50 - radius )
         else:
             width = radius + abs( ellipseRadiusX ) + 2 * ( 50 - radius ) # Gibbous
