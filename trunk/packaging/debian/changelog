@@ -1,3 +1,10 @@
+indicator-lunar (1.0.25-1) precise; urgency=low
+
+  * The notification text (summary and body) is now configurable.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 21 Aug 2013 16:29:13 +1000
+
+
 indicator-lunar (1.0.24-1) precise; urgency=low
 
   * Fixed another update bug: the timeout call was not being refreshed on each

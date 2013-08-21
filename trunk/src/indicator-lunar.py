@@ -61,7 +61,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.24"
+    VERSION = "1.0.25"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -83,6 +83,8 @@ class IndicatorLunar:
     SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW = "showNorthernHemisphereView"
     SETTINGS_SHOW_PHASE = "showPhase"
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
+    SETTINGS_WEREWOLF_WARNING_TEXT_BODY = "werewolfWarningTextBody"
+    SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY = "werewolfWarningTextSummary"
 
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
     LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
@@ -103,6 +105,9 @@ class IndicatorLunar:
         LUNAR_PHASE_FIRST_QUARTER : "First Quarter",
         LUNAR_PHASE_WAXING_GIBBOUS : "Waxing Gibbous"
     }
+
+    WEREWOLF_WARNING_TEXT_BODY = "...werewolves about!!!"
+    WEREWOLF_WARNING_TEXT_SUMMARY = "WARNING..."
 
 
     def __init__( self ):
@@ -178,7 +183,10 @@ class IndicatorLunar:
             self.showHourlyWerewolfWarning == True and \
             percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and \
             phaseIsBetweenNewAndFullInclusive:
-            Notify.Notification.new( "WARNING: Werewolves about!!!", "", IndicatorLunar.SVG_FILE ).show()
+            if self.werewolfWarningTextSummary == "":
+              Notify.Notification.new( " ", self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show() # The notification needs a non-empty summary.
+            else:
+              Notify.Notification.new( self.werewolfWarningTextSummary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
 
 
     def buildMenu( self, lunarPhase, ephemNow ):
@@ -434,7 +442,7 @@ class IndicatorLunar:
 
         notebook = Gtk.Notebook()
 
-        # First tab - display settings.
+        # Display settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -455,28 +463,68 @@ class IndicatorLunar:
         showNorthernHemisphereViewCheckbox.set_active( self.showNorthernHemisphereView )
         grid.attach( showNorthernHemisphereViewCheckbox, 0, 2, 2, 1 )
 
+        notebook.append_page( grid, Gtk.Label( "Display" ) )
+
+        # Notification settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
         showHourlyWerewolfWarningCheckbox = Gtk.CheckButton( "Hourly werewolf warning" )
         showHourlyWerewolfWarningCheckbox.set_active( self.showHourlyWerewolfWarning )
         showHourlyWerewolfWarningCheckbox.set_tooltip_text( "Show an hourly screen notification at full moon" )
-        grid.attach( showHourlyWerewolfWarningCheckbox, 0, 3, 2, 1 )
+        grid.attach( showHourlyWerewolfWarningCheckbox, 0, 0, 2, 1 )
 
-        label = Gtk.Label( "  Illumination %" )
+        label = Gtk.Label( "Illumination %" )
         label.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
-        label.set_margin_left( 15 )
-        grid.attach( label, 0, 4, 1, 1 )
+        label.set_margin_left( 25 )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 1, 1, 1 )
 
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 5, 0 ) )
-        spinner.set_tooltip_text( "The warning commence at the specified illumination (after a new moon, 0%, has occurred)" )
+        spinner.set_tooltip_text( "The warning commences at the specified illumination - starting after a new moon (0%)" )
         spinner.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
         spinner.set_hexpand( True )
-        grid.attach( spinner, 1, 4, 1, 1 )
+        grid.attach( spinner, 1, 1, 1, 1 )
 
         showHourlyWerewolfWarningCheckbox.connect( "toggled", self.onShowHourlyWerewolfWarningCheckbox, label, spinner )
 
-        notebook.append_page( grid, Gtk.Label( "Display" ) )
+        label = Gtk.Label( "Summary" )
+        label.set_margin_left( 25 )
+        label.set_halign( Gtk.Align.START )
+        label.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        grid.attach( label, 0, 2, 1, 1 )
 
-        # Second tab - location.
+        summary = Gtk.Entry()
+        summary.set_text( self.werewolfWarningTextSummary )
+        summary.set_tooltip_text( "The summary text for the werewolf notification" )
+        summary.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        grid.attach( summary, 1, 2, 1, 1 )
+
+        showHourlyWerewolfWarningCheckbox.connect( "toggled", self.onShowHourlyWerewolfWarningCheckbox, label, summary )
+
+        label = Gtk.Label( "Body" )
+        label.set_margin_left( 25 )
+        label.set_halign( Gtk.Align.START )
+        label.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        grid.attach( label, 0, 3, 1, 1 )
+
+        body = Gtk.Entry()
+        body.set_text( self.werewolfWarningTextBody )
+        body.set_tooltip_text( "The body text for the werewolf notification" )
+        body.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        grid.attach( body, 1, 3, 1, 1 )
+
+        showHourlyWerewolfWarningCheckbox.connect( "toggled", self.onShowHourlyWerewolfWarningCheckbox, label, body )
+
+        notebook.append_page( grid, Gtk.Label( "Notification" ) )
+
+        # Location settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -525,7 +573,7 @@ class IndicatorLunar:
 
         notebook.append_page( grid, Gtk.Label( "Location" ) )
 
-        # Third tab - general settings.
+        # General settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -581,7 +629,9 @@ class IndicatorLunar:
             self.showNorthernHemisphereView = showNorthernHemisphereViewCheckbox.get_active()
             self.showHourlyWerewolfWarning = showHourlyWerewolfWarningCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
-            
+            self.werewolfWarningTextSummary = summary.get_text()
+            self.werewolfWarningTextBody = body.get_text()
+
             self.cityName = cityValue
             _city_data[ self.cityName ] = ( str( latitudeValue ), str( longitudeValue ), float( elevationValue ) )
 
@@ -642,6 +692,8 @@ class IndicatorLunar:
         self.showNorthernHemisphereView = True
         self.showPhase = True
         self.werewolfWarningStartIlluminationPercentage = 100
+        self.werewolfWarningTextBody = IndicatorLunar.WEREWOLF_WARNING_TEXT_BODY
+        self.werewolfWarningTextSummary = IndicatorLunar.WEREWOLF_WARNING_TEXT_SUMMARY
 
         if os.path.isfile( IndicatorLunar.SETTINGS_FILE ):
             try:
@@ -658,6 +710,8 @@ class IndicatorLunar:
                 self.showNorthernHemisphereView = settings.get( IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW, self.showNorthernHemisphereView )
                 self.showPhase = settings.get( IndicatorLunar.SETTINGS_SHOW_PHASE, self.showPhase )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
+                self.werewolfWarningTextBody = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY, self.werewolfWarningTextBody )
+                self.werewolfWarningTextSummary = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY, self.werewolfWarningTextSummary )
 
                 # Insert/overwrite the cityName and information into the cities...
                 _city_data[ self.cityName ] = ( str( cityLatitude ), str( cityLongitude ), float( cityElevation ) )
@@ -698,7 +752,9 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_SHOW_ILLUMINATION: self.showIllumination,
                 IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW: self.showNorthernHemisphereView,
                 IndicatorLunar.SETTINGS_SHOW_PHASE: self.showPhase,
-                IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage
+                IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
+                IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY: self.werewolfWarningTextBody,
+                IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY: self.werewolfWarningTextSummary
             }
 
             with open( IndicatorLunar.SETTINGS_FILE, "w" ) as f:
