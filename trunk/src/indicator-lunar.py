@@ -122,6 +122,9 @@ class IndicatorLunar:
         if notifyImported:
             Notify.init( IndicatorLunar.NAME )
 
+        # Initialise the full moon notification time to be in the past...
+        self.nextNotificationDue = datetime.datetime.now() + datetime.timedelta( hours = -1 )
+
         # Attempt to create an AppIndicator3...if it fails, default to a GTK indicator.
         # I've found that on Lubuntu 12.04 the AppIndicator3 gets created but does not work properly...
         # ...the icon cannot be updated dynamically and tooltip/label does not display.
@@ -182,7 +185,8 @@ class IndicatorLunar:
         if notifyImported and \
             self.showHourlyWerewolfWarning and \
             percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and \
-            phaseIsBetweenNewAndFullInclusive:
+            phaseIsBetweenNewAndFullInclusive and \
+            self.nextNotificationDue > datetime.datetime.now():
 
             # The notification must have a non-empty summary. 
             summary = self.werewolfWarningTextSummary
@@ -190,6 +194,10 @@ class IndicatorLunar:
                 summary = " "
 
             Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
+            self.nextNotificationDue = datetime.datetime.now() + datetime.timedelta( hours = 1 )
+
+        # If we are not in full moon mode (not "full moon" and not showing the notification), the next update occurs as per normal.
+        # If we are in full moon mode (it's "full moon" and we are showing the notification),
 
 
     def buildMenu( self, lunarPhase, ephemNow ):
