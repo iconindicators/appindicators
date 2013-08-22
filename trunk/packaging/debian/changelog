@@ -1,6 +1,10 @@
 indicator-lunar (1.0.25-1) precise; urgency=low
 
   * The notification text (summary and body) is now configurable.
+  * The full moon screen notification is no longer fixed to hourly.
+    The indicator updates according to the next date/time for any object's
+    rise/set/phase change.  Therefore the full moon notification may occur more
+    frequently than hourly.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 21 Aug 2013 16:29:13 +1000
 

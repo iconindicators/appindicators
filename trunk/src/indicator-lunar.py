@@ -78,7 +78,7 @@ class IndicatorLunar:
     SETTINGS_CITY_LATITUDE = "cityLatitude"
     SETTINGS_CITY_LONGITUDE = "cityLongitude"
     SETTINGS_CITY_NAME = "cityName"
-    SETTINGS_SHOW_HOURLY_WEREWOLF_WARNING = "showHourlyWerewolfWarning"
+    SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     SETTINGS_SHOW_ILLUMINATION = "showIllumination"
     SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW = "showNorthernHemisphereView"
     SETTINGS_SHOW_PHASE = "showPhase"
@@ -122,9 +122,6 @@ class IndicatorLunar:
         if notifyImported:
             Notify.init( IndicatorLunar.NAME )
 
-        # Initialise the full moon notification time to be in the past...
-        self.nextNotificationDue = datetime.datetime.now() + datetime.timedelta( hours = -1 )
-
         # Attempt to create an AppIndicator3...if it fails, default to a GTK indicator.
         # I've found that on Lubuntu 12.04 the AppIndicator3 gets created but does not work properly...
         # ...the icon cannot be updated dynamically and tooltip/label does not display.
@@ -159,6 +156,7 @@ class IndicatorLunar:
 
         self.buildMenu( lunarPhase, ephemNow )
 
+        # Determine the content of the indicator (label, tooltip, etc).
         if self.showIllumination and self.showPhase:
             labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( percentageIllumination ) + "%)"
         elif self.showIllumination:
@@ -168,6 +166,7 @@ class IndicatorLunar:
         else:
             labelTooltip = ""
 
+        # Set the icon/label handling the Unity and non-Unity cases...
         self.createIconForLunarPhase( lunarPhase, percentageIllumination )
         if self.appindicatorImported:
             self.indicator.set_icon( IndicatorLunar.SVG_ICON )
@@ -182,22 +181,18 @@ class IndicatorLunar:
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
+        # Show the full moon indicator when the user setting is enabled and the phase and illumination percentage are appropriate.
         if notifyImported and \
-            self.showHourlyWerewolfWarning and \
+            self.showWerewolfWarning and \
             percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and \
-            phaseIsBetweenNewAndFullInclusive and \
-            self.nextNotificationDue > datetime.datetime.now():
+            phaseIsBetweenNewAndFullInclusive:
 
-            # The notification must have a non-empty summary. 
+            # The notification summary text must not be empty (at least on Unity).
             summary = self.werewolfWarningTextSummary
             if self.werewolfWarningTextSummary == "":
                 summary = " "
 
             Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
-            self.nextNotificationDue = datetime.datetime.now() + datetime.timedelta( hours = 1 )
-
-        # If we are not in full moon mode (not "full moon" and not showing the notification), the next update occurs as per normal.
-        # If we are in full moon mode (it's "full moon" and we are showing the notification),
 
 
     def buildMenu( self, lunarPhase, ephemNow ):
@@ -324,6 +319,9 @@ class IndicatorLunar:
         nextUpdateInSeconds = int ( ( ephem.localtime( nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() ) + 10
         if nextUpdateInSeconds < 60: # Ensure the update period is positive and not too frequent...
             nextUpdateInSeconds = 60
+
+        if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update period is at least hourly...
+            nextUpdateInSeconds = ( 60 * 60 )
 
         GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
 
@@ -485,13 +483,13 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showHourlyWerewolfWarningCheckbox = Gtk.CheckButton( "Hourly werewolf warning" )
-        showHourlyWerewolfWarningCheckbox.set_active( self.showHourlyWerewolfWarning )
-        showHourlyWerewolfWarningCheckbox.set_tooltip_text( "Show an hourly screen notification at full moon" )
-        grid.attach( showHourlyWerewolfWarningCheckbox, 0, 0, 2, 1 )
+        showWerewolfWarningCheckbox = Gtk.CheckButton( "Werewolf warning" )
+        showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
+        showWerewolfWarningCheckbox.set_tooltip_text( "Screen notification (approximately hourly) at full moon (or leading up to)" )
+        grid.attach( showWerewolfWarningCheckbox, 0, 0, 2, 1 )
 
         label = Gtk.Label( "Illumination %" )
-        label.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         label.set_margin_left( 25 )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 1, 1 )
@@ -499,39 +497,39 @@ class IndicatorLunar:
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 5, 0 ) )
         spinner.set_tooltip_text( "The warning commences at the specified illumination - starting after a new moon (0%)" )
-        spinner.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         spinner.set_hexpand( True )
         grid.attach( spinner, 1, 1, 1, 1 )
 
-        showHourlyWerewolfWarningCheckbox.connect( "toggled", self.onShowHourlyWerewolfWarningCheckbox, label, spinner )
+        showWerewolfWarningCheckbox.connect( "toggled", self.onShowWerewolfWarningCheckbox, label, spinner )
 
         label = Gtk.Label( "Summary" )
         label.set_margin_left( 25 )
         label.set_halign( Gtk.Align.START )
-        label.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( label, 0, 2, 1, 1 )
 
         summary = Gtk.Entry()
         summary.set_text( self.werewolfWarningTextSummary )
         summary.set_tooltip_text( "The summary text for the werewolf notification" )
-        summary.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        summary.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( summary, 1, 2, 1, 1 )
 
-        showHourlyWerewolfWarningCheckbox.connect( "toggled", self.onShowHourlyWerewolfWarningCheckbox, label, summary )
+        showWerewolfWarningCheckbox.connect( "toggled", self.onShowWerewolfWarningCheckbox, label, summary )
 
         label = Gtk.Label( "Body" )
         label.set_margin_left( 25 )
         label.set_halign( Gtk.Align.START )
-        label.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( label, 0, 3, 1, 1 )
 
         body = Gtk.Entry()
         body.set_text( self.werewolfWarningTextBody )
         body.set_tooltip_text( "The body text for the werewolf notification" )
-        body.set_sensitive( showHourlyWerewolfWarningCheckbox.get_active() )
+        body.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( body, 1, 3, 1, 1 )
 
-        showHourlyWerewolfWarningCheckbox.connect( "toggled", self.onShowHourlyWerewolfWarningCheckbox, label, body )
+        showWerewolfWarningCheckbox.connect( "toggled", self.onShowWerewolfWarningCheckbox, label, body )
 
         notebook.append_page( grid, Gtk.Label( "Notification" ) )
 
@@ -638,7 +636,7 @@ class IndicatorLunar:
             self.showPhase = showPhaseCheckbox.get_active()
             self.showIllumination = showIlluminationCheckbox.get_active()
             self.showNorthernHemisphereView = showNorthernHemisphereViewCheckbox.get_active()
-            self.showHourlyWerewolfWarning = showHourlyWerewolfWarningCheckbox.get_active()
+            self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
             self.werewolfWarningTextSummary = summary.get_text()
             self.werewolfWarningTextBody = body.get_text()
@@ -691,14 +689,14 @@ class IndicatorLunar:
         dialog.destroy()
 
 
-    def onShowHourlyWerewolfWarningCheckbox( self, source, spinner, label ):
+    def onShowWerewolfWarningCheckbox( self, source, spinner, label ):
         label.set_sensitive( source.get_active() )
         spinner.set_sensitive( source.get_active() )
 
 
     def loadSettings( self ):
         self.getDefaultCity()
-        self.showHourlyWerewolfWarning = True
+        self.showWerewolfWarning = True
         self.showIllumination = True
         self.showNorthernHemisphereView = True
         self.showPhase = True
@@ -716,7 +714,7 @@ class IndicatorLunar:
                 cityLatitude = settings.get( IndicatorLunar.SETTINGS_CITY_LATITUDE, _city_data.get( self.cityName )[ 0 ] )
                 cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
-                self.showHourlyWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_HOURLY_WEREWOLF_WARNING, self.showHourlyWerewolfWarning )
+                self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
                 self.showIllumination = settings.get( IndicatorLunar.SETTINGS_SHOW_ILLUMINATION, self.showIllumination )
                 self.showNorthernHemisphereView = settings.get( IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW, self.showNorthernHemisphereView )
                 self.showPhase = settings.get( IndicatorLunar.SETTINGS_SHOW_PHASE, self.showPhase )
@@ -759,7 +757,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
                 IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
-                IndicatorLunar.SETTINGS_SHOW_HOURLY_WEREWOLF_WARNING: self.showHourlyWerewolfWarning,
+                IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
                 IndicatorLunar.SETTINGS_SHOW_ILLUMINATION: self.showIllumination,
                 IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW: self.showNorthernHemisphereView,
                 IndicatorLunar.SETTINGS_SHOW_PHASE: self.showPhase,
