@@ -1,3 +1,10 @@
+indicator-lunar (1.0.26-1) precise; urgency=low
+
+  * Put in a test button to show the notification text.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 28 Aug 2013 20:22:21 +1000
+
+
 indicator-lunar (1.0.25-1) precise; urgency=low
 
   * The notification text (summary and body) is now configurable.

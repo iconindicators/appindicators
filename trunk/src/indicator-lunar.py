@@ -61,7 +61,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.25"
+    VERSION = "1.0.26"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -72,6 +72,7 @@ class IndicatorLunar:
     DESKTOP_FILE = NAME + ".desktop"
     SVG_ICON = "." + NAME + "-illumination-icon"
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
+    SVG_FULL_MOON_FILE = os.getenv( "HOME" ) + "/" + "." + NAME + "-fullmoon-icon" + ".svg"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_CITY_ELEVATION = "cityElevation"
@@ -531,6 +532,20 @@ class IndicatorLunar:
 
         showWerewolfWarningCheckbox.connect( "toggled", self.onShowWerewolfWarningCheckbox, label, body )
 
+        test = Gtk.Button( "Test" )
+        test.set_halign( Gtk.Align.END )
+        test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
+        if notifyImported:
+            test.connect( "clicked", self.onTestClicked, summary, body )
+            test.set_tooltip_text( "Show the notification bubble" )
+        else:
+            test.set_sensitive( False )
+            test.set_tooltip_text( "Notifications are not possible on your system" )
+
+        grid.attach( test, 1, 4, 1, 1 )
+
+        showWerewolfWarningCheckbox.connect( "toggled", self.onShowWerewolfWarningCheckbox, test, test )
+
         notebook.append_page( grid, Gtk.Label( "Notification" ) )
 
         # Location settings.
@@ -666,6 +681,25 @@ class IndicatorLunar:
         self.dialog = None
 
 
+    def onTestClicked( self, button, summary, body ):
+        try:
+            with open( IndicatorLunar.SVG_FULL_MOON_FILE, "w" ) as f:
+                f.write( self.getFullMoonSVG() )
+                f.close()
+
+            # The notification summary text must not be empty (at least on Unity).
+            if summary.get_text() == "":
+                Notify.Notification.new( " ", body.get_text(), IndicatorLunar.SVG_FULL_MOON_FILE ).show()
+            else:
+                Notify.Notification.new( summary.get_text(), body.get_text(), IndicatorLunar.SVG_FULL_MOON_FILE ).show()
+
+            os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
+
+        except Exception as e:
+            logging.exception( e )
+            self.showMessage( Gtk.MessageType.ERROR, "An error occurred - cannot show notification." )
+
+
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
         global _city_data
@@ -689,9 +723,9 @@ class IndicatorLunar:
         dialog.destroy()
 
 
-    def onShowWerewolfWarningCheckbox( self, source, spinner, label ):
-        label.set_sensitive( source.get_active() )
-        spinner.set_sensitive( source.get_active() )
+    def onShowWerewolfWarningCheckbox( self, source, widget1, widget2 ):
+        widget1.set_sensitive( source.get_active() )
+        widget2.set_sensitive( source.get_active() )
 
 
     def loadSettings( self ):
