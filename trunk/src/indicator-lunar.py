@@ -234,6 +234,9 @@ class IndicatorLunar:
         nextUpdates.append( ephem.next_last_quarter_moon( ephemNow ) )
         nextUpdates.append( ephem.next_new_moon( ephemNow ) )
 
+        print( "Name | Coordinates | Sign | Degree | Minutes" )
+        self.tropical( ephem.Moon(), ephemNow )
+
         # Sun
         menuItem = Gtk.MenuItem( "Sun" )
         menu.append( menuItem )
@@ -259,6 +262,7 @@ class IndicatorLunar:
         nextUpdates.append( rising )
         nextUpdates.append( setting )
 
+        self.tropical( ephem.Sun(), ephemNow )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Solstice/Equinox
@@ -291,6 +295,7 @@ class IndicatorLunar:
             menuItem = Gtk.MenuItem( indent + planet[ 0 ] )
             self.createPlanetSubmenu( menuItem, city, planet[ 1 ], nextUpdates )
             menu.append( menuItem )
+            self.tropical( planet[ 1 ], ephemNow )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -390,6 +395,48 @@ class IndicatorLunar:
                 phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
 
         return phase
+
+
+    def tropical( self, object, ephemNow ):
+# TODO This is all in UTC...need to convert to Localtime???
+
+        signList=[ 'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces' ]
+
+        # Original code
+        date = '2013/10/14'  #TODO Ensure it is today's date!
+        epochParts = date.split( '/' )
+        epochYears = float( epochParts[ 0 ] )
+        epochMonths = float( epochParts[ 1 ] )
+        epochDecimalMonths = float( epochMonths / 12.0)
+        epochDays = float( epochParts[ 2] )
+        epochDecimalDays = float( epochDays / 365.242 )
+        epochAdjusted = epochYears + epochDecimalMonths + epochDecimalDays
+
+        object.compute( date, epoch = str( epochAdjusted ) )
+        objectCoordinates = str( ephem.Ecliptic( object ).lon ).split( ":" )
+        if float( objectCoordinates[ 2 ] ) > 30:
+            objectCoordinates[ 1 ] = str( int ( objectCoordinates[ 1 ] ) + 1 )
+
+        objectSignDegree = int( objectCoordinates[ 0 ] ) % 30
+        objectSignIndex = int( objectCoordinates[ 0 ] ) / 30
+        objectSignName = signList[ int( objectSignIndex ) ]
+        print( object.name, objectCoordinates, objectSignName, objectSignDegree, objectCoordinates[ 1 ] )
+
+        # New code
+        ( year, month, day ) = ephemNow.triple()
+        epochAdjusted = float( year ) + float( month ) / 12.0 + float( int( day ) ) / 365.242 #TODO Keep the the fractional part of the days?
+
+        object.compute( ephemNow, epoch = str( epochAdjusted ) )
+        objectCoordinates = str( ephem.Ecliptic( object ).lon ).split( ":" )
+        if float( objectCoordinates[ 2 ] ) > 30:
+            objectCoordinates[ 1 ] = str( int ( objectCoordinates[ 1 ] ) + 1 )
+
+        objectSignDegree = int( objectCoordinates[ 0 ] ) % 30
+        objectSignIndex = int( objectCoordinates[ 0 ] ) / 30
+        objectSignName = signList[ int( objectSignIndex ) ]
+        print( object.name, objectCoordinates, objectSignName, objectSignDegree, objectCoordinates[ 1 ] )
+
+        print()
 
 
     def createIconForLunarPhase( self, lunarPhase, illumination ):
