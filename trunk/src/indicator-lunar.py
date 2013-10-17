@@ -4,7 +4,7 @@
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.         
+# (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,7 +29,7 @@
 # Have noticed that the submenus appear as a single space after a certain amount of time.
 # By setting the update interval to every second, it takes a few minutes for the submenus to appear as spaces.
 # I've wrapped try/except around each function to see if a message is produced - but so far nothing.
-# I've also noticed the VirtualBox indicator menu seems to stop responding over time too...maybe it's a related issue? 
+# I've also noticed the VirtualBox indicator menu seems to stop responding over time too...maybe it's a related issue?
 
 
 try:
@@ -61,7 +61,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.26"
+    VERSION = "1.0.27"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -113,7 +113,7 @@ class IndicatorLunar:
 
     def __init__( self ):
         filehandler = logging.FileHandler( filename = IndicatorLunar.LOG, mode = "a", delay = True )
-        logging.basicConfig( format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
+        logging.basicConfig( format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
                              datefmt = "%H:%M:%S", level = logging.DEBUG,
                              handlers = [ filehandler ] )
 
@@ -212,13 +212,13 @@ class IndicatorLunar:
         # Moon
         menuItem = Gtk.MenuItem( "Moon" )
         menu.append( menuItem )
-        self.createPlanetSubmenu( menuItem, city, ephem.Moon( ephemNow ), nextUpdates )
+        self.createPlanetSubmenu( menuItem, city, ephem.Moon( ephemNow ), nextUpdates, ephemNow )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] ) )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
 
-        # Need to work out which phases occur by date rather than using the phase we calculate since the phase (illumination) rounds numbers
+        # Determine which phases occur by date rather than using the phase calculated since the phase (illumination) rounds numbers
         # and so we enter a phase earlier than what is official.
         nextPhases = [ ]
         nextPhases.append( [ self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) ), "First Quarter: " ] )
@@ -234,9 +234,6 @@ class IndicatorLunar:
         nextUpdates.append( ephem.next_last_quarter_moon( ephemNow ) )
         nextUpdates.append( ephem.next_new_moon( ephemNow ) )
 
-        print( "Name | Coordinates | Sign | Degree | Minutes" )
-        self.tropical( ephem.Moon(), ephemNow )
-
         # Sun
         menuItem = Gtk.MenuItem( "Sun" )
         menu.append( menuItem )
@@ -247,6 +244,7 @@ class IndicatorLunar:
         sun = ephem.Sun( ephemNow )
 
         subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( sun )[ 1 ] ) )
+        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.tropical( ephem.Sun(), ephemNow ) ) )
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( sun.earth_distance, 4 ) ) + " AU" ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
@@ -262,7 +260,6 @@ class IndicatorLunar:
         nextUpdates.append( rising )
         nextUpdates.append( setting )
 
-        self.tropical( ephem.Sun(), ephemNow )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Solstice/Equinox
@@ -272,7 +269,7 @@ class IndicatorLunar:
             subMenu.append( Gtk.MenuItem( "Equinox: " + self.localiseAndTrim( equinox ) ) )
             subMenu.append( Gtk.MenuItem( "Solstice: " + self.localiseAndTrim( solstice ) ) )
         else:
-            subMenu.append( Gtk.MenuItem( "Solstice: " + self.localiseAndTrim( solstice ) ) ) 
+            subMenu.append( Gtk.MenuItem( "Solstice: " + self.localiseAndTrim( solstice ) ) )
             subMenu.append( Gtk.MenuItem( "Equinox: " + self.localiseAndTrim( equinox ) ) )
 
         nextUpdates.append( equinox )
@@ -282,20 +279,19 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( "Planets" ) )
 
         planets = [
-            [ "Mercury", ephem.Mercury( ephemNow ) ], 
-            [ "Venus", ephem.Venus( ephemNow ) ], 
-            [ "Mars", ephem.Mars( ephemNow ) ], 
-            [ "Jupiter", ephem.Jupiter( ephemNow ) ], 
-            [ "Saturn", ephem.Saturn( ephemNow ) ], 
-            [ "Uranus", ephem.Uranus( ephemNow ) ], 
-            [ "Neptune", ephem.Neptune( ephemNow ) ], 
+            [ "Mercury", ephem.Mercury( ephemNow ) ],
+            [ "Venus", ephem.Venus( ephemNow ) ],
+            [ "Mars", ephem.Mars( ephemNow ) ],
+            [ "Jupiter", ephem.Jupiter( ephemNow ) ],
+            [ "Saturn", ephem.Saturn( ephemNow ) ],
+            [ "Uranus", ephem.Uranus( ephemNow ) ],
+            [ "Neptune", ephem.Neptune( ephemNow ) ],
             [ "Pluto", ephem.Pluto( ephemNow ) ] ]
 
         for planet in planets:
             menuItem = Gtk.MenuItem( indent + planet[ 0 ] )
-            self.createPlanetSubmenu( menuItem, city, planet[ 1 ], nextUpdates )
+            self.createPlanetSubmenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
             menu.append( menuItem )
-            self.tropical( planet[ 1 ], ephemNow )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -332,10 +328,11 @@ class IndicatorLunar:
         GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
 
 
-    def createPlanetSubmenu( self, planetMenuItem, city, planet, nextUpdates ):
+    def createPlanetSubmenu( self, planetMenuItem, city, planet, nextUpdates, ephemNow ):
         subMenu = Gtk.Menu()
         subMenu.append( Gtk.MenuItem( "Illumination: " + str( int( round( planet.phase ) ) ) + "%" ) )
         subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( planet )[ 1 ] ) )
+        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.tropical( planet, ephemNow ) ) )
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( planet.earth_distance, 4 ) ) + " AU" ) )
         subMenu.append( Gtk.MenuItem( "Distance to Sun: " + str( round( planet.sun_distance, 4 ) ) + " AU" ) )
         subMenu.append( Gtk.SeparatorMenuItem() )
@@ -397,46 +394,26 @@ class IndicatorLunar:
         return phase
 
 
-    def tropical( self, object, ephemNow ):
-# TODO This is all in UTC...need to convert to Localtime???
+    # Code courtesy of Ignius Drake.
+    def tropical( self, planet, ephemNow ):
+        signList = [ 'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces' ]
 
-        signList=[ 'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces' ]
-
-        # Original code
-        date = '2013/10/14'  #TODO Ensure it is today's date!
-        epochParts = date.split( '/' )
-        epochYears = float( epochParts[ 0 ] )
-        epochMonths = float( epochParts[ 1 ] )
-        epochDecimalMonths = float( epochMonths / 12.0)
-        epochDays = float( epochParts[ 2] )
-        epochDecimalDays = float( epochDays / 365.242 )
-        epochAdjusted = epochYears + epochDecimalMonths + epochDecimalDays
-
-        object.compute( date, epoch = str( epochAdjusted ) )
-        objectCoordinates = str( ephem.Ecliptic( object ).lon ).split( ":" )
-        if float( objectCoordinates[ 2 ] ) > 30:
-            objectCoordinates[ 1 ] = str( int ( objectCoordinates[ 1 ] ) + 1 )
-
-        objectSignDegree = int( objectCoordinates[ 0 ] ) % 30
-        objectSignIndex = int( objectCoordinates[ 0 ] ) / 30
-        objectSignName = signList[ int( objectSignIndex ) ]
-        print( object.name, objectCoordinates, objectSignName, objectSignDegree, objectCoordinates[ 1 ] )
-
-        # New code
         ( year, month, day ) = ephemNow.triple()
-        epochAdjusted = float( year ) + float( month ) / 12.0 + float( int( day ) ) / 365.242 #TODO Keep the the fractional part of the days?
+        epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
+        ephemNowDate = str( ephemNow ).split( ' ' )
 
-        object.compute( ephemNow, epoch = str( epochAdjusted ) )
-        objectCoordinates = str( ephem.Ecliptic( object ).lon ).split( ":" )
-        if float( objectCoordinates[ 2 ] ) > 30:
-            objectCoordinates[ 1 ] = str( int ( objectCoordinates[ 1 ] ) + 1 )
+        planet.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
+        planetCoordinates = str( ephem.Ecliptic( planet ).lon ).split( ":" )
 
-        objectSignDegree = int( objectCoordinates[ 0 ] ) % 30
-        objectSignIndex = int( objectCoordinates[ 0 ] ) / 30
-        objectSignName = signList[ int( objectSignIndex ) ]
-        print( object.name, objectCoordinates, objectSignName, objectSignDegree, objectCoordinates[ 1 ] )
+        if float( planetCoordinates[ 2 ] ) > 30:
+            planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
 
-        print()
+        planetSignDegree = int( planetCoordinates[ 0 ] ) % 30
+        planetSignMinute = str( planetCoordinates[ 1 ] )
+        planetSignIndex = int( planetCoordinates[ 0 ] ) / 30
+        planetSignName = signList[ int( planetSignIndex ) ]
+
+        return planetSignName + " " + str( planetSignDegree ) + "° " + planetSignMinute + "'"
 
 
     def createIconForLunarPhase( self, lunarPhase, illumination ):
@@ -450,9 +427,9 @@ class IndicatorLunar:
             lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT or \
             lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS or \
             lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS:
-            svg = self.getCrescentGibbousMoonSVG( 
+            svg = self.getCrescentGibbousMoonSVG(
                 illumination,
-                lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS, 
+                lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS,
                 self.showNorthernHemisphereView,
                 lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT )
 
