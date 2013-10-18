@@ -107,8 +107,8 @@ class IndicatorLunar:
         LUNAR_PHASE_WAXING_GIBBOUS : "Waxing Gibbous"
     }
 
-    WEREWOLF_WARNING_TEXT_BODY = "...werewolves about!!!"
-    WEREWOLF_WARNING_TEXT_SUMMARY = "WARNING..."
+    WEREWOLF_WARNING_TEXT_BODY = "                                          ...werewolves about ! ! !"
+    WEREWOLF_WARNING_TEXT_SUMMARY = "W  A  R  N  I  N  G"
 
 
     def __init__( self ):
