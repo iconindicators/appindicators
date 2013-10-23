@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.26-1) precise; urgency=low
+
+  * Ubuntu 13.10 requires an icon to be set - now uses a dynamically created
+    1 pixel SVG icon (resides in the user's HOME directory). 
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 23 Oct 2013 17:29:34 +1000
+
+
 indicator-ppa-download-statistics (1.0.25-1) precise; urgency=low
 
   * Added a new message type when PPAs are combined.  When anything other than

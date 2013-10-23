@@ -47,7 +47,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.25"
+    VERSION = "1.0.26"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -58,6 +58,9 @@ class IndicatorPPADownloadStatistics:
 
     SERIES = [ "saucy", "raring", "quantal", "precise", "oneiric", "natty", "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy", "gutsy", "feisty", "edgy", "dapper", "breezy", "hoary", "warty" ]
     ARCHITECTURES = [ "amd64", "i386" ]
+
+    SVG_ICON = "." + NAME + "-icon"
+    SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_PPAS = "ppas"
@@ -96,6 +99,20 @@ class IndicatorPPADownloadStatistics:
             self.buildMenu()
             self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
             self.indicator.set_label( "PPA", "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
+
+            # Ubuntu 13.10 requires an icon to be set - that is, setting "" as the icon when instantiating the indicator results in a "missing icon" icon.
+            # As there is no icon needed (text is the icon), dynamically create a 1 pixel SVG which lives in the user's HOME directory and use that as the icon.
+            try:
+                with open( IndicatorPPADownloadStatistics.SVG_FILE, "w" ) as f:
+                    svg = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
+                          '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1 1"></svg>'
+                    f.write( svg )
+                    f.close()
+                self.indicator.set_icon( IndicatorPPADownloadStatistics.SVG_ICON )
+
+            except Exception as e:
+                logging.exception( e )
+                logging.error( "Error writing SVG: " + IndicatorPPADownloadStatistics.SVG_FILE )
         except:
             self.appindicatorImported = False            
             self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
