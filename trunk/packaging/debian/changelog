@@ -1,6 +1,6 @@
 indicator-lunar (1.0.28-1) precise; urgency=low
 
-  * Added the upcoming solar/lunar eclipse.
+  * Added the upcoming solar/lunar eclipse (good until 2099).
     Thanks to Fred Espenak and Jean Meeus and NASA!
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 24 Oct 2013 20:32:13 +1000
