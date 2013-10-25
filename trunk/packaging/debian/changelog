@@ -1,6 +1,6 @@
 indicator-lunar (1.0.28-1) precise; urgency=low
 
-  * Added the upcoming solar/lunar eclipse (good until 2099).
+  * Added the upcoming solar/lunar eclipse (until 2099).
     Thanks to Fred Espenak and Jean Meeus and NASA!
   * Updated the About dialog to reflect various authors and shoulders of giants.
   * In Ubuntu 13.10 the initial value set by the spinner adjustment
