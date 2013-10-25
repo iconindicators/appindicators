@@ -542,7 +542,8 @@ class IndicatorLunar:
         grid.attach( label, 0, 1, 1, 1 )
 
         spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 5, 0 ) )
+        spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 0, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinner.set_value( self.werewolfWarningStartIlluminationPercentage ) # ...so need to force the initial value by explicitly setting it.
         spinner.set_tooltip_text( "The warning commences at the specified illumination - starting after a new moon (0%)" )
         spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         spinner.set_hexpand( True )
