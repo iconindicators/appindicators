@@ -480,7 +480,7 @@ class IndicatorLunar:
 
         self.dialog = Gtk.AboutDialog()
         self.dialog.set_program_name( IndicatorLunar.NAME )
-        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of Ephem.\nEclipse information by Fred Espenak and Jean Meeus.\nTropical Sign by Ignius Drake.\n" )
+        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of PyEphem.\nEclipse information by Fred Espenak and Jean Meeus.\nTropical Sign by Ignius Drake.\n" )
         self.dialog.set_website( IndicatorLunar.WEBSITE )
         self.dialog.set_website_label( IndicatorLunar.WEBSITE )
         self.dialog.set_version( IndicatorLunar.VERSION )
