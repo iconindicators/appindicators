@@ -1393,7 +1393,12 @@ class Eclipses:
             dateTime = ephem.Date( eclipse[ 0 ] + "/" + str( self.months.index( eclipse[ 1 ] ) ) + "/" + eclipse[ 2 ] + " " + eclipse[ 3 ] )
             dateTime = ephem.Date( dateTime - int( eclipse[ 4 ] ) * ephem.second ) # Need to subtract delta T (http://eclipse.gsfc.nasa.gov/LEcat5/deltat.html).        
             if dateTimeUTC <= dateTime:
-                return [ IndicatorLunar.localiseAndTrim( self, dateTime ), eclipseTypes[ eclipse[ 5 ] ], eclipse[ 6 ]  , eclipse[ 7 ] ]
+
+                # Add in the degrees symbol and add a space before the N/S/E/W.
+                latitude = eclipse[ 6 ][ 0 : len( eclipse[ 6 ] ) - 1 ] + "° " + eclipse[ 6 ][ -1 ]
+                longitude = eclipse[ 7 ][ 0 : len( eclipse[ 7 ] ) - 1 ] + "° " + eclipse[ 7 ][ -1 ]
+
+                return [ IndicatorLunar.localiseAndTrim( self, dateTime ), eclipseTypes[ eclipse[ 5 ] ], latitude, longitude ]
 
         return None
 
