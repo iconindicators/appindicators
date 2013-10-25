@@ -74,6 +74,8 @@ class IndicatorLunar:
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
     SVG_FULL_MOON_FILE = os.getenv( "HOME" ) + "/" + "." + NAME + "-fullmoon-icon" + ".svg"
 
+    INDENT = "    "
+
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_CITY_ELEVATION = "cityElevation"
     SETTINGS_CITY_LATITUDE = "cityLatitude"
@@ -208,7 +210,6 @@ class IndicatorLunar:
         menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
         menu = Gtk.Menu()
         city = ephem.city( self.cityName )
-        indent = "    "
 
         # Moon
         menuItem = Gtk.MenuItem( "Moon" )
@@ -228,7 +229,7 @@ class IndicatorLunar:
         nextPhases.append( [ self.localiseAndTrim( ephem.next_new_moon( ephemNow ) ), "New: " ] )
         nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
         for phaseInformation in nextPhases:
-            menuItem.get_submenu().append( Gtk.MenuItem( indent + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
 
         nextUpdates.append( ephem.next_first_quarter_moon( ephemNow ) )
         nextUpdates.append( ephem.next_full_moon( ephemNow ) )
@@ -237,8 +238,9 @@ class IndicatorLunar:
 
         eclipse = self.eclipse.getLunarEclipseForUTC( ephemNow )
         if eclipse is not None:
-            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-            menuItem.get_submenu().append( Gtk.MenuItem( "Eclipse: " + eclipse ) )
+#             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+#             menuItem.get_submenu().append( Gtk.MenuItem( "Eclipse: " + eclipse[ 0 ] + " " + eclipse[ 1 ] + " " + eclipse[ 2 ] + " " + eclipse[ 3 ] ) )
+            self.createEclipseMenu( menuItem.get_submenu(), eclipse )
 
         # Sun
         menuItem = Gtk.MenuItem( "Sun" )
@@ -283,8 +285,9 @@ class IndicatorLunar:
 
         eclipse = self.eclipse.getSolarEclipseForUTC( ephemNow )
         if eclipse is not None:
-            subMenu.append( Gtk.SeparatorMenuItem() )
-            subMenu.append( Gtk.MenuItem( "Eclipse: " + eclipse ) )
+#             subMenu.append( Gtk.SeparatorMenuItem() )
+#             subMenu.append( Gtk.MenuItem( "Eclipse: " + eclipse[ 0 ] + " " + eclipse[ 1 ] + " " + eclipse[ 2 ] + " " + eclipse[ 3 ] ) )
+            self.createEclipseMenu( subMenu, eclipse )
 
         # Planets
         menu.append( Gtk.MenuItem( "Planets" ) )
@@ -300,7 +303,7 @@ class IndicatorLunar:
             [ "Pluto", ephem.Pluto( ephemNow ) ] ]
 
         for planet in planets:
-            menuItem = Gtk.MenuItem( indent + planet[ 0 ] )
+            menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
             self.createPlanetSubmenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
             menu.append( menuItem )
 
@@ -363,6 +366,14 @@ class IndicatorLunar:
 
         nextUpdates.append( rising )
         nextUpdates.append( setting )
+
+
+    def createEclipseMenu( self, menu, eclipse ):
+        menu.append( Gtk.SeparatorMenuItem() )
+        menu.append( Gtk.MenuItem( "Eclipse" ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + eclipse[ 0 ] ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + eclipse[ 1 ] ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Latitude/Longitude: " + eclipse[ 2 ] + " " + eclipse[ 3 ] ) )
 
 
     # Takes a float and converts to local time, trims off fractional seconds and returns a string.
@@ -469,7 +480,7 @@ class IndicatorLunar:
 
         self.dialog = Gtk.AboutDialog()
         self.dialog.set_program_name( IndicatorLunar.NAME )
-        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of Ephem.\n" )
+        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of Ephem.\nEclipse information by Fred Espenak and Jean Meeus.\nTropical Sign by Ignius Drake.\n" )
         self.dialog.set_website( IndicatorLunar.WEBSITE )
         self.dialog.set_website_label( IndicatorLunar.WEBSITE )
         self.dialog.set_version( IndicatorLunar.VERSION )
@@ -1169,7 +1180,7 @@ class Eclipses:
     # ------------------------------------------------
     #               TD of                             
     #  Calendar   Greatest         Ecl.               
-    #    Date      Eclipse     DT  Type  Lat.   Long. 
+    #    Date      Eclipse     DT  Type  Lat.   Long.
     solarEclipseData = [ [ "2013", "Nov", "03", "12:47:36", "68", "H", "3.5N", "11.7W" ],
                         [ "2014", "Apr", "29", "06:04:33", "69", "A", "70.6S", "131.3E" ],
                         [ "2014", "Oct", "23", "21:45:39", "69", "P", "71.2N", "97.2W" ],
@@ -1382,7 +1393,7 @@ class Eclipses:
             dateTime = ephem.Date( eclipse[ 0 ] + "/" + str( self.months.index( eclipse[ 1 ] ) ) + "/" + eclipse[ 2 ] + " " + eclipse[ 3 ] )
             dateTime = ephem.Date( dateTime - int( eclipse[ 4 ] ) * ephem.second ) # Need to subtract delta T (http://eclipse.gsfc.nasa.gov/LEcat5/deltat.html).        
             if dateTimeUTC <= dateTime:
-                return IndicatorLunar.localiseAndTrim( self, dateTime ) + " " + eclipseTypes[ eclipse[ 5 ] ] + " " + eclipse[ 6 ] + " " + eclipse[ 7 ]
+                return [ IndicatorLunar.localiseAndTrim( self, dateTime ), eclipseTypes[ eclipse[ 5 ] ], eclipse[ 6 ]  , eclipse[ 7 ] ]
 
         return None
 
