@@ -372,8 +372,8 @@ class IndicatorLunar:
         menu.append( Gtk.SeparatorMenuItem() )
         menu.append( Gtk.MenuItem( "Eclipse" ) )
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + eclipse[ 0 ] ) )
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + eclipse[ 1 ] ) )
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Latitude/Longitude: " + eclipse[ 2 ] + " " + eclipse[ 3 ] ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + eclipse[ 1 ] ) )
 
 
     # Takes a float and converts to local time, trims off fractional seconds and returns a string.
@@ -480,7 +480,7 @@ class IndicatorLunar:
 
         self.dialog = Gtk.AboutDialog()
         self.dialog.set_program_name( IndicatorLunar.NAME )
-        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of PyEphem.\nEclipse information by Fred Espenak and Jean Meeus.\nTropical Sign by Ignius Drake.\n" )
+        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of PyEphem/XEphem.\nEclipse information by Fred Espenak and Jean Meeus.\nTropical Sign by Ignius Drake.\n" )
         self.dialog.set_website( IndicatorLunar.WEBSITE )
         self.dialog.set_website_label( IndicatorLunar.WEBSITE )
         self.dialog.set_version( IndicatorLunar.VERSION )
