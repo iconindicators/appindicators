@@ -1,6 +1,9 @@
 indicator-ppa-download-statistics (1.0.27-1) precise; urgency=low
 
   * Changed text/tooltip for checkbox to open a PPA in a browser.
+  * In Ubuntu 13.10 the initial value set by the spinner adjustment was not
+    appearing in the spinner field. Need to force the initial value by explicitly
+    setting it.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 1 Nov 2013 11:07:09 +1000
 

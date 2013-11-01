@@ -663,7 +663,8 @@ class IndicatorPPADownloadStatistics:
         grid.attach( label, 0, 3, 1, 1 )
 
         spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) )
+        spinner.set_adjustment( Gtk.Adjustment( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinner.set_value( self.sortByDownloadAmount ) # ...so need to force the initial value by explicitly setting it.
         spinner.set_tooltip_text( "Limit the number of entries when sorting by download." )
         spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
         spinner.set_hexpand( True )
