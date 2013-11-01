@@ -1,3 +1,12 @@
+indicator-virtual-box (1.0.20-1) precise; urgency=low
+
+  * In Ubuntu 13.10 the initial value set by the spinner adjustment was not
+    appearing in the spinner field. Need to force the initial value by explicitly
+    setting it.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 1 Oct 2013 11:32:20 +1000
+
+
 indicator-virtual-box (1.0.19-1) precise; urgency=low
 
   * Only create the log file when needed.  Thanks to dvrc (dvrc.contact@gmail.com).

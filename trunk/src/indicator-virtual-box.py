@@ -50,7 +50,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.19"
+    VERSION = "1.0.20"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -527,7 +527,8 @@ class IndicatorVirtualBox:
         grid.attach( label, 0, 0, 1, 1 )
 
         spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) )
+        spinner.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinner.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
         spinner.set_tooltip_text( "How often the list of VMs and their running status is automatically updated" )
         spinner.set_hexpand( True )
         grid.attach( spinner, 1, 0, 1, 1 )
