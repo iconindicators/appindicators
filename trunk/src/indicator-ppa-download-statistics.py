@@ -47,7 +47,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.26"
+    VERSION = "1.0.27"
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -682,7 +682,7 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Load PPA page on selection" )
+        allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Open PPA in browser" )
         allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item launches the default web browser and loads the PPA home page." )
         allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
         grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 0, 1, 1 )

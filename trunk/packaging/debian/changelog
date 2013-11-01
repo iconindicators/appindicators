@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.27-1) precise; urgency=low
+
+  * Changed text/tooltip for checkbox to open a PPA in a browser.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 1 Nov 2013 11:07:09 +1000
+
+
 indicator-ppa-download-statistics (1.0.26-1) precise; urgency=low
 
   * Ubuntu 13.10 requires an icon to be set - now uses a dynamically created
