@@ -45,7 +45,7 @@ try:
 except:
     notifyImported = False
 
-import datetime, json, locale, logging, os, shutil, subprocess, sys
+import datetime, json, locale, logging, math, os, shutil, subprocess, sys
 
 try:
     import ephem
@@ -215,6 +215,40 @@ class IndicatorLunar:
         menuItem = Gtk.MenuItem( "Moon" )
         menu.append( menuItem )
         self.createPlanetSubmenu( menuItem, city, ephem.Moon( ephemNow ), nextUpdates, ephemNow )
+
+
+        
+#         http://www.physicsforums.com/showthread.php?t=297140
+#         http://www.jgiesen.de/SME/details/seDetails.htm
+#         http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
+        
+        moon = ephem.Moon( ephemNow )
+        moon.compute( city )
+        print( moon.alt, moon.az, moon.ra, moon.dec )
+        
+        sun = ephem.Sun( ephemNow )
+        sun.compute( city )
+        print( sun.alt, sun.az, sun.ra, sun.dec )
+
+        numerator = math.cos( math.radians( sun.dec ) ) * math.sin( math.radians( sun.ra ) - math.radians( moon.ra ) )
+        denominator = math.sin( math.radians( sun.dec ) ) * math.cos( math.radians( moon.dec ) ) - math.cos( math.radians( sun.dec ) ) * math.sin( math.radians( moon.dec ) ) * math.cos( math.radians( sun.ra ) - math.radians( moon.ra ) )
+        brightLimbAngle = math.degrees( math.atan( numerator / denominator ) )
+        print( brightLimbAngle )
+#         Position angle of the Moon's bright Limb:
+#         This angle it's the position angle c of the Moon's bright limb midpoint (C point from the previously image). 
+#         It can be obtained by (this expression it's also valid for the planets):
+#  
+#             tanc = cosd0sin(a0 - a)/(sind0cosd - cosd0sindcos(a0 -a))
+#  
+#         where:  a0, d0, l0: geocentric right ascension, declination and longitude of the Sol;
+#                 a, d, l: geocentric right ascension, declination and longitude of the Moon;
+#  
+#         The angle c during the first quarter will be near the vicinity of 270º and near 90º after the Full Moon.
+#         If we consider c as the position angle of the bright limb midpoint, then the position angle of the poles will be (c-900) and (c+900).
+#         The big advantage that we obtain it's to define easily and without any doubt the bright limb of the Moon.
+ 
+        
+        
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] ) )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
@@ -1405,3 +1439,26 @@ class Eclipses:
 
 
 if __name__ == "__main__": IndicatorLunar().main()
+
+
+# //        the formulas used in my applet to compute the local zenith angle (ZA) of the Moon's bright limb are from the book of Jean Meeus: "Astronomical Algorithms", Willmann-Bell.
+# //        ZA = P - Q
+# //        P = position angle of the Moon's bright limb (chapter 46)
+# //        P = Math.atan2(Math.cos(K*decSun)*Math.sin(K*(alphaSun-alphaMoon)),Math.sin(K*decSun)*Math.cos(K*decMoon)-Math.cos(K*decSun)*Math.sin(K*decMoon)*Math.cos(K*(alphaSun-alphaMoon)))/K;
+# //        Q = parallactic angle of the Moon (chapter 13)
+# //        Q = Math.atan2(Math.sin(K*moonHourAngle),Math.tan(K*latitude)*Math.cos(K*moonDelta)-Math.sin(K*moonDelta)*Math.cos(K*moonHourAngle))/K; // northern latitude positive
+# //        moonHourAngle = THETA0(JD) + longitude - alphaMoon // eastern longitude positive
+# //        double THETA0(double JD) { // Greenwich Mean Sidereal Time
+# //            double T = (JD-2451545.0)/36525.0;
+# //            double x = 280.46061837 + 360.98564736629*(JD-2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;
+# //            x = x % 360.0;
+# //            if (x<0) x = x + 360.0;
+# //            return x;
+# //        }
+# //
+# //        JD = Julian_Day(date, month, year, UT);
+# //        K = Math.PI/180.0;
+
+        
+        
+        
