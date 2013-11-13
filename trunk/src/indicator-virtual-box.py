@@ -36,6 +36,9 @@
 # The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
 
 
+# TODO: Have an option of a delay between VM startups.
+
+
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -50,7 +53,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.20"
+    VERSION = "1.0.21"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -421,6 +424,8 @@ class IndicatorVirtualBox:
 
 
     def onPreferences( self, widget ):
+        self.getVirtualMachines() # Refresh the VMs as the list could have changed (deletion, creation, rename) since the last refresh.
+
         if self.dialog is not None:
             self.dialog.present()
             return

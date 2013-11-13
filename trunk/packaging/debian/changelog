@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.21-1) precise; urgency=low
+
+  * Put in a refresh to ensure the list of VMs is updated when the preferences
+    are displayed.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 13 Oct 2013 20:14:12 +1000
+
+
 indicator-virtual-box (1.0.20-1) precise; urgency=low
 
   * In Ubuntu 13.10 the initial value set by the spinner adjustment was not
