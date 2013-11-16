@@ -66,6 +66,7 @@ class IndicatorVirtualBox:
     VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS = 5
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_DELAY_BETWEEN_AUTO_START = "delayBetweenAutoStart"
     SETTINGS_MENU_TEXT_GROUP_NAME_BEFORE = "menuTextGroupNameBefore"
     SETTINGS_MENU_TEXT_GROUP_NAME_AFTER = "menuTextGroupNameAfter"
     SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
@@ -85,12 +86,17 @@ class IndicatorVirtualBox:
 
         # Start up VMs...
         self.getVirtualMachines()
+        firstVM = True
         for virtualMachineInfo in self.virtualMachineInfos:
             if virtualMachineInfo.getAutoStart():
+                if not firstVM and not virtualMachineInfo.isRunning:
+                    time.sleep( self.delayBetweenAutoStart ) # Only put in a delay if there is another VM to start up and is not already running!
+
                 # Create a dummy widget (radio button) and use that to kick off the start VM function...
                 radioButton = Gtk.RadioButton.new_with_label_from_widget( None, "" )                    
                 radioButton.props.name = virtualMachineInfo.getUUID()
                 self.onStartVirtualMachine( radioButton, False )
+                firstVM = False
 
         # Create the indicator...
         try:
@@ -517,6 +523,16 @@ class IndicatorVirtualBox:
         tree.connect( "row-activated", self.onVMDoubleClick )
         grid.attach( tree, 0, 0, 2, 1 )
 
+        label = Gtk.Label( "Delay (minutes)" )
+        grid.attach( label, 0, 1, 1, 1 )
+
+        spinnerDelay = Gtk.SpinButton()
+        spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStart, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerDelay.set_value( self.delayBetweenAutoStart ) # ...so need to force the initial value by explicitly setting it.
+        spinnerDelay.set_tooltip_text( "Time delay from starting one VM to the next" )
+        spinnerDelay.set_hexpand( True )
+        grid.attach( spinnerDelay, 1, 1, 1, 1 )
+
         notebook.append_page( grid, Gtk.Label( "Virtual Machines" ) )
 
         # Third tab - general settings.
@@ -531,12 +547,12 @@ class IndicatorVirtualBox:
         label = Gtk.Label( "Refresh interval (minutes)" )
         grid.attach( label, 0, 0, 1, 1 )
 
-        spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinner.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( "How often the list of VMs and their running status is automatically updated" )
-        spinner.set_hexpand( True )
-        grid.attach( spinner, 1, 0, 1, 1 )
+        spinnerRefreshInterval = Gtk.SpinButton()
+        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
+        spinnerRefreshInterval.set_tooltip_text( "How often the list of VMs and their running status is automatically updated" )
+        spinnerRefreshInterval.set_hexpand( True )
+        grid.attach( spinnerRefreshInterval, 1, 0, 1, 1 )
 
         autostartIndicatorCheckbox = Gtk.CheckButton( "Autostart" )
         autostartIndicatorCheckbox.set_tooltip_text( "Run the indicator automatically" )
@@ -553,12 +569,13 @@ class IndicatorVirtualBox:
 
         response = self.dialog.run()
         if response == Gtk.ResponseType.OK:
+            self.delayBetweenAutoStart = spinnerDelay.get_value_as_int()
             self.menuTextGroupNameBefore = textGroupNameBefore.get_text()
             self.menuTextGroupNameAfter = textGroupNameAfter.get_text()
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.sortDefault = not sortAlphabeticallyCheckbox.get_active()
 
-            self.refreshIntervalInMinutes = spinner.get_value_as_int()
+            self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             GLib.source_remove( self.timeoutID )
             self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
 
@@ -706,6 +723,7 @@ class IndicatorVirtualBox:
 
 
     def loadSettings( self ):
+        self.delayBetweenAutoStart = 30 # Seconds
         self.menuTextGroupNameBefore = ""
         self.menuTextGroupNameAfter = ""
         self.refreshIntervalInMinutes = 15
@@ -718,6 +736,7 @@ class IndicatorVirtualBox:
                 with open( IndicatorVirtualBox.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
+                self.delayBetweenAutoStart = settings.get( IndicatorVirtualBox.SETTINGS_DELAY_BETWEEN_AUTO_START, self.delayBetweenAutoStart )
                 self.menuTextGroupNameBefore = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_GROUP_NAME_BEFORE, self.menuTextGroupNameBefore )
                 self.menuTextGroupNameAfter = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_GROUP_NAME_AFTER, self.menuTextGroupNameAfter )
                 self.refreshIntervalInMinutes = settings.get( IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
@@ -733,6 +752,7 @@ class IndicatorVirtualBox:
     def saveSettings( self ):
         try:
             settings = {
+                IndicatorVirtualBox.SETTINGS_DELAY_BETWEEN_AUTO_START: self.delayBetweenAutoStart,
                 IndicatorVirtualBox.SETTINGS_MENU_TEXT_GROUP_NAME_BEFORE: self.menuTextGroupNameBefore,
                 IndicatorVirtualBox.SETTINGS_MENU_TEXT_GROUP_NAME_AFTER: self.menuTextGroupNameAfter,
                 IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,

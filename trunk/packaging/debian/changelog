@@ -2,6 +2,7 @@ indicator-virtual-box (1.0.21-1) precise; urgency=low
 
   * Put in a refresh to ensure the list of VMs is updated when the preferences
     are displayed.
+  * Put in a delay between each VM starting up.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 13 Oct 2013 20:14:12 +1000
 
