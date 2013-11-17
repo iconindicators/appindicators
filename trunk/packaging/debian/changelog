@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.22-1) precise; urgency=low
+
+  * Put the list of VMs in the Preferences into a scrolled window.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 17 Nov 2013 14:04:35 +1000
+
+
 indicator-virtual-box (1.0.21-1) precise; urgency=low
 
   * Put in a refresh to ensure the list of VMs is updated when the preferences
@@ -51,7 +58,7 @@ indicator-virtual-box (1.0.16-1) precise; urgency=low
   * Swapped out python-appindicator for gir1.2-appindicator3-0.1 in debian/control
     Depends.
   * Simpler handling for creating the indicator - should hopefully sustain more
-    enviroments. 
+    environments.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 16 Nov 2012 10:26:05 +1000
 
