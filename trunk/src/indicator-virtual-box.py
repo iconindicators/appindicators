@@ -523,7 +523,7 @@ class IndicatorVirtualBox:
         tree.connect( "row-activated", self.onVMDoubleClick )
 
         scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC ) # I don't like setting NEVER...but if I don't, the scrolled window is too small by default.
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 0, 2, 1 )
 
