@@ -36,9 +36,6 @@
 # The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
 
 
-# TODO: Have an option of a delay between VM startups.
-
-
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -86,17 +83,18 @@ class IndicatorVirtualBox:
 
         # Start up VMs...
         self.getVirtualMachines()
-        firstVM = True
+        previousVMNeededStarting = False
         for virtualMachineInfo in self.virtualMachineInfos:
             if virtualMachineInfo.getAutoStart():
-                if not firstVM and not virtualMachineInfo.isRunning:
-                    time.sleep( self.delayBetweenAutoStart ) # Only put in a delay if there is another VM to start up and is not already running!
+                if previousVMNeededStarting and not virtualMachineInfo.isRunning:
+                    time.sleep( self.delayBetweenAutoStart )
+
+                previousVMNeededStarting = not virtualMachineInfo.isRunning
 
                 # Create a dummy widget (radio button) and use that to kick off the start VM function...
                 radioButton = Gtk.RadioButton.new_with_label_from_widget( None, "" )                    
                 radioButton.props.name = virtualMachineInfo.getUUID()
                 self.onStartVirtualMachine( radioButton, False )
-                firstVM = False
 
         # Create the indicator...
         try:
