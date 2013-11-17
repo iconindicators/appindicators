@@ -493,6 +493,8 @@ class IndicatorVirtualBox:
         grid.set_margin_right( 10 )
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
+        grid.set_row_homogeneous( False )
+        grid.set_column_homogeneous( False )
 
         stack = [ ]
         store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon (Gtk.STOCK_APPLY) or None for autostart of VM, VM start command, VM/Group UUID.
@@ -512,14 +514,17 @@ class IndicatorVirtualBox:
 
         tree = Gtk.TreeView( store )
         tree.set_hexpand( True )
-
+        tree.set_vexpand( True )
         tree.append_column( Gtk.TreeViewColumn( "Virtual Machine", Gtk.CellRendererText(), text = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Autostart", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
         tree.append_column( Gtk.TreeViewColumn( "Start Command", Gtk.CellRendererText(), text = 2 ) )
         tree.set_tooltip_text( "Double click to edit a VM's properties" )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onVMDoubleClick )
-        grid.attach( tree, 0, 0, 2, 1 )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.add( tree )
+        grid.attach( scrolledWindow, 0, 0, 2, 1 )
 
         label = Gtk.Label( "Delay (minutes)" )
         grid.attach( label, 0, 1, 1, 1 )
