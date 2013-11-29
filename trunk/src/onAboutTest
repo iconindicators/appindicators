@@ -1,0 +1,51 @@
+    def onAbout( self, widget ):
+        if self.dialog is not None:
+            self.dialog.present()
+            return
+
+        self.dialog = Gtk.AboutDialog()
+        self.dialog.set_program_name( IndicatorStardate.NAME )
+        self.dialog.set_comments( IndicatorStardate.AUTHOR + "\n\nBased on STARDATES IN STAR TREK FAQ V1.6\n" )
+        self.dialog.set_website( IndicatorStardate.WEBSITE )
+        self.dialog.set_website_label( IndicatorStardate.WEBSITE )
+        self.dialog.set_version( IndicatorStardate.VERSION )
+        self.dialog.set_license( IndicatorStardate.LICENSE )
+        self.dialog.set_icon_name( Gtk.STOCK_ABOUT )
+
+        contentArea = self.dialog.get_content_area()
+        children = contentArea.get_children()
+        box = children[ 0 ]
+        buttonBox = children[ 1 ]
+
+        boxChildren = box.get_children()
+        buttonBoxChildren = buttonBox.get_children()
+        for button in buttonBoxChildren:
+            response = self.dialog.get_response_for_widget( button )
+            print( button.get_label(), response )
+
+        notebook = boxChildren[ 2 ]
+        notebook.set_show_tabs( True )
+
+        changelog = Gtk.ToggleButton( "Changelog" )
+        changelog.show()
+        changelog.connect( "toggled", self.onChangelog, notebook )
+        self.dialog.add_action_widget( changelog, -1 )
+
+        label = Gtk.Label( "Fingers Crossed!" )
+        label.show()
+        notebook.append_page( label, None )
+        label.show()
+
+#         actionArea = self.dialog.get_action_area()
+
+
+
+        self.dialog.run()
+        print("x")
+        self.dialog.destroy()
+        self.dialog = None
+
+
+    def onChangelog( self, widget, notebook ):
+        print( "onChangelog" )
+        notebook.set_current_page( 1 )
