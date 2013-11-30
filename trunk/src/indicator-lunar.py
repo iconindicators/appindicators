@@ -32,6 +32,44 @@
 # I've also noticed the VirtualBox indicator menu seems to stop responding over time too...maybe it's a related issue?
 
 
+#TODO
+# Links for astro programs to hopefully determine the angle of the moon terminator...
+# https://github.com/soniakeys/meeus
+# http://www.geoastro.de/elevaz/basics/meeus.htm
+# http://www.geoastro.de/elevaz/basics/index.htm
+# http://www.jgiesen.de/elevazmoon/basics/meeus.htm
+# http://godoc.org/github.com/soniakeys/meeus
+# https://sites.google.com/site/astronomicalalgorithms/
+#
+#
+# From an email from Jürgen Giesen
+#
+# the formulas used in my applet to compute the local zenith angle (ZA) of the Moon's bright limb are from the book of Jean Meeus: "Astronomical Algorithms", Willmann-Bell.
+# 
+# ZA = P - Q
+# 
+# P = position angle of the Moon's bright limb (chapter 46)
+# 
+# P = Math.atan2(Math.cos(K*decSun)*Math.sin(K*(alphaSun-alphaMoon)),Math.sin(K*decSun)*Math.cos(K*decMoon)-Math.cos(K*decSun)*Math.sin(K*decMoon)*Math.cos(K*(alphaSun-alphaMoon)))/K;
+# 
+# Q = parallactic angle of the Moon (chapter 13)
+# 
+# Q = Math.atan2(Math.sin(K*moonHourAngle),Math.tan(K*latitude)*Math.cos(K*moonDelta)-Math.sin(K*moonDelta)*Math.cos(K*moonHourAngle))/K; // northern latitude positive
+# 
+# moonHourAngle = THETA0(JD) + longitude - alphaMoon // eastern longitude positive
+# 
+# double THETA0(double JD) { // Greenwich Mean Sidereal Time
+#     double T = (JD-2451545.0)/36525.0;
+#     double x = 280.46061837 + 360.98564736629*(JD-2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;
+#     x = x % 360.0;
+#     if (x<0) x = x + 360.0;
+#     return x;
+# }
+# 
+# JD = Julian_Day(date, month, year, UT);
+# K = Math.PI/180.0;
+ 
+
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
