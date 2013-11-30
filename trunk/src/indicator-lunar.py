@@ -244,7 +244,8 @@ class IndicatorLunar:
 
     def convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( self, s ):
         t = tuple( str( s ).split( ":" ) )
-        return self._convertToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
+        return self.convertHoursMinutesSecondsIn24HourFormatToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
+#         return self._convertToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
 
 
     def convertHoursMinutesSecondsIn24HourFormatToDecimal( self, hours, minutes, seconds ):
@@ -253,7 +254,8 @@ class IndicatorLunar:
 
     def convertDegreesMinutesSecondsAsStringToDecimal( self, s ):
         t = tuple( str( s ).split( ":" ) )
-        return self._convertToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
+        return self.convertDegreesMinutesSecondsToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
+#         return self._convertToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
 
 
     def convertDegreesMinutesSecondsToDecimal( self, degrees, minutes, seconds ):
@@ -261,7 +263,30 @@ class IndicatorLunar:
 
 
     def _convertToDecimal( self, x, y, z ):
-        return float( x ) + ( ( float( y ) + ( float( z ) / 60.0 ) ) / 60.0 ) 
+        return math.copysign( abs( float( x ) ) + ( ( float( y ) + ( float( z ) / 60.0 ) ) / 60.0 ), float( x ) ) 
+
+
+    def getBrightLimbAngle( self, body1, body2 ):
+        body1RightAscension = self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( body1.ra )
+        body1Declination = self.convertDegreesMinutesSecondsAsStringToDecimal( body1.dec )
+
+        body2RightAscension = self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( body2.ra )
+        body2Declination = self.convertDegreesMinutesSecondsAsStringToDecimal( body2.dec )
+
+        deltaAlpha = ( body1RightAscension - body2RightAscension ) * 15.0
+
+        y = math.cos( math.radians( body1Declination ) ) * math.sin( math.radians( deltaAlpha ) )
+
+        x = math.cos( math.radians( body2Declination ) ) * math.sin( math.radians( body1Declination ) ) - \
+                        math.sin( math.radians( body2Declination ) ) * math.cos( math.radians( body1Declination ) ) * math.cos( math.radians( deltaAlpha ) )
+
+        brightLimbAngle = math.degrees( math.atan2( y, x ) )
+        print(brightLimbAngle)
+        if brightLimbAngle < 0:
+            brightLimbAngle = brightLimbAngle + 360
+
+        print(brightLimbAngle)
+        return brightLimbAngle
 
 
     def buildMenu( self, lunarPhase, ephemNow ):
@@ -283,65 +308,31 @@ class IndicatorLunar:
 
 
 
-
-#         print( self.convertHoursMinutesSecondsIn24HourFormatToDecimal( 18, 31, 27 ) )
-#         print( self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( "18:31:27" ) )
-#         print( self.convertDegreesMinutesSecondsToDecimal( 182, 31, 27 ) )
-#         print( self.convertDegreesMinutesSecondsAsStringToDecimal( "182:31:27" ) )
-
-
-        observer = ephem.Observer()
-#         >>> gatech.lon, gatech.lat = '-84.39733', '33.775867'
-        observer.date = "2003/11/22 00:00:00"
         sun, moon, mercury = ephem.Sun(), ephem.Moon(), ephem.Mercury()
+        observer = ephem.Observer()
+
+        observer.date = "2003/11/22 00:00:00"
+        sun.compute( observer )
+        mercury.compute( observer )
+#         self.getBrightLimbAngle( sun, mercury )
+
+        observer.date = "2003/09/01 00:00:00"
         sun.compute( observer )
         moon.compute( observer )
-        mercury.compute( observer )
+#         self.getBrightLimbAngle( sun, moon )
 
-#         print( "Sun right ascension: ", sun.ra, "\tSun declination: ", sun.dec )
-#         print( "Moon right ascension: ", moon.ra, "\tMoon declination: ", moon.dec )
-#         print( "Mercury right ascension: ", mercury.ra, "\tMercury declination: ", mercury.dec )
-
-        print( "Sun right ascension: ", sun.ra, "\tSun declination: ", sun.dec )
-        print( "Sun right ascension: ", self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( sun.ra ), "\tSun declination: ", self.convertDegreesMinutesSecondsAsStringToDecimal( sun.dec ) )
-
-
+        observer = ephem.Observer()
+        observer.date = "2013/11/12 15:50:00"
+#         observer.date = "2013/11/07 15:50:00"
+        moon = ephem.Moon( observer )
+        sun = ephem.Sun( observer )
+        self.getBrightLimbAngle( sun, moon )
 
 
-
-        
 #         http://www.physicsforums.com/showthread.php?t=297140
 #         http://www.jgiesen.de/SME/details/seDetails.htm
 #         http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
         
-        moon = ephem.Moon( ephemNow )
-        moon.compute( city )
-#         print( moon.alt, moon.az, moon.ra, moon.dec )
-#         print( "Moon right ascension: ", moon.ra )
-#         print( "Moon declination: ", moon.dec )
-        
-        sun = ephem.Sun( ephemNow )
-        sun.compute( city )
-#         print( sun.alt, sun.az, sun.ra, sun.dec )
-#         print( "Sun right ascension: ", sun.ra )
-#         print( "Sun declination: ", sun.dec )
-
-        numerator = math.cos( math.radians( sun.dec ) ) * math.sin( math.radians( sun.ra ) - math.radians( moon.ra ) )
-        denominator = math.sin( math.radians( sun.dec ) ) * math.cos( math.radians( moon.dec ) ) - math.cos( math.radians( sun.dec ) ) * math.sin( math.radians( moon.dec ) ) * math.cos( math.radians( sun.ra ) - math.radians( moon.ra ) )
-        brightLimbAngle = math.degrees( math.atan( numerator / denominator ) )
-#         print( brightLimbAngle )
-#         Position angle of the Moon's bright Limb:
-#         This angle it's the position angle c of the Moon's bright limb midpoint (C point from the previously image). 
-#         It can be obtained by (this expression it's also valid for the planets):
-#  
-#             tanc = cosd0sin(a0 - a)/(sind0cosd - cosd0sindcos(a0 -a))
-#  
-#         where:  a0, d0, l0: geocentric right ascension, declination and longitude of the Sol;
-#                 a, d, l: geocentric right ascension, declination and longitude of the Moon;
-#  
-#         The angle c during the first quarter will be near the vicinity of 270º and near 90º after the Full Moon.
-#         If we consider c as the position angle of the bright limb midpoint, then the position angle of the poles will be (c-900) and (c+900).
-#         The big advantage that we obtain it's to define easily and without any doubt the bright limb of the Moon.
  
         
         
@@ -468,19 +459,19 @@ class IndicatorLunar:
         GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
 
 
-    def createPlanetSubmenu( self, planetMenuItem, city, planet, nextUpdates, ephemNow ):
+    def createPlanetSubmenu( self, planetMenuItem, city, body, nextUpdates, ephemNow ):
         subMenu = Gtk.Menu()
-        subMenu.append( Gtk.MenuItem( "Illumination: " + str( int( round( planet.phase ) ) ) + "%" ) )
-        subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( planet )[ 1 ] ) )
-        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.tropical( planet, ephemNow ) ) )
-        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( planet.earth_distance, 4 ) ) + " AU" ) )
-        subMenu.append( Gtk.MenuItem( "Distance to Sun: " + str( round( planet.sun_distance, 4 ) ) + " AU" ) )
+        subMenu.append( Gtk.MenuItem( "Illumination: " + str( int( round( body.phase ) ) ) + "%" ) )
+        subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( body )[ 1 ] ) )
+        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.tropical( body, ephemNow ) ) )
+        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( body.earth_distance, 4 ) ) + " AU" ) )
+        subMenu.append( Gtk.MenuItem( "Distance to Sun: " + str( round( body.sun_distance, 4 ) ) + " AU" ) )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Must compute the previous information (illumination, constellation, phase and so on BEFORE rising/setting).
         # For some reason the values, most notably phase, are different (and wrong) if calculated AFTER rising/setting are calculated.
-        rising = city.next_rising( planet )
-        setting = city.next_setting( planet )
+        rising = city.next_rising( body )
+        setting = city.next_setting( body )
         if rising > setting:
             subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( setting ) ) )
             subMenu.append( Gtk.MenuItem( "Rise: " + self.localiseAndTrim( rising ) ) )
@@ -1531,26 +1522,3 @@ class Eclipses:
 
 
 if __name__ == "__main__": IndicatorLunar().main()
-
-
-# //        the formulas used in my applet to compute the local zenith angle (ZA) of the Moon's bright limb are from the book of Jean Meeus: "Astronomical Algorithms", Willmann-Bell.
-# //        ZA = P - Q
-# //        P = position angle of the Moon's bright limb (chapter 46)
-# //        P = Math.atan2(Math.cos(K*decSun)*Math.sin(K*(alphaSun-alphaMoon)),Math.sin(K*decSun)*Math.cos(K*decMoon)-Math.cos(K*decSun)*Math.sin(K*decMoon)*Math.cos(K*(alphaSun-alphaMoon)))/K;
-# //        Q = parallactic angle of the Moon (chapter 13)
-# //        Q = Math.atan2(Math.sin(K*moonHourAngle),Math.tan(K*latitude)*Math.cos(K*moonDelta)-Math.sin(K*moonDelta)*Math.cos(K*moonHourAngle))/K; // northern latitude positive
-# //        moonHourAngle = THETA0(JD) + longitude - alphaMoon // eastern longitude positive
-# //        double THETA0(double JD) { // Greenwich Mean Sidereal Time
-# //            double T = (JD-2451545.0)/36525.0;
-# //            double x = 280.46061837 + 360.98564736629*(JD-2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;
-# //            x = x % 360.0;
-# //            if (x<0) x = x + 360.0;
-# //            return x;
-# //        }
-# //
-# //        JD = Julian_Day(date, month, year, UT);
-# //        K = Math.PI/180.0;
-
-        
-        
-        
