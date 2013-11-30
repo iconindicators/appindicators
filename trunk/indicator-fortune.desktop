@@ -1,10 +1,10 @@
 [Desktop Entry]
-Name=Lunar Indicator
-Comment=Lunar indicator applet
-Exec=/usr/share/indicator-lunar/indicator-lunar.py
+Name=Fortune Indicator
+Comment=Fortune indicator applet
+Exec=/usr/share/indicator-fortune/indicator-fortune.py
 Terminal=false
 StartupNotify=true
 Type=Application
-Categories=Utility;
-Icon=indicator-lunar
-Name[en_AU]=indicator-fortune
+Categories=Utility;Amusement
+Icon=indicator-fortune
+

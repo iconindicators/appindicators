@@ -18,5 +18,5 @@ icons/ubuntu-mono-light/*.svg usr/share/icons/ubuntu-mono-light/apps/16
 icons/ubuntu-mono-light/*.svg usr/share/icons/ubuntu-mono-light/apps/22
 icons/ubuntu-mono-light/*.svg usr/share/icons/ubuntu-mono-light/apps/24
 icons/ubuntu-mono-light/*.svg usr/share/icons/ubuntu-mono-light/apps/48
-indicator-lunar.desktop usr/share/applications
-src/indicator-lunar.py usr/share/indicator-lunar
+indicator-fortune.desktop usr/share/applications
+src/indicator-fortune.py usr/share/indicator-fortune

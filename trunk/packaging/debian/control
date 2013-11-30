@@ -1,4 +1,4 @@
-Source: indicator-lunar
+Source: indicator-fortune
 Maintainer: Bernard Giannetti <thebernmeister@hotmail.com>
 Section: python
 Priority: optional
@@ -6,7 +6,7 @@ Build-Depends: python3 (>= 3.2), debhelper (>= 7)
 Standards-Version: 3.9.4
 X-Python3-Version: >= 3.2
 
-Package: indicator-lunar
+Package: indicator-fortune
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, gir1.2-appindicator3-0.1, python3-gi, python3-ephem, python3-notify2
-Description: Application indicator which displays lunar information.
+Depends: ${misc:Depends}, ${python:Depends}, gir1.2-appindicator3-0.1, python3-gi, python3-notify2
+Description: Application indicator which displays fortunes.
