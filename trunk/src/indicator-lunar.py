@@ -33,6 +33,11 @@
 
 
 #TODO
+# Perhaps double check the frequency of updates...
+# So update at least once per hour or more frequently based on the rollover date/time of each body.
+
+
+#TODO
 # Links for astro programs to hopefully determine the angle of the moon terminator...
 # https://github.com/soniakeys/meeus
 # http://www.geoastro.de/elevaz/basics/meeus.htm
