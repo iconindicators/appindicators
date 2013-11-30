@@ -8,5 +8,5 @@ X-Python3-Version: >= 3.2
 
 Package: indicator-fortune
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, gir1.2-appindicator3-0.1, python3-gi, python3-notify2
+Depends: ${misc:Depends}, ${python:Depends}, fortune-mod, gir1.2-appindicator3-0.1, python3-gi, python3-notify2
 Description: Application indicator which displays fortunes.
