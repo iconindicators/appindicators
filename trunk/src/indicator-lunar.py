@@ -310,8 +310,6 @@ class IndicatorLunar:
 
         eclipse = self.eclipse.getLunarEclipseForUTC( ephemNow )
         if eclipse is not None:
-#             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-#             menuItem.get_submenu().append( Gtk.MenuItem( "Eclipse: " + eclipse[ 0 ] + " " + eclipse[ 1 ] + " " + eclipse[ 2 ] + " " + eclipse[ 3 ] ) )
             self.createEclipseMenu( menuItem.get_submenu(), eclipse )
 
         # Sun
@@ -357,8 +355,6 @@ class IndicatorLunar:
 
         eclipse = self.eclipse.getSolarEclipseForUTC( ephemNow )
         if eclipse is not None:
-#             subMenu.append( Gtk.SeparatorMenuItem() )
-#             subMenu.append( Gtk.MenuItem( "Eclipse: " + eclipse[ 0 ] + " " + eclipse[ 1 ] + " " + eclipse[ 2 ] + " " + eclipse[ 3 ] ) )
             self.createEclipseMenu( subMenu, eclipse )
 
         # Planets
