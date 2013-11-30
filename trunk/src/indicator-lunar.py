@@ -214,7 +214,7 @@ class IndicatorLunar:
             labelTooltip = ""
 
         # Set the icon/label handling the Unity and non-Unity cases...
-        self.createIconForLunarPhase( lunarPhase, percentageIllumination )
+        self.createIconForLunarPhase( lunarPhase, percentageIllumination, ephemNow )
         if self.appindicatorImported:
             self.indicator.set_icon( IndicatorLunar.SVG_ICON )
             self.indicator.set_label( labelTooltip, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
@@ -242,53 +242,6 @@ class IndicatorLunar:
             Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
 
 
-    def convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( self, s ):
-        t = tuple( str( s ).split( ":" ) )
-        return self.convertHoursMinutesSecondsIn24HourFormatToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
-#         return self._convertToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
-
-
-    def convertHoursMinutesSecondsIn24HourFormatToDecimal( self, hours, minutes, seconds ):
-        return self._convertToDecimal( hours, minutes, seconds )
-
-
-    def convertDegreesMinutesSecondsAsStringToDecimal( self, s ):
-        t = tuple( str( s ).split( ":" ) )
-        return self.convertDegreesMinutesSecondsToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
-#         return self._convertToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
-
-
-    def convertDegreesMinutesSecondsToDecimal( self, degrees, minutes, seconds ):
-        return self._convertToDecimal( degrees, minutes, seconds )
-
-
-    def _convertToDecimal( self, x, y, z ):
-        return math.copysign( abs( float( x ) ) + ( ( float( y ) + ( float( z ) / 60.0 ) ) / 60.0 ), float( x ) ) 
-
-
-    def getBrightLimbAngle( self, body1, body2 ):
-        body1RightAscension = self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( body1.ra )
-        body1Declination = self.convertDegreesMinutesSecondsAsStringToDecimal( body1.dec )
-
-        body2RightAscension = self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( body2.ra )
-        body2Declination = self.convertDegreesMinutesSecondsAsStringToDecimal( body2.dec )
-
-        deltaAlpha = ( body1RightAscension - body2RightAscension ) * 15.0
-
-        y = math.cos( math.radians( body1Declination ) ) * math.sin( math.radians( deltaAlpha ) )
-
-        x = math.cos( math.radians( body2Declination ) ) * math.sin( math.radians( body1Declination ) ) - \
-                        math.sin( math.radians( body2Declination ) ) * math.cos( math.radians( body1Declination ) ) * math.cos( math.radians( deltaAlpha ) )
-
-        brightLimbAngle = math.degrees( math.atan2( y, x ) )
-        print(brightLimbAngle)
-        if brightLimbAngle < 0:
-            brightLimbAngle = brightLimbAngle + 360
-
-        print(brightLimbAngle)
-        return brightLimbAngle
-
-
     def buildMenu( self, lunarPhase, ephemNow ):
         nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
@@ -307,32 +260,15 @@ class IndicatorLunar:
         self.createPlanetSubmenu( menuItem, city, ephem.Moon( ephemNow ), nextUpdates, ephemNow )
 
 
-
-        sun, moon, mercury = ephem.Sun(), ephem.Moon(), ephem.Mercury()
-        observer = ephem.Observer()
-
-        observer.date = "2003/11/22 00:00:00"
-        sun.compute( observer )
-        mercury.compute( observer )
-#         self.getBrightLimbAngle( sun, mercury )
-
-        observer.date = "2003/09/01 00:00:00"
-        sun.compute( observer )
-        moon.compute( observer )
-#         self.getBrightLimbAngle( sun, moon )
-
-        observer = ephem.Observer()
-        observer.date = "2013/11/12 15:50:00"
-#         observer.date = "2013/11/07 15:50:00"
-        moon = ephem.Moon( observer )
-        sun = ephem.Sun( observer )
-        self.getBrightLimbAngle( sun, moon )
-
-
-#         http://www.physicsforums.com/showthread.php?t=297140
-#         http://www.jgiesen.de/SME/details/seDetails.htm
-#         http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
         
+        city.date = "2013/11/12 15:50:00"
+        city.date = "2013/11/07 15:50:00"
+        city.date = "2003/09/01 00:00:00"
+#         city.date = ephemNow
+        moon = ephem.Moon( city )
+        sun = ephem.Sun( city )
+        brightLimbAngle = self.getBrightLimbAngle( sun, moon )
+        print( brightLimbAngle )
  
         
         
@@ -555,7 +491,7 @@ class IndicatorLunar:
         return planetSignName + " " + str( planetSignDegree ) + "° " + planetSignMinute + "'"
 
 
-    def createIconForLunarPhase( self, lunarPhase, illumination ):
+    def createIconForLunarPhase( self, lunarPhase, illumination, ephemNow ):
         if lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON:
             svg = self.getNewMoonSVG()
         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON:
@@ -580,6 +516,45 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
+
+
+    def convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( self, s ):
+        t = tuple( str( s ).split( ":" ) )
+        return self.__convertToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
+
+
+    def convertDegreesMinutesSecondsAsStringToDecimal( self, s ):
+        t = tuple( str( s ).split( ":" ) )
+        return self.__convertToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
+
+
+    def __convertToDecimal( self, x, y, z ):
+        return math.copysign( abs( float( x ) ) + ( ( float( y ) + ( float( z ) / 60.0 ) ) / 60.0 ), float( x ) ) 
+
+
+    # References:
+    #  http://www.nightskynotebook.com/Moon.php
+    #  Practical Astronomy with Your Calculator By Peter Duffett-Smith
+    def getBrightLimbAngle( self, body1, body2 ):
+
+        body1RightAscension = self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( body1.ra )
+        body1Declination = self.convertDegreesMinutesSecondsAsStringToDecimal( body1.dec )
+
+        body2RightAscension = self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( body2.ra )
+        body2Declination = self.convertDegreesMinutesSecondsAsStringToDecimal( body2.dec )
+
+        deltaAlpha = ( body1RightAscension - body2RightAscension ) * 15.0
+
+        y = math.cos( math.radians( body1Declination ) ) * math.sin( math.radians( deltaAlpha ) )
+
+        x = math.cos( math.radians( body2Declination ) ) * math.sin( math.radians( body1Declination ) ) - \
+                        math.sin( math.radians( body2Declination ) ) * math.cos( math.radians( body1Declination ) ) * math.cos( math.radians( deltaAlpha ) )
+
+        brightLimbAngle = math.degrees( math.atan2( y, x ) )
+        if brightLimbAngle < 0:
+            brightLimbAngle = brightLimbAngle + 360
+
+        return brightLimbAngle
 
 
     def handleLeftClick( self, icon ):
@@ -970,6 +945,68 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
+
+
+        # Calculate the bright limb angle so the icon can be rotated to match (hopefully) reality.
+        # No need to rotate a full/new moon!
+#         moon = ephem.Moon( city )
+#         sun = ephem.Sun( city )
+#         brightLimbAngle = self.getBrightLimbAngle( sun, moon )
+
+
+    def getCrescentGibbousMoonSVG( self, illumination, waning, crescent, ephemNow ):
+        radius = float( self.getMoonRadius() )
+        diameter = 2 * radius
+
+        # http://en.wikipedia.org/wiki/Crescent
+        if crescent:
+            ellipseRadiusX = radius * ( 1 - illumination / 50 )
+        else:
+            ellipseRadiusX = radius * ( illumination / 50 - 1 )
+
+        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
+        if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
+            sweepFlagCircle = str( 0 )
+            sweepFlagEllipse = str( 1 ) if crescent else str( 0 )
+        else:
+            sweepFlagCircle = str( 1 )
+            sweepFlagEllipse = str( 0 ) if crescent else str( 1 )
+
+        if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
+            x = 50
+        else:
+            # Northern and waxing OR southern and waning...
+            if crescent:
+                x = ( 50 - radius )
+            else:
+                x = ( 50 - radius ) + abs( ellipseRadiusX ) # Gibbous
+
+        circle = 'a' + str( radius ) + ',' + str( radius ) + ' 0 0,' + sweepFlagCircle + ' 0,' + str( diameter )
+        ellipse = 'a' + str( ellipseRadiusX ) + ',' + str( radius ) + ' 0 0,' + sweepFlagEllipse + ' 0,-' + str( diameter )
+        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
+
+        if crescent:
+            width = radius + 2 * ( 50 - radius )
+        else:
+            width = radius + abs( ellipseRadiusX ) + 2 * ( 50 - radius ) # Gibbous
+
+        return self.getSVGHeader( width ) + svg + self.getSVGFooter()
+
+
+    def getQuarterMoonSVG( self, ephemNow ):
+        radius = float( self.getMoonRadius() )
+        diameter = 2 * radius
+
+        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
+        if( first == True and northernHemisphere == True ) or ( first == False and northernHemisphere == False ):
+            x = 50 - radius
+            sweepFlag = str( 1 )
+        else:
+            x = 50
+            sweepFlag = str( 0 )
+
+        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' a' + str( radius ) + ',' + str( radius ) + ' 0 0,' + sweepFlag + ' 0,' + str( diameter ) + ' z" fill="' + self.getColourForIconTheme() + '" />'
+        return self.getSVGHeader( ( 50 - radius ) + 50 ) + svg + self.getSVGFooter()
 
 
     def getCrescentGibbousMoonSVG( self, illumination, waning, northernHemisphere, crescent ):
