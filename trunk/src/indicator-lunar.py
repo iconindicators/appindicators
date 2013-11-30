@@ -242,6 +242,28 @@ class IndicatorLunar:
             Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
 
 
+    def convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( self, s ):
+        t = tuple( str( s ).split( ":" ) )
+        return self._convertToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
+
+
+    def convertHoursMinutesSecondsIn24HourFormatToDecimal( self, hours, minutes, seconds ):
+        return self._convertToDecimal( hours, minutes, seconds )
+
+
+    def convertDegreesMinutesSecondsAsStringToDecimal( self, s ):
+        t = tuple( str( s ).split( ":" ) )
+        return self._convertToDecimal( t[ 0 ], t[ 1 ], t[ 2 ] )
+
+
+    def convertDegreesMinutesSecondsToDecimal( self, degrees, minutes, seconds ):
+        return self._convertToDecimal( degrees, minutes, seconds )
+
+
+    def _convertToDecimal( self, x, y, z ):
+        return float( x ) + ( ( float( y ) + ( float( z ) / 60.0 ) ) / 60.0 ) 
+
+
     def buildMenu( self, lunarPhase, ephemNow ):
         nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
@@ -260,6 +282,33 @@ class IndicatorLunar:
         self.createPlanetSubmenu( menuItem, city, ephem.Moon( ephemNow ), nextUpdates, ephemNow )
 
 
+
+
+#         print( self.convertHoursMinutesSecondsIn24HourFormatToDecimal( 18, 31, 27 ) )
+#         print( self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( "18:31:27" ) )
+#         print( self.convertDegreesMinutesSecondsToDecimal( 182, 31, 27 ) )
+#         print( self.convertDegreesMinutesSecondsAsStringToDecimal( "182:31:27" ) )
+
+
+        observer = ephem.Observer()
+#         >>> gatech.lon, gatech.lat = '-84.39733', '33.775867'
+        observer.date = "2003/11/22 00:00:00"
+        sun, moon, mercury = ephem.Sun(), ephem.Moon(), ephem.Mercury()
+        sun.compute( observer )
+        moon.compute( observer )
+        mercury.compute( observer )
+
+#         print( "Sun right ascension: ", sun.ra, "\tSun declination: ", sun.dec )
+#         print( "Moon right ascension: ", moon.ra, "\tMoon declination: ", moon.dec )
+#         print( "Mercury right ascension: ", mercury.ra, "\tMercury declination: ", mercury.dec )
+
+        print( "Sun right ascension: ", sun.ra, "\tSun declination: ", sun.dec )
+        print( "Sun right ascension: ", self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( sun.ra ), "\tSun declination: ", self.convertDegreesMinutesSecondsAsStringToDecimal( sun.dec ) )
+
+
+
+
+
         
 #         http://www.physicsforums.com/showthread.php?t=297140
 #         http://www.jgiesen.de/SME/details/seDetails.htm
@@ -267,16 +316,20 @@ class IndicatorLunar:
         
         moon = ephem.Moon( ephemNow )
         moon.compute( city )
-        print( moon.alt, moon.az, moon.ra, moon.dec )
+#         print( moon.alt, moon.az, moon.ra, moon.dec )
+#         print( "Moon right ascension: ", moon.ra )
+#         print( "Moon declination: ", moon.dec )
         
         sun = ephem.Sun( ephemNow )
         sun.compute( city )
-        print( sun.alt, sun.az, sun.ra, sun.dec )
+#         print( sun.alt, sun.az, sun.ra, sun.dec )
+#         print( "Sun right ascension: ", sun.ra )
+#         print( "Sun declination: ", sun.dec )
 
         numerator = math.cos( math.radians( sun.dec ) ) * math.sin( math.radians( sun.ra ) - math.radians( moon.ra ) )
         denominator = math.sin( math.radians( sun.dec ) ) * math.cos( math.radians( moon.dec ) ) - math.cos( math.radians( sun.dec ) ) * math.sin( math.radians( moon.dec ) ) * math.cos( math.radians( sun.ra ) - math.radians( moon.ra ) )
         brightLimbAngle = math.degrees( math.atan( numerator / denominator ) )
-        print( brightLimbAngle )
+#         print( brightLimbAngle )
 #         Position angle of the Moon's bright Limb:
 #         This angle it's the position angle c of the Moon's bright limb midpoint (C point from the previously image). 
 #         It can be obtained by (this expression it's also valid for the planets):
