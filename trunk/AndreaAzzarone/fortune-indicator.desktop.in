@@ -1,0 +1,8 @@
+[Desktop Entry]
+_Name=Fortune Indicator
+_Comment=FortuneIndicator application
+Categories=GNOME;Utility;
+Exec=fortune-indicator
+Icon=fortune-indicator
+Terminal=false
+Type=Application
