@@ -50,7 +50,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.22"
+    VERSION = "1.0.23"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -523,7 +523,14 @@ class IndicatorVirtualBox:
         tree.connect( "row-activated", self.onVMDoubleClick )
 
         scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC ) # I don't like setting NEVER...but if I don't, the scrolled window is too small by default.
+
+        # The treeview won't expand to show all data, even for a small amount of data.
+        # So only add scrollbars if there is a lot of data...greater than 15 say...
+        if len( self.virtualMachineInfos ) < 15:
+            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
+        else:
+            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 0, 2, 1 )
 
