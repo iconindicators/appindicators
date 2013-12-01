@@ -526,7 +526,7 @@ class IndicatorVirtualBox:
 
         # The treeview won't expand to show all data, even for a small amount of data.
         # So only add scrollbars if there is a lot of data...greater than 15 say...
-        if len( self.virtualMachineInfos ) < 15:
+        if len( self.virtualMachineInfos ) <= 15:
             scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
         else:
             scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
