@@ -26,9 +26,21 @@
 
 
 
-# http://ubuntuguide.org/wiki/Fortune
-
 # Before installing, remove fortune-mod and see if that is the only needed dependency.
+
+# Preferences:
+# Disable auto refresh?
+# Set refresh interval.
+
+
+# Post to Gwibber
+#     def share_last_cookie(self, *arg):
+#         p = subprocess.Popen(["gwibber-poster", "-w", "-m", self.body])
+#         # setup timeout handler to avoid zombies
+#         glib.timeout_add_seconds(1, lambda p: p.poll() is None, p)
+
+
+# Let the user specify a file(s)?
 
 
 try:
@@ -36,15 +48,17 @@ try:
 except:
     pass
 
-from gi.repository import GLib, Gtk
+from gi.repository import Gdk, GLib, Gtk
 
-notifyImported = True
+import json, logging, os, shutil, subprocess, sys
+
 try:
     from gi.repository import Notify
 except:
-    notifyImported = False
-
-import datetime, json, locale, logging, math, os, shutil, subprocess, sys
+    dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "The package gi.repository.Notify must be installed!" )
+    dialog.set_title( "indicator-fortune" )
+    dialog.run()
+    sys.exit()
 
 
 class IndicatorFortune:
@@ -61,12 +75,11 @@ class IndicatorFortune:
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
-    SETTINGS_SHOW_CLASSIC = "showClassic"
-    SETTINGS_SHOW_ISSUE = "showIssue"
+    NOTIFICATION_TEXT_SUMMARY = "Fortune. . ."
 
-    WEREWOLF_WARNING_TEXT_BODY = "                                          ...werewolves about ! ! !"
-    WEREWOLF_WARNING_TEXT_SUMMARY = "W  A  R  N  I  N  G"
+    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_SHOW_NOTIFICATIONS = "showNotifications"
+    SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
 
 
     def __init__( self ):
@@ -76,93 +89,67 @@ class IndicatorFortune:
                              handlers = [ filehandler ] )
 
         self.dialog = None
-#         self.loadSettings()
+        self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
+        self.fortune = ""
+        self.loadSettings()
+        Notify.init( IndicatorFortune.NAME )
 
-        if notifyImported:
-            Notify.init( IndicatorFortune.NAME ) 
-# Maybe bail out or do something like bail out if cannot be imported same as ephem.
-
-
-        # Create the indicator...
         try:
             self.appindicatorImported = True
             self.indicator = appindicator.Indicator.new( IndicatorFortune.NAME, IndicatorFortune.ICON, appindicator.IndicatorCategory.APPLICATION_STATUS )
-            self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
-            self.buildMenu()
             self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
+            self.buildMenu()
+            self.indicator.set_menu( self.menu )
         except:
-            self.appindicatorImported = False
-            self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
+            self.appindicatorImported = False            
             self.buildMenu()
             self.statusicon = Gtk.StatusIcon()
             self.statusicon.set_from_icon_name( IndicatorFortune.ICON )
-            self.statusicon.set_tooltip_text( "Virtual Machines" )
             self.statusicon.connect( "popup-menu", self.handleRightClick )
             self.statusicon.connect( "activate", self.handleLeftClick )
 
 
-
     def main( self ):
         self.update()
-#         GLib.timeout_add_seconds( 10, self.update )
+        self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.update )
         Gtk.main()
 
 
     def update( self ):
-#         self.buildMenu()
-
-        f = ""
-        p = subprocess.Popen( "fortune", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-        for line in p.stdout.readlines():
-            l = str( line.decode() )
-            print( l )
-            f += l
-
-        p.wait()
-
-        # The notification summary text must not be empty (at least on Unity).
-        Notify.Notification.new( "Fortune. . .", f, IndicatorFortune.ICON ).show()
-
+        self.refreshFortune()
         
+        if self.showNotifications:
+            Notify.Notification.new( IndicatorFortune.NOTIFICATION_TEXT_SUMMARY, self.fortune, IndicatorFortune.ICON ).show()
+
         return True
 
 
-
-
     def buildMenu( self ):
-#TODO Maybe only build the menu like stardate indicator - once only.        
-        if self.appindicatorImported:
-            menu = self.indicator.get_menu()
-        else:
-            menu = self.menu
-
-        menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
-        menu = Gtk.Menu()
+        self.menu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem( "One off the top" )
         menuItem.connect( "activate", self.onOneOffTheTop )
-        menu.append( menuItem )
+        self.menu.append( menuItem )
 
-        menu.append( Gtk.SeparatorMenuItem() )
+        menuItem = Gtk.MenuItem( "Copy last fortune" )
+        menuItem.connect( "activate", self.onCopyLastFortune )
+        self.menu.append( menuItem )
+
+        self.menu.append( Gtk.SeparatorMenuItem() )
 
         preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
         preferencesMenuItem.connect( "activate", self.onPreferences )
-        menu.append( preferencesMenuItem )
+        self.menu.append( preferencesMenuItem )
 
         aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
         aboutMenuItem.connect( "activate", self.onAbout )
-        menu.append( aboutMenuItem )
+        self.menu.append( aboutMenuItem )
 
         quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
         quitMenuItem.connect( "activate", Gtk.main_quit )
-        menu.append( quitMenuItem )
+        self.menu.append( quitMenuItem )
 
-        if self.appindicatorImported:
-            self.indicator.set_menu( menu )
-        else:
-            self.menu = menu
-
-        menu.show_all()
+        self.menu.show_all()
 
 
     def handleLeftClick( self, icon ):
@@ -173,22 +160,32 @@ class IndicatorFortune:
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
-    def getFortune( self ):
-        f = ""
-        p = subprocess.Popen( "fortune", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-        for line in p.stdout.readlines():
-            l = str( line.decode() )
-            print( l )
-            f += l
+    def refreshFortune( self ):
+        while True:
+            # https://wiki.ubuntu.com/mhall119/devportal/notify-osd
+            # Seems 10 lines of body text is the limit, so reject any fortune over that limit and get another.
+            self.fortune = ""
+            count = 0
+            p = subprocess.Popen( "fortune", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+            for line in p.stdout.readlines():
+                count += 1
+                l = str( line.decode() )
+                print( l )
+                self.fortune += l
 
-        p.wait()
+            p.wait()
 
-        return f
+            if count <= 9: # If the fortune is 10 lines, the first line is set to "...", so truncate to 9 lines.
+                break
 
 
     def onOneOffTheTop( self, widget ):
-        Notify.Notification.new( "Fortune. . .", self.getFortune(), IndicatorFortune.ICON ).show()
+        self.refreshFortune()
+        Notify.Notification.new( IndicatorFortune.NOTIFICATION_TEXT_SUMMARY, self.fortune, IndicatorFortune.ICON ).show()
 
+
+    def onCopyLastFortune( self, widget ):
+        self.clipboard.set_text( self.fortune, -1 )
 
 
     def onAbout( self, widget ):
@@ -198,7 +195,7 @@ class IndicatorFortune:
 
         self.dialog = Gtk.AboutDialog()
         self.dialog.set_program_name( IndicatorFortune.NAME )
-        self.dialog.set_comments( IndicatorFortune.AUTHOR + "\n\nCalculations courtesy of PyEphem/XEphem.\nEclipse information by Fred Espenak and Jean Meeus.\nTropical Sign by Ignius Drake.\n" )
+        self.dialog.set_comments( IndicatorFortune.AUTHOR )
         self.dialog.set_website( IndicatorFortune.WEBSITE )
         self.dialog.set_website_label( IndicatorFortune.WEBSITE )
         self.dialog.set_version( IndicatorFortune.VERSION )
@@ -210,22 +207,100 @@ class IndicatorFortune:
 
 
     def onPreferences( self, widget ):
-        return
+        if self.dialog is not None:
+            self.dialog.present()
+            return
 
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
 
+        showNotificationCheckbox = Gtk.CheckButton( "Show screen notification" )
+        showNotificationCheckbox.set_active( self.showNotifications )
+        showNotificationCheckbox.set_tooltip_text( "Show fortunes in notification bubble" )
+        grid.attach( showNotificationCheckbox, 0, 0, 2, 1 )
 
-    def showMessage( self, messageType, message ):
-        dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
-        dialog.run()
-        dialog.destroy()
+        label = Gtk.Label( "Refresh interval (minutes)" )
+        grid.attach( label, 0, 1, 1, 1 )
+
+        spinnerRefreshInterval = Gtk.SpinButton()
+        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
+        spinnerRefreshInterval.set_tooltip_text( "How often a fortune is displayed" )
+        spinnerRefreshInterval.set_hexpand( True )
+        grid.attach( spinnerRefreshInterval, 1, 1, 1, 1 )
+
+        autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_active( os.path.exists( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE ) )
+        grid.attach( autostartCheckbox, 0, 2, 2, 1 )
+
+        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog.vbox.pack_start( grid, True, True, 0 )
+        self.dialog.set_border_width( 5 )
+        self.dialog.set_icon_name( IndicatorFortune.ICON )
+        self.dialog.show_all()
+
+        response = self.dialog.run()
+        if response == Gtk.ResponseType.OK:
+            self.showNotifications = showNotificationCheckbox.get_active()
+
+            self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
+            GLib.source_remove( self.timeoutID )
+            self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.update )
+
+            self.saveSettings()
+
+            if not os.path.exists( IndicatorFortune.AUTOSTART_PATH ):
+                os.makedirs( IndicatorFortune.AUTOSTART_PATH )
+
+            if autostartCheckbox.get_active():
+                try:
+                    shutil.copy( IndicatorFortune.DESKTOP_PATH + IndicatorFortune.DESKTOP_FILE, IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
+                except Exception as e:
+                    logging.exception( e )
+            else:
+                try:
+                    os.remove( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
+                except: pass
+
+        self.dialog.destroy()
+        self.dialog = None
 
 
     def loadSettings( self ):
-        return
+        self.refreshIntervalInMinutes = 15
+        self.showNotifications = True
+
+        if os.path.isfile( IndicatorFortune.SETTINGS_FILE ):
+            try:
+                with open( IndicatorFortune.SETTINGS_FILE, "r" ) as f:
+                    settings = json.load( f )
+
+                self.refreshIntervalInMinutes = settings.get( IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
+                self.showNotifications = settings.get( IndicatorFortune.SETTINGS_SHOW_NOTIFICATIONS, self.showNotifications )
+
+            except Exception as e:
+                logging.exception( e )
+                logging.error( "Error reading settings: " + IndicatorFortune.SETTINGS_FILE )
 
 
     def saveSettings( self ):
-        return
+        try:
+            settings = {
+                IndicatorFortune.SETTINGS_SHOW_NOTIFICATIONS: self.showNotifications,
+                IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes
+            }
+
+            with open( IndicatorFortune.SETTINGS_FILE, "w" ) as f:
+                f.write( json.dumps( settings ) )
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing settings: " + IndicatorFortune.SETTINGS_FILE )
 
 
 if __name__ == "__main__": IndicatorFortune().main()
