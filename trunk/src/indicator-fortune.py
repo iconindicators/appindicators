@@ -25,7 +25,6 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
-
 # Before installing, remove fortune-mod and see if that is the only needed dependency.
 
 
@@ -62,7 +61,7 @@ class IndicatorFortune:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
     VERSION = "1.0.0"
-    ICON = NAME
+    ICON = "indicator-lunar"# NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -158,20 +157,25 @@ class IndicatorFortune:
 
     def refreshFortune( self ):
         while True:
-            # https://wiki.ubuntu.com/mhall119/devportal/notify-osd
-            # Seems 10 lines of body text is the limit, so reject any fortune over that limit and get another.
             self.fortune = ""
-            count = 0
             p = subprocess.Popen( "fortune", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
             for line in p.stdout.readlines():
-                count += 1
-                l = str( line.decode() )
+                # Some fortunes contain a line break to fit with 80 characters, so strip the newline character.
+                # However some lines need to be on a new line.
+                # For example, the author/source line(which starts with a TAB) or question/answer lines (which contain TAB).
+                # So if a line contains a TAB, prepend with a newline.
+                l = str( line.decode() ).rstrip() + " "
+                if l.find( "\t" ) > -1:
+                    l = "\n" + l
+
                 print( l )
                 self.fortune += l
 
             p.wait()
 
-            if count <= 9: # If the fortune is 10 lines, the first line is set to "...", so truncate to 9 lines.
+            # From experimentation, it seems that 9 lines of 60 characters per line, totaling 540 characters is the maximum.
+            # As word boundaries are maintained when the notification is displayed, approximate the text limit to say 50 characters a line.
+            if len( self.fortune ) < ( 9 * 50 ):
                 break
 
 
