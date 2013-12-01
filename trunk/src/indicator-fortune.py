@@ -25,13 +25,19 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
-# Before installing, remove fortune-mod and see if that is the only needed dependency.
+#TODO Before installing, remove fortune-mod and see if that is the only needed dependency.
 
 
+# TODO Test by adding a duplicate and editing an existing duplicate and editing to give a duplicate.
+
+
+# TODO Sort fortune paths - when loading/saving/edit/add
+# http://stackoverflow.com/questions/18954160/sort-a-column-in-a-treeview-by-default-or-programmatically
+# Maybe not as the iter from the sort model to the data model needs to be converted...PITA!
 
 # TODO  What happens if the fortunes are removed completely from the properties?
 # Test with no properties, etc, etc
-
+# If no fortunes exist, I get the system message "No fortunes found"...is that good enough?
 
 try:
     from gi.repository import AppIndicator3 as appindicator
@@ -146,15 +152,14 @@ class IndicatorFortune:
 
 
     def refreshFortune( self ):
+        fortuneLocations = " "
+        for fortuneLocation in self.fortunes:
+            if fortuneLocation[ 1 ]:
+                fortuneLocations += fortuneLocation[ 0 ] + " " 
+
         while True:
             self.fortune = ""
-# TODO Sort out!
-# Get the fortunes list from user properties
-
-#             p = subprocess.Popen( "fortune", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-#             p = subprocess.Popen( "fortune -m 'blue-elephant' /usr/share/games/fortunes /home/bernard/Desktop/osp_rules", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-#             p = subprocess.Popen( "fortune -m 'will eventually spawn' /usr/share/games/fortunes /home/bernard/Desktop/osp_rules", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-            p = subprocess.Popen( "fortune /home/bernard/Desktop/osp_rules", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+            p = subprocess.Popen( "fortune" + fortuneLocations, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
             for line in p.stdout.readlines():
                 self.fortune += str( line.decode() )
 
@@ -164,6 +169,8 @@ class IndicatorFortune:
             # When the notification is displayed, the text is wrapped, maintaining word boundaries, to say effectively 45 characters a line.
             if len( self.fortune ) < ( 9 * 45 ):
                 break
+# TODO Still seeing truncation...so maybe make a setting?
+# Say number of lines to chop?
 
 
     def handleLeftClick( self, icon ):
@@ -257,15 +264,48 @@ class IndicatorFortune:
         tree.set_vexpand( True )
         tree.append_column( Gtk.TreeViewColumn( "Fortune File/Directory", Gtk.CellRendererText(), text = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Enabled", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
+        tree.get_column( 0 ).set_sort_column_id( 0 )
         tree.set_tooltip_text( "Double click to edit a fortune's properties" )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onFortuneDoubleClick )
 
         scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC ) # I don't like setting NEVER...but if I don't, the scrolled window is too small by default.
-        scrolledWindow.add( tree )
-        grid.attach( scrolledWindow, 0, 0, 2, 1 )
 
+        # The treeview won't expand to show all data, even for a small amount of data.
+        # So only add scrollbars if there is a lot of data...greater than 15 say...
+        if len( self.fortunes ) <= 15:
+            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
+        else:
+            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+
+        scrolledWindow.add( tree )
+        grid.attach( scrolledWindow, 0, 0, 1, 1 )
+
+        hbox = Gtk.Box( spacing = 6 )
+        hbox.set_homogeneous( True )
+
+        addButton = Gtk.Button( "Add" )
+        addButton.connect( "clicked", self.onFortuneAdd, tree )
+        hbox.pack_start( addButton, True, True, 0 )
+
+        removeButton = Gtk.Button( "Remove" )
+#         removeButton.connect( "clicked", self.on_click_me_clicked )
+# TODO Need to ensure only one item is selected.
+# TODO Remove from the store/model?
+# TODO How to update the table?        
+        hbox.pack_start( removeButton, True, True, 0 )
+
+        resetButton = Gtk.Button( "Reset" )
+#         resetButton.connect( "clicked", self.on_click_me_clicked )
+# TODO Prompt user ... or if they can cancel why bother prompting?
+# Is a reset needed?
+# TODO How to update the table?        
+        hbox.pack_start( resetButton, True, True, 0 )
+
+        grid.attach( hbox, 0, 1, 1, 1 )
+
+# TODO Need add/remove/reset buttons?
+# TODO If the user hits cancel, we need to undo the changes made to the list of fortunes!
         notebook.append_page( grid, Gtk.Label( "Fortunes" ) )
 
         # Third tab - general settings.
@@ -319,10 +359,12 @@ class IndicatorFortune:
         self.dialog = None
 
 
+    def onFortuneAdd( self, button, tree ):
+        self.onFortuneDoubleClick( tree, None, None )
+
+
     def onFortuneDoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
-
-        if treeiter == None: return
 
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -337,18 +379,30 @@ class IndicatorFortune:
         grid.attach( label, 0, 0, 1, 1 )
 
         fortuneFileDirectory = Gtk.Entry()
-        fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
+        fortuneFileDirectory.grab_focus()
+
+        if treeiter is not None: # This is an edit.
+            fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
+
         fortuneFileDirectory.set_tooltip_text( "The full path to the fortune .dat file or directory containing fortune .dat files" )
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
 
         enabledCheckbox = Gtk.CheckButton( "Enabled" )
         enabledCheckbox.set_tooltip_text( "Include this fortune" )
-        enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
+
+        enabledCheckbox.set_active( True )
+        if treeiter is not None: # This is an edit.
+            enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
+
         grid.attach( enabledCheckbox, 0, 1, 2, 1 )
 
         # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
-        dialog = Gtk.Dialog( "Fortune Properties", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        title = "Fortune Properties"
+        if treeiter is None:
+            title = "Add Fortune"
+
+        dialog = Gtk.Dialog( title, None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorFortune.ICON )
@@ -361,32 +415,31 @@ class IndicatorFortune:
                 break
 
             if fortuneFileDirectory.get_text().strip() == "":
-                self.showMessage( Gtk.MessageType.ERROR, "The start command cannot be empty." )
+                self.showMessage( Gtk.MessageType.ERROR, "The fortune path cannot be empty." )
                 fortuneFileDirectory.grab_focus()
                 continue
 
-            if not "%VM%" in fortuneFileDirectory.get_text().strip():
-                self.showMessage( Gtk.MessageType.ERROR, "The start command must contain %VM% which is substituted for the VM name/id." )
+            if not os.path.exists( fortuneFileDirectory.get_text().strip() ):
+                self.showMessage( Gtk.MessageType.ERROR, "The fortune path does not exist." )
                 fortuneFileDirectory.grab_focus()
                 continue
 
-            # Ideally I'd like to do this...
-            #
-            #    if enabledCheckbox.get_active():
-            #        model[ treeiter ][ 1 ] = Gtk.STOCK_APPLY
-            #    else:
-            #        model[ treeiter ][ 1 ] = None
-            #
-            #    model[ treeiter ][ 2 ] = fortuneFileDirectory.get_text().strip()
-            #
-            # But due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
-            # So this is the workaround...
-            if enabledCheckbox.get_active():
-                model.set_value( treeiter, 1, Gtk.STOCK_APPLY )
-                model[ treeiter ][ 2 ] = fortuneFileDirectory.get_text().strip()
+            # Update the data model...
+            # Due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
+            # See more detail in the VirtualBox indicator.
+            if treeiter is not None:
+                # This is an edit.
+                if enabledCheckbox.get_active():
+                    model.set_value( treeiter, 1, Gtk.STOCK_APPLY )
+                    model[ treeiter ][ 0 ] = fortuneFileDirectory.get_text().strip()
+                else:
+                    model.insert_after( treeiter, [ fortuneFileDirectory.get_text().strip(), None ] )
+                    model.remove( treeiter )
             else:
-                model.insert_after( None, treeiter, [ model[ treeiter ][ 0 ], None, fortuneFileDirectory.get_text().strip(), model[ treeiter ][ 3 ] ] )
-                model.remove( treeiter )
+                if enabledCheckbox.get_active():
+                    model.append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY ] )
+                else:
+                    model.append( [ fortuneFileDirectory.get_text().strip(), None ] )
 
             break
 
@@ -400,7 +453,7 @@ class IndicatorFortune:
 
 
     def loadSettings( self ):
-        self.fortunes = [ [ "/usr/share/games/fortunes", True ], [ "bbbb", True ], [ "aaaa", False ] ]
+        self.fortunes = [ [ "/usr/share/games/fortunes", True ], [ "bbbb", False ], [ "aaaa", False ] ]
         self.refreshIntervalInMinutes = 15
         self.showNotifications = True
 
