@@ -28,14 +28,9 @@
 # Before installing, remove fortune-mod and see if that is the only needed dependency.
 
 
-# Post to Gwibber
-#     def share_last_cookie(self, *arg):
-#         p = subprocess.Popen(["gwibber-poster", "-w", "-m", self.body])
-#         # setup timeout handler to avoid zombies
-#         glib.timeout_add_seconds(1, lambda p: p.poll() is None, p)
 
-
-# Let the user specify a file(s)?
+# TODO  What happens if the fortunes are removed completely from the properties?
+# Test with no properties, etc, etc
 
 
 try:
@@ -61,6 +56,8 @@ class IndicatorFortune:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
     VERSION = "1.0.0"
+
+# TODO Replace    
     ICON = "indicator-lunar"# NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -70,9 +67,10 @@ class IndicatorFortune:
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
 
-    NOTIFICATION_TEXT_SUMMARY = "Fortune. . ."
+    NOTIFICATION_SUMMARY = "Fortune. . ."
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_FORTUNES = "fortunes"
     SETTINGS_SHOW_NOTIFICATIONS = "showNotifications"
     SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
 
@@ -112,9 +110,9 @@ class IndicatorFortune:
 
     def update( self ):
         self.refreshFortune()
-        
+
         if self.showNotifications:
-            Notify.Notification.new( IndicatorFortune.NOTIFICATION_TEXT_SUMMARY, self.fortune, IndicatorFortune.ICON ).show()
+            Notify.Notification.new( IndicatorFortune.NOTIFICATION_SUMMARY, self.fortune, IndicatorFortune.ICON ).show()
 
         return True
 
@@ -122,8 +120,8 @@ class IndicatorFortune:
     def buildMenu( self ):
         self.menu = Gtk.Menu()
 
-        menuItem = Gtk.MenuItem( "One off the top" )
-        menuItem.connect( "activate", self.onOneOffTheTop )
+        menuItem = Gtk.MenuItem( "New fortune" )
+        menuItem.connect( "activate", self.newFortune )
         self.menu.append( menuItem )
 
         menuItem = Gtk.MenuItem( "Copy last fortune" )
@@ -147,6 +145,27 @@ class IndicatorFortune:
         self.menu.show_all()
 
 
+    def refreshFortune( self ):
+        while True:
+            self.fortune = ""
+# TODO Sort out!
+# Get the fortunes list from user properties
+
+#             p = subprocess.Popen( "fortune", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+#             p = subprocess.Popen( "fortune -m 'blue-elephant' /usr/share/games/fortunes /home/bernard/Desktop/osp_rules", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+#             p = subprocess.Popen( "fortune -m 'will eventually spawn' /usr/share/games/fortunes /home/bernard/Desktop/osp_rules", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+            p = subprocess.Popen( "fortune /home/bernard/Desktop/osp_rules", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+            for line in p.stdout.readlines():
+                self.fortune += str( line.decode() )
+
+            p.wait()
+
+            # From experimentation, it seems that 9 lines of 60 characters per line, totaling 540 characters is the maximum before truncation.
+            # When the notification is displayed, the text is wrapped, maintaining word boundaries, to say effectively 45 characters a line.
+            if len( self.fortune ) < ( 9 * 45 ):
+                break
+
+
     def handleLeftClick( self, icon ):
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
 
@@ -155,33 +174,9 @@ class IndicatorFortune:
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
-    def refreshFortune( self ):
-        while True:
-            self.fortune = ""
-            p = subprocess.Popen( "fortune", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-            for line in p.stdout.readlines():
-                # Some fortunes contain a line break to fit with 80 characters, so strip the newline character.
-                # However some lines need to be on a new line.
-                # For example, the author/source line(which starts with a TAB) or question/answer lines (which contain TAB).
-                # So if a line contains a TAB, prepend with a newline.
-                l = str( line.decode() ).rstrip() + " "
-                if l.find( "\t" ) > -1:
-                    l = "\n" + l
-
-                print( l )
-                self.fortune += l
-
-            p.wait()
-
-            # From experimentation, it seems that 9 lines of 60 characters per line, totaling 540 characters is the maximum.
-            # As word boundaries are maintained when the notification is displayed, approximate the text limit to say 50 characters a line.
-            if len( self.fortune ) < ( 9 * 50 ):
-                break
-
-
-    def onOneOffTheTop( self, widget ):
+    def newFortune( self, widget ):
         self.refreshFortune()
-        Notify.Notification.new( IndicatorFortune.NOTIFICATION_TEXT_SUMMARY, self.fortune, IndicatorFortune.ICON ).show()
+        Notify.Notification.new( IndicatorFortune.NOTIFICATION_SUMMARY, self.fortune, IndicatorFortune.ICON ).show()
 
 
     def onCopyLastFortune( self, widget ):
@@ -211,6 +206,9 @@ class IndicatorFortune:
             self.dialog.present()
             return
 
+        notebook = Gtk.Notebook()
+
+        # First tab - display settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -234,12 +232,60 @@ class IndicatorFortune:
         spinnerRefreshInterval.set_hexpand( True )
         grid.attach( spinnerRefreshInterval, 1, 1, 1, 1 )
 
+        notebook.append_page( grid, Gtk.Label( "Display" ) )
+
+        # Second tab - fortune file settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+        grid.set_row_homogeneous( False )
+        grid.set_column_homogeneous( False )
+
+        store = Gtk.ListStore( str, str ) # Path to fortune file, tick icon (Gtk.STOCK_APPLY) or None for enabled.
+        for fortune in self.fortunes:
+            if fortune[ 1 ]:
+                store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
+            else:
+                store.append( [ fortune[ 0 ], None ] )
+
+        tree = Gtk.TreeView( store )
+        tree.set_hexpand( True )
+        tree.set_vexpand( True )
+        tree.append_column( Gtk.TreeViewColumn( "Fortune File/Directory", Gtk.CellRendererText(), text = 0 ) )
+        tree.append_column( Gtk.TreeViewColumn( "Enabled", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
+        tree.set_tooltip_text( "Double click to edit a fortune's properties" )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        tree.connect( "row-activated", self.onFortuneDoubleClick )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC ) # I don't like setting NEVER...but if I don't, the scrolled window is too small by default.
+        scrolledWindow.add( tree )
+        grid.attach( scrolledWindow, 0, 0, 2, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "Fortunes" ) )
+
+        # Third tab - general settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_tooltip_text( "Run the indicator automatically" )
         autostartCheckbox.set_active( os.path.exists( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 2, 2, 1 )
+        grid.attach( autostartCheckbox, 0, 0, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "General" ) )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( grid, True, True, 0 )
+        self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorFortune.ICON )
         self.dialog.show_all()
@@ -267,11 +313,94 @@ class IndicatorFortune:
                     os.remove( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
                 except: pass
 
+            self.update()
+
         self.dialog.destroy()
         self.dialog = None
 
 
+    def onFortuneDoubleClick( self, tree, rowNumber, treeViewColumn ):
+        model, treeiter = tree.get_selection().get_selected()
+
+        if treeiter == None: return
+
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        label = Gtk.Label( "Fortune file/directory" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 1, 1 )
+
+        fortuneFileDirectory = Gtk.Entry()
+        fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
+        fortuneFileDirectory.set_tooltip_text( "The full path to the fortune .dat file or directory containing fortune .dat files" )
+        fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
+        grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
+
+        enabledCheckbox = Gtk.CheckButton( "Enabled" )
+        enabledCheckbox.set_tooltip_text( "Include this fortune" )
+        enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
+        grid.attach( enabledCheckbox, 0, 1, 2, 1 )
+
+        # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
+        dialog = Gtk.Dialog( "Fortune Properties", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( grid, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorFortune.ICON )
+
+        while True:
+            dialog.show_all()
+            response = dialog.run()
+
+            if response == Gtk.ResponseType.CANCEL:
+                break
+
+            if fortuneFileDirectory.get_text().strip() == "":
+                self.showMessage( Gtk.MessageType.ERROR, "The start command cannot be empty." )
+                fortuneFileDirectory.grab_focus()
+                continue
+
+            if not "%VM%" in fortuneFileDirectory.get_text().strip():
+                self.showMessage( Gtk.MessageType.ERROR, "The start command must contain %VM% which is substituted for the VM name/id." )
+                fortuneFileDirectory.grab_focus()
+                continue
+
+            # Ideally I'd like to do this...
+            #
+            #    if enabledCheckbox.get_active():
+            #        model[ treeiter ][ 1 ] = Gtk.STOCK_APPLY
+            #    else:
+            #        model[ treeiter ][ 1 ] = None
+            #
+            #    model[ treeiter ][ 2 ] = fortuneFileDirectory.get_text().strip()
+            #
+            # But due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
+            # So this is the workaround...
+            if enabledCheckbox.get_active():
+                model.set_value( treeiter, 1, Gtk.STOCK_APPLY )
+                model[ treeiter ][ 2 ] = fortuneFileDirectory.get_text().strip()
+            else:
+                model.insert_after( None, treeiter, [ model[ treeiter ][ 0 ], None, fortuneFileDirectory.get_text().strip(), model[ treeiter ][ 3 ] ] )
+                model.remove( treeiter )
+
+            break
+
+        dialog.destroy()
+
+
+    def showMessage( self, messageType, message ):
+        dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
+        dialog.run()
+        dialog.destroy()
+
+
     def loadSettings( self ):
+        self.fortunes = [ [ "/usr/share/games/fortunes", True ], [ "bbbb", True ], [ "aaaa", False ] ]
         self.refreshIntervalInMinutes = 15
         self.showNotifications = True
 
@@ -279,6 +408,10 @@ class IndicatorFortune:
             try:
                 with open( IndicatorFortune.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
+
+                self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes )
+                if self.fortunes == [ ]:
+                    self.fortunes = [ [ "/usr/share/games/fortunes", True ] ]
 
                 self.refreshIntervalInMinutes = settings.get( IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
                 self.showNotifications = settings.get( IndicatorFortune.SETTINGS_SHOW_NOTIFICATIONS, self.showNotifications )
@@ -291,6 +424,7 @@ class IndicatorFortune:
     def saveSettings( self ):
         try:
             settings = {
+                IndicatorFortune.SETTINGS_FORTUNES: self.fortunes,
                 IndicatorFortune.SETTINGS_SHOW_NOTIFICATIONS: self.showNotifications,
                 IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes
             }
