@@ -35,6 +35,7 @@
 # http://stackoverflow.com/questions/18954160/sort-a-column-in-a-treeview-by-default-or-programmatically
 # Maybe not as the iter from the sort model to the data model needs to be converted...PITA!
 
+
 # TODO  What happens if the fortunes are removed completely from the properties?
 # Test with no properties, etc, etc
 # If no fortunes exist, I get the system message "No fortunes found"...is that good enough?
@@ -73,6 +74,7 @@ class IndicatorFortune:
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
 
+    DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
     NOTIFICATION_SUMMARY = "Fortune. . ."
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
@@ -152,10 +154,18 @@ class IndicatorFortune:
 
 
     def refreshFortune( self ):
+        if len( self.fortunes ) == 0:
+            self.fortune = "No fortunes defined!"
+            return
+
         fortuneLocations = " "
         for fortuneLocation in self.fortunes:
             if fortuneLocation[ 1 ]:
                 fortuneLocations += fortuneLocation[ 0 ] + " " 
+
+        if fortuneLocations == " ":
+            self.fortune = "No fortunes enabled!"
+            return
 
         while True:
             self.fortune = ""
@@ -289,23 +299,15 @@ class IndicatorFortune:
         hbox.pack_start( addButton, True, True, 0 )
 
         removeButton = Gtk.Button( "Remove" )
-#         removeButton.connect( "clicked", self.on_click_me_clicked )
-# TODO Need to ensure only one item is selected.
-# TODO Remove from the store/model?
-# TODO How to update the table?        
+        removeButton.connect( "clicked", self.onFortuneRemove, tree )
         hbox.pack_start( removeButton, True, True, 0 )
 
         resetButton = Gtk.Button( "Reset" )
-#         resetButton.connect( "clicked", self.on_click_me_clicked )
-# TODO Prompt user ... or if they can cancel why bother prompting?
-# Is a reset needed?
-# TODO How to update the table?        
+        resetButton.connect( "clicked", self.onFortuneReset, tree )
         hbox.pack_start( resetButton, True, True, 0 )
 
         grid.attach( hbox, 0, 1, 1, 1 )
 
-# TODO Need add/remove/reset buttons?
-# TODO If the user hits cancel, we need to undo the changes made to the list of fortunes!
         notebook.append_page( grid, Gtk.Label( "Fortunes" ) )
 
         # Third tab - general settings.
@@ -338,6 +340,16 @@ class IndicatorFortune:
             GLib.source_remove( self.timeoutID )
             self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.update )
 
+            self.fortunes = [ ]
+            treeiter = store.get_iter_first()
+            while treeiter != None:
+                if store[ treeiter ][ 1 ] == Gtk.STOCK_APPLY:
+                    self.fortunes.append( [ store[ treeiter ][ 0 ], True ] )
+                else:
+                    self.fortunes.append( [ store[ treeiter ][ 0 ], False ] )
+
+                treeiter = store.iter_next( treeiter )
+
             self.saveSettings()
 
             if not os.path.exists( IndicatorFortune.AUTOSTART_PATH ):
@@ -357,6 +369,31 @@ class IndicatorFortune:
 
         self.dialog.destroy()
         self.dialog = None
+
+
+    def onFortuneReset( self, button, tree ):
+        dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, "Reset fortunes to factory default?" )
+        response = dialog.run()
+        dialog.destroy()
+        if response == Gtk.ResponseType.OK:
+            model, treeiter = tree.get_selection().get_selected()
+            model.clear()
+            model.append( [ IndicatorFortune.DEFAULT_FORTUNE[ 0 ], Gtk.STOCK_APPLY ]  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
+
+
+    def onFortuneRemove( self, button, tree ):
+        model, treeiter = tree.get_selection().get_selected()
+
+        if treeiter is None:
+            self.showMessage( Gtk.MessageType.ERROR, "No fortune has been selected for removal." )
+            return
+
+        # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+        dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, "Remove the selected fortune?" )
+        response = dialog.run()
+        dialog.destroy()
+        if response == Gtk.ResponseType.OK:
+            model.remove( treeiter )
 
 
     def onFortuneAdd( self, button, tree ):
@@ -453,7 +490,7 @@ class IndicatorFortune:
 
 
     def loadSettings( self ):
-        self.fortunes = [ [ "/usr/share/games/fortunes", True ], [ "bbbb", False ], [ "aaaa", False ] ]
+        self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
         self.refreshIntervalInMinutes = 15
         self.showNotifications = True
 
