@@ -28,10 +28,6 @@
 
 # Before installing, remove fortune-mod and see if that is the only needed dependency.
 
-# Preferences:
-# Disable auto refresh?
-# Set refresh interval.
-
 
 # Post to Gwibber
 #     def share_last_cookie(self, *arg):
