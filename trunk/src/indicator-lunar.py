@@ -260,7 +260,7 @@ class IndicatorLunar:
         self.createPlanetSubmenu( menuItem, city, ephem.Moon( ephemNow ), nextUpdates, ephemNow )
 
 
-        
+################### Bright limb stuff
         city.date = "2013/11/12 15:50:00"
         city.date = "2013/11/07 15:50:00"
         city.date = "2003/09/01 00:00:00"
@@ -270,6 +270,7 @@ class IndicatorLunar:
         brightLimbAngle = self.getBrightLimbAngle( sun, moon )
         print( brightLimbAngle )
  
+################### 
         
         
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
@@ -947,6 +948,7 @@ class IndicatorLunar:
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
 
 
+################### Bright limb stuff
         # Calculate the bright limb angle so the icon can be rotated to match (hopefully) reality.
         # No need to rotate a full/new moon!
 #         moon = ephem.Moon( city )
@@ -1007,6 +1009,8 @@ class IndicatorLunar:
 
         svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' a' + str( radius ) + ',' + str( radius ) + ' 0 0,' + sweepFlag + ' 0,' + str( diameter ) + ' z" fill="' + self.getColourForIconTheme() + '" />'
         return self.getSVGHeader( ( 50 - radius ) + 50 ) + svg + self.getSVGFooter()
+
+################### 
 
 
     def getCrescentGibbousMoonSVG( self, illumination, waning, northernHemisphere, crescent ):
