@@ -147,7 +147,10 @@ class IndicatorFortune:
         fortuneLocations = " "
         for fortuneLocation in self.fortunes:
             if fortuneLocation[ 1 ]:
-                fortuneLocations += fortuneLocation[ 0 ].rstrip( ".dat" ) + " " 
+                if( os.path.isdir( fortuneLocation[ 0 ] ) ):
+                    fortuneLocations += fortuneLocation[ 0 ].rstrip( "/" ) + "/" + " " # Remove any/all trailing slashes, then add one in as 'fortune' needs it! 
+                else:
+                    fortuneLocations += fortuneLocation[ 0 ].rstrip( ".dat" ) + " " # 'fortune' doesn't want the extension.
 
         if fortuneLocations == " ":
             self.fortune = "No fortunes enabled!"
@@ -428,7 +431,7 @@ class IndicatorFortune:
         if rowNumber is not None: # This is an edit.
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
 
-        fortuneFileDirectory.set_tooltip_text( "The full path to the fortune .dat file or directory containing fortune .dat files" )
+        fortuneFileDirectory.set_tooltip_text( "The full path to a fortune .dat file OR a directory containing fortune .dat files.  The corresponding text file(s) must also be present!" )
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
 
