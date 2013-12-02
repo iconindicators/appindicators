@@ -25,21 +25,6 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
-#TODO Before installing, remove fortune-mod and see if that is the only needed dependency.
-
-
-# TODO Test by adding a duplicate and editing an existing duplicate and editing to give a duplicate.
-
-
-# TODO Sort fortune paths - when loading/saving/edit/add
-# http://stackoverflow.com/questions/18954160/sort-a-column-in-a-treeview-by-default-or-programmatically
-# Maybe not as the iter from the sort model to the data model needs to be converted...PITA!
-
-
-# TODO  What happens if the fortunes are removed completely from the properties?
-# Test with no properties, etc, etc
-# If no fortunes exist, I get the system message "No fortunes found"...is that good enough?
-
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -78,8 +63,10 @@ class IndicatorFortune:
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_FORTUNES = "fortunes"
-    SETTINGS_SHOW_NOTIFICATIONS = "showNotifications"
+    SETTINGS_NOTIFICATION_SUMMARY = "notificationSummary"
     SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
+    SETTINGS_SHOW_NOTIFICATIONS = "showNotifications"
+    SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
 
     def __init__( self ):
@@ -119,7 +106,7 @@ class IndicatorFortune:
         self.refreshFortune()
 
         if self.showNotifications:
-            Notify.Notification.new( IndicatorFortune.NOTIFICATION_SUMMARY, self.fortune, IndicatorFortune.ICON ).show()
+            Notify.Notification.new( self.notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
 
         return True
 
@@ -174,12 +161,11 @@ class IndicatorFortune:
 
             p.wait()
 
-            # From experimentation, it seems that 9 lines of 60 characters per line, totaling 540 characters is the maximum before truncation.
-            # When the notification is displayed, the text is wrapped, maintaining word boundaries, to say effectively 45 characters a line.
-            if len( self.fortune ) < ( 9 * 45 ):
-                break
-# TODO Still seeing truncation...so maybe make a setting?
-# Say number of lines to chop?
+            # If the fortune exceeds the limits, John West it...
+            if len( self.fortune ) > self.skipFortuneCharacterCount:
+                continue
+
+            break
 
 
     def handleLeftClick( self, icon ):
@@ -192,7 +178,7 @@ class IndicatorFortune:
 
     def newFortune( self, widget ):
         self.refreshFortune()
-        Notify.Notification.new( IndicatorFortune.NOTIFICATION_SUMMARY, self.fortune, IndicatorFortune.ICON ).show()
+        Notify.Notification.new( self.notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
 
 
     def onCopyLastFortune( self, widget ):
@@ -242,11 +228,31 @@ class IndicatorFortune:
         grid.attach( label, 0, 1, 1, 1 )
 
         spinnerRefreshInterval = Gtk.SpinButton()
-        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60 * 24, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
         spinnerRefreshInterval.set_tooltip_text( "How often a fortune is displayed" )
         spinnerRefreshInterval.set_hexpand( True )
         grid.attach( spinnerRefreshInterval, 1, 1, 1, 1 )
+
+        label = Gtk.Label( "Character limit" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 2, 1, 1 )
+
+        spinnerCharacterCount = Gtk.SpinButton()
+        spinnerCharacterCount.set_adjustment( Gtk.Adjustment( self.skipFortuneCharacterCount, 1, 1000, 1, 50, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerCharacterCount.set_value( self.skipFortuneCharacterCount ) # ...so need to force the initial value by explicitly setting it.
+        spinnerCharacterCount.set_tooltip_text( "Rejects a fortune if it exceeds the character count - don't set too low (below 50) as many fortunes may not appear causing excessive calls to 'fortune'" )
+        spinnerCharacterCount.set_hexpand( True )
+        grid.attach( spinnerCharacterCount, 1, 2, 1, 1 )
+
+        label = Gtk.Label( "Notification summary" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 3, 1, 1 )
+
+        notificationSummary = Gtk.Entry()
+        notificationSummary.set_text( self.notificationSummary )
+        notificationSummary.set_tooltip_text( "The summary text for the notification" )
+        grid.attach( notificationSummary, 1, 3, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
@@ -334,8 +340,10 @@ class IndicatorFortune:
         response = self.dialog.run()
         if response == Gtk.ResponseType.OK:
             self.showNotifications = showNotificationCheckbox.get_active()
-
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
+            self.skipFortuneCharacterCount = spinnerCharacterCount.get_value_as_int()
+            self.notificationSummary = notificationSummary.get_text()
+
             GLib.source_remove( self.timeoutID )
             self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.update )
 
@@ -417,7 +425,7 @@ class IndicatorFortune:
         fortuneFileDirectory = Gtk.Entry()
         fortuneFileDirectory.grab_focus()
 
-        if treeiter is not None: # This is an edit.
+        if rowNumber is not None: # This is an edit.
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
 
         fortuneFileDirectory.set_tooltip_text( "The full path to the fortune .dat file or directory containing fortune .dat files" )
@@ -428,14 +436,14 @@ class IndicatorFortune:
         enabledCheckbox.set_tooltip_text( "Include this fortune" )
 
         enabledCheckbox.set_active( True )
-        if treeiter is not None: # This is an edit.
+        if rowNumber is not None: # This is an edit.
             enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabledCheckbox, 0, 1, 2, 1 )
 
         # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
         title = "Fortune Properties"
-        if treeiter is None:
+        if rowNumber is None:
             title = "Add Fortune"
 
         dialog = Gtk.Dialog( title, None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
@@ -463,7 +471,7 @@ class IndicatorFortune:
             # Update the data model...
             # Due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
             # See more detail in the VirtualBox indicator.
-            if treeiter is not None:
+            if rowNumber is not None:
                 # This is an edit.
                 if enabledCheckbox.get_active():
                     model.set_value( treeiter, 1, Gtk.STOCK_APPLY )
@@ -490,8 +498,10 @@ class IndicatorFortune:
 
     def loadSettings( self ):
         self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
+        self.notificationSummary = IndicatorFortune.NOTIFICATION_SUMMARY
         self.refreshIntervalInMinutes = 15
         self.showNotifications = True
+        self.skipFortuneCharacterCount = 500 # From experimentation, about 60 characters per line, but with word boundaries being kept, about 50 characters per line (at most 10 lines).
 
         if os.path.isfile( IndicatorFortune.SETTINGS_FILE ):
             try:
@@ -500,10 +510,12 @@ class IndicatorFortune:
 
                 self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes )
                 if self.fortunes == [ ]:
-                    self.fortunes = [ [ "/usr/share/games/fortunes", True ] ]
+                    self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
 
+                self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )
                 self.refreshIntervalInMinutes = settings.get( IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
                 self.showNotifications = settings.get( IndicatorFortune.SETTINGS_SHOW_NOTIFICATIONS, self.showNotifications )
+                self.skipFortuneCharacterCount = settings.get( IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT, self.skipFortuneCharacterCount )
 
             except Exception as e:
                 logging.exception( e )
@@ -514,8 +526,10 @@ class IndicatorFortune:
         try:
             settings = {
                 IndicatorFortune.SETTINGS_FORTUNES: self.fortunes,
+                IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY: self.notificationSummary,
                 IndicatorFortune.SETTINGS_SHOW_NOTIFICATIONS: self.showNotifications,
-                IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes
+                IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
+                IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
             }
 
             with open( IndicatorFortune.SETTINGS_FILE, "w" ) as f:
