@@ -1,6 +1,0 @@
-project = fortune-indicator
-version = 0.6.1
-template = ubuntu-application
-lp_id = fortune-indicator
-ppa = fortune-indicator
-dependencies = fortune-mod
