@@ -47,7 +47,7 @@ class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
-    VERSION = "1.0.0"
+    VERSION = "1.0.1"
 
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
@@ -147,7 +147,7 @@ class IndicatorFortune:
         fortuneLocations = " "
         for fortuneLocation in self.fortunes:
             if fortuneLocation[ 1 ]:
-                fortuneLocations += fortuneLocation[ 0 ] + " " 
+                fortuneLocations += fortuneLocation[ 0 ].rstrip( ".dat" ) + " " 
 
         if fortuneLocations == " ":
             self.fortune = "No fortunes enabled!"
