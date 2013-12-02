@@ -1,3 +1,10 @@
+indicator-fortune (1.0.2-1) precise; urgency=low
+
+  * Fixed bug when the notification summary is empty.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 2 Dec 2013 20:18:01 +1000
+ 
+ 
 indicator-fortune (1.0.1-1) precise; urgency=low
 
   * Fixed bug when dealing with .dat files - needed to remove the .dat extension.

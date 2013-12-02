@@ -47,7 +47,7 @@ class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
-    VERSION = "1.0.1"
+    VERSION = "1.0.2"
 
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
@@ -106,7 +106,11 @@ class IndicatorFortune:
         self.refreshFortune()
 
         if self.showNotifications:
-            Notify.Notification.new( self.notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
+            notificationSummary = self.notificationSummary
+            if notificationSummary == "":
+                notificationSummary = " "
+
+            Notify.Notification.new( notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
 
         return True
 
@@ -181,7 +185,12 @@ class IndicatorFortune:
 
     def newFortune( self, widget ):
         self.refreshFortune()
-        Notify.Notification.new( self.notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
+
+        notificationSummary = self.notificationSummary
+        if notificationSummary == "":
+            notificationSummary = " "
+
+        Notify.Notification.new( notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
 
 
     def onCopyLastFortune( self, widget ):
