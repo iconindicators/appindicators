@@ -255,4 +255,85 @@ class IndicatorStardate:
             logging.error( "Error writing settings: " + IndicatorStardate.SETTINGS_FILE )
 
 
+
+# TODO Not sure if this will make the final cut...
+
+    def onPreferencesNEW( self, widget ):
+        if self.dialog is not None:
+            self.dialog.present()
+            return
+
+        notebook = Gtk.Notebook()
+
+        # Display settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        showClassicCheckbox = Gtk.CheckButton( "Use 'classic' conversion" )
+        showClassicCheckbox.set_active( self.showClassic )
+        showClassicCheckbox.set_tooltip_text( "Stardate 'classic' is based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main.\n\nOtherwise the 2009 revised conversion is used (http://en.wikipedia.org/wiki/Stardate)." )
+        grid.attach( showClassicCheckbox, 0, 0, 1, 1 )
+
+        showIssueCheckbox = Gtk.CheckButton( "Show ISSUE" )
+        showIssueCheckbox.set_active( self.showIssue )
+        showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
+        showIssueCheckbox.set_margin_left( 15 )
+        showIssueCheckbox.set_tooltip_text( "Show the ISSUE of the stardate (only applies to 'classic')" )
+        grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
+
+        showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox )
+
+        notebook.append_page( grid, Gtk.Label( "Display" ) )
+
+        # General settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
+        grid.attach( autostartCheckbox, 0, 0, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "General" ) )
+
+        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog.vbox.pack_start( notebook, True, True, 0 )
+        self.dialog.set_border_width( 5 )
+        self.dialog.set_icon_name( IndicatorStardate.ICON )
+        self.dialog.show_all()
+
+        response = self.dialog.run()
+        if response == Gtk.ResponseType.OK:
+            self.showClassic = showClassicCheckbox.get_active()
+            self.showIssue = showIssueCheckbox.get_active()
+            self.saveSettings()
+
+            if not os.path.exists( IndicatorStardate.AUTOSTART_PATH ):
+                os.makedirs( IndicatorStardate.AUTOSTART_PATH )
+
+            if autostartCheckbox.get_active():
+                try:
+                    shutil.copy( IndicatorStardate.DESKTOP_PATH + IndicatorStardate.DESKTOP_FILE, IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
+                except Exception as e:
+                    logging.exception( e )
+            else:
+                try:
+                    os.remove( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
+                except: pass
+
+            self.update()
+
+        self.dialog.destroy()
+        self.dialog = None
+
+
 if __name__ == "__main__": IndicatorStardate().main()
