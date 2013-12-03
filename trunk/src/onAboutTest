@@ -1,3 +1,8 @@
+An alternative to creating a new version of the About dialog with additional tabs (for the changelog for example),
+work out how to have an About tab on the preferences dialog and then add hidden tabs (for license, changelog, etc).
+This allows the removal of the About menu item.
+
+
     def onAbout( self, widget ):
         if self.dialog is not None:
             self.dialog.present()
