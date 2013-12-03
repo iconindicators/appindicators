@@ -25,6 +25,9 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
+# TODO Could use a file chooser with browse for specifying fortunes.
+
+
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
