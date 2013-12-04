@@ -1,3 +1,10 @@
+indicator-fortune (1.0.3-1) precise; urgency=low
+
+  * Fixed bug when the fortune path contains spaces.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wes, 4 Dec 2013 19:28:13 +1000
+ 
+ 
 indicator-fortune (1.0.2-1) precise; urgency=low
 
   * Fixed bug when the notification summary is empty.

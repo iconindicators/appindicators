@@ -47,7 +47,7 @@ class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
-    VERSION = "1.0.2"
+    VERSION = "1.0.3"
 
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
@@ -152,9 +152,9 @@ class IndicatorFortune:
         for fortuneLocation in self.fortunes:
             if fortuneLocation[ 1 ]:
                 if( os.path.isdir( fortuneLocation[ 0 ] ) ):
-                    fortuneLocations += fortuneLocation[ 0 ].rstrip( "/" ) + "/" + " " # Remove any/all trailing slashes, then add one in as 'fortune' needs it! 
+                    fortuneLocations += "'" + fortuneLocation[ 0 ].rstrip( "/" ) + "/" + "' " # Remove any/all trailing slashes, then add one in as 'fortune' needs it! 
                 else:
-                    fortuneLocations += fortuneLocation[ 0 ].rstrip( ".dat" ) + " " # 'fortune' doesn't want the extension.
+                    fortuneLocations += "'" + fortuneLocation[ 0 ].rstrip( ".dat" ) + "' " # 'fortune' doesn't want the extension.
 
         if fortuneLocations == " ":
             self.fortune = "No fortunes enabled!"
