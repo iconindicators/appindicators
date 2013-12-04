@@ -25,9 +25,6 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
-# TODO Could use a file chooser with browse for specifying fortunes.
-
-
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -204,7 +201,7 @@ class IndicatorFortune:
         if self.dialog is not None:
             self.dialog.present()
             return
-
+ 
         self.dialog = Gtk.AboutDialog()
         self.dialog.set_program_name( IndicatorFortune.NAME )
         self.dialog.set_comments( IndicatorFortune.AUTHOR )
@@ -437,6 +434,9 @@ class IndicatorFortune:
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
+        # Would be nice to use a file chooser but a file chooser can only choose a file OR a folder at a given time.
+        # So would need two buttons - one to launch a file chooser and one to launch a folder chooser.
+        # Bit of overkill for something so simple...maybe one day!
         fortuneFileDirectory = Gtk.Entry()
         fortuneFileDirectory.grab_focus()
 
