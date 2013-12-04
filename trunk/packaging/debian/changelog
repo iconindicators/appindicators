@@ -4,7 +4,7 @@ indicator-fortune (1.0.3-1) precise; urgency=low
   * Made the text field containing the fortune path wide enough to display the
     path.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wes, 4 Dec 2013 19:28:13 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Dec 2013 19:28:13 +1000
  
  
 indicator-fortune (1.0.2-1) precise; urgency=low
