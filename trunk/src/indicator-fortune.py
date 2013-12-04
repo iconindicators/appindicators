@@ -450,19 +450,18 @@ class IndicatorFortune:
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
 
         enabledCheckbox = Gtk.CheckButton( "Enabled" )
-        enabledCheckbox.set_tooltip_text( "Include this fortune" )
-
+        enabledCheckbox.set_tooltip_text( "Ensure the fortune file/directory works by running it through 'fortune' in a terminal." )
         enabledCheckbox.set_active( True )
         if rowNumber is not None: # This is an edit.
             enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabledCheckbox, 0, 1, 2, 1 )
 
-        # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
         title = "Fortune Properties"
         if rowNumber is None:
             title = "Add Fortune"
 
+        # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
         dialog = Gtk.Dialog( title, None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
