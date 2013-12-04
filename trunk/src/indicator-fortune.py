@@ -438,13 +438,14 @@ class IndicatorFortune:
         # So would need two buttons - one to launch a file chooser and one to launch a folder chooser.
         # Bit of overkill for something so simple...maybe one day!
         fortuneFileDirectory = Gtk.Entry()
+        fortuneFileDirectory.set_width_chars( 20 )
         fortuneFileDirectory.grab_focus()
 
         if rowNumber is not None: # This is an edit.
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
-            fortuneFileDirectory.set_width_chars( len( model[ treeiter ][ 0 ] ) )
+            fortuneFileDirectory.set_width_chars( len( model[ treeiter ][ 0 ] ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
-        fortuneFileDirectory.set_tooltip_text( "The full path to a fortune .dat file OR a directory containing fortune .dat files.  The corresponding text file(s) must also be present!" )
+        fortuneFileDirectory.set_tooltip_text( "The full path to a fortune .dat file (don't put in the .dat)\n OR a directory containing fortune .dat files.\n\nThe corresponding text file must also be present!" )
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
 
