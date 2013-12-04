@@ -231,20 +231,10 @@ class IndicatorLunar:
         menu.append( menuItem )
         self.createPlanetSubmenu( menuItem, city, ephem.Moon( ephemNow ), nextUpdates, ephemNow )
 
+        city.date = ephemNow
+        brightLimbAngle = self.getBrightLimbAngle( ephem.Sun( city ), ephem.Moon( city ) )
+        menuItem.get_submenu().insert( Gtk.MenuItem( "Bright Limb Angle: " + str( round( brightLimbAngle ) ) + "°" ), 5 )
 
-################### TODO Bright limb stuff
-        city.date = "2013/11/12 15:50:00"
-        city.date = "2013/11/07 15:50:00"
-        city.date = "2003/09/01 00:00:00"
-#         city.date = ephemNow
-        moon = ephem.Moon( city )
-        sun = ephem.Sun( city )
-        brightLimbAngle = self.getBrightLimbAngle( sun, moon )
-        print( brightLimbAngle )
- 
-################### 
-        
-        
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] ) )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
