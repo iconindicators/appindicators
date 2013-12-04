@@ -645,6 +645,7 @@ class IndicatorVirtualBox:
         grid.attach( label, 0, 0, 1, 1 )
 
         startCommand = Gtk.Entry()
+        startCommand.set_width_chars( 20 )
         if model[ treeiter ][ 2 ] is not None:
             startCommand.set_text( model[ treeiter ][ 2 ] )
             startCommand.set_width_chars( len( model[ treeiter ][ 2 ] ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
