@@ -1,5 +1,8 @@
 indicator-lunar (1.0.29-1) precise; urgency=low
 
+  * Added the bright limb angle for the moon and planets.
+    Thanks to 'Practical Astronomy with Your Calculator or Spreadsheet' by
+    Peter Duffett-Smith.
   * Changed the control file 'Depends' from Python to Python3.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 2 Dec 2013 16:43:23 +1000

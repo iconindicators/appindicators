@@ -45,6 +45,7 @@
 # http://www.jgiesen.de/elevazmoon/basics/meeus.htm
 # http://godoc.org/github.com/soniakeys/meeus
 # https://sites.google.com/site/astronomicalalgorithms/
+# ...Need to now rotate the icon according to the bright limb angle!
 
 
 try:
@@ -225,15 +226,12 @@ class IndicatorLunar:
         menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
         menu = Gtk.Menu()
         city = ephem.city( self.cityName )
+        city.date = ephemNow
 
         # Moon
         menuItem = Gtk.MenuItem( "Moon" )
         menu.append( menuItem )
-        self.createPlanetSubmenu( menuItem, city, ephem.Moon( ephemNow ), nextUpdates, ephemNow )
-
-        city.date = ephemNow
-        brightLimbAngle = self.getBrightLimbAngle( ephem.Sun( city ), ephem.Moon( city ) )
-        menuItem.get_submenu().insert( Gtk.MenuItem( "Bright Limb Angle: " + str( round( brightLimbAngle ) ) + "°" ), 5 )
+        self.createPlanetSubmenu( menuItem, city, ephem.Moon( city ), nextUpdates, ephemNow )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] ) )
@@ -309,14 +307,14 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( "Planets" ) )
 
         planets = [
-            [ "Mercury", ephem.Mercury( ephemNow ) ],
-            [ "Venus", ephem.Venus( ephemNow ) ],
-            [ "Mars", ephem.Mars( ephemNow ) ],
-            [ "Jupiter", ephem.Jupiter( ephemNow ) ],
-            [ "Saturn", ephem.Saturn( ephemNow ) ],
-            [ "Uranus", ephem.Uranus( ephemNow ) ],
-            [ "Neptune", ephem.Neptune( ephemNow ) ],
-            [ "Pluto", ephem.Pluto( ephemNow ) ] ]
+            [ "Mercury", ephem.Mercury( city ) ],
+            [ "Venus", ephem.Venus( city ) ],
+            [ "Mars", ephem.Mars( city ) ],
+            [ "Jupiter", ephem.Jupiter( city ) ],
+            [ "Saturn", ephem.Saturn( city ) ],
+            [ "Uranus", ephem.Uranus( city ) ],
+            [ "Neptune", ephem.Neptune( city ) ],
+            [ "Pluto", ephem.Pluto( city ) ] ]
 
         for planet in planets:
             menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
@@ -360,6 +358,7 @@ class IndicatorLunar:
 
     def createPlanetSubmenu( self, planetMenuItem, city, body, nextUpdates, ephemNow ):
         subMenu = Gtk.Menu()
+        subMenu.append( Gtk.MenuItem( "Bright Limb Angle: " + str( round( self.getBrightLimbAngle( ephem.Sun( city ), body ) ) ) + "°" ) )
         subMenu.append( Gtk.MenuItem( "Illumination: " + str( int( round( body.phase ) ) ) + "%" ) )
         subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( body )[ 1 ] ) )
         subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.tropical( body, ephemNow ) ) )
@@ -496,7 +495,7 @@ class IndicatorLunar:
 
     # References:
     #  http://www.nightskynotebook.com/Moon.php
-    #  Practical Astronomy with Your Calculator By Peter Duffett-Smith
+    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
     def getBrightLimbAngle( self, body1, body2 ):
 
         body1RightAscension = self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( body1.ra )
@@ -534,7 +533,7 @@ class IndicatorLunar:
 
         self.dialog = Gtk.AboutDialog()
         self.dialog.set_program_name( IndicatorLunar.NAME )
-        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of PyEphem/XEphem.\nEclipse information by Fred Espenak and Jean Meeus.\nTropical Sign by Ignius Drake." )
+        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of PyEphem/XEphem.\nTropical Sign by Ignius Drake.\nEclipse information by Fred Espenak and Jean Meeus.\nBright Limb calculation from 'Practical Astronomy with Your Calculator or Spreadsheet'." )
         self.dialog.set_website( IndicatorLunar.WEBSITE )
         self.dialog.set_website_label( IndicatorLunar.WEBSITE )
         self.dialog.set_version( IndicatorLunar.VERSION )
