@@ -2,6 +2,8 @@ indicator-virtual-box (1.0.23-1) precise; urgency=low
 
   * If the list of VMs in the Preferences is less than or equal to 15, don't add 
     a vertical scrollbar.
+  * Made the text field containing the start command wide enough to display the
+    start command.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 2 Dec 2013 5:39:34 +1000
 

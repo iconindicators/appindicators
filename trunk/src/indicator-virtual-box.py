@@ -645,7 +645,10 @@ class IndicatorVirtualBox:
         grid.attach( label, 0, 0, 1, 1 )
 
         startCommand = Gtk.Entry()
-        if model[ treeiter ][ 2 ] is not None: startCommand.set_text( model[ treeiter ][ 2 ] )
+        if model[ treeiter ][ 2 ] is not None:
+            startCommand.set_text( model[ treeiter ][ 2 ] )
+            startCommand.set_width_chars( len( model[ treeiter ][ 2 ] ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
+
         startCommand.set_tooltip_text( "The terminal command to start the VM such as\n\t'VBoxManage startvm %VM%' or\n\t'VBoxHeadless --startvm %VM% --vrde off'" )
         startCommand.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( startCommand, 1, 0, 1, 1 )
