@@ -612,6 +612,7 @@ class IndicatorLunar:
 
         summary = Gtk.Entry()
         summary.set_text( self.werewolfWarningTextSummary )
+        summary.set_width_chars( len( self.werewolfWarningTextSummary.strip() ) * 3 / 2 ) # Any whitespace throws off the width, so trim them and base the width of the non-whitespace text.
         summary.set_tooltip_text( "The summary text for the werewolf notification" )
         summary.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( summary, 1, 2, 1, 1 )
@@ -626,6 +627,7 @@ class IndicatorLunar:
 
         body = Gtk.Entry()
         body.set_text( self.werewolfWarningTextBody )
+        body.set_width_chars( len( self.werewolfWarningTextBody.strip() ) * 3 / 2 ) # Any whitespace throws off the width, so trim them and base the width of the non-whitespace text.
         body.set_tooltip_text( "The body text for the werewolf notification" )
         body.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( body, 1, 3, 1, 1 )
