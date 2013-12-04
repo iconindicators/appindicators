@@ -47,7 +47,7 @@ class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
-    VERSION = "1.0.3"
+    VERSION = "1.0.4"
 
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
@@ -118,11 +118,11 @@ class IndicatorFortune:
     def buildMenu( self ):
         self.menu = Gtk.Menu()
 
-        menuItem = Gtk.MenuItem( "New fortune" )
+        menuItem = Gtk.MenuItem( "New Fortune" )
         menuItem.connect( "activate", self.newFortune )
         self.menu.append( menuItem )
 
-        menuItem = Gtk.MenuItem( "Copy last fortune" )
+        menuItem = Gtk.MenuItem( "Copy Last Fortune" )
         menuItem.connect( "activate", self.onCopyLastFortune )
         self.menu.append( menuItem )
 
