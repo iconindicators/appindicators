@@ -1,6 +1,8 @@
 indicator-fortune (1.0.3-1) precise; urgency=low
 
   * Fixed bug when the fortune path contains spaces.
+  * Made the text field containing the fortune path wide enough to display the
+    path.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wes, 4 Dec 2013 19:28:13 +1000
  

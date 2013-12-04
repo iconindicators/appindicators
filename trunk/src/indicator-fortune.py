@@ -442,6 +442,7 @@ class IndicatorFortune:
 
         if rowNumber is not None: # This is an edit.
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
+            fortuneFileDirectory.set_width_chars( len( model[ treeiter ][ 0 ] ) )
 
         fortuneFileDirectory.set_tooltip_text( "The full path to a fortune .dat file OR a directory containing fortune .dat files.  The corresponding text file(s) must also be present!" )
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
