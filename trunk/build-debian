@@ -19,6 +19,7 @@
 # http://www.debian.org/doc/manuals/maint-guide
 # http://www.debian.org/doc/packaging-manuals/python-policy
 # http://www.debian-administration.org/articles/336
+# http://news.softpedia.com/news/How-to-Repack-Deb-Files-on-Debian-and-Ubuntu-404930.shtml
 
 
 BUILD_DIR="build"
