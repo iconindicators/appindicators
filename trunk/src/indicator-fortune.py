@@ -153,9 +153,9 @@ class IndicatorFortune:
         for fortuneLocation in self.fortunes:
             if fortuneLocation[ 1 ]:
                 if( os.path.isdir( fortuneLocation[ 0 ] ) ):
-                    fortuneLocations += "'" + fortuneLocation[ 0 ].rstrip( "/" ) + "/" + "' " # Remove any/all trailing slashes, then add one in as 'fortune' needs it! 
+                    fortuneLocations += "'" + fortuneLocation[ 0 ].rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
                 else:
-                    fortuneLocations += "'" + fortuneLocation[ 0 ].rstrip( ".dat" ) + "' " # 'fortune' doesn't want the extension.
+                    fortuneLocations += "'" + fortuneLocation[ 0 ].replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
 
         if fortuneLocations == " ":
             self.fortune = "No fortunes enabled!"
@@ -456,7 +456,7 @@ class IndicatorFortune:
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
             fortuneFileDirectory.set_width_chars( len( model[ treeiter ][ 0 ] ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
-        fortuneFileDirectory.set_tooltip_text( "The full path to a fortune .dat file (don't put in the .dat)\n OR a directory containing fortune .dat files.\n\nThe corresponding text file must also be present!" )
+        fortuneFileDirectory.set_tooltip_text( "The full path to a fortune .dat file OR\na directory containing fortune .dat files.\n\nThe corresponding text file must also be present!" )
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
 
@@ -464,11 +464,11 @@ class IndicatorFortune:
         hbox.set_homogeneous( True )
 
         browseFileButton = Gtk.Button( "File" )
-        browseFileButton.set_tooltip_text( "Choose a fortune .dat file - ensure the corresponding text file is present." )
+        browseFileButton.set_tooltip_text( "Choose a fortune .dat file - ensure the corresponding text file is present!" )
         hbox.pack_start( browseFileButton, True, True, 0 )
 
         browseDirectoryButton = Gtk.Button( "Directory" )
-        browseDirectoryButton.set_tooltip_text( "Choose a directory containing a fortune .dat file(s) - ensure the corresponding text file(s) is present." )
+        browseDirectoryButton.set_tooltip_text( "Choose a directory containing a fortune .dat file(s) - ensure the corresponding text file(s) is present!" )
         hbox.pack_start( browseDirectoryButton, True, True, 0 )
 
         hbox.set_halign( Gtk.Align.END )
