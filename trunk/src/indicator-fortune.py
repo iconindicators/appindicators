@@ -169,54 +169,11 @@ class IndicatorFortune:
 
             p.wait()
 
-
-# TODO Read OSD links and work out how they render the text...if that can be replicated, can work out whether or not we exceed 10 lines.
-# In the body text, any string of one or more consecutive whitespace characters that
-# contains at least one newline (U+000D CARRIAGE RETURN (CR), U+000A LINE FEED (LF), or U+000D CARRIAGE RETURN (CR)
-# immediately followed by U+000A LINE FEED (LF)), even if a mixture of those, should be treated as a single newline. 
-# Then for each line in the text, any string of one or more consecutive (non-newline) whitespace characters, even if a mixture of them, 
-# should be treated as a single space, and leading and trailing whitespace should not be presented.
-
-# TODO Could modify the fortune... 
-# Replace multiple line separators with one
-# Replace multipe tabs with one
-# Replace multipe spaces with one
-# If a line separator is followed by a non whitespace character (so newline and starts with text), replace the line separator with a space.
-# Replace ':\nTAB' with ': '            
-
-            # If the fortune exceeds the limits, John West it...
-#             if len( self.fortune ) > self.skipFortuneCharacterCount:
-#                 continue
+            # If the fortune exceeds the user-specified character limit, John West it...
+            if len( self.fortune ) > self.skipFortuneCharacterCount:
+                continue
 
             break
-
-        print( self.fortune )
-        print("-------------")
-
-        # Gobble up multiple line separators.
-        self.fortune = re.sub( "(\n)+", "\n", self.fortune )
-#         print("-------------")
-#         print(self.fortune)
-
-        # Gobble up multiple TABS.
-        self.fortune = re.sub( "(\t)+", "\t", self.fortune )
-#         print("-------------")
-#         print(self.fortune)
-
-        # Gobble up multiple spaces.
-        self.fortune = re.sub( "( )+", " ", self.fortune )
-#         print("-------------")
-#         print(self.fortune)
-
-        # Strip leading/trailing whitespace.
-        self.fortune = self.fortune.strip()
-#         print("-------------")
-#         print(self.fortune)
-
-        # If a line separator is followed by a non whitespace character (so newline and starts with text), replace the line separator with a space.
-#         self.fortune = re.sub( "\n\S", " ", self.fortune )
-#         print("-------------")
-        print(self.fortune)
 
 
     def handleLeftClick( self, icon ):
@@ -297,7 +254,7 @@ class IndicatorFortune:
         spinnerCharacterCount = Gtk.SpinButton()
         spinnerCharacterCount.set_adjustment( Gtk.Adjustment( self.skipFortuneCharacterCount, 1, 1000, 1, 50, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerCharacterCount.set_value( self.skipFortuneCharacterCount ) # ...so need to force the initial value by explicitly setting it.
-        spinnerCharacterCount.set_tooltip_text( "Rejects a fortune if it exceeds the character count - don't set too low (below 50) as many fortunes may not appear causing excessive calls to 'fortune'" )
+        spinnerCharacterCount.set_tooltip_text( "Rejects a fortune if it exceeds the character count.\nDon't set too low (below 50) as many fortunes may not appear causing excessive calls to 'fortune'." )
         spinnerCharacterCount.set_hexpand( True )
         grid.attach( spinnerCharacterCount, 1, 2, 1, 1 )
 
@@ -509,7 +466,6 @@ class IndicatorFortune:
 
         enabledCheckbox = Gtk.CheckButton( "Enabled" )
         enabledCheckbox.set_tooltip_text( "Ensure the fortune file/directory works by running it through 'fortune' in a terminal." )
-        enabledCheckbox.set_active( True )
         if rowNumber is not None: # This is an edit.
             enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
 
@@ -596,7 +552,7 @@ class IndicatorFortune:
         self.notificationSummary = IndicatorFortune.NOTIFICATION_SUMMARY
         self.refreshIntervalInMinutes = 15
         self.showNotifications = True
-        self.skipFortuneCharacterCount = 500 # From experimentation, about 60 characters per line, but with word boundaries being kept, about 50 characters per line (at most 10 lines).
+        self.skipFortuneCharacterCount = 360 # From experimentation, about 45 characters per line, but with word boundaries maintained, say 40 characters per line (with at most 9 lines).
 
         if os.path.isfile( IndicatorFortune.SETTINGS_FILE ):
             try:
