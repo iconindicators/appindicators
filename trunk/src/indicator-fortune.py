@@ -23,6 +23,7 @@
 #  http://developer.gnome.org/gtk3
 #  http://python-gtk-3-tutorial.readthedocs.org
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
+#  https://wiki.ubuntu.com/NotifyOSD
 
 
 try:
@@ -168,6 +169,16 @@ class IndicatorFortune:
 
             p.wait()
 
+
+# TODO Read OSD links and work out how they render the text...if that can be replicated, can work out whether or not we exceed 10 lines.
+# In the body text, any string of one or more consecutive whitespace characters that
+# contains at least one newline (U+000D CARRIAGE RETURN (CR), U+000A LINE FEED (LF), or U+000D CARRIAGE RETURN (CR)
+# immediately followed by U+000A LINE FEED (LF)), even if a mixture of those, should be treated as a single newline. 
+# Then for each line in the text, any string of one or more consecutive (non-newline) whitespace characters, even if a mixture of them, 
+# should be treated as a single space, and leading and trailing whitespace should not be presented.
+
+            
+            
             # If the fortune exceeds the limits, John West it...
             if len( self.fortune ) > self.skipFortuneCharacterCount:
                 continue
@@ -312,17 +323,21 @@ class IndicatorFortune:
         hbox.set_homogeneous( True )
 
         addButton = Gtk.Button( "Add" )
+        addButton.set_tooltip_text( "Add a new fortune location" )
         addButton.connect( "clicked", self.onFortuneAdd, tree )
         hbox.pack_start( addButton, True, True, 0 )
 
         removeButton = Gtk.Button( "Remove" )
+        removeButton.set_tooltip_text( "Remove the selected fortune location" )
         removeButton.connect( "clicked", self.onFortuneRemove, tree )
         hbox.pack_start( removeButton, True, True, 0 )
 
         resetButton = Gtk.Button( "Reset" )
+        resetButton.set_tooltip_text( "Remove all fortunes and set back to factory default" )
         resetButton.connect( "clicked", self.onFortuneReset, tree )
         hbox.pack_start( resetButton, True, True, 0 )
 
+        hbox.set_halign( Gtk.Align.CENTER )
         grid.attach( hbox, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Fortunes" ) )
@@ -391,7 +406,7 @@ class IndicatorFortune:
 
 
     def onFortuneReset( self, button, tree ):
-        dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, "Reset fortunes to factory default?" )
+        dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, "Remove all fortunes and set to factory default?" )
         response = dialog.run()
         dialog.destroy()
         if response == Gtk.ResponseType.OK:
@@ -434,12 +449,8 @@ class IndicatorFortune:
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
-        # Would be nice to use a file chooser but a file chooser can only choose a file OR a folder at a given time.
-        # So would need two buttons - one to launch a file chooser and one to launch a folder chooser.
-        # Bit of overkill for something so simple...maybe one day!
         fortuneFileDirectory = Gtk.Entry()
         fortuneFileDirectory.set_width_chars( 20 )
-        fortuneFileDirectory.grab_focus()
 
         if rowNumber is not None: # This is an edit.
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
@@ -449,13 +460,27 @@ class IndicatorFortune:
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
 
+        hbox = Gtk.Box( spacing = 6 )
+        hbox.set_homogeneous( True )
+
+        browseFileButton = Gtk.Button( "File" )
+        browseFileButton.set_tooltip_text( "Choose a fortune .dat file - ensure the corresponding text file is present." )
+        hbox.pack_start( browseFileButton, True, True, 0 )
+
+        browseDirectoryButton = Gtk.Button( "Directory" )
+        browseDirectoryButton.set_tooltip_text( "Choose a directory containing a fortune .dat file(s) - ensure the corresponding text file(s) is present." )
+        hbox.pack_start( browseDirectoryButton, True, True, 0 )
+
+        hbox.set_halign( Gtk.Align.END )
+        grid.attach( hbox, 0, 1, 2, 1 )
+
         enabledCheckbox = Gtk.CheckButton( "Enabled" )
         enabledCheckbox.set_tooltip_text( "Ensure the fortune file/directory works by running it through 'fortune' in a terminal." )
         enabledCheckbox.set_active( True )
         if rowNumber is not None: # This is an edit.
             enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
 
-        grid.attach( enabledCheckbox, 0, 1, 2, 1 )
+        grid.attach( enabledCheckbox, 0, 2, 1, 1 )
 
         title = "Fortune Properties"
         if rowNumber is None:
@@ -466,6 +491,10 @@ class IndicatorFortune:
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorFortune.ICON )
+
+        # Need to set these here as the dialog had not been created at the point the buttons were defined.
+        browseFileButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, True )
+        browseDirectoryButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, False )
 
         while True:
             dialog.show_all()
@@ -502,6 +531,23 @@ class IndicatorFortune:
                     model.append( [ fortuneFileDirectory.get_text().strip(), None ] )
 
             break
+
+        dialog.destroy()
+
+
+    def onBrowseFortune( self, fileOrDirectoryButton, preferencesDialog, fortuneFileDirectory, isFile ):
+        if isFile:
+            title = "Choose a fortune .dat file"
+            action = Gtk.FileChooserAction.OPEN
+        else:
+            title = "Choose a directory containing a fortune .dat file(s)"
+            action = Gtk.FileChooserAction.SELECT_FOLDER
+
+        dialog = Gtk.FileChooserDialog( title, preferencesDialog, action, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
+        dialog.set_filename( fortuneFileDirectory.get_text() )
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            fortuneFileDirectory.set_text( dialog.get_filename() )
 
         dialog.destroy()
 

@@ -1,6 +1,8 @@
 indicator-fortune (1.0.4-1) precise; urgency=low
 
   * Capitalised menu items.
+  * Cleaned up layout of preferences.
+  * Added file/directory browsing for finding fortunes.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Dec 2013 22:58:12 +1000
  
