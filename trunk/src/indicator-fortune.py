@@ -33,7 +33,7 @@ except:
 
 from gi.repository import Gdk, GLib, Gtk
 
-import json, logging, os, shutil, subprocess, sys
+import json, logging, os, re, shutil, subprocess, sys
 
 try:
     from gi.repository import Notify
@@ -177,13 +177,46 @@ class IndicatorFortune:
 # Then for each line in the text, any string of one or more consecutive (non-newline) whitespace characters, even if a mixture of them, 
 # should be treated as a single space, and leading and trailing whitespace should not be presented.
 
-            
-            
+# TODO Could modify the fortune... 
+# Replace multiple line separators with one
+# Replace multipe tabs with one
+# Replace multipe spaces with one
+# If a line separator is followed by a non whitespace character (so newline and starts with text), replace the line separator with a space.
+# Replace ':\nTAB' with ': '            
+
             # If the fortune exceeds the limits, John West it...
-            if len( self.fortune ) > self.skipFortuneCharacterCount:
-                continue
+#             if len( self.fortune ) > self.skipFortuneCharacterCount:
+#                 continue
 
             break
+
+        print( self.fortune )
+        print("-------------")
+
+        # Gobble up multiple line separators.
+        self.fortune = re.sub( "(\n)+", "\n", self.fortune )
+#         print("-------------")
+#         print(self.fortune)
+
+        # Gobble up multiple TABS.
+        self.fortune = re.sub( "(\t)+", "\t", self.fortune )
+#         print("-------------")
+#         print(self.fortune)
+
+        # Gobble up multiple spaces.
+        self.fortune = re.sub( "( )+", " ", self.fortune )
+#         print("-------------")
+#         print(self.fortune)
+
+        # Strip leading/trailing whitespace.
+        self.fortune = self.fortune.strip()
+#         print("-------------")
+#         print(self.fortune)
+
+        # If a line separator is followed by a non whitespace character (so newline and starts with text), replace the line separator with a space.
+#         self.fortune = re.sub( "\n\S", " ", self.fortune )
+#         print("-------------")
+        print(self.fortune)
 
 
     def handleLeftClick( self, icon ):
