@@ -40,23 +40,6 @@
 #TODO
 # Bright limb...
 #
-# Sites which match the values I calculate...
-#
-#  http://www.nightskynotebook.com/Moon.php
-#  http://www.calsky.com/cs.cgi
-#  http://www.calsky.com/cs.cgi
-#
-# Site which don't match...
-# 
-#  http://www.geoastro.de/SME/
-#  http://futureboy.us/fsp/moon.fsp
-#
-# Other references...
-# 
-#  https://github.com/soniakeys/meeus
-#  http://godoc.org/github.com/soniakeys/meeus
-#  https://sites.google.com/site/astronomicalalgorithms
-#
 # Need to modify the icon to rotate according to the moon bright limb angle.
 # No need to do this for full/new moon.
 #
@@ -515,9 +498,22 @@ class IndicatorLunar:
 
 
     # References:
-    #  http://www.nightskynotebook.com/Moon.php
     #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
     #  'Astronomical Algorithms' by Jean Meeus.
+    #
+    # Sites which match calculated values...
+    #  http://www.nightskynotebook.com/Moon.php
+    #  http://www.calsky.com/cs.cgi
+    #  http://www.calsky.com/cs.cgi
+    #
+    # Site which don't match...
+    #  http://www.geoastro.de/SME/
+    #  http://futureboy.us/fsp/moon.fsp
+    #
+    # Other references...
+    #  https://github.com/soniakeys/meeus
+    #  http://godoc.org/github.com/soniakeys/meeus
+    #  https://sites.google.com/site/astronomicalalgorithms
     def getBrightLimbAngle( self, body1, body2 ):
 
         body1RightAscension = self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( body1.ra )
