@@ -38,21 +38,32 @@
 
 
 #TODO
-# Links for astro programs to hopefully determine the angle of the moon terminator...
-# https://github.com/soniakeys/meeus
-# http://www.geoastro.de/elevaz/basics/meeus.htm
-# http://www.geoastro.de/elevaz/basics/index.htm
-# http://www.jgiesen.de/elevazmoon/basics/meeus.htm
-# http://godoc.org/github.com/soniakeys/meeus
-# https://sites.google.com/site/astronomicalalgorithms/
-# ...Need to now rotate the icon according to the bright limb angle!
+# Bright limb...
 #
-# Likely that if the bright limb calculations work out then no need for southern/northern "view" and property.
-# Check with http://www.geoastro.de/SME/ as the bright limb angle seems to change throughout a 24 hour period.
+# Sites which match the values I calculate...
+#
+#  http://www.nightskynotebook.com/Moon.php
+#  http://www.calsky.com/cs.cgi
+#  http://www.calsky.com/cs.cgi
+#
+# Site which don't match...
+# 
+#  http://www.geoastro.de/SME/
+#  http://futureboy.us/fsp/moon.fsp
+#
+# Other references...
+# 
+#  https://github.com/soniakeys/meeus
+#  http://godoc.org/github.com/soniakeys/meeus
+#  https://sites.google.com/site/astronomicalalgorithms
+#
+# Need to modify the icon to rotate according to the moon bright limb angle.
+# No need to do this for full/new moon.
+#
 # Need to visually confirm with the moon, both south and north hemispheres!
 
 
-# TODO Allow user to specify the icon/text.
+# TODO Perhaps allow the user to specify the icon/text.
 # Means the show phase/illumination options will disappear.
 # Format will be something like   [ICON] [MOON-PHASE] ([MOON-ILLUMINATION])
 
