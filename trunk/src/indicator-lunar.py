@@ -1011,7 +1011,7 @@ class IndicatorLunar:
     def getSVGFooter( self ): return '</svg>'
 
 
-    def getMoonRadius( self ): return str( ( 50 - 25 ) / 2 + 25 ) # A radius of 50 is too big and 25 is too small, so choose half way!
+    def getMoonRadius( self ): return str( 50 - ( 50 - 25 ) / 2 ) # A radius of 50 is too big and 25 is too small, so choose half way!
 
 
     def getColourForIconTheme( self ):
