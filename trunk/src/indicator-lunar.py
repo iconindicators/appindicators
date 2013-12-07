@@ -63,7 +63,8 @@
 # Need to visually confirm with the moon, both south and north hemispheres!
 
 
-# TODO Perhaps allow the user to specify the icon/text.
+# TODO
+# Perhaps allow the user to specify the icon/text.
 # Means the show phase/illumination options will disappear.
 # Format will be something like   [ICON] [MOON-PHASE] ([MOON-ILLUMINATION])
 
@@ -516,6 +517,7 @@ class IndicatorLunar:
     # References:
     #  http://www.nightskynotebook.com/Moon.php
     #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
+    #  'Astronomical Algorithms' by Jean Meeus.
     def getBrightLimbAngle( self, body1, body2 ):
 
         body1RightAscension = self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( body1.ra )
@@ -553,7 +555,16 @@ class IndicatorLunar:
 
         self.dialog = Gtk.AboutDialog()
         self.dialog.set_program_name( IndicatorLunar.NAME )
-        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\nCalculations courtesy of PyEphem/XEphem.\nTropical Sign by Ignius Drake.\nEclipse information by Fred Espenak and Jean Meeus.\nBright Limb calculation from 'Practical Astronomy with Your Calculator or Spreadsheet'." )
+
+        commentPyEphem = "Calculations courtesy of PyEphem/XEphem."
+        commentTropicalSign = "Tropical Sign by Ignius Drake."
+        commentEclipse = "Eclipse information by Fred Espenak and Jean Meeus."
+        commentBrightLimb = "Bright Limb calculation from 'Practical Astronomy with Your Calculator or Spreadsheet' by Peter Duffett-Smith and 'Astronomical Algorithms' by Jean Meeus."
+        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\n" +
+                                  commentPyEphem + "\n\n" +
+                                  commentTropicalSign + "\n\n" +
+                                  commentBrightLimb )
+
         self.dialog.set_website( IndicatorLunar.WEBSITE )
         self.dialog.set_website_label( IndicatorLunar.WEBSITE )
         self.dialog.set_version( IndicatorLunar.VERSION )
