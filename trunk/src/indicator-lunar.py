@@ -555,10 +555,11 @@ class IndicatorLunar:
         commentPyEphem = "Calculations courtesy of PyEphem/XEphem."
         commentTropicalSign = "Tropical Sign by Ignius Drake."
         commentEclipse = "Eclipse information by Fred Espenak and Jean Meeus."
-        commentBrightLimb = "Bright Limb calculation from 'Practical Astronomy with Your Calculator or Spreadsheet' by Peter Duffett-Smith and 'Astronomical Algorithms' by Jean Meeus."
+        commentBrightLimb = "Bright Limb from 'Practical Astronomy with Your Calculator or Spreadsheet' by Peter Duffett-Smith and 'Astronomical Algorithms' by Jean Meeus."
         self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\n" +
                                   commentPyEphem + "\n\n" +
                                   commentTropicalSign + "\n\n" +
+                                  commentEclipse + "\n\n" +
                                   commentBrightLimb )
 
         self.dialog.set_website( IndicatorLunar.WEBSITE )
