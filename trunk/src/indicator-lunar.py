@@ -46,6 +46,15 @@
 # http://godoc.org/github.com/soniakeys/meeus
 # https://sites.google.com/site/astronomicalalgorithms/
 # ...Need to now rotate the icon according to the bright limb angle!
+#
+# Likely that if the bright limb calculations work out then no need for southern/northern "view" and property.
+# Check with http://www.geoastro.de/SME/ as the bright limb angle seems to change throughout a 24 hour period.
+# Need to visually confirm with the moon, both south and north hemispheres!
+
+
+# TODO Allow user to specify the icon/text.
+# Means the show phase/illumination options will disappear.
+# Format will be something like   [ICON] [MOON-PHASE] ([MOON-ILLUMINATION])
 
 
 try:
@@ -358,12 +367,12 @@ class IndicatorLunar:
 
     def createPlanetSubmenu( self, planetMenuItem, city, body, nextUpdates, ephemNow ):
         subMenu = Gtk.Menu()
-        subMenu.append( Gtk.MenuItem( "Bright Limb Angle: " + str( round( self.getBrightLimbAngle( ephem.Sun( city ), body ) ) ) + "°" ) )
         subMenu.append( Gtk.MenuItem( "Illumination: " + str( int( round( body.phase ) ) ) + "%" ) )
         subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( body )[ 1 ] ) )
         subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.tropical( body, ephemNow ) ) )
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( body.earth_distance, 4 ) ) + " AU" ) )
         subMenu.append( Gtk.MenuItem( "Distance to Sun: " + str( round( body.sun_distance, 4 ) ) + " AU" ) )
+        subMenu.append( Gtk.MenuItem( "Bright Limb Angle: " + str( round( self.getBrightLimbAngle( ephem.Sun( city ), body ) ) ) + "°" ) )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Must compute the previous information (illumination, constellation, phase and so on BEFORE rising/setting).
@@ -908,71 +917,6 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
-
-
-################### TODO Bright limb stuff
-        # Calculate the bright limb angle so the icon can be rotated to match (hopefully) reality.
-        # No need to rotate a full/new moon!
-#         moon = ephem.Moon( city )
-#         sun = ephem.Sun( city )
-#         brightLimbAngle = self.getBrightLimbAngle( sun, moon )
-
-
-    def getCrescentGibbousMoonSVG( self, illumination, waning, crescent, ephemNow ):
-        radius = float( self.getMoonRadius() )
-        diameter = 2 * radius
-
-        # http://en.wikipedia.org/wiki/Crescent
-        if crescent:
-            ellipseRadiusX = radius * ( 1 - illumination / 50 )
-        else:
-            ellipseRadiusX = radius * ( illumination / 50 - 1 )
-
-        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-        if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
-            sweepFlagCircle = str( 0 )
-            sweepFlagEllipse = str( 1 ) if crescent else str( 0 )
-        else:
-            sweepFlagCircle = str( 1 )
-            sweepFlagEllipse = str( 0 ) if crescent else str( 1 )
-
-        if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
-            x = 50
-        else:
-            # Northern and waxing OR southern and waning...
-            if crescent:
-                x = ( 50 - radius )
-            else:
-                x = ( 50 - radius ) + abs( ellipseRadiusX ) # Gibbous
-
-        circle = 'a' + str( radius ) + ',' + str( radius ) + ' 0 0,' + sweepFlagCircle + ' 0,' + str( diameter )
-        ellipse = 'a' + str( ellipseRadiusX ) + ',' + str( radius ) + ' 0 0,' + sweepFlagEllipse + ' 0,-' + str( diameter )
-        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
-
-        if crescent:
-            width = radius + 2 * ( 50 - radius )
-        else:
-            width = radius + abs( ellipseRadiusX ) + 2 * ( 50 - radius ) # Gibbous
-
-        return self.getSVGHeader( width ) + svg + self.getSVGFooter()
-
-
-    def getQuarterMoonSVG( self, ephemNow ):
-        radius = float( self.getMoonRadius() )
-        diameter = 2 * radius
-
-        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-        if( first == True and northernHemisphere == True ) or ( first == False and northernHemisphere == False ):
-            x = 50 - radius
-            sweepFlag = str( 1 )
-        else:
-            x = 50
-            sweepFlag = str( 0 )
-
-        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' a' + str( radius ) + ',' + str( radius ) + ' 0 0,' + sweepFlag + ' 0,' + str( diameter ) + ' z" fill="' + self.getColourForIconTheme() + '" />'
-        return self.getSVGHeader( ( 50 - radius ) + 50 ) + svg + self.getSVGFooter()
-
-################### 
 
 
     def getCrescentGibbousMoonSVG( self, illumination, waning, northernHemisphere, crescent ):
