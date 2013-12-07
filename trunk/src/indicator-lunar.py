@@ -173,12 +173,28 @@ class IndicatorLunar:
 
     def update( self ):
         ephemNow = ephem.now()
+#         ephemNow = ephem.Date( "2003/09/01" )
+#         ephemNow = ephem.Date( "1992/04/12" )
 
+        city = ephem.city( self.cityName )
+        city.date = ephemNow
+
+        self.getBrightLimbAngle( ephem.Sun( city ), ephem.Moon( city ) )
+
+        sun = ephem.Sun( city )
+        moon = ephem.Moon( city )
+        self.getBrightLimbAngle( sun, moon )
+
+        sun = ephem.Sun()
+        sun.compute()
+        moon = ephem.Moon()
+        moon.compute()
+        self.getBrightLimbAngle( sun, moon )
+        
         lunarPhase = self.calculateLunarPhase( ephemNow )
-        moon = ephem.Moon( ephemNow )
-        percentageIllumination = int( round( moon.phase ) )
+        percentageIllumination = int( round( ephem.Moon( city ).phase ) )
 
-        self.buildMenu( lunarPhase, ephemNow )
+        self.buildMenu( city, ephemNow )
 
         # Determine the content of the indicator (label, tooltip, etc).
         if self.showIllumination and self.showPhase:
@@ -191,7 +207,7 @@ class IndicatorLunar:
             labelTooltip = ""
 
         # Set the icon/label handling the Unity and non-Unity cases...
-        self.createIconForLunarPhase( lunarPhase, percentageIllumination, ephemNow )
+        self.createIconForLunarPhase( lunarPhase, percentageIllumination )
         if self.appindicatorImported:
             self.indicator.set_icon( IndicatorLunar.SVG_ICON )
             self.indicator.set_label( labelTooltip, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
@@ -219,7 +235,7 @@ class IndicatorLunar:
             Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
 
 
-    def buildMenu( self, lunarPhase, ephemNow ):
+    def buildMenu( self, city, ephemNow ):
         nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
         if self.appindicatorImported:
@@ -229,8 +245,6 @@ class IndicatorLunar:
 
         menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
         menu = Gtk.Menu()
-        city = ephem.city( self.cityName )
-        city.date = ephemNow
 
         # Moon
         menuItem = Gtk.MenuItem( "Moon" )
@@ -238,7 +252,7 @@ class IndicatorLunar:
         self.createPlanetSubmenu( menuItem, city, ephem.Moon( city ), nextUpdates, ephemNow )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] ) )
+        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ self.calculateLunarPhase( ephemNow ) ] ) )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
 
@@ -367,7 +381,7 @@ class IndicatorLunar:
         subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.tropical( body, ephemNow ) ) )
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( body.earth_distance, 4 ) ) + " AU" ) )
         subMenu.append( Gtk.MenuItem( "Distance to Sun: " + str( round( body.sun_distance, 4 ) ) + " AU" ) )
-        subMenu.append( Gtk.MenuItem( "Bright Limb Angle: " + str( round( self.getBrightLimbAngle( ephem.Sun( city ), body ) ) ) + "°" ) )
+#         subMenu.append( Gtk.MenuItem( "Bright Limb Angle: " + str( round( self.getBrightLimbAngle( ephem.Sun( city ), body ) ) ) + "°" ) )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Must compute the previous information (illumination, constellation, phase and so on BEFORE rising/setting).
@@ -404,7 +418,7 @@ class IndicatorLunar:
     def calculateLunarPhase( self, ephemNow ):
         nextFullMoonDate = ephem.next_full_moon( ephemNow )
         nextNewMoonDate = ephem.next_new_moon( ephemNow )
-        moon = ephem.Moon( ephemNow )
+        moon = ephem.Moon( ephemNow ) # Strictly speaking the city (set to the current date/time) should be passed in, but it doesn't matter too much.
         currentMoonPhase = int( round( ( moon.phase ) ) )
         phase = None
         if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which one is before the other.
@@ -457,7 +471,7 @@ class IndicatorLunar:
         return planetSignName + " " + str( planetSignDegree ) + "° " + planetSignMinute + "'"
 
 
-    def createIconForLunarPhase( self, lunarPhase, illumination, ephemNow ):
+    def createIconForLunarPhase( self, lunarPhase, illumination ):
         if lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON:
             svg = self.getNewMoonSVG()
         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON:
@@ -484,8 +498,8 @@ class IndicatorLunar:
             logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
 
 
-    def convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( self, s ):
-        return self.__convertToDecimal( s )
+    def convertHoursMinutesSecondsAsStringToDegreesAsDecimal( self, s ):
+        return self.__convertToDecimal( s ) * 15.0
 
 
     def convertDegreesMinutesSecondsAsStringToDecimal( self, s ):
@@ -516,22 +530,57 @@ class IndicatorLunar:
     #  https://sites.google.com/site/astronomicalalgorithms
     def getBrightLimbAngle( self, body1, body2 ):
 
-        body1RightAscension = self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( body1.ra )
-        body1Declination = self.convertDegreesMinutesSecondsAsStringToDecimal( body1.dec )
+# From Jurgen:
+# 
+# The formulas used in my applet to compute the local zenith angle (ZA) of the 
+# Moon's bright limb are from the book of Jean Meeus: "Astronomical Algorithms", Willmann-Bell.
+# 
+# ZA = P - Q
+# 
+# P = position angle of the Moon's bright limb (chapter 46)
+# 
+# P = Math.atan2(Math.cos(K*decSun)*Math.sin(K*(alphaSun-alphaMoon)),Math.sin(K*decSun)*Math.cos(K*decMoon)-Math.cos(K*decSun)*Math.sin(K*decMoon)*Math.cos(K*(alphaSun-alphaMoon)))/K;
+# 
+# Q = parallactic angle of the Moon (chapter 13)
+# 
+# Q = Math.atan2(Math.sin(K*moonHourAngle),Math.tan(K*latitude)*Math.cos(K*moonDelta)-Math.sin(K*moonDelta)*Math.cos(K*moonHourAngle))/K; // northern latitude positive
+# 
+# moonHourAngle = THETA0(JD) + longitude - alphaMoon // eastern longitude positive
+# 
+# double THETA0(double JD) { // Greenwich Mean Sidereal Time
+#     double T = (JD-2451545.0)/36525.0;
+#     double x = 280.46061837 + 360.98564736629*(JD-2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;
+#     x = x % 360.0;
+#     if (x<0) x = x + 360.0;
+#     return x;
+# }
+# 
+# JD = Julian_Day(date, month, year, UT);
+# K = Math.PI/180.0;
 
-        body2RightAscension = self.convertHoursMinutesSecondsIn24HourFormatAsStringToDecimal( body2.ra )
-        body2Declination = self.convertDegreesMinutesSecondsAsStringToDecimal( body2.dec )
+##### SUN IS BODY1 !!!!!!!!!!!!!!!!  Note this!
 
-        deltaAlpha = ( body1RightAscension - body2RightAscension ) * 15.0
+        body1RightAscension = math.radians( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( body1.ra ) )
+        body1Declination = math.radians( self.convertDegreesMinutesSecondsAsStringToDecimal( body1.dec ) )
 
-        y = math.cos( math.radians( body1Declination ) ) * math.sin( math.radians( deltaAlpha ) )
+        body2RightAscension = math.radians( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( body2.ra ) )
+        body2Declination = math.radians( self.convertDegreesMinutesSecondsAsStringToDecimal( body2.dec ) )
 
-        x = math.cos( math.radians( body2Declination ) ) * math.sin( math.radians( body1Declination ) ) - \
-                        math.sin( math.radians( body2Declination ) ) * math.cos( math.radians( body1Declination ) ) * math.cos( math.radians( deltaAlpha ) )
+        y = math.cos( body1Declination ) * math.sin( body1RightAscension - body2RightAscension )
+
+        x = math.cos( body2Declination ) * math.sin( body1Declination ) - \
+                        math.sin( body2Declination ) * math.cos( body1Declination ) * math.cos( body1RightAscension - body2RightAscension )
 
         brightLimbAngle = math.degrees( math.atan2( y, x ) )
+
         if brightLimbAngle < 0:
-            brightLimbAngle = brightLimbAngle + 360
+            brightLimbAngle = brightLimbAngle + 360.0
+
+        if type( body2 ) == ephem.Moon:
+            print( body1.ra, body1.dec )
+            print( body2.ra, body2.dec )
+            print( brightLimbAngle )
+            print()
 
         return brightLimbAngle
 
