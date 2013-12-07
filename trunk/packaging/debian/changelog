@@ -2,7 +2,7 @@ indicator-lunar (1.0.29-1) precise; urgency=low
 
   * Added the bright limb angle for the moon and planets.
     Thanks to 'Practical Astronomy with Your Calculator or Spreadsheet' by
-    Peter Duffett-Smith.
+    Peter Duffett-Smith and 'Astronomical Algorithms' by Jean Meeus.    
   * Changed the control file 'Depends' from Python to Python3.
   * Increased the size of the werewolf summary/body text fields.
 
