@@ -512,8 +512,8 @@ class IndicatorLunar:
 
 
     # References:
-    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
-    #  'Astronomical Algorithms' by Jean Meeus.
+    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
+    #  'Astronomical Algorithms' by Jean Meeus (chapter 48).
     #
     # Sites which match calculated values...
     #  http://www.nightskynotebook.com/Moon.php
