@@ -179,17 +179,37 @@ class IndicatorLunar:
         city = ephem.city( self.cityName )
         city.date = ephemNow
 
-        self.getBrightLimbAngle( ephem.Sun( city ), ephem.Moon( city ) )
+# TODO 
+# References for moon RA/DEC as what PyEphem calculates is different to geoastro and futureboy.
+# http://stackoverflow.com/questions/16293146/pyephem-libnova-stellarium-jpl-horizons-disagree-on-moon-ra-dec
+# http://www.satellite-calculations.com/Satellite/suncalc.htm
+# http://www.stargazing.net/mas/sheets.htm
+# http://oneau.wordpress.com/2010/07/04/astrometry-in-python-with-pyephem/
+
 
         sun = ephem.Sun( city )
         moon = ephem.Moon( city )
-        self.getBrightLimbAngle( sun, moon )
+        print( sun.a_ra, sun.a_dec, moon.a_ra, moon.a_dec )
+        print( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( sun.a_ra ), 
+               self.convertDegreesMinutesSecondsAsStringToDecimal( sun.a_dec ), 
+               self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( moon.a_ra ), 
+               self.convertDegreesMinutesSecondsAsStringToDecimal( moon.a_dec ) )
 
-        sun = ephem.Sun()
-        sun.compute()
-        moon = ephem.Moon()
-        moon.compute()
-        self.getBrightLimbAngle( sun, moon )
+        print( sun.g_ra, sun.g_dec, moon.g_ra, moon.g_dec )
+        print( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( sun.g_ra ), 
+               self.convertDegreesMinutesSecondsAsStringToDecimal( sun.g_dec ), 
+               self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( moon.g_ra ), 
+               self.convertDegreesMinutesSecondsAsStringToDecimal( moon.g_dec ) )
+
+        print( sun.ra, sun.dec, moon.ra, moon.dec )
+        print( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( sun.ra ), 
+               self.convertDegreesMinutesSecondsAsStringToDecimal( sun.dec ), 
+               self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( moon.ra ), 
+               self.convertDegreesMinutesSecondsAsStringToDecimal( moon.dec ) )
+#         self.getBrightLimbAngle( sun, moon )
+
+
+        
         
         lunarPhase = self.calculateLunarPhase( ephemNow )
         percentageIllumination = int( round( ephem.Moon( city ).phase ) )
@@ -381,7 +401,7 @@ class IndicatorLunar:
         subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.tropical( body, ephemNow ) ) )
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( body.earth_distance, 4 ) ) + " AU" ) )
         subMenu.append( Gtk.MenuItem( "Distance to Sun: " + str( round( body.sun_distance, 4 ) ) + " AU" ) )
-#         subMenu.append( Gtk.MenuItem( "Bright Limb Angle: " + str( round( self.getBrightLimbAngle( ephem.Sun( city ), body ) ) ) + "°" ) )
+        subMenu.append( Gtk.MenuItem( "Bright Limb Angle: " + str( round( self.getBrightLimbAngle( ephem.Sun( city ), body ) ) ) + "°" ) )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Must compute the previous information (illumination, constellation, phase and so on BEFORE rising/setting).
@@ -573,14 +593,14 @@ class IndicatorLunar:
 
         brightLimbAngle = math.degrees( math.atan2( y, x ) )
 
+#         if type( body2 ) == ephem.Moon:
+#             print( brightLimbAngle )
+
         if brightLimbAngle < 0:
             brightLimbAngle = brightLimbAngle + 360.0
 
-        if type( body2 ) == ephem.Moon:
-            print( body1.ra, body1.dec )
-            print( body2.ra, body2.dec )
-            print( brightLimbAngle )
-            print()
+#         if type( body2 ) == ephem.Moon:
+#             print( brightLimbAngle )
 
         return brightLimbAngle
 
