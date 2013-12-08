@@ -172,62 +172,28 @@ class IndicatorLunar:
 
 
     def update( self ):
-        ephemNow = ephem.now()
-#         ephemNow = ephem.Date( "2003/09/01" )
-#         ephemNow = ephem.Date( "1992/04/12" )
+        ephemNow = ephem.now() # This is UTC and all calculations using this value convert to local time at display time.
 
         city = ephem.city( self.cityName )
         city.date = ephemNow
 
-# TODO 
-# References for moon RA/DEC as what PyEphem calculates is different to geoastro and futureboy.
-# http://stackoverflow.com/questions/16293146/pyephem-libnova-stellarium-jpl-horizons-disagree-on-moon-ra-dec
-# http://www.satellite-calculations.com/Satellite/suncalc.htm
-# http://www.stargazing.net/mas/sheets.htm
-# http://oneau.wordpress.com/2010/07/04/astrometry-in-python-with-pyephem/
+        lunarIlluminationPercentage = int( round( ephem.Moon( city ).phase ) )
+        lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
 
-
-        sun = ephem.Sun( city )
-        moon = ephem.Moon( city )
-        print( sun.a_ra, sun.a_dec, moon.a_ra, moon.a_dec )
-        print( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( sun.a_ra ), 
-               self.convertDegreesMinutesSecondsAsStringToDecimal( sun.a_dec ), 
-               self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( moon.a_ra ), 
-               self.convertDegreesMinutesSecondsAsStringToDecimal( moon.a_dec ) )
-
-        print( sun.g_ra, sun.g_dec, moon.g_ra, moon.g_dec )
-        print( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( sun.g_ra ), 
-               self.convertDegreesMinutesSecondsAsStringToDecimal( sun.g_dec ), 
-               self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( moon.g_ra ), 
-               self.convertDegreesMinutesSecondsAsStringToDecimal( moon.g_dec ) )
-
-        print( sun.ra, sun.dec, moon.ra, moon.dec )
-        print( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( sun.ra ), 
-               self.convertDegreesMinutesSecondsAsStringToDecimal( sun.dec ), 
-               self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( moon.ra ), 
-               self.convertDegreesMinutesSecondsAsStringToDecimal( moon.dec ) )
-#         self.getBrightLimbAngle( sun, moon )
-
-
-        
-        
-        lunarPhase = self.calculateLunarPhase( ephemNow )
-        percentageIllumination = int( round( ephem.Moon( city ).phase ) )
-
-        self.buildMenu( city, ephemNow )
+        self.buildMenu( city, ephemNow, lunarPhase )
 
         # Determine the content of the indicator (label, tooltip, etc).
         if self.showIllumination and self.showPhase:
-            labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( percentageIllumination ) + "%)"
+            labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( lunarIlluminationPercentage ) + "%)"
         elif self.showIllumination:
-            labelTooltip = str( percentageIllumination ) + "%"
+            labelTooltip = str( lunarIlluminationPercentage ) + "%"
         elif self.showPhase:
             labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
         else:
             labelTooltip = ""
 
         # Set the icon/label handling the Unity and non-Unity cases...
-        self.createIconForLunarPhase( lunarPhase, percentageIllumination )
+        self.createIconForLunarPhase( lunarPhase, lunarIlluminationPercentage )
         if self.appindicatorImported:
             self.indicator.set_icon( IndicatorLunar.SVG_ICON )
             self.indicator.set_label( labelTooltip, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
@@ -244,7 +210,7 @@ class IndicatorLunar:
         # Show the full moon indicator when the user setting is enabled and the phase and illumination percentage are appropriate.
         if notifyImported and \
             self.showWerewolfWarning and \
-            percentageIllumination >= self.werewolfWarningStartIlluminationPercentage and \
+            lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
             phaseIsBetweenNewAndFullInclusive:
 
             # The notification summary text must not be empty (at least on Unity).
@@ -255,7 +221,7 @@ class IndicatorLunar:
             Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
 
 
-    def buildMenu( self, city, ephemNow ):
+    def buildMenu( self, city, ephemNow, lunarPhase ):
         nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
         if self.appindicatorImported:
@@ -263,16 +229,16 @@ class IndicatorLunar:
         else:
             menu = self.menu
 
-        menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
+        menu.popdown() # Make the existing menu, if visible, disappear (if not, GTK complains).
         menu = Gtk.Menu()
 
         # Moon
         menuItem = Gtk.MenuItem( "Moon" )
         menu.append( menuItem )
-        self.createPlanetSubmenu( menuItem, city, ephem.Moon( city ), nextUpdates, ephemNow )
+        self.createBodySubmenu( menuItem, city, ephem.Moon( city ), nextUpdates, ephemNow )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ self.calculateLunarPhase( ephemNow ) ] ) )
+        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + lunarPhase ) )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
 
@@ -303,10 +269,10 @@ class IndicatorLunar:
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
 
-        sun = ephem.Sun( ephemNow )
+        sun = ephem.Sun( city )
 
         subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( sun )[ 1 ] ) )
-        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.tropical( ephem.Sun(), ephemNow ) ) )
+        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.getTropicalSign( sun, ephemNow ) ) )
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( sun.earth_distance, 4 ) ) + " AU" ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
@@ -356,7 +322,7 @@ class IndicatorLunar:
 
         for planet in planets:
             menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
-            self.createPlanetSubmenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
+            self.createBodySubmenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
             menu.append( menuItem )
 
         menu.append( Gtk.SeparatorMenuItem() )
@@ -394,11 +360,11 @@ class IndicatorLunar:
         GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
 
 
-    def createPlanetSubmenu( self, planetMenuItem, city, body, nextUpdates, ephemNow ):
+    def createBodySubmenu( self, bodyMenuItem, city, body, nextUpdates, ephemNow ):
         subMenu = Gtk.Menu()
         subMenu.append( Gtk.MenuItem( "Illumination: " + str( int( round( body.phase ) ) ) + "%" ) )
         subMenu.append( Gtk.MenuItem( "Constellation: " + ephem.constellation( body )[ 1 ] ) )
-        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.tropical( body, ephemNow ) ) )
+        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.getTropicalSign( body, ephemNow ) ) )
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( body.earth_distance, 4 ) ) + " AU" ) )
         subMenu.append( Gtk.MenuItem( "Distance to Sun: " + str( round( body.sun_distance, 4 ) ) + " AU" ) )
         subMenu.append( Gtk.MenuItem( "Bright Limb Angle: " + str( round( self.getBrightLimbAngle( ephem.Sun( city ), body ) ) ) + "°" ) )
@@ -415,7 +381,7 @@ class IndicatorLunar:
             subMenu.append( Gtk.MenuItem( "Rise: " + self.localiseAndTrim( rising ) ) )
             subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( setting ) ) )
 
-        planetMenuItem.set_submenu( subMenu )
+        bodyMenuItem.set_submenu( subMenu )
 
         nextUpdates.append( rising )
         nextUpdates.append( setting )
@@ -435,50 +401,48 @@ class IndicatorLunar:
         return localtimeString[ 0 : localtimeString.rfind( ":" ) + 3 ]
 
 
-    def calculateLunarPhase( self, ephemNow ):
+    def getLunarPhase( self, ephemNow, lunarIlluminationPercentage ):
         nextFullMoonDate = ephem.next_full_moon( ephemNow )
         nextNewMoonDate = ephem.next_new_moon( ephemNow )
-        moon = ephem.Moon( ephemNow ) # Strictly speaking the city (set to the current date/time) should be passed in, but it doesn't matter too much.
-        currentMoonPhase = int( round( ( moon.phase ) ) )
         phase = None
-        if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which one is before the other.
-            # We are somewhere between a new moon and a full moon...
-            if( currentMoonPhase > 99 ):
+        if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
+            # Between a new moon and a full moon...
+            if( lunarIlluminationPercentage > 99 ):
                 phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
-            elif currentMoonPhase <= 99 and currentMoonPhase > 50:
+            elif lunarIlluminationPercentage <= 99 and lunarIlluminationPercentage > 50:
                 phase = IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS
-            elif currentMoonPhase == 50:
+            elif lunarIlluminationPercentage == 50:
                 phase = IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER
-            elif currentMoonPhase < 50 and currentMoonPhase >= 1:
+            elif lunarIlluminationPercentage < 50 and lunarIlluminationPercentage >= 1:
                 phase = IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT
-            else: # currentMoonPhase < 1
+            else: # lunarIlluminationPercentage < 1
                 phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
         else:
-            # We are somewhere between a full moon and the next new moon...
-            if( currentMoonPhase > 99 ):
+            # Between a full moon and the next new moon...
+            if( lunarIlluminationPercentage > 99 ):
                 phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
-            elif currentMoonPhase <= 99 and currentMoonPhase > 50:
+            elif lunarIlluminationPercentage <= 99 and lunarIlluminationPercentage > 50:
                 phase = IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS
-            elif currentMoonPhase == 50:
+            elif lunarIlluminationPercentage == 50:
                 phase = IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER
-            elif currentMoonPhase < 50 and currentMoonPhase >= 1:
+            elif lunarIlluminationPercentage < 50 and lunarIlluminationPercentage >= 1:
                 phase = IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT
-            else: # currentMoonPhase < 1
+            else: # lunarIlluminationPercentage < 1
                 phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
 
         return phase
 
 
     # Code courtesy of Ignius Drake.
-    def tropical( self, planet, ephemNow ):
+    def getTropicalSign( self, body, ephemNow ):
         signList = [ 'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces' ]
 
         ( year, month, day ) = ephemNow.triple()
         epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
         ephemNowDate = str( ephemNow ).split( ' ' )
 
-        planet.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
-        planetCoordinates = str( ephem.Ecliptic( planet ).lon ).split( ":" )
+        body.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
+        planetCoordinates = str( ephem.Ecliptic( body ).lon ).split( ":" )
 
         if float( planetCoordinates[ 2 ] ) > 30:
             planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
@@ -530,7 +494,11 @@ class IndicatorLunar:
         t = tuple( str( s ).split( ":" ) )
         return math.copysign( abs( float( t[ 0 ] ) ) + ( ( float( t[ 1 ] ) + ( float( t[ 2 ] ) / 60.0 ) ) / 60.0 ), float( t[ 0 ] ) )
 
-
+    # Computes the bright limb angle between the sun and a planetary body.
+    # The angle is measured in degrees where zero degrees is a vertical line pointing "up" 
+    # the angle is measured counter clockwise from this vertical line.
+    # Traditionally an angle is measured counter clockwise from a horizontal line to the right.
+    #
     # References:
     #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
     #  'Astronomical Algorithms' by Jean Meeus (chapter 48).
@@ -548,7 +516,7 @@ class IndicatorLunar:
     #  https://github.com/soniakeys/meeus
     #  http://godoc.org/github.com/soniakeys/meeus
     #  https://sites.google.com/site/astronomicalalgorithms
-    def getBrightLimbAngle( self, body1, body2 ):
+    def getBrightLimbAngle( self, sun, body ):
 
 # From Jurgen:
 # 
@@ -578,29 +546,37 @@ class IndicatorLunar:
 # JD = Julian_Day(date, month, year, UT);
 # K = Math.PI/180.0;
 
-##### SUN IS BODY1 !!!!!!!!!!!!!!!!  Note this!
+# References for moon RA/DEC as what PyEphem calculates is different to geoastro and futureboy.
+# http://stackoverflow.com/questions/16293146/pyephem-libnova-stellarium-jpl-horizons-disagree-on-moon-ra-dec
+# http://www.satellite-calculations.com/Satellite/suncalc.htm
+# http://www.stargazing.net/mas/sheets.htm
+# http://oneau.wordpress.com/2010/07/04/astrometry-in-python-with-pyephem/
 
-        body1RightAscension = math.radians( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( body1.ra ) )
-        body1Declination = math.radians( self.convertDegreesMinutesSecondsAsStringToDecimal( body1.dec ) )
+        sunRA = math.radians( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( sun.ra ) )
+        sunDec = math.radians( self.convertDegreesMinutesSecondsAsStringToDecimal( sun.dec ) )
 
-        body2RightAscension = math.radians( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( body2.ra ) )
-        body2Declination = math.radians( self.convertDegreesMinutesSecondsAsStringToDecimal( body2.dec ) )
+        bodyRA = math.radians( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( body.ra ) )
+        bodyDec = math.radians( self.convertDegreesMinutesSecondsAsStringToDecimal( body.dec ) )
 
-        y = math.cos( body1Declination ) * math.sin( body1RightAscension - body2RightAscension )
+#         if type( body ) == ephem.Moon: 
+#             sunRA = math.radians( 255.0962 )
+#             sunDec = math.radians( -22.7283 )
+#             bodyRA = math.radians( 332.3121 )
+#             bodyDec = math.radians( -7.6118 )
 
-        x = math.cos( body2Declination ) * math.sin( body1Declination ) - \
-                        math.sin( body2Declination ) * math.cos( body1Declination ) * math.cos( body1RightAscension - body2RightAscension )
+        y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
+        x = math.cos( bodyDec ) * math.sin( sunDec ) - math.sin( bodyDec ) * math.cos( sunDec ) * math.cos( sunRA - bodyRA )
 
         brightLimbAngle = math.degrees( math.atan2( y, x ) )
 
-#         if type( body2 ) == ephem.Moon:
-#             print( brightLimbAngle )
+        if type( body ) == ephem.Moon: 
+            print( brightLimbAngle )
 
         if brightLimbAngle < 0:
             brightLimbAngle = brightLimbAngle + 360.0
 
-#         if type( body2 ) == ephem.Moon:
-#             print( brightLimbAngle )
+        if type( body ) == ephem.Moon: 
+            print( brightLimbAngle )
 
         return brightLimbAngle
 
