@@ -459,23 +459,18 @@ class IndicatorLunar:
     # Compute the bright limb angle between the sun and a planetary body.
     # The angle is measured in degrees where zero degrees is a vertical line pointing "up" 
     # the angle is measured counter clockwise from this vertical line.
-    # Traditionally an angle is measured counter clockwise from a horizontal line to the right.
-    # Also need to "adjust" the bright limb angle for the observer and this is known as the parallactic angle.
+    # Need to "adjust" the bright limb angle for the observer and this is known as the parallactic angle.
     #
     # References:
     #  'Astronomical Algorithms' by Jean Meeus (chapters 14 and 48).
     #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
-    #
-    # Bright limb angle adjusted for the parallactic angle...
     #  http://www.geoastro.de/moonlibration/
     #  http://www.geoastro.de/SME/
     #  http://futureboy.us/fsp/moon.fsp
     #
-    # Bright limb angle (not taking into account the parallactic angle)...
+    # Other references...
     #  http://www.nightskynotebook.com/Moon.php
     #  http://www.calsky.com/cs.cgi/Moon/6
-    #
-    # Other references...
     #  https://github.com/soniakeys/meeus
     #  http://godoc.org/github.com/soniakeys/meeus
     #  https://sites.google.com/site/astronomicalalgorithms
@@ -501,20 +496,33 @@ class IndicatorLunar:
 
         brightLimbAngleAdjusted = brightLimbAngle - moonParallacticAngle
         if brightLimbAngleAdjusted < 0:
-            brightLimbAngleAdjusted = brightLimbAngleAdjusted + 360.0
+            brightLimbAngleAdjusted += 360.0
+
+        if( type( body ) == ephem.Moon ):
+            print("------------------------------------- ", datetime.datetime.now())
+            print( brightLimbAngle - moonParallacticAngle )
+            print( brightLimbAngleAdjusted )
+
+            if brightLimbAngle < 0:
+                brightLimbAngle += 360.0
+
+            if moonParallacticAngle < 0:
+                moonParallacticAngle += 360.0
+
+            print( brightLimbAngle - moonParallacticAngle )
 
         return brightLimbAngleAdjusted
 
 
-    def convertHMSToDecimalDegrees( self, ra ):
-        t = tuple( str( ra ).split( ":" ) )
+    def convertHMSToDecimalDegrees( self, hms ):
+        t = tuple( str( hms ).split( ":" ) )
         x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) ) * 15.0
         y = float( t[ 0 ] )
         return math.copysign( x, y )
 
 
-    def convertDMSToDecimalDegrees( self, dec ):
-        t = tuple( str( dec ).split( ":" ) )
+    def convertDMSToDecimalDegrees( self, dms ):
+        t = tuple( str( dms ).split( ":" ) )
         x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
         y = float( t[ 0 ] )
         return math.copysign( x, y )
