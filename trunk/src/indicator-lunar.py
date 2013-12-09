@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from Onboard.utils import brighten
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -177,6 +178,18 @@ class IndicatorLunar:
         city = ephem.city( self.cityName )
         city.date = ephemNow
 
+#         city = ephem.city( "London" )
+#         city.date = ephem.Date( "1992/04/12" )
+#         self.getBrightLimbAngle( ephem.Sun( city ), ephem.Moon( city ) )
+# 
+#         city = ephem.city( "London" )
+#         city.date = ephem.Date( "2003/09/01" )
+#         self.getBrightLimbAngle( ephem.Sun( city ), ephem.Moon( city ) )
+# 
+#         city = ephem.city( "London" )
+#         city.date = ephem.Date( "2003/11/22" )
+#         self.getBrightLimbAngle( ephem.Sun( city ), ephem.Mercury( city ) )
+
         lunarIlluminationPercentage = int( round( ephem.Moon( city ).phase ) )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
 
@@ -238,7 +251,7 @@ class IndicatorLunar:
         self.createBodySubmenu( menuItem, city, ephem.Moon( city ), nextUpdates, ephemNow )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + lunarPhase ) )
+        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] ) )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
 
@@ -320,10 +333,10 @@ class IndicatorLunar:
             [ "Neptune", ephem.Neptune( city ) ],
             [ "Pluto", ephem.Pluto( city ) ] ]
 
-#         for planet in planets:
-#             menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
-#             self.createBodySubmenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
-#             menu.append( menuItem )
+        for planet in planets:
+            menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
+            self.createBodySubmenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
+            menu.append( menuItem )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -367,7 +380,7 @@ class IndicatorLunar:
         subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.getTropicalSign( body, ephemNow ) ) )
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + str( round( body.earth_distance, 4 ) ) + " AU" ) )
         subMenu.append( Gtk.MenuItem( "Distance to Sun: " + str( round( body.sun_distance, 4 ) ) + " AU" ) )
-        subMenu.append( Gtk.MenuItem( "Bright Limb Angle: " + str( round( self.getBrightLimbAngle( ephem.Sun( city ), body ) ) ) + "°" ) )
+        subMenu.append( Gtk.MenuItem( "Bright Limb: " + str( round( self.getBrightLimbAngle( city, body ) ) ) + "°" ) )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Must compute the previous information (illumination, constellation, phase and so on BEFORE rising/setting).
@@ -483,20 +496,6 @@ class IndicatorLunar:
             logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
 
 
-    def convertRightAscensionToDecimalDegrees( self, ra ):
-        t = tuple( str( ra ).split( ":" ) )
-        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) ) * 15.0
-        y = float( t[ 0 ] )
-        return math.copysign( x, y )
-
-
-    def convertDeclinationToDecimalDegrees( self, dec ):
-        t = tuple( str( dec ).split( ":" ) )
-        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
-        y = float( t[ 0 ] )
-        return math.copysign( x, y )
-
-
     # Compute the bright limb angle between the sun and a planetary body.
     # The angle is measured in degrees where zero degrees is a vertical line pointing "up" 
     # the angle is measured counter clockwise from this vertical line.
@@ -518,50 +517,76 @@ class IndicatorLunar:
     #  https://github.com/soniakeys/meeus
     #  http://godoc.org/github.com/soniakeys/meeus
     #  https://sites.google.com/site/astronomicalalgorithms
-    def getBrightLimbAngle( self, sun, body ):
+    def getBrightLimbAngle( self, city, body ):
 
 # References for moon RA/DEC as what PyEphem calculates is different to geoastro and futureboy.
 # http://stackoverflow.com/questions/16293146/pyephem-libnova-stellarium-jpl-horizons-disagree-on-moon-ra-dec
-# http://www.satellite-calculations.com/Satellite/suncalc.htm
 # http://www.stargazing.net/mas/sheets.htm
 # http://oneau.wordpress.com/2010/07/04/astrometry-in-python-with-pyephem/
+
+#         if type( body ) != ephem.Moon:
+#             return 111
+
+        sun = ephem.Sun( city )
 
         sunRA = sun.ra
         sunDec = sun.dec 
         bodyRA = body.ra 
         bodyDec = body.dec 
 
-        print( "Sun RA | Dec: ", sunRA, sunDec )
-        print( "Body RA | Dec: ", bodyRA, bodyDec )
+#         print( "Sun RA | Dec: ", sunRA, sunDec )
+#         print( "Body RA | Dec: ", bodyRA, bodyDec )
 
-        sunRA = self.convertRightAscensionToDecimalDegrees( sunRA )
-        sunDec = self.convertDeclinationToDecimalDegrees( sunDec )
-        bodyRA = self.convertRightAscensionToDecimalDegrees( bodyRA )
-        bodyDec = self.convertDeclinationToDecimalDegrees( bodyDec )
+        sunRA = self.convertHMSToDecimalDegrees( sunRA )
+        sunDec = self.convertDMSToDecimalDegrees( sunDec )
+        bodyRA = self.convertHMSToDecimalDegrees( bodyRA )
+        bodyDec = self.convertDMSToDecimalDegrees( bodyDec )
 
-        print( "Sun RA | Dec: ", sunRA, sunDec )
-        print( "Body RA | Dec: ", bodyRA, bodyDec )
+#         print( "Sun RA | Dec: ", sunRA, sunDec )
+#         print( "Body RA | Dec: ", bodyRA, bodyDec )
 
         sunRA = math.radians( sunRA )
         sunDec = math.radians( sunDec )
         bodyRA = math.radians( bodyRA )
         bodyDec = math.radians( bodyDec )
 
-        print( "Sun RA | Dec: ", sunRA, sunDec )
-        print( "Body RA | Dec: ", bodyRA, bodyDec )
+#         print( "Sun RA | Dec: ", sunRA, sunDec )
+#         print( "Body RA | Dec: ", bodyRA, bodyDec )
 
         y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
         x = math.cos( bodyDec ) * math.sin( sunDec ) - math.sin( bodyDec ) * math.cos( sunDec ) * math.cos( sunRA - bodyRA )
-
         brightLimbAngle = math.degrees( math.atan2( y, x ) )
-        print( brightLimbAngle )
+#         if brightLimbAngle < 0:
+#             brightLimbAngle = brightLimbAngle + 360.0
 
-        if brightLimbAngle < 0:
-            brightLimbAngle = brightLimbAngle + 360.0
+        hourAngle = math.radians( self.convertHMSToDecimalDegrees( city.sidereal_time() ) - self.convertHMSToDecimalDegrees( body.ra ) )
+        y = math.sin( hourAngle )
+        x = math.tan( math.radians( self.convertDMSToDecimalDegrees( city.lat ) ) ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
+        moonParallacticAngle = math.degrees( math.atan2( y, x ) )
+#         if moonParallacticAngle < 0:
+#             moonParallacticAngle = moonParallacticAngle + 360.0
 
-        print( brightLimbAngle )
-        sys.exit()
-        return brightLimbAngle
+        A = brightLimbAngle - moonParallacticAngle
+        if A < 0:
+            A = A + 360.0
+
+#         print( brightLimbAngle )
+#         sys.exit()
+        return A
+
+
+    def convertHMSToDecimalDegrees( self, ra ):
+        t = tuple( str( ra ).split( ":" ) )
+        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) ) * 15.0
+        y = float( t[ 0 ] )
+        return math.copysign( x, y )
+
+
+    def convertDMSToDecimalDegrees( self, dec ):
+        t = tuple( str( dec ).split( ":" ) )
+        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
+        y = float( t[ 0 ] )
+        return math.copysign( x, y )
 
 
     def handleLeftClick( self, icon ):
