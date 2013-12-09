@@ -456,33 +456,6 @@ class IndicatorLunar:
         return planetSignName + " " + str( planetSignDegree ) + "° " + planetSignMinute + "'"
 
 
-    def createIconForLunarPhase( self, lunarPhase, illumination ):
-        if lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON:
-            svg = self.getNewMoonSVG()
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON:
-            svg = self.getFullMoonSVG()
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER or lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER:
-            svg = self.getQuarterMoonSVG( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER, self.showNorthernHemisphereView )
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or \
-            lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT or \
-            lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS or \
-            lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS:
-            svg = self.getCrescentGibbousMoonSVG(
-                illumination,
-                lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS,
-                self.showNorthernHemisphereView,
-                lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT )
-
-        try:
-            with open( IndicatorLunar.SVG_FILE, "w" ) as f:
-                f.write( svg )
-                f.close()
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
-
-
     # Compute the bright limb angle between the sun and a planetary body.
     # The angle is measured in degrees where zero degrees is a vertical line pointing "up" 
     # the angle is measured counter clockwise from this vertical line.
@@ -490,16 +463,17 @@ class IndicatorLunar:
     # Also need to "adjust" the bright limb angle for the observer and this is known as the parallactic angle.
     #
     # References:
-    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
     #  'Astronomical Algorithms' by Jean Meeus (chapters 14 and 48).
-    #
-    # Bright limb angle...
-    #  http://www.nightskynotebook.com/Moon.php
-    #  http://www.calsky.com/cs.cgi/Moon/6
+    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
     #
     # Bright limb angle adjusted for the parallactic angle...
+    #  http://www.geoastro.de/moonlibration/
     #  http://www.geoastro.de/SME/
     #  http://futureboy.us/fsp/moon.fsp
+    #
+    # Bright limb angle (not taking into account the parallactic angle)...
+    #  http://www.nightskynotebook.com/Moon.php
+    #  http://www.calsky.com/cs.cgi/Moon/6
     #
     # Other references...
     #  https://github.com/soniakeys/meeus
@@ -546,6 +520,33 @@ class IndicatorLunar:
         return math.copysign( x, y )
 
 
+    def createIconForLunarPhase( self, lunarPhase, illumination ):
+        if lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON:
+            svg = self.getNewMoonSVG()
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON:
+            svg = self.getFullMoonSVG()
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER or lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER:
+            svg = self.getQuarterMoonSVG( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER, self.showNorthernHemisphereView )
+        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or \
+            lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT or \
+            lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS or \
+            lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS:
+            svg = self.getCrescentGibbousMoonSVG(
+                illumination,
+                lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS,
+                self.showNorthernHemisphereView,
+                lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT )
+
+        try:
+            with open( IndicatorLunar.SVG_FILE, "w" ) as f:
+                f.write( svg )
+                f.close()
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
+
+
     def handleLeftClick( self, icon ):
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
 
@@ -565,7 +566,7 @@ class IndicatorLunar:
         commentPyEphem = "Calculations courtesy of PyEphem/XEphem."
         commentTropicalSign = "Tropical Sign by Ignius Drake."
         commentEclipse = "Eclipse information by Fred Espenak and Jean Meeus."
-        commentBrightLimb = "Bright Limb from 'Practical Astronomy with Your Calculator or Spreadsheet' by Peter Duffett-Smith and 'Astronomical Algorithms' by Jean Meeus."
+        commentBrightLimb = "Bright Limb from 'Astronomical Algorithms' by Jean Meeus."
         self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\n" +
                                   commentPyEphem + "\n\n" +
                                   commentTropicalSign + "\n\n" +
