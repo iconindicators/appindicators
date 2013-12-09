@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from Onboard.utils import brighten
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -177,18 +176,6 @@ class IndicatorLunar:
 
         city = ephem.city( self.cityName )
         city.date = ephemNow
-
-#         city = ephem.city( "London" )
-#         city.date = ephem.Date( "1992/04/12" )
-#         self.getBrightLimbAngle( ephem.Sun( city ), ephem.Moon( city ) )
-# 
-#         city = ephem.city( "London" )
-#         city.date = ephem.Date( "2003/09/01" )
-#         self.getBrightLimbAngle( ephem.Sun( city ), ephem.Moon( city ) )
-# 
-#         city = ephem.city( "London" )
-#         city.date = ephem.Date( "2003/11/22" )
-#         self.getBrightLimbAngle( ephem.Sun( city ), ephem.Mercury( city ) )
 
         lunarIlluminationPercentage = int( round( ephem.Moon( city ).phase ) )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
@@ -500,16 +487,17 @@ class IndicatorLunar:
     # The angle is measured in degrees where zero degrees is a vertical line pointing "up" 
     # the angle is measured counter clockwise from this vertical line.
     # Traditionally an angle is measured counter clockwise from a horizontal line to the right.
+    # Also need to "adjust" the bright limb angle for the observer and this is known as the parallactic angle.
     #
     # References:
     #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
-    #  'Astronomical Algorithms' by Jean Meeus (chapter 48).
+    #  'Astronomical Algorithms' by Jean Meeus (chapters 14 and 48).
     #
-    # Sites which match calculated values...
+    # Bright limb angle...
     #  http://www.nightskynotebook.com/Moon.php
     #  http://www.calsky.com/cs.cgi/Moon/6
     #
-    # Site which don't match...
+    # Bright limb angle adjusted for the parallactic angle...
     #  http://www.geoastro.de/SME/
     #  http://futureboy.us/fsp/moon.fsp
     #
@@ -517,62 +505,31 @@ class IndicatorLunar:
     #  https://github.com/soniakeys/meeus
     #  http://godoc.org/github.com/soniakeys/meeus
     #  https://sites.google.com/site/astronomicalalgorithms
+    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
+    #  https://github.com/brandon-rhodes/pyephem/issues/24
+    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
     def getBrightLimbAngle( self, city, body ):
-
-# References for moon RA/DEC as what PyEphem calculates is different to geoastro and futureboy.
-# http://stackoverflow.com/questions/16293146/pyephem-libnova-stellarium-jpl-horizons-disagree-on-moon-ra-dec
-# http://www.stargazing.net/mas/sheets.htm
-# http://oneau.wordpress.com/2010/07/04/astrometry-in-python-with-pyephem/
-
-#         if type( body ) != ephem.Moon:
-#             return 111
-
         sun = ephem.Sun( city )
 
-        sunRA = sun.ra
-        sunDec = sun.dec 
-        bodyRA = body.ra 
-        bodyDec = body.dec 
-
-#         print( "Sun RA | Dec: ", sunRA, sunDec )
-#         print( "Body RA | Dec: ", bodyRA, bodyDec )
-
-        sunRA = self.convertHMSToDecimalDegrees( sunRA )
-        sunDec = self.convertDMSToDecimalDegrees( sunDec )
-        bodyRA = self.convertHMSToDecimalDegrees( bodyRA )
-        bodyDec = self.convertDMSToDecimalDegrees( bodyDec )
-
-#         print( "Sun RA | Dec: ", sunRA, sunDec )
-#         print( "Body RA | Dec: ", bodyRA, bodyDec )
-
-        sunRA = math.radians( sunRA )
-        sunDec = math.radians( sunDec )
-        bodyRA = math.radians( bodyRA )
-        bodyDec = math.radians( bodyDec )
-
-#         print( "Sun RA | Dec: ", sunRA, sunDec )
-#         print( "Body RA | Dec: ", bodyRA, bodyDec )
+        sunRA = math.radians( self.convertHMSToDecimalDegrees( sun.ra ) )
+        sunDec = math.radians( self.convertDMSToDecimalDegrees( sun.dec ) )
+        bodyRA = math.radians( self.convertHMSToDecimalDegrees( body.ra ) )
+        bodyDec = math.radians( self.convertDMSToDecimalDegrees( body.dec ) )
 
         y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
         x = math.cos( bodyDec ) * math.sin( sunDec ) - math.sin( bodyDec ) * math.cos( sunDec ) * math.cos( sunRA - bodyRA )
         brightLimbAngle = math.degrees( math.atan2( y, x ) )
-#         if brightLimbAngle < 0:
-#             brightLimbAngle = brightLimbAngle + 360.0
 
-        hourAngle = math.radians( self.convertHMSToDecimalDegrees( city.sidereal_time() ) - self.convertHMSToDecimalDegrees( body.ra ) )
+        hourAngle = math.radians( self.convertHMSToDecimalDegrees( city.sidereal_time() ) ) - bodyRA
         y = math.sin( hourAngle )
         x = math.tan( math.radians( self.convertDMSToDecimalDegrees( city.lat ) ) ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
         moonParallacticAngle = math.degrees( math.atan2( y, x ) )
-#         if moonParallacticAngle < 0:
-#             moonParallacticAngle = moonParallacticAngle + 360.0
 
-        A = brightLimbAngle - moonParallacticAngle
-        if A < 0:
-            A = A + 360.0
+        brightLimbAngleAdjusted = brightLimbAngle - moonParallacticAngle
+        if brightLimbAngleAdjusted < 0:
+            brightLimbAngleAdjusted = brightLimbAngleAdjusted + 360.0
 
-#         print( brightLimbAngle )
-#         sys.exit()
-        return A
+        return brightLimbAngleAdjusted
 
 
     def convertHMSToDecimalDegrees( self, ra ):
