@@ -65,7 +65,7 @@ try:
 except:
     notifyImported = False
 
-import datetime, json, locale, logging, math, os, shutil, subprocess, sys
+import copy, datetime, json, locale, logging, math, os, shutil, subprocess, sys
 
 try:
     import ephem
@@ -320,10 +320,10 @@ class IndicatorLunar:
             [ "Neptune", ephem.Neptune( city ) ],
             [ "Pluto", ephem.Pluto( city ) ] ]
 
-        for planet in planets:
-            menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
-            self.createBodySubmenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
-            menu.append( menuItem )
+#         for planet in planets:
+#             menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
+#             self.createBodySubmenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
+#             menu.append( menuItem )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -441,8 +441,9 @@ class IndicatorLunar:
         epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
         ephemNowDate = str( ephemNow ).split( ' ' )
 
-        body.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
-        planetCoordinates = str( ephem.Ecliptic( body ).lon ).split( ":" )
+        bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
+        bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
+        planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
 
         if float( planetCoordinates[ 2 ] ) > 30:
             planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
@@ -482,19 +483,21 @@ class IndicatorLunar:
             logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
 
 
-    def convertHoursMinutesSecondsAsStringToDegreesAsDecimal( self, s ):
-        return self.__convertToDecimal( s ) * 15.0
+    def convertRightAscensionToDecimalDegrees( self, ra ):
+        t = tuple( str( ra ).split( ":" ) )
+        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) ) * 15.0
+        y = float( t[ 0 ] )
+        return math.copysign( x, y )
 
 
-    def convertDegreesMinutesSecondsAsStringToDecimal( self, s ):
-        return self.__convertToDecimal( s )
+    def convertDeclinationToDecimalDegrees( self, dec ):
+        t = tuple( str( dec ).split( ":" ) )
+        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
+        y = float( t[ 0 ] )
+        return math.copysign( x, y )
 
 
-    def __convertToDecimal( self, s ):
-        t = tuple( str( s ).split( ":" ) )
-        return math.copysign( abs( float( t[ 0 ] ) ) + ( ( float( t[ 1 ] ) + ( float( t[ 2 ] ) / 60.0 ) ) / 60.0 ), float( t[ 0 ] ) )
-
-    # Computes the bright limb angle between the sun and a planetary body.
+    # Compute the bright limb angle between the sun and a planetary body.
     # The angle is measured in degrees where zero degrees is a vertical line pointing "up" 
     # the angle is measured counter clockwise from this vertical line.
     # Traditionally an angle is measured counter clockwise from a horizontal line to the right.
@@ -505,8 +508,7 @@ class IndicatorLunar:
     #
     # Sites which match calculated values...
     #  http://www.nightskynotebook.com/Moon.php
-    #  http://www.calsky.com/cs.cgi
-    #  http://www.calsky.com/cs.cgi
+    #  http://www.calsky.com/cs.cgi/Moon/6
     #
     # Site which don't match...
     #  http://www.geoastro.de/SME/
@@ -518,66 +520,47 @@ class IndicatorLunar:
     #  https://sites.google.com/site/astronomicalalgorithms
     def getBrightLimbAngle( self, sun, body ):
 
-# From Jurgen:
-# 
-# The formulas used in my applet to compute the local zenith angle (ZA) of the 
-# Moon's bright limb are from the book of Jean Meeus: "Astronomical Algorithms", Willmann-Bell.
-# 
-# ZA = P - Q
-# 
-# P = position angle of the Moon's bright limb (chapter 46)
-# 
-# P = Math.atan2(Math.cos(K*decSun)*Math.sin(K*(alphaSun-alphaMoon)),Math.sin(K*decSun)*Math.cos(K*decMoon)-Math.cos(K*decSun)*Math.sin(K*decMoon)*Math.cos(K*(alphaSun-alphaMoon)))/K;
-# 
-# Q = parallactic angle of the Moon (chapter 13)
-# 
-# Q = Math.atan2(Math.sin(K*moonHourAngle),Math.tan(K*latitude)*Math.cos(K*moonDelta)-Math.sin(K*moonDelta)*Math.cos(K*moonHourAngle))/K; // northern latitude positive
-# 
-# moonHourAngle = THETA0(JD) + longitude - alphaMoon // eastern longitude positive
-# 
-# double THETA0(double JD) { // Greenwich Mean Sidereal Time
-#     double T = (JD-2451545.0)/36525.0;
-#     double x = 280.46061837 + 360.98564736629*(JD-2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;
-#     x = x % 360.0;
-#     if (x<0) x = x + 360.0;
-#     return x;
-# }
-# 
-# JD = Julian_Day(date, month, year, UT);
-# K = Math.PI/180.0;
-
 # References for moon RA/DEC as what PyEphem calculates is different to geoastro and futureboy.
 # http://stackoverflow.com/questions/16293146/pyephem-libnova-stellarium-jpl-horizons-disagree-on-moon-ra-dec
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
 # http://www.stargazing.net/mas/sheets.htm
 # http://oneau.wordpress.com/2010/07/04/astrometry-in-python-with-pyephem/
 
-        sunRA = math.radians( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( sun.ra ) )
-        sunDec = math.radians( self.convertDegreesMinutesSecondsAsStringToDecimal( sun.dec ) )
+        sunRA = sun.ra
+        sunDec = sun.dec 
+        bodyRA = body.ra 
+        bodyDec = body.dec 
 
-        bodyRA = math.radians( self.convertHoursMinutesSecondsAsStringToDegreesAsDecimal( body.ra ) )
-        bodyDec = math.radians( self.convertDegreesMinutesSecondsAsStringToDecimal( body.dec ) )
+        print( "Sun RA | Dec: ", sunRA, sunDec )
+        print( "Body RA | Dec: ", bodyRA, bodyDec )
 
-#         if type( body ) == ephem.Moon: 
-#             sunRA = math.radians( 255.0962 )
-#             sunDec = math.radians( -22.7283 )
-#             bodyRA = math.radians( 332.3121 )
-#             bodyDec = math.radians( -7.6118 )
+        sunRA = self.convertRightAscensionToDecimalDegrees( sunRA )
+        sunDec = self.convertDeclinationToDecimalDegrees( sunDec )
+        bodyRA = self.convertRightAscensionToDecimalDegrees( bodyRA )
+        bodyDec = self.convertDeclinationToDecimalDegrees( bodyDec )
+
+        print( "Sun RA | Dec: ", sunRA, sunDec )
+        print( "Body RA | Dec: ", bodyRA, bodyDec )
+
+        sunRA = math.radians( sunRA )
+        sunDec = math.radians( sunDec )
+        bodyRA = math.radians( bodyRA )
+        bodyDec = math.radians( bodyDec )
+
+        print( "Sun RA | Dec: ", sunRA, sunDec )
+        print( "Body RA | Dec: ", bodyRA, bodyDec )
 
         y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
         x = math.cos( bodyDec ) * math.sin( sunDec ) - math.sin( bodyDec ) * math.cos( sunDec ) * math.cos( sunRA - bodyRA )
 
         brightLimbAngle = math.degrees( math.atan2( y, x ) )
-
-        if type( body ) == ephem.Moon: 
-            print( brightLimbAngle )
+        print( brightLimbAngle )
 
         if brightLimbAngle < 0:
             brightLimbAngle = brightLimbAngle + 360.0
 
-        if type( body ) == ephem.Moon: 
-            print( brightLimbAngle )
-
+        print( brightLimbAngle )
+        sys.exit()
         return brightLimbAngle
 
 
