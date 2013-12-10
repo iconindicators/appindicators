@@ -996,6 +996,48 @@ class IndicatorLunar:
         return self.getSVGHeader( width ) + svg + self.getSVGFooter()
 
 
+    def getNonFullNewMoonSVG( self, illumination ):
+        radius = float( self.getMoonRadius() )
+        diameter = 2 * radius
+
+        # http://en.wikipedia.org/wiki/Crescent
+        if crescent:
+            ellipseRadiusX = radius * ( 1 - illumination / 50 )
+        else:
+            ellipseRadiusX = radius * ( illumination / 50 - 1 )
+
+        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
+#         if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
+#             sweepFlagCircle = str( 0 )
+#             sweepFlagEllipse = str( 1 ) if crescent else str( 0 )
+#         else:
+#             sweepFlagCircle = str( 1 )
+#             sweepFlagEllipse = str( 0 ) if crescent else str( 1 )
+
+        sweepFlagCircle = str( 0 )
+        sweepFlagEllipse = str( 0 )
+
+        if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
+            x = 50
+        else:
+            # Northern and waxing OR southern and waning...
+            if crescent:
+                x = ( 50 - radius )
+            else:
+                x = ( 50 - radius ) + abs( ellipseRadiusX ) # Gibbous
+
+        circle = 'a' + str( radius ) + ',' + str( radius ) + ' 0 0,' + sweepFlagCircle + ' 0,' + str( diameter )
+        ellipse = 'a' + str( ellipseRadiusX ) + ',' + str( radius ) + ' 0 0,' + sweepFlagEllipse + ' 0,-' + str( diameter )
+        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
+
+        if crescent:
+            width = radius + 2 * ( 50 - radius )
+        else:
+            width = radius + abs( ellipseRadiusX ) + 2 * ( 50 - radius ) # Gibbous
+
+        return self.getSVGHeader( width ) + svg + self.getSVGFooter()
+
+
     def getQuarterMoonSVG( self, first, northernHemisphere ):
         radius = float( self.getMoonRadius() )
         diameter = 2 * radius
