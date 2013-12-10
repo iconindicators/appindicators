@@ -997,6 +997,37 @@ class IndicatorLunar:
 
 
     def getNonFullNewMoonSVG( self, illumination ):
+
+#    // The shorter semidiameter of the inner ellipse.
+#    re = radius * (2 illumFraction - 1)
+# 
+#    ca = cos[angle]
+#    sa = sin[angle]
+# 
+#    if (filled)
+#       gp = new filledGeneralPath
+#    else
+#       gp = new GeneralPath
+# 
+#    // Draw outer limb
+#    gp.moveTo[radius ca + cx, -radius sa + cy]
+#    gp.circularArc[cx, cy, 180 degrees]
+# 
+#    // Draw inner ellipse
+#    for theta = -90 degrees to 90 degrees step 2 degrees
+#    {
+#       x = re cos[theta]
+#       y = radius sin[theta]
+# 
+#       yp = x ca - y sa + cy
+#       xp = x sa + y ca + cx
+#       gp.lineTo[xp,yp]
+#    }
+# 
+#    gp.close[]
+#    
+#    return gp
+        
         radius = float( self.getMoonRadius() )
         diameter = 2 * radius
 
