@@ -167,6 +167,7 @@ class IndicatorLunar:
 
 
     def main( self ):
+        self.createIconForLunarPhaseTest()
         self.update()
         Gtk.main()
 
@@ -492,24 +493,27 @@ class IndicatorLunar:
         hourAngle = math.radians( self.convertHMSToDecimalDegrees( city.sidereal_time() ) ) - bodyRA
         y = math.sin( hourAngle )
         x = math.tan( math.radians( self.convertDMSToDecimalDegrees( city.lat ) ) ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
-        moonParallacticAngle = math.degrees( math.atan2( y, x ) )
+        bodyParallacticAngle = math.degrees( math.atan2( y, x ) )
 
-        brightLimbAngleAdjusted = brightLimbAngle - moonParallacticAngle
+        brightLimbAngleAdjusted = brightLimbAngle - bodyParallacticAngle
         if brightLimbAngleAdjusted < 0:
             brightLimbAngleAdjusted += 360.0
 
+# TODO
+# Even though the numbers match up whether the brightLimbAngle and bodyParallacticAngle are adjusted before being combined or after,
+# I feel it's safer to adjust (add 360 to each if negative) before combining.
         if( type( body ) == ephem.Moon ):
             print("------------------------------------- ", datetime.datetime.now())
-            print( brightLimbAngle - moonParallacticAngle )
-            print( brightLimbAngleAdjusted )
+            print( "brightLimbAngle - bodyParallacticAngle =", brightLimbAngle - bodyParallacticAngle )
+            print( "brightLimbAngleAdjusted =", brightLimbAngleAdjusted )
 
             if brightLimbAngle < 0:
                 brightLimbAngle += 360.0
 
-            if moonParallacticAngle < 0:
-                moonParallacticAngle += 360.0
+            if bodyParallacticAngle < 0:
+                bodyParallacticAngle += 360.0
 
-            print( brightLimbAngle - moonParallacticAngle )
+            print( "brightLimbAngle (adjusted) - bodyParallacticAngle (adjusted) =", brightLimbAngle - bodyParallacticAngle )
 
         return brightLimbAngleAdjusted
 
@@ -551,6 +555,32 @@ class IndicatorLunar:
                 f.close()
 
         except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
+
+
+    def createIconForLunarPhaseTest( self ):
+        city = ephem.city( self.cityName )
+        city.date = ephem.now()
+        brightLimbAngle = self.getBrightLimbAngle( city, ephem.Moon( city ) )
+        
+#         svg = self.getNewMoonSVG()
+#         svg = self.getFullMoonSVG()
+#         svg = self.getQuarterMoonSVGNEW( brightLimbAngle )
+#         svg = self.getCrescentGibbousMoonSVG(
+#             illumination,
+#             lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS,
+#             self.showNorthernHemisphereView,
+#             lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT )
+
+        svg = self.getNonFullNewMoonSVG( illuminationPercentage = 10, brightLimbAngleInDegrees = 0 )
+        try:
+            with open( IndicatorLunar.SVG_FILE + "TEST", "w" ) as f:
+                f.write( svg )
+                f.close()
+
+        except Exception as e:
+            print( e )
             logging.exception( e )
             logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
 
@@ -996,7 +1026,7 @@ class IndicatorLunar:
         return self.getSVGHeader( width ) + svg + self.getSVGFooter()
 
 
-    def getNonFullNewMoonSVG( self, illumination ):
+    def getNonFullNewMoonSVG( self, illuminationPercentage, brightLimbAngleInDegrees ):
 
 #    // The shorter semidiameter of the inner ellipse.
 #    re = radius * (2 illumFraction - 1)
@@ -1027,44 +1057,20 @@ class IndicatorLunar:
 #    gp.close[]
 #    
 #    return gp
-        
+
         radius = float( self.getMoonRadius() )
         diameter = 2 * radius
 
-        # http://en.wikipedia.org/wiki/Crescent
-        if crescent:
-            ellipseRadiusX = radius * ( 1 - illumination / 50 )
-        else:
-            ellipseRadiusX = radius * ( illumination / 50 - 1 )
-
-        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-#         if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
-#             sweepFlagCircle = str( 0 )
-#             sweepFlagEllipse = str( 1 ) if crescent else str( 0 )
-#         else:
-#             sweepFlagCircle = str( 1 )
-#             sweepFlagEllipse = str( 0 ) if crescent else str( 1 )
-
+        ellipseRadiusX = radius * ( 1 - illuminationPercentage / 50 )
         sweepFlagCircle = str( 0 )
-        sweepFlagEllipse = str( 0 )
+        sweepFlagEllipse = str( 1 )
+        x = 50
 
-        if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
-            x = 50
-        else:
-            # Northern and waxing OR southern and waning...
-            if crescent:
-                x = ( 50 - radius )
-            else:
-                x = ( 50 - radius ) + abs( ellipseRadiusX ) # Gibbous
-
-        circle = 'a' + str( radius ) + ',' + str( radius ) + ' 0 0,' + sweepFlagCircle + ' 0,' + str( diameter )
-        ellipse = 'a' + str( ellipseRadiusX ) + ',' + str( radius ) + ' 0 0,' + sweepFlagEllipse + ' 0,-' + str( diameter )
+        circle = 'a' + str( radius ) + ' ' + str( radius ) + ' 0 0 ' + sweepFlagCircle + ' 0 ' + str( diameter )
+        ellipse = 'a' + str( ellipseRadiusX ) + ' ' + str( radius ) + ' 0 0 ' + sweepFlagEllipse + ' 0 -' + str( diameter )
         svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
 
-        if crescent:
-            width = radius + 2 * ( 50 - radius )
-        else:
-            width = radius + abs( ellipseRadiusX ) + 2 * ( 50 - radius ) # Gibbous
+        width = radius + 2 * ( 50 - radius )
 
         return self.getSVGHeader( width ) + svg + self.getSVGFooter()
 
@@ -1081,7 +1087,28 @@ class IndicatorLunar:
             x = 50
             sweepFlag = str( 0 )
 
-        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' a' + str( radius ) + ',' + str( radius ) + ' 0 0,' + sweepFlag + ' 0,' + str( diameter ) + ' z" fill="' + self.getColourForIconTheme() + '" />'
+        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' a' + str( radius ) + ' ' + str( radius ) + ' 0 0 ' + sweepFlag + ' 0 ' + str( diameter ) + ' z" fill="' + self.getColourForIconTheme() + '" />'
+        return self.getSVGHeader( ( 50 - radius ) + 50 ) + svg + self.getSVGFooter()
+
+
+#     TODO When creating a half cirlce using the arc construct, adding in a rotation doesn't show in the final picture.
+#     This could just be a bug with the image viewer...need to test with another image viewer program.
+    def getQuarterMoonSVGNEW( self, brightLimbAngle ):
+        print("sfsfkfsdklfjkdlfjsl" )
+        radius = float( self.getMoonRadius() )
+        diameter = 2 * radius
+
+        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
+#         if( first == True and northernHemisphere == True ) or ( first == False and northernHemisphere == False ):
+#             x = 50 - radius
+#             sweepFlag = str( 1 )
+#         else:
+#             x = 50
+#             sweepFlag = str( 0 )
+
+        x = 50
+        sweepFlag = str( 0 )
+        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' a' + str( radius ) + ',' + str( radius ) + ' ' + str( brightLimbAngle ) + ' 0,' + sweepFlag + ' 0,' + str( diameter ) + ' z" fill="' + self.getColourForIconTheme() + '" />'
         return self.getSVGHeader( ( 50 - radius ) + 50 ) + svg + self.getSVGFooter()
 
 
