@@ -42,6 +42,12 @@
 # Means the show phase/illumination options will disappear.
 # Format will be something like   [ICON] [MOON-PHASE] ([MOON-ILLUMINATION])
 
+
+# TODO
+# The icon is broken down into parts based on illumination - 100%, 0%, 50% and the rest.
+# Ensure that the name of the phase (say full moon) covers just 100% and not something like 98% onward.
+
+
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -212,7 +218,7 @@ class IndicatorLunar:
 
             Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
 
-        print( self.data )
+#         print( self.data )
 
 
     def buildMenu( self, city, ephemNow, lunarPhase ):
@@ -568,6 +574,77 @@ class IndicatorLunar:
         x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
         y = float( t[ 0 ] )
         return math.copysign( x, y )
+
+
+    def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees ):
+        # Size of view box.
+        width = 100
+        height = 100
+
+        # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
+        # A radius of 50 is too big and 25 is too small...so compute a radius half way between, based on the width/height of the viewing area.
+        radius = float ( str( ( width / 2 ) - ( ( width / 2 ) - ( width / 4 ) ) / 2 ) )
+
+        if illuminationPercentage == 0 or illuminationPercentage == 100:
+
+            svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
+
+            if illuminationPercentage == 0: # New
+                svg = svgStart + '" fill="none" stroke="' + self.getColourForIconTheme() + '" stroke-width="2" />'
+            else: # Full
+                svg = svgStart + '" fill="' + self.getColourForIconTheme() + '" />'
+        else:
+
+            svgStart = '<path d="M ' + str( width / 2 ) + ' ' + str( height / 2 ) + ' h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0'
+
+            svgEnd = ' transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="' + self.getColourForIconTheme() + '" />'
+
+            if illuminationPercentage == 50: # Quarter
+                svg = svgStart + '"' + svgEnd
+            elif illuminationPercentage < 50: # Crescent
+                svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( 50 - illuminationPercentage ) / 50.0 * radius ) + ' 0 0 0 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd 
+            else: # Gibbous
+                svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( illuminationPercentage - 50 ) / 50.0 * radius ) + ' 0 1 1 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd
+
+        header = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
+             '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
+
+        footer = '</svg>'
+
+        print( svg )
+        svg = header + svg + footer
+
+        try:
+            with open( IndicatorLunar.SVG_FILE, "w" ) as f:
+                f.write( svg )
+                f.close()
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
+
+
+    def getColourForIconTheme( self ):
+        iconTheme = self.getIconTheme()
+        if iconTheme is None:
+            return "#fff200" # Use hicolor as a default.
+
+        if iconTheme == "elementary":
+            return "#f4f4f4"
+
+        if iconTheme == "lubuntu":
+            return "#5a5a5a"
+
+        if iconTheme == "ubuntu-mono-dark":
+            return "#dfdbd2"
+
+        if iconTheme == "ubuntu-mono-light":
+            return "#3c3c3c"
+
+        return "#fff200" # Use hicolor as a default
+
+
+    def getIconTheme( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
     def handleLeftClick( self, icon ):
@@ -970,60 +1047,6 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
-
-
-    def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees ):
-        radius = float ( str( 50 - ( 50 - 25 ) / 2 ) ) # A radius of 50 is too big and 25 is too small, so choose half way!
-
-        if illuminationPercentage == 0: # New
-            svg = '<circle cx="50" cy="50" r="' + radius + '" fill="none" stroke="' + self.getColourForIconTheme() + '" stroke-width="2" />'
-        elif illuminationPercentage == 100: # Full
-            svg = '<circle cx="50" cy="50" r="' + radius + '" fill="' + self.getColourForIconTheme() + '" />'
-        elif illuminationPercentage == 50: # Quarter
-            svg = '<path d="M 50 50 h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0" fill="' + self.getColourForIconTheme() + '" />'
-        elif illuminationPercentage < 50: # Crescent
-            svg = '<path d="M 50 50 h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0 a ' + str( radius ) + ' ' + str( illuminationPercentage ) + ' 0 0 0 ' + str( radius * 2 * -1 ) + ' + 0" transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' 50 50)" fill="' + self.getColourForIconTheme() + '" />'
-        else: # Gibbous
-            svg = '<path d="M 50 50 h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0 a ' + str( radius ) + ' ' + str( illuminationPercentage - 50 ) + ' 0 1 1 ' + str( radius * 2 * -1 ) + ' + 0" transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' 50 50)" fill="' + self.getColourForIconTheme() + '" />'
-
-        header = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
-
-        footer = '</svg>'
-
-        svg = header + svg + footer
-
-        try:
-            with open( IndicatorLunar.SVG_FILE, "w" ) as f:
-                f.write( svg )
-                f.close()
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
-
-
-    def getColourForIconTheme( self ):
-        iconTheme = self.getIconTheme()
-        if iconTheme is None:
-            return "#fff200" # Use hicolor as a default.
-
-        if iconTheme == "elementary":
-            return "#f4f4f4"
-
-        if iconTheme == "lubuntu":
-            return "#5a5a5a"
-
-        if iconTheme == "ubuntu-mono-dark":
-            return "#dfdbd2"
-
-        if iconTheme == "ubuntu-mono-light":
-            return "#3c3c3c"
-
-        return "#fff200" # Use hicolor as a default
-
-
-    def getIconTheme( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
 class Eclipses:
