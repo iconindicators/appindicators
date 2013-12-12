@@ -167,7 +167,7 @@ class IndicatorLunar:
 
 
     def main( self ):
-        self.createIconForLunarPhaseTest()
+#         self.createIconForLunarPhaseTest()
         self.update()
         Gtk.main()
 
@@ -194,7 +194,7 @@ class IndicatorLunar:
             labelTooltip = ""
 
         # Set the icon/label handling the Unity and non-Unity cases...
-        self.createIconForLunarPhase( lunarPhase, lunarIlluminationPercentage )
+        self.createIconForLunarPhase( lunarPhase, lunarIlluminationPercentage, self.getBrightLimbAngle( city, ephem.Moon( city ) ) )
         if self.appindicatorImported:
             self.indicator.set_icon( IndicatorLunar.SVG_ICON )
             self.indicator.set_label( labelTooltip, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
@@ -502,18 +502,18 @@ class IndicatorLunar:
 # TODO
 # Even though the numbers match up whether the brightLimbAngle and bodyParallacticAngle are adjusted before being combined or after,
 # I feel it's safer to adjust (add 360 to each if negative) before combining.
-        if( type( body ) == ephem.Moon ):
-            print("------------------------------------- ", datetime.datetime.now())
-            print( "brightLimbAngle - bodyParallacticAngle =", brightLimbAngle - bodyParallacticAngle )
-            print( "brightLimbAngleAdjusted =", brightLimbAngleAdjusted )
-
-            if brightLimbAngle < 0:
-                brightLimbAngle += 360.0
-
-            if bodyParallacticAngle < 0:
-                bodyParallacticAngle += 360.0
-
-            print( "brightLimbAngle (adjusted) - bodyParallacticAngle (adjusted) =", brightLimbAngle - bodyParallacticAngle )
+#         if( type( body ) == ephem.Moon ):
+#             print("------------------------------------- ", datetime.datetime.now())
+#             print( "brightLimbAngle - bodyParallacticAngle =", brightLimbAngle - bodyParallacticAngle )
+#             print( "brightLimbAngleAdjusted =", brightLimbAngleAdjusted )
+# 
+#             if brightLimbAngle < 0:
+#                 brightLimbAngle += 360.0
+# 
+#             if bodyParallacticAngle < 0:
+#                 bodyParallacticAngle += 360.0
+# 
+#             print( "brightLimbAngle (adjusted) - bodyParallacticAngle (adjusted) =", brightLimbAngle - bodyParallacticAngle )
 
         return brightLimbAngleAdjusted
 
@@ -532,23 +532,24 @@ class IndicatorLunar:
         return math.copysign( x, y )
 
 
-    def createIconForLunarPhase( self, lunarPhase, illumination ):
-        if lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON:
-            svg = self.getNewMoonSVG()
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON:
-            svg = self.getFullMoonSVG()
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER or lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER:
-            svg = self.getQuarterMoonSVG( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER, self.showNorthernHemisphereView )
-        elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or \
-            lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT or \
-            lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS or \
-            lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS:
-            svg = self.getCrescentGibbousMoonSVG(
-                illumination,
-                lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS,
-                self.showNorthernHemisphereView,
-                lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT )
+    def createIconForLunarPhase( self, lunarPhase, illuminationPercentage, brightLimbAngleInDegrees ):
+#         if lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON:
+#             svg = self.getNewMoonSVG()
+#         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON:
+#             svg = self.getFullMoonSVG()
+#         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER or lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER:
+#             svg = self.getQuarterMoonSVG( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER, self.showNorthernHemisphereView )
+#         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or \
+#             lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT or \
+#             lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS or \
+#             lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS:
+#             svg = self.getCrescentGibbousMoonSVG(
+#                 illumination,
+#                 lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS,
+#                 self.showNorthernHemisphereView,
+#                 lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT )
 
+        svg = self.getSVG( illuminationPercentage, brightLimbAngleInDegrees )
         try:
             with open( IndicatorLunar.SVG_FILE, "w" ) as f:
                 f.write( svg )
@@ -1026,7 +1027,7 @@ class IndicatorLunar:
         return self.getSVGHeader( width ) + svg + self.getSVGFooter()
 
 
-    def getNonFullNewMoonSVG( self, illuminationPercentage, brightLimbAngleInDegrees ):
+    def getSVG( self, illuminationPercentage, brightLimbAngleInDegrees ):
 
 #    // The shorter semidiameter of the inner ellipse.
 #    re = radius * (2 illumFraction - 1)
@@ -1059,20 +1060,26 @@ class IndicatorLunar:
 #    return gp
 
         radius = float( self.getMoonRadius() )
-        diameter = 2 * radius
 
-        ellipseRadiusX = radius * ( 1 - illuminationPercentage / 50 )
-        sweepFlagCircle = str( 0 )
-        sweepFlagEllipse = str( 1 )
-        x = 50
+        if illuminationPercentage == 0: # New
+            svg = '<circle cx="50" cy="50" r="' + self.getMoonRadius() + '" fill="none" stroke="' + self.getColourForIconTheme() + '" stroke-width="2" />'
+        elif illuminationPercentage == 100: # Full
+            svg = '<circle cx="50" cy="50" r="' + self.getMoonRadius() + '" fill="' + self.getColourForIconTheme() + '" />'
+        elif illuminationPercentage == 50: # Quarter
+            svg = '<path d="M 50 50 h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0" fill="' + self.getColourForIconTheme() + '" />'
+        elif illuminationPercentage < 50: # Crescent
+            svg = '<path d="M 50 50 h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0 a ' + str( radius ) + ' ' + str( illuminationPercentage ) + ' 0 0 0 ' + str( radius * 2 * -1 ) + ' + 0" transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' 50 50)" fill="' + self.getColourForIconTheme() + '" />'
+        else: # Gibbous
+            svg = '<path d="M 50 50 h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0 a ' + str( radius ) + ' ' + str( illuminationPercentage - 50 ) + ' 0 1 1 ' + str( radius * 2 * -1 ) + ' + 0" transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' 50 50)" fill="' + self.getColourForIconTheme() + '" />'
 
-        circle = 'a' + str( radius ) + ' ' + str( radius ) + ' 0 0 ' + sweepFlagCircle + ' 0 ' + str( diameter )
-        ellipse = 'a' + str( ellipseRadiusX ) + ' ' + str( radius ) + ' 0 0 ' + sweepFlagEllipse + ' 0 -' + str( diameter )
-        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
-
-        width = radius + 2 * ( 50 - radius )
-
-        return self.getSVGHeader( width ) + svg + self.getSVGFooter()
+# <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">
+#   <path id="Gibbous"  d="M 50 50 h-37.5 a 37.5 37.5 0 0 1 75 0 a 37.5 28 0 1 1 -75 0" transform="rotate(-52 50 50)" fill="#dfdbd2" />
+# <!--
+#   <path id="Crescent" d="M 50 50 h-37.5 a 37.5 37.5 0 0 1 75 0 a 37.5 44 0 0 0 -75 0" transform="rotate(-52 50 50)" fill="#dfdbd2" />
+#   <path id="Half" d="M 50 50 h-37.5 a 37.5 37.5 0 0 1 75 0" fill="#dfdbd2" />
+# -->
+# TODO Remove width param from header
+        return self.getSVGHeader( 100 ) + svg + self.getSVGFooter()
 
 
     def getQuarterMoonSVG( self, first, northernHemisphere ):
