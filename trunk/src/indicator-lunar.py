@@ -37,15 +37,6 @@
 # So update at least once per hour or more frequently based on the rollover date/time of each body.
 
 
-#TODO
-# Bright limb...
-#
-# Need to modify the icon to rotate according to the moon bright limb angle.
-# No need to do this for full/new moon.
-#
-# Need to visually confirm with the moon, both south and north hemispheres!
-
-
 # TODO
 # Perhaps allow the user to specify the icon/text.
 # Means the show phase/illumination options will disappear.
@@ -167,7 +158,6 @@ class IndicatorLunar:
 
 
     def main( self ):
-#         self.createIconForLunarPhaseTest()
         self.update()
         Gtk.main()
 
@@ -194,7 +184,7 @@ class IndicatorLunar:
             labelTooltip = ""
 
         # Set the icon/label handling the Unity and non-Unity cases...
-        self.createIconForLunarPhase( lunarPhase, lunarIlluminationPercentage, self.getBrightLimbAngle( city, ephem.Moon( city ) ) )
+        self.createIcon( lunarIlluminationPercentage, self.getBrightLimbAngle( city, ephem.Moon( city ) ) )
         if self.appindicatorImported:
             self.indicator.set_icon( IndicatorLunar.SVG_ICON )
             self.indicator.set_label( labelTooltip, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
@@ -530,60 +520,6 @@ class IndicatorLunar:
         x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
         y = float( t[ 0 ] )
         return math.copysign( x, y )
-
-
-    def createIconForLunarPhase( self, lunarPhase, illuminationPercentage, brightLimbAngleInDegrees ):
-#         if lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON:
-#             svg = self.getNewMoonSVG()
-#         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON:
-#             svg = self.getFullMoonSVG()
-#         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER or lunarPhase == IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER:
-#             svg = self.getQuarterMoonSVG( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER, self.showNorthernHemisphereView )
-#         elif lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or \
-#             lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT or \
-#             lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS or \
-#             lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS:
-#             svg = self.getCrescentGibbousMoonSVG(
-#                 illumination,
-#                 lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS,
-#                 self.showNorthernHemisphereView,
-#                 lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT )
-
-        svg = self.getSVG( illuminationPercentage, brightLimbAngleInDegrees )
-        try:
-            with open( IndicatorLunar.SVG_FILE, "w" ) as f:
-                f.write( svg )
-                f.close()
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
-
-
-    def createIconForLunarPhaseTest( self ):
-        city = ephem.city( self.cityName )
-        city.date = ephem.now()
-        brightLimbAngle = self.getBrightLimbAngle( city, ephem.Moon( city ) )
-        
-#         svg = self.getNewMoonSVG()
-#         svg = self.getFullMoonSVG()
-#         svg = self.getQuarterMoonSVGNEW( brightLimbAngle )
-#         svg = self.getCrescentGibbousMoonSVG(
-#             illumination,
-#             lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS,
-#             self.showNorthernHemisphereView,
-#             lunarPhase == IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT or lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT )
-
-        svg = self.getNonFullNewMoonSVG( illuminationPercentage = 10, brightLimbAngleInDegrees = 0 )
-        try:
-            with open( IndicatorLunar.SVG_FILE + "TEST", "w" ) as f:
-                f.write( svg )
-                f.close()
-
-        except Exception as e:
-            print( e )
-            logging.exception( e )
-            logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
 
 
     def handleLeftClick( self, icon ):
@@ -988,83 +924,13 @@ class IndicatorLunar:
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
 
 
-    def getCrescentGibbousMoonSVG( self, illumination, waning, northernHemisphere, crescent ):
-        radius = float( self.getMoonRadius() )
-        diameter = 2 * radius
-
-        # http://en.wikipedia.org/wiki/Crescent
-        if crescent:
-            ellipseRadiusX = radius * ( 1 - illumination / 50 )
-        else:
-            ellipseRadiusX = radius * ( illumination / 50 - 1 )
-
-        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-        if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
-            sweepFlagCircle = str( 0 )
-            sweepFlagEllipse = str( 1 ) if crescent else str( 0 )
-        else:
-            sweepFlagCircle = str( 1 )
-            sweepFlagEllipse = str( 0 ) if crescent else str( 1 )
-
-        if( northernHemisphere == True and waning == True ) or ( northernHemisphere == False and waning == False ):
-            x = 50
-        else:
-            # Northern and waxing OR southern and waning...
-            if crescent:
-                x = ( 50 - radius )
-            else:
-                x = ( 50 - radius ) + abs( ellipseRadiusX ) # Gibbous
-
-        circle = 'a' + str( radius ) + ',' + str( radius ) + ' 0 0,' + sweepFlagCircle + ' 0,' + str( diameter )
-        ellipse = 'a' + str( ellipseRadiusX ) + ',' + str( radius ) + ' 0 0,' + sweepFlagEllipse + ' 0,-' + str( diameter )
-        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' ' + circle + ' ' + ellipse + ' " fill="' + self.getColourForIconTheme() + '" />'
-
-        if crescent:
-            width = radius + 2 * ( 50 - radius )
-        else:
-            width = radius + abs( ellipseRadiusX ) + 2 * ( 50 - radius ) # Gibbous
-
-        return self.getSVGHeader( width ) + svg + self.getSVGFooter()
-
-
-    def getSVG( self, illuminationPercentage, brightLimbAngleInDegrees ):
-
-#    // The shorter semidiameter of the inner ellipse.
-#    re = radius * (2 illumFraction - 1)
-# 
-#    ca = cos[angle]
-#    sa = sin[angle]
-# 
-#    if (filled)
-#       gp = new filledGeneralPath
-#    else
-#       gp = new GeneralPath
-# 
-#    // Draw outer limb
-#    gp.moveTo[radius ca + cx, -radius sa + cy]
-#    gp.circularArc[cx, cy, 180 degrees]
-# 
-#    // Draw inner ellipse
-#    for theta = -90 degrees to 90 degrees step 2 degrees
-#    {
-#       x = re cos[theta]
-#       y = radius sin[theta]
-# 
-#       yp = x ca - y sa + cy
-#       xp = x sa + y ca + cx
-#       gp.lineTo[xp,yp]
-#    }
-# 
-#    gp.close[]
-#    
-#    return gp
-
-        radius = float( self.getMoonRadius() )
+    def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees ):
+        radius = float ( str( 50 - ( 50 - 25 ) / 2 ) ) # A radius of 50 is too big and 25 is too small, so choose half way!
 
         if illuminationPercentage == 0: # New
-            svg = '<circle cx="50" cy="50" r="' + self.getMoonRadius() + '" fill="none" stroke="' + self.getColourForIconTheme() + '" stroke-width="2" />'
+            svg = '<circle cx="50" cy="50" r="' + radius + '" fill="none" stroke="' + self.getColourForIconTheme() + '" stroke-width="2" />'
         elif illuminationPercentage == 100: # Full
-            svg = '<circle cx="50" cy="50" r="' + self.getMoonRadius() + '" fill="' + self.getColourForIconTheme() + '" />'
+            svg = '<circle cx="50" cy="50" r="' + radius + '" fill="' + self.getColourForIconTheme() + '" />'
         elif illuminationPercentage == 50: # Quarter
             svg = '<path d="M 50 50 h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0" fill="' + self.getColourForIconTheme() + '" />'
         elif illuminationPercentage < 50: # Crescent
@@ -1072,72 +938,21 @@ class IndicatorLunar:
         else: # Gibbous
             svg = '<path d="M 50 50 h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0 a ' + str( radius ) + ' ' + str( illuminationPercentage - 50 ) + ' 0 1 1 ' + str( radius * 2 * -1 ) + ' + 0" transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' 50 50)" fill="' + self.getColourForIconTheme() + '" />'
 
-# <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">
-#   <path id="Gibbous"  d="M 50 50 h-37.5 a 37.5 37.5 0 0 1 75 0 a 37.5 28 0 1 1 -75 0" transform="rotate(-52 50 50)" fill="#dfdbd2" />
-# <!--
-#   <path id="Crescent" d="M 50 50 h-37.5 a 37.5 37.5 0 0 1 75 0 a 37.5 44 0 0 0 -75 0" transform="rotate(-52 50 50)" fill="#dfdbd2" />
-#   <path id="Half" d="M 50 50 h-37.5 a 37.5 37.5 0 0 1 75 0" fill="#dfdbd2" />
-# -->
-# TODO Remove width param from header
-        return self.getSVGHeader( 100 ) + svg + self.getSVGFooter()
+        header = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
 
+        footer = '</svg>'
 
-    def getQuarterMoonSVG( self, first, northernHemisphere ):
-        radius = float( self.getMoonRadius() )
-        diameter = 2 * radius
+        svg = header + svg + footer
 
-        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-        if( first == True and northernHemisphere == True ) or ( first == False and northernHemisphere == False ):
-            x = 50 - radius
-            sweepFlag = str( 1 )
-        else:
-            x = 50
-            sweepFlag = str( 0 )
+        try:
+            with open( IndicatorLunar.SVG_FILE, "w" ) as f:
+                f.write( svg )
+                f.close()
 
-        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' a' + str( radius ) + ' ' + str( radius ) + ' 0 0 ' + sweepFlag + ' 0 ' + str( diameter ) + ' z" fill="' + self.getColourForIconTheme() + '" />'
-        return self.getSVGHeader( ( 50 - radius ) + 50 ) + svg + self.getSVGFooter()
-
-
-#     TODO When creating a half cirlce using the arc construct, adding in a rotation doesn't show in the final picture.
-#     This could just be a bug with the image viewer...need to test with another image viewer program.
-    def getQuarterMoonSVGNEW( self, brightLimbAngle ):
-        print("sfsfkfsdklfjkdlfjsl" )
-        radius = float( self.getMoonRadius() )
-        diameter = 2 * radius
-
-        # http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-#         if( first == True and northernHemisphere == True ) or ( first == False and northernHemisphere == False ):
-#             x = 50 - radius
-#             sweepFlag = str( 1 )
-#         else:
-#             x = 50
-#             sweepFlag = str( 0 )
-
-        x = 50
-        sweepFlag = str( 0 )
-        svg = '<path d="M ' + str( x ) + ' 50 v-' + str( radius ) + ' a' + str( radius ) + ',' + str( radius ) + ' ' + str( brightLimbAngle ) + ' 0,' + sweepFlag + ' 0,' + str( diameter ) + ' z" fill="' + self.getColourForIconTheme() + '" />'
-        return self.getSVGHeader( ( 50 - radius ) + 50 ) + svg + self.getSVGFooter()
-
-
-    def getFullMoonSVG( self ):
-        svg = '<circle cx="50" cy="50" r="' + self.getMoonRadius() + '" fill="' + self.getColourForIconTheme() + '" />'
-        return self.getSVGHeader( 100 ) + svg + self.getSVGFooter()
-
-
-    def getNewMoonSVG( self ):
-        svg = '<circle cx="50" cy="50" r="' + self.getMoonRadius() + '" fill="none" stroke="' + self.getColourForIconTheme() + '" stroke-width="2" />'
-        return self.getSVGHeader( 100 ) + svg + self.getSVGFooter()
-
-
-    def getSVGHeader( self, width ):
-        return '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' + str( width ) + ' 100">'
-
-
-    def getSVGFooter( self ): return '</svg>'
-
-
-    def getMoonRadius( self ): return str( 50 - ( 50 - 25 ) / 2 ) # A radius of 50 is too big and 25 is too small, so choose half way!
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
 
 
     def getColourForIconTheme( self ):
