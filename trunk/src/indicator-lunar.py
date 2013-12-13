@@ -902,6 +902,7 @@ class IndicatorLunar:
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
             self.werewolfWarningTextSummary = summary.get_text()
             self.werewolfWarningTextBody = body.get_text()
+            self.useGTKStatusIcon = useGTKStatusIconCheckbox.get_active()
 
             self.cityName = cityValue
             _city_data[ self.cityName ] = ( str( latitudeValue ), str( longitudeValue ), float( elevationValue ) )
