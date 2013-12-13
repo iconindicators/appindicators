@@ -856,7 +856,7 @@ class IndicatorLunar:
 
         useGTKStatusIconCheckbox = Gtk.CheckButton( "Use GTK StatusIcon" )
         useGTKStatusIconCheckbox.set_active( self.useGTKStatusIcon )
-        useGTKStatusIconCheckbox.set_tooltip_text( "On older versions of *buntu, the icon/tooltip may not display correctly.\n\nUse this setting to use the GTK Status Icon indicator - requires indicator restart." )
+        useGTKStatusIconCheckbox.set_tooltip_text( "On older versions of *buntu, the icon/tooltip may not display correctly.\n\nThis setting will use the GTK Status Icon indicator - requires indicator restart." )
         grid.attach( useGTKStatusIconCheckbox, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "General" ) )
