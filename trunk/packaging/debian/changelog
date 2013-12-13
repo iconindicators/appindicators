@@ -8,6 +8,9 @@ indicator-lunar (1.0.29-1) precise; urgency=low
   * Increased the size of the werewolf summary/body text fields.
   * Modified the Tropical Sign function to use a copy of the body as downstream
     calculations were getting trashed!
+  * Put in a preference to use GTK Status Icon instead of AppIndicator.
+    On Lubuntu 12.04 it was found that AppIndicator would be created but the
+    tooltip would not render.  This preference lets the user fall back to GTK.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 2 Dec 2013 16:43:23 +1000
 
