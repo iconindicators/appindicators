@@ -675,14 +675,17 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
+        hbox = Gtk.Box( spacing = 6 )
+
         label = Gtk.Label( "Display pattern" )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 0, 1, 1 )
+        hbox.pack_start( label, False, False, 0 )
 
         displayPattern = Gtk.Entry()
         displayPattern.set_text( self.displayPattern )
         displayPattern.set_tooltip_text( "The text shown next to the icon (or tooltip where applicable)" )
-        grid.attach( displayPattern, 1, 0, 1, 1 )
+        hbox.pack_start( displayPattern, True, True, 0 )
+
+        grid.attach( hbox, 0, 0, 1, 1 )
 
         store = Gtk.ListStore( str, str ) # Tag, value.
         for key in sorted( self.data.keys() ):
@@ -700,7 +703,7 @@ class IndicatorLunar:
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( tree )
-        grid.attach( scrolledWindow, 0, 1, 2, 1 )
+        grid.attach( scrolledWindow, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
