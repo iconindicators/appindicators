@@ -820,6 +820,7 @@ class IndicatorLunar:
         grid.attach( label, 0, 1, 1, 1 )
 
         latitude = Gtk.Entry()
+        latitude.set_tooltip_text( "Latitude of your location in decimal degrees" )
         grid.attach( latitude, 1, 1, 1, 1 )
 
         label = Gtk.Label( "Longitude (DD)" )
@@ -827,6 +828,7 @@ class IndicatorLunar:
         grid.attach( label, 0, 2, 1, 1 )
 
         longitude = Gtk.Entry()
+        longitude.set_tooltip_text( "Longitude of your location in decimal degrees" )
         grid.attach( longitude, 1, 2, 1, 1 )
 
         label = Gtk.Label( "Elevation (m)" )
@@ -834,6 +836,7 @@ class IndicatorLunar:
         grid.attach( label, 0, 3, 1, 1 )
 
         elevation = Gtk.Entry()
+        elevation.set_tooltip_text( "Height in metres above sea level" )
         grid.attach( elevation, 1, 3, 1, 1 )
 
         city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
