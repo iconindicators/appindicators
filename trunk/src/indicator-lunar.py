@@ -544,6 +544,10 @@ class IndicatorLunar:
         return math.copysign( x, y )
 
 
+    # Creates an SVG icon file representing the moon given the illumination and bright limb angle.
+    #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
+    #    brightLimbAngleInDegrees The angle of the (adjusted) bright limb ranging from 0 to 360 inclusive.
+    #                             If the bright limb is None, a full moon will be rendered and saved to a full moon file (for the notification).
     def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees ):
         # Size of view box.
         width = 100
@@ -580,16 +584,16 @@ class IndicatorLunar:
 
         footer = '</svg>'
 
-        svg = header + svg + footer
-
+        if brightLimbAngleInDegrees is None: filename = IndicatorLunar.SVG_FULL_MOON_FILE
+        else: filename = IndicatorLunar.SVG_FILE
         try:
-            with open( IndicatorLunar.SVG_FILE, "w" ) as f:
-                f.write( svg )
+            with open( filename, "w" ) as f:
+                f.write( header + svg + footer )
                 f.close()
 
         except Exception as e:
             logging.exception( e )
-            logging.error( "Error writing SVG: " + IndicatorLunar.SVG_FILE )
+            logging.error( "Error writing SVG: " + filename )
 
 
     def getColourForIconTheme( self ):
@@ -674,7 +678,7 @@ class IndicatorLunar:
 
         displayPattern = Gtk.Entry()
         displayPattern.set_text( self.displayPattern )
-        displayPattern.set_tooltip_text( "The text shown next to the icon (or tooltip where applicable)" )
+        displayPattern.set_tooltip_text( "The text shown next to the icon (or tooltip, where applicable)" )
         hbox.pack_start( displayPattern, True, True, 0 )
 
         grid.attach( hbox, 0, 0, 1, 1 )
@@ -912,22 +916,15 @@ class IndicatorLunar:
 
 
     def onTestClicked( self, button, summary, body ):
-        try:
-            with open( IndicatorLunar.SVG_FULL_MOON_FILE, "w" ) as f:
-                f.write( self.getFullMoonSVG() )
-                f.close()
+        self.createIcon( 100, None )
 
-            # The notification summary text must not be empty (at least on Unity).
-            if summary.get_text() == "":
-                Notify.Notification.new( " ", body.get_text(), IndicatorLunar.SVG_FULL_MOON_FILE ).show()
-            else:
-                Notify.Notification.new( summary.get_text(), body.get_text(), IndicatorLunar.SVG_FULL_MOON_FILE ).show()
+        # The notification summary text must not be empty (at least on Unity).
+        if summary.get_text() == "":
+            Notify.Notification.new( " ", body.get_text(), IndicatorLunar.SVG_FULL_MOON_FILE ).show()
+        else:
+            Notify.Notification.new( summary.get_text(), body.get_text(), IndicatorLunar.SVG_FULL_MOON_FILE ).show()
 
-            os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
-
-        except Exception as e:
-            logging.exception( e )
-            self.showMessage( Gtk.MessageType.ERROR, "An error occurred - cannot show notification." )
+        os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
