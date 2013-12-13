@@ -498,7 +498,7 @@ class IndicatorLunar:
     # Compute the bright limb angle between the sun and a planetary body.
     # The angle is measured in degrees where zero degrees is a vertical line pointing "up" 
     # the angle is measured counter clockwise from this vertical line.
-    # Need to "adjust" the bright limb angle for the observer and this is known as the parallactic angle.
+    # The bright limb angle is then adjusted for the observer by an amount known as the parallactic angle.
     #
     # References:
     #  'Astronomical Algorithms' by Jean Meeus (chapters 14 and 48).
@@ -527,33 +527,15 @@ class IndicatorLunar:
         y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
         x = math.cos( bodyDec ) * math.sin( sunDec ) - math.sin( bodyDec ) * math.cos( sunDec ) * math.cos( sunRA - bodyRA )
         brightLimbAngle = math.degrees( math.atan2( y, x ) )
+        if brightLimbAngle < 0: brightLimbAngle += 360.0
 
         hourAngle = math.radians( self.convertHMSToDecimalDegrees( city.sidereal_time() ) ) - bodyRA
         y = math.sin( hourAngle )
         x = math.tan( math.radians( self.convertDMSToDecimalDegrees( city.lat ) ) ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
         bodyParallacticAngle = math.degrees( math.atan2( y, x ) )
+        if bodyParallacticAngle < 0: bodyParallacticAngle += 360.0
 
-        brightLimbAngleAdjusted = brightLimbAngle - bodyParallacticAngle
-        if brightLimbAngleAdjusted < 0:
-            brightLimbAngleAdjusted += 360.0
-
-# TODO
-# Even though the numbers match up whether the brightLimbAngle and bodyParallacticAngle are adjusted before being combined or after,
-# I feel it's safer to adjust (add 360 to each if negative) before combining.
-#         if( type( body ) == ephem.Moon ):
-#             print("------------------------------------- ", datetime.datetime.now())
-#             print( "brightLimbAngle - bodyParallacticAngle =", brightLimbAngle - bodyParallacticAngle )
-#             print( "brightLimbAngleAdjusted =", brightLimbAngleAdjusted )
-# 
-#             if brightLimbAngle < 0:
-#                 brightLimbAngle += 360.0
-# 
-#             if bodyParallacticAngle < 0:
-#                 bodyParallacticAngle += 360.0
-# 
-#             print( "brightLimbAngle (adjusted) - bodyParallacticAngle (adjusted) =", brightLimbAngle - bodyParallacticAngle )
-
-        return brightLimbAngleAdjusted
+        return brightLimbAngle - bodyParallacticAngle
 
 
     def convertHMSToDecimalDegrees( self, hms ):
