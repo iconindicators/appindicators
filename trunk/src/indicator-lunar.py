@@ -32,6 +32,13 @@
 # I've also noticed the VirtualBox indicator menu seems to stop responding over time too...maybe it's a related issue?
 
 
+# TODO
+# The tooltip does not appear properly on Lubuntu 12.04 (but is fine on 12.10).
+# The unity indicator is created (so self.appindicatorImported = True) but the tooltip doesn't appear.
+# However using Gtk.StatusIcon(), the tooltip (and icon) are all good.
+# Perhaps have a preference to let the user use the Gtk.StatusIcon() method instead?
+
+
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
