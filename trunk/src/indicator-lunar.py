@@ -37,10 +37,6 @@
 # So update at least once per hour or more frequently based on the rollover date/time of each body.
 
 
-# TODO
-# Maybe let the user specify the icon for particular body?
-
-
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -208,10 +204,6 @@ class IndicatorLunar:
             if self.werewolfWarningTextSummary == "":
                 summary = " "
 
-# TODO
-# The icon shown here will be whatever icon is currently rendered to the file system.
-# If we only show a moon icon then this icon should be a full moon.
-# But if we allow the user to display a non moon icon in the indicator, the icon for the notification will NOT be the full moon.
             Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
 
 
