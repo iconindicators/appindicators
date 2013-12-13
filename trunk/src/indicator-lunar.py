@@ -43,11 +43,6 @@
 # Format will be something like   [ICON] [MOON-PHASE] ([MOON-ILLUMINATION])
 
 
-# TODO
-# The icon is broken down into parts based on illumination - 100%, 0%, 50% and the rest.
-# Ensure that the name of the phase (say full moon) covers just 100% and not something like 98% onward.
-
-
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -446,33 +441,33 @@ class IndicatorLunar:
         return localtimeString[ 0 : localtimeString.rfind( ":" ) + 3 ]
 
 
-    def getLunarPhase( self, ephemNow, lunarIlluminationPercentage ):
+    def getLunarPhase( self, ephemNow, illuminationPercentage ):
         nextFullMoonDate = ephem.next_full_moon( ephemNow )
         nextNewMoonDate = ephem.next_new_moon( ephemNow )
         phase = None
         if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
             # Between a new moon and a full moon...
-            if( lunarIlluminationPercentage > 99 ):
+            if( illuminationPercentage > 99 ):
                 phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
-            elif lunarIlluminationPercentage <= 99 and lunarIlluminationPercentage > 50:
+            elif illuminationPercentage <= 99 and illuminationPercentage > 50:
                 phase = IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS
-            elif lunarIlluminationPercentage == 50:
+            elif illuminationPercentage == 50:
                 phase = IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER
-            elif lunarIlluminationPercentage < 50 and lunarIlluminationPercentage >= 1:
+            elif illuminationPercentage < 50 and illuminationPercentage >= 1:
                 phase = IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT
-            else: # lunarIlluminationPercentage < 1
+            else: # illuminationPercentage < 1
                 phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
         else:
             # Between a full moon and the next new moon...
-            if( lunarIlluminationPercentage > 99 ):
+            if( illuminationPercentage > 99 ):
                 phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
-            elif lunarIlluminationPercentage <= 99 and lunarIlluminationPercentage > 50:
+            elif illuminationPercentage <= 99 and illuminationPercentage > 50:
                 phase = IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS
-            elif lunarIlluminationPercentage == 50:
+            elif illuminationPercentage == 50:
                 phase = IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER
-            elif lunarIlluminationPercentage < 50 and lunarIlluminationPercentage >= 1:
+            elif illuminationPercentage < 50 and illuminationPercentage >= 1:
                 phase = IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT
-            else: # lunarIlluminationPercentage < 1
+            else: # illuminationPercentage < 1
                 phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
 
         return phase
