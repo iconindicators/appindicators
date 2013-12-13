@@ -38,9 +38,7 @@
 
 
 # TODO
-# Perhaps allow the user to specify the icon/text.
-# Means the show phase/illumination options will disappear.
-# Format will be something like   [ICON] [MOON-PHASE] ([MOON-ILLUMINATION])
+# Maybe let the user specify the icon for particular body?
 
 
 try:
@@ -92,12 +90,13 @@ class IndicatorLunar:
     SETTINGS_CITY_LATITUDE = "cityLatitude"
     SETTINGS_CITY_LONGITUDE = "cityLongitude"
     SETTINGS_CITY_NAME = "cityName"
+    SETTINGS_DISPLAY_PATTERN = "displayPattern"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
-    SETTINGS_SHOW_ILLUMINATION = "showIllumination"
-    SETTINGS_SHOW_PHASE = "showPhase"
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
     SETTINGS_WEREWOLF_WARNING_TEXT_BODY = "werewolfWarningTextBody"
     SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY = "werewolfWarningTextSummary"
+
+    DISPLAY_PATTERN_DEFAULT = "[MOON PHASE] [MOON ILLUMINATION]"
 
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
     LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
@@ -174,34 +173,31 @@ class IndicatorLunar:
 
         self.buildMenu( city, ephemNow, lunarPhase )
 
-#         print( self.data )
+        # Parse the display pattern and show it...
+        #
+        # For Ubuntu (Unity), an icon and label can co-exist and there is no tooltip. The icon is always to the right of the label.
+        # On Ubuntu 13.10 (might be a bug), an icon must be displayed, so if no icon tag is present, display a 1 pixel SVG.
+        #
+        # On non Unity (Lubuntu, etc), only an icon can be displayed - text is shown as a tooltip.
+        parsedOutput = self.displayPattern
+        for key in self.data.keys():
+            parsedOutput = parsedOutput.replace( "[" + key + "]", self.data[ key ] )
 
-        # Determine the content of the indicator (label, tooltip, etc).
-        if self.showIllumination and self.showPhase:
-            labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( lunarIlluminationPercentage ) + "%)"
-        elif self.showIllumination:
-            labelTooltip = str( lunarIlluminationPercentage ) + "%"
-        elif self.showPhase:
-            labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
-        else:
-            labelTooltip = ""
-
-        # Set the icon/label handling the Unity and non-Unity cases...
         self.createIcon( lunarIlluminationPercentage, self.getBrightLimbAngle( city, ephem.Moon( city ) ) )
         if self.appindicatorImported:
             self.indicator.set_icon( IndicatorLunar.SVG_ICON )
-            self.indicator.set_label( labelTooltip, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
+            self.indicator.set_label( parsedOutput, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
         else:
             self.statusicon.set_from_file( IndicatorLunar.SVG_FILE )
-            self.statusicon.set_tooltip_text( labelTooltip )
+            self.statusicon.set_tooltip_text( parsedOutput )
 
+        # Show the full moon notification if appropriate...
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-        # Show the full moon indicator when the user setting is enabled and the phase and illumination percentage are appropriate.
         if notifyImported and \
             self.showWerewolfWarning and \
             lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
@@ -212,6 +208,10 @@ class IndicatorLunar:
             if self.werewolfWarningTextSummary == "":
                 summary = " "
 
+# TODO
+# The icon shown here will be whatever icon is currently rendered to the file system.
+# If we only show a moon icon then this icon should be a full moon.
+# But if we allow the user to display a non moon icon in the indicator, the icon for the notification will NOT be the full moon.
             Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
 
 
@@ -675,13 +675,32 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showPhaseCheckbox = Gtk.CheckButton( "Show phase" )
-        showPhaseCheckbox.set_active( self.showPhase )
-        grid.attach( showPhaseCheckbox, 0, 0, 2, 1 )
+        label = Gtk.Label( "Display pattern" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 1, 1 )
 
-        showIlluminationCheckbox = Gtk.CheckButton( "Show illumination" )
-        showIlluminationCheckbox.set_active( self.showIllumination )
-        grid.attach( showIlluminationCheckbox, 0, 1, 2, 1 )
+        displayPattern = Gtk.Entry()
+        displayPattern.set_text( self.displayPattern )
+        displayPattern.set_tooltip_text( "The text shown next to the icon (or tooltip where applicable)" )
+        grid.attach( displayPattern, 1, 0, 1, 1 )
+
+        store = Gtk.ListStore( str, str ) # Tag, value.
+        for key in sorted( self.data.keys() ):
+            store.append( [ key, self.data[ key ] ] )
+
+        tree = Gtk.TreeView( store )
+        tree.set_hexpand( True )
+        tree.set_vexpand( True )
+        tree.append_column( Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 ) )
+        tree.append_column( Gtk.TreeViewColumn( "Value", Gtk.CellRendererText(), text = 1 ) )
+        tree.set_tooltip_text( "Double click to add a tag to the display pattern." )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        tree.connect( "row-activated", self.onTagDoubleClick, displayPattern )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( tree )
+        grid.attach( scrolledWindow, 0, 1, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
@@ -861,8 +880,7 @@ class IndicatorLunar:
                 elevation.grab_focus()
                 continue
 
-            self.showPhase = showPhaseCheckbox.get_active()
-            self.showIllumination = showIlluminationCheckbox.get_active()
+            self.displayPattern = displayPattern.get_text()
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
             self.werewolfWarningTextSummary = summary.get_text()
@@ -891,6 +909,11 @@ class IndicatorLunar:
 
         self.dialog.destroy()
         self.dialog = None
+
+
+    def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, displayPattern ):
+        model, treeiter = tree.get_selection().get_selected()
+        displayPattern.insert_text( "[" + model[ treeiter ][ 0 ] + "]", displayPattern.get_position() )
 
 
     def onTestClicked( self, button, summary, body ):
@@ -942,9 +965,8 @@ class IndicatorLunar:
 
     def loadSettings( self ):
         self.getDefaultCity()
+        self.displayPattern = IndicatorLunar.DISPLAY_PATTERN_DEFAULT
         self.showWerewolfWarning = True
-        self.showIllumination = True
-        self.showPhase = True
         self.werewolfWarningStartIlluminationPercentage = 100
         self.werewolfWarningTextBody = IndicatorLunar.WEREWOLF_WARNING_TEXT_BODY
         self.werewolfWarningTextSummary = IndicatorLunar.WEREWOLF_WARNING_TEXT_SUMMARY
@@ -959,9 +981,8 @@ class IndicatorLunar:
                 cityLatitude = settings.get( IndicatorLunar.SETTINGS_CITY_LATITUDE, _city_data.get( self.cityName )[ 0 ] )
                 cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
+                self.displayPattern = settings.get( IndicatorLunar.SETTINGS_DISPLAY_PATTERN, self.displayPattern )
                 self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
-                self.showIllumination = settings.get( IndicatorLunar.SETTINGS_SHOW_ILLUMINATION, self.showIllumination )
-                self.showPhase = settings.get( IndicatorLunar.SETTINGS_SHOW_PHASE, self.showPhase )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
                 self.werewolfWarningTextBody = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY, self.werewolfWarningTextBody )
                 self.werewolfWarningTextSummary = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY, self.werewolfWarningTextSummary )
@@ -1001,9 +1022,8 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
                 IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
+                IndicatorLunar.SETTINGS_DISPLAY_PATTERN: self.displayPattern,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
-                IndicatorLunar.SETTINGS_SHOW_ILLUMINATION: self.showIllumination,
-                IndicatorLunar.SETTINGS_SHOW_PHASE: self.showPhase,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY: self.werewolfWarningTextBody,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY: self.werewolfWarningTextSummary

@@ -3,6 +3,7 @@ indicator-lunar (1.0.29-1) precise; urgency=low
   * Added the bright limb angle for the moon and planets.  Thanks to
     'Astronomical Algorithms' by Jean Meeus (and Jürgen Giesen for pointers).
   * The icon is now rotated to reflect the bright limb angle!
+  * The icon text (tooltip) is fully configurable!
   * Changed the control file 'Depends' from Python to Python3.
   * Increased the size of the werewolf summary/body text fields.
   * Modified the Tropical Sign function to use a copy of the body as downstream
