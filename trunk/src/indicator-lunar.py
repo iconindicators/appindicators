@@ -94,7 +94,6 @@ class IndicatorLunar:
     SETTINGS_CITY_NAME = "cityName"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     SETTINGS_SHOW_ILLUMINATION = "showIllumination"
-    SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW = "showNorthernHemisphereView"
     SETTINGS_SHOW_PHASE = "showPhase"
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
     SETTINGS_WEREWOLF_WARNING_TEXT_BODY = "werewolfWarningTextBody"
@@ -175,6 +174,8 @@ class IndicatorLunar:
 
         self.buildMenu( city, ephemNow, lunarPhase )
 
+#         print( self.data )
+
         # Determine the content of the indicator (label, tooltip, etc).
         if self.showIllumination and self.showPhase:
             labelTooltip = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ] + " (" + str( lunarIlluminationPercentage ) + "%)"
@@ -212,8 +213,6 @@ class IndicatorLunar:
                 summary = " "
 
             Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
-
-#         print( self.data )
 
 
     def buildMenu( self, city, ephemNow, lunarPhase ):
@@ -601,12 +600,12 @@ class IndicatorLunar:
             else: # Gibbous
                 svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( illuminationPercentage - 50 ) / 50.0 * radius ) + ' 0 1 1 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd
 
-        header = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-             '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
+        header = '<?xml version="1.0" standalone="no"?>' \
+            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
 
         footer = '</svg>'
 
-        print( svg )
         svg = header + svg + footer
 
         try:
@@ -701,10 +700,6 @@ class IndicatorLunar:
         showIlluminationCheckbox = Gtk.CheckButton( "Show illumination" )
         showIlluminationCheckbox.set_active( self.showIllumination )
         grid.attach( showIlluminationCheckbox, 0, 1, 2, 1 )
-
-        showNorthernHemisphereViewCheckbox = Gtk.CheckButton( "Northern hemisphere view" )
-        showNorthernHemisphereViewCheckbox.set_active( self.showNorthernHemisphereView )
-        grid.attach( showNorthernHemisphereViewCheckbox, 0, 2, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
@@ -886,7 +881,6 @@ class IndicatorLunar:
 
             self.showPhase = showPhaseCheckbox.get_active()
             self.showIllumination = showIlluminationCheckbox.get_active()
-            self.showNorthernHemisphereView = showNorthernHemisphereViewCheckbox.get_active()
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
             self.werewolfWarningTextSummary = summary.get_text()
@@ -968,7 +962,6 @@ class IndicatorLunar:
         self.getDefaultCity()
         self.showWerewolfWarning = True
         self.showIllumination = True
-        self.showNorthernHemisphereView = True
         self.showPhase = True
         self.werewolfWarningStartIlluminationPercentage = 100
         self.werewolfWarningTextBody = IndicatorLunar.WEREWOLF_WARNING_TEXT_BODY
@@ -986,7 +979,6 @@ class IndicatorLunar:
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
                 self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
                 self.showIllumination = settings.get( IndicatorLunar.SETTINGS_SHOW_ILLUMINATION, self.showIllumination )
-                self.showNorthernHemisphereView = settings.get( IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW, self.showNorthernHemisphereView )
                 self.showPhase = settings.get( IndicatorLunar.SETTINGS_SHOW_PHASE, self.showPhase )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
                 self.werewolfWarningTextBody = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY, self.werewolfWarningTextBody )
@@ -1029,7 +1021,6 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
                 IndicatorLunar.SETTINGS_SHOW_ILLUMINATION: self.showIllumination,
-                IndicatorLunar.SETTINGS_SHOW_NORTHERN_HEMISPHERE_VIEW: self.showNorthernHemisphereView,
                 IndicatorLunar.SETTINGS_SHOW_PHASE: self.showPhase,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY: self.werewolfWarningTextBody,
