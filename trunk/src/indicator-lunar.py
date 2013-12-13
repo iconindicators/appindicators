@@ -32,11 +32,6 @@
 # I've also noticed the VirtualBox indicator menu seems to stop responding over time too...maybe it's a related issue?
 
 
-#TODO
-# Perhaps double check the frequency of updates...
-# So update at least once per hour or more frequently based on the rollover date/time of each body.
-
-
 try:
     from gi.repository import AppIndicator3 as appindicator
 except:
@@ -358,7 +353,7 @@ class IndicatorLunar:
 
         # Work out when to do the next update...
         # Need to pass an integer to GLib.timeout_add_seconds.
-        # Add a 10 second buffer because the update sometimes happened fractionally earlier (due to truncating the fractional time component).
+        # Add a 10 second buffer because the update can occur slightly earlier (due to truncating the fractional time component).
         nextUpdates.sort()
         nextUpdateInSeconds = int ( ( ephem.localtime( nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() ) + 10
         if nextUpdateInSeconds < 60: # Ensure the update period is positive and not too frequent...
