@@ -39,7 +39,7 @@ class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.14"
+    VERSION = "1.0.15"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -48,6 +48,9 @@ class IndicatorStardate:
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
+
+    COMMENTS = "Shows the current Star Trek™ stardate."
+    CREDITS = [ "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_SHOW_CLASSIC = "showClassic"
@@ -147,13 +150,15 @@ class IndicatorStardate:
             return
 
         self.dialog = Gtk.AboutDialog()
+        self.dialog.add_credit_section( "Credits", IndicatorStardate.CREDITS ) 
+        self.dialog.set_authors( [ IndicatorStardate.AUTHOR ] )
+        self.dialog.set_comments( IndicatorStardate.COMMENTS )
+        self.dialog.set_license_type( Gtk.License.GPL_3_0 )
+        self.dialog.set_logo_icon_name( IndicatorStardate.ICON )
         self.dialog.set_program_name( IndicatorStardate.NAME )
-        self.dialog.set_comments( IndicatorStardate.AUTHOR + "\n\nBased on STARDATES IN STAR TREK FAQ V1.6\n" )
+        self.dialog.set_version( IndicatorStardate.VERSION )
         self.dialog.set_website( IndicatorStardate.WEBSITE )
         self.dialog.set_website_label( IndicatorStardate.WEBSITE )
-        self.dialog.set_version( IndicatorStardate.VERSION )
-        self.dialog.set_license( IndicatorStardate.LICENSE )
-        self.dialog.set_icon_name( Gtk.STOCK_ABOUT )
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
