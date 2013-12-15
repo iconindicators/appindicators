@@ -59,6 +59,7 @@ class IndicatorPPADownloadStatistics:
     SERIES = [ "trusty", "saucy", "raring", "quantal", "precise", "oneiric", "natty", "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy", "gutsy", "feisty", "edgy", "dapper", "breezy", "hoary", "warty" ]
     ARCHITECTURES = [ "amd64", "i386" ]
 
+    COMMENTS = "Shows the total downloads of PPAs."
     SVG_ICON = "." + NAME + "-icon"
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
 
@@ -412,13 +413,14 @@ class IndicatorPPADownloadStatistics:
             return
 
         self.dialog = Gtk.AboutDialog()
+        self.dialog.set_authors( [ IndicatorPPADownloadStatistics.AUTHOR ] )
+        self.dialog.set_comments( IndicatorPPADownloadStatistics.COMMENTS )
+        self.dialog.set_license_type( Gtk.License.GPL_3_0 )
+        self.dialog.set_logo_icon_name( IndicatorPPADownloadStatistics.ICON )
         self.dialog.set_program_name( IndicatorPPADownloadStatistics.NAME )
-        self.dialog.set_comments( IndicatorPPADownloadStatistics.AUTHOR )
+        self.dialog.set_version( IndicatorPPADownloadStatistics.VERSION )
         self.dialog.set_website( IndicatorPPADownloadStatistics.WEBSITE )
         self.dialog.set_website_label( IndicatorPPADownloadStatistics.WEBSITE )
-        self.dialog.set_version( IndicatorPPADownloadStatistics.VERSION )
-        self.dialog.set_license( IndicatorPPADownloadStatistics.LICENSE )
-        self.dialog.set_icon_name( Gtk.STOCK_ABOUT )
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None

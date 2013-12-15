@@ -1,6 +1,7 @@
 indicator-ppa-download-statistics (1.0.28-1) precise; urgency=low
 
   * Added 'trusty' to list of series.
+  * Updated the About dialog to use Gtk+ 3.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 7 Dec 2013 18:55:42 +1000
 
