@@ -61,7 +61,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.30"
+    VERSION = "1.0.31"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -90,7 +90,6 @@ class IndicatorLunar:
     SETTINGS_CITY_NAME = "cityName"
     SETTINGS_DISPLAY_PATTERN = "displayPattern"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
-    SETTINGS_USE_GTK_STATUS_ICON = "useGTKStatusIcon"
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
     SETTINGS_WEREWOLF_WARNING_TEXT_BODY = "werewolfWarningTextBody"
     SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY = "werewolfWarningTextSummary"
@@ -135,41 +134,23 @@ class IndicatorLunar:
         if notifyImported:
             Notify.init( IndicatorLunar.NAME )
 
-        if not self.useGTKStatusIcon:
-            # Attempt to create an AppIndicator3...if it fails, default to a GTK indicator.
-            # I've found that on Lubuntu 12.04 the AppIndicator3 gets created but does not work properly...
-            # ...the icon cannot be updated dynamically and tooltip/label does not display.
-            # The workaround for this is to force the GTK indicator to be created (as per the except below) for Lubuntu 12.04.
-            # For now ignore Lubuntu 12.04 (and presumably Xubuntu 12.04)...
-            # ...if a user screams, put in an option to allow the user to specify which indicator type to use.
-            try:
-                self.appindicatorImported = True
-                self.indicator = appindicator.Indicator.new( IndicatorLunar.NAME, "", appindicator.IndicatorCategory.APPLICATION_STATUS )
-                self.indicator.set_icon_theme_path( os.getenv( "HOME" ) )
-                self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
-                self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
-            except Exception as e:
-                self.appindicatorImported = False
-                self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
-                self.statusicon = Gtk.StatusIcon()
-                self.statusicon.connect( "popup-menu", self.handleRightClick )
-                self.statusicon.connect( "activate", self.handleLeftClick )
-                logging.exception( e )
-                logging.info( "Unable to create AppIndicator - creating GTK Status Icon instead." )
-        else:
-            try:
-                self.appindicatorImported = False
-                self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
-                self.statusicon = Gtk.StatusIcon()
-                self.statusicon.connect( "popup-menu", self.handleRightClick )
-                self.statusicon.connect( "activate", self.handleLeftClick )
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Unable to create GTK Status Icon." )
-                dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Cannot create indicator." )
-                dialog.set_title( "indicator-lunar" )
-                dialog.run()
-                sys.exit()
+        # Create an AppIndicator3 indicator...if it fails, create a GTK indicator.
+        # On Lubuntu 12.04 the AppIndicator3 is created (the icon displays).
+        # However, the tooltip does not display and text cannot be written to the label next to the icon.
+        try:
+            self.appindicatorImported = True
+            self.indicator = appindicator.Indicator.new( IndicatorLunar.NAME, "", appindicator.IndicatorCategory.APPLICATION_STATUS )
+            self.indicator.set_icon_theme_path( os.getenv( "HOME" ) )
+            self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
+            self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
+        except Exception as e:
+            logging.exception( e )
+            logging.info( "Unable to create AppIndicator - creating GTK Status Icon instead." )
+            self.appindicatorImported = False
+            self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
+            self.statusicon = Gtk.StatusIcon()
+            self.statusicon.connect( "popup-menu", self.handleRightClick )
+            self.statusicon.connect( "activate", self.handleLeftClick )
 
 
     def main( self ):
@@ -856,11 +837,6 @@ class IndicatorLunar:
         autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
         grid.attach( autostartCheckbox, 0, 0, 1, 1 )
 
-        useGTKStatusIconCheckbox = Gtk.CheckButton( "Use GTK StatusIcon" )
-        useGTKStatusIconCheckbox.set_active( self.useGTKStatusIcon )
-        useGTKStatusIconCheckbox.set_tooltip_text( "On older versions of *buntu, the icon/tooltip may not display correctly.\n\nThis setting will use the GTK Status Icon indicator - requires indicator restart." )
-        grid.attach( useGTKStatusIconCheckbox, 0, 1, 1, 1 )
-
         notebook.append_page( grid, Gtk.Label( "General" ) )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
@@ -904,7 +880,6 @@ class IndicatorLunar:
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
             self.werewolfWarningTextSummary = summary.get_text()
             self.werewolfWarningTextBody = body.get_text()
-            self.useGTKStatusIcon = useGTKStatusIconCheckbox.get_active()
 
             self.cityName = cityValue
             _city_data[ self.cityName ] = ( str( latitudeValue ), str( longitudeValue ), float( elevationValue ) )
@@ -980,7 +955,6 @@ class IndicatorLunar:
         self.getDefaultCity()
         self.displayPattern = IndicatorLunar.DISPLAY_PATTERN_DEFAULT
         self.showWerewolfWarning = True
-        self.useGTKStatusIcon = False
         self.werewolfWarningStartIlluminationPercentage = 100
         self.werewolfWarningTextBody = IndicatorLunar.WEREWOLF_WARNING_TEXT_BODY
         self.werewolfWarningTextSummary = IndicatorLunar.WEREWOLF_WARNING_TEXT_SUMMARY
@@ -997,7 +971,6 @@ class IndicatorLunar:
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
                 self.displayPattern = settings.get( IndicatorLunar.SETTINGS_DISPLAY_PATTERN, self.displayPattern )
                 self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
-                self.useGTKStatusIcon = settings.get( IndicatorLunar.SETTINGS_USE_GTK_STATUS_ICON, self.useGTKStatusIcon )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
                 self.werewolfWarningTextBody = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY, self.werewolfWarningTextBody )
                 self.werewolfWarningTextSummary = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY, self.werewolfWarningTextSummary )
@@ -1039,7 +1012,6 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
                 IndicatorLunar.SETTINGS_DISPLAY_PATTERN: self.displayPattern,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
-                IndicatorLunar.SETTINGS_USE_GTK_STATUS_ICON: self.useGTKStatusIcon,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY: self.werewolfWarningTextBody,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY: self.werewolfWarningTextSummary

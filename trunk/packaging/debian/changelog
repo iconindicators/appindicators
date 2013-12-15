@@ -1,3 +1,11 @@
+indicator-lunar (1.0.31-1) precise; urgency=low
+
+  * Remove the option to run using GTK StatusIcon.  Was causing the indicator to
+    run with appearing if running on a system which fully supports AppIndicator3.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 15 Dec 2013 15:37:43 +1000
+
+
 indicator-lunar (1.0.30-1) precise; urgency=low
 
   * Updated the About dialog to use Gtk+ 3.
