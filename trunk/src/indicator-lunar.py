@@ -61,7 +61,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.29"
+    VERSION = "1.0.30"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -73,6 +73,13 @@ class IndicatorLunar:
     SVG_ICON = "." + NAME + "-illumination-icon"
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
     SVG_FULL_MOON_FILE = os.getenv( "HOME" ) + "/" + "." + NAME + "-fullmoon-icon" + ".svg"
+
+    COMMENTS = "Shows the moon phase and other astronomical information."
+    CREDIT_BRIGHT_LIMB = "Bright Limb from 'Astronomical Algorithms' by Jean Meeus."
+    CREDIT_ECLIPSE = "Eclipse information by Fred Espenak and Jean Meeus."
+    CREDIT_PYEPHEM = "Calculations courtesy of PyEphem/XEphem."
+    CREDIT_TROPICAL_SIGN = "Tropical Sign by Ignius Drake."
+    CREDITS = [ CREDIT_PYEPHEM, CREDIT_ECLIPSE, CREDIT_TROPICAL_SIGN, CREDIT_BRIGHT_LIMB ]
 
     INDENT = "    "
 
@@ -646,23 +653,15 @@ class IndicatorLunar:
             return
 
         self.dialog = Gtk.AboutDialog()
+        self.dialog.add_credit_section( "Credits", IndicatorLunar.CREDITS ) 
+        self.dialog.set_authors( [ IndicatorLunar.AUTHOR ] )
+        self.dialog.set_comments( IndicatorLunar.COMMENTS )
+        self.dialog.set_license_type( Gtk.License.GPL_3_0 )
+        self.dialog.set_logo_icon_name( IndicatorLunar.ICON )
         self.dialog.set_program_name( IndicatorLunar.NAME )
-
-        commentPyEphem = "Calculations courtesy of PyEphem/XEphem."
-        commentTropicalSign = "Tropical Sign by Ignius Drake."
-        commentEclipse = "Eclipse information by Fred Espenak and Jean Meeus."
-        commentBrightLimb = "Bright Limb from 'Astronomical Algorithms' by Jean Meeus."
-        self.dialog.set_comments( IndicatorLunar.AUTHOR + "\n\n" +
-                                  commentPyEphem + "\n\n" +
-                                  commentTropicalSign + "\n\n" +
-                                  commentEclipse + "\n\n" +
-                                  commentBrightLimb )
-
+        self.dialog.set_version( IndicatorLunar.VERSION )
         self.dialog.set_website( IndicatorLunar.WEBSITE )
         self.dialog.set_website_label( IndicatorLunar.WEBSITE )
-        self.dialog.set_version( IndicatorLunar.VERSION )
-        self.dialog.set_license( IndicatorLunar.LICENSE )
-        self.dialog.set_icon_name( Gtk.STOCK_ABOUT )
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
