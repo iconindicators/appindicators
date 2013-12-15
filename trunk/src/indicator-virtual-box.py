@@ -33,7 +33,7 @@
 # Have noticed that if a VM exists in a group and there is another VM of the same name but not in a group
 # and the group is then ungrouped, the VirtualBox UI doesn't handle it well...
 # ...the UI keeps the group and the VM within it (but removes all unique VMs from the group).
-# The VirtualBox.xml file does seem to reflect the change and so the indicator obeys this file.
+# The VirtualBox.xml file does seem to reflect the change (and the indicator obeys this file).
 
 
 try:
@@ -50,7 +50,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.23"
+    VERSION = "1.0.24"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -61,6 +61,8 @@ class IndicatorVirtualBox:
     DESKTOP_FILE = NAME + ".desktop"
     VIRTUAL_BOX_CONFIGURATION = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
     VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS = 5
+
+    COMMENTS = " Shows VirtualBox™ virtual machines and allows them to be started."
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_DELAY_BETWEEN_AUTO_START = "delayBetweenAutoStart"
@@ -717,13 +719,14 @@ class IndicatorVirtualBox:
             return
 
         self.dialog = Gtk.AboutDialog()
+        self.dialog.set_authors( [ IndicatorVirtualBox.AUTHOR ] )
+        self.dialog.set_comments( IndicatorVirtualBox.COMMENTS )
+        self.dialog.set_license_type( Gtk.License.GPL_3_0 )
+        self.dialog.set_logo_icon_name( IndicatorVirtualBox.ICON )
         self.dialog.set_program_name( IndicatorVirtualBox.NAME )
-        self.dialog.set_comments( IndicatorVirtualBox.AUTHOR )
+        self.dialog.set_version( IndicatorVirtualBox.VERSION )
         self.dialog.set_website( IndicatorVirtualBox.WEBSITE )
         self.dialog.set_website_label( IndicatorVirtualBox.WEBSITE )
-        self.dialog.set_version( IndicatorVirtualBox.VERSION )
-        self.dialog.set_license( IndicatorVirtualBox.LICENSE )
-        self.dialog.set_icon_name( Gtk.STOCK_ABOUT )
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
