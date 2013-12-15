@@ -48,10 +48,8 @@ class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
-    VERSION = "1.0.4"
-
+    VERSION = "1.0.5"
     ICON = NAME
-    LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -61,6 +59,8 @@ class IndicatorFortune:
 
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
     NOTIFICATION_SUMMARY = "Fortune. . ."
+
+    COMMENTS = "Calls the 'fortune' program and shows the result in the on-screen notification."
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_FORTUNES = "fortunes"
@@ -202,15 +202,16 @@ class IndicatorFortune:
         if self.dialog is not None:
             self.dialog.present()
             return
- 
+
         self.dialog = Gtk.AboutDialog()
+        self.dialog.set_authors( [ IndicatorFortune.AUTHOR ] )
+        self.dialog.set_comments( IndicatorFortune.COMMENTS )
+        self.dialog.set_license_type( Gtk.License.GPL_3_0 )
+        self.dialog.set_logo_icon_name( IndicatorFortune.ICON )
         self.dialog.set_program_name( IndicatorFortune.NAME )
-        self.dialog.set_comments( IndicatorFortune.AUTHOR )
+        self.dialog.set_version( IndicatorFortune.VERSION )
         self.dialog.set_website( IndicatorFortune.WEBSITE )
         self.dialog.set_website_label( IndicatorFortune.WEBSITE )
-        self.dialog.set_version( IndicatorFortune.VERSION )
-        self.dialog.set_license( IndicatorFortune.LICENSE )
-        self.dialog.set_icon_name( Gtk.STOCK_ABOUT )
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None

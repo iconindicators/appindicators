@@ -1,3 +1,10 @@
+indicator-fortune (1.0.5-1) precise; urgency=low
+
+  * Updated the About dialog to use Gtk+ 3.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 15 Dec 2013 11:44:52 +1000
+ 
+ 
 indicator-fortune (1.0.4-1) precise; urgency=low
 
   * Capitalised menu items.
