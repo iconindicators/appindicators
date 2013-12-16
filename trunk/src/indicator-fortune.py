@@ -202,7 +202,7 @@ class IndicatorFortune:
         if self.dialog is not None:
             self.dialog.present()
             return
-        print(self.getChangeLog())
+
         self.dialog = AboutDialogWithChangeLog( 
                IndicatorFortune.NAME,
                IndicatorFortune.COMMENTS, 
