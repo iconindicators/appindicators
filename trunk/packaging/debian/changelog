@@ -1,5 +1,12 @@
 indicator-ppa-download-statistics (1.0.28-1) precise; urgency=low
 
+  * Created a new About dialog showing the changelog.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 17 Dec 2013 00:13:45 +1000
+
+
+indicator-ppa-download-statistics (1.0.28-1) precise; urgency=low
+
   * Added 'trusty' to list of series.
   * Updated the About dialog to use Gtk+ 3.
 
@@ -10,8 +17,8 @@ indicator-ppa-download-statistics (1.0.27-1) precise; urgency=low
 
   * Changed text/tooltip for checkbox to open a PPA in a browser.
   * In Ubuntu 13.10 the initial value set by the spinner adjustment was not
-    appearing in the spinner field. Need to force the initial value by explicitly
-    setting it.
+    appearing in the spinner field. Need to force the initial value by
+    explicitly setting it.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 1 Nov 2013 11:07:09 +1000
 
@@ -26,11 +33,12 @@ indicator-ppa-download-statistics (1.0.26-1) precise; urgency=low
 
 indicator-ppa-download-statistics (1.0.25-1) precise; urgency=low
 
-  * Added a new message type when PPAs are combined.  When anything other than
-    statistics appear in the resultset, write out a warning message to the user
-    so the user can uncombine PPAs to see individual messages.
+  * Added a new message type when PPAs are combined.  When anything other
+    than statistics appear in the resultset, write out a warning message to
+    the user so the user can uncombine PPAs to see individual messages.
   * Added all series of Ubuntu (including those no longer supported).
-  * Only create the log file when needed.  Thanks to dvrc (dvrc.contact@gmail.com).
+  * Only create the log file when needed.
+    Thanks to dvrc (dvrc.contact@gmail.com).
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 5 Jul 2013 20:19:17 +1000
 
@@ -48,8 +56,8 @@ indicator-ppa-download-statistics (1.0.23-1) precise; urgency=low
 
   * Now logs to a file in the user's HOME directory.
   * Attempt to bring about/preferences to front.
-  * Placed autostart preference at bottom of preferences dialog to be consistent
-    with other indicators.
+  * Placed autostart preference at bottom of preferences dialog to be
+    consistent with other indicators.
   * Removed redundant onAutoStart function.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 4 Apr 2013 09:31:37 +1000
@@ -91,8 +99,8 @@ indicator-ppa-download-statistics (1.0.19-1) precise; urgency=low
 
 indicator-ppa-download-statistics (1.0.18-1) precise; urgency=low
 
-  * Using threads for each statistic sometimes results in the package names being
-    out of (alphabetical) order...now fixed.
+  * Using threads for each statistic sometimes results in the package names
+    being out of (alphabetical) order...now fixed.
   * Added logging to exceptions.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 20 Dec 2012 13:17:50 +1000
@@ -102,7 +110,7 @@ indicator-ppa-download-statistics (1.0.17-1) precise; urgency=low
 
   * Fixed the add/edit PPA dialog to show the correct title (was erroneously
     showing "Preferences").
-  * Uses multiple threads to do the download...now significantly faster! 
+  * Uses multiple threads to do the download...now significantly faster!
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 18 Dec 2012 23:19:22 +1000
 
@@ -120,24 +128,25 @@ indicator-ppa-download-statistics (1.0.16-1) precise; urgency=low
 indicator-ppa-download-statistics (1.0.15-1) precise; urgency=low
 
   * Modified the download counts for architecture independent binary packages.
-    If a binary package exists in two (or more) places but has different versions,
-    the download count for each binary package is counted (for the first instance
-    of a given version number).  This means that different versions are treated as
-    separate packages but are still combined under the common name.
+    If a binary package exists in two (or more) places but has different
+    versions, the download count for each binary package is counted (for the
+    first instance of a given version number).  This means that different
+    versions are treated as separate packages but are still combined under
+    the common name.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 27 Nov 2012 22:28:25 +1000
 
 
 indicator-ppa-download-statistics (1.0.14-1) precise; urgency=low
 
-  * Add a combine PPA option which combines the statistics when the PPA user/name
-    are the same.
+  * Add a combine PPA option which combines the statistics when the PPA
+    user/name are the same.
     If a published binary is architecture specific (such as compiled C), the
     download count is summed across all instances of that published binary.
     If a published binary is not architecture specific (such as Python), the
     download count is not summed (as it is assumed to be the same binary).
-    The version number is retained only if it is identical across all instances of
-    a published binary.
+    The version number is retained only if it is identical across all
+    instances of a published binary.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 22 Nov 2012 10:49:03 +1000
 
@@ -151,7 +160,8 @@ indicator-ppa-download-statistics (1.0.13-1) precise; urgency=low
 
 indicator-ppa-download-statistics (1.0.12-1) precise; urgency=low
 
-  * Was only updating the menu for a specific case in the preferences...now fixed!
+  * Was only updating the menu for a specific case in the preferences - now
+    fixed!
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 19 Nov 2012 16:31:59 +1000
 
@@ -159,10 +169,10 @@ indicator-ppa-download-statistics (1.0.12-1) precise; urgency=low
 indicator-ppa-download-statistics (1.0.11-1) precise; urgency=low
 
   * Added python3-gi to debian/control Depends (for Precise support).
-  * Swapped out python-appindicator for gir1.2-appindicator3-0.1 in debian/control
-    Depends.
-  * Simpler handling for creating the indicator - should hopefully sustain more
-    enviroments. 
+  * Swapped out python-appindicator for gir1.2-appindicator3-0.1 in
+    debian/control Depends.
+  * Simpler handling for creating the indicator - should hopefully sustain
+    more enviroments. 
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 16 Nov 2012 10:26:05 +1000
 
@@ -170,9 +180,9 @@ indicator-ppa-download-statistics (1.0.11-1) precise; urgency=low
 indicator-ppa-download-statistics (1.0.10-1) precise; urgency=low
 
   * Changes for Python3 and PyGObject.
-  * Dropped requirement for launchpadlib - now makes a direct call for statistics.
-    Many thanks to Barry Warsaw (https://launchpad.net/~barry) for the suggestion
-    and pointers in the right direction!
+  * Dropped requirement for launchpadlib - now makes a direct call for
+    statistics.  Many thanks to Barry Warsaw (https://launchpad.net/~barry)
+    for the suggestion and pointers in the right direction!
   * Added raring to series list and removed unsupported series.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 24 Oct 2012 22:40:33 +1000
@@ -180,10 +190,12 @@ indicator-ppa-download-statistics (1.0.10-1) precise; urgency=low
 
 indicator-ppa-download-statistics (1.0.9-1) precise; urgency=low
 
-  * Constant removing/adding of menu items was leaking memory, so combined menu
-    build/rebuild methods.  Still get the (presumed benign) warning "Trying to 
-    remove a child that doesn't believe we're it's parent" warning.
-  * Now logs in once to LaunchPad - each login uses an excessive amount of memory.
+  * Constant removing/adding of menu items was leaking memory, so combined
+    menu build/rebuild methods.  Still get the (presumed benign) warning
+    "Trying to remove a child that doesn't believe we're it's parent"
+    warning.
+  * Now logs in once to LaunchPad - each login uses an excessive amount of
+    memory.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 26 Aug 2012 16:02:52 +1000
 
@@ -198,7 +210,8 @@ indicator-ppa-download-statistics (1.0.8-1) precise; urgency=low
 indicator-ppa-download-statistics (1.0.7-1) precise; urgency=low
 
   * Add/Edit of PPAs shows current PPA owners/names to save typing.
-  * Selecting a PPA or PPA child from the menu launches the browser to the PPA page.
+  * Selecting a PPA or PPA child from the menu launches the browser to the PPA
+    page.
   * Preferences now contained within a dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 9 Aug 2012 16:19:39 +1000
@@ -221,7 +234,8 @@ indicator-ppa-download-statistics (1.0.5-1) precise; urgency=low
 indicator-ppa-download-statistics (1.0.4-1) precise; urgency=low
 
   * Changed the sample PPA to reflect the new single PPA.
-  * The GtkWarning 'IA__gtk_widget_event' no longer appears (fixed from previous release).
+  * The GtkWarning 'IA__gtk_widget_event' no longer appears (fixed from
+    previous release).
   * Changed the build process to use a single PPA.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 25 Jul 2012 20:57:13 +1000
@@ -237,8 +251,8 @@ indicator-ppa-download-statistics (1.0.3-1) precise; urgency=low
 
 indicator-ppa-download-statistics (1.0.2-1) precise; urgency=low
 
-  * Fixed a bug where the add/edit dialog was not preventing other dialogs from
-    being launched.
+  * Fixed a bug where the add/edit dialog was not preventing other dialogs
+    from being launched.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 10 Jul 2012 21:49:42 +1000
 

@@ -3,7 +3,7 @@
 
 BUILD_DIR="build"
 NAME="indicator-ppa-download-statistics"
-VERSION=1.0.28
+VERSION=1.0.29
 
 rm -rf $BUILD_DIR
 
