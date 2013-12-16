@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.25-1) precise; urgency=low
+
+  * Created a new About dialog showing the changelog.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 17 Dec 2013 00:22:56 +1000
+
+
 indicator-virtual-box (1.0.24-1) precise; urgency=low
 
   * Updated the About dialog to use Gtk+ 3.
@@ -7,10 +14,10 @@ indicator-virtual-box (1.0.24-1) precise; urgency=low
 
 indicator-virtual-box (1.0.23-1) precise; urgency=low
 
-  * If the list of VMs in the Preferences is less than or equal to 15, don't add 
-    a vertical scrollbar.
-  * Made the text field containing the start command wide enough to display the
-    start command.
+  * If the list of VMs in the Preferences is less than or equal to 15, don't
+    add a vertical scrollbar.
+  * Made the text field containing the start command wide enough to display
+    the start command.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 2 Dec 2013 5:39:34 +1000
 
@@ -34,15 +41,16 @@ indicator-virtual-box (1.0.21-1) precise; urgency=low
 indicator-virtual-box (1.0.20-1) precise; urgency=low
 
   * In Ubuntu 13.10 the initial value set by the spinner adjustment was not
-    appearing in the spinner field. Need to force the initial value by explicitly
-    setting it.
+    appearing in the spinner field. Need to force the initial value by
+    explicitly setting it.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 1 Oct 2013 11:32:20 +1000
 
 
 indicator-virtual-box (1.0.19-1) precise; urgency=low
 
-  * Only create the log file when needed.  Thanks to dvrc (dvrc.contact@gmail.com).
+  * Only create the log file when needed.
+    Thanks to dvrc (dvrc.contact@gmail.com).
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 5 Jul 2013 20:14:25 +1000
 
@@ -50,11 +58,11 @@ indicator-virtual-box (1.0.19-1) precise; urgency=low
 indicator-virtual-box (1.0.18-1) precise; urgency=low
 
   * Only brings up one VirtualBox manager at a time.
-  * User can customise the launch command for a VM, allowing VBoxHeadless to be
-    used instead of VBoxManage.
-  * User can set a VM to automatically start when the indicator starts.  Each VM
-    will start up before the indicator displays, with a five second delay between
-    each VM.
+  * User can customise the launch command for a VM, allowing VBoxHeadless to
+    be used instead of VBoxManage.
+  * User can set a VM to automatically start when the indicator starts.
+    Each VM will start up before the indicator displays, with a five second
+    delay between each VM.
   * Now logs to a file in the user's HOME directory.
   * Attempt to bring about/preferences to front.
 
@@ -72,10 +80,10 @@ indicator-virtual-box (1.0.17-1) precise; urgency=low
 indicator-virtual-box (1.0.16-1) precise; urgency=low
 
   * Added python3-gi to debian/control Depends (for Precise support).
-  * Swapped out python-appindicator for gir1.2-appindicator3-0.1 in debian/control
-    Depends.
-  * Simpler handling for creating the indicator - should hopefully sustain more
-    environments.
+  * Swapped out python-appindicator for gir1.2-appindicator3-0.1 in
+    debian/control Depends.
+  * Simpler handling for creating the indicator - should hopefully sustain
+    more environments.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 16 Nov 2012 10:26:05 +1000
 
@@ -91,25 +99,27 @@ indicator-virtual-box (1.0.15-1) precise; urgency=low
   * Now uses a radio button to indicate a running VM as standard.
     Removed the (legacy) show text before/after a VM.
   * Added option to show text before/after a group name.
-  * Known issue: If a VM exists in a group (and there is another VM of the same name
-    but not in a group) and you ungroup, the VM in the group is not removed from the
-    group.  This appears to be a bug in the VirtualBox UI and as such the indicator
-    displays the VM (from the group) alongside the other VMs.
+  * Known issue: If a VM exists in a group (and there is another VM of the
+    same name but not in a group) and you ungroup, the VM in the group is
+    not removed from the group.  This appears to be a bug in the VirtualBox
+    UI and as such the indicator displays the VM (from the group) alongside
+    the other VMs.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 06 Nov 2012 18:45:52 +1000
 
 
 indicator-virtual-box (1.0.14-1) precise; urgency=low
 
-  * Addresses the case in which a VM which has been renamed/deleted and is selected 
-    in the menu but a refresh has not occurred.
+  * Addresses the case in which a VM which has been renamed/deleted and is
+    selected in the menu but a refresh has not occurred.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 24 Sep 2012 19:58:31 +1000
 
 
 indicator-virtual-box (1.0.13-1) precise; urgency=low
 
-  * Fixed the menu (incorrectly initialised) which caused a crash under GTK (non Unity).
+  * Fixed the menu (incorrectly initialised) which caused a crash under GTK
+    (non Unity).
   * Removed duplicate preferences menu item.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 25 Aug 2012 11:22:02 +1000
@@ -117,11 +127,12 @@ indicator-virtual-box (1.0.13-1) precise; urgency=low
 
 indicator-virtual-box (1.0.12-1) precise; urgency=low
 
-  * Noted that memory was leaking - strongly suspect it was due to removing/adding
-    menu items on each update.  As a result, the menu is now completely rebuilt on 
-    each update.  Unfortunately, if the preferences/about dialogs are showing
-    during an update, the warning "Trying to remove a child that doesn't believe
-    we're it's parent" is emitted, which appears to be benign.
+  * Noted that memory was leaking - strongly suspect it was due to
+    removing/adding menu items on each update.  As a result, the menu is now
+    completely rebuilt on each update.  Unfortunately, if the
+    preferences/about dialogs are showing during an update, the warning
+    "Trying to remove a child that doesn't believe we're it's parent" is
+    emitted, which appears to be benign.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 24 Aug 2012 17:29:37 +1000
 
@@ -137,23 +148,26 @@ indicator-virtual-box (1.0.10-1) precise; urgency=low
 
   * Fixed the PPA URL in the About dialog.
   * Consolidated all options into a preferences dialog.
-  * Default sort now matches that given by the VirtualBox UI (rather than VBoxManage).
-  * The update of the running status of the VMs in the menu is now configurable 
-    between 1 and 60 minutes.  Note that an update also occurs each time a VM
-    is started and when the preferences dialog is ok'd/cancelled.
-  * Big thanks to Pascal De Vuyst (https://launchpad.net/~pascal-devuyst) for
-    suggestions/patches for preferences and sorting!
+  * Default sort now matches that given by the VirtualBox UI (rather than
+    VBoxManage).
+  * The update of the running status of the VMs in the menu is now
+    configurable between 1 and 60 minutes.  Note that an update also occurs
+    each time a VM is started and when the preferences dialog is
+    ok'd/cancelled.
+  * Big thanks to Pascal De Vuyst (https://launchpad.net/~pascal-devuyst)
+    for suggestions/patches for preferences and sorting!
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 27 Jul 2012 23:16:31 +1000
 
 
 indicator-virtual-box (1.0.9-1) precise; urgency=low
 
-  * On selecting a VM which is already running, the VM window is brought to the
-    front (using wmctrl).
+  * On selecting a VM which is already running, the VM window is brought to
+    the front (using wmctrl).
   * Removed the refresh menu item.  The list of VMs in the menu are now
     automatically refreshed every 15 minutes.
-  * Fixed an issue where the indicator believes a VM is running but is in fact not.
+  * Fixed an issue where the indicator believes a VM is running but is in
+    fact not.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 27 Jul 2012 11:27:33 +1000
 
@@ -182,15 +196,16 @@ indicator-virtual-box (1.0.6-1) precise; urgency=low
 
 indicator-virtual-box (1.0.5-1) precise; urgency=low
 
-  * Added menu option to add before/after text to the virtual machine menu items.
+  * Added menu option to add before/after text to the virtual machine menu
+    items.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 10 Jul 2012 20:57:12 +1000
 
 
 indicator-virtual-box (1.0.4-1) precise; urgency=low
 
-  * Added menu option to sort virtual machine names alphabetically or by default
-    (as given by VirtualBox).
+  * Added menu option to sort virtual machine names alphabetically or by
+    default (as given by VirtualBox).
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 10 Jul 2012 13:44:47 +1000
 
@@ -223,11 +238,13 @@ indicator-virtual-box (1.0.0-1) precise; urgency=low
 
   * Initial release.
   * Tested on Ubuntu but should work for Lubuntu/Xubuntu.
-  * Lubuntu/Xubuntu:
-     User needs to manually remove spurious directory: /usr/share/icons/elementary/status/48/untitled
-     then rebuild the image cache: sudo gtk-update-icon-cache -f /usr/share/icons/elementary
-  * If 'Gtk Warning: Unable to locate theme engine in module_path: "pixmap"' appears on execution,
-    install "sudo apt-get install gtk2-engines-pixbuf".
-  * The indicator will run without 'virtualbox' installed...but it'll do nothing useful!
+  * On Lubuntu/Xubuntu, user needs to manually remove spurious directory
+      /usr/share/icons/elementary/status/48/untitled
+    then rebuild the image cache
+      sudo gtk-update-icon-cache -f /usr/share/icons/elementary
+  * If 'Unable to locate theme engine in module_path: "pixmap"' appears on
+    execution, install "sudo apt-get install gtk2-engines-pixbuf".
+  * The indicator will run without 'virtualbox' installed...but it'll do
+    nothing useful!
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 7 Jul 2012 11:26:52 +1000

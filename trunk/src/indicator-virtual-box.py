@@ -43,14 +43,14 @@ except:
 
 from gi.repository import GLib, Gtk
 
-import json, locale, logging, os, shutil, subprocess, sys, time
+import gzip, json, locale, logging, os, re, shutil, subprocess, sys, time
 
 
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.24"
+    VERSION = "1.0.25"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -718,15 +718,19 @@ class IndicatorVirtualBox:
             self.dialog.present()
             return
 
-        self.dialog = Gtk.AboutDialog()
-        self.dialog.set_authors( [ IndicatorVirtualBox.AUTHOR ] )
-        self.dialog.set_comments( IndicatorVirtualBox.COMMENTS )
-        self.dialog.set_license_type( Gtk.License.GPL_3_0 )
-        self.dialog.set_logo_icon_name( IndicatorVirtualBox.ICON )
-        self.dialog.set_program_name( IndicatorVirtualBox.NAME )
-        self.dialog.set_version( IndicatorVirtualBox.VERSION )
-        self.dialog.set_website( IndicatorVirtualBox.WEBSITE )
-        self.dialog.set_website_label( IndicatorVirtualBox.WEBSITE )
+        self.dialog = AboutDialogWithChangeLog( 
+               IndicatorVirtualBox.NAME,
+               IndicatorVirtualBox.COMMENTS, 
+               IndicatorVirtualBox.WEBSITE, 
+               IndicatorVirtualBox.WEBSITE, 
+               IndicatorVirtualBox.VERSION, 
+               Gtk.License.GPL_3_0, 
+               IndicatorVirtualBox.ICON,
+               [ IndicatorVirtualBox.AUTHOR ],
+               "",
+               "",
+               self.getChangeLog() )
+
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
@@ -787,6 +791,35 @@ class IndicatorVirtualBox:
             logging.error( "Error writing settings: " + IndicatorVirtualBox.SETTINGS_FILE )
 
 
+    # Assumes a typical format for a Debian changelog file.
+    def getChangeLog( self ):
+        contents = None
+        changeLog = "/usr/share/doc/" + IndicatorVirtualBox.NAME + "/changelog.Debian.gz"
+        if os.path.exists( changeLog ):
+            try:
+                with gzip.open( changeLog, 'rb' ) as f:
+                    changeLogContents = re.split( "\n\n\n", f.read().decode() )
+
+                    contents = ""
+                    for changeLogEntry in changeLogContents:
+                        changeLogEntry = changeLogEntry.split( "\n" )
+
+                        version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
+                        dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
+                        changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
+
+                        contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
+
+                    contents = contents.strip()
+
+            except Exception as e:
+                logging.exception( e )
+                logging.error( "Error reading changelog: " + changeLog )
+                contents = None
+
+        return contents
+
+
 class VirtualMachineInfo:
 
     def __init__( self, name, isGroup, uuid, indent ):
@@ -841,6 +874,82 @@ class VirtualMachineInfo:
 
     def isRunning( self ):
         return self.isRunning
+
+
+class AboutDialogWithChangeLog( Gtk.AboutDialog ):
+
+    CHANGELOG_BUTTON_NAME = "Change _Log"
+
+
+    # If there are no credits, set both credits/creditsLabel to "".
+    # Changelog can be set to None...if that's the case, use a GtkAboutDialog.
+    def __init__( self, programName, comments, website, websiteLabel, version, licenseType, logoIconName, authors, credits, creditsLabel, changeLog ):
+        super( AboutDialogWithChangeLog, self ).__init__()
+
+        self.add_credit_section( creditsLabel, credits )
+        self.set_authors( authors )
+        self.set_comments( comments )
+        self.set_license_type( licenseType )
+        self.set_logo_icon_name( logoIconName )
+        self.set_program_name( programName )
+        self.set_version( version )
+        self.set_website( website )
+        self.set_website_label( websiteLabel )
+        self.set_position( Gtk.WindowPosition.CENTER_ALWAYS )
+
+        if changeLog is None: return
+
+        notebook = self.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
+
+        textView = Gtk.TextView()
+        textView.set_editable( False )
+        textBuffer = textView.get_buffer()
+        textBuffer.set_text( changeLog )
+
+        # Reference https://gitorious.org/ghelp/gtk/raw/5c4f2ef0c1e658827091aadf4fc3c4d5f5964785:gtk/gtkaboutdialog.c
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_shadow_type( Gtk.ShadowType.IN );
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+        scrolledWindow.add( textView )
+        scrolledWindow.show_all()
+
+        changeLogTabIndex = notebook.append_page( scrolledWindow, Gtk.Label( "" ) ) # The tab is hidden so the label contents are irrelevant.
+
+        changeLogButton = Gtk.ToggleButton( AboutDialogWithChangeLog.CHANGELOG_BUTTON_NAME )
+        changeLogButton.set_use_underline( True )
+        changeLogButton.show()
+
+        buttonBox = self.get_content_area().get_children()[ 1 ]
+        buttonBox.pack_start( changeLogButton, True, True, 0 )
+        buttonBox.set_child_secondary( changeLogButton, True )
+
+        buttons = buttonBox.get_children()
+        buttonsForToggle = [ ]
+        for button in buttons:
+            if button.get_label() != AboutDialogWithChangeLog.CHANGELOG_BUTTON_NAME and button.get_label() != "gtk-close":
+                buttonsForToggle.append( button )
+                button.connect( "toggled", self.onOtherToggledButtons, changeLogButton )
+
+        changeLogButton.connect( "toggled", self.onChangeLogButtonToggled, notebook, changeLogTabIndex, buttonsForToggle )
+
+
+    def onChangeLogButtonToggled( self, changeLogButton, notebook, changeLogTabIndex, buttonsForToggle ):
+        if changeLogButton.get_active():
+            if notebook.get_current_page() != 0:
+                for button in buttonsForToggle:
+                    button.set_active( False )
+
+            notebook.set_current_page( changeLogTabIndex )
+        else:
+            if notebook.get_current_page() == changeLogTabIndex:
+                notebook.set_current_page( 0 )
+
+
+    def onOtherToggledButtons( self, toggleButton, changeLogButton ):
+        if toggleButton.get_active() and changeLogButton.get_active():
+            changeLogButton.set_active( False )
 
 
 if __name__ == "__main__": IndicatorVirtualBox().main()
