@@ -1,3 +1,10 @@
+indicator-stardate (1.0.16-1) precise; urgency=low
+
+  * Removed tabbed preferences dialog - tabs were too much.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 16 Dec 2013 11:04:13 +1000
+
+
 indicator-stardate (1.0.15-1) precise; urgency=low
 
   * Updated the About dialog to use Gtk+ 3.
@@ -7,7 +14,8 @@ indicator-stardate (1.0.15-1) precise; urgency=low
 
 indicator-stardate (1.0.14-1) precise; urgency=low
 
-  * Only create the log file when needed.  Thanks to dvrc (dvrc.contact@gmail.com).
+  * Only create the log file when needed.
+    Thanks to dvrc (dvrc.contact@gmail.com).
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 5 Jul 2013 20:29:57 +1000
 
@@ -22,8 +30,8 @@ indicator-stardate (1.0.13-1) precise; urgency=low
 
 indicator-stardate (1.0.12-1) precise; urgency=low
 
-  * Revised the icons to fill in a square boundary - no longer stretched on
-    Lubuntu/Xubuntu.
+  * Revised the icons to fill in a square boundary
+    - no longer stretched on Lubuntu/Xubuntu.
   * Updated labels/tooltips on Preferences.
   * Icons for Preferences/About now show for Lubuntu/Xubuntu.
 
@@ -43,10 +51,10 @@ indicator-stardate (1.0.11-1) precise; urgency=low
 indicator-stardate (1.0.10-1) precise; urgency=low
 
   * Added python3-gi to debian/control Depends (for Precise support).
-  * Swapped out python-appindicator for gir1.2-appindicator3-0.1 in debian/control
-    Depends.
-  * Simpler handling for creating the indicator - should hopefully sustain more
-    environments. 
+  * Swapped out python-appindicator for gir1.2-appindicator3-0.1 in
+    debian/control Depends.
+  * Simpler handling for creating the indicator - should hopefully sustain
+    more environments. 
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 16 Nov 2012 10:26:05 +1000
 
@@ -82,7 +90,8 @@ indicator-stardate (1.0.6-1) precise; urgency=low
 
 indicator-stardate (1.0.5-1) precise; urgency=low
 
-  * Now included example.py in the release to demonstrate the use of the stardate API.
+  * Now included example.py in the release to demonstrate the use of the
+    stardate API.
   * Corrected the API version such that it matches the Java API version.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 11 Jul 2012 16:57:16 +1000
@@ -93,19 +102,20 @@ indicator-stardate (1.0.4-1) precise; urgency=low
   * Icon for Elementary theme incorrectly set at 46 (should have been 48).
   * Icons in Elementary theme should have been in Lubuntu.
   * New icons for Elementary (used by Xubuntu).
-  * Lubuntu/Xubuntu:
-     User needs to manually remove spurious directory: /usr/share/icons/elementary/status/48/untitled
-     then rebuild the image cache: sudo gtk-update-icon-cache -f /usr/share/icons/elementary
-  * If 'Gtk Warning: Unable to locate theme engine in module_path: "pixmap"' appears on execution,
-    install "sudo apt-get install gtk2-engines-pixbuf".
+  * Lubuntu/Xubuntu: User needs to manually remove spurious directory
+      /usr/share/icons/elementary/status/48/untitled
+    then rebuild the image cache
+      sudo gtk-update-icon-cache -f /usr/share/icons/elementary
+  * If the warning 'Unable to locate theme engine in module_path: "pixmap"'
+    appears on execution, install "sudo apt-get install gtk2-engines-pixbuf".
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 25 Jun 2012 22:36:53 +1000
 
 
 indicator-stardate (1.0.3-1) precise; urgency=low
 
-  * Put in detection of Unity to handle the case where python-appindicator is installed
-    but should not be used (Lubuntu) and GTK icon used instead.
+  * Put in detection of Unity to handle the case where python-appindicator is
+    installed but should not be used (Lubuntu) and GTK icon used instead.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 25 Jun 2012 13:23:13 +1000
 
