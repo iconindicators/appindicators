@@ -1,10 +1,17 @@
+indicator-fortune (1.0.6-1) precise; urgency=low
+
+  * Created a new About dialog showing the changelog.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 16 Dec 2013 23:53:14 +1000
+
+
 indicator-fortune (1.0.5-1) precise; urgency=low
 
   * Updated the About dialog to use Gtk+ 3.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 15 Dec 2013 11:44:52 +1000
- 
- 
+
+
 indicator-fortune (1.0.4-1) precise; urgency=low
 
   * Capitalised menu items.
@@ -12,8 +19,8 @@ indicator-fortune (1.0.4-1) precise; urgency=low
   * Added file/directory browsing for finding fortunes.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 5 Dec 2013 16:58:12 +1000
- 
- 
+
+
 indicator-fortune (1.0.3-1) precise; urgency=low
 
   * Fixed bug when the fortune path contains spaces.
@@ -21,24 +28,25 @@ indicator-fortune (1.0.3-1) precise; urgency=low
     path.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Dec 2013 19:28:13 +1000
- 
- 
+
+
 indicator-fortune (1.0.2-1) precise; urgency=low
 
   * Fixed bug when the notification summary is empty.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 2 Dec 2013 20:18:01 +1000
- 
- 
+
+
 indicator-fortune (1.0.1-1) precise; urgency=low
 
-  * Fixed bug when dealing with .dat files - needed to remove the .dat extension.
+  * Fixed bug when dealing with .dat files - needed to remove the .dat
+    extension.
   * Fixed bug when adding a directory and no trailing slash was included.
   * Added to tooltips.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 2 Dec 2013 18:10:11 +1000
- 
- 
+
+
 indicator-fortune (1.0.0-1) precise; urgency=low
 
   * First release.
