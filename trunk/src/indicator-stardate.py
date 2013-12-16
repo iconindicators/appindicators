@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from debian import changelog
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays the current stardate.
+# Application indicator which displays the current Star Trek™ stardate.
 
 
 # References:
@@ -32,14 +33,14 @@ except:
 
 from gi.repository import GLib, Gtk
 
-import datetime, json, logging, os, shutil, stardate, sys
+import datetime, gzip, json, logging, os, re, shutil, stardate, sys
 
 
 class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.15"
+    VERSION = "1.0.16"
     ICON = NAME
     LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -149,16 +150,19 @@ class IndicatorStardate:
             self.dialog.present()
             return
 
-        self.dialog = Gtk.AboutDialog()
-        self.dialog.add_credit_section( "Credits", IndicatorStardate.CREDITS ) 
-        self.dialog.set_authors( [ IndicatorStardate.AUTHOR ] )
-        self.dialog.set_comments( IndicatorStardate.COMMENTS )
-        self.dialog.set_license_type( Gtk.License.GPL_3_0 )
-        self.dialog.set_logo_icon_name( IndicatorStardate.ICON )
-        self.dialog.set_program_name( IndicatorStardate.NAME )
-        self.dialog.set_version( IndicatorStardate.VERSION )
-        self.dialog.set_website( IndicatorStardate.WEBSITE )
-        self.dialog.set_website_label( IndicatorStardate.WEBSITE )
+        self.dialog = AboutDialogWithChangeLog( 
+               IndicatorStardate.NAME,
+               IndicatorStardate.COMMENTS, 
+               IndicatorStardate.WEBSITE, 
+               IndicatorStardate.WEBSITE, 
+               IndicatorStardate.VERSION, 
+               Gtk.License.GPL_3_0, 
+               IndicatorStardate.ICON,
+               [ IndicatorStardate.AUTHOR ],
+                IndicatorStardate.CREDITS,
+                "Credits",
+               self.getChangeLog() )
+
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
@@ -260,85 +264,109 @@ class IndicatorStardate:
             logging.error( "Error writing settings: " + IndicatorStardate.SETTINGS_FILE )
 
 
+    # Assumes a typical format for a Debian changelog file.
+    def getChangeLog( self ):
+        contents = None
+        changeLog = "/usr/share/doc/" + IndicatorStardate.NAME + "/changelog.Debian.gz"
+        if os.path.exists( changeLog ):
+            try:
+                with gzip.open( changeLog, 'rb' ) as f:
+                    changeLogContents = re.split( "\n\n\n", f.read().decode() )
 
-# TODO Not sure if this will make the final cut...
+                    contents = ""
+                    for changeLogEntry in changeLogContents:
+                        changeLogEntry = changeLogEntry.split( "\n" )
 
-    def onPreferencesNEW( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
+                        version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
+                        dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
+                        changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
 
-        notebook = Gtk.Notebook()
+                        contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
 
-        # Display settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+                    contents = contents.strip()
 
-        showClassicCheckbox = Gtk.CheckButton( "Use 'classic' conversion" )
-        showClassicCheckbox.set_active( self.showClassic )
-        showClassicCheckbox.set_tooltip_text( "Stardate 'classic' is based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main.\n\nOtherwise the 2009 revised conversion is used (http://en.wikipedia.org/wiki/Stardate)." )
-        grid.attach( showClassicCheckbox, 0, 0, 1, 1 )
+            except Exception as e:
+                logging.exception( e )
+                logging.error( "Error reading changelog: " + changeLog )
+                contents = None
 
-        showIssueCheckbox = Gtk.CheckButton( "Show ISSUE" )
-        showIssueCheckbox.set_active( self.showIssue )
-        showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
-        showIssueCheckbox.set_margin_left( 15 )
-        showIssueCheckbox.set_tooltip_text( "Show the ISSUE of the stardate (only applies to 'classic')" )
-        grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
+        return contents
 
-        showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox )
 
-        notebook.append_page( grid, Gtk.Label( "Display" ) )
+class AboutDialogWithChangeLog( Gtk.AboutDialog ):
 
-        # General settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+    CHANGELOG_BUTTON_NAME = "Change _Log"
 
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 0, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "General" ) )
+    # If there are no credits, set both credits/creditsLabel to "".
+    # Changelog can be set to None...if that's the case, use a GtkAboutDialog.
+    def __init__( self, programName, comments, website, websiteLabel, version, licenseType, logoIconName, authors, credits, creditsLabel, changeLog ):
+        super( AboutDialogWithChangeLog, self ).__init__()
 
-        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( notebook, True, True, 0 )
-        self.dialog.set_border_width( 5 )
-        self.dialog.set_icon_name( IndicatorStardate.ICON )
-        self.dialog.show_all()
+        self.add_credit_section( creditsLabel, credits )
+        self.set_authors( authors )
+        self.set_comments( comments )
+        self.set_license_type( licenseType )
+        self.set_logo_icon_name( logoIconName )
+        self.set_program_name( programName )
+        self.set_version( version )
+        self.set_website( website )
+        self.set_website_label( websiteLabel )
+        self.set_position( Gtk.WindowPosition.CENTER_ALWAYS )
 
-        response = self.dialog.run()
-        if response == Gtk.ResponseType.OK:
-            self.showClassic = showClassicCheckbox.get_active()
-            self.showIssue = showIssueCheckbox.get_active()
-            self.saveSettings()
+        if changeLog is None: return
 
-            if not os.path.exists( IndicatorStardate.AUTOSTART_PATH ):
-                os.makedirs( IndicatorStardate.AUTOSTART_PATH )
+        notebook = self.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
 
-            if autostartCheckbox.get_active():
-                try:
-                    shutil.copy( IndicatorStardate.DESKTOP_PATH + IndicatorStardate.DESKTOP_FILE, IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
-                except Exception as e:
-                    logging.exception( e )
-            else:
-                try:
-                    os.remove( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
-                except: pass
+        textView = Gtk.TextView()
+        textView.set_editable( False )
+        textBuffer = textView.get_buffer()
+        textBuffer.set_text( changeLog )
 
-            self.update()
+        # Reference https://gitorious.org/ghelp/gtk/raw/5c4f2ef0c1e658827091aadf4fc3c4d5f5964785:gtk/gtkaboutdialog.c
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_shadow_type( Gtk.ShadowType.IN );
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+        scrolledWindow.add( textView )
+        scrolledWindow.show_all()
 
-        self.dialog.destroy()
-        self.dialog = None
+        changeLogTabIndex = notebook.append_page( scrolledWindow, Gtk.Label( "" ) ) # The tab is hidden so the label contents are irrelevant.
+
+        changeLogButton = Gtk.ToggleButton( AboutDialogWithChangeLog.CHANGELOG_BUTTON_NAME )
+        changeLogButton.set_use_underline( True )
+        changeLogButton.show()
+
+        buttonBox = self.get_content_area().get_children()[ 1 ]
+        buttonBox.pack_start( changeLogButton, True, True, 0 )
+        buttonBox.set_child_secondary( changeLogButton, True )
+
+        buttons = buttonBox.get_children()
+        buttonsForToggle = [ ]
+        for button in buttons:
+            if button.get_label() != AboutDialogWithChangeLog.CHANGELOG_BUTTON_NAME and button.get_label() != "gtk-close":
+                buttonsForToggle.append( button )
+                button.connect( "toggled", self.onOtherToggledButtons, changeLogButton )
+
+        changeLogButton.connect( "toggled", self.onChangeLogButtonToggled, notebook, changeLogTabIndex, buttonsForToggle )
+
+
+    def onChangeLogButtonToggled( self, changeLogButton, notebook, changeLogTabIndex, buttonsForToggle ):
+        if changeLogButton.get_active():
+            if notebook.get_current_page() != 0:
+                for button in buttonsForToggle:
+                    button.set_active( False )
+
+            notebook.set_current_page( changeLogTabIndex )
+        else:
+            if notebook.get_current_page() == changeLogTabIndex:
+                notebook.set_current_page( 0 )
+
+
+    def onOtherToggledButtons( self, toggleButton, changeLogButton ):
+        if toggleButton.get_active() and changeLogButton.get_active():
+            changeLogButton.set_active( False )
 
 
 if __name__ == "__main__": IndicatorStardate().main()

@@ -1,5 +1,6 @@
 indicator-stardate (1.0.16-1) precise; urgency=low
 
+  * Created a new About dialog showing the changelog.
   * Removed tabbed preferences dialog - tabs were too much.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 16 Dec 2013 11:04:13 +1000
