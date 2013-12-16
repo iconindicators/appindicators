@@ -1,4 +1,4 @@
-indicator-ppa-download-statistics (1.0.28-1) precise; urgency=low
+indicator-ppa-download-statistics (1.0.29-1) precise; urgency=low
 
   * Created a new About dialog showing the changelog.
 
