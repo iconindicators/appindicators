@@ -510,6 +510,10 @@ class IndicatorLunar:
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
     def getBrightLimbAngle( self, city, body ):
+
+        if type(body) == ephem.Moon:
+            print()
+        
         sun = ephem.Sun( city )
 
         sunRA = math.radians( self.convertHMSToDecimalDegrees( sun.ra ) )
@@ -529,6 +533,13 @@ class IndicatorLunar:
         if bodyParallacticAngle < 0: bodyParallacticAngle += 360.0
 
         return brightLimbAngle - bodyParallacticAngle
+# http://www.weizmann.ac.il/home/eofek/matlab/ephem/parallactic_angle.m
+# http://www.ucolick.org/~magee/observer/
+# http://web.archiveorange.com/archive/v/74jMQyHUOwbskBYwisCl
+# http://www.astro.caltech.edu/~mcs/CBI/pointing/
+# http://books.google.com.au/books?id=hgU4AAAAMAAJ&oe=UTF-8&redir_esc=y
+# https://github.com/brandon-rhodes/pyephem/issues/24
+# http://www.gb.nrao.edu/GBT/DA/gbtidl/release2pt8/contrib/contrib/parangle.pro
 
 
     def convertHMSToDecimalDegrees( self, hms ):
