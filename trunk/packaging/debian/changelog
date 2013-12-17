@@ -23,9 +23,9 @@ indicator-fortune (1.0.4-1) precise; urgency=low
 
 indicator-fortune (1.0.3-1) precise; urgency=low
 
-  * Fixed bug when the fortune path contains spaces.
-  * Made the text field containing the fortune path wide enough to display the
-    path.
+  * Fixed bug when the fortune path contained spaces.
+  * Made the text field containing the fortune path wide enough to display
+    the path.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Dec 2013 19:28:13 +1000
 
@@ -42,7 +42,7 @@ indicator-fortune (1.0.1-1) precise; urgency=low
   * Fixed bug when dealing with .dat files - needed to remove the .dat
     extension.
   * Fixed bug when adding a directory and no trailing slash was included.
-  * Added to tooltips.
+  * Added tooltips.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 2 Dec 2013 18:10:11 +1000
 
