@@ -52,7 +52,6 @@ class IndicatorVirtualBox:
     NAME = "indicator-virtual-box"
     VERSION = "1.0.25"
     ICON = NAME
-    LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
