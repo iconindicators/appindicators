@@ -61,9 +61,8 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.32"
+    VERSION = "1.0.33"
     ICON = NAME
-    LICENSE = "Distributed under the GNU General Public License, version 3.\nhttp://www.opensource.org/licenses/GPL-3.0"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -180,7 +179,7 @@ class IndicatorLunar:
         for key in self.data.keys():
             parsedOutput = parsedOutput.replace( "[" + key + "]", self.data[ key ] )
 
-        self.createIcon( lunarIlluminationPercentage, self.getBrightLimbAngle( city, ephem.Moon( city ) ) )
+        self.createIcon( lunarIlluminationPercentage, self.getBrightLimbAngleRelativeToZenith( city, ephem.Moon( city ) ) )
         if self.appindicatorImported:
             self.indicator.set_icon( IndicatorLunar.SVG_ICON )
             self.indicator.set_label( parsedOutput, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
@@ -279,9 +278,13 @@ class IndicatorLunar:
         self.data[ "SUN DISTANCE TO EARTH" ] = str( round( sun.earth_distance, 4 ) ) + " AU"
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ "SUN DISTANCE TO EARTH" ] ) )
 
-        subMenu.append( Gtk.SeparatorMenuItem() )
+        self.data[ "SUN RIGHT ASCENSION" ] = str( sun.ra )
+        subMenu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ "SUN RIGHT ASCENSION" ] ) )
 
-        self.data[ "SUN DISTANCE TO EARTH" ] = str( round( sun.earth_distance, 4 ) ) + " AU"
+        self.data[ "SUN DECLINATION" ] = str( sun.dec  )
+        subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ "SUN DECLINATION" ] ) )
+
+        subMenu.append( Gtk.SeparatorMenuItem() )
 
         rising = city.next_rising( sun )
         self.data[ "SUN NEXT RISING" ] = self.localiseAndTrim( rising )
@@ -389,8 +392,14 @@ class IndicatorLunar:
         self.data[ body.name.upper() + " DISTANCE TO SUN" ] = str( round( body.sun_distance, 4 ) ) + " AU"
         subMenu.append( Gtk.MenuItem( "Distance to Sun: " + self.data[ body.name.upper() + " DISTANCE TO SUN" ] ) )
 
-        self.data[ body.name.upper() + " BRIGHT LIMB" ] = str( round( self.getBrightLimbAngle( city, body ) ) ) + "°"
+        self.data[ body.name.upper() + " BRIGHT LIMB" ] = str( round( self.getBrightLimbAngleRelativeToZenith( city, body ) ) ) + "°"
         subMenu.append( Gtk.MenuItem( "Bright Limb: " + self.data[ body.name.upper() + " BRIGHT LIMB" ] ) )
+
+        self.data[ body.name.upper() + " RIGHT ASCENSION" ] = str( body.ra )
+        subMenu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ body.name.upper() + " RIGHT ASCENSION" ] ) )
+
+        self.data[ body.name.upper() + " DECLINATION" ] = str( body.dec  )
+        subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ body.name.upper() + " DECLINATION" ] ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -488,10 +497,8 @@ class IndicatorLunar:
         return planetSignName + " " + str( planetSignDegree ) + "° " + planetSignMinute + "'"
 
 
-    # Compute the bright limb angle between the sun and a planetary body.
-    # The angle is measured in degrees where zero degrees is a vertical line pointing "up" 
-    # the angle is measured counter clockwise from this vertical line.
-    # The bright limb angle is then adjusted for the observer by an amount known as the parallactic angle.
+    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body.
+    # Measured in degrees counter clockwise from a positive y axis.
     #
     # References:
     #  'Astronomical Algorithms' by Jean Meeus (chapters 14 and 48).
@@ -503,19 +510,19 @@ class IndicatorLunar:
     # Other references...
     #  http://www.nightskynotebook.com/Moon.php
     #  http://www.calsky.com/cs.cgi/Moon/6
+    #  http://www.calsky.com/cs.cgi/Sun/3
     #  https://github.com/soniakeys/meeus
     #  http://godoc.org/github.com/soniakeys/meeus
     #  https://sites.google.com/site/astronomicalalgorithms
     #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
-    def getBrightLimbAngle( self, city, body ):
-
-        if type(body) == ephem.Moon:
-            print()
-        
+    #  http://web.archiveorange.com/archive/v/74jMQyHUOwbskBYwisCl
+    #  https://github.com/brandon-rhodes/pyephem/issues/24
+    def getBrightLimbAngleRelativeToZenith( self, city, body ):
         sun = ephem.Sun( city )
 
+        # Have noticed very different values for the RA compared with geoastro/futureboy (and yet generally the end result is close)!
         sunRA = math.radians( self.convertHMSToDecimalDegrees( sun.ra ) )
         sunDec = math.radians( self.convertDMSToDecimalDegrees( sun.dec ) )
         bodyRA = math.radians( self.convertHMSToDecimalDegrees( body.ra ) )
@@ -524,22 +531,16 @@ class IndicatorLunar:
         y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
         x = math.cos( bodyDec ) * math.sin( sunDec ) - math.sin( bodyDec ) * math.cos( sunDec ) * math.cos( sunRA - bodyRA )
         brightLimbAngle = math.degrees( math.atan2( y, x ) )
-        if brightLimbAngle < 0: brightLimbAngle += 360.0
 
         hourAngle = math.radians( self.convertHMSToDecimalDegrees( city.sidereal_time() ) ) - bodyRA
         y = math.sin( hourAngle )
         x = math.tan( math.radians( self.convertDMSToDecimalDegrees( city.lat ) ) ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
-        bodyParallacticAngle = math.degrees( math.atan2( y, x ) )
-        if bodyParallacticAngle < 0: bodyParallacticAngle += 360.0
+        parallacticAngle = math.degrees( math.atan2( y, x ) )
 
-        return brightLimbAngle - bodyParallacticAngle
-# http://www.weizmann.ac.il/home/eofek/matlab/ephem/parallactic_angle.m
-# http://www.ucolick.org/~magee/observer/
-# http://web.archiveorange.com/archive/v/74jMQyHUOwbskBYwisCl
-# http://www.astro.caltech.edu/~mcs/CBI/pointing/
-# http://books.google.com.au/books?id=hgU4AAAAMAAJ&oe=UTF-8&redir_esc=y
-# https://github.com/brandon-rhodes/pyephem/issues/24
-# http://www.gb.nrao.edu/GBT/DA/gbtidl/release2pt8/contrib/contrib/parangle.pro
+        zenithAngle = brightLimbAngle - parallacticAngle
+        if zenithAngle < 0.0: zenithAngle += 360.0
+
+        return zenithAngle
 
 
     def convertHMSToDecimalDegrees( self, hms ):
