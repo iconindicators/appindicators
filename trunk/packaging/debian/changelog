@@ -1,3 +1,10 @@
+indicator-lunar (1.0.33-1) precise; urgency=low
+
+  * Added right ascension and declination to the menu for each planetary body.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 18 Dec 2013 20:23:11 +1000
+
+
 indicator-lunar (1.0.32-1) precise; urgency=low
 
   * Created a new About dialog showing the changelog.
