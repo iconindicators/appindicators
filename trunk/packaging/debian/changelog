@@ -1,7 +1,5 @@
 indicator-lunar (1.0.33-1) precise; urgency=low
 
-  * Added right ascension and declination to the menu for the sun and
-    planetary bodies.
   * Bright limb angle tweaked - needed to add 360 as some angles were
     negative.
 

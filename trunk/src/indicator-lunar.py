@@ -278,12 +278,6 @@ class IndicatorLunar:
         self.data[ "SUN DISTANCE TO EARTH" ] = str( round( sun.earth_distance, 4 ) ) + " AU"
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ "SUN DISTANCE TO EARTH" ] ) )
 
-        self.data[ "SUN RIGHT ASCENSION" ] = str( sun.ra )
-        subMenu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ "SUN RIGHT ASCENSION" ] ) )
-
-        self.data[ "SUN DECLINATION" ] = str( sun.dec  )
-        subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ "SUN DECLINATION" ] ) )
-
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         rising = city.next_rising( sun )
@@ -394,12 +388,6 @@ class IndicatorLunar:
 
         self.data[ body.name.upper() + " BRIGHT LIMB" ] = str( round( self.getBrightLimbAngleRelativeToZenith( city, body ) ) ) + "°"
         subMenu.append( Gtk.MenuItem( "Bright Limb: " + self.data[ body.name.upper() + " BRIGHT LIMB" ] ) )
-
-        self.data[ body.name.upper() + " RIGHT ASCENSION" ] = str( body.ra )
-        subMenu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ body.name.upper() + " RIGHT ASCENSION" ] ) )
-
-        self.data[ body.name.upper() + " DECLINATION" ] = str( body.dec  )
-        subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ body.name.upper() + " DECLINATION" ] ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
