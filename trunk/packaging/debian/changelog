@@ -1,7 +1,12 @@
 indicator-lunar (1.0.33-1) precise; urgency=low
 
-  * Bright limb angle tweaked - needed to add 360 as some angles were
-    negative.
+  * Bright limb angle was sometimes negative and needed to be "folded" into
+    the correct quadrant by adding 360.
+  * Changed the RA/Dec calculations in the bright limb to use Apparent
+    Geocentric Position as this gives a closer value to that calculated by
+    Meeus.
+  * Added RA/Dec to sun and planetary bodies.
+  * Thanks to Alan Eliasen (http://futureboy.us) for bright limb and RA/Dec.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 18 Dec 2013 20:23:11 +1000
 

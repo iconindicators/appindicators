@@ -278,6 +278,8 @@ class IndicatorLunar:
         self.data[ "SUN DISTANCE TO EARTH" ] = str( round( sun.earth_distance, 4 ) ) + " AU"
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ "SUN DISTANCE TO EARTH" ] ) )
 
+        self.createRADecSubMenu( subMenu, sun )
+
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         rising = city.next_rising( sun )
@@ -389,6 +391,8 @@ class IndicatorLunar:
         self.data[ body.name.upper() + " BRIGHT LIMB" ] = str( round( self.getBrightLimbAngleRelativeToZenith( city, body ) ) ) + "°"
         subMenu.append( Gtk.MenuItem( "Bright Limb: " + self.data[ body.name.upper() + " BRIGHT LIMB" ] ) )
 
+        self.createRADecSubMenu( subMenu, body )
+
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Must compute the previous information (illumination, constellation, phase and so on BEFORE rising/setting).
@@ -422,6 +426,18 @@ class IndicatorLunar:
 
         self.data[ label + " ECLIPSE TYPE" ] = eclipse[ 1 ]
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + eclipse[ 1 ] ) )
+
+
+    def createRADecSubMenu( self, subMenu, body ):
+        self.data[ body.name.upper() + " RIGHT ASCENSION" ] = str( round( self.convertHMSToDecimalDegrees( body.g_ra ), 2 )) + "°"
+        subMenu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ body.name.upper() + " RIGHT ASCENSION" ] ) )
+
+        direction = "N"
+        if body.g_dec < 0.0:
+            direction = "S"
+
+        self.data[ body.name.upper() + " DECLINATION" ] = str( abs( round( self.convertDMSToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction
+        subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ body.name.upper() + " DECLINATION" ] ) )
 
 
     # Takes a float and converts to local time, trims off fractional seconds and returns a string.
