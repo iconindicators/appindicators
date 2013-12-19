@@ -510,11 +510,11 @@ class IndicatorLunar:
     def getBrightLimbAngleRelativeToZenith( self, city, body ):
         sun = ephem.Sun( city )
 
-        # Have noticed very different values for the RA compared with geoastro/futureboy (and yet generally the end result is close)!
-        sunRA = math.radians( self.convertHMSToDecimalDegrees( sun.ra ) )
-        sunDec = math.radians( self.convertDMSToDecimalDegrees( sun.dec ) )
-        bodyRA = math.radians( self.convertHMSToDecimalDegrees( body.ra ) )
-        bodyDec = math.radians( self.convertDMSToDecimalDegrees( body.dec ) )
+        # Using the Apparent Geocentric Position as this is closest to the Meeus example 25.a for RA/Dec.
+        sunRA = math.radians( self.convertHMSToDecimalDegrees( sun.g_ra ) )
+        sunDec = math.radians( self.convertDMSToDecimalDegrees( sun.g_dec ) )
+        bodyRA = math.radians( self.convertHMSToDecimalDegrees( body.g_ra ) )
+        bodyDec = math.radians( self.convertDMSToDecimalDegrees( body.g_dec ) )
 
         y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
         x = math.cos( bodyDec ) * math.sin( sunDec ) - math.sin( bodyDec ) * math.cos( sunDec ) * math.cos( sunRA - bodyRA )
@@ -545,9 +545,9 @@ class IndicatorLunar:
         return math.copysign( x, y )
 
 
-    # Creates an SVG icon file representing the moon given the illumination and bright limb angle.
+    # Creates an SVG icon file representing the moon given the illumination and bright limb angle (relative to zenith).
     #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
-    #    brightLimbAngleInDegrees The angle of the (adjusted) bright limb ranging from 0 to 360 inclusive.
+    #    brightLimbAngleInDegrees The angle of the (relative to zenith) bright limb ranging from 0 to 360 inclusive.
     #                             If the bright limb is None, a full moon will be rendered and saved to a full moon file (for the notification).
     def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees ):
         # Size of view box.
