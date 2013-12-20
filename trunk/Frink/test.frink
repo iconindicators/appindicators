@@ -1,0 +1,36 @@
+// To run, open a terminal:
+//	java -classpath frink.jar frink.parser.Frink -f test.frink
+// Both 
+//	sun.frink (http://futureboy.us/frinksamp/sun.frink) 
+//	frink.jar (http://futureboy.us/frinkjar/frink.jar)
+// must be present.
+
+use sun.frink
+
+// Sydney, Australia
+latitude = -33.867487
+longitude = 151.20699
+
+// Need to setDefaultTimezone[ "UTC" ]?
+currentDateTime = now[]
+
+[ alpha0, delta0 ] = sunApparentRADecl[ currentDateTime ]
+println[ "sunRA " + alpha0 ]
+println[ "sunDec " + delta0 ]
+
+[alpha, delta] = moonApparentRADecl[ currentDateTime ]
+println[ "moonRA " + alpha ]
+println[ "moonDec " + delta ]
+
+moonPositionAngle = arctan[ cos[ delta0 ] sin[ alpha0 - alpha ], sin[ delta0 ] cos[ delta ] - cos[ delta0 ] sin[ delta ] cos[ alpha0 - alpha ] ]
+println[ "moonPositionAngle " + moonPositionAngle ]
+
+hourAngle = hourAngle[ currentDateTime, longitude, alpha ]
+println[ "hourAngle " + hourAngle ]
+
+parallacticAngle = arctan[ sin[ hourAngle ], tan[ latitude ] cos[ delta ] - sin[ delta ] cos[ hourAngle ] ]
+println[ "parallacticAngle " + parallacticAngle ]
+
+moonPositionAngleRelativeToZenith = moonPositionAngle - parallacticAngle
+println[ "moonPositionAngleRelativeToZenith " + moonPositionAngleRelativeToZenith ]
+
