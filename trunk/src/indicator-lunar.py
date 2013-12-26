@@ -61,7 +61,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.33"
+    VERSION = "1.0.34"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -429,14 +429,14 @@ class IndicatorLunar:
 
 
     def createRADecSubMenu( self, subMenu, body ):
-        self.data[ body.name.upper() + " RIGHT ASCENSION" ] = str( round( self.convertHMSToDecimalDegrees( body.g_ra ), 2 )) + "°"
+        self.data[ body.name.upper() + " RIGHT ASCENSION" ] = str( round( self.convertHMSToDecimalDegrees( body.g_ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.g_ra ) ) + ")"
         subMenu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ body.name.upper() + " RIGHT ASCENSION" ] ) )
 
         direction = "N"
         if body.g_dec < 0.0:
             direction = "S"
 
-        self.data[ body.name.upper() + " DECLINATION" ] = str( abs( round( self.convertDMSToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction
+        self.data[ body.name.upper() + " DECLINATION" ] = str( abs( round( self.convertDMSToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.g_dec ) ) + ")"
         subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ body.name.upper() + " DECLINATION" ] ) )
 
 
