@@ -50,7 +50,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.25"
+    VERSION = "1.0.26"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -703,12 +703,6 @@ class IndicatorVirtualBox:
 
             break
 
-        dialog.destroy()
-
-
-    def showMessage( self, messageType, message ):
-        dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
-        dialog.run()
         dialog.destroy()
 
 
