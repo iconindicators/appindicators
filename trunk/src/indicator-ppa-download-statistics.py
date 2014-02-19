@@ -1,3 +1,18 @@
+#TODO Add some form of filtering to PPAs...
+# The NoobsLab PPA is very long and I'm only interested in the items of mine which they include in their PPA.
+# So maybe (on a per PPA basis, explained later) allow inclusive filtering.  
+# For my PPA, I'dd have no filters.
+#
+# For the NoobsLab PPA, I'd have the filters "indicator-fortune", "indicator-lunar"...listing my indicators.
+# All other items in the NoobsLab PPA would be dropped from view.
+#
+# Per PPA basis: Is this per user/name (thebernmeister/ppa), or per user (thebernmeister)?
+# Given I have thebernmeister/ppa and thebernmeister/testing, maybe the filtering applies on a per user/name basis.
+
+
+#TODO NoobsLab has dropper and indicator-privacy at the bottom of the list...as if they weren't sorted...why?
+
+
 #!/usr/bin/env python3
 
 
@@ -47,7 +62,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.29"
+    VERSION = "1.0.30"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
