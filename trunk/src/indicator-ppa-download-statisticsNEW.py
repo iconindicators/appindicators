@@ -1,3 +1,6 @@
+# {"combinePPAs": false, "showSubmenu": true, "sortByDownloadAmount": 5, "ppas": [["thebernmeister", "ppa", "precise", "amd64"]], "allowMenuItemsToLaunchBrowser": true, "sortByDownload": false}
+
+
 # TODO Is it possible data will get clobbered?
 # Multiple threads appending to the same PPA object...will they clobber each other?
 # http://docs.python.org/3/library/threading.html#using-locks-conditions-and-semaphores-in-the-with-statement
@@ -166,6 +169,14 @@ class IndicatorPPADownloadStatistics:
         menu = Gtk.Menu()
 
         # Add PPAs to the menu...
+        ppas = deepcopy( self.ppasNEW ) # Leave the original download data as is - makes dynamic (user) changes faster (don't have to re-download).
+
+        ppas = self.applyFilters( ppas )
+
+        if( True ):
+            return;
+
+        
         ppas = self.getPPAsSorted( self.combinePPAs )
         ppaDownloadStatistics = self.ppaDownloadStatistics
 
@@ -269,6 +280,34 @@ class IndicatorPPADownloadStatistics:
             self.menu = menu
 
         menu.show_all()
+
+
+    def applyFilters( self, ppas ):
+        print("Filters")
+        for ppa in ppas:
+            simpleKey = ppa.getSimpleKey() # thebernmeister | ppa
+            if( simpleKey in self.filters ):
+                publishedBinaries = ppa.getPublishedBinaries()
+                print( publishedBinaries )
+            
+
+
+for i in xrange(len(somelist) - 1, -1, -1):
+    element = somelist[i]
+    do_action(element)
+    if check(element):
+        del somelist[i]
+[
+    indicator-fortune | 1.0.6-1 | 12 | False,
+     indicator-lunar | 1.0.33-1 | 68 | False,
+      indicator-ppa-download-statistics | 1.0.29-1 | 53 | False, 
+    indicator-stardate | 1.0.16-1 | 38 | False,
+     indicator-virtual-box | 1.0.25-1 | 409 | False,
+     python3-ephem | 3.7.5.1-1~precise1 | 41 | True
+]
+            
+        
+        return
 
 
     def getCombinedPPAs( self ):
@@ -448,40 +487,11 @@ class IndicatorPPADownloadStatistics:
                [ IndicatorPPADownloadStatistics.AUTHOR ],
                "",
                "",
-               self.getChangeLog() )
+               "/usr/share/doc/" + IndicatorPPADownloadStatistics.NAME + "/changelog.Debian.gz" )
 
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
-
-
-    # Assumes a typical format for a Debian changelog file.
-    def getChangeLog( self ):
-        contents = None
-        changeLog = "/usr/share/doc/" + IndicatorPPADownloadStatistics.NAME + "/changelog.Debian.gz"
-        if os.path.exists( changeLog ):
-            try:
-                with gzip.open( changeLog, 'rb' ) as f:
-                    changeLogContents = re.split( "\n\n\n", f.read().decode() )
-
-                    contents = ""
-                    for changeLogEntry in changeLogContents:
-                        changeLogEntry = changeLogEntry.split( "\n" )
-
-                        version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
-                        dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
-                        changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
-
-                        contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
-
-                    contents = contents.strip()
-
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Error reading changelog: " + changeLog )
-                contents = None
-
-        return contents
 
 
     def onAdd( self, widget ):
@@ -659,10 +669,11 @@ class IndicatorPPADownloadStatistics:
         return -1 # Should never happen!
 
 
-    def showMessage( self, messageType, message ):
-        dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
-        dialog.run()
-        dialog.destroy()
+#     def showMessage( self, messageType, message ):
+#         dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
+#         dialog.run()
+#         dialog.destroy()
+# TODO Delete
 
 
     def onRemove( self, widget ):
@@ -681,8 +692,9 @@ class IndicatorPPADownloadStatistics:
             self.requestPPADownloadAndMenuRefresh()
 
         self.dialog = None
-    def onPreferences( self, widget ):
 
+
+    def onPreferences( self, widget ):
 
         if self.dialog is not None:
             self.dialog.present()
@@ -799,7 +811,11 @@ class IndicatorPPADownloadStatistics:
         self.sortByDownloadAmount = 3
         self.combinePPAs = False
         self.showSubmenu = False
-        self.ppas = { }
+        self.filters = { }
+        
+        self.filters[ 'thebernmeister | ppa' ] = "indicator-lunar"
+
+# TODO Rename - remove the NEW
         self.ppasNEW = [ ]
 
         if os.path.isfile( IndicatorPPADownloadStatistics.SETTINGS_FILE ):
@@ -829,14 +845,6 @@ class IndicatorPPADownloadStatistics:
             # No properties file exists, so populate with a sample PPA to give the user an idea of the format.
             self.ppasNEW = [ ]
             self.ppasNEW.append( PPA( "thebernmeister", "ppa", "precise", "amd64" ) )
-
-
-    # Initialises the 'download' data for each PPA as the string 'downloading data'.
-    def setToDownloadingData( self ):    
-        self.lock.acquire()
-        for key in self.ppas:
-            self.ppaDownloadStatistics[ key ] = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
-        self.lock.release()
 
 
     def saveSettings( self ):
@@ -1002,6 +1010,9 @@ class PPA:
         self.series = series
         self.architecture = architecture
 
+        self.key = str( self.user ) + " | " + str( self.name ) + " | " + str( self.series ) + " | " + str( self.architecture )
+        self.simpleKey = str( self.user ) + " | " + str( self.name )
+
 
     def reset( self ):
         self.status = PPA.STATUS_NEEDS_DOWNLOAD
@@ -1033,7 +1044,11 @@ class PPA:
 
 
     def getKey( self ):
-        return self.__str__()
+        return self.key
+
+
+    def getSimpleKey( self ):
+        return self.simpleKey
 
 
     def addPublishedBinary( self, packageName, packageVersion, downloadCount, architectureSpecific ):
@@ -1051,13 +1066,12 @@ class PPA:
             print( self.status )
 
 
-
     def getPublishedBinaries( self ):
         return self.publishedBinaries
 
 
     def __str__( self ):
-        return str( self.user ) + " | " + str( self.name ) + " | " + str( self.series ) + " | " + str( self.architecture )
+        return self.key
 
 
     def __repr__( self ):
@@ -1103,82 +1117,6 @@ class PublishedBinary:
 
     def __repr__( self ):
         return self.__str__()
-
-
-class AboutDialogWithChangeLog( Gtk.AboutDialog ):
-
-    CHANGELOG_BUTTON_NAME = "Change _Log"
-
-
-    # If there are no credits, set both credits/creditsLabel to "".
-    # Changelog can be set to None...if that's the case, use a GtkAboutDialog.
-    def __init__( self, programName, comments, website, websiteLabel, version, licenseType, logoIconName, authors, credits, creditsLabel, changeLog ):
-        super( AboutDialogWithChangeLog, self ).__init__()
-
-        self.add_credit_section( creditsLabel, credits )
-        self.set_authors( authors )
-        self.set_comments( comments )
-        self.set_license_type( licenseType )
-        self.set_logo_icon_name( logoIconName )
-        self.set_program_name( programName )
-        self.set_version( version )
-        self.set_website( website )
-        self.set_website_label( websiteLabel )
-        self.set_position( Gtk.WindowPosition.CENTER_ALWAYS )
-
-        if changeLog is None: return
-
-        notebook = self.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
-
-        textView = Gtk.TextView()
-        textView.set_editable( False )
-        textBuffer = textView.get_buffer()
-        textBuffer.set_text( changeLog )
-
-        # Reference https://gitorious.org/ghelp/gtk/raw/5c4f2ef0c1e658827091aadf4fc3c4d5f5964785:gtk/gtkaboutdialog.c
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_shadow_type( Gtk.ShadowType.IN );
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( textView )
-        scrolledWindow.show_all()
-
-        changeLogTabIndex = notebook.append_page( scrolledWindow, Gtk.Label( "" ) ) # The tab is hidden so the label contents are irrelevant.
-
-        changeLogButton = Gtk.ToggleButton( AboutDialogWithChangeLog.CHANGELOG_BUTTON_NAME )
-        changeLogButton.set_use_underline( True )
-        changeLogButton.show()
-
-        buttonBox = self.get_content_area().get_children()[ 1 ]
-        buttonBox.pack_start( changeLogButton, True, True, 0 )
-        buttonBox.set_child_secondary( changeLogButton, True )
-
-        buttons = buttonBox.get_children()
-        buttonsForToggle = [ ]
-        for button in buttons:
-            if button.get_label() != AboutDialogWithChangeLog.CHANGELOG_BUTTON_NAME and button.get_label() != "gtk-close":
-                buttonsForToggle.append( button )
-                button.connect( "toggled", self.onOtherToggledButtons, changeLogButton )
-
-        changeLogButton.connect( "toggled", self.onChangeLogButtonToggled, notebook, changeLogTabIndex, buttonsForToggle )
-
-
-    def onChangeLogButtonToggled( self, changeLogButton, notebook, changeLogTabIndex, buttonsForToggle ):
-        if changeLogButton.get_active():
-            if notebook.get_current_page() != 0:
-                for button in buttonsForToggle:
-                    button.set_active( False )
-
-            notebook.set_current_page( changeLogTabIndex )
-        else:
-            if notebook.get_current_page() == changeLogTabIndex:
-                notebook.set_current_page( 0 )
-
-
-    def onOtherToggledButtons( self, toggleButton, changeLogButton ):
-        if toggleButton.get_active() and changeLogButton.get_active():
-            changeLogButton.set_active( False )
 
 
 if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
