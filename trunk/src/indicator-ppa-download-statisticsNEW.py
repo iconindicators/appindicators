@@ -1,14 +1,9 @@
 # {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 4, "sortByDownload": true, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": false}
 
-
-
 #{"ppas": [  ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"],  ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"] ], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": true, "combinePPAs": true}
 
 # {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
 
-
-
-# TODO Add tooltip that a zero value for clip will not clip.
 
 
 # TODO Test "if A == False" is the same as "if not A".
@@ -24,30 +19,21 @@
 # TODO Modify the build script and packaging, etc, etc to include the PythonUtils.
 
 
-# TODO If there is a preferences tab for filters...that means a list of PPAs, 
-# maybe the add/remove/edit stuff could also be put into the preferences? 
+# TODO Need a preferences tab for filters...
+# Perhaps also the add/remove/edit stuff could also be put into the preferences? 
 
 
 # TODO Add a PPA (after initial PPAs have done their download) and ensure the "downloading now" is shown.
 
 
 # TODO Possible to have an ignore error...whatever that means?
-
-
-# TODO SHould a sortByDownload amount of zero mean no sortByDownload?
-
+# Only makes sense when combining...a PPA with an error is tossed.  How to let the user know there's an error though?
 
 
 # TODO Perhaps block UI access whilst downloading...
 # Can show a message to the user.
 # If things are locked when the user is editing/adding/etc and the update kicks off, how to handle this?  Wait?
 # Maybe delay for 5 minutes?
-
-
-#TODO Add some form of filtering to PPAs...
-
-
-#TODO NoobsLab has dropper and indicator-privacy at the bottom of the list...as if they weren't sorted...why?
 
 
 #!/usr/bin/env python3
@@ -226,8 +212,8 @@ class IndicatorPPADownloadStatistics:
                     elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
                         message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
                     else:
-                        # TODO Need to first check if we're combined before saying "uncombine to show the messages"?
-                        # Is it possible to be uncombined and have the multiple errors?
+# TODO Need to first check if we're combined before saying "uncombine to show the messages"?
+# Is it possible to be uncombined and have the multiple errors?
                         message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
                     subMenuItem = Gtk.MenuItem( indent + message )
@@ -261,8 +247,8 @@ class IndicatorPPADownloadStatistics:
                     elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
                         message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
                     else:
-                        # TODO Need to first check if we're combined before saying "uncombine to show the messages"?
-                        # Is it possible to be uncombined and have the multiple errors?
+# TODO Need to first check if we're combined before saying "uncombine to show the messages"?
+# Is it possible to be uncombined and have the multiple errors?
                         message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
                     menuItem = Gtk.MenuItem( indent + message )
@@ -731,7 +717,7 @@ class IndicatorPPADownloadStatistics:
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.sortByDownloadAmount ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( "Limit the number of entries when sorting by download." )
+        spinner.set_tooltip_text( "Limit the number of entries when sorting by download.\nA value of zero will not clip." )
         spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
         spinner.set_hexpand( True )
         grid.attach( spinner, 1, 3, 1, 1 )
@@ -844,6 +830,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def saveSettings( self ):
+# TODO...fix!
         try:
             ppas = [ ]
             for k, v in list( self.ppas.items() ):
@@ -1049,7 +1036,7 @@ class PPA:
         self.architecture = architecture
 
 
-    # Returns a key of the form 'PPA User | PPA Name | Series | Architecture'
+    # Returns a key of the form 'PPA User | PPA Name | Series | Architecture' or 'PPA User | PPA Name' if series/architecture are undefined. 
     def getKey( self ):
         if self.series is None or self.architecture is None:
             return str( self.user ) + " | " + str( self.name )
