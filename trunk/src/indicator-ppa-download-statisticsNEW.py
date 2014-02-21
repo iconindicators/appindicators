@@ -1,7 +1,14 @@
+# {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 4, "sortByDownload": true, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": false}
+
+
+
 #{"ppas": [  ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"],  ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"] ], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": true, "combinePPAs": true}
 
 # {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
 
+
+
+# TODO Add tooltip that a zero value for clip will not clip.
 
 
 # TODO Test "if A == False" is the same as "if not A".
@@ -27,7 +34,7 @@
 # TODO Possible to have an ignore error...whatever that means?
 
 
-# TODO SHould a clip amount of zero mean no clip?
+# TODO SHould a sortByDownload amount of zero mean no sortByDownload?
 
 
 
@@ -189,10 +196,7 @@ class IndicatorPPADownloadStatistics:
 
         self.filter( ppas )
         if self.combinePPAs: self.combine( ppas )
-
-# TODO
-#         if self.sortByDownload:
-#             ppaDownloadStatistics = self.getClippedPPAs( ppas, ppaDownloadStatistics )
+        if self.sortByDownload: self.sortByDownloadAndClip( ppas )
 
         indent = "    "
         if self.showSubmenu:
@@ -406,24 +410,12 @@ class IndicatorPPADownloadStatistics:
         ppas.sort( key = operator.methodcaller( "getKey" ) )
 
 
-# TODO...
-    def clip( self, ppas ):
+    def sortByDownloadAndClip( self, ppas ):
         for ppa in ppas:
-            print( ppa )
-
-
-    def getClippedPPAs( self, ppas, ppaDownloadStatistics ):
-        clippedPPADownloadStatistics = { }
-        for ppa in ppas:
-            publishedBinaryInfos = ppaDownloadStatistics.get( ppa )
-            if type( publishedBinaryInfos ) is str: # This is a string message (either 'downloading data' or 'no information' or 'error retrieving PPA').
-                clippedPPADownloadStatistics[ ppa ] = publishedBinaryInfos
-                continue
-
-            publishedBinaryInfosSortedByDownloadCount = sorted( ppaDownloadStatistics.get( ppa ), key = lambda publishedBinaryInfo: publishedBinaryInfo.downloadCount, reverse = True )
-            clippedPPADownloadStatistics[ ppa ] = publishedBinaryInfosSortedByDownloadCount[ : self.sortByDownloadAmount ]
-
-        return clippedPPADownloadStatistics        
+            ppa.getPublishedBinaries().sort( key = operator.methodcaller( "getDownloadCount" ), reverse = True )
+            
+            if self.sortByDownloadAmount > 0:
+                del ppa.getPublishedBinaries()[ self.sortByDownloadAmount : ]
 
 
     def getPPAUsersSorted( self ):
@@ -967,9 +959,6 @@ class IndicatorPPADownloadStatistics:
                     indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
                     packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
 
-                    if packageName == "dropper":
-                        print( architectureSpecific )
-
                     t = Thread( target = self.getDownloadCount, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ), )
                     threads.append( t )
                     t.start()
@@ -1135,5 +1124,4 @@ class PublishedBinary:
         return self.__str__()
 
 
-if __name__ == "__main__": 
-     IndicatorPPADownloadStatistics().main()
+if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
