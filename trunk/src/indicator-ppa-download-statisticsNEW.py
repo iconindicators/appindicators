@@ -1,4 +1,25 @@
-# {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": true, "combinePPAs": true}
+#{"ppas": [  ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"],  ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"] ], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": true, "combinePPAs": true}
+
+# {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
+
+
+
+# TODO Test "if A == False" is the same as "if not A".
+
+
+# TODO When combining, need an option which says if two published binaries have the same package name
+# and are architecture dependent, combine only if the version numbers match (or perhaps, ignore version numbers for architecture dependent).
+# The dropper package from NoobsLab is NOT architecture specific and multiple version appear.
+# So maybe just have a setting "Ignore versions" and nothing to do with architecture specificity.
+# Maybe two checkboxes indented under Combine: Ignore Version for Architecture Dependent, Ignore Version for Architecture Independent? 
+
+
+# TODO Modify the build script and packaging, etc, etc to include the PythonUtils.
+
+
+# TODO If there is a preferences tab for filters...that means a list of PPAs, 
+# maybe the add/remove/edit stuff could also be put into the preferences? 
+
 
 # TODO Add a PPA (after initial PPAs have done their download) and ensure the "downloading now" is shown.
 
@@ -9,11 +30,6 @@
 # TODO SHould a clip amount of zero mean no clip?
 
 
-# TODO Is it possible data will get clobbered?
-# Multiple threads appending to the same PPA object...will they clobber each other?
-# http://docs.python.org/3/library/threading.html#using-locks-conditions-and-semaphores-in-the-with-statement
-# Maybe use the link above - the threads which write to an individual PPA object could use their own private lock.
-
 
 # TODO Perhaps block UI access whilst downloading...
 # Can show a message to the user.
@@ -21,16 +37,7 @@
 # Maybe delay for 5 minutes?
 
 
-#TODO Add some form of filtering to PPAs...# TODO Add a PPA (after initial PPAs have done their download) and ensure the "downloading now" is shown.
-# The NoobsLab PPA is very long and I'm only interested in the items of mine which they include in their PPA.
-# So maybe (on a per PPA basis, explained later) allow inclusive filtering.  
-# For my PPA, I'dd have no filters.
-#
-# For the NoobsLab PPA, I'd have the filters "indicator-fortune", "indicator-lunar"...listing my indicators.
-# All other items in the NoobsLab PPA would be dropped from view.
-#
-# Per PPA basis: Is this per user/name (thebernmeister/ppa), or per user (thebernmeister)?
-# Given I have thebernmeister/ppa and thebernmeister/testing, maybe the filtering applies on a per user/name basis.
+#TODO Add some form of filtering to PPAs...
 
 
 #TODO NoobsLab has dropper and indicator-privacy at the bottom of the list...as if they weren't sorted...why?
@@ -78,6 +85,7 @@ from threading import Thread
 from urllib.request import urlopen
 
 import itertools, gzip, json, locale, logging, operator, os, re, shutil, sys, threading, time, webbrowser
+import PythonUtils
 
 
 class IndicatorPPADownloadStatistics:
@@ -167,7 +175,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def buildMenu( self ):
-        if self.appindicatorImported == True:
+        if self.appindicatorImported:
             menu = self.indicator.get_menu()
         else:
             menu = self.menu
@@ -180,23 +188,14 @@ class IndicatorPPADownloadStatistics:
         ppas = deepcopy( self.ppasNEW ) # Leave the original download data as is - makes dynamic (user) changes faster (don't have to re-download).
 
         self.filter( ppas )
+        if self.combinePPAs: self.combine( ppas )
 
-#         ppas = self.getPPAsSorted( self.combinePPAs )
-#         ppaDownloadStatistics = self.ppaDownloadStatistics
-
-#         if self.combinePPAs == True:
-#             ppaDownloadStatistics = self.getCombinedPPAs()
-
-        if self.combinePPAs == True:
-            self.combine( ppas )
-
-#         if self.sortByDownload == True:
+# TODO
+#         if self.sortByDownload:
 #             ppaDownloadStatistics = self.getClippedPPAs( ppas, ppaDownloadStatistics )
 
-
-# TODO If combined, should the key or simpleKey be used (for either submenus or no submenus)?
         indent = "    "
-        if self.showSubmenu == True:
+        if self.showSubmenu:
             for ppa in ppas:
                 menuItem = Gtk.MenuItem( ppa.getKey() )
                 menu.append( menuItem )
@@ -205,19 +204,27 @@ class IndicatorPPADownloadStatistics:
                 if ppa.getStatus() == PPA.STATUS_OK:
                     publishedBinaries = ppa.getPublishedBinaries()
                     for publishedBinary in publishedBinaries:
-                        subMenuItem = Gtk.MenuItem( indent + publishedBinary.getPackageName() + " (" + publishedBinary.getPackageVersion() + "): " + str( publishedBinary.getDownloadCount() ) )
+                        if publishedBinary.getPackageVersion() is None:
+                            label = indent + publishedBinary.getPackageName() + ": " + str( publishedBinary.getDownloadCount() )
+                        else:
+                            label = indent + publishedBinary.getPackageName() + " (" + publishedBinary.getPackageVersion() + "): " + str( publishedBinary.getDownloadCount() )
+
+                        subMenuItem = Gtk.MenuItem( label )
                         subMenuItem.set_name( ppa.getKey() )
                         subMenuItem.connect( "activate", self.onPPA )
                         subMenu.append( subMenuItem )
                         menuItem.set_submenu( subMenu )
                 else:
-# TODO Need to handle the multiple errors status.                    
                     if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                         message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
                     elif ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
                         message = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
                     elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
                         message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
+                    else:
+                        # TODO Need to first check if we're combined before saying "uncombine to show the messages"?
+                        # Is it possible to be uncombined and have the multiple errors?
+                        message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
                     subMenuItem = Gtk.MenuItem( indent + message )
                     subMenu.append( subMenuItem )
@@ -233,19 +240,26 @@ class IndicatorPPADownloadStatistics:
                 if ppa.getStatus() == PPA.STATUS_OK:
                     publishedBinaries = ppa.getPublishedBinaries()
                     for publishedBinary in publishedBinaries:
-                        menuItem = Gtk.MenuItem( indent + publishedBinary.getPackageName() + " (" + publishedBinary.getPackageVersion() + "): " + str( publishedBinary.getDownloadCount() ) )
+                        if publishedBinary.getPackageVersion() is None:
+                            label = indent + publishedBinary.getPackageName() + ": " + str( publishedBinary.getDownloadCount() )
+                        else:
+                            label = indent + publishedBinary.getPackageName() + " (" + publishedBinary.getPackageVersion() + "): " + str( publishedBinary.getDownloadCount() )
+
+                        menuItem = Gtk.MenuItem( label )
                         menuItem.set_name( ppa.getKey() )
                         menuItem.connect( "activate", self.onPPA )
                         menu.append( menuItem )
                 else:
-# TODO Need to handle the multiple errors status.                    
-# TODO If the error status is multiple errors, can't say to uncombine to show the messages...
                     if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                         message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
                     elif ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
                         message = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
                     elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
                         message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
+                    else:
+                        # TODO Need to first check if we're combined before saying "uncombine to show the messages"?
+                        # Is it possible to be uncombined and have the multiple errors?
+                        message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
                     menuItem = Gtk.MenuItem( indent + message )
                     menu.append( menuItem )
@@ -295,7 +309,7 @@ class IndicatorPPADownloadStatistics:
         quitMenuItem.connect( "activate", Gtk.main_quit )
         menu.append( quitMenuItem )
 
-        if self.appindicatorImported == True:
+        if self.appindicatorImported:
             self.indicator.set_menu( menu )
         else:
             self.menu = menu
@@ -305,16 +319,15 @@ class IndicatorPPADownloadStatistics:
 
     def filter( self, ppas ):
         for ppa in ppas:
-            simpleKey = ppa.getSimpleKey()
-            if not simpleKey in self.filters:
+            key = ppa.getUser() + " | " + ppa.getName()
+            if not key in self.filters:
                 continue
 
             publishedBinaries = ppa.getPublishedBinaries()
             for i in range( len( publishedBinaries ) - 1, -1, -1 ): # Iterate backwards, enabling a "simpler" way to delete elements.
                 publishedBinary = publishedBinaries[ i ]
                 match = False
-
-                for filter in self.filters.get( simpleKey ):
+                for filter in self.filters.get( key ):
                     if filter in publishedBinary.getPackageName():
                         match = True
                         break
@@ -323,112 +336,80 @@ class IndicatorPPADownloadStatistics:
                     del publishedBinaries[ i ]
 
 
-# TODO Make sure that NoobsLab dropper/indicator-privacy are not at the bottom!
     def combine( self, ppas ):
         combinedPPAs = { } # Key is the PPA simple key; value is the combined ppa (the series/architecture are set to None).
-        for ppa in ppas:
-            simpleKey = ppa.getSimpleKey()
-            if simpleKey in combinedPPAs:
 
-                if ppa.getStatus() == PPA.STATUS_OK and combinedPPAs[ simpleKey ].getStatus() == PPA.STATUS_OK:
-                    print("TODO Combine")
+        # Match up identical PPAs.  Two PPAs match if their 'PPA User | PPA Name' are identical.
+        # If a PPA's status is anything other than OK, that PPA's error status is now THE status for all matching PPAs.
+        for ppa in ppas:
+            key = ppa.getUser() + " | " + ppa.getName()
+            if key in combinedPPAs:
+                if ppa.getStatus() == PPA.STATUS_OK and combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
+                    combinedPPAs[ key ].getPublishedBinaries().extend( ppa.getPublishedBinaries() )
 
                 else:
-                    # The existing (combined) ppa or the current ppa has an error (or both)...
-                    if ppa.getStatus() == combinedPPAs[ simpleKey ].getStatus():
+                    # The existing ppa or the current ppa has an error (or both)...
+                    if ppa.getStatus() == combinedPPAs[ key ].getStatus():
                         continue # Same error, so nothing to do.
 
-                    elif combinedPPAs[ simpleKey ].getStatus() == PPA.STATUS_OK:
-                        combinedPPAs[ simpleKey ].setStatus( ppa.getStatus() ) # The current PPA has an error, so that becomes the new status.
+                    elif combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
+                        combinedPPAs[ key ].setStatus( ppa.getStatus() ) # The current PPA has an error, so that becomes the new status.
+                        combinedPPAs[ key ].setPublishedBinaries( [ ] )
 
-                    elif ppa.getStatus() != combinedPPAs[ simpleKey ].getStatus():
-                        combinedPPAs[ simpleKey ].setStatus( PPA.STATUS_MULTIPLE_ERRORS ) # The combined PPA and the current PPA have different errors, so set a combined error.
+                    elif ppa.getStatus() != combinedPPAs[ key ].getStatus():
+                        combinedPPAs[ key ].setStatus( PPA.STATUS_MULTIPLE_ERRORS ) # The combined PPA and the current PPA have different errors, so set a combined error.
 
                     else:
                         continue # Current PPA is OK but the existing PPA is in error...so nothing to do but keep the error.
 
             else:
+                # No previous match for this PPA.  Nullify the series/architecture as they are no longer relevent when combined.
                 ppa.setSeries( None )
                 ppa.setArchitecture( None )
-                combinedPPAs[ simpleKey ] = ppa
+                if ppa.getStatus() != PPA.STATUS_OK:  #TODO Is this necessary?  Surely if there's an error the downloader should wipe the PPA object of PBs?
+                    ppa.setPublishedBinaries( [ ] )
 
+                combinedPPAs[ key ] = ppa
 
-    def getCombinedPPAs( self ):
-        combinedPPADownloadStatistics = { }
-        ppas = self.getPPAsSorted( False )
-        architectureIndependentPublishedBinaries = [ ] # Used to manage the download counts of architecture independent published binaries.
-        for ppa in ppas:
-            combinedKey = ppa[ : ppa.find( " | ", ppa.find( " | " ) + 1 ) ] # The combined ppa is 'ppaUser | ppaName | series | architecture' stripped down to 'ppaUser | ppaName'.
-            publishedBinaryInfos = self.ppaDownloadStatistics.get( ppa )
+# TODO Handle this...
+#         self.ignoreVersionInArchitectureSpecific = True
+# Assuming for now the version IS ignored in architecture specific.
+# See note at top of file.
 
-            if type( publishedBinaryInfos ) is str: # This is a string message (either 'downloading data' or something else).
-                if publishedBinaryInfos == IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA:
-                    combinedPPADownloadStatistics[ combinedKey ] = publishedBinaryInfos
-                else:
-                    combinedPPADownloadStatistics[ combinedKey ] = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
+        # Now have a hash table containing ppas which either have an error status or are a concatenation of all published binaries from ppas with the same PPA User/Name.
+        del ppas[ : ] # In place remove all elements.
+        for key in combinedPPAs:
+            temp = { }
+            ppa = combinedPPAs[ key ]
+            publishedBinaries = ppa.getPublishedBinaries() # A PPA with a status other than OK will have no published binaries...
+            for publishedBinary in publishedBinaries:
+                key = publishedBinary.getPackageName() + " | " + publishedBinary.getPackageVersion()
+                if publishedBinary.isArchitectureSpecific():
+                    key = publishedBinary.getPackageName()
+                    publishedBinary.setPackageVersion( None )
 
-                continue
-
-            # We have a list of statistics.
-            # If a string message has previously been added, substitute a message telling the user there are multiple messages...
-            # At this point we will never get the "downloading" message as it's handled above.
-            if combinedKey in combinedPPADownloadStatistics and type( combinedPPADownloadStatistics[ combinedKey ] ) is str:
-                combinedPPADownloadStatistics[ combinedKey ] = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
-                continue
-
-            # Iterate over the published binary infos and combine...
-            for publishedBinaryInfo in publishedBinaryInfos:
-
-                # A key to record architecture independent published binary packages which have already been added.
-                id_ = combinedKey + publishedBinaryInfo.getPackageName() + publishedBinaryInfo.getPackageVersion() # id is a reserved keyword!
-
-                if combinedKey not in combinedPPADownloadStatistics:
-                    # This is the first occurrence of this combined PPA...
-                    combinedPublishedBinaryInfo = PublishedBinary( publishedBinaryInfo.getPackageName(), publishedBinaryInfo.getPackageVersion(), publishedBinaryInfo.getDownloadCount(), publishedBinaryInfo.isArchitectureSpecific() )
-                    combinedPPADownloadStatistics[ combinedKey ] = [ combinedPublishedBinaryInfo ]
-                    architectureIndependentPublishedBinaries.append( id_ )
+                if not key in temp:
+                    temp[ key ] = publishedBinary
                     continue
 
-                # This combined PPA already exists...see if a combined published binary exists which matches the current published binary...
-                combinedPublishedBinaryInfos = combinedPPADownloadStatistics.get( combinedKey )
-                added = False
-                for combinedPublishedBinaryInfo in combinedPublishedBinaryInfos:
-                    if publishedBinaryInfo.getPackageName() == combinedPublishedBinaryInfo.getPackageName():
-                        # Update the existing combined published binary...
-                        # Assume that the architecture specific flag of publishedBinaryInfo always matches that of the combinedPublishedBinaryInfo.
-                        if publishedBinaryInfo.isArchitectureSpecific() == True:
-                            combinedPublishedBinaryInfo.setDownloadCount( publishedBinaryInfo.getDownloadCount() + combinedPublishedBinaryInfo.getDownloadCount( ) )
-                        else:
-                            # Architecture independent published binaries with the same name can have different versions.
-                            # For example an older version may exist for Natty but a newer version exists for Precise.
-                            # In this case the binaries (and their download counts) need to be uniquely counted.
-                            if not id_ in architectureIndependentPublishedBinaries:
-                                # This published binary has not yet been added in, so add it's download count to the running total.
-                                combinedPublishedBinaryInfo.setDownloadCount( publishedBinaryInfo.getDownloadCount() + combinedPublishedBinaryInfo.getDownloadCount( ) )
-                                architectureIndependentPublishedBinaries.append( id_ )
+                if publishedBinary.isArchitectureSpecific():
+                    temp[ key ].setDownloadCount( temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount() )
 
-                        # If the versions do not match then wipe...
-                        if combinedPublishedBinaryInfo.getPackageVersion() is not None: 
-                            if publishedBinaryInfo.getPackageVersion() != combinedPublishedBinaryInfo.getPackageVersion():
-                                combinedPublishedBinaryInfo.setPackageVersion( None )
+            publishedBinaries = [ ]
+            for key in temp:
+                publishedBinaries.append( temp[ key ] )
 
-                        added = True
-                        break
+            publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
+            ppa.setPublishedBinaries( publishedBinaries )
+            ppas.append( ppa  )
 
-                # This published binary has not yet been added, so append...
-                if not added:
-                    combinedPublishedBinaryInfo = PublishedBinary( publishedBinaryInfo.getPackageName(), publishedBinaryInfo.getPackageVersion(), publishedBinaryInfo.getDownloadCount(), publishedBinaryInfo.isArchitectureSpecific() )
-                    combinedPublishedBinaryInfos.append( combinedPublishedBinaryInfo )
-                    architectureIndependentPublishedBinaries.append( id_ )
+        ppas.sort( key = operator.methodcaller( "getKey" ) )
 
-        # Sort each list of published binaries...
-        for key in combinedPPADownloadStatistics:
-            combinedPublishedBinaries = combinedPPADownloadStatistics.get( key )
-            if type( combinedPublishedBinaries ) is PublishedBinary:
-                combinedPublishedBinariesNew = sorted( combinedPublishedBinaries, key = lambda combinedPublishedBinary: combinedPublishedBinary.packageName )
-                combinedPPADownloadStatistics[ key ] = combinedPublishedBinariesNew
 
-        return combinedPPADownloadStatistics        
+# TODO...
+    def clip( self, ppas ):
+        for ppa in ppas:
+            print( ppa )
 
 
     def getClippedPPAs( self, ppas, ppaDownloadStatistics ):
@@ -443,21 +424,6 @@ class IndicatorPPADownloadStatistics:
             clippedPPADownloadStatistics[ ppa ] = publishedBinaryInfosSortedByDownloadCount[ : self.sortByDownloadAmount ]
 
         return clippedPPADownloadStatistics        
-
-
-    def getPPAsSorted( self, combined ):
-        sortedKeys = [ ] 
-
-        if combined == True:
-            for key in list( self.ppas.keys() ):
-                combinedKey = key[ : key.find( " | ", key.find( " | " ) + 1 ) ] # The combined key is 'ppaUser | ppaName | series | architecture' stripped down to 'ppaUser | ppaName'.
-                if not combinedKey in sortedKeys:
-                    sortedKeys.append( combinedKey )
-        else:
-            for key in list( self.ppas.keys() ):
-                sortedKeys.append( key )
-
-        return sorted( sortedKeys, key = locale.strxfrm )
 
 
     def getPPAUsersSorted( self ):
@@ -511,7 +477,7 @@ class IndicatorPPADownloadStatistics:
             series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
             url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
 
-        webbrowser.open( url ) # This returns a boolean - I wanted to message the user on a false return value but popping up a message dialog causes a lock up!
+        webbrowser.open( url ) # This returns a boolean - showing the user a message on a false return value causes a lock up!
 
 
     def onAbout( self, widget ):
@@ -519,7 +485,7 @@ class IndicatorPPADownloadStatistics:
             self.dialog.present()
             return
 
-        self.dialog = AboutDialogWithChangeLog( 
+        self.dialog = PythonUtils.AboutDialogWithChangeLog( 
                IndicatorPPADownloadStatistics.NAME,
                IndicatorPPADownloadStatistics.COMMENTS, 
                IndicatorPPADownloadStatistics.WEBSITE, 
@@ -650,19 +616,19 @@ class IndicatorPPADownloadStatistics:
                 ppaNameValue = ppaName.get_text().strip()
 
             if ppaUserValue == "":
-                self.showMessage( Gtk.MessageType.ERROR, "PPA user cannot be empty." )
+                PythonUtils.showMessage( Gtk.MessageType.ERROR, "PPA user cannot be empty." )
                 ppaUser.grab_focus()
                 continue
 
             if ppaNameValue == "":
-                self.showMessage( Gtk.MessageType.ERROR, "PPA name cannot be empty." )
+                PythonUtils.showMessage( Gtk.MessageType.ERROR, "PPA name cannot be empty." )
                 ppaName.grab_focus()
                 continue
 
             ppaList = [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ]
             key = self.getPPAKey( ppaList )
             if key not in self.ppas: # If there is no change, there is nothing to do...
-                if add == True:
+                if add:
                     self.ppas[ key ] = PPA( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
                 else: # This is an edit...we are 'renaming' the PPA key, but the PPA download data is still present under the old key!
                     oldKey = self.getPPAKey( [ existingPPAUser, existingPPAName, existingSeries, existingArchitecture ] )
@@ -710,13 +676,6 @@ class IndicatorPPADownloadStatistics:
                 return i
 
         return -1 # Should never happen!
-
-
-#     def showMessage( self, messageType, message ):
-#         dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
-#         dialog.run()
-#         dialog.destroy()
-# TODO Delete
 
 
     def onRemove( self, widget ):
@@ -857,8 +816,8 @@ class IndicatorPPADownloadStatistics:
         self.filters = { }
         
 #         TODO Remove
-        self.filters[ 'noobslab | indicators' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-        self.filters[ 'whoopie79 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
+#         self.filters[ 'noobslab | indicators' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
+#         self.filters[ 'whoopie79 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
 
 # TODO Rename - remove the NEW
         self.ppasNEW = [ ]
@@ -989,6 +948,7 @@ class IndicatorPPADownloadStatistics:
             numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
             if numberOfPublishedBinaries == 0:
                 ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+                ppa.setPublishedBinaries( [ ] )
             else:
                 # The results are returned in lots of 75...so need to retrieve each lot after the first 75.
                 index = 0
@@ -1001,13 +961,16 @@ class IndicatorPPADownloadStatistics:
                         resultPage += 1
                         index = 0
 
-                    binaryPackageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
-                    binaryPackageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
+                    packageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
+                    packageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
                     architectureSpecific = publishedBinaries[ "entries" ][ index ][ "architecture_specific" ]
                     indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
-                    binaryPackageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
+                    packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
 
-                    t = Thread( target = self.getDownloadCount, args = ( ppa, binaryPackageName, binaryPackageVersion, architectureSpecific, binaryPackageId ), )
+                    if packageName == "dropper":
+                        print( architectureSpecific )
+
+                    t = Thread( target = self.getDownloadCount, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ), )
                     threads.append( t )
                     t.start()
 
@@ -1021,6 +984,7 @@ class IndicatorPPADownloadStatistics:
         except Exception as e:
             logging.exception( e )
             ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+            ppa.setPublishedBinaries( [ ] )
 
 
     def getDownloadCount( self, ppa, packageName, packageVersion, architectureSpecific, packageId ):
@@ -1032,10 +996,12 @@ class IndicatorPPADownloadStatistics:
                 ppa.addPublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific )
             else:
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                ppa.setPublishedBinaries( [ ] )
 
         except Exception as e:
             logging.exception( e )
             ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+            ppa.setPublishedBinaries( [ ] )
 
 
 class PPA:
@@ -1055,9 +1021,6 @@ class PPA:
         self.name = name
         self.series = series
         self.architecture = architecture
-
-        self.key = str( self.user ) + " | " + str( self.name ) + " | " + str( self.series ) + " | " + str( self.architecture )
-        self.simpleKey = str( self.user ) + " | " + str( self.name )
 
 
     def reset( self ):
@@ -1099,12 +1062,10 @@ class PPA:
 
     # Returns a key of the form 'PPA User | PPA Name | Series | Architecture'
     def getKey( self ):
-        return self.key
+        if self.series is None or self.architecture is None:
+            return str( self.user ) + " | " + str( self.name )
 
-
-    # Returns a key of the form 'PPA User | PPA Name'
-    def getSimpleKey( self ):
-        return self.simpleKey
+        return str( self.user ) + " | " + str( self.name ) + " | " + str( self.series ) + " | " + str( self.architecture )
 
 
     def addPublishedBinary( self, packageName, packageVersion, downloadCount, architectureSpecific ):
@@ -1119,6 +1080,10 @@ class PPA:
 
     def getPublishedBinaries( self ):
         return self.publishedBinaries
+
+
+    def setPublishedBinaries( self, publishedBinaries ):
+        self.publishedBinaries = publishedBinaries
 
 
     def __str__( self ):
@@ -1170,4 +1135,5 @@ class PublishedBinary:
         return self.__str__()
 
 
-if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
+if __name__ == "__main__": 
+     IndicatorPPADownloadStatistics().main()
