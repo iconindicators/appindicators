@@ -1,3 +1,27 @@
+#
+#
+#  {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"],
+# ["thebernmeister", "ppa", "precise", "i386"], 
+# ["guido-iodice", "precise-updates", "precise", "amd64"],
+# ["guido-iodice", "precise-updates", "precise", "i386"], 
+# ["erdie1", "ppa", "precise", "amd64"],
+# ["erdie1", "ppa", "precise", "i386"], 
+# ["guido-iodice", "raring-quasi-rolling", "raring", "amd64"],
+# ["guido-iodice", "raring-quasi-rolling", "raring", "i386"], 
+# 
+# 
+# 
+# 
+# ["noobslab", "indicators", "quantal", "amd64"]
+# 
+# 
+# 
+# ], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
+#
+#
+
+
+
 #         self.filters[ 'noobslab | indicators' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
 #         self.filters[ 'whoopie79 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
 
@@ -7,6 +31,15 @@
 #{"ppas": [  ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"],  ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"] ], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": true, "combinePPAs": true}
 
 # {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
+
+
+
+#TODO Sleep between some threads?  Somehow lighten the breadth of the load.
+# Maybe do one PPA at a time...then copy the results out and do the next PPA? 
+# How to avoid calling the menu to build itself whilst its currently building itself?
+
+
+#TODO Depending on the error (if it's a download error), do a redownload of that PPA?
 
 
 # TODO Need to sort the filter text with each filter.
@@ -981,8 +1014,8 @@ class IndicatorPPADownloadStatistics:
 
 
     def requestPPADownloadAndMenuRefresh( self ):
-#         self.lock.acquire()
-#         Thread( target = self.getPPADownloadStatistics ).start()
+        self.lock.acquire()
+        Thread( target = self.getPPADownloadStatistics ).start()
 
 # TODO Why need to return?
         return True 
