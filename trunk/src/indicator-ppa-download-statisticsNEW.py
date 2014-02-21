@@ -1,9 +1,18 @@
+#         self.filters[ 'noobslab | indicators' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
+#         self.filters[ 'whoopie79 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
+
+
 # {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 4, "sortByDownload": true, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": false}
 
 #{"ppas": [  ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"],  ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"] ], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": true, "combinePPAs": true}
 
 # {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
 
+
+# TODO Need to sort the filter text with each filter.
+
+
+# TODO Have a sample filter with the sample ppa?
 
 
 # TODO Test "if A == False" is the same as "if not A".
@@ -16,7 +25,7 @@
 # Maybe two checkboxes indented under Combine: Ignore Version for Architecture Dependent, Ignore Version for Architecture Independent? 
 
 
-# TODO Modify the build script and packaging, etc, etc to include the PythonUtils.
+# TODO Modify the build script and packaging, etc, etc to include the pythonutils.
 
 
 # TODO Need a preferences tab for filters...
@@ -26,8 +35,10 @@
 # TODO Add a PPA (after initial PPAs have done their download) and ensure the "downloading now" is shown.
 
 
-# TODO Possible to have an ignore error...whatever that means?
-# Only makes sense when combining...a PPA with an error is tossed.  How to let the user know there's an error though?
+# TODO Possible to have an ignore error...so a PPA with an error is tossed.
+# How to let the user know there's an error though?
+# If the user unchecks the "hide errors" checkbox, the menu will be rebuilt, with errors displayed
+# (and the user may have to uncombine to see message details).
 
 
 # TODO Perhaps block UI access whilst downloading...
@@ -74,11 +85,12 @@ except:
     pass
 
 from gi.repository import GLib, Gtk
+from ppa import *
 from threading import Thread
 from urllib.request import urlopen
 
 import itertools, gzip, json, locale, logging, operator, os, re, shutil, sys, threading, time, webbrowser
-import PythonUtils
+import pythonutils
 
 
 class IndicatorPPADownloadStatistics:
@@ -463,7 +475,7 @@ class IndicatorPPADownloadStatistics:
             self.dialog.present()
             return
 
-        self.dialog = PythonUtils.AboutDialogWithChangeLog( 
+        self.dialog = pythonutils.AboutDialogWithChangeLog( 
                IndicatorPPADownloadStatistics.NAME,
                IndicatorPPADownloadStatistics.COMMENTS, 
                IndicatorPPADownloadStatistics.WEBSITE, 
@@ -594,12 +606,12 @@ class IndicatorPPADownloadStatistics:
                 ppaNameValue = ppaName.get_text().strip()
 
             if ppaUserValue == "":
-                PythonUtils.showMessage( Gtk.MessageType.ERROR, "PPA user cannot be empty." )
+                pythonutils.showMessage( Gtk.MessageType.ERROR, "PPA user cannot be empty." )
                 ppaUser.grab_focus()
                 continue
 
             if ppaNameValue == "":
-                PythonUtils.showMessage( Gtk.MessageType.ERROR, "PPA name cannot be empty." )
+                pythonutils.showMessage( Gtk.MessageType.ERROR, "PPA name cannot be empty." )
                 ppaName.grab_focus()
                 continue
 
@@ -682,7 +694,7 @@ class IndicatorPPADownloadStatistics:
 
         notebook = Gtk.Notebook()
 
-        # First tab - display settings.
+        # First tab - PPAs.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -691,7 +703,87 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showAsSubmenusCheckbox = Gtk.CheckButton( "Show as PPAs submenus" )
+# TODO Add/edit/remove ppas.
+
+        notebook.append_page( grid, Gtk.Label( "PPAs" ) )
+
+        # Second tab - filters.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        store = Gtk.ListStore( str, str ) # 'PPA User | PPA Name', filter text.
+        keys = {  }
+        for ppa in self.ppasNEW:
+            key = ppa.getUser() + " | " + ppa.getName()
+
+            if key in keys:
+                continue # Add each 'PPA User | PPA Name' once!
+
+            keys[ key ] = key
+            if key in self.filters:
+                store.append( [ key, "\n".join( self.filters[ key ] ) ] )
+            else:
+                store.append( [ key, "" ] )
+
+        tree = Gtk.TreeView( store )
+        tree.set_hexpand( True )
+        tree.set_vexpand( True )
+        tree.append_column( Gtk.TreeViewColumn( "PPA", Gtk.CellRendererText(), text = 0 ) )
+        tree.append_column( Gtk.TreeViewColumn( "Filter", Gtk.CellRendererText(), text = 1 ) )
+        tree.set_tooltip_text( "Double click to add/modify a filter." )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+
+# TODO Not sure about this...
+        # The treeview won't expand to show all data, even for a small amount of data.
+        # So only add scrollbars if there is a lot of data...greater than 15 say...
+#         if len( self.virtualMachineInfos ) <= 15:
+#             scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
+#         else:
+#             scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+
+        scrolledWindow.set_policy( Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( tree )
+        grid.attach( scrolledWindow, 0, 0, 2, 1 )
+
+        hbox = Gtk.Box( spacing = 6 )
+
+        label = Gtk.Label( "Filter" )
+        hbox.pack_start( label, False, False, 0 )
+
+        filterText = Gtk.Entry()
+#         filterText.set_text( )
+#         filterText.set_tooltip_text( "The text shown next to the icon (or tooltip, where applicable)" )
+        hbox.pack_start( filterText, True, True, 0 )
+
+        apply = Gtk.Button( "Apply" )
+#         apply.connect( "clicked", self.onApply, filterText )
+#         apply.set_tooltip_text( "Notifications are not possible on your system" )
+
+        hbox.pack_start( apply, False, False, 0 )
+
+        grid.attach( hbox, 0, 1, 2, 1 )
+
+#         tree.connect( "row-activated", self.onFilterDoubleClick, filterText )
+
+        notebook.append_page( grid, Gtk.Label( "Filters" ) )
+
+        # Third tab - display settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        showAsSubmenusCheckbox = Gtk.CheckButton( "Show PPAs as submenus" )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
@@ -704,15 +796,30 @@ class IndicatorPPADownloadStatistics:
         combinePPAsCheckbox.set_active( self.combinePPAs )
         grid.attach( combinePPAsCheckbox, 0, 1, 2, 1 )
 
+# So maybe just have a setting "Ignore versions" and nothing to do with architecture specificity.
+# Maybe two checkboxes indented under Combine: Ignore Version for Architecture Dependent, Ignore Version for Architecture Independent? 
+
+        ignoreVersionArchitectureDependentCheckbox = Gtk.CheckButton( "Ignore Version for Architecture Dependent" )
+        ignoreVersionArchitectureDependentCheckbox.set_margin_left( 15 )
+        ignoreVersionArchitectureDependentCheckbox.set_tooltip_text( "TODO" ) #TODO
+        ignoreVersionArchitectureDependentCheckbox.set_active( True ) #TODO Fix
+        grid.attach( ignoreVersionArchitectureDependentCheckbox, 0, 2, 2, 1 )
+
+        ignoreVersionArchitectureIndependentCheckbox = Gtk.CheckButton( "Ignore Version for Architecture Independent" )
+        ignoreVersionArchitectureIndependentCheckbox.set_margin_left( 15 )
+        ignoreVersionArchitectureIndependentCheckbox.set_tooltip_text( "TODO" ) #TODO
+        ignoreVersionArchitectureIndependentCheckbox.set_active( True ) #TODO Fix
+        grid.attach( ignoreVersionArchitectureIndependentCheckbox, 0, 3, 2, 1 )
+
         sortByDownloadCheckbox = Gtk.CheckButton( "Sort By Download" )
-        sortByDownloadCheckbox.set_tooltip_text( "Sort by download within each PPA." )
+        sortByDownloadCheckbox.set_tooltip_text( "Sort by download (highest first) within each PPA." )
         sortByDownloadCheckbox.set_active( self.sortByDownload )
-        grid.attach( sortByDownloadCheckbox, 0, 2, 2, 1 )
+        grid.attach( sortByDownloadCheckbox, 0, 4, 2, 1 )
 
         label = Gtk.Label( "  Clip Amount" )
         label.set_sensitive( sortByDownloadCheckbox.get_active() )
         label.set_margin_left( 15 )
-        grid.attach( label, 0, 3, 1, 1 )
+        grid.attach( label, 0, 5, 1, 1 )
 
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
@@ -720,13 +827,18 @@ class IndicatorPPADownloadStatistics:
         spinner.set_tooltip_text( "Limit the number of entries when sorting by download.\nA value of zero will not clip." )
         spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
         spinner.set_hexpand( True )
-        grid.attach( spinner, 1, 3, 1, 1 )
+        grid.attach( spinner, 1, 5, 1, 1 )
 
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
+        ignoreErrorsCheckbox = Gtk.CheckButton( "Ignore Errors" )
+        ignoreErrorsCheckbox.set_tooltip_text( "TODO" )
+        ignoreErrorsCheckbox.set_active( True ) #TODO
+        grid.attach( ignoreErrorsCheckbox, 0, 6, 2, 1 )
+
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
-        # Second  tab - general settings.
+        # Fourth tab - general settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -736,7 +848,7 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_bottom( 10 )
 
         allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Open PPA in browser" )
-        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item launches the default web browser and loads the PPA home page." )
+        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item launches the default web browser, loading the PPA's page." )
         allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
         grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 0, 1, 1 )
 
@@ -785,6 +897,16 @@ class IndicatorPPADownloadStatistics:
         spinner.set_sensitive( source.get_active() )
 
 
+#     def onFilterDoubleClick( self, tree, rowNumber, treeViewColumn, displayPattern ):
+#         model, treeiter = tree.get_selection().get_selected()
+#         displayPattern.insert_text( "[" + model[ treeiter ][ 0 ] + "]", displayPattern.get_position() )
+
+
+#     def onApply( self, tree, rowNumber, treeViewColumn, displayPattern ):
+#         model, treeiter = tree.get_selection().get_selected()
+#         displayPattern.insert_text( "[" + model[ treeiter ][ 0 ] + "]", displayPattern.get_position() )
+
+
     def loadSettings( self ):
         self.allowMenuItemsToLaunchBrowser = True
         self.sortByDownload = False
@@ -792,10 +914,6 @@ class IndicatorPPADownloadStatistics:
         self.combinePPAs = False
         self.showSubmenu = False
         self.filters = { }
-        
-#         TODO Remove
-#         self.filters[ 'noobslab | indicators' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-#         self.filters[ 'whoopie79 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
 
 # TODO Rename - remove the NEW
         self.ppasNEW = [ ]
@@ -811,6 +929,10 @@ class IndicatorPPADownloadStatistics:
 
                 self.ppasNEW.sort( key = operator.methodcaller( "getKey" ) )
 
+#TODO Load filters and remove these...
+                self.filters[ 'noobslab | indicators' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
+                self.filters[ 'whoopie79 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
+
                 self.allowMenuItemsToLaunchBrowser = settings.get( IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER, self.allowMenuItemsToLaunchBrowser )
                 self.sortByDownload = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD, self.sortByDownload )
                 self.sortByDownloadAmount = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT, self.sortByDownloadAmount )
@@ -821,12 +943,17 @@ class IndicatorPPADownloadStatistics:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
 # TODO Delete the settings file...alert the user?                
-                self.ppasNEW = [ ]
-                self.ppasNEW.append( PPA( "thebernmeister", "ppa", "precise", "amd64" ) )
+                self.initialiseDefaultSettings()
         else:
             # No properties file exists, so populate with a sample PPA to give the user an idea of the format.
-            self.ppasNEW = [ ]
-            self.ppasNEW.append( PPA( "thebernmeister", "ppa", "precise", "amd64" ) )
+            self.initialiseDefaultSettings()
+
+
+    def initialiseDefaultSettings( self ):
+        self.ppasNEW = [ ]
+        self.ppasNEW.append( PPA( "thebernmeister", "ppa", "precise", "amd64" ) )
+        self.filters = { }
+        self.filters[ 'thebernmeister | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
 
 
     def saveSettings( self ):
@@ -854,8 +981,8 @@ class IndicatorPPADownloadStatistics:
 
 
     def requestPPADownloadAndMenuRefresh( self ):
-        self.lock.acquire()
-        Thread( target = self.getPPADownloadStatistics ).start()
+#         self.lock.acquire()
+#         Thread( target = self.getPPADownloadStatistics ).start()
 
 # TODO Why need to return?
         return True 
@@ -978,137 +1105,6 @@ class IndicatorPPADownloadStatistics:
             logging.exception( e )
             ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
             ppa.setPublishedBinaries( [ ] )
-
-
-class PPA:
-
-    STATUS_OK = "OK"
-    STATUS_NEEDS_DOWNLOAD = "NEEDS DOWNLOAD"
-    STATUS_ERROR_RETRIEVING_PPA = "ERROR RETRIEVING PPA"
-    STATUS_MULTIPLE_ERRORS = "MULTIPLE ERRORS"
-    STATUS_NO_PUBLISHED_BINARIES = "NO PUBLISHED BINARIES"
-
-
-    def __init__( self, user, name, series, architecture ):
-        self.status = PPA.STATUS_NEEDS_DOWNLOAD
-        self.publishedBinaries = [ ]
-
-        self.user = user
-        self.name = name
-        self.series = series
-        self.architecture = architecture
-
-
-    def reset( self ):
-        self.status = PPA.STATUS_NEEDS_DOWNLOAD
-        self.publishedBinaries = [ ]
-
-
-    def getStatus( self ):
-        return self.status
-
-
-    def setStatus( self, status ):
-        self.status = status
-
-
-    def getUser( self ):
-        return self.user
-
-
-    def getName( self ):
-        return self.name
-
-
-    def getSeries( self ):
-        return self.series
-
-
-    def setSeries( self, series ):
-        self.series = series
-
-
-    def getArchitecture( self ):
-        return self.architecture
-
-
-    def setArchitecture( self, architecture ):
-        self.architecture = architecture
-
-
-    # Returns a key of the form 'PPA User | PPA Name | Series | Architecture' or 'PPA User | PPA Name' if series/architecture are undefined. 
-    def getKey( self ):
-        if self.series is None or self.architecture is None:
-            return str( self.user ) + " | " + str( self.name )
-
-        return str( self.user ) + " | " + str( self.name ) + " | " + str( self.series ) + " | " + str( self.architecture )
-
-
-    def addPublishedBinary( self, packageName, packageVersion, downloadCount, architectureSpecific ):
-        self.publishedBinaries.append( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
-
-
-    def noMorePublishedBinariesToAdd( self ):
-        if self.status == PPA.STATUS_NEEDS_DOWNLOAD:
-            self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
-            self.setStatus( PPA.STATUS_OK )
-
-
-    def getPublishedBinaries( self ):
-        return self.publishedBinaries
-
-
-    def setPublishedBinaries( self, publishedBinaries ):
-        self.publishedBinaries = publishedBinaries
-
-
-    def __str__( self ):
-        return self.key
-
-
-    def __repr__( self ):
-        return self.__str__()
-
-
-class PublishedBinary:
-
-    def __init__( self, packageName, packageVersion, downloadCount, architectureSpecific ):
-        self.packageName = packageName
-        self.packageVersion = packageVersion
-        self.downloadCount = downloadCount
-        self.architectureSpecific = architectureSpecific
-
-
-    def getPackageName( self ):
-        return self.packageName
-
-
-    def getPackageVersion( self ):
-        return self.packageVersion
-
-
-    def setPackageVersion( self, packageVersion ):
-        self.packageVersion = packageVersion
-
-
-    def getDownloadCount( self ):
-        return self.downloadCount
-
-
-    def setDownloadCount( self, downloadCount ):
-        self.downloadCount = downloadCount
-
-
-    def isArchitectureSpecific( self ):
-        return self.architectureSpecific
-
-
-    def __str__( self ):
-        return str( self.packageName ) + " | " + str( self.packageVersion ) + " | " + str( self.downloadCount ) + " | " + str( self.architectureSpecific )
-
-
-    def __repr__( self ):
-        return self.__str__()
 
 
 if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
