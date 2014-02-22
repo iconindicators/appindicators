@@ -37,7 +37,28 @@
 #TODO Sleep between some threads?  Somehow lighten the breadth of the load.
 # Maybe do one PPA at a time...then copy the results out and do the next PPA? 
 # How to avoid calling the menu to build itself whilst its currently building itself?
-
+# 
+# Load settings.
+#    PPA object initialised with PPA info but no PBs.  
+#    Deep copy PPA object to PPAForMenu.
+# Build menu.
+#    Grab lock.
+#    Use PPAForMenu to update menu.
+#    Release lock.
+# Kick off update.
+#    Update thread deep copies PPA object to PPAForUpdateThread.
+#    For each PPA...
+#        Create a new thread (with sleeps) to get the PPA data, placing results into PPAForUpdateThread.
+#        When threads finished, grab lock, deep copy PPA data from PPAForUpdateThread to PPAForMenu, release lock, tell menu to update itself in a new thread (GLib).
+#    
+# PREVENT USER accessing GUI during update???  
+# Maybe disable the menu items?  
+# How/when to reenable?  
+# When the update thread fully finishes?
+# Maybe the build menu method needs a boolean parameter - enable/disable items?
+#
+# By updating a PPA at a time, does this effect combining?
+   
 
 #TODO Depending on the error (if it's a download error), do a redownload of that PPA?
 
@@ -58,7 +79,7 @@
 # Maybe two checkboxes indented under Combine: Ignore Version for Architecture Dependent, Ignore Version for Architecture Independent? 
 
 
-# TODO Modify the build script and packaging, etc, etc to include the pythonutils.
+# TODO Modify the build script and packaging, etc, etc to include the utils.
 
 
 # TODO Need a preferences tab for filters...
@@ -118,12 +139,11 @@ except:
     pass
 
 from gi.repository import GLib, Gtk
-from ppa import *
 from threading import Thread
+from ppa import PPA, PublishedBinary
 from urllib.request import urlopen
 
-import itertools, gzip, json, locale, logging, operator, os, re, shutil, sys, threading, time, webbrowser
-import pythonutils
+import itertools, pythonutils, gzip, json, locale, logging, operator, os, re, shutil, sys, threading, time, webbrowser
 
 
 class IndicatorPPADownloadStatistics:
@@ -508,7 +528,7 @@ class IndicatorPPADownloadStatistics:
             self.dialog.present()
             return
 
-        self.dialog = pythonutils.AboutDialogWithChangeLog( 
+        self.dialog = pythonutils.AboutDialog( 
                IndicatorPPADownloadStatistics.NAME,
                IndicatorPPADownloadStatistics.COMMENTS, 
                IndicatorPPADownloadStatistics.WEBSITE, 
@@ -519,11 +539,13 @@ class IndicatorPPADownloadStatistics:
                [ IndicatorPPADownloadStatistics.AUTHOR ],
                "",
                "",
-               "/usr/share/doc/" + IndicatorPPADownloadStatistics.NAME + "/changelog.Debian.gz" )
+               "/usr/share/doc/" + IndicatorPPADownloadStatistics.NAME + "/changelog.Debian.gz",
+               logging )
 
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
+
 
 
     def onAdd( self, widget ):
@@ -1014,8 +1036,8 @@ class IndicatorPPADownloadStatistics:
 
 
     def requestPPADownloadAndMenuRefresh( self ):
-        self.lock.acquire()
-        Thread( target = self.getPPADownloadStatistics ).start()
+#         self.lock.acquire()
+#         Thread( target = self.getPPADownloadStatistics ).start()
 
 # TODO Why need to return?
         return True 
@@ -1064,7 +1086,7 @@ class IndicatorPPADownloadStatistics:
         threads = []
         for ppa in self.ppasNEW:
             ppa.reset()
-            t = Thread( target = self.getPublishedBinaries, args = ( [ ppa ] ), )
+            t = Thread( target = self.getPublishedBinariesOLD, args = ( [ ppa ] ), )
             threads.append( t )
             t.start()
 
@@ -1106,7 +1128,7 @@ class IndicatorPPADownloadStatistics:
                     indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
                     packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
 
-                    t = Thread( target = self.getDownloadCount, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ), )
+                    t = Thread( target = self.getDownloadCountOLD, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ), )
                     threads.append( t )
                     t.start()
 
@@ -1138,6 +1160,5 @@ class IndicatorPPADownloadStatistics:
             logging.exception( e )
             ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
             ppa.setPublishedBinaries( [ ] )
-
 
 if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
