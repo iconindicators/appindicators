@@ -1,3 +1,11 @@
+# TODO Maybe move  getColourForIconTheme,  getIconTheme,  handleLeftClick,  handleRightClick to general utils?
+# Use new AboutDialog and remove current one.
+# Use new showMessage and remove current one.
+# Remove getChangeLog
+# Move Eclise to it's own file.
+
+
+
 #!/usr/bin/env python3
 
 
@@ -802,6 +810,8 @@ class IndicatorLunar:
 
         label = Gtk.Label( "City" )
         label.set_halign( Gtk.Align.START )
+
+# TODO Should this be grid.attach?        
         grid.add( label )
 
         global _city_data
