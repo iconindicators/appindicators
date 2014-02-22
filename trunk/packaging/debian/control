@@ -8,5 +8,5 @@ X-Python3-Version: >= 3.2
 
 Package: indicator-ppa-download-statistics
 Architecture: all
-Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-gi
+Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-gi, python3-notify2
 Description:  Application indicator which displays PPA download statistics.

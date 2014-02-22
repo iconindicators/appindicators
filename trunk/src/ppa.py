@@ -40,7 +40,7 @@ class PPA:
         self.architecture = architecture
 
 
-    def reset( self ):
+    def resetForDownload( self ):
         self.status = PPA.STATUS_NEEDS_DOWNLOAD
         self.publishedBinaries = [ ]
 
