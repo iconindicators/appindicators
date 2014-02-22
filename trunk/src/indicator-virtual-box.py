@@ -1,3 +1,10 @@
+# TODO Use new handleLeftClick,  handleRightClick in general utils?
+# Use new AboutDialog and remove current one.
+# Use new showMessage and remove current one.
+# Remove getChangeLog
+# Move VirtualMachineInfo to a new file.
+
+
 #!/usr/bin/env python3
 
 
