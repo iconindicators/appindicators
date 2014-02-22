@@ -23,6 +23,13 @@
 # {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
 
 
+# TODO What happens if the filters remove all packages?  Need a new error message?
+# Best way to test?  Maybe add filters for my ppa?
+
+
+# TODO WOuld still be nice to increase the speed of download and/or update the menu progressively after each ppa is downloaded.
+
+
 # TODO Only do a re-download if a ppa was a/e/r...not just when OK is clicked in the preferences.
 
 
@@ -1134,27 +1141,6 @@ class IndicatorPPADownloadStatistics:
                     key = ppa.getUser() + " | " + ppa.getName()
                     if self.filterAtDownload and key in self.filters:
                         match = False
-#                         print('ddfdfdfd')
-#                         
-# TODO WHilst testing this code to make sure my ppa passes (without an associated filter) got this when uncombining
-# 01:17:10,563 root ERROR 'IndicatorPPADownloadStatistics' object has no attribute 'ppas'
-# Traceback (most recent call last):
-#   File "/home/bernard/Programming/IndicatorPPADownloadStatistics/src/indicator-ppa-download-statisticsNEW.py", line 1026, in saveSettings
-#     for k, v in list( self.ppas.items() ):
-# AttributeError: 'IndicatorPPADownloadStatistics' object has no attribute 'ppas'
-# 01:17:10,565 root ERROR Error writing settings: /home/bernard/.indicator-ppa-download-statistics.json
-# 
-# Only got one ppa for testing at the time
-# 
-# 
-#  {"ppas": [
-# 
-# 
-# ["thebernmeister", "ppa", "raring", "i386"]],
-# "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
-
-
-                        
                         for filter in self.filters.get( key ):
                             if filter in packageName:
                                 match = True
