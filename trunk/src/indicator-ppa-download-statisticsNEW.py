@@ -4,8 +4,6 @@
 # ["thebernmeister", "ppa", "precise", "i386"], 
 # ["guido-iodice", "precise-updates", "precise", "amd64"],
 # ["guido-iodice", "precise-updates", "precise", "i386"], 
-# ["erdie1", "ppa", "precise", "amd64"],
-# ["erdie1", "ppa", "precise", "i386"], 
 # ["guido-iodice", "raring-quasi-rolling", "raring", "amd64"],
 # ["guido-iodice", "raring-quasi-rolling", "raring", "i386"]],
 # "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
@@ -14,7 +12,6 @@
 #         self.filters[ 'whoopie79 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
 #         self.filters[ 'guido-iodice | precise-updates' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
 #         self.filters[ 'guido-iodice | raring-quasi-rolling' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-#         self.filters[ 'erdie1 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
 
 
 
@@ -24,6 +21,9 @@
 #{"ppas": [  ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"],  ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"] ], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": true, "combinePPAs": true}
 
 # {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
+
+
+# TODO Only do a re-download if a ppa was a/e/r...not just when OK is clicked in the preferences.
 
 
 #TODO Depending on the error (if it's a download error), do a redownload of that PPA?
@@ -480,7 +480,7 @@ class IndicatorPPADownloadStatistics:
     def onPreferences( self, widget ):
 
         if self.locked:
-            Notify.Notification.new( "Refreshing download statistics...", "Preferences are unavailable.", IndicatorPPADownloadStatistics.ICON ).show()
+            Notify.Notification.new( "Refreshing download statistics...", "Preferences are currently unavailable.", IndicatorPPADownloadStatistics.ICON ).show()
             return
 
         if self.dialog is not None:
@@ -661,6 +661,11 @@ class IndicatorPPADownloadStatistics:
         grid.attach( hbox, 0, 1, 2, 1 )
 
 #         filterTree.connect( "row-activated", self.onFilterDoubleClick, filterText )
+
+        filterAtDownloadCheckbox = Gtk.CheckButton( "Filter At Download" )
+        filterAtDownloadCheckbox.set_tooltip_text( "TODO" )
+        filterAtDownloadCheckbox.set_active( self.filterAtDownload )
+        grid.attach( filterAtDownloadCheckbox, 0, 2, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Filters" ) )
 
@@ -969,6 +974,7 @@ class IndicatorPPADownloadStatistics:
         self.showSubmenu = False
         self.showNotificationOnUpdate = True
         self.filters = { }
+        self.filterAtDownload = True
 
 # TODO Rename - remove the NEW
         self.ppasNEW = [ ]
@@ -989,7 +995,6 @@ class IndicatorPPADownloadStatistics:
                 self.filters[ 'whoopie79 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
                 self.filters[ 'guido-iodice | precise-updates' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
                 self.filters[ 'guido-iodice | raring-quasi-rolling' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-                self.filters[ 'erdie1 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
 
                 self.allowMenuItemsToLaunchBrowser = settings.get( IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER, self.allowMenuItemsToLaunchBrowser )
                 self.sortByDownload = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD, self.sortByDownload )
@@ -1083,8 +1088,6 @@ class IndicatorPPADownloadStatistics:
         self.lock.acquire()
         self.locked = True
 
-# TODO Need to find a way that only 10 (or something) URLs connections are underway at any one time.
-
         for ppa in self.ppasNEW:
             ppa.resetForDownload()
             t = Thread( target = self.getPublishedBinaries, args = ( [ ppa ] ) )
@@ -1126,6 +1129,41 @@ class IndicatorPPADownloadStatistics:
                         index = 0
 
                     packageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
+
+                    # Filter out unwanted packages...
+                    key = ppa.getUser() + " | " + ppa.getName()
+                    if self.filterAtDownload and key in self.filters:
+                        match = False
+#                         print('ddfdfdfd')
+#                         
+# TODO WHilst testing this code to make sure my ppa passes (without an associated filter) got this when uncombining
+# 01:17:10,563 root ERROR 'IndicatorPPADownloadStatistics' object has no attribute 'ppas'
+# Traceback (most recent call last):
+#   File "/home/bernard/Programming/IndicatorPPADownloadStatistics/src/indicator-ppa-download-statisticsNEW.py", line 1026, in saveSettings
+#     for k, v in list( self.ppas.items() ):
+# AttributeError: 'IndicatorPPADownloadStatistics' object has no attribute 'ppas'
+# 01:17:10,565 root ERROR Error writing settings: /home/bernard/.indicator-ppa-download-statistics.json
+# 
+# Only got one ppa for testing at the time
+# 
+# 
+#  {"ppas": [
+# 
+# 
+# ["thebernmeister", "ppa", "raring", "i386"]],
+# "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
+
+
+                        
+                        for filter in self.filters.get( key ):
+                            if filter in packageName:
+                                match = True
+                                break
+        
+                        if not match:
+                            index += 1
+                            continue
+
                     packageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
                     architectureSpecific = publishedBinaries[ "entries" ][ index ][ "architecture_specific" ]
                     indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
@@ -1135,10 +1173,14 @@ class IndicatorPPADownloadStatistics:
                     threads.append( t )
                     t.start()
 
-                    index += 1
+                    # Limit to 10 threads at a time.
+                    if( len( threads ) > 10 ):
+                        for t in threads:
+                            t.join()
 
-                for t in threads:
-                    t.join()
+                        threads = [ ]
+
+                    index += 1
 
                 ppa.noMorePublishedBinariesToAdd()
 

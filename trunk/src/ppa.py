@@ -104,7 +104,7 @@ class PPA:
 
 
     def __str__( self ):
-        return self.key
+        return self.getKey()
 
 
     def __repr__( self ):
