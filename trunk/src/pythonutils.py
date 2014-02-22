@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.         
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# General utilities.
+
+
+from gi.repository import Gtk
+
+import gzip, os, re
+
+
+# Shows a message dialog.
+#    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING or Gtk.MessageType.QUESTION.
+#    message: The message.
+def showMessage( messageType, message ):
+    dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
+    dialog.run()
+    dialog.destroy()
+    
+    
+# A GTK AboutDialog with optional change log displayed in its own tab.
+class AboutDialog( Gtk.AboutDialog ):
+
+    CHANGELOG_BUTTON_NAME = "Change _Log"
+
+
+    # programName: Program name.
+    # comments: Comments.
+    # website: Website URL (used on click).
+    # websiteLabel: Website (may or may not be the actual URL).
+    # version: String of the numeric program version.
+    # licenseType: Any of Gtk.License.*
+    # logoIconName: The name of the image icon - without extension.
+    # authors: List of authors.
+    # creditsPeople: List of creditors.
+    # creditsLabel: Credit text.
+    # changeLog: The full path to the change log; None otherwise.
+    # logging: Default Python logging mechanism; None otherwise.
+    def __init__( self, programName, comments, website, websiteLabel, version, licenseType, logoIconName, authors, creditsPeople, creditsLabel, changeLog, logging ):
+
+        super( AboutDialog, self ).__init__()
+
+        self.add_credit_section( creditsLabel, creditsPeople )
+        self.set_authors( authors )
+        self.set_comments( comments )
+        self.set_license_type( licenseType )
+        self.set_logo_icon_name( logoIconName )
+        self.set_program_name( programName )
+        self.set_version( version )
+        self.set_website( website )
+        self.set_website_label( websiteLabel )
+        self.set_position( Gtk.WindowPosition.CENTER_ALWAYS )
+        self.changeLog = changeLog
+        self.logging = logging
+
+
+        if changeLog is None: return
+
+        notebook = self.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
+
+        textView = Gtk.TextView()
+        textView.set_editable( False )
+        textBuffer = textView.get_buffer()
+        textBuffer.set_text( self.getChangeLog() )
+
+        # Reference https://gitorious.org/ghelp/gtk/raw/5c4f2ef0c1e658827091aadf4fc3c4d5f5964785:gtk/gtkaboutdialog.c
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_shadow_type( Gtk.ShadowType.IN );
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+        scrolledWindow.add( textView )
+        scrolledWindow.show_all()
+
+        changeLogTabIndex = notebook.append_page( scrolledWindow, Gtk.Label( "" ) ) # The tab is hidden so the label contents are irrelevant.
+
+        changeLogButton = Gtk.ToggleButton( AboutDialog.CHANGELOG_BUTTON_NAME )
+        changeLogButton.set_use_underline( True )
+        changeLogButton.show()
+
+        buttonBox = self.get_content_area().get_children()[ 1 ]
+        buttonBox.pack_start( changeLogButton, True, True, 0 )
+        buttonBox.set_child_secondary( changeLogButton, True )
+
+        buttons = buttonBox.get_children()
+        buttonsForToggle = [ ]
+        for button in buttons:
+            if button.get_label() != AboutDialog.CHANGELOG_BUTTON_NAME and button.get_label() != "gtk-close":
+                buttonsForToggle.append( button )
+                button.connect( "toggled", self.onOtherToggledButtons, changeLogButton )
+
+        changeLogButton.connect( "toggled", self.onChangeLogButtonToggled, notebook, changeLogTabIndex, buttonsForToggle )
+
+
+    def onChangeLogButtonToggled( self, changeLogButton, notebook, changeLogTabIndex, buttonsForToggle ):
+        if changeLogButton.get_active():
+            if notebook.get_current_page() != 0:
+                for button in buttonsForToggle:
+                    button.set_active( False )
+
+            notebook.set_current_page( changeLogTabIndex )
+        else:
+            if notebook.get_current_page() == changeLogTabIndex:
+                notebook.set_current_page( 0 )
+
+
+    def onOtherToggledButtons( self, toggleButton, changeLogButton ):
+        if toggleButton.get_active() and changeLogButton.get_active():
+            changeLogButton.set_active( False )
+
+
+    # Assumes a typical format for a Debian change log file.
+    def getChangeLog( self ):
+        contents = None
+        if os.path.exists( self.changeLog ):
+            try:
+                with gzip.open( self.changeLog, "rb" ) as f:
+                    changeLogContents = re.split( "\n\n\n", f.read().decode() )
+
+                    contents = ""
+                    for changeLogEntry in changeLogContents:
+                        changeLogEntry = changeLogEntry.split( "\n" )
+
+                        version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
+                        dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
+                        changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
+
+                        contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
+
+                    contents = contents.strip()
+
+            except Exception as e:
+                if not self.logging is None:
+                    self.logging.exception( e )
+                    self.logging.error( "Error reading change log: " + self.changeLog )
+
+                contents = None
+
+        return contents    
