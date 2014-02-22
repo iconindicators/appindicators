@@ -1,5 +1,9 @@
+# TODO Use new handleLeftClick,  handleRightClick in general utils?
+# Use new AboutDialog and remove current one.
+# Remove getChangeLog
+
+
 #!/usr/bin/env python3
-from debian import changelog
 
 
 # This program is free software: you can redistribute it and/or modify
