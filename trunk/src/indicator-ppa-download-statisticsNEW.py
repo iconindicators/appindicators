@@ -1,6 +1,12 @@
 #
 #
-#  {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"],
+#  {"ppas": [["noobslab", "indicators", "precise", "i386"],
+# ["noobslab", "indicators", "raring", "i386"],
+# ["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"],
+#  ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "quantal", "amd64"], 
+# ["noobslab", "indicators", "precise", "amd64"],
+#  ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], 
+# ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"],
 # ["thebernmeister", "ppa", "precise", "i386"], 
 # ["guido-iodice", "precise-updates", "precise", "amd64"],
 # ["guido-iodice", "precise-updates", "precise", "i386"], 
@@ -31,6 +37,9 @@
 
 
 # TODO Only do a re-download if a ppa was a/e/r...not just when OK is clicked in the preferences.
+
+
+#TODO If the filter checkbox is toggled from checked to unchecked, need to do a redownload...right?
 
 
 #TODO Depending on the error (if it's a download error), do a redownload of that PPA?
@@ -1095,6 +1104,19 @@ class IndicatorPPADownloadStatistics:
         self.lock.acquire()
         self.locked = True
 
+# TODO Something is not right...the download is taking too long.
+# The PPAs are...
+
+# thebernmeister: 8 ppas, 6 results: 1 results page per ppa, 6 items per ppa = 8 * 1 + 8 * 6 = 56
+# noobslab: 6 ppas, 40 results: 1 results page per ppa, 6 items per ppa = 6 * 1 + 6 * 6 = 42
+# whoopie79: 1 ppa, 42 results: 1 results page per ppa, 6 items per ppa = 1 * 1 + 1 * 6 = 7
+# guido-iodice 2 ppas, 400 results: 6 results pages per ppa, 6 items per ppa = 2 * 6 + 2 * 6 = 24
+# guido-iodice 2 ppas, 425 results: 6 results pages per ppa, 6 items per ppa = 2 * 6 + 2 * 6 = 24
+
+
+
+
+
         for ppa in self.ppasNEW:
             ppa.resetForDownload()
             t = Thread( target = self.getPublishedBinaries, args = ( [ ppa ] ) )
@@ -1123,52 +1145,62 @@ class IndicatorPPADownloadStatistics:
             if numberOfPublishedBinaries == 0:
                 ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
                 ppa.setPublishedBinaries( [ ] )
-            else:
-                # The results are returned in lots of 75...so need to retrieve each lot after the first 75.
-                index = 0
-                resultPage = 1
-                resultsPerUrl = 75
-                for i in range( numberOfPublishedBinaries ):
-                    if i == ( resultPage * resultsPerUrl ): # This loops handles results on pages after the first page.
-                        newURL = publishedBinariesURL + "&ws.start=" + str( resultPage * resultsPerUrl )
-                        publishedBinaries = json.loads( urlopen( newURL ).read().decode( "utf8" ) )
-                        resultPage += 1
-                        index = 0
+                return
 
-                    packageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
+            # This PPA has at least one published binary...
+            # The results are returned in lots of 75...so need to retrieve each lot after the first 75.
+            index = 0
+            resultPage = 1
+            resultsPerUrl = 75
+            for i in range( numberOfPublishedBinaries ):
+                if i == ( resultPage * resultsPerUrl ): # This loops handles results on pages after the first page.
+                    newURL = publishedBinariesURL + "&ws.start=" + str( resultPage * resultsPerUrl )
+                    publishedBinaries = json.loads( urlopen( newURL ).read().decode( "utf8" ) )
+                    resultPage += 1
+                    index = 0
 
-                    # Filter out unwanted packages...
-                    key = ppa.getUser() + " | " + ppa.getName()
-                    if self.filterAtDownload and key in self.filters:
-                        match = False
-                        for filter in self.filters.get( key ):
-                            if filter in packageName:
-                                match = True
-                                break
-        
-                        if not match:
-                            index += 1
-                            continue
+                packageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
 
-                    packageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
-                    architectureSpecific = publishedBinaries[ "entries" ][ index ][ "architecture_specific" ]
-                    indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
-                    packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
+                # Filter out unwanted packages...
+                key = ppa.getUser() + " | " + ppa.getName()
+                if self.filterAtDownload and key in self.filters:
+                    match = False
+                    for filter in self.filters.get( key ):
+                        if filter in packageName:
+                            match = True
+                            break
+    
+                    if not match:
+                        index += 1
+                        continue
 
-                    t = Thread( target = self.getDownloadCount, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ) )
-                    threads.append( t )
-                    t.start()
+                packageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
+                architectureSpecific = publishedBinaries[ "entries" ][ index ][ "architecture_specific" ]
+                indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
+                packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
 
-                    # Limit to 10 threads at a time.
+                t = Thread( target = self.getDownloadCount, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ) )
+                threads.append( t )
+                t.start()
+
+                # Limit to 10 threads at a time.
+                while( len( threads ) > 10 ):
+                    for t in threads:
+                        if not t.is_alive():
+                            threads.remove( t )
+                    
                     if( len( threads ) > 10 ):
-                        for t in threads:
-                            t.join()
+                        time.sleep( 1 )
 
-                        threads = [ ]
+#                 if( len( threads ) > 10 ):
+#                     for t in threads:
+#                         t.join()
+# 
+#                     threads = [ ]
 
-                    index += 1
+                index += 1
 
-                ppa.noMorePublishedBinariesToAdd()
+            ppa.noMorePublishedBinariesToAdd()
 
         except Exception as e:
             logging.exception( e )
