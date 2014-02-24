@@ -45,36 +45,28 @@ class PPA:
         self.publishedBinaries = [ ]
 
 
-    def getStatus( self ):
-        return self.status
+    def getStatus( self ): return self.status
 
 
-    def setStatus( self, status ):
-        self.status = status
+    def setStatus( self, status ): self.status = status
 
 
-    def getUser( self ):
-        return self.user
+    def getUser( self ): return self.user
 
 
-    def getName( self ):
-        return self.name
+    def getName( self ): return self.name
 
 
-    def getSeries( self ):
-        return self.series
+    def getSeries( self ): return self.series
 
 
-    def setSeries( self, series ):
-        self.series = series
+    def setSeries( self, series ): self.series = series
 
 
-    def getArchitecture( self ):
-        return self.architecture
+    def getArchitecture( self ): return self.architecture
 
 
-    def setArchitecture( self, architecture ):
-        self.architecture = architecture
+    def setArchitecture( self, architecture ): self.architecture = architecture
 
 
     # Returns a key of the form 'PPA User | PPA Name | Series | Architecture' or 'PPA User | PPA Name' if series/architecture are undefined. 
@@ -95,20 +87,16 @@ class PPA:
             self.setStatus( PPA.STATUS_OK )
 
 
-    def getPublishedBinaries( self ):
-        return self.publishedBinaries
+    def getPublishedBinaries( self ): return self.publishedBinaries
 
 
-    def setPublishedBinaries( self, publishedBinaries ):
-        self.publishedBinaries = publishedBinaries
+    def setPublishedBinaries( self, publishedBinaries ): self.publishedBinaries = publishedBinaries
 
 
-    def __str__( self ):
-        return self.getKey()
+    def __str__( self ): return self.getKey()
 
 
-    def __repr__( self ):
-        return self.__str__()
+    def __repr__( self ): return self.__str__()
 
 
 class PublishedBinary:
@@ -120,33 +108,29 @@ class PublishedBinary:
         self.architectureSpecific = architectureSpecific
 
 
-    def getPackageName( self ):
-        return self.packageName
+    def getPackageName( self ): return self.packageName
 
 
-    def getPackageVersion( self ):
-        return self.packageVersion
+    def getPackageVersion( self ): return self.packageVersion
 
 
-    def setPackageVersion( self, packageVersion ):
-        self.packageVersion = packageVersion
+    def setPackageVersion( self, packageVersion ): self.packageVersion = packageVersion
 
 
-    def getDownloadCount( self ):
-        return self.downloadCount
+    def getDownloadCount( self ): return self.downloadCount
 
 
-    def setDownloadCount( self, downloadCount ):
-        self.downloadCount = downloadCount
+    def setDownloadCount( self, downloadCount ): self.downloadCount = downloadCount
 
 
-    def isArchitectureSpecific( self ):
-        return self.architectureSpecific
+    def isArchitectureSpecific( self ): return self.architectureSpecific
 
 
     def __str__( self ):
-        return str( self.packageName ) + " | " + str( self.packageVersion ) + " | " + str( self.downloadCount ) + " | " + str( self.architectureSpecific )
+        return str( self.packageName ) + " | " + \
+            str( self.packageVersion ) + " | " + \
+            str( self.downloadCount ) + " | " + \
+            str( self.architectureSpecific )
 
 
-    def __repr__( self ):
-        return self.__str__()
+    def __repr__( self ): return self.__str__()
