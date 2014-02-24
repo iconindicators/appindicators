@@ -1,39 +1,8 @@
-#
-#
-#  {"ppas": [["noobslab", "indicators", "precise", "i386"],
-# ["noobslab", "indicators", "raring", "i386"],
-# ["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"],
-#  ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "quantal", "amd64"], 
-# ["noobslab", "indicators", "precise", "amd64"],
-#  ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], 
-# ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"],
-# ["thebernmeister", "ppa", "precise", "i386"], 
-# ["guido-iodice", "precise-updates", "precise", "amd64"],
-# ["guido-iodice", "precise-updates", "precise", "i386"], 
-# ["guido-iodice", "raring-quasi-rolling", "raring", "amd64"],
-# ["guido-iodice", "raring-quasi-rolling", "raring", "i386"]],
-# "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
-# 
-#         self.filters[ 'noobslab | indicators' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-#         self.filters[ 'whoopie79 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-#         self.filters[ 'guido-iodice | precise-updates' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-#         self.filters[ 'guido-iodice | raring-quasi-rolling' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-
-
-
-
-# {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 4, "sortByDownload": true, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": false}
-
-#{"ppas": [  ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"],  ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"] ], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": true, "combinePPAs": true}
-
-# {"ppas": [["noobslab", "indicators", "precise", "i386"],["noobslab", "indicators", "raring", "i386"],["noobslab", "indicators", "raring", "amd64"], ["whoopie79", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "precise", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "i386"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"]], "sortByDownloadAmount": 10, "sortByDownload": false, "allowMenuItemsToLaunchBrowser": true, "showSubmenu": false, "combinePPAs": true}
+# {"allowMenuItemsToLaunchBrowser": true, "ppas": [["guido-iodice", "precise-updates", "precise", "amd64"], ["guido-iodice", "precise-updates", "precise", "i386"], ["guido-iodice", "raring-quasi-rolling", "raring", "amd64"], ["guido-iodice", "raring-quasi-rolling", "raring", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["noobslab", "indicators", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "raring", "amd64"], ["noobslab", "indicators", "raring", "i386"], ["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"], ["whoopie79", "ppa", "precise", "i386"]], "showNotificationOnUpdate": true, "sortByDownload": false, "combinePPAs": true, "showSubmenu": false, "filters": {"whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownloadAmount": 5}
 
 
 # TODO What happens if the filters remove all packages?  Need a new error message?
 # Best way to test?  Maybe add filters for my ppa?
-
-
-# TODO WOuld still be nice to increase the speed of download and/or update the menu progressively after each ppa is downloaded.
 
 
 # TODO Only do a re-download if a ppa was a/e/r...not just when OK is clicked in the preferences.
@@ -48,9 +17,6 @@
 # TODO Need to sort the filter text with each filter.
 
 
-# TODO Have a sample filter with the sample ppa?
-
-
 # TODO When combining, need an option which says if two published binaries have the same package name
 # and are architecture dependent, combine only if the version numbers match (or perhaps, ignore version numbers for architecture dependent).
 # The dropper package from NoobsLab is NOT architecture specific and multiple version appear.
@@ -59,10 +25,6 @@
 
 
 # TODO Modify the build script and packaging, etc, etc to include the utils.
-
-
-# TODO Need a preferences tab for filters...
-# Perhaps also the add/remove/edit stuff could also be put into the preferences? 
 
 
 # TODO Add a PPA (after initial PPAs have done their download) and ensure the "downloading now" is shown.
@@ -74,7 +36,7 @@
 # (and the user may have to uncombine to see message details).
 
 
-# TODO If things are locked when the user is editing/adding/etc and the update kicks off, how to handle this?
+# TODO If the user is editing/adding/etc and the update kicks off, how to handle this?
 # Wait?
 # Maybe delay for 5 minutes?
 
@@ -111,6 +73,7 @@
 
 from copy import deepcopy
 from datetime import datetime
+from curses.ascii import NUL
 
 try:
     from gi.repository import AppIndicator3 as appindicator
@@ -123,7 +86,7 @@ from ppa import PPA, PublishedBinary
 from urllib.request import urlopen
 
 import itertools, pythonutils, gzip, json, locale, logging, operator, os, re, shutil, sys, threading, time, webbrowser
-
+import datetime
 
 class IndicatorPPADownloadStatistics:
 
@@ -146,12 +109,14 @@ class IndicatorPPADownloadStatistics:
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
-    SETTINGS_PPAS = "ppas"
     SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER = "allowMenuItemsToLaunchBrowser"
+    SETTINGS_COMBINE_PPAS = "combinePPAs"
+    SETTINGS_FILTERS = "filters"
+    SETTINGS_SHOW_NOTIFICATION_ON_UPDATE = "showNotificationOnUpdate"
+    SETTINGS_PPAS = "ppas"
+    SETTINGS_SHOW_SUBMENU = "showSubmenu"
     SETTINGS_SORT_BY_DOWNLOAD = "sortByDownload"
     SETTINGS_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
-    SETTINGS_COMBINE_PPAS = "combinePPAs"
-    SETTINGS_SHOW_SUBMENU = "showSubmenu"
 
     MESSAGE_DOWNLOADING_DATA = "(downloading data...)"
     MESSAGE_ERROR_RETRIEVING_PPA = "(error retrieving PPA)"
@@ -164,7 +129,7 @@ class IndicatorPPADownloadStatistics:
 
         GLib.threads_init()
         self.lock = threading.Lock()
-        self.locked = False
+        self.indicatorIsLocked = False
         Notify.init( IndicatorPPADownloadStatistics.NAME )
 
         filehandler = logging.FileHandler( filename = IndicatorPPADownloadStatistics.LOG, mode = "a", delay = True )
@@ -495,8 +460,8 @@ class IndicatorPPADownloadStatistics:
 
     def onPreferences( self, widget ):
 
-        if self.locked:
-            Notify.Notification.new( "Refreshing download statistics...", "Preferences are currently unavailable.", IndicatorPPADownloadStatistics.ICON ).show()
+        if self.indicatorIsLocked:
+            Notify.Notification.new( "Refreshing...", "Preferences are currently unavailable.", IndicatorPPADownloadStatistics.ICON ).show()
             return
 
         if self.dialog is not None:
@@ -515,6 +480,7 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_bottom( 10 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show PPAs as submenus" )
+        showAsSubmenusCheckbox.set_tooltip_text( "The download statitics for each PPA will be shown in a submenu" )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
@@ -600,7 +566,7 @@ class IndicatorPPADownloadStatistics:
         ppaTree.connect( "row-activated", self.onPPADoubleClick )
 
         scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( ppaTree )
         grid.attach( scrolledWindow, 0, 0, 1, 1 )
 
@@ -641,11 +607,12 @@ class IndicatorPPADownloadStatistics:
 
             keys[ key ] = key
             if key in self.filters:
-                filterStore.append( [ key, " | ".join( self.filters[ key ] ) ] )
+                filterStore.append( [ key, "\n".join( self.filters[ key ] ) ] )
             else:
                 filterStore.append( [ key, "" ] )
 
         filterTree = Gtk.TreeView( filterStore )
+        filterTree.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
         filterTree.set_hexpand( True )
         filterTree.set_vexpand( True )
         filterTree.append_column( Gtk.TreeViewColumn( "PPA", Gtk.CellRendererText(), text = 0 ) )
@@ -654,7 +621,7 @@ class IndicatorPPADownloadStatistics:
         filterTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
         scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( filterTree )
         grid.attach( scrolledWindow, 0, 0, 2, 1 )
 
@@ -717,6 +684,7 @@ class IndicatorPPADownloadStatistics:
             self.combinePPAs = combinePPAsCheckbox.get_active()
             self.sortByDownload = sortByDownloadCheckbox.get_active()
             self.sortByDownloadAmount = spinner.get_value_as_int()
+            self.showNotificationOnUpdate = showNotificationOnUpdateCheckbox.get_active()
             self.allowMenuItemsToLaunchBrowser = allowMenuItemsToLaunchBrowserCheckbox.get_active()
 # TODO Save ppas!  Get data from model...from fortune:
 #             self.fortunes = [ ]
@@ -985,11 +953,10 @@ class IndicatorPPADownloadStatistics:
     def loadSettings( self ):
         self.allowMenuItemsToLaunchBrowser = True
         self.sortByDownload = False
-        self.sortByDownloadAmount = 3
+        self.sortByDownloadAmount = 5
         self.combinePPAs = False
         self.showSubmenu = False
         self.showNotificationOnUpdate = True
-        self.filters = { }
         self.filterAtDownload = True
 
 # TODO Rename - remove the NEW
@@ -1006,22 +973,17 @@ class IndicatorPPADownloadStatistics:
 
                 self.ppasNEW.sort( key = operator.methodcaller( "getKey" ) )
 
-#TODO Load filters and remove these...
-                self.filters[ 'noobslab | indicators' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-                self.filters[ 'whoopie79 | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-                self.filters[ 'guido-iodice | precise-updates' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-                self.filters[ 'guido-iodice | raring-quasi-rolling' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
-
                 self.allowMenuItemsToLaunchBrowser = settings.get( IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER, self.allowMenuItemsToLaunchBrowser )
+                self.combinePPAs = settings.get( IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS, self.combinePPAs )
+                self.filters = settings.get( IndicatorPPADownloadStatistics.SETTINGS_FILTERS, { } )
+                self.showNotificationOnUpdate = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SHOW_NOTIFICATION_ON_UPDATE, self.showNotificationOnUpdate )
+                self.showSubmenu = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
                 self.sortByDownload = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD, self.sortByDownload )
                 self.sortByDownloadAmount = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT, self.sortByDownloadAmount )
-                self.combinePPAs = settings.get( IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS, self.combinePPAs )
-                self.showSubmenu = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
 
             except Exception as e:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
-# TODO Delete the settings file...alert the user?                
                 self.initialiseDefaultSettings()
         else:
             # No properties file exists, so populate with a sample PPA to give the user an idea of the format.
@@ -1036,19 +998,20 @@ class IndicatorPPADownloadStatistics:
 
 
     def saveSettings( self ):
-# TODO...fix!
         try:
             ppas = [ ]
-            for k, v in list( self.ppas.items() ):
-                ppas.append( [ v.getUser(), v.getName(), v.getSeries(), v.getArchitecture() ] )
+            for ppa in self.ppasNEW:
+                ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
             settings = {
                 IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER: self.allowMenuItemsToLaunchBrowser,
-                IndicatorPPADownloadStatistics.SETTINGS_PPAS: ppas,
-                IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD: self.sortByDownload,
-                IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT: self.sortByDownloadAmount,
+                IndicatorPPADownloadStatistics.SETTINGS_FILTERS: self.filters,
                 IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS: self.combinePPAs,
-                IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU: self.showSubmenu
+                IndicatorPPADownloadStatistics.SETTINGS_PPAS: ppas,
+                IndicatorPPADownloadStatistics.SETTINGS_SHOW_NOTIFICATION_ON_UPDATE: self.showNotificationOnUpdate,
+                IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
+                IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD: self.sortByDownload,
+                IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT: self.sortByDownloadAmount
             }
 
             with open( IndicatorPPADownloadStatistics.SETTINGS_FILE, "w" ) as f:
@@ -1101,106 +1064,86 @@ class IndicatorPPADownloadStatistics:
     #    ,... 
     #}
     def getPPADownloadStatistics( self ):
-        self.lock.acquire()
-        self.locked = True
-
-# TODO Something is not right...the download is taking too long.
-# The PPAs are...
-
-# thebernmeister: 8 ppas, 6 results: 1 results page per ppa, 6 items per ppa = 8 * 1 + 8 * 6 = 56
-# noobslab: 6 ppas, 40 results: 1 results page per ppa, 6 items per ppa = 6 * 1 + 6 * 6 = 42
-# whoopie79: 1 ppa, 42 results: 1 results page per ppa, 6 items per ppa = 1 * 1 + 1 * 6 = 7
-# guido-iodice 2 ppas, 400 results: 6 results pages per ppa, 6 items per ppa = 2 * 6 + 2 * 6 = 24
-# guido-iodice 2 ppas, 425 results: 6 results pages per ppa, 6 items per ppa = 2 * 6 + 2 * 6 = 24
-
-
-
-
+        with self.lock: self.indicatorIsLocked = True
 
         for ppa in self.ppasNEW:
             ppa.resetForDownload()
-            t = Thread( target = self.getPublishedBinaries, args = ( [ ppa ] ) )
-            t.start()
-            t.join()
+            self.getPublishedBinaries( ppa )
 
-        self.locked = False
-        self.lock.release()
+        with self.lock: self.indicatorIsLocked = False
 
         GLib.idle_add( self.buildMenu )
 
         if self.showNotificationOnUpdate:
-            Notify.Notification.new( "Download statistics updated!", "", IndicatorPPADownloadStatistics.ICON ).show()
+            Notify.Notification.new( "Statistics downloaded!", "", IndicatorPPADownloadStatistics.ICON ).show()
 
 
     def getPublishedBinaries( self, ppa ):
-        threads = []
-
-        publishedBinariesURL = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
+        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
                 "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + \
                 ppa.getSeries() + "/" + ppa.getArchitecture()
 
         try:
-            publishedBinaries = json.loads( urlopen( publishedBinariesURL ).read().decode( "utf8" ) )
+            publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
             numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
             if numberOfPublishedBinaries == 0:
                 ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
                 ppa.setPublishedBinaries( [ ] )
-                return
 
-            # This PPA has at least one published binary...
-            # The results are returned in lots of 75...so need to retrieve each lot after the first 75.
-            index = 0
-            resultPage = 1
-            resultsPerUrl = 75
-            for i in range( numberOfPublishedBinaries ):
-                if i == ( resultPage * resultsPerUrl ): # This loops handles results on pages after the first page.
-                    newURL = publishedBinariesURL + "&ws.start=" + str( resultPage * resultsPerUrl )
-                    publishedBinaries = json.loads( urlopen( newURL ).read().decode( "utf8" ) )
-                    resultPage += 1
-                    index = 0
+            else:
+                # This PPA has at least one published binary...
+                # The results are returned in lots of 75, so need to retrieve each lot after the first 75.
+                # Could in future try to get each subsequent URL in a thread to increase speed, but the code quiclky becomes messy.
+                index = 0
+                resultPage = 1
+                resultsPerUrl = 75
+                threads = []
+                for i in range( numberOfPublishedBinaries ):
+                    if i == ( resultPage * resultsPerUrl ):
+                        # Handle result pages after the first page.
+                        newURL = url + "&ws.start=" + str( resultPage * resultsPerUrl )
+                        publishedBinaries = json.loads( urlopen( newURL ).read().decode( "utf8" ) )
+                        resultPage += 1
+                        index = 0
 
-                packageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
+                    packageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
 
-                # Filter out unwanted packages...
-                key = ppa.getUser() + " | " + ppa.getName()
-                if self.filterAtDownload and key in self.filters:
-                    match = False
-                    for filter in self.filters.get( key ):
-                        if filter in packageName:
-                            match = True
-                            break
-    
-                    if not match:
-                        index += 1
-                        continue
+                    # Filter out unwanted packages...
+                    key = ppa.getUser() + " | " + ppa.getName()
+                    if self.filterAtDownload and key in self.filters:
+                        match = False
+                        for filter in self.filters.get( key ):
+                            if filter in packageName:
+                                match = True
+                                break
 
-                packageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
-                architectureSpecific = publishedBinaries[ "entries" ][ index ][ "architecture_specific" ]
-                indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
-                packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
+                        if not match:
+                            index += 1
+                            continue
 
-                t = Thread( target = self.getDownloadCount, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ) )
-                threads.append( t )
-                t.start()
+                    # Limit to 10 concurrent fetches of package download count...
+                    if len( threads ) > 10:
+                        for t in threads:
+                            t.join()
 
-                # Limit to 10 threads at a time.
-                while( len( threads ) > 10 ):
-                    for t in threads:
-                        if not t.is_alive():
-                            threads.remove( t )
-                    
-                    if( len( threads ) > 10 ):
-                        time.sleep( 1 )
+                        threads = []
 
-#                 if( len( threads ) > 10 ):
-#                     for t in threads:
-#                         t.join()
-# 
-#                     threads = [ ]
+                    packageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
+                    architectureSpecific = publishedBinaries[ "entries" ][ index ][ "architecture_specific" ]
+                    indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
+                    packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
 
-                index += 1
+                    t = Thread( target = self.getDownloadCount, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ) )
+                    t.start()
+                    threads.append( t )
 
-            ppa.noMorePublishedBinariesToAdd()
+                    index += 1
+
+                # Wait for remaining threads...
+                for t in threads:
+                    t.join()
+
+                ppa.noMorePublishedBinariesToAdd()
 
         except Exception as e:
             logging.exception( e )
@@ -1209,19 +1152,24 @@ class IndicatorPPADownloadStatistics:
 
 
     def getDownloadCount( self, ppa, packageName, packageVersion, architectureSpecific, packageId ):
+        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
 
         try:
-            downloadCountURL = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
-            downloadCount = json.loads( urlopen( downloadCountURL ).read().decode( "utf8" ) )
-            if str( downloadCount ).isnumeric():
-                ppa.addPublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific )
-            else:
-                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-                ppa.setPublishedBinaries( [ ] )
+            downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
+            
+            with self.lock:
+                if str( downloadCount ).isnumeric():
+                    ppa.addPublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific )
+                else:
+                    ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                    ppa.setPublishedBinaries( [ ] )
 
         except Exception as e:
             logging.exception( e )
-            ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-            ppa.setPublishedBinaries( [ ] )
+
+            with self.lock:
+                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                ppa.setPublishedBinaries( [ ] )
+
 
 if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
