@@ -1,8 +1,6 @@
 # {"allowMenuItemsToLaunchBrowser": true, "ppas": [["guido-iodice", "precise-updates", "precise", "amd64"], ["guido-iodice", "precise-updates", "precise", "i386"], ["guido-iodice", "raring-quasi-rolling", "raring", "amd64"], ["guido-iodice", "raring-quasi-rolling", "raring", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["noobslab", "indicators", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "raring", "amd64"], ["noobslab", "indicators", "raring", "i386"], ["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"], ["whoopie79", "ppa", "precise", "i386"]], "showNotificationOnUpdate": true, "sortByDownload": false, "combinePPAs": true, "showSubmenu": false, "filters": {"whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownloadAmount": 5}
 
-
-# TODO What happens if the filters remove all packages?  Need a new error message?
-# Best way to test?  Maybe add filters for my ppa?
+# {"showNotificationOnUpdate": true, "showSubmenu": false, "ppas": [["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"]], "combinePPAs": true, "sortByDownloadAmount": 5, "allowMenuItemsToLaunchBrowser": true, "filters": {"noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownload": false}
 
 
 # TODO Only do a re-download if a ppa was a/e/r...not just when OK is clicked in the preferences.
@@ -122,6 +120,7 @@ class IndicatorPPADownloadStatistics:
     MESSAGE_ERROR_RETRIEVING_PPA = "(error retrieving PPA)"
     MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE = "(multiple messages - uncombine PPAs)"
     MESSAGE_NO_PUBLISHED_BINARIES = "(no published binaries)"
+    MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED = "(published binaries completely filtered)"
 
 
     def __init__( self ):
@@ -220,6 +219,8 @@ class IndicatorPPADownloadStatistics:
                         message = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
                     elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
                         message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
+                    elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+                        message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
                     else:
 # TODO Need to first check if we're combined before saying "uncombine to show the messages"?
 # Is it possible to be uncombined and have the multiple errors?
@@ -255,6 +256,8 @@ class IndicatorPPADownloadStatistics:
                         message = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
                     elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
                         message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
+                    elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+                        message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
                     else:
 # TODO Need to first check if we're combined before saying "uncombine to show the messages"?
 # Is it possible to be uncombined and have the multiple errors?
@@ -1144,6 +1147,9 @@ class IndicatorPPADownloadStatistics:
                     t.join()
 
                 ppa.noMorePublishedBinariesToAdd()
+                
+                if numberOfPublishedBinaries > 0 and len( ppa.getPublishedBinaries() ) == 0:
+                    ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
 
         except Exception as e:
             logging.exception( e )
