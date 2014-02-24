@@ -127,11 +127,7 @@ class PublishedBinary:
     def isArchitectureSpecific( self ): return self.architectureSpecific
 
 
-    def __str__( self ):
-        return str( self.packageName ) + " | " + \
-            str( self.packageVersion ) + " | " + \
-            str( self.downloadCount ) + " | " + \
-            str( self.architectureSpecific )
+    def __str__( self ): return str( self.packageName ) + " | " + str( self.packageVersion ) + " | " + str( self.downloadCount ) + " | " + str( self.architectureSpecific )
 
 
     def __repr__( self ): return self.__str__()
