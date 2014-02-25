@@ -1,6 +1,13 @@
 # {"allowMenuItemsToLaunchBrowser": true, "ppas": [["guido-iodice", "precise-updates", "precise", "amd64"], ["guido-iodice", "precise-updates", "precise", "i386"], ["guido-iodice", "raring-quasi-rolling", "raring", "amd64"], ["guido-iodice", "raring-quasi-rolling", "raring", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["noobslab", "indicators", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "raring", "amd64"], ["noobslab", "indicators", "raring", "i386"], ["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"], ["whoopie79", "ppa", "precise", "i386"]], "showNotificationOnUpdate": true, "sortByDownload": false, "combinePPAs": true, "showSubmenu": false, "filters": {"whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownloadAmount": 5}
 
+
 # {"showNotificationOnUpdate": true, "showSubmenu": false, "ppas": [["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"]], "combinePPAs": true, "sortByDownloadAmount": 5, "allowMenuItemsToLaunchBrowser": true, "filters": {"noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownload": false}
+
+
+#TODO Would still like to improve download speed.
+# Somehow change the retrieval of each results page to be multithreaded. 
+# The downloads shouldn't take as long as they do.
+# Maybe add lots of prints with times to see where the delays are.
 
 
 # TODO Only do a re-download if a ppa was a/e/r...not just when OK is clicked in the preferences.
@@ -13,19 +20,16 @@
 
 
 # TODO Need to sort the filter text with each filter.
+# When do we sort?  At load/save time?
+# Perhaps in the preferences - sort at the point the filters will be displayed.
+# Then sort again on a save.
 
 
-# TODO When combining, need an option which says if two published binaries have the same package name
-# and are architecture dependent, combine only if the version numbers match (or perhaps, ignore version numbers for architecture dependent).
-# The dropper package from NoobsLab is NOT architecture specific and multiple version appear.
-# So maybe just have a setting "Ignore versions" and nothing to do with architecture specificity.
-# Maybe two checkboxes indented under Combine: Ignore Version for Architecture Dependent, Ignore Version for Architecture Independent? 
+# TODO Ensure the build script and packaging, etc, etc to includes the utils and new PPA class.
+# May not need the if test to check for the presence of the pythonutil.py - the cp will fail and the script aborts at that point right?
 
 
-# TODO Modify the build script and packaging, etc, etc to include the utils.
-
-
-# TODO Add a PPA (after initial PPAs have done their download) and ensure the "downloading now" is shown.
+# TODO Add a PPA (after initial PPAs have done their download) and ensure the "downloading now" is shown and a redownload is happening.
 
 
 # TODO Possible to have an ignore error...so a PPA with an error is tossed.
@@ -37,6 +41,8 @@
 # TODO If the user is editing/adding/etc and the update kicks off, how to handle this?
 # Wait?
 # Maybe delay for 5 minutes?
+# Maybe set a flag that an update is required.  If the user hits ok, the update needs to be done anyway.
+# If the user hits cancel, the flag is used to kick off an update. 
 
 
 #!/usr/bin/env python3
@@ -110,8 +116,9 @@ class IndicatorPPADownloadStatistics:
     SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER = "allowMenuItemsToLaunchBrowser"
     SETTINGS_COMBINE_PPAS = "combinePPAs"
     SETTINGS_FILTERS = "filters"
-    SETTINGS_SHOW_NOTIFICATION_ON_UPDATE = "showNotificationOnUpdate"
+    SETTINGS_IGNORE_VERSION_ARCHITECTURE_SPECIFIC = "ignoreVersionArchitectureSpecific"
     SETTINGS_PPAS = "ppas"
+    SETTINGS_SHOW_NOTIFICATION_ON_UPDATE = "showNotificationOnUpdate"
     SETTINGS_SHOW_SUBMENU = "showSubmenu"
     SETTINGS_SORT_BY_DOWNLOAD = "sortByDownload"
     SETTINGS_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
@@ -222,8 +229,6 @@ class IndicatorPPADownloadStatistics:
                     elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
                         message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
                     else:
-# TODO Need to first check if we're combined before saying "uncombine to show the messages"?
-# Is it possible to be uncombined and have the multiple errors?
                         message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
                     subMenuItem = Gtk.MenuItem( indent + message )
@@ -259,8 +264,6 @@ class IndicatorPPADownloadStatistics:
                     elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
                         message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
                     else:
-# TODO Need to first check if we're combined before saying "uncombine to show the messages"?
-# Is it possible to be uncombined and have the multiple errors?
                         message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
                     menuItem = Gtk.MenuItem( indent + message )
@@ -337,25 +340,21 @@ class IndicatorPPADownloadStatistics:
                 # No previous match for this PPA.  Nullify the series/architecture as they are no longer relevent when combined.
                 ppa.setSeries( None )
                 ppa.setArchitecture( None )
-                if ppa.getStatus() != PPA.STATUS_OK:  #TODO Is this necessary?  Surely if there's an error the downloader should wipe the PPA object of PBs?
+                if ppa.getStatus() != PPA.STATUS_OK:  # Hopefull the dowloader erased the published binaries on error...but just in case!
                     ppa.setPublishedBinaries( [ ] )
 
                 combinedPPAs[ key ] = ppa
 
-# TODO Handle this...
-#         self.ignoreVersionInArchitectureSpecific = True
-# Assuming for now the version IS ignored in architecture specific.
-# See note at top of file.
-
         # Now have a hash table containing ppas which either have an error status or are a concatenation of all published binaries from ppas with the same PPA User/Name.
-        del ppas[ : ] # In place remove all elements.
+        del ppas[ : ] # Remove all elements (and keep reference to original variable).
         for key in combinedPPAs:
             temp = { }
             ppa = combinedPPAs[ key ]
-            publishedBinaries = ppa.getPublishedBinaries() # A PPA with a status other than OK will have no published binaries...
+            publishedBinaries = ppa.getPublishedBinaries() # A PPA with a status other than OK will have no published binaries...so this code for all PPAs.
             for publishedBinary in publishedBinaries:
+                
                 key = publishedBinary.getPackageName() + " | " + publishedBinary.getPackageVersion()
-                if publishedBinary.isArchitectureSpecific():
+                if publishedBinary.isArchitectureSpecific() and self.ignoreVersionArchitectureSpecific:
                     key = publishedBinary.getPackageName()
                     publishedBinary.setPackageVersion( None )
 
@@ -464,7 +463,7 @@ class IndicatorPPADownloadStatistics:
     def onPreferences( self, widget ):
 
         if self.indicatorIsLocked:
-            Notify.Notification.new( "Refreshing...", "Preferences are currently unavailable.", IndicatorPPADownloadStatistics.ICON ).show()
+            Notify.Notification.new( "Downloading...", "Preferences are currently unavailable.", IndicatorPPADownloadStatistics.ICON ).show()
             return
 
         if self.dialog is not None:
@@ -488,38 +487,48 @@ class IndicatorPPADownloadStatistics:
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
         combinePPAsCheckbox = Gtk.CheckButton( "Combine PPAs" )
-        toolTip = "Combines the statistics when the PPA user/name are the same.\n\n"
-        toolTip += "If a published binary is architecture specific (such as compiled C), the download counts are summed across all instances of that published binary.\n\n"
-        toolTip += "If a published binary is not architecture specific (such as Python), the download counts are only summed when the version of the binary is different.\n\n"
-        toolTip += "The version number is retained only if it is identical across all instances of a published binary."
+        toolTip = "Combine the statistics of binary packages when the PPA user/name are the same.\n\n"
+        toolTip += "When not architecture specific (such as Python),\n"
+        toolTip += "if the package names and version numbers of two binary packages are identical,\n"
+        toolTip += "the packages are treated as the same package and the download counts are NOT summed.\n\n"
+        toolTip += "For architecture specific (such as compiled C),\n"
+        toolTip += "if the package names and version numbers of two binary packages are identical,\n"
+        toolTip += "the packages are treated as the same package and the download counts ARE summed."
         combinePPAsCheckbox.set_tooltip_text( toolTip )
         combinePPAsCheckbox.set_active( self.combinePPAs )
         grid.attach( combinePPAsCheckbox, 0, 1, 2, 1 )
 
-# So maybe just have a setting "Ignore versions" and nothing to do with architecture specificity.
-# Maybe two checkboxes indented under Combine: Ignore Version for Architecture Dependent, Ignore Version for Architecture Independent? 
+        ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( "Ignore Version for Architecture Specific" )
+        ignoreVersionArchitectureSpecificCheckbox.set_margin_left( 15 )
+        toolTip = "For architecture specific binary packages, the version number is ignored by default.\n\n"
+        toolTip += "Unchecking WILL use the version number in determining if binary packages are the same.\n\n"
+        toolTip += "The version number is retained only if it is identical across all instances of a published binary."
 
-        ignoreVersionArchitectureDependentCheckbox = Gtk.CheckButton( "Ignore Version for Architecture Dependent" )
-        ignoreVersionArchitectureDependentCheckbox.set_margin_left( 15 )
-        ignoreVersionArchitectureDependentCheckbox.set_tooltip_text( "TODO" ) #TODO
-        ignoreVersionArchitectureDependentCheckbox.set_active( True ) #TODO Fix
-        grid.attach( ignoreVersionArchitectureDependentCheckbox, 0, 2, 2, 1 )
+        toolTip = "For architecture specific, sometimes the same package name\n"
+        toolTip += "but different version 'number' is actually the SAME package.\n\n"
+        toolTip += "For example, a source C package for both Ubuntu Saucy and Ubuntu Trusty\n"
+        toolTip += "will be compiled twice, each with a different version 'number',\n"
+        toolTip += "despite being the SAME release.\n\n"
+        toolTip += "Checking this option will ignore the version number\n"
+        toolTip += "when determining if two architecture specific packages are identical.\n\n"
+        toolTip += "The version number is retained only if it is identical across all instances of a published binary."
 
-        ignoreVersionArchitectureIndependentCheckbox = Gtk.CheckButton( "Ignore Version for Architecture Independent" )
-        ignoreVersionArchitectureIndependentCheckbox.set_margin_left( 15 )
-        ignoreVersionArchitectureIndependentCheckbox.set_tooltip_text( "TODO" ) #TODO
-        ignoreVersionArchitectureIndependentCheckbox.set_active( True ) #TODO Fix
-        grid.attach( ignoreVersionArchitectureIndependentCheckbox, 0, 3, 2, 1 )
+        ignoreVersionArchitectureSpecificCheckbox.set_tooltip_text( toolTip )
+        ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
+        ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
+        grid.attach( ignoreVersionArchitectureSpecificCheckbox, 0, 2, 2, 1 )
+
+        combinePPAsCheckbox.connect( "toggled", self.onCombinePPAsCheckbox, ignoreVersionArchitectureSpecificCheckbox )
 
         sortByDownloadCheckbox = Gtk.CheckButton( "Sort By Download" )
         sortByDownloadCheckbox.set_tooltip_text( "Sort by download (highest first) within each PPA." )
         sortByDownloadCheckbox.set_active( self.sortByDownload )
-        grid.attach( sortByDownloadCheckbox, 0, 4, 2, 1 )
+        grid.attach( sortByDownloadCheckbox, 0, 3, 2, 1 )
 
         label = Gtk.Label( "  Clip Amount" )
         label.set_sensitive( sortByDownloadCheckbox.get_active() )
         label.set_margin_left( 15 )
-        grid.attach( label, 0, 5, 1, 1 )
+        grid.attach( label, 0, 4, 1, 1 )
 
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
@@ -527,19 +536,19 @@ class IndicatorPPADownloadStatistics:
         spinner.set_tooltip_text( "Limit the number of entries when sorting by download.\nA value of zero will not clip." )
         spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
         spinner.set_hexpand( True )
-        grid.attach( spinner, 1, 5, 1, 1 )
+        grid.attach( spinner, 1, 4, 1, 1 )
 
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
         ignoreErrorsCheckbox = Gtk.CheckButton( "Ignore Errors" )
         ignoreErrorsCheckbox.set_tooltip_text( "TODO" )
         ignoreErrorsCheckbox.set_active( True ) #TODO
-        grid.attach( ignoreErrorsCheckbox, 0, 6, 2, 1 )
+        grid.attach( ignoreErrorsCheckbox, 0, 5, 2, 1 )
 
         showNotificationOnUpdateCheckbox = Gtk.CheckButton( "Notify On Update" )
         showNotificationOnUpdateCheckbox.set_tooltip_text( "Show a screen notification when PPA download statistics have been updated." )
         showNotificationOnUpdateCheckbox.set_active( self.showNotificationOnUpdate )
-        grid.attach( showNotificationOnUpdateCheckbox, 0, 7, 2, 1 )
+        grid.attach( showNotificationOnUpdateCheckbox, 0, 6, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
@@ -685,6 +694,7 @@ class IndicatorPPADownloadStatistics:
         if response == Gtk.ResponseType.OK:
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
+            self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
             self.sortByDownload = sortByDownloadCheckbox.get_active()
             self.sortByDownloadAmount = spinner.get_value_as_int()
             self.showNotificationOnUpdate = showNotificationOnUpdateCheckbox.get_active()
@@ -719,6 +729,10 @@ class IndicatorPPADownloadStatistics:
 
         self.dialog.destroy()
         self.dialog = None
+
+
+    def onCombinePPAsCheckbox( self, source, checkbox ):
+        checkbox.set_sensitive( source.get_active() )
 
 
     def onClipByDownloadCheckbox( self, source, spinner, label ):
@@ -958,6 +972,7 @@ class IndicatorPPADownloadStatistics:
         self.sortByDownload = False
         self.sortByDownloadAmount = 5
         self.combinePPAs = False
+        self.ignoreVersionArchitectureSpecific = True
         self.showSubmenu = False
         self.showNotificationOnUpdate = True
         self.filterAtDownload = True
@@ -979,6 +994,7 @@ class IndicatorPPADownloadStatistics:
                 self.allowMenuItemsToLaunchBrowser = settings.get( IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER, self.allowMenuItemsToLaunchBrowser )
                 self.combinePPAs = settings.get( IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS, self.combinePPAs )
                 self.filters = settings.get( IndicatorPPADownloadStatistics.SETTINGS_FILTERS, { } )
+                self.ignoreVersionArchitectureSpecific = settings.get( IndicatorPPADownloadStatistics.SETTINGS_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, self.ignoreVersionArchitectureSpecific )
                 self.showNotificationOnUpdate = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SHOW_NOTIFICATION_ON_UPDATE, self.showNotificationOnUpdate )
                 self.showSubmenu = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
                 self.sortByDownload = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD, self.sortByDownload )
@@ -1010,6 +1026,7 @@ class IndicatorPPADownloadStatistics:
                 IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER: self.allowMenuItemsToLaunchBrowser,
                 IndicatorPPADownloadStatistics.SETTINGS_FILTERS: self.filters,
                 IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS: self.combinePPAs,
+                IndicatorPPADownloadStatistics.SETTINGS_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
                 IndicatorPPADownloadStatistics.SETTINGS_PPAS: ppas,
                 IndicatorPPADownloadStatistics.SETTINGS_SHOW_NOTIFICATION_ON_UPDATE: self.showNotificationOnUpdate,
                 IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
