@@ -25,10 +25,8 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
-try:
-    from gi.repository import AppIndicator3 as appindicator
-except:
-    pass
+try: from gi.repository import AppIndicator3 as appindicator
+except: pass
 
 from gi.repository import GLib, Gtk
 
@@ -229,8 +227,7 @@ class IndicatorStardate:
         self.dialog = None
 
 
-    def onShowClassicCheckbox( self, source, showIssueCheckbox ):
-        showIssueCheckbox.set_sensitive( source.get_active() )
+    def onShowClassicCheckbox( self, source, showIssueCheckbox ): showIssueCheckbox.set_sensitive( source.get_active() )
 
 
     def loadSettings( self ):
