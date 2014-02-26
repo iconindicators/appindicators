@@ -14,13 +14,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import datetime
-import stardate
+import datetime, stardate
+
 
 # Exercise the Stardate API.
 now = datetime.datetime.now()
 currentStardate = stardate.Stardate() # By default, 'classic' will be used.
 print( "Stardate API version: " + currentStardate.getVersion() )
+
 
 # Test 'classic' stardate.
 currentStardate.setGregorian( now )
@@ -33,6 +34,7 @@ print( "[" + str( currentStardate.getStardateIssue() ) + "] " +
        str( currentStardate.getStardateInteger() ) + "." + 
        str( currentStardate.getStardateFraction() ) + " 'classic' = " + 
        currentStardate.toGregorianString() )
+
 
 # Test '2009 revised' stardate.
 currentStardate.setClassic( False ) # Now using '2009 revised'.
