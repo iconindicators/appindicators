@@ -18,7 +18,7 @@ cp $NAME.desktop $BUILD_DIR/$NAME-$VERSION
 cp build-debian $BUILD_DIR/$NAME-$VERSION
 
 mkdir -p $BUILD_DIR/$NAME-$VERSION/src
-cp src/indicator-virtual-box.py src/virtualmachineinfo.py $BUILD_DIR/$NAME-$VERSION/src
+cp src/indicator-virtual-box.py src/virtualmachine.py $BUILD_DIR/$NAME-$VERSION/src
 cp $PYTHON_UTILS $BUILD_DIR/$NAME-$VERSION/src
 
 mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/elementary

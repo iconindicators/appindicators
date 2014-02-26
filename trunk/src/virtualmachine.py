@@ -18,7 +18,7 @@
 # Virtual Machine information.
 
 
-class VirtualMachineInfo:
+class Info:
 
     def __init__( self, name, isGroup, uuid, indent ):
         self.name = name

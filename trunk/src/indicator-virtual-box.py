@@ -43,7 +43,7 @@ except:
 
 from gi.repository import GLib, Gtk
 
-import gzip, json, locale, logging, os, pythonutils, re, shutil, subprocess, sys, time, virtualmachineinfo
+import gzip, json, locale, logging, os, pythonutils, re, shutil, subprocess, sys, time, virtualmachine
 
 
 class IndicatorVirtualBox:
@@ -297,7 +297,7 @@ class IndicatorVirtualBox:
         virtualMachineInfos = []
         for line in p.stdout.readlines():
             info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
-            virtualMachineInfo = virtualmachineinfo.VirtualMachineInfo( info[ 0 ], False, info[ 1 ], 0 )
+            virtualMachineInfo = virtualmachine.Info( info[ 0 ], False, info[ 1 ], 0 )
             virtualMachineInfos.append( virtualMachineInfo )
 
         p.wait()
@@ -311,7 +311,7 @@ class IndicatorVirtualBox:
         try:
             uuids = list( p.communicate()[ 0 ].decode().rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
             for uuid in uuids:
-                virtualMachineInfo = virtualmachineinfo.VirtualMachineInfo( "", False, uuid, 0 )
+                virtualMachineInfo = virtualmachine.Info( "", False, uuid, 0 )
                 virtualMachineInfos.append( virtualMachineInfo )                
         except: # The VM order has never been altered giving an empty result (and exception).
             virtualMachineInfos = []
@@ -328,14 +328,14 @@ class IndicatorVirtualBox:
             for item in items:
                 itemName = str( item ).split( "=" )[ 1 ] 
                 if str( item ).startswith( "go" ) or str( item ).startswith( "gc" ):
-                    virtualMachineInfo = virtualmachineinfo.VirtualMachineInfo( itemName, True, "", indentAmount ) # For a group there is no UUID.
+                    virtualMachineInfo = virtualmachine.Info( itemName, True, "", indentAmount ) # For a group there is no UUID.
                     virtualMachineInfos.append( virtualMachineInfo )
                     if grepString.endswith( "/" ):
                         virtualMachineInfos += self.getVirtualMachinesFromConfigWithGroups( grepString + itemName, indentAmount + 1 )
                     else:
                         virtualMachineInfos += self.getVirtualMachinesFromConfigWithGroups( grepString + "/" + itemName, indentAmount + 1 )
                 else:
-                    virtualMachineInfo = virtualmachineinfo.VirtualMachineInfo( "", False, itemName, indentAmount ) # This is a VM: we have it's UUID but not its name...so the caller needs to add it in.
+                    virtualMachineInfo = virtualmachine.Info( "", False, itemName, indentAmount ) # This is a VM: we have it's UUID but not its name...so the caller needs to add it in.
                     virtualMachineInfos.append( virtualMachineInfo )
         except:
             virtualMachineInfos = []
