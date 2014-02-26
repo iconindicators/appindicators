@@ -2,7 +2,7 @@ indicator-lunar (1.0.34-1) precise; urgency=low
 
   * Added RA/Dec in hh:mm:ss/dd:mm:ss respectively.
   * Uses AboutDialog and showMessage from common library.
-  * Added icon/theme methods to common library.
+  * Moved theme methods to common library.
   * Moved eclipse information into a separate file and removed Ephem dependency.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 26 Dec 2013 12:05:57 +1000
