@@ -368,7 +368,7 @@ class IndicatorFortune:
 
         notebook.append_page( grid, Gtk.Label( "General" ) )
 
-        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog = Gtk.Dialog( "Preferences", None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorFortune.ICON )
@@ -495,8 +495,7 @@ class IndicatorFortune:
         if rowNumber is None:
             title = "Add Fortune"
 
-        # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
-        dialog = Gtk.Dialog( title, None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorFortune.ICON )
@@ -545,7 +544,7 @@ class IndicatorFortune:
         dialog.destroy()
 
 
-    def onBrowseFortune( self, fileOrDirectoryButton, preferencesDialog, fortuneFileDirectory, isFile ):
+    def onBrowseFortune( self, fileOrDirectoryButton, addEditDialog, fortuneFileDirectory, isFile ):
         if isFile:
             title = "Choose a fortune .dat file"
             action = Gtk.FileChooserAction.OPEN
@@ -553,7 +552,8 @@ class IndicatorFortune:
             title = "Choose a directory containing a fortune .dat file(s)"
             action = Gtk.FileChooserAction.SELECT_FOLDER
 
-        dialog = Gtk.FileChooserDialog( title, preferencesDialog, action, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
+        dialog = Gtk.FileChooserDialog( title, addEditDialog, action, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
+        dialog.set_modal( True ) # This seems to have no effect - the underlying add/edit dialog is still clickable.
         dialog.set_filename( fortuneFileDirectory.get_text() )
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
