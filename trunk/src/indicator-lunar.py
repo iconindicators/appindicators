@@ -780,8 +780,7 @@ class IndicatorLunar:
         label = Gtk.Label( "City" )
         label.set_halign( Gtk.Align.START )
 
-# TODO Should this be grid.attach?        
-        grid.add( label )
+        grid.attach( label, 0, 0, 1, 1 )
 
         global _city_data
         cities = sorted( _city_data.keys(), key = locale.strxfrm )
