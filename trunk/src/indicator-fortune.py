@@ -266,7 +266,6 @@ class IndicatorFortune:
         spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60 * 24, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
         spinnerRefreshInterval.set_tooltip_text( "How often a fortune is displayed" )
-        spinnerRefreshInterval.set_hexpand( True )
         grid.attach( spinnerRefreshInterval, 1, 1, 1, 1 )
 
         label = Gtk.Label( "Character limit" )
@@ -277,7 +276,6 @@ class IndicatorFortune:
         spinnerCharacterCount.set_adjustment( Gtk.Adjustment( self.skipFortuneCharacterCount, 1, 1000, 1, 50, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerCharacterCount.set_value( self.skipFortuneCharacterCount ) # ...so need to force the initial value by explicitly setting it.
         spinnerCharacterCount.set_tooltip_text( "Rejects a fortune if it exceeds the character count.\nDon't set too low (below 50) as many fortunes may not appear causing excessive calls to 'fortune'." )
-        spinnerCharacterCount.set_hexpand( True )
         grid.attach( spinnerCharacterCount, 1, 2, 1, 1 )
 
         label = Gtk.Label( "Notification summary" )
@@ -287,6 +285,7 @@ class IndicatorFortune:
         notificationSummary = Gtk.Entry()
         notificationSummary.set_text( self.notificationSummary )
         notificationSummary.set_tooltip_text( "The summary text for the notification" )
+        notificationSummary.set_hexpand( True )
         grid.attach( notificationSummary, 1, 3, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
