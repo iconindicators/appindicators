@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Lunar/solar eclipse tables - courtesy of NASA.
+# Lunar/solar eclipse tables from 2014 to 2099 - courtesy of NASA.
 
 
 import datetime
