@@ -1,6 +1,6 @@
 indicator-stardate (1.0.17-1) precise; urgency=low
 
-  * Uses AboutDialog from external file.
+  * Uses AboutDialog from common library.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 25 Feb 2014 22:48:33 +1000
 
