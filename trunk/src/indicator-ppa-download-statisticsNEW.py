@@ -4,12 +4,6 @@
 # {"showNotificationOnUpdate": true, "showSubmenu": false, "ppas": [["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"]], "combinePPAs": true, "sortByDownloadAmount": 5, "allowMenuItemsToLaunchBrowser": true, "filters": {"noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownload": false}
 
 
-#TODO Would still like to improve download speed.
-# Somehow change the retrieval of each results page to be multithreaded. 
-# The downloads shouldn't take as long as they do.
-# Maybe add lots of prints with times to see where the delays are.
-
-
 # TODO Only do a re-download if a ppa was a/e/r...not just when OK is clicked in the preferences.
 
 
@@ -25,14 +19,10 @@
 # Then sort again on a save.
 
 
-# TODO Ensure the build script and packaging, etc, etc to includes the utils and new PPA class.
-# May not need the if test to check for the presence of the pythonutil.py - the cp will fail and the script aborts at that point right?
-
-
 # TODO Add a PPA (after initial PPAs have done their download) and ensure the "downloading now" is shown and a redownload is happening.
 
 
-# TODO Possible to have an ignore error...so a PPA with an error is tossed.
+# TODO Is it possible to have an ignore error...so a PPA with an error is tossed.
 # How to let the user know there's an error though?
 # If the user unchecks the "hide errors" checkbox, the menu will be rebuilt, with errors displayed
 # (and the user may have to uncombine to see message details).
@@ -76,8 +66,6 @@
 
 
 from copy import deepcopy
-from datetime import datetime
-from curses.ascii import NUL
 
 try:
     from gi.repository import AppIndicator3 as appindicator
@@ -90,7 +78,8 @@ from ppa import PPA, PublishedBinary
 from urllib.request import urlopen
 
 import itertools, pythonutils, gzip, json, locale, logging, operator, os, re, shutil, sys, threading, time, webbrowser
-import datetime
+import datetime #TODO remove
+
 
 class IndicatorPPADownloadStatistics:
 
@@ -193,7 +182,7 @@ class IndicatorPPADownloadStatistics:
         menu = Gtk.Menu()
 
         # Add PPAs to the menu...
-        ppas = deepcopy( self.ppasNEW ) # Leave the original download data as is - makes dynamic (user) changes faster (don't have to re-download).
+        ppas = deepcopy( self.ppas ) # Leave the original download data as is - makes dynamic (user) changes faster (don't have to re-download).
 
         self.filter( ppas )
         if self.combinePPAs: self.combine( ppas )
@@ -384,28 +373,6 @@ class IndicatorPPADownloadStatistics:
                 del ppa.getPublishedBinaries()[ self.sortByDownloadAmount : ]
 
 
-    def getPPAUsers( self ):
-        ppaUsers = [ ] 
-        for ppa in self.ppasNEW:
-            if ppa.getUser() not in ppaUsers:
-                ppaUsers.append( ppa.getUser() )
- 
-        return sorted( ppaUsers, key = locale.strxfrm )
-
-
-    def getPPANames( self ):
-        ppaNames = [ ] 
-        for ppa in self.ppasNEW:
-            if ppa.getName() not in ppaNames:
-                ppaNames.append( ppa.getName() )
- 
-        return sorted( ppaNames, key = locale.strxfrm )
-
- 
-#     def getPPAKey( self, ppaList ):
-#         return str( ppaList[ 0 ] ) + " | " + str( ppaList[ 1 ] ) + " | " + str( ppaList[ 2 ] ) + " | " + str( ppaList[ 3 ] )
-
-
     def handleLeftClick( self, icon ):
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
 
@@ -461,7 +428,6 @@ class IndicatorPPADownloadStatistics:
 
 
     def onPreferences( self, widget ):
-
         if self.indicatorIsLocked:
             Notify.Notification.new( "Downloading...", "Preferences are currently unavailable.", IndicatorPPADownloadStatistics.ICON ).show()
             return
@@ -482,7 +448,7 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_bottom( 10 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show PPAs as submenus" )
-        showAsSubmenusCheckbox.set_tooltip_text( "The download statitics for each PPA will be shown in a submenu" )
+        showAsSubmenusCheckbox.set_tooltip_text( "The download statitics for each PPA will be shown in a separate submenu" )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
@@ -562,7 +528,7 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_bottom( 10 )
 
         ppaStore = Gtk.ListStore( str, str, str, str ) # PPA User, PPA Name, Series, Architecture.
-        for ppa in self.ppasNEW:
+        for ppa in self.ppas:
             ppaStore.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
         ppaTree = Gtk.TreeView( ppaStore )
@@ -572,7 +538,6 @@ class IndicatorPPADownloadStatistics:
         ppaTree.append_column( Gtk.TreeViewColumn( "PPA Name", Gtk.CellRendererText(), text = 1 ) )
         ppaTree.append_column( Gtk.TreeViewColumn( "Series", Gtk.CellRendererText(), text = 2 ) )
         ppaTree.append_column( Gtk.TreeViewColumn( "Architecture", Gtk.CellRendererText(), text = 3 ) )
-        ppaTree.get_column( 0 ).set_sort_column_id( 0 )
         ppaTree.set_tooltip_text( "Double click to edit a PPA" )
         ppaTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         ppaTree.connect( "row-activated", self.onPPADoubleClick )
@@ -611,7 +576,7 @@ class IndicatorPPADownloadStatistics:
 
         filterStore = Gtk.ListStore( str, str ) # 'PPA User | PPA Name', filter text.
         keys = {  }
-        for ppa in self.ppasNEW:
+        for ppa in self.ppas:
             key = ppa.getUser() + " | " + ppa.getName()
 
             if key in keys:
@@ -638,7 +603,7 @@ class IndicatorPPADownloadStatistics:
         grid.attach( scrolledWindow, 0, 0, 2, 1 )
 
         hbox = Gtk.Box( spacing = 6 )
-
+#TODO Need to explain the filters apply to the package name and are inclusive and no regex/wildcards.
         label = Gtk.Label( "Filter" )
         hbox.pack_start( label, False, False, 0 )
 
@@ -658,7 +623,7 @@ class IndicatorPPADownloadStatistics:
 #         filterTree.connect( "row-activated", self.onFilterDoubleClick, filterText )
 
         filterAtDownloadCheckbox = Gtk.CheckButton( "Filter At Download" )
-        filterAtDownloadCheckbox.set_tooltip_text( "TODO" )
+        filterAtDownloadCheckbox.set_tooltip_text( "Apply filtering at download time - reduces the amount/time for download." )
         filterAtDownloadCheckbox.set_active( self.filterAtDownload )
         grid.attach( filterAtDownloadCheckbox, 0, 2, 2, 1 )
 
@@ -744,7 +709,7 @@ class IndicatorPPADownloadStatistics:
         model, treeiter = tree.get_selection().get_selected()
 
         if treeiter is None:
-            self.showMessage( Gtk.MessageType.ERROR, "No PPA has been selected for removal." )
+            pythonutils.showMessage( Gtk.MessageType.ERROR, "No PPA has been selected for removal." )
             return
 
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
@@ -774,12 +739,19 @@ class IndicatorPPADownloadStatistics:
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
-        if len( self.ppasNEW ) > 0:
+        if len( model ) > 0:
             ppaUser = Gtk.ComboBoxText.new_with_entry()
-            ppaUsers = self.getPPAUsers()
+
+            ppaUsers = [ ] 
+            for row in range( len( model ) ):
+                if model[ row ][ 0 ] not in ppaUsers:
+                    ppaUsers.append( model[ row ][ 0 ] )
+
+            ppaUsers.sort( key = locale.strxfrm )
             for item in ppaUsers:
                 ppaUser.append_text( item )
 
+#TODO Test this with several ppa users.
             if rowNumber is not None: # This is an edit.
                 ppaUser.set_active( self.getIndexForPPAUser( ppaUsers, model[ treeiter ][ 0 ] ) )
         else:
@@ -793,14 +765,21 @@ class IndicatorPPADownloadStatistics:
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 1, 1 )
 
-        if len( self.ppasNEW ) > 0:
+        if len( model ) > 0:
             ppaName = Gtk.ComboBoxText.new_with_entry()
-            ppaNames = self.getPPANames()
+
+            ppaNames = [ ] 
+            for row in range( len( model ) ):
+                if model[ row ][ 1 ] not in ppaNames:
+                    ppaNames.append( model[ row ][ 1 ] )
+
+            ppaNames.sort( key = locale.strxfrm )
             for item in ppaNames:
                 ppaName.append_text( item )
 
-            if rowNumber is not None:
-                ppaName.set_active( self.getIndexForPPAName( ppaNames, model[ treeiter ][ 1 ] ) )
+#TODO Test this with several ppa names.
+            if rowNumber is not None: # This is an edit.
+                ppaName.set_active( self.getIndexForPPAName( ppaUsers, model[ treeiter ][ 0 ] ) )
         else:
             ppaName = Gtk.Entry() # There are no PPAs present - adding the first PPA.
 
@@ -853,72 +832,41 @@ class IndicatorPPADownloadStatistics:
             if response == Gtk.ResponseType.CANCEL:
                 break
 
-#             if ppaUser.get_text().strip() == "":
-#                 self.showMessage( Gtk.MessageType.ERROR, "The fortune path cannot be empty." )
-#                 ppaUser.grab_focus()
-#                 continue
-# 
-#             if not os.path.exists( ppaUser.get_text().strip() ):
-#                 self.showMessage( Gtk.MessageType.ERROR, "The fortune path does not exist." )
-#                 ppaUser.grab_focus()
-#                 continue
-# 
-#             # Update the data model...
-#             # Due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
-#             # See more detail in the VirtualBox indicator.
-#             if rowNumber is not None:
-#                 # This is an edit.
-#                 if enabledCheckbox.get_active():
-#                     model.set_value( treeiter, 1, Gtk.STOCK_APPLY )
-#                     model[ treeiter ][ 0 ] = ppaUser.get_text().strip()
-#                 else:
-#                     model.insert_after( treeiter, [ ppaUser.get_text().strip(), None ] )
-#                     model.remove( treeiter )
-#             else:
-#                 if enabledCheckbox.get_active():
-#                     model.append( [ ppaUser.get_text().strip(), Gtk.STOCK_APPLY ] )
-#                 else:
-#                     model.append( [ ppaUser.get_text().strip(), None ] )
+            if len( model ) > 0:
+                ppaUserValue = ppaUser.get_active_text().strip()
+                ppaNameValue = ppaName.get_active_text().strip()
+            else:
+                ppaUserValue = ppaUser.get_text().strip()
+                ppaNameValue = ppaName.get_text().strip()
 
-#         while True:
-#             self.dialog.show_all()
-#             response = self.dialog.run()
-# 
-#             if response == Gtk.ResponseType.CANCEL:
-#                 break
-# 
-#             if len( self.ppas ) > 0:
-#                 ppaUserValue = ppaUser.get_active_text().strip()
-#                 ppaNameValue = ppaName.get_active_text().strip()
-#             else:
-#                 ppaUserValue = ppaUser.get_text().strip()
-#                 ppaNameValue = ppaName.get_text().strip()
-# 
-#             if ppaUserValue == "":
-#                 pythonutils.showMessage( Gtk.MessageType.ERROR, "PPA user cannot be empty." )
-#                 ppaUser.grab_focus()
-#                 continue
-# 
-#             if ppaNameValue == "":
-#                 pythonutils.showMessage( Gtk.MessageType.ERROR, "PPA name cannot be empty." )
-#                 ppaName.grab_focus()
-#                 continue
-# 
-#             ppaList = [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ]
-#             key = self.getPPAKey( ppaList )
-#             if key not in self.ppas: # If there is no change, there is nothing to do...
-#                 if add:
-#                     self.ppas[ key ] = PPA( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
-#                 else: # This is an edit...we are 'renaming' the PPA key, but the PPA download data is still present under the old key!
-#                     oldKey = self.getPPAKey( [ existingPPAUser, existingPPAName, existingSeries, existingArchitecture ] )
-#                     del self.ppas[ oldKey ]
-#                     self.ppas[ key ] = PPA( ppaList[ 0 ], ppaList[ 1 ], ppaList[ 2 ], ppaList[ 3 ] )
-# 
-#                 self.saveSettings()
-#                 GLib.timeout_add_seconds( 1, self.buildMenu ) # If we update the menu directly, GTK complains that the menu (which kicked off preferences) no longer exists.
-#                 self.requestPPADownloadAndMenuRefresh()
-# 
-#             break
+            if ppaUserValue == "":
+                pythonutils.showMessage( Gtk.MessageType.ERROR, "PPA user cannot be empty." )
+                ppaUser.grab_focus()
+                continue
+
+            if ppaNameValue == "":
+                pythonutils.showMessage( Gtk.MessageType.ERROR, "PPA name cannot be empty." )
+                ppaName.grab_focus()
+                continue
+
+            # Update the data model...
+            if rowNumber is not None:
+                # This is an edit.
+                model.insert_after( treeiter, [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
+                model.remove( treeiter )
+            else:
+                model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
+
+            # Resort the model...copy all data out of the model into an array, sort the array, clear the model, copy the sorted array into the model!
+            modelData = [ ]
+            for row in range( len( model ) ):
+                modelData.append( [ model[ row ][ 0 ], model[ row ][ 1 ], model[ row ][ 2 ], model[ row ][ 3 ] ] )
+
+            model.clear()
+
+            modelData.sort( key = lambda x: x[ 0 ] )
+            for item in modelData:
+                model.append( item )
 
             break
 
@@ -977,8 +925,7 @@ class IndicatorPPADownloadStatistics:
         self.showNotificationOnUpdate = True
         self.filterAtDownload = True
 
-# TODO Rename - remove the NEW
-        self.ppasNEW = [ ]
+        self.ppas = [ ]
 
         if os.path.isfile( IndicatorPPADownloadStatistics.SETTINGS_FILE ):
             try:
@@ -987,9 +934,9 @@ class IndicatorPPADownloadStatistics:
 
                 ppas = settings.get( IndicatorPPADownloadStatistics.SETTINGS_PPAS, [ ] )
                 for ppa in ppas:
-                    self.ppasNEW.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
+                    self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
 
-                self.ppasNEW.sort( key = operator.methodcaller( "getKey" ) )
+                self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
                 self.allowMenuItemsToLaunchBrowser = settings.get( IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER, self.allowMenuItemsToLaunchBrowser )
                 self.combinePPAs = settings.get( IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS, self.combinePPAs )
@@ -1010,8 +957,8 @@ class IndicatorPPADownloadStatistics:
 
 
     def initialiseDefaultSettings( self ):
-        self.ppasNEW = [ ]
-        self.ppasNEW.append( PPA( "thebernmeister", "ppa", "precise", "amd64" ) )
+        self.ppas = [ ]
+        self.ppas.append( PPA( "thebernmeister", "ppa", "precise", "amd64" ) )
         self.filters = { }
         self.filters[ 'thebernmeister | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
 
@@ -1019,7 +966,7 @@ class IndicatorPPADownloadStatistics:
     def saveSettings( self ):
         try:
             ppas = [ ]
-            for ppa in self.ppasNEW:
+            for ppa in self.ppas:
                 ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
             settings = {
@@ -1086,7 +1033,7 @@ class IndicatorPPADownloadStatistics:
     def getPPADownloadStatistics( self ):
         with self.lock: self.indicatorIsLocked = True
 
-        for ppa in self.ppasNEW:
+        for ppa in self.ppas:
             ppa.resetForDownload()
             self.getPublishedBinaries( ppa )
 
