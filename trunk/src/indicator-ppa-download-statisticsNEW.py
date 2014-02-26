@@ -11,9 +11,6 @@
 # Given that filters only apply at download time, need to rethink when a redownload needs to take place.
 
 
-#TODO Depending on the error (if it's a download error), do a redownload of that PPA?
-
-
 # TODO Need to sort the filter text with each filter.
 # When do we sort?  At load/save time?
 # Perhaps in the preferences - sort at the point the filters will be displayed.
@@ -920,7 +917,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def requestPPADownloadAndMenuRefresh( self ):
-#         Thread( target = self.getPPADownloadStatistics ).start()
+        Thread( target = self.getPPADownloadStatistics ).start()
 # TODO Why need to return?
         return True 
 
@@ -965,6 +962,12 @@ class IndicatorPPADownloadStatistics:
         for ppa in self.ppas:
             ppa.resetForDownload()
             self.getPublishedBinaries( ppa )
+
+        for ppa in self.ppas:
+            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                print( "Refetch for", ppa ) #TODO Remove once proven!
+                ppa.resetForDownload()
+                self.getPublishedBinaries( ppa )
 
         with self.lock: self.indicatorIsLocked = False
 
