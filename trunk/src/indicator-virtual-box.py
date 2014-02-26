@@ -1,10 +1,3 @@
-# TODO Use new handleLeftClick,  handleRightClick in general utils?
-# Use new AboutDialog and remove current one.
-# Use new showMessage and remove current one.
-# Remove getChangeLog
-# Move VirtualMachineInfo to a new file.
-
-
 #!/usr/bin/env python3
 
 
@@ -50,7 +43,7 @@ except:
 
 from gi.repository import GLib, Gtk
 
-import gzip, json, locale, logging, os, re, shutil, subprocess, sys, time
+import gzip, json, locale, logging, os, pythonutils, re, shutil, subprocess, sys, time, virtualmachineinfo
 
 
 class IndicatorVirtualBox:
@@ -304,7 +297,7 @@ class IndicatorVirtualBox:
         virtualMachineInfos = []
         for line in p.stdout.readlines():
             info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
-            virtualMachineInfo = VirtualMachineInfo( info[ 0 ], False, info[ 1 ], 0 )
+            virtualMachineInfo = virtualmachineinfo.VirtualMachineInfo( info[ 0 ], False, info[ 1 ], 0 )
             virtualMachineInfos.append( virtualMachineInfo )
 
         p.wait()
@@ -318,7 +311,7 @@ class IndicatorVirtualBox:
         try:
             uuids = list( p.communicate()[ 0 ].decode().rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
             for uuid in uuids:
-                virtualMachineInfo = VirtualMachineInfo( "", False, uuid, 0 )
+                virtualMachineInfo = virtualmachineinfo.VirtualMachineInfo( "", False, uuid, 0 )
                 virtualMachineInfos.append( virtualMachineInfo )                
         except: # The VM order has never been altered giving an empty result (and exception).
             virtualMachineInfos = []
@@ -335,14 +328,14 @@ class IndicatorVirtualBox:
             for item in items:
                 itemName = str( item ).split( "=" )[ 1 ] 
                 if str( item ).startswith( "go" ) or str( item ).startswith( "gc" ):
-                    virtualMachineInfo = VirtualMachineInfo( itemName, True, "", indentAmount ) # For a group there is no UUID.
+                    virtualMachineInfo = virtualmachineinfo.VirtualMachineInfo( itemName, True, "", indentAmount ) # For a group there is no UUID.
                     virtualMachineInfos.append( virtualMachineInfo )
                     if grepString.endswith( "/" ):
                         virtualMachineInfos += self.getVirtualMachinesFromConfigWithGroups( grepString + itemName, indentAmount + 1 )
                     else:
                         virtualMachineInfos += self.getVirtualMachinesFromConfigWithGroups( grepString + "/" + itemName, indentAmount + 1 )
                 else:
-                    virtualMachineInfo = VirtualMachineInfo( "", False, itemName, indentAmount ) # This is a VM: we have it's UUID but not its name...so the caller needs to add it in.
+                    virtualMachineInfo = virtualmachineinfo.VirtualMachineInfo( "", False, itemName, indentAmount ) # This is a VM: we have it's UUID but not its name...so the caller needs to add it in.
                     virtualMachineInfos.append( virtualMachineInfo )
         except:
             virtualMachineInfos = []
@@ -374,10 +367,10 @@ class IndicatorVirtualBox:
         virtualMachineInfo = self.getVirtualMachineInfo( virtualMachineUUID )
         virtualMachineName = virtualMachineInfo.getName()
         if virtualMachineName is None:
-            self.showMessage( Gtk.MessageType.ERROR, "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
+            pythonutils.showMessage( None, Gtk.MessageType.ERROR, "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
         elif virtualMachineInfo.isRunning:
             if self.duplicateVirtualMachineNameExists( virtualMachineName ):
-                self.showMessage( Gtk.MessageType.ERROR, "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified." )
+                pythonutils.showMessage( None, Gtk.MessageType.ERROR, "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified." )
             else:
                 windowID = None
                 p = subprocess.Popen( "wmctrl -l", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
@@ -389,7 +382,7 @@ class IndicatorVirtualBox:
                 p.wait()
 
                 if windowID is None:
-                    self.showMessage( Gtk.MessageType.ERROR, "The VM is running but its window could not be found - perhaps it is running headless" )
+                    pythonutils.showMessage( None, Gtk.MessageType.ERROR, "The VM is running but its window could not be found - perhaps it is running headless" )
                 else:
                     # If the VM is running headless then there will be no window to display...
                     p = subprocess.Popen( "wmctrl -i -a " + windowID, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
@@ -406,7 +399,7 @@ class IndicatorVirtualBox:
                 time.sleep( IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS )
 
             except Exception as e:
-                self.showMessage( Gtk.MessageType.ERROR, "The VM '" + virtualMachineInfo.getName() + "' could not be started - check the log file: " + IndicatorVirtualBox.LOG )
+                pythonutils.showMessage( None, Gtk.MessageType.ERROR, "The VM '" + virtualMachineInfo.getName() + "' could not be started - check the log file: " + IndicatorVirtualBox.LOG )
                 logging.exception( e )
 
         if doRefresh: self.onRefresh()
@@ -427,12 +420,6 @@ class IndicatorVirtualBox:
                 count += 1
 
         return count > 1
-
-
-    def showMessage( self, messageType, message ):
-        dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
-        dialog.run()
-        dialog.destroy()
 
 
     def onPreferences( self, widget ):
@@ -681,12 +668,12 @@ class IndicatorVirtualBox:
                 break
 
             if startCommand.get_text().strip() == "":
-                self.showMessage( Gtk.MessageType.ERROR, "The start command cannot be empty." )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The start command cannot be empty." )
                 startCommand.grab_focus()
                 continue
 
             if not "%VM%" in startCommand.get_text().strip():
-                self.showMessage( Gtk.MessageType.ERROR, "The start command must contain %VM% which is substituted for the VM name/id." )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The start command must contain %VM% which is substituted for the VM name/id." )
                 startCommand.grab_focus()
                 continue
 
@@ -718,7 +705,7 @@ class IndicatorVirtualBox:
             self.dialog.present()
             return
 
-        self.dialog = AboutDialogWithChangeLog( 
+        self.dialog = pythonutils.AboutDialog( 
                IndicatorVirtualBox.NAME,
                IndicatorVirtualBox.COMMENTS, 
                IndicatorVirtualBox.WEBSITE, 
@@ -729,7 +716,8 @@ class IndicatorVirtualBox:
                [ IndicatorVirtualBox.AUTHOR ],
                "",
                "",
-               self.getChangeLog() )
+               "/usr/share/doc/" + IndicatorVirtualBox.NAME + "/changelog.Debian.gz",
+               logging )
 
         self.dialog.run()
         self.dialog.destroy()
@@ -789,167 +777,6 @@ class IndicatorVirtualBox:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing settings: " + IndicatorVirtualBox.SETTINGS_FILE )
-
-
-    # Assumes a typical format for a Debian changelog file.
-    def getChangeLog( self ):
-        contents = None
-        changeLog = "/usr/share/doc/" + IndicatorVirtualBox.NAME + "/changelog.Debian.gz"
-        if os.path.exists( changeLog ):
-            try:
-                with gzip.open( changeLog, 'rb' ) as f:
-                    changeLogContents = re.split( "\n\n\n", f.read().decode() )
-
-                    contents = ""
-                    for changeLogEntry in changeLogContents:
-                        changeLogEntry = changeLogEntry.split( "\n" )
-
-                        version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
-                        dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
-                        changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
-
-                        contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
-
-                    contents = contents.strip()
-
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Error reading changelog: " + changeLog )
-                contents = None
-
-        return contents
-
-
-class VirtualMachineInfo:
-
-    def __init__( self, name, isGroup, uuid, indent ):
-        self.name = name
-        self.isGroup = isGroup
-        self.uuid = uuid
-        self.indent = indent
-        self.isRunning = False
-        self.autoStart = False
-        self.startCommand = "VBoxManage startvm %VM%"
-
-
-    def getName( self ):
-        return self.name
-
-
-    def setName( self, name ):
-        self.name = name
-
-
-    def getStartCommand( self ):
-        return self.startCommand
-
-
-    def setStartCommand( self, startCommand ):
-        self.startCommand = startCommand
-
-
-    def getAutoStart( self ):
-        return self.autoStart
-
-
-    def setAutoStart( self, autoStart ):
-        self.autoStart = autoStart
-
-
-    def isGroup( self ):
-        return self.isGroup
-
-
-    def getUUID( self ):
-        return self.uuid
-
-
-    def getIndent( self ):
-        return self.indent
-
-
-    def setRunning( self ):
-        self.isRunning = True
-
-
-    def isRunning( self ):
-        return self.isRunning
-
-
-class AboutDialogWithChangeLog( Gtk.AboutDialog ):
-
-    CHANGELOG_BUTTON_NAME = "Change _Log"
-
-
-    # If there are no credits, set both credits/creditsLabel to "".
-    # Changelog can be set to None...if that's the case, use a GtkAboutDialog.
-    def __init__( self, programName, comments, website, websiteLabel, version, licenseType, logoIconName, authors, credits, creditsLabel, changeLog ):
-        super( AboutDialogWithChangeLog, self ).__init__()
-
-        self.add_credit_section( creditsLabel, credits )
-        self.set_authors( authors )
-        self.set_comments( comments )
-        self.set_license_type( licenseType )
-        self.set_logo_icon_name( logoIconName )
-        self.set_program_name( programName )
-        self.set_version( version )
-        self.set_website( website )
-        self.set_website_label( websiteLabel )
-        self.set_position( Gtk.WindowPosition.CENTER_ALWAYS )
-
-        if changeLog is None: return
-
-        notebook = self.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
-
-        textView = Gtk.TextView()
-        textView.set_editable( False )
-        textBuffer = textView.get_buffer()
-        textBuffer.set_text( changeLog )
-
-        # Reference https://gitorious.org/ghelp/gtk/raw/5c4f2ef0c1e658827091aadf4fc3c4d5f5964785:gtk/gtkaboutdialog.c
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_shadow_type( Gtk.ShadowType.IN );
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( textView )
-        scrolledWindow.show_all()
-
-        changeLogTabIndex = notebook.append_page( scrolledWindow, Gtk.Label( "" ) ) # The tab is hidden so the label contents are irrelevant.
-
-        changeLogButton = Gtk.ToggleButton( AboutDialogWithChangeLog.CHANGELOG_BUTTON_NAME )
-        changeLogButton.set_use_underline( True )
-        changeLogButton.show()
-
-        buttonBox = self.get_content_area().get_children()[ 1 ]
-        buttonBox.pack_start( changeLogButton, True, True, 0 )
-        buttonBox.set_child_secondary( changeLogButton, True )
-
-        buttons = buttonBox.get_children()
-        buttonsForToggle = [ ]
-        for button in buttons:
-            if button.get_label() != AboutDialogWithChangeLog.CHANGELOG_BUTTON_NAME and button.get_label() != "gtk-close":
-                buttonsForToggle.append( button )
-                button.connect( "toggled", self.onOtherToggledButtons, changeLogButton )
-
-        changeLogButton.connect( "toggled", self.onChangeLogButtonToggled, notebook, changeLogTabIndex, buttonsForToggle )
-
-
-    def onChangeLogButtonToggled( self, changeLogButton, notebook, changeLogTabIndex, buttonsForToggle ):
-        if changeLogButton.get_active():
-            if notebook.get_current_page() != 0:
-                for button in buttonsForToggle:
-                    button.set_active( False )
-
-            notebook.set_current_page( changeLogTabIndex )
-        else:
-            if notebook.get_current_page() == changeLogTabIndex:
-                notebook.set_current_page( 0 )
-
-
-    def onOtherToggledButtons( self, toggleButton, changeLogButton ):
-        if toggleButton.get_active() and changeLogButton.get_active():
-            changeLogButton.set_active( False )
 
 
 if __name__ == "__main__": IndicatorVirtualBox().main()

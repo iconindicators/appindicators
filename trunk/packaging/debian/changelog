@@ -1,6 +1,8 @@
 indicator-virtual-box (1.0.26-1) precise; urgency=low
 
   * Removed duplicate showMessage function.
+  * Uses AboutDialog and showMessage from common library.
+  * Moved virtual machine information into a separate file.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 27 Jan 2014 13:33:27 +1000
 
