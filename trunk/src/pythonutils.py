@@ -26,8 +26,8 @@ import gzip, os, re
 # Shows a message dialog.
 #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING or Gtk.MessageType.QUESTION.
 #    message: The message.
-def showMessage( messageType, message ):
-    dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
+def showMessage( parent, messageType, message ):
+    dialog = Gtk.MessageDialog( Gtk.DialogFlags.MODAL, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
     dialog.run()
     dialog.destroy()
     
