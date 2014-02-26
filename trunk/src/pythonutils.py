@@ -23,16 +23,19 @@ from gi.repository import Gtk
 import gzip, os, re
 
 
-def isNumber( string ):
+# Returns True if a number; False otherwise.
+def isNumber( numberAsString ):
     try:
-        float( string )
+        float( numberAsString )
         return True
     except ValueError:
         return False
 
 
+# Returns the colour (as #xxyyzz) for the current GTK icon theme.
 def getColourForIconTheme():
     iconTheme = getIconTheme()
+
     if iconTheme is None: return "#fff200" # Use hicolor as a default.
 
     if iconTheme == "elementary": return "#f4f4f4"
@@ -46,6 +49,7 @@ def getColourForIconTheme():
     return "#fff200" # Use hicolor as a default
 
 
+# Returns the name of the current GTK icon theme.
 def getIconTheme(): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
