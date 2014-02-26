@@ -50,8 +50,8 @@
 #
 # The '2009 revised' conversion is based on http://en.wikipedia.org/wiki/Stardate.
 
-import datetime
-import math
+
+import datetime, math
 
 
 class Stardate:
