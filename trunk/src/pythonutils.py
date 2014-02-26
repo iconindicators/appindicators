@@ -23,15 +23,49 @@ from gi.repository import Gtk
 import gzip, os, re
 
 
+def isNumber( string ):
+    try:
+        float( string )
+        return True
+    except ValueError:
+        return False
+
+
+def getColourForIconTheme():
+    iconTheme = getIconTheme()
+    if iconTheme is None: return "#fff200" # Use hicolor as a default.
+
+    if iconTheme == "elementary": return "#f4f4f4"
+
+    if iconTheme == "lubuntu": return "#5a5a5a"
+
+    if iconTheme == "ubuntu-mono-dark": return "#dfdbd2"
+
+    if iconTheme == "ubuntu-mono-light": return "#3c3c3c"
+
+    return "#fff200" # Use hicolor as a default
+
+
+def getIconTheme(): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
+
+
 # Shows a message dialog.
-#    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING or Gtk.MessageType.QUESTION.
+#    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
 #    message: The message.
 def showMessage( parent, messageType, message ):
-    dialog = Gtk.MessageDialog( Gtk.DialogFlags.MODAL, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
+    dialog = Gtk.MessageDialog( parent, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
     dialog.run()
     dialog.destroy()
-    
-    
+
+
+# Shows and OK/Cancel dialog prompt and returns either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
+def showOKCancel( parent, message ):
+    dialog = Gtk.MessageDialog( parent, Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, message )
+    response = dialog.run()
+    dialog.destroy()
+    return response
+
+
 # A GTK AboutDialog with optional change log displayed in its own tab.
 class AboutDialog( Gtk.AboutDialog ):
 
