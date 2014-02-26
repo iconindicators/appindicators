@@ -32,18 +32,14 @@
 # I've also noticed the VirtualBox indicator menu seems to stop responding over time too...maybe it's a related issue?
 
 
-try:
-    from gi.repository import AppIndicator3 as appindicator
-except:
-    pass
+try: from gi.repository import AppIndicator3 as appindicator
+except: pass
 
 from gi.repository import GLib, Gtk
 
 notifyImported = True
-try:
-    from gi.repository import Notify
-except:
-    notifyImported = False
+try: from gi.repository import Notify
+except: notifyImported = False
 
 import copy, datetime, eclipse, gzip, json, locale, logging, math, os, pythonutils, re, shutil, subprocess, sys
 
