@@ -196,30 +196,6 @@ class IndicatorFortune:
             return
 
         self.dialog = pythonutils.AboutDialog( 
-               IndicatorPPADownloadStatistics.NAME,
-               IndicatorPPADownloadStatistics.COMMENTS, 
-               IndicatorPPADownloadStatistics.WEBSITE, 
-               IndicatorPPADownloadStatistics.WEBSITE, 
-               IndicatorPPADownloadStatistics.VERSION, 
-               Gtk.License.GPL_3_0, 
-               IndicatorPPADownloadStatistics.ICON,
-               [ IndicatorPPADownloadStatistics.AUTHOR ],
-               "",
-               "",
-               "/usr/share/doc/" + IndicatorPPADownloadStatistics.NAME + "/changelog.Debian.gz",
-               logging )
-
-        self.dialog.run()
-        self.dialog.destroy()
-        self.dialog = None
-
-    
-    def onAbout( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
-
-        self.dialog = pythonutils.AboutDialog( 
                IndicatorFortune.NAME,
                IndicatorFortune.COMMENTS, 
                IndicatorFortune.WEBSITE, 
@@ -416,10 +392,7 @@ class IndicatorFortune:
 
 
     def onFortuneReset( self, button, tree ):
-        dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, "Remove all fortunes and set to factory default?" )
-        response = dialog.run()
-        dialog.destroy()
-        if response == Gtk.ResponseType.OK:
+        if pythonutils.showOKCancel( None, "Remove all fortunes and set to factory default?" ) == Gtk.ResponseType.OK:
             model, treeiter = tree.get_selection().get_selected()
             model.clear()
             model.append( [ IndicatorFortune.DEFAULT_FORTUNE[ 0 ], Gtk.STOCK_APPLY ]  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
@@ -429,14 +402,11 @@ class IndicatorFortune:
         model, treeiter = tree.get_selection().get_selected()
 
         if treeiter is None:
-            pythonutils.showMessage( Gtk.MessageType.ERROR, "No fortune has been selected for removal." )
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "No fortune has been selected for removal." )
             return
 
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-        dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, "Remove the selected fortune?" )
-        response = dialog.run()
-        dialog.destroy()
-        if response == Gtk.ResponseType.OK:
+        if pythonutils.showOKCancel( None, "Remove the selected fortune?" ) == Gtk.ResponseType.OK:
             model.remove( treeiter )
 
 
@@ -512,12 +482,12 @@ class IndicatorFortune:
                 break
 
             if fortuneFileDirectory.get_text().strip() == "":
-                pythonutils.showMessage( Gtk.MessageType.ERROR, "The fortune path cannot be empty." )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The fortune path cannot be empty." )
                 fortuneFileDirectory.grab_focus()
                 continue
 
             if not os.path.exists( fortuneFileDirectory.get_text().strip() ):
-                pythonutils.showMessage( Gtk.MessageType.ERROR, "The fortune path does not exist." )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The fortune path does not exist." )
                 fortuneFileDirectory.grab_focus()
                 continue
 
@@ -539,6 +509,26 @@ class IndicatorFortune:
                 else:
                     model.append( [ fortuneFileDirectory.get_text().strip(), None ] )
 
+# Maybe if an edit, remove ... then copy all across, add the new/edit, clear, and copy back?
+            # Update the data model...
+            if rowNumber is not None:
+                # This is an edit.
+                model.insert_after( treeiter, [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
+                model.remove( treeiter )
+            else:
+                model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
+
+            # Resort the model...copy all data out of the model into an array, sort the array, clear the model, copy the sorted array into the model!
+            modelData = [ ]
+            for row in range( len( model ) ):
+                modelData.append( [ model[ row ][ 0 ], model[ row ][ 1 ], model[ row ][ 2 ], model[ row ][ 3 ] ] )
+
+            model.clear()
+
+            modelData.sort( key = lambda x: x[ 0 ] )
+            for item in modelData:
+                model.append( item )
+            
             break
 
         dialog.destroy()
