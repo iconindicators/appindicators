@@ -1,10 +1,10 @@
 indicator-ppa-download-statistics (1.0.30-1) precise; urgency=low
 
   * Uses AboutDialog and showMessage from external file.
-  * Adding filtering of PPA packages.  A filter is a set of strings, on a per PPA
-    user/name basis, used to match package names - a matched package name is kept
-    whereas unmatched package names are dropped.  Filters can be applied at
-    download time or after all the PPA package statistics have been downloaded.
+  * Adding filtering of PPA packages.  A filter comprises one or more strings,
+    on a per PPA user/name basis, used to match package names.  A matched package
+    name is kept whereas unmatched package names are dropped.  Filters are applied
+    at download time.
   * Added a notification option for when statistics have been updated.
   * Added an option to combining PPAs on how to handle versions for
     architecture specific packages.
