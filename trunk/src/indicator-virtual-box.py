@@ -36,10 +36,8 @@
 # The VirtualBox.xml file does seem to reflect the change (and the indicator obeys this file).
 
 
-try:
-    from gi.repository import AppIndicator3 as appindicator
-except:
-    pass
+try: from gi.repository import AppIndicator3 as appindicator
+except: pass
 
 from gi.repository import GLib, Gtk
 
