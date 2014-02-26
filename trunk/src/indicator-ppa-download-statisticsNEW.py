@@ -8,6 +8,7 @@
 
 
 #TODO If the filter checkbox is toggled from checked to unchecked, need to do a redownload...right?
+# Given that filters only apply at download time, need to rethink when a redownload needs to take place.
 
 
 #TODO Depending on the error (if it's a download error), do a redownload of that PPA?
@@ -20,12 +21,6 @@
 
 
 # TODO Add a PPA (after initial PPAs have done their download) and ensure the "downloading now" is shown and a redownload is happening.
-
-
-# TODO Is it possible to have an ignore error...so a PPA with an error is tossed.
-# How to let the user know there's an error though?
-# If the user unchecks the "hide errors" checkbox, the menu will be rebuilt, with errors displayed
-# (and the user may have to uncombine to see message details).
 
 
 # TODO If the user is editing/adding/etc and the update kicks off, how to handle this?
@@ -78,7 +73,6 @@ from ppa import PPA, PublishedBinary
 from urllib.request import urlopen
 
 import itertools, pythonutils, gzip, json, locale, logging, operator, os, re, shutil, sys, threading, time, webbrowser
-import datetime #TODO remove
 
 
 class IndicatorPPADownloadStatistics:
@@ -184,7 +178,6 @@ class IndicatorPPADownloadStatistics:
         # Add PPAs to the menu...
         ppas = deepcopy( self.ppas ) # Leave the original download data as is - makes dynamic (user) changes faster (don't have to re-download).
 
-        self.filter( ppas )
         if self.combinePPAs: self.combine( ppas )
         if self.sortByDownload: self.sortByDownloadAndClip( ppas )
 
@@ -278,25 +271,6 @@ class IndicatorPPADownloadStatistics:
             self.menu = menu
 
         menu.show_all()
-
-
-    def filter( self, ppas ):
-        for ppa in ppas:
-            key = ppa.getUser() + " | " + ppa.getName()
-            if not key in self.filters:
-                continue
-
-            publishedBinaries = ppa.getPublishedBinaries()
-            for i in range( len( publishedBinaries ) - 1, -1, -1 ): # Iterate backwards, enabling a "simpler" way to delete elements.
-                publishedBinary = publishedBinaries[ i ]
-                match = False
-                for filter in self.filters.get( key ):
-                    if filter in publishedBinary.getPackageName():
-                        match = True
-                        break
-
-                if not match:
-                    del publishedBinaries[ i ]
 
 
     def combine( self, ppas ):
@@ -501,20 +475,14 @@ class IndicatorPPADownloadStatistics:
         spinner.set_value( self.sortByDownloadAmount ) # ...so need to force the initial value by explicitly setting it.
         spinner.set_tooltip_text( "Limit the number of entries when sorting by download.\nA value of zero will not clip." )
         spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
-        spinner.set_hexpand( True )
         grid.attach( spinner, 1, 4, 1, 1 )
 
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
-        ignoreErrorsCheckbox = Gtk.CheckButton( "Ignore Errors" )
-        ignoreErrorsCheckbox.set_tooltip_text( "TODO" )
-        ignoreErrorsCheckbox.set_active( True ) #TODO
-        grid.attach( ignoreErrorsCheckbox, 0, 5, 2, 1 )
-
         showNotificationOnUpdateCheckbox = Gtk.CheckButton( "Notify On Update" )
         showNotificationOnUpdateCheckbox.set_tooltip_text( "Show a screen notification when PPA download statistics have been updated." )
         showNotificationOnUpdateCheckbox.set_active( self.showNotificationOnUpdate )
-        grid.attach( showNotificationOnUpdateCheckbox, 0, 6, 2, 1 )
+        grid.attach( showNotificationOnUpdateCheckbox, 0, 5, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
@@ -622,11 +590,6 @@ class IndicatorPPADownloadStatistics:
 
 #         filterTree.connect( "row-activated", self.onFilterDoubleClick, filterText )
 
-        filterAtDownloadCheckbox = Gtk.CheckButton( "Filter At Download" )
-        filterAtDownloadCheckbox.set_tooltip_text( "Apply filtering at download time - reduces the amount/time for download." )
-        filterAtDownloadCheckbox.set_active( self.filterAtDownload )
-        grid.attach( filterAtDownloadCheckbox, 0, 2, 2, 1 )
-
         notebook.append_page( grid, Gtk.Label( "Filters" ) )
 
         # Fourth tab - general settings.
@@ -709,14 +672,11 @@ class IndicatorPPADownloadStatistics:
         model, treeiter = tree.get_selection().get_selected()
 
         if treeiter is None:
-            pythonutils.showMessage( Gtk.MessageType.ERROR, "No PPA has been selected for removal." )
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "No PPA has been selected for removal." )
             return
 
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-        dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, "Remove the selected PPA?" )
-        response = dialog.run()
-        dialog.destroy()
-        if response == Gtk.ResponseType.OK:
+        if pythonutils.showOKCancel( None, "Remove the selected PPA?" ) == Gtk.ResponseType.OK:
             model.remove( treeiter )
 
 
@@ -726,6 +686,8 @@ class IndicatorPPADownloadStatistics:
 
     def onPPADoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
+
+# TODO Can hit Add multiple times whilst the add/edit dialog is displayed...maybe remove too!
 
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -753,7 +715,7 @@ class IndicatorPPADownloadStatistics:
 
 #TODO Test this with several ppa users.
             if rowNumber is not None: # This is an edit.
-                ppaUser.set_active( self.getIndexForPPAUser( ppaUsers, model[ treeiter ][ 0 ] ) )
+                ppaUser.set_active( ppaUsers.index( model[ treeiter ][ 0 ] ) )
         else:
             ppaUser = Gtk.Entry() # There are no PPAs present - adding the first PPA.
 
@@ -779,7 +741,7 @@ class IndicatorPPADownloadStatistics:
 
 #TODO Test this with several ppa names.
             if rowNumber is not None: # This is an edit.
-                ppaName.set_active( self.getIndexForPPAName( ppaUsers, model[ treeiter ][ 0 ] ) )
+                ppaName.set_active( ppaUsers.index( model[ treeiter ][ 0 ] ) )
         else:
             ppaName = Gtk.Entry() # There are no PPAs present - adding the first PPA.
 
@@ -794,7 +756,7 @@ class IndicatorPPADownloadStatistics:
             series.append_text( item )
 
         if rowNumber is not None:
-            series.set_active( self.getIndexForSeries( model[ treeiter ][ 2 ] ) )
+            series.set_active( IndicatorPPADownloadStatistics.SERIES.index( model[ treeiter ][ 2 ] ) )
         else:
             series.set_active( 0 )
 
@@ -809,7 +771,7 @@ class IndicatorPPADownloadStatistics:
             architectures.append_text( item )
 
         if rowNumber is not None:
-            architectures.set_active( self.getIndexForArchitecture( model[ treeiter ][ 3 ] ) )
+            architectures.set_active( IndicatorPPADownloadStatistics.ARCHITECTURES.index( model[ treeiter ][ 3 ] ) )
         else:
             architectures.set_active( 0 )
 
@@ -820,7 +782,7 @@ class IndicatorPPADownloadStatistics:
             title = "Add PPA"
 
         # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
-        dialog = Gtk.Dialog( title, None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
@@ -840,12 +802,12 @@ class IndicatorPPADownloadStatistics:
                 ppaNameValue = ppaName.get_text().strip()
 
             if ppaUserValue == "":
-                pythonutils.showMessage( Gtk.MessageType.ERROR, "PPA user cannot be empty." )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA user cannot be empty." )
                 ppaUser.grab_focus()
                 continue
 
             if ppaNameValue == "":
-                pythonutils.showMessage( Gtk.MessageType.ERROR, "PPA name cannot be empty." )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA name cannot be empty." )
                 ppaName.grab_focus()
                 continue
 
@@ -871,38 +833,6 @@ class IndicatorPPADownloadStatistics:
             break
 
         dialog.destroy()
-
-
-    def getIndexForPPAUser( self, ppaUsers, ppaUser ):
-        for i in range( len( ppaUsers ) ):
-            if ppaUsers[ i ] == ppaUser:
-                return i
-
-        return -1 # Should never happen!
-
-
-    def getIndexForPPAName( self, ppaNames, ppaName ):
-        for i in range( len( ppaNames ) ):
-            if ppaNames[ i ] == ppaName:
-                return i
-
-        return -1 # Should never happen!
-
-
-    def getIndexForSeries( self, series ):
-        for i in range( len( IndicatorPPADownloadStatistics.SERIES ) ):
-            if IndicatorPPADownloadStatistics.SERIES[ i ] == series:
-                return i
-
-        return -1 # Should never happen!
-
-
-    def getIndexForArchitecture( self, architecture ):
-        for i in range( len( IndicatorPPADownloadStatistics.ARCHITECTURES ) ):
-            if IndicatorPPADownloadStatistics.ARCHITECTURES[ i ] == architecture:
-                return i
-
-        return -1 # Should never happen!
 
 
 #     def onFilterDoubleClick( self, tree, rowNumber, treeViewColumn, displayPattern ):
@@ -990,8 +920,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def requestPPADownloadAndMenuRefresh( self ):
-        Thread( target = self.getPPADownloadStatistics ).start()
-        
+#         Thread( target = self.getPPADownloadStatistics ).start()
 # TODO Why need to return?
         return True 
 
@@ -1077,7 +1006,7 @@ class IndicatorPPADownloadStatistics:
 
                     # Filter out unwanted packages...
                     key = ppa.getUser() + " | " + ppa.getName()
-                    if self.filterAtDownload and key in self.filters:
+                    if key in self.filters:
                         match = False
                         for filter in self.filters.get( key ):
                             if filter in packageName:
@@ -1111,7 +1040,7 @@ class IndicatorPPADownloadStatistics:
                     t.join()
 
                 ppa.noMorePublishedBinariesToAdd()
-                
+
                 if numberOfPublishedBinaries > 0 and len( ppa.getPublishedBinaries() ) == 0:
                     ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
 
@@ -1126,7 +1055,7 @@ class IndicatorPPADownloadStatistics:
 
         try:
             downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
-            
+
             with self.lock:
                 if str( downloadCount ).isnumeric():
                     ppa.addPublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific )
