@@ -1,9 +1,3 @@
-# TODO Use new handleLeftClick,  handleRightClick in general utils?
-# Use new AboutDialog and remove current one.
-# Use new showMessage and remove current one.
-# Remove getChangeLog
-
-
 #!/usr/bin/env python3
 
 
@@ -37,24 +31,16 @@ try:
 except:
     pass
 
-from gi.repository import Gdk, GLib, Gtk
+from gi.repository import Gdk, GLib, Gtk, Notify
 
-import gzip, json, logging, os, re, shutil, subprocess, sys
-
-try:
-    from gi.repository import Notify
-except:
-    dialog = Gtk.MessageDialog( None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "The package gi.repository.Notify must be installed!" )
-    dialog.set_title( "indicator-fortune" )
-    dialog.run()
-    sys.exit()
+import gzip, json, logging, os, pythonutils, re, shutil, subprocess, sys
 
 
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
-    VERSION = "1.0.6"
+    VERSION = "1.0.7"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -209,7 +195,31 @@ class IndicatorFortune:
             self.dialog.present()
             return
 
-        self.dialog = AboutDialogWithChangeLog( 
+        self.dialog = pythonutils.AboutDialog( 
+               IndicatorPPADownloadStatistics.NAME,
+               IndicatorPPADownloadStatistics.COMMENTS, 
+               IndicatorPPADownloadStatistics.WEBSITE, 
+               IndicatorPPADownloadStatistics.WEBSITE, 
+               IndicatorPPADownloadStatistics.VERSION, 
+               Gtk.License.GPL_3_0, 
+               IndicatorPPADownloadStatistics.ICON,
+               [ IndicatorPPADownloadStatistics.AUTHOR ],
+               "",
+               "",
+               "/usr/share/doc/" + IndicatorPPADownloadStatistics.NAME + "/changelog.Debian.gz",
+               logging )
+
+        self.dialog.run()
+        self.dialog.destroy()
+        self.dialog = None
+
+    
+    def onAbout( self, widget ):
+        if self.dialog is not None:
+            self.dialog.present()
+            return
+
+        self.dialog = pythonutils.AboutDialog( 
                IndicatorFortune.NAME,
                IndicatorFortune.COMMENTS, 
                IndicatorFortune.WEBSITE, 
@@ -220,7 +230,8 @@ class IndicatorFortune:
                [ IndicatorFortune.AUTHOR ],
                 "",
                 "",
-               self.getChangeLog() )
+               "/usr/share/doc/" + IndicatorFortune.NAME + "/changelog.Debian.gz",
+               logging )
 
         self.dialog.run()
         self.dialog.destroy()
@@ -291,7 +302,7 @@ class IndicatorFortune:
         grid.set_row_homogeneous( False )
         grid.set_column_homogeneous( False )
 
-        store = Gtk.ListStore( str, str ) # Path to fortune file, tick icon (Gtk.STOCK_APPLY) or None for enabled.
+        store = Gtk.ListStore( str, str ) # Path to fortune file, tick icon (Gtk.STOCK_APPLY) or None.
         for fortune in self.fortunes:
             if fortune[ 1 ]:
                 store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
@@ -303,7 +314,6 @@ class IndicatorFortune:
         tree.set_vexpand( True )
         tree.append_column( Gtk.TreeViewColumn( "Fortune File/Directory", Gtk.CellRendererText(), text = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Enabled", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
-        tree.get_column( 0 ).set_sort_column_id( 0 )
         tree.set_tooltip_text( "Double click to edit a fortune's properties" )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onFortuneDoubleClick )
@@ -420,7 +430,7 @@ class IndicatorFortune:
         model, treeiter = tree.get_selection().get_selected()
 
         if treeiter is None:
-            self.showMessage( Gtk.MessageType.ERROR, "No fortune has been selected for removal." )
+            pythonutils.showMessage( Gtk.MessageType.ERROR, "No fortune has been selected for removal." )
             return
 
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
@@ -504,18 +514,19 @@ class IndicatorFortune:
                 break
 
             if fortuneFileDirectory.get_text().strip() == "":
-                self.showMessage( Gtk.MessageType.ERROR, "The fortune path cannot be empty." )
+                pythonutils.showMessage( Gtk.MessageType.ERROR, "The fortune path cannot be empty." )
                 fortuneFileDirectory.grab_focus()
                 continue
 
             if not os.path.exists( fortuneFileDirectory.get_text().strip() ):
-                self.showMessage( Gtk.MessageType.ERROR, "The fortune path does not exist." )
+                pythonutils.showMessage( Gtk.MessageType.ERROR, "The fortune path does not exist." )
                 fortuneFileDirectory.grab_focus()
                 continue
 
             # Update the data model...
             # Due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
             # See more detail in the VirtualBox indicator.
+#TODO See ppa download stats...need to update the model, remove all items, sort, put all back in!
             if rowNumber is not None:
                 # This is an edit.
                 if enabledCheckbox.get_active():
@@ -552,12 +563,6 @@ class IndicatorFortune:
         dialog.destroy()
 
 
-    def showMessage( self, messageType, message ):
-        dialog = Gtk.MessageDialog( None, 0, messageType, Gtk.ButtonsType.OK, message )
-        dialog.run()
-        dialog.destroy()
-
-
     def loadSettings( self ):
         self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
         self.notificationSummary = IndicatorFortune.NOTIFICATION_SUMMARY
@@ -573,6 +578,8 @@ class IndicatorFortune:
                 self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes )
                 if self.fortunes == [ ]:
                     self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
+
+                self.fortunes.sort( key = lambda x: x[ 0 ] )
 
                 self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )
                 self.refreshIntervalInMinutes = settings.get( IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
@@ -600,111 +607,6 @@ class IndicatorFortune:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing settings: " + IndicatorFortune.SETTINGS_FILE )
-
-
-    # Assumes a typical format for a Debian changelog file.
-    def getChangeLog( self ):
-        contents = None
-        changeLog = "/usr/share/doc/" + IndicatorFortune.NAME + "/changelog.Debian.gz"
-        if os.path.exists( changeLog ):
-            try:
-                with gzip.open( changeLog, 'rb' ) as f:
-                    changeLogContents = re.split( "\n\n\n", f.read().decode() )
-
-                    contents = ""
-                    for changeLogEntry in changeLogContents:
-                        changeLogEntry = changeLogEntry.split( "\n" )
-
-                        version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
-                        dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
-                        changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
-
-                        contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
-
-                    contents = contents.strip()
-
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Error reading changelog: " + changeLog )
-                contents = None
-
-        return contents
-
-
-class AboutDialogWithChangeLog( Gtk.AboutDialog ):
-
-    CHANGELOG_BUTTON_NAME = "Change _Log"
-
-
-    # If there are no credits, set both credits/creditsLabel to "".
-    # Changelog can be set to None...if that's the case, use a GtkAboutDialog.
-    def __init__( self, programName, comments, website, websiteLabel, version, licenseType, logoIconName, authors, credits, creditsLabel, changeLog ):
-        super( AboutDialogWithChangeLog, self ).__init__()
-
-        self.add_credit_section( creditsLabel, credits )
-        self.set_authors( authors )
-        self.set_comments( comments )
-        self.set_license_type( licenseType )
-        self.set_logo_icon_name( logoIconName )
-        self.set_program_name( programName )
-        self.set_version( version )
-        self.set_website( website )
-        self.set_website_label( websiteLabel )
-        self.set_position( Gtk.WindowPosition.CENTER_ALWAYS )
-
-        if changeLog is None: return
-
-        notebook = self.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
-
-        textView = Gtk.TextView()
-        textView.set_editable( False )
-        textBuffer = textView.get_buffer()
-        textBuffer.set_text( changeLog )
-
-        # Reference https://gitorious.org/ghelp/gtk/raw/5c4f2ef0c1e658827091aadf4fc3c4d5f5964785:gtk/gtkaboutdialog.c
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_shadow_type( Gtk.ShadowType.IN );
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( textView )
-        scrolledWindow.show_all()
-
-        changeLogTabIndex = notebook.append_page( scrolledWindow, Gtk.Label( "" ) ) # The tab is hidden so the label contents are irrelevant.
-
-        changeLogButton = Gtk.ToggleButton( AboutDialogWithChangeLog.CHANGELOG_BUTTON_NAME )
-        changeLogButton.set_use_underline( True )
-        changeLogButton.show()
-
-        buttonBox = self.get_content_area().get_children()[ 1 ]
-        buttonBox.pack_start( changeLogButton, True, True, 0 )
-        buttonBox.set_child_secondary( changeLogButton, True )
-
-        buttons = buttonBox.get_children()
-        buttonsForToggle = [ ]
-        for button in buttons:
-            if button.get_label() != AboutDialogWithChangeLog.CHANGELOG_BUTTON_NAME and button.get_label() != "gtk-close":
-                buttonsForToggle.append( button )
-                button.connect( "toggled", self.onOtherToggledButtons, changeLogButton )
-
-        changeLogButton.connect( "toggled", self.onChangeLogButtonToggled, notebook, changeLogTabIndex, buttonsForToggle )
-
-
-    def onChangeLogButtonToggled( self, changeLogButton, notebook, changeLogTabIndex, buttonsForToggle ):
-        if changeLogButton.get_active():
-            if notebook.get_current_page() != 0:
-                for button in buttonsForToggle:
-                    button.set_active( False )
-
-            notebook.set_current_page( changeLogTabIndex )
-        else:
-            if notebook.get_current_page() == changeLogTabIndex:
-                notebook.set_current_page( 0 )
-
-
-    def onOtherToggledButtons( self, toggleButton, changeLogButton ):
-        if toggleButton.get_active() and changeLogButton.get_active():
-            changeLogButton.set_active( False )
 
 
 if __name__ == "__main__": IndicatorFortune().main()

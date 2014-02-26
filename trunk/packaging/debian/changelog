@@ -1,3 +1,11 @@
+indicator-fortune (1.0.7-1) precise; urgency=low
+
+  * Now sorts fortunes by path name in the add/edit/remove list.
+  * Uses AboutDialog and showMessage from external file.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 25 Feb 2014 18:05:24 +1000
+
+
 indicator-fortune (1.0.6-1) precise; urgency=low
 
   * Created a new About dialog showing the changelog.
