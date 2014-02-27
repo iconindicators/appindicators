@@ -12,4 +12,5 @@ icons/lubuntu/indicator-ppa-download-statistics.svg usr/share/icons/lubuntu/apps
 icons/lubuntu/indicator-ppa-download-statistics.svg usr/share/icons/lubuntu/apps/48
 indicator-ppa-download-statistics.desktop usr/share/applications
 src/indicator-ppa-download-statistics.py usr/share/indicator-ppa-download-statistics
-
+src/ppa.py usr/share/indicator-ppa-download-statistics
+src/pythonutils.py usr/share/indicator-ppa-download-statistics
