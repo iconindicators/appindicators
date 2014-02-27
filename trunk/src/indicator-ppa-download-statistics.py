@@ -29,6 +29,9 @@
 # {"showNotificationOnUpdate": true, "showSubmenu": false, "ppas": [["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"]], "combinePPAs": true, "sortByDownloadAmount": 5, "allowMenuItemsToLaunchBrowser": true, "filters": {"noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownload": false}
 
 
+# TODO If all PPAs are removed, what happens to any filters?
+
+
 # TODO Only do a re-download if a ppa was a/e/r...not just when OK is clicked in the preferences.
 
 
@@ -460,9 +463,6 @@ class IndicatorPPADownloadStatistics:
 
         ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( "Ignore Version for Architecture Specific" )
         ignoreVersionArchitectureSpecificCheckbox.set_margin_left( 15 )
-        toolTip = "For architecture specific binary packages, the version number is ignored by default.\n\n"
-        toolTip += "Unchecking WILL use the version number in determining if binary packages are the same.\n\n"
-        toolTip += "The version number is retained only if it is identical across all instances of a published binary."
 
         toolTip = "For architecture specific, sometimes the same package name\n"
         toolTip += "but different version 'number' is actually the SAME package.\n\n"
@@ -472,7 +472,6 @@ class IndicatorPPADownloadStatistics:
         toolTip += "Checking this option will ignore the version number\n"
         toolTip += "when determining if two architecture specific packages are identical.\n\n"
         toolTip += "The version number is retained only if it is identical across all instances of a published binary."
-
         ignoreVersionArchitectureSpecificCheckbox.set_tooltip_text( toolTip )
         ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
@@ -567,8 +566,7 @@ class IndicatorPPADownloadStatistics:
         for ppa in self.ppas:
             key = ppa.getUser() + " | " + ppa.getName()
 
-            if key in keys:
-                continue # Add each 'PPA User | PPA Name' once!
+            if key in keys: continue # Add each 'PPA User | PPA Name' once!
 
             keys[ key ] = key
             if key in self.filters:
@@ -584,31 +582,28 @@ class IndicatorPPADownloadStatistics:
         filterTree.append_column( Gtk.TreeViewColumn( "Filter", Gtk.CellRendererText(), text = 1 ) )
         filterTree.set_tooltip_text( "Double click to add/modify a filter." )
         filterTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        filterTree.connect( "row-activated", self.onFilterDoubleClick, ppaTree )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( filterTree )
-        grid.attach( scrolledWindow, 0, 0, 2, 1 )
+        grid.attach( scrolledWindow, 0, 0, 1, 1 )
 
         hbox = Gtk.Box( spacing = 6 )
-#TODO Need to explain the filters apply to the package name and are inclusive and no regex/wildcards.
-        label = Gtk.Label( "Filter" )
-        hbox.pack_start( label, False, False, 0 )
+        hbox.set_homogeneous( True )
 
-        filterText = Gtk.Entry()
-#         filterText.set_text( )
-#         filterText.set_tooltip_text( "The text shown next to the icon (or tooltip, where applicable)" )
-        hbox.pack_start( filterText, True, True, 0 )
+        addButton = Gtk.Button( "Add" )
+        addButton.set_tooltip_text( "Add a new filter" )
+        addButton.connect( "clicked", self.onFilterAdd, filterTree, ppaTree )
+        hbox.pack_start( addButton, True, True, 0 )
 
-        apply = Gtk.Button( "Apply" )
-#         apply.connect( "clicked", self.onApply, filterText )
-#         apply.set_tooltip_text( "Notifications are not possible on your system" )
+        removeButton = Gtk.Button( "Remove" )
+        removeButton.set_tooltip_text( "Remove the selected filter" )
+        removeButton.connect( "clicked", self.onFilterRemove, ppaTree, filterTree )
+        hbox.pack_start( removeButton, True, True, 0 )
 
-        hbox.pack_start( apply, False, False, 0 )
-
-        grid.attach( hbox, 0, 1, 2, 1 )
-
-#         filterTree.connect( "row-activated", self.onFilterDoubleClick, filterText )
+        hbox.set_halign( Gtk.Align.CENTER )
+        grid.attach( hbox, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Filters" ) )
 
@@ -647,16 +642,16 @@ class IndicatorPPADownloadStatistics:
             self.sortByDownloadAmount = spinner.get_value_as_int()
             self.showNotificationOnUpdate = showNotificationOnUpdateCheckbox.get_active()
             self.allowMenuItemsToLaunchBrowser = allowMenuItemsToLaunchBrowserCheckbox.get_active()
-# TODO Save ppas!  Get data from model...from fortune:
-#             self.fortunes = [ ]
-#             treeiter = store.get_iter_first()
-#             while treeiter != None:
-#                 if store[ treeiter ][ 1 ] == Gtk.STOCK_APPLY:
-#                     self.fortunes.append( [ store[ treeiter ][ 0 ], True ] )
-#                 else:
-#                     self.fortunes.append( [ store[ treeiter ][ 0 ], False ] )
-# 
-#                 treeiter = store.iter_next( treeiter )
+
+            self.ppas = [ ]
+            treeiter = ppaStore.get_iter_first()
+            while treeiter != None:
+                self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
+                treeiter = ppaStore.iter_next( treeiter )
+
+            self.ppas.sort( key = operator.methodcaller( "getKey" ) )
+
+# TODO Save filters.
 
             self.saveSettings()
 
@@ -672,6 +667,8 @@ class IndicatorPPADownloadStatistics:
                 try:
                     os.remove( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
                 except: pass
+
+#TODO Decide under what circumstances a re-download must occur.
 
             GLib.timeout_add_seconds( 1, self.buildMenu ) # If the menu is updated directly, GTK complains that the menu (which kicked off preferences) no longer exists.
 
@@ -696,7 +693,7 @@ class IndicatorPPADownloadStatistics:
             return
 
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-        if pythonutils.showOKCancel( None, "Remove the selected PPA?" ) == Gtk.ResponseType.OK:
+        if pythonutils.showOKCancel( self.dialog, "Remove the selected PPA?" ) == Gtk.ResponseType.OK:
             model.remove( treeiter )
 
 
@@ -706,8 +703,6 @@ class IndicatorPPADownloadStatistics:
 
     def onPPADoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
-
-# TODO Can hit Add multiple times whilst the add/edit dialog is displayed...maybe remove too!
 
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -733,7 +728,6 @@ class IndicatorPPADownloadStatistics:
             for item in ppaUsers:
                 ppaUser.append_text( item )
 
-#TODO Test this with several ppa users.
             if rowNumber is not None: # This is an edit.
                 ppaUser.set_active( ppaUsers.index( model[ treeiter ][ 0 ] ) )
         else:
@@ -759,9 +753,8 @@ class IndicatorPPADownloadStatistics:
             for item in ppaNames:
                 ppaName.append_text( item )
 
-#TODO Test this with several ppa names.
             if rowNumber is not None: # This is an edit.
-                ppaName.set_active( ppaUsers.index( model[ treeiter ][ 0 ] ) )
+                ppaName.set_active( ppaNames.index( model[ treeiter ][ 1 ] ) )
         else:
             ppaName = Gtk.Entry() # There are no PPAs present - adding the first PPA.
 
@@ -801,7 +794,6 @@ class IndicatorPPADownloadStatistics:
         if rowNumber is None:
             title = "Add PPA"
 
-        # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
         dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
@@ -832,17 +824,18 @@ class IndicatorPPADownloadStatistics:
                 continue
 
             # Update the data model...
-            if rowNumber is not None:
-                # This is an edit.
-                model.insert_after( treeiter, [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
-                model.remove( treeiter )
-            else:
-                model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
+            # To resort after the add/edit, easiest thing to do is...
+            #     Remove the item from the model if an edit.
+            #     Regardless of add or edit, add item to the model.
+            #     Copy all data out of model.
+            #     Clear model.
+            #     Sort copied data back into model.
+            if rowNumber is not None: model.remove( treeiter ) # This is an edit.
 
-            # Resort the model...copy all data out of the model into an array, sort the array, clear the model, copy the sorted array into the model!
+            model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
+
             modelData = [ ]
-            for row in range( len( model ) ):
-                modelData.append( [ model[ row ][ 0 ], model[ row ][ 1 ], model[ row ][ 2 ], model[ row ][ 3 ] ] )
+            for row in range( len( model ) ): modelData.append( [ model[ row ][ 0 ], model[ row ][ 1 ], model[ row ][ 2 ], model[ row ][ 3 ] ] )
 
             model.clear()
 
@@ -855,14 +848,173 @@ class IndicatorPPADownloadStatistics:
         dialog.destroy()
 
 
-#     def onFilterDoubleClick( self, tree, rowNumber, treeViewColumn, displayPattern ):
-#         model, treeiter = tree.get_selection().get_selected()
-#         displayPattern.insert_text( "[" + model[ treeiter ][ 0 ] + "]", displayPattern.get_position() )
+    def onFilterRemove( self, button, tree ):
+        model, treeiter = tree.get_selection().get_selected()
+
+        if treeiter is None:
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "No filter has been selected for removal." )
+            return
+
+        # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+        if pythonutils.showOKCancel( self.dialog, "Remove the selected filter?" ) == Gtk.ResponseType.OK:
+            model.remove( treeiter )
 
 
-#     def onApply( self, tree, rowNumber, treeViewColumn, displayPattern ):
-#         model, treeiter = tree.get_selection().get_selected()
-#         displayPattern.insert_text( "[" + model[ treeiter ][ 0 ] + "]", displayPattern.get_position() )
+    def onFilterAdd( self, button, filterTree, ppaTree ):
+        self.onFilterDoubleClick( filterTree, None, None, ppaTree )
+
+
+    def onFilterDoubleClick( self, filterTree, rowNumber, treeViewColumnm, ppaTree ):
+        filterTreeModel, filterTreeIter = filterTree.get_selection().get_selected()
+        ppaTreeModel, ppaTreeIter = ppaTree.get_selection().get_selected()
+
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        label = Gtk.Label( "PPA User" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 1, 1 )
+
+        if len( ppaTreeModel ) > 0:
+            ppaUsers = [ ] 
+            for row in range( len( ppaTreeModel ) ):
+                if ppaTreeModel[ row ][ 0 ] not in ppaUsers:
+                    ppaUsers.append( ppaTreeModel[ row ][ 0 ] )
+
+            ppaUsers.sort( key = locale.strxfrm )
+            ppaUser = Gtk.ComboBoxText.new_with_entry()
+            for item in ppaUsers:
+                ppaUser.append_text( item )
+
+            if rowNumber is not None: # This is an edit.
+                ppaUserString = filterTreeModel[ filterTreeIter ][ 0 ].split( " | " )[ 0 ]
+                ppaUser.set_active( ppaUsers.index( ppaUserString ) )
+        else:
+            ppaUser = Gtk.Entry() # There are no PPAs present.
+
+        ppaUser.set_hexpand( True ) # Only need to set this once and all objects will expand.
+
+        grid.attach( ppaUser, 1, 0, 1, 1 )
+
+        label = Gtk.Label( "PPA Name" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 1, 1, 1 )
+
+        if len( ppaTreeModel ) > 0:
+            ppaNames = [ ] 
+            for row in range( len( ppaTreeModel ) ):
+                if ppaTreeModel[ row ][ 1 ] not in ppaNames:
+                    ppaNames.append( ppaTreeModel[ row ][ 1 ] )
+
+            ppaNames.sort( key = locale.strxfrm )
+            ppaName = Gtk.ComboBoxText.new_with_entry()
+            for item in ppaNames:
+                ppaName.append_text( item )
+
+            if rowNumber is not None: # This is an edit.
+                ppaNameString = filterTreeModel[ filterTreeIter ][ 0 ].split( " | " )[ 1 ]
+                ppaName.set_active( ppaNames.index( ppaNameString ) )
+        else:
+            ppaName = Gtk.Entry() # There are no PPAs present.
+
+        grid.attach( ppaName, 1, 1, 1, 1 )
+
+        label = Gtk.Label( "Filter Text" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 2, 2, 1 )
+
+        textview = Gtk.TextView()
+        toolTip = "Each line of text is a single filter which is compared\n" + \
+                  "against each package name during download.\n\n" + \
+                  "If a package name contains any part of any filter,\n" + \
+                  "that package is included in the download statistics.\n\n" + \
+                  "No wildcards nor regular expressions."
+
+        textview.set_tooltip_text( toolTip )
+        if rowNumber is not None: textview.get_buffer().set_text( filterTreeModel[ filterTreeIter ][ 1 ] ) # This is an edit.
+
+        scrolledwindow = Gtk.ScrolledWindow()
+        scrolledwindow.add( textview )
+        scrolledwindow.set_hexpand( True )
+        scrolledwindow.set_vexpand( True )
+
+        grid.attach( scrolledwindow, 0, 3, 2, 1 )
+
+        title = "Edit Filter"
+        if rowNumber is None:
+            title = "Add Filter"
+
+        dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( grid, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
+        dialog.set_default_size( -1, 350 ) # Set a height otherwise the textview is too narrow.
+
+        while True:
+            dialog.show_all()
+            response = dialog.run()
+
+            if response == Gtk.ResponseType.CANCEL:
+                break
+
+            if len( ppaTreeModel ) > 0:
+                ppaUserValue = ppaUser.get_active_text().strip()
+                ppaNameValue = ppaName.get_active_text().strip()
+            else:
+                ppaUserValue = ppaUser.get_text().strip()
+                ppaNameValue = ppaName.get_text().strip()
+
+# TODO...
+            if ppaUserValue == "":
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA user cannot be empty." )
+                ppaUser.grab_focus()
+                continue
+
+            if not ppaUserValue in ppaUsers:
+                if not pythonutils.showOKCancel( dialog, "You have entered a PPA User\nwhich does not exist.\n\nContinue?" ) == Gtk.ResponseType.OK: continue
+
+            if ppaNameValue == "":
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA name cannot be empty." )
+                ppaName.grab_focus()
+                continue
+
+            if not ppaNameValue in ppaNames:
+                if not pythonutils.showOKCancel( dialog, "You have entered a PPA Name\nwhich does not exist.\n\nContinue?" ) == Gtk.ResponseType.OK: continue
+
+            buffer = textview.get_buffer()
+            filterText = buffer.get_text( buffer.get_start_iter(), buffer.get_end_iter(), False )
+
+
+            if True: break
+
+            # Update the data filterTreeModel...
+            # To resort after the add/edit, easiest thing to do is...
+            #     Remove the item from the filterTreeModel if an edit.
+            #     Regardless of add or edit, add item to the filterTreeModel.
+            #     Copy all data out of filterTreeModel.
+            #     Clear filterTreeModel.
+            #     Sort copied data back into filterTreeModel.
+            if rowNumber is not None: filterTreeModel.remove( filterTreeIter ) # This is an edit.
+
+            filterTreeModel.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
+
+            modelData = [ ]
+            for row in range( len( filterTreeModel ) ): modelData.append( [ filterTreeModel[ row ][ 0 ], filterTreeModel[ row ][ 1 ], filterTreeModel[ row ][ 2 ], filterTreeModel[ row ][ 3 ] ] )
+
+            filterTreeModel.clear()
+
+            modelData.sort( key = lambda x: x[ 0 ] )
+            for item in modelData:
+                filterTreeModel.append( item )
+
+            break
+
+        dialog.destroy()
 
 
     def loadSettings( self ):
@@ -940,8 +1092,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def requestPPADownloadAndMenuRefresh( self ):
-        Thread( target = self.getPPADownloadStatistics ).start()
-# TODO Why need to return?
+#         Thread( target = self.getPPADownloadStatistics ).start()
         return True 
 
 
