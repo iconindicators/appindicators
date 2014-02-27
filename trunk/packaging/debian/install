@@ -22,3 +22,4 @@ indicator-stardate.desktop usr/share/applications
 src/example.py usr/share/indicator-stardate
 src/indicator-stardate.py usr/share/indicator-stardate
 src/stardate.py usr/share/indicator-stardate
+src/pythonutils.py usr/share/indicator-stardate
