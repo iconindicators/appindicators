@@ -26,10 +26,8 @@
 #  https://wiki.ubuntu.com/NotifyOSD
 
 
-try:
-    from gi.repository import AppIndicator3 as appindicator
-except:
-    pass
+try: from gi.repository import AppIndicator3 as appindicator
+except: pass
 
 from gi.repository import Gdk, GLib, Gtk, Notify
 
@@ -529,6 +527,11 @@ class IndicatorFortune:
             for item in modelData:
                 model.append( item )
             
+#         for fortune in self.fortunes:
+#             if fortune[ 1 ]:
+#                 store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
+#             else:
+#                 store.append( [ fortune[ 0 ], None ] )
             break
 
         dialog.destroy()
