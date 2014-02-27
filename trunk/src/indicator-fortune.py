@@ -492,46 +492,28 @@ class IndicatorFortune:
             # Update the data model...
             # Due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
             # See more detail in the VirtualBox indicator.
-#TODO See ppa download stats...need to update the model, remove all items, sort, put all back in!
-            if rowNumber is not None:
-                # This is an edit.
-                if enabledCheckbox.get_active():
-                    model.set_value( treeiter, 1, Gtk.STOCK_APPLY )
-                    model[ treeiter ][ 0 ] = fortuneFileDirectory.get_text().strip()
-                else:
-                    model.insert_after( treeiter, [ fortuneFileDirectory.get_text().strip(), None ] )
-                    model.remove( treeiter )
-            else:
-                if enabledCheckbox.get_active():
-                    model.append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY ] )
-                else:
-                    model.append( [ fortuneFileDirectory.get_text().strip(), None ] )
+            # To resort after the add/edit, easiest thing to do is...
+            #     Remove the item from the model if an edit.
+            #     Regardless of add or edit, add item to the model.
+            #     Copy all data out of model.
+            #     Clear model.
+            #     Sort copied data back into model.
+            if rowNumber is not None: model.remove( treeiter ) # This is an edit.
 
-# Maybe if an edit, remove ... then copy all across, add the new/edit, clear, and copy back?
-            # Update the data model...
-            if rowNumber is not None:
-                # This is an edit.
-                model.insert_after( treeiter, [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
-                model.remove( treeiter )
+            if enabledCheckbox.get_active():
+                model.append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY ] )
             else:
-                model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
+                model.append( [ fortuneFileDirectory.get_text().strip(), None ] )
 
-            # Resort the model...copy all data out of the model into an array, sort the array, clear the model, copy the sorted array into the model!
             modelData = [ ]
-            for row in range( len( model ) ):
-                modelData.append( [ model[ row ][ 0 ], model[ row ][ 1 ], model[ row ][ 2 ], model[ row ][ 3 ] ] )
+            for row in range( len( model ) ): modelData.append( [ model[ row ][ 0 ], model[ row ][ 1 ] ] )
 
             model.clear()
 
             modelData.sort( key = lambda x: x[ 0 ] )
             for item in modelData:
                 model.append( item )
-            
-#         for fortune in self.fortunes:
-#             if fortune[ 1 ]:
-#                 store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
-#             else:
-#                 store.append( [ fortune[ 0 ], None ] )
+
             break
 
         dialog.destroy()
