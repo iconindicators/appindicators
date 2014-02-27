@@ -1,4 +1,29 @@
-# {"allowMenuItemsToLaunchBrowser": true, "ppas": [["guido-iodice", "precise-updates", "precise", "amd64"], ["guido-iodice", "precise-updates", "precise", "i386"], ["guido-iodice", "raring-quasi-rolling", "raring", "amd64"], ["guido-iodice", "raring-quasi-rolling", "raring", "i386"], ["noobslab", "indicators", "precise", "amd64"], ["noobslab", "indicators", "precise", "i386"], ["noobslab", "indicators", "quantal", "amd64"], ["noobslab", "indicators", "quantal", "i386"], ["noobslab", "indicators", "raring", "amd64"], ["noobslab", "indicators", "raring", "i386"], ["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"], ["whoopie79", "ppa", "precise", "i386"]], "showNotificationOnUpdate": true, "sortByDownload": false, "combinePPAs": true, "showSubmenu": false, "filters": {"whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownloadAmount": 5}
+# {
+# "allowMenuItemsToLaunchBrowser": true, 
+# "ppas": [
+#           ["guido-iodice", "raring-quasi-rolling", "raring", "amd64"], 
+#           ["guido-iodice", "raring-quasi-rolling", "raring", "i386"], 
+#           ["noobslab", "indicators", "precise", "amd64"], 
+#           ["noobslab", "indicators", "precise", "i386"], 
+#           ["noobslab", "indicators", "quantal", "amd64"], 
+#           ["noobslab", "indicators", "quantal", "i386"],  
+#           ["thebernmeister", "ppa", "precise", "amd64"], 
+#           ["thebernmeister", "ppa", "precise", "i386"], 
+#           ["thebernmeister", "ppa", "quantal", "amd64"], 
+#           ["thebernmeister", "ppa", "quantal", "i386"],  
+#           ["thebernmeister", "ppa", "saucy", "amd64"], 
+#           ["thebernmeister", "ppa", "saucy", "i386"], 
+#           ["whoopie79", "ppa", "precise", "i386"]], 
+# "showNotificationOnUpdate": true, 
+# "sortByDownload": false, 
+# "combinePPAs": true, 
+# "showSubmenu": false, 
+# "filters": {
+#             "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"],  
+#             "noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], 
+#             "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, 
+# "sortByDownloadAmount": 10
+# }
 
 
 # {"showNotificationOnUpdate": true, "showSubmenu": false, "ppas": [["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"]], "combinePPAs": true, "sortByDownloadAmount": 5, "allowMenuItemsToLaunchBrowser": true, "filters": {"noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownload": false}
@@ -59,10 +84,8 @@
 
 from copy import deepcopy
 
-try:
-    from gi.repository import AppIndicator3 as appindicator
-except:
-    pass
+try: from gi.repository import AppIndicator3 as appindicator
+except: pass
 
 from gi.repository import GLib, Gtk, Notify
 from threading import Thread
