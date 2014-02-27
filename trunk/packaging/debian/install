@@ -20,3 +20,4 @@ icons/ubuntu-mono-light/*.svg usr/share/icons/ubuntu-mono-light/apps/24
 icons/ubuntu-mono-light/*.svg usr/share/icons/ubuntu-mono-light/apps/48
 indicator-fortune.desktop usr/share/applications
 src/indicator-fortune.py usr/share/indicator-fortune
+src/pythonutils.py usr/share/indicator-fortune
