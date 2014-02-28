@@ -57,7 +57,7 @@ import datetime, math
 class Stardate:
 
     def __init__( self ):
-        self.API_VERSION = "Version 2.0 (2013-03-04)"
+        self.API_VERSION = "Version 3.0 (2014-02-28)"
 
         # Rates (in stardate units per day) for each stardate era. 
         self.stardateRates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
@@ -188,14 +188,35 @@ class Stardate:
 
     # Returns the current value of the ('classic' or '2009 revised') stardate in string format.
     #
-    #  showIssue If true, the issue part of the 'classic' stardate will be included.
-    def toStardateString( self, showIssue ):
+    #  showIssue    If True, the issue part of the 'classic' stardate will be included.
+    #  padInteber   If True, the integer part will be padded with zeros at the start (only applies for classic).
+    def toStardateString( self, showIssue, padInteger ):
         stringBuilder = ""
 
-        if self.classic and showIssue:
-            stringBuilder = "[" + str( self.stardateIssue ) + "] "
+        if self.classic:
 
-        stringBuilder += str( self.stardateInteger ) + "." + str( self.stardateFraction )
+            if showIssue:
+                stringBuilder = "[" + str( self.stardateIssue ) + "] "
+
+            if padInteger:
+                if self.stardateIssue < 21:
+                    padding = len( "1000" ) - len( str( self.stardateInteger ) )
+                else:
+                    padding = len( "10000" ) - len( str( self.stardateInteger ) )
+    
+                integer = str( self.stardateInteger )
+                for i in range( padding ):
+                    integer = "0" + integer
+    
+                stringBuilder += str( integer )
+    
+            else:
+                stringBuilder += str( self.stardateInteger )
+
+            stringBuilder += "." + str( self.stardateFraction )
+
+        else:
+            stringBuilder = str( self.stardateInteger ) + "." + str( self.stardateFraction )
 
         return stringBuilder
 
@@ -259,16 +280,12 @@ class Stardate:
             numberOfDays = numberOfSeconds / 60.0 / 60.0 / 24.0
             rate = self.stardateRates[ 0 ]
             units = numberOfDays * rate
-            remainder = units % stardateRange[ 0 ]
 
-            if int( remainder ) == 0:
-                self.stardateIssue = -1 * int( units / stardateRange[ 0 ] )
-            else:
-                self.stardateIssue = -1 * int( units / stardateRange[ 0 ] ) + stardateIssues[ 0 ]
+            self.stardateIssue = stardateIssues[ 0 ] - int( units / stardateRange[ 0 ] )
 
-            remainder = ( -1 * self.stardateIssue * stardateRange[ 0 ] ) - units
+            remainder = stardateRange[ 0 ] - ( units % stardateRange[ 0 ] )
             self.stardateInteger = int( remainder )
-            self.stardateFraction = int( remainder * 10.0 ) - ( int( remainder ) * 10)
+            self.stardateFraction = int( remainder * 10.0 ) - ( int( remainder ) * 10 )
             return
 
         # Remainder of time periods can be treated equally...

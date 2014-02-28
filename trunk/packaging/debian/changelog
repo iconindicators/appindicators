@@ -1,3 +1,11 @@
+indicator-stardate (1.0.19-1) precise; urgency=low
+
+  * Fixed a bug when calculating present day stardates.
+  * Added option to pad the INTEGER part of classic stardates.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 28 Feb 2014 22:29:55 +1000
+
+
 indicator-stardate (1.0.18-1) precise; urgency=low
 
   * Neglected to update the install file!

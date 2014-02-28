@@ -18,13 +18,6 @@
 # Application indicator which displays the current Star Trek™ stardate.
 
 
-# References:
-#  http://developer.gnome.org/pygobject
-#  http://developer.gnome.org/gtk3
-#  http://python-gtk-3-tutorial.readthedocs.org
-#  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
-
-
 try: from gi.repository import AppIndicator3 as appindicator
 except: pass
 
@@ -37,7 +30,7 @@ class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.18"
+    VERSION = "1.0.19"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -50,6 +43,7 @@ class IndicatorStardate:
     CREDITS = [ "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_PAD_INTEGER = "padInteger"
     SETTINGS_SHOW_CLASSIC = "showClassic"
     SETTINGS_SHOW_ISSUE = "showIssue"
 
@@ -122,7 +116,7 @@ class IndicatorStardate:
     def update( self ):
         self.stardate.setClassic( self.showClassic )
         self.stardate.setGregorian( datetime.datetime.now() )
-        s = self.stardate.toStardateString( self.showIssue )
+        s = self.stardate.toStardateString( self.showIssue, self.padInteger )
 
         if self.appindicatorImported == True:
             self.indicator.set_label( s, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
@@ -133,12 +127,10 @@ class IndicatorStardate:
         return True # Needed so the timer continues!
 
 
-    def handleLeftClick( self, icon ):
-        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
+    def handleLeftClick( self, icon ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
 
 
-    def handleRightClick( self, icon, button, time ):
-        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
+    def handleRightClick( self, icon, button, time ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
     def onAbout( self, widget ):
@@ -190,11 +182,18 @@ class IndicatorStardate:
         showIssueCheckbox.set_tooltip_text( "Show the ISSUE of the stardate (only applies to 'classic')" )
         grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
 
-        showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox )
+        padIntegerCheckbox = Gtk.CheckButton( "Pad INTEGER" )
+        padIntegerCheckbox.set_active( self.padInteger )
+        padIntegerCheckbox.set_sensitive( showClassicCheckbox.get_active() )
+        padIntegerCheckbox.set_margin_left( 15 )
+        padIntegerCheckbox.set_tooltip_text( "Pad the INTEGER part with leading zeroes (only applies to 'classic')" )
+        grid.attach( padIntegerCheckbox, 0, 2, 1, 1 )
+
+        showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
 
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 2, 2, 1 )
+        grid.attach( autostartCheckbox, 0, 3, 2, 1 )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( grid, True, True, 0 )
@@ -206,6 +205,7 @@ class IndicatorStardate:
         if response == Gtk.ResponseType.OK:
             self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
+            self.padInteger = padIntegerCheckbox.get_active()
             self.saveSettings()
 
             if not os.path.exists( IndicatorStardate.AUTOSTART_PATH ):
@@ -227,10 +227,13 @@ class IndicatorStardate:
         self.dialog = None
 
 
-    def onShowClassicCheckbox( self, source, showIssueCheckbox ): showIssueCheckbox.set_sensitive( source.get_active() )
+    def onShowClassicCheckbox( self, source, showIssueCheckbox, padIntegerCheckbox ):
+        padIntegerCheckbox.set_sensitive( source.get_active() )
+        showIssueCheckbox.set_sensitive( source.get_active() )
 
 
     def loadSettings( self ):
+        self.padInteger = True
         self.showClassic = True
         self.showIssue = True
 
@@ -239,6 +242,8 @@ class IndicatorStardate:
                 with open( IndicatorStardate.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
+                self.padInteger = settings.get( IndicatorStardate.SETTINGS_PAD_INTEGER, self.padInteger )
+                self.showClassic = settings.get( IndicatorStardate.SETTINGS_SHOW_CLASSIC, self.showClassic )
                 self.showIssue = settings.get( IndicatorStardate.SETTINGS_SHOW_ISSUE, self.showIssue )
 
             except Exception as e:
@@ -249,7 +254,8 @@ class IndicatorStardate:
     def saveSettings( self ):
         try:
             settings = {
-                IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showClassic,
+                IndicatorStardate.SETTINGS_PAD_INTEGER: self.padInteger,
+                IndicatorStardate.SETTINGS_SHOW_CLASSIC: self.showClassic,
                 IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showIssue
             }
             with open( IndicatorStardate.SETTINGS_FILE, "w" ) as f:

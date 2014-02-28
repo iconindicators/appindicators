@@ -3,7 +3,7 @@
 
 BUILD_DIR="build"
 NAME="indicator-stardate"
-VERSION=1.0.18
+VERSION=1.0.19
 PYTHON_UTILS=../PythonUtils/src/pythonutils.py
 
 if [ ! -f $PYTHON_UTILS ];
