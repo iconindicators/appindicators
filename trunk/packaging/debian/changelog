@@ -9,6 +9,8 @@ indicator-ppa-download-statistics (1.0.30-1) precise; urgency=low
   * Added an option when combining PPAs on how to handle versions for
     architecture specific packages.
   * Moved the add/edit/remove of PPAs into the preferences dialog.
+  * Now uses icons for ubuntu-mono-dark and ubuntu-mono-light rather than text and
+    hicolor icon.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 19 Feb 2014 09:37:24 +1000
 

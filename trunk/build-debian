@@ -30,6 +30,12 @@ cp icons/indicator-ppa-download-statistics-hicolor.svg $BUILD_DIR/$NAME-$VERSION
 mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/lubuntu
 cp icons/indicator-ppa-download-statistics-lubuntu.svg $BUILD_DIR/$NAME-$VERSION/icons/lubuntu/indicator-ppa-download-statistics.svg
 
+mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-dark
+cp icons/indicator-ppa-download-statistics-ubuntu-mono-dark.svg $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-dark/indicator-ppa-download-statistics.svg
+
+mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-light
+cp icons/indicator-ppa-download-statistics-ubuntu-mono-light.svg $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-light/indicator-ppa-download-statistics.svg
+
 cd $BUILD_DIR
 tar -czf "${NAME}_${VERSION}.orig.tar.gz" $NAME-$VERSION
 cd ..
