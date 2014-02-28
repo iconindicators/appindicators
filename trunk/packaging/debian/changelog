@@ -1,3 +1,12 @@
+indicator-virtual-box (1.0.29-1) precise; urgency=low
+
+  * Changed checking of Gtk.ResponseType.CANCEL to Gtk.ResponseType.OK
+    as it was possible to simulate Gtk.ResponseType.OK by hitting the escape
+    key.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 1 Mar 2014 10:00:58 +1000
+
+
 indicator-virtual-box (1.0.28-1) precise; urgency=low
 
   * Fixed typo in delay preference - the value is in seconds, not minutes.

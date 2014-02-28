@@ -3,7 +3,7 @@
 
 BUILD_DIR="build"
 NAME="indicator-virtual-box"
-VERSION=1.0.28
+VERSION=1.0.29
 PYTHON_UTILS=../PythonUtils/src/pythonutils.py
 
 if [ ! -f $PYTHON_UTILS ];
