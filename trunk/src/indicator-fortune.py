@@ -476,45 +476,47 @@ class IndicatorFortune:
             dialog.show_all()
             response = dialog.run()
 
-            if response == Gtk.ResponseType.CANCEL:
+            if response == Gtk.ResponseType.OK:
+
+                if fortuneFileDirectory.get_text().strip() == "":
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The fortune path cannot be empty." )
+                    fortuneFileDirectory.grab_focus()
+                    continue
+    
+                if not os.path.exists( fortuneFileDirectory.get_text().strip() ):
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The fortune path does not exist." )
+                    fortuneFileDirectory.grab_focus()
+                    continue
+    
+    
+    # TODO Change to new method in ppa.
+    # TODO Check in the remove method that the parent is passed in to all dialogs...check everywhere!
+                # Update the data model...
+                # Due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
+                # See more detail in the VirtualBox indicator.
+                # To resort after the add/edit, easiest thing to do is...
+                #     Remove the item from the model if an edit.
+                #     Regardless of add or edit, add item to the model.
+                #     Copy all data out of model.
+                #     Clear model.
+                #     Sort copied data back into model.
+                if rowNumber is not None: model.remove( treeiter ) # This is an edit.
+    
+                if enabledCheckbox.get_active():
+                    model.append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY ] )
+                else:
+                    model.append( [ fortuneFileDirectory.get_text().strip(), None ] )
+    
+                modelData = [ ]
+                for row in range( len( model ) ): modelData.append( [ model[ row ][ 0 ], model[ row ][ 1 ] ] )
+    
+                model.clear()
+    
+                modelData.sort( key = lambda x: x[ 0 ] )
+                for item in modelData:
+                    model.append( item )
+    
                 break
-
-            if fortuneFileDirectory.get_text().strip() == "":
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The fortune path cannot be empty." )
-                fortuneFileDirectory.grab_focus()
-                continue
-
-            if not os.path.exists( fortuneFileDirectory.get_text().strip() ):
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The fortune path does not exist." )
-                fortuneFileDirectory.grab_focus()
-                continue
-
-            # Update the data model...
-            # Due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
-            # See more detail in the VirtualBox indicator.
-            # To resort after the add/edit, easiest thing to do is...
-            #     Remove the item from the model if an edit.
-            #     Regardless of add or edit, add item to the model.
-            #     Copy all data out of model.
-            #     Clear model.
-            #     Sort copied data back into model.
-            if rowNumber is not None: model.remove( treeiter ) # This is an edit.
-
-            if enabledCheckbox.get_active():
-                model.append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY ] )
-            else:
-                model.append( [ fortuneFileDirectory.get_text().strip(), None ] )
-
-            modelData = [ ]
-            for row in range( len( model ) ): modelData.append( [ model[ row ][ 0 ], model[ row ][ 1 ] ] )
-
-            model.clear()
-
-            modelData.sort( key = lambda x: x[ 0 ] )
-            for item in modelData:
-                model.append( item )
-
-            break
 
         dialog.destroy()
 
