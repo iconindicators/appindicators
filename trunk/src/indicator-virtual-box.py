@@ -18,13 +18,6 @@
 # Application indicator which displays/controls VirtualBox virtual machines.
 
 
-# References:
-#  http://developer.gnome.org/pygobject
-#  http://developer.gnome.org/gtk3
-#  http://python-gtk-3-tutorial.readthedocs.org
-#  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
-
-
 # On Lubuntu 12.10 the following message appears when the indicator is executed:
 #   ERROR:root:Could not find any typelib for AppIndicator3
 # From https://kororaa.org/forums/viewtopic.php?f=7&t=220#p2343, it (hopefully) is safe to ignore.
@@ -48,7 +41,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.27"
+    VERSION = "1.0.28"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -527,13 +520,13 @@ class IndicatorVirtualBox:
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 0, 2, 1 )
 
-        label = Gtk.Label( "Delay (minutes)" )
+        label = Gtk.Label( "Delay (seconds)" )
         grid.attach( label, 0, 1, 1, 1 )
 
         spinnerDelay = Gtk.SpinButton()
         spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStart, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerDelay.set_value( self.delayBetweenAutoStart ) # ...so need to force the initial value by explicitly setting it.
-        spinnerDelay.set_tooltip_text( "Time delay from starting one VM to the next" )
+        spinnerDelay.set_tooltip_text( "Time delay (in seconds) from starting one VM to the next" )
         spinnerDelay.set_hexpand( True )
         grid.attach( spinnerDelay, 1, 1, 1, 1 )
 
@@ -653,7 +646,7 @@ class IndicatorVirtualBox:
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
         # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
-        dialog = Gtk.Dialog( "VM Properties", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog = Gtk.Dialog( "VM Properties", self.dialog, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorVirtualBox.ICON )
@@ -722,12 +715,10 @@ class IndicatorVirtualBox:
         self.dialog = None
 
 
-    def handleLeftClick( self, icon ):
-        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
+    def handleLeftClick( self, icon ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
 
 
-    def handleRightClick( self, icon, button, time ):
-        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
+    def handleRightClick( self, icon, button, time ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
     def loadSettings( self ):
