@@ -841,8 +841,7 @@ class IndicatorLunar:
             self.dialog.show_all()
             response = self.dialog.run()
 
-            if response == Gtk.ResponseType.CANCEL:
-                break
+            if response != Gtk.ResponseType.OK: break
 
             cityValue = city.get_active_text()
             if cityValue == "":
