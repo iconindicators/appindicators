@@ -29,6 +29,9 @@
 # {"showNotificationOnUpdate": true, "showSubmenu": false, "ppas": [["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"]], "combinePPAs": true, "sortByDownloadAmount": 5, "allowMenuItemsToLaunchBrowser": true, "filters": {"noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownload": false}
 
 
+# TODO Ensure that preferences and add/edit of ppa/filters ok and cancel properly. 
+
+
 # TODO If all PPAs are removed, what happens to any filters?
 
 
@@ -605,8 +608,7 @@ class IndicatorPPADownloadStatistics:
         self.dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
         self.dialog.show_all()
 
-        response = self.dialog.run()
-        if response == Gtk.ResponseType.OK:
+        if self.dialog.run() == Gtk.ResponseType.OK:
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
@@ -769,30 +771,28 @@ class IndicatorPPADownloadStatistics:
 
         while True:
             dialog.show_all()
-            response = dialog.run()
+            if dialog.run() == Gtk.ResponseType.OK:
 
-            if response != Gtk.ResponseType.OK: break
-
-            if len( model ) > 0:
-                ppaUserValue = ppaUser.get_active_text().strip()
-                ppaNameValue = ppaName.get_active_text().strip()
-            else:
-                ppaUserValue = ppaUser.get_text().strip()
-                ppaNameValue = ppaName.get_text().strip()
-
-            if ppaUserValue == "":
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA user cannot be empty." )
-                ppaUser.grab_focus()
-                continue
-
-            if ppaNameValue == "":
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA name cannot be empty." )
-                ppaName.grab_focus()
-                continue
-
-            if rowNumber is not None: model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
-
-            model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
+                if len( model ) > 0:
+                    ppaUserValue = ppaUser.get_active_text().strip()
+                    ppaNameValue = ppaName.get_active_text().strip()
+                else:
+                    ppaUserValue = ppaUser.get_text().strip()
+                    ppaNameValue = ppaName.get_text().strip()
+    
+                if ppaUserValue == "":
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA user cannot be empty." )
+                    ppaUser.grab_focus()
+                    continue
+    
+                if ppaNameValue == "":
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA name cannot be empty." )
+                    ppaName.grab_focus()
+                    continue
+    
+                if rowNumber is not None: model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
+    
+                model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
 
             break
 
@@ -892,20 +892,18 @@ class IndicatorPPADownloadStatistics:
 
         while True:
             dialog.show_all()
-            response = dialog.run()
+            if dialog.run() == Gtk.ResponseType.OK:
 
-            if response != Gtk.ResponseType.OK: break
-
-            buffer = textview.get_buffer()
-            filterText = buffer.get_text( buffer.get_start_iter(), buffer.get_end_iter(), False )
-            filterText = "\n".join( filterText.split() )
-            if len( filterText ) == 0:
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "Please enter filter text!" )
-                continue
-
-            if rowNumber is not None: filterTreeModel.remove( filterTreeIter ) # This is an edit...remove the old value and append new value.  
-
-            filterTreeModel.append( [ ppaUsersNames.get_active_text(), filterText ] ) 
+                buffer = textview.get_buffer()
+                filterText = buffer.get_text( buffer.get_start_iter(), buffer.get_end_iter(), False )
+                filterText = "\n".join( filterText.split() )
+                if len( filterText ) == 0:
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "Please enter filter text!" )
+                    continue
+    
+                if rowNumber is not None: filterTreeModel.remove( filterTreeIter ) # This is an edit...remove the old value and append new value.  
+    
+                filterTreeModel.append( [ ppaUsersNames.get_active_text(), filterText ] ) 
 
             break
 
