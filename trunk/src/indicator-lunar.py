@@ -55,7 +55,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.36"
+    VERSION = "1.0.37"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -608,12 +608,10 @@ class IndicatorLunar:
             logging.error( "Error writing SVG: " + filename )
 
 
-    def handleLeftClick( self, icon ):
-        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
+    def handleLeftClick( self, icon ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
 
 
-    def handleRightClick( self, icon, button, time ):
-        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
+    def handleRightClick( self, icon, button, time ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
     def onAbout( self, widget ):
@@ -839,9 +837,7 @@ class IndicatorLunar:
 
         while True:
             self.dialog.show_all()
-            response = self.dialog.run()
-
-            if response != Gtk.ResponseType.OK: break
+            if self.dialog.run() != Gtk.ResponseType.OK: break
 
             cityValue = city.get_active_text()
             if cityValue == "":

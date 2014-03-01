@@ -1,3 +1,10 @@
+indicator-lunar (1.0.37-1) precise; urgency=low
+
+  * Preferences loop was incorrectly handling OK/cancel.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 1 Mar 2014 11:51:27 +1000
+
+
 indicator-lunar (1.0.36-1) precise; urgency=low
 
   * Changed checking of Gtk.ResponseType.CANCEL to Gtk.ResponseType.OK
