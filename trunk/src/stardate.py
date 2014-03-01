@@ -93,23 +93,20 @@ class Stardate:
 
     # Gets the period (in seconds) between updates/changes to the current stardate.
     def getStardateFractionalPeriod( self ):
-        if self.classic:
-            return int( 1.0 / ( self.stardateRates[ self.index ] / 24.0 / 60.0 / 60.0 ) / 10.0 )
-        else:
-            return ( 24 * 60 * 60 )
+        if self.classic: return int( 1.0 / ( self.stardateRates[ self.index ] / 24.0 / 60.0 / 60.0 ) / 10.0 )
+
+        return ( 24 * 60 * 60 )
 
 
     # Sets the conversion method, either 'classic' or '2009 revised'.
     #  classic If True, 'classic' conversion is used; otherwise '2009 revised' conversion.   
-    def setClassic( self, classic ):
-        self.classic = classic
+    def setClassic( self, classic ): self.classic = classic
 
 
     # Gets the conversion method, either 'classic' or '2009 revised'.
     #
     # Returns true if 'classic' conversion is used; false if '2009 revised' conversion.   
-    def getClassic( self ):
-        return self.classic
+    def getClassic( self ): return self.classic
 
 
     # Sets a Gregorian date/time object for conversion to a ('classic' or '2009 revised') stardate.
@@ -222,8 +219,7 @@ class Stardate:
 
 
     # Returns the current value of the Gregorian date/time in string format "%Y-%m-%d %H:%M:%S".
-    def toGregorianString( self ):
-        return self.gregorianDateTime.strftime( "%Y-%m-%d %H:%M:%S" )
+    def toGregorianString( self ): return self.gregorianDateTime.strftime( "%Y-%m-%d %H:%M:%S" )
 
 
     # Converts the current 'classic' stardate to the equivalent Gregorian date/time.

@@ -18,7 +18,7 @@ import datetime, stardate
 
 
 # Exercise the Stardate API.
-now = datetime.datetime.now()
+now = datetime.datetime.utcnow()
 currentStardate = stardate.Stardate() # By default, 'classic' will be used.
 print( "Stardate API version: " + currentStardate.getVersion() )
 

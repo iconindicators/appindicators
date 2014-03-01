@@ -30,7 +30,7 @@ class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-stardate"
-    VERSION = "1.0.19"
+    VERSION = "1.0.20"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -115,7 +115,7 @@ class IndicatorStardate:
 
     def update( self ):
         self.stardate.setClassic( self.showClassic )
-        self.stardate.setGregorian( datetime.datetime.now() )
+        self.stardate.setGregorian( datetime.datetime.utcnow() )
         s = self.stardate.toStardateString( self.showIssue, self.padInteger )
 
         if self.appindicatorImported == True:

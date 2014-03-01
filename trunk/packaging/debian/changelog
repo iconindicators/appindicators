@@ -1,3 +1,11 @@
+indicator-stardate (1.0.20-1) precise; urgency=low
+
+  * Uses UTC rather than the local date/time.
+  * AboutDialog is now resizable - makes reading the changelog easier.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 1 Mar 2014 16:07:31 +1000
+
+
 indicator-stardate (1.0.19-1) precise; urgency=low
 
   * Fixed a bug when calculating present day stardates.
