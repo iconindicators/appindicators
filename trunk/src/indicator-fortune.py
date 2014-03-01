@@ -38,7 +38,7 @@ class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
-    VERSION = "1.0.7"
+    VERSION = "1.0.8"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -276,6 +276,7 @@ class IndicatorFortune:
         grid.set_column_homogeneous( False )
 
         store = Gtk.ListStore( str, str ) # Path to fortune file, tick icon (Gtk.STOCK_APPLY) or None.
+        store.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
         for fortune in self.fortunes:
             if fortune[ 1 ]:
                 store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
@@ -348,8 +349,7 @@ class IndicatorFortune:
         self.dialog.set_icon_name( IndicatorFortune.ICON )
         self.dialog.show_all()
 
-        response = self.dialog.run()
-        if response == Gtk.ResponseType.OK:
+        if self.dialog.run() == Gtk.ResponseType.OK:
             self.showNotifications = showNotificationCheckbox.get_active()
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.skipFortuneCharacterCount = spinnerCharacterCount.get_value_as_int()
@@ -370,8 +370,7 @@ class IndicatorFortune:
 
             self.saveSettings()
 
-            if not os.path.exists( IndicatorFortune.AUTOSTART_PATH ):
-                os.makedirs( IndicatorFortune.AUTOSTART_PATH )
+            if not os.path.exists( IndicatorFortune.AUTOSTART_PATH ): os.makedirs( IndicatorFortune.AUTOSTART_PATH )
 
             if autostartCheckbox.get_active():
                 try:
@@ -381,7 +380,8 @@ class IndicatorFortune:
             else:
                 try:
                     os.remove( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
-                except: pass
+                except:
+                    pass
 
             self.update()
 
@@ -474,9 +474,7 @@ class IndicatorFortune:
 
         while True:
             dialog.show_all()
-            response = dialog.run()
-
-            if response == Gtk.ResponseType.OK:
+            if dialog.run() == Gtk.ResponseType.OK:
 
                 if fortuneFileDirectory.get_text().strip() == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The fortune path cannot be empty." )
@@ -487,36 +485,15 @@ class IndicatorFortune:
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The fortune path does not exist." )
                     fortuneFileDirectory.grab_focus()
                     continue
-    
-    
-    # TODO Change to new method in ppa.
-    # TODO Check in the remove method that the parent is passed in to all dialogs...check everywhere!
-                # Update the data model...
-                # Due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
-                # See more detail in the VirtualBox indicator.
-                # To resort after the add/edit, easiest thing to do is...
-                #     Remove the item from the model if an edit.
-                #     Regardless of add or edit, add item to the model.
-                #     Copy all data out of model.
-                #     Clear model.
-                #     Sort copied data back into model.
-                if rowNumber is not None: model.remove( treeiter ) # This is an edit.
+
+                if rowNumber is not None: model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
     
                 if enabledCheckbox.get_active():
                     model.append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY ] )
                 else:
                     model.append( [ fortuneFileDirectory.get_text().strip(), None ] )
-    
-                modelData = [ ]
-                for row in range( len( model ) ): modelData.append( [ model[ row ][ 0 ], model[ row ][ 1 ] ] )
-    
-                model.clear()
-    
-                modelData.sort( key = lambda x: x[ 0 ] )
-                for item in modelData:
-                    model.append( item )
-    
-                break
+
+            break
 
         dialog.destroy()
 
@@ -530,7 +507,7 @@ class IndicatorFortune:
             action = Gtk.FileChooserAction.SELECT_FOLDER
 
         dialog = Gtk.FileChooserDialog( title, addEditDialog, action, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
-        dialog.set_modal( True ) # This seems to have no effect - the underlying add/edit dialog is still clickable.
+        dialog.set_modal( True ) # TODO: This seems to have no effect - the underlying add/edit dialog is still clickable.
         dialog.set_filename( fortuneFileDirectory.get_text() )
         response = dialog.run()
         if response == Gtk.ResponseType.OK:

@@ -1,3 +1,10 @@
+indicator-fortune (1.0.8-1) precise; urgency=low
+
+  * Fixed the ok/cancel when add/edit of fortunes in the preferences.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 1 Mar 2014 11:41:12 +1000
+
+
 indicator-fortune (1.0.7-1) precise; urgency=low
 
   * Now sorts fortunes by path name in the add/edit/remove list.
