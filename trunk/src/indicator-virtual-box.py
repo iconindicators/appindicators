@@ -41,7 +41,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.29"
+    VERSION = "1.0.30"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -563,9 +563,8 @@ class IndicatorVirtualBox:
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorVirtualBox.ICON )
         self.dialog.show_all()
-
-        response = self.dialog.run()
-        if response == Gtk.ResponseType.OK:
+        
+        if self.dialog.run() == Gtk.ResponseType.OK:
             self.delayBetweenAutoStart = spinnerDelay.get_value_as_int()
             self.menuTextGroupNameBefore = textGroupNameBefore.get_text()
             self.menuTextGroupNameAfter = textGroupNameAfter.get_text()
@@ -653,39 +652,38 @@ class IndicatorVirtualBox:
 
         while True:
             dialog.show_all()
-            response = dialog.run()
 
-            if response == Gtk.ResponseType.OK:
+            if dialog.run() != Gtk.ResponseType.OK: break
 
-                if startCommand.get_text().strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The start command cannot be empty." )
-                    startCommand.grab_focus()
-                    continue
+            if startCommand.get_text().strip() == "":
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The start command cannot be empty." )
+                startCommand.grab_focus()
+                continue
+
+            if not "%VM%" in startCommand.get_text().strip():
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The start command must contain %VM% which is substituted for the VM name/id." )
+                startCommand.grab_focus()
+                continue
+
+            # Ideally I'd like to do this...
+            #
+            #    if autostartCheckbox.get_active():
+            #        model[ treeiter ][ 1 ] = Gtk.STOCK_APPLY
+            #    else:
+            #        model[ treeiter ][ 1 ] = None
+            #
+            #    model[ treeiter ][ 2 ] = startCommand.get_text().strip()
+            #
+            # But due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
+            # So this is the workaround...
+            if autostartCheckbox.get_active():
+                model.set_value( treeiter, 1, Gtk.STOCK_APPLY )
+                model[ treeiter ][ 2 ] = startCommand.get_text().strip()
+            else:
+                model.insert_after( None, treeiter, [ model[ treeiter ][ 0 ], None, startCommand.get_text().strip(), model[ treeiter ][ 3 ] ] )
+                model.remove( treeiter )
     
-                if not "%VM%" in startCommand.get_text().strip():
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The start command must contain %VM% which is substituted for the VM name/id." )
-                    startCommand.grab_focus()
-                    continue
-    
-                # Ideally I'd like to do this...
-                #
-                #    if autostartCheckbox.get_active():
-                #        model[ treeiter ][ 1 ] = Gtk.STOCK_APPLY
-                #    else:
-                #        model[ treeiter ][ 1 ] = None
-                #
-                #    model[ treeiter ][ 2 ] = startCommand.get_text().strip()
-                #
-                # But due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
-                # So this is the workaround...
-                if autostartCheckbox.get_active():
-                    model.set_value( treeiter, 1, Gtk.STOCK_APPLY )
-                    model[ treeiter ][ 2 ] = startCommand.get_text().strip()
-                else:
-                    model.insert_after( None, treeiter, [ model[ treeiter ][ 0 ], None, startCommand.get_text().strip(), model[ treeiter ][ 3 ] ] )
-                    model.remove( treeiter )
-    
-                break
+            break
 
         dialog.destroy()
 
