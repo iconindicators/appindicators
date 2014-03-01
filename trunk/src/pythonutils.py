@@ -28,6 +28,7 @@ def isNumber( numberAsString ):
     try:
         float( numberAsString )
         return True
+
     except ValueError:
         return False
 
@@ -108,6 +109,8 @@ class AboutDialog( Gtk.AboutDialog ):
 
         if changeLog is None: return
 
+        self.set_resizable( True )
+
         notebook = self.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
 
         textView = Gtk.TextView()
@@ -186,6 +189,6 @@ class AboutDialog( Gtk.AboutDialog ):
                     self.logging.exception( e )
                     self.logging.error( "Error reading change log: " + self.changeLog )
 
-                contents = None
+                contents = "Error reading change log: " + self.changeLog
 
-        return contents    
+        return contents
