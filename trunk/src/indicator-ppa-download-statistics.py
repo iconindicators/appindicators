@@ -13,7 +13,8 @@
 #           ["thebernmeister", "ppa", "quantal", "i386"],  
 #           ["thebernmeister", "ppa", "saucy", "amd64"], 
 #           ["thebernmeister", "ppa", "saucy", "i386"], 
-#           ["whoopie79", "ppa", "precise", "i386"]], 
+#           ["whoopie79", "ppa", "precise", "i386"]
+# ], 
 # "showNotificationOnUpdate": true, 
 # "sortByDownload": false, 
 # "combinePPAs": true, 
@@ -21,7 +22,8 @@
 # "filters": {
 #             "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"],  
 #             "noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], 
-#             "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, 
+#             "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]
+# }, 
 # "sortByDownloadAmount": 10
 # }
 
@@ -29,23 +31,13 @@
 # {"showNotificationOnUpdate": true, "showSubmenu": false, "ppas": [["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"]], "combinePPAs": true, "sortByDownloadAmount": 5, "allowMenuItemsToLaunchBrowser": true, "filters": {"noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownload": false}
 
 
-# TODO Ensure that preferences and add/edit of ppa/filters ok and cancel properly. 
-
-
 # TODO If all PPAs are removed, what happens to any filters?
 
 
+# TODO If all PPAs of a common user/name are removed, what happens to the underlying filter? 
+
+
 # TODO Only do a re-download if a ppa was a/e/r...not just when OK is clicked in the preferences.
-
-
-#TODO If the filter checkbox is toggled from checked to unchecked, need to do a redownload...right?
-# Given that filters only apply at download time, need to rethink when a redownload needs to take place.
-
-
-# TODO Need to sort the filter text with each filter.
-# When do we sort?  At load/save time?
-# Perhaps in the preferences - sort at the point the filters will be displayed.
-# Then sort again on a save.
 
 
 # TODO Add a PPA (after initial PPAs have done their download) and ensure the "downloading now" is shown and a redownload is happening.
@@ -415,6 +407,8 @@ class IndicatorPPADownloadStatistics:
             self.dialog.present()
             return
 
+        self.downloadRequired = False
+
         notebook = Gtk.Notebook()
 
         # First tab - display settings.
@@ -609,6 +603,7 @@ class IndicatorPPADownloadStatistics:
         self.dialog.show_all()
 
         if self.dialog.run() == Gtk.ResponseType.OK:
+#TODO Probably should lock here
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
@@ -625,12 +620,15 @@ class IndicatorPPADownloadStatistics:
 
             self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
-# TODO Save filters.
+            self.filters = { }
+            treeiter = filterStore.get_iter_first()
+            while treeiter != None:
+                self.filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
+                treeiter = filterStore.iter_next( treeiter )
 
             self.saveSettings()
 
-            if not os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH ):
-                os.makedirs( IndicatorPPADownloadStatistics.AUTOSTART_PATH )
+            if not os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH ): os.makedirs( IndicatorPPADownloadStatistics.AUTOSTART_PATH )
 
             if autostartCheckbox.get_active():
                 try:
@@ -640,14 +638,25 @@ class IndicatorPPADownloadStatistics:
             else:
                 try:
                     os.remove( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
-                except: pass
+                except:
+                    pass
 
-#TODO Decide under what circumstances a re-download must occur.
-
-            GLib.timeout_add_seconds( 1, self.buildMenu ) # If the menu is updated directly, GTK complains that the menu (which kicked off preferences) no longer exists.
+            GLib.timeout_add_seconds( 1, self.buildMenuAndDownload )
 
         self.dialog.destroy()
         self.dialog = None
+
+
+    def buildMenuAndDownload( self ):
+        print("building menu")
+        self.buildMenu()
+
+        if self.downloadRequired:
+            print("doing download")
+            self.requestPPADownloadAndMenuRefresh()
+            self.downloadRequired = False
+
+        return False # So this is not called more than once.
 
 
     def onCombinePPAsCheckbox( self, source, checkbox ): checkbox.set_sensitive( source.get_active() )
@@ -779,20 +788,30 @@ class IndicatorPPADownloadStatistics:
                 else:
                     ppaUserValue = ppaUser.get_text().strip()
                     ppaNameValue = ppaName.get_text().strip()
-    
+
                 if ppaUserValue == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA user cannot be empty." )
                     ppaUser.grab_focus()
                     continue
-    
+
                 if ppaNameValue == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA name cannot be empty." )
                     ppaName.grab_focus()
                     continue
-    
+
                 if rowNumber is not None: model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
-    
+
                 model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
+
+                # Determine if data has changed...
+                if rowNumber is None:
+                    self.downloadRequired = True # Added a PPA.
+                else:
+                    self.downloadRequired = not( \
+                        ppaUserValue == model[ treeiter ][ 0 ] and \
+                        ppaNameValue == model[ treeiter ][ 1 ] and \
+                        series.get_active_text() == model[ treeiter ][ 2 ] and \
+                        architectures.get_active_text() == model[ treeiter ][ 3 ] )
 
             break
 
@@ -809,13 +828,25 @@ class IndicatorPPADownloadStatistics:
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
         if pythonutils.showOKCancel( self.dialog, "Remove the selected filter?" ) == Gtk.ResponseType.OK:
             model.remove( treeiter )
+            self.downloadRequired = True
 
 
     def onFilterAdd( self, button, filterTree, ppaTree ):
         if len( ppaTree.get_model() ) == 0:
             pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Please add a PPA first!" )
         else:
-            self.onFilterDoubleClick( filterTree, None, None, ppaTree )
+
+            # If the number of filters equals the number of PPA User/Names, cannot add a filter!
+            ppaUsersNames = [ ]
+            for ppa in range( len( ppaTree.get_model() ) ):
+                ppaUserName = ppaTree.get_model()[ ppa ][ 0 ] + " | " + ppaTree.get_model()[ ppa ][ 1 ]
+                if not ppaUserName in ppaUsersNames:
+                    ppaUsersNames.append( ppaUserName )
+
+            if len( filterTree.get_model() ) == len( ppaUsersNames ):
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.INFO, "Only one filter per PPA User/Name." )
+            else:
+                self.onFilterDoubleClick( filterTree, None, None, ppaTree )
 
 
     def onFilterDoubleClick( self, filterTree, rowNumber, treeViewColumnm, ppaTree ):
@@ -902,8 +933,14 @@ class IndicatorPPADownloadStatistics:
                     continue
     
                 if rowNumber is not None: filterTreeModel.remove( filterTreeIter ) # This is an edit...remove the old value and append new value.  
-    
+
                 filterTreeModel.append( [ ppaUsersNames.get_active_text(), filterText ] ) 
+
+                # Determine if data has changed...
+                if rowNumber is None:
+                    self.downloadRequired = True # Added a filter.
+                else:
+                    self.downloadRequired = filterTreeModel[ filterTreeIter ][ 1 ] != filterText
 
             break
 
