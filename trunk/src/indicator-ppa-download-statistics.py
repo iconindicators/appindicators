@@ -554,20 +554,6 @@ class IndicatorPPADownloadStatistics:
         self.dialog.show_all()
 
         if self.dialog.run() == Gtk.ResponseType.OK:
-#TODO Iterate through the filters and if there's a filter with no matching ppa user/name alert the user?            
-# Alternatively make such filters italic?
-# http://lazka.github.io/pgi-docs/api/Gtk_3.0/interfaces/CellLayout.html?highlight=set_cell_data_func#Gtk.CellLayout.set_cell_data_func
-# http://www.pygtk.org/pygtk2tutorial/sec-CellRenderers.html
-# http://faq.pygtk.org/index.py?file=faq13.045.htp&req=edit
-# http://stackoverflow.com/questions/14998298/how-to-write-custom-gtk-cellrenderer-in-python-and-gtk-3
-# http://scentric.net/tutorial/sec-custom-cell-renderers.html
-# http://stackoverflow.com/questions/11178743/gtk-3-0-how-to-use-a-gtk-treestore-with-custom-model-items
-# http://www.pygtk.org/pygtk2reference/class-gtktreeviewcolumn.html
-# http://nullege.com/codes/search/gtk.TreeViewColumn.set_cell_data_func
-# http://www.daa.com.au/pipermail/pygtk/2010-November/019160.html
-# http://osdir.com/ml/gnome.gtk+.python/2004-02/msg00087.html
-# https://mail.gnome.org/archives/python-hackers-list/2011-March/msg00005.html
-
 
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
