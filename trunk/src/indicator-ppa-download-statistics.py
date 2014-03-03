@@ -1,39 +1,3 @@
-# {
-# "allowMenuItemsToLaunchBrowser": true, 
-# "ppas": [
-#           ["guido-iodice", "raring-quasi-rolling", "raring", "amd64"], 
-#           ["guido-iodice", "raring-quasi-rolling", "raring", "i386"], 
-#           ["noobslab", "indicators", "precise", "amd64"], 
-#           ["noobslab", "indicators", "precise", "i386"], 
-#           ["noobslab", "indicators", "quantal", "amd64"], 
-#           ["noobslab", "indicators", "quantal", "i386"],  
-#           ["thebernmeister", "ppa", "precise", "amd64"], 
-#           ["thebernmeister", "ppa", "precise", "i386"], 
-#           ["thebernmeister", "ppa", "quantal", "amd64"], 
-#           ["thebernmeister", "ppa", "quantal", "i386"],  
-#           ["thebernmeister", "ppa", "saucy", "amd64"], 
-#           ["thebernmeister", "ppa", "saucy", "i386"], 
-#           ["whoopie79", "ppa", "precise", "i386"]
-# ], 
-# "showNotificationOnUpdate": true, 
-# "sortByDownload": false, 
-# "combinePPAs": true, 
-# "showSubmenu": false, 
-# "filters": {
-#             "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"],  
-#             "noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], 
-#             "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]
-# }, 
-# "sortByDownloadAmount": 10
-# }
-
-
-# {"showNotificationOnUpdate": true, "showSubmenu": false, "ppas": [["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"]], "combinePPAs": true, "sortByDownloadAmount": 5, "allowMenuItemsToLaunchBrowser": true, "filters": {"noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownload": false}
-
-
-#TODO Make a filter key in the display italic if there's no matching ppa?
-
-
 #!/usr/bin/env python3
 
 
@@ -591,7 +555,19 @@ class IndicatorPPADownloadStatistics:
 
         if self.dialog.run() == Gtk.ResponseType.OK:
 #TODO Iterate through the filters and if there's a filter with no matching ppa user/name alert the user?            
-#TODO Probably should lock here to stop the autodownload...or is it possible to cancel the update thread and then start it again?
+# Alternatively make such filters italic?
+# http://lazka.github.io/pgi-docs/api/Gtk_3.0/interfaces/CellLayout.html?highlight=set_cell_data_func#Gtk.CellLayout.set_cell_data_func
+# http://www.pygtk.org/pygtk2tutorial/sec-CellRenderers.html
+# http://faq.pygtk.org/index.py?file=faq13.045.htp&req=edit
+# http://stackoverflow.com/questions/14998298/how-to-write-custom-gtk-cellrenderer-in-python-and-gtk-3
+# http://scentric.net/tutorial/sec-custom-cell-renderers.html
+# http://stackoverflow.com/questions/11178743/gtk-3-0-how-to-use-a-gtk-treestore-with-custom-model-items
+# http://www.pygtk.org/pygtk2reference/class-gtktreeviewcolumn.html
+# http://nullege.com/codes/search/gtk.TreeViewColumn.set_cell_data_func
+# http://www.daa.com.au/pipermail/pygtk/2010-November/019160.html
+# http://osdir.com/ml/gnome.gtk+.python/2004-02/msg00087.html
+# https://mail.gnome.org/archives/python-hackers-list/2011-March/msg00005.html
+
 
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
