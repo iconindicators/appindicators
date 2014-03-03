@@ -46,7 +46,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.30"
+    VERSION = "1.0.31"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -598,7 +598,7 @@ class IndicatorPPADownloadStatistics:
                 except:
                     pass
 
-            GLib.timeout_add_seconds( 1, self.buildMenuAndDownload )
+            GLib.timeout_add_seconds( 1, self.buildMenu )
             GLib.timeout_add_seconds( 10, self.requestPPADownloadAndMenuRefresh, False ) # Hopefully 10 seconds is sufficient to rebuild the menu!
 
         self.dialog.destroy()
