@@ -31,23 +31,7 @@
 # {"showNotificationOnUpdate": true, "showSubmenu": false, "ppas": [["thebernmeister", "ppa", "precise", "amd64"], ["thebernmeister", "ppa", "precise", "i386"], ["thebernmeister", "ppa", "quantal", "amd64"], ["thebernmeister", "ppa", "quantal", "i386"], ["thebernmeister", "ppa", "raring", "amd64"], ["thebernmeister", "ppa", "raring", "i386"], ["thebernmeister", "ppa", "saucy", "amd64"], ["thebernmeister", "ppa", "saucy", "i386"]], "combinePPAs": true, "sortByDownloadAmount": 5, "allowMenuItemsToLaunchBrowser": true, "filters": {"noobslab | indicators": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | precise-updates": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "whoopie79 | ppa": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"], "guido-iodice | raring-quasi-rolling": ["indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem"]}, "sortByDownload": false}
 
 
-# TODO If all PPAs are removed, what happens to any filters?
-
-
-# TODO If all PPAs of a common user/name are removed, what happens to the underlying filter? 
-
-
-# TODO Only do a re-download if a ppa was a/e/r...not just when OK is clicked in the preferences.
-
-
-# TODO Add a PPA (after initial PPAs have done their download) and ensure the "downloading now" is shown and a redownload is happening.
-
-
-# TODO If the user is editing/adding/etc and the update kicks off, how to handle this?
-# Wait?
-# Maybe delay for 5 minutes?
-# Maybe set a flag that an update is required.  If the user hits ok, the update needs to be done anyway.
-# If the user hits cancel, the flag is used to kick off an update. 
+#TODO Make a filter key in the display italic if there's no matching ppa?
 
 
 #!/usr/bin/env python3
@@ -163,8 +147,8 @@ class IndicatorPPADownloadStatistics:
 
 
     def main( self ):
-        self.requestPPADownloadAndMenuRefresh()
-        GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh ) # Auto update every 6 hours.
+        self.requestPPADownloadAndMenuRefresh( False )
+        GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every 6 hours.
         Gtk.main()
 
 
@@ -407,7 +391,9 @@ class IndicatorPPADownloadStatistics:
             self.dialog.present()
             return
 
-        self.downloadRequired = False
+        with self.lock: self.indicatorIsLocked = True
+
+        self.ppasOrFiltersModified = False
 
         notebook = Gtk.Notebook()
 
@@ -421,7 +407,7 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_bottom( 10 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show PPAs as submenus" )
-        showAsSubmenusCheckbox.set_tooltip_text( "The download statitics for each PPA will be shown in a separate submenu" )
+        showAsSubmenusCheckbox.set_tooltip_text( "The download statitics for each PPA will be shown in a separate submenu." )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
@@ -549,7 +535,7 @@ class IndicatorPPADownloadStatistics:
         filterTree.set_vexpand( True )
         filterTree.append_column( Gtk.TreeViewColumn( "PPA", Gtk.CellRendererText(), text = 0 ) )
         filterTree.append_column( Gtk.TreeViewColumn( "Filter", Gtk.CellRendererText(), text = 1 ) )
-        filterTree.set_tooltip_text( "Double click to add/modify a filter." )
+        filterTree.set_tooltip_text( "Double click to edit a filter." )
         filterTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         filterTree.connect( "row-activated", self.onFilterDoubleClick, ppaTree )
 
@@ -592,6 +578,7 @@ class IndicatorPPADownloadStatistics:
 
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
+        autostartCheckbox.set_tooltip_text( "Run the indicator automatically" )
         grid.attach( autostartCheckbox, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "General" ) )
@@ -603,7 +590,9 @@ class IndicatorPPADownloadStatistics:
         self.dialog.show_all()
 
         if self.dialog.run() == Gtk.ResponseType.OK:
-#TODO Probably should lock here
+#TODO Iterate through the filters and if there's a filter with no matching ppa user/name alert the user?            
+#TODO Probably should lock here to stop the autodownload...or is it possible to cancel the update thread and then start it again?
+
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
@@ -612,19 +601,25 @@ class IndicatorPPADownloadStatistics:
             self.showNotificationOnUpdate = showNotificationOnUpdateCheckbox.get_active()
             self.allowMenuItemsToLaunchBrowser = allowMenuItemsToLaunchBrowserCheckbox.get_active()
 
-            self.ppas = [ ]
-            treeiter = ppaStore.get_iter_first()
-            while treeiter != None:
-                self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
-                treeiter = ppaStore.iter_next( treeiter )
+            if self.ppasOrFiltersModified:
 
-            self.ppas.sort( key = operator.methodcaller( "getKey" ) )
+                self.ppasOrFiltersModified = False
 
-            self.filters = { }
-            treeiter = filterStore.get_iter_first()
-            while treeiter != None:
-                self.filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
-                treeiter = filterStore.iter_next( treeiter )
+                # Only save the PPAs/filters if modified - avoids a re-download.
+                # On a PPA remove, a re-download really doesn't need to occur...but it's a PITA to sort that one out!
+                self.ppas = [ ]
+                treeiter = ppaStore.get_iter_first()
+                while treeiter != None:
+                    self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
+                    treeiter = ppaStore.iter_next( treeiter )
+    
+                self.ppas.sort( key = operator.methodcaller( "getKey" ) )
+    
+                self.filters = { }
+                treeiter = filterStore.get_iter_first()
+                while treeiter != None:
+                    self.filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
+                    treeiter = filterStore.iter_next( treeiter )
 
             self.saveSettings()
 
@@ -642,21 +637,11 @@ class IndicatorPPADownloadStatistics:
                     pass
 
             GLib.timeout_add_seconds( 1, self.buildMenuAndDownload )
+            GLib.timeout_add_seconds( 10, self.requestPPADownloadAndMenuRefresh, False ) # Hopefully 10 seconds is sufficient to rebuild the menu!
 
         self.dialog.destroy()
         self.dialog = None
-
-
-    def buildMenuAndDownload( self ):
-        print("building menu")
-        self.buildMenu()
-
-        if self.downloadRequired:
-            print("doing download")
-            self.requestPPADownloadAndMenuRefresh()
-            self.downloadRequired = False
-
-        return False # So this is not called more than once.
+        with self.lock: self.indicatorIsLocked = False
 
 
     def onCombinePPAsCheckbox( self, source, checkbox ): checkbox.set_sensitive( source.get_active() )
@@ -675,7 +660,9 @@ class IndicatorPPADownloadStatistics:
             return
 
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-        if pythonutils.showOKCancel( self.dialog, "Remove the selected PPA?" ) == Gtk.ResponseType.OK: model.remove( treeiter )
+        if pythonutils.showOKCancel( self.dialog, "Remove the selected PPA?" ) == Gtk.ResponseType.OK:
+            model.remove( treeiter )
+            self.ppasOrFiltersModified = True
 
 
     def onPPAAdd( self, button, tree ): self.onPPADoubleClick( tree, None, None )
@@ -799,19 +786,39 @@ class IndicatorPPADownloadStatistics:
                     ppaName.grab_focus()
                     continue
 
-                if rowNumber is not None: model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
+                # Ensure there is no duplicate...
+                if ( rowNumber is None and len( model ) > 0 ) or ( rowNumber is not None and len( model ) > 1 ):
+                    # Doing an add and there's at least one PPA OR doing an edit and there's at least two PPAs...
+                    if rowNumber is None: # Doing an add, so data has changed.
+                        dataHasBeenChanged = True
+                    else: # Doing an edit, so check to see if there the data has actually been changed...
+                        dataHasBeenChanged = not ( \
+                            ppaUserValue == model[ treeiter ][ 0 ] and \
+                            ppaNameValue == model[ treeiter ][ 1 ] and \
+                            series.get_active_text() == model[ treeiter ][ 2 ] and \
+                            architectures.get_active_text() == model[ treeiter ][ 3 ] )
 
+                    if dataHasBeenChanged:
+                        duplicate = False
+                        for row in range( len( model ) ):
+                            if \
+                                ppaUserValue == model[ row ][ 0 ] and \
+                                ppaNameValue == model[ row ][ 1 ] and \
+                                series.get_active_text() == model[ row ][ 2 ] and \
+                                architectures.get_active_text() == model[ row ][ 3 ]:
+
+                                duplicate = True
+                                break
+
+                        if duplicate:
+                            pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "Duplicates disallowed - there is an identical PPA!" )
+                            continue
+
+                # Update the model...
+                if rowNumber is not None: model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
                 model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
 
-                # Determine if data has changed...
-                if rowNumber is None:
-                    self.downloadRequired = True # Added a PPA.
-                else:
-                    self.downloadRequired = not( \
-                        ppaUserValue == model[ treeiter ][ 0 ] and \
-                        ppaNameValue == model[ treeiter ][ 1 ] and \
-                        series.get_active_text() == model[ treeiter ][ 2 ] and \
-                        architectures.get_active_text() == model[ treeiter ][ 3 ] )
+                self.ppasOrFiltersModified = True
 
             break
 
@@ -828,7 +835,7 @@ class IndicatorPPADownloadStatistics:
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
         if pythonutils.showOKCancel( self.dialog, "Remove the selected filter?" ) == Gtk.ResponseType.OK:
             model.remove( treeiter )
-            self.downloadRequired = True
+            self.ppasOrFiltersModified = True
 
 
     def onFilterAdd( self, button, filterTree, ppaTree ):
@@ -897,8 +904,8 @@ class IndicatorPPADownloadStatistics:
 
         textview = Gtk.TextView()
         toolTip = "Each line of text is a single filter which is compared\n" + \
-                  "against every package name during download.\n\n" + \
-                  "If a package name contains any part of any filter,\n" + \
+                  "against each package name during download.\n\n" + \
+                  "If a package name contains ANY part of ANY filter,\n" + \
                   "that package is included in the download statistics.\n\n" + \
                   "No wildcards nor regular expressions accepted!"
 
@@ -931,16 +938,12 @@ class IndicatorPPADownloadStatistics:
                 if len( filterText ) == 0:
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "Please enter filter text!" )
                     continue
-    
-                if rowNumber is not None: filterTreeModel.remove( filterTreeIter ) # This is an edit...remove the old value and append new value.  
 
+                # Update the model...
+                if rowNumber is not None: filterTreeModel.remove( filterTreeIter ) # This is an edit...remove the old value and append new value.  
                 filterTreeModel.append( [ ppaUsersNames.get_active_text(), filterText ] ) 
 
-                # Determine if data has changed...
-                if rowNumber is None:
-                    self.downloadRequired = True # Added a filter.
-                else:
-                    self.downloadRequired = filterTreeModel[ filterTreeIter ][ 1 ] != filterText
+                self.ppasOrFiltersModified = True
 
             break
 
@@ -1021,9 +1024,9 @@ class IndicatorPPADownloadStatistics:
             logging.error( "Error writing settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
 
 
-    def requestPPADownloadAndMenuRefresh( self ):
-#         Thread( target = self.getPPADownloadStatistics ).start()
-        return True 
+    def requestPPADownloadAndMenuRefresh( self, runAgain ):
+        Thread( target = self.getPPADownloadStatistics ).start()
+        return runAgain
 
 
     # Get a list of the published binaries for each PPA.
@@ -1061,6 +1064,8 @@ class IndicatorPPADownloadStatistics:
     #    ,... 
     #}
     def getPPADownloadStatistics( self ):
+        if self.indicatorIsLocked: return # It's possible the user has the properties open and an automatic update has kicked off...so don't do the update!
+
         with self.lock: self.indicatorIsLocked = True
 
         for ppa in self.ppas:
