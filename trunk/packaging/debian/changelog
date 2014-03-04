@@ -1,6 +1,15 @@
+indicator-ppa-download-statistics (1.0.32-1) precise; urgency=low
+
+  * Fixed a bug: after modifying ppas/filters, a download is kicked off.
+    If the user opens the preferences before the download starts, the download is
+    aborted.  Now the download is scheduled later.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 4 Mar 2014 20:55:56 +1000
+
+
 indicator-ppa-download-statistics (1.0.31-1) precise; urgency=low
 
-  * Fixed a bug when saving prefernces and rebuilding the menu.
+  * Fixed a bug when saving preferences and rebuilding the menu.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 3 Mar 2014 19:32:33 +1000
 

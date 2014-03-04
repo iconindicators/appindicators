@@ -46,7 +46,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.31"
+    VERSION = "1.0.32"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -1026,7 +1026,11 @@ class IndicatorPPADownloadStatistics:
     #    ,... 
     #}
     def getPPADownloadStatistics( self ):
-        if self.indicatorIsLocked: return # It's possible the user has the properties open and an automatic update has kicked off...so don't do the update!
+        if self.indicatorIsLocked:
+            # It's possible the user has the properties open and an automatic update has kicked off...
+            # ...reschedule the update for a later.
+            GLib.timeout_add_seconds( 10, self.requestPPADownloadAndMenuRefresh, False )
+            return
 
         with self.lock: self.indicatorIsLocked = True
 
