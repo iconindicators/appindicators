@@ -46,7 +46,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.32"
+    VERSION = "1.0.33"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -565,8 +565,6 @@ class IndicatorPPADownloadStatistics:
 
             if self.ppasOrFiltersModified:
 
-                self.ppasOrFiltersModified = False
-
                 # Only save the PPAs/filters if modified - avoids a re-download.
                 # On a PPA remove, a re-download really doesn't need to occur...but it's a PITA to sort that one out!
                 self.ppas = [ ]
@@ -599,7 +597,10 @@ class IndicatorPPADownloadStatistics:
                     pass
 
             GLib.timeout_add_seconds( 1, self.buildMenu )
-            GLib.timeout_add_seconds( 10, self.requestPPADownloadAndMenuRefresh, False ) # Hopefully 10 seconds is sufficient to rebuild the menu!
+
+            if self.ppasOrFiltersModified:
+                self.ppasOrFiltersModified = False
+                GLib.timeout_add_seconds( 10, self.requestPPADownloadAndMenuRefresh, False ) # Hopefully 10 seconds is sufficient to rebuild the menu!
 
         self.dialog.destroy()
         self.dialog = None

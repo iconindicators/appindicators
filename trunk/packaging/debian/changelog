@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.33-1) precise; urgency=low
+
+  * Fixed a bug: after hitting OK on preferences, only do a download if the
+    ppas/filters have been modified.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 4 Mar 2014 22:19:10 +1000
+
+
 indicator-ppa-download-statistics (1.0.32-1) precise; urgency=low
 
   * Fixed a bug: after modifying ppas/filters, a download is kicked off.
