@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.34-1) precise; urgency=low
+
+  * Will now quit during the download process.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 7 Mar 2014 12:29:58 +1000
+
+
 indicator-ppa-download-statistics (1.0.33-1) precise; urgency=low
 
   * Fixed a bug: after hitting OK on preferences, only do a download if the

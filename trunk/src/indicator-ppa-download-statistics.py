@@ -33,7 +33,7 @@ from copy import deepcopy
 try: from gi.repository import AppIndicator3 as appindicator
 except: pass
 
-from gi.repository import GLib, Gtk, Notify
+from gi.repository import Gio, GLib, Gtk, Notify
 from threading import Thread
 from ppa import PPA, PublishedBinary
 from urllib.request import urlopen
@@ -46,7 +46,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.33"
+    VERSION = "1.0.34"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -86,6 +86,7 @@ class IndicatorPPADownloadStatistics:
         self.lock = threading.Lock()
         self.indicatorIsLocked = False
         Notify.init( IndicatorPPADownloadStatistics.NAME )
+        self.quitRequested = False
 
         filehandler = logging.FileHandler( filename = IndicatorPPADownloadStatistics.LOG, mode = "a", delay = True )
         logging.basicConfig( format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
@@ -213,7 +214,7 @@ class IndicatorPPADownloadStatistics:
         menu.append( aboutMenuItem )
 
         quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        quitMenuItem.connect( "activate", Gtk.main_quit )
+        quitMenuItem.connect( "activate", self.quit )
         menu.append( quitMenuItem )
 
         if self.appindicatorImported:
@@ -222,6 +223,11 @@ class IndicatorPPADownloadStatistics:
             self.menu = menu
 
         menu.show_all()
+
+
+    def quit( self, widget ):
+        self.quitRequested = True
+        Gio.Application.quit( self )
 
 
     def combine( self, ppas ):
@@ -559,6 +565,9 @@ class IndicatorPPADownloadStatistics:
 # If there are PPAs with no filters, perhaps warn the user?
 # If there are filters with no PPAs, perhaps warn the user?
 # If both conditions occur, maybe just show one (combined) message?
+
+# TODO Is is possible to set a flag when Quit is selected...
+# ...then abort during the download?
 
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
@@ -1058,6 +1067,9 @@ class IndicatorPPADownloadStatistics:
 
 
     def getPublishedBinaries( self, ppa ):
+
+        if self.quitRequested: Gio.Application.quit( self )
+
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
                 "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + \
                 ppa.getSeries() + "/" + ppa.getArchitecture()
@@ -1078,6 +1090,9 @@ class IndicatorPPADownloadStatistics:
                 resultsPerUrl = 75
                 threads = []
                 for i in range( numberOfPublishedBinaries ):
+
+                    if self.quitRequested: Gio.Application.quit( self )
+
                     if i == ( resultPage * resultsPerUrl ):
                         # Handle result pages after the first page.
                         newURL = url + "&ws.start=" + str( resultPage * resultsPerUrl )
