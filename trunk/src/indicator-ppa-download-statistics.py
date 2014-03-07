@@ -555,6 +555,11 @@ class IndicatorPPADownloadStatistics:
 
         if self.dialog.run() == Gtk.ResponseType.OK:
 
+#TODO...
+# If there are PPAs with no filters, perhaps warn the user?
+# If there are filters with no PPAs, perhaps warn the user?
+# If both conditions occur, maybe just show one (combined) message?
+
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
