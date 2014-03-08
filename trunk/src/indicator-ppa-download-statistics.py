@@ -561,14 +561,6 @@ class IndicatorPPADownloadStatistics:
 
         if self.dialog.run() == Gtk.ResponseType.OK:
 
-#TODO...
-# If there are PPAs with no filters, perhaps warn the user?
-# If there are filters with no PPAs, perhaps warn the user?
-# If both conditions occur, maybe just show one (combined) message?
-
-# TODO Is is possible to set a flag when Quit is selected...
-# ...then abort during the download?
-
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
@@ -970,7 +962,7 @@ class IndicatorPPADownloadStatistics:
 
     def initialiseDefaultSettings( self ):
         self.ppas = [ ]
-        self.ppas.append( PPA( "thebernmeister", "ppa", "precise", "amd64" ) )
+        self.ppas.append( PPA( "thebernmeister", "ppa", "trusty", "amd64" ) )
         self.filters = { }
         self.filters[ 'thebernmeister | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
 
