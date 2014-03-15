@@ -4,6 +4,7 @@ indicator-ppa-download-statistics (1.0.35-1) precise; urgency=low
     toggled signal set.
   * Put in a fix for Ubuntu 12.04 (Python 3.2) which does not handle
     AboutDialog::add_credit_section().
+  * Fixed quit during download (was causing a core dump).
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 15 Mar 2014 12:36:10 +1000
 

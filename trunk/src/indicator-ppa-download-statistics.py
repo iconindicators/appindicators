@@ -226,8 +226,9 @@ class IndicatorPPADownloadStatistics:
 
 
     def quit( self, widget ):
-        self.quitRequested = True
-        Gio.Application.quit( self )
+        if not self.quitRequested:
+            self.quitRequested = True
+            Gtk.main_quit()
 
 
     def combine( self, ppas ):
@@ -1054,13 +1055,15 @@ class IndicatorPPADownloadStatistics:
 
         GLib.idle_add( self.buildMenu )
 
-        if self.showNotificationOnUpdate:
+        if self.showNotificationOnUpdate and not self.quitRequested:
             Notify.Notification.new( "Statistics downloaded!", "", IndicatorPPADownloadStatistics.ICON ).show()
 
 
     def getPublishedBinaries( self, ppa ):
 
-        if self.quitRequested: Gio.Application.quit( self )
+        if self.quitRequested:
+            self.quit( None )
+            return
 
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
                 "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + \
@@ -1083,7 +1086,9 @@ class IndicatorPPADownloadStatistics:
                 threads = []
                 for i in range( numberOfPublishedBinaries ):
 
-                    if self.quitRequested: Gio.Application.quit( self )
+                    if self.quitRequested:
+                        self.quit( None )
+                        return
 
                     if i == ( resultPage * resultsPerUrl ):
                         # Handle result pages after the first page.
