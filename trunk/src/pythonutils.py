@@ -140,7 +140,7 @@ class AboutDialog( Gtk.AboutDialog ):
         buttons = buttonBox.get_children()
         buttonsForToggle = [ ]
         for button in buttons:
-            if button.get_label() != AboutDialog.CHANGELOG_BUTTON_NAME and button.get_label() != "gtk-close":
+            if button != changeLogButton and type( button ) == Gtk.ToggleButton:
                 buttonsForToggle.append( button )
                 button.connect( "toggled", self.onOtherToggledButtons, changeLogButton )
 
