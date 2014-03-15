@@ -41,7 +41,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.30"
+    VERSION = "1.0.31"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
