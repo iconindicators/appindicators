@@ -1,3 +1,11 @@
+indicator-stardate (1.0.21-1) precise; urgency=low
+
+  * Fixed a bug where non-toggle buttons (the close button) were having the
+    toggled signal set.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 15 Mar 2014 12:36:10 +1000
+
+
 indicator-stardate (1.0.20-1) precise; urgency=low
 
   * Uses UTC rather than the local date/time.
