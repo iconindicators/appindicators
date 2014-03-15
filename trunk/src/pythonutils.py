@@ -93,8 +93,17 @@ class AboutDialog( Gtk.AboutDialog ):
 
         super( AboutDialog, self ).__init__()
 
-        self.add_credit_section( creditsLabel, creditsPeople )
-        self.set_authors( authors )
+        try:
+            self.set_authors( authors )
+            self.add_credit_section( creditsLabel, creditsPeople )
+        except:
+            authorsCredits = authors
+            for credit in creditsPeople:
+                authorsCredits.append( "" )
+                authorsCredits.append( credit )
+
+            self.set_authors( authorsCredits )
+
         self.set_comments( comments )
         self.set_license_type( licenseType )
         self.set_logo_icon_name( logoIconName )
@@ -106,8 +115,7 @@ class AboutDialog( Gtk.AboutDialog ):
         self.changeLog = changeLog
         self.logging = logging
 
-
-        if changeLog is None: return
+        if changeLog is None: return # No point continuing as the changelog will not be displayed and this dialog reverts to the AboutDialog.
 
         self.set_resizable( True )
 
