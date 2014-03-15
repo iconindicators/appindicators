@@ -46,7 +46,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.35"
+    VERSION = "1.0.36"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -113,7 +113,7 @@ class IndicatorPPADownloadStatistics:
 
     def main( self ):
         self.requestPPADownloadAndMenuRefresh( False )
-        GLib.timeout_add_seconds( 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every 6 hours.
+        GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every 6 hours.
         Gtk.main()
 
 
