@@ -2,6 +2,8 @@ indicator-virtual-box (1.0.31-1) precise; urgency=low
 
   * Fixed a bug where non-toggle buttons (the close button) were having the
     toggled signal set.
+  * Put in a fix for Ubuntu 12.04 (Python 3.2) which does not handle
+    AboutDialog::add_credit_section().
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 15 Mar 2014 12:36:10 +1000
 
