@@ -1,3 +1,11 @@
+indicator-fortune (1.0.9-1) precise; urgency=low
+
+  * Fixed a bug where non-toggle buttons (the close button) were having the
+    toggled signal set.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 15 Mar 2014 12:36:10 +1000
+
+
 indicator-fortune (1.0.8-1) precise; urgency=low
 
   * Fixed the ok/cancel when add/edit of fortunes in the preferences.
