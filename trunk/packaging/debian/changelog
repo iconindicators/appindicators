@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.35-1) precise; urgency=low
+
+  * Fixed a bug where non-toggle buttons (the close button) were having the
+    toggled signal set.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 15 Mar 2014 12:36:10 +1000
+
+
 indicator-ppa-download-statistics (1.0.34-1) precise; urgency=low
 
   * Now lets the user quit the indicator during the download.
