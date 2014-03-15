@@ -1,3 +1,11 @@
+indicator-lunar (1.0.38-1) precise; urgency=low
+
+  * Fixed a bug where non-toggle buttons (the close button) were having the
+    toggled signal set.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 15 Mar 2014 12:36:10 +1000
+
+
 indicator-lunar (1.0.37-1) precise; urgency=low
 
   * Preferences loop was incorrectly handling OK/cancel.
