@@ -98,8 +98,8 @@ class AboutDialog( Gtk.AboutDialog ):
             self.add_credit_section( creditsLabel, creditsPeople )
         except:
             authorsCredits = authors
+            authorsCredits.append( "" )
             for credit in creditsPeople:
-                authorsCredits.append( "" )
                 authorsCredits.append( credit )
 
             self.set_authors( authorsCredits )
