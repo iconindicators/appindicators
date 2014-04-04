@@ -55,7 +55,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.38"
+    VERSION = "1.0.39"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -825,6 +825,7 @@ class IndicatorLunar:
         grid.set_margin_bottom( 10 )
 
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_tooltip_text( "Run the indicator automatically" )
         autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
         grid.attach( autostartCheckbox, 0, 0, 1, 1 )
 

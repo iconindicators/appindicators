@@ -1,3 +1,11 @@
+indicator-lunar (1.0.39-1) precise; urgency=low
+
+  * Fixed a bug where the eclipse data (the month) was incorrectly parsed in
+    non-English locales.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 4 Apr 2014 14:59:25 +1000
+
+
 indicator-lunar (1.0.38-1) precise; urgency=low
 
   * Fixed a bug where non-toggle buttons (the close button) were having the
