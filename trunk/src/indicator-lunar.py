@@ -25,13 +25,6 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
-#TODO
-# Have noticed that the submenus appear as a single space after a certain amount of time.
-# By setting the update interval to every second, it takes a few minutes for the submenus to appear as spaces.
-# I've wrapped try/except around each function to see if a message is produced - but so far nothing.
-# I've also noticed the VirtualBox indicator menu seems to stop responding over time too...maybe it's a related issue?
-
-
 try: from gi.repository import AppIndicator3 as appindicator
 except: pass
 
