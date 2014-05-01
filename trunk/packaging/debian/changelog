@@ -1,6 +1,8 @@
 indicator-ppa-download-statistics (1.0.37-1) precise; urgency=low
 
   * Added 'utopic' to list of series.
+  * Fixed blocking of preferences - when a download is underway the preferences
+    cannot be opened.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 1 May 2014 10:47:40 +1000
 

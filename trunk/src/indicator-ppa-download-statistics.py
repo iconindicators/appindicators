@@ -84,7 +84,8 @@ class IndicatorPPADownloadStatistics:
 
         GLib.threads_init()
         self.lock = threading.Lock()
-        self.indicatorIsLocked = False
+        self.downloadInProgress = False
+        self.preferencesOpen = False
         Notify.init( IndicatorPPADownloadStatistics.NAME )
         self.quitRequested = False
 
@@ -354,7 +355,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def onPreferences( self, widget ):
-        if self.indicatorIsLocked:
+        if self.downloadInProgress:
             Notify.Notification.new( "Downloading...", "Preferences are currently unavailable.", IndicatorPPADownloadStatistics.ICON ).show()
             return
 
@@ -362,7 +363,7 @@ class IndicatorPPADownloadStatistics:
             self.dialog.present()
             return
 
-        with self.lock: self.indicatorIsLocked = True
+        with self.lock: self.preferencesOpen = True
 
         self.ppasOrFiltersModified = False
 
@@ -606,12 +607,12 @@ class IndicatorPPADownloadStatistics:
             GLib.timeout_add_seconds( 1, self.buildMenu )
 
             if self.ppasOrFiltersModified:
-                self.ppasOrFiltersModified = False
                 GLib.timeout_add_seconds( 10, self.requestPPADownloadAndMenuRefresh, False ) # Hopefully 10 seconds is sufficient to rebuild the menu!
+                with self.lock: self.downloadInProgress = True # Although the download hasn't actually started, this ensures the preferences cannot be opened until the download completes.
 
         self.dialog.destroy()
         self.dialog = None
-        with self.lock: self.indicatorIsLocked = False
+        with self.lock: self.preferencesOpen = False
 
 
     def onCombinePPAsCheckbox( self, source, checkbox ): checkbox.set_sensitive( source.get_active() )
@@ -1034,13 +1035,12 @@ class IndicatorPPADownloadStatistics:
     #    ,... 
     #}
     def getPPADownloadStatistics( self ):
-        if self.indicatorIsLocked:
-            # It's possible the user has the properties open and an automatic update has kicked off...
-            # ...reschedule the update for a later.
-            GLib.timeout_add_seconds( 10, self.requestPPADownloadAndMenuRefresh, False )
+        if self.preferencesOpen:
+            # If the user has the preferences open and an automatic update has kicked off, reschedule the update.
+            GLib.timeout_add_seconds( 60, self.requestPPADownloadAndMenuRefresh, False )
             return
 
-        with self.lock: self.indicatorIsLocked = True
+        with self.lock: self.downloadInProgress = True
 
         for ppa in self.ppas:
             ppa.resetForDownload()
@@ -1051,7 +1051,7 @@ class IndicatorPPADownloadStatistics:
                 ppa.resetForDownload()
                 self.getPublishedBinaries( ppa )
 
-        with self.lock: self.indicatorIsLocked = False
+        with self.lock: self.downloadInProgress = False
 
         GLib.idle_add( self.buildMenu )
 
