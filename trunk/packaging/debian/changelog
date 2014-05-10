@@ -100,7 +100,7 @@ indicator-virtual-box (1.0.20-1) precise; urgency=low
 indicator-virtual-box (1.0.19-1) precise; urgency=low
 
   * Only create the log file when needed.
-    Thanks to dvrc (dvrc.contact@gmail.com).
+    Thanks to Rafael Cavalcanti <rafael.kavalkanti@gmail.com>.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 5 Jul 2013 20:14:25 +1000
 
