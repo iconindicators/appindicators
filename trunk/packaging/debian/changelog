@@ -56,7 +56,7 @@ indicator-stardate (1.0.15-1) precise; urgency=low
 indicator-stardate (1.0.14-1) precise; urgency=low
 
   * Only create the log file when needed.
-    Thanks to dvrc (dvrc.contact@gmail.com).
+    Thanks to Rafael Cavalcanti <rafael.kavalkanti@gmail.com>.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 5 Jul 2013 20:29:57 +1000
 
