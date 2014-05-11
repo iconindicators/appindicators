@@ -38,7 +38,7 @@ class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
-    VERSION = "1.0.9"
+    VERSION = "1.0.10"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -110,11 +110,15 @@ class IndicatorFortune:
         self.menu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem( "New Fortune" )
-        menuItem.connect( "activate", self.newFortune )
+        menuItem.connect( "activate", self.onShowFortune, True )
         self.menu.append( menuItem )
 
         menuItem = Gtk.MenuItem( "Copy Last Fortune" )
         menuItem.connect( "activate", self.onCopyLastFortune )
+        self.menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem( "Show Last Fortune" )
+        menuItem.connect( "activate", self.onShowFortune, False )
         self.menu.append( menuItem )
 
         self.menu.append( Gtk.SeparatorMenuItem() )
@@ -174,8 +178,8 @@ class IndicatorFortune:
         self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
-    def newFortune( self, widget ):
-        self.refreshFortune()
+    def onShowFortune( self, widget, new ):
+        if new: self.refreshFortune()
 
         notificationSummary = self.notificationSummary
         if notificationSummary == "":

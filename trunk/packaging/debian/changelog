@@ -1,3 +1,10 @@
+indicator-fortune (1.0.10-1) precise; urgency=low
+
+  * Added "Show Last Fortune" menu option.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 12 May 2014 8:02:21 +1000
+
+
 indicator-fortune (1.0.9-1) precise; urgency=low
 
   * Fixed a bug where non-toggle buttons (the close button) were having the
