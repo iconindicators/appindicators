@@ -34,9 +34,6 @@ notifyImported = True
 try: from gi.repository import Notify
 except: notifyImported = False
 
-# TODO Testing for ISS
-# from urllib.request import urlopen
-
 import copy, datetime, eclipse, gzip, json, locale, logging, math, os, pythonutils, re, shutil, subprocess, sys
 
 try:
@@ -79,6 +76,7 @@ class IndicatorLunar:
     SETTINGS_CITY_NAME = "cityName"
     SETTINGS_DISPLAY_PATTERN = "displayPattern"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
+    SETTINGS_STARS = "stars"
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
     SETTINGS_WEREWOLF_WARNING_TEXT_BODY = "werewolfWarningTextBody"
     SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY = "werewolfWarningTextSummary"
@@ -142,33 +140,6 @@ class IndicatorLunar:
 
 
     def main( self ):
-#         from pprint import pprint
-#         pprint(ephem._libastro.builtin_planets())
-#         pprint([name for _0, _1, name in ephem._libastro.builtin_planets()])
-
-
-
-#         for star in ephem.stars.stars:
-#             print( star )
-
-
-        
-
-            
-#                 if city in timezone:
-#                     self.cityName = city
-#                     break
-# 
-#             if self.cityName is None or self.cityName == "":
-#                 self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
-# 
-#         except Exception as e:
-#             logging.exception( e )
-#             logging.error( "Error getting default cityName." )
-#             self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
-
-        
-        
         self.update()
         Gtk.main()
 
@@ -180,10 +151,6 @@ class IndicatorLunar:
         city.date = ephemNow
         self.data[ "CITY NAME" ] = self.cityName
 
-#         rigel = ephem.star( "Rigel" )
-#         rigel.compute( city )
-#         print( rigel )
-        
         lunarIlluminationPercentage = int( round( ephem.Moon( city ).phase ) )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
 
@@ -238,105 +205,9 @@ class IndicatorLunar:
         menu.popdown() # Make the existing menu, if visible, disappear (if not, GTK complains).
         menu = Gtk.Menu()
 
-        # Moon
-        menuItem = Gtk.MenuItem( "Moon" )
-        menu.append( menuItem )
-        self.createBodySubmenu( menuItem, city, ephem.Moon( city ), nextUpdates, ephemNow )
-
-        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-
-        self.data[ "MOON PHASE" ] = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
-        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + self.data[ "MOON PHASE" ] ) )
-
-        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
-
-        # Determine which phases occur by date rather than using the phase calculated since the phase (illumination) rounds numbers
-        # and so we enter a phase earlier than what is official.
-        nextPhases = [ ]
-
-        self.data[ "MOON FIRST QUARTER" ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
-        nextPhases.append( [ self.data[ "MOON FIRST QUARTER" ], "First Quarter: " ] )
-
-        self.data[ "MOON FULL" ] = self.localiseAndTrim( ephem.next_full_moon( ephemNow ) )
-        nextPhases.append( [ self.data[ "MOON FULL" ], "Full: " ] )
-
-        self.data[ "MOON THIRD QUARTER" ] = self.localiseAndTrim( ephem.next_last_quarter_moon( ephemNow ) )
-        nextPhases.append( [ self.data[ "MOON THIRD QUARTER" ], "Third Quarter: " ] )
-
-        self.data[ "MOON NEW" ] = self.localiseAndTrim( ephem.next_new_moon( ephemNow ) )
-        nextPhases.append( [ self.data[ "MOON NEW" ], "New: " ] )
-
-        nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
-        for phaseInformation in nextPhases:
-            menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
-
-        nextUpdates.append( ephem.next_first_quarter_moon( ephemNow ) )
-        nextUpdates.append( ephem.next_full_moon( ephemNow ) )
-        nextUpdates.append( ephem.next_last_quarter_moon( ephemNow ) )
-        nextUpdates.append( ephem.next_new_moon( ephemNow ) )
-
-        eclipseInformation = eclipse.getLunarEclipseForUTC( ephemNow.datetime() )
-        if eclipseInformation is not None:
-            self.createEclipseMenu( menuItem.get_submenu(), eclipseInformation, "MOON" )
-
-        # Sun
-        menuItem = Gtk.MenuItem( "Sun" )
-        menu.append( menuItem )
-
-        subMenu = Gtk.Menu()
-        menuItem.set_submenu( subMenu )
-
-        sun = ephem.Sun( city )
-
-        self.data[ "SUN CONSTELLATION" ] = ephem.constellation( sun )[ 1 ]
-        subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ "SUN CONSTELLATION" ] ) )
-
-        self.data[ "SUN TROPICAL SIGN" ] = self.getTropicalSign( sun, ephemNow )
-        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ "SUN TROPICAL SIGN" ] ) )
-
-        self.data[ "SUN DISTANCE TO EARTH" ] = str( round( sun.earth_distance, 4 ) ) + " AU"
-        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ "SUN DISTANCE TO EARTH" ] ) )
-
-        self.createRADecSubMenu( subMenu, sun )
-
-        subMenu.append( Gtk.SeparatorMenuItem() )
-
-        rising = city.next_rising( sun )
-        self.data[ "SUN NEXT RISING" ] = self.localiseAndTrim( rising )
-        setting = city.next_setting( sun )
-        self.data[ "SUN NEXT SETTING" ] = self.localiseAndTrim( setting )
-        if rising > setting:
-            subMenu.append( Gtk.MenuItem( "Set: " + self.data[ "SUN NEXT SETTING" ] ) )
-            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ "SUN NEXT RISING" ] ) )
-        else:
-            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ "SUN NEXT RISING" ] ) )
-            subMenu.append( Gtk.MenuItem( "Set: " + self.data[ "SUN NEXT SETTING" ] ) )
-
-        nextUpdates.append( rising )
-        nextUpdates.append( setting )
-
-        subMenu.append( Gtk.SeparatorMenuItem() )
-
-        # Solstice/Equinox
-        equinox = ephem.next_equinox( ephemNow )
-        self.data[ "SUN EQUINOX" ] = self.localiseAndTrim( equinox )
-        solstice = ephem.next_solstice( ephemNow )
-        self.data[ "SUN SOLSTICE" ] = self.localiseAndTrim( solstice )
-        if equinox < solstice:
-            subMenu.append( Gtk.MenuItem( "Equinox: " + self.data[ "SUN EQUINOX" ] ) )
-            subMenu.append( Gtk.MenuItem( "Solstice: " + self.data[ "SUN SOLSTICE" ] ) )
-        else:
-            subMenu.append( Gtk.MenuItem( "Solstice: " + self.data[ "SUN SOLSTICE" ] ) )
-            subMenu.append( Gtk.MenuItem( "Equinox: " + self.data[ "SUN EQUINOX" ] ) )
-
-        nextUpdates.append( equinox )
-        nextUpdates.append( solstice )
-
-        eclipseInformation = eclipse.getSolarEclipseForUTC( ephemNow.datetime() )
-        if eclipseInformation is not None:
-            self.createEclipseMenu( subMenu, eclipseInformation, "SUN" )
-
+        self.createMoonMenu( menu, city, nextUpdates, ephemNow, lunarPhase )
+        self.createSunMenu( menu, city, nextUpdates, ephemNow )
+        
         # Planets
         menu.append( Gtk.MenuItem( "Planets" ) )
 
@@ -352,10 +223,10 @@ class IndicatorLunar:
 
         for planet in planets:
             menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
-            self.createBodySubmenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
             menu.append( menuItem )
+            self.createBodyMenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
 
-        menu.append( Gtk.SeparatorMenuItem() )
+        self.createStarsMenu( menu, city )
 
 # TODO Testing for ISS
 #         # ISS
@@ -364,6 +235,8 @@ class IndicatorLunar:
 #         self.createISSSubmenu( menuItem, city, nextUpdates, ephemNow )
 # 
 #         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+
+        menu.append( Gtk.SeparatorMenuItem() )
 
         preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
         preferencesMenuItem.connect( "activate", self.onPreferences )
@@ -400,6 +273,8 @@ class IndicatorLunar:
 
 # TODO Testing for ISS
 #     def createISSSubmenu( self, menuItem, city, nextUpdates, ephemNow ):
+#         from urllib.request import urlopen
+#
 #         subMenu = Gtk.Menu()
 # 
 #         global _city_data
@@ -462,7 +337,113 @@ class IndicatorLunar:
 # http://stackoverflow.com/questions/4497728/get-country-from-latitude-longitude
 
 
-    def createBodySubmenu( self, bodyMenuItem, city, body, nextUpdates, ephemNow ):
+    def createMoonMenu( self, menu, city, nextUpdates, ephemNow, lunarPhase ):
+        menuItem = Gtk.MenuItem( "Moon" )
+        menu.append( menuItem )
+
+        self.createBodyMenu( menuItem, city, ephem.Moon( city ), nextUpdates, ephemNow )
+
+        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+
+        self.data[ "MOON PHASE" ] = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
+        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + self.data[ "MOON PHASE" ] ) )
+
+        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+        menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
+
+        # Determine which phases occur by date rather than using the phase calculated since the phase (illumination) rounds numbers
+        # and so we enter a phase earlier than what is official.
+        nextPhases = [ ]
+
+        self.data[ "MOON FIRST QUARTER" ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
+        nextPhases.append( [ self.data[ "MOON FIRST QUARTER" ], "First Quarter: " ] )
+
+        self.data[ "MOON FULL" ] = self.localiseAndTrim( ephem.next_full_moon( ephemNow ) )
+        nextPhases.append( [ self.data[ "MOON FULL" ], "Full: " ] )
+
+        self.data[ "MOON THIRD QUARTER" ] = self.localiseAndTrim( ephem.next_last_quarter_moon( ephemNow ) )
+        nextPhases.append( [ self.data[ "MOON THIRD QUARTER" ], "Third Quarter: " ] )
+
+        self.data[ "MOON NEW" ] = self.localiseAndTrim( ephem.next_new_moon( ephemNow ) )
+        nextPhases.append( [ self.data[ "MOON NEW" ], "New: " ] )
+
+        nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
+        for phaseInformation in nextPhases:
+            menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
+
+        nextUpdates.append( ephem.next_first_quarter_moon( ephemNow ) )
+        nextUpdates.append( ephem.next_full_moon( ephemNow ) )
+        nextUpdates.append( ephem.next_last_quarter_moon( ephemNow ) )
+        nextUpdates.append( ephem.next_new_moon( ephemNow ) )
+
+        eclipseInformation = eclipse.getLunarEclipseForUTC( ephemNow.datetime() )
+        if eclipseInformation is not None:
+            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+            self.createEclipseMenu( menuItem.get_submenu(), eclipseInformation, "MOON" )
+
+
+    def createSunMenu( self, menu, city, nextUpdates, ephemNow ):
+        menuItem = Gtk.MenuItem( "Sun" )
+        menu.append( menuItem )
+
+        subMenu = Gtk.Menu()
+        menuItem.set_submenu( subMenu )
+
+        sun = ephem.Sun( city )
+
+        self.data[ "SUN CONSTELLATION" ] = ephem.constellation( sun )[ 1 ]
+        subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ "SUN CONSTELLATION" ] ) )
+
+        self.data[ "SUN TROPICAL SIGN" ] = self.getTropicalSign( sun, ephemNow )
+        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ "SUN TROPICAL SIGN" ] ) )
+
+        self.data[ "SUN DISTANCE TO EARTH" ] = str( round( sun.earth_distance, 4 ) ) + " AU"
+        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ "SUN DISTANCE TO EARTH" ] ) )
+
+        subMenu.append( Gtk.SeparatorMenuItem() )
+
+        self.createRADecAzAltMagMenu( subMenu, sun )
+
+        subMenu.append( Gtk.SeparatorMenuItem() )
+
+        rising = city.next_rising( sun )
+        self.data[ "SUN NEXT RISING" ] = self.localiseAndTrim( rising )
+        setting = city.next_setting( sun )
+        self.data[ "SUN NEXT SETTING" ] = self.localiseAndTrim( setting )
+        if rising > setting:
+            subMenu.append( Gtk.MenuItem( "Set: " + self.data[ "SUN NEXT SETTING" ] ) )
+            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ "SUN NEXT RISING" ] ) )
+        else:
+            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ "SUN NEXT RISING" ] ) )
+            subMenu.append( Gtk.MenuItem( "Set: " + self.data[ "SUN NEXT SETTING" ] ) )
+
+        nextUpdates.append( rising )
+        nextUpdates.append( setting )
+
+        subMenu.append( Gtk.SeparatorMenuItem() )
+
+        # Solstice/Equinox
+        equinox = ephem.next_equinox( ephemNow )
+        self.data[ "SUN EQUINOX" ] = self.localiseAndTrim( equinox )
+        solstice = ephem.next_solstice( ephemNow )
+        self.data[ "SUN SOLSTICE" ] = self.localiseAndTrim( solstice )
+        if equinox < solstice:
+            subMenu.append( Gtk.MenuItem( "Equinox: " + self.data[ "SUN EQUINOX" ] ) )
+            subMenu.append( Gtk.MenuItem( "Solstice: " + self.data[ "SUN SOLSTICE" ] ) )
+        else:
+            subMenu.append( Gtk.MenuItem( "Solstice: " + self.data[ "SUN SOLSTICE" ] ) )
+            subMenu.append( Gtk.MenuItem( "Equinox: " + self.data[ "SUN EQUINOX" ] ) )
+
+        nextUpdates.append( equinox )
+        nextUpdates.append( solstice )
+
+        eclipseInformation = eclipse.getSolarEclipseForUTC( ephemNow.datetime() )
+        if eclipseInformation is not None:
+            subMenu.append( Gtk.SeparatorMenuItem() )
+            self.createEclipseMenu( subMenu, eclipseInformation, "SUN" )
+
+
+    def createBodyMenu( self, bodyMenuItem, city, body, nextUpdates, ephemNow ):
         subMenu = Gtk.Menu()
 
         self.data[ body.name.upper() + " ILLUMINATION" ] = str( int( round( body.phase ) ) ) + "%"
@@ -483,7 +464,9 @@ class IndicatorLunar:
         self.data[ body.name.upper() + " BRIGHT LIMB" ] = str( round( self.getBrightLimbAngleRelativeToZenith( city, body ) ) ) + "°"
         subMenu.append( Gtk.MenuItem( "Bright Limb: " + self.data[ body.name.upper() + " BRIGHT LIMB" ] ) )
 
-        self.createRADecSubMenu( subMenu, body )
+        subMenu.append( Gtk.SeparatorMenuItem() )
+
+        self.createRADecAzAltMagMenu( subMenu, body )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -507,7 +490,6 @@ class IndicatorLunar:
 
 
     def createEclipseMenu( self, menu, eclipse, label ):
-        menu.append( Gtk.SeparatorMenuItem() )
         menu.append( Gtk.MenuItem( "Eclipse" ) )
 
         localisedAndTrimmedDateTime = self.localiseAndTrim( ephem.Date( eclipse[ 0 ] ) )
@@ -522,24 +504,44 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + eclipse[ 1 ] ) )
 
 
-    def createRADecSubMenu( self, subMenu, body ):
-        subMenu.append( Gtk.SeparatorMenuItem() )
+    def createStarsMenu( self, menu, city ):
+        if len( self.stars ) == 0: return
 
+        menuItem = Gtk.MenuItem( "Stars" )
+        menu.append( menuItem )
+
+        for starName in self.stars:
+            menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starName )
+            menu.append( menuItem )
+
+            subMenu = Gtk.Menu()
+            menuItem.set_submenu( subMenu )
+
+            star = ephem.star( starName )
+            star.compute( city )
+
+            self.createRADecAzAltMagMenu( subMenu, star )
+
+
+    def createRADecAzAltMagMenu( self, menu, body ):
         self.data[ body.name.upper() + " RIGHT ASCENSION" ] = str( round( self.convertHMSToDecimalDegrees( body.g_ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.g_ra ) ) + ")"
-        subMenu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ body.name.upper() + " RIGHT ASCENSION" ] ) )
+        menu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ body.name.upper() + " RIGHT ASCENSION" ] ) )
 
         direction = "N"
         if body.g_dec < 0.0:
             direction = "S"
 
         self.data[ body.name.upper() + " DECLINATION" ] = str( abs( round( self.convertDMSToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.g_dec ) ) + ")"
-        subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ body.name.upper() + " DECLINATION" ] ) )
+        menu.append( Gtk.MenuItem( "Declination: " + self.data[ body.name.upper() + " DECLINATION" ] ) )
 
         self.data[ body.name.upper() + " AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
-        subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ body.name.upper() + " AZIMUTH" ] ) )
+        menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ body.name.upper() + " AZIMUTH" ] ) )
 
         self.data[ body.name.upper() + " ALTITUDE" ] = str( round( self.convertDMSToDecimalDegrees( body.alt ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
-        subMenu.append( Gtk.MenuItem( "Altitude: " + self.data[ body.name.upper() + " ALTITUDE" ] ) )
+        menu.append( Gtk.MenuItem( "Altitude: " + self.data[ body.name.upper() + " ALTITUDE" ] ) )
+
+        self.data[ body.name.upper() + " MAGNITUDE" ] = str( body.mag )
+        menu.append( Gtk.MenuItem( "Magnitude: " + self.data[ body.name.upper() + " MAGNITUDE" ] ) )
 
 
     # Takes a float and converts to local time, trims off fractional seconds and returns a string.
@@ -793,6 +795,41 @@ class IndicatorLunar:
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
+        # Star settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        hbox = Gtk.Box( spacing = 6 )
+
+        starStore = Gtk.ListStore( str, bool ) # Star name, show/hide.
+        for star in sorted( ephem.stars.stars ):
+            starStore.append( [ star, star in self.stars ] )
+
+        tree = Gtk.TreeView( starStore )
+        tree.set_hexpand( True )
+        tree.set_vexpand( True )
+
+        tree.append_column( Gtk.TreeViewColumn( "Star", Gtk.CellRendererText(), text = 0 ) )
+
+        renderer_toggle = Gtk.CellRendererToggle()
+        renderer_toggle.connect( "toggled", self.onStarToggled, starStore )
+        tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 1 ) )
+
+        tree.set_tooltip_text( "Check a star to display in the menu." )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( tree )
+        grid.attach( scrolledWindow, 0, 0, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "Stars" ) )
+
         # Notification settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -971,6 +1008,10 @@ class IndicatorLunar:
                 elevation.grab_focus()
                 continue
 
+            self.stars = [ ]
+            for starInfo in starStore:
+                if starInfo[ 1 ]: self.stars.append( starInfo[ 0 ] )
+
             self.displayPattern = displayPattern.get_text()
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
@@ -1019,6 +1060,10 @@ class IndicatorLunar:
         os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
 
 
+    def onStarToggled( self, widget, path, store ):
+        store[ path ][ 1 ] = not store[ path ][ 1 ]
+
+
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
         global _city_data
@@ -1037,6 +1082,7 @@ class IndicatorLunar:
         self.getDefaultCity()
         self.displayPattern = IndicatorLunar.DISPLAY_PATTERN_DEFAULT
         self.showWerewolfWarning = True
+        self.stars = [ ]
         self.werewolfWarningStartIlluminationPercentage = 100
         self.werewolfWarningTextBody = IndicatorLunar.WEREWOLF_WARNING_TEXT_BODY
         self.werewolfWarningTextSummary = IndicatorLunar.WEREWOLF_WARNING_TEXT_SUMMARY
@@ -1053,6 +1099,7 @@ class IndicatorLunar:
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
                 self.displayPattern = settings.get( IndicatorLunar.SETTINGS_DISPLAY_PATTERN, self.displayPattern )
                 self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
+                self.stars = settings.get( IndicatorLunar.SETTINGS_STARS, self.stars )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
                 self.werewolfWarningTextBody = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY, self.werewolfWarningTextBody )
                 self.werewolfWarningTextSummary = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY, self.werewolfWarningTextSummary )
@@ -1094,6 +1141,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
                 IndicatorLunar.SETTINGS_DISPLAY_PATTERN: self.displayPattern,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
+                IndicatorLunar.SETTINGS_STARS: self.stars,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY: self.werewolfWarningTextBody,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY: self.werewolfWarningTextSummary

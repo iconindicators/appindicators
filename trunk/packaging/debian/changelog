@@ -1,6 +1,7 @@
 indicator-lunar (1.0.40-1) precise; urgency=low
 
-  * Added azimuth/altitude information for all bodies.
+  * Added azimuth/altitude/magnitude information for all bodies.
+  * Can now choose stars to display from the ephem catalog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 24 May 2014 10:49:40 +1000
 
