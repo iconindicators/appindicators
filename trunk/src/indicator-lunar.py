@@ -31,6 +31,9 @@
 #         won't be updated until the OK is pressed and then the preferences reopened.
 #         Can the display tab be watched for a click event or maybe when something is checked an event could then change the display list?
 #
+#         What happens if a star is added, then ok, then add that star info to the display, then ok, then remove the star...what happens to the display info?
+#         Maybe check the display info on ok and strip unknown tags?
+#
 #
 
 
