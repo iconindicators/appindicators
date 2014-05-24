@@ -25,6 +25,16 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
+#
+#
+#  TODO   If a star is checked/unchecked, the change in the list of items for display (first tab)
+#         won't be updated until the OK is pressed and then the preferences reopened.
+#         Can the display tab be watched for a click event or maybe when something is checked an event could then change the display list?
+#
+#
+
+
+
 try: from gi.repository import AppIndicator3 as appindicator
 except: pass
 
@@ -34,7 +44,9 @@ notifyImported = True
 try: from gi.repository import Notify
 except: notifyImported = False
 
-import copy, datetime, eclipse, gzip, json, locale, logging, math, os, pythonutils, re, shutil, subprocess, sys
+from urllib.request import urlopen
+
+import copy, datetime, eclipse, gzip, json, locale, logging, math, os, pythonutils, re, shutil, subprocess, sys, tle
 
 try:
     import ephem
@@ -76,6 +88,7 @@ class IndicatorLunar:
     SETTINGS_CITY_LONGITUDE = "cityLongitude"
     SETTINGS_CITY_NAME = "cityName"
     SETTINGS_DISPLAY_PATTERN = "displayPattern"
+    SETTINGS_SATELLITES = "satellites"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     SETTINGS_STARS = "stars"
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
@@ -107,6 +120,8 @@ class IndicatorLunar:
     WEREWOLF_WARNING_TEXT_BODY = "                                          ...werewolves about ! ! !"
     WEREWOLF_WARNING_TEXT_SUMMARY = "W  A  R  N  I  N  G"
 
+    SATELLITE_TLE_URL = "http://www.celestrak.com/NORAD/elements/stations.txt"
+
 
     def __init__( self ):
         filehandler = logging.FileHandler( filename = IndicatorLunar.LOG, mode = "a", delay = True )
@@ -116,10 +131,10 @@ class IndicatorLunar:
 
         self.dialog = None
         self.data = { }
+        self.getSatelliteTLEData()
         self.loadSettings()
 
-        if notifyImported:
-            Notify.init( IndicatorLunar.NAME )
+        if notifyImported: Notify.init( IndicatorLunar.NAME )
 
         # Create an AppIndicator3 indicator...if it fails, create a GTK indicator.
         # On Lubuntu 12.04 the AppIndicator3 is created (the icon displays).
@@ -146,7 +161,7 @@ class IndicatorLunar:
 
 
     def update( self ):
-        ephemNow = ephem.now() # This is UTC and all calculations using this value convert to local time at display time.
+        ephemNow = ephem.now() # This is UTC used in all calculations.  When it comes time to display, convert to local time.
 
         city = ephem.city( self.cityName )
         city.date = ephemNow
@@ -207,11 +222,18 @@ class IndicatorLunar:
         menu = Gtk.Menu()
 
         self.createMoonMenu( menu, city, nextUpdates, ephemNow, lunarPhase )
+
         self.createSunMenu( menu, city, nextUpdates, ephemNow )
         
         # Planets
         menu.append( Gtk.MenuItem( "Planets" ) )
-
+#
+#
+#
+# TODO If the satellite stuff goes in...consider converting the planet stuff into a similar form as the stars (as user can opt in/out on specific planets).
+#
+#
+#
         planets = [
             [ "Mercury", ephem.Mercury( city ) ],
             [ "Venus", ephem.Venus( city ) ],
@@ -228,6 +250,8 @@ class IndicatorLunar:
             self.createBodyMenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
 
         self.createStarsMenu( menu, city )
+
+        self.createSatellitesMenu( menu, city, nextUpdates )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -416,21 +440,8 @@ class IndicatorLunar:
         nextUpdates.append( setting )
 
 
-    def createEclipseMenu( self, menu, eclipse, label ):
-        menu.append( Gtk.MenuItem( "Eclipse" ) )
-
-        localisedAndTrimmedDateTime = self.localiseAndTrim( ephem.Date( eclipse[ 0 ] ) )
-
-        self.data[ label + " ECLIPSE DATE TIME" ] = localisedAndTrimmedDateTime
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + localisedAndTrimmedDateTime ) )
-
-        self.data[ label + " ECLIPSE LATITUDE LONGITUDE" ] = eclipse[ 2 ] + " " + eclipse[ 3 ]
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Latitude/Longitude: " + eclipse[ 2 ] + " " + eclipse[ 3 ] ) )
-
-        self.data[ label + " ECLIPSE TYPE" ] = eclipse[ 1 ]
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + eclipse[ 1 ] ) )
-
-
+    # NOTE: Does not make sense to show rise/set times for stars.
+    # Depending on the star and the city, some stars are always up or always down.
     def createStarsMenu( self, menu, city ):
         if len( self.stars ) == 0: return
 
@@ -448,6 +459,94 @@ class IndicatorLunar:
             star.compute( city )
 
             self.createRADecAzAltMagMenu( subMenu, star )
+
+
+    # Uses NORAD (http://celestrak.com/NORAD/elements) TLE information with PyEphem to compute satellite rise/transit/set times.
+    # Alternate sources:
+    #     http://spotthestation.nasa.gov/sightings
+    #     http://www.n2yo.com/passes/?s=25544
+    def createSatellitesMenu( self, menu, city, nextUpdates ):
+#TODO Need to handle empty tle data.  Maybe put a message in the indicator...or in the preferences or as a notification?
+#TODO Maybe wrap this method in try/catch...if bad data came back, don't want the whole indicator to fall over.
+#TODO Only refresh the NORAD/tle data every 12 hours...check the site to see how often it changes.
+        
+        
+# 2014 May 24 (Day 144)
+# ISS (ZARYA)             
+# 1 25544U 98067A   14144.25429147  .00013298  00000-0  23626-3 0  3470
+# 2 25544  51.6479 218.2294 0003503  34.9920  27.7254 15.50515783887617
+        
+        
+        if len( self.satellites ) == 0: return
+
+        if len( self.satelliteTLEData ) == 0:
+#TODO Tell user there was a download error...how can the user force a refresh?
+            return
+
+        menuItem = Gtk.MenuItem( "Satellites" )
+        menu.append( menuItem )
+
+        for satelliteName in self.satellites:
+            menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteName )
+            menu.append( menuItem )
+
+            subMenu = Gtk.Menu()
+            menuItem.set_submenu( subMenu )
+
+            foundSatellite = False
+            for tle in self.satelliteTLEData:
+                if satelliteName == tle.getTitle():
+            
+                    satelliteInfo = city.next_pass( ephem.readtle( tle.getTitle(), tle.getLine1(), tle.getLine2() ) )
+        
+                    subMenu.append( Gtk.MenuItem( "Rise" ) )
+        
+                    self.data[ satelliteName + " RISE TIME" ] =  self.localiseAndTrim( satelliteInfo[ 0 ] )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ satelliteName + " RISE TIME" ] ) )
+        
+                    self.data[ satelliteName + " RISE AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( satelliteInfo[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satelliteInfo[ 1 ] ) ) + ")"
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ satelliteName + " RISE AZIMUTH" ] ) )
+        
+#                     subMenu.append( Gtk.MenuItem( "Transit" ) )
+#         
+#                     self.data[ satelliteName + " TRANSIT TIME" ] =  self.localiseAndTrim( satelliteInfo[ 2 ] )
+#                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ satelliteName + " TRANSIT TIME" ] ) )
+#         
+#                     self.data[ satelliteName + " TRANSIT AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( satelliteInfo[ 3 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satelliteInfo[ 3 ] ) ) + ")"
+#                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ satelliteName + " TRANSIT AZIMUTH" ] ) )
+        
+                    subMenu.append( Gtk.SeparatorMenuItem() )
+
+                    subMenu.append( Gtk.MenuItem( "Set" ) )
+        
+                    self.data[ satelliteName + " SET TIME" ] =  self.localiseAndTrim( satelliteInfo[ 4 ] )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ satelliteName + " SET TIME" ] ) )
+        
+                    self.data[ satelliteName + " SET AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( satelliteInfo[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satelliteInfo[ 5 ] ) ) + ")"
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ satelliteName + " SET AZIMUTH" ] ) )
+        
+                    nextUpdates.append( satelliteInfo[ 4 ] ) # Only do an update after the satellite has set.
+
+                    foundSatellite = True
+                    break
+
+            if not foundSatellite:
+                subMenu.append( Gtk.MenuItem( "No data!" ) )
+
+
+    def createEclipseMenu( self, menu, eclipse, label ):
+        menu.append( Gtk.MenuItem( "Eclipse" ) )
+
+        localisedAndTrimmedDateTime = self.localiseAndTrim( ephem.Date( eclipse[ 0 ] ) )
+
+        self.data[ label + " ECLIPSE DATE TIME" ] = localisedAndTrimmedDateTime
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + localisedAndTrimmedDateTime ) )
+
+        self.data[ label + " ECLIPSE LATITUDE LONGITUDE" ] = eclipse[ 2 ] + " " + eclipse[ 3 ]
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Latitude/Longitude: " + eclipse[ 2 ] + " " + eclipse[ 3 ] ) )
+
+        self.data[ label + " ECLIPSE TYPE" ] = eclipse[ 1 ]
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + eclipse[ 1 ] ) )
 
 
     def createRADecAzAltMagMenu( self, menu, body ):
@@ -734,6 +833,7 @@ class IndicatorLunar:
         hbox = Gtk.Box( spacing = 6 )
 
         starStore = Gtk.ListStore( str, bool ) # Star name, show/hide.
+        from ephem import stars
         for star in sorted( ephem.stars.stars ):
             starStore.append( [ star, star in self.stars ] )
 
@@ -935,6 +1035,11 @@ class IndicatorLunar:
                 elevation.grab_focus()
                 continue
 
+#
+#
+# TODO  Need to flush self.data of all star information.
+#
+#
             self.stars = [ ]
             for starInfo in starStore:
                 if starInfo[ 1 ]: self.stars.append( starInfo[ 0 ] )
@@ -1008,6 +1113,7 @@ class IndicatorLunar:
     def loadSettings( self ):
         self.getDefaultCity()
         self.displayPattern = IndicatorLunar.DISPLAY_PATTERN_DEFAULT
+        self.satellites = [ ]
         self.showWerewolfWarning = True
         self.stars = [ ]
         self.werewolfWarningStartIlluminationPercentage = 100
@@ -1025,6 +1131,7 @@ class IndicatorLunar:
                 cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
                 self.displayPattern = settings.get( IndicatorLunar.SETTINGS_DISPLAY_PATTERN, self.displayPattern )
+                self.satellites = settings.get( IndicatorLunar.SETTINGS_SATELLITES, self.satellites )
                 self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
                 self.stars = settings.get( IndicatorLunar.SETTINGS_STARS, self.stars )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
@@ -1037,6 +1144,20 @@ class IndicatorLunar:
             except Exception as e:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorLunar.SETTINGS_FILE )
+
+
+    def getSatelliteTLEData( self ):
+        try:
+            self.satelliteTLEData = [ ]
+# TODO Uncomment            
+#             data = urlopen( IndicatorLunar.SATELLITE_TLE_URL ).read().decode( "utf8" ).splitlines()
+#             for i in range( 0, len( data ), 3 ):
+#                 self.satelliteTLEData.append( tle.Info( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() ) )
+
+        except Exception as e:
+            self.satelliteTLEData = [ ] # Empty data indicates error.
+            logging.exception( e )
+            logging.error( "Unable to download " + IndicatorLunar.SATELLITE_TLE_URL )
 
 
     def getDefaultCity( self ):
@@ -1067,6 +1188,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
                 IndicatorLunar.SETTINGS_DISPLAY_PATTERN: self.displayPattern,
+                IndicatorLunar.SETTINGS_SATELLITES: self.satellites,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
                 IndicatorLunar.SETTINGS_STARS: self.stars,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
