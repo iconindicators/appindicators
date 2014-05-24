@@ -1,3 +1,10 @@
+indicator-lunar (1.0.41-1) precise; urgency=low
+
+  * An import fell off somehow...adding back in!
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 24 May 2014 21:10:11 +1000
+
+
 indicator-lunar (1.0.40-1) precise; urgency=low
 
   * Added azimuth/altitude/magnitude information for all bodies.
