@@ -51,7 +51,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.39"
+    VERSION = "1.0.40"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -142,6 +142,33 @@ class IndicatorLunar:
 
 
     def main( self ):
+#         from pprint import pprint
+#         pprint(ephem._libastro.builtin_planets())
+#         pprint([name for _0, _1, name in ephem._libastro.builtin_planets()])
+
+
+
+#         for star in ephem.stars.stars:
+#             print( star )
+
+
+        
+
+            
+#                 if city in timezone:
+#                     self.cityName = city
+#                     break
+# 
+#             if self.cityName is None or self.cityName == "":
+#                 self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
+# 
+#         except Exception as e:
+#             logging.exception( e )
+#             logging.error( "Error getting default cityName." )
+#             self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
+
+        
+        
         self.update()
         Gtk.main()
 
@@ -153,6 +180,10 @@ class IndicatorLunar:
         city.date = ephemNow
         self.data[ "CITY NAME" ] = self.cityName
 
+#         rigel = ephem.star( "Rigel" )
+#         rigel.compute( city )
+#         print( rigel )
+        
         lunarIlluminationPercentage = int( round( ephem.Moon( city ).phase ) )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
 
@@ -492,6 +523,8 @@ class IndicatorLunar:
 
 
     def createRADecSubMenu( self, subMenu, body ):
+        subMenu.append( Gtk.SeparatorMenuItem() )
+
         self.data[ body.name.upper() + " RIGHT ASCENSION" ] = str( round( self.convertHMSToDecimalDegrees( body.g_ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.g_ra ) ) + ")"
         subMenu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ body.name.upper() + " RIGHT ASCENSION" ] ) )
 
@@ -501,6 +534,12 @@ class IndicatorLunar:
 
         self.data[ body.name.upper() + " DECLINATION" ] = str( abs( round( self.convertDMSToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.g_dec ) ) + ")"
         subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ body.name.upper() + " DECLINATION" ] ) )
+
+        self.data[ body.name.upper() + " AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
+        subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ body.name.upper() + " AZIMUTH" ] ) )
+
+        self.data[ body.name.upper() + " ALTITUDE" ] = str( round( self.convertDMSToDecimalDegrees( body.alt ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
+        subMenu.append( Gtk.MenuItem( "Altitude: " + self.data[ body.name.upper() + " ALTITUDE" ] ) )
 
 
     # Takes a float and converts to local time, trims off fractional seconds and returns a string.

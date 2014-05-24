@@ -1,3 +1,10 @@
+indicator-lunar (1.0.40-1) precise; urgency=low
+
+  * Added azimuth/altitude information for all bodies.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 24 May 2014 10:49:40 +1000
+
+
 indicator-lunar (1.0.39-1) precise; urgency=low
 
   * Fixed a bug where the eclipse data (the month) was incorrectly parsed in
