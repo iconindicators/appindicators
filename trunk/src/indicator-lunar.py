@@ -228,6 +228,14 @@ class IndicatorLunar:
 
         self.createStarsMenu( menu, city )
 
+# TODO Testing for ISS
+#         # ISS
+#         menuItem = Gtk.MenuItem( "ISS" )
+#         menu.append( menuItem )
+#         self.createISSSubmenu( menuItem, city, nextUpdates, ephemNow )
+# 
+#         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+
         menu.append( Gtk.SeparatorMenuItem() )
 
         preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
@@ -261,6 +269,76 @@ class IndicatorLunar:
             nextUpdateInSeconds = ( 60 * 60 )
 
         GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
+
+
+# TODO Testing for ISS
+#
+# Possibly pyephem can also provide ISS (and other satellite stuff) from a catalogue.
+# http://rhodesmill.org/pyephem/tutorial.html#loading-bodies-from-catalogues
+#
+#     def createISSSubmenu( self, menuItem, city, nextUpdates, ephemNow ):
+#         from urllib.request import urlopen
+#
+#         subMenu = Gtk.Menu()
+# 
+#         global _city_data
+#         url = "http://api.open-notify.org/iss/?" + \
+#             "lat=" + _city_data.get( self.cityName )[ 0 ] + \
+#             "&lon=" + _city_data.get( self.cityName )[ 1 ] + \
+#             "&alt=" + str( _city_data.get( self.cityName )[ 2 ] ) + \
+#             "&n=10"
+#
+# #TODO Major problems with the city.
+# # Need to map the city name from Ephem to the Country_City or Country_Region_City url of NASA.
+# # Further, what to do if the user adds in a city name which is not in the NASA list?
+#
+#         try:
+#             issPassTimes = json.loads( urlopen( url ).read().decode( "utf8" ) )
+#             if issPassTimes[ "message" ] == "success":
+#                 for item in issPassTimes[ "response" ]:
+# #                     subMenu.append( Gtk.MenuItem( str( datetime.datetime.fromtimestamp( item[ "risetime" ] ) ) + " | " + str( item[ "duration" ] ) + "s" ) )
+# 
+#                     subMenu.append( Gtk.MenuItem( "Date/Time: " + str( datetime.datetime.fromtimestamp( item[ "risetime" ] ) ) ) )
+#                     subMenu.append( Gtk.MenuItem( "Date/Time: " + str( datetime.datetime.fromtimestamp( item[ "risetime" ] ).replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) ) ) )
+# 
+# 
+#                     subMenu.append( Gtk.MenuItem( "Duration: " + str( item[ "duration" ] ) + "s" ) )
+# #                     subMenu.append( Gtk.MenuItem( str( datetime.datetime.fromtimestamp( item[ "risetime" ] ) ) + " | " + str( item[ "duration" ] ) + "s" ) )
+#                     subMenu.append( Gtk.SeparatorMenuItem() )
+# 
+# #TODO Don't add last sep.
+#             else: subMenu.append( Gtk.MenuItem( "ERROR" ) )                                                                 # TODO Better menu item on error            
+# 
+#         except Exception as e:
+#             print(e)
+#             logging.exception( e )
+#             subMenu.append( Gtk.MenuItem( "ERROR" ) )
+# # TODO Better menu item on error            
+# 
+#         menuItem.set_submenu( subMenu )
+# 
+# # TODO Add next ISS pass time to nextUpdates...
+# #         nextUpdates.append( rising )
+# 
+# 
+# #TODO Other sites/info for ISS:
+# http://celestrak.com/NORAD/elements/
+# http://spotthestation.nasa.gov/sightings/index.cfm
+# http://spotthestation.nasa.gov/sightings/view.cfm?country=Australia&region=New_South_Wales&city=Sydney
+# http://spotthestation.nasa.gov/sightings/xml_files/Australia_New_South_Wales_Sydney.xml
+# http://www.n2yo.com/passes/?s=25544
+# http://spotthestation.nasa.gov/sightings/location_files/United_Kingdom.cfm
+# http://spotthestation.nasa.gov/sightings/location_files/United_Kingdom_England.cfm
+# http://spotthestation.nasa.gov/sightings/location_files/United_Kingdom_Scotland.cfm
+# http://spotthestation.nasa.gov/sightings/location_files/Canada.cfm
+# http://spotthestation.nasa.gov/sightings/location_files/Canada_British_Columbia.cfm
+# http://spotthestation.nasa.gov/sightings/location_files/Austria.cfm
+# http://spotthestation.nasa.gov/sightings/location_files/Austria_None.cfm
+# http://stackoverflow.com/questions/4013606/google-maps-how-to-get-country-state-province-region-city-given-a-lat-long-va
+# http://stackoverflow.com/questions/6797569/easiest-way-to-get-city-name-using-geolocation
+# http://stackoverflow.com/questions/11149144/google-maps-get-latitude-and-longitude-having-city-name
+# http://stackoverflow.com/questions/6159074/given-the-lat-long-coordinates-how-can-we-find-out-the-city-country
+# http://stackoverflow.com/questions/4497728/get-country-from-latitude-longitude
 
 
     def createMoonMenu( self, menu, city, nextUpdates, ephemNow, lunarPhase ):
