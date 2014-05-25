@@ -1292,13 +1292,16 @@ class IndicatorLunar:
     def loadSettings( self ):
         self.getDefaultCity()
         self.displayPattern = IndicatorLunar.DISPLAY_PATTERN_DEFAULT
-        self.planets = [ ]
         self.satellites = [ ]
         self.showWerewolfWarning = True
         self.stars = [ ]
         self.werewolfWarningStartIlluminationPercentage = 100
         self.werewolfWarningTextBody = IndicatorLunar.WEREWOLF_WARNING_TEXT_BODY
         self.werewolfWarningTextSummary = IndicatorLunar.WEREWOLF_WARNING_TEXT_SUMMARY
+
+        self.planets = [ ]
+        for planet in IndicatorLunar.PLANETS:
+            self.planets.append( planet[ 0 ] )
 
         if os.path.isfile( IndicatorLunar.SETTINGS_FILE ):
             try:
