@@ -1,3 +1,10 @@
+indicator-lunar (1.0.42-1) precise; urgency=low
+
+  * Added satellite/station lookup - requires internet access.
+  
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 25 May 2014 17:52:57 +1000
+
+
 indicator-lunar (1.0.41-1) precise; urgency=low
 
   * An import fell off somehow...adding back in!
