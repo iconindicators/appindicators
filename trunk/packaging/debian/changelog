@@ -1,5 +1,6 @@
 indicator-lunar (1.0.42-1) precise; urgency=low
 
+  * Fixed a bug where star data was not being removed after a star was unchecked.
   * Added satellite/station lookup - requires internet access.
   
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 25 May 2014 17:52:57 +1000

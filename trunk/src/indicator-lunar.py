@@ -34,7 +34,25 @@
 #         What happens if a star is added, then ok, then add that star info to the display, then ok, then remove the star...what happens to the display info?
 #         Maybe check the display info on ok and strip unknown tags?
 #
+#         Would an apply button help?  If you apply then cancel changes are dropped.  
 #
+#
+
+
+#
+# TODO Let the user test the notification for satellites?  Allow the user to configure the text?  
+#Maybe just the body text (over the horizon) as the summary is the satellite name.
+#Maybe not at all...just a checkbox on the satellite tab enable/disable the notifications.
+#Maybe not even an option to enable/disable the notifications...just show them?
+
+
+#
+#TODO What happens when the satellite list cannot be retrieved?
+# Allow the user to hit a refresh button?
+# What to show in the preferences list?
+# What to show in the indicator for satellites - if I have ISS but no data, show ISS and an error message?
+
+
 
 
 
@@ -64,7 +82,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.41"
+    VERSION = "1.0.42"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -123,8 +141,9 @@ class IndicatorLunar:
     WEREWOLF_WARNING_TEXT_BODY = "                                          ...werewolves about ! ! !"
     WEREWOLF_WARNING_TEXT_SUMMARY = "W  A  R  N  I  N  G"
 
+    SATELLITE_TEXT_SUMMARY = "                      ...is above the horizon!"
     SATELLITE_TLE_URL = "http://www.celestrak.com/NORAD/elements/stations.txt"
-
+            
 
     def __init__( self ):
         filehandler = logging.FileHandler( filename = IndicatorLunar.LOG, mode = "a", delay = True )
@@ -133,7 +152,6 @@ class IndicatorLunar:
                              handlers = [ filehandler ] )
 
         self.dialog = None
-        self.data = { }
         self.getSatelliteTLEData()
         self.loadSettings()
 
@@ -164,6 +182,7 @@ class IndicatorLunar:
 
 
     def update( self ):
+        self.data = { } # Reset each run, otherwise data will accumulate (if a star/satellite was added then removed, the computed data remains).
         ephemNow = ephem.now() # This is UTC used in all calculations.  When it comes time to display, convert to local time.
 
         city = ephem.city( self.cityName )
@@ -233,7 +252,7 @@ class IndicatorLunar:
 #
 #
 #
-# TODO If the satellite stuff goes in...consider converting the planet stuff into a similar form as the stars (as user can opt in/out on specific planets).
+# TODO Consider converting the planet stuff into a similar form as the stars (as user can opt in/out on specific planets)???
 #
 #
 #
@@ -473,11 +492,18 @@ class IndicatorLunar:
 #TODO Maybe wrap this method in try/catch...if bad data came back, don't want the whole indicator to fall over.
 #TODO Only refresh the NORAD/tle data every 12 hours...check the site to see how often it changes.
         
-        
+#  "satellites": ["ISS (ZARYA)"]
+ 
+         
 # 2014 May 24 (Day 144)
 # ISS (ZARYA)             
 # 1 25544U 98067A   14144.25429147  .00013298  00000-0  23626-3 0  3470
 # 2 25544  51.6479 218.2294 0003503  34.9920  27.7254 15.50515783887617
+
+# 2014 May 25 (Day 145)
+# ISS (ZARYA)             
+# 1 25544U 98067A   14144.71997774  .00013074  00000-0  23233-3 0  3518
+# 2 25544  51.6481 215.9209 0003422  37.9944 105.8398 15.50527264887680
         
         
         if len( self.satellites ) == 0: return
@@ -804,14 +830,24 @@ class IndicatorLunar:
 
         grid.attach( hbox, 0, 0, 1, 1 )
 
-        store = Gtk.ListStore( str, str ) # Tag, value.
+        displayTagsStore = Gtk.ListStore( str, str ) # Tag, value.
         for key in sorted( self.data.keys() ):
-            store.append( [ key, self.data[ key ] ] )
+            displayTagsStore.append( [ key, self.data[ key ] ] )
 
-        tree = Gtk.TreeView( store )
+        displayTagsStoreSort = Gtk.TreeModelSort( displayTagsStore )
+        displayTagsStoreSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+        tree = Gtk.TreeView( displayTagsStoreSort )
+        
+#         tree = Gtk.TreeView( displayTagsStore )
         tree.set_hexpand( True )
         tree.set_vexpand( True )
         tree.append_column( Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 ) )
+
+#         column = Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 )
+#         column.set_sort_column_id( 0 )
+#         tree.append_column( column )
+
+        
         tree.append_column( Gtk.TreeViewColumn( "Value", Gtk.CellRendererText(), text = 1 ) )
         tree.set_tooltip_text( "Double click to add a tag to the display pattern." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
@@ -836,7 +872,6 @@ class IndicatorLunar:
         hbox = Gtk.Box( spacing = 6 )
 
         starStore = Gtk.ListStore( str, bool ) # Star name, show/hide.
-        from ephem import stars
         for star in sorted( ephem.stars.stars ):
             starStore.append( [ star, star in self.stars ] )
 
@@ -847,7 +882,7 @@ class IndicatorLunar:
         tree.append_column( Gtk.TreeViewColumn( "Star", Gtk.CellRendererText(), text = 0 ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onStarToggled, starStore )
+        renderer_toggle.connect( "toggled", self.onStarToggled, starStore, displayTagsStore )
         tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 1 ) )
 
         tree.set_tooltip_text( "Check a star to display in the menu." )
@@ -860,7 +895,42 @@ class IndicatorLunar:
 
         notebook.append_page( grid, Gtk.Label( "Stars" ) )
 
-        # Notification settings.
+        # Satellite settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        hbox = Gtk.Box( spacing = 6 )
+
+        satelliteStore = Gtk.ListStore( str, bool ) # Satellite name, show/hide.
+        for tle in self.satelliteTLEData:
+            satelliteStore.append( [ tle.getTitle(), tle.getTitle() in self.satellites ] )
+
+        tree = Gtk.TreeView( satelliteStore )
+        tree.set_hexpand( True )
+        tree.set_vexpand( True )
+
+        tree.append_column( Gtk.TreeViewColumn( "Satellite", Gtk.CellRendererText(), text = 0 ) )
+
+        renderer_toggle = Gtk.CellRendererToggle()
+        renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore )
+        tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 1 ) )
+
+        tree.set_tooltip_text( "Check a satellite to display in the menu." )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( tree )
+        grid.attach( scrolledWindow, 0, 0, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "Satellites" ) )
+
+        # Full Moon notification settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -934,7 +1004,7 @@ class IndicatorLunar:
 
         showWerewolfWarningCheckbox.connect( "toggled", self.onShowWerewolfWarningCheckbox, test, test )
 
-        notebook.append_page( grid, Gtk.Label( "Notification" ) )
+        notebook.append_page( grid, Gtk.Label( "Full Moon" ) )
 
         # Location settings.
         grid = Gtk.Grid()
@@ -1040,7 +1110,8 @@ class IndicatorLunar:
 
 #
 #
-# TODO  Need to flush self.data of all star information.
+# TODO  Need to flush self.data of all star/satellite information.
+#Is this still needed given the toggle handler function which adds/removes this information?
 #
 #
             self.stars = [ ]
@@ -1095,8 +1166,45 @@ class IndicatorLunar:
         os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
 
 
-    def onStarToggled( self, widget, path, store ):
-        store[ path ][ 1 ] = not store[ path ][ 1 ]
+    def onStarToggled( self, widget, path, starStore, displayTagsStore ):
+        starStore[ path ][ 1 ] = not starStore[ path ][ 1 ]
+
+#TODO Strip the star tag from the display pattern field on uncheck of a star?
+
+        starName = starStore[ path ][ 0 ].upper()
+        if starStore[ path ][ 1 ]:
+            displayTagsStore.append( [ starName + " RIGHT ASCENSION", "(needs refresh)" ] )
+            displayTagsStore.append( [ starName + " DECLINATION", "(needs refresh)" ] )
+            displayTagsStore.append( [ starName + " AZIMUTH", "(needs refresh)" ] )
+            displayTagsStore.append( [ starName + " ALTITUDE", "(needs refresh)" ] )
+            displayTagsStore.append( [ starName + " MAGNITUDE", "(needs refresh)" ] )
+        else:
+            iter = displayTagsStore.get_iter_first()
+            while iter is not None:
+                if displayTagsStore[ iter ][ 0 ].startswith( starName ):
+                    if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
+                else:
+                    iter = displayTagsStore.iter_next( iter )
+
+
+    def onSatelliteToggled( self, widget, path, satelliteStore, displayTagsStore ):
+        satelliteStore[ path ][ 1 ] = not satelliteStore[ path ][ 1 ]
+
+#TODO Strip the satellite tag from the display pattern field on uncheck of a satellite?
+
+        satelliteName = satelliteStore[ path ][ 0 ].upper()
+        if satelliteStore[ path ][ 1 ]:
+            displayTagsStore.append( [ satelliteName + " RISE TIME", "(needs refresh)" ] )
+            displayTagsStore.append( [ satelliteName + " RISE AZIMUTH", "(needs refresh)" ] )
+            displayTagsStore.append( [ satelliteName + " SET TIME", "(needs refresh)" ] )
+            displayTagsStore.append( [ satelliteName + " SET AZIMUTH", "(needs refresh)" ] )
+        else:
+            iter = displayTagsStore.get_iter_first()
+            while iter is not None:
+                if displayTagsStore[ iter ][ 0 ].startswith( satelliteName ):
+                    if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
+                else:
+                    iter = displayTagsStore.iter_next( iter )
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
@@ -1150,17 +1258,24 @@ class IndicatorLunar:
 
 
     def getSatelliteTLEData( self ):
-        try:
-            self.satelliteTLEData = [ ]
-# TODO Uncomment            
+#         try:
+#             self.satelliteTLEData = [ ]
 #             data = urlopen( IndicatorLunar.SATELLITE_TLE_URL ).read().decode( "utf8" ).splitlines()
 #             for i in range( 0, len( data ), 3 ):
 #                 self.satelliteTLEData.append( tle.Info( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() ) )
+# 
+#         except Exception as e:
+#             self.satelliteTLEData = [ ] # Empty data indicates error.
+#             logging.exception( e )
+#             logging.error( "Unable to download " + IndicatorLunar.SATELLITE_TLE_URL )
 
-        except Exception as e:
-            self.satelliteTLEData = [ ] # Empty data indicates error.
-            logging.exception( e )
-            logging.error( "Unable to download " + IndicatorLunar.SATELLITE_TLE_URL )
+        
+        self.satelliteTLEData = [ ]
+        self.satelliteTLEData.append( tle.Info( 
+           "ISS (ZARYA)", 
+           "1 25544U 98067A   14144.25429147  .00013298  00000-0  23626-3 0  3470" ,
+           "2 25544  51.6479 218.2294 0003503  34.9920  27.7254 15.50515783887617" ) )
+
 
 
     def getDefaultCity( self ):
