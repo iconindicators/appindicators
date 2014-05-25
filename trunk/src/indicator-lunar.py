@@ -109,6 +109,7 @@ class IndicatorLunar:
     SETTINGS_CITY_LONGITUDE = "cityLongitude"
     SETTINGS_CITY_NAME = "cityName"
     SETTINGS_DISPLAY_PATTERN = "displayPattern"
+    SETTINGS_PLANETS = "planets"
     SETTINGS_SATELLITES = "satellites"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     SETTINGS_STARS = "stars"
@@ -143,7 +144,17 @@ class IndicatorLunar:
 
     SATELLITE_TEXT_SUMMARY = "                      ...is above the horizon!"
     SATELLITE_TLE_URL = "http://www.celestrak.com/NORAD/elements/stations.txt"
-            
+
+    PLANETS = [
+            [ "Mercury", ephem.Mercury() ],
+            [ "Venus", ephem.Venus() ],
+            [ "Mars", ephem.Mars() ],
+            [ "Jupiter", ephem.Jupiter() ],
+            [ "Saturn", ephem.Saturn() ],
+            [ "Uranus", ephem.Uranus() ],
+            [ "Neptune", ephem.Neptune() ],
+            [ "Pluto", ephem.Pluto() ] ]
+
 
     def __init__( self ):
         filehandler = logging.FileHandler( filename = IndicatorLunar.LOG, mode = "a", delay = True )
@@ -152,7 +163,15 @@ class IndicatorLunar:
                              handlers = [ filehandler ] )
 
         self.dialog = None
-        self.getSatelliteTLEData()
+
+#         self.getSatelliteTLEData()
+#TODO Remove after testing.        
+        self.satelliteTLEData = [ ]
+        self.satelliteTLEData.append( tle.Info( 
+           "ISS (ZARYA)", 
+           "1 25544U 98067A   14144.25429147  .00013298  00000-0  23626-3 0  3470" ,
+           "2 25544  51.6479 218.2294 0003503  34.9920  27.7254 15.50515783887617" ) )
+
         self.loadSettings()
 
         if notifyImported: Notify.init( IndicatorLunar.NAME )
@@ -248,28 +267,15 @@ class IndicatorLunar:
         self.createSunMenu( menu, city, nextUpdates, ephemNow )
         
         # Planets
-        menu.append( Gtk.MenuItem( "Planets" ) )
-#
-#
-#
-# TODO Consider converting the planet stuff into a similar form as the stars (as user can opt in/out on specific planets)???
-#
-#
-#
-        planets = [
-            [ "Mercury", ephem.Mercury( city ) ],
-            [ "Venus", ephem.Venus( city ) ],
-            [ "Mars", ephem.Mars( city ) ],
-            [ "Jupiter", ephem.Jupiter( city ) ],
-            [ "Saturn", ephem.Saturn( city ) ],
-            [ "Uranus", ephem.Uranus( city ) ],
-            [ "Neptune", ephem.Neptune( city ) ],
-            [ "Pluto", ephem.Pluto( city ) ] ]
+        if len( self.planets ) > 0:
+            menu.append( Gtk.MenuItem( "Planets" ) )
 
-        for planet in planets:
-            menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
-            menu.append( menuItem )
-            self.createBodyMenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
+            for planet in IndicatorLunar.PLANETS:
+                if planet[ 0 ] in self.planets:
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
+                    menu.append( menuItem )
+                    planet[ 1 ].compute( city )
+                    self.createBodyMenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
 
         self.createStarsMenu( menu, city )
 
@@ -462,8 +468,8 @@ class IndicatorLunar:
         nextUpdates.append( setting )
 
 
-    # NOTE: Does not make sense to show rise/set times for stars.
-    # Depending on the star and the city, some stars are always up or always down.
+    # The rise/set times for stars are not shown.
+    # Depending on the star and the city, some stars are always up or never up (particularly at high latitudes).
     def createStarsMenu( self, menu, city ):
         if len( self.stars ) == 0: return
 
@@ -525,7 +531,7 @@ class IndicatorLunar:
             foundSatellite = False
             for tle in self.satelliteTLEData:
                 if satelliteName == tle.getTitle():
-            
+
                     satelliteInfo = city.next_pass( ephem.readtle( tle.getTitle(), tle.getLine1(), tle.getLine2() ) )
         
                     subMenu.append( Gtk.MenuItem( "Rise" ) )
@@ -535,15 +541,7 @@ class IndicatorLunar:
         
                     self.data[ satelliteName + " RISE AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( satelliteInfo[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satelliteInfo[ 1 ] ) ) + ")"
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ satelliteName + " RISE AZIMUTH" ] ) )
-        
-#                     subMenu.append( Gtk.MenuItem( "Transit" ) )
-#         
-#                     self.data[ satelliteName + " TRANSIT TIME" ] =  self.localiseAndTrim( satelliteInfo[ 2 ] )
-#                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ satelliteName + " TRANSIT TIME" ] ) )
-#         
-#                     self.data[ satelliteName + " TRANSIT AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( satelliteInfo[ 3 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satelliteInfo[ 3 ] ) ) + ")"
-#                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ satelliteName + " TRANSIT AZIMUTH" ] ) )
-        
+
                     subMenu.append( Gtk.SeparatorMenuItem() )
 
                     subMenu.append( Gtk.MenuItem( "Set" ) )
@@ -560,6 +558,7 @@ class IndicatorLunar:
                     break
 
             if not foundSatellite:
+#TODO Need to distinguish between a failure to do a download and having a good download but no data for a particular satellite.
                 subMenu.append( Gtk.MenuItem( "No data!" ) )
 
 
@@ -838,20 +837,14 @@ class IndicatorLunar:
         displayTagsStoreSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
         tree = Gtk.TreeView( displayTagsStoreSort )
         
-#         tree = Gtk.TreeView( displayTagsStore )
         tree.set_hexpand( True )
         tree.set_vexpand( True )
         tree.append_column( Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 ) )
-
-#         column = Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 )
-#         column.set_sort_column_id( 0 )
-#         tree.append_column( column )
-
         
         tree.append_column( Gtk.TreeViewColumn( "Value", Gtk.CellRendererText(), text = 1 ) )
         tree.set_tooltip_text( "Double click to add a tag to the display pattern." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.connect( "row-activated", self.onTagDoubleClick, displayPattern )
+        tree.connect( "row-activated", self.onDisplayTagDoubleClick, displayPattern )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -859,6 +852,41 @@ class IndicatorLunar:
         grid.attach( scrolledWindow, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
+
+        # Planet settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        hbox = Gtk.Box( spacing = 6 )
+
+        planetStore = Gtk.ListStore( str, bool ) # Planet name, show/hide.
+        for planet in IndicatorLunar.PLANETS: # Don't sort, but keep "natural" order.
+            planetStore.append( [ planet[ 0 ], planet[ 0 ] in self.planets ] )
+
+        tree = Gtk.TreeView( planetStore )
+        tree.set_hexpand( True )
+        tree.set_vexpand( True )
+
+        tree.append_column( Gtk.TreeViewColumn( "Star", Gtk.CellRendererText(), text = 0 ) )
+
+        renderer_toggle = Gtk.CellRendererToggle()
+        renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, displayTagsStore )
+        tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 1 ) )
+
+        tree.set_tooltip_text( "Check a planet to display in the menu." )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( tree )
+        grid.attach( scrolledWindow, 0, 0, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "Planets" ) )
 
         # Star settings.
         grid = Gtk.Grid()
@@ -905,6 +933,9 @@ class IndicatorLunar:
         grid.set_margin_bottom( 10 )
 
         hbox = Gtk.Box( spacing = 6 )
+
+#TODO If there is no satellite TLE data, perhaps instead of the table put a label/message?
+# Have a refresh button...or perhaps do a refresh automatically if there is no data and the user clicks ok on the prefs?
 
         satelliteStore = Gtk.ListStore( str, bool ) # Satellite name, show/hide.
         for tle in self.satelliteTLEData:
@@ -1108,15 +1139,17 @@ class IndicatorLunar:
                 elevation.grab_focus()
                 continue
 
-#
-#
-# TODO  Need to flush self.data of all star/satellite information.
-#Is this still needed given the toggle handler function which adds/removes this information?
-#
-#
+            self.planets = [ ]
+            for planetInfo in planetStore:
+                if planetInfo[ 1 ]: self.planets.append( planetInfo[ 0 ] )
+
             self.stars = [ ]
             for starInfo in starStore:
                 if starInfo[ 1 ]: self.stars.append( starInfo[ 0 ] )
+
+            self.satellites = [ ]
+            for satelliteInfo in satelliteStore:
+                if satelliteInfo[ 1 ]: self.satellites.append( satelliteInfo[ 0 ] )
 
             self.displayPattern = displayPattern.get_text()
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
@@ -1149,7 +1182,7 @@ class IndicatorLunar:
         self.dialog = None
 
 
-    def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, displayPattern ):
+    def onDisplayTagDoubleClick( self, tree, rowNumber, treeViewColumn, displayPattern ):
         model, treeiter = tree.get_selection().get_selected()
         displayPattern.insert_text( "[" + model[ treeiter ][ 0 ] + "]", displayPattern.get_position() )
 
@@ -1164,6 +1197,28 @@ class IndicatorLunar:
             Notify.Notification.new( summary.get_text(), body.get_text(), IndicatorLunar.SVG_FULL_MOON_FILE ).show()
 
         os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
+
+
+    def onPlanetToggled( self, widget, path, planetStore, displayTagsStore ):
+        planetStore[ path ][ 1 ] = not planetStore[ path ][ 1 ]
+
+#TODO Strip the plenet tag from the display pattern field on uncheck of a plenet?
+
+        planetName = planetStore[ path ][ 0 ].upper()
+        if planetStore[ path ][ 1 ]:
+#TODO Sort these...which ones apply for planets?
+            displayTagsStore.append( [ planetName + " RIGHT ASCENSION", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " DECLINATION", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " AZIMUTH", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " ALTITUDE", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " MAGNITUDE", "(needs refresh)" ] )
+        else:
+            iter = displayTagsStore.get_iter_first()
+            while iter is not None:
+                if displayTagsStore[ iter ][ 0 ].startswith( planetName ):
+                    if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
+                else:
+                    iter = displayTagsStore.iter_next( iter )
 
 
     def onStarToggled( self, widget, path, starStore, displayTagsStore ):
@@ -1221,9 +1276,23 @@ class IndicatorLunar:
         widget2.set_sensitive( source.get_active() )
 
 
+    def getSatelliteTLEData( self ):
+        try:
+            self.satelliteTLEData = [ ]
+            data = urlopen( IndicatorLunar.SATELLITE_TLE_URL ).read().decode( "utf8" ).splitlines()
+            for i in range( 0, len( data ), 3 ):
+                self.satelliteTLEData.append( tle.Info( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() ) )
+  
+        except Exception as e:
+            self.satelliteTLEData = [ ] # Empty data indicates error.
+            logging.exception( e )
+            logging.error( "Error downloading from " + IndicatorLunar.SATELLITE_TLE_URL )
+
+
     def loadSettings( self ):
         self.getDefaultCity()
         self.displayPattern = IndicatorLunar.DISPLAY_PATTERN_DEFAULT
+        self.planets = [ ]
         self.satellites = [ ]
         self.showWerewolfWarning = True
         self.stars = [ ]
@@ -1242,6 +1311,7 @@ class IndicatorLunar:
                 cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
                 self.displayPattern = settings.get( IndicatorLunar.SETTINGS_DISPLAY_PATTERN, self.displayPattern )
+                self.satellites = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
                 self.satellites = settings.get( IndicatorLunar.SETTINGS_SATELLITES, self.satellites )
                 self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
                 self.stars = settings.get( IndicatorLunar.SETTINGS_STARS, self.stars )
@@ -1255,27 +1325,6 @@ class IndicatorLunar:
             except Exception as e:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorLunar.SETTINGS_FILE )
-
-
-    def getSatelliteTLEData( self ):
-#         try:
-#             self.satelliteTLEData = [ ]
-#             data = urlopen( IndicatorLunar.SATELLITE_TLE_URL ).read().decode( "utf8" ).splitlines()
-#             for i in range( 0, len( data ), 3 ):
-#                 self.satelliteTLEData.append( tle.Info( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() ) )
-# 
-#         except Exception as e:
-#             self.satelliteTLEData = [ ] # Empty data indicates error.
-#             logging.exception( e )
-#             logging.error( "Unable to download " + IndicatorLunar.SATELLITE_TLE_URL )
-
-        
-        self.satelliteTLEData = [ ]
-        self.satelliteTLEData.append( tle.Info( 
-           "ISS (ZARYA)", 
-           "1 25544U 98067A   14144.25429147  .00013298  00000-0  23626-3 0  3470" ,
-           "2 25544  51.6479 218.2294 0003503  34.9920  27.7254 15.50515783887617" ) )
-
 
 
     def getDefaultCity( self ):
@@ -1306,6 +1355,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
                 IndicatorLunar.SETTINGS_DISPLAY_PATTERN: self.displayPattern,
+                IndicatorLunar.SETTINGS_PLANETS: self.planets,
                 IndicatorLunar.SETTINGS_SATELLITES: self.satellites,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
                 IndicatorLunar.SETTINGS_STARS: self.stars,
