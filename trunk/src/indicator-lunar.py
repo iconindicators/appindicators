@@ -25,23 +25,6 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
-#
-# TODO Let the user test the notification for satellites?  Allow the user to configure the text?  
-#Maybe just the body text (over the horizon) as the summary is the satellite name.
-#Maybe not at all...just a checkbox on the satellite tab enable/disable the notifications.
-#Maybe not even an option to enable/disable the notifications...just show them?
-
-
-#
-#TODO What happens when the satellite list cannot be retrieved?
-# Allow the user to hit a refresh button?
-# What to show in the preferences list?
-# What to show in the indicator for satellites - if I have ISS but no data, show ISS and an error message?
-
-
-
-
-
 try: from gi.repository import AppIndicator3 as appindicator
 except: pass
 
@@ -79,12 +62,13 @@ class IndicatorLunar:
     SVG_ICON = "." + NAME + "-illumination-icon"
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
     SVG_FULL_MOON_FILE = os.getenv( "HOME" ) + "/" + "." + NAME + "-fullmoon-icon" + ".svg"
+    SVG_SATELLITE_ICON = NAME + "-satellite"
 
     COMMENTS = "Displays the moon phase and other astronomical information."
     CREDIT_BRIGHT_LIMB = "Bright Limb from 'Astronomical Algorithms' by Jean Meeus."
     CREDIT_ECLIPSE = "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov"
     CREDIT_PYEPHEM = "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem"
-    CREDIT_SATELLITE = "Satellite TLE by Dr T S Kelso. http://www.celestrak.com"
+    CREDIT_SATELLITE = "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com"
     CREDIT_TROPICAL_SIGN = "Tropical Sign by Ignius Drake."
     CREDITS = [ CREDIT_PYEPHEM, CREDIT_ECLIPSE, CREDIT_TROPICAL_SIGN, CREDIT_BRIGHT_LIMB, CREDIT_SATELLITE ]
 
@@ -98,6 +82,7 @@ class IndicatorLunar:
     SETTINGS_DISPLAY_PATTERN = "displayPattern"
     SETTINGS_PLANETS = "planets"
     SETTINGS_SATELLITES = "satellites"
+    SETTINGS_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     SETTINGS_STARS = "stars"
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
@@ -150,15 +135,7 @@ class IndicatorLunar:
                              handlers = [ filehandler ] )
 
         self.dialog = None
-
-#         self.getSatelliteTLEData()
-#TODO Remove after testing.        
-        self.satelliteTLEData = [ ]
-        self.satelliteTLEData.append( tle.Info( 
-           "ISS (ZARYA)", 
-           "1 25544U 98067A   14144.25429147  .00013298  00000-0  23626-3 0  3470" ,
-           "2 25544  51.6479 218.2294 0003503  34.9920  27.7254 15.50515783887617" ) )
-
+        self.getSatelliteTLEData()
         self.loadSettings()
 
         if notifyImported: Notify.init( IndicatorLunar.NAME )
@@ -188,6 +165,9 @@ class IndicatorLunar:
 
 
     def update( self ):
+        # Automatically update the satellite TLE data at most every 12 hours.
+        if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ): self.getSatelliteTLEData() 
+
         self.data = { } # Reset each run, otherwise data will accumulate (if a star/satellite was added then removed, the computed data remains).
         ephemNow = ephem.now() # This is UTC used in all calculations.  When it comes time to display, convert to local time.
 
@@ -218,7 +198,7 @@ class IndicatorLunar:
             self.statusicon.set_from_file( IndicatorLunar.SVG_FILE )
             self.statusicon.set_tooltip_text( parsedOutput )
 
-        # Show the full moon notification if appropriate...
+        # Determine if the full moon notification should be displayed...
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
@@ -236,6 +216,12 @@ class IndicatorLunar:
                 summary = " "
 
             Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
+
+        # Determine if the satellite notification should be displayed...
+        if notifyImported and self.showSatelliteNotification and self.satelliteName is not None:
+#TODO Work out how/when/if to show the notification and for which satellite!            
+            Notify.Notification.new( self.satelliteName, IndicatorLunar.SATELLITE_TEXT_SUMMARY, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+
 
 
     def buildMenu( self, city, ephemNow, lunarPhase ):
@@ -476,35 +462,17 @@ class IndicatorLunar:
             self.createRADecAzAltMagMenu( subMenu, star )
 
 
-    # Uses NORAD (http://celestrak.com/NORAD/elements) TLE information with PyEphem to compute satellite rise/transit/set times.
-    # Alternate sources:
+    # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/transit/set times.
+    # Other sources/background:
     #   http://spotthestation.nasa.gov/sightings
     #   http://www.n2yo.com/passes/?s=25544
     #   http://www.heavens-above.com/
     def createSatellitesMenu( self, menu, city, nextUpdates ):
-#TODO Need to handle empty tle data.  Maybe put a message in the indicator...or in the preferences or as a notification?
-#TODO Maybe wrap this method in try/catch...if bad data came back, don't want the whole indicator to fall over.
-#TODO Only refresh the NORAD/tle data every 12 hours...check the site to see how often it changes.
-        
-#  "satellites": ["ISS (ZARYA)"]
- 
-         
-# 2014 May 24 (Day 144)
-# ISS (ZARYA)             
-# 1 25544U 98067A   14144.25429147  .00013298  00000-0  23626-3 0  3470
-# 2 25544  51.6479 218.2294 0003503  34.9920  27.7254 15.50515783887617
+        self.satelliteName = None  #TODO Needs a description...!
 
-# 2014 May 25 (Day 145)
-# ISS (ZARYA)             
-# 1 25544U 98067A   14144.71997774  .00013074  00000-0  23233-3 0  3518
-# 2 25544  51.6481 215.9209 0003422  37.9944 105.8398 15.50527264887680
-        
-        
         if len( self.satellites ) == 0: return
 
-        if len( self.satelliteTLEData ) == 0:
-#TODO Tell user there was a download error...how can the user force a refresh?
-            return
+        if len( self.satelliteTLEData ) == 0: return # No point adding "non information" to the menu.  The preferences will tell the user there is a problem.
 
         menuItem = Gtk.MenuItem( "Satellites" )
         menu.append( menuItem )
@@ -521,32 +489,31 @@ class IndicatorLunar:
                 if satelliteName == tle.getTitle():
 
                     satelliteInfo = city.next_pass( ephem.readtle( tle.getTitle(), tle.getLine1(), tle.getLine2() ) )
-        
+
                     subMenu.append( Gtk.MenuItem( "Rise" ) )
-        
+
                     self.data[ satelliteName + " RISE TIME" ] =  self.localiseAndTrim( satelliteInfo[ 0 ] )
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ satelliteName + " RISE TIME" ] ) )
-        
+
                     self.data[ satelliteName + " RISE AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( satelliteInfo[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satelliteInfo[ 1 ] ) ) + ")"
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ satelliteName + " RISE AZIMUTH" ] ) )
 
                     subMenu.append( Gtk.SeparatorMenuItem() )
 
                     subMenu.append( Gtk.MenuItem( "Set" ) )
-        
+
                     self.data[ satelliteName + " SET TIME" ] =  self.localiseAndTrim( satelliteInfo[ 4 ] )
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ satelliteName + " SET TIME" ] ) )
-        
+
                     self.data[ satelliteName + " SET AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( satelliteInfo[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satelliteInfo[ 5 ] ) ) + ")"
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ satelliteName + " SET AZIMUTH" ] ) )
-        
+
                     nextUpdates.append( satelliteInfo[ 4 ] ) # Only do an update after the satellite has set.
 
                     foundSatellite = True
                     break
 
             if not foundSatellite:
-#TODO Need to distinguish between a failure to do a download and having a good download but no data for a particular satellite.
                 subMenu.append( Gtk.MenuItem( "No data!" ) )
 
 
@@ -853,7 +820,7 @@ class IndicatorLunar:
         hbox = Gtk.Box( spacing = 6 )
 
         planetStore = Gtk.ListStore( str, bool ) # Planet name, show/hide.
-        for planet in IndicatorLunar.PLANETS: # Don't sort, but keep "natural" order.
+        for planet in IndicatorLunar.PLANETS: # Don't sort, rather keep the natural order.
             planetStore.append( [ planet[ 0 ], planet[ 0 ] in self.planets ] )
 
         tree = Gtk.TreeView( planetStore )
@@ -922,30 +889,40 @@ class IndicatorLunar:
 
         hbox = Gtk.Box( spacing = 6 )
 
-#TODO If there is no satellite TLE data, perhaps instead of the table put a label/message?
-# Have a refresh button...or perhaps do a refresh automatically if there is no data and the user clicks ok on the prefs?
-
-        satelliteStore = Gtk.ListStore( str, bool ) # Satellite name, show/hide.
-        for tle in self.satelliteTLEData:
-            satelliteStore.append( [ tle.getTitle(), tle.getTitle() in self.satellites ] )
-
-        tree = Gtk.TreeView( satelliteStore )
-        tree.set_hexpand( True )
-        tree.set_vexpand( True )
-
-        tree.append_column( Gtk.TreeViewColumn( "Satellite", Gtk.CellRendererText(), text = 0 ) )
-
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore )
-        tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 1 ) )
-
-        tree.set_tooltip_text( "Check a satellite to display in the menu." )
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( tree )
-        grid.attach( scrolledWindow, 0, 0, 1, 1 )
+        if len( self.satelliteTLEData ) == 0:
+            # Error downloading data.
+            label = Gtk.Label()
+            label.set_markup( "Unable to download the satellite data!\nCheck that <a href=\'" + IndicatorLunar.SATELLITE_TLE_URL + "'>" + IndicatorLunar.SATELLITE_TLE_URL + "</a> is available.\n" )
+            label.set_margin_left( 25 )
+            label.set_halign( Gtk.Align.START )
+            grid.attach( label, 0, 0, 1, 1 )
+        else:
+            showSatelliteNotificationCheckbox = Gtk.CheckButton( "Satellite notification" )
+            showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
+            showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon (may not be visible)" )
+            grid.attach( showSatelliteNotificationCheckbox, 0, 0, 1, 1 )
+    
+            satelliteStore = Gtk.ListStore( str, bool ) # Satellite name, show/hide.
+            for tle in self.satelliteTLEData:
+                satelliteStore.append( [ tle.getTitle(), tle.getTitle() in self.satellites ] )
+    
+            tree = Gtk.TreeView( satelliteStore )
+            tree.set_hexpand( True )
+            tree.set_vexpand( True )
+    
+            tree.append_column( Gtk.TreeViewColumn( "Satellite", Gtk.CellRendererText(), text = 0 ) )
+    
+            renderer_toggle = Gtk.CellRendererToggle()
+            renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore )
+            tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 1 ) )
+    
+            tree.set_tooltip_text( "Check a satellite to display in the menu." )
+            tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+    
+            scrolledWindow = Gtk.ScrolledWindow()
+            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+            scrolledWindow.add( tree )
+            grid.attach( scrolledWindow, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Satellites" ) )
 
@@ -1135,9 +1112,16 @@ class IndicatorLunar:
             for starInfo in starStore:
                 if starInfo[ 1 ]: self.stars.append( starInfo[ 0 ] )
 
-            self.satellites = [ ]
-            for satelliteInfo in satelliteStore:
-                if satelliteInfo[ 1 ]: self.satellites.append( satelliteInfo[ 0 ] )
+            if len( self.satelliteTLEData ) == 0:
+                # No satellite TLE data exists (due to a download error).
+                # Fudge the last update to be in the past to force a download.
+                # Don't initialise the list of satellites the user has chosen as this data is still valid despite a failed download.
+                self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 )
+            else:
+                self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
+                self.satellites = [ ]
+                for satelliteInfo in satelliteStore:
+                    if satelliteInfo[ 1 ]: self.satellites.append( satelliteInfo[ 0 ] )
 
             self.displayPattern = displayPattern.get_text()
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
@@ -1186,19 +1170,24 @@ class IndicatorLunar:
 
         os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
 
-
+#
 #TODO Strip the plenet tag from the display pattern field on uncheck of a plenet?
+#Maybe strip when the user clicks OK?
+#Maybe leave it....lets the user see there is a "mistake" and they can fix it.
+#
     def onPlanetToggled( self, widget, path, planetStore, displayTagsStore ):
         planetStore[ path ][ 1 ] = not planetStore[ path ][ 1 ]
         planetName = planetStore[ path ][ 0 ].upper()
 
         if planetStore[ path ][ 1 ]:
-#TODO Sort these...which ones apply for planets?
-            displayTagsStore.append( [ planetName + " RIGHT ASCENSION", "(needs refresh)" ] )
-            displayTagsStore.append( [ planetName + " DECLINATION", "(needs refresh)" ] )
-            displayTagsStore.append( [ planetName + " AZIMUTH", "(needs refresh)" ] )
-            displayTagsStore.append( [ planetName + " ALTITUDE", "(needs refresh)" ] )
-            displayTagsStore.append( [ planetName + " MAGNITUDE", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " ILLUMINATION", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " CONSTELLATION", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " TROPICAL SIGN", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " DISTANCE TO EARTH", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " DISTANCE TO SUN", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " BRIGHT LIMB", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " RISING", "(needs refresh)" ] )
+            displayTagsStore.append( [ planetName + " SETTING", "(needs refresh)" ] )
         else:
             iter = displayTagsStore.get_iter_first()
             while iter is not None:
@@ -1207,8 +1196,9 @@ class IndicatorLunar:
                 else:
                     iter = displayTagsStore.iter_next( iter )
 
-
+#
 #TODO Strip the star tag from the display pattern field on uncheck of a star?
+#
     def onStarToggled( self, widget, path, starStore, displayTagsStore ):
         starStore[ path ][ 1 ] = not starStore[ path ][ 1 ]
         starName = starStore[ path ][ 0 ].upper()
@@ -1227,8 +1217,10 @@ class IndicatorLunar:
                 else:
                     iter = displayTagsStore.iter_next( iter )
 
+#
 
 #TODO Strip the satellite tag from the display pattern field on uncheck of a satellite?
+#
     def onSatelliteToggled( self, widget, path, satelliteStore, displayTagsStore ):
         satelliteStore[ path ][ 1 ] = not satelliteStore[ path ][ 1 ]
         satelliteName = satelliteStore[ path ][ 0 ].upper()
@@ -1262,16 +1254,29 @@ class IndicatorLunar:
 
 
     def getSatelliteTLEData( self ):
+        print(datetime.datetime.now())
+#TODO Remove after testing.
+#        
+#         self.satelliteTLEData = [ ]
+#         self.satelliteTLEData.append( tle.Info( 
+#            "ISS (ZARYA)", 
+#            "1 25544U 98067A   14144.25429147  .00013298  00000-0  23626-3 0  3470" ,
+#            "2 25544  51.6479 218.2294 0003503  34.9920  27.7254 15.50515783887617" ) )
+#         self.lastUpdateTLE = datetime.datetime.now()
+#         if True: return
+
         try:
             self.satelliteTLEData = [ ]
             data = urlopen( IndicatorLunar.SATELLITE_TLE_URL ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ), 3 ):
                 self.satelliteTLEData.append( tle.Info( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() ) )
-  
+
         except Exception as e:
             self.satelliteTLEData = [ ] # Empty data indicates error.
             logging.exception( e )
-            logging.error( "Error downloading from " + IndicatorLunar.SATELLITE_TLE_URL )
+            logging.error( "Error downloading satellite TLE data from " + IndicatorLunar.SATELLITE_TLE_URL )
+
+        self.lastUpdateTLE = datetime.datetime.now()
 
 
     def getDefaultCity( self ):
@@ -1290,7 +1295,7 @@ class IndicatorLunar:
 
         except Exception as e:
             logging.exception( e )
-            logging.error( "Error getting default cityName." )
+            logging.error( "Error getting default city." )
             self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
 
 
@@ -1298,12 +1303,14 @@ class IndicatorLunar:
         self.getDefaultCity()
         self.displayPattern = IndicatorLunar.DISPLAY_PATTERN_DEFAULT
         self.satellites = [ ]
+        self.showSatelliteNotification = True
         self.showWerewolfWarning = True
         self.stars = [ ]
         self.werewolfWarningStartIlluminationPercentage = 100
         self.werewolfWarningTextBody = IndicatorLunar.WEREWOLF_WARNING_TEXT_BODY
         self.werewolfWarningTextSummary = IndicatorLunar.WEREWOLF_WARNING_TEXT_SUMMARY
 
+        # By default, all planets should be displayed, unless the user chooses otherwise.
         self.planets = [ ]
         for planet in IndicatorLunar.PLANETS:
             self.planets.append( planet[ 0 ] )
@@ -1319,8 +1326,9 @@ class IndicatorLunar:
                 cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
                 self.displayPattern = settings.get( IndicatorLunar.SETTINGS_DISPLAY_PATTERN, self.displayPattern )
-                self.satellites = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
+                self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
                 self.satellites = settings.get( IndicatorLunar.SETTINGS_SATELLITES, self.satellites )
+                self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
                 self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
                 self.stars = settings.get( IndicatorLunar.SETTINGS_STARS, self.stars )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
@@ -1345,6 +1353,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_DISPLAY_PATTERN: self.displayPattern,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
                 IndicatorLunar.SETTINGS_SATELLITES: self.satellites,
+                IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
                 IndicatorLunar.SETTINGS_STARS: self.stars,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
