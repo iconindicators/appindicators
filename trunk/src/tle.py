@@ -27,14 +27,17 @@ class Info:
         self.line2 = line2
 
 
-    def getTitle( self ): return self.title
+    def getName( self ): return self.title
 
 
     def getLine1( self ): return self.line1
 
 
     def getLine2( self ): return self.line2
-    
+
+
+    def getNumber( self ): return self.line1[ 2 : 7 ]
+
 
     def __str__( self ): return str( self.title ) + " | " + str( self.line1 ) + " | " + str( self.line2 )
 
