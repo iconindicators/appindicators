@@ -1,8 +1,7 @@
 indicator-lunar (1.0.42-1) precise; urgency=low
 
-  * Fixed a bug where the star data was not being removed after a star was
-    unchecked.
-  * User can now choose which planets, if any, to display in the menu.
+  * Star data was not being removed after a star was unchecked - Fixed.
+  * Planets can now be chosen by the user (for display in the menu).
   * Added URLs to credits section in About dialog.
   * Added satellite/station lookup - requires intermittent internet access.
   
