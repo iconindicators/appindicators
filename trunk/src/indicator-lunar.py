@@ -26,20 +26,6 @@
 
 
 #
-#
-#  TODO   If a star is checked/unchecked, the change in the list of items for display (first tab)
-#         won't be updated until the OK is pressed and then the preferences reopened.
-#         Can the display tab be watched for a click event or maybe when something is checked an event could then change the display list?
-#
-#         What happens if a star is added, then ok, then add that star info to the display, then ok, then remove the star...what happens to the display info?
-#         Maybe check the display info on ok and strip unknown tags?
-#
-#         Would an apply button help?  If you apply then cancel changes are dropped.  
-#
-#
-
-
-#
 # TODO Let the user test the notification for satellites?  Allow the user to configure the text?  
 #Maybe just the body text (over the horizon) as the summary is the satellite name.
 #Maybe not at all...just a checkbox on the satellite tab enable/disable the notifications.
@@ -94,12 +80,13 @@ class IndicatorLunar:
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
     SVG_FULL_MOON_FILE = os.getenv( "HOME" ) + "/" + "." + NAME + "-fullmoon-icon" + ".svg"
 
-    COMMENTS = "Shows the moon phase and other astronomical information."
+    COMMENTS = "Displays the moon phase and other astronomical information."
     CREDIT_BRIGHT_LIMB = "Bright Limb from 'Astronomical Algorithms' by Jean Meeus."
-    CREDIT_ECLIPSE = "Eclipse information by Fred Espenak and Jean Meeus."
-    CREDIT_PYEPHEM = "Calculations courtesy of PyEphem/XEphem."
+    CREDIT_ECLIPSE = "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov"
+    CREDIT_PYEPHEM = "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem"
+    CREDIT_SATELLITE = "Satellite TLE by Dr T S Kelso. http://www.celestrak.com"
     CREDIT_TROPICAL_SIGN = "Tropical Sign by Ignius Drake."
-    CREDITS = [ CREDIT_PYEPHEM, CREDIT_ECLIPSE, CREDIT_TROPICAL_SIGN, CREDIT_BRIGHT_LIMB ]
+    CREDITS = [ CREDIT_PYEPHEM, CREDIT_ECLIPSE, CREDIT_TROPICAL_SIGN, CREDIT_BRIGHT_LIMB, CREDIT_SATELLITE ]
 
     INDENT = "    "
 
@@ -468,8 +455,8 @@ class IndicatorLunar:
         nextUpdates.append( setting )
 
 
-    # The rise/set times for stars are not shown.
-    # Depending on the star and the city, some stars are always up or never up (particularly at high latitudes).
+    # The rise/set times for stars are not included in the display.
+    # Depending on the star/city combination, some stars are always up or never up (particularly at high latitudes).
     def createStarsMenu( self, menu, city ):
         if len( self.stars ) == 0: return
 
@@ -491,8 +478,9 @@ class IndicatorLunar:
 
     # Uses NORAD (http://celestrak.com/NORAD/elements) TLE information with PyEphem to compute satellite rise/transit/set times.
     # Alternate sources:
-    #     http://spotthestation.nasa.gov/sightings
-    #     http://www.n2yo.com/passes/?s=25544
+    #   http://spotthestation.nasa.gov/sightings
+    #   http://www.n2yo.com/passes/?s=25544
+    #   http://www.heavens-above.com/
     def createSatellitesMenu( self, menu, city, nextUpdates ):
 #TODO Need to handle empty tle data.  Maybe put a message in the indicator...or in the preferences or as a notification?
 #TODO Maybe wrap this method in try/catch...if bad data came back, don't want the whole indicator to fall over.
@@ -1199,12 +1187,11 @@ class IndicatorLunar:
         os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
 
 
+#TODO Strip the plenet tag from the display pattern field on uncheck of a plenet?
     def onPlanetToggled( self, widget, path, planetStore, displayTagsStore ):
         planetStore[ path ][ 1 ] = not planetStore[ path ][ 1 ]
-
-#TODO Strip the plenet tag from the display pattern field on uncheck of a plenet?
-
         planetName = planetStore[ path ][ 0 ].upper()
+
         if planetStore[ path ][ 1 ]:
 #TODO Sort these...which ones apply for planets?
             displayTagsStore.append( [ planetName + " RIGHT ASCENSION", "(needs refresh)" ] )
@@ -1221,12 +1208,11 @@ class IndicatorLunar:
                     iter = displayTagsStore.iter_next( iter )
 
 
+#TODO Strip the star tag from the display pattern field on uncheck of a star?
     def onStarToggled( self, widget, path, starStore, displayTagsStore ):
         starStore[ path ][ 1 ] = not starStore[ path ][ 1 ]
-
-#TODO Strip the star tag from the display pattern field on uncheck of a star?
-
         starName = starStore[ path ][ 0 ].upper()
+
         if starStore[ path ][ 1 ]:
             displayTagsStore.append( [ starName + " RIGHT ASCENSION", "(needs refresh)" ] )
             displayTagsStore.append( [ starName + " DECLINATION", "(needs refresh)" ] )
@@ -1242,12 +1228,11 @@ class IndicatorLunar:
                     iter = displayTagsStore.iter_next( iter )
 
 
+#TODO Strip the satellite tag from the display pattern field on uncheck of a satellite?
     def onSatelliteToggled( self, widget, path, satelliteStore, displayTagsStore ):
         satelliteStore[ path ][ 1 ] = not satelliteStore[ path ][ 1 ]
-
-#TODO Strip the satellite tag from the display pattern field on uncheck of a satellite?
-
         satelliteName = satelliteStore[ path ][ 0 ].upper()
+
         if satelliteStore[ path ][ 1 ]:
             displayTagsStore.append( [ satelliteName + " RISE TIME", "(needs refresh)" ] )
             displayTagsStore.append( [ satelliteName + " RISE AZIMUTH", "(needs refresh)" ] )
@@ -1289,6 +1274,26 @@ class IndicatorLunar:
             logging.error( "Error downloading from " + IndicatorLunar.SATELLITE_TLE_URL )
 
 
+    def getDefaultCity( self ):
+        try:
+            p = subprocess.Popen( "cat /etc/timezone", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+            timezone = p.communicate()[ 0 ].decode()
+            self.cityName = None
+            global _city_data
+            for city in _city_data.keys():
+                if city in timezone:
+                    self.cityName = city
+                    break
+
+            if self.cityName is None or self.cityName == "":
+                self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error getting default cityName." )
+            self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
+
+
     def loadSettings( self ):
         self.getDefaultCity()
         self.displayPattern = IndicatorLunar.DISPLAY_PATTERN_DEFAULT
@@ -1328,26 +1333,6 @@ class IndicatorLunar:
             except Exception as e:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorLunar.SETTINGS_FILE )
-
-
-    def getDefaultCity( self ):
-        try:
-            p = subprocess.Popen( "cat /etc/timezone", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-            timezone = p.communicate()[ 0 ].decode()
-            self.cityName = None
-            global _city_data
-            for city in _city_data.keys():
-                if city in timezone:
-                    self.cityName = city
-                    break
-
-            if self.cityName is None or self.cityName == "":
-                self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error getting default cityName." )
-            self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
 
 
     def saveSettings( self ):
