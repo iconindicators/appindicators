@@ -119,14 +119,14 @@ class IndicatorLunar:
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
     PLANETS = [
-            [ "Mercury", ephem.Mercury() ],
-            [ "Venus", ephem.Venus() ],
-            [ "Mars", ephem.Mars() ],
-            [ "Jupiter", ephem.Jupiter() ],
-            [ "Saturn", ephem.Saturn() ],
-            [ "Uranus", ephem.Uranus() ],
-            [ "Neptune", ephem.Neptune() ],
-            [ "Pluto", ephem.Pluto() ] ]
+        [ "Mercury", ephem.Mercury() ],
+        [ "Venus", ephem.Venus() ],
+        [ "Mars", ephem.Mars() ],
+        [ "Jupiter", ephem.Jupiter() ],
+        [ "Saturn", ephem.Saturn() ],
+        [ "Uranus", ephem.Uranus() ],
+        [ "Neptune", ephem.Neptune() ],
+        [ "Pluto", ephem.Pluto() ] ]
 
 
     def __init__( self ):
@@ -304,8 +304,8 @@ class IndicatorLunar:
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
 
-        # Determine which phases occur by date rather than using the phase calculated since the phase (illumination) rounds numbers
-        # and so we enter a phase earlier than what is official.
+        # Determine which phases occur by date rather than using the phase calculated
+        # as the phase (illumination) rounds numbers and so a given phase is entered earlier than what is official.
         nextPhases = [ ]
 
         self.data[ "MOON FIRST QUARTER" ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
@@ -329,6 +329,7 @@ class IndicatorLunar:
         nextUpdates.append( ephem.next_last_quarter_moon( ephemNow ) )
         nextUpdates.append( ephem.next_new_moon( ephemNow ) )
 
+        # Eclipse.
         eclipseInformation = eclipse.getLunarEclipseForUTC( ephemNow.datetime() )
         if eclipseInformation is not None:
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
@@ -359,6 +360,7 @@ class IndicatorLunar:
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
+        # Rising/Setting.
         rising = city.next_rising( sun )
         self.data[ "SUN NEXT RISING" ] = self.localiseAndTrim( rising )
         setting = city.next_setting( sun )
@@ -375,7 +377,7 @@ class IndicatorLunar:
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
-        # Solstice/Equinox
+        # Solstice/Equinox.
         equinox = ephem.next_equinox( ephemNow )
         self.data[ "SUN EQUINOX" ] = self.localiseAndTrim( equinox )
         solstice = ephem.next_solstice( ephemNow )
@@ -390,6 +392,7 @@ class IndicatorLunar:
         nextUpdates.append( equinox )
         nextUpdates.append( solstice )
 
+        # Eclipse.
         eclipseInformation = eclipse.getSolarEclipseForUTC( ephemNow.datetime() )
         if eclipseInformation is not None:
             subMenu.append( Gtk.SeparatorMenuItem() )
@@ -500,7 +503,7 @@ class IndicatorLunar:
                     self.data[ tag + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ tag + " RISE TIME" ] ) )
 
-                    self.data[ tag + " RISE AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+                    self.data[ tag + " RISE AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ tag + " RISE AZIMUTH" ] ) )
 
                     subMenu.append( Gtk.SeparatorMenuItem() )
@@ -510,7 +513,7 @@ class IndicatorLunar:
                     self.data[ tag + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ tag + " SET TIME" ] ) )
 
-                    self.data[ tag + " SET AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+                    self.data[ tag + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ tag + " SET AZIMUTH" ] ) )
 
                     nextUpdates.append( nextPass[ 4 ] ) # Only do an update after the satelliteInfo has set.
@@ -537,21 +540,22 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + eclipse[ 1 ] ) )
 
 
+    # Compute the right ascension, declination, azimuth, altitude and magnitude for a body.
     def createRADecAzAltMagMenu( self, menu, body ):
-        self.data[ body.name.upper() + " RIGHT ASCENSION" ] = str( round( self.convertHMSToDecimalDegrees( body.g_ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.g_ra ) ) + ")"
+        self.data[ body.name.upper() + " RIGHT ASCENSION" ] = str( round( self.convertHoursMinutesSecondsToDecimalDegrees( body.g_ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.g_ra ) ) + ")"
         menu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ body.name.upper() + " RIGHT ASCENSION" ] ) )
 
         direction = "N"
         if body.g_dec < 0.0:
             direction = "S"
 
-        self.data[ body.name.upper() + " DECLINATION" ] = str( abs( round( self.convertDMSToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.g_dec ) ) + ")"
+        self.data[ body.name.upper() + " DECLINATION" ] = str( abs( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.g_dec ) ) + ")"
         menu.append( Gtk.MenuItem( "Declination: " + self.data[ body.name.upper() + " DECLINATION" ] ) )
 
-        self.data[ body.name.upper() + " AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
+        self.data[ body.name.upper() + " AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
         menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ body.name.upper() + " AZIMUTH" ] ) )
 
-        self.data[ body.name.upper() + " ALTITUDE" ] = str( round( self.convertDMSToDecimalDegrees( body.alt ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
+        self.data[ body.name.upper() + " ALTITUDE" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.alt ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
         menu.append( Gtk.MenuItem( "Altitude: " + self.data[ body.name.upper() + " ALTITUDE" ] ) )
 
         self.data[ body.name.upper() + " MAGNITUDE" ] = str( body.mag )
@@ -559,8 +563,8 @@ class IndicatorLunar:
 
 
     # Takes a float and converts to local time, trims off fractional seconds and returns a string.
-    def localiseAndTrim( self, value ):
-        localtimeString = str( ephem.localtime( value ) )
+    def localiseAndTrim( self, pyEphemDateTime ):
+        localtimeString = str( ephem.localtime( pyEphemDateTime ) )
         return localtimeString[ 0 : localtimeString.rfind( ":" ) + 3 ]
 
 
@@ -645,18 +649,18 @@ class IndicatorLunar:
         sun = ephem.Sun( city )
 
         # Using the Apparent Geocentric Position as this is closest to the Meeus example 25.a for RA/Dec.
-        sunRA = math.radians( self.convertHMSToDecimalDegrees( sun.g_ra ) )
-        sunDec = math.radians( self.convertDMSToDecimalDegrees( sun.g_dec ) )
-        bodyRA = math.radians( self.convertHMSToDecimalDegrees( body.g_ra ) )
-        bodyDec = math.radians( self.convertDMSToDecimalDegrees( body.g_dec ) )
+        sunRA = math.radians( self.convertHoursMinutesSecondsToDecimalDegrees( sun.g_ra ) )
+        sunDec = math.radians( self.convertDegreesMinutesSecondsToDecimalDegrees( sun.g_dec ) )
+        bodyRA = math.radians( self.convertHoursMinutesSecondsToDecimalDegrees( body.g_ra ) )
+        bodyDec = math.radians( self.convertDegreesMinutesSecondsToDecimalDegrees( body.g_dec ) )
 
         y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
         x = math.cos( bodyDec ) * math.sin( sunDec ) - math.sin( bodyDec ) * math.cos( sunDec ) * math.cos( sunRA - bodyRA )
         brightLimbAngle = math.degrees( math.atan2( y, x ) )
 
-        hourAngle = math.radians( self.convertHMSToDecimalDegrees( city.sidereal_time() ) ) - bodyRA
+        hourAngle = math.radians( self.convertHoursMinutesSecondsToDecimalDegrees( city.sidereal_time() ) ) - bodyRA
         y = math.sin( hourAngle )
-        x = math.tan( math.radians( self.convertDMSToDecimalDegrees( city.lat ) ) ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
+        x = math.tan( math.radians( self.convertDegreesMinutesSecondsToDecimalDegrees( city.lat ) ) ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
         parallacticAngle = math.degrees( math.atan2( y, x ) )
 
         zenithAngle = brightLimbAngle - parallacticAngle
@@ -665,14 +669,14 @@ class IndicatorLunar:
         return zenithAngle
 
 
-    def convertHMSToDecimalDegrees( self, hms ):
+    def convertHoursMinutesSecondsToDecimalDegrees( self, hms ):
         t = tuple( str( hms ).split( ":" ) )
         x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) ) * 15.0
         y = float( t[ 0 ] )
         return math.copysign( x, y )
 
 
-    def convertDMSToDecimalDegrees( self, dms ):
+    def convertDegreesMinutesSecondsToDecimalDegrees( self, dms ):
         t = tuple( str( dms ).split( ":" ) )
         x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
         y = float( t[ 0 ] )
@@ -909,7 +913,7 @@ class IndicatorLunar:
     
             showSatelliteNotificationCheckbox = Gtk.CheckButton( "Rise Time Notification" )
             showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
-            showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon...may not be visible!" )
+            showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon." )
             grid.attach( showSatelliteNotificationCheckbox, 0, 1, 1, 1 )
     
             satelliteStore = Gtk.ListStore( str, str, bool ) # Satellite name, satellite number, show/hide.
