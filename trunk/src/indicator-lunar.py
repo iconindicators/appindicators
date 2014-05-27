@@ -83,6 +83,7 @@ class IndicatorLunar:
     SETTINGS_PLANETS = "planets"
     SETTINGS_SATELLITES = "satellites"
     SETTINGS_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
+    SETTINGS_SHOW_SATELLITE_NUMBER = "showSatelliteNumber"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     SETTINGS_STARS = "stars"
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
@@ -478,9 +479,11 @@ class IndicatorLunar:
         menu.append( menuItem )
 
         for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
-            
-#TODO Have an option to show the satellite number?            
-            menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ] )
+            if self.showSatelliteNumber:
+                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ] )
+            else:
+                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteNameNumber[ 0 ] )
+
             menu.append( menuItem )
 
             subMenu = Gtk.Menu()
@@ -899,10 +902,15 @@ class IndicatorLunar:
             label.set_halign( Gtk.Align.START )
             grid.attach( label, 0, 0, 1, 1 )
         else:
+            showSatelliteNumberCheckbox = Gtk.CheckButton( "Show Satellite Number" )
+            showSatelliteNumberCheckbox.set_active( self.showSatelliteNumber )
+            showSatelliteNumberCheckbox.set_tooltip_text( "Include the satellite number in the menu" )
+            grid.attach( showSatelliteNumberCheckbox, 0, 0, 1, 1 )
+    
             showSatelliteNotificationCheckbox = Gtk.CheckButton( "Rise Time Notification" )
             showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
             showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon...may not be visible!" )
-            grid.attach( showSatelliteNotificationCheckbox, 0, 0, 1, 1 )
+            grid.attach( showSatelliteNotificationCheckbox, 0, 1, 1, 1 )
     
             satelliteStore = Gtk.ListStore( str, str, bool ) # Satellite name, satellite number, show/hide.
             for satellite in self.satelliteTLEData:
@@ -928,7 +936,7 @@ class IndicatorLunar:
             scrolledWindow = Gtk.ScrolledWindow()
             scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
             scrolledWindow.add( tree )
-            grid.attach( scrolledWindow, 0, 1, 1, 1 )
+            grid.attach( scrolledWindow, 0, 2, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Satellites" ) )
 
@@ -1125,6 +1133,7 @@ class IndicatorLunar:
                 self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 )
             else:
                 self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
+                self.showSatelliteNumber = showSatelliteNumberCheckbox.get_active()
                 self.satellites = [ ]
                 for satelliteInfo in satelliteStore:
                     if satelliteInfo[ 2 ]: self.satellites.append( [ satelliteInfo[ 0 ], satelliteInfo[ 1 ] ] )
@@ -1304,6 +1313,7 @@ class IndicatorLunar:
         self.displayPattern = IndicatorLunar.DISPLAY_PATTERN_DEFAULT
         self.satellites = [ ]
         self.showSatelliteNotification = True
+        self.showSatelliteNumber = False
         self.showWerewolfWarning = True
         self.stars = [ ]
         self.werewolfWarningStartIlluminationPercentage = 100
@@ -1329,6 +1339,7 @@ class IndicatorLunar:
                 self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
                 self.satellites = settings.get( IndicatorLunar.SETTINGS_SATELLITES, self.satellites )
                 self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
+                self.showSatelliteNumber = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NUMBER, self.showSatelliteNumber )
                 self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
                 self.stars = settings.get( IndicatorLunar.SETTINGS_STARS, self.stars )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
@@ -1354,6 +1365,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
                 IndicatorLunar.SETTINGS_SATELLITES: self.satellites,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
+                IndicatorLunar.SETTINGS_SHOW_SATELLITE_NUMBER: self.showSatelliteNumber,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
                 IndicatorLunar.SETTINGS_STARS: self.stars,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
