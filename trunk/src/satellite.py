@@ -21,25 +21,28 @@
 
 class Info:
 
-    def __init__( self, title, line1, line2 ):
-        self.title = title
-        self.line1 = line1
-        self.line2 = line2
+    def __init__( self, tleTitle, tleLine1, tleLine2 ):
+        self.tleTitle = tleTitle
+        self.tleLine1 = tleLine1
+        self.tleLine2 = tleLine2
 
 
-    def getName( self ): return self.title
+    def getTLETitle( self ): return self.tleTitle
 
 
-    def getLine1( self ): return self.line1
+    def getTLELine1( self ): return self.tleLine1
 
 
-    def getLine2( self ): return self.line2
+    def getTLELine2( self ): return self.tleLine2
 
 
-    def getNumber( self ): return self.line1[ 2 : 7 ]
+    def getName( self ): return self.tleTitle
 
 
-    def __str__( self ): return str( self.title ) + " | " + str( self.line1 ) + " | " + str( self.line2 )
+    def getNumber( self ): return self.tleLine1[ 2 : 7 ]
+
+
+    def __str__( self ): return str( self.tleTitle ) + " | " + str( self.tleLine1 ) + " | " + str( self.tleLine2 )
 
 
     def __repr__( self ): return self.__str__()    
