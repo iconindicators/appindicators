@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays lunar, solar and planetary information.
+# Application indicator which displays lunar, solar, planetary, star and satellite information.
 
 
 # References:
@@ -36,7 +36,7 @@ except: notifyImported = False
 
 from urllib.request import urlopen
 
-import copy, datetime, eclipse, gzip, json, locale, logging, math, os, pythonutils, re, shutil, subprocess, sys, tle
+import copy, datetime, eclipse, gzip, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys
 
 try:
     import ephem
@@ -114,8 +114,8 @@ class IndicatorLunar:
     WEREWOLF_WARNING_TEXT_BODY = "                                          ...werewolves about ! ! !"
     WEREWOLF_WARNING_TEXT_SUMMARY = "W  A  R  N  I  N  G"
 
-    SATELLITE_TEXT_SUMMARY = "                      ...is above the horizon!"
-    SATELLITE_TLE_URL = "http://www.celestrak.com/NORAD/elements/stations.txt"
+    SATELLITE_TEXT_SUMMARY = "                      ...is above the horizon!"  #TODO Might have to change the text if the update is 1 minute before the rise time. 
+    SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
     PLANETS = [
             [ "Mercury", ephem.Mercury() ],
@@ -477,39 +477,41 @@ class IndicatorLunar:
         menuItem = Gtk.MenuItem( "Satellites" )
         menu.append( menuItem )
 
-        for satelliteName in self.satellites:
-            menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteName )
+        for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
+            
+#TODO Have an option to show the satellite number?            
+            menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ] )
             menu.append( menuItem )
 
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
 
             foundSatellite = False
-            for tle in self.satelliteTLEData:
-                if satelliteName == tle.getTitle():
-
-                    satelliteInfo = city.next_pass( ephem.readtle( tle.getTitle(), tle.getLine1(), tle.getLine2() ) )
+            for satelliteInfo in self.satelliteTLEData:
+                if satelliteNameNumber[ 0 ] == satelliteInfo.getName():
+                    nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
+                    tag = satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ]
 
                     subMenu.append( Gtk.MenuItem( "Rise" ) )
 
-                    self.data[ satelliteName + " RISE TIME" ] =  self.localiseAndTrim( satelliteInfo[ 0 ] )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ satelliteName + " RISE TIME" ] ) )
+                    self.data[ tag + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ tag + " RISE TIME" ] ) )
 
-                    self.data[ satelliteName + " RISE AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( satelliteInfo[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satelliteInfo[ 1 ] ) ) + ")"
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ satelliteName + " RISE AZIMUTH" ] ) )
+                    self.data[ tag + " RISE AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ tag + " RISE AZIMUTH" ] ) )
 
                     subMenu.append( Gtk.SeparatorMenuItem() )
 
                     subMenu.append( Gtk.MenuItem( "Set" ) )
 
-                    self.data[ satelliteName + " SET TIME" ] =  self.localiseAndTrim( satelliteInfo[ 4 ] )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ satelliteName + " SET TIME" ] ) )
+                    self.data[ tag + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ tag + " SET TIME" ] ) )
 
-                    self.data[ satelliteName + " SET AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( satelliteInfo[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satelliteInfo[ 5 ] ) ) + ")"
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ satelliteName + " SET AZIMUTH" ] ) )
+                    self.data[ tag + " SET AZIMUTH" ] = str( round( self.convertDMSToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ tag + " SET AZIMUTH" ] ) )
 
-                    nextUpdates.append( satelliteInfo[ 4 ] ) # Only do an update after the satellite has set.
-
+                    nextUpdates.append( nextPass[ 4 ] ) # Only do an update after the satelliteInfo has set.
+#TODO If nextUpdates is used also to hold the satelliteInfo rise time, add this rise time in but with say one minute before the actual time.
                     foundSatellite = True
                     break
 
@@ -790,8 +792,8 @@ class IndicatorLunar:
 
         displayTagsStoreSort = Gtk.TreeModelSort( displayTagsStore )
         displayTagsStoreSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+
         tree = Gtk.TreeView( displayTagsStoreSort )
-        
         tree.set_hexpand( True )
         tree.set_vexpand( True )
         tree.append_column( Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 ) )
@@ -897,26 +899,30 @@ class IndicatorLunar:
             label.set_halign( Gtk.Align.START )
             grid.attach( label, 0, 0, 1, 1 )
         else:
-            showSatelliteNotificationCheckbox = Gtk.CheckButton( "Satellite notification" )
+            showSatelliteNotificationCheckbox = Gtk.CheckButton( "Rise Time Notification" )
             showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
-            showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon (may not be visible)" )
+            showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon...may not be visible!" )
             grid.attach( showSatelliteNotificationCheckbox, 0, 0, 1, 1 )
     
-            satelliteStore = Gtk.ListStore( str, bool ) # Satellite name, show/hide.
-            for tle in self.satelliteTLEData:
-                satelliteStore.append( [ tle.getTitle(), tle.getTitle() in self.satellites ] )
-    
-            tree = Gtk.TreeView( satelliteStore )
+            satelliteStore = Gtk.ListStore( str, str, bool ) # Satellite name, satellite number, show/hide.
+            for satellite in self.satelliteTLEData:
+                satelliteStore.append( [ satellite.getName(), satellite.getNumber(), [ satellite.getName(), satellite.getNumber() ] in self.satellites ] )
+
+            satelliteStoreSort = Gtk.TreeModelSort( satelliteStore )
+            satelliteStoreSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+
+            tree = Gtk.TreeView( satelliteStoreSort )
             tree.set_hexpand( True )
             tree.set_vexpand( True )
     
-            tree.append_column( Gtk.TreeViewColumn( "Satellite", Gtk.CellRendererText(), text = 0 ) )
+            tree.append_column( Gtk.TreeViewColumn( "Name", Gtk.CellRendererText(), text = 0 ) )
+            tree.append_column( Gtk.TreeViewColumn( "Number", Gtk.CellRendererText(), text = 1 ) )
     
             renderer_toggle = Gtk.CellRendererToggle()
-            renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore )
-            tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 1 ) )
+            renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
+            tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 2 ) )
     
-            tree.set_tooltip_text( "Check a satellite to display in the menu." )
+            tree.set_tooltip_text( "Check a satellite/station/rocket to display in the menu." )
             tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
     
             scrolledWindow = Gtk.ScrolledWindow()
@@ -1121,7 +1127,7 @@ class IndicatorLunar:
                 self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
                 self.satellites = [ ]
                 for satelliteInfo in satelliteStore:
-                    if satelliteInfo[ 1 ]: self.satellites.append( satelliteInfo[ 0 ] )
+                    if satelliteInfo[ 2 ]: self.satellites.append( [ satelliteInfo[ 0 ], satelliteInfo[ 1 ] ] )
 
             self.displayPattern = displayPattern.get_text()
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
@@ -1170,11 +1176,7 @@ class IndicatorLunar:
 
         os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
 
-#
-#TODO Strip the plenet tag from the display pattern field on uncheck of a plenet?
-#Maybe strip when the user clicks OK?
-#Maybe leave it....lets the user see there is a "mistake" and they can fix it.
-#
+
     def onPlanetToggled( self, widget, path, planetStore, displayTagsStore ):
         planetStore[ path ][ 1 ] = not planetStore[ path ][ 1 ]
         planetName = planetStore[ path ][ 0 ].upper()
@@ -1196,9 +1198,7 @@ class IndicatorLunar:
                 else:
                     iter = displayTagsStore.iter_next( iter )
 
-#
-#TODO Strip the star tag from the display pattern field on uncheck of a star?
-#
+
     def onStarToggled( self, widget, path, starStore, displayTagsStore ):
         starStore[ path ][ 1 ] = not starStore[ path ][ 1 ]
         starName = starStore[ path ][ 0 ].upper()
@@ -1217,23 +1217,23 @@ class IndicatorLunar:
                 else:
                     iter = displayTagsStore.iter_next( iter )
 
-#
 
-#TODO Strip the satellite tag from the display pattern field on uncheck of a satellite?
-#
-    def onSatelliteToggled( self, widget, path, satelliteStore, displayTagsStore ):
-        satelliteStore[ path ][ 1 ] = not satelliteStore[ path ][ 1 ]
-        satelliteName = satelliteStore[ path ][ 0 ].upper()
+    def onSatelliteToggled( self, widget, path, satelliteStore, displayTagsStore, satelliteStoreSort ):
+        # Convert the index in the sorted model to the index in the underlying (child) modeel.
+        childPath = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) )
 
-        if satelliteStore[ path ][ 1 ]:
-            displayTagsStore.append( [ satelliteName + " RISE TIME", "(needs refresh)" ] )
-            displayTagsStore.append( [ satelliteName + " RISE AZIMUTH", "(needs refresh)" ] )
-            displayTagsStore.append( [ satelliteName + " SET TIME", "(needs refresh)" ] )
-            displayTagsStore.append( [ satelliteName + " SET AZIMUTH", "(needs refresh)" ] )
+        satelliteStore[ childPath ][ 2 ] = not satelliteStore[ childPath ][ 2 ]
+        tag = satelliteStore[ childPath ][ 0 ].upper() + " - " + satelliteStore[ childPath ][ 1 ]
+
+        if satelliteStore[ childPath ][ 1 ]:
+            displayTagsStore.append( [ tag + " RISE TIME", "(needs refresh)" ] )
+            displayTagsStore.append( [ tag + " RISE AZIMUTH", "(needs refresh)" ] )
+            displayTagsStore.append( [ tag + " SET TIME", "(needs refresh)" ] )
+            displayTagsStore.append( [ tag + " SET AZIMUTH", "(needs refresh)" ] )
         else:
             iter = displayTagsStore.get_iter_first()
             while iter is not None:
-                if displayTagsStore[ iter ][ 0 ].startswith( satelliteName ):
+                if displayTagsStore[ iter ][ 0 ].startswith( tag ):
                     if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
                 else:
                     iter = displayTagsStore.iter_next( iter )
@@ -1254,11 +1254,10 @@ class IndicatorLunar:
 
 
     def getSatelliteTLEData( self ):
-        print(datetime.datetime.now())
 #TODO Remove after testing.
 #        
 #         self.satelliteTLEData = [ ]
-#         self.satelliteTLEData.append( tle.Info( 
+#         self.satelliteTLEData.append( satellite.Info( 
 #            "ISS (ZARYA)", 
 #            "1 25544U 98067A   14144.25429147  .00013298  00000-0  23626-3 0  3470" ,
 #            "2 25544  51.6479 218.2294 0003503  34.9920  27.7254 15.50515783887617" ) )
@@ -1269,9 +1268,10 @@ class IndicatorLunar:
             self.satelliteTLEData = [ ]
             data = urlopen( IndicatorLunar.SATELLITE_TLE_URL ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ), 3 ):
-                self.satelliteTLEData.append( tle.Info( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() ) )
+                self.satelliteTLEData.append( satellite.Info( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() ) )
 
         except Exception as e:
+            print(e)
             self.satelliteTLEData = [ ] # Empty data indicates error.
             logging.exception( e )
             logging.error( "Error downloading satellite TLE data from " + IndicatorLunar.SATELLITE_TLE_URL )
