@@ -135,7 +135,7 @@ class IndicatorLunar:
     WEREWOLF_WARNING_TEXT_BODY = "                                          ...werewolves about ! ! !"
     WEREWOLF_WARNING_TEXT_SUMMARY = "W  A  R  N  I  N  G"
 
-    SATELLITE_TEXT_SUMMARY = "      ...is in transit!"
+    SATELLITE_TEXT_SUMMARY = "                                          ...is above the horizon!"
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
     PLANETS = [
@@ -189,31 +189,28 @@ class IndicatorLunar:
 
 
     def update( self ):
-#TODO Somehow ensure that a given satellite only notifies once per transit.
-        # Satellite notification.
-        # Need to use data from the previous run as the rise/set is always the .....
-        # If the satellite is up and the calculations are updated, the current rise/set will be overwritten with the next rise/set.
-#TODO Once the satellite menu stuff is done (keep a rise/set time for the duration of the transit) then revisit this and make sure it's okay.        
-#         if notifyImported and self.showSatelliteNotification:
-#             ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
-#             for satelliteNameNumber in self.satellites:
-#                 riseTimeKey = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], ( satelliteNameNumber[ 1 ] ) ) + " RISE TIME"
-#                 setTimeKey = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], ( satelliteNameNumber[ 1 ] ) ) + " SET TIME"
-#                 if riseTimeKey in self.data and ephemNowInLocalTime > ephem.Date( self.data[ riseTimeKey ] ) and setTimeKey in self.data and ephemNowInLocalTime < ephem.Date( self.data[ setTimeKey ] ):
-#                     if self.showSatelliteNumber:
-#                         Notify.Notification.new( satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ], IndicatorLunar.SATELLITE_TEXT_SUMMARY, IndicatorLunar.SVG_SATELLITE_ICON ).show()
-#                     else:
-#                         Notify.Notification.new( satelliteNameNumber[ 0 ], IndicatorLunar.SATELLITE_TEXT_SUMMARY, IndicatorLunar.SVG_SATELLITE_ICON ).show()
-
         # Update the satellite TLE data at most every 12 hours.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ): self.getSatelliteTLEData() 
+
+        # This is UTC used in all calculations.  When it comes time to display, it is converted to local time.
+        ephemNow = ephem.now()
+
+#TODO Somehow ensure that a given satellite only notifies once per transit.
+        # Satellite notification.
+        if notifyImported and self.showSatelliteNotification:
+            ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
+            for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
+                riseTimeKey = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], ( satelliteNameNumber[ 1 ] ) ) + " RISE TIME"
+                setTimeKey = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], ( satelliteNameNumber[ 1 ] ) ) + " SET TIME"
+                if riseTimeKey in self.data and ephemNowInLocalTime > ephem.Date( self.data[ riseTimeKey ] ) and setTimeKey in self.data and ephemNowInLocalTime < ephem.Date( self.data[ setTimeKey ] ):
+                    if self.showSatelliteNumber:
+                        Notify.Notification.new( satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ], IndicatorLunar.SATELLITE_TEXT_SUMMARY, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+                    else:
+                        Notify.Notification.new( satelliteNameNumber[ 0 ], IndicatorLunar.SATELLITE_TEXT_SUMMARY, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
         # Reset the data on each update, otherwise data will accumulate (if a star/satellite was added then removed, the computed data remains).
         self.dataPrevious = self.data
         self.data = { }
-
-        # This is UTC used in all calculations.  When it comes time to display, it is converted to local time.
-        ephemNow = ephem.now()
 
         city = ephem.city( self.cityName )
         city.date = ephemNow
@@ -325,7 +322,7 @@ class IndicatorLunar:
             nextUpdateInSeconds = ( 60 * 60 )
 
         print( datetime.datetime.now(), nextUpdateInSeconds)  #TODO Remove!
-        GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
+        self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
 
 
     def createMoonMenu( self, menu, city, nextUpdates, ephemNow, lunarPhase ):
@@ -551,6 +548,11 @@ class IndicatorLunar:
                 nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
             except ValueError:
                 subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Occurs when the satellite is always up or never up.
+                continue
+
+            if nextPass is None or nextPass[ 0 ] is None or nextPass[ 1 ] is None or nextPass[ 2 ] is None or nextPass[ 3 ] is None or nextPass[ 4 ] is None or nextPass[ 5 ] is None:
+                print(satelliteNameNumber)
+                subMenu.append( Gtk.MenuItem( "NONE" ) )
                 continue
 
             if nextPass[ 0 ] < nextPass[ 4 ]:
@@ -1255,6 +1257,7 @@ class IndicatorLunar:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
 
+            GLib.source_remove( self.eventSourceID )
             self.update()
             break
 
