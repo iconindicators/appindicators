@@ -28,6 +28,8 @@
 #TODO Search for next pass and similar...do I need to catch valueerror?  
 # Related to circumpolar error
 # http://rhodesmill.org/pyephem/quick.html 
+#Need to guard against ValueError (AlwaysUp and NeverUp)?
+#Test for a location near the poles.
 
 
 # TODO Perhaps it's possible to distinguish a visible transit from all transits.
@@ -40,8 +42,6 @@
 # Compare results against heavensabove or "nyse". 
 
 
-# TODO Check other places for rise/set calculations ... need to guard against ValueError (AlwaysUp and NeverUp)?
-#Test for a location near the poles.
 
 
 try: from gi.repository import AppIndicator3 as appindicator
@@ -539,7 +539,7 @@ class IndicatorLunar:
 
             key = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], satelliteNameNumber[ 1 ] )
             if not key in self.satelliteTLEData:
-                subMenu.append( Gtk.MenuItem( "No data!" ) )
+                subMenu.append( Gtk.MenuItem( "No TLE data!" ) )
                 continue
 
             satelliteInfo = self.satelliteTLEData[ key ]
@@ -550,9 +550,8 @@ class IndicatorLunar:
                 subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Occurs when the satellite is always up or never up.
                 continue
 
-            if nextPass is None or nextPass[ 0 ] is None or nextPass[ 1 ] is None or nextPass[ 2 ] is None or nextPass[ 3 ] is None or nextPass[ 4 ] is None or nextPass[ 5 ] is None:
-                print(satelliteNameNumber)
-                subMenu.append( Gtk.MenuItem( "NONE" ) )
+            if nextPass is None or nextPass[ 0 ] is None or nextPass[ 1 ] is None or nextPass[ 4 ] is None or nextPass[ 5 ] is None: # Ignore transit.
+                subMenu.append( Gtk.MenuItem( "Unable to compute next pass!" ) )
                 continue
 
             if nextPass[ 0 ] < nextPass[ 4 ]:
