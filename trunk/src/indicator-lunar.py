@@ -622,23 +622,10 @@ class IndicatorLunar:
 
             if nextPass[ 0 ] < nextPass[ 4 ]:
                 # The satellite is below the horizon.
-                subMenu.append( Gtk.MenuItem( "Rise" ) )
-
                 self.data[ key + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " RISE TIME" ] ) )
-
                 self.data[ key + " RISE AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " RISE AZIMUTH" ] ) )
-
-                subMenu.append( Gtk.SeparatorMenuItem() )
-
-                subMenu.append( Gtk.MenuItem( "Set" ) )
-
                 self.data[ key + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " SET TIME" ] ) )
-
                 self.data[ key + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " SET AZIMUTH" ] ) )
 
                 nextUpdates.append( nextPass[ 0 ] )
                 nextUpdates.append( nextPass[ 4 ] )
@@ -647,23 +634,10 @@ class IndicatorLunar:
                 # Obtain the rise time/azimuth from the previous run.
                 if ( key + " RISE TIME" ) in self.dataPrevious and ( key + " RISE AZIMUTH" ) in self.dataPrevious:
                     # The data from the previous run is available...
-                    subMenu.append( Gtk.MenuItem( "Rise" ) )
-
                     self.data[ key + " RISE TIME" ] =  self.dataPrevious[ key + " RISE TIME" ]
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " RISE TIME" ] ) )
-
                     self.data[ key + " RISE AZIMUTH" ] =  self.dataPrevious[ key + " RISE AZIMUTH" ]
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " RISE AZIMUTH" ] ) )
-
-                    subMenu.append( Gtk.SeparatorMenuItem() )
-
-                    subMenu.append( Gtk.MenuItem( "Set" ) )
-
                     self.data[ key + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " SET TIME" ] ) )
-        
                     self.data[ key + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " SET AZIMUTH" ] ) )
 
                     nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
                 else:
@@ -682,26 +656,24 @@ class IndicatorLunar:
                         subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Occurs when the satellite is always up or never up.
                         continue
 
-                    subMenu.append( Gtk.MenuItem( "Rise" ) )
-    
                     self.data[ key + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " RISE TIME" ] ) )
-    
                     self.data[ key + " RISE AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " RISE AZIMUTH" ] ) )
-    
-                    subMenu.append( Gtk.SeparatorMenuItem() )
-    
-                    subMenu.append( Gtk.MenuItem( "Set" ) )
-    
                     self.data[ key + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " SET TIME" ] ) )
-    
                     self.data[ key + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " SET AZIMUTH" ] ) )
-    
+
                     nextUpdates.append( nextPass[ 0 ] )
                     nextUpdates.append( nextPass[ 4 ] )
+
+            # Build the menu...
+            subMenu.append( Gtk.MenuItem( "Rise" ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " RISE TIME" ] ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " RISE AZIMUTH" ] ) )
+
+            subMenu.append( Gtk.SeparatorMenuItem() )
+
+            subMenu.append( Gtk.MenuItem( "Set" ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " SET TIME" ] ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " SET AZIMUTH" ] ) )
 
 
     # Returns the string
