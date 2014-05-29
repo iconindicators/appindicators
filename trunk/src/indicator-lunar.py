@@ -158,6 +158,7 @@ class IndicatorLunar:
         self.dialog = None
         self.data = { }
         self.dataPrevious = { }
+        self.satelliteNotifications = { }
 
         self.getSatelliteTLEData()
         self.loadSettings()
@@ -200,13 +201,28 @@ class IndicatorLunar:
         if notifyImported and self.showSatelliteNotification:
             ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
             for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
+
+                # Is there a rise/set time for the current satellite...
                 riseTimeKey = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], ( satelliteNameNumber[ 1 ] ) ) + " RISE TIME"
                 setTimeKey = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], ( satelliteNameNumber[ 1 ] ) ) + " SET TIME"
-                if riseTimeKey in self.data and ephemNowInLocalTime > ephem.Date( self.data[ riseTimeKey ] ) and setTimeKey in self.data and ephemNowInLocalTime < ephem.Date( self.data[ setTimeKey ] ):
-                    if self.showSatelliteNumber:
-                        Notify.Notification.new( satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ], IndicatorLunar.SATELLITE_TEXT_SUMMARY, IndicatorLunar.SVG_SATELLITE_ICON ).show()
-                    else:
-                        Notify.Notification.new( satelliteNameNumber[ 0 ], IndicatorLunar.SATELLITE_TEXT_SUMMARY, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+                if not ( riseTimeKey in self.data and setTimeKey in self.data ):
+                    continue
+
+                # Ensure the current time is within the rise/set...
+                if not ( ephemNowInLocalTime > ephem.Date( self.data[ riseTimeKey ] ) and ephemNowInLocalTime < ephem.Date( self.data[ setTimeKey ] ) ):
+                    continue
+
+                # Show a notification for the satellite, but only once per pass...
+                key = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], satelliteNameNumber[ 1 ] )
+                if key in self.satelliteNotifications and ephemNowInLocalTime < ephem.Date( self.satelliteNotifications[ key ] ):
+                    continue
+
+                self.satelliteNotifications[ key ] = self.data[ setTimeKey ] # Flag to ensure the notification happens once per satellite's pass.
+
+                if self.showSatelliteNumber:
+                    Notify.Notification.new( satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ], IndicatorLunar.SATELLITE_TEXT_SUMMARY, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+                else:
+                    Notify.Notification.new( satelliteNameNumber[ 0 ], IndicatorLunar.SATELLITE_TEXT_SUMMARY, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
         # Reset the data on each update, otherwise data will accumulate (if a star/satellite was added then removed, the computed data remains).
         self.dataPrevious = self.data
@@ -558,20 +574,20 @@ class IndicatorLunar:
                 # The satellite is below the horizon.
                 self.data[ key + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
                 self.data[ key + " RISE AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
-                self.data[ key + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
+                self.data[ key + " SET TIME" ] = self.localiseAndTrim( nextPass[ 4 ] )
                 self.data[ key + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
 
                 nextUpdates.append( nextPass[ 0 ] )
                 nextUpdates.append( nextPass[ 4 ] )
             else:
                 # The satellite is passing over and so the calculated rise time is for the next pass.
-                # Obtain the rise time/azimuth from the previous run.
+                # Use the rise/set from the previous run.
                 if ( key + " RISE TIME" ) in self.dataPrevious and ( key + " RISE AZIMUTH" ) in self.dataPrevious:
                     # The data from the previous run is available...
                     self.data[ key + " RISE TIME" ] =  self.dataPrevious[ key + " RISE TIME" ]
-                    self.data[ key + " RISE AZIMUTH" ] =  self.dataPrevious[ key + " RISE AZIMUTH" ]
-                    self.data[ key + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
-                    self.data[ key + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+                    self.data[ key + " RISE AZIMUTH" ] = self.dataPrevious[ key + " RISE AZIMUTH" ]
+                    self.data[ key + " SET TIME" ] =  self.dataPrevious[ key + " SET TIME" ]
+                    self.data[ key + " SET AZIMUTH" ] = self.dataPrevious[ key + " SET AZIMUTH" ]
 
                     nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
                 else:
@@ -592,7 +608,7 @@ class IndicatorLunar:
 
                     self.data[ key + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
                     self.data[ key + " RISE AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
-                    self.data[ key + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
+                    self.data[ key + " SET TIME" ] = self.localiseAndTrim( nextPass[ 4 ] )
                     self.data[ key + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
 
                     nextUpdates.append( nextPass[ 0 ] )
