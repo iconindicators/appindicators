@@ -40,6 +40,10 @@
 # Compare results against heavensabove or "nyse". 
 
 
+# TODO Check other places for rise/set calculations ... need to guard against ValueError (AlwaysUp and NeverUp)?
+#Test for a location near the poles.
+
+
 try: from gi.repository import AppIndicator3 as appindicator
 except: pass
 
@@ -152,6 +156,9 @@ class IndicatorLunar:
                              handlers = [ filehandler ] )
 
         self.dialog = None
+        self.data = { }
+        self.dataPrevious = { }
+
         self.getSatelliteTLEData()
         self.loadSettings()
 
@@ -182,6 +189,7 @@ class IndicatorLunar:
 
 
     def update( self ):
+#TODO Somehow ensure that a given satellite only notifies once per transit.
         # Satellite notification.
         # Need to use data from the previous run as the rise/set is always the .....
         # If the satellite is up and the calculations are updated, the current rise/set will be overwritten with the next rise/set.
@@ -201,6 +209,7 @@ class IndicatorLunar:
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ): self.getSatelliteTLEData() 
 
         # Reset the data on each update, otherwise data will accumulate (if a star/satellite was added then removed, the computed data remains).
+        self.dataPrevious = self.data
         self.data = { }
 
         # This is UTC used in all calculations.  When it comes time to display, it is converted to local time.
@@ -315,7 +324,7 @@ class IndicatorLunar:
         if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update period is at least hourly...
             nextUpdateInSeconds = ( 60 * 60 )
 
-        print(nextUpdateInSeconds)
+        print( datetime.datetime.now(), nextUpdateInSeconds)  #TODO Remove!
         GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
 
 
@@ -567,6 +576,18 @@ class IndicatorLunar:
     #   http://spotthestation.nasa.gov/sightings
     #   http://www.n2yo.com/passes/?s=25544
     #   http://www.heavens-above.com/
+    #
+    # For planets/stars, the next rise/set time is shown.
+    # If already above the horizon, the set time is shown followed by the rise time for the next pass.
+    # This makes sense as planets/stars are slow moving.
+    # As satellites are faster moving and pass several times a day, a different approach is used.
+    # When a notification is displayed indicating a satellite is now passing overhead,
+    # the user may want to see the rise/set for the current pass (rather than the set for the current pass and rise for the next pass).
+    # Therefore when doing an update...
+    # If a satellite is yet to rise, show the upcoming rise/set time.
+    # If a satellite is currently passing over, show the rise/set time for that pass.
+    # This allows the user to see the rise/set time for the current pass as it is happening.
+    # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
     def createSatellitesMenu( self, menu, city, nextUpdates ):
         if len( self.satellites ) == 0: return
 
@@ -574,10 +595,6 @@ class IndicatorLunar:
 
         menuItem = Gtk.MenuItem( "Satellites" )
         menu.append( menuItem )
-#TODO Somehow ensure that a given satellite only notifies once per transit.
-
-#TODO An update occurs as a result of the rise time and the new rise/set time overwrite the current rise/set time.
-#                 ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
 
         for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
             if self.showSatelliteNumber:
@@ -600,49 +617,91 @@ class IndicatorLunar:
             try:
                 nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
             except ValueError:
-#TODO Possible to have a better error message?   Can't determine if the error is always up or ever up (or something else). 
-                subMenu.append( Gtk.MenuItem( "No rise/set." ) ) # Occurs when the satellite is always up or never up.
+                subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Occurs when the satellite is always up or never up.
                 continue
 
-            # If the current time is during a transit, compute for the next transit.
-            if nextPass[ 4 ] < nextPass[ 0 ]:
-                difference = nextPass[ 0 ] - nextPass[ 4 ] # Date/time difference between the set and rise.
-                ephemFuture = ephem.Date( city.date + ( difference / 2.0 ) ) # Set a future date to be half the difference between the set time and the next rise time.
-                cityFuture = ephem.Observer()
-                cityFuture.lat = city.lat
-                cityFuture.long = city.long
-                cityFuture.elevation = city.elevation
-                cityFuture.date = ephemFuture
+            if nextPass[ 0 ] < nextPass[ 4 ]:
+                # The satellite is below the horizon.
+                subMenu.append( Gtk.MenuItem( "Rise" ) )
 
-                try:
-                    nextPass = cityFuture.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
-                except ValueError:
-#TODO Possible to have a better error message?   Can't determine if the error is always up or ever up (or something else). 
-                    subMenu.append( Gtk.MenuItem( "No rise/set." ) ) # Occurs when the satellite is always up or never up.
-                    continue
+                self.data[ key + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
+                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " RISE TIME" ] ) )
 
-            tag = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], satelliteNameNumber[ 1 ] )
+                self.data[ key + " RISE AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " RISE AZIMUTH" ] ) )
 
-            subMenu.append( Gtk.MenuItem( "Rise" ) )
+                subMenu.append( Gtk.SeparatorMenuItem() )
 
-            self.data[ tag + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ tag + " RISE TIME" ] ) )
+                subMenu.append( Gtk.MenuItem( "Set" ) )
 
-            self.data[ tag + " RISE AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ tag + " RISE AZIMUTH" ] ) )
+                self.data[ key + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
+                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " SET TIME" ] ) )
 
-            subMenu.append( Gtk.SeparatorMenuItem() )
+                self.data[ key + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " SET AZIMUTH" ] ) )
 
-            subMenu.append( Gtk.MenuItem( "Set" ) )
+                nextUpdates.append( nextPass[ 0 ] )
+                nextUpdates.append( nextPass[ 4 ] )
+            else:
+                # The satellite is passing over and so the calculated rise time is for the next pass.
+                # Obtain the rise time/azimuth from the previous run.
+                if ( key + " RISE TIME" ) in self.dataPrevious and ( key + " RISE AZIMUTH" ) in self.dataPrevious:
+                    # The data from the previous run is available...
+                    subMenu.append( Gtk.MenuItem( "Rise" ) )
 
-            self.data[ tag + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ tag + " SET TIME" ] ) )
+                    self.data[ key + " RISE TIME" ] =  self.dataPrevious[ key + " RISE TIME" ]
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " RISE TIME" ] ) )
 
-            self.data[ tag + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ tag + " SET AZIMUTH" ] ) )
+                    self.data[ key + " RISE AZIMUTH" ] =  self.dataPrevious[ key + " RISE AZIMUTH" ]
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " RISE AZIMUTH" ] ) )
 
-            nextUpdates.append( nextPass[ 0 ] )
-            nextUpdates.append( nextPass[ 4 ] )
+                    subMenu.append( Gtk.SeparatorMenuItem() )
+
+                    subMenu.append( Gtk.MenuItem( "Set" ) )
+
+                    self.data[ key + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " SET TIME" ] ) )
+        
+                    self.data[ key + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " SET AZIMUTH" ] ) )
+
+                    nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
+                else:
+                    # There is no previous data (typically because this is the first run).
+                    # So just use the next pass.
+                    difference = nextPass[ 0 ] - nextPass[ 4 ] # Date/time difference between the current set and next rise.
+                    ephemFuture = ephem.Date( city.date + ( difference / 2.0 ) ) # Set a future date to be half the difference between the set time and the next rise time.
+                    cityFuture = ephem.Observer()
+                    cityFuture.lat = city.lat
+                    cityFuture.long = city.long
+                    cityFuture.elevation = city.elevation
+                    cityFuture.date = ephemFuture
+                    try:
+                        nextPass = cityFuture.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
+                    except ValueError:
+                        subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Occurs when the satellite is always up or never up.
+                        continue
+
+                    subMenu.append( Gtk.MenuItem( "Rise" ) )
+    
+                    self.data[ key + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " RISE TIME" ] ) )
+    
+                    self.data[ key + " RISE AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " RISE AZIMUTH" ] ) )
+    
+                    subMenu.append( Gtk.SeparatorMenuItem() )
+    
+                    subMenu.append( Gtk.MenuItem( "Set" ) )
+    
+                    self.data[ key + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " SET TIME" ] ) )
+    
+                    self.data[ key + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " SET AZIMUTH" ] ) )
+    
+                    nextUpdates.append( nextPass[ 0 ] )
+                    nextUpdates.append( nextPass[ 4 ] )
 
 
     # Returns the string
