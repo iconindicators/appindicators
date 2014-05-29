@@ -509,73 +509,6 @@ class IndicatorLunar:
     #   http://spotthestation.nasa.gov/sightings
     #   http://www.n2yo.com/passes/?s=25544
     #   http://www.heavens-above.com/
-    def createSatellitesMenuORIGINAL( self, menu, city, nextUpdates ):
-        if len( self.satellites ) == 0: return
-
-        if len( self.satelliteTLEData ) == 0: return # No point adding "non information" to the menu.  The preferences will tell the user there is a problem.
-
-        menuItem = Gtk.MenuItem( "Satellites" )
-        menu.append( menuItem )
-
-        for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
-            if self.showSatelliteNumber:
-                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ] )
-            else:
-                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteNameNumber[ 0 ] )
-
-            menu.append( menuItem )
-
-            subMenu = Gtk.Menu()
-            menuItem.set_submenu( subMenu )
-
-            key = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], satelliteNameNumber[ 1 ] )
-            if key in self.satelliteTLEData:
-                satelliteInfo = self.satelliteTLEData[ key ]
-                nextPass = None
-                try:
-                    nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
-                except ValueError as e:
-#TODO Possible to have a better error message?  
-#Can't determine if the error is always up or ever up (or something else). 
-                    subMenu.append( Gtk.MenuItem( "No rise/set information." ) ) # Occurs when the satellite is always up or never up.
-                    continue
-
-#TODO Somehow ensure that a given satellite only notifies once per transit.
-
-#TODO An update occurs as a result of the rise time and the new rise/set time overwrite the current rise/set time.
-#                 ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
-
-                tag = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], satelliteNameNumber[ 1 ] )
-
-                subMenu.append( Gtk.MenuItem( "Rise" ) )
-
-                self.data[ tag + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ tag + " RISE TIME" ] ) )
-
-                self.data[ tag + " RISE AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ tag + " RISE AZIMUTH" ] ) )
-
-                subMenu.append( Gtk.SeparatorMenuItem() )
-
-                subMenu.append( Gtk.MenuItem( "Set" ) )
-
-                self.data[ tag + " SET TIME" ] =  self.localiseAndTrim( nextPass[ 4 ] )
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ tag + " SET TIME" ] ) )
-
-                self.data[ tag + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ tag + " SET AZIMUTH" ] ) )
-
-                nextUpdates.append( nextPass[ 0 ] )
-                nextUpdates.append( nextPass[ 4 ] )
-            else:
-                subMenu.append( Gtk.MenuItem( "No data!" ) )
-
-
-    # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/transit/set times.
-    # Other sources/background:
-    #   http://spotthestation.nasa.gov/sightings
-    #   http://www.n2yo.com/passes/?s=25544
-    #   http://www.heavens-above.com/
     #
     # For planets/stars, the next rise/set time is shown.
     # If already above the horizon, the set time is shown followed by the rise time for the next pass.
@@ -665,14 +598,12 @@ class IndicatorLunar:
                     nextUpdates.append( nextPass[ 4 ] )
 
             # Build the menu...
-            subMenu.append( Gtk.MenuItem( "Rise" ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " RISE TIME" ] ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Rise: " + self.data[ key + " RISE TIME" ] ) )
             subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " RISE AZIMUTH" ] ) )
 
             subMenu.append( Gtk.SeparatorMenuItem() )
 
-            subMenu.append( Gtk.MenuItem( "Set" ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Time: " + self.data[ key + " SET TIME" ] ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Set: " + self.data[ key + " SET TIME" ] ) )
             subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " SET AZIMUTH" ] ) )
 
 
@@ -950,7 +881,7 @@ class IndicatorLunar:
 
         grid.attach( hbox, 0, 0, 1, 1 )
 
-        displayTagsStore = Gtk.ListStore( str, str ) # Tag, value.
+        displayTagsStore = Gtk.ListStore( str, str ) # Display tag, value.
         for key in sorted( self.data.keys() ):
             displayTagsStore.append( [ key, self.data[ key ] ] )
 
@@ -1394,17 +1325,17 @@ class IndicatorLunar:
         childPath = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) )
 
         satelliteStore[ childPath ][ 2 ] = not satelliteStore[ childPath ][ 2 ]
-        tag = self.getSatelliteNameNumber( satelliteStore[ childPath ][ 0 ].upper(), satelliteStore[ childPath ][ 1 ] )
+        key = self.getSatelliteNameNumber( satelliteStore[ childPath ][ 0 ].upper(), satelliteStore[ childPath ][ 1 ] )
 
         if satelliteStore[ childPath ][ 1 ]:
-            displayTagsStore.append( [ tag + " RISE TIME", IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ tag + " RISE AZIMUTH", IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ tag + " SET TIME", IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ tag + " SET AZIMUTH", IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ key + " RISE TIME", IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ key + " RISE AZIMUTH", IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ key + " SET TIME", IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ key + " SET AZIMUTH", IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
         else:
             iter = displayTagsStore.get_iter_first()
             while iter is not None:
-                if displayTagsStore[ iter ][ 0 ].startswith( tag ):
+                if displayTagsStore[ iter ][ 0 ].startswith( key ):
                     if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
                 else:
                     iter = displayTagsStore.iter_next( iter )
@@ -1544,30 +1475,4 @@ class IndicatorLunar:
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
 
 
-if __name__ == "__main__": 
-    
-#     gatech = ephem.Observer()
-#     gatech.lon, gatech.lat = '-84.39733', '33.775867'
-#     iss = ephem.readtle(
-#                         "ISS (ZARYA)",
-#                         "1 25544U 98067A   03097.78853147  .00021906  00000-0  28403-3 0  8652",
-#                         "2 25544  51.6361  13.7980 0004256  35.6671  59.2566 15.58778559250029")
- 
-#     gatech.date = '2003/3/23'
-#     iss.compute(gatech)
-#     print( iss.rise_time, iss.transit_time, iss.set_time )
-#    2003/3/23 00:00:44 2003/3/23 00:03:22 2003/3/23 00:06:00    
-#  
-#     gatech.date = '2003/3/23 00:01:30'
-#     iss.compute(gatech)
-#     print( iss.rise_time, iss.transit_time, iss.set_time )
-#     
-#     gatechCopy = gatech
-#     gatechCopy.date = '2003/3/23 06:01:30'
-#     iss.compute(gatechCopy)
-#     print( iss.rise_time, iss.transit_time, iss.set_time )
-# 
-#     iss.compute(gatech)
-#     print( iss.rise_time, iss.transit_time, iss.set_time )
-
-    IndicatorLunar().main()
+if __name__ == "__main__": IndicatorLunar().main()
