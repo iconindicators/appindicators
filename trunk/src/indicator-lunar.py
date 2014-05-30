@@ -558,8 +558,7 @@ class IndicatorLunar:
     # This allows the user to see the rise/set time for the current pass as it is happening.
     # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
     #
-    # Perhaps it's possible to distinguish a visible transit from all transits...
-    #    http://stackoverflow.com/questions/12845908/horizon-for-earth-satellites
+    # Consider implementing an option to distinguish a visible transit from all transits...
     #    http://www.sharebrained.com/2011/10/18/track-the-iss-pyephem
     #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
     def createSatellitesMenu( self, ephemNow, menu, nextUpdates ):
