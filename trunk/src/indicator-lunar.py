@@ -193,10 +193,9 @@ class IndicatorLunar:
         # Update the satellite TLE data at most every 12 hours.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ): self.getSatelliteTLEData() 
 
-        # This is UTC used in all calculations.  When it comes time to display, it is converted to local time.
+        # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
         ephemNow = ephem.now()
 
-#TODO Somehow ensure that a given satellite only notifies once per transit.
         # Satellite notification.
         if notifyImported and self.showSatelliteNotification:
             ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
@@ -337,7 +336,6 @@ class IndicatorLunar:
         if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update period is at least hourly...
             nextUpdateInSeconds = ( 60 * 60 )
 
-        print( datetime.datetime.now(), nextUpdateInSeconds)  #TODO Remove!
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
 
 
@@ -355,8 +353,8 @@ class IndicatorLunar:
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
 
-        # Determine which phases occur by date rather than using the phase calculated
-        # as the phase (illumination) rounds numbers and so a given phase is entered earlier than what is official.
+        # Determine which phases occur by date rather than using the phase calculated.
+        # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
         nextPhases = [ ]
 
         self.data[ "MOON FIRST QUARTER" ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
@@ -1374,16 +1372,6 @@ class IndicatorLunar:
 
 
     def getSatelliteTLEData( self ):
-#TODO Remove after testing.
-#        
-#         self.satelliteTLEData = { }
-#         self.satelliteTLEData.append( "ISS (ZARYA)" + " - " + "25544", satellite.Info( 
-#            "ISS (ZARYA)", 
-#            "1 25544U 98067A   14144.25429147  .00013298  00000-0  23626-3 0  3470" ,
-#            "2 25544  51.6479 218.2294 0003503  34.9920  27.7254 15.50515783887617" ) )
-#         self.lastUpdateTLE = datetime.datetime.now()
-#         if True: return
-
         try:
             self.satelliteTLEData = { } # Key 'satellite name - satellite number'; value satellite.Info object.
             data = urlopen( IndicatorLunar.SATELLITE_TLE_URL ).read().decode( "utf8" ).splitlines()
