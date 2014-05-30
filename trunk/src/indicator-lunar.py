@@ -25,25 +25,6 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
-#TODO Search for next pass and similar...do I need to catch valueerror?  
-# Related to circumpolar error
-# http://rhodesmill.org/pyephem/quick.html 
-#Need to guard against ValueError (AlwaysUp and NeverUp)?
-#Test for a location near the poles.
-
-
-# TODO Perhaps it's possible to distinguish a visible transit from all transits.
-# http://stackoverflow.com/questions/12845908/horizon-for-earth-satellites
-# http://www.sharebrained.com/2011/10/18/track-the-iss-pyephem/
-# http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
-
-
-#TODO Could make the rise/set for satellites show all transits for the next 5 days or whatever the upper limit is using the TLE.
-# Compare results against heavensabove or "nyse". 
-
-
-
-
 try: from gi.repository import AppIndicator3 as appindicator
 except: pass
 
@@ -191,7 +172,7 @@ class IndicatorLunar:
 
     def update( self ):
         # Update the satellite TLE data at most every 12 hours.
-        if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ): self.getSatelliteTLEData() 
+#         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ): self.getSatelliteTLEData() 
 
         # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
         ephemNow = ephem.now()
@@ -300,7 +281,7 @@ class IndicatorLunar:
                     planet[ 1 ].compute( city )
                     self.createBodyMenu( menuItem, city, planet[ 1 ], nextUpdates, ephemNow )
 
-        self.createStarsMenu( menu, city )
+        self.createStarsMenu( menu, city, nextUpdates )
 
         self.createSatellitesMenu( menu, city, nextUpdates )
 
@@ -410,19 +391,25 @@ class IndicatorLunar:
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # Rising/Setting.
-        rising = city.next_rising( sun )
-        self.data[ "SUN NEXT RISING" ] = self.localiseAndTrim( rising )
-        setting = city.next_setting( sun )
-        self.data[ "SUN NEXT SETTING" ] = self.localiseAndTrim( setting )
-        if rising > setting:
-            subMenu.append( Gtk.MenuItem( "Set: " + self.data[ "SUN NEXT SETTING" ] ) )
-            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ "SUN NEXT RISING" ] ) )
-        else:
-            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ "SUN NEXT RISING" ] ) )
-            subMenu.append( Gtk.MenuItem( "Set: " + self.data[ "SUN NEXT SETTING" ] ) )
+        try:
+            rising = city.next_rising( sun )
+            self.data[ "SUN NEXT RISING" ] = self.localiseAndTrim( rising )
+            setting = city.next_setting( sun )
+            self.data[ "SUN NEXT SETTING" ] = self.localiseAndTrim( setting )
+            if rising > setting:
+                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ "SUN NEXT SETTING" ] ) )
+                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ "SUN NEXT RISING" ] ) )
+            else:
+                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ "SUN NEXT RISING" ] ) )
+                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ "SUN NEXT SETTING" ] ) )
 
-        nextUpdates.append( rising )
-        nextUpdates.append( setting )
+            nextUpdates.append( rising )
+            nextUpdates.append( setting )
+
+        except ephem.AlwaysUpError:
+            subMenu.append( Gtk.MenuItem( "Always Up!" ) )
+        except ephem.NeverUpError:
+            subMenu.append( Gtk.MenuItem( "Never Up!" ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -477,26 +464,30 @@ class IndicatorLunar:
 
         # Must compute the previous information (illumination, constellation, phase and so on BEFORE rising/setting).
         # For some reason the values, most notably phase, are different (and wrong) if calculated AFTER rising/setting are calculated.
-        rising = city.next_rising( body )
-        self.data[ body.name.upper() + " RISING" ] = str( self.localiseAndTrim( rising ) )
-        setting = city.next_setting( body )
-        self.data[ body.name.upper() + " SETTING" ] = str( self.localiseAndTrim( setting ) )
-        if rising > setting:
-            subMenu.append( Gtk.MenuItem( "Set: " + self.data[ body.name.upper() + " SETTING" ] ) )
-            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ body.name.upper() + " RISING" ] ) )
-        else:
-            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ body.name.upper() + " RISING" ] ) )
-            subMenu.append( Gtk.MenuItem( "Set: " + self.data[ body.name.upper() + " SETTING" ] ) )
+        try:
+            rising = city.next_rising( body )
+            setting = city.next_setting( body )
+            self.data[ body.name.upper() + " RISING" ] = str( self.localiseAndTrim( rising ) )
+            self.data[ body.name.upper() + " SETTING" ] = str( self.localiseAndTrim( setting ) )
+            if rising > setting:
+                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ body.name.upper() + " SETTING" ] ) )
+                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ body.name.upper() + " RISING" ] ) )
+            else:
+                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ body.name.upper() + " RISING" ] ) )
+                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ body.name.upper() + " SETTING" ] ) )
+     
+            nextUpdates.append( rising )
+            nextUpdates.append( setting )
+
+        except ephem.AlwaysUpError:
+            subMenu.append( Gtk.MenuItem( "Always Up!" ) )
+        except ephem.NeverUpError:
+            subMenu.append( Gtk.MenuItem( "Never Up!" ) )
 
         bodyMenuItem.set_submenu( subMenu )
 
-        nextUpdates.append( rising )
-        nextUpdates.append( setting )
 
-
-    # The rise/set times for stars are not included in the display.
-    # Depending on the star/city combination, some stars are always up or never up (particularly at high latitudes).
-    def createStarsMenu( self, menu, city ):
+    def createStarsMenu( self, menu, city, nextUpdates ):
         if len( self.stars ) == 0: return
 
         menuItem = Gtk.MenuItem( "Stars" )
@@ -513,6 +504,27 @@ class IndicatorLunar:
             star.compute( city )
 
             self.createRADecAzAltMagMenu( subMenu, star )
+
+            # Rising/Setting.
+            try:
+                rising = city.next_rising( star )
+                self.data[ star.name.upper() + " NEXT RISING" ] = self.localiseAndTrim( rising )
+                setting = city.next_setting( star )
+                self.data[ star.name.upper() + " NEXT SETTING" ] = self.localiseAndTrim( setting )
+                if rising > setting:
+                    subMenu.append( Gtk.MenuItem( "Set: " + self.data[ star.name.upper() + " NEXT SETTING" ] ) )
+                    subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ star.name.upper() + " NEXT RISING" ] ) )
+                else:
+                    subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ star.name.upper() + " NEXT RISING" ] ) )
+                    subMenu.append( Gtk.MenuItem( "Set: " + self.data[ star.name.upper() + " NEXT SETTING" ] ) )
+
+                nextUpdates.append( rising )
+                nextUpdates.append( setting )
+
+            except ephem.AlwaysUpError:
+                subMenu.append( Gtk.MenuItem( "Always Up!" ) )
+            except ephem.NeverUpError:
+                subMenu.append( Gtk.MenuItem( "Never Up!" ) )
 
 
     # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/transit/set times.
@@ -532,6 +544,11 @@ class IndicatorLunar:
     # If a satellite is currently passing over, show the rise/set time for that pass.
     # This allows the user to see the rise/set time for the current pass as it is happening.
     # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
+    #
+    # Perhaps it's possible to distinguish a visible transit from all transits...
+    #    http://stackoverflow.com/questions/12845908/horizon-for-earth-satellites
+    #    http://www.sharebrained.com/2011/10/18/track-the-iss-pyephem
+    #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
     def createSatellitesMenu( self, menu, city, nextUpdates ):
         if len( self.satellites ) == 0: return
 
@@ -601,7 +618,7 @@ class IndicatorLunar:
                     try:
                         nextPass = cityFuture.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
                     except ValueError:
-                        subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Occurs when the satellite is always up or never up.
+                        subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Unfortunately, unable to determine if this is an AlwaysUpError or a NeverUpError.
                         continue
 
                     self.data[ key + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
