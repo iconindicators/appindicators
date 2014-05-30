@@ -3,7 +3,7 @@ indicator-lunar (1.0.42-1) precise; urgency=low
   * Bug fix: The star data was not being removed after a star was unchecked.
   * Bug fix: Each time the preferences was closed (on clicking OK) an update
     was kicked off (in addition to the main update).
-  * Bug fix: Handle extreme latitudes when encountering always up or never up
+  * Bug fix: Handle "extreme" latitudes when encountering always up or never up
     for rise/set of a body.
   * Planets can now be chosen by the user (for display in the menu).
   * Added rise/set times to stars.
@@ -11,7 +11,7 @@ indicator-lunar (1.0.42-1) precise; urgency=low
   * Added satellite/station rise and set times - requires intermittent
     internet access for satellite TLE data.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 25 May 2014 17:52:57 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 30 May 2014 19:48:16 +1000
 
 
 indicator-lunar (1.0.41-1) precise; urgency=low
