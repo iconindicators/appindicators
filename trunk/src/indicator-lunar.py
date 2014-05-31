@@ -642,30 +642,26 @@ class IndicatorLunar:
                     nextUpdates.append( nextPass[ 4 ] )
 
             # Build the menu...
-            subMenu.append( Gtk.MenuItem( "Rise" ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.data[ key + " RISE TIME" ] ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " RISE AZIMUTH" ] ) )
+            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ key + " RISE TIME" ] ) )
+            subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + " RISE AZIMUTH" ] ) )
 
-            subMenu.append( Gtk.MenuItem( "Set" ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " +  self.data[ key + " SET TIME" ] ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + " SET AZIMUTH" ] ) )
+            subMenu.append( Gtk.MenuItem( "Set: " +  self.data[ key + " SET TIME" ] ) )
+            subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + " SET AZIMUTH" ] ) )
 
             # Add the next five passes...
             city = self.getCity( ephemNow )
-            for i in range( 4 ):
+            for i in range( 5 ):
                 try:
                     city.date = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Assume that at least 30 minutes elapses between the previous set and the next rise.
                     nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
 
-                    subMenu.append( Gtk.SeparatorMenuItem() )
+                    subMenu.append( Gtk.MenuItem( "" ) )
 
-                    subMenu.append( Gtk.MenuItem( "Rise" ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.localiseAndTrim( nextPass[ 0 ] ) ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")" ) )
+                    subMenu.append( Gtk.MenuItem( "Rise: " + self.localiseAndTrim( nextPass[ 0 ] ) ) )
+                    subMenu.append( Gtk.MenuItem( "Azimuth: " + str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")" ) )
 
-                    subMenu.append( Gtk.MenuItem( "Set" ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.localiseAndTrim( nextPass[ 4 ] ) ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")" ) )
+                    subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( nextPass[ 4 ] ) ) )
+                    subMenu.append( Gtk.MenuItem( "Azimuth: " + str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")" ) )
 
                 except ValueError: 
                     break
