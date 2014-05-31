@@ -269,6 +269,8 @@ class IndicatorLunar:
         self.createSunMenu( menu, nextUpdates, ephemNow )
         
         # Planets
+        # Reference:
+        #    http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
         if len( self.planets ) > 0:
             menu.append( Gtk.MenuItem( "Planets" ) )
 
@@ -315,9 +317,12 @@ class IndicatorLunar:
         if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update period is at least hourly...
             nextUpdateInSeconds = ( 60 * 60 )
 
+        print( ephemNow, "\t", nextUpdateInSeconds )
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
 
 
+    # Reference:
+    #    http://www.ga.gov.au/geodesy/astro/moonrise.jsp
     def createMoonMenu( self, menu, nextUpdates, ephemNow, lunarPhase ):
         city = self.getCity( ephemNow )
 
@@ -366,6 +371,9 @@ class IndicatorLunar:
             self.createEclipseMenu( menuItem.get_submenu(), eclipseInformation, "MOON" )
 
 
+    # References:
+    #    http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
+    #    http://www.ga.gov.au/geodesy/astro/sunrise.jsp
     def createSunMenu( self, menu, nextUpdates, ephemNow ):
         city = self.getCity( ephemNow )
 
@@ -394,6 +402,7 @@ class IndicatorLunar:
 
         # Rising/Setting.
         try:
+            city = self.getCity( ephemNow )
             rising = city.next_rising( sun )
             self.data[ "SUN NEXT RISING" ] = self.localiseAndTrim( rising )
             setting = city.next_setting( sun )
@@ -410,10 +419,8 @@ class IndicatorLunar:
 
         except ephem.AlwaysUpError:
             subMenu.append( Gtk.MenuItem( "Always Up!" ) )
-            city = self.getCity( ephemNow )
         except ephem.NeverUpError:
             subMenu.append( Gtk.MenuItem( "Never Up!" ) )
-            city = self.getCity( ephemNow )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -440,7 +447,6 @@ class IndicatorLunar:
 
 
     def createBodyMenu( self, bodyMenuItem, body, nextUpdates, ephemNow ):
-        city = self.getCity( ephemNow )
         subMenu = Gtk.Menu()
 
         self.data[ body.name.upper() + " ILLUMINATION" ] = str( int( round( body.phase ) ) ) + "%"
@@ -458,7 +464,7 @@ class IndicatorLunar:
         self.data[ body.name.upper() + " DISTANCE TO SUN" ] = str( round( body.sun_distance, 4 ) ) + " AU"
         subMenu.append( Gtk.MenuItem( "Distance to Sun: " + self.data[ body.name.upper() + " DISTANCE TO SUN" ] ) )
 
-        self.data[ body.name.upper() + " BRIGHT LIMB" ] = str( round( self.getBrightLimbAngleRelativeToZenith( city, body ) ) ) + "°"
+        self.data[ body.name.upper() + " BRIGHT LIMB" ] = str( round( self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), body ) ) ) + "°"
         subMenu.append( Gtk.MenuItem( "Bright Limb: " + self.data[ body.name.upper() + " BRIGHT LIMB" ] ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
@@ -470,6 +476,7 @@ class IndicatorLunar:
         # Must compute the previous information (illumination, constellation, phase and so on BEFORE rising/setting).
         # For some reason the values, most notably phase, are different (and wrong) if calculated AFTER rising/setting are calculated.
         try:
+            city = self.getCity( ephemNow )
             rising = city.next_rising( body )
             setting = city.next_setting( body )
             self.data[ body.name.upper() + " RISING" ] = str( self.localiseAndTrim( rising ) )
@@ -486,10 +493,8 @@ class IndicatorLunar:
 
         except ephem.AlwaysUpError:
             subMenu.append( Gtk.MenuItem( "Always Up!" ) )
-            city = self.getCity( ephemNow )
         except ephem.NeverUpError:
             subMenu.append( Gtk.MenuItem( "Never Up!" ) )
-            city = self.getCity( ephemNow )
 
         bodyMenuItem.set_submenu( subMenu )
 
@@ -499,12 +504,9 @@ class IndicatorLunar:
     def createStarsMenu( self, ephemNow, menu, nextUpdates ):
         if len( self.stars ) == 0: return
 
-        city = self.getCity( ephemNow )
-
         menuItem = Gtk.MenuItem( "Stars" )
         menu.append( menuItem )
 
-        ephemNow = city.date
         for starName in self.stars:
             menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starName )
             menu.append( menuItem )
@@ -512,6 +514,7 @@ class IndicatorLunar:
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
 
+            city = self.getCity( ephemNow )
             star = ephem.star( starName )
             star.compute( city )
             self.createRADecAzAltMagMenu( subMenu, star )
@@ -534,10 +537,8 @@ class IndicatorLunar:
 
             except ephem.AlwaysUpError:
                 subMenu.append( Gtk.MenuItem( "Always Up!" ) )
-                city = self.getCity( ephemNow )
             except ephem.NeverUpError:
                 subMenu.append( Gtk.MenuItem( "Never Up!" ) )
-                city = self.getCity( ephemNow )
 
 
     # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/transit/set times.
@@ -565,8 +566,6 @@ class IndicatorLunar:
 
         if len( self.satelliteTLEData ) == 0: return # No point adding "non information" to the menu.  The preferences will tell the user there is a problem.
 
-        city = self.getCity( ephemNow )
-
         menuItem = Gtk.MenuItem( "Satellites" )
         menu.append( menuItem )
 
@@ -587,12 +586,12 @@ class IndicatorLunar:
                 continue
 
             satelliteInfo = self.satelliteTLEData[ key ]
+            city = self.getCity( ephemNow )
             nextPass = None
             try:
                 nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
             except ValueError:
                 subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Occurs when the satellite is always up or never up.
-                city = self.getCity( ephemNow )
                 continue
 
             if nextPass is None or nextPass[ 0 ] is None or nextPass[ 1 ] is None or nextPass[ 4 ] is None or nextPass[ 5 ] is None: # Ignore transit.
@@ -624,16 +623,11 @@ class IndicatorLunar:
                     # So just use the next pass.
                     difference = nextPass[ 0 ] - nextPass[ 4 ] # Date/time difference between the current set and next rise.
                     ephemFuture = ephem.Date( city.date + ( difference / 2.0 ) ) # Set a future date to be half the difference between the set time and the next rise time.
-                    cityFuture = ephem.Observer()
-                    cityFuture.lat = city.lat
-                    cityFuture.long = city.long
-                    cityFuture.elevation = city.elevation
-                    cityFuture.date = ephemFuture
+                    city = self.getCity( ephemFuture )
                     try:
-                        nextPass = cityFuture.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
+                        nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
                     except ValueError:
                         subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Unfortunately, unable to determine if this is an AlwaysUpError or a NeverUpError.
-                        city = self.getCity( ephemNow )
                         continue
 
                     self.data[ key + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
@@ -655,7 +649,7 @@ class IndicatorLunar:
 
             # Add the next five passes...
             city = self.getCity( ephemNow )
-            for i in range( 5 ):
+            for i in range( 4 ):
                 try:
                     city.date = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Assume that at least 30 minutes elapses between the previous set and the next rise.
                     nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
@@ -1543,4 +1537,4 @@ class IndicatorLunar:
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
 
 
-if __name__ == "__main__":  IndicatorLunar().main()
+if __name__ == "__main__": IndicatorLunar().main()
