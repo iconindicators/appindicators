@@ -6,7 +6,7 @@ indicator-lunar (1.0.42-1) precise; urgency=low
   * Bug fix: Handle "extreme" latitudes when encountering always up or never up
     for rise/set of a body.
   * Planets can now be chosen by the user (for display in the menu).
-  * Added rise/set times to stars.
+  * Added rise/set times and constellation to stars.
   * Added URLs to credits section in About dialog.
   * Added satellite/station rise and set times - requires intermittent
     internet access for satellite TLE data.

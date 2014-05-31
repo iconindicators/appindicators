@@ -317,7 +317,6 @@ class IndicatorLunar:
         if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update period is at least hourly...
             nextUpdateInSeconds = ( 60 * 60 )
 
-        print( ephemNow, "\t", nextUpdateInSeconds )
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
 
 
@@ -517,6 +516,10 @@ class IndicatorLunar:
             city = self.getCity( ephemNow )
             star = ephem.star( starName )
             star.compute( city )
+
+            self.data[ star.name.upper() + " CONSTELLATION" ] = ephem.constellation( star )[ 1 ]
+            subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ star.name.upper() + " CONSTELLATION" ] ) )
+
             self.createRADecAzAltMagMenu( subMenu, star )
 
             # Rising/Setting.
