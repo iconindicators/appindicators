@@ -49,7 +49,7 @@ class IndicatorVirtualBox:
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
-    VIRTUAL_BOX_CONFIGURATION = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
+    VIRTUAL_BOX_CONFIGURATION = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
     VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS = 5
 
     COMMENTS = " Shows VirtualBox™ virtual machines and allows them to be started."

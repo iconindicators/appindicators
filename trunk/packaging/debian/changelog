@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.32-1) precise; urgency=low
+
+  * The VirtualBox configuration file is now located in .config directory.
+    Updated internals to handle the change.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 7 Jun 2014 21:23:20 +1000
+
+
 indicator-virtual-box (1.0.31-1) precise; urgency=low
 
   * Fixed a bug where non-toggle buttons (the close button) were having the
