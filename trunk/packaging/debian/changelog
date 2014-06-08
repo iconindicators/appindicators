@@ -1,3 +1,11 @@
+indicator-lunar (1.0.43-1) precise; urgency=low
+
+  * Bug fix: Now handles the situation when the next rise/set time for a
+    satellite is calculated to be None.
+    
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 8 Jun 2014 22:08:46 +1000
+
+
 indicator-lunar (1.0.42-1) precise; urgency=low
 
   * Bug fix: The star data was not being removed after a star was unchecked.

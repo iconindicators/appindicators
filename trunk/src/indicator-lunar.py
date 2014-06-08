@@ -51,7 +51,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.42"
+    VERSION = "1.0.43"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -654,6 +654,8 @@ class IndicatorLunar:
                 try:
                     city.date = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Assume that at least 30 minutes elapses between the previous set and the next rise.
                     nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
+                    if nextPass is None or nextPass[ 0 ] is None or nextPass[ 1 ] is None or nextPass[ 4 ] is None or nextPass[ 5 ] is None: 
+                        break # Sometimes (don't know why) the result can be None.
 
                     subMenu.append( Gtk.MenuItem( "" ) )
 
@@ -663,8 +665,7 @@ class IndicatorLunar:
                     subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( nextPass[ 4 ] ) ) )
                     subMenu.append( Gtk.MenuItem( "Azimuth: " + str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")" ) )
 
-                except ValueError: 
-                    break
+                except ValueError: break # Occurs when the satellite is never up or always up.  Unfortunately cannot distinguish which.
 
 
     # Returns the string
