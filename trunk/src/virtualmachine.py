@@ -20,9 +20,13 @@
 
 class Info:
 
-    def __init__( self, name, isGroup, uuid, indent ):
+    # Name of VM or Group.
+    # Boolean True if a group; False otherwise.
+    # UUID of VM/Group.
+    # Numberic amount to indent when groups are used. 
+    def __init__( self, name, group, uuid, indent ):
         self.name = name
-        self.isGroup = isGroup
+        self.group = group
         self.uuid = uuid
         self.indent = indent
         self.isRunning = False
@@ -48,7 +52,7 @@ class Info:
     def setAutoStart( self, autoStart ): self.autoStart = autoStart
 
 
-    def isGroup( self ): return self.isGroup
+    def isGroup( self ): return self.group
 
 
     def getUUID( self ): return self.uuid
@@ -61,3 +65,9 @@ class Info:
 
 
     def isRunning( self ): return self.isRunning
+
+
+    def __str__( self ): return self.getName() + " | " + str( self.isGroup() ) + " | " + self.getUUID()
+
+
+    def __repr__( self ): return self.__str__()
