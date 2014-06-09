@@ -1,8 +1,9 @@
 indicator-virtual-box (1.0.33-1) precise; urgency=low
 
-  * The VirtualBox configuration file can exist in different places, sometimes
-    simultaneously, depending on the version of VirtualBox.
-    Now handles the different cases...hopefully!
+  * It has become apparent the VirtualBox configuration file can exist in
+    different places, sometimes simultaneously, depending on the version of
+    VirtualBox.  Now handles the different cases...hopefully!
+  * Handle a warning message from VBoxManage when obtaining a list of VMs.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 Jun 2014 16:16:10 +1000
 

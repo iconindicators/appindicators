@@ -53,9 +53,8 @@ class IndicatorVirtualBox:
     # Seems that the configuration file has moved between versions of VirtualBox.
     # In fact the config file can exist in TWO places simultaneously...
     # ...with one file containing group information and the other file containing non-group information.
-    VIRTUAL_BOX_CONFIGURATION_FILE = "VirtualBox.xml"
-    VIRTUAL_BOX_CONFIGURATION_A = os.getenv( "HOME" ) + "/.config/VirtualBox/" + VIRTUAL_BOX_CONFIGURATION_FILE
-    VIRTUAL_BOX_CONFIGURATION_B = os.getenv( "HOME" ) + "/.VirtualBox/" + VIRTUAL_BOX_CONFIGURATION_FILE
+    VIRTUAL_BOX_CONFIGURATION_A = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
+    VIRTUAL_BOX_CONFIGURATION_B = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
 
     VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS = 5
 
@@ -218,110 +217,20 @@ class IndicatorVirtualBox:
         self.virtualMachineInfos = self.getVirtualMachinesFromBackend()
         if len( self.virtualMachineInfos ) == 0: return
 
-        print( "Backend: ", self.virtualMachineInfos )
-
         # We have a list of VMs and UUIDs - now obtain groups or sort order.
         # The configuration file can exist in different locations depending on the version of VirtualBox.
         # Further, two config files can be in active use simultaneously - one for groups and the other for general GUI.
         # So need to parse both files...if they exist.
-        virtualMachineInfosA = [ ]
-        if os.path.exists( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_A ):
-            virtualMachineInfosA = self.getVirtualMachinesFromConfigWithGroups( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_A, "GUI/GroupDefinitions/", 0 ) # Attempt to get the groups and UUIDs.
-            print( "A1: ", virtualMachineInfosA )
-            if len( virtualMachineInfosA ) == 0: # There was no group data, so attempt to get UI sort order...
-                virtualMachineInfosA = self.getVirtualMachinesFromConfigWithoutGroups( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_A )
-                print( "A2: ", virtualMachineInfosA )
+        virtualMachineInfosA = self.getVirtualMachinesFromConfigFile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_A ) 
+        virtualMachineInfosB = self.getVirtualMachinesFromConfigFile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_B ) 
 
-            if len( virtualMachineInfosA ) > 0:
-
-                # There are VMs present - now double check the count matches that from the backend.
-                # I've observed...
-                #
-                #    If a VM is added to a group and the group then removed/ungrouped, the GUI/GroupDefinition remains, listing that VM.  
-                #    If another VM is created, the GUI/GroupDefinitions only lists the original/first VM...giving an incorrect reading.
-                #
-                #    If a VM is created and added to a group and a VM is later created of the same name but not in a group,
-                #    that new VM is not listed (and neither are subsequent VMs).
-                #
-                # So take what information the groups gave and append to that the VMs which are missing (from the backend information).
-                for virtualMachineInfoFromBackEnd in self.virtualMachineInfos:
-                    found = False
-                    for virtualMachineInfo in virtualMachineInfosA:
-                        if virtualMachineInfoFromBackEnd.getUUID() == virtualMachineInfo.getUUID():
-                            found = True
-                            break
-
-                    if found == False:
-                        virtualMachineInfosA.append( virtualMachineInfoFromBackEnd )
-
-                print( "A amended: ", virtualMachineInfosA )
-
-                # We now have a list of group names and VM UUIDs OR a list of VM UUIDs...
-                # However the VM names are not present.
-                # Get the VM names from the list from the backend...
-                for virtualMachineInfoFromBackEnd in self.virtualMachineInfos:
-                    for virtualMachineInfo in virtualMachineInfosA:
-                        if virtualMachineInfoFromBackEnd.getUUID() == virtualMachineInfo.getUUID():
-                            virtualMachineInfo.setName( virtualMachineInfoFromBackEnd.getName() )
-                            break
-
-                print( "A: ", virtualMachineInfosA )
-
-        # Repeat for the alternate config file...
-        virtualMachineInfosB = [ ]
-        if os.path.exists( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_B ):
-            virtualMachineInfosB = self.getVirtualMachinesFromConfigWithGroups( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_B, "GUI/GroupDefinitions/", 0 ) # Attempt to get the groups and UUIDs.
-            print( "B1: ", virtualMachineInfosB )
-            if len( virtualMachineInfosB ) == 0: # There was no group data, so attempt to get UI sort order...
-                virtualMachineInfosB = self.getVirtualMachinesFromConfigWithoutGroups( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_B )
-                print( "B2: ", virtualMachineInfosB )
-
-            if len( virtualMachineInfosB ) > 0:
-
-                # There are VMs present - now double check the count matches that from the backend.
-                # I've observed...
-                #
-                #    If a VM is added to a group and the group then removed/ungrouped, the GUI/GroupDefinition remains, listing that VM.  
-                #    If another VM is created, the GUI/GroupDefinitions only lists the original/first VM...giving an incorrect reading.
-                #
-                #    If a VM is created and added to a group and a VM is later created of the same name but not in a group,
-                #    that new VM is not listed (and neither are subsequent VMs).
-                #
-                # So take what information the groups gave and append to that the VMs which are missing (from the backend information).
-                for virtualMachineInfoFromBackEnd in self.virtualMachineInfos:
-                    found = False
-                    for virtualMachineInfo in virtualMachineInfosB:
-                        if virtualMachineInfoFromBackEnd.getUUID() == virtualMachineInfo.getUUID():
-                            found = True
-                            break
-
-                    if found == False:
-                        virtualMachineInfosB.append( virtualMachineInfoFromBackEnd )
-
-                print( "B amended: ", virtualMachineInfosB )
-    
-                # We now have a list of group names and VM UUIDs OR a list of VM UUIDs...
-                # However the VM names are not present.
-                # Get the VM names from the list from the backend...
-                for virtualMachineInfoFromBackEnd in self.virtualMachineInfos:
-                    for virtualMachineInfo in virtualMachineInfosB:
-                        if virtualMachineInfoFromBackEnd.getUUID() == virtualMachineInfo.getUUID():
-                            virtualMachineInfo.setName( virtualMachineInfoFromBackEnd.getName() )
-                            break
-    
-                print( "B: ", virtualMachineInfosB )
-
-        # Information from the config A takes precendence of config B as it appears config A is what the latest VirtualBox release uses.
-        # If there is no information from neither config, use what was obtained from the backend.
+        # Information from config A takes precedence of config B as it appears config A is what the latest VirtualBox release uses.
+        # If neither config has information, use what was obtained from the backend.
         if len( virtualMachineInfosA ) > 0 or len( virtualMachineInfosB ) > 0:
             if len( virtualMachineInfosA ) > 0:
                 self.virtualMachineInfos = virtualMachineInfosA
             else:
                 self.virtualMachineInfos = virtualMachineInfosB
-
-        print( "Pre-run check A: ", virtualMachineInfosA )
-        print( "Pre-run check B: ", virtualMachineInfosB )
-        print( "Pre-run check: ", self.virtualMachineInfos )
 
         # Determine which VMs are running...
         p = subprocess.Popen( "VBoxManage list runningvms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
@@ -334,15 +243,10 @@ class IndicatorVirtualBox:
             except: pass # Sometimes VBoxManage emits a warning message along with the VM information.
         p.wait()
 
-        print( "Pre-sort: ", self.virtualMachineInfos )
-
         # Alphabetically sort...
         if self.sortDefault == False and not self.groupsExist():
-            print( "SORTING" )
             self.virtualMachineInfos = sorted( self.virtualMachineInfos, key = lambda virtualMachineInfo: virtualMachineInfo.name )
 
-        print( "Final: ", self.virtualMachineInfos )
-        
         # Add to each VM its properties (autostart and the start command).
         for uuid in self.virtualMachinePreferences:
             virtualMachineInfo = self.getVirtualMachineInfo( uuid )
@@ -351,24 +255,33 @@ class IndicatorVirtualBox:
                 virtualMachineInfo.setStartCommand( self.virtualMachinePreferences[ uuid ][ 1 ] )
 
 
-    def getVirtualMachinesOLD( self ):
-        self.virtualMachineInfos = [ ] # A list of VirtualBox items.
+    # Obtain a list of VMs using VBoxManage.
+    # This does not include any groups (if present) nor any order set by the user in the GUI.
+    def getVirtualMachinesFromBackend( self ):
+        p = subprocess.Popen( "VBoxManage list vms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+        virtualMachineInfos = []
+        for line in p.stdout.readlines():
+            try:
+                info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
+                virtualMachineInfo = virtualmachine.Info( info[ 0 ], False, info[ 1 ], 0 )
+                virtualMachineInfos.append( virtualMachineInfo )
+            except: pass # Sometimes VBoxManage emits a warning message along with the VM information.
+        p.wait()
+        return virtualMachineInfos
 
-        if not self.isVirtualBoxInstalled(): return
 
-        self.virtualMachineInfos = self.getVirtualMachinesFromBackend()
-        if len( self.virtualMachineInfos ) == 0: return
+    # Parse the specified VirtualBox.xml file to obtain a list of VMs together with groups or sort order. 
+    def getVirtualMachinesFromConfigFile( self, configFile ):
+        virtualMachineInfos = [ ]
+        if os.path.exists( configFile ):
+            virtualMachineInfos = self.parseGroupDefinitions( configFile, "GUI/GroupDefinitions/", 0 ) # Attempt to get the groups and UUIDs.
+            if len( virtualMachineInfos ) == 0: # There was no group data, so attempt to get UI sort order...
+                virtualMachineInfos = self.parseSelectorVMPositions( configFile )
 
-        # We have a list of VMs and UUIDs...now determine if we have groups or the sort order has been changed...
-        if os.path.exists( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION ):
-            # Attempt to get the groups and UUIDs...
-            grepString = "GUI/GroupDefinitions/"
-            virtualMachineInfos = self.getVirtualMachinesFromConfigWithGroups( grepString, 0 )
             if len( virtualMachineInfos ) > 0:
-                # There are VMs present - now double check the count matches that from the backend.
-                # I've observed...
+                # Sometimes the VirtualBox.xml file does not accurately reflect changes made in the VirtualBox GUI...
                 #
-                #    If a VM is added to a group and the group then removed/ungrouped, the GUI/GroupDefinition remains, listing that VM.  
+                #    If a VM is added to a group and then group is ungrouped, the GUI/GroupDefinition remains, listing that VM.  
                 #    If another VM is created, the GUI/GroupDefinitions only lists the original/first VM...giving an incorrect reading.
                 #
                 #    If a VM is created and added to a group and a VM is later created of the same name but not in a group,
@@ -384,69 +297,21 @@ class IndicatorVirtualBox:
 
                     if found == False:
                         virtualMachineInfos.append( virtualMachineInfoFromBackEnd )
-            else:
-                # There was no group data, so attempt to get UI sort order...
-                virtualMachineInfos = self.getVirtualMachinesFromConfigWithoutGroups()
 
-            # We now have a list of group names and VM UUIDs OR a list of VM UUIDs...
-            # However the VM names are not present.
-            # Get the VM names from the list from the backend...
-            for virtualMachineInfoFromBackEnd in self.virtualMachineInfos:
-                for virtualMachineInfo in virtualMachineInfos:
-                    if virtualMachineInfoFromBackEnd.getUUID() == virtualMachineInfo.getUUID():
-                        virtualMachineInfo.setName( virtualMachineInfoFromBackEnd.getName() )
-                        break
+                # Now have a list of group names and VM UUIDs OR a list of VM UUIDs.
+                # The VM names though are not present, so get the VM names from the list from the backend...
+                for virtualMachineInfoFromBackEnd in self.virtualMachineInfos:
+                    for virtualMachineInfo in virtualMachineInfos:
+                        if virtualMachineInfoFromBackEnd.getUUID() == virtualMachineInfo.getUUID():
+                            virtualMachineInfo.setName( virtualMachineInfoFromBackEnd.getName() )
+                            break
 
-            self.virtualMachineInfos = virtualMachineInfos
-
-        # Determine which VMs are running...
-        p = subprocess.Popen( "VBoxManage list runningvms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-        for line in p.stdout.readlines():
-            try:
-                info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
-                for virtualMachineInfo in self.virtualMachineInfos:
-                    if virtualMachineInfo.getUUID() == info[ 1 ]:
-                        virtualMachineInfo.setRunning()
-            except: pass # Sometimes VBoxManage emits a warning message along with the VM information.
-        p.wait()
-
-        # Alphabetically sort...
-        if self.sortDefault == False and not self.groupsExist():
-            self.virtualMachineInfos = sorted( self.virtualMachineInfos, key = lambda virtualMachineInfo: virtualMachineInfo.name )
-
-        # Add to each VM its properties (autostart and the start command).
-        for uuid in self.virtualMachinePreferences:
-            virtualMachineInfo = self.getVirtualMachineInfo( uuid )
-            if virtualMachineInfo is not None:
-                virtualMachineInfo.setAutoStart( self.virtualMachinePreferences[ uuid ][ 0 ] == Gtk.STOCK_APPLY )
-                virtualMachineInfo.setStartCommand( self.virtualMachinePreferences[ uuid ][ 1 ] )
-
-
-    def groupsExist( self ):
-        for virtualMachineInfo in self.virtualMachineInfos:
-            if virtualMachineInfo.isGroup():
-                return True
-
-        return False
-
-
-    # Obtain a list of VMs using VBoxManage.  This does not include any groups (if present).
-    def getVirtualMachinesFromBackend( self ):
-        p = subprocess.Popen( "VBoxManage list vms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-        virtualMachineInfos = []
-        for line in p.stdout.readlines():
-            try:
-                info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
-                virtualMachineInfo = virtualmachine.Info( info[ 0 ], False, info[ 1 ], 0 )
-                virtualMachineInfos.append( virtualMachineInfo )
-            except: pass # Sometimes VBoxManage emits a warning message along with the VM information.
-        p.wait()
         return virtualMachineInfos
 
 
-    # Obtain a list of VMs by parsing the specified VirtualBox.xml configuration file.
+    # Obtain a list of VMs and their sort order by parsing the specified VirtualBox.xml configuration file.
     # This approach works when no groups have been created by the user or the version of VirtualBox does not support groups.
-    def getVirtualMachinesFromConfigWithoutGroups( self, configFile ):
+    def parseSelectorVMPositions( self, configFile ):
         virtualMachineInfos = []
         p = subprocess.Popen( "grep GUI/SelectorVMPositions " + configFile, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
         try:
@@ -460,25 +325,9 @@ class IndicatorVirtualBox:
         return virtualMachineInfos
 
 
-    # Obtain a list of VMs by parsing the VirtualBox.xml configuration file.
-    # This approach works when no groups have been created by the user or the version of VirtualBox does not support groups.
-    def getVirtualMachinesFromConfigWithoutGroupsOLD( self ):
-        virtualMachineInfos = []
-        p = subprocess.Popen( "grep GUI/SelectorVMPositions " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-        try:
-            uuids = list( p.communicate()[ 0 ].decode().rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
-            for uuid in uuids:
-                virtualMachineInfo = virtualmachine.Info( "", False, uuid, 0 )
-                virtualMachineInfos.append( virtualMachineInfo )                
-        except: # The VM order has never been altered giving an empty result (and exception).
-            virtualMachineInfos = []
-
-        return virtualMachineInfos
-
-
     # Obtain a list of VMs including group names and group structure by parsing the specified VirtualBox.xml configuration file.
     # The returned information contains no VM names - these need to be filled in by the caller.
-    def getVirtualMachinesFromConfigWithGroups( self, configFile, grepString, indentAmount ):
+    def parseGroupDefinitions( self, configFile, grepString, indentAmount ):
         virtualMachineInfos = []
         p = subprocess.Popen( "grep \"" + grepString + "\\\"\" " + configFile, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
         try:
@@ -489,9 +338,9 @@ class IndicatorVirtualBox:
                     virtualMachineInfo = virtualmachine.Info( itemName, True, "", indentAmount ) # For a group there is no UUID.
                     virtualMachineInfos.append( virtualMachineInfo )
                     if grepString.endswith( "/" ):
-                        virtualMachineInfos += self.getVirtualMachinesFromConfigWithGroups( configFile, grepString + itemName, indentAmount + 1 )
+                        virtualMachineInfos += self.parseGroupDefinitions( configFile, grepString + itemName, indentAmount + 1 )
                     else:
-                        virtualMachineInfos += self.getVirtualMachinesFromConfigWithGroups( configFile, grepString + "/" + itemName, indentAmount + 1 )
+                        virtualMachineInfos += self.parseGroupDefinitions( configFile, grepString + "/" + itemName, indentAmount + 1 )
                 else:
                     virtualMachineInfo = virtualmachine.Info( "", False, itemName, indentAmount ) # This is a VM: we have it's UUID but not its name...so the caller needs to add it in.
                     virtualMachineInfos.append( virtualMachineInfo )
@@ -501,29 +350,12 @@ class IndicatorVirtualBox:
         return virtualMachineInfos
 
 
-    # Obtain a list of VMs including group names and group structure by parsing the VirtualBox.xml configuration file.
-    # The returned information contains no VM names - these need to be filled in by the caller.
-    def getVirtualMachinesFromConfigWithGroupsOLD( self, grepString, indentAmount ):
-        virtualMachineInfos = []
-        p = subprocess.Popen( "grep \"" + grepString + "\\\"\" " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-        try:
-            items = list( p.communicate()[ 0 ].decode().rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
-            for item in items:
-                itemName = str( item ).split( "=" )[ 1 ] 
-                if str( item ).startswith( "go" ) or str( item ).startswith( "gc" ):
-                    virtualMachineInfo = virtualmachine.Info( itemName, True, "", indentAmount ) # For a group there is no UUID.
-                    virtualMachineInfos.append( virtualMachineInfo )
-                    if grepString.endswith( "/" ):
-                        virtualMachineInfos += self.getVirtualMachinesFromConfigWithGroups( grepString + itemName, indentAmount + 1 )
-                    else:
-                        virtualMachineInfos += self.getVirtualMachinesFromConfigWithGroups( grepString + "/" + itemName, indentAmount + 1 )
-                else:
-                    virtualMachineInfo = virtualmachine.Info( "", False, itemName, indentAmount ) # This is a VM: we have it's UUID but not its name...so the caller needs to add it in.
-                    virtualMachineInfos.append( virtualMachineInfo )
-        except:
-            virtualMachineInfos = []
+    def groupsExist( self ):
+        for virtualMachineInfo in self.virtualMachineInfos:
+            if virtualMachineInfo.isGroup():
+                return True
 
-        return virtualMachineInfos
+        return False
 
 
     def onRefresh( self ):
