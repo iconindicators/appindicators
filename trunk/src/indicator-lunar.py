@@ -564,6 +564,8 @@ class IndicatorLunar:
     #
     # Consider implementing an option to distinguish a visible transit from all transits...
     #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
+    #    http://www.celestrak.com/columns/v03n01
+    #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
     def createSatellitesMenu( self, ephemNow, menu, nextUpdates ):
         if len( self.satellites ) == 0: return
 
