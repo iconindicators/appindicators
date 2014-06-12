@@ -38,7 +38,7 @@ class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
-    VERSION = "1.0.10"
+    VERSION = "1.0.11"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -61,10 +61,8 @@ class IndicatorFortune:
 
 
     def __init__( self ):
-        filehandler = logging.FileHandler( filename = IndicatorFortune.LOG, mode = "a", delay = True )
-        logging.basicConfig( format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
-                             datefmt = "%H:%M:%S", level = logging.DEBUG,
-                             handlers = [ filehandler ] )
+        filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
+        logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
         self.dialog = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )

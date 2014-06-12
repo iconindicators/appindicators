@@ -3,7 +3,7 @@
 
 BUILD_DIR="build"
 NAME="indicator-fortune"
-VERSION=1.0.10
+VERSION=1.0.11
 PYTHON_UTILS=../PythonUtils/src/pythonutils.py
 
 if [ ! -f $PYTHON_UTILS ];
