@@ -20,7 +20,7 @@
 
 from gi.repository import Gtk
 
-import gzip, os, re
+import gzip, logging.handlers, os, re
 
 
 # Returns True if a number; False otherwise.
@@ -200,3 +200,20 @@ class AboutDialog( Gtk.AboutDialog ):
                 contents = "Error reading change log: " + self.changeLog
 
         return contents
+
+
+# Log file handler.  Truncates the file when the file size limit is reached.
+# http://stackoverflow.com/questions/24157278/limit-python-log-file
+# http://svn.python.org/view/python/trunk/Lib/logging/handlers.py?view=markup
+class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
+    def __init__( self, filename, mode = "a", maxBytes = 0, encoding = None, delay = 0 ):
+        super( TruncatedFileHandler, self ).__init__( filename, mode, maxBytes, 0, encoding, delay )
+
+
+    def doRollover( self ):
+        if self.stream: self.stream.close()
+
+        if os.path.exists( self.baseFilename ): os.remove( self.baseFilename )
+
+        self.mode = "a" # Using "w" instead works in the same way as does append...why?  Surely "w" would write from the beginning each time?
+        self.stream = self._open()
