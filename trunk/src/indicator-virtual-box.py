@@ -41,7 +41,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.33"
+    VERSION = "1.0.34"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -71,10 +71,8 @@ class IndicatorVirtualBox:
 
 
     def __init__( self ):
-        filehandler = logging.FileHandler( filename = IndicatorVirtualBox.LOG, mode = "a", delay = True )
-        logging.basicConfig( format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
-                             datefmt = "%H:%M:%S", level = logging.DEBUG,
-                             handlers = [ filehandler ] )
+        filehandler = pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG, "a", 10000, None, True )
+        logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
         self.loadSettings()
         self.dialog = None
