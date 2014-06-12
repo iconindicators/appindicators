@@ -696,6 +696,163 @@ class IndicatorLunar:
                 except ValueError: break # Occurs when the satellite is never up or always up.  Unfortunately cannot distinguish which.
 
 
+    def createSatellitesMenuNEW( self, ephemNow, menu, nextUpdates ):
+        if len( self.satellites ) == 0: return
+
+        if len( self.satelliteTLEData ) == 0: return # No point adding "non information" to the menu.  The preferences will tell the user there is a problem.
+
+        menuItem = Gtk.MenuItem( "Satellites" )
+        menu.append( menuItem )
+
+        for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
+            if self.showSatelliteNumber:
+                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ] )
+            else:
+                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteNameNumber[ 0 ] )
+
+            menu.append( menuItem )
+
+            subMenu = Gtk.Menu()
+            menuItem.set_submenu( subMenu )
+
+            key = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], satelliteNameNumber[ 1 ] )
+            if not key in self.satelliteTLEData:
+                subMenu.append( Gtk.MenuItem( "No TLE data!" ) )
+                continue
+
+            satelliteInfo = self.satelliteTLEData[ key ]
+            city = self.getCity( ephemNow )
+            nextPass = None
+            try: nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
+            except ValueError:
+                subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Occurs when the satellite is always up or never up.
+                continue
+
+            if nextPass is None or nextPass[ 0 ] is None or nextPass[ 1 ] is None or nextPass[ 4 ] is None or nextPass[ 5 ] is None: # Ignore transit.
+                subMenu.append( Gtk.MenuItem( "Unable to compute next pass!" ) )
+                continue
+
+            if nextPass[ 0 ] < nextPass[ 4 ]:
+                # The satellite is below the horizon.
+                self.data[ key + IndicatorLunar.TAG_RISE_TIME ] = self.localiseAndTrim( nextPass[ 0 ] )
+                self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+                self.data[ key + IndicatorLunar.TAG_SET_TIME ] = self.localiseAndTrim( nextPass[ 4 ] )
+                self.data[ key + IndicatorLunar.TAG_SET_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+
+                nextUpdates.append( nextPass[ 0 ] )
+                nextUpdates.append( nextPass[ 4 ] )
+            else:
+                # The satellite is passing over and so the calculated rise time is for the next pass.
+                # Use the rise/set from the previous run.
+                if ( key + IndicatorLunar.TAG_RISE_TIME ) in self.dataPrevious and ( key + IndicatorLunar.TAG_RISE_AZIMUTH ) in self.dataPrevious:
+                    # The data from the previous run is available...
+                    self.data[ key + IndicatorLunar.TAG_RISE_TIME ] = self.dataPrevious[ key + IndicatorLunar.TAG_RISE_TIME ]
+                    self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ] = self.dataPrevious[ key + IndicatorLunar.TAG_RISE_AZIMUTH ]
+                    self.data[ key + IndicatorLunar.TAG_SET_TIME ] = self.dataPrevious[ key + IndicatorLunar.TAG_SET_TIME ]
+                    self.data[ key + IndicatorLunar.TAG_SET_AZIMUTH ] = self.dataPrevious[ key + IndicatorLunar.TAG_SET_AZIMUTH ]
+
+                    nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
+                else:
+                    # There is no previous data (typically because this is the first run), so just use the next pass.
+                    ephemFuture = ephem.Date( city.date + ( ( nextPass[ 0 ] - nextPass[ 4 ] ) / 2.0 ) ) # Set a future date to be half the difference between the current set time and the next future rise time.
+                    city = self.getCity( ephemFuture )
+                    try:
+                        nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
+                    except ValueError:
+                        subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Unfortunately, unable to determine if this is an AlwaysUpError or a NeverUpError.
+                        continue
+
+                    self.data[ key + IndicatorLunar.TAG_RISE_TIME ] = self.localiseAndTrim( nextPass[ 0 ] )
+                    self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+                    self.data[ key + IndicatorLunar.TAG_SET_TIME ] = self.localiseAndTrim( nextPass[ 4 ] )
+                    self.data[ key + IndicatorLunar.TAG_SET_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+
+                    nextUpdates.append( nextPass[ 0 ] )
+                    nextUpdates.append( nextPass[ 4 ] )
+
+            # Build the menu...
+            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ key + IndicatorLunar.TAG_RISE_TIME ] ) )
+            subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ] ) )
+
+            subMenu.append( Gtk.MenuItem( "Set: " +  self.data[ key + IndicatorLunar.TAG_SET_TIME ] ) )
+            subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + IndicatorLunar.TAG_SET_AZIMUTH ] ) )
+
+            # Add the next five passes...
+            city = self.getCity( ephemNow )
+            for i in range( 5 ):
+                try:
+                    city.date = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Assume that at least 30 minutes elapses between the previous set and the next rise.
+                    nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
+                    if nextPass is None or nextPass[ 0 ] is None or nextPass[ 1 ] is None or nextPass[ 4 ] is None or nextPass[ 5 ] is None: 
+                        break # Sometimes (don't know why) the result can be None.
+
+                    subMenu.append( Gtk.MenuItem( "" ) )
+
+                    subMenu.append( Gtk.MenuItem( "Rise: " + self.localiseAndTrim( nextPass[ 0 ] ) ) )
+                    subMenu.append( Gtk.MenuItem( "Azimuth: " + str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")" ) )
+
+                    subMenu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( nextPass[ 4 ] ) ) )
+                    subMenu.append( Gtk.MenuItem( "Azimuth: " + str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")" ) )
+
+                except ValueError: break # Occurs when the satellite is never up or always up.  Unfortunately cannot distinguish which.
+
+
+    def calculateSatelliteNextPass( self, ephemNow, satelliteInfo, visible, nextUpdates ):
+            city = self.getCity( ephemNow )
+            nextPass = None
+            try:
+                nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
+            except ValueError:
+                return "Never rises or never sets." # Occurs when the satellite is always up or never up.
+
+            if nextPass is None or nextPass[ 0 ] is None or nextPass[ 1 ] is None or nextPass[ 4 ] is None or nextPass[ 5 ] is None: # Ignore transit.
+                return "Unable to compute next pass!"
+
+            if nextPass[ 0 ] < nextPass[ 4 ]:
+                # The satellite is below the horizon.
+                self.data[ key + IndicatorLunar.TAG_RISE_TIME ] = self.localiseAndTrim( nextPass[ 0 ] )
+                self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+                self.data[ key + IndicatorLunar.TAG_SET_TIME ] = self.localiseAndTrim( nextPass[ 4 ] )
+                self.data[ key + IndicatorLunar.TAG_SET_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+
+                nextUpdates.append( nextPass[ 0 ] )
+                nextUpdates.append( nextPass[ 4 ] )
+            else:
+                # The satellite is passing over and so the calculated rise time is for the next pass.
+                # Use the rise/set from the previous run.
+                if ( key + IndicatorLunar.TAG_RISE_TIME ) in self.dataPrevious and ( key + IndicatorLunar.TAG_RISE_AZIMUTH ) in self.dataPrevious:
+                    # The data from the previous run is available...
+                    self.data[ key + IndicatorLunar.TAG_RISE_TIME ] = self.dataPrevious[ key + IndicatorLunar.TAG_RISE_TIME ]
+                    self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ] = self.dataPrevious[ key + IndicatorLunar.TAG_RISE_AZIMUTH ]
+                    self.data[ key + IndicatorLunar.TAG_SET_TIME ] = self.dataPrevious[ key + IndicatorLunar.TAG_SET_TIME ]
+                    self.data[ key + IndicatorLunar.TAG_SET_AZIMUTH ] = self.dataPrevious[ key + IndicatorLunar.TAG_SET_AZIMUTH ]
+
+                    nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
+                else:
+                    # There is no previous data (typically because this is the first run), so just use the next pass.
+                    ephemFuture = ephem.Date( city.date + ( ( nextPass[ 0 ] - nextPass[ 4 ] ) / 2.0 ) ) # Set a future date to be half the difference between the current set time and the next future rise time.
+                    city = self.getCity( ephemFuture )
+                    try:
+                        nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
+                    except ValueError:
+                        return "Never rises or never sets."  # Unfortunately, unable to determine if this is an AlwaysUpError or a NeverUpError.
+
+                    self.data[ key + IndicatorLunar.TAG_RISE_TIME ] = self.localiseAndTrim( nextPass[ 0 ] )
+                    self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+                    self.data[ key + IndicatorLunar.TAG_SET_TIME ] = self.localiseAndTrim( nextPass[ 4 ] )
+                    self.data[ key + IndicatorLunar.TAG_SET_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+
+                    nextUpdates.append( nextPass[ 0 ] )
+                    nextUpdates.append( nextPass[ 4 ] )
+
+            # Build the menu...
+            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ key + IndicatorLunar.TAG_RISE_TIME ] ) )
+            subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ] ) )
+
+            subMenu.append( Gtk.MenuItem( "Set: " +  self.data[ key + IndicatorLunar.TAG_SET_TIME ] ) )
+            subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + IndicatorLunar.TAG_SET_AZIMUTH ] ) )
+
+
     # Returns the string
     #    satelliteName - satelliteNumber
     # useful for keys into a dict/hashtable and for display.
