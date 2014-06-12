@@ -622,10 +622,8 @@ class IndicatorLunar:
 
                     nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
                 else:
-                    # There is no previous data (typically because this is the first run).
-                    # So just use the next pass.
-                    difference = nextPass[ 0 ] - nextPass[ 4 ] # Date/time difference between the current set and next rise.
-                    ephemFuture = ephem.Date( city.date + ( difference / 2.0 ) ) # Set a future date to be half the difference between the set time and the next rise time.
+                    # There is no previous data (typically because this is the first run), so just use the next pass.
+                    ephemFuture = ephem.Date( city.date + ( ( nextPass[ 0 ] - nextPass[ 4 ] ) / 2.0 ) ) # Set a future date to be half the difference between the current set time and the next future rise time.
                     city = self.getCity( ephemFuture )
                     try:
                         nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
