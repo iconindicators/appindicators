@@ -321,6 +321,13 @@ class IndicatorLunar:
     # Reference:
     #    http://www.ga.gov.au/geodesy/astro/moonrise.jsp
     def createMoonMenu( self, menu, nextUpdates, ephemNow, lunarPhase ):
+        TAG_MOON_ECLIPSE = "MOON"
+        TAG_MOON_FIRST_QUARTER = "MOON FIRST QUARTER"
+        TAG_MOON_FULL ="MOON FULL"
+        TAG_MOON_NEW = "MOON NEW"
+        TAG_MOON_PHASE = "MOON PHASE"
+        TAG_MOON_THIRD_QUARTER = "MOON THIRD QUARTER"
+
         city = self.getCity( ephemNow )
 
         menuItem = Gtk.MenuItem( "Moon" )
@@ -330,8 +337,8 @@ class IndicatorLunar:
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
-        self.data[ "MOON PHASE" ] = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
-        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + self.data[ "MOON PHASE" ] ) )
+        self.data[ TAG_MOON_PHASE ] = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
+        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + self.data[ TAG_MOON_PHASE ] ) )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
@@ -340,17 +347,17 @@ class IndicatorLunar:
         # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
         nextPhases = [ ]
 
-        self.data[ "MOON FIRST QUARTER" ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
-        nextPhases.append( [ self.data[ "MOON FIRST QUARTER" ], "First Quarter: " ] )
+        self.data[ TAG_MOON_FIRST_QUARTER ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
+        nextPhases.append( [ self.data[ TAG_MOON_FIRST_QUARTER ], "First Quarter: " ] )
 
-        self.data[ "MOON FULL" ] = self.localiseAndTrim( ephem.next_full_moon( ephemNow ) )
-        nextPhases.append( [ self.data[ "MOON FULL" ], "Full: " ] )
+        self.data[ TAG_MOON_FULL ] = self.localiseAndTrim( ephem.next_full_moon( ephemNow ) )
+        nextPhases.append( [ self.data[ TAG_MOON_FULL ], "Full: " ] )
 
-        self.data[ "MOON THIRD QUARTER" ] = self.localiseAndTrim( ephem.next_last_quarter_moon( ephemNow ) )
-        nextPhases.append( [ self.data[ "MOON THIRD QUARTER" ], "Third Quarter: " ] )
+        self.data[ TAG_MOON_THIRD_QUARTER ] = self.localiseAndTrim( ephem.next_last_quarter_moon( ephemNow ) )
+        nextPhases.append( [ self.data[ TAG_MOON_THIRD_QUARTER ], "Third Quarter: " ] )
 
-        self.data[ "MOON NEW" ] = self.localiseAndTrim( ephem.next_new_moon( ephemNow ) )
-        nextPhases.append( [ self.data[ "MOON NEW" ], "New: " ] )
+        self.data[ TAG_MOON_NEW ] = self.localiseAndTrim( ephem.next_new_moon( ephemNow ) )
+        nextPhases.append( [ self.data[ TAG_MOON_NEW ], "New: " ] )
 
         nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
         for phaseInformation in nextPhases:
@@ -365,13 +372,22 @@ class IndicatorLunar:
         eclipseInformation = eclipse.getLunarEclipseForUTC( ephemNow.datetime() )
         if eclipseInformation is not None:
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-            self.createEclipseMenu( menuItem.get_submenu(), eclipseInformation, "MOON" )
+            self.createEclipseMenu( menuItem.get_submenu(), eclipseInformation, TAG_MOON_ECLIPSE )
 
 
     # References:
     #    http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     #    http://www.ga.gov.au/geodesy/astro/sunrise.jsp
     def createSunMenu( self, menu, nextUpdates, ephemNow ):
+        TAG_SUN_CONSTELLATION = "SUN CONSTELLATION"
+        TAG_SUN_DISTANCE_TO_EARTH = "SUN DISTANCE TO EARTH"
+        TAG_SUN_ECLIPSE = "SUN"
+        TAG_SUN_EQUINOX = "SUN EQUINOX"
+        TAG_SUN_NEXT_RISING = "SUN NEXT RISING"
+        TAG_SUN_NEXT_SETTING = "SUN NEXT SETTING"
+        TAG_SUN_SOLSTICE = "SUN SOLSTICE"
+        TAG_SUN_TROPICAL_SIGN = "SUN TROPICAL SIGN"
+
         city = self.getCity( ephemNow )
 
         menuItem = Gtk.MenuItem( "Sun" )
@@ -382,14 +398,14 @@ class IndicatorLunar:
 
         sun = ephem.Sun( city )
 
-        self.data[ "SUN CONSTELLATION" ] = ephem.constellation( sun )[ 1 ]
-        subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ "SUN CONSTELLATION" ] ) )
+        self.data[ TAG_SUN_CONSTELLATION ] = ephem.constellation( sun )[ 1 ]
+        subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ TAG_SUN_CONSTELLATION ] ) )
 
-        self.data[ "SUN TROPICAL SIGN" ] = self.getTropicalSign( sun, ephemNow )
-        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ "SUN TROPICAL SIGN" ] ) )
+        self.data[ TAG_SUN_TROPICAL_SIGN ] = self.getTropicalSign( sun, ephemNow )
+        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ TAG_SUN_TROPICAL_SIGN ] ) )
 
-        self.data[ "SUN DISTANCE TO EARTH" ] = str( round( sun.earth_distance, 4 ) ) + " AU"
-        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ "SUN DISTANCE TO EARTH" ] ) )
+        self.data[ TAG_SUN_DISTANCE_TO_EARTH ] = str( round( sun.earth_distance, 4 ) ) + " AU"
+        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ TAG_SUN_DISTANCE_TO_EARTH ] ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -401,15 +417,15 @@ class IndicatorLunar:
         try:
             city = self.getCity( ephemNow )
             rising = city.next_rising( sun )
-            self.data[ "SUN NEXT RISING" ] = self.localiseAndTrim( rising )
+            self.data[ TAG_SUN_NEXT_RISING ] = self.localiseAndTrim( rising )
             setting = city.next_setting( sun )
-            self.data[ "SUN NEXT SETTING" ] = self.localiseAndTrim( setting )
+            self.data[ TAG_SUN_NEXT_SETTING ] = self.localiseAndTrim( setting )
             if rising > setting:
-                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ "SUN NEXT SETTING" ] ) )
-                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ "SUN NEXT RISING" ] ) )
+                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ TAG_SUN_NEXT_SETTING ] ) )
+                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ TAG_SUN_NEXT_RISING ] ) )
             else:
-                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ "SUN NEXT RISING" ] ) )
-                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ "SUN NEXT SETTING" ] ) )
+                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ TAG_SUN_NEXT_RISING ] ) )
+                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ TAG_SUN_NEXT_SETTING ] ) )
 
             nextUpdates.append( rising )
             nextUpdates.append( setting )
@@ -423,15 +439,15 @@ class IndicatorLunar:
 
         # Solstice/Equinox.
         equinox = ephem.next_equinox( ephemNow )
-        self.data[ "SUN EQUINOX" ] = self.localiseAndTrim( equinox )
+        self.data[ TAG_SUN_EQUINOX ] = self.localiseAndTrim( equinox )
         solstice = ephem.next_solstice( ephemNow )
-        self.data[ "SUN SOLSTICE" ] = self.localiseAndTrim( solstice )
+        self.data[ TAG_SUN_SOLSTICE ] = self.localiseAndTrim( solstice )
         if equinox < solstice:
-            subMenu.append( Gtk.MenuItem( "Equinox: " + self.data[ "SUN EQUINOX" ] ) )
-            subMenu.append( Gtk.MenuItem( "Solstice: " + self.data[ "SUN SOLSTICE" ] ) )
+            subMenu.append( Gtk.MenuItem( "Equinox: " + self.data[ TAG_SUN_EQUINOX ] ) )
+            subMenu.append( Gtk.MenuItem( "Solstice: " + self.data[ TAG_SUN_SOLSTICE ] ) )
         else:
-            subMenu.append( Gtk.MenuItem( "Solstice: " + self.data[ "SUN SOLSTICE" ] ) )
-            subMenu.append( Gtk.MenuItem( "Equinox: " + self.data[ "SUN EQUINOX" ] ) )
+            subMenu.append( Gtk.MenuItem( "Solstice: " + self.data[ TAG_SUN_SOLSTICE ] ) )
+            subMenu.append( Gtk.MenuItem( "Equinox: " + self.data[ TAG_SUN_EQUINOX ] ) )
 
         nextUpdates.append( equinox )
         nextUpdates.append( solstice )
@@ -440,29 +456,38 @@ class IndicatorLunar:
         eclipseInformation = eclipse.getSolarEclipseForUTC( ephemNow.datetime() )
         if eclipseInformation is not None:
             subMenu.append( Gtk.SeparatorMenuItem() )
-            self.createEclipseMenu( subMenu, eclipseInformation, "SUN" )
+            self.createEclipseMenu( subMenu, eclipseInformation, TAG_SUN_ECLIPSE )
 
 
     def createBodyMenu( self, bodyMenuItem, body, nextUpdates, ephemNow ):
+        TAG_BODY_BRIGHT_LIMB = " BRIGHT LIMB"
+        TAG_BODY_CONSTELLATION = " CONSTELLATION"
+        TAG_BODY_DISTANCE_TO_EARTH = " DISTANCE TO EARTH"
+        TAG_BODY_DISTANCE_TO_SUN = " DISTANCE TO SUN"
+        TAG_BODY_ILLUMINATION = " ILLUMINATION"
+        TAG_BODY_RISING = " RISING"
+        TAG_BODY_SETTING = " SETTING"
+        TAG_BODY_TROPICAL_SIGN = " TROPICAL SIGN"
+
         subMenu = Gtk.Menu()
 
-        self.data[ body.name.upper() + " ILLUMINATION" ] = str( int( round( body.phase ) ) ) + "%"
-        subMenu.append( Gtk.MenuItem( "Illumination: " + self.data[ body.name.upper() + " ILLUMINATION" ] ) )
+        self.data[ body.name.upper() + TAG_BODY_ILLUMINATION ] = str( int( round( body.phase ) ) ) + "%"
+        subMenu.append( Gtk.MenuItem( "Illumination: " + self.data[ body.name.upper() + TAG_BODY_ILLUMINATION ] ) )
 
-        self.data[ body.name.upper() + " CONSTELLATION" ] = ephem.constellation( body )[ 1 ]
-        subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ body.name.upper() + " CONSTELLATION" ] ) )
+        self.data[ body.name.upper() + TAG_BODY_CONSTELLATION ] = ephem.constellation( body )[ 1 ]
+        subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ body.name.upper() + TAG_BODY_CONSTELLATION ] ) )
 
-        self.data[ body.name.upper() + " TROPICAL SIGN" ] = self.getTropicalSign( body, ephemNow )
-        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ body.name.upper() + " TROPICAL SIGN" ] ) )
+        self.data[ body.name.upper() + TAG_BODY_TROPICAL_SIGN ] = self.getTropicalSign( body, ephemNow )
+        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ body.name.upper() + TAG_BODY_TROPICAL_SIGN ] ) )
 
-        self.data[ body.name.upper() + " DISTANCE TO EARTH" ] = str( round( body.earth_distance, 4 ) ) + " AU"
-        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ body.name.upper() + " DISTANCE TO EARTH" ] ) )
+        self.data[ body.name.upper() + TAG_BODY_DISTANCE_TO_EARTH ] = str( round( body.earth_distance, 4 ) ) + " AU"
+        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ body.name.upper() + TAG_BODY_DISTANCE_TO_EARTH ] ) )
 
-        self.data[ body.name.upper() + " DISTANCE TO SUN" ] = str( round( body.sun_distance, 4 ) ) + " AU"
-        subMenu.append( Gtk.MenuItem( "Distance to Sun: " + self.data[ body.name.upper() + " DISTANCE TO SUN" ] ) )
+        self.data[ body.name.upper() + TAG_BODY_DISTANCE_TO_SUN ] = str( round( body.sun_distance, 4 ) ) + " AU"
+        subMenu.append( Gtk.MenuItem( "Distance to Sun: " + self.data[ body.name.upper() + TAG_BODY_DISTANCE_TO_SUN ] ) )
 
-        self.data[ body.name.upper() + " BRIGHT LIMB" ] = str( round( self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), body ) ) ) + "°"
-        subMenu.append( Gtk.MenuItem( "Bright Limb: " + self.data[ body.name.upper() + " BRIGHT LIMB" ] ) )
+        self.data[ body.name.upper() + TAG_BODY_BRIGHT_LIMB ] = str( round( self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), body ) ) ) + "°"
+        subMenu.append( Gtk.MenuItem( "Bright Limb: " + self.data[ body.name.upper() + TAG_BODY_BRIGHT_LIMB ] ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -476,14 +501,14 @@ class IndicatorLunar:
             city = self.getCity( ephemNow )
             rising = city.next_rising( body )
             setting = city.next_setting( body )
-            self.data[ body.name.upper() + " RISING" ] = str( self.localiseAndTrim( rising ) )
-            self.data[ body.name.upper() + " SETTING" ] = str( self.localiseAndTrim( setting ) )
+            self.data[ body.name.upper() + TAG_BODY_RISING ] = str( self.localiseAndTrim( rising ) )
+            self.data[ body.name.upper() + TAG_BODY_SETTING ] = str( self.localiseAndTrim( setting ) )
             if rising > setting:
-                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ body.name.upper() + " SETTING" ] ) )
-                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ body.name.upper() + " RISING" ] ) )
+                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ body.name.upper() + TAG_BODY_SETTING ] ) )
+                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ body.name.upper() + TAG_BODY_RISING ] ) )
             else:
-                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ body.name.upper() + " RISING" ] ) )
-                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ body.name.upper() + " SETTING" ] ) )
+                subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ body.name.upper() + TAG_BODY_RISING ] ) )
+                subMenu.append( Gtk.MenuItem( "Set: " + self.data[ body.name.upper() + TAG_BODY_SETTING ] ) )
      
             nextUpdates.append( rising )
             nextUpdates.append( setting )
@@ -499,6 +524,10 @@ class IndicatorLunar:
     # Reference:
     #    http://aa.usno.navy.mil/data/docs/mrst.php
     def createStarsMenu( self, ephemNow, menu, nextUpdates ):
+        TAG_STAR_CONSTELLATION = " CONSTELLATION"
+        TAG_STAR_NEXT_RISING = " NEXT RISING"
+        TAG_STAR_NEXT_SETTING = " NEXT SETTING"
+
         if len( self.stars ) == 0: return
 
         menuItem = Gtk.MenuItem( "Stars" )
@@ -515,23 +544,23 @@ class IndicatorLunar:
             star = ephem.star( starName )
             star.compute( city )
 
-            self.data[ star.name.upper() + " CONSTELLATION" ] = ephem.constellation( star )[ 1 ]
-            subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ star.name.upper() + " CONSTELLATION" ] ) )
+            self.data[ star.name.upper() + TAG_STAR_CONSTELLATION ] = ephem.constellation( star )[ 1 ]
+            subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ star.name.upper() + TAG_STAR_CONSTELLATION ] ) )
 
             self.createRADecAzAltMagMenu( subMenu, star )
 
             # Rising/Setting.
             try:
                 rising = city.next_rising( star )
-                self.data[ star.name.upper() + " NEXT RISING" ] = self.localiseAndTrim( rising )
+                self.data[ star.name.upper() + TAG_STAR_NEXT_RISING ] = self.localiseAndTrim( rising )
                 setting = city.next_setting( star )
-                self.data[ star.name.upper() + " NEXT SETTING" ] = self.localiseAndTrim( setting )
+                self.data[ star.name.upper() + TAG_STAR_NEXT_SETTING ] = self.localiseAndTrim( setting )
                 if rising > setting:
-                    subMenu.append( Gtk.MenuItem( "Set: " + self.data[ star.name.upper() + " NEXT SETTING" ] ) )
-                    subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ star.name.upper() + " NEXT RISING" ] ) )
+                    subMenu.append( Gtk.MenuItem( "Set: " + self.data[ star.name.upper() + TAG_STAR_NEXT_SETTING ] ) )
+                    subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ star.name.upper() + TAG_STAR_NEXT_RISING ] ) )
                 else:
-                    subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ star.name.upper() + " NEXT RISING" ] ) )
-                    subMenu.append( Gtk.MenuItem( "Set: " + self.data[ star.name.upper() + " NEXT SETTING" ] ) )
+                    subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ star.name.upper() + TAG_STAR_NEXT_RISING ] ) )
+                    subMenu.append( Gtk.MenuItem( "Set: " + self.data[ star.name.upper() + TAG_STAR_NEXT_SETTING ] ) )
 
                 nextUpdates.append( rising )
                 nextUpdates.append( setting )
@@ -565,6 +594,11 @@ class IndicatorLunar:
     #    http://www.celestrak.com/columns/v03n01
     #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
     def createSatellitesMenu( self, ephemNow, menu, nextUpdates ):
+        TAG_SATELLITE_RISE_AZIMUTH = " RISE AZIMUTH"
+        TAG_SATELLITE_RISE_TIME = " RISE TIME"
+        TAG_SATELLITE_SET_AZIMUTH = " SET AZIMUTH"
+        TAG_SATELLITE_SET_TIME = " SET TIME"
+
         if len( self.satellites ) == 0: return
 
         if len( self.satelliteTLEData ) == 0: return # No point adding "non information" to the menu.  The preferences will tell the user there is a problem.
@@ -603,22 +637,22 @@ class IndicatorLunar:
 
             if nextPass[ 0 ] < nextPass[ 4 ]:
                 # The satellite is below the horizon.
-                self.data[ key + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
-                self.data[ key + " RISE AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
-                self.data[ key + " SET TIME" ] = self.localiseAndTrim( nextPass[ 4 ] )
-                self.data[ key + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+                self.data[ key + TAG_SATELLITE_RISE_TIME ] =  self.localiseAndTrim( nextPass[ 0 ] )
+                self.data[ key + TAG_SATELLITE_RISE_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+                self.data[ key + TAG_SATELLITE_SET_TIME ] = self.localiseAndTrim( nextPass[ 4 ] )
+                self.data[ key + TAG_SATELLITE_SET_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
 
                 nextUpdates.append( nextPass[ 0 ] )
                 nextUpdates.append( nextPass[ 4 ] )
             else:
                 # The satellite is passing over and so the calculated rise time is for the next pass.
                 # Use the rise/set from the previous run.
-                if ( key + " RISE TIME" ) in self.dataPrevious and ( key + " RISE AZIMUTH" ) in self.dataPrevious:
+                if ( key + TAG_SATELLITE_RISE_TIME ) in self.dataPrevious and ( key + TAG_SATELLITE_RISE_AZIMUTH ) in self.dataPrevious:
                     # The data from the previous run is available...
-                    self.data[ key + " RISE TIME" ] =  self.dataPrevious[ key + " RISE TIME" ]
-                    self.data[ key + " RISE AZIMUTH" ] = self.dataPrevious[ key + " RISE AZIMUTH" ]
-                    self.data[ key + " SET TIME" ] =  self.dataPrevious[ key + " SET TIME" ]
-                    self.data[ key + " SET AZIMUTH" ] = self.dataPrevious[ key + " SET AZIMUTH" ]
+                    self.data[ key + TAG_SATELLITE_RISE_TIME ] =  self.dataPrevious[ key + TAG_SATELLITE_RISE_TIME ]
+                    self.data[ key + TAG_SATELLITE_RISE_AZIMUTH ] = self.dataPrevious[ key + TAG_SATELLITE_RISE_AZIMUTH ]
+                    self.data[ key + TAG_SATELLITE_SET_TIME ] =  self.dataPrevious[ key + TAG_SATELLITE_SET_TIME ]
+                    self.data[ key + TAG_SATELLITE_SET_AZIMUTH ] = self.dataPrevious[ key + TAG_SATELLITE_SET_AZIMUTH ]
 
                     nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
                 else:
@@ -631,20 +665,20 @@ class IndicatorLunar:
                         subMenu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Unfortunately, unable to determine if this is an AlwaysUpError or a NeverUpError.
                         continue
 
-                    self.data[ key + " RISE TIME" ] =  self.localiseAndTrim( nextPass[ 0 ] )
-                    self.data[ key + " RISE AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
-                    self.data[ key + " SET TIME" ] = self.localiseAndTrim( nextPass[ 4 ] )
-                    self.data[ key + " SET AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+                    self.data[ key + TAG_SATELLITE_RISE_TIME ] =  self.localiseAndTrim( nextPass[ 0 ] )
+                    self.data[ key + TAG_SATELLITE_RISE_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+                    self.data[ key + TAG_SATELLITE_SET_TIME ] = self.localiseAndTrim( nextPass[ 4 ] )
+                    self.data[ key + TAG_SATELLITE_SET_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
 
                     nextUpdates.append( nextPass[ 0 ] )
                     nextUpdates.append( nextPass[ 4 ] )
 
             # Build the menu...
-            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ key + " RISE TIME" ] ) )
-            subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + " RISE AZIMUTH" ] ) )
+            subMenu.append( Gtk.MenuItem( "Rise: " + self.data[ key + TAG_SATELLITE_RISE_TIME ] ) )
+            subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + TAG_SATELLITE_RISE_AZIMUTH ] ) )
 
-            subMenu.append( Gtk.MenuItem( "Set: " +  self.data[ key + " SET TIME" ] ) )
-            subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + " SET AZIMUTH" ] ) )
+            subMenu.append( Gtk.MenuItem( "Set: " +  self.data[ key + TAG_SATELLITE_SET_TIME ] ) )
+            subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + TAG_SATELLITE_SET_AZIMUTH ] ) )
 
             # Add the next five passes...
             city = self.getCity( ephemNow )
@@ -672,41 +706,51 @@ class IndicatorLunar:
     def getSatelliteNameNumber( self, satelliteName, satelliteNumber ): return satelliteName + " - " + satelliteNumber
 
 
-    def createEclipseMenu( self, menu, eclipse, label ):
+    def createEclipseMenu( self, menu, eclipseData, tag ):
+        TAG_ECLIPSE_DATE_TIME = " ECLIPSE DATE TIME"
+        TAG_ECLIPSE_LATITUDE_LONGITUDE = " ECLIPSE LATITUDE LONGITUDE"
+        TAG_ECLIPSE_TYPE = " ECLIPSE TYPE"
+
         menu.append( Gtk.MenuItem( "Eclipse" ) )
 
-        localisedAndTrimmedDateTime = self.localiseAndTrim( ephem.Date( eclipse[ 0 ] ) )
+        localisedAndTrimmedDateTime = self.localiseAndTrim( ephem.Date( eclipseData[ 0 ] ) )
 
-        self.data[ label + " ECLIPSE DATE TIME" ] = localisedAndTrimmedDateTime
+        self.data[ tag + TAG_ECLIPSE_DATE_TIME ] = localisedAndTrimmedDateTime
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + localisedAndTrimmedDateTime ) )
 
-        self.data[ label + " ECLIPSE LATITUDE LONGITUDE" ] = eclipse[ 2 ] + " " + eclipse[ 3 ]
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Latitude/Longitude: " + eclipse[ 2 ] + " " + eclipse[ 3 ] ) )
+        self.data[ tag + TAG_ECLIPSE_LATITUDE_LONGITUDE ] = eclipseData[ 2 ] + " " + eclipseData[ 3 ]
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Latitude/Longitude: " + eclipseData[ 2 ] + " " + eclipseData[ 3 ] ) )
 
-        self.data[ label + " ECLIPSE TYPE" ] = eclipse[ 1 ]
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + eclipse[ 1 ] ) )
+        self.data[ tag + TAG_ECLIPSE_TYPE ] = eclipseData[ 1 ]
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + eclipseData[ 1 ] ) )
 
 
     # Compute the right ascension, declination, azimuth, altitude and magnitude for a body.
     def createRADecAzAltMagMenu( self, menu, body ):
-        self.data[ body.name.upper() + " RIGHT ASCENSION" ] = str( round( self.convertHoursMinutesSecondsToDecimalDegrees( body.g_ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.g_ra ) ) + ")"
-        menu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ body.name.upper() + " RIGHT ASCENSION" ] ) )
+        TAG_RIGHT_ASCENSION = " RIGHT ASCENSION"
+        TAG_DECLINATION = " DECLINATION"
+        TAG_AZIMUTH = " AZIMUTH"
+        TAG_ALTITUDE = " ALTITUDE"
+        TAG_MAGNITUDE = " MAGNITUDE"
+
+        self.data[ body.name.upper() + TAG_RIGHT_ASCENSION ] = str( round( self.convertHoursMinutesSecondsToDecimalDegrees( body.g_ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.g_ra ) ) + ")"
+        menu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ body.name.upper() + TAG_RIGHT_ASCENSION ] ) )
 
         direction = "N"
         if body.g_dec < 0.0:
             direction = "S"
 
-        self.data[ body.name.upper() + " DECLINATION" ] = str( abs( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.g_dec ) ) + ")"
-        menu.append( Gtk.MenuItem( "Declination: " + self.data[ body.name.upper() + " DECLINATION" ] ) )
+        self.data[ body.name.upper() + TAG_DECLINATION ] = str( abs( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.g_dec ) ) + ")"
+        menu.append( Gtk.MenuItem( "Declination: " + self.data[ body.name.upper() + TAG_DECLINATION ] ) )
 
-        self.data[ body.name.upper() + " AZIMUTH" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
-        menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ body.name.upper() + " AZIMUTH" ] ) )
+        self.data[ body.name.upper() + TAG_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
+        menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ body.name.upper() + TAG_AZIMUTH ] ) )
 
-        self.data[ body.name.upper() + " ALTITUDE" ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.alt ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
-        menu.append( Gtk.MenuItem( "Altitude: " + self.data[ body.name.upper() + " ALTITUDE" ] ) )
+        self.data[ body.name.upper() + TAG_ALTITUDE ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.alt ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
+        menu.append( Gtk.MenuItem( "Altitude: " + self.data[ body.name.upper() + TAG_ALTITUDE ] ) )
 
-        self.data[ body.name.upper() + " MAGNITUDE" ] = str( body.mag )
-        menu.append( Gtk.MenuItem( "Magnitude: " + self.data[ body.name.upper() + " MAGNITUDE" ] ) )
+        self.data[ body.name.upper() + TAG_MAGNITUDE ] = str( body.mag )
+        menu.append( Gtk.MenuItem( "Magnitude: " + self.data[ body.name.upper() + TAG_MAGNITUDE ] ) )
 
 
     # Takes a float and converts to local time, trims off fractional seconds and returns a string.
