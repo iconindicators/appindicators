@@ -46,7 +46,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.37"
+    VERSION = "1.0.38"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -89,10 +89,8 @@ class IndicatorPPADownloadStatistics:
         Notify.init( IndicatorPPADownloadStatistics.NAME )
         self.quitRequested = False
 
-        filehandler = logging.FileHandler( filename = IndicatorPPADownloadStatistics.LOG, mode = "a", delay = True )
-        logging.basicConfig( format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s", 
-                             datefmt = "%H:%M:%S", level = logging.DEBUG,
-                             handlers = [ filehandler ] )
+        filehandler = pythonutils.TruncatedFileHandler( IndicatorPPADownloadStatistics.LOG, "a", 10000, None, True )
+        logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
         self.loadSettings()
 
@@ -1065,10 +1063,11 @@ class IndicatorPPADownloadStatistics:
             self.quit( None )
             return
 
-        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
+        baseURL = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
                 "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + \
                 ppa.getSeries() + "/" + ppa.getArchitecture()
 
+        url = baseURL
         try:
             publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
             numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
@@ -1092,8 +1091,8 @@ class IndicatorPPADownloadStatistics:
 
                     if i == ( resultPage * resultsPerUrl ):
                         # Handle result pages after the first page.
-                        newURL = url + "&ws.start=" + str( resultPage * resultsPerUrl )
-                        publishedBinaries = json.loads( urlopen( newURL ).read().decode( "utf8" ) )
+                        url = baseURL + "&ws.start=" + str( resultPage * resultsPerUrl )
+                        publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
                         resultPage += 1
                         index = 0
 
