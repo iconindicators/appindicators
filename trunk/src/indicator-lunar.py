@@ -51,7 +51,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.43"
+    VERSION = "1.0.44"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -131,10 +131,8 @@ class IndicatorLunar:
 
 
     def __init__( self ):
-        filehandler = logging.FileHandler( filename = IndicatorLunar.LOG, mode = "a", delay = True )
-        logging.basicConfig( format = "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
-                             datefmt = "%H:%M:%S", level = logging.DEBUG,
-                             handlers = [ filehandler ] )
+        filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
+        logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
         self.dialog = None
         self.data = { }
