@@ -82,6 +82,7 @@ class IndicatorLunar:
     SETTINGS_DISPLAY_PATTERN = "displayPattern"
     SETTINGS_PLANETS = "planets"
     SETTINGS_SATELLITES = "satellites"
+    SETTINGS_SHOW_PLANETS_AS_SUBMENU = "showPlanetsAsSubmenu"
     SETTINGS_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
     SETTINGS_SHOW_SATELLITE_NUMBER = "showSatelliteNumber"
     SETTINGS_SHOW_STARS_AS_SUBMENU = "showStarsAsSubmenu"
@@ -283,17 +284,27 @@ class IndicatorLunar:
         self.createMoonMenu( menu, nextUpdates, ephemNow, lunarPhase )
 
         self.createSunMenu( menu, nextUpdates, ephemNow )
-        
+
         # Planets
         # Reference:
         #    http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
         if len( self.planets ) > 0:
-            menu.append( Gtk.MenuItem( "Planets" ) )
+            planetsMenuItem = Gtk.MenuItem( "Planets" )
+            menu.append( planetsMenuItem )
+
+            if self.showPlanetsAsSubMenu:
+                planetsSubMenu = Gtk.Menu()
+                planetsMenuItem.set_submenu( planetsSubMenu )
 
             for planet in IndicatorLunar.PLANETS:
                 if planet[ 0 ] in self.planets:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
-                    menu.append( menuItem )
+                    if self.showPlanetsAsSubMenu:
+                        menuItem = Gtk.MenuItem( planet[ 0 ] )
+                        planetsSubMenu.append( menuItem )
+                    else:
+                        menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
+                        menu.append( menuItem )
+
                     planet[ 1 ].compute( self.getCity( ephemNow ) )
                     self.createBodyMenu( menuItem, planet[ 1 ], nextUpdates, ephemNow )
 
@@ -1302,6 +1313,10 @@ class IndicatorLunar:
 
         hbox = Gtk.Box( spacing = 6 )
 
+        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Show planets as submenus" )
+        showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
+        grid.attach( showPlanetsAsSubmenuCheckbox, 0, 0, 1, 1 )
+
         planetStore = Gtk.ListStore( str, bool ) # Planet name, show/hide.
         for planet in IndicatorLunar.PLANETS: # Don't sort, rather keep the natural order.
             planetStore.append( [ planet[ 0 ], planet[ 0 ] in self.planets ] )
@@ -1322,7 +1337,7 @@ class IndicatorLunar:
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( tree )
-        grid.attach( scrolledWindow, 0, 0, 1, 1 )
+        grid.attach( scrolledWindow, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Planets" ) )
 
@@ -1337,7 +1352,7 @@ class IndicatorLunar:
 
         hbox = Gtk.Box( spacing = 6 )
 
-        showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Show stars as submenu" )
+        showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Show stars as submenus" )
         showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
         grid.attach( showStarsAsSubmenuCheckbox, 0, 0, 1, 1 )
 
@@ -1622,6 +1637,7 @@ class IndicatorLunar:
                     if satelliteInfo[ 2 ]: self.satellites.append( [ satelliteInfo[ 0 ], satelliteInfo[ 1 ] ] )
 
             self.displayPattern = displayPattern.get_text()
+            self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
@@ -1788,6 +1804,7 @@ class IndicatorLunar:
         self.getDefaultCity()
         self.displayPattern = IndicatorLunar.DISPLAY_PATTERN_DEFAULT
         self.satellites = [ ]
+        self.showPlanetsAsSubMenu = False
         self.showSatelliteNotification = True
         self.showSatelliteNumber = False
         self.showStarsAsSubMenu = False
@@ -1815,6 +1832,7 @@ class IndicatorLunar:
                 self.displayPattern = settings.get( IndicatorLunar.SETTINGS_DISPLAY_PATTERN, self.displayPattern )
                 self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
                 self.satellites = settings.get( IndicatorLunar.SETTINGS_SATELLITES, self.satellites )
+                self.showPlanetsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
                 self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
                 self.showSatelliteNumber = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NUMBER, self.showSatelliteNumber )
                 self.showStarsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
@@ -1842,6 +1860,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_DISPLAY_PATTERN: self.displayPattern,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
                 IndicatorLunar.SETTINGS_SATELLITES: self.satellites,
+                IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_NUMBER: self.showSatelliteNumber,
                 IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU: self.showStarsAsSubMenu,
