@@ -26,6 +26,11 @@ from builtins import print
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
+#
+# TODO Work out how to make each table show a minimum number of rows...otherwise they all shrink to one row.
+#
+
+
 try: from gi.repository import AppIndicator3 as appindicator
 except: pass
 
@@ -87,6 +92,7 @@ class IndicatorLunar:
     SETTINGS_SHOW_PLANETS_AS_SUBMENU = "showPlanetsAsSubmenu"
     SETTINGS_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
     SETTINGS_SHOW_SATELLITE_NUMBER = "showSatelliteNumber"
+    SETTINGS_SHOW_SATELLITES_AS_SUBMENU = "showSatellitesAsSubmenu"
     SETTINGS_SHOW_STARS_AS_SUBMENU = "showStarsAsSubmenu"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     SETTINGS_STARS = "stars"
@@ -195,6 +201,15 @@ class IndicatorLunar:
 
         # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
         ephemNow = ephem.now()
+
+#TODO
+# Have an option to notify only visible passes.
+# When enabled only visible passes are notified.
+# When disabled/unchecked, all passes are notified (identically to what occurs at present).
+#
+# Ensure the option for notification makes it clear that notification follows the visible passes option.
+# That is, if show only visible passes is enabled, only visible passes will appear in the notification.
+# If show only visible passes is unchecked (so show all passes), then all passes will appear in the notification. 
 
         # Satellite notification.
         if notifyImported and self.showSatelliteNotification:
@@ -312,9 +327,7 @@ class IndicatorLunar:
 
         self.createStarsMenu( ephemNow, menu, nextUpdates )
 
-#TODO Remove old call.
-#         self.createSatellitesMenu( ephemNow, menu, nextUpdates )
-        self.createSatellitesMenuNEW( ephemNow, menu, nextUpdates )
+        self.createSatellitesMenu( ephemNow, menu, nextUpdates )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -598,28 +611,6 @@ class IndicatorLunar:
                 subMenu.append( Gtk.MenuItem( "Never Up!" ) )
 
 
-#TODO
-# Have an option to show only visible passes in the menu.  
-# When enabled only visible passes displayed.
-# If disabled/unchecked, all passes are displayed (identically to what occurs at present).
-#
-# Have an option to notify only visible passes.
-# When enabled only visible passes are notified.
-# When disabled/unchecked, all passes are notified (identically to what occurs at present).
-#
-# Ensure the option for notification makes it clear that notification follows the visible passes option.
-# That is, if show only visible passes is enabled, only visible passes will appear in the notification.
-# If show only visible passes is unchecked (so show all passes), then all passes will appear in the notification. 
-# 
-# Showing only visible passes (and notification) means that a given satellite will only visibly pass every few days.
-# As such, the user may then enable all satellites to increase the the chance of seeing any satellite.
-# The consequence of this is the list of satellites in the menu now increases to 100 which flies off the screen.
-# Also, the notification will flash up a lot during the dawn/dusk period as any satellites will pass over.
-# The high volume of notifications during this time is to be expected - you select a lot of satellites, you should expect to be notified!
-# The long menu might be somewhat annoying.
-# Possibly offer to make the satellite menu a submenu (so it'll be three levels and not two).
-
-
     # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/transit/set times.
     # Other sources/background:
     #   http://spotthestation.nasa.gov/sightings
@@ -650,13 +641,22 @@ class IndicatorLunar:
         menuItem = Gtk.MenuItem( "Satellites" )
         menu.append( menuItem )
 
+        if self.showSatellitesAsSubMenu:
+            satellitesSubMenu = Gtk.Menu()
+            menuItem.set_submenu( satellitesSubMenu )
+
         for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
             if self.showSatelliteNumber:
-                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ] )
+                menuText = satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ]
             else:
-                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + satelliteNameNumber[ 0 ] )
+                menuText = satelliteNameNumber[ 0 ]
 
-            menu.append( menuItem )
+            if self.showSatellitesAsSubMenu:
+                menuItem = Gtk.MenuItem( menuText )
+                satellitesSubMenu.append( menuItem )
+            else:
+                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + menuText )
+                menu.append( menuItem )
 
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
@@ -671,11 +671,12 @@ class IndicatorLunar:
 
     def calculateNextSatellitePass( self, ephemNow, satelliteNameNumber, menu, nextUpdates ):
         satelliteInfo = self.satelliteTLEData[ satelliteNameNumber ]
-        dateTime = ephemNow
         foundPass = False
-        nextPass = None # Define here so it is scope for the subsequent pass calculations.
-        while True:
-            city = self.getCity( dateTime )
+        nextPass = None # Define here so it is in scope for the subsequent pass calculations.       
+        currentDateTime = ephemNow
+        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 10 ) # Stop looking for transits 10 days from ephemNow.
+        while currentDateTime < endDateTime:
+            city = self.getCity( currentDateTime )
             satellite = ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) # Need to fetch on each iteration as the visibility check may alter the object's internals. 
             nextPass = None
             try: nextPass = city.next_pass( satellite )
@@ -683,100 +684,85 @@ class IndicatorLunar:
                 menu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # The satellite is always up or never up.
                 break
 
-            if nextPass is None or nextPass[ 0 ] is None or nextPass[ 1 ] is None or nextPass[ 2 ] is None or nextPass[ 3 ] is None or nextPass[ 4 ] is None or nextPass[ 5 ] is None:
-                menu.append( Gtk.MenuItem( "Unable to compute next pass!" ) )
+            if not self.nextPassIsValid( nextPass ):
+                menu.append( Gtk.MenuItem( "Unable to compute next transit!" ) )
                 break
 
             if nextPass[ 0 ] < nextPass[ 4 ]: # The satellite is below the horizon.
-                isVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
-                if self.onlyShowVisibleSatellitePasses and not isVisible:
-                    dateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
+                passIsVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
+                if self.onlyShowVisibleSatellitePasses and not passIsVisible:
+                    currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
                     continue
 
                 self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ] = self.localiseAndTrim( nextPass[ 0 ] )
                 self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
                 self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ] = self.localiseAndTrim( nextPass[ 4 ] )
                 self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
-                self.data[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ] = str( isVisible )
-
-                menu.append( Gtk.MenuItem( "Rise: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ] ) )
-                menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ] ) )
-                menu.append( Gtk.MenuItem( "Set: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ] ) )
-                menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ] ) )
-                menu.append( Gtk.MenuItem( "Visible: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ] ) )
+                self.data[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ] = str( passIsVisible )
 
                 nextUpdates.append( nextPass[ 0 ] )
                 nextUpdates.append( nextPass[ 4 ] )
 
                 foundPass = True
                 break
-            else:
-                if True: 
-                    print(" Edge! ")
-                    return False
 
-#                 # The satellite is passing over and so the calculated rise time is for the next pass.
-#                 # Use the rise/set from the previous run.
-#                 if ( satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ) in self.dataPrevious and ( satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ) in self.dataPrevious:
-#                     # The data from the previous run is available...
-#                     self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ]
-#                     self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ]
-#                     self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ]
-#                     self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ]
-#     
-#                     nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
-#                 else:
-#                     # There is no previous data (typically because this is the first run), so just use the next pass.
-#                     ephemFuture = ephem.Date( city.date + ( ( nextPass[ 0 ] - nextPass[ 4 ] ) / 2.0 ) ) # Set a future date to be half the difference between the current set time and the next future rise time.
-#                     city = self.getCity( ephemFuture )
-#                     try:
-#                         nextPass = city.next_pass( ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) )
-#                     except ValueError:
-#                         menu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # Unfortunately, unable to determine if this is an AlwaysUpError or a NeverUpError.
-#                         return False
-#     
-#                     self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ] = self.localiseAndTrim( nextPass[ 0 ] )
-#                     self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
-#                     self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ] = self.localiseAndTrim( nextPass[ 4 ] )
-#                     self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
-#     
-#                     nextUpdates.append( nextPass[ 0 ] )
-#                     nextUpdates.append( nextPass[ 4 ] )
+            # The satellite is in transit and so the rise time is for the next pass - use the rise/set from the previous run.
+            if ( satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ) in self.dataPrevious: # Assume rest of data is also present!
+                # The data from the previous run is available...
+                self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ]
+                self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ]
+                self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ]
+                self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ]
+                self.data[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ]
 
-        if foundPass: self.calculateSatelliteSubsequentPasses( satelliteInfo, menu, nextPass[ 4 ] )
+                nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
+
+                foundPass = True
+                break
+
+            # There is no previous data (typically because this is the first run and the satellite is in transit), so look for the next pass.
+            currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
+
+        if foundPass:
+            menu.append( Gtk.MenuItem( "Rise: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ] ) )
+            menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ] ) )
+            menu.append( Gtk.MenuItem( "Set: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ] ) )
+            menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ] ) )
+            menu.append( Gtk.MenuItem( "Visible: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ] ) )
+
+            self.calculateSatelliteSubsequentPasses( ephemNow, satelliteInfo, menu, nextPass[ 4 ] )
+
+        if currentDateTime >= endDateTime and not foundPass:
+            menu.append( Gtk.MenuItem( "No transits within the next 10 days." ) )
 
 
-    def calculateSatelliteSubsequentPasses( self, satelliteInfo, menu, lastPassDateTime ):
-        nextPass = [ ]
-        nextPass[ 4 ] = lastPassDateTime
-        numberSubsequentPasses = 5
+    def calculateSatelliteSubsequentPasses( self, ephemNow, satelliteInfo, menu, lastPassDateTime ):
+        currentDateTime = ephem.Date( lastPassDateTime + ephem.minute * 30 ) # Start looking for transits after the last set.
+        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 10 ) # Stop looking for transits 10 days from ephemNow.
+        numberPasses = 5 # Compute at most the next 5 transits.
         count = 0
-        while count < numberSubsequentPasses:
-            foundPass = False
-            while not foundPass:
-                try:
-                    city = self.getCity()
-                    city.date = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Assume that at least 30 minutes elapses between transits.
-                    satellite = ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) # Need to fetch on each iteration as the visibility check may alter the object's internals. 
-                    nextPass = city.next_pass( satellite )
-                    isVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
-                    if self.onlyShowVisibleSatellitePasses and not isVisible:
-                        dateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
-                        continue
+        while count < numberPasses and currentDateTime < endDateTime:
+            city = self.getCity( currentDateTime )
+            satellite = ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) # Need to fetch on each iteration as the visibility check may alter the object's internals. 
+            try:
+                nextPass = city.next_pass( satellite )
+                if not self.nextPassIsValid( nextPass ): break
 
+#TODO Need to trap/check for nextPass[ 0 ] < nextPass[ 4 ]?
+                isVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
+                if ( self.onlyShowVisibleSatellitePasses and isVisible ) or not self.onlyShowVisibleSatellitePasses:
                     menu.append( Gtk.MenuItem( "" ) )
                     menu.append( Gtk.MenuItem( "Rise: " + self.localiseAndTrim( nextPass[ 0 ] ) ) )
                     menu.append( Gtk.MenuItem( "Azimuth: " + str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")" ) )
                     menu.append( Gtk.MenuItem( "Set: " + self.localiseAndTrim( nextPass[ 4 ] ) ) )
                     menu.append( Gtk.MenuItem( "Azimuth: " + str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")" ) )
-                    menu.append( Gtk.MenuItem( "Visible: " + str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")" ) )
-
-                    foundPass = True
+                    menu.append( Gtk.MenuItem( "Visible: " + str( isVisible ) ) )
+    
                     count += 1
 
-                except ValueError: # Occurs when the satellite is never up or always up.  Unfortunately cannot distinguish which. 
-                    foundPass = True
-                    count = numberSubsequentPasses
+                currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
+
+            except ValueError: break # Occurs when the satellite is never up or always up.  Unfortunately cannot distinguish which. 
 
 
     def isSatellitePassVisible( self, satellite, transitDateTime ):
@@ -788,7 +774,20 @@ class IndicatorLunar:
         sun = ephem.Sun()
         sun.compute( city )
 
-        return satellite.eclipsed is False and sun.alt > ephem.degrees( "-18" ) and sun.alt < ephem.degrees( "-6" )
+        return satellite.eclipsed is False and \
+            sun.alt > ephem.degrees( "-18" ) and \
+            sun.alt < ephem.degrees( "-6" )
+
+
+    def nextPassIsValid( self, nextPass ):
+        return nextPass is not None and \
+            len( nextPass ) == 6 and \
+            nextPass[ 0 ] is not None and \
+            nextPass[ 1 ] is not None and \
+            nextPass[ 2 ] is not None and \
+            nextPass[ 3 ] is not None and \
+            nextPass[ 4 ] is not None and \
+            nextPass[ 5 ] is not None
 
 
     # Returns the string
@@ -1130,7 +1129,7 @@ class IndicatorLunar:
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
         scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 1, 1, 1 )
 
@@ -1199,15 +1198,19 @@ class IndicatorLunar:
             showSatelliteNumberCheckbox.set_tooltip_text( "Include the satellite number in the menu." )
             grid.attach( showSatelliteNumberCheckbox, 0, 0, 1, 1 )
 
+            showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show satellites as submenus" )
+            showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
+            grid.attach( showSatellitesAsSubmenuCheckbox, 0, 1, 1, 1 )
+
             showSatellitePassesVisibleCheckbox = Gtk.CheckButton( "Show only visible passes" )
             showSatellitePassesVisibleCheckbox.set_active( self.onlyShowVisibleSatellitePasses )
             showSatellitePassesVisibleCheckbox.set_tooltip_text( "Only display information for visible passes." )
-            grid.attach( showSatellitePassesVisibleCheckbox, 0, 1, 1, 1 )
+            grid.attach( showSatellitePassesVisibleCheckbox, 0, 2, 1, 1 )
 
             showSatelliteNotificationCheckbox = Gtk.CheckButton( "Rise Time Notification" )
             showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
             showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon." )
-            grid.attach( showSatelliteNotificationCheckbox, 0, 2, 1, 1 )
+            grid.attach( showSatelliteNotificationCheckbox, 0, 3, 1, 1 )
 
             satelliteStore = Gtk.ListStore( str, str, bool ) # Satellite name, satellite number, show/hide.
             for key in self.satelliteTLEData:
@@ -1234,7 +1237,7 @@ class IndicatorLunar:
             scrolledWindow = Gtk.ScrolledWindow()
             scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
             scrolledWindow.add( tree )
-            grid.attach( scrolledWindow, 0, 3, 1, 1 )
+            grid.attach( scrolledWindow, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Satellites" ) )
 
@@ -1431,6 +1434,7 @@ class IndicatorLunar:
                 self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 )
             else:
                 self.onlyShowVisibleSatellitePasses = showSatellitePassesVisibleCheckbox.get_active()
+                self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
                 self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
                 self.showSatelliteNumber = showSatelliteNumberCheckbox.get_active()
                 self.satellites = [ ]
@@ -1609,6 +1613,7 @@ class IndicatorLunar:
         self.showPlanetsAsSubMenu = False
         self.showSatelliteNotification = True
         self.showSatelliteNumber = False
+        self.showSatellitesAsSubMenu = False
         self.showStarsAsSubMenu = False
         self.showWerewolfWarning = True
         self.stars = [ ]
@@ -1638,6 +1643,7 @@ class IndicatorLunar:
                 self.showPlanetsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
                 self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
                 self.showSatelliteNumber = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NUMBER, self.showSatelliteNumber )
+                self.showSatellitesAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU, self.showSatellitesAsSubMenu )
                 self.showStarsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
                 self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
                 self.stars = settings.get( IndicatorLunar.SETTINGS_STARS, self.stars )
@@ -1667,6 +1673,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_NUMBER: self.showSatelliteNumber,
+                IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU: self.showSatellitesAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU: self.showStarsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
                 IndicatorLunar.SETTINGS_STARS: self.stars,
