@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from builtins import print
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -28,6 +27,11 @@ from builtins import print
 
 #
 # TODO Work out how to make each table show a minimum number of rows...otherwise they all shrink to one row.
+#
+
+
+#
+# TODO Add a notification to say lunar is starting up...or perhaps computing satellites stuff....or downloading.
 #
 
 
@@ -92,6 +96,7 @@ class IndicatorLunar:
     SETTINGS_SHOW_PLANETS_AS_SUBMENU = "showPlanetsAsSubmenu"
     SETTINGS_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
     SETTINGS_SHOW_SATELLITE_NUMBER = "showSatelliteNumber"
+    SETTINGS_SHOW_SATELLITE_SUBSEQUENT_PASSES = "showSatelliteSubsequentPasses"
     SETTINGS_SHOW_SATELLITES_AS_SUBMENU = "showSatellitesAsSubmenu"
     SETTINGS_SHOW_STARS_AS_SUBMENU = "showStarsAsSubmenu"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
@@ -201,15 +206,6 @@ class IndicatorLunar:
 
         # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
         ephemNow = ephem.now()
-
-#TODO
-# Have an option to notify only visible passes.
-# When enabled only visible passes are notified.
-# When disabled/unchecked, all passes are notified (identically to what occurs at present).
-#
-# Ensure the option for notification makes it clear that notification follows the visible passes option.
-# That is, if show only visible passes is enabled, only visible passes will appear in the notification.
-# If show only visible passes is unchecked (so show all passes), then all passes will appear in the notification. 
 
         # Satellite notification.
         if notifyImported and self.showSatelliteNotification:
@@ -620,19 +616,15 @@ class IndicatorLunar:
     # For planets/stars, the next rise/set time is shown.
     # If already above the horizon, the set time is shown followed by the rise time for the next pass.
     # This makes sense as planets/stars are slow moving.
-    # As satellites are faster moving and pass several times a day, a different approach is used.
+    #
+    # However, as satellites are faster moving and pass several times a day, a different approach is used.
     # When a notification is displayed indicating a satellite is now passing overhead,
     # the user may want to see the rise/set for the current pass (rather than the set for the current pass and rise for the next pass).
-    # Therefore when doing an update...
-    # If a satellite is yet to rise, show the upcoming rise/set time.
-    # If a satellite is currently passing over, show the rise/set time for that pass.
+    # Therefore...
+    #    If a satellite is yet to rise, show the upcoming rise/set time.
+    #    If a satellite is currently passing over, show the rise/set time for that pass.
     # This allows the user to see the rise/set time for the current pass as it is happening.
     # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
-    #
-    # Distinguishes visible transits from all transits...
-    #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
-    #    http://www.celestrak.com/columns/v03n01
-    #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
     def createSatellitesMenu( self, ephemNow, menu, nextUpdates ):
         if len( self.satellites ) == 0: return
 
@@ -672,7 +664,7 @@ class IndicatorLunar:
     def calculateNextSatellitePass( self, ephemNow, satelliteNameNumber, menu, nextUpdates ):
         satelliteInfo = self.satelliteTLEData[ satelliteNameNumber ]
         foundPass = False
-        nextPass = None # Define here so it is in scope for the subsequent pass calculations.       
+        nextPass = None # Initialised here so it is in scope for the subsequent pass calculations.       
         currentDateTime = ephemNow
         endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 10 ) # Stop looking for transits 10 days from ephemNow.
         while currentDateTime < endDateTime:
@@ -720,17 +712,17 @@ class IndicatorLunar:
                 foundPass = True
                 break
 
-            # There is no previous data (typically because this is the first run and the satellite is in transit), so look for the next pass.
+            # There is no previous data (as this is the first run and the satellite is in transit), so look for the next pass.
             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
 
-        if foundPass:
+        if currentDateTime < endDateTime and foundPass:
             menu.append( Gtk.MenuItem( "Rise: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ] ) )
             menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ] ) )
             menu.append( Gtk.MenuItem( "Set: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ] ) )
             menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ] ) )
             menu.append( Gtk.MenuItem( "Visible: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ] ) )
 
-            self.calculateSatelliteSubsequentPasses( ephemNow, satelliteInfo, menu, nextPass[ 4 ] )
+            if self.showSatelliteSubsequentPasses: self.calculateSatelliteSubsequentPasses( ephemNow, satelliteInfo, menu, nextPass[ 4 ] )
 
         if currentDateTime >= endDateTime and not foundPass:
             menu.append( Gtk.MenuItem( "No transits within the next 10 days." ) )
@@ -748,7 +740,8 @@ class IndicatorLunar:
                 nextPass = city.next_pass( satellite )
                 if not self.nextPassIsValid( nextPass ): break
 
-#TODO Need to trap/check for nextPass[ 0 ] < nextPass[ 4 ]?
+                if nextPass[ 0 ] >= nextPass[ 4 ]: break # Shouldn't happen but sometimes Ephem yields strange results!
+
                 isVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
                 if ( self.onlyShowVisibleSatellitePasses and isVisible ) or not self.onlyShowVisibleSatellitePasses:
                     menu.append( Gtk.MenuItem( "" ) )
@@ -765,6 +758,10 @@ class IndicatorLunar:
             except ValueError: break # Occurs when the satellite is never up or always up.  Unfortunately cannot distinguish which. 
 
 
+    # Distinguishes visible transits from all transits...
+    #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
+    #    http://www.celestrak.com/columns/v03n01
+    #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
     def isSatellitePassVisible( self, satellite, transitDateTime ):
         city = self.getCity( transitDateTime )
         city.pressure = 0
@@ -1083,7 +1080,7 @@ class IndicatorLunar:
         tree.set_hexpand( True )
         tree.set_vexpand( True )
         tree.append_column( Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 ) )
-        
+
         tree.append_column( Gtk.TreeViewColumn( "Value", Gtk.CellRendererText(), text = 1 ) )
         tree.set_tooltip_text( "Double click to add a tag to the display pattern." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
@@ -1188,7 +1185,7 @@ class IndicatorLunar:
         if len( self.satelliteTLEData ) == 0:
             # Error downloading data.
             label = Gtk.Label()
-            label.set_markup( "Unable to download the satellite data!\nCheck that <a href=\'" + IndicatorLunar.SATELLITE_TLE_URL + "'>" + IndicatorLunar.SATELLITE_TLE_URL + "</a> is available.\n" )
+            label.set_markup( "Unable to download the satellite data!\n\nCheck that <a href=\'" + IndicatorLunar.SATELLITE_TLE_URL + "'>" + IndicatorLunar.SATELLITE_TLE_URL + "</a> is available.\n" )
             label.set_margin_left( 25 )
             label.set_halign( Gtk.Align.START )
             grid.attach( label, 0, 0, 1, 1 )
@@ -1207,10 +1204,15 @@ class IndicatorLunar:
             showSatellitePassesVisibleCheckbox.set_tooltip_text( "Only display information for visible passes." )
             grid.attach( showSatellitePassesVisibleCheckbox, 0, 2, 1, 1 )
 
-            showSatelliteNotificationCheckbox = Gtk.CheckButton( "Rise Time Notification" )
+            showSatelliteSubsequentPassesCheckbox = Gtk.CheckButton( "Show subsequent passes" )
+            showSatelliteSubsequentPassesCheckbox.set_active( self.showSatelliteSubsequentPasses )
+            showSatelliteSubsequentPassesCheckbox.set_tooltip_text( "Show passes in addition to the current." )
+            grid.attach( showSatelliteSubsequentPassesCheckbox, 0, 3, 1, 1 )
+
+            showSatelliteNotificationCheckbox = Gtk.CheckButton( "Notification on rise" )
             showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
             showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon." )
-            grid.attach( showSatelliteNotificationCheckbox, 0, 3, 1, 1 )
+            grid.attach( showSatelliteNotificationCheckbox, 0, 4, 1, 1 )
 
             satelliteStore = Gtk.ListStore( str, str, bool ) # Satellite name, satellite number, show/hide.
             for key in self.satelliteTLEData:
@@ -1237,7 +1239,7 @@ class IndicatorLunar:
             scrolledWindow = Gtk.ScrolledWindow()
             scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
             scrolledWindow.add( tree )
-            grid.attach( scrolledWindow, 0, 4, 1, 1 )
+            grid.attach( scrolledWindow, 0, 5, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Satellites" ) )
 
@@ -1435,6 +1437,7 @@ class IndicatorLunar:
             else:
                 self.onlyShowVisibleSatellitePasses = showSatellitePassesVisibleCheckbox.get_active()
                 self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
+                self.showSatelliteSubsequentPasses = showSatelliteSubsequentPassesCheckbox.get_active()
                 self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
                 self.showSatelliteNumber = showSatelliteNumberCheckbox.get_active()
                 self.satellites = [ ]
@@ -1613,6 +1616,7 @@ class IndicatorLunar:
         self.showPlanetsAsSubMenu = False
         self.showSatelliteNotification = True
         self.showSatelliteNumber = False
+        self.showSatelliteSubsequentPasses = False
         self.showSatellitesAsSubMenu = False
         self.showStarsAsSubMenu = False
         self.showWerewolfWarning = True
@@ -1643,6 +1647,7 @@ class IndicatorLunar:
                 self.showPlanetsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
                 self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
                 self.showSatelliteNumber = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NUMBER, self.showSatelliteNumber )
+                self.showSatelliteSubsequentPasses= settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_SUBSEQUENT_PASSES, self.showSatelliteSubsequentPasses )
                 self.showSatellitesAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU, self.showSatellitesAsSubMenu )
                 self.showStarsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
                 self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
@@ -1673,6 +1678,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_NUMBER: self.showSatelliteNumber,
+                IndicatorLunar.SETTINGS_SHOW_SATELLITE_SUBSEQUENT_PASSES: self.showSatelliteSubsequentPasses,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU: self.showSatellitesAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU: self.showStarsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
