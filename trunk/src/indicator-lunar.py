@@ -25,16 +25,6 @@
 #  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
-#
-# TODO Work out how to make each table show a minimum number of rows...otherwise they all shrink to one row.
-#
-
-
-#
-# TODO Add a notification to say lunar is starting up...or perhaps computing satellites stuff....or downloading.
-#
-
-
 try: from gi.repository import AppIndicator3 as appindicator
 except: pass
 
@@ -1106,6 +1096,7 @@ class IndicatorLunar:
 
         showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Show planets as submenus" )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
+        showPlanetsAsSubmenuCheckbox.set_tooltip_text( "Show each planet in its own submenu." )
         grid.attach( showPlanetsAsSubmenuCheckbox, 0, 0, 1, 1 )
 
         planetStore = Gtk.ListStore( str, bool ) # Planet name, show/hide.
@@ -1144,6 +1135,7 @@ class IndicatorLunar:
         hbox = Gtk.Box( spacing = 6 )
 
         showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Show stars as submenus" )
+        showStarsAsSubmenuCheckbox.set_tooltip_text( "Show each star in its own submenu." )
         showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
         grid.attach( showStarsAsSubmenuCheckbox, 0, 0, 1, 1 )
 
@@ -1192,27 +1184,28 @@ class IndicatorLunar:
         else:
             showSatelliteNumberCheckbox = Gtk.CheckButton( "Show satellite number" )
             showSatelliteNumberCheckbox.set_active( self.showSatelliteNumber )
-            showSatelliteNumberCheckbox.set_tooltip_text( "Include the satellite number in the menu." )
+            showSatelliteNumberCheckbox.set_tooltip_text( "Include the satellite number in the menu/notification." )
             grid.attach( showSatelliteNumberCheckbox, 0, 0, 1, 1 )
 
-            showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show satellites as submenus" )
+            showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show as submenus" )
             showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
+            showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
             grid.attach( showSatellitesAsSubmenuCheckbox, 0, 1, 1, 1 )
 
-            showSatellitePassesVisibleCheckbox = Gtk.CheckButton( "Show only visible passes" )
+            showSatellitePassesVisibleCheckbox = Gtk.CheckButton( "Only show visible passes" )
             showSatellitePassesVisibleCheckbox.set_active( self.onlyShowVisibleSatellitePasses )
             showSatellitePassesVisibleCheckbox.set_tooltip_text( "Only display information for visible passes." )
             grid.attach( showSatellitePassesVisibleCheckbox, 0, 2, 1, 1 )
 
             showSatelliteSubsequentPassesCheckbox = Gtk.CheckButton( "Show subsequent passes" )
             showSatelliteSubsequentPassesCheckbox.set_active( self.showSatelliteSubsequentPasses )
-            showSatelliteSubsequentPassesCheckbox.set_tooltip_text( "Show passes in addition to the current." )
-            grid.attach( showSatelliteSubsequentPassesCheckbox, 0, 3, 1, 1 )
+            showSatelliteSubsequentPassesCheckbox.set_tooltip_text( "Show passes following the current." )
+            grid.attach( showSatelliteSubsequentPassesCheckbox, 2, 0, 1, 1 )
 
             showSatelliteNotificationCheckbox = Gtk.CheckButton( "Notification on rise" )
             showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
             showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon." )
-            grid.attach( showSatelliteNotificationCheckbox, 0, 4, 1, 1 )
+            grid.attach( showSatelliteNotificationCheckbox, 2, 1, 1, 1 )
 
             satelliteStore = Gtk.ListStore( str, str, bool ) # Satellite name, satellite number, show/hide.
             for key in self.satelliteTLEData:
@@ -1233,13 +1226,16 @@ class IndicatorLunar:
             renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
             tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 2 ) )
     
-            tree.set_tooltip_text( "Check a satellite/station/rocket to display in the menu." )
+            tree.set_tooltip_text( "Check a satellite, station or rocket booster to display in the menu." )
             tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
     
             scrolledWindow = Gtk.ScrolledWindow()
             scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
             scrolledWindow.add( tree )
-            grid.attach( scrolledWindow, 0, 5, 1, 1 )
+            grid.attach( scrolledWindow, 0, 3, 3, 1 )
+
+            separator = Gtk.Separator.new( Gtk.Orientation.VERTICAL )
+            grid.attach( separator, 1, 0, 1, 3 )
 
         notebook.append_page( grid, Gtk.Label( "Satellites" ) )
 
