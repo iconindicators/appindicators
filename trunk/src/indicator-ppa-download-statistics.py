@@ -377,7 +377,7 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_bottom( 10 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show PPAs as submenus" )
-        showAsSubmenusCheckbox.set_tooltip_text( "The download statitics for each PPA will be shown in a separate submenu." )
+        showAsSubmenusCheckbox.set_tooltip_text( "The download statitics for each PPA are shown in a separate submenu." )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
@@ -393,7 +393,7 @@ class IndicatorPPADownloadStatistics:
         combinePPAsCheckbox.set_active( self.combinePPAs )
         grid.attach( combinePPAsCheckbox, 0, 1, 2, 1 )
 
-        ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( "Ignore Version for Architecture Specific" )
+        ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( "Ignore version for architecture specific" )
         ignoreVersionArchitectureSpecificCheckbox.set_margin_left( 15 )
 
         toolTip = "For architecture specific, sometimes the same package name\n"
@@ -401,9 +401,10 @@ class IndicatorPPADownloadStatistics:
         toolTip += "For example, a source C package for both Ubuntu Saucy and Ubuntu Trusty\n"
         toolTip += "will be compiled twice, each with a different version 'number',\n"
         toolTip += "despite being the SAME release.\n\n"
-        toolTip += "Checking this option will ignore the version number\n"
-        toolTip += "when determining if two architecture specific packages are identical.\n\n"
-        toolTip += "The version number is retained only if it is identical across all instances of a published binary."
+        toolTip += "Checking this option will ignore the version number when\n"
+        toolTip += "determining if two architecture specific packages are identical.\n\n"
+        toolTip += "The version number is retained only if it is identical\n"
+        toolTip += "across ALL instances of a published binary."
         ignoreVersionArchitectureSpecificCheckbox.set_tooltip_text( toolTip )
         ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
@@ -411,12 +412,12 @@ class IndicatorPPADownloadStatistics:
 
         combinePPAsCheckbox.connect( "toggled", self.onCombinePPAsCheckbox, ignoreVersionArchitectureSpecificCheckbox )
 
-        sortByDownloadCheckbox = Gtk.CheckButton( "Sort By Download" )
+        sortByDownloadCheckbox = Gtk.CheckButton( "Sort by download" )
         sortByDownloadCheckbox.set_tooltip_text( "Sort by download (highest first) within each PPA." )
         sortByDownloadCheckbox.set_active( self.sortByDownload )
         grid.attach( sortByDownloadCheckbox, 0, 3, 2, 1 )
 
-        label = Gtk.Label( "  Clip Amount" )
+        label = Gtk.Label( "  Clip amount" )
         label.set_sensitive( sortByDownloadCheckbox.get_active() )
         label.set_margin_left( 15 )
         grid.attach( label, 0, 4, 1, 1 )
@@ -430,7 +431,7 @@ class IndicatorPPADownloadStatistics:
 
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
-        showNotificationOnUpdateCheckbox = Gtk.CheckButton( "Notify On Update" )
+        showNotificationOnUpdateCheckbox = Gtk.CheckButton( "Notify on update" )
         showNotificationOnUpdateCheckbox.set_tooltip_text( "Show a screen notification when PPA download statistics have been updated." )
         showNotificationOnUpdateCheckbox.set_active( self.showNotificationOnUpdate )
         grid.attach( showNotificationOnUpdateCheckbox, 0, 5, 2, 1 )
