@@ -51,7 +51,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.44"
+    VERSION = "1.0.45"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -424,8 +424,9 @@ class IndicatorLunar:
         self.data[ TAG_SUN + IndicatorLunar.TAG_CONSTELLATION ] = ephem.constellation( sun )[ 1 ]
         subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ TAG_SUN + IndicatorLunar.TAG_CONSTELLATION ] ) )
 
-        self.data[ TAG_SUN + IndicatorLunar.TAG_TROPICAL_SIGN ] = self.getTropicalSign( sun, ephemNow )
-        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ TAG_SUN + IndicatorLunar.TAG_TROPICAL_SIGN ] ) )
+#TODO Since upgrading to Ephem 3.7.5.3, a segmentation fault occurs after getTropicalSign returns...why?
+#         self.data[ TAG_SUN + IndicatorLunar.TAG_TROPICAL_SIGN ] = self.getTropicalSign( sun, ephemNow )
+#         subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ TAG_SUN + IndicatorLunar.TAG_TROPICAL_SIGN ] ) )
 
         self.data[ TAG_SUN + IndicatorLunar.TAG_DISTANCE_TO_EARTH ] = str( round( sun.earth_distance, 4 ) ) + " AU"
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ TAG_SUN + IndicatorLunar.TAG_DISTANCE_TO_EARTH ] ) )
@@ -493,8 +494,9 @@ class IndicatorLunar:
         self.data[ body.name.upper() + IndicatorLunar.TAG_CONSTELLATION ] = ephem.constellation( body )[ 1 ]
         subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ body.name.upper() + IndicatorLunar.TAG_CONSTELLATION ] ) )
 
-        self.data[ body.name.upper() + IndicatorLunar.TAG_TROPICAL_SIGN ] = self.getTropicalSign( body, ephemNow )
-        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ body.name.upper() + IndicatorLunar.TAG_TROPICAL_SIGN ] ) )
+#TODO Since upgrading to Ephem 3.7.5.3, a segmentation fault occurs after getTropicalSign returns...why?
+#         self.data[ body.name.upper() + IndicatorLunar.TAG_TROPICAL_SIGN ] = self.getTropicalSign( body, ephemNow )
+#         subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ body.name.upper() + IndicatorLunar.TAG_TROPICAL_SIGN ] ) )
 
         self.data[ body.name.upper() + IndicatorLunar.TAG_DISTANCE_TO_EARTH ] = str( round( body.earth_distance, 4 ) ) + " AU"
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ body.name.upper() + IndicatorLunar.TAG_DISTANCE_TO_EARTH ] ) )
