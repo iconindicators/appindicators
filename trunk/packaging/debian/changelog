@@ -2,6 +2,8 @@ indicator-lunar (1.0.46-1) precise; urgency=low
 
   * Put in a fix to handle Gtk.TreeModelSort bug reported at 
     https://bugs.launchpad.net/ubuntu/+source/pygobject/+bug/1114406.
+  * When only showing visible satellites, the visible label/tag is now dropped.
+  * Added option to hide satellites when no transit information is available.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Jun 2014 17:33:16 +1000
 
