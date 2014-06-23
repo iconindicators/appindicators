@@ -1,3 +1,11 @@
+indicator-lunar (1.0.46-1) precise; urgency=low
+
+  * Put in a fix to handle Gtk.TreeModelSort bug reported at 
+    https://bugs.launchpad.net/ubuntu/+source/pygobject/+bug/1114406.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Jun 2014 17:33:16 +1000
+
+
 indicator-lunar (1.0.45-1) precise; urgency=low
 
   * A segmentation fault occurs when running with the new version of

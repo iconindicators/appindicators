@@ -51,7 +51,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.45"
+    VERSION = "1.0.46"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -618,16 +618,57 @@ class IndicatorLunar:
     # This allows the user to see the rise/set time for the current pass as it is happening.
     # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
     def createSatellitesMenu( self, ephemNow, menu, nextUpdates ):
+#TODO Fix!
+        self.hideNoUpcomingTransits = True
+
         if len( self.satellites ) == 0: return
 
         if len( self.satelliteTLEData ) == 0: return # No point adding "non information" to the menu.  The preferences will tell the user there is a problem.
 
-        menuItem = Gtk.MenuItem( "Satellites" )
-        menu.append( menuItem )
+        satellitesMenuItem = Gtk.MenuItem( "Satellites" )
+        menu.append( satellitesMenuItem )
 
         if self.showSatellitesAsSubMenu:
             satellitesSubMenu = Gtk.Menu()
-            menuItem.set_submenu( satellitesSubMenu )
+            satellitesMenuItem.set_submenu( satellitesSubMenu ) #TODO This line needs to be done once only, but down in the loop after the first success. 
+
+        addedAtLeastOneTransit = False
+        for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
+            subMenu = Gtk.Menu()
+            key = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], satelliteNameNumber[ 1 ] )
+            if not key in self.satelliteTLEData:
+                subMenu.append( Gtk.MenuItem( "No TLE data!" ) )
+            else:
+                success = self.calculateNextSatellitePass( ephemNow, key, subMenu, nextUpdates )
+                if not success and self.hideNoUpcomingTransits:
+                    continue
+
+            if self.showSatelliteNumber:
+                menuText = satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ]
+            else:
+                menuText = satelliteNameNumber[ 0 ]
+
+            if self.showSatellitesAsSubMenu:
+                menuItem = Gtk.MenuItem( menuText )
+                satellitesSubMenu.append( menuItem )
+            else:
+                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + menuText )
+                menu.append( menuItem )
+
+            menuItem.set_submenu( subMenu )
+
+
+    def createSatellitesMenuORIG( self, ephemNow, menu, nextUpdates ):
+        if len( self.satellites ) == 0: return
+
+        if len( self.satelliteTLEData ) == 0: return # No point adding "non information" to the menu.  The preferences will tell the user there is a problem.
+
+        satellitesMenuItem = Gtk.MenuItem( "Satellites" )
+        menu.append( satellitesMenuItem )
+
+        if self.showSatellitesAsSubMenu:
+            satellitesSubMenu = Gtk.Menu()
+            satellitesMenuItem.set_submenu( satellitesSubMenu )
 
         for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
             if self.showSatelliteNumber:
@@ -654,6 +695,7 @@ class IndicatorLunar:
 
 
     def calculateNextSatellitePass( self, ephemNow, satelliteNameNumber, menu, nextUpdates ):
+        if True: return False
         satelliteInfo = self.satelliteTLEData[ satelliteNameNumber ]
         foundPass = False
         nextPass = None # Initialised here so it is in scope for the subsequent pass calculations.       
@@ -707,6 +749,7 @@ class IndicatorLunar:
             # There is no previous data (as this is the first run and the satellite is in transit), so look for the next pass.
             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
 
+        success = True
         if currentDateTime < endDateTime and foundPass:
             menu.append( Gtk.MenuItem( "Rise: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_TIME ] ) )
             menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ] ) )
@@ -718,6 +761,9 @@ class IndicatorLunar:
 
         if currentDateTime >= endDateTime and not foundPass:
             menu.append( Gtk.MenuItem( "No transits within the next 10 days." ) )
+            success = False
+
+        return success
 
 
     def calculateSatelliteSubsequentPasses( self, ephemNow, satelliteInfo, menu, lastPassDateTime ):
@@ -1065,7 +1111,7 @@ class IndicatorLunar:
         for key in sorted( self.data.keys() ):
             displayTagsStore.append( [ key, self.data[ key ] ] )
 
-        displayTagsStoreSort = Gtk.TreeModelSort( displayTagsStore )
+        displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
         displayTagsStoreSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView( displayTagsStoreSort )
@@ -1214,7 +1260,7 @@ class IndicatorLunar:
                 satelliteInfo = self.satelliteTLEData[ key ]
                 satelliteStore.append( [ satelliteInfo.getName(), satelliteInfo.getNumber(), [ satelliteInfo.getName(), satelliteInfo.getNumber() ] in self.satellites ] )
 
-            satelliteStoreSort = Gtk.TreeModelSort( satelliteStore )
+            satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
             satelliteStoreSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
             tree = Gtk.TreeView( satelliteStoreSort )
