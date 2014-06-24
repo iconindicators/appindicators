@@ -51,7 +51,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.46"
+    VERSION = "1.0.47"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -425,6 +425,9 @@ class IndicatorLunar:
         self.data[ TAG_SUN + IndicatorLunar.TAG_CONSTELLATION ] = ephem.constellation( sun )[ 1 ]
         subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ TAG_SUN + IndicatorLunar.TAG_CONSTELLATION ] ) )
 
+        self.data[ TAG_SUN + IndicatorLunar.TAG_MAGNITUDE ] = str( sun.mag )
+        subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ TAG_SUN + IndicatorLunar.TAG_MAGNITUDE ] ) )
+
 #TODO Since upgrading to Ephem 3.7.5.3, a segmentation fault occurs after getTropicalSign returns...why?
 #         self.data[ TAG_SUN + IndicatorLunar.TAG_TROPICAL_SIGN ] = self.getTropicalSign( sun, ephemNow )
 #         subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ TAG_SUN + IndicatorLunar.TAG_TROPICAL_SIGN ] ) )
@@ -434,7 +437,7 @@ class IndicatorLunar:
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
-        self.createRADecAzAltMagMenu( subMenu, sun )
+        self.createRADecAzAltMenu( subMenu, sun )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -495,6 +498,9 @@ class IndicatorLunar:
         self.data[ body.name.upper() + IndicatorLunar.TAG_CONSTELLATION ] = ephem.constellation( body )[ 1 ]
         subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ body.name.upper() + IndicatorLunar.TAG_CONSTELLATION ] ) )
 
+        self.data[ body.name.upper() + IndicatorLunar.TAG_MAGNITUDE ] = str( body.mag )
+        subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ body.name.upper() + IndicatorLunar.TAG_MAGNITUDE ] ) )
+
 #TODO Since upgrading to Ephem 3.7.5.3, a segmentation fault occurs after getTropicalSign returns...why?
 #         self.data[ body.name.upper() + IndicatorLunar.TAG_TROPICAL_SIGN ] = self.getTropicalSign( body, ephemNow )
 #         subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ body.name.upper() + IndicatorLunar.TAG_TROPICAL_SIGN ] ) )
@@ -510,7 +516,7 @@ class IndicatorLunar:
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
-        self.createRADecAzAltMagMenu( subMenu, body )
+        self.createRADecAzAltMenu( subMenu, body )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -574,7 +580,12 @@ class IndicatorLunar:
             self.data[ star.name.upper() + IndicatorLunar.TAG_CONSTELLATION ] = ephem.constellation( star )[ 1 ]
             subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ star.name.upper() + IndicatorLunar.TAG_CONSTELLATION ] ) )
 
-            self.createRADecAzAltMagMenu( subMenu, star )
+            self.data[ star.name.upper() + IndicatorLunar.TAG_MAGNITUDE ] = str( star.mag )
+            subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ star.name.upper() + IndicatorLunar.TAG_MAGNITUDE ] ) )
+
+            subMenu.append( Gtk.SeparatorMenuItem() )
+            
+            self.createRADecAzAltMenu( subMenu, star )
 
             subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -809,8 +820,8 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + eclipseData[ 1 ] ) )
 
 
-    # Compute the right ascension, declination, azimuth, altitude and magnitude for a body.
-    def createRADecAzAltMagMenu( self, menu, body ):
+    # Compute the right ascension, declination, azimuth and altitude for a body.
+    def createRADecAzAltMenu( self, menu, body ):
         self.data[ body.name.upper() + IndicatorLunar.TAG_RIGHT_ASCENSION ] = str( round( self.convertHoursMinutesSecondsToDecimalDegrees( body.g_ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.g_ra ) ) + ")"
         menu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ body.name.upper() + IndicatorLunar.TAG_RIGHT_ASCENSION ] ) )
 
@@ -826,9 +837,6 @@ class IndicatorLunar:
 
         self.data[ body.name.upper() + IndicatorLunar.TAG_ALTITUDE ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.alt ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
         menu.append( Gtk.MenuItem( "Altitude: " + self.data[ body.name.upper() + IndicatorLunar.TAG_ALTITUDE ] ) )
-
-        self.data[ body.name.upper() + IndicatorLunar.TAG_MAGNITUDE ] = str( body.mag )
-        menu.append( Gtk.MenuItem( "Magnitude: " + self.data[ body.name.upper() + IndicatorLunar.TAG_MAGNITUDE ] ) )
 
 
     # Takes a float and converts to local time, trims off fractional seconds and returns a string.

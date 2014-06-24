@@ -1,3 +1,11 @@
+indicator-lunar (1.0.47-1) precise; urgency=low
+
+  * Moved magnitude to main section for each item rather than in the RA/Dec
+    section which is to do with location.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 24 Jun 2014 15:41:01 +1000
+
+
 indicator-lunar (1.0.46-1) precise; urgency=low
 
   * Put in a fix to handle Gtk.TreeModelSort bug reported at 
