@@ -1,7 +1,10 @@
 indicator-lunar (1.0.47-1) precise; urgency=low
 
-  * Moved magnitude to main section for each item rather than in the RA/Dec
-    section which is to do with location.
+  * Bug fix: When switching to show visible satellite passes to show all
+    passes, data for the visibility was not initialised.
+  * Moved magnitude from the RA/Dec section to the main section as magnitude
+    has nothing to do with location.
+  * Added the azimuth to the satellite notification.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 24 Jun 2014 15:41:01 +1000
 

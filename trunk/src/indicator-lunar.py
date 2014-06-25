@@ -122,7 +122,7 @@ class IndicatorLunar:
     WEREWOLF_WARNING_TEXT_BODY = "                                          ...werewolves about ! ! !"
     WEREWOLF_WARNING_TEXT_SUMMARY = "W  A  R  N  I  N  G"
 
-    SATELLITE_TEXT_SUMMARY = "                                          ...is above the horizon!"
+    SATELLITE_TEXT_SUMMARY = "                          ...now rising at azimuth "
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
     PLANETS = [
@@ -220,10 +220,11 @@ class IndicatorLunar:
 
                 self.satelliteNotifications[ key ] = self.data[ setTimeKey ] # Flag to ensure the notification happens once per satellite's pass.
 
-                if self.showSatelliteNumber:
-                    Notify.Notification.new( satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ], IndicatorLunar.SATELLITE_TEXT_SUMMARY, IndicatorLunar.SVG_SATELLITE_ICON ).show()
-                else:
-                    Notify.Notification.new( satelliteNameNumber[ 0 ], IndicatorLunar.SATELLITE_TEXT_SUMMARY, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+                degreeSymbolIndex = self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ].index( "°" )
+                summary = IndicatorLunar.SATELLITE_TEXT_SUMMARY + self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ][ 0 : degreeSymbolIndex + 1 ]
+                if self.showSatelliteNumber: message = satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ]
+                else: message = satelliteNameNumber[ 0 ]
+                Notify.Notification.new( message, summary, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
         # Reset the data on each update, otherwise data will accumulate (if a star/satellite was added then removed, the computed data remains).
         self.dataPrevious = self.data
@@ -715,7 +716,9 @@ class IndicatorLunar:
                 self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ]
                 self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ]
                 self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ]
-                if not self.onlyShowVisibleSatellitePasses: self.data[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ]
+                if not self.onlyShowVisibleSatellitePasses:
+                    if ( satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ) in self.dataPrevious: # If switching from visible passes to all passes, it's possible there is no previous data for a satellite as it was not visible.
+                        self.data[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ] = self.dataPrevious[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ]
 
                 nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
 
@@ -730,7 +733,9 @@ class IndicatorLunar:
             menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_RISE_AZIMUTH ] ) )
             menu.append( Gtk.MenuItem( "Set: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_TIME ] ) )
             menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_SET_AZIMUTH ] ) )
-            if not self.onlyShowVisibleSatellitePasses: menu.append( Gtk.MenuItem( "Visible: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ] ) )
+            if not self.onlyShowVisibleSatellitePasses:
+                if ( satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ) in self.dataPrevious: # If switching from visible passes to all passes, it's possible there is no previous data for a satellite as it was not visible.
+                    menu.append( Gtk.MenuItem( "Visible: " + self.data[ satelliteNameNumber + IndicatorLunar.TAG_VISIBLE ] ) )
 
             if self.showSatelliteSubsequentPasses: self.calculateSatelliteSubsequentPasses( ephemNow, satelliteInfo, menu, nextPass[ 4 ] )
 
