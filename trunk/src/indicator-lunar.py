@@ -51,7 +51,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.47"
+    VERSION = "1.0.48"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -681,10 +681,12 @@ class IndicatorLunar:
         while currentDateTime < endDateTime:
             city = self.getCity( currentDateTime )
             satellite = ephem.readtle( satelliteInfo.getName(), satelliteInfo.getTLELine1(), satelliteInfo.getTLELine2() ) # Need to fetch on each iteration as the visibility check may alter the object's internals. 
+            satellite.compute( city )
             nextPass = None
             try: nextPass = city.next_pass( satellite )
             except ValueError:
-                menu.append( Gtk.MenuItem( "Never rises or never sets." ) ) # The satellite is always up or never up.
+                if satellite.circumpolar: menu.append( Gtk.MenuItem( "Satellite is circumpolar." ) )
+                elif satellite.neverup: menu.append( Gtk.MenuItem( "Satellite never rises." ) )
                 break
 
             if not self.nextPassIsValid( nextPass ):
@@ -772,7 +774,7 @@ class IndicatorLunar:
 
                 currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
 
-            except ValueError: break # Occurs when the satellite is never up or always up.  Unfortunately cannot distinguish which. 
+            except ValueError: break # Occurs when the satellite is never up or circumpolar. 
 
 
     # Distinguishes visible transits from all transits...
@@ -1233,7 +1235,7 @@ class IndicatorLunar:
 
             hideSatelliteWhenNoTransitCheckbox = Gtk.CheckButton( "Hide satellite when no transit" )
             hideSatelliteWhenNoTransitCheckbox.set_active( self.hideSatelliteWhenNoTransit )
-            hideSatelliteWhenNoTransitCheckbox.set_tooltip_text( "If no transit can be computed, hide the satellite.\n\nA transit may not be computed as a result of...\n\tmissing TLE data,\n\tsatellite never rises or never sets,\n\tno visible transit occurs in the next 10 days." )
+            hideSatelliteWhenNoTransitCheckbox.set_tooltip_text( "If no transit can be computed, hide the satellite.\n\nA transit may not be computed as a result of...\n\tmissing TLE data,\n\tsatellite never rises or is circumpolar,\n\tno visible transit occurs in the next 10 days." )
             grid.attach( hideSatelliteWhenNoTransitCheckbox, 2, 2, 1, 1 )
 
             satelliteStore = Gtk.ListStore( str, str, bool ) # Satellite name, satellite number, show/hide.

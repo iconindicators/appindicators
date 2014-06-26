@@ -1,3 +1,12 @@
+indicator-lunar (1.0.48-1) precise; urgency=low
+
+  * Can now distinguish satellites when they never rise or are circumpolar.
+    https://github.com/brandon-rhodes/pyephem/issues/45
+    Thanks to Brandon Rhodes, author of pyephem!
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 26 Jun 2014 18:54:11 +1000
+
+
 indicator-lunar (1.0.47-1) precise; urgency=low
 
   * Bug fix: When switching to show visible satellite passes to show all

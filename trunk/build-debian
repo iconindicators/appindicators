@@ -3,7 +3,7 @@
 
 BUILD_DIR="build"
 NAME="indicator-lunar"
-VERSION=1.0.47
+VERSION=1.0.48
 PYTHON_UTILS=../PythonUtils/src/pythonutils.py
 
 if [ ! -f $PYTHON_UTILS ];
@@ -18,7 +18,7 @@ cp $NAME.desktop $BUILD_DIR/$NAME-$VERSION
 cp build-debian $BUILD_DIR/$NAME-$VERSION
 
 mkdir -p $BUILD_DIR/$NAME-$VERSION/src
-cp src/*.py $BUILD_DIR/$NAME-$VERSION/src
+cp src/eclipse.py src/indicator-lunar.py src/satellite.py $BUILD_DIR/$NAME-$VERSION/src
 cp $PYTHON_UTILS $BUILD_DIR/$NAME-$VERSION/src
 
 mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/elementary
