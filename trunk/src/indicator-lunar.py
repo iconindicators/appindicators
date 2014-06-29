@@ -125,15 +125,17 @@ class IndicatorLunar:
     SATELLITE_TEXT_SUMMARY = "                          ...now rising at azimuth "
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
+#TODO There is a bug in pyephem which causes a seg fault when copying a body.
+# As a workaround, make a duplicate of each planet for ultimate use in the tropical sign calculation.
     PLANETS = [
-        [ "Mercury", ephem.Mercury() ],
-        [ "Venus", ephem.Venus() ],
-        [ "Mars", ephem.Mars() ],
-        [ "Jupiter", ephem.Jupiter() ],
-        [ "Saturn", ephem.Saturn() ],
-        [ "Uranus", ephem.Uranus() ],
-        [ "Neptune", ephem.Neptune() ],
-        [ "Pluto", ephem.Pluto() ] ]
+        [ "Mercury", ephem.Mercury(), ephem.Mercury() ],
+        [ "Venus", ephem.Venus(), ephem.Venus() ],
+        [ "Mars", ephem.Mars(), ephem.Mars() ],
+        [ "Jupiter", ephem.Jupiter(), ephem.Jupiter() ],
+        [ "Saturn", ephem.Saturn(), ephem.Saturn() ],
+        [ "Uranus", ephem.Uranus(), ephem.Uranus() ],
+        [ "Neptune", ephem.Neptune(), ephem.Neptune() ],
+        [ "Pluto", ephem.Pluto(), ephem.Pluto() ] ]
 
     TAG_ALTITUDE = " ALTITUDE"
     TAG_AZIMUTH = " AZIMUTH"
@@ -311,7 +313,7 @@ class IndicatorLunar:
                         menu.append( menuItem )
 
                     planet[ 1 ].compute( self.getCity( ephemNow ) )
-                    self.createBodyMenu( menuItem, planet[ 1 ], nextUpdates, ephemNow )
+                    self.createBodyMenu( menuItem, planet[ 1 ], planet[ 2 ], nextUpdates, ephemNow )
 
         self.createStarsMenu( ephemNow, menu, nextUpdates )
 
@@ -360,7 +362,7 @@ class IndicatorLunar:
         menuItem = Gtk.MenuItem( "Moon" )
         menu.append( menuItem )
 
-        self.createBodyMenu( menuItem, ephem.Moon( city ), nextUpdates, ephemNow )
+        self.createBodyMenu( menuItem, ephem.Moon( city ), ephem.Moon( city ), nextUpdates, ephemNow )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
@@ -429,9 +431,10 @@ class IndicatorLunar:
         self.data[ TAG_SUN + IndicatorLunar.TAG_MAGNITUDE ] = str( sun.mag )
         subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ TAG_SUN + IndicatorLunar.TAG_MAGNITUDE ] ) )
 
-#TODO Since upgrading to Ephem 3.7.5.3, a segmentation fault occurs after getTropicalSign returns...why?
+#TODO For now, need to pass in a copy of the sun as there is a bug in pyephem when copying objects.
+        self.data[ TAG_SUN + IndicatorLunar.TAG_TROPICAL_SIGN ] = self.getTropicalSign( ephem.Sun( city ), ephemNow )
 #         self.data[ TAG_SUN + IndicatorLunar.TAG_TROPICAL_SIGN ] = self.getTropicalSign( sun, ephemNow )
-#         subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ TAG_SUN + IndicatorLunar.TAG_TROPICAL_SIGN ] ) )
+        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ TAG_SUN + IndicatorLunar.TAG_TROPICAL_SIGN ] ) )
 
         self.data[ TAG_SUN + IndicatorLunar.TAG_DISTANCE_TO_EARTH ] = str( round( sun.earth_distance, 4 ) ) + " AU"
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ TAG_SUN + IndicatorLunar.TAG_DISTANCE_TO_EARTH ] ) )
@@ -490,7 +493,8 @@ class IndicatorLunar:
             self.createEclipseMenu( subMenu, eclipseInformation, TAG_SUN )
 
 
-    def createBodyMenu( self, bodyMenuItem, body, nextUpdates, ephemNow ):
+#TODO For now, need to pass in a copy of the body as there is a bug in pyephem when copying objects.
+    def createBodyMenu( self, bodyMenuItem, body, bodyCopy, nextUpdates, ephemNow ):
         subMenu = Gtk.Menu()
 
         self.data[ body.name.upper() + IndicatorLunar.TAG_ILLUMINATION ] = str( int( round( body.phase ) ) ) + "%"
@@ -502,9 +506,10 @@ class IndicatorLunar:
         self.data[ body.name.upper() + IndicatorLunar.TAG_MAGNITUDE ] = str( body.mag )
         subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ body.name.upper() + IndicatorLunar.TAG_MAGNITUDE ] ) )
 
-#TODO Since upgrading to Ephem 3.7.5.3, a segmentation fault occurs after getTropicalSign returns...why?
+#TODO For now, need to pass in a copy of the body as there is a bug in pyephem when copying objects.
+        self.data[ body.name.upper() + IndicatorLunar.TAG_TROPICAL_SIGN ] = self.getTropicalSign( bodyCopy, ephemNow )
 #         self.data[ body.name.upper() + IndicatorLunar.TAG_TROPICAL_SIGN ] = self.getTropicalSign( body, ephemNow )
-#         subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ body.name.upper() + IndicatorLunar.TAG_TROPICAL_SIGN ] ) )
+        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ body.name.upper() + IndicatorLunar.TAG_TROPICAL_SIGN ] ) )
 
         self.data[ body.name.upper() + IndicatorLunar.TAG_DISTANCE_TO_EARTH ] = str( round( body.earth_distance, 4 ) ) + " AU"
         subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ body.name.upper() + IndicatorLunar.TAG_DISTANCE_TO_EARTH ] ) )
@@ -885,14 +890,17 @@ class IndicatorLunar:
 
 
     # Code courtesy of Ignius Drake.
-    def getTropicalSign( self, body, ephemNow ):
+    def getTropicalSign( self, body, bodyCopy, ephemNow ):
         signList = [ "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces" ]
 
         ( year, month, day ) = ephemNow.triple()
         epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
         ephemNowDate = str( ephemNow ).split( " " )
 
-        bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
+#TODO Need to pass in the body copy as there is a bug in pyephem...
+# https://github.com/brandon-rhodes/pyephem/issues/44
+# Although resolved, a release has not yet been made and so passing in a body copy is the workaround.
+#         bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
         bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
         planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
 
