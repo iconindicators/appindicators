@@ -890,7 +890,7 @@ class IndicatorLunar:
 
 
     # Code courtesy of Ignius Drake.
-    def getTropicalSign( self, body, bodyCopy, ephemNow ):
+    def getTropicalSign( self, body, ephemNow ):
         signList = [ "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces" ]
 
         ( year, month, day ) = ephemNow.triple()
@@ -901,6 +901,7 @@ class IndicatorLunar:
 # https://github.com/brandon-rhodes/pyephem/issues/44
 # Although resolved, a release has not yet been made and so passing in a body copy is the workaround.
 #         bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
+        bodyCopy = body
         bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
         planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
 
