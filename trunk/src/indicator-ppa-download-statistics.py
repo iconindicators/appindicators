@@ -22,20 +22,20 @@
 #  http://developer.gnome.org/pygobject
 #  http://developer.gnome.org/gtk3
 #  http://python-gtk-3-tutorial.readthedocs.org
-#  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
+#  https://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/api/AppIndicator3_0.1/classes/Indicator.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 #  http://launchpad.net/+apidoc
 #  http://help.launchpad.net/API/launchpadlib
 #  http://help.launchpad.net/API/Hacking
 
 
 from copy import deepcopy
-
-try: from gi.repository import AppIndicator3 as appindicator
-except: pass
-
-from gi.repository import Gio, GLib, Gtk, Notify
-from threading import Thread
+from gi.repository import AppIndicator3, Gio, GLib, Gtk, Notify
 from ppa import PPA, PublishedBinary
+from threading import Thread
 from urllib.request import urlopen
 
 import itertools, pythonutils, gzip, json, locale, logging, operator, os, re, shutil, sys, threading, time, webbrowser
@@ -94,20 +94,10 @@ class IndicatorPPADownloadStatistics:
 
         self.loadSettings()
 
-        try:
-            self.appindicatorImported = True
-            self.indicator = appindicator.Indicator.new( IndicatorPPADownloadStatistics.NAME, IndicatorPPADownloadStatistics.ICON, appindicator.IndicatorCategory.APPLICATION_STATUS )
-            self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
-            self.buildMenu()
-            self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
-        except:
-            self.appindicatorImported = False            
-            self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
-            self.buildMenu()
-            self.statusicon = Gtk.StatusIcon()
-            self.statusicon.set_from_icon_name( IndicatorPPADownloadStatistics.ICON )
-            self.statusicon.connect( "popup-menu", self.handleRightClick )
-            self.statusicon.connect( "activate", self.handleLeftClick )
+        self.indicator = AppIndicator3.Indicator.new( IndicatorPPADownloadStatistics.NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
+        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+        self.buildMenu()
 
 
     def main( self ):
@@ -117,10 +107,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def buildMenu( self ):
-        if self.appindicatorImported:
-            menu = self.indicator.get_menu()
-        else:
-            menu = self.menu
+        menu = self.indicator.get_menu()
 
         menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
 
@@ -216,10 +203,7 @@ class IndicatorPPADownloadStatistics:
         quitMenuItem.connect( "activate", self.quit )
         menu.append( quitMenuItem )
 
-        if self.appindicatorImported:
-            self.indicator.set_menu( menu )
-        else:
-            self.menu = menu
+        self.indicator.set_menu( menu )
 
         menu.show_all()
 
@@ -299,12 +283,6 @@ class IndicatorPPADownloadStatistics:
             ppa.getPublishedBinaries().sort( key = operator.methodcaller( "getDownloadCount" ), reverse = True )
             
             if self.sortByDownloadAmount > 0: del ppa.getPublishedBinaries()[ self.sortByDownloadAmount : ]
-
-
-    def handleLeftClick( self, icon ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
-
-
-    def handleRightClick( self, icon, button, time ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
     def onPPA( self, widget ):
