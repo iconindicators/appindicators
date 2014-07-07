@@ -18,9 +18,15 @@
 # Application indicator which displays/controls VirtualBox virtual machines.
 
 
-# On Lubuntu 12.10 the following message appears when the indicator is executed:
-#   ERROR:root:Could not find any typelib for AppIndicator3
-# From https://kororaa.org/forums/viewtopic.php?f=7&t=220#p2343, it (hopefully) is safe to ignore.
+# References:
+#  http://developer.gnome.org/pygobject
+#  http://developer.gnome.org/gtk3
+#  http://python-gtk-3-tutorial.readthedocs.org
+#  https://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/api/AppIndicator3_0.1/classes/Indicator.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
 # Have noticed that if a VM exists in a group and there is another VM of the same name but not in a group
@@ -29,10 +35,7 @@
 # The VirtualBox.xml file does seem to reflect the change (and the indicator obeys this file).
 
 
-try: from gi.repository import AppIndicator3 as appindicator
-except: pass
-
-from gi.repository import GLib, Gtk
+from gi.repository import AppIndicator, GLib, Gtk
 
 import gzip, json, locale, logging, os, pythonutils, re, shutil, subprocess, sys, time, virtualmachine
 
@@ -92,22 +95,10 @@ class IndicatorVirtualBox:
                 radioButton.props.name = virtualMachineInfo.getUUID()
                 self.onStartVirtualMachine( radioButton, False )
 
-        # Create the indicator...
-        try:
-            self.appindicatorImported = True
-            self.indicator = appindicator.Indicator.new( IndicatorVirtualBox.NAME, IndicatorVirtualBox.ICON, appindicator.IndicatorCategory.APPLICATION_STATUS )
-            self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
-            self.buildMenu()
-            self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
-        except:
-            self.appindicatorImported = False
-            self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
-            self.buildMenu()
-            self.statusicon = Gtk.StatusIcon()
-            self.statusicon.set_from_icon_name( IndicatorVirtualBox.ICON )
-            self.statusicon.set_tooltip_text( "Virtual Machines" )
-            self.statusicon.connect( "popup-menu", self.handleRightClick )
-            self.statusicon.connect( "activate", self.handleLeftClick )
+        self.indicator = AppIndicator3.Indicator.new( IndicatorVirtualBox.NAME, IndicatorVirtualBox.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+        self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
+        self.buildMenu()
 
 
     def main( self ):
@@ -116,10 +107,7 @@ class IndicatorVirtualBox:
 
 
     def buildMenu( self ):
-        if self.appindicatorImported == True:
-            menu = self.indicator.get_menu()
-        else:
-            menu = self.menu
+        menu = self.indicator.get_menu()
 
         menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
 
@@ -194,10 +182,7 @@ class IndicatorVirtualBox:
         quitMenuItem.connect( "activate", Gtk.main_quit )
         menu.append( quitMenuItem )
 
-        if self.appindicatorImported == True:
-            self.indicator.set_menu( menu )
-        else:
-            self.menu = menu
+        self.indicator.set_menu( menu )
 
         menu.show_all()
 
@@ -732,12 +717,6 @@ class IndicatorVirtualBox:
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
-
-
-    def handleLeftClick( self, icon ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
-
-
-    def handleRightClick( self, icon, button, time ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
     def loadSettings( self ):
