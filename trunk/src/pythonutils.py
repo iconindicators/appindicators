@@ -29,8 +29,7 @@ def isNumber( numberAsString ):
         float( numberAsString )
         return True
 
-    except ValueError:
-        return False
+    except ValueError: return False
 
 
 # Returns the colour (as #xxyyzz) for the current GTK icon theme.
