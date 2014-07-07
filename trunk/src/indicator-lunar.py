@@ -22,13 +22,14 @@
 #  http://developer.gnome.org/pygobject
 #  http://developer.gnome.org/gtk3
 #  http://python-gtk-3-tutorial.readthedocs.org
-#  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
+#  https://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/api/AppIndicator3_0.1/classes/Indicator.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
-try: from gi.repository import AppIndicator3 as appindicator
-except: pass
-
-from gi.repository import GLib, Gtk
+from gi.repository import AppIndicator3, GLib, Gtk
 
 notifyImported = True
 try: from gi.repository import Notify
@@ -51,7 +52,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.48"
+    VERSION = "1.0.49"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -169,23 +170,10 @@ class IndicatorLunar:
 
         if notifyImported: Notify.init( IndicatorLunar.NAME )
 
-        # Create an AppIndicator3 indicator...if it fails, create a GTK indicator.
-        # On Lubuntu 12.04 the AppIndicator3 is created (the icon displays).
-        # However, the tooltip does not display and text cannot be written to the label next to the icon.
-        try:
-            self.appindicatorImported = True
-            self.indicator = appindicator.Indicator.new( IndicatorLunar.NAME, "", appindicator.IndicatorCategory.APPLICATION_STATUS )
-            self.indicator.set_icon_theme_path( os.getenv( "HOME" ) )
-            self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
-            self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling...
-        except Exception as e:
-            logging.exception( e )
-            logging.info( "Unable to create AppIndicator - creating GTK Status Icon instead." )
-            self.appindicatorImported = False
-            self.menu = Gtk.Menu() # Set an empty menu to get things rolling...
-            self.statusicon = Gtk.StatusIcon()
-            self.statusicon.connect( "popup-menu", self.handleRightClick )
-            self.statusicon.connect( "activate", self.handleLeftClick )
+        self.indicator = AppIndicator3.Indicator.new( IndicatorLunar.NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator.set_icon_theme_path( os.getenv( "HOME" ) )
+        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+        self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
 
 
     def main( self ):
@@ -250,12 +238,8 @@ class IndicatorLunar:
             parsedOutput = parsedOutput.replace( "[" + key + "]", self.data[ key ] )
 
         self.createIcon( lunarIlluminationPercentage, self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), ephem.Moon( self.getCity( ephemNow ) ) ) )
-        if self.appindicatorImported:
-            self.indicator.set_icon( IndicatorLunar.SVG_ICON )
-            self.indicator.set_label( parsedOutput, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
-        else:
-            self.statusicon.set_from_file( IndicatorLunar.SVG_FILE )
-            self.statusicon.set_tooltip_text( parsedOutput )
+        self.indicator.set_icon( IndicatorLunar.SVG_ICON )
+        self.indicator.set_label( parsedOutput, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
 
         # Full moon notification.
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
@@ -280,10 +264,7 @@ class IndicatorLunar:
     def buildMenu( self, ephemNow, lunarPhase ):
         nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
-        if self.appindicatorImported:
-            menu = self.indicator.get_menu()
-        else:
-            menu = self.menu
+        menu = self.indicator.get_menu()
 
         menu.popdown() # Make the existing menu, if visible, disappear (if not, GTK complains).
         menu = Gtk.Menu()
@@ -333,10 +314,7 @@ class IndicatorLunar:
         quitMenuItem.connect( "activate", Gtk.main_quit )
         menu.append( quitMenuItem )
 
-        if self.appindicatorImported:
-            self.indicator.set_menu( menu )
-        else:
-            self.menu = menu
+        self.indicator.set_menu( menu )
 
         menu.show_all()
 
@@ -1034,12 +1012,6 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing SVG: " + filename )
-
-
-    def handleLeftClick( self, icon ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
-
-
-    def handleRightClick( self, icon, button, time ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
     def onAbout( self, widget ):
