@@ -90,8 +90,7 @@ class IndicatorFortune:
 
         if self.showNotifications:
             notificationSummary = self.notificationSummary
-            if notificationSummary == "":
-                notificationSummary = " "
+            if notificationSummary == "": notificationSummary = " "
 
             Notify.Notification.new( notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
 
@@ -155,14 +154,12 @@ class IndicatorFortune:
         while True:
             self.fortune = ""
             p = subprocess.Popen( "fortune" + fortuneLocations, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-            for line in p.stdout.readlines():
-                self.fortune += str( line.decode() )
+            for line in p.stdout.readlines(): self.fortune += str( line.decode() )
 
             p.wait()
 
             # If the fortune exceeds the user-specified character limit, John West it...
-            if len( self.fortune ) > self.skipFortuneCharacterCount:
-                continue
+            if len( self.fortune ) > self.skipFortuneCharacterCount: continue
 
             break
 
@@ -270,10 +267,8 @@ class IndicatorFortune:
         store = Gtk.ListStore( str, str ) # Path to fortune file, tick icon (Gtk.STOCK_APPLY) or None.
         store.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
         for fortune in self.fortunes:
-            if fortune[ 1 ]:
-                store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
-            else:
-                store.append( [ fortune[ 0 ], None ] )
+            if fortune[ 1 ]: store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
+            else: store.append( [ fortune[ 0 ], None ] )
 
         tree = Gtk.TreeView( store )
         tree.set_hexpand( True )
@@ -378,10 +373,8 @@ class IndicatorFortune:
             self.fortunes = [ ]
             treeiter = store.get_iter_first()
             while treeiter != None:
-                if store[ treeiter ][ 1 ] == Gtk.STOCK_APPLY:
-                    self.fortunes.append( [ store[ treeiter ][ 0 ], True ] )
-                else:
-                    self.fortunes.append( [ store[ treeiter ][ 0 ], False ] )
+                if store[ treeiter ][ 1 ] == Gtk.STOCK_APPLY: self.fortunes.append( [ store[ treeiter ][ 0 ], True ] )
+                else: self.fortunes.append( [ store[ treeiter ][ 0 ], False ] )
 
                 treeiter = store.iter_next( treeiter )
 
@@ -390,15 +383,11 @@ class IndicatorFortune:
             if not os.path.exists( IndicatorFortune.AUTOSTART_PATH ): os.makedirs( IndicatorFortune.AUTOSTART_PATH )
 
             if autostartCheckbox.get_active():
-                try:
-                    shutil.copy( IndicatorFortune.DESKTOP_PATH + IndicatorFortune.DESKTOP_FILE, IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
-                except Exception as e:
-                    logging.exception( e )
+                try: shutil.copy( IndicatorFortune.DESKTOP_PATH + IndicatorFortune.DESKTOP_FILE, IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
+                except Exception as e: logging.exception( e )
             else:
-                try:
-                    os.remove( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
-                except:
-                    pass
+                try: os.remove( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
+                except: pass
 
             self.indicator.set_menu( self.buildMenu() )
             self.update()
@@ -422,8 +411,7 @@ class IndicatorFortune:
             return
 
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-        if pythonutils.showOKCancel( None, "Remove the selected fortune?" ) == Gtk.ResponseType.OK:
-            model.remove( treeiter )
+        if pythonutils.showOKCancel( None, "Remove the selected fortune?" ) == Gtk.ResponseType.OK: model.remove( treeiter )
 
 
     def onFortuneAdd( self, button, tree ): self.onFortuneDoubleClick( tree, None, None )
@@ -477,8 +465,7 @@ class IndicatorFortune:
         grid.attach( enabledCheckbox, 0, 2, 1, 1 )
 
         title = "Fortune Properties"
-        if rowNumber is None:
-            title = "Add Fortune"
+        if rowNumber is None: title = "Add Fortune"
 
         dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
@@ -543,8 +530,7 @@ class IndicatorFortune:
 
         if os.path.isfile( IndicatorFortune.SETTINGS_FILE ):
             try:
-                with open( IndicatorFortune.SETTINGS_FILE, "r" ) as f:
-                    settings = json.load( f )
+                with open( IndicatorFortune.SETTINGS_FILE, "r" ) as f: settings = json.load( f )
 
                 self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes )
                 if self.fortunes == [ ]:
@@ -574,8 +560,7 @@ class IndicatorFortune:
                 IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
             }
 
-            with open( IndicatorFortune.SETTINGS_FILE, "w" ) as f:
-                f.write( json.dumps( settings ) )
+            with open( IndicatorFortune.SETTINGS_FILE, "w" ) as f: f.write( json.dumps( settings ) )
 
         except Exception as e:
             logging.exception( e )
