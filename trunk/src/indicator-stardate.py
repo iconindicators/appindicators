@@ -18,6 +18,17 @@
 # Application indicator which displays the current Star Trek™ stardate.
 
 
+# References:
+#  http://developer.gnome.org/pygobject
+#  http://developer.gnome.org/gtk3
+#  http://python-gtk-3-tutorial.readthedocs.org
+#  https://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/api/AppIndicator3_0.1/classes/Indicator.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-14.04
+
+
 from gi.repository import AppIndicator3, GLib, Gtk
 
 import datetime, gzip, json, logging, os, pythonutils, re, shutil, stardate, sys
