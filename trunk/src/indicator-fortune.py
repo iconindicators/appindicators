@@ -22,14 +22,14 @@
 #  http://developer.gnome.org/pygobject
 #  http://developer.gnome.org/gtk3
 #  http://python-gtk-3-tutorial.readthedocs.org
-#  http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 #  https://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/api/AppIndicator3_0.1/classes/Indicator.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
-try: from gi.repository import AppIndicator3 as appindicator
-except: pass
-
-from gi.repository import Gdk, GLib, Gtk, Notify
+from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 
 import gzip, json, logging, os, pythonutils, re, shutil, subprocess, sys
 
@@ -54,6 +54,10 @@ class IndicatorFortune:
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_FORTUNES = "fortunes"
+    SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
+    SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW = 1
+    SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST = 2
+    SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST = 3
     SETTINGS_NOTIFICATION_SUMMARY = "notificationSummary"
     SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     SETTINGS_SHOW_NOTIFICATIONS = "showNotifications"
@@ -70,19 +74,9 @@ class IndicatorFortune:
         self.loadSettings()
         Notify.init( IndicatorFortune.NAME )
 
-        try:
-            self.appindicatorImported = True
-            self.indicator = appindicator.Indicator.new( IndicatorFortune.NAME, IndicatorFortune.ICON, appindicator.IndicatorCategory.APPLICATION_STATUS )
-            self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
-            self.buildMenu()
-            self.indicator.set_menu( self.menu )
-        except:
-            self.appindicatorImported = False            
-            self.buildMenu()
-            self.statusicon = Gtk.StatusIcon()
-            self.statusicon.set_from_icon_name( IndicatorFortune.ICON )
-            self.statusicon.connect( "popup-menu", self.handleRightClick )
-            self.statusicon.connect( "activate", self.handleLeftClick )
+        self.indicator = AppIndicator3.Indicator.new( IndicatorFortune.NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+        self.indicator.set_menu( self.buildMenu() )
 
 
     def main( self ):
@@ -105,35 +99,40 @@ class IndicatorFortune:
 
 
     def buildMenu( self ):
-        self.menu = Gtk.Menu()
+        menu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem( "New Fortune" )
         menuItem.connect( "activate", self.onShowFortune, True )
-        self.menu.append( menuItem )
+        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW: self.indicator.set_secondary_activate_target( menuItem )
+        menu.append( menuItem )
 
         menuItem = Gtk.MenuItem( "Copy Last Fortune" )
         menuItem.connect( "activate", self.onCopyLastFortune )
-        self.menu.append( menuItem )
+        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST: self.indicator.set_secondary_activate_target( menuItem )
+        menu.append( menuItem )
 
         menuItem = Gtk.MenuItem( "Show Last Fortune" )
         menuItem.connect( "activate", self.onShowFortune, False )
-        self.menu.append( menuItem )
+        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST: self.indicator.set_secondary_activate_target( menuItem )
+        menu.append( menuItem )
 
-        self.menu.append( Gtk.SeparatorMenuItem() )
+        menu.append( Gtk.SeparatorMenuItem() )
 
         preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
         preferencesMenuItem.connect( "activate", self.onPreferences )
-        self.menu.append( preferencesMenuItem )
+        menu.append( preferencesMenuItem )
 
         aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
         aboutMenuItem.connect( "activate", self.onAbout )
-        self.menu.append( aboutMenuItem )
+        menu.append( aboutMenuItem )
 
         quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
         quitMenuItem.connect( "activate", Gtk.main_quit )
-        self.menu.append( quitMenuItem )
+        menu.append( quitMenuItem )
 
-        self.menu.show_all()
+        menu.show_all()
+        
+        return menu
 
 
     def refreshFortune( self ):
@@ -168,14 +167,6 @@ class IndicatorFortune:
             break
 
 
-    def handleLeftClick( self, icon ):
-        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
-
-
-    def handleRightClick( self, icon, button, time ):
-        self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
-
-
     def onShowFortune( self, widget, new ):
         if new: self.refreshFortune()
 
@@ -186,8 +177,7 @@ class IndicatorFortune:
         Notify.Notification.new( notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
 
 
-    def onCopyLastFortune( self, widget ):
-        self.clipboard.set_text( self.fortune, -1 )
+    def onCopyLastFortune( self, widget ): self.clipboard.set_text( self.fortune, -1 )
 
 
     def onAbout( self, widget ):
@@ -338,10 +328,31 @@ class IndicatorFortune:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
+        label = Gtk.Label( "Middle mouse click of the icon shows:" )
+        label.set_tooltip_text( "Not supported on all versions/derivatives of Ubuntu" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 1, 1 )
+
+        radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, "New fortune" )
+        radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
+        radioMiddleMouseClickNewFortune.set_margin_left( 15 )
+        grid.attach( radioMiddleMouseClickNewFortune, 0, 1, 1, 1 )
+
+        radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_from_widget( radioMiddleMouseClickNewFortune )
+        radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
+        radioMiddleMouseClickCopyLastFortune.set_label( "Copy last fortune" )
+        radioMiddleMouseClickCopyLastFortune.set_margin_left( 15 )
+        grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 2, 1, 1 )
+
+        radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_mnemonic_from_widget( radioMiddleMouseClickNewFortune, "Show last fortune" )
+        radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
+        radioMiddleMouseClickShowLastFortune.set_margin_left( 15 )
+        grid.attach( radioMiddleMouseClickShowLastFortune, 0, 3, 1, 1 )
+
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_tooltip_text( "Run the indicator automatically" )
         autostartCheckbox.set_active( os.path.exists( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 0, 1, 1 )
+        grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "General" ) )
 
@@ -352,6 +363,10 @@ class IndicatorFortune:
         self.dialog.show_all()
 
         if self.dialog.run() == Gtk.ResponseType.OK:
+            if radioMiddleMouseClickNewFortune.get_active(): self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
+            elif radioMiddleMouseClickCopyLastFortune.get_active(): self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST
+            else: self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
+
             self.showNotifications = showNotificationCheckbox.get_active()
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.skipFortuneCharacterCount = spinnerCharacterCount.get_value_as_int()
@@ -385,6 +400,7 @@ class IndicatorFortune:
                 except:
                     pass
 
+            self.indicator.set_menu( self.buildMenu() )
             self.update()
 
         self.dialog.destroy()
@@ -410,8 +426,7 @@ class IndicatorFortune:
             model.remove( treeiter )
 
 
-    def onFortuneAdd( self, button, tree ):
-        self.onFortuneDoubleClick( tree, None, None )
+    def onFortuneAdd( self, button, tree ): self.onFortuneDoubleClick( tree, None, None )
 
 
     def onFortuneDoubleClick( self, tree, rowNumber, treeViewColumn ):
@@ -520,6 +535,7 @@ class IndicatorFortune:
 
     def loadSettings( self ):
         self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
+        self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
         self.notificationSummary = IndicatorFortune.NOTIFICATION_SUMMARY
         self.refreshIntervalInMinutes = 15
         self.showNotifications = True
@@ -536,6 +552,7 @@ class IndicatorFortune:
 
                 self.fortunes.sort( key = lambda x: x[ 0 ] )
 
+                self.middleMouseClickOnIcon = settings.get( IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
                 self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )
                 self.refreshIntervalInMinutes = settings.get( IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
                 self.showNotifications = settings.get( IndicatorFortune.SETTINGS_SHOW_NOTIFICATIONS, self.showNotifications )
@@ -550,6 +567,7 @@ class IndicatorFortune:
         try:
             settings = {
                 IndicatorFortune.SETTINGS_FORTUNES: self.fortunes,
+                IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON: self.middleMouseClickOnIcon,
                 IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY: self.notificationSummary,
                 IndicatorFortune.SETTINGS_SHOW_NOTIFICATIONS: self.showNotifications,
                 IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
