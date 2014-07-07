@@ -105,8 +105,7 @@ class IndicatorStardate:
         # The stardate calculation and WHEN the stardate changes are not synchronised,
         # so update at ten times speed (but no less than once per second).
         period = int( self.stardate.getStardateFractionalPeriod() / 10 ) 
-        if period < 1:
-            period = 1
+        if period < 1: period = 1
 
         GLib.timeout_add_seconds( period, self.update )
         Gtk.main()
@@ -115,7 +114,6 @@ class IndicatorStardate:
     def update( self ):
         self.stardate.setClassic( self.showClassic )
         self.stardate.setGregorian( datetime.datetime.utcnow() )
-
         s = self.stardate.toStardateString( self.showIssue, self.padInteger )
         self.indicator.set_label( s, "" )
         if self.showInMenu: self.stardateMenuItem.set_label( "Stardate: " + s )
@@ -238,8 +236,7 @@ class IndicatorStardate:
 
         if os.path.isfile( IndicatorStardate.SETTINGS_FILE ):
             try:
-                with open( IndicatorStardate.SETTINGS_FILE, "r" ) as f:
-                    settings = json.load( f )
+                with open( IndicatorStardate.SETTINGS_FILE, "r" ) as f: settings = json.load( f )
 
                 self.padInteger = settings.get( IndicatorStardate.SETTINGS_PAD_INTEGER, self.padInteger )
                 self.showClassic = settings.get( IndicatorStardate.SETTINGS_SHOW_CLASSIC, self.showClassic )
@@ -259,8 +256,7 @@ class IndicatorStardate:
                 IndicatorStardate.SETTINGS_SHOW_IN_MENU: self.showInMenu,
                 IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showIssue
             }
-            with open( IndicatorStardate.SETTINGS_FILE, "w" ) as f:
-                f.write( json.dumps( settings ) )
+            with open( IndicatorStardate.SETTINGS_FILE, "w" ) as f: f.write( json.dumps( settings ) )
 
         except Exception as e:
             logging.exception( e )
