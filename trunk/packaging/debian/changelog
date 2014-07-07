@@ -2,7 +2,7 @@ indicator-lunar (1.0.49-1) precise; urgency=low
 
   * Removed legacy code to support old appindicator framework.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 7 Jul 2014 17:2:45 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 7 Jul 2014 17:27:45 +1000
 
 
 indicator-lunar (1.0.48-1) precise; urgency=low
