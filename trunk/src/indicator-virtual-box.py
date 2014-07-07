@@ -108,7 +108,6 @@ class IndicatorVirtualBox:
 
     def buildMenu( self ):
         menu = self.indicator.get_menu()
-
         menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
 
         # Create the new menu and populate...
@@ -183,7 +182,6 @@ class IndicatorVirtualBox:
         menu.append( quitMenuItem )
 
         self.indicator.set_menu( menu )
-
         menu.show_all()
 
 
@@ -224,6 +222,7 @@ class IndicatorVirtualBox:
                     if virtualMachineInfo.getUUID() == info[ 1 ]:
                         virtualMachineInfo.setRunning()
             except: pass # Sometimes VBoxManage emits a warning message along with the VM information.
+
         p.wait()
 
         # Alphabetically sort...
@@ -249,6 +248,7 @@ class IndicatorVirtualBox:
                 virtualMachineInfo = virtualmachine.Info( info[ 0 ], False, info[ 1 ], 0 )
                 virtualMachineInfos.append( virtualMachineInfo )
             except: pass # Sometimes VBoxManage emits a warning message along with the VM information.
+
         p.wait()
         return virtualMachineInfos
 
@@ -302,9 +302,8 @@ class IndicatorVirtualBox:
             for uuid in uuids:
                 virtualMachineInfo = virtualmachine.Info( "", False, uuid, 0 )
                 virtualMachineInfos.append( virtualMachineInfo )                
-        except: # The VM order has never been altered giving an empty result (and exception).
-            virtualMachineInfos = []
-
+        except: virtualMachineInfos = [] # The VM order has never been altered giving an empty result (and exception).
+            
         return virtualMachineInfos
 
 
@@ -327,16 +326,15 @@ class IndicatorVirtualBox:
                 else:
                     virtualMachineInfo = virtualmachine.Info( "", False, itemName, indentAmount ) # This is a VM: we have it's UUID but not its name...so the caller needs to add it in.
                     virtualMachineInfos.append( virtualMachineInfo )
-        except:
-            virtualMachineInfos = []
+
+        except: virtualMachineInfos = []
 
         return virtualMachineInfos
 
 
     def groupsExist( self ):
         for virtualMachineInfo in self.virtualMachineInfos:
-            if virtualMachineInfo.isGroup():
-                return True
+            if virtualMachineInfo.isGroup(): return True
 
         return False
 
@@ -493,8 +491,7 @@ class IndicatorVirtualBox:
         store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon (Gtk.STOCK_APPLY) or None for autostart of VM, VM start command, VM/Group UUID.
         parent = None
         for virtualMachineInfo in self.virtualMachineInfos:
-            if virtualMachineInfo.getIndent() < len( stack ):
-                parent = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
+            if virtualMachineInfo.getIndent() < len( stack ): parent = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
 
             if virtualMachineInfo.isGroup():
                 stack.append( parent )
@@ -519,10 +516,8 @@ class IndicatorVirtualBox:
 
         # The treeview won't expand to show all data, even for a small amount of data.
         # So only add scrollbars if there is a lot of data...greater than 15 say...
-        if len( self.virtualMachineInfos ) <= 15:
-            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
-        else:
-            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        if len( self.virtualMachineInfos ) <= 15: scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
+        else: scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
 
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 0, 2, 1 )
@@ -586,17 +581,13 @@ class IndicatorVirtualBox:
 
             self.saveSettings()
 
-            if not os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ):
-                os.makedirs( IndicatorVirtualBox.AUTOSTART_PATH )
+            if not os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ): os.makedirs( IndicatorVirtualBox.AUTOSTART_PATH )
 
             if autostartIndicatorCheckbox.get_active():
-                try:
-                    shutil.copy( IndicatorVirtualBox.DESKTOP_PATH + IndicatorVirtualBox.DESKTOP_FILE, IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
-                except Exception as e:
-                    logging.exception( e )
+                try: shutil.copy( IndicatorVirtualBox.DESKTOP_PATH + IndicatorVirtualBox.DESKTOP_FILE, IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
+                except Exception as e: logging.exception( e )
             else:
-                try:
-                    os.remove( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
+                try: os.remove( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
                 except: pass
 
             self.onRefresh()
@@ -730,8 +721,7 @@ class IndicatorVirtualBox:
 
         if os.path.isfile( IndicatorVirtualBox.SETTINGS_FILE ):
             try:
-                with open( IndicatorVirtualBox.SETTINGS_FILE, "r" ) as f:
-                    settings = json.load( f )
+                with open( IndicatorVirtualBox.SETTINGS_FILE, "r" ) as f: settings = json.load( f )
 
                 self.delayBetweenAutoStart = settings.get( IndicatorVirtualBox.SETTINGS_DELAY_BETWEEN_AUTO_START, self.delayBetweenAutoStart )
                 self.menuTextGroupNameBefore = settings.get( IndicatorVirtualBox.SETTINGS_MENU_TEXT_GROUP_NAME_BEFORE, self.menuTextGroupNameBefore )
@@ -758,8 +748,7 @@ class IndicatorVirtualBox:
                 IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences
             }
 
-            with open( IndicatorVirtualBox.SETTINGS_FILE, "w" ) as f:
-                f.write( json.dumps( settings ) )
+            with open( IndicatorVirtualBox.SETTINGS_FILE, "w" ) as f: f.write( json.dumps( settings ) )
 
         except Exception as e:
             logging.exception( e )
