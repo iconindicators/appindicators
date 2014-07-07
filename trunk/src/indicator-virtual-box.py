@@ -35,7 +35,7 @@
 # The VirtualBox.xml file does seem to reflect the change (and the indicator obeys this file).
 
 
-from gi.repository import AppIndicator, GLib, Gtk
+from gi.repository import AppIndicator3, GLib, Gtk
 
 import gzip, json, locale, logging, os, pythonutils, re, shutil, subprocess, sys, time, virtualmachine
 
