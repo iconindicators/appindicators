@@ -18,10 +18,7 @@
 # Application indicator which displays the current Star Trek™ stardate.
 
 
-try: from gi.repository import AppIndicator3 as appindicator
-except: pass
-
-from gi.repository import GLib, Gtk
+from gi.repository import AppIndicator3, GLib, Gtk
 
 import datetime, gzip, json, logging, os, pythonutils, re, shutil, stardate, sys
 
@@ -46,6 +43,7 @@ class IndicatorStardate:
     SETTINGS_PAD_INTEGER = "padInteger"
     SETTINGS_SHOW_CLASSIC = "showClassic"
     SETTINGS_SHOW_ISSUE = "showIssue"
+    SETTINGS_SHOW_IN_MENU = "showInMenu"
 
 
     def __init__( self ):
@@ -53,47 +51,39 @@ class IndicatorStardate:
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
         self.dialog = None
+        self.stardateMenuItem = None
         self.loadSettings()
 
-        try:
-            self.appindicatorImported = True
-            self.indicator = appindicator.Indicator.new( IndicatorStardate.NAME, IndicatorStardate.ICON, appindicator.IndicatorCategory.APPLICATION_STATUS )
-            self.indicator.set_status( appindicator.IndicatorStatus.ACTIVE )
-            self.buildMenu()
-            self.indicator.set_menu( self.menu )
-        except:
-            self.appindicatorImported = False            
-            self.buildMenu()
-            self.statusicon = Gtk.StatusIcon()
-            self.statusicon.set_from_icon_name( IndicatorStardate.ICON )
-            self.statusicon.connect( "popup-menu", self.handleRightClick )
-            self.statusicon.connect( "activate", self.handleLeftClick )
+        self.indicator = AppIndicator3.Indicator.new( IndicatorStardate.NAME, IndicatorStardate.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+        self.indicator.set_menu( self.buildMenu() )
 
 
     def buildMenu( self ):
-        self.menu = Gtk.Menu()
+        menu = Gtk.Menu()
 
-        if self.appindicatorImported == False:
+        if self.showInMenu:
             image = Gtk.Image()
             image.set_from_icon_name( IndicatorStardate.ICON, Gtk.IconSize.MENU )
             self.stardateMenuItem = Gtk.ImageMenuItem()
             self.stardateMenuItem.set_image( image )
-            self.menu.append( self.stardateMenuItem )
-            self.menu.append( Gtk.SeparatorMenuItem() )
+            menu.append( self.stardateMenuItem )
+            menu.append( Gtk.SeparatorMenuItem() )
 
         preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
         preferencesMenuItem.connect( "activate", self.onPreferences )
-        self.menu.append( preferencesMenuItem )
+        menu.append( preferencesMenuItem )
 
         aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
         aboutMenuItem.connect( "activate", self.onAbout )
-        self.menu.append( aboutMenuItem )
+        menu.append( aboutMenuItem )
 
         quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
         quitMenuItem.connect( "activate", Gtk.main_quit )
-        self.menu.append( quitMenuItem )
+        menu.append( quitMenuItem )
 
-        self.menu.show_all()
+        menu.show_all()
+        return menu
 
 
     def main( self ):
@@ -114,21 +104,12 @@ class IndicatorStardate:
     def update( self ):
         self.stardate.setClassic( self.showClassic )
         self.stardate.setGregorian( datetime.datetime.utcnow() )
-        s = self.stardate.toStardateString( self.showIssue, self.padInteger )
 
-        if self.appindicatorImported == True:
-            self.indicator.set_label( s, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
-        else:
-            self.statusicon.set_tooltip_text( "Stardate: " + s )
-            self.stardateMenuItem.set_label( "Stardate: " + s )
+        s = self.stardate.toStardateString( self.showIssue, self.padInteger )
+        self.indicator.set_label( s, "" )
+        if self.showInMenu: self.stardateMenuItem.set_label( "Stardate: " + s )
 
         return True # Needed so the timer continues!
-
-
-    def handleLeftClick( self, icon ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, 1, Gtk.get_current_event_time() )
-
-
-    def handleRightClick( self, icon, button, time ): self.menu.popup( None, None, Gtk.StatusIcon.position_menu, self.statusicon, button, time )
 
 
     def onAbout( self, widget ):
@@ -189,9 +170,15 @@ class IndicatorStardate:
 
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
 
+        showInMenuCheckbox = Gtk.CheckButton( "Show in menu" )
+        showInMenuCheckbox.set_active( self.showInMenu )
+        showInMenuCheckbox.set_tooltip_text( "Show the stardate in the menu\n(for desktop environments which prohibit text\nlabels adjacent to the icon)" )
+        grid.attach( showInMenuCheckbox, 0, 3, 1, 1 )
+
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 3, 2, 1 )
+        autostartCheckbox.set_tooltip_text( "Run the indicator automatically" )
+        grid.attach( autostartCheckbox, 0, 4, 2, 1 )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( grid, True, True, 0 )
@@ -201,9 +188,10 @@ class IndicatorStardate:
 
         response = self.dialog.run()
         if response == Gtk.ResponseType.OK:
-            self.showClassic = showClassicCheckbox.get_active()
-            self.showIssue = showIssueCheckbox.get_active()
             self.padInteger = padIntegerCheckbox.get_active()
+            self.showClassic = showClassicCheckbox.get_active()
+            self.showInMenu = showInMenuCheckbox.get_active()
+            self.showIssue = showIssueCheckbox.get_active()
             self.saveSettings()
 
             if not os.path.exists( IndicatorStardate.AUTOSTART_PATH ):
@@ -219,6 +207,7 @@ class IndicatorStardate:
                     os.remove( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
                 except: pass
 
+            self.indicator.set_menu( self.buildMenu() )
             self.update()
 
         self.dialog.destroy()
@@ -233,6 +222,7 @@ class IndicatorStardate:
     def loadSettings( self ):
         self.padInteger = True
         self.showClassic = True
+        self.showInMenu = False
         self.showIssue = True
 
         if os.path.isfile( IndicatorStardate.SETTINGS_FILE ):
@@ -242,6 +232,7 @@ class IndicatorStardate:
 
                 self.padInteger = settings.get( IndicatorStardate.SETTINGS_PAD_INTEGER, self.padInteger )
                 self.showClassic = settings.get( IndicatorStardate.SETTINGS_SHOW_CLASSIC, self.showClassic )
+                self.showInMenu = settings.get( IndicatorStardate.SETTINGS_SHOW_IN_MENU, self.showInMenu )
                 self.showIssue = settings.get( IndicatorStardate.SETTINGS_SHOW_ISSUE, self.showIssue )
 
             except Exception as e:
@@ -254,6 +245,7 @@ class IndicatorStardate:
             settings = {
                 IndicatorStardate.SETTINGS_PAD_INTEGER: self.padInteger,
                 IndicatorStardate.SETTINGS_SHOW_CLASSIC: self.showClassic,
+                IndicatorStardate.SETTINGS_SHOW_IN_MENU: self.showInMenu,
                 IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showIssue
             }
             with open( IndicatorStardate.SETTINGS_FILE, "w" ) as f:
