@@ -29,14 +29,8 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
-from gi.repository import AppIndicator3, GLib, Gtk
-
-notifyImported = True
-try: from gi.repository import Notify
-except: notifyImported = False
-
+from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
-
 import copy, datetime, eclipse, gzip, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys
 
 try:
@@ -168,7 +162,7 @@ class IndicatorLunar:
         self.getSatelliteTLEData()
         self.loadSettings()
 
-        if notifyImported: Notify.init( IndicatorLunar.NAME )
+        Notify.init( IndicatorLunar.NAME )
 
         self.indicator = AppIndicator3.Indicator.new( IndicatorLunar.NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_icon_theme_path( os.getenv( "HOME" ) )
@@ -189,7 +183,7 @@ class IndicatorLunar:
         ephemNow = ephem.now()
 
         # Satellite notification.
-        if notifyImported and self.showSatelliteNotification:
+        if self.showSatelliteNotification:
             ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
             for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
 
@@ -248,8 +242,7 @@ class IndicatorLunar:
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-        if notifyImported and \
-            self.showWerewolfWarning and \
+        if self.showWerewolfWarning and \
             lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
             phaseIsBetweenNewAndFullInclusive:
 
@@ -1314,12 +1307,8 @@ class IndicatorLunar:
         test = Gtk.Button( "Test" )
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        if notifyImported:
-            test.connect( "clicked", self.onTestClicked, summary, body )
-            test.set_tooltip_text( "Show the notification bubble" )
-        else:
-            test.set_sensitive( False )
-            test.set_tooltip_text( "Notifications are not possible on your system" )
+        test.connect( "clicked", self.onTestClicked, summary, body )
+        test.set_tooltip_text( "Show the notification bubble" )
 
         grid.attach( test, 1, 4, 1, 1 )
 
@@ -1642,8 +1631,7 @@ class IndicatorLunar:
 
         if os.path.isfile( IndicatorLunar.SETTINGS_FILE ):
             try:
-                with open( IndicatorLunar.SETTINGS_FILE, "r" ) as f:
-                    settings = json.load( f )
+                with open( IndicatorLunar.SETTINGS_FILE, "r" ) as f: settings = json.load( f )
 
                 global _city_data
                 cityElevation = settings.get( IndicatorLunar.SETTINGS_CITY_ELEVATION, _city_data.get( self.cityName )[ 2 ] )
@@ -1700,8 +1688,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY: self.werewolfWarningTextSummary
             }
 
-            with open( IndicatorLunar.SETTINGS_FILE, "w" ) as f:
-                f.write( json.dumps( settings ) )
+            with open( IndicatorLunar.SETTINGS_FILE, "w" ) as f: f.write( json.dumps( settings ) )
 
         except Exception as e:
             logging.exception( e )
