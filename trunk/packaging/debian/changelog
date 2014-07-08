@@ -1,4 +1,4 @@
-indicator-fortune (1.0.11-1) precise; urgency=low
+indicator-fortune (1.0.12-1) precise; urgency=low
 
   * Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a
     segmentation fault).
