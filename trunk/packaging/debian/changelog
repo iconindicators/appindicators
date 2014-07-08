@@ -1,3 +1,11 @@
+indicator-stardate (1.0.23-1) precise; urgency=low
+
+  * Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a
+    segmentation fault).
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 8 Jul 2014 11:12:13 +1000
+
+
 indicator-stardate (1.0.22-1) precise; urgency=low
 
   * Optionally shows the stardate in the menu for desktop environments which
