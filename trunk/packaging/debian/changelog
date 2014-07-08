@@ -1,5 +1,13 @@
 indicator-fortune (1.0.11-1) precise; urgency=low
 
+  * Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a
+    segmentation fault).
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 8 Jul 2014 11:10:21 +1000
+
+
+indicator-fortune (1.0.11-1) precise; urgency=low
+
   * Now supports a middle mouse click on the icon to trigger one of the
     New/Copy/Show fortune menu items (not supported on all versions/derivatives
     of Ubuntu).
