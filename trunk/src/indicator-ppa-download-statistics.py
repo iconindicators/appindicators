@@ -46,7 +46,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.38"
+    VERSION = "1.0.39"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -107,8 +107,6 @@ class IndicatorPPADownloadStatistics:
 
 
     def buildMenu( self ):
-        menu = self.indicator.get_menu()
-        menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
         menu = Gtk.Menu()
 
         # Add PPAs to the menu...

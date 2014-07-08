@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.39-1) precise; urgency=low
+
+  * Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a
+    segmentation fault).
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 8 Jul 2014 11:07:35 +1000
+
+
 indicator-ppa-download-statistics (1.0.38-1) precise; urgency=low
 
   * Updated some labels/tooltips in the user preferences dialog.
