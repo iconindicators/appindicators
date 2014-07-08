@@ -31,7 +31,7 @@
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
-import copy, datetime, eclipse, gzip, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys
+import copy, datetime, eclipse, glob, gzip, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys
 
 try:
     import ephem
@@ -47,6 +47,7 @@ class IndicatorLunar:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
     VERSION = "1.0.50"
+    ICON_STATE = True
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -54,8 +55,6 @@ class IndicatorLunar:
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = NAME + ".desktop"
-    SVG_ICON = "." + NAME + "-illumination-icon"
-    SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
     SVG_FULL_MOON_FILE = os.getenv( "HOME" ) + "/" + "." + NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = NAME + "-satellite"
 
@@ -159,6 +158,10 @@ class IndicatorLunar:
         self.dataPrevious = { }
         self.satelliteNotifications = { }
 
+        for file in glob.glob( os.getenv( "HOME" ) + "/." + IndicatorLunar.NAME + "*.svg" ):
+            print(file)
+            os.remove( file )
+
         self.getSatelliteTLEData()
         self.loadSettings()
 
@@ -176,6 +179,8 @@ class IndicatorLunar:
 
 
     def update( self ):
+        self.toggleIconState()
+
         # Update the satellite TLE data at most every 12 hours.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ): self.getSatelliteTLEData() 
 
@@ -232,7 +237,7 @@ class IndicatorLunar:
             parsedOutput = parsedOutput.replace( "[" + key + "]", self.data[ key ] )
 
         self.createIcon( lunarIlluminationPercentage, self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), ephem.Moon( self.getCity( ephemNow ) ) ) )
-        self.indicator.set_icon( IndicatorLunar.SVG_ICON )
+        self.indicator.set_icon( self.getIconName() )
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
 
         # Full moon notification.
@@ -251,7 +256,7 @@ class IndicatorLunar:
             if self.werewolfWarningTextSummary == "":
                 summary = " "
 
-            Notify.Notification.new( summary, self.werewolfWarningTextBody, IndicatorLunar.SVG_FILE ).show()
+            Notify.Notification.new( summary, self.werewolfWarningTextBody, self.getIconFile() ).show()
 
 
     def buildMenu( self, ephemNow, lunarPhase ):
@@ -992,7 +997,7 @@ class IndicatorLunar:
         footer = '</svg>'
 
         if brightLimbAngleInDegrees is None: filename = IndicatorLunar.SVG_FULL_MOON_FILE
-        else: filename = IndicatorLunar.SVG_FILE
+        else: filename = self.getIconFile()
         try:
             with open( filename, "w" ) as f:
                 f.write( header + svg + footer )
@@ -1001,6 +1006,24 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing SVG: " + filename )
+
+
+    def getIconName( self ):
+        iconName = "." + IndicatorLunar.NAME + "-illumination-icon"
+
+        if IndicatorLunar.ICON_STATE: return iconName + "-1"
+
+        return iconName + "-2"
+
+
+    def getIconFile( self ):
+        return os.getenv( "HOME" ) + "/" + self.getIconName() + ".svg"
+
+
+    # Hideous workaround because setting the icon with the same name repeatedly does not change the icon any more.
+    # So alternate the name of the icon!
+    # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
+    def toggleIconState( self ): IndicatorLunar.ICON_STATE = not IndicatorLunar.ICON_STATE
 
 
     def onAbout( self, widget ):

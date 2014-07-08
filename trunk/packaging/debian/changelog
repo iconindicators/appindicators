@@ -2,6 +2,10 @@ indicator-lunar (1.0.50-1) precise; urgency=low
 
   * Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a
     segmentation fault).
+  * Bug fix: Using the same name for the icon causes the icon to appear the
+    same so appindicator (or something) decides not to reload the icon.
+    The workaround is to give the icon a new name - really, alternate the name.
+    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 8 Jul 2014 11:11:14 +1000
 
