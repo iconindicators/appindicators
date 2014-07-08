@@ -18,8 +18,7 @@ cp $NAME.desktop $BUILD_DIR/$NAME-$VERSION
 cp build-debian $BUILD_DIR/$NAME-$VERSION
 
 mkdir -p $BUILD_DIR/$NAME-$VERSION/src
-cp src/example.py src/indicator-stardate.py src/stardate.py $BUILD_DIR/$NAME-$VERSION/src
-cp $PYTHON_UTILS $BUILD_DIR/$NAME-$VERSION/src
+cp src/example.py src/indicator-stardate.py src/stardate.py $PYTHON_UTILS $BUILD_DIR/$NAME-$VERSION/src
 
 mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/elementary
 cp icons/indicator-stardate-elementary.svg $BUILD_DIR/$NAME-$VERSION/icons/elementary/indicator-stardate.svg
