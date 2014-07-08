@@ -46,7 +46,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.49"
+    VERSION = "1.0.50"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -257,9 +257,6 @@ class IndicatorLunar:
     def buildMenu( self, ephemNow, lunarPhase ):
         nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
-        menu = self.indicator.get_menu()
-
-        menu.popdown() # Make the existing menu, if visible, disappear (if not, GTK complains).
         menu = Gtk.Menu()
 
         self.createMoonMenu( menu, nextUpdates, ephemNow, lunarPhase )
@@ -308,7 +305,6 @@ class IndicatorLunar:
         menu.append( quitMenuItem )
 
         self.indicator.set_menu( menu )
-
         menu.show_all()
 
         # Work out when to do the next update...
