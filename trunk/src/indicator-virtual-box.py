@@ -44,7 +44,7 @@ class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-virtual-box"
-    VERSION = "1.0.34"
+    VERSION = "1.0.35"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -107,10 +107,6 @@ class IndicatorVirtualBox:
 
 
     def buildMenu( self ):
-        menu = self.indicator.get_menu()
-        menu.popdown() # Make the existing menu, if visible, disappear (if we don't do this we get GTK complaints).
-
-        # Create the new menu and populate...
         menu = Gtk.Menu()
         if self.isVirtualBoxInstalled():
             self.getVirtualMachines()
