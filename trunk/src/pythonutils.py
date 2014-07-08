@@ -20,7 +20,7 @@
 
 from gi.repository import Gtk
 
-import gzip, logging.handlers, os, re
+import gzip, logging.handlers, os, re, sys
 
 
 # Returns True if a number; False otherwise.
@@ -92,10 +92,15 @@ class AboutDialog( Gtk.AboutDialog ):
 
         super( AboutDialog, self ).__init__()
 
-        try:
+        # The function 'add_credit_section' is/was not available on Ubuntu 12.04 (GTK 3.2 and python 3.2).
+        # Previously I was using a try/except to trap a call to 'add_credit_section' - on the except, set the authors a different (older) way.
+        # However something has changed and 'add_credit_section' appears to exist but causes a segmentation fault when called.
+        # The workaround is to test the python version and use that to discriminate and avoid the try/except.
+        # The function 'add_credit_section' IS available on Ubuntu 14.04 (python 3.4).
+        if sys.version_info.major == 3 and sys.version_info.minor >= 4:
             self.set_authors( authors )
             self.add_credit_section( creditsLabel, creditsPeople )
-        except:
+        else:
             authorsCredits = authors
             authorsCredits.append( "" )
             for credit in creditsPeople:
