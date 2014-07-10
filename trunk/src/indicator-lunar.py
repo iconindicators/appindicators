@@ -1023,6 +1023,7 @@ class IndicatorLunar:
     # Hideous workaround because setting the icon with the same name repeatedly does not change the icon any more.
     # So alternate the name of the icon!
     # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
+    # http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
     def toggleIconState( self ): IndicatorLunar.ICON_STATE = not IndicatorLunar.ICON_STATE
 
 
