@@ -46,7 +46,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.50"
+    VERSION = "1.0.51"
     ICON_STATE = True
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -157,10 +157,9 @@ class IndicatorLunar:
         self.data = { }
         self.dataPrevious = { }
         self.satelliteNotifications = { }
+        self.lastFullMoonNotfication = ephem.Date( "2000/01/01" ) # Set a date way back in the past...
 
-        for file in glob.glob( os.getenv( "HOME" ) + "/." + IndicatorLunar.NAME + "*.svg" ):
-            print(file)
-            os.remove( file )
+        for file in glob.glob( os.getenv( "HOME" ) + "/." + IndicatorLunar.NAME + "*.svg" ): os.remove( file )
 
         self.getSatelliteTLEData()
         self.loadSettings()
@@ -249,14 +248,16 @@ class IndicatorLunar:
 
         if self.showWerewolfWarning and \
             lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
-            phaseIsBetweenNewAndFullInclusive:
+            phaseIsBetweenNewAndFullInclusive and \
+            ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) <= ephemNow ):
 
-            # The notification summary text must not be empty (at least on Unity).
+            # The notification summary text cannot be empty (at least on Unity).
             summary = self.werewolfWarningTextSummary
             if self.werewolfWarningTextSummary == "":
                 summary = " "
 
             Notify.Notification.new( summary, self.werewolfWarningTextBody, self.getIconFile() ).show()
+            self.lastFullMoonNotfication = ephemNow
 
 
     def buildMenu( self, ephemNow, lunarPhase ):

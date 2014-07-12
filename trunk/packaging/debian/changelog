@@ -1,3 +1,12 @@
+indicator-lunar (1.0.51-1) precise; urgency=low
+
+  * Ensure that the full moon notification happens approximately hourly and
+    not more frequently.
+  * Removed debug print statement.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 12 Jul 2014 17:32:21 +1000
+
+
 indicator-lunar (1.0.50-1) precise; urgency=low
 
   * Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a
