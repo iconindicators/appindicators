@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.40-1) precise; urgency=low
+
+  * Now passes filter text to the URL which retrieves the published binary
+    information...results in much faster download for large PPAs!
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 21 Jul 2014 12:38:51 +1000
+
+
 indicator-ppa-download-statistics (1.0.39-1) precise; urgency=low
 
   * Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a

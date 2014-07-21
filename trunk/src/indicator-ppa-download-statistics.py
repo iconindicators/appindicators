@@ -46,7 +46,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.39"
+    VERSION = "1.0.40"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -994,12 +994,17 @@ class IndicatorPPADownloadStatistics:
 
         for ppa in self.ppas:
             ppa.resetForDownload()
-            self.getPublishedBinaries( ppa )
+            key = ppa.getUser() + " | " + ppa.getName()
+            if key in self.filters: self.getPublishedBinariesWithFilters( ppa )
+            else: self.getPublishedBinariesNoFilters( ppa )
 
+        # Have a second attempt at failures...
         for ppa in self.ppas:
             if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                 ppa.resetForDownload()
-                self.getPublishedBinaries( ppa )
+                key = ppa.getUser() + " | " + ppa.getName()
+                if key in self.filters: self.getPublishedBinariesWithFilters( ppa )
+                else: self.getPublishedBinariesNoFilters( ppa )
 
         with self.lock: self.downloadInProgress = False
 
@@ -1009,15 +1014,11 @@ class IndicatorPPADownloadStatistics:
             Notify.Notification.new( "Statistics downloaded!", "", IndicatorPPADownloadStatistics.ICON ).show()
 
 
-    def getPublishedBinaries( self, ppa ):
-
-        if self.quitRequested:
-            self.quit( None )
-            return
-
+    def getPublishedBinariesNoFilters( self, ppa ):
         baseURL = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
-                "?ws.op=getPublishedBinaries&status=Published&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + \
-                ppa.getSeries() + "/" + ppa.getArchitecture()
+                "?ws.op=getPublishedBinaries" + \
+                "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
+                "&status=Published"
 
         url = baseURL
         try:
@@ -1026,66 +1027,87 @@ class IndicatorPPADownloadStatistics:
             if numberOfPublishedBinaries == 0:
                 ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
                 ppa.setPublishedBinaries( [ ] )
+                return
 
-            else:
-                # This PPA has at least one published binary...
-                # The results are returned in lots of 75, so need to retrieve each lot after the first 75.
-                # Could in future try to get each subsequent URL in a thread to increase speed, but the code quiclky becomes messy.
-                index = 0
-                resultPage = 1
-                resultsPerUrl = 75
-                threads = []
-                for i in range( numberOfPublishedBinaries ):
+            self.processPublishedBinaries( ppa, baseURL, publishedBinaries, numberOfPublishedBinaries )
 
-                    if self.quitRequested:
-                        self.quit( None )
-                        return
+        except Exception as e:
+            logging.exception( e )
+            ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+            ppa.setPublishedBinaries( [ ] )
 
-                    if i == ( resultPage * resultsPerUrl ):
-                        # Handle result pages after the first page.
-                        url = baseURL + "&ws.start=" + str( resultPage * resultsPerUrl )
-                        publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
-                        resultPage += 1
-                        index = 0
 
-                    packageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
+    def getPublishedBinariesWithFilters( self, ppa ):
+        for filter in self.filters.get( ppa.getUser() + " | " + ppa.getName() ):
 
-                    # Filter out unwanted packages...
-                    key = ppa.getUser() + " | " + ppa.getName()
-                    if key in self.filters:
-                        match = False
-                        for filter in self.filters.get( key ):
-                            if filter in packageName:
-                                match = True
-                                break
+            baseURL = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
+                    "?ws.op=getPublishedBinaries" + \
+                    "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
+                    "&status=Published" + \
+                    "&exact_match=false" + \
+                    "&ordered=false" + \
+                    "&binary_name=" + filter
 
-                        if not match:
-                            index += 1
-                            continue
+            url = baseURL
+            try:
+                publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
+                numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
+                if numberOfPublishedBinaries == 0:
+                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+                    ppa.setPublishedBinaries( [ ] )
+                    continue
 
-                    # Limit to 10 concurrent fetches of package download count...
-                    if len( threads ) > 10:
-                        for t in threads: t.join()
+                self.processPublishedBinaries( ppa, baseURL, publishedBinaries, numberOfPublishedBinaries )
 
-                        threads = []
+            except Exception as e:
+                logging.exception( e )
+                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                ppa.setPublishedBinaries( [ ] )
 
-                    packageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
-                    architectureSpecific = publishedBinaries[ "entries" ][ index ][ "architecture_specific" ]
-                    indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
-                    packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
 
-                    t = Thread( target = self.getDownloadCount, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ) )
-                    t.start()
-                    threads.append( t )
+    # Takes the published binary and extracts the information needed to get the download count (for each package).
+    # As the results in a published binary are returned in lots of 75, if there are more that 75 published binaries, continue to loop to get the remainder.
+    def processPublishedBinaries( self, ppa, baseURL, publishedBinaries, numberOfPublishedBinaries ):
+        try:
+            index = 0
+            resultPage = 1
+            resultsPerUrl = 75
+            threads = []
+            for i in range( numberOfPublishedBinaries ):
+                if self.quitRequested:
+                    self.quit( None )
+                    return
 
-                    index += 1
+                if i == ( resultPage * resultsPerUrl ):
+                    # Handle result pages after the first page.
+                    url = baseURL + "&ws.start=" + str( resultPage * resultsPerUrl )
+                    publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
+                    resultPage += 1
+                    index = 0
 
-                # Wait for remaining threads...
-                for t in threads: t.join()
+                packageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
 
-                ppa.noMorePublishedBinariesToAdd()
+                # Limit to 10 concurrent fetches of package download count...
+                if len( threads ) > 10:
+                    for t in threads: t.join()
+                    threads = []
 
-                if numberOfPublishedBinaries > 0 and len( ppa.getPublishedBinaries() ) == 0: ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+                packageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
+                architectureSpecific = publishedBinaries[ "entries" ][ index ][ "architecture_specific" ]
+                indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
+                packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
+
+                t = Thread( target = self.getDownloadCount, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ) )
+                t.start()
+                threads.append( t )
+
+                index += 1
+
+            for t in threads: t.join() # Wait for remaining threads...
+
+            ppa.noMorePublishedBinariesToAdd()
+
+            if numberOfPublishedBinaries > 0 and len( ppa.getPublishedBinaries() ) == 0: ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
 
         except Exception as e:
             logging.exception( e )
