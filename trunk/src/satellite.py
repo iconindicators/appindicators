@@ -42,7 +42,7 @@ class Info:
     def getName( self ): return self.tleTitle
 
 
-    def getCatalogueNumber( self ): return self.tleLine1[ 2 : 7 ]
+    def getCatalogNumber( self ): return self.tleLine1[ 2 : 7 ]
 
 
     def getInternationalDesignation( self ): 
