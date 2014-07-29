@@ -16,7 +16,10 @@
 
 
 # Two-line Element Set.
+# http://www.satobs.org/element.html
 # http://en.wikipedia.org/wiki/Two-line_element_set
+# https://www.mmto.org/obscats/tle.html
+# http://celestrak.com/columns/v04n03
 
 
 class Info:
@@ -39,7 +42,15 @@ class Info:
     def getName( self ): return self.tleTitle
 
 
-    def getNumber( self ): return self.tleLine1[ 2 : 7 ]
+    def getCatalogueNumber( self ): return self.tleLine1[ 2 : 7 ]
+
+
+    def getInternationalDesignation( self ): 
+        launchYear = self.tleLine1[ 9 : 11 ]
+        if int( launchYear ) < 57:  launchYear = "20" + launchYear
+        else: launchYear = "19" + launchYear 
+
+        return launchYear + "-" + self.tleLine1[ 11 : 17 ]
 
 
     def __str__( self ): return str( self.tleTitle ) + " | " + str( self.tleLine1 ) + " | " + str( self.tleLine2 )
