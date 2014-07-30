@@ -50,7 +50,7 @@ class Info:
         if int( launchYear ) < 57:  launchYear = "20" + launchYear
         else: launchYear = "19" + launchYear 
 
-        return launchYear + "-" + self.tleLine1[ 11 : 17 ]
+        return launchYear + "-" + self.tleLine1[ 11 : 17 ].strip()
 
 
     def __str__( self ): return str( self.tleTitle ) + " | " + str( self.tleLine1 ) + " | " + str( self.tleLine2 )
