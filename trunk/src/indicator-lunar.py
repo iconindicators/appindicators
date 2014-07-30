@@ -46,7 +46,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.51"
+    VERSION = "1.0.52"
     ICON_STATE = True
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -66,32 +66,33 @@ class IndicatorLunar:
     CREDIT_TROPICAL_SIGN = "Tropical Sign by Ignius Drake."
     CREDITS = [ CREDIT_PYEPHEM, CREDIT_ECLIPSE, CREDIT_TROPICAL_SIGN, CREDIT_BRIGHT_LIMB, CREDIT_SATELLITE ]
 
+    DISPLAY_NEEDS_REFRESH = "(needs refresh)"
     INDENT = "    "
+    NEWLINE = "[NEWLINE]"   #TODO Maybe not needed...!
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_CITY_ELEVATION = "cityElevation"
     SETTINGS_CITY_LATITUDE = "cityLatitude"
     SETTINGS_CITY_LONGITUDE = "cityLongitude"
     SETTINGS_CITY_NAME = "cityName"
-    SETTINGS_DISPLAY_PATTERN = "displayPattern"
     SETTINGS_HIDE_SATELLITE_WHEN_NO_TRANSIT = "hideSatelliteWhenNoTransit"
+    SETTINGS_INDICATOR_TEXT = "indicatorText"
     SETTINGS_ONLY_SHOW_VISIBLE_SATELLITE_PASSES = "onlyShowVisibleSatellitePasses"
     SETTINGS_PLANETS = "planets"
+    SETTINGS_SATELLITE_MENU_TEXT = "satelliteMenuText"
+    SETTINGS_SATELLITE_NOTIFICATION_MESSAGE_TEXT = "satelliteNotificationMessageText"
+    SETTINGS_SATELLITE_NOTIFICATION_SUMMARY_TEXT = "satelliteNotificationSummaryText"
     SETTINGS_SATELLITES = "satellites"
     SETTINGS_SHOW_PLANETS_AS_SUBMENU = "showPlanetsAsSubmenu"
     SETTINGS_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
-    SETTINGS_SHOW_SATELLITE_NUMBER = "showSatelliteNumber"
     SETTINGS_SHOW_SATELLITE_SUBSEQUENT_PASSES = "showSatelliteSubsequentPasses"
     SETTINGS_SHOW_SATELLITES_AS_SUBMENU = "showSatellitesAsSubmenu"
     SETTINGS_SHOW_STARS_AS_SUBMENU = "showStarsAsSubmenu"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     SETTINGS_STARS = "stars"
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
-    SETTINGS_WEREWOLF_WARNING_TEXT_BODY = "werewolfWarningTextBody"
+    SETTINGS_WEREWOLF_WARNING_TEXT_MESSAGE = "werewolfWarningTextMessage"
     SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY = "werewolfWarningTextSummary"
-
-    DISPLAY_PATTERN_DEFAULT = "[MOON PHASE] [MOON ILLUMINATION]"
-    DISPLAY_NEEDS_REFRESH = "(needs refresh)"
 
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
     LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
@@ -113,11 +114,24 @@ class IndicatorLunar:
         LUNAR_PHASE_WAXING_GIBBOUS : "Waxing Gibbous"
     }
 
-    WEREWOLF_WARNING_TEXT_BODY = "                                          ...werewolves about ! ! !"
-    WEREWOLF_WARNING_TEXT_SUMMARY = "W  A  R  N  I  N  G"
+    INDICATOR_TEXT_DEFAULT = "[MOON PHASE] [MOON ILLUMINATION]"
 
-    SATELLITE_TEXT_SUMMARY = "                          ...now rising at azimuth "
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
+
+    SATELLITE_TAG_NAME = "[NAME]"
+    SATELLITE_TAG_CATALOG_NUMBER = "[CATALOG NUMBER]"
+    SATELLITE_TAG_INTERNATIONAL_DESIGNATION = "[INTERNATIONAL DESIGNATION]"
+
+    SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_CATALOG_NUMBER
+#TODO Will need to work out if newline is needed here.
+#TODO Need a tag for the rise azimuth.
+    SATELLITE_NOTIFICATION_MESSAGE_TEXT_DEFAULT = "Catalog: " + SATELLITE_TAG_CATALOG_NUMBER + NEWLINE + "Designation: " + SATELLITE_TAG_INTERNATIONAL_DESIGNATION + NEWLINE + "                          ...now rising at azimuth "
+    SATELLITE_NOTIFICATION_SUMMARY_TEXT_DEFAULT = SATELLITE_TAG_NAME
+
+    SATELLITE_TEXT_SUMMARY = "                          ...now rising at azimuth " #TODO Will need to be renamed to default...or maybe remove altogether?
+
+    WEREWOLF_WARNING_TEXT_MESSAGE_DEFAULT = "                                          ...werewolves about ! ! !"
+    WEREWOLF_WARNING_TEXT_SUMMARY_DEFAULT = "W  A  R  N  I  N  G"
 
 #TODO There is a bug in pyephem which causes a seg fault when copying a body.
 # As a workaround, make a duplicate of each planet for ultimate use in the tropical sign calculation.
@@ -173,6 +187,7 @@ class IndicatorLunar:
 
 
     def main( self ):
+        print()#TODO Remove
         self.update()
         Gtk.main()
 
@@ -208,11 +223,15 @@ class IndicatorLunar:
 
                 self.satelliteNotifications[ key ] = self.data[ setTimeKey ] # Flag to ensure the notification happens once per satellite's pass.
 
+                # Parse the satellite summary/message to create the notification...
                 degreeSymbolIndex = self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ].index( "°" )
                 summary = IndicatorLunar.SATELLITE_TEXT_SUMMARY + self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ][ 0 : degreeSymbolIndex + 1 ]
-                if self.showSatelliteNumber: message = satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ]
-                else: message = satelliteNameNumber[ 0 ]
-                Notify.Notification.new( message, summary, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+
+                message = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] )
+                message = message.replace( IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER, satelliteNameNumber[ 1 ] )
+                message = message.replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION, self.satelliteTLEData[ key ].getInternationalDesignation() )
+
+#                 Notify.Notification.new( message, summary, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
         # Reset the data on each update, otherwise data will accumulate (if a star/satellite was added then removed, the computed data remains).
         self.dataPrevious = self.data
@@ -225,13 +244,13 @@ class IndicatorLunar:
 
         self.buildMenu( ephemNow, lunarPhase )
 
-        # Parse the display pattern and show it...
+        # Parse the indicator text and show it...
         #
         # For Ubuntu (Unity), an icon and label can co-exist and there is no tooltip. The icon is always to the right of the label.
         # On Ubuntu 13.10 (might be a bug), an icon must be displayed, so if no icon tag is present, display a 1 pixel SVG.
         #
         # On non Unity (Lubuntu, etc), only an icon can be displayed - text is shown as a tooltip.
-        parsedOutput = self.displayPattern
+        parsedOutput = self.indicatorText
         for key in self.data.keys():
             parsedOutput = parsedOutput.replace( "[" + key + "]", self.data[ key ] )
 
@@ -256,7 +275,7 @@ class IndicatorLunar:
             if self.werewolfWarningTextSummary == "":
                 summary = " "
 
-            Notify.Notification.new( summary, self.werewolfWarningTextBody, self.getIconFile() ).show()
+            Notify.Notification.new( summary, self.werewolfWarningTextMessage, self.getIconFile() ).show()
             self.lastFullMoonNotfication = ephemNow
 
 
@@ -594,7 +613,7 @@ class IndicatorLunar:
     # Other sources/background:
     #   http://spotthestation.nasa.gov/sightings
     #   http://www.n2yo.com/passes/?s=25544
-    #   http://www.heavens-above.com/
+    #   http://www.heavens-above.com
     #
     # For planets/stars, the next rise/set time is shown.
     # If already above the horizon, the set time is shown followed by the rise time for the next pass.
@@ -631,10 +650,10 @@ class IndicatorLunar:
                 if not success and self.hideSatelliteWhenNoTransit:
                     continue
 
-            if self.showSatelliteNumber:
-                menuText = satelliteNameNumber[ 0 ] + " - " + satelliteNameNumber[ 1 ]
-            else:
-                menuText = satelliteNameNumber[ 0 ]
+                # Parse the satellite menu text...
+                menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] )
+                menuText = menuText.replace( IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER, satelliteNameNumber[ 1 ] )
+                menuText = menuText.replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION, self.satelliteTLEData[ key ].getInternationalDesignation() )
 
             if firstRun:
                 firstRun = False
@@ -1059,7 +1078,7 @@ class IndicatorLunar:
 
         notebook = Gtk.Notebook()
 
-        # Display settings.
+        # Indicator text.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -1070,13 +1089,15 @@ class IndicatorLunar:
 
         hbox = Gtk.Box( spacing = 6 )
 
-        label = Gtk.Label( "Display pattern" )
+        label = Gtk.Label( "Indicator text" )
         hbox.pack_start( label, False, False, 0 )
 
-        displayPattern = Gtk.Entry()
-        displayPattern.set_text( self.displayPattern )
-        displayPattern.set_tooltip_text( "The text shown next to the icon (or tooltip, where applicable)" )
-        hbox.pack_start( displayPattern, True, True, 0 )
+        indicatorText = Gtk.Entry()
+        indicatorText.set_text( self.indicatorText )
+        indicatorText.set_tooltip_text( "The text shown next to the indicator icon\n(or shown as a tooltip, where applicable).\n\nDefault: " + IndicatorLunar.INDICATOR_TEXT_DEFAULT )
+        hbox.pack_start( indicatorText, True, True, 0 )
+
+#TODO Want a test button?
 
         grid.attach( hbox, 0, 0, 1, 1 )
 
@@ -1093,16 +1114,16 @@ class IndicatorLunar:
         tree.append_column( Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 ) )
 
         tree.append_column( Gtk.TreeViewColumn( "Value", Gtk.CellRendererText(), text = 1 ) )
-        tree.set_tooltip_text( "Double click to add a tag to the display pattern." )
+        tree.set_tooltip_text( "Double click to add a tag to the indicator text." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.connect( "row-activated", self.onDisplayTagDoubleClick, displayPattern )
+        tree.connect( "row-activated", self.onIndicatorTextTagDoubleClick, indicatorText )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "Display" ) )
+        notebook.append_page( grid, Gtk.Label( "Indicator Text" ) )
 
         # Planet settings.
         grid = Gtk.Grid()
@@ -1115,7 +1136,7 @@ class IndicatorLunar:
 
         hbox = Gtk.Box( spacing = 6 )
 
-        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Show planets as submenus" )
+        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Show as submenus" )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
         showPlanetsAsSubmenuCheckbox.set_tooltip_text( "Show each planet in its own submenu." )
         grid.attach( showPlanetsAsSubmenuCheckbox, 0, 0, 1, 1 )
@@ -1155,7 +1176,7 @@ class IndicatorLunar:
 
         hbox = Gtk.Box( spacing = 6 )
 
-        showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Show stars as submenus" )
+        showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Show as submenus" )
         showStarsAsSubmenuCheckbox.set_tooltip_text( "Show each star in its own submenu." )
         showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
         grid.attach( showStarsAsSubmenuCheckbox, 0, 0, 1, 1 )
@@ -1193,8 +1214,6 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        hbox = Gtk.Box( spacing = 6 )
-
         if len( self.satelliteTLEData ) == 0:
             # Error downloading data.
             label = Gtk.Label()
@@ -1203,40 +1222,10 @@ class IndicatorLunar:
             label.set_halign( Gtk.Align.START )
             grid.attach( label, 0, 0, 1, 1 )
         else:
-            showSatelliteNumberCheckbox = Gtk.CheckButton( "Show satellite number" )
-            showSatelliteNumberCheckbox.set_active( self.showSatelliteNumber )
-            showSatelliteNumberCheckbox.set_tooltip_text( "Include the satellite number in the menu/notification." )
-            grid.attach( showSatelliteNumberCheckbox, 0, 0, 1, 1 )
-
-            showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show as submenus" )
-            showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
-            showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
-            grid.attach( showSatellitesAsSubmenuCheckbox, 0, 1, 1, 1 )
-
-            showSatellitePassesVisibleCheckbox = Gtk.CheckButton( "Only show visible passes" )
-            showSatellitePassesVisibleCheckbox.set_active( self.onlyShowVisibleSatellitePasses )
-            showSatellitePassesVisibleCheckbox.set_tooltip_text( "Only display information for visible passes." )
-            grid.attach( showSatellitePassesVisibleCheckbox, 0, 2, 1, 1 )
-
-            showSatelliteSubsequentPassesCheckbox = Gtk.CheckButton( "Show subsequent passes" )
-            showSatelliteSubsequentPassesCheckbox.set_active( self.showSatelliteSubsequentPasses )
-            showSatelliteSubsequentPassesCheckbox.set_tooltip_text( "Show passes following the current." )
-            grid.attach( showSatelliteSubsequentPassesCheckbox, 2, 0, 1, 1 )
-
-            showSatelliteNotificationCheckbox = Gtk.CheckButton( "Notification on rise" )
-            showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
-            showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon." )
-            grid.attach( showSatelliteNotificationCheckbox, 2, 1, 1, 1 )
-
-            hideSatelliteWhenNoTransitCheckbox = Gtk.CheckButton( "Hide satellite when no transit" )
-            hideSatelliteWhenNoTransitCheckbox.set_active( self.hideSatelliteWhenNoTransit )
-            hideSatelliteWhenNoTransitCheckbox.set_tooltip_text( "If no transit can be computed, hide the satellite.\n\nA transit may not be computed as a result of...\n\tmissing TLE data,\n\tsatellite never rises or is circumpolar,\n\tno visible transit occurs in the next 10 days." )
-            grid.attach( hideSatelliteWhenNoTransitCheckbox, 2, 2, 1, 1 )
-
             satelliteStore = Gtk.ListStore( str, str, bool ) # Satellite name, satellite number, show/hide.
             for key in self.satelliteTLEData:
                 satelliteInfo = self.satelliteTLEData[ key ]
-                satelliteStore.append( [ satelliteInfo.getName(), satelliteInfo.getNumber(), [ satelliteInfo.getName(), satelliteInfo.getNumber() ] in self.satellites ] )
+                satelliteStore.append( [ satelliteInfo.getName(), satelliteInfo.getCatalogNumber(), [ satelliteInfo.getName(), satelliteInfo.getCatalogNumber() ] in self.satellites ] )
 
             satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
             satelliteStoreSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
@@ -1252,7 +1241,7 @@ class IndicatorLunar:
             renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
             tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 2 ) )
     
-            tree.set_tooltip_text( "Check a satellite, station or rocket booster to display in the menu." )
+            tree.set_tooltip_text( "Check a satellite, station or rocket body to display in the menu." )
             tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
     
             scrolledWindow = Gtk.ScrolledWindow()
@@ -1260,10 +1249,104 @@ class IndicatorLunar:
             scrolledWindow.add( tree )
             grid.attach( scrolledWindow, 0, 3, 3, 1 )
 
-            separator = Gtk.Separator.new( Gtk.Orientation.VERTICAL )
-            grid.attach( separator, 1, 0, 1, 3 )
-
         notebook.append_page( grid, Gtk.Label( "Satellites" ) )
+
+        # Satellite display settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        hbox = Gtk.Box( spacing = 6 )
+
+        label = Gtk.Label( "Menu" )
+        hbox.pack_start( label, False, False, 0 )
+
+        satelliteMenuText = Gtk.Entry()
+        satelliteMenuText.set_text( self.satelliteMenuText )
+        satelliteMenuText.set_hexpand( True )
+        satelliteMenuText.set_tooltip_text( 
+             "The text for each satellite in the menu.\n\n" + \
+             "Available tags:\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION )
+
+        hbox.pack_start( satelliteMenuText, True, True, 0 )
+
+        grid.attach( hbox, 0, 0, 1, 1 )
+
+        hbox = Gtk.Box( spacing = 6 )
+
+        label = Gtk.Label( "Notification summary" )
+        hbox.pack_start( label, False, False, 0 )
+
+        satelliteNotificationSummaryText = Gtk.Entry()
+        satelliteNotificationSummaryText.set_text( self.satelliteNotificationSummaryText )
+        satelliteNotificationSummaryText.set_hexpand( True )
+        satelliteNotificationSummaryText.set_tooltip_text( 
+             "The summary text for each satellite rise notification.\n\n" + \
+             "Available tags:\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION ) #TODO Needs to be rise azimuth
+#TODO Need newline?        
+
+        hbox.pack_start( satelliteNotificationSummaryText, True, True, 0 )
+
+        grid.attach( hbox, 0, 1, 1, 1 )
+
+        hbox = Gtk.Box( spacing = 6 )
+
+        label = Gtk.Label( "Notification message" )
+        hbox.pack_start( label, False, False, 0 )
+
+        satelliteNotificationMessageText = Gtk.Entry()
+        satelliteNotificationMessageText.set_text( self.satelliteNotificationMessageText )
+        satelliteNotificationMessageText.set_hexpand( True )
+        satelliteNotificationMessageText.set_tooltip_text( 
+             "The message text for each satellite rise notification.\n\n" + \
+             "Available tags:\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION ) #TODO Needs to be rise azimuth
+#TODO Need newline?        
+
+        hbox.pack_start( satelliteNotificationMessageText, True, True, 0 )
+
+        grid.attach( hbox, 0, 2, 1, 1 )
+
+        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show as submenus" )
+        showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
+        showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
+        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 3, 1, 1 )
+ 
+        showSatellitePassesVisibleCheckbox = Gtk.CheckButton( "Only show visible passes" )
+        showSatellitePassesVisibleCheckbox.set_active( self.onlyShowVisibleSatellitePasses )
+        showSatellitePassesVisibleCheckbox.set_tooltip_text( "Only display information for visible passes." )
+        grid.attach( showSatellitePassesVisibleCheckbox, 0, 4, 1, 1 )
+ 
+        showSatelliteSubsequentPassesCheckbox = Gtk.CheckButton( "Show subsequent passes" )
+        showSatelliteSubsequentPassesCheckbox.set_active( self.showSatelliteSubsequentPasses )
+        showSatelliteSubsequentPassesCheckbox.set_tooltip_text( "Show passes following the current." )
+        grid.attach( showSatelliteSubsequentPassesCheckbox, 0, 5, 1, 1 )
+ 
+        showSatelliteNotificationCheckbox = Gtk.CheckButton( "Notification on rise" )
+        showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
+        showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon." )
+        grid.attach( showSatelliteNotificationCheckbox, 0, 6, 1, 1 )
+ 
+        hideSatelliteWhenNoTransitCheckbox = Gtk.CheckButton( "Hide satellite when no transit" )
+        hideSatelliteWhenNoTransitCheckbox.set_active( self.hideSatelliteWhenNoTransit )
+        hideSatelliteWhenNoTransitCheckbox.set_tooltip_text( "If no transit can be computed, hide the satellite.\n\nA transit may not be computed as a result of...\n\tmissing TLE data,\n\tsatellite never rises or is circumpolar,\n\tno visible transit occurs in the next 10 days." )
+        grid.attach( hideSatelliteWhenNoTransitCheckbox, 0, 7, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "Satellite Display" ) )
 
         # Full Moon notification settings.
         grid = Gtk.Grid()
@@ -1276,7 +1359,7 @@ class IndicatorLunar:
 
         showWerewolfWarningCheckbox = Gtk.CheckButton( "Werewolf warning" )
         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
-        showWerewolfWarningCheckbox.set_tooltip_text( "Screen notification (approximately hourly) at full moon (or leading up to)" )
+        showWerewolfWarningCheckbox.set_tooltip_text( "Screen notification (approximately hourly)\nat full moon (or leading up to)" )
         grid.attach( showWerewolfWarningCheckbox, 0, 0, 2, 1 )
 
         label = Gtk.Label( "Illumination %" )
@@ -1288,7 +1371,7 @@ class IndicatorLunar:
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 0, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.werewolfWarningStartIlluminationPercentage ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( "The warning commences at the specified illumination - starting after a new moon (0%)" )
+        spinner.set_tooltip_text( "The warning commences at the specified illumination,\nstarting after a new moon (0%)" )
         spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         spinner.set_hexpand( True )
         grid.attach( spinner, 1, 1, 1, 1 )
@@ -1310,25 +1393,30 @@ class IndicatorLunar:
 
         showWerewolfWarningCheckbox.connect( "toggled", self.onShowWerewolfWarningCheckbox, label, summary )
 
-        label = Gtk.Label( "Body" )
+        label = Gtk.Label( "Message" )
         label.set_margin_left( 25 )
         label.set_halign( Gtk.Align.START )
+        label.set_valign( Gtk.Align.START )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( label, 0, 3, 1, 1 )
 
-        body = Gtk.Entry()
-        body.set_text( self.werewolfWarningTextBody )
-        body.set_width_chars( len( self.werewolfWarningTextBody.strip() ) * 3 / 2 ) # Any whitespace throws off the width, so trim them and base the width of the non-whitespace text.
-        body.set_tooltip_text( "The body text for the werewolf notification" )
-        body.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        grid.attach( body, 1, 3, 1, 1 )
+        message = Gtk.TextView()
+        message.get_buffer().set_text( self.werewolfWarningTextMessage )
+        message.set_tooltip_text( "The message text for the werewolf notification.\n\nFor formatting restrictions, refer to\nhttps://wiki.ubuntu.com/NotifyOSD#Body_text" )
+        message.set_sensitive( showWerewolfWarningCheckbox.get_active() )
 
-        showWerewolfWarningCheckbox.connect( "toggled", self.onShowWerewolfWarningCheckbox, label, body )
+        scrolledwindow = Gtk.ScrolledWindow()
+        scrolledwindow.set_hexpand( True )
+        scrolledwindow.set_vexpand( True )
+        scrolledwindow.add( message )
+        grid.attach( scrolledwindow, 1, 3, 1, 1 )
+
+        showWerewolfWarningCheckbox.connect( "toggled", self.onShowWerewolfWarningCheckbox, label, message )
 
         test = Gtk.Button( "Test" )
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        test.connect( "clicked", self.onTestClicked, summary, body )
+        test.connect( "clicked", self.onTestClicked, summary, message )
         test.set_tooltip_text( "Show the notification bubble" )
 
         grid.attach( test, 1, 4, 1, 1 )
@@ -1453,23 +1541,24 @@ class IndicatorLunar:
                 # Don't initialise the list of satellites the user has chosen as this data is still valid despite a failed download.
                 self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 )
             else:
-                self.onlyShowVisibleSatellitePasses = showSatellitePassesVisibleCheckbox.get_active()
-                self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
-                self.showSatelliteSubsequentPasses = showSatelliteSubsequentPassesCheckbox.get_active()
-                self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
-                self.hideSatelliteWhenNoTransit = hideSatelliteWhenNoTransitCheckbox.get_active()
-                self.showSatelliteNumber = showSatelliteNumberCheckbox.get_active()
                 self.satellites = [ ]
                 for satelliteInfo in satelliteStore:
                     if satelliteInfo[ 2 ]: self.satellites.append( [ satelliteInfo[ 0 ], satelliteInfo[ 1 ] ] )
 
-            self.displayPattern = displayPattern.get_text()
+            self.onlyShowVisibleSatellitePasses = showSatellitePassesVisibleCheckbox.get_active()
+            self.satelliteMenuText = satelliteMenuText.get_text()
+            self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
+            self.showSatelliteSubsequentPasses = showSatelliteSubsequentPassesCheckbox.get_active()
+            self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
+            self.hideSatelliteWhenNoTransit = hideSatelliteWhenNoTransitCheckbox.get_active()
+
+            self.indicatorText = indicatorText.get_text()
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
             self.werewolfWarningTextSummary = summary.get_text()
-            self.werewolfWarningTextBody = body.get_text()
+            self.werewolfWarningTextMessage = pythonutils.getTextViewText( message )
 
             self.cityName = cityValue
             _city_data[ self.cityName ] = ( str( latitudeValue ), str( longitudeValue ), float( elevationValue ) )
@@ -1497,19 +1586,20 @@ class IndicatorLunar:
         self.dialog = None
 
 
-    def onDisplayTagDoubleClick( self, tree, rowNumber, treeViewColumn, displayPattern ):
+    def onIndicatorTextTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
         model, treeiter = tree.get_selection().get_selected()
-        displayPattern.insert_text( "[" + model[ treeiter ][ 0 ] + "]", displayPattern.get_position() )
+        indicatorTextEntry.insert_text( "[" + model[ treeiter ][ 0 ] + "]", indicatorTextEntry.get_position() )
 
 
-    def onTestClicked( self, button, summary, body ):
+# TODO Can this function be re-used/shared with the satellite notification test button?
+    def onTestClicked( self, button, summaryEntry, messageTextView ):
         self.createIcon( 100, None )
 
         # The notification summary text must not be empty (at least on Unity).
-        if summary.get_text() == "":
-            Notify.Notification.new( " ", body.get_text(), IndicatorLunar.SVG_FULL_MOON_FILE ).show()
+        if summaryEntry.get_text() == "":
+            Notify.Notification.new( " ", pythonutils.getTextViewText( messageTextView ), IndicatorLunar.SVG_FULL_MOON_FILE ).show()
         else:
-            Notify.Notification.new( summary.get_text(), body.get_text(), IndicatorLunar.SVG_FULL_MOON_FILE ).show()
+            Notify.Notification.new( summaryEntry.get_text(), pythonutils.getTextViewText( messageTextView ), IndicatorLunar.SVG_FULL_MOON_FILE ).show()
 
         os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
 
@@ -1592,11 +1682,11 @@ class IndicatorLunar:
 
     def getSatelliteTLEData( self ):
         try:
-            self.satelliteTLEData = { } # Key 'satellite name - satellite number'; value satellite.Info object.
+            self.satelliteTLEData = { } # Key 'satellite name - satellite catalog number'; value satellite.Info object.
             data = urlopen( IndicatorLunar.SATELLITE_TLE_URL ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ), 3 ):
                 satelliteInfo = satellite.Info( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
-                key = self.getSatelliteNameNumber( satelliteInfo.getName(), satelliteInfo.getNumber() )
+                key = self.getSatelliteNameNumber( satelliteInfo.getName(), satelliteInfo.getCatalogNumber() )
                 self.satelliteTLEData[ key ] = satelliteInfo
 
         except Exception as e:
@@ -1629,21 +1719,23 @@ class IndicatorLunar:
 
     def loadSettings( self ):
         self.getDefaultCity()
-        self.displayPattern = IndicatorLunar.DISPLAY_PATTERN_DEFAULT
         self.hideSatelliteWhenNoTransit = True
+        self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.onlyShowVisibleSatellitePasses = False
+        self.satelliteMenuText = IndicatorLunar.SATELLITE_MENU_TEXT_DEFAULT
+        self.satelliteNotificationMessageText = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_TEXT_DEFAULT
+        self.satelliteNotificationSummaryText = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_TEXT_DEFAULT
         self.satellites = [ ]
         self.showPlanetsAsSubMenu = False
         self.showSatelliteNotification = True
-        self.showSatelliteNumber = False
         self.showSatelliteSubsequentPasses = False
         self.showSatellitesAsSubMenu = False
         self.showStarsAsSubMenu = False
         self.showWerewolfWarning = True
         self.stars = [ ]
         self.werewolfWarningStartIlluminationPercentage = 100
-        self.werewolfWarningTextBody = IndicatorLunar.WEREWOLF_WARNING_TEXT_BODY
-        self.werewolfWarningTextSummary = IndicatorLunar.WEREWOLF_WARNING_TEXT_SUMMARY
+        self.werewolfWarningTextMessage = IndicatorLunar.WEREWOLF_WARNING_TEXT_MESSAGE_DEFAULT
+        self.werewolfWarningTextSummary = IndicatorLunar.WEREWOLF_WARNING_TEXT_SUMMARY_DEFAULT
 
         # By default, all planets should be displayed, unless the user chooses otherwise.
         self.planets = [ ]
@@ -1659,21 +1751,23 @@ class IndicatorLunar:
                 cityLatitude = settings.get( IndicatorLunar.SETTINGS_CITY_LATITUDE, _city_data.get( self.cityName )[ 0 ] )
                 cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
-                self.displayPattern = settings.get( IndicatorLunar.SETTINGS_DISPLAY_PATTERN, self.displayPattern )
                 self.hideSatelliteWhenNoTransit = settings.get( IndicatorLunar.SETTINGS_HIDE_SATELLITE_WHEN_NO_TRANSIT, self.hideSatelliteWhenNoTransit )
+                self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
                 self.onlyShowVisibleSatellitePasses = settings.get( IndicatorLunar.SETTINGS_ONLY_SHOW_VISIBLE_SATELLITE_PASSES, self.onlyShowVisibleSatellitePasses )
                 self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
+                self.satelliteMenuText = settings.get( IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT, self.satelliteMenuText )
+                self.satelliteNotificationMessageText = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE_TEXT, self.satelliteNotificationMessageText )
+                self.satelliteNotificationSummaryText = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY_TEXT, self.satelliteNotificationSummaryText )
                 self.satellites = settings.get( IndicatorLunar.SETTINGS_SATELLITES, self.satellites )
                 self.showPlanetsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
                 self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
-                self.showSatelliteNumber = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NUMBER, self.showSatelliteNumber )
                 self.showSatelliteSubsequentPasses= settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_SUBSEQUENT_PASSES, self.showSatelliteSubsequentPasses )
                 self.showSatellitesAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU, self.showSatellitesAsSubMenu )
                 self.showStarsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
                 self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
                 self.stars = settings.get( IndicatorLunar.SETTINGS_STARS, self.stars )
                 self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
-                self.werewolfWarningTextBody = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY, self.werewolfWarningTextBody )
+                self.werewolfWarningTextMessage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_MESSAGE, self.werewolfWarningTextMessage )
                 self.werewolfWarningTextSummary = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY, self.werewolfWarningTextSummary )
 
                 # Insert/overwrite the cityName and information into the cities...
@@ -1691,21 +1785,23 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
                 IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
-                IndicatorLunar.SETTINGS_DISPLAY_PATTERN: self.displayPattern,
                 IndicatorLunar.SETTINGS_HIDE_SATELLITE_WHEN_NO_TRANSIT: self.hideSatelliteWhenNoTransit,
+                IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
                 IndicatorLunar.SETTINGS_ONLY_SHOW_VISIBLE_SATELLITE_PASSES: self.onlyShowVisibleSatellitePasses,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
+                IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT: self.satelliteMenuText,
+                IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE_TEXT: self.satelliteNotificationMessageText,
+                IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY_TEXT: self.satelliteNotificationSummaryText,
                 IndicatorLunar.SETTINGS_SATELLITES: self.satellites,
                 IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
-                IndicatorLunar.SETTINGS_SHOW_SATELLITE_NUMBER: self.showSatelliteNumber,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_SUBSEQUENT_PASSES: self.showSatelliteSubsequentPasses,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU: self.showSatellitesAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU: self.showStarsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
                 IndicatorLunar.SETTINGS_STARS: self.stars,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
-                IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_BODY: self.werewolfWarningTextBody,
+                IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_MESSAGE: self.werewolfWarningTextMessage,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_TEXT_SUMMARY: self.werewolfWarningTextSummary
             }
 
