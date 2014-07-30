@@ -70,6 +70,10 @@ def showOKCancel( parent, message ):
     return response
 
 
+# Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
+def getTextViewText( textView ): return textView.get_buffer().get_text( textView.get_buffer().get_start_iter(), textView.get_buffer().get_end_iter(), True )
+
+
 # A GTK AboutDialog with optional change log displayed in its own tab.
 class AboutDialog( Gtk.AboutDialog ):
 
