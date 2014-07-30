@@ -51,16 +51,14 @@ def __getEclipseForUTC( eclipseData, eclipseTypes, dateTimeUTC ):
     return None
 
 
-# Sourced from http://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
-# 
+# http://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
+#
 # Title: Five Millennium Catalog of Lunar Eclipses: -1999 to +3000 (2000 BCE to 3000CE)
 # Authors: Fred Espenak and Jean Meeus
 # Source: NASA Technical Publication NASA/TP-2009-214173
 # On Web: http://eclipse.gsfc.nasa.gov/SEpubs/5MKLE.html
 # Catalog Key: http://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
 # Date: 2011 May 23
-# ----------------------------------------------------------------------------------------------------------------
-# Five Millennium Catalog of Lunar Eclipses: -1999 to +3000 (2000 BCE to 3000CE)
 # 
 #      Year   Month   Day   HH:MM:SS    DT   Type  Lat   Long
 lunarEclipseData = [
@@ -261,10 +259,9 @@ lunarEclipseData = [
     [ "2099", "09", "29", "10:36:38", "202", "N", "3N", "161W" ] ]
 
 
-# Sourced from
-#    http://eclipse.gsfc.nasa.gov/SEpubs/5MKSE.html
-#     http://eclipse.gsfc.nasa.gov/5MCSE/5MKSEcatalog.txt
-# 
+# http://eclipse.gsfc.nasa.gov/SEpubs/5MKSE.html
+# http://eclipse.gsfc.nasa.gov/5MCSE/5MKSEcatalog.txt
+#
 # Title: Five Millennium Catalog of Solar Eclipses: -1999 to +3000 (2000 BCE to 3000CE)
 # Authors: Fred Espenak and Jean Meeus
 # Source: NASA Technical Publication NASA/TP-2008-214170
@@ -273,7 +270,6 @@ lunarEclipseData = [
 #
 #      Year   Month   Day   HH:MM:SS    DT   Type  Lat   Long
 solarEclipseData = [
-    [ "2013", "11", "03", "12:47:36", "68", "H", "3.5N", "11.7W" ],
     [ "2014", "04", "29", "06:04:33", "69", "A", "70.6S", "131.3E" ],
     [ "2014", "10", "23", "21:45:39", "69", "P", "71.2N", "97.2W" ],
     [ "2015", "03", "20", "09:46:47", "69", "T", "64.4N", "6.6W" ],
