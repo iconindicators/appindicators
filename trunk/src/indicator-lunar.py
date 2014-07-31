@@ -239,6 +239,7 @@ class IndicatorLunar:
                     replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth )
 
                 Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+                print( summary, message )
 
         # Reset the data on each update, otherwise data will accumulate (if a star/satellite was added then removed, the computed data remains).
         self.dataPrevious = self.data
@@ -1568,7 +1569,7 @@ class IndicatorLunar:
             else:
                 self.satellites = [ ]
                 for satelliteInfo in satelliteStore:
-                    if satelliteInfo[ 2 ]: self.satellites.append( [ satelliteInfo[ 0 ], satelliteInfo[ 1 ] ] )
+                    if satelliteInfo[ 3 ]: self.satellites.append( [ satelliteInfo[ 0 ], satelliteInfo[ 1 ] ] )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = satelliteNotificationSummaryText.get_text() 
@@ -1685,7 +1686,7 @@ class IndicatorLunar:
         # Convert the index in the sorted model to the index in the underlying (child) modeel.
         childPath = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) )
 
-        satelliteStore[ childPath ][ 2 ] = not satelliteStore[ childPath ][ 2 ]
+        satelliteStore[ childPath ][ 3 ] = not satelliteStore[ childPath ][ 3 ]
         key = self.getSatelliteNameNumber( satelliteStore[ childPath ][ 0 ].upper(), satelliteStore[ childPath ][ 1 ] )
 
         if satelliteStore[ childPath ][ 1 ]:
