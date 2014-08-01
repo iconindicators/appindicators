@@ -8,6 +8,8 @@ indicator-lunar (1.0.52-1) precise; urgency=low
   * Reorganisation and overhaul of the preferences dialog.
   * Satellite menu text is now configurable.
   * Satellite notification text is now configurable.
+  * Clicking on a satellite's child menu items will open that satellite at
+    http://www.n2yo.com.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 29 Jul 2014 19:18:54 +1000
 

@@ -31,7 +31,7 @@
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
-import copy, datetime, eclipse, glob, gzip, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys
+import copy, datetime, eclipse, glob, gzip, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys, webbrowser
 
 try:
     import ephem
@@ -70,6 +70,8 @@ class IndicatorLunar:
     INDENT = "    "
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+
+    SETTINGS_ALLOW_SATELLITE_MENU_ITEMS_TO_LAUNCH_BROWSER = "allowSatelliteMenuItemsToLaunchBrowser"
     SETTINGS_CITY_ELEVATION = "cityElevation"
     SETTINGS_CITY_LATITUDE = "cityLatitude"
     SETTINGS_CITY_LONGITUDE = "cityLongitude"
@@ -239,7 +241,6 @@ class IndicatorLunar:
                     replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth )
 
                 Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
-                print( summary, message )
 
         # Reset the data on each update, otherwise data will accumulate (if a star/satellite was added then removed, the computed data remains).
         self.dataPrevious = self.data
@@ -408,7 +409,7 @@ class IndicatorLunar:
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
             self.createEclipseMenu( menuItem.get_submenu(), eclipseInformation, "MOON" )
 
-
+    
     # References:
     #    http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     #    http://www.ga.gov.au/geodesy/astro/sunrise.jsp
@@ -654,8 +655,10 @@ class IndicatorLunar:
             if not key in self.satelliteTLEData:
                 if not self.hideSatelliteOnNoPass:
                     subMenu.append( Gtk.MenuItem( "No TLE data!" ) )
+                    self.addOnSatellite( subMenu, satelliteNameNumber[ 1 ] )
             else:
                 success = self.calculateNextSatellitePass( ephemNow, key, subMenu, nextUpdates )
+                self.addOnSatellite( subMenu, satelliteNameNumber[ 1 ] )
                 if not success and self.hideSatelliteOnNoPass:
                     continue
 
@@ -676,6 +679,16 @@ class IndicatorLunar:
                 menu.append( menuItem )
 
             menuItem.set_submenu( subMenu )
+
+
+    def addOnSatellite( self, subMenu, satelliteCatalogNumber ):
+        if self.allowSatelliteMenuItemsToLaunchBrowser:
+            for child in subMenu.get_children():
+                child.set_name( satelliteCatalogNumber )
+                child.connect( "activate", self.onSatellite )
+
+
+    def onSatellite( self, widget ): webbrowser.open( "http://www.n2yo.com/satellite/?s=" + widget.props.name )
 
 
     def calculateNextSatellitePass( self, ephemNow, satelliteNameNumber, menu, nextUpdates ):
@@ -1157,25 +1170,30 @@ class IndicatorLunar:
         showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
         showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
         grid.attach( showSatellitesAsSubmenuCheckbox, 0, 2, 2, 1 )
- 
+
         onlyShowVisibleSatellitePassesCheckbox = Gtk.CheckButton( "Only show visible satellite passes" )
         onlyShowVisibleSatellitePassesCheckbox.set_active( self.onlyShowVisibleSatellitePasses )
         onlyShowVisibleSatellitePassesCheckbox.set_tooltip_text( "Only display information for visible satellite passes." )
         grid.attach( onlyShowVisibleSatellitePassesCheckbox, 0, 3, 2, 1 )
- 
+
         showSatelliteSubsequentPassesCheckbox = Gtk.CheckButton( "Show subsequent satellite passes" )
         showSatelliteSubsequentPassesCheckbox.set_active( self.showSatelliteSubsequentPasses )
         showSatelliteSubsequentPassesCheckbox.set_tooltip_text( "Show satellite passes following the most current pass." )
         grid.attach( showSatelliteSubsequentPassesCheckbox, 0, 4, 2, 1 )
- 
+
         hideSatelliteOnNoPassCheckbox = Gtk.CheckButton( "Hide satellite on no pass" )
         hideSatelliteOnNoPassCheckbox.set_active( self.hideSatelliteOnNoPass )
         hideSatelliteOnNoPassCheckbox.set_tooltip_text( "If no satellite pass can be computed, don't show the satellite in the menu.\n\nA pass may not be computed as a result of...\n\tmissing TLE data,\n\tsatellite never rises or is circumpolar,\n\tno visible pass occurs in the next 10 days." )
         grid.attach( hideSatelliteOnNoPassCheckbox, 0, 5, 2, 1 )
 
+        allowSatelliteMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Open browser on satellite selection" )
+        allowSatelliteMenuItemsToLaunchBrowserCheckbox.set_active( self.allowSatelliteMenuItemsToLaunchBrowser )
+        allowSatelliteMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a satellite's child items will open\nthat satellite at http://www.n2yo.com." )
+        grid.attach( allowSatelliteMenuItemsToLaunchBrowserCheckbox, 0, 6, 2, 1 )
+
         label = Gtk.Label( "Satellite menu text" )
         label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 6, 1, 1 )
+        grid.attach( label, 0, 7, 1, 1 )
 
         satelliteMenuText = Gtk.Entry()
         satelliteMenuText.set_text( self.satelliteMenuText )
@@ -1187,7 +1205,7 @@ class IndicatorLunar:
              IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER + "\n\t" + \
              IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION )
 
-        grid.attach( satelliteMenuText, 1, 6, 1, 1 )
+        grid.attach( satelliteMenuText, 1, 7, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Menu" ) )
 
@@ -1551,6 +1569,7 @@ class IndicatorLunar:
             self.onlyShowVisibleSatellitePasses = onlyShowVisibleSatellitePassesCheckbox.get_active()
             self.showSatelliteSubsequentPasses = showSatelliteSubsequentPassesCheckbox.get_active()
             self.hideSatelliteOnNoPass = hideSatelliteOnNoPassCheckbox.get_active()
+            self.allowSatelliteMenuItemsToLaunchBrowser = allowSatelliteMenuItemsToLaunchBrowserCheckbox.get_active()
             self.satelliteMenuText = satelliteMenuText.get_text()
 
             self.planets = [ ]
@@ -1756,6 +1775,7 @@ class IndicatorLunar:
 
     def loadSettings( self ):
         self.getDefaultCity()
+        self.allowSatelliteMenuItemsToLaunchBrowser = True
         self.hideSatelliteOnNoPass = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.onlyShowVisibleSatellitePasses = False
@@ -1788,6 +1808,8 @@ class IndicatorLunar:
                 cityLatitude = settings.get( IndicatorLunar.SETTINGS_CITY_LATITUDE, _city_data.get( self.cityName )[ 0 ] )
                 cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
+
+                self.allowSatelliteMenuItemsToLaunchBrowser = settings.get( IndicatorLunar.SETTINGS_ALLOW_SATELLITE_MENU_ITEMS_TO_LAUNCH_BROWSER, self.allowSatelliteMenuItemsToLaunchBrowser )
                 self.hideSatelliteOnNoPass = settings.get( IndicatorLunar.SETTINGS_HIDE_SATELLITE_ON_NO_PASS, self.hideSatelliteOnNoPass )
                 self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
                 self.onlyShowVisibleSatellitePasses = settings.get( IndicatorLunar.SETTINGS_ONLY_SHOW_VISIBLE_SATELLITE_PASSES, self.onlyShowVisibleSatellitePasses )
@@ -1822,6 +1844,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
                 IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
+                IndicatorLunar.SETTINGS_ALLOW_SATELLITE_MENU_ITEMS_TO_LAUNCH_BROWSER: self.allowSatelliteMenuItemsToLaunchBrowser,
                 IndicatorLunar.SETTINGS_HIDE_SATELLITE_ON_NO_PASS: self.hideSatelliteOnNoPass,
                 IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
                 IndicatorLunar.SETTINGS_ONLY_SHOW_VISIBLE_SATELLITE_PASSES: self.onlyShowVisibleSatellitePasses,
