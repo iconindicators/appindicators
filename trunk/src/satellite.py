@@ -16,6 +16,7 @@
 
 
 # Two-line Element Set.
+# http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
 # http://www.satobs.org/element.html
 # http://en.wikipedia.org/wiki/Two-line_element_set
 # https://www.mmto.org/obscats/tle.html
@@ -42,10 +43,10 @@ class Info:
     def getName( self ): return self.tleTitle
 
 
-    def getCatalogNumber( self ): return self.tleLine1[ 2 : 7 ]
+    def getNumber( self ): return self.tleLine1[ 2 : 7 ]
 
 
-    def getInternationalDesignation( self ): 
+    def getInternationalDesignator( self ): 
         launchYear = self.tleLine1[ 9 : 11 ]
         if int( launchYear ) < 57:  launchYear = "20" + launchYear
         else: launchYear = "19" + launchYear 
