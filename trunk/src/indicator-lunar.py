@@ -47,7 +47,7 @@ class IndicatorLunar:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
     VERSION = "1.0.52"
-    ICON_STATE = True
+    ICON_STATE = True # Used to work around this https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -197,55 +197,13 @@ class IndicatorLunar:
         # Update the satellite TLE data at most every 12 hours.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ): self.getSatelliteTLEData() 
 
-        # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
-        ephemNow = ephem.now()
+        ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
 
-        # Satellite notification.
-        if self.showSatelliteNotification:
-            ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
-            for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
-
-                # Is there a rise/set time for the current satellite...
-                riseTimeKey = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], ( satelliteNameNumber[ 1 ] ) ) + IndicatorLunar.TAG_RISE_TIME
-                setTimeKey = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], ( satelliteNameNumber[ 1 ] ) ) + IndicatorLunar.TAG_SET_TIME
-                if not ( riseTimeKey in self.data and setTimeKey in self.data ):
-                    continue
-
-                # Ensure the current time is within the rise/set...
-                if not ( ephemNowInLocalTime > ephem.Date( self.data[ riseTimeKey ] ) and ephemNowInLocalTime < ephem.Date( self.data[ setTimeKey ] ) ):
-                    continue
-
-                # Show a notification for the satellite, but only once per pass...
-                key = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], satelliteNameNumber[ 1 ] )
-                if key in self.satelliteNotifications and ephemNowInLocalTime < ephem.Date( self.satelliteNotifications[ key ] ):
-                    continue
-
-                self.satelliteNotifications[ key ] = self.data[ setTimeKey ] # Flag to ensure the notification happens once per satellite's pass.
-
-                # Parse the satellite summary/message to create the notification...
-                degreeSymbolIndex = self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ].index( "°" )
-                riseAzimuth = self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ][ 0 : degreeSymbolIndex + 1 ]
-
-                summary = self.satelliteNotificationSummary. \
-                    replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] ). \
-                    replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNameNumber[ 1 ] ). \
-                    replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
-                    replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth )
-
-                if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
-
-                message = self.satelliteNotificationMessage. \
-                    replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] ). \
-                    replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNameNumber[ 1 ] ). \
-                    replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
-                    replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth )
-
-                Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
-
-        # Reset the data on each update, otherwise data will accumulate (if a star/satellite was added then removed, the computed data remains).
+        if self.showSatelliteNotification: self.doSatelliteNotification( ephemNow )
+        
+        # Reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
         self.dataPrevious = self.data
         self.data = { }
-
         self.data[ "CITY NAME" ] = self.cityName
 
         lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
@@ -253,9 +211,55 @@ class IndicatorLunar:
 
         self.buildMenu( ephemNow, lunarPhase )
 
-        # Parse the indicator text...
-        #
-        # For Ubuntu (Unity), an icon and label can co-exist and there is no tooltip. The icon is always to the right of the label.
+        self.updateIndicatorIcon( ephemNow, lunarIlluminationPercentage )
+
+        if self.showWerewolfWarning: self.doFullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
+
+
+    def doSatelliteNotification( self, ephemNow ):
+        ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
+        for satelliteNameNumber in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
+
+            # Is there a rise/set time for the current satellite...
+            riseTimeKey = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], ( satelliteNameNumber[ 1 ] ) ) + IndicatorLunar.TAG_RISE_TIME
+            setTimeKey = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], ( satelliteNameNumber[ 1 ] ) ) + IndicatorLunar.TAG_SET_TIME
+            if not ( riseTimeKey in self.data and setTimeKey in self.data ):
+                continue
+
+            # Ensure the current time is within the rise/set...
+            if not ( ephemNowInLocalTime > ephem.Date( self.data[ riseTimeKey ] ) and ephemNowInLocalTime < ephem.Date( self.data[ setTimeKey ] ) ):
+                continue
+
+            # Show a notification for the satellite, but only once per pass...
+            key = self.getSatelliteNameNumber( satelliteNameNumber[ 0 ], satelliteNameNumber[ 1 ] )
+            if key in self.satelliteNotifications and ephemNowInLocalTime < ephem.Date( self.satelliteNotifications[ key ] ):
+                continue
+
+            self.satelliteNotifications[ key ] = self.data[ setTimeKey ] # Flag to ensure the notification happens once per satellite's pass.
+
+            # Parse the satellite summary/message to create the notification...
+            degreeSymbolIndex = self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ].index( "°" )
+            riseAzimuth = self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ][ 0 : degreeSymbolIndex + 1 ]
+
+            summary = self.satelliteNotificationSummary. \
+                replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNameNumber[ 1 ] ). \
+                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth )
+
+            if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
+
+            message = self.satelliteNotificationMessage. \
+                replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNameNumber[ 1 ] ). \
+                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth )
+
+            Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+
+
+    def updateIndicatorIcon( self, ephemNow, lunarIlluminationPercentage ):
+        # For Ubuntu (Unity), an icon and label can co-exist - also, there is no tooltip. The icon is always to the right of the label.
         # On Ubuntu 13.10 (might be a bug), an icon must be displayed, so if no icon tag is present, display a 1 pixel SVG.
         #
         # On non Unity (Lubuntu, etc), only an icon can be displayed - text is shown as a tooltip.
@@ -267,15 +271,15 @@ class IndicatorLunar:
         self.indicator.set_icon( self.getIconName() )
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
 
-        # Full moon notification.
+
+    def doFullMoonNotification( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-        if self.showWerewolfWarning and \
-            lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
+        if lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
             phaseIsBetweenNewAndFullInclusive and \
             ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) <= ephemNow ):
 
