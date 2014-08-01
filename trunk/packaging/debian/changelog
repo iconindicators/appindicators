@@ -2,8 +2,7 @@ indicator-lunar (1.0.52-1) precise; urgency=low
 
   * Full moon (werewolf) notification message now supports multiple lines.
     For formatting restrictions, refer to https://wiki.ubuntu.com/NotifyOSD.
-  * Satellite info object now distinguishes between the catalog number and
-    international designation.
+  * Satellite info object now provides international designator.
   * Renamed some properties - the user should check all properties.
   * Reorganisation and overhaul of the preferences dialog.
   * Satellite menu text is now configurable.

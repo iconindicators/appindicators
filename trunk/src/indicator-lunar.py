@@ -120,15 +120,15 @@ class IndicatorLunar:
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
     SATELLITE_TAG_NAME = "[NAME]"
-    SATELLITE_TAG_CATALOG_NUMBER = "[CATALOG NUMBER]"
-    SATELLITE_TAG_INTERNATIONAL_DESIGNATION = "[INTERNATIONAL DESIGNATION]"
+    SATELLITE_TAG_NUMBER = "[NUMBER]"
+    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR = "[INTERNATIONAL DESIGNATOR]"
     SATELLITE_TAG_RISE_AZIMUTH = "[RISE AZIMUTH]"
 
-    SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_CATALOG_NUMBER
+    SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = "                 ...now rising at azimuth " + SATELLITE_TAG_RISE_AZIMUTH + \
-        "\nCatalog: " + SATELLITE_TAG_CATALOG_NUMBER + \
-        "\nDesignation: " + SATELLITE_TAG_INTERNATIONAL_DESIGNATION
+        "\nNumber: " + SATELLITE_TAG_NUMBER + \
+        "\nDesignator: " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
 
     WEREWOLF_WARNING_MESSAGE_DEFAULT = "                                          ...werewolves about ! ! !"
     WEREWOLF_WARNING_SUMMARY_DEFAULT = "W  A  R  N  I  N  G"
@@ -228,16 +228,16 @@ class IndicatorLunar:
 
                 summary = self.satelliteNotificationSummary. \
                     replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] ). \
-                    replace( IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER, satelliteNameNumber[ 1 ] ). \
-                    replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION, self.satelliteTLEData[ key ].getInternationalDesignation() ). \
+                    replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNameNumber[ 1 ] ). \
+                    replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
                     replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth )
 
                 if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
 
                 message = self.satelliteNotificationMessage. \
                     replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] ). \
-                    replace( IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER, satelliteNameNumber[ 1 ] ). \
-                    replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION, self.satelliteTLEData[ key ].getInternationalDesignation() ). \
+                    replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNameNumber[ 1 ] ). \
+                    replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
                     replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth )
 
                 Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
@@ -620,6 +620,7 @@ class IndicatorLunar:
 
     # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
     # Other sources/background:
+    #   http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
     #   http://spotthestation.nasa.gov/sightings
     #   http://www.n2yo.com
     #   http://www.heavens-above.com
@@ -664,8 +665,8 @@ class IndicatorLunar:
 
                 # Parse the satellite menu text...
                 menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] )
-                menuText = menuText.replace( IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER, satelliteNameNumber[ 1 ] )
-                menuText = menuText.replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION, self.satelliteTLEData[ key ].getInternationalDesignation() )
+                menuText = menuText.replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNameNumber[ 1 ] )
+                menuText = menuText.replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() )
 
             if firstRun:
                 firstRun = False
@@ -681,10 +682,10 @@ class IndicatorLunar:
             menuItem.set_submenu( subMenu )
 
 
-    def addOnSatellite( self, subMenu, satelliteCatalogNumber ):
+    def addOnSatellite( self, subMenu, satelliteNumber ):
         if self.allowSatelliteMenuItemsToLaunchBrowser:
             for child in subMenu.get_children():
-                child.set_name( satelliteCatalogNumber )
+                child.set_name( satelliteNumber )
                 child.connect( "activate", self.onSatellite )
 
 
@@ -1147,82 +1148,25 @@ class IndicatorLunar:
         label.set_justify( Gtk.Justification.CENTER )
         notebook.append_page( grid, label )
 
-        # Menu display.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        # Planets.
+        vbox = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
 
         showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Show planets as submenus" )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
         showPlanetsAsSubmenuCheckbox.set_tooltip_text( "Show each planet in its own submenu." )
-        grid.attach( showPlanetsAsSubmenuCheckbox, 0, 0, 2, 1 )
+        vbox.pack_start( showPlanetsAsSubmenuCheckbox, False, False, 0 )
 
-        showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Show stars as submenus" )
-        showStarsAsSubmenuCheckbox.set_tooltip_text( "Show each star in its own submenu." )
-        showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
-        grid.attach( showStarsAsSubmenuCheckbox, 0, 1, 2, 1 )
-
-        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show satellites as submenus" )
-        showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
-        showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
-        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 2, 2, 1 )
-
-        onlyShowVisibleSatellitePassesCheckbox = Gtk.CheckButton( "Only show visible satellite passes" )
-        onlyShowVisibleSatellitePassesCheckbox.set_active( self.onlyShowVisibleSatellitePasses )
-        onlyShowVisibleSatellitePassesCheckbox.set_tooltip_text( "Only display information for visible satellite passes." )
-        grid.attach( onlyShowVisibleSatellitePassesCheckbox, 0, 3, 2, 1 )
-
-        showSatelliteSubsequentPassesCheckbox = Gtk.CheckButton( "Show subsequent satellite passes" )
-        showSatelliteSubsequentPassesCheckbox.set_active( self.showSatelliteSubsequentPasses )
-        showSatelliteSubsequentPassesCheckbox.set_tooltip_text( "Show satellite passes following the most current pass." )
-        grid.attach( showSatelliteSubsequentPassesCheckbox, 0, 4, 2, 1 )
-
-        hideSatelliteOnNoPassCheckbox = Gtk.CheckButton( "Hide satellite on no pass" )
-        hideSatelliteOnNoPassCheckbox.set_active( self.hideSatelliteOnNoPass )
-        hideSatelliteOnNoPassCheckbox.set_tooltip_text( "If no satellite pass can be computed, don't show the satellite in the menu.\n\nA pass may not be computed as a result of...\n\tmissing TLE data,\n\tsatellite never rises or is circumpolar,\n\tno visible pass occurs in the next 10 days." )
-        grid.attach( hideSatelliteOnNoPassCheckbox, 0, 5, 2, 1 )
-
-        allowSatelliteMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Open browser on satellite selection" )
-        allowSatelliteMenuItemsToLaunchBrowserCheckbox.set_active( self.allowSatelliteMenuItemsToLaunchBrowser )
-        allowSatelliteMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a satellite's child items will open\nthat satellite at http://www.n2yo.com." )
-        grid.attach( allowSatelliteMenuItemsToLaunchBrowserCheckbox, 0, 6, 2, 1 )
-
-        label = Gtk.Label( "Satellite menu text" )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 7, 1, 1 )
-
-        satelliteMenuText = Gtk.Entry()
-        satelliteMenuText.set_text( self.satelliteMenuText )
-        satelliteMenuText.set_hexpand( True )
-        satelliteMenuText.set_tooltip_text( 
-             "The text for each satellite item in the menu.\n\n" + \
-             "Available tags:\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER + "\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION )
-
-        grid.attach( satelliteMenuText, 1, 7, 1, 1 )
-
-        notebook.append_page( grid, Gtk.Label( "Menu" ) )
-
-        # Planets.
-        planetStore = Gtk.ListStore( str, bool ) # Planet name, show/hide.
-        for planet in IndicatorLunar.PLANETS: # Don't sort, rather keep the natural order.
-            planetStore.append( [ planet[ 0 ], planet[ 0 ] in self.planets ] )
+        planetStore = Gtk.ListStore( bool, str ) # Show/hide, planet name.
+        for planet in IndicatorLunar.PLANETS:
+            planetStore.append( [ planet[ 0 ] in self.planets, planet[ 0 ] ] ) # Don't sort, rather keep the natural order.
 
         tree = Gtk.TreeView( planetStore )
-        tree.set_hexpand( True )
-        tree.set_vexpand( True )
-
-        tree.append_column( Gtk.TreeViewColumn( "Planet", Gtk.CellRendererText(), text = 0 ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, displayTagsStore )
-        tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 1 ) )
+        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
+
+        tree.append_column( Gtk.TreeViewColumn( "Planet", Gtk.CellRendererText(), text = 1 ) )
 
         tree.set_tooltip_text( "Check a planet to display in the menu." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
@@ -1231,22 +1175,29 @@ class IndicatorLunar:
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
         scrolledWindow.add( tree )
 
-        notebook.append_page( scrolledWindow, Gtk.Label( "Planets" ) )
+        vbox.pack_start( scrolledWindow, True, True, 0 )
+
+        notebook.append_page( vbox, Gtk.Label( "Planets" ) )
 
         # Stars.
-        starStore = Gtk.ListStore( str, bool ) # Star name, show/hide.
+        vbox = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
+
+        showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Show stars as submenus" )
+        showStarsAsSubmenuCheckbox.set_tooltip_text( "Show each star in its own submenu." )
+        showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
+        vbox.pack_start( showStarsAsSubmenuCheckbox, False, False, 0 )
+
+        starStore = Gtk.ListStore( bool, str ) # Show/hide, star name.
         for star in sorted( ephem.stars.stars ):
-            starStore.append( [ star, star in self.stars ] )
+            starStore.append( [ star in self.stars, star ] )
 
         tree = Gtk.TreeView( starStore )
-        tree.set_hexpand( True )
-        tree.set_vexpand( True )
-
-        tree.append_column( Gtk.TreeViewColumn( "Star", Gtk.CellRendererText(), text = 0 ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onStarToggled, starStore, displayTagsStore )
-        tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 1 ) )
+        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
+
+        tree.append_column( Gtk.TreeViewColumn( "Star", Gtk.CellRendererText(), text = 1 ) )
 
         tree.set_tooltip_text( "Check a star to display in the menu." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
@@ -1255,45 +1206,99 @@ class IndicatorLunar:
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( tree )
 
-        notebook.append_page( scrolledWindow, Gtk.Label( "Stars" ) )
+        vbox.pack_start( scrolledWindow, True, True, 0 )
+
+        notebook.append_page( vbox, Gtk.Label( "Stars" ) )
 
         # Satellites.
-        if len( self.satelliteTLEData ) == 0:
-            # Error downloading data.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show satellites as submenus" )
+        showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
+        showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
+        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 0, 1, 1 )
+
+        onlyShowVisibleSatellitePassesCheckbox = Gtk.CheckButton( "Show only visible passes" )
+        onlyShowVisibleSatellitePassesCheckbox.set_active( self.onlyShowVisibleSatellitePasses )
+        onlyShowVisibleSatellitePassesCheckbox.set_tooltip_text( "Only display information for visible satellite passes." )
+        grid.attach( onlyShowVisibleSatellitePassesCheckbox, 0, 1, 1, 1 )
+
+        showSatelliteSubsequentPassesCheckbox = Gtk.CheckButton( "Show subsequent passes" )
+        showSatelliteSubsequentPassesCheckbox.set_active( self.showSatelliteSubsequentPasses )
+        showSatelliteSubsequentPassesCheckbox.set_tooltip_text( "Show satellite passes following the most current pass." )
+        grid.attach( showSatelliteSubsequentPassesCheckbox, 0, 2, 1, 1 )
+
+        hideSatelliteOnNoPassCheckbox = Gtk.CheckButton( "Hide on no pass" )
+        hideSatelliteOnNoPassCheckbox.set_active( self.hideSatelliteOnNoPass )
+        hideSatelliteOnNoPassCheckbox.set_tooltip_text( "If no satellite pass can be computed, don't show the satellite in the menu.\n\nA pass may not be computed as a result of...\n\tmissing TLE data,\n\tsatellite never rises or is circumpolar,\n\tno visible pass occurs in the next 10 days." )
+        grid.attach( hideSatelliteOnNoPassCheckbox, 2, 0, 2, 1 )
+
+        allowSatelliteMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Open browser on selection" )
+        allowSatelliteMenuItemsToLaunchBrowserCheckbox.set_active( self.allowSatelliteMenuItemsToLaunchBrowser )
+        allowSatelliteMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking any of a satellite's child items\nwill open that satellite at http://www.n2yo.com." )
+        grid.attach( allowSatelliteMenuItemsToLaunchBrowserCheckbox, 2, 1, 2, 1 )
+
+        label = Gtk.Label( "Menu text" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 2, 2, 1, 1 )
+
+        satelliteMenuText = Gtk.Entry()
+        satelliteMenuText.set_text( self.satelliteMenuText )
+        satelliteMenuText.set_hexpand( True )
+        satelliteMenuText.set_tooltip_text( 
+             "The text for each satellite item in the menu.\n\n" + \
+             "Available tags:\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR )
+
+        grid.attach( satelliteMenuText, 3, 2, 1, 1 )
+
+        separator = Gtk.Separator.new( Gtk.Orientation.VERTICAL )
+        grid.attach( separator, 1, 0, 1, 3 )
+
+        if len( self.satelliteTLEData ) == 0: # Error downloading data...
             label = Gtk.Label()
-            label.set_markup( "Unable to download the satellite data!\n\nCheck that <a href=\'" + IndicatorLunar.SATELLITE_TLE_URL + "'>" + IndicatorLunar.SATELLITE_TLE_URL + "</a> is available.\n" )
-            label.set_margin_left( 25 )
+            label.set_markup( "Unable to download the satellite data!\n\nEnsure <a href=\'" + IndicatorLunar.SATELLITE_TLE_URL + "'>" + IndicatorLunar.SATELLITE_TLE_URL + "</a> is available.\n" )
             label.set_halign( Gtk.Align.START )
-            notebook.append_page( label, Gtk.Label( "Menu" ) )
+            grid.attach( label, 0, 3, 4, 1 )
         else:
-            satelliteStore = Gtk.ListStore( str, str, str, bool ) # Satellite name, catalog number, international designation, show/hide.
+            satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
             for key in self.satelliteTLEData:
                 satelliteInfo = self.satelliteTLEData[ key ]
-                satelliteStore.append( [ satelliteInfo.getName(), satelliteInfo.getCatalogNumber(), satelliteInfo.getInternationalDesignation(), [ satelliteInfo.getName(), satelliteInfo.getCatalogNumber() ] in self.satellites ] )
+                satelliteStore.append( [ [ satelliteInfo.getName(), satelliteInfo.getNumber() ] in self.satellites, satelliteInfo.getName(), satelliteInfo.getNumber(), satelliteInfo.getInternationalDesignator() ] )
 
             satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
-            satelliteStoreSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+            satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
             tree = Gtk.TreeView( satelliteStoreSort )
-            tree.set_hexpand( True )
-            tree.set_vexpand( True )
-
-            tree.append_column( Gtk.TreeViewColumn( "Name", Gtk.CellRendererText(), text = 0 ) )
-            tree.append_column( Gtk.TreeViewColumn( "Catalog Number", Gtk.CellRendererText(), text = 1 ) )
-            tree.append_column( Gtk.TreeViewColumn( "International Designation", Gtk.CellRendererText(), text = 2 ) )
 
             renderer_toggle = Gtk.CellRendererToggle()
             renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
-            tree.append_column( Gtk.TreeViewColumn( "Display", renderer_toggle, active = 3 ) )
+            tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
+
+            tree.append_column( Gtk.TreeViewColumn( "Satellite", Gtk.CellRendererText(), text = 1 ) )
+            tree.append_column( Gtk.TreeViewColumn( "Number", Gtk.CellRendererText(), text = 2 ) )
+            tree.append_column( Gtk.TreeViewColumn( "International Designator", Gtk.CellRendererText(), text = 3 ) )
 
             tree.set_tooltip_text( "Check a satellite, station or rocket body to display in the menu." )
             tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
             scrolledWindow = Gtk.ScrolledWindow()
             scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+            scrolledWindow.set_hexpand( True )
+            scrolledWindow.set_vexpand( True )
             scrolledWindow.add( tree )
 
-            notebook.append_page( scrolledWindow, Gtk.Label( "Satellites" ) )
+            grid.attach( scrolledWindow, 0, 3, 4, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "Satellites" ) )
 
         # Satellite rise notification.
         grid = Gtk.Grid()
@@ -1322,8 +1327,8 @@ class IndicatorLunar:
             "The summary for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH + \
             "\n\nFor formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
@@ -1344,8 +1349,8 @@ class IndicatorLunar:
             "The message for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH + \
             "\n\nFor formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
@@ -1574,11 +1579,11 @@ class IndicatorLunar:
 
             self.planets = [ ]
             for planetInfo in planetStore:
-                if planetInfo[ 1 ]: self.planets.append( planetInfo[ 0 ] )
+                if planetInfo[ 0 ]: self.planets.append( planetInfo[ 1 ] )
 
             self.stars = [ ]
             for starInfo in starStore:
-                if starInfo[ 1 ]: self.stars.append( starInfo[ 0 ] )
+                if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
 
             if len( self.satelliteTLEData ) == 0:
                 # No satellite TLE data exists (due to a download error).
@@ -1588,7 +1593,7 @@ class IndicatorLunar:
             else:
                 self.satellites = [ ]
                 for satelliteInfo in satelliteStore:
-                    if satelliteInfo[ 3 ]: self.satellites.append( [ satelliteInfo[ 0 ], satelliteInfo[ 1 ] ] )
+                    if satelliteInfo[ 0 ]: self.satellites.append( [ satelliteInfo[ 1 ], satelliteInfo[ 2 ] ] )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = satelliteNotificationSummaryText.get_text() 
@@ -1643,14 +1648,14 @@ class IndicatorLunar:
             # Mock data...
             summary = summary. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME, "ISS (ZARYA)" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER, "25544" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION, "1998-067A" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, "25544" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, "123.45°" )
 
             message = message. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME, "ISS (ZARYA)" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_CATALOG_NUMBER, "25544" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATION, "1998-067A" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, "25544" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, "123.45°" )
 
         if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
@@ -1661,10 +1666,10 @@ class IndicatorLunar:
 
 
     def onPlanetToggled( self, widget, path, planetStore, displayTagsStore ):
-        planetStore[ path ][ 1 ] = not planetStore[ path ][ 1 ]
-        planetName = planetStore[ path ][ 0 ].upper()
+        planetStore[ path ][ 0 ] = not planetStore[ path ][ 0 ]
+        planetName = planetStore[ path ][ 1 ].upper()
 
-        if planetStore[ path ][ 1 ]:
+        if planetStore[ path ][ 0 ]:
             displayTagsStore.append( [ planetName + IndicatorLunar.TAG_ILLUMINATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
             displayTagsStore.append( [ planetName + IndicatorLunar.TAG_CONSTELLATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
             displayTagsStore.append( [ planetName + IndicatorLunar.TAG_TROPICAL_SIGN, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
@@ -1683,10 +1688,10 @@ class IndicatorLunar:
 
 
     def onStarToggled( self, widget, path, starStore, displayTagsStore ):
-        starStore[ path ][ 1 ] = not starStore[ path ][ 1 ]
-        starName = starStore[ path ][ 0 ].upper()
+        starStore[ path ][ 0 ] = not starStore[ path ][ 0 ]
+        starName = starStore[ path ][ 1 ].upper()
 
-        if starStore[ path ][ 1 ]:
+        if starStore[ path ][ 0 ]:
             displayTagsStore.append( [ starName + IndicatorLunar.TAG_RIGHT_ASCENSION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
             displayTagsStore.append( [ starName + IndicatorLunar.TAG_DECLINATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
             displayTagsStore.append( [ starName + IndicatorLunar.TAG_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
@@ -1705,10 +1710,10 @@ class IndicatorLunar:
         # Convert the index in the sorted model to the index in the underlying (child) modeel.
         childPath = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) )
 
-        satelliteStore[ childPath ][ 3 ] = not satelliteStore[ childPath ][ 3 ]
-        key = self.getSatelliteNameNumber( satelliteStore[ childPath ][ 0 ].upper(), satelliteStore[ childPath ][ 1 ] )
+        satelliteStore[ childPath ][ 0 ] = not satelliteStore[ childPath ][ 0 ]
+        key = self.getSatelliteNameNumber( satelliteStore[ childPath ][ 1 ].upper(), satelliteStore[ childPath ][ 2 ] )
 
-        if satelliteStore[ childPath ][ 1 ]:
+        if satelliteStore[ childPath ][ 2 ]:
             displayTagsStore.append( [ key + IndicatorLunar.TAG_RISE_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
             displayTagsStore.append( [ key + IndicatorLunar.TAG_RISE_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
             displayTagsStore.append( [ key + IndicatorLunar.TAG_SET_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
@@ -1738,11 +1743,11 @@ class IndicatorLunar:
 
     def getSatelliteTLEData( self ):
         try:
-            self.satelliteTLEData = { } # Key 'satellite name - satellite catalog number'; value satellite.Info object.
+            self.satelliteTLEData = { } # Key 'satellite name - satellite number'; value satellite.Info object.
             data = urlopen( IndicatorLunar.SATELLITE_TLE_URL ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ), 3 ):
                 satelliteInfo = satellite.Info( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
-                key = self.getSatelliteNameNumber( satelliteInfo.getName(), satelliteInfo.getCatalogNumber() )
+                key = self.getSatelliteNameNumber( satelliteInfo.getName(), satelliteInfo.getNumber() )
                 self.satelliteTLEData[ key ] = satelliteInfo
 
         except Exception as e:
