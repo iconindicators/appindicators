@@ -1027,9 +1027,8 @@ class IndicatorPPADownloadStatistics:
             if numberOfPublishedBinaries == 0:
                 ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
                 ppa.setPublishedBinaries( [ ] )
-                return
 
-            self.processPublishedBinaries( ppa, baseURL, publishedBinaries, numberOfPublishedBinaries )
+            else: self.processPublishedBinaries( ppa, baseURL, publishedBinaries, numberOfPublishedBinaries )
 
         except Exception as e:
             logging.exception( e )
@@ -1066,7 +1065,7 @@ class IndicatorPPADownloadStatistics:
 
 
     # Takes the published binary and extracts the information needed to get the download count (for each package).
-    # As the results in a published binary are returned in lots of 75, if there are more that 75 published binaries, continue to loop to get the remainder.
+    # The results in a published binary are returned in lots of 75; for more than 75 published binaries, loop to get the remainder.
     def processPublishedBinaries( self, ppa, baseURL, publishedBinaries, numberOfPublishedBinaries ):
         try:
             index = 0
