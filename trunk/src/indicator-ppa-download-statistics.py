@@ -46,7 +46,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.40"
+    VERSION = "1.0.41"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -1051,12 +1051,7 @@ class IndicatorPPADownloadStatistics:
             try:
                 publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
                 numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
-                if numberOfPublishedBinaries == 0:
-                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
-                    ppa.setPublishedBinaries( [ ] )
-                    continue
-
-                self.processPublishedBinaries( ppa, baseURL, publishedBinaries, numberOfPublishedBinaries )
+                if numberOfPublishedBinaries > 0: self.processPublishedBinaries( ppa, baseURL, publishedBinaries, numberOfPublishedBinaries )
 
             except Exception as e:
                 logging.exception( e )

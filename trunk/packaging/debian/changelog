@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.41-1) precise; urgency=low
+
+  * Fixed a bug: When a PPA had more than one filter, the results were
+    completely filtered out.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 9 Aug 2014 20:57:02 +1000
+
+
 indicator-ppa-download-statistics (1.0.40-1) precise; urgency=low
 
   * Now passes filter text to the URL which retrieves the published binary
