@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.42-1) precise; urgency=low
+
+  * Fixed a bug: The download status was sometimes obscured if filtering was
+    enabled.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 10 Aug 2014 14:25:06 +1000
+
+
 indicator-ppa-download-statistics (1.0.41-1) precise; urgency=low
 
   * Fixed a bug: When a PPA had more than one filter, the results were
