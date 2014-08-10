@@ -41,15 +41,20 @@ class PPA:
         self.architecture = architecture
 
 
-    def resetForDownload( self ):
-        self.status = PPA.STATUS_NEEDS_DOWNLOAD
-        self.publishedBinaries = [ ]
-
-
     def getStatus( self ): return self.status
 
 
-    def setStatus( self, status ): self.status = status
+    def setStatus( self, status ):
+        if status == PPA.STATUS_OK: self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
+
+        if status == PPA.STATUS_ERROR_RETRIEVING_PPA or \
+            status == PPA.STATUS_MULTIPLE_ERRORS or \
+            status == PPA.STATUS_NEEDS_DOWNLOAD or \
+            status == PPA.STATUS_NO_PUBLISHED_BINARIES or \
+            status == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+            self.publishedBinaries = [ ]
+
+        self.status = status
 
 
     def getUser( self ): return self.user
@@ -61,37 +66,38 @@ class PPA:
     def getSeries( self ): return self.series
 
 
-    def setSeries( self, series ): self.series = series
-
-
     def getArchitecture( self ): return self.architecture
 
 
-    def setArchitecture( self, architecture ): self.architecture = architecture
+    # Used for combined PPAs.
+    def nullifyArchitectureSeries( self ):
+        self.architecture = None
+        self.series = None
 
 
     # Returns a key of the form 'PPA User | PPA Name | Series | Architecture' or 'PPA User | PPA Name' if series/architecture are undefined. 
     def getKey( self ):
-        if self.series is None or self.architecture is None:
-            return str( self.user ) + " | " + str( self.name )
+        if self.series is None or self.architecture is None: return str( self.user ) + " | " + str( self.name )
 
         return str( self.user ) + " | " + str( self.name ) + " | " + str( self.series ) + " | " + str( self.architecture )
 
 
-    def addPublishedBinary( self, packageName, packageVersion, downloadCount, architectureSpecific ):
-        self.publishedBinaries.append( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
+    def addPublishedBinary( self, publishedBinary ): self.publishedBinaries.append( publishedBinary )
 
 
-    def noMorePublishedBinariesToAdd( self ):
-        if self.status == PPA.STATUS_NEEDS_DOWNLOAD:
-            self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
-            self.setStatus( PPA.STATUS_OK )
+    # Used for combined PPAs.
+    def addPublishedBinaries( self, publishedBinaries ): self.publishedBinaries.extend( publishedBinaries )
 
 
     def getPublishedBinaries( self ): return self.publishedBinaries
 
 
-    def setPublishedBinaries( self, publishedBinaries ): self.publishedBinaries = publishedBinaries
+    def sortPublishedBinariesByDownloadCountAndClip( self, clipAmount ):
+        self.publishedBinaries.sort( key = operator.methodcaller( "getDownloadCount" ), reverse = True )
+        if clipAmount > 0: del self.publishedBinaries[ clipAmount : ]
+
+
+    def resetPublishedBinaries( self ): self.publishedBinaries = [ ]
 
 
     def __str__( self ): return self.getKey()
