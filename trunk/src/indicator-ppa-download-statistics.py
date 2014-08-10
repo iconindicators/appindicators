@@ -38,7 +38,7 @@ from ppa import PPA, PublishedBinary
 from threading import Thread
 from urllib.request import urlopen
 
-import itertools, pythonutils, gzip, json, locale, logging, operator, os, re, shutil, sys, threading, time, webbrowser
+import itertools, pythonutils, json, locale, logging, operator, os, re, shutil, sys, threading, time, webbrowser
 
 
 class IndicatorPPADownloadStatistics:
