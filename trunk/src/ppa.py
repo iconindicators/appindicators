@@ -116,11 +116,6 @@ class PublishedBinary( object ):
         self.packageVersion = packageVersion
         self.downloadCount = downloadCount
         self.architectureSpecific = architectureSpecific
-        
-        
-        import datetime
-        minute = datetime.datetime.now().minute
-        if self.packageName == "indicator-stardate" and self.downloadCount == 23 and minute > 15:  self.downloadCount = 2225
 
 
     def getPackageName( self ): return self.packageName
