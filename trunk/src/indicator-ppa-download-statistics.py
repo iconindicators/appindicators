@@ -46,7 +46,7 @@ class IndicatorPPADownloadStatistics:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-ppa-download-statistics"
     ICON = NAME
-    VERSION = "1.0.42"
+    VERSION = "1.0.43"
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -372,7 +372,7 @@ class IndicatorPPADownloadStatistics:
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
         showNotificationOnUpdateCheckbox = Gtk.CheckButton( "Notify on update" )
-        showNotificationOnUpdateCheckbox.set_tooltip_text( "Show a screen notification when PPA download statistics have been updated." )
+        showNotificationOnUpdateCheckbox.set_tooltip_text( "Show a screen notification when the PPA\ndownload statistics have been updated AND\nare different to the last download." )
         showNotificationOnUpdateCheckbox.set_active( self.showNotificationOnUpdate )
         grid.attach( showNotificationOnUpdateCheckbox, 0, 5, 2, 1 )
 
@@ -855,6 +855,7 @@ class IndicatorPPADownloadStatistics:
         self.filterAtDownload = True
 
         self.ppas = [ ]
+        self.ppasPrevious = [ ] # Used to hold the most recent download for comparison.
 
         if os.path.isfile( IndicatorPPADownloadStatistics.SETTINGS_FILE ):
             try:
@@ -978,8 +979,10 @@ class IndicatorPPADownloadStatistics:
 
         GLib.idle_add( self.buildMenu )
 
-        if self.showNotificationOnUpdate and not self.quitRequested:
+        if self.showNotificationOnUpdate and not self.quitRequested and self.ppasPrevious != self.ppas:
             Notify.Notification.new( "Statistics downloaded!", "", IndicatorPPADownloadStatistics.ICON ).show()
+
+        self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.
 
 
     def getPublishedBinariesNoFilters( self, ppa ):

@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.43-1) precise; urgency=low
+
+  * Now shows the screen notification only if there is a difference in the
+    statistics between downloads.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 11 Aug 2014 17:22:15 +1000
+
+
 indicator-ppa-download-statistics (1.0.42-1) precise; urgency=low
 
   * Fixed a bug: The download status was sometimes obscured if filtering was
