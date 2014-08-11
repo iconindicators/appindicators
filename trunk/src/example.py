@@ -27,7 +27,7 @@ print( "Stardate API version: " + currentStardate.getVersion() )
 currentStardate.setGregorian( now )
 print( str( now.year ) + "/" + str( now.month ) + "/" + str( now.day ) + " " + 
        str( now.hour ) + ":" + str( now.minute ) + ":" + str( now.second ) + " (y/m/d h:m:s) = " + 
-       currentStardate.toStardateString( True ) + " 'classic'" )
+       currentStardate.toStardateString( True, False ) + " 'classic'" )
 
 currentStardate.setStardateClassic( currentStardate.getStardateIssue(), currentStardate.getStardateInteger(), currentStardate.getStardateFraction() )
 print( "[" + str( currentStardate.getStardateIssue() ) + "] " + 
@@ -41,7 +41,7 @@ currentStardate.setClassic( False ) # Now using '2009 revised'.
 currentStardate.setGregorian( now )
 print( str( now.year ) + "/" + str( now.month ) + "/" + str( now.day ) + " " + 
        str( now.hour ) + ":" + str( now.minute ) + ":" + str( now.second ) + " (y/m/d h:m:s) = " + 
-       currentStardate.toStardateString( True ) + " '2009 revised'" )
+       currentStardate.toStardateString( True, False ) + " '2009 revised'" )
 
 currentStardate.setStardate2009Revised( currentStardate.getStardateInteger(), currentStardate.getStardateFraction() )
 print( str( currentStardate.getStardateInteger() ) + "." + 
