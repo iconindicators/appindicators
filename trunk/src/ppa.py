@@ -21,7 +21,7 @@
 import operator
 
 
-class PPA:
+class PPA( object ):
 
     STATUS_OK = "OK"
     STATUS_NEEDS_DOWNLOAD = "NEEDS DOWNLOAD"
@@ -106,7 +106,7 @@ class PPA:
     def __repr__( self ): return self.__str__()
 
 
-class PublishedBinary:
+class PublishedBinary( object ):
 
     def __init__( self, packageName, packageVersion, downloadCount, architectureSpecific ):
         self.packageName = packageName
