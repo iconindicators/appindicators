@@ -322,3 +322,9 @@ class Stardate( object ):
         self.stardateIssue = None
         self.stardateInteger = self.gregorianDateTime.year
         self.stardateFraction = ( datetime.date( self.gregorianDateTime.year, self.gregorianDateTime.month, self.gregorianDateTime.day ) - datetime.date( self.gregorianDateTime.year, 1, 1 ) ).days
+
+
+    def __str__( self ): return "Classic: " + str( self.classic ) + "  |  Stardate: " + self.toStardateString( True, True ) + "  |  Gregorian: " + self.toGregorianString() 
+
+
+    def __repr__( self ): return self.__str__()
