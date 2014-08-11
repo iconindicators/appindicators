@@ -59,10 +59,10 @@ class Stardate( Object ):
     def __init__( self ):
         self.API_VERSION = "Version 3.0 (2014-02-28)"
 
-        # Rates (in stardate units per day) for each stardate era. 
+        # Rates (in stardate units per day) for each 'classic' stardate era. 
         self.stardateRates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
 
-        # The Gregorian dates which reflect the start date for each rate.
+        # The Gregorian dates which reflect the start date for each rate in the 'classic' stardate era.
         # For example, an index of 3 (Gregorian date of 5/10/2283) corresponds to the rate of 0.5 stardate units per day.
         # The month is zero-based (January = 0).
         self.gregorianDates = []
@@ -75,13 +75,13 @@ class Stardate( Object ):
         # Internal representation for the Gregorian date/time. 
         self.gregorianDateTime = None
 
-        # Internal representation for the stardate. 
-        self.stardateIssue = 0
-        self.stardateInteger = 0
-        self.stardateFraction = 0
+        # Internal representation for the 'classic' stardate. 
+        self.stardateIssue = None
+        self.stardateInteger = None
+        self.stardateFraction = None
 
-        # The index specifying the specific stardate rate.
-        self.index = 0
+        # The index specifying the specific 'classic' stardate rate.
+        self.index = -1
 
         # If True = 'classic' conversion; False = '2009 revised' conversion.
         self.classic = True
@@ -192,29 +192,21 @@ class Stardate( Object ):
         stringBuilder = ""
 
         if self.classic:
-
-            if showIssue:
-                stringBuilder = "[" + str( self.stardateIssue ) + "] "
+            if showIssue: stringBuilder = "[" + str( self.stardateIssue ) + "] "
 
             if padInteger:
-                if self.stardateIssue < 21:
-                    padding = len( "1000" ) - len( str( self.stardateInteger ) )
-                else:
-                    padding = len( "10000" ) - len( str( self.stardateInteger ) )
-    
+                if self.stardateIssue < 21: padding = len( "1000" ) - len( str( self.stardateInteger ) )
+                else: padding = len( "10000" ) - len( str( self.stardateInteger ) )
+
                 integer = str( self.stardateInteger )
-                for i in range( padding ):
-                    integer = "0" + integer
-    
+                for i in range( padding ): integer = "0" + integer
                 stringBuilder += str( integer )
-    
-            else:
-                stringBuilder += str( self.stardateInteger )
+
+            else: stringBuilder += str( self.stardateInteger )
 
             stringBuilder += "." + str( self.stardateFraction )
 
-        else:
-            stringBuilder = str( self.stardateInteger ) + "." + str( self.stardateFraction )
+        else: stringBuilder = str( self.stardateInteger ) + "." + str( self.stardateFraction )
 
         return stringBuilder
 
@@ -227,37 +219,38 @@ class Stardate( Object ):
     def __stardateToGregorianClassic( self ):
         fractionLength = len( str( self.stardateFraction ) )
         fractionDivisor = math.pow( 10.0, fractionLength )
+        self.index = -1
         if self.stardateIssue < 0:
-            index = 0
+            self.index = 0
             units = self.stardateIssue * 10000.0 + self.stardateInteger + self.stardateFraction / fractionDivisor
         elif self.stardateIssue >= 0 and self.stardateIssue < 19:
-            index = 1
+            self.index = 1
             units = self.stardateIssue * 1000.0 + self.stardateInteger + self.stardateFraction / fractionDivisor
         elif self.stardateIssue == 19 and self.stardateInteger < 7340:
-            index = 1
+            self.index = 1
             units = self.stardateIssue * 19.0 * 1000.0 + self.stardateInteger + self.stardateFraction / fractionDivisor
         elif self.stardateIssue == 19 and self.stardateInteger >= 7340 and self.stardateInteger < 7840:
-            index = 2
+            self.index = 2
             units = self.stardateInteger + self.stardateFraction / fractionDivisor - 7340
         elif self.stardateIssue == 19 and self.stardateInteger >= 7840:
-            index = 3
+            self.index = 3
             units = self.stardateInteger + self.stardateFraction / fractionDivisor - 7840
         elif self.stardateIssue == 20 and self.stardateInteger < 5006:
-            index = 3
+            self.index = 3
             units = 1000.0 + self.stardateInteger + self.stardateFraction / fractionDivisor
         elif self.stardateIssue >= 21:
-            index = 4
+            self.index = 4
             units = ( self.stardateIssue - 21 ) * 10000.0 + self.stardateInteger + self.stardateFraction / fractionDivisor
         else:
             raise Exception( "Illegal issue/integer: " + str( self.stardateIssue ) + "/" + str( self.stardateInteger ) )
 
-        rate = self.stardateRates[ index ]
+        rate = self.stardateRates[ self.index ]
         days = units / rate
         hours = ( days - int( days ) ) * 24.0
         minutes = ( hours - int( hours ) ) * 60.0
         seconds = ( minutes - int( minutes ) ) * 60.0
 
-        self.gregorianDateTime = datetime.datetime( self.gregorianDates[ index ].year, self.gregorianDates[ index ].month, self.gregorianDates[ index ].day )
+        self.gregorianDateTime = datetime.datetime( self.gregorianDates[ self.index ].year, self.gregorianDates[ self.index ].month, self.gregorianDates[ self.index ].day )
         self.gregorianDateTime += datetime.timedelta( int( days ), int( seconds ), 0, 0, int( minutes ), int( hours ) )
 
 
@@ -273,35 +266,36 @@ class Stardate( Object ):
         day = self.gregorianDateTime.day
         if ( year < 2162 ) or ( year == 2162 and month == 1 and day < 4 ):
             # Pre-stardate (pre 4/1/2162)...do the conversion here because a negative time is generated and throws out all other cases.          
+            self.index = 0
             numberOfSeconds = ( self.gregorianDates[ 0 ] - self.gregorianDateTime ).total_seconds()
             numberOfDays = numberOfSeconds / 60.0 / 60.0 / 24.0
-            rate = self.stardateRates[ 0 ]
+            rate = self.stardateRates[ self.index ]
             units = numberOfDays * rate
 
-            self.stardateIssue = stardateIssues[ 0 ] - int( units / stardateRange[ 0 ] )
+            self.stardateIssue = stardateIssues[ self.index ] - int( units / stardateRange[ self.index ] )
 
-            remainder = stardateRange[ 0 ] - ( units % stardateRange[ 0 ] )
+            remainder = stardateRange[ self.index ] - ( units % stardateRange[ self.index ] )
             self.stardateInteger = int( remainder )
             self.stardateFraction = int( remainder * 10.0 ) - ( int( remainder ) * 10 )
             return
 
         # Remainder of time periods can be treated equally...
-        index = -1
+        self.index = -1
         if ( year == 2162 and month == 1 and day >= 4 ) or ( year == 2162 and month > 1 ) or ( year > 2162 and year < 2270 ) or ( year == 2270 and month == 1 and day < 26 ): # First period of stardates (4/1/2162 - 26/1/2270).
-            index = 1
+            self.index = 1
         elif ( year == 2270 and month == 1 and day >= 26 ) or ( year == 2270 & month > 1 ) or ( year > 2270 and year < 2283 ) or ( year == 2283 and month < 10 ) or ( year == 2283 and month == 10 and day < 5 ): # Second period of stardates (26/1/2270 - 5/10/2283)
-            index = 2
+            self.index = 2
         elif ( year == 2283 and month == 10 and day >= 5 ) or ( year == 2283 and month > 10 ) or ( year > 2283 and year < 2323 ): # Third period of stardates (5/10/2283 - 1/1/2323)
-            index = 3
+            self.index = 3
         elif year >= 2323: # Fourth period of stardates (1/1/2323 - )
-            index = 4
+            self.index = 4
         else:
             raise Exception( "Invalid year/month/day: " + str( year ) + "/" + str( month ) + "/" + str( day ) )
 
         # Now convert...
-        numberOfSeconds = ( self.gregorianDateTime - self.gregorianDates[ index ] ).total_seconds()
+        numberOfSeconds = ( self.gregorianDateTime - self.gregorianDates[ self.index ] ).total_seconds()
         numberOfDays = numberOfSeconds / 60.0 / 60.0 / 24.0
-        rate = self.stardateRates[ index ]
+        rate = self.stardateRates[ self.index ]
         units = numberOfDays * rate
         self.stardateIssue = int( units / stardateRange[ index ] ) + stardateIssues[ index ]
         remainder = units % stardateRange[ index ]
