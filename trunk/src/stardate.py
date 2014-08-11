@@ -99,6 +99,7 @@ class Stardate( Object ):
 
 
     # Sets the conversion method, either 'classic' or '2009 revised'.
+    #
     #  classic If True, 'classic' conversion is used; otherwise '2009 revised' conversion.   
     def setClassic( self, classic ): self.classic = classic
 
