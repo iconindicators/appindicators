@@ -54,7 +54,7 @@
 import datetime, math
 
 
-class Stardate:
+class Stardate( Object ):
 
     def __init__( self ):
         self.API_VERSION = "Version 3.0 (2014-02-28)"
