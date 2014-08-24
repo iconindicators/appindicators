@@ -42,12 +42,15 @@
 # The Gregorian calendar commenced in 1582 and is in use to this day.
 # It is based on a modified version of the Julian calendar.
 #
-# In 2162, stardates were developed by Starfleet.  Stardate [0]0000.0 commenced on midnight 4/1/2162.  
+# In 2162, stardates were developed by Starfleet.
+# Stardate [0]0000.0 commenced on midnight 4/1/2162.  
 # The stardate rate from this date to 26/1/2270 was 5 units per day.
 #
-# Between 26/1/2270 and 5/10/2283 ([19]7340.0 and [19]7840.0, respectively) the stardate rate changes to 0.1 units per day.
+# Between 26/1/2270 and 5/10/2283 ([19]7340.0 and [19]7840.0, respectively)
+# the rate changes to 0.1 units per day.
 #
-# Between 5/10/2283 to 1/1/2323 ([19]7840.0 and [20]5006.0, respectively) the rate changes once again, this time to 0.5 units per day.
+# Between 5/10/2283 to 1/1/2323 ([19]7840.0 and [20]5006.0, respectively),
+# the rate changes to 0.5 units per day.
 #
 # From 1/1/2323 ([20]5006.0) the rate changed to 1000 units per mean solar year (365.2425 days).  
 # Also, stardate [20]5006.0 becomes [21]00000.0.
@@ -330,7 +333,7 @@ class Stardate( object ):
     def __gregorianToStardate2009Revised( self ):
         self.stardateIssue = None
         self.stardateInteger = self.gregorianDateTime.year
-        self.stardateFraction = ( datetime.date( self.gregorianDateTime.year, self.gregorianDateTime.month, self.gregorianDateTime.day ) - datetime.date( self.gregorianDateTime.year, 1, 1 ) ).days
+        self.stardateFraction = ( datetime.date( self.gregorianDateTime.year, self.gregorianDateTime.month, self.gregorianDateTime.day ) - datetime.date( self.gregorianDateTime.year, 1, 1 ) ).days + 1
 
 
     def __str__( self ): return "Classic: " + str( self.classic ) + "  |  Stardate: " + self.toStardateString( True, True ) + "  |  Gregorian: " + self.toGregorianString() 
