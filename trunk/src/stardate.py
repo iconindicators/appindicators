@@ -73,7 +73,7 @@ class Stardate( object ):
 
         # The Gregorian dates which reflect the start date for each rate in the 'classic' stardate era.
         # For example, an index of 3 (Gregorian date of 5/10/2283) corresponds to the rate of 0.5 stardate units per day.
-        # The month is zero-based (January = 0).
+        # The month is one-based (January = 1).
         self.gregorianDates = []
         self.gregorianDates.append( datetime.datetime( 2162, 1, 4, ) )
         self.gregorianDates.append( datetime.datetime( 2162, 1, 4 ) )
