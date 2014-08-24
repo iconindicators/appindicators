@@ -39,7 +39,7 @@
 # It is based on a modified version of the Julian calendar.
 #
 # In 2162, stardates were developed by Starfleet.  Stardate [0]0000.0 commenced on midnight 4/1/2162.  
-# The stardate rate from this date to 26/1/2270 was 5 units per day
+# The stardate rate from this date to 26/1/2270 was 5 units per day.
 #
 # Between 26/1/2270 and 5/10/2283 ([19]7340.0 and [19]7840.0, respectively) the stardate rate changes to 0.1 units per day.
 #
