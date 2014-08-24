@@ -15,10 +15,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Converts between Star Trek(R) stardates and Gregorian date/times.
-# There are two conversion types: 'classic' and '2009 revised'.
+# Converts between Star Trek™ stardates and Gregorian date/times.
+# There are two types of stardates: 'classic' and '2009 revised'.
 #
-# The 'classic' stardate conversion is based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main.
+#
+# 'classic' stardates
+# -------------------
+#
+# The 'classic' stardate is based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main.
 #
 # Stardates are related to Julian/Gregorian dates as depicted on the following time line:
 #
@@ -48,7 +52,12 @@
 # From 1/1/2323 ([20]5006.0) the rate changed to 1000 units per mean solar year (365.2425 days).  
 # Also, stardate [20]5006.0 becomes [21]00000.0.
 #
-# The '2009 revised' conversion is based on http://en.wikipedia.org/wiki/Stardate.
+#
+# '2009 revised'
+# --------------
+#
+# The '2009 revised' stardate is based on http://en.wikipedia.org/wiki/Stardate.
+
 
 
 import datetime, math
