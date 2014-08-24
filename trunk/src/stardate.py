@@ -237,25 +237,25 @@ class Stardate( object ):
         fractionLength = len( str( self.stardateFraction ) )
         fractionDivisor = math.pow( 10.0, fractionLength )
         self.index = -1
-        if self.stardateIssue < 0:
+        if self.stardateIssue < 0: # Pre-stardate (pre 4/1/2162).
             self.index = 0
             units = self.stardateIssue * 10000.0 + self.stardateInteger + self.stardateFraction / fractionDivisor
-        elif self.stardateIssue >= 0 and self.stardateIssue < 19:
+        elif self.stardateIssue >= 0 and self.stardateIssue < 19: # First period of stardates (4/1/2162 - 26/1/2270).
             self.index = 1
             units = self.stardateIssue * 1000.0 + self.stardateInteger + self.stardateFraction / fractionDivisor
-        elif self.stardateIssue == 19 and self.stardateInteger < 7340:
+        elif self.stardateIssue == 19 and self.stardateInteger < 7340: # First period of stardates (4/1/2162 - 26/1/2270).
             self.index = 1
             units = self.stardateIssue * 19.0 * 1000.0 + self.stardateInteger + self.stardateFraction / fractionDivisor
-        elif self.stardateIssue == 19 and self.stardateInteger >= 7340 and self.stardateInteger < 7840:
+        elif self.stardateIssue == 19 and self.stardateInteger >= 7340 and self.stardateInteger < 7840: # Second period of stardates (26/1/2270 - 5/10/2283)
             self.index = 2
             units = self.stardateInteger + self.stardateFraction / fractionDivisor - 7340
-        elif self.stardateIssue == 19 and self.stardateInteger >= 7840:
+        elif self.stardateIssue == 19 and self.stardateInteger >= 7840: # Third period of stardates (5/10/2283 - 1/1/2323)
             self.index = 3
             units = self.stardateInteger + self.stardateFraction / fractionDivisor - 7840
-        elif self.stardateIssue == 20 and self.stardateInteger < 5006:
+        elif self.stardateIssue == 20 and self.stardateInteger < 5006: # Third period of stardates (5/10/2283 - 1/1/2323)
             self.index = 3
             units = 1000.0 + self.stardateInteger + self.stardateFraction / fractionDivisor
-        elif self.stardateIssue >= 21:
+        elif self.stardateIssue >= 21: # Fourth period of stardates (1/1/2323 - )
             self.index = 4
             units = ( self.stardateIssue - 21 ) * 10000.0 + self.stardateInteger + self.stardateFraction / fractionDivisor
         else:
