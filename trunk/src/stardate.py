@@ -280,12 +280,12 @@ class Stardate( object ):
 
         # Determine which era the given Gregorian date falls...
         year = self.gregorianDateTime.year
-        month = self.gregorianDateTime.month
+        month = self.gregorianDateTime.month # Month is one-based.
         day = self.gregorianDateTime.day
         if ( year < 2162 ) or ( year == 2162 and month == 1 and day < 4 ):
             # Pre-stardate (pre 4/1/2162)...do the conversion here because a negative time is generated and throws out all other cases.          
             self.index = 0
-            numberOfSeconds = ( self.gregorianDates[ 0 ] - self.gregorianDateTime ).total_seconds()
+            numberOfSeconds = ( self.gregorianDates[ self.index ] - self.gregorianDateTime ).total_seconds()
             numberOfDays = numberOfSeconds / 60.0 / 60.0 / 24.0
             rate = self.stardateRates[ self.index ]
             units = numberOfDays * rate
@@ -298,14 +298,14 @@ class Stardate( object ):
             return
 
         # Remainder of time periods can be treated equally...
-        if ( year == 2162 and month == 1 and day >= 4 ) or ( year == 2162 and month > 1 ) or ( year > 2162 and year < 2270 ) or ( year == 2270 and month == 1 and day < 26 ): # First period of stardates (4/1/2162 - 26/1/2270).
-            self.index = 1
-        elif ( year == 2270 and month == 1 and day >= 26 ) or ( year == 2270 & month > 1 ) or ( year > 2270 and year < 2283 ) or ( year == 2283 and month < 10 ) or ( year == 2283 and month == 10 and day < 5 ): # Second period of stardates (26/1/2270 - 5/10/2283)
-            self.index = 2
-        elif ( year == 2283 and month == 10 and day >= 5 ) or ( year == 2283 and month > 10 ) or ( year > 2283 and year < 2323 ): # Third period of stardates (5/10/2283 - 1/1/2323)
-            self.index = 3
-        elif year >= 2323: # Fourth period of stardates (1/1/2323 - )
-            self.index = 4
+        if ( year == 2162 and month == 1 and day >= 4 ) or ( year == 2162 and month > 1 ) or ( year > 2162 and year < 2270 ) or ( year == 2270 and month == 1 and day < 26 ):
+            self.index = 1 # First period of stardates (4/1/2162 - 26/1/2270).
+        elif ( year == 2270 and month == 1 and day >= 26 ) or ( year == 2270 & month > 1 ) or ( year > 2270 and year < 2283 ) or ( year == 2283 and month < 10 ) or ( year == 2283 and month == 10 and day < 5 ):
+            self.index = 2 # Second period of stardates (26/1/2270 - 5/10/2283)
+        elif ( year == 2283 and month == 10 and day >= 5 ) or ( year == 2283 and month > 10 ) or ( year > 2283 and year < 2323 ):
+            self.index = 3 # Third period of stardates (5/10/2283 - 1/1/2323)
+        elif year >= 2323:
+            self.index = 4 # Fourth period of stardates (1/1/2323 - )
         else:
             raise Exception( "Invalid year/month/day: " + str( year ) + "/" + str( month ) + "/" + str( day ) )
 
@@ -314,9 +314,9 @@ class Stardate( object ):
         numberOfDays = numberOfSeconds / 60.0 / 60.0 / 24.0
         rate = self.stardateRates[ self.index ]
         units = numberOfDays * rate
-        self.stardateIssue = int( units / stardateRange[ index ] ) + stardateIssues[ index ]
-        remainder = units % stardateRange[ index ]
-        self.stardateInteger = int( remainder ) + stardateIntegers[ index ]
+        self.stardateIssue = int( units / stardateRange[ self.index ] ) + stardateIssues[ self.index ]
+        remainder = units % stardateRange[ self.index ]
+        self.stardateInteger = int( remainder ) + stardateIntegers[ self.index ]
         self.stardateFraction = int( remainder * 10.0 ) - ( int( remainder ) * 10 )
 
 
