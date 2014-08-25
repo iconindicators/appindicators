@@ -124,10 +124,10 @@ class Stardate( object ):
     def getClassic( self ): return self.classic
 
 
-    # Sets a Gregorian date/time object for conversion to a ('classic' or '2009 revised') stardate.
+    # Sets a Gregorian date/time in UTC object for conversion to a ('classic' or '2009 revised') stardate.
     # Note the 'classic' status must be set PRIOR to setting the Gregorian date/time.
     #
-    #  gregorianDateTime A Gregorian date/time to be converted to a stardate (1900 <= year <= 9500).
+    #  gregorianDateTime A Gregorian date/time in UTC to be converted to a stardate (1900 <= year <= 9500).
     #
     # Raises an exception if the Gregorian year is out the defined range.
     def setGregorian( self, gregorianDateTime ):
@@ -185,7 +185,7 @@ class Stardate( object ):
         self.__stardateToGregorian2009Revised()
 
 
-    # Returns the current Gregorian date/time.
+    # Returns the current Gregorian date/time in UTC.
     def getGregorian( self ): return self.gregorianDateTime
 
 
