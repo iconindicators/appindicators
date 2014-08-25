@@ -62,14 +62,13 @@
 # The '2009 revised' stardate is based on http://en.wikipedia.org/wiki/Stardate.
 
 
-
 import datetime, math
 
 
 class Stardate( object ):
 
     def __init__( self ):
-        self.API_VERSION = "Version 3.1 (2014-08-11)"
+        self.API_VERSION = "Version 3.2 (2014-08-25)"
 
         # Rates (in stardate units per day) for each 'classic' stardate era. 
         self.stardateRates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
@@ -216,7 +215,9 @@ class Stardate( object ):
                 else: padding = len( "10000" ) - len( str( self.stardateInteger ) )
 
                 integer = str( self.stardateInteger )
-                for i in range( padding ): integer = "0" + integer
+                for i in range( padding ):
+                    integer = "0" + integer
+
                 stringBuilder += str( integer )
 
             else: stringBuilder += str( self.stardateInteger )
