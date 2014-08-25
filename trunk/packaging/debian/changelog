@@ -1,3 +1,10 @@
+indicator-stardate (1.0.24-1) precise; urgency=low
+
+  * Bug fix: Corrected the '2009 revised' stardate; was out by one.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 25 Aug 2014 17:09:25 +1000
+
+
 indicator-stardate (1.0.23-1) precise; urgency=low
 
   * Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a
