@@ -46,7 +46,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.52"
+    VERSION = "1.0.53"
     ICON_STATE = True # Used to work around this https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -123,10 +123,16 @@ class IndicatorLunar:
     SATELLITE_TAG_NUMBER = "[NUMBER]"
     SATELLITE_TAG_INTERNATIONAL_DESIGNATOR = "[INTERNATIONAL DESIGNATOR]"
     SATELLITE_TAG_RISE_AZIMUTH = "[RISE AZIMUTH]"
+    SATELLITE_TAG_RISE_TIME = "[RISE TIME]"
+    SATELLITE_TAG_SET_AZIMUTH = "[SET AZIMUTH]"
+    SATELLITE_TAG_SET_TIME = "[SET TIME]"
 
     SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = "                 ...now rising at azimuth " + SATELLITE_TAG_RISE_AZIMUTH + \
+        "\nRise Time: " + SATELLITE_TAG_RISE_TIME + \
+        "\nSet Azimuth: " + SATELLITE_TAG_SET_AZIMUTH + \
+        "\nSet Time: " + SATELLITE_TAG_SET_TIME + \
         "\nNumber: " + SATELLITE_TAG_NUMBER + \
         "\nDesignator: " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
 
@@ -238,14 +244,22 @@ class IndicatorLunar:
             self.satelliteNotifications[ key ] = self.data[ setTimeKey ] # Flag to ensure the notification happens once per satellite's pass.
 
             # Parse the satellite summary/message to create the notification...
+            riseTime = self.data[ key + IndicatorLunar.TAG_RISE_TIME ]
             degreeSymbolIndex = self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ].index( "°" )
             riseAzimuth = self.data[ key + IndicatorLunar.TAG_RISE_AZIMUTH ][ 0 : degreeSymbolIndex + 1 ]
+
+            setTime = self.data[ key + IndicatorLunar.TAG_SET_TIME ]
+            degreeSymbolIndex = self.data[ key + IndicatorLunar.TAG_SET_AZIMUTH ].index( "°" )
+            setAzimuth = self.data[ key + IndicatorLunar.TAG_SET_AZIMUTH ][ 0 : degreeSymbolIndex + 1 ]
 
             summary = self.satelliteNotificationSummary. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNameNumber[ 1 ] ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth )
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime )
 
             if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
 
@@ -253,7 +267,10 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNameNumber[ 1 ] ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth )
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime )
 
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
@@ -1333,7 +1350,10 @@ class IndicatorLunar:
             IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH + \
+            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_RISE_TIME + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_SET_TIME + \
             "\n\nFor formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
         grid.attach( satelliteNotificationSummaryText, 1, 1, 1, 1 )
@@ -1355,7 +1375,10 @@ class IndicatorLunar:
             IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH + \
+            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_RISE_TIME + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_SET_TIME + \
             "\n\nFor formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -1654,13 +1677,19 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_NAME, "ISS (ZARYA)" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, "1998-067A" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, "123.45°" )
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, "123.45°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, self.localiseAndTrim( ephem.now() ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, "321.54°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, self.localiseAndTrim( ephem.Date( ephem.now() + 10 * ephem.minute ) ) )
 
             message = message. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME, "ISS (ZARYA)" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, "1998-067A" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, "123.45°" )
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, "123.45°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, self.localiseAndTrim( ephem.now() ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, "321.54°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, self.localiseAndTrim( ephem.Date( ephem.now() + 10 * ephem.minute ) ) )
 
         if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
 
