@@ -81,6 +81,12 @@ def onCheckbox( self, *widgets ):
         widget.set_sensitive( self.get_active() )
 
 
+# Listens to radio events and toggles the visibility of the widgets.
+def onRadio( self, *widgets ):
+    for widget in widgets:
+        widget.set_sensitive( self.get_active() )
+
+
 # A GTK AboutDialog with optional change log displayed in its own tab.
 class AboutDialog( Gtk.AboutDialog ):
 
