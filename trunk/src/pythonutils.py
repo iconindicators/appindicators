@@ -74,6 +74,13 @@ def showOKCancel( parent, message ):
 def getTextViewText( textView ): return textView.get_buffer().get_text( textView.get_buffer().get_start_iter(), textView.get_buffer().get_end_iter(), True )
 
 
+
+# Listens to checkbox events and toggles the visibility of the widgets.
+def onCheckbox( self, *widgets ):
+    for widget in widgets:
+        widget.set_sensitive( self.get_active() )
+
+
 # A GTK AboutDialog with optional change log displayed in its own tab.
 class AboutDialog( Gtk.AboutDialog ):
 
