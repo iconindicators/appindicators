@@ -38,7 +38,7 @@ class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-fortune"
-    VERSION = "1.0.12"
+    VERSION = "1.0.13"
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -333,13 +333,12 @@ class IndicatorFortune:
         radioMiddleMouseClickNewFortune.set_margin_left( 15 )
         grid.attach( radioMiddleMouseClickNewFortune, 0, 1, 1, 1 )
 
-        radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_from_widget( radioMiddleMouseClickNewFortune )
+        radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "New fortune" )
         radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
-        radioMiddleMouseClickCopyLastFortune.set_label( "Copy last fortune" )
         radioMiddleMouseClickCopyLastFortune.set_margin_left( 15 )
         grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 2, 1, 1 )
 
-        radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_mnemonic_from_widget( radioMiddleMouseClickNewFortune, "Show last fortune" )
+        radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "Show last fortune" )
         radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
         radioMiddleMouseClickShowLastFortune.set_margin_left( 15 )
         grid.attach( radioMiddleMouseClickShowLastFortune, 0, 3, 1, 1 )
