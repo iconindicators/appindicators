@@ -1194,7 +1194,7 @@ class IndicatorLunar:
 #         label.set_justify( Gtk.Justification.CENTER )
         notebook.append_page( grid, label )
 
-
+#TODO...
 # Show me the next transit for each satellite, within the next 5 days.
 #    ...and are visible.
 #    ...and the next subsequent transits.
@@ -1213,61 +1213,77 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
+        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
+        box.set_margin_left( 25 )
+
         label = Gtk.Label( "Show as submenus" )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
+#         box.pack_start( label, True, True, 0 )
 
         showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Planets" )
-        showPlanetsAsSubmenuCheckbox.set_margin_left( 25 )
+#         showPlanetsAsSubmenuCheckbox.set_margin_left( 25 )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
         showPlanetsAsSubmenuCheckbox.set_tooltip_text( "Show each planet in its own submenu." )
-        grid.attach( showPlanetsAsSubmenuCheckbox, 0, 1, 1, 1 )
+#         grid.attach( showPlanetsAsSubmenuCheckbox, 0, 1, 1, 1 )
+        box.pack_start( showPlanetsAsSubmenuCheckbox, True, True, 0 )
 
         showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Stars" )
-        showStarsAsSubmenuCheckbox.set_margin_left( 25 )
+#         showStarsAsSubmenuCheckbox.set_margin_left( 25 )
         showStarsAsSubmenuCheckbox.set_tooltip_text( "Show each star in its own submenu." )
         showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
-        grid.attach( showStarsAsSubmenuCheckbox, 0, 2, 1, 1 )
+#         grid.attach( showStarsAsSubmenuCheckbox, 0, 2, 1, 1 )
+        box.pack_start( showStarsAsSubmenuCheckbox, True, True, 0 )
 
         showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Satellites" )
         showSatellitesAsSubmenuCheckbox.set_margin_left( 25 )
         showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
         showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
-        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 3, 1, 1 )
+#         grid.attach( showSatellitesAsSubmenuCheckbox, 0, 3, 1, 1 )
+        box.pack_start( showSatellitesAsSubmenuCheckbox, True, True, 0 )
 
-#         separator = Gtk.Separator.new( Gtk.Orientation.VERTICAL )
-#         grid.attach( separator, 1, 0, 1, 3 )
+#         boxRight = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
+#         boxRight.set_margin_left( 10 )
+        grid.attach( box, 0, 2, 1, 1 )
 
         radioShowNextTransit = Gtk.RadioButton.new_with_label_from_widget( None, "Show each satellite's next transit" )
+        radioShowNextTransit.set_margin_top( 10 )
 #         radioShowNextTransit.set_active( self. )
         grid.attach( radioShowNextTransit, 0, 4, 1, 1 )
+#         boxRight.pack_start( radioShowNextTransit, False, False, 0 )
 
         onlyShowVisibleSatellitePassesCheckbox = Gtk.CheckButton( "Show only visible satellite passes" )
         onlyShowVisibleSatellitePassesCheckbox.set_margin_left( 25 )
         onlyShowVisibleSatellitePassesCheckbox.set_active( self.onlyShowVisibleSatellitePasses )
         onlyShowVisibleSatellitePassesCheckbox.set_tooltip_text( "Only display information for visible satellite passes." )
         grid.attach( onlyShowVisibleSatellitePassesCheckbox, 0, 5, 1, 1 )
+#         boxRight.pack_start( onlyShowVisibleSatellitePassesCheckbox, False, False, 0 )
 
         showSatelliteSubsequentPassesCheckbox = Gtk.CheckButton( "Show subsequent satellite passes" )
         showSatelliteSubsequentPassesCheckbox.set_margin_left( 25 )
         showSatelliteSubsequentPassesCheckbox.set_active( self.showSatelliteSubsequentPasses )
         showSatelliteSubsequentPassesCheckbox.set_tooltip_text( "Show satellite passes following the most current pass." )
         grid.attach( showSatelliteSubsequentPassesCheckbox, 0, 6, 1, 1 )
+#         boxRight.pack_start( showSatelliteSubsequentPassesCheckbox, False, False, 0 )
 
         hideSatelliteOnNoPassCheckbox = Gtk.CheckButton( "Hide on no satellite pass" )
         hideSatelliteOnNoPassCheckbox.set_margin_left( 25 )
         hideSatelliteOnNoPassCheckbox.set_active( self.hideSatelliteOnNoPass )
         hideSatelliteOnNoPassCheckbox.set_tooltip_text( "If no satellite pass can be computed, don't show the satellite in the menu.\n\nA pass may not be computed as a result of...\n\tmissing TLE data,\n\tsatellite never rises or is circumpolar,\n\tno visible pass occurs in the next 10 days." )
         grid.attach( hideSatelliteOnNoPassCheckbox, 0, 7, 1, 1 )
+#         boxRight.pack_start( hideSatelliteOnNoPassCheckbox, False, False, 0 )
 
-        radioShowVisibleWindow = Gtk.RadioButton.new_with_label_from_widget( None, "Show satellites in the next visible window" )
+        radioShowVisibleWindow = Gtk.RadioButton.new_with_label_from_widget( radioShowNextTransit, "Show satellites in the next visible window" )
 #         radioShowVisibleWindow.set_active( self. )
         grid.attach( radioShowVisibleWindow, 0, 8, 1, 1 )
+#         boxRight.pack_start( radioShowVisibleWindow, False, False, 0 )
 
+#         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
+#         box.pack_start( boxLeft, False, False, 0 )
+#         box.pack_start( Gtk.Separator.new( Gtk.Orientation.VERTICAL ), True, True, 0 )
+#         box.pack_start( boxRight, False, False, 0 )
+#         grid.attach( box, 0, 1, 1, 1 )
 
-#TODO Need a reset button back to default lookup URL?
-#TODO Need a reset button back to default TLE source?
-        
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 10 )
 
@@ -1315,7 +1331,10 @@ class IndicatorLunar:
 
         box.pack_start( satelliteURLText, True, True, 0 )
 
-#TODO Need a reset button back to default URL?
+#TODO Add handler.
+        reset = Gtk.Button( "Reset" )
+        reset.set_tooltip_text( "Reset the satellite 'on click' URL to factory default." )
+        box.pack_start( reset, False, False, 0 )
 
         allowSatelliteMenuItemsToLaunchBrowserCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteURLText )
 
@@ -1337,11 +1356,14 @@ class IndicatorLunar:
         TLEURLText.set_text( self.satelliteTLEURL )
         TLEURLText.set_sensitive( self.satelliteTLEUseURL )
         TLEURLText.set_hexpand( True )
-        TLEURLText.set_tooltip_text( "A URL from which to download TLE satellite data." )
+        TLEURLText.set_tooltip_text( "The URL from which to download TLE satellite data." )
         box.pack_start( TLEURLText, True, True, 0 )
 
-#TODO Need a reset button back to default URL?
-        
+#TODO Add handler.
+        reset = Gtk.Button( "Reset" )
+        reset.set_tooltip_text( "Reset the TLE download URL to factory default." )
+        box.pack_start( reset, False, False, 0 )
+
         grid.attach( box, 0, 13, 1, 1 )
 
         radioTLEFromURL.connect( "toggled", pythonutils.onRadio, TLEURLText )
@@ -1552,17 +1574,13 @@ class IndicatorLunar:
 
         test = Gtk.Button( "Test" )
         test.set_halign( Gtk.Align.END )
+        test.set_margin_bottom( 10 )
         test.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         test.connect( "clicked", self.onTestClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, False )
         test.set_tooltip_text( "Show the notification bubble.\nTags will be substituted with mock text." )
         grid.attach( test, 1, 3, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
-
-        separator = Gtk.Separator.new( Gtk.Orientation.HORIZONTAL )
-        separator.set_margin_top( 10 )
-        separator.set_margin_bottom( 10 )
-        grid.attach( separator, 0, 4, 2, 1 )
 
         showWerewolfWarningCheckbox = Gtk.CheckButton( "Werewolf" )
         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
@@ -1871,6 +1889,13 @@ class IndicatorLunar:
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorLunar.ICON )
+
+
+#TODO See if all buttons can be made the same width as the ok/cancel buttons.
+#         print( self.dialog.get_widget_for_response( Gtk.ResponseType.OK ).get_preferred_width() )
+#         print( self.dialog.get_widget_for_response( Gtk.ResponseType.OK ).get_preferred_height() )
+#         print( self.dialog.get_widget_for_response( Gtk.ResponseType.CANCEL ).get_preferred_width() )
+#         print( self.dialog.get_widget_for_response( Gtk.ResponseType.CANCEL ).get_preferred_height() )
 
         while True:
             self.dialog.show_all()
