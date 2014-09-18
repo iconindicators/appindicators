@@ -23,8 +23,7 @@
 # http://celestrak.com/columns/v04n03
 
 
-class Info:
-
+class TLE:
     def __init__( self, tleTitle, tleLine1, tleLine2 ):
         self.tleTitle = tleTitle
         self.tleLine1 = tleLine1
@@ -57,4 +56,4 @@ class Info:
     def __str__( self ): return str( self.tleTitle ) + " | " + str( self.tleLine1 ) + " | " + str( self.tleLine2 )
 
 
-    def __repr__( self ): return self.__str__()    
+    def __repr__( self ): return self.__str__()
