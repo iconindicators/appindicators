@@ -163,8 +163,6 @@ class IndicatorLunar:
         LUNAR_PHASE_WAXING_GIBBOUS : "Waxing Gibbous"
     }
 
-    SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
-
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
     SATELLITE_TAG_INTERNATIONAL_DESIGNATOR = "[INTERNATIONAL DESIGNATOR]"
@@ -172,6 +170,9 @@ class IndicatorLunar:
     SATELLITE_TAG_RISE_TIME = "[RISE TIME]"
     SATELLITE_TAG_SET_AZIMUTH = "[SET AZIMUTH]"
     SATELLITE_TAG_SET_TIME = "[SET TIME]"
+
+    SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
+    SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
 
     SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + " rising at azimuth " + SATELLITE_TAG_RISE_AZIMUTH
@@ -184,7 +185,7 @@ class IndicatorLunar:
     WEREWOLF_WARNING_MESSAGE_DEFAULT = "                                          ...werewolves about ! ! !"
     WEREWOLF_WARNING_SUMMARY_DEFAULT = "W  A  R  N  I  N  G"
 
-    INDICATOR_TEXT_DEFAULT = "[" + BODY_MOON + " " + DATA_ILLUMINATION + "]"
+    INDICATOR_TEXT_DEFAULT = "[" + BODY_MOON + " " + DATA_PHASE + "]"
 
 
     def __init__( self ):
@@ -221,7 +222,7 @@ class IndicatorLunar:
 #If doing an update (particularly with show all satellite passes) the GUI locks up when updating.
 #Test this...do a print START with timestamp and print END with timestamp and see if the GUI is locked during the times.
     def update( self ):
-        print( "Start:", ephem.now() )#TODO Remove
+#         print( "Start:", ephem.now() )#TODO Remove
         self.toggleIconState()
 
         # Update the satellite TLE data at most every 12 hours.
@@ -269,7 +270,7 @@ class IndicatorLunar:
             nextUpdateInSeconds = ( 60 * 60 )
 
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
-        print( "End:", ephem.now() )#TODO Remove
+#         print( "End:", ephem.now() )#TODO Remove
 
 
     def satelliteNotification( self, ephemNow ):
@@ -1199,17 +1200,17 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        hbox = Gtk.Box( spacing = 6 )
+        box = Gtk.Box( spacing = 6 )
 
         label = Gtk.Label( "Icon Text" )
-        hbox.pack_start( label, False, False, 0 )
+        box.pack_start( label, False, False, 0 )
 
         indicatorText = Gtk.Entry()
         indicatorText.set_text( self.indicatorText )
-        indicatorText.set_tooltip_text( "The text shown next to the indicator icon\n(or shown as a tooltip, where applicable).\n\nDefault: " + IndicatorLunar.INDICATOR_TEXT_DEFAULT )
-        hbox.pack_start( indicatorText, True, True, 0 )
+        indicatorText.set_tooltip_text( "The text shown next to the indicator icon\n(or shown as a tooltip, where applicable)." )
+        box.pack_start( indicatorText, True, True, 0 )
 
-        grid.attach( hbox, 0, 0, 1, 1 )
+        grid.attach( box, 0, 0, 1, 1 )
 
         displayTagsStore = Gtk.ListStore( str, str ) # Display tag, value.
         sortedKeysAsStringsAndValues = [ ]
@@ -1331,8 +1332,8 @@ class IndicatorLunar:
 
         box.pack_start( satelliteURLText, True, True, 0 )
 
-#TODO Add handler.
         reset = Gtk.Button( "Reset" )
+        reset.connect( "clicked", self.onResetSatelliteOnClickURL, satelliteURLText )
         reset.set_tooltip_text( "Reset the satellite 'on click' URL to factory default." )
         box.pack_start( reset, False, False, 0 )
 
@@ -1359,8 +1360,8 @@ class IndicatorLunar:
         TLEURLText.set_tooltip_text( "The URL from which to download TLE satellite data." )
         box.pack_start( TLEURLText, True, True, 0 )
 
-#TODO Add handler.
         reset = Gtk.Button( "Reset" )
+        reset.connect( "clicked", self.onResetSatelliteTLEURL, TLEURLText )
         reset.set_tooltip_text( "Reset the TLE download URL to factory default." )
         box.pack_start( reset, False, False, 0 )
 
@@ -1380,7 +1381,6 @@ class IndicatorLunar:
 # self.satelliteTLEURL
 # must be set to "" not None
 
-#TODO Somehow alert the user when satellite data is refreshed if there are new satellites?  Maybe as a notification after each download/fileload?
         TLEFileText = Gtk.Entry()
         TLEFileText.set_text( self.satelliteTLEFile )
         TLEFileText.set_sensitive( not self.satelliteTLEUseURL )
@@ -1389,6 +1389,7 @@ class IndicatorLunar:
         box.pack_start( TLEFileText, True, True, 0 )
 
         browseButton = Gtk.Button( "Browse" )
+        browseButton.connect( "clicked", self.onBrowseTLEFile, TLEFileText )
         browseButton.set_sensitive( not self.satelliteTLEUseURL )
         browseButton.set_tooltip_text( "Specify the TLE file." )
         box.pack_start( browseButton, False, False, 0 )
@@ -1400,12 +1401,11 @@ class IndicatorLunar:
         notebook.append_page( grid, Gtk.Label( "Menu" ) )
 
         # Planets/Stars.
-        hbox = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 0 ) # Bug in Python - must specify the parameter names!
-        hbox.set_spacing( 15 )
+        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 15 ) # Bug in Python - must specify the parameter names!
 
         planetStore = Gtk.ListStore( bool, str ) # Show/hide, planet name.
         for planet in IndicatorLunar.PLANETS:
-            planetStore.append( [ planet[ 0 ] in self.planets, planet[ 0 ] ] ) # Don't sort, rather keep the natural order.
+            planetStore.append( [ planet[ 0 ] in self.planets, planet[ 0 ] ] )
 
         tree = Gtk.TreeView( planetStore )
 
@@ -1422,7 +1422,7 @@ class IndicatorLunar:
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
         scrolledWindow.add( tree )
 
-        hbox.pack_start( scrolledWindow, True, True, 0 )
+        box.pack_start( scrolledWindow, True, True, 0 )
 
         starStore = Gtk.ListStore( bool, str ) # Show/hide, star name.
         for star in sorted( ephem.stars.stars ):
@@ -1443,9 +1443,9 @@ class IndicatorLunar:
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( tree )
 
-        hbox.pack_start( scrolledWindow, True, True, 0 )
+        box.pack_start( scrolledWindow, True, True, 0 )
 
-        notebook.append_page( hbox, Gtk.Label( "Planets / Stars" ) )
+        notebook.append_page( box, Gtk.Label( "Planets / Stars" ) )
 
         # Satellites.
         if len( self.satelliteTLEData ) == 0: # Error downloading/reading data...
@@ -1504,7 +1504,7 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showSatelliteNotificationCheckbox = Gtk.CheckButton( "Satellite" )
+        showSatelliteNotificationCheckbox = Gtk.CheckButton( "Satellite rise" )
         showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
         showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon." )
         grid.attach( showSatelliteNotificationCheckbox, 0, 0, 2, 1 )
@@ -1574,16 +1574,14 @@ class IndicatorLunar:
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
         separator = Gtk.Separator.new( Gtk.Orientation.HORIZONTAL )
-        separator.set_margin_top( 10 )
-        separator.set_margin_bottom( 10 )
         grid.attach( separator, 0, 4, 2, 1 )
 
-        showWerewolfWarningCheckbox = Gtk.CheckButton( "Werewolf" )
+        showWerewolfWarningCheckbox = Gtk.CheckButton( "Werewolf warning" )
         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
         showWerewolfWarningCheckbox.set_tooltip_text( "Screen notification (approximately hourly)\nat full moon (or leading up to)." )
         grid.attach( showWerewolfWarningCheckbox, 0, 5, 2, 1 )
 
-        label = Gtk.Label( "Illumination %" )
+        label = Gtk.Label( "Illumination" )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         label.set_halign( Gtk.Align.START )
         label.set_margin_left( 25 )
@@ -1592,7 +1590,7 @@ class IndicatorLunar:
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 0, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.werewolfWarningStartIlluminationPercentage ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( "The warning commences at the specified illumination,\nstarting after a new moon (0%)." )
+        spinner.set_tooltip_text( "The notification commences at the\nspecified illumination (%),\nstarting after a new moon (0%)." )
         spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( spinner, 1, 6, 1, 1 )
 
@@ -1660,8 +1658,8 @@ class IndicatorLunar:
         global _city_data
         cities = sorted( _city_data.keys(), key = locale.strxfrm )
         city = Gtk.ComboBoxText.new_with_entry()
-        city.set_tooltip_text( "To reset the cities (with factory lat/long/elev),\ncreate a bogus city and restart the indicator." )
-        city.set_hexpand( True ) # Only need to set this once and all objects will expand.
+        city.set_tooltip_text( "To reset the cities to default lat/long/elev,\nadd a bogus city and restart the indicator." )
+        city.set_hexpand( True )
         for c in cities:
             city.append_text( c )
 
@@ -1734,6 +1732,24 @@ class IndicatorLunar:
                 satelliteMenuText.grab_focus()
                 continue
 
+            if allowSatelliteMenuItemsToLaunchBrowserCheckbox.get_active() and satelliteURLText.get_text().strip() == "":
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Satellite 'on-click' URL cannot be empty." )
+                notebook.set_current_page( 1 )
+                satelliteURLText.grab_focus()
+                continue
+
+            if radioTLEFromURL.get_active() and TLEURLText.get_text().strip() == "":
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Satellite TLE URL cannot be empty." )
+                notebook.set_current_page( 1 )
+                TLEURLText.grab_focus()
+                continue
+
+            if radioTLEFromFile.get_active() and TLEFileText.get_text().strip() == "":
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Satellite TLE file cannot be empty." )
+                notebook.set_current_page( 1 )
+                TLEFileText.grab_focus()
+                continue
+
             cityValue = city.get_active_text()
             if cityValue == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "City cannot be empty." )
@@ -1766,13 +1782,14 @@ class IndicatorLunar:
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
-            self.onlyShowVisibleSatellitePasses = onlyShowVisibleSatellitePassesCheckbox.get_active()
-            self.showSatelliteSubsequentPasses = showSatelliteSubsequentPassesCheckbox.get_active()
-            self.hideSatelliteOnNoPass = hideSatelliteOnNoPassCheckbox.get_active()
             self.satelliteMenuText = satelliteMenuText.get_text()
+            self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
+            self.onlyShowVisibleSatellitePasses = onlyShowVisibleSatellitePassesCheckbox.get_active()
             self.allowSatelliteMenuItemsToLaunchBrowser = allowSatelliteMenuItemsToLaunchBrowserCheckbox.get_active()
             self.satelliteOnClickURL = satelliteURLText.get_text()
-            self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
+            self.satelliteTLEUseURL = radioTLEFromURL.get_active()
+            self.satelliteTLEURL = TLEURLText.get_text()
+            self.satelliteTLEFile = TLEFileText.get_text()
 
             self.planets = [ ]
             for planetInfo in planetStore:
@@ -1806,9 +1823,7 @@ class IndicatorLunar:
 
             self.saveSettings()
 
-            if not os.path.exists( IndicatorLunar.AUTOSTART_PATH ):
-                os.makedirs( IndicatorLunar.AUTOSTART_PATH )
-
+            if not os.path.exists( IndicatorLunar.AUTOSTART_PATH ): os.makedirs( IndicatorLunar.AUTOSTART_PATH )
             if autostartCheckbox.get_active():
                 try:
                     shutil.copy( IndicatorLunar.DESKTOP_PATH + IndicatorLunar.DESKTOP_FILE, IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
@@ -1830,6 +1845,28 @@ class IndicatorLunar:
     def onIndicatorTextTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
         model, treeiter = tree.get_selection().get_selected()
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ 0 ] + "]", indicatorTextEntry.get_position() )
+
+
+    def onResetSatelliteOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_ON_CLICK_URL )
+
+
+    def onResetSatelliteTLEURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
+
+
+    def onBrowseTLEFile( self, browseButton, TLEFileText ):
+        dialog = Gtk.FileChooserDialog(
+                    "Choose a TLE data file",
+                    self.dialog,
+                    Gtk.FileChooserAction.OPEN,
+                    ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
+        dialog.set_transient_for( self.dialog )
+        dialog.set_modal( True ) # TODO https://bugs.launchpad.net/ubuntu/+source/overlay-scrollbar/+bug/903302
+        dialog.set_filename( TLEFileText.get_text() )
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            TLEFileText.set_text( dialog.get_filename() )
+
+        dialog.destroy()
 
 
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
@@ -1873,14 +1910,23 @@ class IndicatorLunar:
         planetName = planetStore[ path ][ 1 ].upper()
 
         if planetStore[ path ][ 0 ]:
-            displayTagsStore.append( [ planetName + IndicatorLunar.DATA_ILLUMINATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + IndicatorLunar.DATA_CONSTELLATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + IndicatorLunar.DATA_TROPICAL_SIGN, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + IndicatorLunar.DATA_DISTANCE_TO_EARTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + IndicatorLunar.DATA_DISTANCE_TO_SUN, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + IndicatorLunar.DATA_BRIGHT_LIMB, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_ILLUMINATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_CONSTELLATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_MAGNITUDE, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_TROPICAL_SIGN, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DISTANCE_TO_EARTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DISTANCE_TO_SUN, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_BRIGHT_LIMB, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_RIGHT_ASCENSION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DECLINATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_ALTITUDE, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+
+            if ( planetName, IndicatorLunar.DATA_MESSAGE ) in self.data:
+                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_MESSAGE, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            else:
+                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
         else:
             iter = displayTagsStore.get_iter_first()
             while iter is not None:
@@ -1895,11 +1941,18 @@ class IndicatorLunar:
         starName = starStore[ path ][ 1 ].upper()
 
         if starStore[ path ][ 0 ]:
-            displayTagsStore.append( [ starName + IndicatorLunar.DATA_RIGHT_ASCENSION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ starName + IndicatorLunar.DATA_DECLINATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ starName + IndicatorLunar.DATA_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ starName + IndicatorLunar.DATA_ALTITUDE, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ starName + IndicatorLunar.DATA_MAGNITUDE, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_CONSTELLATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_MAGNITUDE, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_RIGHT_ASCENSION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_DECLINATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_ALTITUDE, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+
+            if ( starName, IndicatorLunar.DATA_MESSAGE ) in self.data:
+                displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_MESSAGE, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            else:
+                displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+                displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
         else:
             iter = displayTagsStore.get_iter_first()
             while iter is not None:
@@ -1990,7 +2043,7 @@ class IndicatorLunar:
         self.satelliteMenuText = IndicatorLunar.SATELLITE_MENU_TEXT_DEFAULT
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
         self.satelliteNotificationSummary = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT
-        self.satelliteOnClickURL = "http://www.n2yo.com/satellite/?s=" + IndicatorLunar.SATELLITE_TAG_NUMBER
+        self.satelliteOnClickURL = IndicatorLunar.SATELLITE_ON_CLICK_URL
         self.satelliteTLEFile = ""
         self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
         self.satelliteTLEUseURL = True
@@ -2091,3 +2144,4 @@ class IndicatorLunar:
 
 
 if __name__ == "__main__": IndicatorLunar().main()
+#TODO Somehow alert the user when satellite data is refreshed if there are new satellites?  Maybe as a notification after each download/fileload?

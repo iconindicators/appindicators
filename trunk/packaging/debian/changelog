@@ -1,5 +1,11 @@
 indicator-lunar (1.0.53-1) precise; urgency=low
 
+  * Bug fix: When checking (adding) a planet in the preferences, the
+    magnitude, right ascension, declination, azimuth and altitude were
+    omitted from indicator text tags table.
+  * Bug fix: When checking (adding) a star in the preferences, the
+    constellation, rise time and set time were omitted from indicator text
+    tags table.
   * Satellite notification now includes the rise time, set time and set azimuth.
   * The URL which is opened on satellite selection is now configurable.
   * Redesign of preferences dialog to handle additional options.
