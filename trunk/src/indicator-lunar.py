@@ -1352,7 +1352,6 @@ class IndicatorLunar:
         box.pack_start( TLEURLText, True, True, 0 )
 
         fetch = Gtk.Button( "Fetch" )
-        fetch.connect( "clicked", self.onFetch, TLEURLText )
         fetch.set_tooltip_text( "Download the TLE data from the specified URL.\nIf the URL is empty, the default URL will be used." )
         box.pack_start( fetch, False, False, 0 )
 
@@ -1380,7 +1379,6 @@ class IndicatorLunar:
         box.pack_start( TLEFileText, True, True, 0 )
 
         browseButton = Gtk.Button( "Browse" )
-        browseButton.connect( "clicked", self.onBrowseTLEFile, TLEFileText )
         browseButton.set_sensitive( not self.satelliteTLEUseURL )
         browseButton.set_tooltip_text( "Specify the TLE file." )
         box.pack_start( browseButton, False, False, 0 )
@@ -1438,68 +1436,41 @@ class IndicatorLunar:
 
         notebook.append_page( box, Gtk.Label( "Planets / Stars" ) )
 
-
+        # Satellites.
+        box = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 0 ) # Bug in Python - must specify the parameter names!
 
         label = Gtk.Label()
         label.set_halign( Gtk.Align.CENTER )
-        if len( self.satelliteTLEData ) == 0: # No TLE data...
-            object = label
-        else
-            object = scrollWindow
 
+        satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
 
-        # Satellites.
-        if len( self.satelliteTLEData ) == 0: # No TLE data...
-            if self.satelliteTLEUseURL:
-                if self.satelliteTLEURL is None or len( self.satelliteTLEURL ) == 0:
-                    message = "No URL specified to download the satellite TLE data."
-                else:
-                    message = "Unable to download the satellite TLE data.\n\nEnsure <a href=\'" + self.satelliteTLEURL + "'>" + self.satelliteTLEURL + "</a> is available."
-            else:
-                if self.satelliteTLEFile is None or len( self.satelliteTLEFile ) == 0:
-                    message = "No TLD data file specified."
-                else:
-                    message = "Unable to read the TLE data file\n\nEnsure " + self.satelliteTLEFile + " is available."
+        satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
+        satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
-            label = Gtk.Label()
-            label.set_markup( message )
-            label.set_halign( Gtk.Align.CENTER )
-            object = label
-        else:
-#TODO Test with a bad/ugly data file?
-            satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
-            for key in self.satelliteTLEData:
-                satelliteTLE = self.satelliteTLEData[ key ]
-                satelliteStore.append(
-                    [ ( satelliteTLE.getName(), satelliteTLE.getNumber() ) in self.satellites,
-                    satelliteTLE.getName(),
-                    satelliteTLE.getNumber(),
-                    satelliteTLE.getInternationalDesignator() ] )
+        tree = Gtk.TreeView( satelliteStoreSort )
 
-            satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
-            satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
+        renderer_toggle = Gtk.CellRendererToggle()
+        renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
+        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
 
-            tree = Gtk.TreeView( satelliteStoreSort )
+        tree.append_column( Gtk.TreeViewColumn( "Satellite", Gtk.CellRendererText(), text = 1 ) )
+        tree.append_column( Gtk.TreeViewColumn( "Number", Gtk.CellRendererText(), text = 2 ) )
+        tree.append_column( Gtk.TreeViewColumn( "International Designator", Gtk.CellRendererText(), text = 3 ) )
 
-            renderer_toggle = Gtk.CellRendererToggle()
-            renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
-            tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
+        tree.set_tooltip_text( "Check a satellite, station or rocket body to display in the menu." )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
-            tree.append_column( Gtk.TreeViewColumn( "Satellite", Gtk.CellRendererText(), text = 1 ) )
-            tree.append_column( Gtk.TreeViewColumn( "Number", Gtk.CellRendererText(), text = 2 ) )
-            tree.append_column( Gtk.TreeViewColumn( "International Designator", Gtk.CellRendererText(), text = 3 ) )
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+        scrolledWindow.add( tree )
 
-            tree.set_tooltip_text( "Check a satellite, station or rocket body to display in the menu." )
-            tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        notebook.append_page( box, Gtk.Label( "Satellites" ) )
 
-            scrolledWindow = Gtk.ScrolledWindow()
-            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-            scrolledWindow.set_hexpand( True )
-            scrolledWindow.set_vexpand( True )
-            scrolledWindow.add( tree )
-            object = scrolledWindow
-
-        notebook.append_page( object, Gtk.Label( "Satellites" ) )
+        self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore )
+        fetch.connect( "clicked", self.onFetch, TLEURLText, label, scrolledWindow, box, satelliteStore, notebook )
+        browseButton.connect( "clicked", self.onBrowseTLEFile, TLEFileText, label, scrolledWindow, box, satelliteStore, notebook )
 
         # OSD (satellite and full moon).
         grid = Gtk.Grid()
@@ -1847,22 +1818,25 @@ class IndicatorLunar:
         self.dialog = None
 
 
-    def populateSatellitePreferencesTab( self, label, scrolledWindow, satelliteStore ):
+    def updateSatellitePreferencesTab( self, label, scrolledWindow, box, satelliteStore ):
         if len( self.satelliteTLEData ) == 0: # No TLE data...
             if self.satelliteTLEUseURL:
                 if self.satelliteTLEURL is None or len( self.satelliteTLEURL ) == 0:
-                    message = "No URL specified to download the satellite TLE data."
+                    label.set_markup( "No URL specified to download the satellite TLE data." )
                 else:
-                    message = "Unable to download the satellite TLE data.\n\nEnsure <a href=\'" + self.satelliteTLEURL + "'>" + self.satelliteTLEURL + "</a> is available."
+                    label.set_markup( "Unable to download the satellite TLE data.\n\nEnsure <a href=\'" + self.satelliteTLEURL + "'>" + self.satelliteTLEURL + "</a> is available." )
             else:
                 if self.satelliteTLEFile is None or len( self.satelliteTLEFile ) == 0:
-                    message = "No TLD data file specified."
+                    label.set_markup( "No TLD data file specified." )
                 else:
-                    message = "Unable to read the TLE data file\n\nEnsure " + self.satelliteTLEFile + " is available."
+                    label.set_markup( "Unable to read the TLE data file\n\nEnsure " + self.satelliteTLEFile + " is available." )
 
-            label.set_markup( message )
-            label.show()
-            scrolledWindow.hide()
+            if label not in box.get_children():
+                box.pack_start( label, False, False, 0 )
+
+            if scrolledWindow in box.get_children():
+                box.remove( scrolledWindow, True, True, 0 )
+
         else:
 #TODO Test with a bad/ugly data file?
             satelliteStore.clear()
@@ -1874,8 +1848,11 @@ class IndicatorLunar:
                     satelliteTLE.getNumber(),
                     satelliteTLE.getInternationalDesignator() ] )
 
-            scrolledWindow.show()
-            label.hide()
+            if scrolledWindow not in box.get_children():
+                box.pack_start( scrolledWindow, True, True, 0 )
+
+            if label in box.get_children():
+                box.remove( label )
 
 
     def onIndicatorTextTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
@@ -1886,16 +1863,18 @@ class IndicatorLunar:
     def onResetSatelliteOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_ON_CLICK_URL )
 
 
-    def onFetch( self, button, textEntry ):
-        if textEntry.get_text().strip() == "":
-            textEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
+    def onFetch( self, button, TLEURLtTextEntry, label, scrolledWindow, box, satelliteStore, notebook ):
+        if TLEURLtTextEntry.get_text().strip() == "":
+            TLEURLtTextEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
+        self.satelliteTLEUseURL = True
+        self.satelliteTLEURL = TLEURLtTextEntry.get_text().strip()
         self.getSatelliteTLEData()
-        
+        self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore )
         notebook.set_current_page( 3 )
 
 
-    def onBrowseTLEFile( self, browseButton, TLEFileText ):
+    def onBrowseTLEFile( self, browseButton, TLEFileTextEntry, label, scrolledWindow, box, satelliteStore, notebook ):
         dialog = Gtk.FileChooserDialog(
                     "Choose a TLE data file",
                     self.dialog,
@@ -1903,10 +1882,15 @@ class IndicatorLunar:
                     ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
         dialog.set_transient_for( self.dialog )
         dialog.set_modal( True ) # TODO https://bugs.launchpad.net/ubuntu/+source/overlay-scrollbar/+bug/903302
-        dialog.set_filename( TLEFileText.get_text() )
+        dialog.set_filename( TLEFileTextEntry.get_text() )
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            TLEFileText.set_text( dialog.get_filename() )
+            TLEFileTextEntry.set_text( dialog.get_filename() )
+            self.satelliteTLEUseURL = False
+            self.satelliteTLEFile = dialog.get_filename()
+            self.getSatelliteTLEData()
+            self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore )
+            notebook.set_current_page( 3 )
 
         dialog.destroy()
 
@@ -2038,7 +2022,6 @@ class IndicatorLunar:
             if self.satelliteTLEUseURL:
                 data = urlopen( self.satelliteTLEURL ).read().decode( "utf8" ).splitlines()
             else:
-                print( self.satelliteTLEFile)
                 with open( self.satelliteTLEFile, "rt" ) as f: data = f.read().splitlines()
  
             for i in range( 0, len( data ), 3 ):
