@@ -203,8 +203,7 @@ class IndicatorLunar:
             os.remove( file )
 
         self.loadSettings()
-        self.getSatelliteTLEData()
-
+        self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile )
         Notify.init( IndicatorLunar.NAME )
 
         self.indicator = AppIndicator3.Indicator.new( IndicatorLunar.NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
@@ -227,7 +226,7 @@ class IndicatorLunar:
 
         # Update the satellite TLE data at most every 12 hours.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
-            self.getSatelliteTLEData()
+            self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile )
 
         ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
 
@@ -571,6 +570,12 @@ class IndicatorLunar:
 
         # Parse the menu text to replace tags with values...
         menuTextAndSatelliteKeys = [ ]
+        #TODO Getting a key error in the replace lines...
+        # I added the file 2012-044.txt and then the indicator did it's update...
+        # Maybe the key is busted?
+        # Might be because the list of satellites I've checked has not been updated to reflect the new TLE (which has a different source of satellites)...
+        #...if that's the case, when clicking ok on the preferences, need to verify each checked satellite against the new tle.
+        # More deep...if the preferences are open and the TLE has been changed, then the check for satellites (here) must still occur.
         for key in self.satellites:
             menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, key[ 0 ] ) \
                         .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ) \
@@ -1468,9 +1473,9 @@ class IndicatorLunar:
 
         notebook.append_page( box, Gtk.Label( "Satellites" ) )
 
-        self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore )
-        fetch.connect( "clicked", self.onFetch, TLEURLText, label, scrolledWindow, box, satelliteStore, notebook )
-        browseButton.connect( "clicked", self.onBrowseTLEFile, TLEFileText, label, scrolledWindow, box, satelliteStore, notebook )
+        self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore, self.satelliteTLEData, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip() )
+        fetch.connect( "clicked", self.onFetch, TLEURLText, label, scrolledWindow, box, satelliteStore, notebook, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip() )
+        browseButton.connect( "clicked", self.onBrowseTLEFile, TLEFileText, label, scrolledWindow, box, satelliteStore, notebook, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip() )
 
         # OSD (satellite and full moon).
         grid = Gtk.Grid()
@@ -1818,18 +1823,18 @@ class IndicatorLunar:
         self.dialog = None
 
 
-    def updateSatellitePreferencesTab( self, label, scrolledWindow, box, satelliteStore ):
-        if len( self.satelliteTLEData ) == 0: # No TLE data...
-            if self.satelliteTLEUseURL:
-                if self.satelliteTLEURL is None or len( self.satelliteTLEURL ) == 0:
+    def updateSatellitePreferencesTab( self, label, scrolledWindow, box, satelliteStore, satelliteTLEData, useURL, url, file ):
+        if len( satelliteTLEData ) == 0: # No TLE data...
+            if useURL:
+                if url is None or len( url ) == 0:
                     label.set_markup( "No URL specified to download the satellite TLE data." )
                 else:
-                    label.set_markup( "Unable to download the satellite TLE data.\n\nEnsure <a href=\'" + self.satelliteTLEURL + "'>" + self.satelliteTLEURL + "</a> is available." )
+                    label.set_markup( "Unable to download the satellite TLE data.\n\nEnsure <a href=\'" + url + "'>" + url + "</a> is available." )
             else:
-                if self.satelliteTLEFile is None or len( self.satelliteTLEFile ) == 0:
+                if file is None or len( file ) == 0:
                     label.set_markup( "No TLD data file specified." )
                 else:
-                    label.set_markup( "Unable to read the TLE data file\n\nEnsure " + self.satelliteTLEFile + " is available." )
+                    label.set_markup( "Unable to read the TLE data file\n\nEnsure " + file + " is available." )
 
             if label not in box.get_children():
                 box.pack_start( label, False, False, 0 )
@@ -1840,8 +1845,8 @@ class IndicatorLunar:
         else:
 #TODO Test with a bad/ugly data file?
             satelliteStore.clear()
-            for key in self.satelliteTLEData:
-                satelliteTLE = self.satelliteTLEData[ key ]
+            for key in satelliteTLEData:
+                satelliteTLE = satelliteTLEData[ key ]
                 satelliteStore.append(
                     [ ( satelliteTLE.getName(), satelliteTLE.getNumber() ) in self.satellites,
                     satelliteTLE.getName(),
@@ -1863,18 +1868,18 @@ class IndicatorLunar:
     def onResetSatelliteOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_ON_CLICK_URL )
 
 
-    def onFetch( self, button, TLEURLtTextEntry, label, scrolledWindow, box, satelliteStore, notebook ):
+    def onFetch( self, button, TLEURLtTextEntry, label, scrolledWindow, box, satelliteStore, notebook, useURL, url, file ):
         if TLEURLtTextEntry.get_text().strip() == "":
             TLEURLtTextEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
         self.satelliteTLEUseURL = True
         self.satelliteTLEURL = TLEURLtTextEntry.get_text().strip()
-        self.getSatelliteTLEData()
-        self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore )
+        satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile )
+        self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore, satelliteTLEData, useURL, url, file )
         notebook.set_current_page( 3 )
 
 
-    def onBrowseTLEFile( self, browseButton, TLEFileTextEntry, label, scrolledWindow, box, satelliteStore, notebook ):
+    def onBrowseTLEFile( self, browseButton, TLEFileTextEntry, label, scrolledWindow, box, satelliteStore, notebook, useURL, url, file ):
         dialog = Gtk.FileChooserDialog(
                     "Choose a TLE data file",
                     self.dialog,
@@ -1888,8 +1893,8 @@ class IndicatorLunar:
             TLEFileTextEntry.set_text( dialog.get_filename() )
             self.satelliteTLEUseURL = False
             self.satelliteTLEFile = dialog.get_filename()
-            self.getSatelliteTLEData()
-            self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore )
+            satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile )
+            self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore, satelliteTLEData, useURL, url, file )
             notebook.set_current_page( 3 )
 
         dialog.destroy()
@@ -1991,17 +1996,17 @@ class IndicatorLunar:
     def onSatelliteToggled( self, widget, path, satelliteStore, displayTagsStore, satelliteStoreSort ):
         childPath = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) ) # Convert sorted model index to underlying (child) model index.
         satelliteStore[ childPath ][ 0 ] = not satelliteStore[ childPath ][ 0 ]
-        key = self.getSatelliteKey( satelliteStore[ childPath ][ 1 ].upper(), satelliteStore[ childPath ][ 2 ] )
+        satelliteNameNumber = satelliteStore[ childPath ][ 1 ].upper() + " " + satelliteStore[ childPath ][ 2 ] + " "
 
         if satelliteStore[ childPath ][ 2 ]:
-            displayTagsStore.append( [ key + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ key + IndicatorLunar.DATA_RISE_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ key + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ key + IndicatorLunar.DATA_SET_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_RISE_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_SET_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
         else:
             iter = displayTagsStore.get_iter_first()
             while iter is not None:
-                if displayTagsStore[ iter ][ 0 ].startswith( key ):
+                if displayTagsStore[ iter ][ 0 ].startswith( satelliteNameNumber ):
                     if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
                 else:
                     iter = displayTagsStore.iter_next( iter )
@@ -2037,6 +2042,32 @@ class IndicatorLunar:
                 logging.error( "Error reading satellite TLE data from " + str( self.satelliteTLEFile ) )
 
         self.lastUpdateTLE = datetime.datetime.now()
+
+
+    def getSatelliteTLEData( self, useURL, url, file ):
+        try:
+            satelliteTLEData = { } # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
+            if useURL:
+                data = urlopen( url ).read().decode( "utf8" ).splitlines()
+            else:
+                with open( file, "rt" ) as f: data = f.read().splitlines()
+ 
+            for i in range( 0, len( data ), 3 ):
+                tle = satellite.TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
+                satelliteTLEData[ ( tle.getName(), tle.getNumber() ) ] = tle
+
+        except Exception as e:
+            satelliteTLEData = { } # Empty data indicates error.
+            logging.exception( e )
+            if url:
+                logging.error( "Error downloading satellite TLE data from " + str( url ) )
+            else:
+                logging.error( "Error reading satellite TLE data from " + str( file ) )
+
+#TODO Only want to do this on an official update.
+        self.lastUpdateTLE = datetime.datetime.now()
+
+        return satelliteTLEData
 
 
     def getDefaultCity( self ):
