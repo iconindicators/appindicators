@@ -9,7 +9,9 @@ indicator-lunar (1.0.53-1) precise; urgency=low
   * Satellite notification now includes the rise time, set time and set azimuth.
   * The URL which is opened on satellite selection is now configurable.
   * Can now specify the TLE data source - either a URL or file.
-  * Redesign of preferences dialog to handle additional options.
+  * Can now sort satellites by rise date/time.
+  * Removed satellite subsequent pass information.
+  * Redesign of preferences dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 12 Sep 2014 15:55:26 +1000
 
