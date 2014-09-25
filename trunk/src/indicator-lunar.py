@@ -885,7 +885,7 @@ class IndicatorLunar:
             if ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.dataPrevious: # ...assume the rest of the data is also present!
                 # If visible passes are wanted but the previous data pass was not visible, need to recalculate (all other scenarios the data is good).
                 if not self.onlyShowVisibleSatellitePasses or \
-                    ( self.onlyShowVisibleSatellitePasses and dataPrevious[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == "True" ):
+                    ( self.onlyShowVisibleSatellitePasses and self.dataPrevious[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == "True" ):
 
                     self.nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
                     self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
@@ -1757,8 +1757,6 @@ class IndicatorLunar:
             self.satelliteTLEURL = TLEURLText.get_text().strip()
             self.satelliteTLEFile = TLEFileText.get_text().strip()
 
-#TODO Test when hitting OK and the TLE URL is empty that the default URL is substituted.
-
 #TODO If the TLE data has changed and the user hits ok, need to update the TLE data update date/time (only for URL mode).
 #In fact, the auto update of TLEs every 12 hours should only happen for URLs...or should it?
             self.planets = [ ]
@@ -2198,3 +2196,5 @@ if __name__ == "__main__": IndicatorLunar().main()
 #TODO If the indicator after 12 hours tries to reload the TLE url/file and fails, do we nuke the existing TLE data...or keep it?
 #Is there a way to let the user know there was a failure?
 #Make an option to allow the user how often to do the update/check?
+
+#TODO On startup, if the TLE data load fails, fire a notification?
