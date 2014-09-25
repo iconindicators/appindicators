@@ -71,13 +71,13 @@ class IndicatorLunar:
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
 
-    SETTINGS_ALLOW_SATELLITE_MENU_ITEMS_TO_LAUNCH_BROWSER = "allowSatelliteMenuItemsToLaunchBrowser"
     SETTINGS_CITY_ELEVATION = "cityElevation"
     SETTINGS_CITY_LATITUDE = "cityLatitude"
     SETTINGS_CITY_LONGITUDE = "cityLongitude"
     SETTINGS_CITY_NAME = "cityName"
     SETTINGS_INDICATOR_TEXT = "indicatorText"
     SETTINGS_ONLY_SHOW_VISIBLE_SATELLITE_PASSES = "onlyShowVisibleSatellitePasses"
+    SETTINGS_OPEN_BROWSER_ON_SATELLITE_SELECTION = "openBrowserOnSatelliteSelection"
     SETTINGS_PLANETS = "planets"
     SETTINGS_SATELLITE_MENU_TEXT = "satelliteMenuText"
     SETTINGS_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
@@ -655,7 +655,7 @@ class IndicatorLunar:
 
 
     def addOnSatelliteHandler( self, subMenu, key ):
-        if self.allowSatelliteMenuItemsToLaunchBrowser:
+        if self.openBrowserOnSatelliteSelection:
             for child in subMenu.get_children():
                 child.set_name( str( key ) ) # Cannot pass the tuple - must be a string.
                 child.connect( "activate", self.onSatellite )
@@ -1145,8 +1145,7 @@ class IndicatorLunar:
         return iconName + "-2"
 
 
-    def getIconFile( self ):
-        return os.getenv( "HOME" ) + "/" + self.getIconName() + ".svg"
+    def getIconFile( self ): return os.getenv( "HOME" ) + "/" + self.getIconName() + ".svg"
 
 
     # Hideous workaround because setting the icon with the same name does not change the icon any more.
@@ -1284,7 +1283,7 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 2, 1, 1 )
 
-        sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( "Sort satellites by date/time" )
+        sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( "Sort satellites by rise date/time" )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 20 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
         sortSatellitesByDateTimeCheckbox.set_tooltip_text( "Satellites are sorted alphabetically by menu text.\nIf checked, satellites will be sorted by rise date/time." )
@@ -1296,15 +1295,15 @@ class IndicatorLunar:
         onlyShowVisibleSatellitePassesCheckbox.set_tooltip_text( "If checked, only satellites with a visible pass are displayed.\nBy default, all passes, visible or not, are shown (including error messages)." )
         grid.attach( onlyShowVisibleSatellitePassesCheckbox, 0, 4, 1, 1 )
 
-        allowSatelliteMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Open browser on satellite selection" )
-        allowSatelliteMenuItemsToLaunchBrowserCheckbox.set_active( self.allowSatelliteMenuItemsToLaunchBrowser )
-        allowSatelliteMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking any of a satellite's child items\nwill open the URL below for that satellite." )
-        allowSatelliteMenuItemsToLaunchBrowserCheckbox.set_margin_top( 20 )
-        grid.attach( allowSatelliteMenuItemsToLaunchBrowserCheckbox, 0, 5, 1, 1 )
+        openBrowserOnSatelliteSelectionCheckbox = Gtk.CheckButton( "Open browser on satellite selection" )
+        openBrowserOnSatelliteSelectionCheckbox.set_active( self.openBrowserOnSatelliteSelection )
+        openBrowserOnSatelliteSelectionCheckbox.set_tooltip_text( "Clicking any of a satellite's child items\nwill open the URL below for that satellite." )
+        openBrowserOnSatelliteSelectionCheckbox.set_margin_top( 20 )
+        grid.attach( openBrowserOnSatelliteSelectionCheckbox, 0, 5, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_left( 25 )
-        box.set_sensitive( allowSatelliteMenuItemsToLaunchBrowserCheckbox.get_active() )
+        box.set_sensitive( openBrowserOnSatelliteSelectionCheckbox.get_active() )
 
         label = Gtk.Label( "URL" )
         label.set_halign( Gtk.Align.START )
@@ -1327,7 +1326,7 @@ class IndicatorLunar:
         reset.set_tooltip_text( "Reset the satellite 'on click' URL to factory default." )
         box.pack_start( reset, False, False, 0 )
 
-        allowSatelliteMenuItemsToLaunchBrowserCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteURLText )
+        openBrowserOnSatelliteSelectionCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteURLText )
 
         grid.attach( box, 0, 6, 1, 1 )
 
@@ -1364,11 +1363,6 @@ class IndicatorLunar:
         radioTLEFromFile = Gtk.RadioButton.new_with_label_from_widget( radioTLEFromURL, "File" )
         radioTLEFromFile.set_active( not self.satelliteTLEUseURL )
         box.pack_start( radioTLEFromFile, False, False, 0 )
-
-# TODO
-# self.satelliteTLEFile
-# self.satelliteTLEURL
-# must be set to "" not None
 
         TLEFileText = Gtk.Entry()
         TLEFileText.set_text( self.satelliteTLEFile )
@@ -1465,11 +1459,11 @@ class IndicatorLunar:
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( tree )
 
-        notebook.append_page( box, Gtk.Label( "Satellites" ) )
-
         self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore, self.satelliteTLEData, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip() )
         fetch.connect( "clicked", self.onFetch, TLEURLText, label, scrolledWindow, box, satelliteStore, notebook, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip(), displayTagsStore )
         browseButton.connect( "clicked", self.onBrowseTLEFile, TLEFileText, label, scrolledWindow, box, satelliteStore, notebook, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip(), displayTagsStore )
+
+        notebook.append_page( box, Gtk.Label( "Satellites" ) )
 
         # OSD (satellite and full moon).
         grid = Gtk.Grid()
@@ -1708,14 +1702,13 @@ class IndicatorLunar:
                 satelliteMenuText.grab_focus()
                 continue
 
-            if allowSatelliteMenuItemsToLaunchBrowserCheckbox.get_active() and satelliteURLText.get_text().strip() == "":
+            if openBrowserOnSatelliteSelectionCheckbox.get_active() and satelliteURLText.get_text().strip() == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Satellite 'on-click' URL cannot be empty." )
                 notebook.set_current_page( 1 )
                 satelliteURLText.grab_focus()
                 continue
 
-            if radioTLEFromURL.get_active() and TLEURLText.get_text().strip() == "":
-                TLEURLText.set_text( IndicatorLunar.SATELLITE_TLE_URL )
+            if TLEURLText.get_text().strip() == "": TLEURLText.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
             if radioTLEFromFile.get_active() and TLEFileText.get_text().strip() == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Satellite TLE file cannot be empty." )
@@ -1726,43 +1719,43 @@ class IndicatorLunar:
             cityValue = city.get_active_text()
             if cityValue == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "City cannot be empty." )
-                notebook.set_current_page( 7 )
+                notebook.set_current_page( 6 )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
             if latitudeValue == "" or not pythonutils.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Latitude must be a number between 90 and -90 inclusive." )
-                notebook.set_current_page( 7 )
+                notebook.set_current_page( 6 )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
             if longitudeValue == "" or not pythonutils.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Longitude must be a number between 180 and -180 inclusive." )
-                notebook.set_current_page( 7 )
+                notebook.set_current_page( 6 )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
             if elevationValue == "" or not pythonutils.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Elevation must be a number number between 0 and 10000 inclusive." )
-                notebook.set_current_page( 7 )
+                notebook.set_current_page( 6 )
                 elevation.grab_focus()
                 continue
 
-            self.indicatorText = indicatorText.get_text()
+            self.indicatorText = indicatorText.get_text().strip()
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
-            self.satelliteMenuText = satelliteMenuText.get_text()
+            self.satelliteMenuText = satelliteMenuText.get_text().strip()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.onlyShowVisibleSatellitePasses = onlyShowVisibleSatellitePassesCheckbox.get_active()
-            self.allowSatelliteMenuItemsToLaunchBrowser = allowSatelliteMenuItemsToLaunchBrowserCheckbox.get_active()
-            self.satelliteOnClickURL = satelliteURLText.get_text()
+            self.openBrowserOnSatelliteSelection = openBrowserOnSatelliteSelectionCheckbox.get_active()
+            self.satelliteOnClickURL = satelliteURLText.get_text().strip()
             self.satelliteTLEUseURL = radioTLEFromURL.get_active()
-            self.satelliteTLEURL = TLEURLText.get_text()
-            self.satelliteTLEFile = TLEFileText.get_text()
+            self.satelliteTLEURL = TLEURLText.get_text().strip()
+            self.satelliteTLEFile = TLEFileText.get_text().strip()
 
 #TODO Test when hitting OK and the TLE URL is empty that the default URL is substituted.
 
@@ -1776,6 +1769,8 @@ class IndicatorLunar:
             for starInfo in starStore:
                 if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
 
+#TODO Needs to get the satellite data from the TLE which is either current, or downloaded/read in.
+#Need to keep whatever TLE data is current (existing or newly downloaded/read in) AND which satellites are checked (from the satellite table store).
             if len( self.satelliteTLEData ) == 0:
                 # No satellite TLE data exists (due to a download error).
                 # Fudge the last update to be in the past to force a download/reload.
@@ -1787,8 +1782,8 @@ class IndicatorLunar:
                     if satelliteTLE[ 0 ]: self.satellites.append( ( satelliteTLE[ 1 ], satelliteTLE[ 2 ] ) )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
-            self.satelliteNotificationSummary = satelliteNotificationSummaryText.get_text() 
-            self.satelliteNotificationMessage = pythonutils.getTextViewText( satelliteNotificationMessageText ) 
+            self.satelliteNotificationSummary = satelliteNotificationSummaryText.get_text()
+            self.satelliteNotificationMessage = pythonutils.getTextViewText( satelliteNotificationMessageText )
 
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
@@ -2090,7 +2085,7 @@ class IndicatorLunar:
 
     def loadSettings( self ):
         self.getDefaultCity()
-        self.allowSatelliteMenuItemsToLaunchBrowser = True
+        self.openBrowserOnSatelliteSelection = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.onlyShowVisibleSatellitePasses = False
         self.satelliteMenuText = IndicatorLunar.SATELLITE_MENU_TEXT_DEFAULT
@@ -2127,7 +2122,7 @@ class IndicatorLunar:
                 cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
 
-                self.allowSatelliteMenuItemsToLaunchBrowser = settings.get( IndicatorLunar.SETTINGS_ALLOW_SATELLITE_MENU_ITEMS_TO_LAUNCH_BROWSER, self.allowSatelliteMenuItemsToLaunchBrowser )
+                self.openBrowserOnSatelliteSelection = settings.get( IndicatorLunar.SETTINGS_OPEN_BROWSER_ON_SATELLITE_SELECTION, self.openBrowserOnSatelliteSelection )
                 self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
                 self.onlyShowVisibleSatellitePasses = settings.get( IndicatorLunar.SETTINGS_ONLY_SHOW_VISIBLE_SATELLITE_PASSES, self.onlyShowVisibleSatellitePasses )
                 self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
@@ -2167,7 +2162,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
                 IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
-                IndicatorLunar.SETTINGS_ALLOW_SATELLITE_MENU_ITEMS_TO_LAUNCH_BROWSER: self.allowSatelliteMenuItemsToLaunchBrowser,
+                IndicatorLunar.SETTINGS_OPEN_BROWSER_ON_SATELLITE_SELECTION: self.openBrowserOnSatelliteSelection,
                 IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
                 IndicatorLunar.SETTINGS_ONLY_SHOW_VISIBLE_SATELLITE_PASSES: self.onlyShowVisibleSatellitePasses,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
@@ -2199,7 +2194,7 @@ class IndicatorLunar:
 
 
 if __name__ == "__main__": IndicatorLunar().main()
-#TODO Somehow alert the user when satellite data is refreshed if there are new satellites?  Maybe as a notification after each download/fileload?
-#TODO On default, check all planets?
-#TODO On default, check all stars?
-#TODO On default, check all satellites?
+
+#TODO If the indicator after 12 hours tries to reload the TLE url/file and fails, do we nuke the existing TLE data...or keep it?
+#Is there a way to let the user know there was a failure?
+#Make an option to allow the user how often to do the update/check?
