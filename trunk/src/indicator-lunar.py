@@ -213,6 +213,7 @@ class IndicatorLunar:
 
 
     def main( self ):
+        self.noTLENotification()
         self.update()
         Gtk.main()
 
@@ -326,6 +327,12 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime )
 
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+
+
+#TODO Need this?
+    def noTLENotification( self ): 
+        Notify.Notification.new( "summary", "message", "dialog-warning" ).show()
+        Notify.Notification.new( "summary", "message", "dialog-error" ).show()
 
 
     def updateIcon( self, ephemNow, lunarIlluminationPercentage ):
@@ -1710,6 +1717,8 @@ class IndicatorLunar:
 
             if TLEURLText.get_text().strip() == "": TLEURLText.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
+#TODO Maybe allow empty...and that means satellites are disabled?
+#If so need a tooltip to tell the user.
             if radioTLEFromFile.get_active() and TLEFileText.get_text().strip() == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Satellite TLE file cannot be empty." )
                 notebook.set_current_page( 1 )
@@ -1767,10 +1776,12 @@ class IndicatorLunar:
             for starInfo in starStore:
                 if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
 
-#TODO Needs to get the satellite data from the TLE which is either current, or downloaded/read in.
-#Need to keep whatever TLE data is current (existing or newly downloaded/read in) AND which satellites are checked (from the satellite table store).
+#TODO Need to figure out how to save the satellites...also how can a user opt out of the satellite stuff?
+#Think more about the satellite process...
+            self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile, True )
             if len( self.satelliteTLEData ) == 0:
-                # No satellite TLE data exists (due to a download error).
+
+                # No satellite TLE data exists - so set the  (due to a download error).
                 # Fudge the last update to be in the past to force a download/reload.
                 # Don't initialise the list of satellites the user has chosen as this data is still valid despite a failed download/reload.
                 self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 )
