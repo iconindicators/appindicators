@@ -696,9 +696,8 @@ class IndicatorLunar:
         self.updateEclipse( ephemNow, IndicatorLunar.BODY_MOON )
 
 
-    # References:
-    #    http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
-    #    http://www.ga.gov.au/geodesy/astro/sunrise.jsp
+    # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
+    # http://www.ga.gov.au/geodesy/astro/sunrise.jsp
     def updateSun( self, ephemNow ):
         city = self.getCity( ephemNow )
         sun = ephem.Sun( city )
@@ -1128,10 +1127,7 @@ class IndicatorLunar:
 
     def getIconName( self ):
         iconName = "." + IndicatorLunar.NAME + "-illumination-icon"
-
-        if IndicatorLunar.ICON_STATE: return iconName + "-1"
-
-        return iconName + "-2"
+        return ( iconName + "-1" ) if IndicatorLunar.ICON_STATE else ( iconName + "-2" )
 
 
     def getIconFile( self ): return os.getenv( "HOME" ) + "/" + self.getIconName() + ".svg"
