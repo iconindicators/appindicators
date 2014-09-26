@@ -47,7 +47,7 @@ class IndicatorLunar:
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
     VERSION = "1.0.53"
-    ICON_STATE = True # Needed as a workaround for https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
+    ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -66,7 +66,7 @@ class IndicatorLunar:
     ABOUT_CREDIT_TROPICAL_SIGN = "Tropical Sign by Ignius Drake."
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE ]
 
-    DISPLAY_NEEDS_REFRESH = "(needs refresh)"  #TODO Is this needed...if so, is it used correctly?  Are tags missing?
+    DISPLAY_NEEDS_REFRESH = "(needs refresh)"
     INDENT = "    "
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
@@ -190,32 +190,25 @@ class IndicatorLunar:
 
     def __init__( self ):
         self.dialog = None
-        self.data = { }
-        self.dataPrevious = { }
-        self.satelliteNotifications = { }
 
         filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
-        self.lastFullMoonNotfication = ephem.Date( "2000/01/01" ) # Set a date way back in the past...
+        Notify.init( IndicatorLunar.NAME )
 
-        for file in glob.glob( os.getenv( "HOME" ) + "/." + IndicatorLunar.NAME + "*.svg" ):
-            os.remove( file )
+        self.lastFullMoonNotfication = ephem.Date( "2000/01/01" ) # Set a date way back in the past...
 
         self.loadSettings()
         self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile, True )
-        Notify.init( IndicatorLunar.NAME )
 
         self.indicator = AppIndicator3.Indicator.new( IndicatorLunar.NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_icon_theme_path( os.getenv( "HOME" ) )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-        self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
 
-
-    def main( self ):
-        self.noTLENotification()
         self.update()
-        Gtk.main()
+
+
+    def main( self ): Gtk.main()
 
 
 #TODO Should this be run in a thread?
@@ -232,12 +225,10 @@ class IndicatorLunar:
         ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
 
 #TODO Why is this done before the city is initialised?  Does it need to be done before the backend updates/calculations are done?
-        if self.showSatelliteNotification:
-            self.satelliteNotification( ephemNow )
+        self.satelliteNotification( ephemNow )
 
-        # Reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
-        self.dataPrevious = self.data
-        self.data = { }
+        self.dataPrevious = self.data # Used to access satellite pass information when a satellite is currently in transit.
+        self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
         self.data[ IndicatorLunar.DATA_CITY_NAME ] = self.cityName
 
         lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
@@ -252,17 +243,11 @@ class IndicatorLunar:
         self.updateSatellites( ephemNow )
 
         self.updateMenu( ephemNow, lunarPhase )
-
         self.updateIcon( ephemNow, lunarIlluminationPercentage )
+        self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
 
-        if self.showWerewolfWarning:
-            self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
-
-        # Work out when to do the next update...
-        # Need to pass an integer to GLib.timeout_add_seconds.
-        # Add a 10 second buffer because the update can occur slightly earlier (due to truncating the fractional time component).
         self.nextUpdates.sort()
-        nextUpdateInSeconds = int ( ( ephem.localtime( self.nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() ) + 10
+        nextUpdateInSeconds = int ( ( ephem.localtime( self.nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() ) + 10 # Add a 10 second buffer.
         if nextUpdateInSeconds < 60: # Ensure the update period is positive and not too frequent...
             nextUpdateInSeconds = 60
 
@@ -274,6 +259,8 @@ class IndicatorLunar:
 
 
     def satelliteNotification( self, ephemNow ):
+        if not self.showSatelliteNotification: return
+
         ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
 
 #TODO Test!!!
@@ -336,21 +323,18 @@ class IndicatorLunar:
 
 
     def updateIcon( self, ephemNow, lunarIlluminationPercentage ):
-        # For Ubuntu (Unity), an icon and label can co-exist - also, there is no tooltip. The icon is always to the right of the label.
-        # On Ubuntu 13.10 (might be a bug), an icon must be displayed, so if no icon tag is present, display a 1 pixel SVG.
-        #
-        # On non Unity (Lubuntu, etc), only an icon can be displayed - text is shown as a tooltip.
         parsedOutput = self.indicatorText
-#TODO Once the preferences are all fixed, make sure tags other than the default work too.
         for key in self.data.keys():
             parsedOutput = parsedOutput.replace( "[" + " ".join( key ) + "]", self.data[ key ] )
 
         self.createIcon( lunarIlluminationPercentage, self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), ephem.Moon( self.getCity( ephemNow ) ) ) )
         self.indicator.set_icon( self.getIconName() )
-        self.indicator.set_label( parsedOutput, "" ) # Second parameter is a guide for how wide the text could get (see label-guide in http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html).
+        self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
 
     def fullMoonNotification( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
+        if not self.showWerewolfWarning: return
+
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
@@ -361,10 +345,8 @@ class IndicatorLunar:
             phaseIsBetweenNewAndFullInclusive and \
             ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) <= ephemNow ):
 
-            # The notification summary text cannot be empty (at least on Unity).
             summary = self.werewolfWarningSummary
-            if self.werewolfWarningSummary == "":
-                summary = " "
+            if self.werewolfWarningSummary == "": summary = " " # The notification summary text cannot be empty (at least on Unity).
 
             Notify.Notification.new( summary, self.werewolfWarningMessage, self.getIconFile() ).show()
             self.lastFullMoonNotfication = ephemNow
@@ -390,7 +372,7 @@ class IndicatorLunar:
         menu.append( aboutMenuItem )
 
         quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        quitMenuItem.connect( "activate", Gtk.main_quit )
+        quitMenuItem.connect( "activate", self.onQuit )
         menu.append( quitMenuItem )
 
         self.indicator.set_menu( menu )
@@ -577,13 +559,9 @@ class IndicatorLunar:
 
         # Parse the menu text to replace tags with values...
         menuTextAndSatelliteKeys = [ ]
-        #TODO Getting a key error in the replace lines...
-        # I added the file 2012-044.txt and then the indicator did it's update...
-        # Maybe the key is busted?
-        # Might be because the list of satellites I've checked has not been updated to reflect the new TLE (which has a different source of satellites)...
-        #...if that's the case, when clicking ok on the preferences, need to verify each checked satellite against the new tle.
-        # More deep...if the preferences are open and the TLE has been changed, then the check for satellites (here) must still occur.
         for key in self.satellites:
+            if key not in self.satelliteTLEData: continue # User may have satellites from a previous run which are not in the current TLE data.
+
             menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, key[ 0 ] ) \
                         .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ) \
                         .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() )
@@ -694,7 +672,7 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] ) )
 
 
-    # Reference: http://www.ga.gov.au/geodesy/astro/moonrise.jsp
+    # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
     def updateMoon( self, ephemNow, lunarPhase ):
         city = self.getCity( ephemNow )
 
@@ -755,7 +733,7 @@ class IndicatorLunar:
         self.updateEclipse( ephemNow, IndicatorLunar.BODY_SUN )
 
 
-    # Reference http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
+    # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     def updatePlanets( self, ephemNow ):
         if len( self.planets ) == 0: return;
 
@@ -906,7 +884,7 @@ class IndicatorLunar:
             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
 
 
-    # Distinguishes visible passes from all passes...
+    # Determine if a satellite pass is visible or not...
     #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
     #    http://www.celestrak.com/columns/v03n01
     #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
@@ -959,9 +937,9 @@ class IndicatorLunar:
             self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] = eclipseInformation[ 1 ]
 
 
-    # Takes a float and converts to local time, trims off fractional seconds and returns a string.
-    def localiseAndTrim( self, pyEphemDateTime ):
-        localtimeString = str( ephem.localtime( pyEphemDateTime ) )
+    # Takes a float pyEphem DateTime and converts to local time, trims off fractional seconds and returns a string.
+    def localiseAndTrim( self, ephemDateTime ):
+        localtimeString = str( ephem.localtime( ephemDateTime ) )
         return localtimeString[ 0 : localtimeString.rfind( ":" ) + 3 ]
 
 
@@ -1160,6 +1138,13 @@ class IndicatorLunar:
     # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     # http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
     def toggleIconState( self ): IndicatorLunar.ICON_STATE = not IndicatorLunar.ICON_STATE
+
+
+    def onQuit( self, widget ):
+        for file in glob.glob( os.getenv( "HOME" ) + "/." + IndicatorLunar.NAME + "*.svg" ):
+            os.remove( file )
+
+        Gtk.main_quit()
 
 
     def onAbout( self, widget ):
@@ -1766,8 +1751,6 @@ class IndicatorLunar:
             self.satelliteTLEURL = TLEURLText.get_text().strip()
             self.satelliteTLEFile = TLEFileText.get_text().strip()
 
-#TODO If the TLE data has changed and the user hits ok, need to update the TLE data update date/time (only for URL mode).
-#In fact, the auto update of TLEs every 12 hours should only happen for URLs...or should it?
             self.planets = [ ]
             for planetInfo in planetStore:
                 if planetInfo[ 0 ]: self.planets.append( planetInfo[ 1 ] )
@@ -1776,19 +1759,10 @@ class IndicatorLunar:
             for starInfo in starStore:
                 if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
 
-#TODO Need to figure out how to save the satellites...also how can a user opt out of the satellite stuff?
-#Think more about the satellite process...
-            self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile, True )
-            if len( self.satelliteTLEData ) == 0:
-
-                # No satellite TLE data exists - so set the  (due to a download error).
-                # Fudge the last update to be in the past to force a download/reload.
-                # Don't initialise the list of satellites the user has chosen as this data is still valid despite a failed download/reload.
-                self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 )
-            else:
-                self.satellites = [ ]
-                for satelliteTLE in satelliteStore:
-                    if satelliteTLE[ 0 ]: self.satellites.append( ( satelliteTLE[ 1 ], satelliteTLE[ 2 ] ) )
+            self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Force the TLE data to be updated.
+            self.satellites = [ ]
+            for satelliteTLE in satelliteStore:
+                if satelliteTLE[ 0 ]: self.satellites.append( ( satelliteTLE[ 1 ], satelliteTLE[ 2 ] ) )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = satelliteNotificationSummaryText.get_text()
@@ -2093,6 +2067,10 @@ class IndicatorLunar:
 
 
     def loadSettings( self ):
+        self.data = { }
+        self.dataPrevious = { }
+        self.satelliteNotifications = { }
+
         self.getDefaultCity()
         self.openBrowserOnSatelliteSelection = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
