@@ -190,16 +190,19 @@ class IndicatorLunar:
 
     def __init__( self ):
         self.dialog = None
+        self.data = { }
+        self.dataPrevious = { }
+        self.satelliteNotifications = { }
 
         filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
         Notify.init( IndicatorLunar.NAME )
 
+        self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Set the last TLE update in the past so an update occurs. 
         self.lastFullMoonNotfication = ephem.Date( "2000/01/01" ) # Set a date way back in the past...
 
         self.loadSettings()
-        self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile, True )
 
         self.indicator = AppIndicator3.Indicator.new( IndicatorLunar.NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_icon_theme_path( os.getenv( "HOME" ) )
@@ -220,7 +223,7 @@ class IndicatorLunar:
 
         # Update the satellite TLE data at most every 12 hours.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
-            self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile, True )
+            self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile )
 
         ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
 
@@ -316,7 +319,8 @@ class IndicatorLunar:
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
 
-#TODO Need this?
+#TODO On startup, if the TLE data load fails, fire a notification?    
+# What about a notification when the TLE reload fails?
     def noTLENotification( self ): 
         Notify.Notification.new( "summary", "message", "dialog-warning" ).show()
         Notify.Notification.new( "summary", "message", "dialog-error" ).show()
@@ -1872,7 +1876,7 @@ class IndicatorLunar:
 
         self.satelliteTLEUseURL = True
         self.satelliteTLEURL = TLEURLTextEntry.get_text().strip()
-        satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile, False )
+        satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile )
         self.updateSatellitePreferencesTab( noTLELabel, satellitesScrolledWindow, box, satelliteStore, satelliteTLEData, TLESourceIsURL, url, file )
         self.updateDisplayTags( displayTagsStore, False, satelliteTLEData )
         notebook.set_current_page( 3 )
@@ -1892,7 +1896,7 @@ class IndicatorLunar:
             TLEFileTextEntry.set_text( dialog.get_filename() )
             self.satelliteTLEUseURL = False
             self.satelliteTLEFile = dialog.get_filename()
-            satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile, False )
+            satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile )
             self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore, satelliteTLEData, useURL, url, file )
             self.updateDisplayTags( displayTagsStore, False, satelliteTLEData )
             notebook.set_current_page( 3 )
@@ -2021,7 +2025,7 @@ class IndicatorLunar:
             elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
 
 
-    def getSatelliteTLEData( self, useURL, url, file, isRealUpdate ):
+    def getSatelliteTLEData( self, useURL, url, file ):
         try:
             satelliteTLEData = { } # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
             if useURL:
@@ -2040,8 +2044,6 @@ class IndicatorLunar:
                 logging.error( "Error downloading satellite TLE data from " + str( url ) )
             else:
                 logging.error( "Error reading satellite TLE data from " + str( file ) )
-
-        if isRealUpdate: self.lastUpdateTLE = datetime.datetime.now()
 
         return satelliteTLEData
 
@@ -2067,10 +2069,6 @@ class IndicatorLunar:
 
 
     def loadSettings( self ):
-        self.data = { }
-        self.dataPrevious = { }
-        self.satelliteNotifications = { }
-
         self.getDefaultCity()
         self.openBrowserOnSatelliteSelection = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
@@ -2181,9 +2179,3 @@ class IndicatorLunar:
 
 
 if __name__ == "__main__": IndicatorLunar().main()
-
-#TODO If the indicator after 12 hours tries to reload the TLE url/file and fails, do we nuke the existing TLE data...or keep it?
-#Is there a way to let the user know there was a failure?
-#Make an option to allow the user how often to do the update/check?
-
-#TODO On startup, if the TLE data load fails, fire a notification?
