@@ -187,6 +187,15 @@ class IndicatorLunar:
 
     INDICATOR_TEXT_DEFAULT = "[" + BODY_MOON + " " + DATA_PHASE + "]"
 
+    MESSAGE_BODY_ALWAYS_UP = "Always Up!"
+    MESSAGE_BODY_NEVER_UP = "Never Up!"
+    MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "Satellite is circumpolar."
+    MESSAGE_SATELLITE_NEVER_RISES = "Satellite never rises."
+    MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS = "No passes within the next 10 days."
+    MESSAGE_SATELLITE_NO_TLE_DATA = "No TLE data!"
+    MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = "Unable to compute next pass!"
+    MESSAGE_SATELLITE_VALUE_ERROR = "ValueError"
+
 
     def __init__( self ):
         self.dialog = None
@@ -214,11 +223,7 @@ class IndicatorLunar:
     def main( self ): Gtk.main()
 
 
-#TODO Should this be run in a thread?
-#If doing an update (particularly with show all satellite passes) the GUI locks up when updating.
-#Test this...do a print START with timestamp and print END with timestamp and see if the GUI is locked during the times.
     def update( self ):
-#         print( "Start:", ephem.now() )#TODO Remove
         self.toggleIconState()
 
         # Update the satellite TLE data at most every 12 hours.
@@ -258,7 +263,6 @@ class IndicatorLunar:
             nextUpdateInSeconds = ( 60 * 60 )
 
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
-#         print( "End:", ephem.now() )#TODO Remove
 
 
     def satelliteNotification( self, ephemNow ):
@@ -384,6 +388,12 @@ class IndicatorLunar:
 
 
     def updateMoonMenu( self, menu ):
+
+        if ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_MESSAGE ) in self.data and \
+            self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
+            self.hideBodyIfNeverUp:
+            return
+
         menuItem = Gtk.MenuItem( "Moon" )
         menu.append( menuItem )
 
@@ -413,6 +423,12 @@ class IndicatorLunar:
 
 
     def updateSunMenu( self, menu ):
+
+        if ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) in self.data and \
+            self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
+            self.hideBodyIfNeverUp:
+            return
+
         menuItem = Gtk.MenuItem( "Sun" )
         menu.append( menuItem )
 
@@ -462,6 +478,20 @@ class IndicatorLunar:
     def updatePlanetsMenu( self, menu ):
         if len( self.planets ) == 0: return;
 
+        allUserSpecifiedPlanetsAreNeverUp = True
+        for planet in IndicatorLunar.PLANETS:
+            if planet[ 0 ] in self.planets and ( planet[ 1 ], IndicatorLunar.DATA_MESSAGE ) not in self.data:
+                allUserSpecifiedPlanetsAreNeverUp = False
+                break
+
+            if planet[ 0 ] in self.planets and \
+                ( planet[ 1 ], IndicatorLunar.DATA_MESSAGE ) in self.data and \
+                self.data[ ( planet[ 1 ], IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_ALWAYS_UP:
+                allUserSpecifiedPlanetsAreNeverUp = False
+                break
+
+        if allUserSpecifiedPlanetsAreNeverUp and self.hideBodyIfNeverUp: return
+
         planetsMenuItem = Gtk.MenuItem( "Planets" )
         menu.append( planetsMenuItem )
 
@@ -470,15 +500,20 @@ class IndicatorLunar:
             planetsMenuItem.set_submenu( planetsSubMenu )
 
         for planet in IndicatorLunar.PLANETS:
-            if planet[ 0 ] in self.planets:
-                if self.showPlanetsAsSubMenu:
-                    menuItem = Gtk.MenuItem( planet[ 0 ] )
-                    planetsSubMenu.append( menuItem )
-                else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
-                    menu.append( menuItem )
+            if planet[ 0 ] not in self.planets: continue
 
-                self.updateBodyMenu( menuItem, planet[ 1 ] )
+            if ( planet[ 1 ], IndicatorLunar.DATA_MESSAGE ) in self.data and \
+                self.data[ ( planet[ 1 ], IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
+                self.hideBodyIfNeverUp: continue
+
+            if self.showPlanetsAsSubMenu:
+                menuItem = Gtk.MenuItem( planet[ 0 ] )
+                planetsSubMenu.append( menuItem )
+            else:
+                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
+                menu.append( menuItem )
+
+            self.updateBodyMenu( menuItem, planet[ 1 ] )
 
 
     def updateBodyMenu( self, menuItem, dataTag ):
@@ -516,6 +551,22 @@ class IndicatorLunar:
     def updateStarsMenu( self, menu ):
         if len( self.stars ) == 0: return
 
+        allUserSpecifiedStarsAreNeverUp = True
+        for starName in self.stars:
+            dataTag = starName.upper()
+
+            if starName in self.stars and ( dataTag, IndicatorLunar.DATA_MESSAGE ) not in self.data:
+                allUserSpecifiedStarsAreNeverUp = False
+                break
+
+            if starName in self.stars and \
+                ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data and \
+                self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_ALWAYS_UP:
+                allUserSpecifiedStarsAreNeverUp = False
+                break
+
+        if allUserSpecifiedStarsAreNeverUp and self.hideBodyIfNeverUp: return
+
         menuItem = Gtk.MenuItem( "Stars" )
         menu.append( menuItem )
 
@@ -524,8 +575,13 @@ class IndicatorLunar:
             menuItem.set_submenu( starsSubMenu )
 
         for starName in self.stars:
+
             dataTag = starName.upper()
 
+            if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data and \
+                self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
+                self.hideBodyIfNeverUp: continue
+            
             if self.showStarsAsSubMenu:
                 menuItem = Gtk.MenuItem( starName )
                 starsSubMenu.append( menuItem )
@@ -722,8 +778,8 @@ class IndicatorLunar:
             self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_SET_TIME ) ] = self.localiseAndTrim( setting )
             self.nextUpdates.append( rising )
             self.nextUpdates.append( setting )
-        except ephem.AlwaysUpError: self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] = "Always Up!"
-        except ephem.NeverUpError: self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] = "Never Up!"
+        except ephem.AlwaysUpError: self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
+        except ephem.NeverUpError: self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
         # Solstice/Equinox.
         equinox = ephem.next_equinox( ephemNow )
@@ -772,8 +828,8 @@ class IndicatorLunar:
             self.data[ ( dataTag, IndicatorLunar.DATA_SET_TIME ) ] = str( self.localiseAndTrim( setting ) )
             self.nextUpdates.append( rising )
             self.nextUpdates.append( setting )
-        except ephem.AlwaysUpError: self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] = "Always Up!"
-        except ephem.NeverUpError: self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] = "Never Up!"
+        except ephem.AlwaysUpError: self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
+        except ephem.NeverUpError: self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
 
     # http://aa.usno.navy.mil/data/docs/mrst.php
@@ -801,8 +857,8 @@ class IndicatorLunar:
                 self.nextUpdates.append( rising )
                 self.nextUpdates.append( setting )
 
-            except ephem.AlwaysUpError: self.data[ ( starTag, IndicatorLunar.DATA_MESSAGE ) ] = "Always Up!"
-            except ephem.NeverUpError: self.data[ ( starTag, IndicatorLunar.DATA_MESSAGE ) ] = "Never Up!"
+            except ephem.AlwaysUpError: self.data[ ( starTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
+            except ephem.NeverUpError: self.data[ ( starTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
 
     # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
@@ -830,11 +886,11 @@ class IndicatorLunar:
             if key in self.satelliteTLEData:
                 self.calculateNextSatellitePass( ephemNow, key, self.satelliteTLEData[ key ] )
             else:
-                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = "No TLE data!"
+                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_TLE_DATA
 
 
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
-        self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = "No passes within the next 10 days." # Default.
+        self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS # Default.
         currentDateTime = ephemNow
         endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 10 ) # Stop looking for passes 10 days from ephemNow.
         while currentDateTime < endDateTime:
@@ -843,14 +899,14 @@ class IndicatorLunar:
             satellite.compute( city )
             try: nextPass = city.next_pass( satellite )
             except ValueError:
-                message = "ValueError"
-                if satellite.circumpolar: message = "Satellite is circumpolar." 
-                elif satellite.neverup: message = "Satellite never rises."
+                message = IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
+                if satellite.circumpolar: message = IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR 
+                elif satellite.neverup: message = IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = message
                 break
 
             if not self.nextPassIsNonZero( nextPass ):
-                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = "Unable to compute next pass!"
+                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS
                 break
 
             if nextPass[ 0 ] < nextPass[ 4 ]: # The satellite is below the horizon.
@@ -1253,6 +1309,18 @@ class IndicatorLunar:
         box.pack_start( showSatellitesAsSubmenuCheckbox, False, False, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
+
+#TODO Have an option to hide stars that are never up?
+#What about moon/sun/planets?
+# Maybe one option for all (excluding satellites)?
+#What happens if a satellite is never up?  Does it get displayed?
+
+#TODO Have an option when selecting a star a webpage opens (similar to satellites)?
+# Need to find a site for this....maybe wikipedia?
+#What about planets/moon/sun?
+# Maybe have a field for the stars URL and one for moon/sun/planets (although both fields are wikipedia).
+
+#TODO Could combine the location and general tabs and call it general.
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 20 )
@@ -1816,6 +1884,8 @@ class IndicatorLunar:
             displayTagsStore.append( [ item[ 0 ], item[ 1 ] ] )
 
 
+#TODO Check all the satellites?  Need to differentiate between the dialog starting up and showing the satellites...
+# ...and the user selecting a new url/file by hitting fetch/browse.
     def updateSatellitePreferencesTab( self, noTLELabel, satellitesScrolledWindow, box, satelliteStore, satelliteTLEData, TLESourceIsURL, url, file ):
         satelliteStore.clear() 
 
@@ -2069,6 +2139,7 @@ class IndicatorLunar:
         self.openBrowserOnSatelliteSelection = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.onlyShowVisibleSatellitePasses = False
+        self.hideBodyIfNeverUp = True   #TODO Set to False by default
         self.satelliteMenuText = IndicatorLunar.SATELLITE_MENU_TEXT_DEFAULT
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
         self.satelliteNotificationSummary = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT
