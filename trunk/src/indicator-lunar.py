@@ -75,9 +75,9 @@ class IndicatorLunar:
     SETTINGS_CITY_LATITUDE = "cityLatitude"
     SETTINGS_CITY_LONGITUDE = "cityLongitude"
     SETTINGS_CITY_NAME = "cityName"
+    SETTINGS_HIDE_BODY_IF_NEVER_UP = "hideBodyIfNeverUp"
     SETTINGS_INDICATOR_TEXT = "indicatorText"
-    SETTINGS_ONLY_SHOW_VISIBLE_SATELLITE_PASSES = "onlyShowVisibleSatellitePasses"
-    SETTINGS_OPEN_BROWSER_ON_SATELLITE_SELECTION = "openBrowserOnSatelliteSelection"
+    SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS = "hideSatelliteIfNoVisiblePass"
     SETTINGS_PLANETS = "planets"
     SETTINGS_SATELLITE_MENU_TEXT = "satelliteMenuText"
     SETTINGS_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
@@ -575,7 +575,6 @@ class IndicatorLunar:
             menuItem.set_submenu( starsSubMenu )
 
         for starName in self.stars:
-
             dataTag = starName.upper()
 
             if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data and \
@@ -654,7 +653,7 @@ class IndicatorLunar:
             menuText = menuTextAndSatelliteKey[ 0 ]
             key = menuTextAndSatelliteKey[ 1 ]
             addedItem = False
-            if self.onlyShowVisibleSatellitePasses:
+            if self.hideSatelliteIfNoVisiblePass:
                 if ( key + ( IndicatorLunar.DATA_VISIBLE, ) ) in self.data and self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == "True":
                     addedItem = True
                     subMenu = Gtk.Menu()
@@ -700,10 +699,9 @@ class IndicatorLunar:
 
 
     def addOnSatelliteHandler( self, subMenu, key ):
-        if self.openBrowserOnSatelliteSelection:
-            for child in subMenu.get_children():
-                child.set_name( str( key ) ) # Cannot pass the tuple - must be a string.
-                child.connect( "activate", self.onSatellite )
+        for child in subMenu.get_children():
+            child.set_name( str( key ) ) # Cannot pass the tuple - must be a string.
+            child.connect( "activate", self.onSatellite )
 
 
     def onSatellite( self, widget ):
@@ -715,7 +713,7 @@ class IndicatorLunar:
             replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteTLE.getNumber() ). \
             replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, satelliteTLE.getInternationalDesignator() )
 
-        webbrowser.open( url )
+        if len( url ) > 0: webbrowser.open( url )
 
 
     def updateRightAscensionDeclinationAzimuthAltitudeMenu( self, menu, dataTag ):
@@ -911,7 +909,7 @@ class IndicatorLunar:
 
             if nextPass[ 0 ] < nextPass[ 4 ]: # The satellite is below the horizon.
                 passIsVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
-                if self.onlyShowVisibleSatellitePasses and not passIsVisible:
+                if self.hideSatelliteIfNoVisiblePass and not passIsVisible:
                     currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
                     continue
 
@@ -928,8 +926,8 @@ class IndicatorLunar:
             # The satellite is above the horizon and so the rise time is for the NEXT pass - use the rise/set from the previous run.
             if ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.dataPrevious: # ...assume the rest of the data is also present!
                 # If visible passes are wanted but the previous data pass was not visible, need to recalculate (all other scenarios the data is good).
-                if not self.onlyShowVisibleSatellitePasses or \
-                    ( self.onlyShowVisibleSatellitePasses and self.dataPrevious[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == "True" ):
+                if not self.hideSatelliteIfNoVisiblePass or \
+                    ( self.hideSatelliteIfNoVisiblePass and self.dataPrevious[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == "True" ):
 
                     self.nextUpdates.append( nextPass[ 4 ] ) # Don't add the rise time as it is in the past!
                     self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
@@ -1295,7 +1293,7 @@ class IndicatorLunar:
 
         showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Planets" )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
-        showPlanetsAsSubmenuCheckbox.set_tooltip_text( "Show each planet in its own submenu." )
+        showPlanetsAsSubmenuCheckbox.set_tooltip_text( "Show each planet (excluding moon/sun) in its own submenu." )
         box.pack_start( showPlanetsAsSubmenuCheckbox, False, False, 0 )
 
         showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Stars" )
@@ -1310,17 +1308,16 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 1, 1, 1 )
 
-#TODO Have an option to hide stars that are never up?
-#What about moon/sun/planets?
-# Maybe one option for all (excluding satellites)?
+# TODO
 #What happens if a satellite is never up?  Does it get displayed?
+# What about if it is always up?
+# Investigate all these conditions...!
 
-#TODO Have an option when selecting a star a webpage opens (similar to satellites)?
-# Need to find a site for this....maybe wikipedia?
-#What about planets/moon/sun?
-# Maybe have a field for the stars URL and one for moon/sun/planets (although both fields are wikipedia).
-
-#TODO Could combine the location and general tabs and call it general.
+        hideBodyIfNeverUpCheckbox = Gtk.CheckButton( "Hide bodies which are 'never up'" )
+        hideBodyIfNeverUpCheckbox.set_margin_top( 20 )
+        hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
+        hideBodyIfNeverUpCheckbox.set_tooltip_text( "If checked, only bodies (planets, moon, sun, stars)\nwhich rise/set or are 'always up' will be shown.\n\nOtherwise all bodies are shown." )
+        grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 20 )
@@ -1341,31 +1338,24 @@ class IndicatorLunar:
 
         box.pack_start( satelliteMenuText, True, True, 0 )
 
-        grid.attach( box, 0, 2, 1, 1 )
+        grid.attach( box, 0, 3, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( "Sort satellites by rise date/time" )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 20 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
-        sortSatellitesByDateTimeCheckbox.set_tooltip_text( "Satellites are sorted alphabetically by menu text.\nIf checked, satellites will be sorted by rise date/time." )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 3, 1, 1 )
+        sortSatellitesByDateTimeCheckbox.set_tooltip_text( "By default, satellites are sorted\nalphabetically by menu text.\n\nIf checked, satellites will be\nsorted by rise date/time." )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 4, 1, 1 )
 
-        onlyShowVisibleSatellitePassesCheckbox = Gtk.CheckButton( "Show only satellites with a visible pass" )
-        onlyShowVisibleSatellitePassesCheckbox.set_margin_top( 20 )
-        onlyShowVisibleSatellitePassesCheckbox.set_active( self.onlyShowVisibleSatellitePasses )
-        onlyShowVisibleSatellitePassesCheckbox.set_tooltip_text( "If checked, only satellites with a visible pass are displayed.\nBy default, all passes, visible or not, are shown (including error messages)." )
-        grid.attach( onlyShowVisibleSatellitePassesCheckbox, 0, 4, 1, 1 )
-
-        openBrowserOnSatelliteSelectionCheckbox = Gtk.CheckButton( "Open browser on satellite selection" )
-        openBrowserOnSatelliteSelectionCheckbox.set_active( self.openBrowserOnSatelliteSelection )
-        openBrowserOnSatelliteSelectionCheckbox.set_tooltip_text( "Clicking any of a satellite's child items\nwill open the URL below for that satellite." )
-        openBrowserOnSatelliteSelectionCheckbox.set_margin_top( 20 )
-        grid.attach( openBrowserOnSatelliteSelectionCheckbox, 0, 5, 1, 1 )
+        hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( "Hide satellites which have no upcoming visible pass" )
+        hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 20 )
+        hideSatelliteIfNoVisiblePassCheckbox.set_active( self.hideSatelliteIfNoVisiblePass )
+        hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text( "If checked, only satellites with an\nupcoming visible pass are displayed.\n\nOtherwise, all passes, visible or not, are shown\n(including error messages)." )
+        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 5, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_left( 25 )
-        box.set_sensitive( openBrowserOnSatelliteSelectionCheckbox.get_active() )
+        box.set_margin_top( 20 )
 
-        label = Gtk.Label( "URL" )
+        label = Gtk.Label( "Satellite URL" )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -1373,7 +1363,9 @@ class IndicatorLunar:
         satelliteURLText.set_text( self.satelliteOnClickURL )
         satelliteURLText.set_hexpand( True )
         satelliteURLText.set_tooltip_text( 
-             "The URL used to lookup a satellite when selected from the menu.\n\n" + \
+             "The URL used to lookup a satellite (in the default browser) when\n" + \
+             "any of the satellite's child items are selected from the menu.\n\n" + \
+             "If empty, no lookup will be done.\n\n" + \
              "Available tags:\n\t" + \
              IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
              IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
@@ -1383,10 +1375,8 @@ class IndicatorLunar:
 
         reset = Gtk.Button( "Reset" )
         reset.connect( "clicked", self.onResetSatelliteOnClickURL, satelliteURLText )
-        reset.set_tooltip_text( "Reset the satellite 'on click' URL to factory default." )
+        reset.set_tooltip_text( "Reset the satellite look-up URL to factory default." )
         box.pack_start( reset, False, False, 0 )
-
-        openBrowserOnSatelliteSelectionCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteURLText )
 
         grid.attach( box, 0, 6, 1, 1 )
 
@@ -1762,12 +1752,6 @@ class IndicatorLunar:
                 satelliteMenuText.grab_focus()
                 continue
 
-            if openBrowserOnSatelliteSelectionCheckbox.get_active() and satelliteURLText.get_text().strip() == "":
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Satellite 'on-click' URL cannot be empty." )
-                notebook.set_current_page( 1 )
-                satelliteURLText.grab_focus()
-                continue
-
             if TLEURLText.get_text().strip() == "": TLEURLText.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
 #TODO Maybe allow empty...and that means satellites are disabled?
@@ -1811,9 +1795,9 @@ class IndicatorLunar:
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
             self.satelliteMenuText = satelliteMenuText.get_text().strip()
+            self.hideBodyIfNeverUp = hideBodyIfNeverUpCheckbox.get_active()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
-            self.onlyShowVisibleSatellitePasses = onlyShowVisibleSatellitePassesCheckbox.get_active()
-            self.openBrowserOnSatelliteSelection = openBrowserOnSatelliteSelectionCheckbox.get_active()
+            self.hideSatelliteIfNoVisiblePass = hideSatelliteIfNoVisiblePassCheckbox.get_active()
             self.satelliteOnClickURL = satelliteURLText.get_text().strip()
             self.satelliteTLEUseURL = radioTLEFromURL.get_active()
             self.satelliteTLEURL = TLEURLText.get_text().strip()
@@ -1882,6 +1866,9 @@ class IndicatorLunar:
 
         for item in sorted( sortedKeysAsStringsAndValues, key = lambda x: ( x[ 0 ] ) ):
             displayTagsStore.append( [ item[ 0 ], item[ 1 ] ] )
+
+
+#TODO Not sure where the TLE file stuff was left at...need to do a full TLE file/url test!!!
 
 
 #TODO Check all the satellites?  Need to differentiate between the dialog starting up and showing the satellites...
@@ -2136,10 +2123,9 @@ class IndicatorLunar:
 
     def loadSettings( self ):
         self.getDefaultCity()
-        self.openBrowserOnSatelliteSelection = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
-        self.onlyShowVisibleSatellitePasses = False
-        self.hideBodyIfNeverUp = True   #TODO Set to False by default
+        self.hideSatelliteIfNoVisiblePass = False
+        self.hideBodyIfNeverUp = False
         self.satelliteMenuText = IndicatorLunar.SATELLITE_MENU_TEXT_DEFAULT
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
         self.satelliteNotificationSummary = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT
@@ -2174,9 +2160,9 @@ class IndicatorLunar:
                 cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
 
-                self.openBrowserOnSatelliteSelection = settings.get( IndicatorLunar.SETTINGS_OPEN_BROWSER_ON_SATELLITE_SELECTION, self.openBrowserOnSatelliteSelection )
+                self.hideBodyIfNeverUp = settings.get( IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
                 self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
-                self.onlyShowVisibleSatellitePasses = settings.get( IndicatorLunar.SETTINGS_ONLY_SHOW_VISIBLE_SATELLITE_PASSES, self.onlyShowVisibleSatellitePasses )
+                self.hideSatelliteIfNoVisiblePass = settings.get( IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
                 self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
                 self.satelliteMenuText = settings.get( IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT, self.satelliteMenuText )
                 self.satelliteNotificationMessage = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
@@ -2214,9 +2200,9 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
                 IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
-                IndicatorLunar.SETTINGS_OPEN_BROWSER_ON_SATELLITE_SELECTION: self.openBrowserOnSatelliteSelection,
+                IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
                 IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
-                IndicatorLunar.SETTINGS_ONLY_SHOW_VISIBLE_SATELLITE_PASSES: self.onlyShowVisibleSatellitePasses,
+                IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
                 IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT: self.satelliteMenuText,
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
