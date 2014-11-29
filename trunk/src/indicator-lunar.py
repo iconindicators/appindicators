@@ -27,9 +27,10 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 #  http://developer.ubuntu.com/api/devel/ubuntu-14.04
+#  https://wiki.gnome.org/Projects/PyGObject/Threading
 
-
-from gi.repository import AppIndicator3, GLib, Gtk, Notify
+from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
+from threading import Thread, Timer
 from urllib.request import urlopen
 import copy, datetime, eclipse, glob, gzip, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys, webbrowser
 
@@ -198,11 +199,13 @@ class IndicatorLunar:
 
 
     def __init__( self ):
+        print( "Init - start", str( datetime.datetime.now().time() ) )
         self.dialog = None
         self.data = { }
         self.dataPrevious = { }
         self.satelliteNotifications = { }
 
+        GObject.threads_init()
         filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
@@ -218,12 +221,20 @@ class IndicatorLunar:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.update()
+        print( "Init - end", str( datetime.datetime.now().time() ) )
 
 
     def main( self ): Gtk.main()
 
 
     def update( self ):
+        print( "Update - start", str( datetime.datetime.now().time() ) )
+        Thread( target = self.updateBackend ).start()
+        print( "Update - end", str( datetime.datetime.now().time() ) )
+
+
+    def updateBackend( self ):
+        print( "Backend - start", str( datetime.datetime.now().time() ) )
         self.toggleIconState()
 
         # Update the satellite TLE data at most every 12 hours.
@@ -250,6 +261,17 @@ class IndicatorLunar:
         self.updateStars( ephemNow )
         self.updateSatellites( ephemNow )
 
+#         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
+#         self.eventSourceID = GLib.timeout_add_seconds( 20, self.updateInternal )
+#         self.eventSourceID = GLib.timeout_add_seconds( 1, self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
+#         self.updateFrontend( ephemNow, lunarPhase, lunarIlluminationPercentage )
+
+        GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
+        print( "Backend - end", str( datetime.datetime.now().time() ) )
+
+
+    def updateFrontend( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
+        print( "Frontend - start", str( datetime.datetime.now().time() ) )
         self.updateMenu( ephemNow, lunarPhase )
         self.updateIcon( ephemNow, lunarIlluminationPercentage )
         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
@@ -262,7 +284,13 @@ class IndicatorLunar:
         if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update period is at least hourly...
             nextUpdateInSeconds = ( 60 * 60 )
 
-        self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
+#         Timer( 10, self.update, [ False ] ).start()
+
+#         GLib.timeout_add_seconds( 10, self.update, False )
+#         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
+        self.eventSourceID = GLib.timeout_add_seconds( 10, self.update )
+        print( "Frontend - end", str( datetime.datetime.now().time() ) )
+        print()
 
 
     def satelliteNotification( self, ephemNow ):
@@ -887,6 +915,10 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_TLE_DATA
 
 
+#TODO This takes a while to run...can it be sped up?
+#IF not, run in a thread so the indicator comes up quicker?
+#Perhaps alert the user with OSD to say the satellites stuff is being updated...be patient!
+
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
         self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS # Default.
         currentDateTime = ephemNow
@@ -1226,6 +1258,7 @@ class IndicatorLunar:
 
 
     def onPreferences( self, widget ):
+        print( "onPreferences" )
         if self.dialog is not None:
             self.dialog.present()
             return
@@ -1841,8 +1874,15 @@ class IndicatorLunar:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
 
-            GLib.source_remove( self.eventSourceID )
+
+#TODO We remove the upcoming call to update here...but what happens if we are already in an update?
+#Need some sort of token/lock mechanism?
+
+            self.dialog.hide()
+#             GLib.source_remove( self.eventSourceID )
+#             GLib.idle_add( self.update )
             self.update()
+#             self.eventSourceID = GLib.timeout_add_seconds( 1, self.update )
             break
 
         self.dialog.destroy()
