@@ -261,11 +261,6 @@ class IndicatorLunar:
         self.updateStars( ephemNow )
         self.updateSatellites( ephemNow )
 
-#         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
-#         self.eventSourceID = GLib.timeout_add_seconds( 20, self.updateInternal )
-#         self.eventSourceID = GLib.timeout_add_seconds( 1, self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
-#         self.updateFrontend( ephemNow, lunarPhase, lunarIlluminationPercentage )
-
         GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
         print( "Backend - end", str( datetime.datetime.now().time() ) )
 
@@ -284,11 +279,9 @@ class IndicatorLunar:
         if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update period is at least hourly...
             nextUpdateInSeconds = ( 60 * 60 )
 
-#         Timer( 10, self.update, [ False ] ).start()
-
-#         GLib.timeout_add_seconds( 10, self.update, False )
-#         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
-        self.eventSourceID = GLib.timeout_add_seconds( 10, self.update )
+#TODO Not sure if the eventSourceID is needed...see what happens with the Preferences dialog.
+# Maybe only stop an update from occurring if it has not started...so need a flag?
+        self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         print( "Frontend - end", str( datetime.datetime.now().time() ) )
         print()
 
@@ -382,7 +375,8 @@ class IndicatorLunar:
             ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) <= ephemNow ):
 
             summary = self.werewolfWarningSummary
-            if self.werewolfWarningSummary == "": summary = " " # The notification summary text cannot be empty (at least on Unity).
+            if self.werewolfWarningSummary == "":
+                summary = " " # The notification summary text cannot be empty (at least on Unity).
 
             Notify.Notification.new( summary, self.werewolfWarningMessage, self.getIconFile() ).show()
             self.lastFullMoonNotfication = ephemNow
@@ -532,7 +526,8 @@ class IndicatorLunar:
 
             if ( planet[ 1 ], IndicatorLunar.DATA_MESSAGE ) in self.data and \
                 self.data[ ( planet[ 1 ], IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
-                self.hideBodyIfNeverUp: continue
+                self.hideBodyIfNeverUp:
+                continue
 
             if self.showPlanetsAsSubMenu:
                 menuItem = Gtk.MenuItem( planet[ 0 ] )
@@ -607,7 +602,8 @@ class IndicatorLunar:
 
             if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data and \
                 self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
-                self.hideBodyIfNeverUp: continue
+                self.hideBodyIfNeverUp:
+                continue
             
             if self.showStarsAsSubMenu:
                 menuItem = Gtk.MenuItem( starName )
@@ -915,10 +911,6 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_TLE_DATA
 
 
-#TODO This takes a while to run...can it be sped up?
-#IF not, run in a thread so the indicator comes up quicker?
-#Perhaps alert the user with OSD to say the satellites stuff is being updated...be patient!
-
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
         self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS # Default.
         currentDateTime = ephemNow
@@ -1005,8 +997,7 @@ class IndicatorLunar:
         self.data[ ( dataTag, IndicatorLunar.DATA_RIGHT_ASCENSION ) ] = str( round( self.convertHoursMinutesSecondsToDecimalDegrees( body.g_ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.g_ra ) ) + ")"
 
         direction = "N"
-        if body.g_dec < 0.0:
-            direction = "S"
+        if body.g_dec < 0.0: direction = "S"
 
         self.data[ ( dataTag, IndicatorLunar.DATA_DECLINATION ) ] = str( abs( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.g_dec ) ) + ")"
         self.data[ ( dataTag, IndicatorLunar.DATA_AZIMUTH ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
@@ -1227,8 +1218,7 @@ class IndicatorLunar:
 
 
     def onQuit( self, widget ):
-        for file in glob.glob( os.getenv( "HOME" ) + "/." + IndicatorLunar.NAME + "*.svg" ):
-            os.remove( file )
+        for file in glob.glob( os.getenv( "HOME" ) + "/." + IndicatorLunar.NAME + "*.svg" ): os.remove( file )
 
         Gtk.main_quit()
 
