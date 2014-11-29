@@ -8,7 +8,7 @@ indicator-lunar (1.0.53-1) precise; urgency=low
     tags table.
   * Satellite notification now includes the rise time, set time and set azimuth.
   * The URL which is opened on satellite selection is now configurable.
-  * Can now hide planets/stars if not visible.
+  * Can now hide planets/stars if will 'never rise'.
   * Can now specify the TLE data source - either a URL or file.
   * Can now sort satellites by rise date/time.
   * Removed satellite subsequent pass information.
