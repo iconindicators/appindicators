@@ -28,6 +28,8 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 #  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 #  https://wiki.gnome.org/Projects/PyGObject/Threading
+#  https://wiki.gnome.org/Projects/PyGObject
+
 
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread, Timer
