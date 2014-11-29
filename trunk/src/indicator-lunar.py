@@ -201,7 +201,6 @@ class IndicatorLunar:
 
 
     def __init__( self ):
-        print( "Init - start", str( datetime.datetime.now().time() ) )
         self.dialog = None
         self.data = { }
         self.dataPrevious = { }
@@ -223,20 +222,16 @@ class IndicatorLunar:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.update()
-        print( "Init - end", str( datetime.datetime.now().time() ) )
 
 
     def main( self ): Gtk.main()
 
 
     def update( self ):
-        print( "Update - start", str( datetime.datetime.now().time() ) )
         Thread( target = self.updateBackend ).start()
-        print( "Update - end", str( datetime.datetime.now().time() ) )
 
 
     def updateBackend( self ):
-        print( "Backend - start", str( datetime.datetime.now().time() ) )
         self.toggleIconState()
 
         # Update the satellite TLE data at most every 12 hours.
@@ -264,11 +259,9 @@ class IndicatorLunar:
         self.updateSatellites( ephemNow )
 
         GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
-        print( "Backend - end", str( datetime.datetime.now().time() ) )
 
 
     def updateFrontend( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
-        print( "Frontend - start", str( datetime.datetime.now().time() ) )
         self.updateMenu( ephemNow, lunarPhase )
         self.updateIcon( ephemNow, lunarIlluminationPercentage )
         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
@@ -284,8 +277,6 @@ class IndicatorLunar:
 #TODO Not sure if the eventSourceID is needed...see what happens with the Preferences dialog.
 # Maybe only stop an update from occurring if it has not started...so need a flag?
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
-        print( "Frontend - end", str( datetime.datetime.now().time() ) )
-        print()
 
 
     def satelliteNotification( self, ephemNow ):
@@ -1250,7 +1241,6 @@ class IndicatorLunar:
 
 
     def onPreferences( self, widget ):
-        print( "onPreferences" )
         if self.dialog is not None:
             self.dialog.present()
             return
