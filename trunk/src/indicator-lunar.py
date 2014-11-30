@@ -1310,12 +1310,6 @@ class IndicatorLunar:
         showStarsAsSubmenuCheckbox.set_margin_top( 20 )
         grid.attach( showStarsAsSubmenuCheckbox, 0, 1, 1, 1 )
 
-        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show satellites as submenus" )
-        showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
-        showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
-        showSatellitesAsSubmenuCheckbox.set_margin_top( 20 )
-        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 2, 1, 1 )
-
 # TODO
 #What happens if a satellite is never up?  Does it get displayed?
 # What about if it is always up?
@@ -1325,7 +1319,13 @@ class IndicatorLunar:
         hideBodyIfNeverUpCheckbox.set_margin_top( 20 )
         hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
         hideBodyIfNeverUpCheckbox.set_tooltip_text( "If checked, only bodies (planets, moon, sun, stars)\nwhich rise/set or are 'always up' will be shown.\n\nOtherwise all bodies are shown." )
-        grid.attach( hideBodyIfNeverUpCheckbox, 0, 3, 1, 1 )
+        grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
+
+        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show satellites as submenus" )
+        showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
+        showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
+        showSatellitesAsSubmenuCheckbox.set_margin_top( 20 )
+        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 3, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 20 )
@@ -1821,6 +1821,7 @@ class IndicatorLunar:
         self.dialog = None
 
 
+#TODO Handle None/empty satelliteTLDData
     def updateDisplayTags( self, displayTagsStore, keepSatellites, satelliteTLEData ):
         displayTagsStore.clear()
         sortedKeysAsStringsAndValues = [ ]
