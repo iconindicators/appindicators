@@ -1525,7 +1525,7 @@ class IndicatorLunar:
         scrolledWindow.add( tree )
 
         self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore, self.satelliteTLEData, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip() )
-        fetch.connect( "clicked", self.onFetch, TLEURLText, label, scrolledWindow, box, satelliteStore, notebook, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip(), displayTagsStore )
+        fetch.connect( "clicked", self.onFetchTLEURL, TLEURLText, label, scrolledWindow, box, satelliteStore, notebook, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip(), displayTagsStore )
         browseButton.connect( "clicked", self.onBrowseTLEFile, TLEFileText, label, scrolledWindow, box, satelliteStore, notebook, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip(), displayTagsStore )
 
         notebook.append_page( box, Gtk.Label( "Satellites" ) )
@@ -1890,11 +1890,6 @@ class IndicatorLunar:
             displayTagsStore.append( [ item[ 0 ], item[ 1 ] ] )
 
 
-#TODO Not sure where the TLE file stuff was left at...need to do a full TLE file/url test!!!
-
-
-#TODO Check all the satellites?  Need to differentiate between the dialog starting up and showing the satellites...
-# ...and the user selecting a new url/file by hitting fetch/browse.
     def updateSatellitePreferencesTab( self, noTLELabel, satellitesScrolledWindow, box, satelliteStore, satelliteTLEData, TLESourceIsURL, url, file ):
         satelliteStore.clear() 
 
@@ -1945,7 +1940,7 @@ class IndicatorLunar:
     def onResetSatelliteOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_ON_CLICK_URL )
 
 
-    def onFetch( self, button, TLEURLTextEntry, noTLELabel, satellitesScrolledWindow, box, satelliteStore, notebook, TLESourceIsURL, url, file, displayTagsStore ):
+    def onFetchTLEURL( self, button, TLEURLTextEntry, noTLELabel, satellitesScrolledWindow, box, satelliteStore, notebook, TLESourceIsURL, url, file, displayTagsStore ):
         if TLEURLTextEntry.get_text().strip() == "":
             TLEURLTextEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
