@@ -233,10 +233,10 @@ class IndicatorLunar:
         self.toggleIconState()
 
 
-#TODO Handle all references to self.satelliteTLEData and check if it is None (error) or empty (no data).
         # Update the satellite TLE data at most every 12 hours.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
             self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
+            #TODO Handle all references to self.satelliteTLEData and check if it is None (error) or empty (no data).
 
         ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
 
@@ -1841,26 +1841,23 @@ class IndicatorLunar:
             displayTagsStore.append( [ item[ 0 ], item[ 1 ] ] )
 
 
-
 #TODO Test each clause!
     def updateSatellitePreferencesTab( self, noTLELabel, satellitesScrolledWindow, box, satelliteStore, satelliteTLEData, url ):
         satelliteStore.clear() 
 
         if satelliteTLEData is None or len( satelliteTLEData ) == 0: # An error or no TLE data...
             if satelliteTLEData is None:
-                noTLELabel.set_markup( "An error occurred accessing the TLE data source at <a href=\'" + url + "'>" + url + "</a>." )
+                message = "An error occurred accessing the TLE data source at <a href=\'" + url + "'>" + url + "</a>."
             else: # No TLE data...
-                noTLELabel.set_markup( "No TLE data found at <a href=\'" + url + "'>" + url + "</a>." )
-            
-# TODO: What does this comment mean?
-# ...when updating the display tags store, it will use the satellites from the list (but there are none)...so need to clear the satellites to be correct?
+                message = "No TLE data found at <a href=\'" + url + "'>" + url + "</a>."
+
+            noTLELabel.set_markup( message )
 
             if noTLELabel not in box.get_children(): box.pack_start( noTLELabel, False, False, 0 )
 
             if satellitesScrolledWindow in box.get_children(): box.remove( satellitesScrolledWindow, True, True, 0 )
 
         else:
-#TODO Test with a bad/ugly data file?
             for key in satelliteTLEData:
                 satelliteTLE = satelliteTLEData[ key ]
                 satelliteStore.append(
@@ -2016,8 +2013,152 @@ class IndicatorLunar:
             longitude.set_text( _city_data.get( city )[ 1 ] )
             elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
 
+#TODO What to do if the TLE url/file cannot be loaded...
+#...on startup?
+#...during a refresh?
+#Say a user runs the indicator, points to a url to get the data and then disconnects from the internet.
+#Have an option to not refresh TLE?
 
-    # Returns (as a hashtable) the satellite TLE data from the specified URL.  On error, returns None.
+
+#TODO Probably when the preferences are opened, stop updates.  Use a thread lock?
+
+#TODO Add one TLE file and hit ok.
+#Then add another file, delete the first file and while an update occurs (I think), should get exceptions...
+#
+# pydev debugger: starting (pid: 3618)
+# --- Logging error ---
+# Traceback (most recent call last):
+#   File "/usr/lib/python3.4/urllib/request.py", line 1386, in open_local_file
+#     stats = os.stat(localfile)
+# FileNotFoundError: [Errno 2] No such file or directory: '/home/bernard/Desktop/tle-new.txt'
+# 
+# During handling of the above exception, another exception occurred:
+# 
+# Traceback (most recent call last):
+#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 2022, in getSatelliteTLEData
+#     data = urlopen( url ).read().decode( "utf8" ).splitlines()
+#   File "/usr/lib/python3.4/urllib/request.py", line 153, in urlopen
+#     return opener.open(url, data, timeout)
+#   File "/usr/lib/python3.4/urllib/request.py", line 455, in open
+#     response = self._open(req, data)
+#   File "/usr/lib/python3.4/urllib/request.py", line 473, in _open
+#     '_open', req)
+#   File "/usr/lib/python3.4/urllib/request.py", line 433, in _call_chain
+#     result = func(*args)
+#   File "/usr/lib/python3.4/urllib/request.py", line 1364, in file_open
+#     return self.open_local_file(req)
+#   File "/usr/lib/python3.4/urllib/request.py", line 1404, in open_local_file
+#     raise URLError(exp)
+# urllib.error.URLError: <urlopen error [Errno 2] No such file or directory: '/home/bernard/Desktop/tle-new.txt'>
+# 
+# During handling of the above exception, another exception occurred:
+# 
+# Traceback (most recent call last):
+#   File "/usr/lib/python3.4/logging/handlers.py", line 71, in emit
+#     if self.shouldRollover(record):
+#   File "/usr/lib/python3.4/logging/handlers.py", line 187, in shouldRollover
+#     msg = "%s\n" % self.format(record)
+#   File "/usr/lib/python3.4/logging/__init__.py", line 814, in format
+#     return fmt.format(record)
+#   File "/usr/lib/python3.4/logging/__init__.py", line 551, in format
+#     record.message = record.getMessage()
+#   File "/usr/lib/python3.4/logging/__init__.py", line 314, in getMessage
+#     msg = msg % self.args
+# TypeError: not all arguments converted during string formatting
+# Call stack:
+#   File "/usr/lib/python3.4/threading.py", line 888, in _bootstrap
+#     self._bootstrap_inner()
+#   File "/usr/lib/python3.4/threading.py", line 920, in _bootstrap_inner
+#     self.run()
+#   File "/usr/lib/python3.4/threading.py", line 868, in run
+#     self._target(*self._args, **self._kwargs)
+#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 238, in updateBackend
+#     self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
+#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 2030, in getSatelliteTLEData
+#     logging.error( "Error retrieving satellite TLE data from", str( url ) )
+# Message: 'Error retrieving satellite TLE data from'
+# Arguments: ('file:///home/bernard/Desktop/tle-new.txt',)
+# Exception in thread Thread-12:
+# Traceback (most recent call last):
+#   File "/usr/lib/python3.4/threading.py", line 920, in _bootstrap_inner
+#     self.run()
+#   File "/usr/lib/python3.4/threading.py", line 868, in run
+#     self._target(*self._args, **self._kwargs)
+#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 259, in updateBackend
+#     self.updateSatellites( ephemNow )
+#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 901, in updateSatellites
+#     if key in self.satelliteTLEData:
+# TypeError: argument of type 'NoneType' is not iterable
+# 
+# --- Logging error ---
+# Traceback (most recent call last):
+#   File "/usr/lib/python3.4/urllib/request.py", line 1386, in open_local_file
+#     stats = os.stat(localfile)
+# FileNotFoundError: [Errno 2] No such file or directory: '/home/bernard/Desktop/tle-new.txt'
+# 
+# During handling of the above exception, another exception occurred:
+# 
+# Traceback (most recent call last):
+#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 2022, in getSatelliteTLEData
+#     data = urlopen( url ).read().decode( "utf8" ).splitlines()
+#   File "/usr/lib/python3.4/urllib/request.py", line 153, in urlopen
+#     return opener.open(url, data, timeout)
+#   File "/usr/lib/python3.4/urllib/request.py", line 455, in open
+#     response = self._open(req, data)
+#   File "/usr/lib/python3.4/urllib/request.py", line 473, in _open
+#     '_open', req)
+#   File "/usr/lib/python3.4/urllib/request.py", line 433, in _call_chain
+#     result = func(*args)
+#   File "/usr/lib/python3.4/urllib/request.py", line 1364, in file_open
+#     return self.open_local_file(req)
+#   File "/usr/lib/python3.4/urllib/request.py", line 1404, in open_local_file
+#     raise URLError(exp)
+# urllib.error.URLError: <urlopen error [Errno 2] No such file or directory: '/home/bernard/Desktop/tle-new.txt'>
+# 
+# During handling of the above exception, another exception occurred:
+# 
+# Traceback (most recent call last):
+#   File "/usr/lib/python3.4/logging/handlers.py", line 71, in emit
+#     if self.shouldRollover(record):
+#   File "/usr/lib/python3.4/logging/handlers.py", line 187, in shouldRollover
+#     msg = "%s\n" % self.format(record)
+#   File "/usr/lib/python3.4/logging/__init__.py", line 814, in format
+#     return fmt.format(record)
+#   File "/usr/lib/python3.4/logging/__init__.py", line 551, in format
+#     record.message = record.getMessage()
+#   File "/usr/lib/python3.4/logging/__init__.py", line 314, in getMessage
+#     msg = msg % self.args
+# TypeError: not all arguments converted during string formatting
+# Call stack:
+#   File "/usr/lib/python3.4/threading.py", line 888, in _bootstrap
+#     self._bootstrap_inner()
+#   File "/usr/lib/python3.4/threading.py", line 920, in _bootstrap_inner
+#     self.run()
+#   File "/usr/lib/python3.4/threading.py", line 868, in run
+#     self._target(*self._args, **self._kwargs)
+#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 238, in updateBackend
+#     self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
+#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 2030, in getSatelliteTLEData
+#     logging.error( "Error retrieving satellite TLE data from", str( url ) )
+# Message: 'Error retrieving satellite TLE data from'
+# Arguments: ('file:///home/bernard/Desktop/tle-new.txt',)
+# Exception in thread Thread-13:
+# Traceback (most recent call last):
+#   File "/usr/lib/python3.4/threading.py", line 920, in _bootstrap_inner
+#     self.run()
+#   File "/usr/lib/python3.4/threading.py", line 868, in run
+#     self._target(*self._args, **self._kwargs)
+#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 259, in updateBackend
+#     self.updateSatellites( ephemNow )
+#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 901, in updateSatellites
+#     if key in self.satelliteTLEData:
+# TypeError: argument of type 'NoneType' is not iterable
+
+
+
+
+    # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
+    # On error, returns None.
     def getSatelliteTLEData( self, url ):
         try:
             satelliteTLEData = { } # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
@@ -2029,7 +2170,7 @@ class IndicatorLunar:
         except Exception as e:
             satelliteTLEData = None # Indicates error.
             logging.exception( e )
-            logging.error( "Error open satellite TLE data from " + str( url ) )
+            logging.error( "Error retrieving satellite TLE data from", str( url ) )
 
         return satelliteTLEData
 
