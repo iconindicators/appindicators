@@ -86,9 +86,7 @@ class IndicatorLunar:
     SETTINGS_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
     SETTINGS_SATELLITE_NOTIFICATION_SUMMARY = "satelliteNotificationSummary"
     SETTINGS_SATELLITE_ON_CLICK_URL = "satelliteOnClickURL"
-    SETTINGS_SATELLITE_TLE_FILE = "satelliteTLEFile"
     SETTINGS_SATELLITE_TLE_URL = "satelliteTLEURL"
-    SETTINGS_SATELLITE_TLE_USE_URL = "satelliteTLEUseURL"
     SETTINGS_SATELLITES = "satellites"
     SETTINGS_SATELLITES_SORT_BY_DATE_TIME = "satellitesSortByDateTime"
     SETTINGS_SHOW_PLANETS_AS_SUBMENU = "showPlanetsAsSubmenu"
@@ -234,9 +232,11 @@ class IndicatorLunar:
     def updateBackend( self ):
         self.toggleIconState()
 
+
+#TODO Handle all references to self.satelliteTLEData and check if it is None (error) or empty (no data).
         # Update the satellite TLE data at most every 12 hours.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
-            self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile )
+            self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
 
         ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
 
@@ -1299,29 +1299,22 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        label = Gtk.Label( "Show items as submenus" )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 0, 1, 1 )
-
-        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 40 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_left( 25 )
-
-        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Planets" )
+        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Show planets as submenus" )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
         showPlanetsAsSubmenuCheckbox.set_tooltip_text( "Show each planet (excluding moon/sun) in its own submenu." )
-        box.pack_start( showPlanetsAsSubmenuCheckbox, False, False, 0 )
+        grid.attach( showPlanetsAsSubmenuCheckbox, 0, 0, 1, 1 )
 
-        showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Stars" )
+        showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Show stars as submenus" )
         showStarsAsSubmenuCheckbox.set_tooltip_text( "Show each star in its own submenu." )
         showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
-        box.pack_start( showStarsAsSubmenuCheckbox, False, False, 0 )
+        showStarsAsSubmenuCheckbox.set_margin_top( 20 )
+        grid.attach( showStarsAsSubmenuCheckbox, 0, 1, 1, 1 )
 
-        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Satellites" )
+        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show satellites as submenus" )
         showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
         showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
-        box.pack_start( showSatellitesAsSubmenuCheckbox, False, False, 0 )
-
-        grid.attach( box, 0, 1, 1, 1 )
+        showSatellitesAsSubmenuCheckbox.set_margin_top( 20 )
+        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 2, 1, 1 )
 
 # TODO
 #What happens if a satellite is never up?  Does it get displayed?
@@ -1332,7 +1325,7 @@ class IndicatorLunar:
         hideBodyIfNeverUpCheckbox.set_margin_top( 20 )
         hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
         hideBodyIfNeverUpCheckbox.set_tooltip_text( "If checked, only bodies (planets, moon, sun, stars)\nwhich rise/set or are 'always up' will be shown.\n\nOtherwise all bodies are shown." )
-        grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
+        grid.attach( hideBodyIfNeverUpCheckbox, 0, 3, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 20 )
@@ -1353,24 +1346,24 @@ class IndicatorLunar:
 
         box.pack_start( satelliteMenuText, True, True, 0 )
 
-        grid.attach( box, 0, 3, 1, 1 )
+        grid.attach( box, 0, 4, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( "Sort satellites by rise date/time" )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 20 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
         sortSatellitesByDateTimeCheckbox.set_tooltip_text( "By default, satellites are sorted\nalphabetically by menu text.\n\nIf checked, satellites will be\nsorted by rise date/time." )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 4, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 5, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( "Hide satellites which have no upcoming visible pass" )
         hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 20 )
         hideSatelliteIfNoVisiblePassCheckbox.set_active( self.hideSatelliteIfNoVisiblePass )
         hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text( "If checked, only satellites with an\nupcoming visible pass are displayed.\n\nOtherwise, all passes, visible or not, are shown\n(including error messages)." )
-        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 5, 1, 1 )
+        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 6, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 20 )
 
-        label = Gtk.Label( "Satellite URL" )
+        label = Gtk.Label( "Satellite 'on-click' URL" )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -1393,57 +1386,26 @@ class IndicatorLunar:
         reset.set_tooltip_text( "Reset the satellite look-up URL to factory default." )
         box.pack_start( reset, False, False, 0 )
 
-        grid.attach( box, 0, 6, 1, 1 )
-
-        label = Gtk.Label( "Satellite TLE data source" )
-        label.set_margin_top( 20 )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 7, 1, 1 )
+        grid.attach( box, 0, 7, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_left( 25 )
+        box.set_margin_top( 20 )
 
-        radioTLEFromURL = Gtk.RadioButton.new_with_label_from_widget( None, "URL" )
-        radioTLEFromURL.set_active( self.satelliteTLEUseURL )
-        box.pack_start( radioTLEFromURL, False, False, 0 )
+        label = Gtk.Label( "Satellite TLE data" )
+        label.set_halign( Gtk.Align.START )
+        box.pack_start( label, False, False, 0 )
 
         TLEURLText = Gtk.Entry()
         TLEURLText.set_text( self.satelliteTLEURL )
-        TLEURLText.set_sensitive( self.satelliteTLEUseURL )
         TLEURLText.set_hexpand( True )
-        TLEURLText.set_tooltip_text( "The URL from which to download TLE satellite data." )
+        TLEURLText.set_tooltip_text( "The URL from which to source TLE satellite data." ) #TODO Add file:/// example.
         box.pack_start( TLEURLText, True, True, 0 )
 
         fetch = Gtk.Button( "Fetch" )
-        fetch.set_tooltip_text( "Download the TLE data from the specified URL.\nIf the URL is empty, the default URL will be used." )
+        fetch.set_tooltip_text( "Download the TLE data from the specified URL.\nIf the URL is empty, the default URL will be used." )  # TODO Add that this will load a local file.
         box.pack_start( fetch, False, False, 0 )
 
         grid.attach( box, 0, 8, 1, 1 )
-
-        radioTLEFromURL.connect( "toggled", pythonutils.onRadio, TLEURLText )
-
-        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_left( 25 )
-
-        radioTLEFromFile = Gtk.RadioButton.new_with_label_from_widget( radioTLEFromURL, "File" )
-        radioTLEFromFile.set_active( not self.satelliteTLEUseURL )
-        box.pack_start( radioTLEFromFile, False, False, 0 )
-
-        TLEFileText = Gtk.Entry()
-        TLEFileText.set_text( self.satelliteTLEFile )
-        TLEFileText.set_sensitive( not self.satelliteTLEUseURL )
-        TLEFileText.set_hexpand( True )
-        TLEFileText.set_tooltip_text( "A file from which to read TLE satellite data." )
-        box.pack_start( TLEFileText, True, True, 0 )
-
-        browseButton = Gtk.Button( "Browse" )
-        browseButton.set_sensitive( not self.satelliteTLEUseURL )
-        browseButton.set_tooltip_text( "Specify the TLE file." )
-        box.pack_start( browseButton, False, False, 0 )
-
-        radioTLEFromFile.connect( "toggled", pythonutils.onRadio, TLEFileText, browseButton )
-
-        grid.attach( box, 0, 9, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Menu" ) )
 
@@ -1524,9 +1486,8 @@ class IndicatorLunar:
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( tree )
 
-        self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore, self.satelliteTLEData, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip() )
-        fetch.connect( "clicked", self.onFetchTLEURL, TLEURLText, label, scrolledWindow, box, satelliteStore, notebook, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip(), displayTagsStore )
-        browseButton.connect( "clicked", self.onBrowseTLEFile, TLEFileText, label, scrolledWindow, box, satelliteStore, notebook, radioTLEFromURL.get_active(), TLEURLText.get_text().strip(), TLEFileText.get_text().strip(), displayTagsStore )
+        self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore, self.satelliteTLEData, TLEURLText.get_text().strip() )
+        fetch.connect( "clicked", self.onFetchTLEURL, TLEURLText, label, scrolledWindow, box, satelliteStore, notebook, displayTagsStore )
 
         notebook.append_page( box, Gtk.Label( "Satellites" ) )
 
@@ -1769,14 +1730,6 @@ class IndicatorLunar:
 
             if TLEURLText.get_text().strip() == "": TLEURLText.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
-#TODO Maybe allow empty...and that means satellites are disabled?
-#If so need a tooltip to tell the user.
-            if radioTLEFromFile.get_active() and TLEFileText.get_text().strip() == "":
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Satellite TLE file cannot be empty." )
-                notebook.set_current_page( 1 )
-                TLEFileText.grab_focus()
-                continue
-
             cityValue = city.get_active_text()
             if cityValue == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "City cannot be empty." )
@@ -1814,9 +1767,7 @@ class IndicatorLunar:
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.hideSatelliteIfNoVisiblePass = hideSatelliteIfNoVisiblePassCheckbox.get_active()
             self.satelliteOnClickURL = satelliteURLText.get_text().strip()
-            self.satelliteTLEUseURL = radioTLEFromURL.get_active()
             self.satelliteTLEURL = TLEURLText.get_text().strip()
-            self.satelliteTLEFile = TLEFileText.get_text().strip()
 
             self.planets = [ ]
             for planetInfo in planetStore:
@@ -1859,7 +1810,6 @@ class IndicatorLunar:
 
 #TODO We remove the upcoming call to update here...but what happens if we are already in an update?
 #Need some sort of token/lock mechanism?
-
             self.dialog.hide()
 #             GLib.source_remove( self.eventSourceID )
 #             GLib.idle_add( self.update )
@@ -1890,27 +1840,23 @@ class IndicatorLunar:
             displayTagsStore.append( [ item[ 0 ], item[ 1 ] ] )
 
 
-    def updateSatellitePreferencesTab( self, noTLELabel, satellitesScrolledWindow, box, satelliteStore, satelliteTLEData, TLESourceIsURL, url, file ):
+
+#TODO Test each clause!
+    def updateSatellitePreferencesTab( self, noTLELabel, satellitesScrolledWindow, box, satelliteStore, satelliteTLEData, url ):
         satelliteStore.clear() 
 
-        if len( satelliteTLEData ) == 0: # No TLE data...
-            # when updating the display tags store, it will use the satellites from the list (but there are none)...so need to clear the satellites to be correct?
-            if TLESourceIsURL:
-                if url is None or len( url ) == 0:
-                    noTLELabel.set_markup( "No URL specified to download the satellite TLE data." )
-                else:
-                    noTLELabel.set_markup( "Unable to download the satellite TLE data.\n\nEnsure <a href=\'" + url + "'>" + url + "</a> is available." )
-            else:
-                if file is None or len( file ) == 0:
-                    noTLELabel.set_markup( "No TLE data file specified." )
-                else:
-                    noTLELabel.set_markup( "Unable to read the TLE data file\n\nEnsure " + file + " is available." )
+        if satelliteTLEData is None or len( satelliteTLEData ) == 0: # An error or no TLE data...
+            if satelliteTLEData is None:
+                noTLELabel.set_markup( "An error occurred accessing the TLE data source at <a href=\'" + url + "'>" + url + "</a>." )
+            else: # No TLE data...
+                noTLELabel.set_markup( "No TLE data found at <a href=\'" + url + "'>" + url + "</a>." )
+            
+# TODO: What does this comment mean?
+# ...when updating the display tags store, it will use the satellites from the list (but there are none)...so need to clear the satellites to be correct?
 
-            if noTLELabel not in box.get_children():
-                box.pack_start( noTLELabel, False, False, 0 )
+            if noTLELabel not in box.get_children(): box.pack_start( noTLELabel, False, False, 0 )
 
-            if satellitesScrolledWindow in box.get_children():
-                box.remove( satellitesScrolledWindow, True, True, 0 )
+            if satellitesScrolledWindow in box.get_children(): box.remove( satellitesScrolledWindow, True, True, 0 )
 
         else:
 #TODO Test with a bad/ugly data file?
@@ -1925,11 +1871,9 @@ class IndicatorLunar:
                     ]
                 )
 
-            if satellitesScrolledWindow not in box.get_children():
-                box.pack_start( satellitesScrolledWindow, True, True, 0 )
+            if satellitesScrolledWindow not in box.get_children(): box.pack_start( satellitesScrolledWindow, True, True, 0 )
 
-            if noTLELabel in box.get_children():
-                box.remove( noTLELabel )
+            if noTLELabel in box.get_children(): box.remove( noTLELabel )
 
 
     def onIndicatorTextTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
@@ -1940,38 +1884,15 @@ class IndicatorLunar:
     def onResetSatelliteOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_ON_CLICK_URL )
 
 
-    def onFetchTLEURL( self, button, TLEURLTextEntry, noTLELabel, satellitesScrolledWindow, box, satelliteStore, notebook, TLESourceIsURL, url, file, displayTagsStore ):
+    def onFetchTLEURL( self, button, TLEURLTextEntry, noTLELabel, satellitesScrolledWindow, box, satelliteStore, notebook, displayTagsStore ):
         if TLEURLTextEntry.get_text().strip() == "":
             TLEURLTextEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
-        self.satelliteTLEUseURL = True
-        self.satelliteTLEURL = TLEURLTextEntry.get_text().strip()
-        satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile )
-        self.updateSatellitePreferencesTab( noTLELabel, satellitesScrolledWindow, box, satelliteStore, satelliteTLEData, TLESourceIsURL, url, file )
+        url = TLEURLTextEntry.get_text().strip()
+        satelliteTLEData = self.getSatelliteTLEData( url )
+        self.updateSatellitePreferencesTab( noTLELabel, satellitesScrolledWindow, box, satelliteStore, satelliteTLEData, url )
         self.updateDisplayTags( displayTagsStore, False, satelliteTLEData )
         notebook.set_current_page( 3 )
-
-
-    def onBrowseTLEFile( self, browseButton, TLEFileTextEntry, label, scrolledWindow, box, satelliteStore, notebook, useURL, url, file, displayTagsStore ):
-        dialog = Gtk.FileChooserDialog(
-                    "Choose a TLE data file",
-                    self.dialog,
-                    Gtk.FileChooserAction.OPEN,
-                    ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
-        dialog.set_transient_for( self.dialog )
-        dialog.set_modal( True ) # Does not work -  https://bugs.launchpad.net/ubuntu/+source/overlay-scrollbar/+bug/903302
-        dialog.set_filename( TLEFileTextEntry.get_text() )
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            TLEFileTextEntry.set_text( dialog.get_filename() )
-            self.satelliteTLEUseURL = False
-            self.satelliteTLEFile = dialog.get_filename()
-            satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEUseURL, self.satelliteTLEURL, self.satelliteTLEFile )
-            self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore, satelliteTLEData, useURL, url, file )
-            self.updateDisplayTags( displayTagsStore, False, satelliteTLEData )
-            notebook.set_current_page( 3 )
-
-        dialog.destroy()
 
 
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
@@ -2095,25 +2016,19 @@ class IndicatorLunar:
             elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
 
 
-    def getSatelliteTLEData( self, useURL, url, file ):
+    # Returns (as a hashtable) the satellite TLE data from the specified URL.  On error, returns None.
+    def getSatelliteTLEData( self, url ):
         try:
             satelliteTLEData = { } # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
-            if useURL:
-                data = urlopen( url ).read().decode( "utf8" ).splitlines()
-            else:
-                with open( file, "rt" ) as f: data = f.read().splitlines()
- 
+            data = urlopen( url ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ), 3 ):
                 tle = satellite.TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
                 satelliteTLEData[ ( tle.getName(), tle.getNumber() ) ] = tle
 
         except Exception as e:
-            satelliteTLEData = { } # Empty data indicates error.
+            satelliteTLEData = None # Indicates error.
             logging.exception( e )
-            if useURL:
-                logging.error( "Error downloading satellite TLE data from " + str( url ) )
-            else:
-                logging.error( "Error reading satellite TLE data from " + str( file ) )
+            logging.error( "Error open satellite TLE data from " + str( url ) )
 
         return satelliteTLEData
 
@@ -2140,16 +2055,14 @@ class IndicatorLunar:
 
     def loadSettings( self ):
         self.getDefaultCity()
-        self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.hideSatelliteIfNoVisiblePass = False
         self.hideBodyIfNeverUp = False
+        self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.satelliteMenuText = IndicatorLunar.SATELLITE_MENU_TEXT_DEFAULT
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
         self.satelliteNotificationSummary = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT
         self.satelliteOnClickURL = IndicatorLunar.SATELLITE_ON_CLICK_URL
-        self.satelliteTLEFile = ""
         self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
-        self.satelliteTLEUseURL = True
         self.satellites = [ ]
         self.satellitesSortByDateTime = False
         self.showPlanetsAsSubMenu = False
@@ -2178,16 +2091,14 @@ class IndicatorLunar:
                 self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
 
                 self.hideBodyIfNeverUp = settings.get( IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
-                self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
                 self.hideSatelliteIfNoVisiblePass = settings.get( IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
+                self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
                 self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
                 self.satelliteMenuText = settings.get( IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT, self.satelliteMenuText )
                 self.satelliteNotificationMessage = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
                 self.satelliteNotificationSummary = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
                 self.satelliteOnClickURL = settings.get( IndicatorLunar.SETTINGS_SATELLITE_ON_CLICK_URL, self.satelliteOnClickURL )
-                self.satelliteTLEFile = settings.get( IndicatorLunar.SETTINGS_SATELLITE_TLE_FILE, self.satelliteTLEFile )
                 self.satelliteTLEURL = settings.get( IndicatorLunar.SETTINGS_SATELLITE_TLE_URL, self.satelliteTLEURL )
-                self.satelliteTLEUseURL = settings.get( IndicatorLunar.SETTINGS_SATELLITE_TLE_USE_URL, self.satelliteTLEUseURL )
                 self.satellitesSortByDateTime = settings.get( IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME, self.satellitesSortByDateTime )
                 self.showPlanetsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
                 self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
@@ -2218,16 +2129,14 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
                 IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
-                IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
                 IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
+                IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
                 IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT: self.satelliteMenuText,
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,
                 IndicatorLunar.SETTINGS_SATELLITE_ON_CLICK_URL: self.satelliteOnClickURL,
-                IndicatorLunar.SETTINGS_SATELLITE_TLE_FILE: self.satelliteTLEFile,
                 IndicatorLunar.SETTINGS_SATELLITE_TLE_URL: self.satelliteTLEURL,
-                IndicatorLunar.SETTINGS_SATELLITE_TLE_USE_URL: self.satelliteTLEUseURL,
                 IndicatorLunar.SETTINGS_SATELLITES: self.satellites,
                 IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME: self.satellitesSortByDateTime,
                 IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
