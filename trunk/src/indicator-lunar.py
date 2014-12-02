@@ -2210,8 +2210,8 @@ class IndicatorLunar:
 
     def loadSettings( self ):
         self.getDefaultCity()
-        self.hideSatelliteIfNoVisiblePass = False
-        self.hideBodyIfNeverUp = False
+        self.hideSatelliteIfNoVisiblePass = True
+        self.hideBodyIfNeverUp = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.satelliteMenuText = IndicatorLunar.SATELLITE_MENU_TEXT_DEFAULT
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
@@ -2222,8 +2222,8 @@ class IndicatorLunar:
         self.satellitesSortByDateTime = False
         self.showPlanetsAsSubMenu = False
         self.showSatelliteNotification = True
-        self.showSatellitesAsSubMenu = False
-        self.showStarsAsSubMenu = False
+        self.showSatellitesAsSubMenu = True
+        self.showStarsAsSubMenu = True
         self.showWerewolfWarning = True
         self.stars = [ ]
         self.werewolfWarningStartIlluminationPercentage = 100
