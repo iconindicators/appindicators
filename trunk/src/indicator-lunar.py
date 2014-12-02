@@ -29,12 +29,13 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 #  https://wiki.gnome.org/Projects/PyGObject/Threading
 #  https://wiki.gnome.org/Projects/PyGObject
+#  http://lazka.github.io/pgi-docs
 
 
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread, Timer
 from urllib.request import urlopen
-import copy, datetime, eclipse, glob, gzip, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys, webbrowser
+import copy, datetime, eclipse, glob, gzip, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys, threading, time, webbrowser
 
 try:
     import ephem
@@ -43,6 +44,18 @@ try:
 except:
     pythonutils.showMessage( None, Gtk.MessageType.ERROR, "You must also install python3-ephem!" )
     sys.exit()
+
+
+#TODO
+# When the preferences are open, self.data is used to populate tables, etc.
+# That means the backend update must be suspended until the preferences are closed.
+# When the preferences are closed, a backend update must be kicked off immediately...
+# ...by default if OK is hit.
+# ...if cancel is hit, the update may not be needed but the update which was scheduled to run is no longer scheduled.
+#
+# Conversely, if an update is happening, the preferences should not be opened.
+# So either disable/enable the preferences menu item before/after the update,
+# or pause the preferences from appearing (if selected) until the update is complete.
 
 
 class IndicatorLunar:
@@ -199,12 +212,17 @@ class IndicatorLunar:
 
 
     def __init__( self ):
+        self.eventSourceID = None #TODO Remove
+        self.preferencesMenuItem = None #TODO Remove?
+        
+        
         self.dialog = None
         self.data = { }
         self.dataPrevious = { }
         self.satelliteNotifications = { }
 
         GObject.threads_init()
+        self.lock = threading.Lock()
         filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
@@ -225,13 +243,30 @@ class IndicatorLunar:
     def main( self ): Gtk.main()
 
 
-    def update( self ):
-        Thread( target = self.updateBackend ).start()
+    def twiddle( self ):
+#         if self.indicator.get_menu() is not None:
+#             menuItems = self.indicator.get_menu().get_children()
+#             for menuItem in menuItems:
+#                 if isinstance( menuItem, Gtk.ImageMenuItem ):
+#                     menuItem.set_sensitive( False )
+        if self.preferencesMenuItem is not None:
+            self.preferencesMenuItem.set_sensitive( False )
+#             print( self.preferencesMenuItem.do_get_label() )
+#             self.preferencesMenuItem.do_set_label( self.preferencesMenuItem.do_get_label() + " (unavailable whilst refreshing)" )
+
+
+    def update( self ): Thread( target = self.updateBackend ).start()
 
 
     def updateBackend( self ):
-        self.toggleIconState()
+        print( "updateBackend", self.eventSourceID, threading.get_ident() )
+        if not self.lock.acquire( False ):
+            print( "Cannot updateBackend" )
+            return
 
+#         GLib.idle_add( self.twiddle )
+
+        self.toggleIconState()
 
         # Update the satellite TLE data at most every 12 hours.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
@@ -262,6 +297,7 @@ class IndicatorLunar:
 
 
     def updateFrontend( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
+        print( "updateFrontend", threading.get_ident() )
         self.updateMenu( ephemNow, lunarPhase )
         self.updateIcon( ephemNow, lunarIlluminationPercentage )
         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
@@ -274,9 +310,10 @@ class IndicatorLunar:
         if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update period is at least hourly...
             nextUpdateInSeconds = ( 60 * 60 )
 
-#TODO Not sure if the eventSourceID is needed...see what happens with the Preferences dialog.
-# Maybe only stop an update from occurring if it has not started...so need a flag?
+        nextUpdateInSeconds = 15
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
+        print( "updateFrontend", self.eventSourceID, nextUpdateInSeconds )
+        self.lock.release()
 
 
     def satelliteNotification( self, ephemNow ):
@@ -386,17 +423,21 @@ class IndicatorLunar:
 
         menu.append( Gtk.SeparatorMenuItem() )
 
-        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        preferencesMenuItem.connect( "activate", self.onPreferences )
-        menu.append( preferencesMenuItem )
+#         menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
+#         menuItem.connect( "activate", self.onPreferences )
+#         menu.append( menuItem )
 
-        aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
-        aboutMenuItem.connect( "activate", self.onAbout )
-        menu.append( aboutMenuItem )
+        self.preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
+        self.preferencesMenuItem.connect( "activate", self.onPreferences )
+        menu.append( self.preferencesMenuItem )
 
-        quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        quitMenuItem.connect( "activate", self.onQuit )
-        menu.append( quitMenuItem )
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
+        menuItem.connect( "activate", self.onAbout )
+        menu.append( menuItem )
+
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
+        menuItem.connect( "activate", self.onQuit )
+        menu.append( menuItem )
 
         self.indicator.set_menu( menu )
         menu.show_all()
@@ -1222,28 +1263,60 @@ class IndicatorLunar:
             return
 
         self.dialog = pythonutils.AboutDialog( 
-               IndicatorLunar.NAME,
-               IndicatorLunar.ABOUT_COMMENTS, 
-               IndicatorLunar.WEBSITE, 
-               IndicatorLunar.WEBSITE, 
-               IndicatorLunar.VERSION, 
-               Gtk.License.GPL_3_0, 
-               IndicatorLunar.ICON,
-               [ IndicatorLunar.AUTHOR ],
-               IndicatorLunar.ABOUT_CREDITS,
-               "Credits",
-               "/usr/share/doc/" + IndicatorLunar.NAME + "/changelog.Debian.gz",
-               logging )
+            IndicatorLunar.NAME,
+            IndicatorLunar.ABOUT_COMMENTS, 
+            IndicatorLunar.WEBSITE, 
+            IndicatorLunar.WEBSITE, 
+            IndicatorLunar.VERSION, 
+            Gtk.License.GPL_3_0, 
+            IndicatorLunar.ICON,
+            [ IndicatorLunar.AUTHOR ],
+            IndicatorLunar.ABOUT_CREDITS,
+            "Credits",
+            "/usr/share/doc/" + IndicatorLunar.NAME + "/changelog.Debian.gz",
+            logging )
 
         self.dialog.run()
         self.dialog.destroy()
         self.dialog = None
 
 
+    def test( self, widget ):
+        print( "test", threading.get_ident() )
+        while not self.lock.acquire( blocking = False ):
+            print( "sleeping" )
+            time.sleep( 1 )
+
+        GLib.idle_add( self.onPreferencesInternal, widget )        
+        print( "test ending")
+
+
     def onPreferences( self, widget ):
         if self.dialog is not None:
             self.dialog.present()
             return
+
+        print( "onPreferences", self.eventSourceID, threading.get_ident() )
+
+        if self.lock.acquire( blocking = False ):
+            self.onPreferencesInternal( widget )
+        else:
+            Notify.Notification.new( "Preferences Unavailable...", "The lunar indicator is momentarily refreshing and so the preferences are unavailable.", IndicatorLunar.ICON ).show()
+            Thread( target = self.test, args = ( widget, ) ).start()
+        
+        
+    def onPreferencesInternal( self, widget ):
+#         notified = False
+#         while not self.lock.acquire( blocking = False ):
+#             if not notified:
+#                 Notify.Notification.new( "Refreshing", "The lunar indicator is refreshing and the preferences will be shown shortly...", IndicatorLunar.ICON ).show()
+#                 notified = True
+
+#             print( "sleeping")
+#             time.sleep( 10 )
+
+        print( "onPreferencesInternal", self.eventSourceID )
+        GLib.source_remove( self.eventSourceID )  # TODO What if the ID is None or invalid?  Check the remove clause?
 
         notebook = Gtk.Notebook()
 
@@ -1807,18 +1880,12 @@ class IndicatorLunar:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
 
-
-#TODO We remove the upcoming call to update here...but what happens if we are already in an update?
-#Need some sort of token/lock mechanism?
-            self.dialog.hide()
-#             GLib.source_remove( self.eventSourceID )
-#             GLib.idle_add( self.update )
-            self.update()
-#             self.eventSourceID = GLib.timeout_add_seconds( 1, self.update )
             break
 
         self.dialog.destroy()
         self.dialog = None
+        self.lock.release()
+        self.update()
 
 
 #TODO Handle None/empty satelliteTLDData
