@@ -247,7 +247,7 @@ class IndicatorLunar:
 
         self.dataPrevious = self.data # Used to access satellite pass information when a satellite is currently in transit.
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
-        self.data[ IndicatorLunar.DATA_CITY_NAME ] = self.cityName
+        self.data[ ( IndicatorLunar.DATA_CITY_NAME, "" ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match all other data.
 
         lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
