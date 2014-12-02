@@ -33,9 +33,9 @@
 
 
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
-from threading import Thread, Timer
+from threading import Thread
 from urllib.request import urlopen
-import copy, datetime, eclipse, glob, gzip, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys, threading, time, webbrowser
+import copy, datetime, eclipse, glob, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys, threading, time, webbrowser
 
 try:
     import ephem
@@ -44,18 +44,6 @@ try:
 except:
     pythonutils.showMessage( None, Gtk.MessageType.ERROR, "You must also install python3-ephem!" )
     sys.exit()
-
-
-#TODO
-# When the preferences are open, self.data is used to populate tables, etc.
-# That means the backend update must be suspended until the preferences are closed.
-# When the preferences are closed, a backend update must be kicked off immediately...
-# ...by default if OK is hit.
-# ...if cancel is hit, the update may not be needed but the update which was scheduled to run is no longer scheduled.
-#
-# Conversely, if an update is happening, the preferences should not be opened.
-# So either disable/enable the preferences menu item before/after the update,
-# or pause the preferences from appearing (if selected) until the update is complete.
 
 
 class IndicatorLunar:
@@ -212,10 +200,6 @@ class IndicatorLunar:
 
 
     def __init__( self ):
-        self.eventSourceID = None #TODO Remove
-        self.preferencesMenuItem = None #TODO Remove?
-        
-        
         self.dialog = None
         self.data = { }
         self.dataPrevious = { }
@@ -243,28 +227,11 @@ class IndicatorLunar:
     def main( self ): Gtk.main()
 
 
-    def twiddle( self ):
-#         if self.indicator.get_menu() is not None:
-#             menuItems = self.indicator.get_menu().get_children()
-#             for menuItem in menuItems:
-#                 if isinstance( menuItem, Gtk.ImageMenuItem ):
-#                     menuItem.set_sensitive( False )
-        if self.preferencesMenuItem is not None:
-            self.preferencesMenuItem.set_sensitive( False )
-#             print( self.preferencesMenuItem.do_get_label() )
-#             self.preferencesMenuItem.do_set_label( self.preferencesMenuItem.do_get_label() + " (unavailable whilst refreshing)" )
-
-
     def update( self ): Thread( target = self.updateBackend ).start()
 
 
     def updateBackend( self ):
-        print( "updateBackend", self.eventSourceID, threading.get_ident() )
-        if not self.lock.acquire( False ):
-            print( "Cannot updateBackend" )
-            return
-
-#         GLib.idle_add( self.twiddle )
+        if not self.lock.acquire( False ): return
 
         self.toggleIconState()
 
@@ -297,7 +264,6 @@ class IndicatorLunar:
 
 
     def updateFrontend( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
-        print( "updateFrontend", threading.get_ident() )
         self.updateMenu( ephemNow, lunarPhase )
         self.updateIcon( ephemNow, lunarIlluminationPercentage )
         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
@@ -310,9 +276,7 @@ class IndicatorLunar:
         if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update period is at least hourly...
             nextUpdateInSeconds = ( 60 * 60 )
 
-        nextUpdateInSeconds = 15
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
-        print( "updateFrontend", self.eventSourceID, nextUpdateInSeconds )
         self.lock.release()
 
 
@@ -423,13 +387,9 @@ class IndicatorLunar:
 
         menu.append( Gtk.SeparatorMenuItem() )
 
-#         menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-#         menuItem.connect( "activate", self.onPreferences )
-#         menu.append( menuItem )
-
-        self.preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        self.preferencesMenuItem.connect( "activate", self.onPreferences )
-        menu.append( self.preferencesMenuItem )
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
+        menuItem.connect( "activate", self.onPreferences )
+        menu.append( menuItem )
 
         menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
         menuItem.connect( "activate", self.onAbout )
@@ -1281,14 +1241,11 @@ class IndicatorLunar:
         self.dialog = None
 
 
-    def test( self, widget ):
-        print( "test", threading.get_ident() )
+    def waitForUpdateToFinish( self, widget ):
         while not self.lock.acquire( blocking = False ):
-            print( "sleeping" )
             time.sleep( 1 )
 
         GLib.idle_add( self.onPreferencesInternal, widget )        
-        print( "test ending")
 
 
     def onPreferences( self, widget ):
@@ -1296,27 +1253,17 @@ class IndicatorLunar:
             self.dialog.present()
             return
 
-        print( "onPreferences", self.eventSourceID, threading.get_ident() )
-
+        # If the preferences were open and accessing the backend data (self.data) and an update occurs, that's not good.
+        # So ensure that no update is occurring...if it is, wait for it to end.
         if self.lock.acquire( blocking = False ):
             self.onPreferencesInternal( widget )
         else:
-            Notify.Notification.new( "Preferences Unavailable...", "The lunar indicator is momentarily refreshing and so the preferences are unavailable.", IndicatorLunar.ICON ).show()
-            Thread( target = self.test, args = ( widget, ) ).start()
+            Notify.Notification.new( "Preferences unavailable...", "The lunar indicator is momentarily refreshing; preferences will be available shortly.", IndicatorLunar.ICON ).show()
+            Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start()
         
         
     def onPreferencesInternal( self, widget ):
-#         notified = False
-#         while not self.lock.acquire( blocking = False ):
-#             if not notified:
-#                 Notify.Notification.new( "Refreshing", "The lunar indicator is refreshing and the preferences will be shown shortly...", IndicatorLunar.ICON ).show()
-#                 notified = True
-
-#             print( "sleeping")
-#             time.sleep( 10 )
-
-        print( "onPreferencesInternal", self.eventSourceID )
-        GLib.source_remove( self.eventSourceID )  # TODO What if the ID is None or invalid?  Check the remove clause?
+        GLib.source_remove( self.eventSourceID ) # Ensure no update occurs whilst the preferences are open.
 
         notebook = Gtk.Notebook()
 
@@ -1882,10 +1829,10 @@ class IndicatorLunar:
 
             break
 
-        self.dialog.destroy()
-        self.dialog = None
         self.lock.release()
         self.update()
+        self.dialog.destroy()
+        self.dialog = None
 
 
 #TODO Handle None/empty satelliteTLDData
@@ -2085,9 +2032,8 @@ class IndicatorLunar:
 #...during a refresh?
 #Say a user runs the indicator, points to a url to get the data and then disconnects from the internet.
 #Have an option to not refresh TLE?
+#Only replace TLE data (after the auto 12 hourly refresh) if data was found...on error or no data...maybe notify user but don't delete existing good data!
 
-
-#TODO Probably when the preferences are opened, stop updates.  Use a thread lock?
 
 #TODO Add one TLE file and hit ok.
 #Then add another file, delete the first file and while an update occurs (I think), should get exceptions...
