@@ -253,7 +253,7 @@ class IndicatorLunar:
 
         ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
 
-#TODO Why is this done before the city is initialised?  Does it need to be done before the backend updates/calculations are done?
+#TODO Why is this done before the city is initialised just below?  Does it need to be done before the backend updates/calculations are done?
         self.satelliteNotification( ephemNow )
 
         self.dataPrevious = self.data # Used to access satellite pass information when a satellite is currently in transit.
@@ -347,13 +347,6 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime )
 
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
-
-
-#TODO On startup, if the TLE data load fails, fire a notification?    
-# What about a notification when the TLE reload fails?
-    def noTLENotification( self ): 
-        Notify.Notification.new( "summary", "message", "dialog-warning" ).show()
-        Notify.Notification.new( "summary", "message", "dialog-error" ).show()
 
 
     def updateIcon( self, ephemNow, lunarIlluminationPercentage ):
