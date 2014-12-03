@@ -204,6 +204,7 @@ class IndicatorLunar:
         self.data = { }
         self.dataPrevious = { }
         self.satelliteNotifications = { }
+        self.satelliteTLEData = { }
 
         GObject.threads_init()
         self.lock = threading.Lock()
@@ -216,12 +217,11 @@ class IndicatorLunar:
         self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Set the last TLE update in the past so an update occurs. 
         self.lastFullMoonNotfication = ephem.Date( "2000/01/01" ) # Set a date way back in the past...
 
-        self.loadSettings()
-
         self.indicator = AppIndicator3.Indicator.new( IndicatorLunar.NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_icon_theme_path( os.getenv( "HOME" ) )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
+        self.loadSettings()
         self.update()
 
 
@@ -237,9 +237,19 @@ class IndicatorLunar:
         self.toggleIconState()
 
         # Update the satellite TLE data at most every 12 hours.
-        if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
-            self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
-            #TODO Handle all references to self.satelliteTLEData and check if it is None (error) or empty (no data).
+        if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):# and len( self.satellites ) > 0:
+            satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
+
+            if satelliteTLEData is None:
+                summary = "Satellite TLE Failure"
+                message = "Unable to retrieve the satellite TLE data.  Will use previous TLE data, if available."
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            elif len( satelliteTLEData ) == 0:
+                summary = "Satellite TLE Empty"
+                message = "The satellite TLE data retrieved is empty.  Will use previous TLE data, if available."
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            else:
+                self.satelliteTLEData = satelliteTLEData
 
         ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
 
@@ -1858,6 +1868,8 @@ class IndicatorLunar:
 
 #TODO Test each clause!
     def updateSatellitePreferencesTab( self, noTLELabel, satellitesScrolledWindow, box, satelliteStore, satelliteTLEData, url ):
+#TODO The incoming satelliteTLEData can be None, empty or non-empty...handle.
+
         satelliteStore.clear() 
 
         if satelliteTLEData is None or len( satelliteTLEData ) == 0: # An error or no TLE data...
@@ -2184,7 +2196,7 @@ class IndicatorLunar:
         except Exception as e:
             satelliteTLEData = None # Indicates error.
             logging.exception( e )
-            logging.error( "Error retrieving satellite TLE data from", str( url ) )
+            logging.error( "Error retrieving satellite TLE data from " + str( url ) )
 
         return satelliteTLEData
 
@@ -2214,7 +2226,11 @@ class IndicatorLunar:
         self.hideBodyIfNeverUp = True
         self.hideSatelliteIfNoVisiblePass = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
+
         self.planets = [ ]
+        for planet in IndicatorLunar.PLANETS:
+            self.planets.append( planet[ 0 ] )
+
         self.satelliteMenuText = IndicatorLunar.SATELLITE_MENU_TEXT_DEFAULT
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
         self.satelliteNotificationSummary = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT
@@ -2232,51 +2248,45 @@ class IndicatorLunar:
         self.werewolfWarningMessage = IndicatorLunar.WEREWOLF_WARNING_MESSAGE_DEFAULT
         self.werewolfWarningSummary = IndicatorLunar.WEREWOLF_WARNING_SUMMARY_DEFAULT
 
-        if os.path.isfile( IndicatorLunar.SETTINGS_FILE ):
-            try:
-                with open( IndicatorLunar.SETTINGS_FILE, "r" ) as f: settings = json.load( f )
+        if not os.path.isfile( IndicatorLunar.SETTINGS_FILE ): return
 
-                global _city_data
-                cityElevation = settings.get( IndicatorLunar.SETTINGS_CITY_ELEVATION, _city_data.get( self.cityName )[ 2 ] )
-                cityLatitude = settings.get( IndicatorLunar.SETTINGS_CITY_LATITUDE, _city_data.get( self.cityName )[ 0 ] )
-                cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
-                self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
+        try:
+            with open( IndicatorLunar.SETTINGS_FILE, "r" ) as f: settings = json.load( f )
 
-                self.hideBodyIfNeverUp = settings.get( IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
-                self.hideSatelliteIfNoVisiblePass = settings.get( IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
-                self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
+            global _city_data
+            cityElevation = settings.get( IndicatorLunar.SETTINGS_CITY_ELEVATION, _city_data.get( self.cityName )[ 2 ] )
+            cityLatitude = settings.get( IndicatorLunar.SETTINGS_CITY_LATITUDE, _city_data.get( self.cityName )[ 0 ] )
+            cityLongitude = settings.get( IndicatorLunar.SETTINGS_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
+            self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
+            _city_data[ self.cityName ] = ( str( cityLatitude ), str( cityLongitude ), float( cityElevation ) ) # Insert/overwrite the cityName and information into the cities.
 
-                for planet in IndicatorLunar.PLANETS:
-                    self.planets.append( planet[ 0 ] )
+            self.hideBodyIfNeverUp = settings.get( IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
+            self.hideSatelliteIfNoVisiblePass = settings.get( IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
+            self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
+            self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
+            self.satelliteMenuText = settings.get( IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT, self.satelliteMenuText )
+            self.satelliteNotificationMessage = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
+            self.satelliteNotificationSummary = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
+            self.satelliteOnClickURL = settings.get( IndicatorLunar.SETTINGS_SATELLITE_ON_CLICK_URL, self.satelliteOnClickURL )
+            self.satelliteTLEURL = settings.get( IndicatorLunar.SETTINGS_SATELLITE_TLE_URL, self.satelliteTLEURL )
 
-                self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
+            self.satellites = settings.get( IndicatorLunar.SETTINGS_SATELLITES, self.satellites )
+            self.satellites = [ tuple( l ) for l in self.satellites ] # Converts from a list of lists to a list of tuples...go figure!
 
-                self.satelliteMenuText = settings.get( IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT, self.satelliteMenuText )
-                self.satelliteNotificationMessage = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
-                self.satelliteNotificationSummary = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
-                self.satelliteOnClickURL = settings.get( IndicatorLunar.SETTINGS_SATELLITE_ON_CLICK_URL, self.satelliteOnClickURL )
-                self.satelliteTLEURL = settings.get( IndicatorLunar.SETTINGS_SATELLITE_TLE_URL, self.satelliteTLEURL )
+            self.satellitesSortByDateTime = settings.get( IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME, self.satellitesSortByDateTime )
+            self.showPlanetsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
+            self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
+            self.showSatellitesAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU, self.showSatellitesAsSubMenu )
+            self.showStarsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
+            self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
+            self.stars = settings.get( IndicatorLunar.SETTINGS_STARS, self.stars )
+            self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
+            self.werewolfWarningMessage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_MESSAGE, self.werewolfWarningMessage )
+            self.werewolfWarningSummary = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_SUMMARY, self.werewolfWarningSummary )
 
-                self.satellites = settings.get( IndicatorLunar.SETTINGS_SATELLITES, self.satellites )
-                self.satellites = [ tuple( l ) for l in self.satellites ] # Converts from a list of lists to a list of tuples...go figure!
-
-                self.satellitesSortByDateTime = settings.get( IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME, self.satellitesSortByDateTime )
-                self.showPlanetsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
-                self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
-                self.showSatellitesAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU, self.showSatellitesAsSubMenu )
-                self.showStarsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
-                self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
-                self.stars = settings.get( IndicatorLunar.SETTINGS_STARS, self.stars )
-                self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
-                self.werewolfWarningMessage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_MESSAGE, self.werewolfWarningMessage )
-                self.werewolfWarningSummary = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_SUMMARY, self.werewolfWarningSummary )
-
-                # Insert/overwrite the cityName and information into the cities...
-                _city_data[ self.cityName ] = ( str( cityLatitude ), str( cityLongitude ), float( cityElevation ) )
-
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Error reading settings: " + IndicatorLunar.SETTINGS_FILE )
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error reading settings: " + IndicatorLunar.SETTINGS_FILE )
 
 
     def saveSettings( self ):
