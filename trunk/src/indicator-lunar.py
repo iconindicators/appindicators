@@ -253,7 +253,9 @@ class IndicatorLunar:
 
         ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
 
-#TODO Why is this done before the city is initialised just below?  Does it need to be done before the backend updates/calculations are done?
+#TODO Why is this done before the city is initialised just below? 
+# Does it need to be done before the backend updates/calculations are done?
+# Figure out after the actual satellite update and notification interaction is sorted.
         self.satelliteNotification( ephemNow )
 
         self.dataPrevious = self.data # Used to access satellite pass information when a satellite is currently in transit.
@@ -296,7 +298,7 @@ class IndicatorLunar:
 
         ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
 
-#TODO Test!!!
+#TODO Test and make sure this all makes sense!!!
         for key in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
 
             # Is there a rise/set time for the current satellite...
@@ -1422,11 +1424,11 @@ class IndicatorLunar:
         TLEURLText = Gtk.Entry()
         TLEURLText.set_text( self.satelliteTLEURL )
         TLEURLText.set_hexpand( True )
-        TLEURLText.set_tooltip_text( "The URL from which to source TLE satellite data." ) #TODO Add file:/// example.
+        TLEURLText.set_tooltip_text( "The URL from which to source TLE satellite data.\nTo specify a local file, use file:///." )
         box.pack_start( TLEURLText, True, True, 0 )
 
         fetch = Gtk.Button( "Fetch" )
-        fetch.set_tooltip_text( "Download the TLE data from the specified URL.\nIf the URL is empty, the default URL will be used." )  # TODO Add that this will load a local file.
+        fetch.set_tooltip_text( "Retrieve the TLE data from the specified URL.\nIf the URL is empty, the default URL will be used." )
         box.pack_start( fetch, False, False, 0 )
 
         grid.attach( box, 0, 8, 1, 1 )
