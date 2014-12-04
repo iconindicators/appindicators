@@ -1424,7 +1424,12 @@ class IndicatorLunar:
         TLEURLText = Gtk.Entry()
         TLEURLText.set_text( self.satelliteTLEURL )
         TLEURLText.set_hexpand( True )
-        TLEURLText.set_tooltip_text( "The URL from which to source TLE satellite data.\nTo specify a local file, use file:///." )
+        TLEURLText.set_tooltip_text(
+            "The URL from which to source TLE satellite data.\n" + \
+            "To specify a local file, use file:///.\n\n" + \
+            "The satellite TLE data will be automatically\n" + \
+            "loaded each time the indicator is started\n" + \
+            "and approximately every 12 hours thereafter." )
         box.pack_start( TLEURLText, True, True, 0 )
 
         fetch = Gtk.Button( "Fetch" )
