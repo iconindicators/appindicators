@@ -32,6 +32,10 @@
 #  http://lazka.github.io/pgi-docs
 
 
+
+#TODO During an auto update of TLE data, if a satellite is missing in the updated TLE data, 
+# does that satellite still appear in the menu but with a "no TLE data" message? 
+
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
@@ -891,8 +895,8 @@ class IndicatorLunar:
     #   http://www.heavens-above.com
     #   http://in-the-sky.org
     #
-    # For planets/stars, the next rise/set time is shown.
-    # If already above the horizon, the set time is shown followed by the rise time for the next pass.
+    # For planets/stars, the immediately next rise/set time is shown.
+    # If already above the horizon, the set time is shown followed by the rise time for the following pass.
     # This makes sense as planets/stars are slow moving.
     #
     # However, as satellites are faster moving and pass several times a day, a different approach is used.
@@ -927,7 +931,7 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = message
                 break
 
-            if not self.nextPassIsNonZero( nextPass ):
+            if not self.satellitePassIsValid( nextPass ):
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS
                 break
 
@@ -981,15 +985,15 @@ class IndicatorLunar:
         return ( satellite.eclipsed is False ) and ( sun.alt > ephem.degrees( "-18" ) ) and ( sun.alt < ephem.degrees( "-6" ) )
 
 
-    def nextPassIsNonZero( self, nextPass ):
-        return nextPass is not None and \
-            len( nextPass ) == 6 and \
-            nextPass[ 0 ] is not None and \
-            nextPass[ 1 ] is not None and \
-            nextPass[ 2 ] is not None and \
-            nextPass[ 3 ] is not None and \
-            nextPass[ 4 ] is not None and \
-            nextPass[ 5 ] is not None
+    def satellitePassIsValid( self, satellitePass ):
+        return satellitePass is not None and \
+            len( satellitePass ) == 6 and \
+            satellitePass[ 0 ] is not None and \
+            satellitePass[ 1 ] is not None and \
+            satellitePass[ 2 ] is not None and \
+            satellitePass[ 3 ] is not None and \
+            satellitePass[ 4 ] is not None and \
+            satellitePass[ 5 ] is not None
 
 
     # Compute the right ascension, declination, azimuth and altitude for a body.
