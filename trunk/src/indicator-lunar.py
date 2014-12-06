@@ -32,6 +32,10 @@
 #  http://lazka.github.io/pgi-docs
 
 
+#TODO Maybe see if possible to have a different SVG icon for satellites, rocket boosters, debris.
+# Might need to search via http://celestrak.com/satcat/search.asp or some other way.
+
+
 #TODO During an auto update of TLE data, if a satellite is missing in the updated TLE data, 
 # does that satellite still appear in the menu but with a "no TLE data" message? 
 
@@ -1904,7 +1908,7 @@ class IndicatorLunar:
         if satelliteTLEData is None or len( satelliteTLEData ) == 0: # An error or no TLE data...
             if satelliteTLEData is None:
                 message = "An error occurred accessing the TLE data source at\n<a href=\'" + url + "'>" + url + "</a>"
-            else: # No TLE data...
+            else:
                 message = "No TLE data found at\n<a href=\'" + url + "'>" + url + "</a>"
 
             grid.get_child_at( 0, 0 ).hide()
