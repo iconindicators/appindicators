@@ -197,7 +197,7 @@ class IndicatorLunar:
     MESSAGE_BODY_NEVER_UP = "Never Up!"
     MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "Satellite is circumpolar."
     MESSAGE_SATELLITE_NEVER_RISES = "Satellite never rises."
-    MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS = "No passes within the next 10 days."
+    MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_FIVE_DAYS = "No passes within the next 5 days."
     MESSAGE_SATELLITE_NO_TLE_DATA = "No TLE data!"
     MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = "Unable to compute next pass!"
     MESSAGE_SATELLITE_VALUE_ERROR = "ValueError"
@@ -916,9 +916,9 @@ class IndicatorLunar:
 
 
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
-        self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS # Default.
+        self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_FIVE_DAYS # Default.
         currentDateTime = ephemNow
-        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 10 ) # Stop looking for passes 10 days from ephemNow.
+        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 5 ) # Stop looking for passes 5 days from ephemNow.
         while currentDateTime < endDateTime:
             city = self.getCity( currentDateTime )
             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check may alter the object's internals.

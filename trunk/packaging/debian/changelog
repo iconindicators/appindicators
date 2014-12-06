@@ -14,6 +14,7 @@ indicator-lunar (1.0.53-1) precise; urgency=low
   * Satellites can now be sorted by rise date/time.
   * Removed satellite subsequent pass information as it slowed down the update
     of the indicator (noticable when many satellites are checked).
+  * Satellite passes are only calculated up to 5 days ahead (rather than 10).
   * Overhaul of the preferences dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 12 Sep 2014 15:55:26 +1000
