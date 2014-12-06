@@ -1277,12 +1277,11 @@ class IndicatorLunar:
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
         grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( 10 )
+        box.set_margin_right( 10 )
 
         label = Gtk.Label( "Icon Text" )
         box.pack_start( label, False, False, 0 )
@@ -1302,9 +1301,10 @@ class IndicatorLunar:
         tree = Gtk.TreeView( displayTagsStoreSort )
         tree.set_hexpand( True )
         tree.set_vexpand( True )
-        tree.append_column( Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 ) )
 
+        tree.append_column( Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Value", Gtk.CellRendererText(), text = 1 ) )
+
         tree.set_tooltip_text( "Double click to add a tag to the indicator text." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onIndicatorTextTagDoubleClick, indicatorText )
@@ -1322,8 +1322,8 @@ class IndicatorLunar:
         grid.set_row_spacing( 10 )
         grid.set_margin_left( 10 )
         grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid.set_margin_top( 15 )
+        grid.set_margin_bottom( 15 )
 
         showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Show planets as submenus" )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
@@ -1347,12 +1347,6 @@ class IndicatorLunar:
         hideBodyIfNeverUpCheckbox.set_tooltip_text( "If checked, only bodies (planets, moon, sun, stars)\nwhich rise/set or are 'always up' will be shown.\n\nOtherwise all bodies are shown." )
         grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
 
-        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show satellites as submenus" )
-        showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
-        showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
-        showSatellitesAsSubmenuCheckbox.set_margin_top( 20 )
-        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 3, 1, 1 )
-
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 20 )
 
@@ -1372,7 +1366,13 @@ class IndicatorLunar:
 
         box.pack_start( satelliteMenuText, True, True, 0 )
 
-        grid.attach( box, 0, 4, 1, 1 )
+        grid.attach( box, 0, 3, 1, 1 )
+
+        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show satellites as submenus" )
+        showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
+        showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
+        showSatellitesAsSubmenuCheckbox.set_margin_top( 20 )
+        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 4, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( "Sort satellites by rise date/time" )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 20 )
@@ -1414,30 +1414,6 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 7, 1, 1 )
 
-        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_top( 20 )
-
-        label = Gtk.Label( "Satellite TLE data" )
-        label.set_halign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
-
-        TLEURLText = Gtk.Entry()
-        TLEURLText.set_text( self.satelliteTLEURL )
-        TLEURLText.set_hexpand( True )
-        TLEURLText.set_tooltip_text(
-            "The URL from which to source TLE satellite data.\n" + \
-            "To specify a local file, use file:///.\n\n" + \
-            "The satellite TLE data will be automatically\n" + \
-            "loaded each time the indicator is started\n" + \
-            "and approximately every 12 hours thereafter." )
-        box.pack_start( TLEURLText, True, True, 0 )
-
-        fetch = Gtk.Button( "Fetch" )
-        fetch.set_tooltip_text( "Retrieve the TLE data from the specified URL.\nIf the URL is empty, the default URL will be used." )
-        box.pack_start( fetch, False, False, 0 )
-
-        grid.attach( box, 0, 8, 1, 1 )
-
         notebook.append_page( grid, Gtk.Label( "Menu" ) )
 
         # Planets/Stars.
@@ -1451,8 +1427,8 @@ class IndicatorLunar:
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, displayTagsStore )
-        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
 
+        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Planet", Gtk.CellRendererText(), text = 1 ) )
 
         tree.set_tooltip_text( "Check a planet to display in the menu." )
@@ -1472,8 +1448,8 @@ class IndicatorLunar:
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onStarToggled, starStore, displayTagsStore )
-        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
 
+        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Star", Gtk.CellRendererText(), text = 1 ) )
 
         tree.set_tooltip_text( "Check a star to display in the menu." )
@@ -1488,10 +1464,13 @@ class IndicatorLunar:
         notebook.append_page( box, Gtk.Label( "Planets / Stars" ) )
 
         # Satellites.
-        box = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 0 ) # Bug in Python - must specify the parameter names!
+        satelliteTabGrid = Gtk.Grid()
+        satelliteTabGrid.set_row_spacing( 10 )
+        satelliteTabGrid.set_margin_bottom( 10 )
 
         label = Gtk.Label()
-        label.set_halign( Gtk.Align.CENTER )
+#         label.set_halign( Gtk.Align.CENTER ) #TODO Need this?
+        satelliteTabGrid.attach( label, 0, 0, 1, 1 )
 
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
 
@@ -1516,11 +1495,36 @@ class IndicatorLunar:
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( tree )
+        satelliteTabGrid.attach( scrolledWindow, 0, 1, 1, 1 )
 
-        self.updateSatellitePreferencesTab( label, scrolledWindow, box, satelliteStore, self.satelliteTLEData, TLEURLText.get_text().strip() )
-        fetch.connect( "clicked", self.onFetchTLEURL, TLEURLText, label, scrolledWindow, box, satelliteStore, notebook, displayTagsStore )
+        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
+        box.set_margin_top( 10 )
+        box.set_margin_left( 10 )
+        box.set_margin_right( 10 )
 
-        notebook.append_page( box, Gtk.Label( "Satellites" ) )
+        label = Gtk.Label( "Satellite TLE data" )
+        label.set_halign( Gtk.Align.START )
+        box.pack_start( label, False, False, 0 )
+
+        TLEURLText = Gtk.Entry()
+        TLEURLText.set_text( self.satelliteTLEURL )
+        TLEURLText.set_hexpand( True )
+        TLEURLText.set_tooltip_text(
+            "The URL from which to source TLE satellite data.\n" + \
+            "To specify a local file, use file:///.\n\n" + \
+            "The satellite TLE data will be automatically\n" + \
+            "loaded each time the indicator is started\n" + \
+            "and approximately every 12 hours thereafter." )
+        box.pack_start( TLEURLText, True, True, 0 )
+
+        fetch = Gtk.Button( "Fetch" )
+        fetch.set_tooltip_text( "Retrieve the TLE data from the specified URL.\nIf the URL is empty, the default URL will be used." )
+        fetch.connect( "clicked", self.onFetchTLEURL, TLEURLText, satelliteTabGrid, satelliteStore, displayTagsStore )
+        box.pack_start( fetch, False, False, 0 )
+
+        satelliteTabGrid.attach( box, 0, 2, 1, 1 )
+
+        notebook.append_page( satelliteTabGrid, Gtk.Label( "Satellites" ) )
 
         # OSD (satellite and full moon).
         grid = Gtk.Grid()
@@ -1741,6 +1745,9 @@ class IndicatorLunar:
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorLunar.ICON )
+        self.dialog.show_all()
+
+        self.updateSatellitePreferencesTab( satelliteTabGrid, satelliteStore, self.satelliteTLEData, TLEURLText.get_text().strip() )
 
 
 #TODO See if all buttons can be made the same width as the ok/cancel buttons.
@@ -1750,7 +1757,6 @@ class IndicatorLunar:
 #         print( self.dialog.get_widget_for_response( Gtk.ResponseType.CANCEL ).get_preferred_height() )
 
         while True:
-            self.dialog.show_all()
             if self.dialog.run() != Gtk.ResponseType.OK: break
 
             if satelliteMenuText.get_text().strip() == "":
@@ -1764,28 +1770,28 @@ class IndicatorLunar:
             cityValue = city.get_active_text()
             if cityValue == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "City cannot be empty." )
-                notebook.set_current_page( 6 )
+                notebook.set_current_page( 5 )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
             if latitudeValue == "" or not pythonutils.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Latitude must be a number between 90 and -90 inclusive." )
-                notebook.set_current_page( 6 )
+                notebook.set_current_page( 5 )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
             if longitudeValue == "" or not pythonutils.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Longitude must be a number between 180 and -180 inclusive." )
-                notebook.set_current_page( 6 )
+                notebook.set_current_page( 5 )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
             if elevationValue == "" or not pythonutils.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Elevation must be a number number between 0 and 10000 inclusive." )
-                notebook.set_current_page( 6 )
+                notebook.set_current_page( 5 )
                 elevation.grab_focus()
                 continue
 
@@ -1867,9 +1873,8 @@ class IndicatorLunar:
 
 
 #TODO Test each clause!
-    def updateSatellitePreferencesTab( self, noTLELabel, satellitesScrolledWindow, box, satelliteStore, satelliteTLEData, url ):
 #TODO The incoming satelliteTLEData can be None, empty or non-empty...handle.
-
+    def updateSatellitePreferencesTab( self, grid, satelliteStore, satelliteTLEData, url ):
         satelliteStore.clear() 
 
         if satelliteTLEData is None or len( satelliteTLEData ) == 0: # An error or no TLE data...
@@ -1878,11 +1883,9 @@ class IndicatorLunar:
             else: # No TLE data...
                 message = "No TLE data found at <a href=\'" + url + "'>" + url + "</a>."
 
-            noTLELabel.set_markup( message )
-
-            if noTLELabel not in box.get_children(): box.pack_start( noTLELabel, False, False, 0 )
-
-            if satellitesScrolledWindow in box.get_children(): box.remove( satellitesScrolledWindow, True, True, 0 )
+            grid.get_child_at( 0, 0 ).set_markup( message )
+            grid.get_child_at( 0, 0 ).show()
+            grid.get_child_at( 0, 1 ).hide()
 
         else:
             for key in satelliteTLEData:
@@ -1896,9 +1899,8 @@ class IndicatorLunar:
                     ]
                 )
 
-            if satellitesScrolledWindow not in box.get_children(): box.pack_start( satellitesScrolledWindow, True, True, 0 )
-
-            if noTLELabel in box.get_children(): box.remove( noTLELabel )
+            grid.get_child_at( 0, 0 ).hide()
+            grid.get_child_at( 0, 1 ).show()
 
 
     def onIndicatorTextTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
@@ -1909,15 +1911,14 @@ class IndicatorLunar:
     def onResetSatelliteOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_ON_CLICK_URL )
 
 
-    def onFetchTLEURL( self, button, TLEURLTextEntry, noTLELabel, satellitesScrolledWindow, box, satelliteStore, notebook, displayTagsStore ):
+    def onFetchTLEURL( self, button, TLEURLTextEntry, grid, satelliteStore, displayTagsStore ):
         if TLEURLTextEntry.get_text().strip() == "":
             TLEURLTextEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
         url = TLEURLTextEntry.get_text().strip()
         satelliteTLEData = self.getSatelliteTLEData( url )
-        self.updateSatellitePreferencesTab( noTLELabel, satellitesScrolledWindow, box, satelliteStore, satelliteTLEData, url )
+        self.updateSatellitePreferencesTab( grid, satelliteStore, satelliteTLEData, url )
         self.updateDisplayTags( displayTagsStore, False, satelliteTLEData )
-        notebook.set_current_page( 3 )
 
 
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
