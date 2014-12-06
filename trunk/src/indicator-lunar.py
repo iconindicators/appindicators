@@ -32,9 +32,18 @@
 #  http://lazka.github.io/pgi-docs
 
 
-
 #TODO During an auto update of TLE data, if a satellite is missing in the updated TLE data, 
 # does that satellite still appear in the menu but with a "no TLE data" message? 
+
+
+#TODO What to do if the TLE url/file cannot be loaded...
+#...on startup?
+#...during a refresh?
+#Say a user runs the indicator, points to a url to get the data and then disconnects from the internet.
+#Have an option to not refresh TLE?
+#Only replace TLE data (after the auto 12 hourly refresh) if data was found...on error or no data...maybe notify user but don't delete existing good data!
+#Is it possible to add in a bogus url, hit ok, quit and restart the indicator?  What happens?
+
 
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
@@ -915,6 +924,11 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_TLE_DATA
 
 
+# TODO
+#What happens if a satellite is never up?  Does it get displayed?
+# What about if it is always up?
+# Investigate all these conditions...!
+
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
         self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_FIVE_DAYS # Default.
         currentDateTime = ephemNow
@@ -1222,7 +1236,10 @@ class IndicatorLunar:
 
 
     def onQuit( self, widget ):
-        for file in glob.glob( os.getenv( "HOME" ) + "/." + IndicatorLunar.NAME + "*.svg" ): os.remove( file )
+        # Remove the SVG files created by the indicator (in the user's home directory).
+        svgFiles = os.getenv( "HOME" ) + "/." + IndicatorLunar.NAME + "*.svg"
+        for file in glob.glob( svgFiles ):
+            os.remove( file )
 
         Gtk.main_quit()
 
@@ -1339,11 +1356,6 @@ class IndicatorLunar:
         showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
         showStarsAsSubmenuCheckbox.set_margin_top( 20 )
         grid.attach( showStarsAsSubmenuCheckbox, 0, 1, 1, 1 )
-
-# TODO
-#What happens if a satellite is never up?  Does it get displayed?
-# What about if it is always up?
-# Investigate all these conditions...!
 
         hideBodyIfNeverUpCheckbox = Gtk.CheckButton( "Hide bodies which are 'never up'" )
         hideBodyIfNeverUpCheckbox.set_margin_top( 20 )
@@ -2042,16 +2054,10 @@ class IndicatorLunar:
             longitude.set_text( _city_data.get( city )[ 1 ] )
             elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
 
-#TODO What to do if the TLE url/file cannot be loaded...
-#...on startup?
-#...during a refresh?
-#Say a user runs the indicator, points to a url to get the data and then disconnects from the internet.
-#Have an option to not refresh TLE?
-#Only replace TLE data (after the auto 12 hourly refresh) if data was found...on error or no data...maybe notify user but don't delete existing good data!
-
 
 #TODO Add one TLE file and hit ok.
 #Then add another file, delete the first file and while an update occurs (I think), should get exceptions...
+#Preferences are open at this point.
 #
 # pydev debugger: starting (pid: 3618)
 # --- Logging error ---
