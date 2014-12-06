@@ -45,6 +45,20 @@
 #Is it possible to add in a bogus url, hit ok, quit and restart the indicator?  What happens?
 
 
+# TODO
+#What happens if a satellite is never up?  Does it get displayed?
+# What about if it is always up?
+# Investigate all these conditions...!
+
+
+#TODO
+#Start with a valid TLE file.  
+# Open preference and add a bogus file (try both a missing file and empty file).
+# Hit ok.  Open prefs and the old (good) data is still there.
+# Try with a URL also.
+
+
+
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
@@ -302,7 +316,6 @@ class IndicatorLunar:
         if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update period is at least hourly...
             nextUpdateInSeconds = ( 60 * 60 )
 
-        nextUpdateInSeconds = 15#TODO remove
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
         print( "updated", ephemNow )
@@ -925,11 +938,6 @@ class IndicatorLunar:
             else:
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_TLE_DATA
 
-
-# TODO
-#What happens if a satellite is never up?  Does it get displayed?
-# What about if it is always up?
-# Investigate all these conditions...!
 
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
         self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_FIVE_DAYS # Default.
@@ -1831,6 +1839,7 @@ class IndicatorLunar:
             self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Force the TLE data to be updated.
             self.satellites = [ ]
             for satelliteTLE in satelliteStore:
+                print( satelliteTLE[ 1 ], satelliteTLE[ 2 ] )
                 if satelliteTLE[ 0 ]: self.satellites.append( ( satelliteTLE[ 1 ], satelliteTLE[ 2 ] ) )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
