@@ -1314,7 +1314,7 @@ class IndicatorLunar:
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "Icon" ) )
+        notebook.append_page( grid, Gtk.Label( " Icon" ) )
 
         # Menu.
         grid = Gtk.Grid()
@@ -1414,7 +1414,7 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 7, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "Menu" ) )
+        notebook.append_page( grid, Gtk.Label( " Menu" ) )
 
         # Planets/Stars.
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 15 ) # Bug in Python - must specify the parameter names!
@@ -1461,7 +1461,7 @@ class IndicatorLunar:
 
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        notebook.append_page( box, Gtk.Label( "Planets / Stars" ) )
+        notebook.append_page( box, Gtk.Label( " Planets  /  Stars" ) )
 
         # Satellites.
         satelliteTabGrid = Gtk.Grid()
@@ -1511,7 +1511,7 @@ class IndicatorLunar:
         TLEURLText.set_hexpand( True )
         TLEURLText.set_tooltip_text(
             "The URL from which to source TLE satellite data.\n" + \
-            "To specify a local file, use file:///.\n\n" + \
+            "To specify a local file, use 'file:///'.\n\n" + \
             "The satellite TLE data will be automatically\n" + \
             "loaded each time the indicator is started\n" + \
             "and approximately every 12 hours thereafter." )
@@ -1524,7 +1524,7 @@ class IndicatorLunar:
 
         satelliteTabGrid.attach( box, 0, 2, 1, 1 )
 
-        notebook.append_page( satelliteTabGrid, Gtk.Label( "Satellites" ) )
+        notebook.append_page( satelliteTabGrid, Gtk.Label( " Satellites" ) )
 
         # OSD (satellite and full moon).
         grid = Gtk.Grid()
@@ -1670,7 +1670,7 @@ class IndicatorLunar:
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
-        notebook.append_page( grid, Gtk.Label( "Notifications" ) )
+        notebook.append_page( grid, Gtk.Label( " Notifications" ) )
 
         # Location.
         grid = Gtk.Grid()
@@ -1723,7 +1723,7 @@ class IndicatorLunar:
         city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
         city.set_active( cities.index( self.cityName ) )
 
-        notebook.append_page( grid, Gtk.Label( "Location" ) )
+        notebook.append_page( grid, Gtk.Label( " Location" ) )
 
         # General.
         grid = Gtk.Grid()
@@ -1739,7 +1739,7 @@ class IndicatorLunar:
         autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
         grid.attach( autostartCheckbox, 0, 0, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "General" ) )
+        notebook.append_page( grid, Gtk.Label( " General" ) )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
