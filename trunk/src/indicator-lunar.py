@@ -931,7 +931,7 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = message
                 break
 
-            if not self.satellitePassIsValid( nextPass ):
+            if not self.isSatellitePassValid( nextPass ):
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS
                 break
 
@@ -969,6 +969,17 @@ class IndicatorLunar:
             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
 
 
+    def isSatellitePassValid( self, satellitePass ):
+        return satellitePass is not None and \
+            len( satellitePass ) == 6 and \
+            satellitePass[ 0 ] is not None and \
+            satellitePass[ 1 ] is not None and \
+            satellitePass[ 2 ] is not None and \
+            satellitePass[ 3 ] is not None and \
+            satellitePass[ 4 ] is not None and \
+            satellitePass[ 5 ] is not None
+
+
     # Determine if a satellite pass is visible or not...
     #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
     #    http://www.celestrak.com/columns/v03n01
@@ -983,17 +994,6 @@ class IndicatorLunar:
         sun.compute( city )
 
         return ( satellite.eclipsed is False ) and ( sun.alt > ephem.degrees( "-18" ) ) and ( sun.alt < ephem.degrees( "-6" ) )
-
-
-    def satellitePassIsValid( self, satellitePass ):
-        return satellitePass is not None and \
-            len( satellitePass ) == 6 and \
-            satellitePass[ 0 ] is not None and \
-            satellitePass[ 1 ] is not None and \
-            satellitePass[ 2 ] is not None and \
-            satellitePass[ 3 ] is not None and \
-            satellitePass[ 4 ] is not None and \
-            satellitePass[ 5 ] is not None
 
 
     # Compute the right ascension, declination, azimuth and altitude for a body.
@@ -1472,10 +1472,6 @@ class IndicatorLunar:
         satelliteTabGrid.set_row_spacing( 10 )
         satelliteTabGrid.set_margin_bottom( 10 )
 
-        label = Gtk.Label()
-#         label.set_halign( Gtk.Align.CENTER ) #TODO Need this?
-        satelliteTabGrid.attach( label, 0, 0, 1, 1 )
-
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
 
         satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
@@ -1499,7 +1495,7 @@ class IndicatorLunar:
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( tree )
-        satelliteTabGrid.attach( scrolledWindow, 0, 1, 1, 1 )
+        satelliteTabGrid.attach( scrolledWindow, 0, 0, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 10 )
@@ -1526,7 +1522,14 @@ class IndicatorLunar:
         fetch.connect( "clicked", self.onFetchTLEURL, TLEURLText, satelliteTabGrid, satelliteStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
-        satelliteTabGrid.attach( box, 0, 2, 1, 1 )
+        satelliteTabGrid.attach( box, 0, 1, 1, 1 )
+
+        label = Gtk.Label()
+        label.set_margin_left( 10 )
+        label.set_margin_right( 10 )
+        label.set_justify( Gtk.Justification.CENTER )
+        
+        satelliteTabGrid.attach( label, 0, 2, 1, 1 )
 
         notebook.append_page( satelliteTabGrid, Gtk.Label( " Satellites" ) )
 
@@ -1753,13 +1756,6 @@ class IndicatorLunar:
 
         self.updateSatellitePreferencesTab( satelliteTabGrid, satelliteStore, self.satelliteTLEData, TLEURLText.get_text().strip() )
 
-
-#TODO See if all buttons can be made the same width as the ok/cancel buttons.
-#         print( self.dialog.get_widget_for_response( Gtk.ResponseType.OK ).get_preferred_width() )
-#         print( self.dialog.get_widget_for_response( Gtk.ResponseType.OK ).get_preferred_height() )
-#         print( self.dialog.get_widget_for_response( Gtk.ResponseType.CANCEL ).get_preferred_width() )
-#         print( self.dialog.get_widget_for_response( Gtk.ResponseType.CANCEL ).get_preferred_height() )
-
         while True:
             if self.dialog.run() != Gtk.ResponseType.OK: break
 
@@ -1856,19 +1852,22 @@ class IndicatorLunar:
         self.dialog = None
 
 
-#TODO Handle None/empty satelliteTLDData
     def updateDisplayTags( self, displayTagsStore, keepSatellites, satelliteTLEData ):
         displayTagsStore.clear()
         sortedKeysAsStringsAndValues = [ ]
 
+        # Refresh the display tags with all data.
+        # However for satellites, if this is a simple refresh, keep the existing satellites (and data).
+        # If the user is fetching new TLE data, don't add in the existing satellites...add in the new ones from the TLE (later).
         for key in self.data.keys():
             if ( ( key[ 0 ], key[ 1 ] ) ) in self.satellites: # This key refers to a satellite...
                 if keepSatellites:
                     sortedKeysAsStringsAndValues.append( [ " ".join( key ), self.data[ key ] ] )
-            else: # This is a non-satellite, so add it...
+            else: # This is a non-satellite, so just add it...
                 sortedKeysAsStringsAndValues.append( [ " ".join( key ), self.data[ key ] ] )
 
-        if not keepSatellites:
+        # The user has fetched new TLE data, so add that in (assuming it's kosher)...
+        if not keepSatellites and satelliteTLEData is not None:
             for key in satelliteTLEData:
                 sortedKeysAsStringsAndValues.append( [ " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
@@ -1876,20 +1875,18 @@ class IndicatorLunar:
             displayTagsStore.append( [ item[ 0 ], item[ 1 ] ] )
 
 
-#TODO Test each clause!
-#TODO The incoming satelliteTLEData can be None, empty or non-empty...handle.
     def updateSatellitePreferencesTab( self, grid, satelliteStore, satelliteTLEData, url ):
         satelliteStore.clear() 
 
         if satelliteTLEData is None or len( satelliteTLEData ) == 0: # An error or no TLE data...
             if satelliteTLEData is None:
-                message = "An error occurred accessing the TLE data source at <a href=\'" + url + "'>" + url + "</a>."
+                message = "An error occurred accessing the TLE data source at\n<a href=\'" + url + "'>" + url + "</a>"
             else: # No TLE data...
-                message = "No TLE data found at <a href=\'" + url + "'>" + url + "</a>."
+                message = "No TLE data found at\n<a href=\'" + url + "'>" + url + "</a>"
 
-            grid.get_child_at( 0, 0 ).set_markup( message )
-            grid.get_child_at( 0, 0 ).show()
-            grid.get_child_at( 0, 1 ).hide()
+            grid.get_child_at( 0, 0 ).hide()
+            grid.get_child_at( 0, 2 ).set_markup( message )
+            grid.get_child_at( 0, 2 ).show()
 
         else:
             for key in satelliteTLEData:
@@ -1903,8 +1900,8 @@ class IndicatorLunar:
                     ]
                 )
 
-            grid.get_child_at( 0, 0 ).hide()
-            grid.get_child_at( 0, 1 ).show()
+            grid.get_child_at( 0, 0 ).show()
+            grid.get_child_at( 0, 2 ).hide()
 
 
     def onIndicatorTextTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
