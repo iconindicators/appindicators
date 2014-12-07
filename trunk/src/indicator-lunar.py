@@ -1780,6 +1780,7 @@ class IndicatorLunar:
         self.dialog.set_icon_name( IndicatorLunar.ICON )
         self.dialog.show_all()
 
+        # Update the tab here as some elements will be hidden, which must be done after the dialog is shown.
         self.updateSatellitePreferencesTab( satelliteTabGrid, satelliteStore, self.satelliteTLEData, TLEURLText.get_text().strip() )
 
         while True:
@@ -1790,8 +1791,6 @@ class IndicatorLunar:
                 notebook.set_current_page( 1 )
                 satelliteMenuText.grab_focus()
                 continue
-
-            if TLEURLText.get_text().strip() == "": TLEURLText.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
             cityValue = city.get_active_text()
             if cityValue == "":
@@ -1824,13 +1823,12 @@ class IndicatorLunar:
             self.indicatorText = indicatorText.get_text().strip()
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
-            self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
-            self.satelliteMenuText = satelliteMenuText.get_text().strip()
             self.hideBodyIfNeverUp = hideBodyIfNeverUpCheckbox.get_active()
+            self.satelliteMenuText = satelliteMenuText.get_text().strip()
+            self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.hideSatelliteIfNoVisiblePass = hideSatelliteIfNoVisiblePassCheckbox.get_active()
             self.satelliteOnClickURL = satelliteURLText.get_text().strip()
-            self.satelliteTLEURL = TLEURLText.get_text().strip()
 
             self.planets = [ ]
             for planetInfo in planetStore:
@@ -1840,11 +1838,16 @@ class IndicatorLunar:
             for starInfo in starStore:
                 if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
 
-            self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Force the TLE data to be updated.
             self.satellites = [ ]
             for satelliteTLE in satelliteStore:
-                print( satelliteTLE[ 1 ], satelliteTLE[ 2 ] )
-                if satelliteTLE[ 0 ]: self.satellites.append( ( satelliteTLE[ 1 ], satelliteTLE[ 2 ] ) )
+                print( satelliteTLE[ 1 ], satelliteTLE[ 2 ] )#TODO Remove
+                if satelliteTLE[ 0 ]:
+                    self.satellites.append( ( satelliteTLE[ 1 ], satelliteTLE[ 2 ] ) )
+
+            if TLEURLText.get_text().strip() == "":
+                self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
+            else:
+                self.satelliteTLEURL = TLEURLText.get_text().strip()
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = satelliteNotificationSummaryText.get_text()
@@ -1870,6 +1873,8 @@ class IndicatorLunar:
                 try:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
+
+            self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Force the TLE data to be updated.
 
             break
 
