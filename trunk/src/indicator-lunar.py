@@ -55,14 +55,6 @@
 # Investigate all these conditions...!
 
 
-#TODO
-#Start with a valid TLE file.  
-# Open preference and add a bogus file (try both a missing file and empty file).
-# Hit ok.  Open prefs and the old (good) data is still there.
-# Try with a URL also.
-
-
-
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
@@ -269,6 +261,7 @@ class IndicatorLunar:
 
         # Update the satellite TLE data at most every 12 hours.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):# and len( self.satellites ) > 0:  #TODO Is this bit at the end needed?
+#...Maybe it was to allow somehow a reload of TLE data if the data was None/empty?            
             satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
 
             if satelliteTLEData is None:
