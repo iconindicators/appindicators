@@ -1509,7 +1509,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
         tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
 
-        tree.append_column( Gtk.TreeViewColumn( "Satellite", Gtk.CellRendererText(), text = 1 ) )
+        tree.append_column( Gtk.TreeViewColumn( "Satellite Name", Gtk.CellRendererText(), text = 1 ) )
         tree.append_column( Gtk.TreeViewColumn( "Number", Gtk.CellRendererText(), text = 2 ) )
         tree.append_column( Gtk.TreeViewColumn( "International Designator", Gtk.CellRendererText(), text = 3 ) )
 
@@ -1910,9 +1910,9 @@ class IndicatorLunar:
 
         if satelliteTLEData is None or len( satelliteTLEData ) == 0: # An error or no TLE data...
             if satelliteTLEData is None:
-                message = "An error occurred accessing the TLE data source at\n<a href=\'" + url + "'>" + url + "</a>"
+                message = "Cannot access the TLE data source <a href=\'" + url + "'>" + url + "</a>"
             else:
-                message = "No TLE data found at\n<a href=\'" + url + "'>" + url + "</a>"
+                message = "No TLE data found at <a href=\'" + url + "'>" + url + "</a>"
 
             grid.get_child_at( 0, 0 ).hide()
             grid.get_child_at( 0, 2 ).set_markup( message )
