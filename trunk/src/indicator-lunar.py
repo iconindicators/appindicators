@@ -272,12 +272,12 @@ class IndicatorLunar:
             satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
 
             if satelliteTLEData is None:
-                summary = "Satellite TLE Failure"
-                message = "Unable to retrieve the satellite TLE data.  Will use previous TLE data, if available."
+                summary = "Error Retrieving Satellite TLE Data"
+                message = "The satellite TLE data source could not be reached.  Previous TLE data will be used, if available."
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             elif len( satelliteTLEData ) == 0:
-                summary = "Satellite TLE Empty"
-                message = "The satellite TLE data retrieved is empty.  Will use previous TLE data, if available."
+                summary = "Empty Satellite TLE Data"
+                message = "The satellite TLE data retrieved is empty.  Previous TLE data will be used, if available."
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             else:
                 self.satelliteTLEData = satelliteTLEData
@@ -1532,8 +1532,13 @@ class IndicatorLunar:
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
+        # Need a local copy of the satellite TLE URL and TLE data.
+        # Also, as they need to be modified in the fetch handler, use a one-element list.
         satelliteTLEURL = [ ]
-        satelliteTLEURL.append( self.satelliteTLEURL ) # Local copy of the TLE URL for use in the preferences.
+        satelliteTLEURL.append( self.satelliteTLEURL )
+        satelliteTLEData = [ ]
+        satelliteTLEData.append( self.satelliteTLEData )
+
         TLEURLEntry = Gtk.Entry()
         TLEURLEntry.set_text( satelliteTLEURL[ 0 ] )
         TLEURLEntry.set_hexpand( True )
@@ -1547,7 +1552,7 @@ class IndicatorLunar:
 
         fetch = Gtk.Button( "Fetch" )
         fetch.set_tooltip_text( "Retrieve the TLE data from the specified URL.\nIf the URL is empty, the default URL will be used." )
-        fetch.connect( "clicked", self.onFetchTLEURL, satelliteTLEURL, TLEURLEntry, satelliteTabGrid, satelliteStore, displayTagsStore )
+        fetch.connect( "clicked", self.onFetchTLEURL, satelliteTLEURL, satelliteTLEData, TLEURLEntry, satelliteTabGrid, satelliteStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
         satelliteTabGrid.attach( box, 0, 1, 1, 1 )
@@ -1841,6 +1846,7 @@ class IndicatorLunar:
                 if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
 
             self.satelliteTLEURL = satelliteTLEURL[ 0 ]
+            self.satelliteTLEData = satelliteTLEData[ 0 ]
 
             self.satellites = [ ]
             for satelliteTLE in satelliteStore:
@@ -1942,15 +1948,18 @@ class IndicatorLunar:
     def onResetSatelliteOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_ON_CLICK_URL )
 
 
-    def onFetchTLEURL( self, button, satelliteTLEURL, TLEURLEntry, grid, satelliteStore, displayTagsStore ):
+    def onFetchTLEURL( self, button, satelliteTLEURL, satelliteTLEData, TLEURLEntry, grid, satelliteStore, displayTagsStore ):
         if TLEURLEntry.get_text().strip() == "":
             TLEURLEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
         del satelliteTLEURL[ : ] # Remove the satellite TLE URL.
         satelliteTLEURL.append( TLEURLEntry.get_text().strip() )
-        satelliteTLEData = self.getSatelliteTLEData( satelliteTLEURL[ 0 ] )
-        self.updateSatellitePreferencesTab( grid, satelliteStore, satelliteTLEData, satelliteTLEURL[ 0 ] )
-        self.updateDisplayTags( displayTagsStore, False, satelliteTLEData )
+
+        del satelliteTLEData[ : ] # Remove the satellite TLE data.
+        satelliteTLEData.append( self.getSatelliteTLEData( satelliteTLEURL[ 0 ] ) )
+
+        self.updateSatellitePreferencesTab( grid, satelliteStore, satelliteTLEData[ 0 ], satelliteTLEURL[ 0 ] )
+        self.updateDisplayTags( displayTagsStore, False, satelliteTLEData[ 0 ] )
 
 
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
