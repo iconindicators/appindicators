@@ -268,7 +268,7 @@ class IndicatorLunar:
         self.toggleIconState()
 
         # Update the satellite TLE data at most every 12 hours.
-        if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):# and len( self.satellites ) > 0:
+        if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):# and len( self.satellites ) > 0:  #TODO Is this bit at the end needed?
             satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
 
             if satelliteTLEData is None:
@@ -1532,20 +1532,22 @@ class IndicatorLunar:
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
-        TLEURLText = Gtk.Entry()
-        TLEURLText.set_text( self.satelliteTLEURL )
-        TLEURLText.set_hexpand( True )
-        TLEURLText.set_tooltip_text(
+        satelliteTLEURL = [ ]
+        satelliteTLEURL.append( self.satelliteTLEURL ) # Local copy of the TLE URL for use in the preferences.
+        TLEURLEntry = Gtk.Entry()
+        TLEURLEntry.set_text( satelliteTLEURL[ 0 ] )
+        TLEURLEntry.set_hexpand( True )
+        TLEURLEntry.set_tooltip_text(
             "The URL from which to source TLE satellite data.\n" + \
             "To specify a local file, use 'file:///'.\n\n" + \
             "The satellite TLE data will be automatically\n" + \
             "loaded each time the indicator is started\n" + \
             "and approximately every 12 hours thereafter." )
-        box.pack_start( TLEURLText, True, True, 0 )
+        box.pack_start( TLEURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( "Fetch" )
         fetch.set_tooltip_text( "Retrieve the TLE data from the specified URL.\nIf the URL is empty, the default URL will be used." )
-        fetch.connect( "clicked", self.onFetchTLEURL, TLEURLText, satelliteTabGrid, satelliteStore, displayTagsStore )
+        fetch.connect( "clicked", self.onFetchTLEURL, satelliteTLEURL, TLEURLEntry, satelliteTabGrid, satelliteStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
         satelliteTabGrid.attach( box, 0, 1, 1, 1 )
@@ -1781,7 +1783,7 @@ class IndicatorLunar:
         self.dialog.show_all()
 
         # Update the tab here as some elements will be hidden, which must be done after the dialog is shown.
-        self.updateSatellitePreferencesTab( satelliteTabGrid, satelliteStore, self.satelliteTLEData, TLEURLText.get_text().strip() )
+        self.updateSatellitePreferencesTab( satelliteTabGrid, satelliteStore, self.satelliteTLEData, TLEURLEntry.get_text().strip() )
 
         while True:
             if self.dialog.run() != Gtk.ResponseType.OK: break
@@ -1838,16 +1840,12 @@ class IndicatorLunar:
             for starInfo in starStore:
                 if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
 
+            self.satelliteTLEURL = satelliteTLEURL[ 0 ]
+
             self.satellites = [ ]
             for satelliteTLE in satelliteStore:
-                print( satelliteTLE[ 1 ], satelliteTLE[ 2 ] )#TODO Remove
                 if satelliteTLE[ 0 ]:
                     self.satellites.append( ( satelliteTLE[ 1 ], satelliteTLE[ 2 ] ) )
-
-            if TLEURLText.get_text().strip() == "":
-                self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
-            else:
-                self.satelliteTLEURL = TLEURLText.get_text().strip()
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = satelliteNotificationSummaryText.get_text()
@@ -1944,13 +1942,14 @@ class IndicatorLunar:
     def onResetSatelliteOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_ON_CLICK_URL )
 
 
-    def onFetchTLEURL( self, button, TLEURLTextEntry, grid, satelliteStore, displayTagsStore ):
-        if TLEURLTextEntry.get_text().strip() == "":
-            TLEURLTextEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
+    def onFetchTLEURL( self, button, satelliteTLEURL, TLEURLEntry, grid, satelliteStore, displayTagsStore ):
+        if TLEURLEntry.get_text().strip() == "":
+            TLEURLEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
-        url = TLEURLTextEntry.get_text().strip()
-        satelliteTLEData = self.getSatelliteTLEData( url )
-        self.updateSatellitePreferencesTab( grid, satelliteStore, satelliteTLEData, url )
+        del satelliteTLEURL[ : ] # Remove the satellite TLE URL.
+        satelliteTLEURL.append( TLEURLEntry.get_text().strip() )
+        satelliteTLEData = self.getSatelliteTLEData( satelliteTLEURL[ 0 ] )
+        self.updateSatellitePreferencesTab( grid, satelliteStore, satelliteTLEData, satelliteTLEURL[ 0 ] )
         self.updateDisplayTags( displayTagsStore, False, satelliteTLEData )
 
 
