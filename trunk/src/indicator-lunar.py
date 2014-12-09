@@ -32,6 +32,9 @@
 #  http://lazka.github.io/pgi-docs
 
 
+#TODO When hiding a non visible satellite, should a circumpolar satellite be hidden or not?
+
+
 #TODO During an auto update of TLE data, if a satellite is missing in the updated TLE data, 
 # does that satellite still appear in the menu but with a "no TLE data" message? 
 
@@ -311,7 +314,6 @@ class IndicatorLunar:
 
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
-        print( "updated", ephemNow )
 
 
     def satelliteNotification( self, ephemNow ):
@@ -938,13 +940,16 @@ class IndicatorLunar:
         endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 5 ) # Stop looking for passes 5 days from ephemNow.
         while currentDateTime < endDateTime:
             city = self.getCity( currentDateTime )
-            satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check may alter the object's internals.
+            satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
             satellite.compute( city )
             try: nextPass = city.next_pass( satellite )
             except ValueError:
                 message = IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
-                if satellite.circumpolar: message = IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR 
-                elif satellite.neverup: message = IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES
+                if satellite.circumpolar:
+                    message = IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR 
+                elif satellite.neverup:
+                    message = IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES
+
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = message
                 break
 
@@ -952,7 +957,7 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS
                 break
 
-            if nextPass[ 0 ] < nextPass[ 4 ]: # The satellite is below the horizon.
+            if nextPass[ 0 ] < nextPass[ 4 ]: # Rise time is before set time - the satellite is below the horizon.
                 passIsVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
                 if self.hideSatelliteIfNoVisiblePass and not passIsVisible:
                     currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
