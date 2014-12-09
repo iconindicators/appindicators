@@ -39,15 +39,6 @@
 # does that satellite still appear in the menu but with a "no TLE data" message? 
 
 
-#TODO What to do if the TLE url/file cannot be loaded...
-#...on startup?
-#...during a refresh?
-#Say a user runs the indicator, points to a url to get the data and then disconnects from the internet.
-#Have an option to not refresh TLE?
-#Only replace TLE data (after the auto 12 hourly refresh) if data was found...on error or no data...maybe notify user but don't delete existing good data!
-#Is it possible to add in a bogus url, hit ok, quit and restart the indicator?  What happens?
-
-
 # TODO
 #What happens if a satellite is never up?  Does it get displayed?
 # What about if it is always up?
@@ -259,10 +250,9 @@ class IndicatorLunar:
         self.toggleIconState()
 
         # Update the satellite TLE data at most every 12 hours.
-        if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):# and len( self.satellites ) > 0:  #TODO Is this bit at the end needed?
-#...Maybe it was to allow somehow a reload of TLE data if the data was None/empty?            
+        # Only accept the latest TLE data if it is valid (otherwise, use the TLE data from the previous run).
+        if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
             satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
-
             if satelliteTLEData is None:
                 summary = "Error Retrieving Satellite TLE Data"
                 message = "The satellite TLE data source could not be reached.  Previous TLE data will be used, if available."
