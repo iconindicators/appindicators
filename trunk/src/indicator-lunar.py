@@ -32,10 +32,6 @@
 #  http://lazka.github.io/pgi-docs
 
 
-#TODO Maybe see if possible to have a different SVG icon for satellites, rocket boosters, debris.
-# Might need to search via http://celestrak.com/satcat/search.asp or some other way.
-
-
 #TODO During an auto update of TLE data, if a satellite is missing in the updated TLE data, 
 # does that satellite still appear in the menu but with a "no TLE data" message? 
 
