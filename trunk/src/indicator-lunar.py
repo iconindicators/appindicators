@@ -1293,7 +1293,11 @@ class IndicatorLunar:
         if self.lock.acquire( blocking = False ):
             self.onPreferencesInternal( widget )
         else:
-            Notify.Notification.new( "Preferences unavailable...", "The lunar indicator is momentarily refreshing; preferences will be available shortly.", IndicatorLunar.ICON ).show()
+            Notify.Notification.new(
+                "Preferences unavailable...",
+                "The lunar indicator is momentarily refreshing; preferences will be available shortly.",
+                IndicatorLunar.ICON ).show()
+
             Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start()
         
         
@@ -1368,7 +1372,10 @@ class IndicatorLunar:
         hideBodyIfNeverUpCheckbox = Gtk.CheckButton( "Hide bodies which are 'never up'" )
         hideBodyIfNeverUpCheckbox.set_margin_top( 20 )
         hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
-        hideBodyIfNeverUpCheckbox.set_tooltip_text( "If checked, only bodies (planets, moon, sun, stars)\nwhich rise/set or are 'always up' will be shown.\n\nOtherwise all bodies are shown." )
+        hideBodyIfNeverUpCheckbox.set_tooltip_text(
+            "If checked, only bodies (planets, moon, sun, stars)\n" + \
+            "which rise/set or are 'always up' will be shown.\n\n" + \
+            "Otherwise all bodies are shown." )
         grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
@@ -1401,13 +1408,20 @@ class IndicatorLunar:
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( "Sort satellites by rise date/time" )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 20 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
-        sortSatellitesByDateTimeCheckbox.set_tooltip_text( "By default, satellites are sorted\nalphabetically by menu text.\n\nIf checked, satellites will be\nsorted by rise date/time." )
+        sortSatellitesByDateTimeCheckbox.set_tooltip_text(
+            "By default, satellites are sorted\n" + \
+            "alphabetically by menu text.\n\n" + \
+            "If checked, satellites will be\nsorted by rise date/time." )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 5, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( "Hide satellites which have no upcoming visible pass" )
         hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 20 )
         hideSatelliteIfNoVisiblePassCheckbox.set_active( self.hideSatelliteIfNoVisiblePass )
-        hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text( "If checked, only satellites with an\nupcoming visible pass are displayed.\n\nOtherwise, all passes, visible or not, are shown\n(including error messages)." )
+        hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text(
+            "If checked, only satellites with an\n" + \
+            "upcoming visible pass are displayed.\n\n" + \
+            "Otherwise, all passes, visible or not, are shown\n" + \
+            "(including error messages)." )
         grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 6, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
@@ -1545,7 +1559,9 @@ class IndicatorLunar:
         box.pack_start( TLEURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( "Fetch" )
-        fetch.set_tooltip_text( "Retrieve the TLE data from the specified URL.\nIf the URL is empty, the default URL will be used." )
+        fetch.set_tooltip_text(
+            "Retrieve the TLE data from the specified URL.\n" + \
+            "If the URL is empty, the default URL will be used." )
         fetch.connect( "clicked", self.onFetchTLEURL, satelliteTLEURL, satelliteTLEData, TLEURLEntry, satelliteTabGrid, satelliteStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
@@ -1643,7 +1659,9 @@ class IndicatorLunar:
 
         showWerewolfWarningCheckbox = Gtk.CheckButton( "Werewolf warning" )
         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
-        showWerewolfWarningCheckbox.set_tooltip_text( "Screen notification (approximately hourly)\nat full moon (or leading up to)." )
+        showWerewolfWarningCheckbox.set_tooltip_text(
+            "Screen notification (approximately hourly)\n" + \
+            "at full moon (or leading up to)." )
         grid.attach( showWerewolfWarningCheckbox, 0, 5, 2, 1 )
 
         label = Gtk.Label( "Illumination" )
@@ -1655,7 +1673,10 @@ class IndicatorLunar:
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 0, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.werewolfWarningStartIlluminationPercentage ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( "The notification commences at the\nspecified illumination (%),\nstarting after a new moon (0%)." )
+        spinner.set_tooltip_text(
+            "The notification commences at the\n" + \
+            "specified illumination (%),\n" + \
+            "starting after a new moon (0%)." )
         spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( spinner, 1, 6, 1, 1 )
 
@@ -1669,7 +1690,9 @@ class IndicatorLunar:
 
         werewolfNotificationSummaryText = Gtk.Entry()
         werewolfNotificationSummaryText.set_text( self.werewolfWarningSummary )
-        werewolfNotificationSummaryText.set_tooltip_text( "The summary for the werewolf notification.\n\nFor formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
+        werewolfNotificationSummaryText.set_tooltip_text(
+            "The summary for the werewolf notification.\n\n" + \
+            "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
         werewolfNotificationSummaryText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( werewolfNotificationSummaryText, 1, 7, 1, 1 )
 
@@ -1684,7 +1707,9 @@ class IndicatorLunar:
 
         werewolfNotificationMessageText = Gtk.TextView()
         werewolfNotificationMessageText.get_buffer().set_text( self.werewolfWarningMessage )
-        werewolfNotificationMessageText.set_tooltip_text( "The message for the werewolf notification.\n\nFor formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
+        werewolfNotificationMessageText.set_tooltip_text(
+            "The message for the werewolf notification.\n\n" + \
+            "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
         werewolfNotificationMessageText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -1723,7 +1748,9 @@ class IndicatorLunar:
         global _city_data
         cities = sorted( _city_data.keys(), key = locale.strxfrm )
         city = Gtk.ComboBoxText.new_with_entry()
-        city.set_tooltip_text( "To reset the cities to default lat/long/elev,\nadd a bogus city and restart the indicator." )
+        city.set_tooltip_text(
+            "To reset the cities to default lat/long/elev,\n" + \
+            "add a bogus city and restart the indicator." )
         city.set_hexpand( True )
         for c in cities:
             city.append_text( c )
