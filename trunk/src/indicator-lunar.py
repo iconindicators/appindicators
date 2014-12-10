@@ -266,9 +266,7 @@ class IndicatorLunar:
 
         ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
 
-#TODO Why is this done before the city is initialised just below? 
-# Does it need to be done before the backend updates/calculations are done?
-# Figure out after the actual satellite update and notification interaction is sorted.
+#TODO Why is this done BEFORE the backend updates/calculations...if so, why?
         self.satelliteNotification( ephemNow )
 
         self.dataPrevious = self.data # Used to access satellite pass information when a satellite is currently in transit.
@@ -306,12 +304,12 @@ class IndicatorLunar:
         self.lock.release()
 
 
+#TODO Test and make sure this all makes sense!!!
     def satelliteNotification( self, ephemNow ):
         if not self.showSatelliteNotification: return
 
         ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
 
-#TODO Test and make sure this all makes sense!!!
         for key in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
 
             # Is there a rise/set time for the current satellite...
