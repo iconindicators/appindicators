@@ -32,15 +32,7 @@
 #  http://lazka.github.io/pgi-docs
 
 
-#TODO When hiding a non visible satellite, should a circumpolar satellite be hidden or not?
-
-
-#TODO During an auto update of TLE data, if a satellite is missing in the updated TLE data, 
-# does that satellite still appear in the menu but with a "no TLE data" message? 
-
-
-# TODO
-#What happens if a satellite is never up?  Does it get displayed?
+# TODO What happens if a satellite is never up?  Does it get displayed?
 # What about if it is always up?
 # Investigate all these conditions...!
 
@@ -699,6 +691,13 @@ class IndicatorLunar:
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] ) )
                     self.addOnSatelliteHandler( subMenu, key )
+                elif ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) in self.data and self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
+                    addedItem = True
+                    subMenu = Gtk.Menu()
+                    subMenu.append( Gtk.MenuItem( self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] ) )
+                    subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] ) )
+                    subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] ) )
+                    self.addOnSatelliteHandler( subMenu, key )
             else:
                 addedItem = True
                 subMenu = Gtk.Menu()
@@ -933,7 +932,9 @@ class IndicatorLunar:
             try: nextPass = city.next_pass( satellite )
             except ValueError:
                 if satellite.circumpolar:
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR  #TODO If circumpolar, is there az/dec data?  If so and we put this in...need to be careful below when using previous data and not attempt to get rise/set times.
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR
+                    self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( satellite.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satellite.az ) ) + ")"
+                    self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( satellite.dec ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satellite.dec ) ) + ")"
                 elif satellite.neverup:
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES
                 else:

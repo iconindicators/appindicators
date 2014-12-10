@@ -14,6 +14,8 @@ indicator-lunar (1.0.53-1) precise; urgency=low
   * Satellites can now be sorted by rise date/time.
   * Removed the satellite subsequent pass information as it slowed down the
     update of the indicator (noticable when many satellites are checked).
+  * When showing only visible passes, satellites which are circumpolar or
+    'always up' are included, despite not actually transiting.
   * Overhaul of the preferences dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 12 Sep 2014 15:55:26 +1000
