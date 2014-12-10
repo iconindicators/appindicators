@@ -32,11 +32,6 @@
 #  http://lazka.github.io/pgi-docs
 
 
-# TODO What happens if a satellite is never up?  Does it get displayed?
-# What about if it is always up?
-# Investigate all these conditions...!
-
-
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
