@@ -254,7 +254,7 @@ class IndicatorLunar:
         ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
 
 #TODO Why is this done BEFORE the backend updates/calculations...if so, why?
-        self.satelliteNotification( ephemNow )
+#         self.satelliteNotification( ephemNow )
 
         self.dataPrevious = self.data # Used to access satellite pass information when a satellite is currently in transit.
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
@@ -265,10 +265,10 @@ class IndicatorLunar:
 
         self.nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
-        self.updateMoon( ephemNow, lunarPhase )
-        self.updateSun( ephemNow )
-        self.updatePlanets( ephemNow )
-        self.updateStars( ephemNow )
+#         self.updateMoon( ephemNow, lunarPhase )
+#         self.updateSun( ephemNow )
+#         self.updatePlanets( ephemNow )
+#         self.updateStars( ephemNow )
         self.updateSatellites( ephemNow )
 
         GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
@@ -277,18 +277,24 @@ class IndicatorLunar:
     def updateFrontend( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
         self.updateMenu( ephemNow, lunarPhase )
         self.updateIcon( ephemNow, lunarIlluminationPercentage )
-        self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
+#         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
+        self.satelliteNotification( ephemNow )
 
         self.nextUpdates.sort()
-        nextUpdateInSeconds = int ( ( ephem.localtime( self.nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() ) + 10 # Add a 10 second buffer.
+        nextUpdateInSeconds = int( math.ceil( ( ephem.localtime( self.nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() ) )
+        print( nextUpdateInSeconds )
         if nextUpdateInSeconds < 60: # Ensure the update period is positive and not too frequent...
             nextUpdateInSeconds = 60
 
+        print( nextUpdateInSeconds )
         if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update period is at least hourly...
             nextUpdateInSeconds = ( 60 * 60 )
 
+        print( nextUpdateInSeconds )
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
+        print( "Next update at", datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds ) )
+        print()
 
 
 #TODO Test and make sure this all makes sense!!!
@@ -300,35 +306,57 @@ class IndicatorLunar:
         for key in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
 
             # Is there a rise/set time for the current satellite...
+            fullKey = key + ( IndicatorLunar.DATA_RISE_TIME, )
+            exists = fullKey in self.data 
+  
+            fullKey = key + ( IndicatorLunar.DATA_SET_TIME, )
+            exists = fullKey in self.data 
+
             if not (
-                ( key, IndicatorLunar.DATA_RISE_TIME ) in self.data and 
-                ( key, IndicatorLunar.DATA_SET_TIME ) in self.data ):
+                ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.data and 
+                ( key + ( IndicatorLunar.DATA_SET_TIME, ) ) in self.data ):
                 continue
 
             # Ensure the current time is within the rise/set...
             if not (
-                ephemNowInLocalTime > ephem.Date( self.data[ ( key, IndicatorLunar.DATA_RISE_TIME ) ] ) and
-                ephemNowInLocalTime < ephem.Date( self.data[ ( key, IndicatorLunar.DATA_SET_TIME  ) ] ) ):
+                ephemNowInLocalTime > ephem.Date( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) and
+                ephemNowInLocalTime < ephem.Date( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) ):
                 continue
 
             # Show a notification for the satellite, but only once per pass...
             if key in self.satelliteNotifications and ephemNowInLocalTime < ephem.Date( self.satelliteNotifications[ key ] ):
                 continue
 
-            self.satelliteNotifications[ key ] = self.data[ ( key, IndicatorLunar.DATA_SET_TIME ) ] # Flag to ensure the notification happens once per satellite's pass.
+# [['COSMOS 2428 - 31792', ('COSMOS 2428', '31792'), '2014-12-10 20:40:26'], ['SL-3 R/B - 04814', ('SL-3 R/B', '04814'), '2014-12-10 20:40:58'], ['ERS-2 - 23560', ('ERS-2', '23560'), '2014-12-10 20:41:15'], ['SL-3 R/B - 10114', ('SL-3 R/B', '10114'), '2014-12-10 20:41:37'], ['SL-16 R/B - 31793', ('SL-16 R/B', '31793'), '2014-12-10 20:44:59'], ['ALOS (DAICHI) - 28931', ('ALOS (DAICHI)', '28931'), '2014-12-10 20:45:38'], ['SL-16 R/B - 23705', ('SL-16 R/B', '23705'), '2014-12-10 20:47:27'], ['COSMOS 2058 - 20465', ('COSMOS 2058', '20465'), '2014-12-10 20:47:29'], ['COSMOS 1844 - 17973', ('COSMOS 1844', '17973'), '2014-12-10 20:49:23'], ['ARIANE 40 R/B - 21610', ('ARIANE 40 R/B', '21610'), '2014-12-10 20:49:30'], ['OAO 2 - 03597', ('OAO 2', '03597'), '2014-12-10 20:52:00'], ['COSMOS 1500 - 14372', ('COSMOS 1500', '14372'), '2014-12-10 20:52:11'], ['SL-16 R/B - 22566', ('SL-16 R/B', '22566'), '2014-12-10 20:52:34'], ['SL-16 R/B - 22220', ('SL-16 R/B', '22220'), '2014-12-10 20:52:55'], ['H-2A R/B - 28932', ('H-2A R/B', '28932'), '2014-12-10 20:53:52'], ['SEASAT 1 - 10967', ('SEASAT 1', '10967'), '2014-12-10 20:58:48'], ['ENVISAT - 27386', ('ENVISAT', '27386'), '2014-12-10 20:59:20'], ['ISIS 1 - 03669', ('ISIS 1', '03669'), '2014-12-10 20:59:54'], ['ATLAS 5 CENTAUR R/B - 30778', ('ATLAS 5 CENTAUR R/B', '30778'), '2014-12-10 21:02:08'], ['COSMOS 1953 - 19210', ('COSMOS 1953', '19210'), '2014-12-10 21:04:46'], ['GENESIS 1 - 29252', ('GENESIS 1', '29252'), '2014-12-10 21:06:07'], ['SL-3 R/B - 13154', ('SL-3 R/B', '13154'), '2014-12-10 21:06:23'], ['MIDORI II (ADEOS-II) - 27597', ('MIDORI II (ADEOS-II)', '27597'), '2014-12-10 21:07:11'], ['COSMOS 2084 - 20663', ('COSMOS 2084', '20663'), '2014-12-10 21:09:00'], ['SL-14 R/B - 16882', ('SL-14 R/B', '16882'), '2014-12-10 21:10:59'], ['SL-16 R/B - 23343', ('SL-16 R/B', '23343'), '2014-12-10 21:11:05'], ['SUZAKU (ASTRO-EII) - 28773', ('SUZAKU (ASTRO-EII)', '28773'), '2014-12-10 21:11:19'], ['GENESIS 2 - 31789', ('GENESIS 2', '31789'), '2014-12-10 21:11:50'], ['CZ-4B R/B - 28059', ('CZ-4B R/B', '28059'), '2014-12-10 21:15:59'], ['SL-16 R/B - 28353', ('SL-16 R/B', '28353'), '2014-12-10 21:18:11'], ['SL-3 R/B - 14208', ('SL-3 R/B', '14208'), '2014-12-10 21:20:28'], ['SL-16 R/B - 22803', ('SL-16 R/B', '22803'), '2014-12-10 21:21:09'], ['SL-14 R/B - 17912', ('SL-14 R/B', '17912'), '2014-12-10 21:21:37'], ['SL-3 R/B - 13068', ('SL-3 R/B', '13068'), '2014-12-10 21:23:26'], ['SL-8 R/B - 12139', ('SL-8 R/B', '12139'), '2014-12-10 21:29:16'], ['ARIANE 5 R/B - 28499', ('ARIANE 5 R/B', '28499'), '2014-12-10 21:30:42'], ['CZ-2D R/B - 28738', ('CZ-2D R/B', '28738'), '2014-12-10 21:31:30'], ['SL-16 R/B - 24298', ('SL-16 R/B', '24298'), '2014-12-10 21:32:42'], ['COSMOS 482 DESCENT CRAFT - 06073', ('COSMOS 482 DESCENT CRAFT', '06073'), '2014-12-10 21:38:31'], ['IDEFIX & ARIANE 42P R/B - 27422', ('IDEFIX & ARIANE 42P R/B', '27422'), '2014-12-10 21:38:57'], ['SL-8 R/B - 07004', ('SL-8 R/B', '07004'), '2014-12-10 21:39:48'], ['COSMOS 2151 - 21422', ('COSMOS 2151', '21422'), '2014-12-10 21:45:16'], ['SL-14 R/B - 11672', ('SL-14 R/B', '11672'), '2014-12-10 21:50:18'], ['SL-3 R/B - 11849', ('SL-3 R/B', '11849'), '2014-12-10 21:52:46'], ['SL-16 R/B - 23088', ('SL-16 R/B', '23088'), '2014-12-10 21:55:15'], ['SL-14 R/B - 11267', ('SL-14 R/B', '11267'), '2014-12-10 21:56:31'], ['ATLAS CENTAUR R/B - 06155', ('ATLAS CENTAUR R/B', '06155'), '2014-12-10 22:03:00'], ['AJISAI (EGS) - 16908', ('AJISAI (EGS)', '16908'), '2014-12-10 22:09:05'], ['SL-3 R/B - 19046', ('SL-3 R/B', '19046'), '2014-12-10 22:10:37'], ['SL-16 R/B - 25407', ('SL-16 R/B', '25407'), '2014-12-10 22:10:54'], ['SL-8 R/B - 21876', ('SL-8 R/B', '21876'), '2014-12-10 22:12:27'], ['KORONAS-FOTON - 33504', ('KORONAS-FOTON', '33504'), '2014-12-10 22:13:22'], ['DELTA 2 R/B(1) - 20453', ('DELTA 2 R/B(1)', '20453'), '2014-12-10 22:14:12'], ['SL-3 R/B - 13403', ('SL-3 R/B', '13403'), '2014-12-10 22:14:12'], ['COSMOS 1544 - 14819', ('COSMOS 1544', '14819'), '2014-12-10 22:14:36'], ['ATLAS CENTAUR 2 - 00694', ('ATLAS CENTAUR 2', '00694'), '2014-12-10 22:18:33'], ['CUSAT 2 & FALCON 9 R/B - 39271', ('CUSAT 2 & FALCON 9 R/B', '39271'), '2014-12-10 22:18:37'], ['COSMOS 2242 - 22626', ('COSMOS 2242', '22626'), '2014-12-10 22:18:49'], ['DELTA 1 R/B - 20323', ('DELTA 1 R/B', '20323'), '2014-12-10 22:21:45'], ['INTERCOSMOS 24 - 20261', ('INTERCOSMOS 24', '20261'), '2014-12-10 22:24:47'], ['ERBS - 15354', ('ERBS', '15354'), '2014-12-10 22:30:34'], ['SL-3 R/B - 00877', ('SL-3 R/B', '00877'), '2014-12-10 22:37:52'], ['SL-3 R/B - 16111', ('SL-3 R/B', '16111'), '2014-12-10 22:39:45'], ['SL-8 R/B - 02802', ('SL-8 R/B', '02802'), '2014-12-10 22:46:58'], ['SL-14 R/B - 18153', ('SL-14 R/B', '18153'), '2014-12-10 22:53:18'], ['SL-3 R/B - 12904', ('SL-3 R/B', '12904'), '2014-12-10 23:01:21'], ['TERRA - 25994', ('TERRA', '25994'), '2014-12-10 23:04:03'], ['SL-14 R/B - 18749', ('SL-14 R/B', '18749'), '2014-12-10 23:10:05'], ['COSMOS 1626 - 15494', ('COSMOS 1626', '15494'), '2014-12-10 23:13:41'], ['H-2A R/B - 27601', ('H-2A R/B', '27601'), '2014-12-10 23:14:14'], ['SL-16 R/B - 19120', ('SL-16 R/B', '19120'), '2014-12-10 23:14:28'], ['ASTEX 1 - 05560', ('ASTEX 1', '05560'), '2014-12-10 23:23:44'], ['AKARI (ASTRO-F) - 28939', ('AKARI (ASTRO-F)', '28939'), '2014-12-10 23:31:07'], ['SL-8 R/B - 20775', ('SL-8 R/B', '20775'), '2014-12-10 23:31:19'], ['CZ-2C R/B - 31114', ('CZ-2C R/B', '31114'), '2014-12-10 23:36:49'], ['SL-8 R/B - 15483', ('SL-8 R/B', '15483'), '2014-12-10 23:40:59'], ['OAO 3 (COPERNICUS) - 06153', ('OAO 3 (COPERNICUS)', '06153'), '2014-12-10 23:51:09'], ['INTERCOSMOS 25 - 21819', ('INTERCOSMOS 25', '21819'), '2014-12-10 23:56:22'], ['COSMOS 2278 - 23087', ('COSMOS 2278', '23087'), '2014-12-11 00:19:23'], ['SL-14 R/B - 21820', ('SL-14 R/B', '21820'), '2014-12-11 00:20:29'], ['SL-14 R/B - 15945', ('SL-14 R/B', '15945'), '2014-12-11 00:30:22'], ['SL-14 R/B - 20511', ('SL-14 R/B', '20511'), '2014-12-11 00:30:54'], ['ORBVIEW 2 (SEASTAR) - 24883', ('ORBVIEW 2 (SEASTAR)', '24883'), '2014-12-11 00:32:20'], ['AQUA - 27424', ('AQUA', '27424'), '2014-12-11 00:42:43'], ['SL-12 R/B(2) - 15772', ('SL-12 R/B(2)', '15772'), '2014-12-11 00:44:30'], ['SL-8 R/B - 11574', ('SL-8 R/B', '11574'), '2014-12-11 00:48:10'], ['SL-14 R/B - 21423', ('SL-14 R/B', '21423'), '2014-12-11 00:53:18'], ['SL-8 R/B - 19257', ('SL-8 R/B', '19257'), '2014-12-11 00:54:59'], ['CZ-4B R/B - 27432', ('CZ-4B R/B', '27432'), '2014-12-11 01:15:01'], ['SL-14 R/B - 14820', ('SL-14 R/B', '14820'), '2014-12-11 01:28:12'], ['COSMOS 1933 - 18958', ('COSMOS 1933', '18958'), '2014-12-11 01:32:56'], ['OKEAN-3 - 21397', ('OKEAN-3', '21397'), '2014-12-11 01:33:23'], ['SERT 2 - 04327', ('SERT 2', '04327'), '2014-12-11 01:36:52'], ['SL-14 R/B - 20262', ('SL-14 R/B', '20262'), '2014-12-11 01:40:04'], ['COSMOS 1867 - 18187', ('COSMOS 1867', '18187'), '2014-12-11 01:40:42'], ['SL-3 R/B - 05118', ('SL-3 R/B', '05118'), '2014-12-11 01:40:51'], ['THOR AGENA D R/B - 00733', ('THOR AGENA D R/B', '00733'), '2014-12-11 01:42:12'], ['ERS-1 - 21574', ('ERS-1', '21574'), '2014-12-11 01:55:02'], ['SL-16 R/B - 19650', ('SL-16 R/B', '19650'), '2014-12-11 01:55:21'], ['SL-16 R/B - 20625', ('SL-16 R/B', '20625'), '2014-12-11 01:58:19'], ['RESURS-DK 1 - 29228', ('RESURS-DK 1', '29228'), '2014-12-11 02:07:28'], ['CZ-2C R/B - 28222', ('CZ-2C R/B', '28222'), '2014-12-11 02:12:37'], ['SL-14 R/B - 19574', ('SL-14 R/B', '19574'), '2014-12-11 02:19:16'], ['SL-8 R/B - 12389', ('SL-8 R/B', '12389'), '2014-12-11 02:29:53'], ['SL-16 R/B - 25861', ('SL-16 R/B', '25861'), '2014-12-11 02:32:55'], ['SL-8 R/B - 03230', ('SL-8 R/B', '03230'), '2014-12-11 02:35:40'], ['SL-16 R/B - 17590', ('SL-16 R/B', '17590'), '2014-12-11 02:41:29'], ['SL-8 R/B - 05730', ('SL-8 R/B', '05730'), '2014-12-11 02:42:05'], ['ARIANE 40+ R/B - 23561', ('ARIANE 40+ R/B', '23561'), '2014-12-11 02:42:26'], ['OKEAN-O - 25860', ('OKEAN-O', '25860'), '2014-12-11 02:54:02'], ['SL-16 R/B - 25400', ('SL-16 R/B', '25400'), '2014-12-11 02:56:41'], ['SL-16 R/B - 16182', ('SL-16 R/B', '16182'), '2014-12-11 02:57:39'], ['SL-8 R/B - 21938', ('SL-8 R/B', '21938'), '2014-12-11 03:05:37'], ['CZ-4B R/B - 25732', ('CZ-4B R/B', '25732'), '2014-12-11 03:07:54'], ['ARIANE 40 R/B - 22830', ('ARIANE 40 R/B', '22830'), '2014-12-11 03:11:27'], ['CZ-2C R/B - 28480', ('CZ-2C R/B', '28480'), '2014-12-11 03:23:55'], ['SL-3 R/B - 13819', ('SL-3 R/B', '13819'), '2014-12-11 03:26:10'], ['SL-14 R/B - 16496', ('SL-14 R/B', '16496'), '2014-12-11 03:27:33'], ['COSMOS 1536 - 14699', ('COSMOS 1536', '14699'), '2014-12-11 03:46:34'], ['CZ-4B R/B - 29507', ('CZ-4B R/B', '29507'), '2014-12-11 03:49:51'], ['COSMOS 1833 - 17589', ('COSMOS 1833', '17589'), '2014-12-11 03:53:10'], ['COSMOS 1975 - 19573', ('COSMOS 1975', '19573'), '2014-12-11 03:55:58'], ['ISS (ZARYA) - 25544', ('ISS (ZARYA)', '25544'), '2014-12-11 03:59:02'], ['SL-14 R/B - 26874', ('SL-14 R/B', '26874'), '2014-12-11 04:15:34'], ['METEOR PRIRODA - 12585', ('METEOR PRIRODA', '12585'), '2014-12-11 04:16:20'], ['SL-14 R/B - 20466', ('SL-14 R/B', '20466'), '2014-12-11 04:22:48'], ['COSMOS 1812 - 17295', ('COSMOS 1812', '17295'), '2014-12-11 04:32:03'], ['COSMOS 2228 - 22286', ('COSMOS 2228', '22286'), '2014-12-11 04:34:23'], ['JB-3 2 (ZY 2B) - 27550', ('JB-3 2 (ZY 2B)', '27550'), '2014-12-11 04:56:38'], ['DELTA 1 R/B - 08063', ('DELTA 1 R/B', '08063'), '2014-12-11 05:00:29'], ['SL-16 R/B - 22285', ('SL-16 R/B', '22285'), '2014-12-11 05:23:08'], ['SL-14 R/B - 17567', ('SL-14 R/B', '17567'), '2014-12-11 05:25:00'], ['SL-8 R/B - 14484', ('SL-8 R/B', '14484'), '2014-12-11 05:26:33'], ['SL-8 R/B - 21088', ('SL-8 R/B', '21088'), '2014-12-11 05:29:32'], ['SL-14 R/B - 16792', ('SL-14 R/B', '16792'), '2014-12-11 05:31:50'], ['SL-6 R/B(2) - 20666', ('SL-6 R/B(2)', '20666'), '2014-12-11 05:32:50'], ['HST - 20580', ('HST', '20580'), '2014-12-11 05:44:27'], ['SL-16 R/B - 23405', ('SL-16 R/B', '23405'), '2014-12-11 05:56:59'], ['SL-3 R/B - 12465', ('SL-3 R/B', '12465'), '2014-12-11 06:09:36'], ['COSMO-SKYMED 1 - 31598', ('COSMO-SKYMED 1', '31598'), '2014-12-11 06:21:31'], ['TIANGONG 1 - 37820', ('TIANGONG 1', '37820'), '2014-12-11 06:23:26'], ['SL-8 R/B - 25723', ('SL-8 R/B', '25723'), '2014-12-11 06:30:02'], ['SL-8 R/B - 08459', ('SL-8 R/B', '08459'), '2014-12-11 07:17:45']]
+# 97
+# 97
+# 97
+# Next update at 2014-12-10 20:40:26.990610
+# 
+# [['SL-3 R/B - 04814', ('SL-3 R/B', '04814'), '2014-12-10 20:40:52'], ['ERS-2 - 23560', ('ERS-2', '23560'), '2014-12-10 20:41:19'], ['SL-3 R/B - 10114', ('SL-3 R/B', '10114'), '2014-12-10 20:41:35'], ['SL-16 R/B - 31793', ('SL-16 R/B', '31793'), '2014-12-10 20:45:00'], ['ALOS (DAICHI) - 28931', ('ALOS (DAICHI)', '28931'), '2014-12-10 20:45:39'], ['SL-16 R/B - 23705', ('SL-16 R/B', '23705'), '2014-12-10 20:47:24'], ['COSMOS 2058 - 20465', ('COSMOS 2058', '20465'), '2014-12-10 20:47:35'], ['COSMOS 1844 - 17973', ('COSMOS 1844', '17973'), '2014-12-10 20:49:25'], ['ARIANE 40 R/B - 21610', ('ARIANE 40 R/B', '21610'), '2014-12-10 20:49:34'], ['OAO 2 - 03597', ('OAO 2', '03597'), '2014-12-10 20:52:04'], ['COSMOS 1500 - 14372', ('COSMOS 1500', '14372'), '2014-12-10 20:52:20'], ['SL-16 R/B - 22566', ('SL-16 R/B', '22566'), '2014-12-10 20:52:37'], ['SL-16 R/B - 22220', ('SL-16 R/B', '22220'), '2014-12-10 20:52:58'], ['H-2A R/B - 28932', ('H-2A R/B', '28932'), '2014-12-10 20:53:49'], ['SEASAT 1 - 10967', ('SEASAT 1', '10967'), '2014-12-10 20:58:42'], ['ENVISAT - 27386', ('ENVISAT', '27386'), '2014-12-10 20:59:16'], ['ISIS 1 - 03669', ('ISIS 1', '03669'), '2014-12-10 20:59:54'], ['ATLAS 5 CENTAUR R/B - 30778', ('ATLAS 5 CENTAUR R/B', '30778'), '2014-12-10 21:02:02'], ['COSMOS 1953 - 19210', ('COSMOS 1953', '19210'), '2014-12-10 21:04:40'], ['GENESIS 1 - 29252', ('GENESIS 1', '29252'), '2014-12-10 21:06:12'], ['SL-3 R/B - 13154', ('SL-3 R/B', '13154'), '2014-12-10 21:06:28'], ['MIDORI II (ADEOS-II) - 27597', ('MIDORI II (ADEOS-II)', '27597'), '2014-12-10 21:07:13'], ['COSMOS 2084 - 20663', ('COSMOS 2084', '20663'), '2014-12-10 21:08:54'], ['SL-14 R/B - 16882', ('SL-14 R/B', '16882'), '2014-12-10 21:11:01'], ['SL-16 R/B - 23343', ('SL-16 R/B', '23343'), '2014-12-10 21:11:03'], ['SUZAKU (ASTRO-EII) - 28773', ('SUZAKU (ASTRO-EII)', '28773'), '2014-12-10 21:11:13'], ['GENESIS 2 - 31789', ('GENESIS 2', '31789'), '2014-12-10 21:11:45'], ['CZ-4B R/B - 28059', ('CZ-4B R/B', '28059'), '2014-12-10 21:16:01'], ['SL-16 R/B - 28353', ('SL-16 R/B', '28353'), '2014-12-10 21:18:13'], ['SL-3 R/B - 14208', ('SL-3 R/B', '14208'), '2014-12-10 21:20:14'], ['SL-16 R/B - 22803', ('SL-16 R/B', '22803'), '2014-12-10 21:21:11'], ['SL-14 R/B - 17912', ('SL-14 R/B', '17912'), '2014-12-10 21:21:41'], ['SL-3 R/B - 13068', ('SL-3 R/B', '13068'), '2014-12-10 21:23:30'], ['SL-8 R/B - 12139', ('SL-8 R/B', '12139'), '2014-12-10 21:29:18'], ['ARIANE 5 R/B - 28499', ('ARIANE 5 R/B', '28499'), '2014-12-10 21:30:43'], ['CZ-2D R/B - 28738', ('CZ-2D R/B', '28738'), '2014-12-10 21:31:35'], ['SL-16 R/B - 24298', ('SL-16 R/B', '24298'), '2014-12-10 21:32:40'], ['COSMOS 482 DESCENT CRAFT - 06073', ('COSMOS 482 DESCENT CRAFT', '06073'), '2014-12-10 21:38:31'], ['IDEFIX & ARIANE 42P R/B - 27422', ('IDEFIX & ARIANE 42P R/B', '27422'), '2014-12-10 21:39:00'], ['SL-8 R/B - 07004', ('SL-8 R/B', '07004'), '2014-12-10 21:39:52'], ['COSMOS 2151 - 21422', ('COSMOS 2151', '21422'), '2014-12-10 21:45:10'], ['SL-14 R/B - 11672', ('SL-14 R/B', '11672'), '2014-12-10 21:50:14'], ['SL-3 R/B - 11849', ('SL-3 R/B', '11849'), '2014-12-10 21:52:50'], ['SL-16 R/B - 23088', ('SL-16 R/B', '23088'), '2014-12-10 21:55:13'], ['SL-14 R/B - 11267', ('SL-14 R/B', '11267'), '2014-12-10 21:56:31'], ['ATLAS CENTAUR R/B - 06155', ('ATLAS CENTAUR R/B', '06155'), '2014-12-10 22:03:01'], ['AJISAI (EGS) - 16908', ('AJISAI (EGS)', '16908'), '2014-12-10 22:09:05'], ['SL-16 R/B - 25407', ('SL-16 R/B', '25407'), '2014-12-10 22:10:49'], ['SL-3 R/B - 13403', ('SL-3 R/B', '13403'), '2014-12-10 22:12:12'], ['SL-8 R/B - 21876', ('SL-8 R/B', '21876'), '2014-12-10 22:12:38'], ['KORONAS-FOTON - 33504', ('KORONAS-FOTON', '33504'), '2014-12-10 22:13:20'], ['DELTA 2 R/B(1) - 20453', ('DELTA 2 R/B(1)', '20453'), '2014-12-10 22:14:07'], ['COSMOS 1544 - 14819', ('COSMOS 1544', '14819'), '2014-12-10 22:14:39'], ['CUSAT 2 & FALCON 9 R/B - 39271', ('CUSAT 2 & FALCON 9 R/B', '39271'), '2014-12-10 22:18:38'], ['DELTA 1 R/B - 20323', ('DELTA 1 R/B', '20323'), '2014-12-10 22:21:44'], ['INTERCOSMOS 24 - 20261', ('INTERCOSMOS 24', '20261'), '2014-12-10 22:24:47'], ['ERBS - 15354', ('ERBS', '15354'), '2014-12-10 22:30:41'], ['SL-3 R/B - 16111', ('SL-3 R/B', '16111'), '2014-12-10 22:37:18'], ['SL-3 R/B - 00877', ('SL-3 R/B', '00877'), '2014-12-10 22:37:52'], ['SL-8 R/B - 02802', ('SL-8 R/B', '02802'), '2014-12-10 22:47:00'], ['SL-14 R/B - 18153', ('SL-14 R/B', '18153'), '2014-12-10 22:53:17'], ['SL-3 R/B - 12904', ('SL-3 R/B', '12904'), '2014-12-10 23:01:20'], ['TERRA - 25994', ('TERRA', '25994'), '2014-12-10 23:04:06'], ['SL-14 R/B - 18749', ('SL-14 R/B', '18749'), '2014-12-10 23:10:01'], ['COSMOS 1626 - 15494', ('COSMOS 1626', '15494'), '2014-12-10 23:10:39'], ['H-2A R/B - 27601', ('H-2A R/B', '27601'), '2014-12-10 23:14:02'], ['SL-16 R/B - 19120', ('SL-16 R/B', '19120'), '2014-12-10 23:14:32'], ['ASTEX 1 - 05560', ('ASTEX 1', '05560'), '2014-12-10 23:23:51'], ['AKARI (ASTRO-F) - 28939', ('AKARI (ASTRO-F)', '28939'), '2014-12-10 23:31:12'], ['SL-8 R/B - 20775', ('SL-8 R/B', '20775'), '2014-12-10 23:31:21'], ['CZ-2C R/B - 31114', ('CZ-2C R/B', '31114'), '2014-12-10 23:36:55'], ['SL-8 R/B - 15483', ('SL-8 R/B', '15483'), '2014-12-10 23:41:02'], ['OAO 3 (COPERNICUS) - 06153', ('OAO 3 (COPERNICUS)', '06153'), '2014-12-10 23:51:05'], ['INTERCOSMOS 25 - 21819', ('INTERCOSMOS 25', '21819'), '2014-12-10 23:56:22'], ['COSMOS 2278 - 23087', ('COSMOS 2278', '23087'), '2014-12-11 00:19:23'], ['SL-14 R/B - 21820', ('SL-14 R/B', '21820'), '2014-12-11 00:20:30'], ['SL-14 R/B - 15945', ('SL-14 R/B', '15945'), '2014-12-11 00:30:19'], ['SL-14 R/B - 20511', ('SL-14 R/B', '20511'), '2014-12-11 00:30:57'], ['ORBVIEW 2 (SEASTAR) - 24883', ('ORBVIEW 2 (SEASTAR)', '24883'), '2014-12-11 00:32:20'], ['AQUA - 27424', ('AQUA', '27424'), '2014-12-11 00:42:44'], ['SL-12 R/B(2) - 15772', ('SL-12 R/B(2)', '15772'), '2014-12-11 00:44:32'], ['SL-8 R/B - 11574', ('SL-8 R/B', '11574'), '2014-12-11 00:48:10'], ['SL-14 R/B - 21423', ('SL-14 R/B', '21423'), '2014-12-11 00:53:09'], ['SL-8 R/B - 19257', ('SL-8 R/B', '19257'), '2014-12-11 00:54:58'], ['CZ-4B R/B - 27432', ('CZ-4B R/B', '27432'), '2014-12-11 01:15:02'], ['SL-14 R/B - 14820', ('SL-14 R/B', '14820'), '2014-12-11 01:28:10'], ['COSMOS 1933 - 18958', ('COSMOS 1933', '18958'), '2014-12-11 01:33:01'], ['OKEAN-3 - 21397', ('OKEAN-3', '21397'), '2014-12-11 01:33:30'], ['SERT 2 - 04327', ('SERT 2', '04327'), '2014-12-11 01:36:53'], ['SL-14 R/B - 20262', ('SL-14 R/B', '20262'), '2014-12-11 01:40:03'], ['COSMOS 1867 - 18187', ('COSMOS 1867', '18187'), '2014-12-11 01:40:48'], ['SL-3 R/B - 05118', ('SL-3 R/B', '05118'), '2014-12-11 01:40:53'], ['THOR AGENA D R/B - 00733', ('THOR AGENA D R/B', '00733'), '2014-12-11 01:42:10'], ['ERS-1 - 21574', ('ERS-1', '21574'), '2014-12-11 01:54:52'], ['SL-16 R/B - 19650', ('SL-16 R/B', '19650'), '2014-12-11 01:55:20'], ['SL-16 R/B - 20625', ('SL-16 R/B', '20625'), '2014-12-11 01:58:21'], ['RESURS-DK 1 - 29228', ('RESURS-DK 1', '29228'), '2014-12-11 02:07:31'], ['CZ-2C R/B - 28222', ('CZ-2C R/B', '28222'), '2014-12-11 02:12:36'], ['SL-14 R/B - 19574', ('SL-14 R/B', '19574'), '2014-12-11 02:19:08'], ['SL-8 R/B - 12389', ('SL-8 R/B', '12389'), '2014-12-11 02:29:52'], ['SL-16 R/B - 25861', ('SL-16 R/B', '25861'), '2014-12-11 02:32:58'], ['SL-8 R/B - 03230', ('SL-8 R/B', '03230'), '2014-12-11 02:35:45'], ['SL-16 R/B - 17590', ('SL-16 R/B', '17590'), '2014-12-11 02:41:31'], ['SL-8 R/B - 05730', ('SL-8 R/B', '05730'), '2014-12-11 02:42:15'], ['ARIANE 40+ R/B - 23561', ('ARIANE 40+ R/B', '23561'), '2014-12-11 02:42:27'], ['OKEAN-O - 25860', ('OKEAN-O', '25860'), '2014-12-11 02:54:05'], ['SL-16 R/B - 25400', ('SL-16 R/B', '25400'), '2014-12-11 02:56:31'], ['SL-16 R/B - 16182', ('SL-16 R/B', '16182'), '2014-12-11 02:57:29'], ['SL-8 R/B - 21938', ('SL-8 R/B', '21938'), '2014-12-11 03:05:33'], ['CZ-4B R/B - 25732', ('CZ-4B R/B', '25732'), '2014-12-11 03:07:55'], ['ARIANE 40 R/B - 22830', ('ARIANE 40 R/B', '22830'), '2014-12-11 03:11:28'], ['CZ-2C R/B - 28480', ('CZ-2C R/B', '28480'), '2014-12-11 03:23:58'], ['SL-3 R/B - 13819', ('SL-3 R/B', '13819'), '2014-12-11 03:26:06'], ['SL-14 R/B - 16496', ('SL-14 R/B', '16496'), '2014-12-11 03:27:30'], ['COSMOS 1536 - 14699', ('COSMOS 1536', '14699'), '2014-12-11 03:46:27'], ['CZ-4B R/B - 29507', ('CZ-4B R/B', '29507'), '2014-12-11 03:49:55'], ['COSMOS 1833 - 17589', ('COSMOS 1833', '17589'), '2014-12-11 03:53:11'], ['COSMOS 1975 - 19573', ('COSMOS 1975', '19573'), '2014-12-11 03:56:02'], ['ISS (ZARYA) - 25544', ('ISS (ZARYA)', '25544'), '2014-12-11 03:58:58'], ['SL-14 R/B - 26874', ('SL-14 R/B', '26874'), '2014-12-11 04:15:40'], ['METEOR PRIRODA - 12585', ('METEOR PRIRODA', '12585'), '2014-12-11 04:16:24'], ['SL-14 R/B - 20466', ('SL-14 R/B', '20466'), '2014-12-11 04:22:50'], ['COSMOS 1812 - 17295', ('COSMOS 1812', '17295'), '2014-12-11 04:32:03'], ['COSMOS 2228 - 22286', ('COSMOS 2228', '22286'), '2014-12-11 04:34:23'], ['JB-3 2 (ZY 2B) - 27550', ('JB-3 2 (ZY 2B)', '27550'), '2014-12-11 04:56:43'], ['DELTA 1 R/B - 08063', ('DELTA 1 R/B', '08063'), '2014-12-11 05:00:35'], ['SL-16 R/B - 22285', ('SL-16 R/B', '22285'), '2014-12-11 05:23:08'], ['SL-14 R/B - 17567', ('SL-14 R/B', '17567'), '2014-12-11 05:24:52'], ['SL-8 R/B - 14484', ('SL-8 R/B', '14484'), '2014-12-11 05:26:29'], ['SL-8 R/B - 21088', ('SL-8 R/B', '21088'), '2014-12-11 05:29:34'], ['SL-14 R/B - 16792', ('SL-14 R/B', '16792'), '2014-12-11 05:31:52'], ['SL-6 R/B(2) - 20666', ('SL-6 R/B(2)', '20666'), '2014-12-11 05:32:50'], ['HST - 20580', ('HST', '20580'), '2014-12-11 05:44:22'], ['SL-16 R/B - 23405', ('SL-16 R/B', '23405'), '2014-12-11 05:56:59'], ['SL-3 R/B - 12465', ('SL-3 R/B', '12465'), '2014-12-11 06:09:28'], ['COSMO-SKYMED 1 - 31598', ('COSMO-SKYMED 1', '31598'), '2014-12-11 06:21:35'], ['TIANGONG 1 - 37820', ('TIANGONG 1', '37820'), '2014-12-11 06:23:33'], ['SL-8 R/B - 25723', ('SL-8 R/B', '25723'), '2014-12-11 06:30:04'], ['SL-8 R/B - 08459', ('SL-8 R/B', '08459'), '2014-12-11 07:17:48'], ['ATLAS CENTAUR 2 - 00694', ('ATLAS CENTAUR 2', '00694'), 'No passes within the next 10 days.'], ['COSMOS 2242 - 22626', ('COSMOS 2242', '22626'), 'No passes within the next 10 days.'], ['COSMOS 2428 - 31792', ('COSMOS 2428', '31792'), 'No passes within the next 10 days.'], ['SL-3 R/B - 19046', ('SL-3 R/B', '19046'), 'No passes within the next 10 days.']]
+# ('COSMOS 2428', '31792') 2014/12/10 20:40:28
+# 24
+# 60
+# 60
+# Next update at 2014-12-10 20:41:29.534940
+
+
+            self.satelliteNotifications[ key ] = self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] # Ensures the notification happens once per satellite pass.
+
+            print( key, ephemNowInLocalTime )
 
             # Parse the satellite summary/message to create the notification...
-            riseTime = self.data[ ( key, IndicatorLunar.DATA_RISE_TIME ) ]
-            degreeSymbolIndex = self.data[ ( key, IndicatorLunar.DATA_RISE_AZIMUTH ) ].index( "°" )
-            riseAzimuth = self.data[ ( key, IndicatorLunar.DATA_RISE_AZIMUTH ) ][ 0 : degreeSymbolIndex + 1 ]
+            riseTime = self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
+            degreeSymbolIndex = self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ].index( "°" )
+            riseAzimuth = self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ][ 0 : degreeSymbolIndex + 1 ]
 
-            setTime = self.data[ ( key, IndicatorLunar.DATA_SET_TIME ) ]
-            degreeSymbolIndex = self.data[ ( key, IndicatorLunar.DATA_SET_AZIMUTH ) ].index( "°" )
-            setAzimuth = self.data[ ( key, IndicatorLunar.DATA_SET_AZIMUTH ) ][ 0 : degreeSymbolIndex + 1 ]
+            setTime = self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ]
+            degreeSymbolIndex = self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ].index( "°" )
+            setAzimuth = self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ][ 0 : degreeSymbolIndex + 1 ]
 
             summary = self.satelliteNotificationSummary. \
-                replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] ). \
-                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNameNumber[ 1 ] ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NAME, key[ 0 ] ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
@@ -338,8 +366,8 @@ class IndicatorLunar:
             if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
 
             message = self.satelliteNotificationMessage. \
-                replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteNameNumber[ 0 ] ). \
-                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNameNumber[ 1 ] ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NAME, key[ 0 ] ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
@@ -383,10 +411,10 @@ class IndicatorLunar:
     def updateMenu( self, ephemNow, lunarPhase ):
         menu = Gtk.Menu()
 
-        self.updateMoonMenu( menu )
-        self.updateSunMenu( menu )
-        self.updatePlanetsMenu( menu )
-        self.updateStarsMenu( menu )
+#         self.updateMoonMenu( menu )
+#         self.updateSunMenu( menu )
+#         self.updatePlanetsMenu( menu )
+#         self.updateStarsMenu( menu )
         self.updateSatellitesMenu( menu )
 
         menu.append( Gtk.SeparatorMenuItem() )
@@ -662,6 +690,8 @@ class IndicatorLunar:
             menuTextAndSatelliteKeys = sorted( menuTextAndSatelliteKeys, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
         else:
             menuTextAndSatelliteKeys = sorted( menuTextAndSatelliteKeys, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
+
+        print( menuTextAndSatelliteKeys )
 
         # Build the menu...
         satellitesMenuItem = Gtk.MenuItem( "Satellites" )
