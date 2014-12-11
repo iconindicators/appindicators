@@ -989,10 +989,10 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS
 
 
-    def calculateSatelliteRiseTimeBackFromSetTime( self, ephemNow, riseTime, setTime, key, satelliteTLE ):
-        currentDateTime = ephemNow
-        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 10 ) # Stop looking for passes 10 days from ephemNow.
-        while currentDateTime < endDateTime:
+    def calculateSatellitePreviousRiseTime( self, ephemNow, key, satelliteTLE ):
+        currentDateTime = ephem.Date( ephemNow - ephem.minute * 1 ) # Start looking for the rise time one minute prior to the current time.
+        endDateTime = ephem.Date( ephemNow - ephem.hour * 1 ) # Only look back an hour for the rise time (then just give up).
+        while currentDateTime > endDateTime:
             city = self.getCity( currentDateTime )
             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
             satellite.compute( city )
@@ -1014,7 +1014,10 @@ class IndicatorLunar:
                 break
 
             # The pass is valid; determine if the pass is in the future or is in progress...
-            if nextPass[ 0 ] < nextPass[ 4 ]: # Rise time is before set time - the satellite is below the horizon.
+            if nextPass[ 0 ] >= nextPass[ 4 ]:
+                continue
+
+             # Rise time is before set time - the satellite is below the horizon.
                 passIsVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
                 if self.hideSatelliteIfNoVisiblePass and not passIsVisible:
                     currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
