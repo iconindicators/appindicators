@@ -941,9 +941,11 @@ class IndicatorLunar:
             # If the satellite is passing, need to work out when it rose...
             if nextPass[ 0 ] > nextPass[ 4 ]:
                 # The rise time is after set time, meaning the satellite is current passing.
+                setTime = nextPass[ 4 ]
                 nextPass = self.calculateSatellitePassForRisingPriorToNow( currentDateTime, key, satelliteTLE )
                 if nextPass is None:
-                    currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
+                    print( key )
+                    currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
                     continue
 
             # Now have a satellite rise/transit/set; determine if the pass is visible (and if the user wants only visible passes).
