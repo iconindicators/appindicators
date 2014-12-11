@@ -420,7 +420,6 @@ class IndicatorLunar:
 
 
     def updateMoonMenu( self, menu ):
-
         if ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_MESSAGE ) in self.data and \
             self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
             self.hideBodyIfNeverUp:
@@ -455,7 +454,6 @@ class IndicatorLunar:
 
 
     def updateSunMenu( self, menu ):
-
         if ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) in self.data and \
             self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
             self.hideBodyIfNeverUp:
@@ -674,8 +672,6 @@ class IndicatorLunar:
             menuTextAndSatelliteKeys = sorted( menuTextAndSatelliteKeys, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
         else:
             menuTextAndSatelliteKeys = sorted( menuTextAndSatelliteKeys, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
-
-        print( menuTextAndSatelliteKeys )
 
         # Build the menu...
         satellitesMenuItem = Gtk.MenuItem( "Satellites" )
