@@ -1899,7 +1899,6 @@ class IndicatorLunar:
                 except: pass
 
             self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Force the TLE data to be updated.
-#TODO Test hitting fetch, getting TLE data, selecting satellites (different to what was there before the fetch) and hit cancel...does the old data still exist?
             self.data = { } # Erase the data as the user may have changed the satellites and/or location.
             break
 
