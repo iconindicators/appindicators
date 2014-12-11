@@ -236,8 +236,7 @@ class IndicatorLunar:
 
         self.toggleIconState()
 
-        # Update the satellite TLE data at most every 12 hours.
-        # Only accept the latest TLE data if it is valid (otherwise, use the TLE data from the previous run).
+        # Update the satellite TLE data at most every 12 hours.  If the data is invalid, use the TLE data from the previous run.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
             satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
             if satelliteTLEData is None:
@@ -251,14 +250,11 @@ class IndicatorLunar:
             else:
                 self.satelliteTLEData = satelliteTLEData
 
-        ephemNow = ephem.now() # UTC is used in all calculations.  When it comes time to display, conversion to local time takes place.
-
-#TODO Why is this done BEFORE the backend updates/calculations...if so, why?
-#         self.satelliteNotification( ephemNow )
-
         self.dataPrevious = self.data # Used to access satellite pass information when a satellite is currently in transit.
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
-        self.data[ ( IndicatorLunar.DATA_CITY_NAME, "" ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match all other data.
+        self.data[ ( IndicatorLunar.DATA_CITY_NAME, "" ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match the format of all other data.
+
+        ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
 
         lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
@@ -296,6 +292,65 @@ class IndicatorLunar:
         self.lock.release()
         print( "Next update at", datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds ) )
         print()
+
+
+    def updateMenu( self, ephemNow, lunarPhase ):
+        menu = Gtk.Menu()
+
+#TODO Put back!
+#         self.updateMoonMenu( menu )
+#         self.updateSunMenu( menu )
+#         self.updatePlanetsMenu( menu )
+#         self.updateStarsMenu( menu )
+        self.updateSatellitesMenu( menu )
+
+        menu.append( Gtk.SeparatorMenuItem() )
+
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
+        menuItem.connect( "activate", self.onPreferences )
+        menu.append( menuItem )
+
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
+        menuItem.connect( "activate", self.onAbout )
+        menu.append( menuItem )
+
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
+        menuItem.connect( "activate", self.onQuit )
+        menu.append( menuItem )
+
+        self.indicator.set_menu( menu )
+        menu.show_all()
+
+
+    def updateIcon( self, ephemNow, lunarIlluminationPercentage ):
+        parsedOutput = self.indicatorText
+        for key in self.data.keys():
+            parsedOutput = parsedOutput.replace( "[" + " ".join( key ) + "]", self.data[ key ] )
+
+        self.createIcon( lunarIlluminationPercentage, self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), ephem.Moon( self.getCity( ephemNow ) ) ) )
+        self.indicator.set_icon( self.getIconName() )
+        self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
+
+
+    def fullMoonNotification( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
+        if not self.showWerewolfWarning: return
+
+        phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
+
+        if lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
+            phaseIsBetweenNewAndFullInclusive and \
+            ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) <= ephemNow ):
+
+            summary = self.werewolfWarningSummary
+            if self.werewolfWarningSummary == "":
+                summary = " " # The notification summary text cannot be empty (at least on Unity).
+
+            Notify.Notification.new( summary, self.werewolfWarningMessage, self.getIconFile() ).show()
+            self.lastFullMoonNotfication = ephemNow
 
 
 #TODO Test and make sure this all makes sense!!!
@@ -362,64 +417,6 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime )
 
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
-
-
-    def updateIcon( self, ephemNow, lunarIlluminationPercentage ):
-        parsedOutput = self.indicatorText
-        for key in self.data.keys():
-            parsedOutput = parsedOutput.replace( "[" + " ".join( key ) + "]", self.data[ key ] )
-
-        self.createIcon( lunarIlluminationPercentage, self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), ephem.Moon( self.getCity( ephemNow ) ) ) )
-        self.indicator.set_icon( self.getIconName() )
-        self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
-
-
-    def fullMoonNotification( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
-        if not self.showWerewolfWarning: return
-
-        phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
-            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
-            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
-            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
-            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
-
-        if lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
-            phaseIsBetweenNewAndFullInclusive and \
-            ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) <= ephemNow ):
-
-            summary = self.werewolfWarningSummary
-            if self.werewolfWarningSummary == "":
-                summary = " " # The notification summary text cannot be empty (at least on Unity).
-
-            Notify.Notification.new( summary, self.werewolfWarningMessage, self.getIconFile() ).show()
-            self.lastFullMoonNotfication = ephemNow
-
-
-    def updateMenu( self, ephemNow, lunarPhase ):
-        menu = Gtk.Menu()
-
-#         self.updateMoonMenu( menu )
-#         self.updateSunMenu( menu )
-#         self.updatePlanetsMenu( menu )
-#         self.updateStarsMenu( menu )
-        self.updateSatellitesMenu( menu )
-
-        menu.append( Gtk.SeparatorMenuItem() )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        menuItem.connect( "activate", self.onPreferences )
-        menu.append( menuItem )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
-        menuItem.connect( "activate", self.onAbout )
-        menu.append( menuItem )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        menuItem.connect( "activate", self.onQuit )
-        menu.append( menuItem )
-
-        self.indicator.set_menu( menu )
-        menu.show_all()
 
 
     def updateMoonMenu( self, menu ):
