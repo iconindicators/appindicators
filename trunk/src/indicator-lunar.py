@@ -202,7 +202,6 @@ class IndicatorLunar:
     def __init__( self ):
         self.dialog = None
         self.data = { }
-        self.dataPrevious = { }
         self.satelliteNotifications = { }
         self.satelliteTLEData = { }
 
@@ -250,21 +249,19 @@ class IndicatorLunar:
             else:
                 self.satelliteTLEData = satelliteTLEData
 
-        self.dataPrevious = self.data # Used to access satellite pass information when a satellite is currently in transit.
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
         self.data[ ( IndicatorLunar.DATA_CITY_NAME, "" ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match the format of all other data.
+        self.nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
         ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
 
         lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
 
-        self.nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
-
-#         self.updateMoon( ephemNow, lunarPhase )
-#         self.updateSun( ephemNow )
-#         self.updatePlanets( ephemNow )
-#         self.updateStars( ephemNow )
+        self.updateMoon( ephemNow, lunarPhase )
+        self.updateSun( ephemNow )
+        self.updatePlanets( ephemNow )
+        self.updateStars( ephemNow )
         self.updateSatellites( ephemNow )
 
         GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
@@ -273,41 +270,29 @@ class IndicatorLunar:
     def updateFrontend( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
         self.updateMenu( ephemNow, lunarPhase )
         self.updateIcon( ephemNow, lunarIlluminationPercentage )
-#         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
+        self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
         self.satelliteNotification( ephemNow )
 
-#TODO The subsequent updates seem to be too soon...a satellite rises and will set 10 minutes later, but the next update will happen in 2 minutes...why?        
-#         self.nextUpdates.sort()
-        self.nextUpdates = sorted( self.nextUpdates, key = lambda x: ( x[ 0 ] ) )
-        
-#         print( ephem.localtime( self.nextUpdates[ 0 ] ) )
-        print( ephem.localtime( self.nextUpdates[ 0 ][ 0 ] ), self.nextUpdates[ 0 ][ 1 ] )
-        nextUpdateInSeconds = int( ( ephem.localtime( self.nextUpdates[ 0 ][ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() )
-#         nextUpdateInSeconds = int( ( ephem.localtime( self.nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() )
+        self.nextUpdates.sort()
+        nextUpdateInSeconds = int( ( ephem.localtime( self.nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() )
 
         # Ensure the update period is positive, at most every minute and at least every hour.
-        print( nextUpdateInSeconds )
-        if nextUpdateInSeconds < 10:
-            nextUpdateInSeconds = 10
-#         if nextUpdateInSeconds < 60:
-#             nextUpdateInSeconds = 60
-#         elif nextUpdateInSeconds > ( 60 * 60 ):
-#             nextUpdateInSeconds = ( 60 * 60 )
+        if nextUpdateInSeconds < 60:
+            nextUpdateInSeconds = 60
+        elif nextUpdateInSeconds > ( 60 * 60 ):
+            nextUpdateInSeconds = ( 60 * 60 )
 
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
-        print( nextUpdateInSeconds )
-        print( "Next update at", datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds ) )
 
 
     def updateMenu( self, ephemNow, lunarPhase ):
         menu = Gtk.Menu()
 
-#TODO Put back!
-#         self.updateMoonMenu( menu )
-#         self.updateSunMenu( menu )
-#         self.updatePlanetsMenu( menu )
-#         self.updateStarsMenu( menu )
+        self.updateMoonMenu( menu )
+        self.updateSunMenu( menu )
+        self.updatePlanetsMenu( menu )
+        self.updateStarsMenu( menu )
         self.updateSatellitesMenu( menu )
 
         menu.append( Gtk.SeparatorMenuItem() )
@@ -952,36 +937,32 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS
                 break
 
-            # The pass is valid; determine if the pass is in the future or is in progress...
-            if nextPass[ 0 ] < nextPass[ 4 ]: # Rise time is before set time - the satellite is below the horizon.
-                passIsVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
-                if self.hideSatelliteIfNoVisiblePass and not passIsVisible:
-                    currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
+            # Need to get the rise/transit/set for the satellite.
+            # If the satellite is passing, need to work out when it rose...
+            if nextPass[ 0 ] > nextPass[ 4 ]:
+                # The rise time is after set time, meaning the satellite is current passing.
+                nextPass = self.calculateSatellitePassForRisingPriorToNow( currentDateTime, key, satelliteTLE )
+                if nextPass is None:
+                    currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
                     continue
 
-                # The pass is visible and the user wants only visible passes OR the user wants any pass...
-                self.nextUpdates.append( ( nextPass[ 0 ], key ) )
-                self.nextUpdates.append( ( nextPass[ 4 ], key ) )
-#                 self.nextUpdates.append( nextPass[ 0 ] )
-#                 self.nextUpdates.append( nextPass[ 4 ] )
-                self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = self.localiseAndTrim( nextPass[ 0 ] )
-                self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
-                self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = self.localiseAndTrim( nextPass[ 4 ] )
-                self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
-                self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible )
-                break
+            # Now have a satellite rise/transit/set; determine if the pass is visible (and if the user wants only visible passes).
+            passIsVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
+            if self.hideSatelliteIfNoVisiblePass and not passIsVisible:
+                currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
+                continue
 
-            # The satellite is above the horizon which means the rise time is for the NEXT pass and the set time is for the CURRENT pass.
-            # Use the rise/set from the previous run if it exists...
-            if ( ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.dataPrevious ):
-                self.nextUpdates.append( ( nextPass[ 4 ], key ) ) # The rise time is in the past, so no need to add it in.
-#             self.nextUpdates.append( nextPass[ 4 ] ) # The rise time is in the past, so no need to add it in.
-                self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
-                self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ]
-                self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_SET_TIME, ) ]
-                self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ]
-                self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_VISIBLE, ) ]
-                break
+            # The pass is visible and the user wants only visible passes OR the user wants any pass...
+            self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = self.localiseAndTrim( nextPass[ 0 ] )
+            self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+            self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = self.localiseAndTrim( nextPass[ 4 ] )
+            self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+            self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible )
+
+            self.nextUpdates.append( nextPass[ 4 ] )
+            if ephem.Date( nextPass[ 0 ] ) > currentDateTime: self.nextUpdates.append( nextPass[ 0 ] ) # No point adding a time in the past.
+
+            break
 
             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
 
@@ -989,70 +970,24 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS
 
 
-    def calculateSatellitePreviousRiseTime( self, ephemNow, key, satelliteTLE ):
-        currentDateTime = ephem.Date( ephemNow - ephem.minute * 1 ) # Start looking for the rise time one minute prior to the current time.
+    def calculateSatellitePassForRisingPriorToNow( self, ephemNow, key, satelliteTLE ):
+        currentDateTime = ephem.Date( ephemNow - ephem.minute ) # Start looking from one minute ago.
         endDateTime = ephem.Date( ephemNow - ephem.hour * 1 ) # Only look back an hour for the rise time (then just give up).
         while currentDateTime > endDateTime:
             city = self.getCity( currentDateTime )
             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
             satellite.compute( city )
-            try: nextPass = city.next_pass( satellite )
-            except ValueError:
-                if satellite.circumpolar:
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR
-                    self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( satellite.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satellite.az ) ) + ")"
-                    self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( satellite.dec ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satellite.dec ) ) + ")"
-                elif satellite.neverup:
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES
-                else:
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
+            try:
+                nextPass = city.next_pass( satellite )
+                if not self.isSatellitePassValid( nextPass ): return None # Unlikely to happen but better to be safe!
 
-                break
+                if nextPass[ 0 ] < nextPass[ 4 ]: return nextPass
 
-            if not self.isSatellitePassValid( nextPass ):
-                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS
-                break
+                currentDateTime = ephem.Date( currentDateTime - ephem.minute )
 
-            # The pass is valid; determine if the pass is in the future or is in progress...
-            if nextPass[ 0 ] >= nextPass[ 4 ]:
-                continue
+            except: return None # This should never happen as the satellite has a rise and set (is not circumpolar or never up).
 
-             # Rise time is before set time - the satellite is below the horizon.
-                passIsVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
-                if self.hideSatelliteIfNoVisiblePass and not passIsVisible:
-                    currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
-                    continue
 
-                # The pass is visible and the user wants only visible passes OR the user wants any pass...
-                self.nextUpdates.append( ( nextPass[ 0 ], key ) )
-                self.nextUpdates.append( ( nextPass[ 4 ], key ) )
-#                 self.nextUpdates.append( nextPass[ 0 ] )
-#                 self.nextUpdates.append( nextPass[ 4 ] )
-                self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = self.localiseAndTrim( nextPass[ 0 ] )
-                self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
-                self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = self.localiseAndTrim( nextPass[ 4 ] )
-                self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
-                self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible )
-                break
-
-            # The satellite is above the horizon which means the rise time is for the NEXT pass and the set time is for the CURRENT pass.
-            # Use the rise/set from the previous run if it exists...
-            if ( ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.dataPrevious ):
-                self.nextUpdates.append( ( nextPass[ 4 ], key ) ) # The rise time is in the past, so no need to add it in.
-#             self.nextUpdates.append( nextPass[ 4 ] ) # The rise time is in the past, so no need to add it in.
-                self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
-                self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ]
-                self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_SET_TIME, ) ]
-                self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ]
-                self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = self.dataPrevious[ key + ( IndicatorLunar.DATA_VISIBLE, ) ]
-                break
-
-            currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
-
-        if currentDateTime >= endDateTime:
-            self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS
-
-    
     def isSatellitePassValid( self, satellitePass ):
         return satellitePass is not None and \
             len( satellitePass ) == 6 and \
