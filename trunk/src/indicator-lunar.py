@@ -179,10 +179,10 @@ class IndicatorLunar:
     SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
-        "Rise Azimuth: " + SATELLITE_TAG_RISE_AZIMUTH + \
-        "\nRise Time: " + SATELLITE_TAG_RISE_TIME + \
-        "\nSet Azimuth: " + SATELLITE_TAG_SET_AZIMUTH + \
-        "\nSet Time: " + SATELLITE_TAG_SET_TIME
+        "Rise Time: " + SATELLITE_TAG_RISE_TIME + \
+        "\nRise Azimuth: " + SATELLITE_TAG_RISE_AZIMUTH + \
+        "\nSet Time: " + SATELLITE_TAG_SET_TIME + \
+        "\nSet Azimuth: " + SATELLITE_TAG_SET_AZIMUTH
 
     WEREWOLF_WARNING_MESSAGE_DEFAULT = "                                          ...werewolves about ! ! !"
     WEREWOLF_WARNING_SUMMARY_DEFAULT = "W  A  R  N  I  N  G"
