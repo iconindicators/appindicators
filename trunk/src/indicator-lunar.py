@@ -326,22 +326,24 @@ class IndicatorLunar:
     def fullMoonNotification( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
         if not self.showWerewolfWarning: return
 
+        if lunarIlluminationPercentage < self.werewolfWarningStartIlluminationPercentage: return
+
+        if ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) > ephemNow ): return
+
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-        if lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
-            phaseIsBetweenNewAndFullInclusive and \
-            ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) <= ephemNow ):
+        if not phaseIsBetweenNewAndFullInclusive: return
 
-            summary = self.werewolfWarningSummary
-            if self.werewolfWarningSummary == "":
-                summary = " " # The notification summary text cannot be empty (at least on Unity).
+        summary = self.werewolfWarningSummary
+        if self.werewolfWarningSummary == "":
+            summary = " " # The notification summary text cannot be empty (at least on Unity).
 
-            Notify.Notification.new( summary, self.werewolfWarningMessage, self.getIconFile() ).show()
-            self.lastFullMoonNotfication = ephemNow
+        Notify.Notification.new( summary, self.werewolfWarningMessage, self.getIconFile() ).show()
+        self.lastFullMoonNotfication = ephemNow
 
 
     def satelliteNotification( self, ephemNow ):
@@ -941,7 +943,6 @@ class IndicatorLunar:
                 setTime = nextPass[ 4 ]
                 nextPass = self.calculateSatellitePassForRisingPriorToNow( currentDateTime, key, satelliteTLE )
                 if nextPass is None:
-                    print( key, "Debug: Could not find previous rise." ) #TODO Remove
                     currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
                     continue
 
@@ -959,7 +960,8 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible )
 
             self.nextUpdates.append( nextPass[ 4 ] )
-            if ephem.Date( nextPass[ 0 ] ) > currentDateTime: self.nextUpdates.append( nextPass[ 0 ] ) # No point adding a time in the past.
+            if ephem.Date( nextPass[ 0 ] ) > currentDateTime:
+                self.nextUpdates.append( nextPass[ 0 ] ) # No point adding a time in the past.
 
             break
 
@@ -1186,15 +1188,14 @@ class IndicatorLunar:
         radius = float ( str( ( width / 2 ) - ( ( width / 2 ) - ( width / 4 ) ) / 2 ) )
 
         if illuminationPercentage == 0 or illuminationPercentage == 100:
-
             svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
 
             if illuminationPercentage == 0: # New
                 svg = svgStart + '" fill="none" stroke="' + pythonutils.getColourForIconTheme() + '" stroke-width="2" />'
             else: # Full
                 svg = svgStart + '" fill="' + pythonutils.getColourForIconTheme() + '" />'
-        else:
 
+        else:
             svgStart = '<path d="M ' + str( width / 2 ) + ' ' + str( height / 2 ) + ' h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0'
 
             svgEnd = ' transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="' + pythonutils.getColourForIconTheme() + '" />'
@@ -1212,8 +1213,11 @@ class IndicatorLunar:
 
         footer = '</svg>'
 
-        if brightLimbAngleInDegrees is None: filename = IndicatorLunar.SVG_FULL_MOON_FILE
-        else: filename = self.getIconFile()
+        if brightLimbAngleInDegrees is None:
+            filename = IndicatorLunar.SVG_FULL_MOON_FILE
+        else:
+            filename = self.getIconFile()
+
         try:
             with open( filename, "w" ) as f:
                 f.write( header + svg + footer )
@@ -1289,14 +1293,12 @@ class IndicatorLunar:
         if self.lock.acquire( blocking = False ):
             self.onPreferencesInternal( widget )
         else:
-            Notify.Notification.new(
-                "Preferences unavailable...",
-                "The lunar indicator is momentarily refreshing; preferences will be available shortly.",
-                IndicatorLunar.ICON ).show()
-
+            summary = "Preferences unavailable..."
+            message = "The lunar indicator is momentarily refreshing; preferences will be available shortly."
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start()
-        
-        
+
+
     def onPreferencesInternal( self, widget ):
         GLib.source_remove( self.eventSourceID ) # Ensure no update occurs whilst the preferences are open.
 
