@@ -347,28 +347,25 @@ class IndicatorLunar:
     def satelliteNotification( self, ephemNow ):
         if not self.showSatelliteNotification: return
 
+        # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
+        satelliteNameNumberRiseTimes = [ ]
+        for key in self.satellites:
+            if ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.data: # Assume all other information is present!
+                satelliteNameNumberRiseTimes.append( [ key, self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
+
+        if self.satellitesSortByDateTime:
+            satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 1 ], x[ 0 ] ) )
+        else:
+            satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
+
         ephemNowInLocalTime = ephem.Date( self.localiseAndTrim( ephemNow ) )
-        for key in sorted( self.satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) ):
-
-            # Is there a rise/set time for the current satellite...
-            fullKey = key + ( IndicatorLunar.DATA_RISE_TIME, )
-            exists = fullKey in self.data 
-  
-            fullKey = key + ( IndicatorLunar.DATA_SET_TIME, )
-            exists = fullKey in self.data 
-
-            if not (
-                ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.data and 
-                ( key + ( IndicatorLunar.DATA_SET_TIME, ) ) in self.data ):
-                continue
+        for key, riseTime in satelliteNameNumberRiseTimes:
 
             # Ensure the current time is within the rise/set...
-            if not (
-                ephemNowInLocalTime > ephem.Date( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) and
-                ephemNowInLocalTime < ephem.Date( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) ):
-                continue
+            if ephemNowInLocalTime < ephem.Date( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) or \
+               ephemNowInLocalTime > ephem.Date( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ): continue
 
-            # Show a notification for the satellite, but only once per pass...
+            # Show the notification for the particular satellite only once per pass...
             if key in self.satelliteNotifications and ephemNowInLocalTime < ephem.Date( self.satelliteNotifications[ key ] ):
                 continue
 
@@ -944,7 +941,7 @@ class IndicatorLunar:
                 setTime = nextPass[ 4 ]
                 nextPass = self.calculateSatellitePassForRisingPriorToNow( currentDateTime, key, satelliteTLE )
                 if nextPass is None:
-                    print( key )
+                    print( key, "Debug: Could not find previous rise." ) #TODO Remove
                     currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
                     continue
 
