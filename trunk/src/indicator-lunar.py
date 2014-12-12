@@ -177,12 +177,12 @@ class IndicatorLunar:
     SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
 
     SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER
-    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + " rising at azimuth " + SATELLITE_TAG_RISE_AZIMUTH
+    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
-        "Set Azimuth: " + SATELLITE_TAG_SET_AZIMUTH + \
-        "\nSet Time: " + SATELLITE_TAG_SET_TIME + \
-        "\nNumber: " + SATELLITE_TAG_NUMBER + \
-        "\nInternational Designator: " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
+        "Rise Azimuth: " + SATELLITE_TAG_RISE_AZIMUTH + \
+        "\nRise Time: " + SATELLITE_TAG_RISE_TIME + \
+        "\nSet Azimuth: " + SATELLITE_TAG_SET_AZIMUTH + \
+        "\nSet Time: " + SATELLITE_TAG_SET_TIME
 
     WEREWOLF_WARNING_MESSAGE_DEFAULT = "                                          ...werewolves about ! ! !"
     WEREWOLF_WARNING_SUMMARY_DEFAULT = "W  A  R  N  I  N  G"
