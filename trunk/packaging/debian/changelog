@@ -6,12 +6,14 @@ indicator-lunar (1.0.53-1) precise; urgency=low
   * Bug fix: When checking (adding) a star in the preferences, the
     constellation, rise time and set time were omitted from indicator text
     tags table.
+  * Satellites can now be sorted by rise date/time.
   * Satellite notification now includes the rise time, set time and set
     azimuth.
+  * Satellite notification now shows satellites in name/number order
+    or rise time order, depending on user preference.
   * The URL which is opened on satellite selection is now configurable.
   * Planets/stars which 'never rise' can now be hidden.
   * The TLE data source may be specified as a URL (including local file).
-  * Satellites can now be sorted by rise date/time.
   * Removed the satellite subsequent pass information as it slowed down the
     update of the indicator (noticable when many satellites are checked).
   * When showing only visible passes, satellites which are circumpolar or
