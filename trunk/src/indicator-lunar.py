@@ -611,6 +611,7 @@ class IndicatorLunar:
 
             subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] ) )
             subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ ( dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] ) )
+            subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] ) )
 
             subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -868,6 +869,7 @@ class IndicatorLunar:
 
             self.data[ ( starTag, IndicatorLunar.DATA_CONSTELLATION ) ] = ephem.constellation( star )[ 1 ]
             self.data[ ( starTag, IndicatorLunar.DATA_MAGNITUDE ) ] = str( star.mag )
+            self.data[ ( starTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( ephem.star( starName ), ephemNow )
             
             self.updateRightAscensionDeclinationAzimuthAltitude( star, starTag )
 
