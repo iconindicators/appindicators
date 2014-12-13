@@ -132,18 +132,16 @@ class IndicatorLunar:
     BODY_MOON = ephem.Moon().name.upper()
     BODY_SUN = ephem.Sun().name.upper()
 
-#TODO There is a bug in pyephem which causes a seg fault when copying a body.
-# As a workaround, make a duplicate of each planet for ultimate use in the tropical sign calculation.
-    # Planet name, data tag, body, copy of body.
+    # Planet name, data tag, body.
     PLANETS = [
-        [ ephem.Mercury().name, ephem.Mercury().name.upper(), ephem.Mercury(), ephem.Mercury() ],
-        [ ephem.Venus().name, ephem.Venus().name.upper(), ephem.Venus(), ephem.Venus() ],
-        [ ephem.Mars().name, ephem.Mars().name.upper(), ephem.Mars(), ephem.Mars() ],
-        [ ephem.Jupiter().name, ephem.Jupiter().name.upper(), ephem.Jupiter(), ephem.Jupiter() ],
-        [ ephem.Saturn().name, ephem.Saturn().name.upper(), ephem.Saturn(), ephem.Saturn() ],
-        [ ephem.Uranus().name, ephem.Uranus().name.upper(), ephem.Uranus(), ephem.Uranus() ],
-        [ ephem.Neptune().name, ephem.Neptune().name.upper(), ephem.Neptune(), ephem.Neptune() ],
-        [ ephem.Pluto().name, ephem.Pluto().name.upper(), ephem.Pluto(), ephem.Pluto() ] ]
+        [ ephem.Mercury().name, ephem.Mercury().name.upper(), ephem.Mercury() ],
+        [ ephem.Venus().name, ephem.Venus().name.upper(), ephem.Venus() ],
+        [ ephem.Mars().name, ephem.Mars().name.upper(), ephem.Mars() ],
+        [ ephem.Jupiter().name, ephem.Jupiter().name.upper(), ephem.Jupiter() ],
+        [ ephem.Saturn().name, ephem.Saturn().name.upper(), ephem.Saturn() ],
+        [ ephem.Uranus().name, ephem.Uranus().name.upper(), ephem.Uranus() ],
+        [ ephem.Neptune().name, ephem.Neptune().name.upper(), ephem.Neptune() ],
+        [ ephem.Pluto().name, ephem.Pluto().name.upper(), ephem.Pluto() ] ]
 
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
     LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
@@ -760,7 +758,7 @@ class IndicatorLunar:
     def updateMoon( self, ephemNow, lunarPhase ):
         city = self.getCity( ephemNow )
 
-        self.updateBody( ephem.Moon( city ), ephem.Moon( city ), IndicatorLunar.BODY_MOON, ephemNow )
+        self.updateBody( ephem.Moon( city ), IndicatorLunar.BODY_MOON, ephemNow )
 
         self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
         self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FIRST_QUARTER ) ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
@@ -784,11 +782,7 @@ class IndicatorLunar:
 
         self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_CONSTELLATION ) ] = ephem.constellation( sun )[ 1 ]
         self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MAGNITUDE ) ] = str( sun.mag )
-
-#TODO For now, need to pass in a copy of the sun as there is a bug in pyephem when copying objects.
-        self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( ephem.Sun( city ), ephemNow )
-#         self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( sun, ephemNow )
-
+        self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( sun, ephemNow )
         self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] = str( round( sun.earth_distance, 4 ) ) + " AU"
 
         self.updateRightAscensionDeclinationAzimuthAltitude( sun, IndicatorLunar.BODY_SUN )
@@ -823,19 +817,14 @@ class IndicatorLunar:
         for planet in IndicatorLunar.PLANETS:
             if planet[ 0 ] in self.planets:
                 planet[ 2 ].compute( self.getCity( ephemNow ) )
-                self.updateBody( planet[ 2 ], planet[ 3 ], planet[ 1 ], ephemNow )
+                self.updateBody( planet[ 2 ], planet[ 1 ], ephemNow )
 
 
-#TODO For now, need to pass in a copy of the body as there is a bug in pyephem when copying objects.
-    def updateBody( self, body, bodyCopy, dataTag, ephemNow ):
+    def updateBody( self, body, dataTag, ephemNow ):
         self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] = str( int( round( body.phase ) ) ) + "%"
         self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] = ephem.constellation( body )[ 1 ]
         self.data[ ( dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] = str( body.mag )
-
-#TODO For now, need to pass in a copy of the body as there is a bug in pyephem when copying objects.
-        self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( bodyCopy, ephemNow )
-#         self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( body, ephemNow )
-
+        self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( body, ephemNow )
         self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] = str( round( body.earth_distance, 4 ) ) + " AU"
         self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] = str( round( body.sun_distance, 4 ) ) + " AU"
         self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] = str( round( self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), body ) ) ) + "°"
@@ -869,8 +858,8 @@ class IndicatorLunar:
 
             self.data[ ( starTag, IndicatorLunar.DATA_CONSTELLATION ) ] = ephem.constellation( star )[ 1 ]
             self.data[ ( starTag, IndicatorLunar.DATA_MAGNITUDE ) ] = str( star.mag )
-            self.data[ ( starTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( ephem.star( starName ), ephemNow )
-            
+            self.data[ ( starTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( star, ephemNow )
+
             self.updateRightAscensionDeclinationAzimuthAltitude( star, starTag )
 
             try:
@@ -1080,7 +1069,6 @@ class IndicatorLunar:
 
         return phase
 
-
     # Code courtesy of Ignius Drake.
     def getTropicalSign( self, body, ephemNow ):
         signList = [ "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces" ]
@@ -1089,11 +1077,8 @@ class IndicatorLunar:
         epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
         ephemNowDate = str( ephemNow ).split( " " )
 
-#TODO For now, need to pass in the body copy as there is a bug in pyephem...
-# https://github.com/brandon-rhodes/pyephem/issues/44
-# Although resolved, a release has not yet been made and so passing in a body copy is the workaround.
+        bodyCopy = self.getBodyCopy( body ) # Used to workaround https://github.com/brandon-rhodes/pyephem/issues/44 until a formal release of pyephem is made.
 #         bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
-        bodyCopy = body
         bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
         planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
 
@@ -1108,7 +1093,27 @@ class IndicatorLunar:
         return planetSignName + " " + str( planetSignDegree ) + "° " + planetSignMinute + "'"
 
 
-    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body.
+    # Used to workaround https://github.com/brandon-rhodes/pyephem/issues/44 until a formal release of pyephem is made.
+    def getBodyCopy( self, body ):
+        bodyName = body.name
+        bodyCopy = None
+
+        if bodyName == "Sun": bodyCopy = ephem.Sun()
+        elif bodyName == "Moon": bodyCopy = ephem.Moon()
+        elif bodyName == "Mercury": bodyCopy = ephem.Mercury()
+        elif bodyName == "Venus": bodyCopy = ephem.Venus()
+        elif bodyName == "Mars": bodyCopy = ephem.Mars()
+        elif bodyName == "Jupiter": bodyCopy = ephem.Jupiter()
+        elif bodyName == "Saturn": bodyCopy = ephem.Saturn()
+        elif bodyName == "Uranus": bodyCopy = ephem.Uranus()
+        elif bodyName == "Neptune": bodyCopy = ephem.Neptune()
+        elif bodyName == "Pluto": bodyCopy = ephem.Pluto()
+        else: bodyCopy = ephem.star( bodyName ) # If not the sun/moon/planet, assume a star.
+
+        return bodyCopy
+
+
+    # Compute the bright limb angle (relative to zenith) between the sun and a planetary bodyCopy.
     # Measured in degrees counter clockwise from a positive y axis.
     #
     # References:
