@@ -1865,7 +1865,11 @@ class IndicatorLunar:
                 if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
 
             self.satelliteTLEURL = satelliteTLEURL[ 0 ]
-            self.satelliteTLEData = satelliteTLEData[ 0 ]
+            
+            if satelliteTLEData[ 0 ] is None:
+                self.satelliteTLEData = [ ]
+            else:
+                self.satelliteTLEData = satelliteTLEData[ 0 ]
 
             self.satellites = [ ]
             for satelliteTLE in satelliteStore:
@@ -1912,16 +1916,16 @@ class IndicatorLunar:
         sortedKeysAsStringsAndValues = [ ]
 
         # Refresh the display tags with all data.
-        # However for satellites, if this is a simple refresh, keep the existing satellites (and data).
-        # If the user is fetching new TLE data, don't add in the existing satellites...add in the new ones from the TLE (later).
+        # For satellites, if the preferences dialog is initialising, keep the existing satellites and data.
+        # Otherwise, the user has done a fetch and so don't add in the satellites as they are likely to be different.
         for key in self.data.keys():
             if ( ( key[ 0 ], key[ 1 ] ) ) in self.satellites: # This key refers to a satellite...
                 if keepSatellites:
                     sortedKeysAsStringsAndValues.append( [ " ".join( key ), self.data[ key ] ] )
-            else: # This is a non-satellite, so just add it...
+            else: # This is a non-satellite, so add it...
                 sortedKeysAsStringsAndValues.append( [ " ".join( key ), self.data[ key ] ] )
 
-        # The user has fetched new TLE data, so add that in (assuming it's kosher)...
+        # The user has fetched new TLE data, so add it...
         if not keepSatellites and satelliteTLEData is not None:
             for key in satelliteTLEData:
                 sortedKeysAsStringsAndValues.append( [ " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
@@ -1975,7 +1979,7 @@ class IndicatorLunar:
         satelliteTLEURL.append( TLEURLEntry.get_text().strip() )
 
         del satelliteTLEData[ : ] # Remove the satellite TLE data.
-        satelliteTLEData.append( self.getSatelliteTLEData( satelliteTLEURL[ 0 ] ) )
+        satelliteTLEData.append( self.getSatelliteTLEData( satelliteTLEURL[ 0 ] ) ) # The TLE data can be None, empty or non-empty.
 
         self.updateSatellitePreferencesTab( grid, satelliteStore, satelliteTLEData[ 0 ], satelliteTLEURL[ 0 ] )
         self.updateDisplayTags( displayTagsStore, False, satelliteTLEData[ 0 ] )
@@ -2156,7 +2160,7 @@ class IndicatorLunar:
         self.satelliteOnClickURL = IndicatorLunar.SATELLITE_ON_CLICK_URL
         self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
         self.satellites = [ ]
-        self.satellitesSortByDateTime = False
+        self.satellitesSortByDateTime = True
         self.showPlanetsAsSubMenu = False
         self.showSatelliteNotification = True
         self.showSatellitesAsSubMenu = True
