@@ -547,11 +547,14 @@ class IndicatorLunar:
 
     def updateMoonsMenu( self, moonMenuItem, moonName ):
         subMenu = Gtk.Menu()
+
         subMenu.append( Gtk.MenuItem( "Earth Visible: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_EARTH_VISIBLE ) ] ) )
         subMenu.append( Gtk.SeparatorMenuItem() )
-        subMenu.append( Gtk.MenuItem( "X Offset: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_X_OFFSET ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Y Offset: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_Y_OFFSET ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Z Offset: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] ) )
+
+        subMenu.append( Gtk.MenuItem( "Offset from Planet (in planet radii)" ) )
+        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "X: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_X_OFFSET ) ] ) )
+        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Y: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_Y_OFFSET ) ] ) )
+        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Z: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] ) )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, moonName.upper() )
@@ -852,12 +855,7 @@ class IndicatorLunar:
             for moon in planet[ 3 ]:
                 moon.compute( city )
                 self.updateRightAscensionDeclinationAzimuthAltitude( moon, moon.name.upper() )
-
-#TODO Test this...always getting a 1.0...do we ever get a 0.0?
-                if moon.earth_visible < 1.0:
-                    print( moon.name, moon.earth_visible, datetime.datetime.now() )
-                
-                self.data[ ( moon.name.upper(), IndicatorLunar.DATA_EARTH_VISIBLE ) ] = str( moon.earth_visible ) #TODO Make into True or False, assuming only ever get 1.0 or 0.0 
+                self.data[ ( moon.name.upper(), IndicatorLunar.DATA_EARTH_VISIBLE ) ] = str( bool( moon.earth_visible ) )
                 self.data[ ( moon.name.upper(), IndicatorLunar.DATA_X_OFFSET ) ] = str( round( moon.x, 1 ) )
                 self.data[ ( moon.name.upper(), IndicatorLunar.DATA_Y_OFFSET ) ] = str( round( moon.y, 1 ) )
                 self.data[ ( moon.name.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] = str( round( moon.z, 1 ) )
