@@ -7,8 +7,8 @@ indicator-lunar (1.0.53-1) precise; urgency=low
     constellation, rise time and set time were omitted from indicator text
     tags table.
   * Satellites can now be sorted by rise date/time.  This is now the default.
-  * Satellite notification now includes the rise time, set time and set
-    azimuth.
+  * Satellite notification now optionally includes the rise time, set time,
+    set azimuth and visibility.
   * Satellite notification now shows satellites in name/number order
     or rise time order, depending on user preference.
   * The URL which is opened on satellite selection is now configurable.
