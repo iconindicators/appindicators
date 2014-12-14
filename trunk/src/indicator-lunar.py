@@ -1950,9 +1950,14 @@ class IndicatorLunar:
             else:
                 message = "No TLE data found at <a href=\'" + url + "'>" + url + "</a>"
 
-            grid.get_child_at( 0, 0 ).hide()
-            grid.get_child_at( 0, 2 ).set_markup( message )
-            grid.get_child_at( 0, 2 ).show()
+            # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
+            children = grid.get_children()
+            for child in children:
+                if child.__class__.__name__ == "Label":
+                    child.show()
+                    child.set_markup( message )
+                elif child.__class__.__name__ == "ScrolledWindow":
+                    child.hide()
 
         else:
             for key in satelliteTLEData:
@@ -1966,8 +1971,13 @@ class IndicatorLunar:
                     ]
                 )
 
-            grid.get_child_at( 0, 0 ).show()
-            grid.get_child_at( 0, 2 ).hide()
+            # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
+            children = grid.get_children()
+            for child in children:
+                if child.__class__.__name__ == "Label":
+                    child.hide()
+                elif child.__class__.__name__ == "ScrolledWindow":
+                    child.show()
 
 
     def onIndicatorTextTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
