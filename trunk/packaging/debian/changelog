@@ -19,6 +19,7 @@ indicator-lunar (1.0.53-1) precise; urgency=low
   * When showing only visible passes, satellites which are circumpolar or
     'always up' are included, despite not actually transiting.
   * Added Tropical Sign to stars.
+  * Added attributes of the major moons to Mars, Jupiter, Saturn and Uranus.
   * Overhaul of the preferences dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 12 Sep 2014 15:55:26 +1000

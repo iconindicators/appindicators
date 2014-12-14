@@ -108,6 +108,7 @@ class IndicatorLunar:
     DATA_DECLINATION = "DECLINATION"
     DATA_DISTANCE_TO_EARTH = "DISTANCE TO EARTH"
     DATA_DISTANCE_TO_SUN = "DISTANCE TO SUN"
+    DATA_EARTH_VISIBLE = "EARTH VISIBLE"
     DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
     DATA_ECLIPSE_LATITUDE_LONGITUDE = "ECLIPSE LATITUDE LONGITUDE"
     DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
@@ -117,6 +118,9 @@ class IndicatorLunar:
     DATA_ILLUMINATION = "ILLUMINATION"
     DATA_MAGNITUDE = "MAGNITUDE"
     DATA_MESSAGE = "MESSAGE"
+    DATA_X_OFFSET = "X OFFSET"
+    DATA_Y_OFFSET = "Y OFFSET"
+    DATA_Z_OFFSET = "Z OFFSET"
     DATA_NEW = "NEW"
     DATA_PHASE = "PHASE"
     DATA_RIGHT_ASCENSION = "RIGHT ASCENSION"
@@ -132,16 +136,16 @@ class IndicatorLunar:
     BODY_MOON = ephem.Moon().name.upper()
     BODY_SUN = ephem.Sun().name.upper()
 
-    # Planet name, data tag, body.
+    # Planet name, data tag, body, moons.
     PLANETS = [
-        [ ephem.Mercury().name, ephem.Mercury().name.upper(), ephem.Mercury() ],
-        [ ephem.Venus().name, ephem.Venus().name.upper(), ephem.Venus() ],
-        [ ephem.Mars().name, ephem.Mars().name.upper(), ephem.Mars() ],
-        [ ephem.Jupiter().name, ephem.Jupiter().name.upper(), ephem.Jupiter() ],
-        [ ephem.Saturn().name, ephem.Saturn().name.upper(), ephem.Saturn() ],
-        [ ephem.Uranus().name, ephem.Uranus().name.upper(), ephem.Uranus() ],
-        [ ephem.Neptune().name, ephem.Neptune().name.upper(), ephem.Neptune() ],
-        [ ephem.Pluto().name, ephem.Pluto().name.upper(), ephem.Pluto() ] ]
+        [ ephem.Mercury().name, ephem.Mercury().name.upper(), ephem.Mercury(), [ ] ],
+        [ ephem.Venus().name, ephem.Venus().name.upper(), ephem.Venus(), [ ] ],
+        [ ephem.Mars().name, ephem.Mars().name.upper(), ephem.Mars(), [ ephem.Deimos(), ephem.Phobos() ] ],
+        [ ephem.Jupiter().name, ephem.Jupiter().name.upper(), ephem.Jupiter(), [ ephem.Callisto(), ephem.Europa(), ephem.Ganymede(), ephem.Io() ] ],
+        [ ephem.Saturn().name, ephem.Saturn().name.upper(), ephem.Saturn(), [ ephem.Dione(), ephem.Enceladus(), ephem.Hyperion(), ephem.Iapetus(), ephem.Mimas(), ephem.Rhea(), ephem.Tethys(), ephem.Titan() ] ],
+        [ ephem.Uranus().name, ephem.Uranus().name.upper(), ephem.Uranus(), [ ephem.Ariel(), ephem.Miranda(), ephem.Oberon(), ephem.Titania(), ephem.Umbriel() ] ],
+        [ ephem.Neptune().name, ephem.Neptune().name.upper(), ephem.Neptune(), [ ] ],
+        [ ephem.Pluto().name, ephem.Pluto().name.upper(), ephem.Pluto(), [ ] ] ]
 
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
     LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
@@ -527,8 +531,29 @@ class IndicatorLunar:
             else:
                 menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
                 menu.append( menuItem )
+                self.updateBodyMenu( menuItem, planet[ 1 ] )
 
             self.updateBodyMenu( menuItem, planet[ 1 ] )
+
+            if len( planet[ 3 ] ) > 0: menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+            for moon in planet[ 3 ]:
+                moonMenuItem = Gtk.MenuItem( moon.name )
+                menuItem.get_submenu().append( moonMenuItem )
+                self.updateMoonsMenu( moonMenuItem, moon.name )
+
+
+    def updateMoonsMenu( self, moonMenuItem, moonName ):
+        subMenu = Gtk.Menu()
+        subMenu.append( Gtk.MenuItem( "Earth Visible: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_EARTH_VISIBLE ) ] ) )
+        subMenu.append( Gtk.SeparatorMenuItem() )
+        subMenu.append( Gtk.MenuItem( "X Offset: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_X_OFFSET ) ] ) )
+        subMenu.append( Gtk.MenuItem( "Y Offset: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_Y_OFFSET ) ] ) )
+        subMenu.append( Gtk.MenuItem( "Z Offset: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] ) )
+        subMenu.append( Gtk.SeparatorMenuItem() )
+
+        self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, moonName.upper() )
+
+        moonMenuItem.set_submenu( subMenu )
 
 
     def updateBodyMenu( self, menuItem, dataTag ):
@@ -815,9 +840,24 @@ class IndicatorLunar:
         if len( self.planets ) == 0: return;
 
         for planet in IndicatorLunar.PLANETS:
-            if planet[ 0 ] in self.planets:
-                planet[ 2 ].compute( self.getCity( ephemNow ) )
-                self.updateBody( planet[ 2 ], planet[ 1 ], ephemNow )
+            if planet[ 0 ] not in self.planets: continue
+
+            planet[ 2 ].compute( self.getCity( ephemNow ) )
+            self.updateBody( planet[ 2 ], planet[ 1 ], ephemNow )
+
+            city = self.getCity( ephemNow )
+            for moon in planet[ 3 ]:
+                moon.compute( city )
+                self.updateRightAscensionDeclinationAzimuthAltitude( moon, moon.name.upper() )
+
+#TODO Test this...always getting a 1.0...do we ever get a 0.0?
+                if moon.earth_visible < 1.0:
+                    print( moon.name, moon.earth_visible, datetime.datetime.now() )
+                
+                self.data[ ( moon.name.upper(), IndicatorLunar.DATA_EARTH_VISIBLE ) ] = str( moon.earth_visible ) #TODO Make into True or False, assuming only ever get 1.0 or 0.0 
+                self.data[ ( moon.name.upper(), IndicatorLunar.DATA_X_OFFSET ) ] = str( round( moon.x, 1 ) )
+                self.data[ ( moon.name.upper(), IndicatorLunar.DATA_Y_OFFSET ) ] = str( round( moon.y, 1 ) )
+                self.data[ ( moon.name.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] = str( round( moon.z, 1 ) )
 
 
     def updateBody( self, body, dataTag, ephemNow ):
