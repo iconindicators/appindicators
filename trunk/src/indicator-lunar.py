@@ -538,15 +538,21 @@ class IndicatorLunar:
 
             self.updateBodyMenu( menuItem, planet[ 1 ] )
 
-            if len( planet[ 3 ] ) > 0: menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+            if len( planet[ 3 ] ) > 0:
+                menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+                menuItem.get_submenu().append( Gtk.MenuItem( "Major Moons" ) )
+
             for moon in planet[ 3 ]:
-                moonMenuItem = Gtk.MenuItem( moon.name )
+                moonMenuItem = Gtk.MenuItem( IndicatorLunar.INDENT + moon.name )
                 menuItem.get_submenu().append( moonMenuItem )
                 self.updateMoonsMenu( moonMenuItem, moon.name )
 
 
     def updateMoonsMenu( self, moonMenuItem, moonName ):
         subMenu = Gtk.Menu()
+
+        self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, moonName.upper() )
+        subMenu.append( Gtk.SeparatorMenuItem() )
 
         subMenu.append( Gtk.MenuItem( "Earth Visible: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_EARTH_VISIBLE ) ] ) )
         subMenu.append( Gtk.SeparatorMenuItem() )
@@ -555,9 +561,6 @@ class IndicatorLunar:
         subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "X: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_X_OFFSET ) ] ) )
         subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Y: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_Y_OFFSET ) ] ) )
         subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Z: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] ) )
-        subMenu.append( Gtk.SeparatorMenuItem() )
-
-        self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, moonName.upper() )
 
         moonMenuItem.set_submenu( subMenu )
 
