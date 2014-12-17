@@ -1657,7 +1657,8 @@ class IndicatorLunar:
             IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_RISE_TIME + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_TIME + \
+            IndicatorLunar.SATELLITE_TAG_SET_TIME + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_VISIBLE + \
             "\n\nFor formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
         grid.attach( satelliteNotificationSummaryText, 1, 1, 1, 1 )
