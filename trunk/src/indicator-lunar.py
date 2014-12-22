@@ -105,9 +105,11 @@ class IndicatorLunar:
     DATA_BRIGHT_LIMB = "BRIGHT LIMB"
     DATA_CITY_NAME = "CITY NAME"
     DATA_CONSTELLATION = "CONSTELLATION"
+    DATA_DAWN = "DAWN"
     DATA_DECLINATION = "DECLINATION"
     DATA_DISTANCE_TO_EARTH = "DISTANCE TO EARTH"
     DATA_DISTANCE_TO_SUN = "DISTANCE TO SUN"
+    DATA_DUSK = "DUSK"
     DATA_EARTH_VISIBLE = "EARTH VISIBLE"
     DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
     DATA_ECLIPSE_LATITUDE_LONGITUDE = "ECLIPSE LATITUDE LONGITUDE"
@@ -473,12 +475,18 @@ class IndicatorLunar:
         else:
             rising = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_RISE_TIME ) ]
             setting = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_SET_TIME ) ]
+            dawn = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DAWN ) ]
+            dusk = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DUSK ) ]
             if rising > setting:
                 subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
+                subMenu.append( Gtk.MenuItem( "Dusk: " + dusk ) )
+                subMenu.append( Gtk.MenuItem( "Dawn: " + dawn ) )
                 subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
             else:
+                subMenu.append( Gtk.MenuItem( "Dawn: " + dawn ) )
                 subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
                 subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
+                subMenu.append( Gtk.MenuItem( "Dusk: " + dusk ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -824,12 +832,21 @@ class IndicatorLunar:
         # Rising/Setting.
         try:
             city = self.getCity( ephemNow )
+
             rising = city.next_rising( sun )
             setting = city.next_setting( sun )
             self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_RISE_TIME ) ] = self.localiseAndTrim( rising )
             self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_SET_TIME ) ] = self.localiseAndTrim( setting )
             self.nextUpdates.append( rising )
             self.nextUpdates.append( setting )
+
+            city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
+            dawn = city.next_rising( sun, use_center = True )
+            dusk = city.next_setting( sun, use_center = True )
+            self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DAWN ) ] = self.localiseAndTrim( dawn )
+            self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DUSK ) ] = self.localiseAndTrim( dusk )
+            self.nextUpdates.append( dawn )
+            self.nextUpdates.append( dusk )
         except ephem.AlwaysUpError: self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
         except ephem.NeverUpError: self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
