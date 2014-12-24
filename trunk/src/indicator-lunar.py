@@ -36,6 +36,7 @@ from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
 import copy, datetime, eclipse, glob, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys, threading, time, webbrowser
+from Onboard.Indicator import Indicator
 
 try:
     import ephem
@@ -421,8 +422,7 @@ class IndicatorLunar:
         menuItem = Gtk.MenuItem( "Moon" )
         menu.append( menuItem )
 
-        self.updateBodyMenu( menuItem, IndicatorLunar.BODY_MOON )
-
+        self.updateCommonMenu( menuItem, ephem.Moon(), IndicatorLunar.BODY_MOON )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
         menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] ) )
@@ -455,50 +455,18 @@ class IndicatorLunar:
         menuItem = Gtk.MenuItem( "Sun" )
         menu.append( menuItem )
 
-        subMenu = Gtk.Menu()
-        menuItem.set_submenu( subMenu )
-
-        subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_CONSTELLATION ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MAGNITUDE ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_TROPICAL_SIGN ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ ( IndicatorLunar.BODY_SUN,  IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] ) )
-
-        subMenu.append( Gtk.SeparatorMenuItem() )
-
-        self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, IndicatorLunar.BODY_SUN )
-
-        subMenu.append( Gtk.SeparatorMenuItem() )
-
-        # Rising/Setting.
-        if ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) in self.data:
-            subMenu.append( Gtk.MenuItem( self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] ) )
-        else:
-            rising = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_RISE_TIME ) ]
-            setting = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_SET_TIME ) ]
-            dawn = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DAWN ) ]
-            dusk = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DUSK ) ]
-            if rising > setting:
-                subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
-                subMenu.append( Gtk.MenuItem( "Dusk: " + dusk ) )
-                subMenu.append( Gtk.MenuItem( "Dawn: " + dawn ) )
-                subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
-            else:
-                subMenu.append( Gtk.MenuItem( "Dawn: " + dawn ) )
-                subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
-                subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
-                subMenu.append( Gtk.MenuItem( "Dusk: " + dusk ) )
-
-        subMenu.append( Gtk.SeparatorMenuItem() )
+        self.updateCommonMenu( menuItem, ephem.Sun(), IndicatorLunar.BODY_SUN )
+        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
         # Solstice/Equinox.
         equinox = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_EQUINOX ) ]
         solstice = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_SOLSTICE ) ]
         if equinox < solstice:
-            subMenu.append( Gtk.MenuItem( "Equinox: " + equinox ) )
-            subMenu.append( Gtk.MenuItem( "Solstice: " + solstice ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( "Equinox: " + equinox ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( "Solstice: " + solstice ) )
         else:
-            subMenu.append( Gtk.MenuItem( "Solstice: " + solstice ) )
-            subMenu.append( Gtk.MenuItem( "Equinox: " + equinox ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( "Solstice: " + solstice ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( "Equinox: " + equinox ) )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         self.updateEclipseMenu( menuItem.get_submenu(), IndicatorLunar.BODY_SUN )
@@ -542,9 +510,8 @@ class IndicatorLunar:
             else:
                 menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
                 menu.append( menuItem )
-                self.updateBodyMenu( menuItem, planet[ 1 ] )
 
-            self.updateBodyMenu( menuItem, planet[ 1 ] )
+            self.updateCommonMenu( menuItem, planet[ 2 ], planet[ 1 ] )
 
             if len( planet[ 3 ] ) > 0:
                 menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
@@ -571,38 +538,6 @@ class IndicatorLunar:
         subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Z: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] ) )
 
         moonMenuItem.set_submenu( subMenu )
-
-
-    def updateBodyMenu( self, menuItem, dataTag ):
-        subMenu = Gtk.Menu()
-
-        subMenu.append( Gtk.MenuItem( "Illumination: " + self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ ( dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Distance to Sun: " + self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Bright Limb: " + self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] ) )
-
-        subMenu.append( Gtk.SeparatorMenuItem() )
-
-        self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, dataTag )
-
-        subMenu.append( Gtk.SeparatorMenuItem() )
-
-        if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data:
-            subMenu.append( Gtk.MenuItem( self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] ) )
-        else:
-            rising = self.data[ ( dataTag, IndicatorLunar.DATA_RISE_TIME ) ]
-            setting = self.data[ ( dataTag, IndicatorLunar.DATA_SET_TIME ) ]
-            if rising > setting:
-                subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
-                subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
-            else:
-                subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
-                subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
-
-        menuItem.set_submenu( subMenu )
 
 
     def updateStarsMenu( self, menu ):
@@ -646,30 +581,55 @@ class IndicatorLunar:
                 menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starName )
                 menu.append( menuItem )
 
-            subMenu = Gtk.Menu()
-            menuItem.set_submenu( subMenu )
+            self.updateCommonMenu( menuItem, ephem.star( starName ), dataTag )
 
-            subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] ) )
-            subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ ( dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] ) )
-            subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] ) )
 
-            subMenu.append( Gtk.SeparatorMenuItem() )
+    def updateCommonMenu( self, menuItem, body, dataTag ):
+        subMenu = Gtk.Menu()
 
-            self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, dataTag )
+        if self.isPlanetOrMoon( body ):
+            subMenu.append( Gtk.MenuItem( "Illumination: " + self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] ) )
 
-            subMenu.append( Gtk.SeparatorMenuItem() )
+        subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] ) )
+        subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ ( dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] ) )
+        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] ) )
 
-            if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data:
-                subMenu.append( Gtk.MenuItem( self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] ) )
+        if self.isPlanetOrMoon( body ) or body.name == ephem.Sun().name:
+            subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] ) )
+
+        if self.isPlanetOrMoon( body ):
+            subMenu.append( Gtk.MenuItem( "Distance to Sun: " + self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] ) )
+            subMenu.append( Gtk.MenuItem( "Bright Limb: " + self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] ) )
+
+        subMenu.append( Gtk.SeparatorMenuItem() )
+
+        self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, dataTag )
+        subMenu.append( Gtk.SeparatorMenuItem() )
+
+        if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data:
+            subMenu.append( Gtk.MenuItem( self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] ) )
+        else:
+            rising = self.data[ ( dataTag, IndicatorLunar.DATA_RISE_TIME ) ]
+            setting = self.data[ ( dataTag, IndicatorLunar.DATA_SET_TIME ) ]
+            
+            if body.name == ephem.Sun().name:
+                dawn = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DAWN ) ]
+                dusk = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DUSK ) ]
+
+            if rising > setting:
+                subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
+                if body.name == ephem.Sun().name:
+                    subMenu.append( Gtk.MenuItem( "Dusk: " + dusk ) )
+                    subMenu.append( Gtk.MenuItem( "Dawn: " + dawn ) )
+
+                subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
             else:
-                rising = self.data[ ( dataTag, IndicatorLunar.DATA_RISE_TIME ) ]
-                setting = self.data[ ( dataTag, IndicatorLunar.DATA_SET_TIME ) ]
-                if rising > setting:
-                    subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
-                    subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
-                else:
-                    subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
-                    subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
+                if body.name == ephem.Sun().name: subMenu.append( Gtk.MenuItem( "Dawn: " + setting ) )
+                subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
+                subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
+                if body.name == ephem.Sun().name: subMenu.append( Gtk.MenuItem( "Dusk: " + setting ) )
+
+        menuItem.set_submenu( subMenu )
 
 
     def updateSatellitesMenu( self, menu ):
@@ -799,8 +759,7 @@ class IndicatorLunar:
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
     def updateMoon( self, ephemNow, lunarPhase ):
         city = self.getCity( ephemNow )
-
-        self.updateBody( ephem.Moon( city ), IndicatorLunar.BODY_MOON, ephemNow )
+        self.updateCommon( ephem.Moon( city ), IndicatorLunar.BODY_MOON, ephemNow )
 
         self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
         self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FIRST_QUARTER ) ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
@@ -821,25 +780,12 @@ class IndicatorLunar:
     def updateSun( self, ephemNow ):
         city = self.getCity( ephemNow )
         sun = ephem.Sun( city )
-
-        self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_CONSTELLATION ) ] = ephem.constellation( sun )[ 1 ]
-        self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MAGNITUDE ) ] = str( sun.mag )
-        self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( sun, ephemNow )
-        self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] = str( round( sun.earth_distance, 4 ) ) + " AU"
-
+        self.updateCommon( sun, IndicatorLunar.BODY_SUN, ephemNow )
         self.updateRightAscensionDeclinationAzimuthAltitude( sun, IndicatorLunar.BODY_SUN )
 
-        # Rising/Setting.
+        # Dawn/Dusk.
         try:
             city = self.getCity( ephemNow )
-
-            rising = city.next_rising( sun )
-            setting = city.next_setting( sun )
-            self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_RISE_TIME ) ] = self.localiseAndTrim( rising )
-            self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_SET_TIME ) ] = self.localiseAndTrim( setting )
-            self.nextUpdates.append( rising )
-            self.nextUpdates.append( setting )
-
             city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
             dawn = city.next_rising( sun, use_center = True )
             dusk = city.next_setting( sun, use_center = True )
@@ -863,13 +809,11 @@ class IndicatorLunar:
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     def updatePlanets( self, ephemNow ):
-        if len( self.planets ) == 0: return;
-
         for planet in IndicatorLunar.PLANETS:
             if planet[ 0 ] not in self.planets: continue
 
             planet[ 2 ].compute( self.getCity( ephemNow ) )
-            self.updateBody( planet[ 2 ], planet[ 1 ], ephemNow )
+            self.updateCommon( planet[ 2 ], planet[ 1 ], ephemNow )
 
             city = self.getCity( ephemNow )
             for moon in planet[ 3 ]:
@@ -881,14 +825,29 @@ class IndicatorLunar:
                 self.data[ ( moon.name.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] = str( round( moon.z, 1 ) )
 
 
-    def updateBody( self, body, dataTag, ephemNow ):
-        self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] = str( int( round( body.phase ) ) ) + "%"
+    # http://aa.usno.navy.mil/data/docs/mrst.php
+    def updateStars( self, ephemNow ):
+        for starName in self.stars:
+            city = self.getCity( ephemNow )
+            star = ephem.star( starName )
+            star.compute( city )
+            self.updateCommon( star, star.name.upper(), ephemNow )
+
+
+    def updateCommon( self, body, dataTag, ephemNow ):
+        if self.isPlanetOrMoon( body ):
+            self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] = str( int( round( body.phase ) ) ) + "%"
+
         self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] = ephem.constellation( body )[ 1 ]
         self.data[ ( dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] = str( body.mag )
         self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( body, ephemNow )
-        self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] = str( round( body.earth_distance, 4 ) ) + " AU"
-        self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] = str( round( body.sun_distance, 4 ) ) + " AU"
-        self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] = str( round( self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), body ) ) ) + "°"
+
+        if self.isPlanetOrMoon( body ) or body.name == ephem.Sun().name:
+            self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] = str( round( body.earth_distance, 4 ) ) + " AU"
+
+        if self.isPlanetOrMoon( body ):
+            self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] = str( round( body.sun_distance, 4 ) ) + " AU"
+            self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] = str( round( self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), body ) ) ) + "°"
 
         self.updateRightAscensionDeclinationAzimuthAltitude( body, dataTag )
 
@@ -906,34 +865,20 @@ class IndicatorLunar:
         except ephem.NeverUpError: self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
 
-    # http://aa.usno.navy.mil/data/docs/mrst.php
-    def updateStars( self, ephemNow ):
-        if len( self.stars ) == 0: return
+    def isPlanetOrMoon( self, body ):
+        planetOrMoon = False
+        bodyName = body.name.upper()
 
-        for starName in self.stars:
-            city = self.getCity( ephemNow )
-            star = ephem.star( starName )
-            star.compute( city )
+        for planetInfo in IndicatorLunar.PLANETS:
+            planetName = planetInfo[ 1 ]
+            if bodyName == planetName:
+                planetOrMoon = True
+                break 
 
-            starTag = star.name.upper()
+        if bodyName == ephem.Moon().name.upper():
+            planetOrMoon = True
 
-            self.data[ ( starTag, IndicatorLunar.DATA_CONSTELLATION ) ] = ephem.constellation( star )[ 1 ]
-            self.data[ ( starTag, IndicatorLunar.DATA_MAGNITUDE ) ] = str( star.mag )
-            self.data[ ( starTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( star, ephemNow )
-
-            self.updateRightAscensionDeclinationAzimuthAltitude( star, starTag )
-
-            try:
-                rising = city.next_rising( star )
-                self.data[ ( starTag, IndicatorLunar.DATA_RISE_TIME ) ] = self.localiseAndTrim( rising )
-                setting = city.next_setting( star )
-                self.data[ ( starTag, IndicatorLunar.DATA_SET_TIME ) ] = self.localiseAndTrim( setting )
-
-                self.nextUpdates.append( rising )
-                self.nextUpdates.append( setting )
-
-            except ephem.AlwaysUpError: self.data[ ( starTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
-            except ephem.NeverUpError: self.data[ ( starTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
+        return planetOrMoon
 
 
     # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
