@@ -63,7 +63,7 @@ class IndicatorLunar:
     SVG_FULL_MOON_FILE = os.getenv( "HOME" ) + "/" + "." + NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = NAME + "-satellite"
 
-    ABOUT_COMMENTS = "Shows lunar, solar, planetary, star and satellite information."
+    ABOUT_COMMENTS = "Displays lunar, solar, planetary, star and satellite information."
     ABOUT_CREDIT_BRIGHT_LIMB = "Bright Limb from 'Astronomical Algorithms' by Jean Meeus."
     ABOUT_CREDIT_ECLIPSE = "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov"
     ABOUT_CREDIT_PYEPHEM = "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem"
