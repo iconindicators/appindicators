@@ -609,25 +609,17 @@ class IndicatorLunar:
         if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data:
             subMenu.append( Gtk.MenuItem( self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] ) )
         else:
-            rising = self.data[ ( dataTag, IndicatorLunar.DATA_RISE_TIME ) ]
-            setting = self.data[ ( dataTag, IndicatorLunar.DATA_SET_TIME ) ]
-            
+            data = [ ]
+            data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_RISE_TIME ) ], "Rise: " ] )
+            data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_SET_TIME ) ], "Set: " ] )
             if body.name == ephem.Sun().name:
-                dawn = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DAWN ) ]
-                dusk = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DUSK ) ]
+                data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_DAWN ) ], "Dawn: " ] )
+                data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_DUSK ) ], "Dusk: " ] )
 
-            if rising > setting:
-                subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
-                if body.name == ephem.Sun().name:
-                    subMenu.append( Gtk.MenuItem( "Dusk: " + dusk ) )
-                    subMenu.append( Gtk.MenuItem( "Dawn: " + dawn ) )
+            data = sorted( data, key = lambda x: ( x[ 0 ] ) )
 
-                subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
-            else:
-                if body.name == ephem.Sun().name: subMenu.append( Gtk.MenuItem( "Dawn: " + setting ) )
-                subMenu.append( Gtk.MenuItem( "Rise: " + rising ) )
-                subMenu.append( Gtk.MenuItem( "Set: " + setting ) )
-                if body.name == ephem.Sun().name: subMenu.append( Gtk.MenuItem( "Dusk: " + setting ) )
+            for dateTime, text in data:
+                subMenu.append( Gtk.MenuItem( text + dateTime ) )
 
         menuItem.set_submenu( subMenu )
 
