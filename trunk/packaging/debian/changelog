@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.36-1) precise; urgency=low
+
+  * Neatened up the left alignment changelog text in the About dialog.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 25 Dec 2014 17:10:10 +1000
+
+
 indicator-virtual-box (1.0.35-1) precise; urgency=low
 
   * Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a
