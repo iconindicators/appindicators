@@ -1,6 +1,13 @@
 indicator-virtual-box (1.0.36-1) precise; urgency=low
 
   * Neatened up the left alignment changelog text in the About dialog.
+  * Tidied up tooltips and spacing in the Preferences dialog.
+  * Only show the "groups as submenus" option in the Preferences dialog if
+    groups exist.
+  * Only show the "sort VMs alphabetically" option in the Preferences dialog
+    if groups do not exist.
+  * Removed the before/after group text as this was a legacy feature.
+  * Reorganised the Preferences dialog as per consolidated preferences.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 25 Dec 2014 17:10:10 +1000
 
