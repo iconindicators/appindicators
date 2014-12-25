@@ -421,65 +421,7 @@ class IndicatorVirtualBox:
 
         notebook = Gtk.Notebook()
 
-        # First tab - general settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 20 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )        
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
-        grid.set_margin_bottom( 10 )
-
-        showAsSubmenusCheckbox = Gtk.CheckButton( "Show groups as submenus" )
-        showAsSubmenusCheckbox.set_tooltip_text(
-            "Groups can be shown with their VMs in submenus,\n" + \
-            "or shown with their VMs as an indented list." )
-        showAsSubmenusCheckbox.set_active( self.showSubmenu )
-
-        sortAlphabeticallyCheckbox = Gtk.CheckButton( "Sort VMs alphabetically" )
-        sortAlphabeticallyCheckbox.set_tooltip_text( 
-            "VMs can be sorted alphabetically or\n" + \
-            "as set in the VirtualBox Manager." )
-        sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
-
-        # Only show one of these, depending if groups are present or not...
-        if self.groupsExist():
-            grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
-        else:
-            grid.attach( sortAlphabeticallyCheckbox, 0, 0, 2, 1 )
-
-        label = Gtk.Label( "Startup delay (seconds)" )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 1, 1, 1 )
-
-        spinnerDelay = Gtk.SpinButton()
-        spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to force the initial value by explicitly setting it.
-        spinnerDelay.set_tooltip_text( "Amount of time to wait from\nstarting one VM to the next." )
-        grid.attach( spinnerDelay, 1, 1, 1, 1 )
-
-        label = Gtk.Label( "Refresh interval (minutes)" )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 2, 1, 1 )
-
-        spinnerRefreshInterval = Gtk.SpinButton()
-        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
-        spinnerRefreshInterval.set_tooltip_text( "How often the list of VMs and\nrunning status is updated." )
-        grid.attach( spinnerRefreshInterval, 1, 2, 1, 1 )
-
-        autostartIndicatorCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartIndicatorCheckbox.set_tooltip_text( "Run the indicator automatically." )
-        autostartIndicatorCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
-        grid.attach( autostartIndicatorCheckbox, 0, 3, 2, 1 )
-
-        notebook.append_page( grid, Gtk.Label( "General" ) )
-
-        # Second tab - List of VMs.
+        # List of VMs.
         stack = [ ]
         store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon (Gtk.STOCK_APPLY) or None for autostart of VM, VM start command, VM/Group UUID.
         parent = None
@@ -511,6 +453,64 @@ class IndicatorVirtualBox:
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
 
         notebook.append_page( scrolledWindow, Gtk.Label( "Virtual Machines" ) )
+
+        # General settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 20 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )        
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+        grid.set_margin_bottom( 10 )
+
+        showAsSubmenusCheckbox = Gtk.CheckButton( "Show groups as submenus" )
+        showAsSubmenusCheckbox.set_tooltip_text(
+            "Groups can be shown with their VMs in submenus,\n" + \
+            "or shown with their VMs as an indented list." )
+        showAsSubmenusCheckbox.set_active( self.showSubmenu )
+
+        sortAlphabeticallyCheckbox = Gtk.CheckButton( "Sort VMs alphabetically" )
+        sortAlphabeticallyCheckbox.set_tooltip_text( 
+            "VMs can be sorted alphabetically or\n" + \
+            "as set in the VirtualBox Manager." )
+        sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
+
+        # Only show one of these, depending if groups are present or not...
+        if self.groupsExist():
+            grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
+        else:
+            grid.attach( sortAlphabeticallyCheckbox, 0, 0, 2, 1 )
+
+        label = Gtk.Label( "Refresh interval (minutes)" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 1, 1, 1 )
+
+        spinnerRefreshInterval = Gtk.SpinButton()
+        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
+        spinnerRefreshInterval.set_tooltip_text( "How often the list of VMs and\nrunning status is updated." )
+        grid.attach( spinnerRefreshInterval, 1, 1, 1, 1 )
+
+        label = Gtk.Label( "Startup delay (seconds)" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 2, 1, 1 )
+
+        spinnerDelay = Gtk.SpinButton()
+        spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to force the initial value by explicitly setting it.
+        spinnerDelay.set_tooltip_text( "Amount of time to wait from\nstarting one VM to the next." )
+        grid.attach( spinnerDelay, 1, 2, 1, 1 )
+
+        autostartIndicatorCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartIndicatorCheckbox.set_tooltip_text( "Run the indicator automatically." )
+        autostartIndicatorCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
+        grid.attach( autostartIndicatorCheckbox, 0, 3, 2, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "General" ) )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
