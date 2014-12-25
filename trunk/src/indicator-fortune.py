@@ -60,7 +60,6 @@ class IndicatorFortune:
     SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST = 3
     SETTINGS_NOTIFICATION_SUMMARY = "notificationSummary"
     SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
-    SETTINGS_SHOW_NOTIFICATIONS = "showNotifications"
     SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
 
@@ -88,11 +87,11 @@ class IndicatorFortune:
     def update( self ):
         self.refreshFortune()
 
-        if self.showNotifications:
-            notificationSummary = self.notificationSummary
-            if notificationSummary == "": notificationSummary = " "
+        notificationSummary = self.notificationSummary
+        if notificationSummary == "":
+            notificationSummary = " " # Can't be empty text.
 
-            Notify.Notification.new( notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
+        Notify.Notification.new( notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
 
         return True
 
@@ -208,7 +207,7 @@ class IndicatorFortune:
 
         notebook = Gtk.Notebook()
 
-        # First tab - display settings.
+        # First tab - general settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -217,41 +216,73 @@ class IndicatorFortune:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showNotificationCheckbox = Gtk.CheckButton( "Show screen notification" )
-        showNotificationCheckbox.set_active( self.showNotifications )
-        showNotificationCheckbox.set_tooltip_text( "Show fortunes in notification bubble" )
-        grid.attach( showNotificationCheckbox, 0, 0, 2, 1 )
-
         label = Gtk.Label( "Refresh interval (minutes)" )
-        grid.attach( label, 0, 1, 1, 1 )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 1, 1 )
 
         spinnerRefreshInterval = Gtk.SpinButton()
         spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60 * 24, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
-        spinnerRefreshInterval.set_tooltip_text( "How often a fortune is displayed" )
-        grid.attach( spinnerRefreshInterval, 1, 1, 1, 1 )
+        spinnerRefreshInterval.set_tooltip_text( "How often a fortune is displayed." )
+        grid.attach( spinnerRefreshInterval, 1, 0, 1, 1 )
 
-        label = Gtk.Label( "Character limit" )
+        label = Gtk.Label( "Notification summary" )
         label.set_halign( Gtk.Align.START )
+        label.set_margin_top( 10 )
+        grid.attach( label, 0, 1, 1, 1 )
+
+        notificationSummary = Gtk.Entry()
+        notificationSummary.set_text( self.notificationSummary )
+        notificationSummary.set_tooltip_text( "The summary text for the notification." )
+        notificationSummary.set_hexpand( True )
+        notificationSummary.set_margin_top( 10 )
+        grid.attach( notificationSummary, 1, 1, 1, 1 )
+
+        label = Gtk.Label( "Message character limit" )
+        label.set_halign( Gtk.Align.START )
+        label.set_margin_top( 10 )
         grid.attach( label, 0, 2, 1, 1 )
 
         spinnerCharacterCount = Gtk.SpinButton()
         spinnerCharacterCount.set_adjustment( Gtk.Adjustment( self.skipFortuneCharacterCount, 1, 1000, 1, 50, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerCharacterCount.set_value( self.skipFortuneCharacterCount ) # ...so need to force the initial value by explicitly setting it.
-        spinnerCharacterCount.set_tooltip_text( "Rejects a fortune if it exceeds the character count.\nDon't set too low (below 50) as many fortunes may not appear causing excessive calls to 'fortune'." )
+        spinnerCharacterCount.set_tooltip_text(
+           "If the fortune exceeds the limit,\n" + \
+           "a new fortune is created.\n\n" + \
+           "Do not set too low (say below 50)\n" + \
+           "as many fortunes may not appear,\n" + \
+           "resulting in excessive calls to 'fortune'." )
+        spinnerCharacterCount.set_margin_top( 10 )
         grid.attach( spinnerCharacterCount, 1, 2, 1, 1 )
 
-        label = Gtk.Label( "Notification summary" )
+        label = Gtk.Label( "Middle mouse click of the icon" )
+        label.set_tooltip_text( "Not supported on all versions/derivatives of Ubuntu!" )
         label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 3, 1, 1 )
+        label.set_margin_top( 10 )
+        grid.attach( label, 0, 3, 2, 1 )
 
-        notificationSummary = Gtk.Entry()
-        notificationSummary.set_text( self.notificationSummary )
-        notificationSummary.set_tooltip_text( "The summary text for the notification" )
-        notificationSummary.set_hexpand( True )
-        grid.attach( notificationSummary, 1, 3, 1, 1 )
+        radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, "Shows a new fortune" )
+        radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
+        radioMiddleMouseClickNewFortune.set_margin_left( 15 )
+        grid.attach( radioMiddleMouseClickNewFortune, 0, 4, 2, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "Display" ) )
+        radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "Copies current fortune to clipboard" )
+        radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
+        radioMiddleMouseClickCopyLastFortune.set_margin_left( 15 )
+        grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 5, 2, 1 )
+
+        radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "Shows current fortune" )
+        radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
+        radioMiddleMouseClickShowLastFortune.set_margin_left( 15 )
+        grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 2, 1 )
+
+        autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_tooltip_text( "Run the indicator automatically." )
+        autostartCheckbox.set_active( os.path.exists( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE ) )
+        autostartCheckbox.set_margin_top( 10 )
+        grid.attach( autostartCheckbox, 0, 7, 2, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "General" ) )
 
         # Second tab - fortune file settings.
         grid = Gtk.Grid()
@@ -271,6 +302,7 @@ class IndicatorFortune:
             else: store.append( [ fortune[ 0 ], None ] )
 
         tree = Gtk.TreeView( store )
+        tree.expand_all()
         tree.set_hexpand( True )
         tree.set_vexpand( True )
         tree.append_column( Gtk.TreeViewColumn( "Fortune File/Directory", Gtk.CellRendererText(), text = 0 ) )
@@ -280,15 +312,9 @@ class IndicatorFortune:
         tree.connect( "row-activated", self.onFortuneDoubleClick )
 
         scrolledWindow = Gtk.ScrolledWindow()
-
-        # The treeview won't expand to show all data, even for a small amount of data.
-        # So only add scrollbars if there is a lot of data...greater than 15 say...
-        if len( self.fortunes ) <= 15:
-            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
-        else:
-            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( tree )
+
         grid.attach( scrolledWindow, 0, 0, 1, 1 )
 
         hbox = Gtk.Box( spacing = 6 )
@@ -314,42 +340,6 @@ class IndicatorFortune:
 
         notebook.append_page( grid, Gtk.Label( "Fortunes" ) )
 
-        # Third tab - general settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
-
-        label = Gtk.Label( "Middle mouse click of the icon shows:" )
-        label.set_tooltip_text( "Not supported on all versions/derivatives of Ubuntu" )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 0, 1, 1 )
-
-        radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, "New fortune" )
-        radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
-        radioMiddleMouseClickNewFortune.set_margin_left( 15 )
-        grid.attach( radioMiddleMouseClickNewFortune, 0, 1, 1, 1 )
-
-        radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "New fortune" )
-        radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
-        radioMiddleMouseClickCopyLastFortune.set_margin_left( 15 )
-        grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 2, 1, 1 )
-
-        radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "Show last fortune" )
-        radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
-        radioMiddleMouseClickShowLastFortune.set_margin_left( 15 )
-        grid.attach( radioMiddleMouseClickShowLastFortune, 0, 3, 1, 1 )
-
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_tooltip_text( "Run the indicator automatically" )
-        autostartCheckbox.set_active( os.path.exists( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 4, 1, 1 )
-
-        notebook.append_page( grid, Gtk.Label( "General" ) )
-
         self.dialog = Gtk.Dialog( "Preferences", None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
@@ -361,7 +351,6 @@ class IndicatorFortune:
             elif radioMiddleMouseClickCopyLastFortune.get_active(): self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST
             else: self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
 
-            self.showNotifications = showNotificationCheckbox.get_active()
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.skipFortuneCharacterCount = spinnerCharacterCount.get_value_as_int()
             self.notificationSummary = notificationSummary.get_text()
@@ -524,7 +513,6 @@ class IndicatorFortune:
         self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
         self.notificationSummary = IndicatorFortune.NOTIFICATION_SUMMARY
         self.refreshIntervalInMinutes = 15
-        self.showNotifications = True
         self.skipFortuneCharacterCount = 360 # From experimentation, about 45 characters per line, but with word boundaries maintained, say 40 characters per line (with at most 9 lines).
 
         if os.path.isfile( IndicatorFortune.SETTINGS_FILE ):
@@ -540,7 +528,6 @@ class IndicatorFortune:
                 self.middleMouseClickOnIcon = settings.get( IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
                 self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )
                 self.refreshIntervalInMinutes = settings.get( IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
-                self.showNotifications = settings.get( IndicatorFortune.SETTINGS_SHOW_NOTIFICATIONS, self.showNotifications )
                 self.skipFortuneCharacterCount = settings.get( IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT, self.skipFortuneCharacterCount )
 
             except Exception as e:
@@ -554,7 +541,6 @@ class IndicatorFortune:
                 IndicatorFortune.SETTINGS_FORTUNES: self.fortunes,
                 IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON: self.middleMouseClickOnIcon,
                 IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY: self.notificationSummary,
-                IndicatorFortune.SETTINGS_SHOW_NOTIFICATIONS: self.showNotifications,
                 IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
                 IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
             }

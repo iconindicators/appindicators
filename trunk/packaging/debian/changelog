@@ -1,7 +1,8 @@
 indicator-fortune (1.0.13-1) precise; urgency=low
 
-  * Internal tidy of radio button code in the Preferences dialog.
   * Neatened up the left alignment changelog text in the About dialog.
+  * Removed redundant option to show screen notification!
+  * Overhaul of Preferences dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 13 Sep 2014 10:14:51 +1000
 
