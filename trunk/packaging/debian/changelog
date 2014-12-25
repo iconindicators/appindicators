@@ -21,7 +21,8 @@ indicator-lunar (1.0.53-1) precise; urgency=low
   * Added Tropical Sign to stars.
   * Added attributes of the major moons to Mars, Jupiter, Saturn and Uranus.
   * Added dawn/dusk for sun.
-  * Overhaul of the preferences dialog.
+  * Overhaul of the Preferences dialog.
+  * Neatened up the left alignment changelog text in the About dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 12 Sep 2014 15:55:26 +1000
 
@@ -33,7 +34,7 @@ indicator-lunar (1.0.52-1) precise; urgency=low
   * Satellite info object now provides international designator.
   * Renamed some preferences - the user may need to set their preferences
     particularly if defaults were changed.
-  * Reorganisation and overhaul of the preferences dialog.
+  * Reorganisation and overhaul of the Preferences dialog.
   * Satellite menu text is now configurable.
   * Satellite rise notification summary and message are now configurable.
     For formatting restrictions, refer to https://wiki.ubuntu.com/NotifyOSD.
