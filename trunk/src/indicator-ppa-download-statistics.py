@@ -307,7 +307,100 @@ class IndicatorPPADownloadStatistics:
 
         notebook = Gtk.Notebook()
 
-        # First tab - display settings.
+        # PPAs.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        ppaStore = Gtk.ListStore( str, str, str, str ) # PPA User, PPA Name, Series, Architecture.
+        ppaStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+        for ppa in self.ppas: ppaStore.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
+
+        ppaTree = Gtk.TreeView( ppaStore )
+        ppaTree.set_hexpand( True )
+        ppaTree.set_vexpand( True )
+        ppaTree.append_column( Gtk.TreeViewColumn( "PPA User", Gtk.CellRendererText(), text = 0 ) )
+        ppaTree.append_column( Gtk.TreeViewColumn( "PPA Name", Gtk.CellRendererText(), text = 1 ) )
+        ppaTree.append_column( Gtk.TreeViewColumn( "Series", Gtk.CellRendererText(), text = 2 ) )
+        ppaTree.append_column( Gtk.TreeViewColumn( "Architecture", Gtk.CellRendererText(), text = 3 ) )
+        ppaTree.set_tooltip_text( "Double click to edit a PPA." )
+        ppaTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        ppaTree.connect( "row-activated", self.onPPADoubleClick )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( ppaTree )
+        grid.attach( scrolledWindow, 0, 0, 1, 1 )
+
+        hbox = Gtk.Box( spacing = 6 )
+        hbox.set_homogeneous( True )
+
+        addButton = Gtk.Button( "Add" )
+        addButton.set_tooltip_text( "Add a new PPA." )
+        addButton.connect( "clicked", self.onPPAAdd, ppaTree )
+        hbox.pack_start( addButton, True, True, 0 )
+
+        removeButton = Gtk.Button( "Remove" )
+        removeButton.set_tooltip_text( "Remove the selected PPA." )
+        removeButton.connect( "clicked", self.onPPARemove, ppaTree )
+        hbox.pack_start( removeButton, True, True, 0 )
+
+        hbox.set_halign( Gtk.Align.CENTER )
+        grid.attach( hbox, 0, 1, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "PPAs" ) )
+
+        # Filters.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        filterStore = Gtk.ListStore( str, str ) # 'PPA User | PPA Name', filter text.
+        filterStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+        for key in sorted( self.filters ): filterStore.append( [ key, "\n".join( self.filters[ key ] ) ] )
+
+        filterTree = Gtk.TreeView( filterStore )
+        filterTree.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
+        filterTree.set_hexpand( True )
+        filterTree.set_vexpand( True )
+        filterTree.append_column( Gtk.TreeViewColumn( "PPA", Gtk.CellRendererText(), text = 0 ) )
+        filterTree.append_column( Gtk.TreeViewColumn( "Filter", Gtk.CellRendererText(), text = 1 ) )
+        filterTree.set_tooltip_text( "Double click to edit a filter." )
+        filterTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        filterTree.connect( "row-activated", self.onFilterDoubleClick, ppaTree )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( filterTree )
+        grid.attach( scrolledWindow, 0, 0, 1, 1 )
+
+        hbox = Gtk.Box( spacing = 6 )
+        hbox.set_homogeneous( True )
+
+        addButton = Gtk.Button( "Add" )
+        addButton.set_tooltip_text( "Add a new filter." )
+        addButton.connect( "clicked", self.onFilterAdd, filterTree, ppaTree )
+        hbox.pack_start( addButton, True, True, 0 )
+
+        removeButton = Gtk.Button( "Remove" )
+        removeButton.set_tooltip_text( "Remove the selected filter." )
+        removeButton.connect( "clicked", self.onFilterRemove, filterTree )
+        hbox.pack_start( removeButton, True, True, 0 )
+
+        hbox.set_halign( Gtk.Align.CENTER )
+        grid.attach( hbox, 0, 1, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "Filters" ) )
+
+        # General settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -402,99 +495,6 @@ class IndicatorPPADownloadStatistics:
         grid.attach( autostartCheckbox, 0, 7, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "General" ) )
-
-        # Second tab - PPAs.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
-
-        ppaStore = Gtk.ListStore( str, str, str, str ) # PPA User, PPA Name, Series, Architecture.
-        ppaStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
-        for ppa in self.ppas: ppaStore.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
-
-        ppaTree = Gtk.TreeView( ppaStore )
-        ppaTree.set_hexpand( True )
-        ppaTree.set_vexpand( True )
-        ppaTree.append_column( Gtk.TreeViewColumn( "PPA User", Gtk.CellRendererText(), text = 0 ) )
-        ppaTree.append_column( Gtk.TreeViewColumn( "PPA Name", Gtk.CellRendererText(), text = 1 ) )
-        ppaTree.append_column( Gtk.TreeViewColumn( "Series", Gtk.CellRendererText(), text = 2 ) )
-        ppaTree.append_column( Gtk.TreeViewColumn( "Architecture", Gtk.CellRendererText(), text = 3 ) )
-        ppaTree.set_tooltip_text( "Double click to edit a PPA." )
-        ppaTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        ppaTree.connect( "row-activated", self.onPPADoubleClick )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( ppaTree )
-        grid.attach( scrolledWindow, 0, 0, 1, 1 )
-
-        hbox = Gtk.Box( spacing = 6 )
-        hbox.set_homogeneous( True )
-
-        addButton = Gtk.Button( "Add" )
-        addButton.set_tooltip_text( "Add a new PPA." )
-        addButton.connect( "clicked", self.onPPAAdd, ppaTree )
-        hbox.pack_start( addButton, True, True, 0 )
-
-        removeButton = Gtk.Button( "Remove" )
-        removeButton.set_tooltip_text( "Remove the selected PPA." )
-        removeButton.connect( "clicked", self.onPPARemove, ppaTree )
-        hbox.pack_start( removeButton, True, True, 0 )
-
-        hbox.set_halign( Gtk.Align.CENTER )
-        grid.attach( hbox, 0, 1, 1, 1 )
-
-        notebook.append_page( grid, Gtk.Label( "PPAs" ) )
-
-        # Third tab - filters.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
-
-        filterStore = Gtk.ListStore( str, str ) # 'PPA User | PPA Name', filter text.
-        filterStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
-        for key in sorted( self.filters ): filterStore.append( [ key, "\n".join( self.filters[ key ] ) ] )
-
-        filterTree = Gtk.TreeView( filterStore )
-        filterTree.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
-        filterTree.set_hexpand( True )
-        filterTree.set_vexpand( True )
-        filterTree.append_column( Gtk.TreeViewColumn( "PPA", Gtk.CellRendererText(), text = 0 ) )
-        filterTree.append_column( Gtk.TreeViewColumn( "Filter", Gtk.CellRendererText(), text = 1 ) )
-        filterTree.set_tooltip_text( "Double click to edit a filter." )
-        filterTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        filterTree.connect( "row-activated", self.onFilterDoubleClick, ppaTree )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( filterTree )
-        grid.attach( scrolledWindow, 0, 0, 1, 1 )
-
-        hbox = Gtk.Box( spacing = 6 )
-        hbox.set_homogeneous( True )
-
-        addButton = Gtk.Button( "Add" )
-        addButton.set_tooltip_text( "Add a new filter." )
-        addButton.connect( "clicked", self.onFilterAdd, filterTree, ppaTree )
-        hbox.pack_start( addButton, True, True, 0 )
-
-        removeButton = Gtk.Button( "Remove" )
-        removeButton.set_tooltip_text( "Remove the selected filter." )
-        removeButton.connect( "clicked", self.onFilterRemove, filterTree )
-        hbox.pack_start( removeButton, True, True, 0 )
-
-        hbox.set_halign( Gtk.Align.CENTER )
-        grid.attach( hbox, 0, 1, 1, 1 )
-
-        notebook.append_page( grid, Gtk.Label( "Filters" ) )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
