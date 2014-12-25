@@ -101,7 +101,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def main( self ):
-        self.requestPPADownloadAndMenuRefresh( False )
+#         self.requestPPADownloadAndMenuRefresh( False )
         GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every 6 hours.
         Gtk.main()
 
@@ -317,34 +317,45 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_bottom( 10 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show PPAs as submenus" )
-        showAsSubmenusCheckbox.set_tooltip_text( "The download statitics for each PPA are shown in a separate submenu." )
+        showAsSubmenusCheckbox.set_tooltip_text( "The download statistics for each PPA\nare shown in a separate submenu." )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
         combinePPAsCheckbox = Gtk.CheckButton( "Combine PPAs" )
-        toolTip = "Combine the statistics of binary packages when the PPA user/name are the same.\n\n"
-        toolTip += "When not architecture specific (such as Python),\n"
-        toolTip += "if the package names and version numbers of two binary packages are identical,\n"
-        toolTip += "the packages are treated as the same package and the download counts are NOT summed.\n\n"
-        toolTip += "For architecture specific (such as compiled C),\n"
-        toolTip += "if the package names and version numbers of two binary packages are identical,\n"
-        toolTip += "the packages are treated as the same package and the download counts ARE summed."
+        toolTip =  "Combine the statistics of binary packages\n"
+        toolTip += "when the PPA user/name are the same.\n\n"
+        toolTip += "When a package is NOT architecture specific:\n"
+        toolTip += "If the package names and version numbers\n"
+        toolTip += "of two binary packages are identical,\n"
+        toolTip += "the packages are treated as the same package\n"
+        toolTip += "and the download counts are NOT summed.\n"
+        toolTip += "Packages such as Python fall into this category.\n\n"
+        toolTip += "When a package IS architecture specific:\n"
+        toolTip += "If the package names and version numbers\n"
+        toolTip += "of two binary packages are identical,\n"
+        toolTip += "the packages are treated as the same package\n"
+        toolTip += "and the download counts ARE summed.\n"
+        toolTip += "Packages such as compiled C fall into this category."
         combinePPAsCheckbox.set_tooltip_text( toolTip )
         combinePPAsCheckbox.set_active( self.combinePPAs )
+        combinePPAsCheckbox.set_margin_top( 10 )
         grid.attach( combinePPAsCheckbox, 0, 1, 2, 1 )
 
         ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( "Ignore version for architecture specific" )
         ignoreVersionArchitectureSpecificCheckbox.set_margin_left( 15 )
 
-        toolTip = "For architecture specific, sometimes the same package name\n"
-        toolTip += "but different version 'number' is actually the SAME package.\n\n"
-        toolTip += "For example, a source C package for both Ubuntu Saucy and Ubuntu Trusty\n"
-        toolTip += "will be compiled twice, each with a different version 'number',\n"
+        toolTip =  "Sometimes architecture specific packages with the\n"
+        toolTip += "same package name but different version 'number'\n"
+        toolTip += "are logically the SAME package.\n\n"
+        toolTip += "For example, a C source package for both\n"
+        toolTip += "Ubuntu Saucy and Ubuntu Trusty will be compiled\n"
+        toolTip += "twice, each with a different version 'number',\n"
         toolTip += "despite being the SAME release.\n\n"
-        toolTip += "Checking this option will ignore the version number when\n"
-        toolTip += "determining if two architecture specific packages are identical.\n\n"
-        toolTip += "The version number is retained only if it is identical\n"
-        toolTip += "across ALL instances of a published binary."
+        toolTip += "Checking this option will ignore the version\n"
+        toolTip += "number when determining if two architecture\n"
+        toolTip += "specific packages are identical.\n\n"
+        toolTip += "The version number is retained only if it is\n"
+        toolTip += "identical across ALL instances of a published binary."
         ignoreVersionArchitectureSpecificCheckbox.set_tooltip_text( toolTip )
         ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
@@ -355,6 +366,7 @@ class IndicatorPPADownloadStatistics:
         sortByDownloadCheckbox = Gtk.CheckButton( "Sort by download" )
         sortByDownloadCheckbox.set_tooltip_text( "Sort by download (highest first) within each PPA." )
         sortByDownloadCheckbox.set_active( self.sortByDownload )
+        sortByDownloadCheckbox.set_margin_top( 10 )
         grid.attach( sortByDownloadCheckbox, 0, 3, 2, 1 )
 
         label = Gtk.Label( "  Clip amount" )
@@ -374,6 +386,7 @@ class IndicatorPPADownloadStatistics:
         showNotificationOnUpdateCheckbox = Gtk.CheckButton( "Notify on update" )
         showNotificationOnUpdateCheckbox.set_tooltip_text( "Show a screen notification when the PPA\ndownload statistics have been updated AND\nare different to the last download." )
         showNotificationOnUpdateCheckbox.set_active( self.showNotificationOnUpdate )
+        showNotificationOnUpdateCheckbox.set_margin_top( 10 )
         grid.attach( showNotificationOnUpdateCheckbox, 0, 5, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
@@ -398,7 +411,7 @@ class IndicatorPPADownloadStatistics:
         ppaTree.append_column( Gtk.TreeViewColumn( "PPA Name", Gtk.CellRendererText(), text = 1 ) )
         ppaTree.append_column( Gtk.TreeViewColumn( "Series", Gtk.CellRendererText(), text = 2 ) )
         ppaTree.append_column( Gtk.TreeViewColumn( "Architecture", Gtk.CellRendererText(), text = 3 ) )
-        ppaTree.set_tooltip_text( "Double click to edit a PPA" )
+        ppaTree.set_tooltip_text( "Double click to edit a PPA." )
         ppaTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         ppaTree.connect( "row-activated", self.onPPADoubleClick )
 
@@ -411,12 +424,12 @@ class IndicatorPPADownloadStatistics:
         hbox.set_homogeneous( True )
 
         addButton = Gtk.Button( "Add" )
-        addButton.set_tooltip_text( "Add a new PPA" )
+        addButton.set_tooltip_text( "Add a new PPA." )
         addButton.connect( "clicked", self.onPPAAdd, ppaTree )
         hbox.pack_start( addButton, True, True, 0 )
 
         removeButton = Gtk.Button( "Remove" )
-        removeButton.set_tooltip_text( "Remove the selected PPA" )
+        removeButton.set_tooltip_text( "Remove the selected PPA." )
         removeButton.connect( "clicked", self.onPPARemove, ppaTree )
         hbox.pack_start( removeButton, True, True, 0 )
 
@@ -457,12 +470,12 @@ class IndicatorPPADownloadStatistics:
         hbox.set_homogeneous( True )
 
         addButton = Gtk.Button( "Add" )
-        addButton.set_tooltip_text( "Add a new filter" )
+        addButton.set_tooltip_text( "Add a new filter." )
         addButton.connect( "clicked", self.onFilterAdd, filterTree, ppaTree )
         hbox.pack_start( addButton, True, True, 0 )
 
         removeButton = Gtk.Button( "Remove" )
-        removeButton.set_tooltip_text( "Remove the selected filter" )
+        removeButton.set_tooltip_text( "Remove the selected filter." )
         removeButton.connect( "clicked", self.onFilterRemove, filterTree )
         hbox.pack_start( removeButton, True, True, 0 )
 
@@ -481,13 +494,14 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_bottom( 10 )
 
         allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Open PPA in browser" )
-        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item launches the default web browser, loading the PPA's page." )
+        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item loads the\nPPA's page in the default browser." )
         allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
         grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 0, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
-        autostartCheckbox.set_tooltip_text( "Run the indicator automatically" )
+        autostartCheckbox.set_tooltip_text( "Run the indicator automatically." )
+        autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "General" ) )
