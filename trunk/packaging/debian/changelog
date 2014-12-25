@@ -1,7 +1,7 @@
 indicator-stardate (1.0.25-1) precise; urgency=low
 
   * Neatened up the left alignment changelog text in the About dialog.
-  * Cleaned up tooltips in the Preferences dialog.
+  * Cleaned up tooltips and added spacing in the Preferences dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 25 Dec 2014 17:11:25 +1000
 
