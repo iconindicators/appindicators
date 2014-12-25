@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.44-1) precise; urgency=low
+
+  * Neatened up the left alignment changelog text in the About dialog.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 25 Dec 2014 17:08:35 +1000
+
+
 indicator-ppa-download-statistics (1.0.43-1) precise; urgency=low
 
   * Now shows the screen notification only if there is a difference in the
