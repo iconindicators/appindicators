@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.45-1) precise; urgency=low
+
+  * Added 'vivid' to the list of series.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 26 Dec 2014 10:03:19 +1000
+
+
 indicator-ppa-download-statistics (1.0.44-1) precise; urgency=low
 
   * Neatened up the left alignment changelog text in the About dialog.
