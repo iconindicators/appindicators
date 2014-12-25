@@ -207,7 +207,63 @@ class IndicatorFortune:
 
         notebook = Gtk.Notebook()
 
-        # First tab - general settings.
+        # Fortune file settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+        grid.set_row_homogeneous( False )
+        grid.set_column_homogeneous( False )
+
+        store = Gtk.ListStore( str, str ) # Path to fortune file, tick icon (Gtk.STOCK_APPLY) or None.
+        store.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+        for fortune in self.fortunes:
+            if fortune[ 1 ]: store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
+            else: store.append( [ fortune[ 0 ], None ] )
+
+        tree = Gtk.TreeView( store )
+        tree.expand_all()
+        tree.set_hexpand( True )
+        tree.set_vexpand( True )
+        tree.append_column( Gtk.TreeViewColumn( "Fortune File/Directory", Gtk.CellRendererText(), text = 0 ) )
+        tree.append_column( Gtk.TreeViewColumn( "Enabled", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
+        tree.set_tooltip_text( "Double click to edit a fortune's properties" )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        tree.connect( "row-activated", self.onFortuneDoubleClick )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( tree )
+
+        grid.attach( scrolledWindow, 0, 0, 1, 1 )
+
+        hbox = Gtk.Box( spacing = 6 )
+        hbox.set_homogeneous( True )
+
+        addButton = Gtk.Button( "Add" )
+        addButton.set_tooltip_text( "Add a new fortune location" )
+        addButton.connect( "clicked", self.onFortuneAdd, tree )
+        hbox.pack_start( addButton, True, True, 0 )
+
+        removeButton = Gtk.Button( "Remove" )
+        removeButton.set_tooltip_text( "Remove the selected fortune location" )
+        removeButton.connect( "clicked", self.onFortuneRemove, tree )
+        hbox.pack_start( removeButton, True, True, 0 )
+
+        resetButton = Gtk.Button( "Reset" )
+        resetButton.set_tooltip_text( "Remove all fortunes and set back to factory default" )
+        resetButton.connect( "clicked", self.onFortuneReset, tree )
+        hbox.pack_start( resetButton, True, True, 0 )
+
+        hbox.set_halign( Gtk.Align.CENTER )
+        grid.attach( hbox, 0, 1, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "Fortunes" ) )
+
+        # General settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -283,62 +339,6 @@ class IndicatorFortune:
         grid.attach( autostartCheckbox, 0, 7, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "General" ) )
-
-        # Second tab - fortune file settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
-        grid.set_row_homogeneous( False )
-        grid.set_column_homogeneous( False )
-
-        store = Gtk.ListStore( str, str ) # Path to fortune file, tick icon (Gtk.STOCK_APPLY) or None.
-        store.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
-        for fortune in self.fortunes:
-            if fortune[ 1 ]: store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
-            else: store.append( [ fortune[ 0 ], None ] )
-
-        tree = Gtk.TreeView( store )
-        tree.expand_all()
-        tree.set_hexpand( True )
-        tree.set_vexpand( True )
-        tree.append_column( Gtk.TreeViewColumn( "Fortune File/Directory", Gtk.CellRendererText(), text = 0 ) )
-        tree.append_column( Gtk.TreeViewColumn( "Enabled", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
-        tree.set_tooltip_text( "Double click to edit a fortune's properties" )
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.connect( "row-activated", self.onFortuneDoubleClick )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( tree )
-
-        grid.attach( scrolledWindow, 0, 0, 1, 1 )
-
-        hbox = Gtk.Box( spacing = 6 )
-        hbox.set_homogeneous( True )
-
-        addButton = Gtk.Button( "Add" )
-        addButton.set_tooltip_text( "Add a new fortune location" )
-        addButton.connect( "clicked", self.onFortuneAdd, tree )
-        hbox.pack_start( addButton, True, True, 0 )
-
-        removeButton = Gtk.Button( "Remove" )
-        removeButton.set_tooltip_text( "Remove the selected fortune location" )
-        removeButton.connect( "clicked", self.onFortuneRemove, tree )
-        hbox.pack_start( removeButton, True, True, 0 )
-
-        resetButton = Gtk.Button( "Reset" )
-        resetButton.set_tooltip_text( "Remove all fortunes and set back to factory default" )
-        resetButton.connect( "clicked", self.onFortuneReset, tree )
-        hbox.pack_start( resetButton, True, True, 0 )
-
-        hbox.set_halign( Gtk.Align.CENTER )
-        grid.attach( hbox, 0, 1, 1, 1 )
-
-        notebook.append_page( grid, Gtk.Label( "Fortunes" ) )
 
         self.dialog = Gtk.Dialog( "Preferences", None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
