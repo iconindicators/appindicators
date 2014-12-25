@@ -156,7 +156,7 @@ class IndicatorVirtualBox:
 
             menu.append( Gtk.SeparatorMenuItem() )
 
-            self.virtualBoxMenuItem = Gtk.MenuItem( "Launch VirtualBox" )
+            self.virtualBoxMenuItem = Gtk.MenuItem( "Launch VirtualBox Manager" )
             self.virtualBoxMenuItem.connect( "activate", self.onLaunchVirtualBox )
             menu.append( self.virtualBoxMenuItem )
         else:
