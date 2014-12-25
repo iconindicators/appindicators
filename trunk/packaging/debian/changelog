@@ -1,6 +1,7 @@
 indicator-fortune (1.0.13-1) precise; urgency=low
 
-  * Internal tidy of radio button code in preferences dialog.
+  * Internal tidy of radio button code in the Preferences dialog.
+  * Neatened up the left alignment changelog text in the About dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 13 Sep 2014 10:14:51 +1000
 
