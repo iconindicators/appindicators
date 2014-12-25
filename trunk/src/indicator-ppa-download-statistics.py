@@ -294,7 +294,7 @@ class IndicatorPPADownloadStatistics:
 
     def onPreferences( self, widget ):
         if self.downloadInProgress:
-            Notify.Notification.new( "Downloading statistics...", "Preferences are currently unavailable.", IndicatorPPADownloadStatistics.ICON ).show()
+            Notify.Notification.new( "Downloading data...", "Preferences are currently unavailable.", IndicatorPPADownloadStatistics.ICON ).show()
             return
 
         if self.dialog is not None:
