@@ -497,6 +497,8 @@ class IndicatorVirtualBox:
 
         tree = Gtk.TreeView( store )
         tree.expand_all()
+        tree.set_hexpand( True )
+        tree.set_vexpand( True )
         tree.append_column( Gtk.TreeViewColumn( "Virtual Machine", Gtk.CellRendererText(), text = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Autostart", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
         tree.append_column( Gtk.TreeViewColumn( "Start Command", Gtk.CellRendererText(), text = 2 ) )
