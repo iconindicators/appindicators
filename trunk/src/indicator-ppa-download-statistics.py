@@ -364,7 +364,7 @@ class IndicatorPPADownloadStatistics:
         combinePPAsCheckbox.connect( "toggled", self.onCombinePPAsCheckbox, ignoreVersionArchitectureSpecificCheckbox )
 
         sortByDownloadCheckbox = Gtk.CheckButton( "Sort by download" )
-        sortByDownloadCheckbox.set_tooltip_text( "Sort by download (highest first) within each PPA." )
+        sortByDownloadCheckbox.set_tooltip_text( "Sort by download (highest first)\nwithin each PPA." )
         sortByDownloadCheckbox.set_active( self.sortByDownload )
         sortByDownloadCheckbox.set_margin_top( 10 )
         grid.attach( sortByDownloadCheckbox, 0, 3, 2, 1 )
@@ -377,7 +377,7 @@ class IndicatorPPADownloadStatistics:
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.sortByDownloadAmount ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( "Limit the number of entries when sorting by download.\nA value of zero will not clip." )
+        spinner.set_tooltip_text( "Limit the number of entries\nwhen sorting by download.\n\nA value of zero will not clip." )
         spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
         grid.attach( spinner, 1, 4, 1, 1 )
 
@@ -389,7 +389,19 @@ class IndicatorPPADownloadStatistics:
         showNotificationOnUpdateCheckbox.set_margin_top( 10 )
         grid.attach( showNotificationOnUpdateCheckbox, 0, 5, 2, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "Display" ) )
+        allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Open PPA in browser" )
+        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item loads the\nPPA's page in the default browser." )
+        allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
+        allowMenuItemsToLaunchBrowserCheckbox.set_margin_top( 10 )
+        grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 6, 2, 1 )
+
+        autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
+        autostartCheckbox.set_tooltip_text( "Run the indicator automatically." )
+        autostartCheckbox.set_margin_top( 10 )
+        grid.attach( autostartCheckbox, 0, 7, 2, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "General" ) )
 
         # Second tab - PPAs.
         grid = Gtk.Grid()
@@ -483,28 +495,6 @@ class IndicatorPPADownloadStatistics:
         grid.attach( hbox, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Filters" ) )
-
-        # Fourth tab - general settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
-
-        allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Open PPA in browser" )
-        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item loads the\nPPA's page in the default browser." )
-        allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
-        grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 0, 1, 1 )
-
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
-        autostartCheckbox.set_tooltip_text( "Run the indicator automatically." )
-        autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 1, 1, 1 )
-
-        notebook.append_page( grid, Gtk.Label( "General" ) )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
