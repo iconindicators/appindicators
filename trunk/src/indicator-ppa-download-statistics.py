@@ -364,7 +364,7 @@ class IndicatorPPADownloadStatistics:
         combinePPAsCheckbox.connect( "toggled", self.onCombinePPAsCheckbox, ignoreVersionArchitectureSpecificCheckbox )
 
         sortByDownloadCheckbox = Gtk.CheckButton( "Sort by download" )
-        sortByDownloadCheckbox.set_tooltip_text( "Sort by download (highest first)\nwithin each PPA." )
+        sortByDownloadCheckbox.set_tooltip_text( "Sort by download count\nwithin each PPA." )
         sortByDownloadCheckbox.set_active( self.sortByDownload )
         sortByDownloadCheckbox.set_margin_top( 10 )
         grid.attach( sortByDownloadCheckbox, 0, 3, 2, 1 )
