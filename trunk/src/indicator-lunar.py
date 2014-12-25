@@ -1350,7 +1350,7 @@ class IndicatorLunar:
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( " Icon" ) )
+        notebook.append_page( grid, Gtk.Label( "Icon" ) )
 
         # Menu.
         grid = Gtk.Grid()
@@ -1455,7 +1455,7 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 7, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( " Menu" ) )
+        notebook.append_page( grid, Gtk.Label( "Menu" ) )
 
         # Planets/Stars.
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 15 ) # Bug in Python - must specify the parameter names!
@@ -1502,7 +1502,7 @@ class IndicatorLunar:
 
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        notebook.append_page( box, Gtk.Label( " Planets  /  Stars" ) )
+        notebook.append_page( box, Gtk.Label( "Planets / Stars" ) )
 
         # Satellites.
         satelliteTabGrid = Gtk.Grid()
@@ -1577,7 +1577,7 @@ class IndicatorLunar:
         
         satelliteTabGrid.attach( label, 0, 2, 1, 1 )
 
-        notebook.append_page( satelliteTabGrid, Gtk.Label( " Satellites" ) )
+        notebook.append_page( satelliteTabGrid, Gtk.Label( "Satellites" ) )
 
         # OSD (satellite and full moon).
         grid = Gtk.Grid()
@@ -1734,7 +1734,7 @@ class IndicatorLunar:
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
-        notebook.append_page( grid, Gtk.Label( " Notifications" ) )
+        notebook.append_page( grid, Gtk.Label( "Notifications" ) )
 
         # Location.
         grid = Gtk.Grid()
@@ -1756,7 +1756,6 @@ class IndicatorLunar:
         city.set_tooltip_text(
             "To reset the cities to default lat/long/elev,\n" + \
             "add a bogus city and restart the indicator." )
-        city.set_hexpand( True )
         for c in cities:
             city.append_text( c )
 
@@ -1795,7 +1794,7 @@ class IndicatorLunar:
         autostartCheckbox.set_margin_top( 20 )
         grid.attach( autostartCheckbox, 0, 4, 2, 1 )
 
-        notebook.append_page( grid, Gtk.Label( " General" ) )
+        notebook.append_page( grid, Gtk.Label( "General" ) )
 
         self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
