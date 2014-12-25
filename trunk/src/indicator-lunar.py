@@ -1789,21 +1789,11 @@ class IndicatorLunar:
         city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
         city.set_active( cities.index( self.cityName ) )
 
-        notebook.append_page( grid, Gtk.Label( " Location" ) )
-
-        # General.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
-
         autostartCheckbox = Gtk.CheckButton( "Autostart" )
         autostartCheckbox.set_tooltip_text( "Run the indicator automatically." )
         autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
-        grid.attach( autostartCheckbox, 0, 0, 1, 1 )
+        autostartCheckbox.set_margin_top( 20 )
+        grid.attach( autostartCheckbox, 0, 4, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( " General" ) )
 
