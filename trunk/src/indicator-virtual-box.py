@@ -165,17 +165,17 @@ class IndicatorVirtualBox:
             menu.insert( Gtk.MenuItem( "(VirtualBox is not installed)" ), 0 )
             menu.append( Gtk.SeparatorMenuItem() )
 
-        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        preferencesMenuItem.connect( "activate", self.onPreferences )
-        menu.append( preferencesMenuItem )
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
+        menuItem.connect( "activate", self.onPreferences )
+        menu.append( menuItem )
 
-        aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
-        aboutMenuItem.connect( "activate", self.onAbout )
-        menu.append( aboutMenuItem )
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
+        menuItem.connect( "activate", self.onAbout )
+        menu.append( menuItem )
 
-        quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        quitMenuItem.connect( "activate", Gtk.main_quit )
-        menu.append( quitMenuItem )
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
+        menuItem.connect( "activate", Gtk.main_quit )
+        menu.append( menuItem )
 
         self.indicator.set_menu( menu )
         menu.show_all()
@@ -201,7 +201,7 @@ class IndicatorVirtualBox:
         virtualMachineInfosA = self.getVirtualMachinesFromConfigFile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_A ) 
         virtualMachineInfosB = self.getVirtualMachinesFromConfigFile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_B ) 
 
-        # Information from config A takes precedence of config B as it appears config A is what the latest VirtualBox release uses.
+        # Information from config A takes precedence over config B as it appears config A is what the latest VirtualBox release uses.
         # If neither config has information, use what was obtained from the backend.
         if len( virtualMachineInfosA ) > 0 or len( virtualMachineInfosB ) > 0:
             if len( virtualMachineInfosA ) > 0:
@@ -443,7 +443,7 @@ class IndicatorVirtualBox:
 
         textGroupNameBefore = Gtk.Entry()
         textGroupNameBefore.set_text( self.menuTextGroupNameBefore )
-        textGroupNameBefore.set_tooltip_text( "If groups are present, this text will appear BEFORE each group name" )
+        textGroupNameBefore.set_tooltip_text( "If groups are present, this text will appear BEFORE each group name." )
         textGroupNameBefore.set_hexpand( True )
         grid.attach( textGroupNameBefore, 1, 1, 1, 1 )
 
@@ -454,21 +454,25 @@ class IndicatorVirtualBox:
 
         textGroupNameAfter = Gtk.Entry()
         textGroupNameAfter.set_text( self.menuTextGroupNameAfter )
-        textGroupNameAfter.set_tooltip_text( "If groups are present, this text will appear AFTER each group name" )
+        textGroupNameAfter.set_tooltip_text( "If groups are present, this text will appear AFTER each group name," )
         grid.attach( textGroupNameAfter, 1, 2, 1, 1 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( "Show groups as submenus" )
-        showAsSubmenusCheckbox.set_margin_top( 10 ) # Bit of padding from the item above.
-        showAsSubmenusCheckbox.set_tooltip_text( "Applies when groups ARE present" )
+        showAsSubmenusCheckbox.set_margin_top( 10 )
+        showAsSubmenusCheckbox.set_tooltip_text(
+            "Groups can be shown with their VMs in submenus, or\n" + \
+            "shown with their VMs as an indented list." )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
-        showAsSubmenusCheckbox.set_sensitive( self.groupsExist() )
-        grid.attach( showAsSubmenusCheckbox, 0, 3, 2, 1 )
+        showAsSubmenusCheckbox.set_margin_top( 10 )
+        if self.groupsExist(): grid.attach( showAsSubmenusCheckbox, 0, 3, 2, 1 ) # Only show this option if groups are present.
 
         sortAlphabeticallyCheckbox = Gtk.CheckButton( "Sort VMs alphabetically" )
-        sortAlphabeticallyCheckbox.set_tooltip_text( "Applies when groups are NOT present" )
+        sortAlphabeticallyCheckbox.set_tooltip_text( 
+            "VMs can be sorted alphabetically or\n" + \
+            "as set in the VirtualBox Manager." )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
-        sortAlphabeticallyCheckbox.set_sensitive( not self.groupsExist() )
-        grid.attach( sortAlphabeticallyCheckbox, 0, 4, 2, 1 )
+        sortAlphabeticallyCheckbox.set_margin_top( 10 )
+        if not self.groupsExist(): grid.attach( sortAlphabeticallyCheckbox, 0, 3, 2, 1 ) # Only show this option if groups are NOT present.
 
         notebook.append_page( grid, Gtk.Label( "Display" ) )
 
@@ -504,7 +508,7 @@ class IndicatorVirtualBox:
         tree.append_column( Gtk.TreeViewColumn( "Virtual Machine", Gtk.CellRendererText(), text = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Autostart", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
         tree.append_column( Gtk.TreeViewColumn( "Start Command", Gtk.CellRendererText(), text = 2 ) )
-        tree.set_tooltip_text( "Double click to edit a VM's properties" )
+        tree.set_tooltip_text( "Double click to edit a VM's properties." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onVMDoubleClick )
 
@@ -516,15 +520,16 @@ class IndicatorVirtualBox:
         else: scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
 
         scrolledWindow.add( tree )
+        scrolledWindow.set_margin_bottom( 10 )
         grid.attach( scrolledWindow, 0, 0, 2, 1 )
 
-        label = Gtk.Label( "Delay (seconds)" )
+        label = Gtk.Label( "Time delay (seconds)" )
         grid.attach( label, 0, 1, 1, 1 )
 
         spinnerDelay = Gtk.SpinButton()
         spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStart, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerDelay.set_value( self.delayBetweenAutoStart ) # ...so need to force the initial value by explicitly setting it.
-        spinnerDelay.set_tooltip_text( "Time delay (in seconds) from starting one VM to the next" )
+        spinnerDelay.set_tooltip_text( "Amount of time to wait from\nstarting one VM to the next." )
         spinnerDelay.set_hexpand( True )
         grid.attach( spinnerDelay, 1, 1, 1, 1 )
 
@@ -545,13 +550,14 @@ class IndicatorVirtualBox:
         spinnerRefreshInterval = Gtk.SpinButton()
         spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
-        spinnerRefreshInterval.set_tooltip_text( "How often the list of VMs and their running status is automatically updated" )
+        spinnerRefreshInterval.set_tooltip_text( "How often the list of VMs and\nrunning status is updated." )
         spinnerRefreshInterval.set_hexpand( True )
         grid.attach( spinnerRefreshInterval, 1, 0, 1, 1 )
 
         autostartIndicatorCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartIndicatorCheckbox.set_tooltip_text( "Run the indicator automatically" )
+        autostartIndicatorCheckbox.set_tooltip_text( "Run the indicator automatically." )
         autostartIndicatorCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
+        autostartIndicatorCheckbox.set_margin_top( 10 )
         grid.attach( autostartIndicatorCheckbox, 0, 1, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( "General" ) )
