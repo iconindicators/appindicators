@@ -195,30 +195,30 @@ class AboutDialog( Gtk.AboutDialog ):
 
     # Assumes a typical format for a Debian change log file.
     def getChangeLog( self ):
+        if not os.path.exists( self.changeLog ): return None
+
         contents = None
-        if os.path.exists( self.changeLog ):
-            try:
-                with gzip.open( self.changeLog, "rb" ) as f:
-                    changeLogContents = re.split( "\n\n\n", f.read().decode() )
+        try:
+            with gzip.open( self.changeLog, "rb" ) as f:
+                changeLogContents = re.split( "\n\n\n", f.read().decode() )
 
-                    contents = ""
-                    for changeLogEntry in changeLogContents:
-                        changeLogEntry = changeLogEntry.split( "\n" )
+            contents = ""
+            for changeLogEntry in changeLogContents:
+                changeLogEntry = changeLogEntry.split( "\n" )
+                version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
+                dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
+                changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
+                changes = changes.replace( "    ", "     " )
+                contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
 
-                        version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
-                        dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
-                        changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
+            contents = contents.strip()
 
-                        contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
+        except Exception as e:
+            if not self.logging is None:
+                self.logging.exception( e )
+                self.logging.error( "Error reading change log: " + self.changeLog )
 
-                    contents = contents.strip()
-
-            except Exception as e:
-                if not self.logging is None:
-                    self.logging.exception( e )
-                    self.logging.error( "Error reading change log: " + self.changeLog )
-
-                contents = "Error reading change log: " + self.changeLog
+            contents = "Error reading change log: " + self.changeLog
 
         return contents
 
