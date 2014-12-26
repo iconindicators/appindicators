@@ -36,7 +36,6 @@ from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
 import copy, datetime, eclipse, glob, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys, threading, time, webbrowser
-from Onboard.Indicator import Indicator
 
 try:
     import ephem
