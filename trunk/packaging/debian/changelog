@@ -1,3 +1,10 @@
+indicator-lunar (1.0.54-1) precise; urgency=low
+
+  * Bug fix: Removed a bogus import which caused problems when running.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 28 Dec 2014 14:54:08 +1000
+
+
 indicator-lunar (1.0.53-1) precise; urgency=low
 
   * Bug fix: When checking (adding) a planet in the preferences, the
