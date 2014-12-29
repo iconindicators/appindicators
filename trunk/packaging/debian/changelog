@@ -1,6 +1,7 @@
 indicator-fortune (1.0.14-1) precise; urgency=low
 
   * Tidied tooltips in the Preferences dialog.
+  * Cleaned up menu code.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 26 Dec 2014 19:54:35 +1000
 

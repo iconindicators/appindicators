@@ -116,17 +116,17 @@ class IndicatorFortune:
 
         menu.append( Gtk.SeparatorMenuItem() )
 
-        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        preferencesMenuItem.connect( "activate", self.onPreferences )
-        menu.append( preferencesMenuItem )
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
+        menuItem.connect( "activate", self.onPreferences )
+        menu.append( menuItem )
 
-        aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
-        aboutMenuItem.connect( "activate", self.onAbout )
-        menu.append( aboutMenuItem )
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
+        menuItem.connect( "activate", self.onAbout )
+        menu.append( menuItem )
 
-        quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        quitMenuItem.connect( "activate", Gtk.main_quit )
-        menu.append( quitMenuItem )
+        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
+        menuItem.connect( "activate", Gtk.main_quit )
+        menu.append( menuItem )
 
         menu.show_all()
         
@@ -230,7 +230,7 @@ class IndicatorFortune:
         tree.set_vexpand( True )
         tree.append_column( Gtk.TreeViewColumn( "Fortune File/Directory", Gtk.CellRendererText(), text = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Enabled", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
-        tree.set_tooltip_text( "Double click to edit a fortune's properties" )
+        tree.set_tooltip_text( "Double click to edit a fortune's properties." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onFortuneDoubleClick )
 
@@ -244,17 +244,17 @@ class IndicatorFortune:
         hbox.set_homogeneous( True )
 
         addButton = Gtk.Button( "Add" )
-        addButton.set_tooltip_text( "Add a new fortune location" )
+        addButton.set_tooltip_text( "Add a new fortune location." )
         addButton.connect( "clicked", self.onFortuneAdd, tree )
         hbox.pack_start( addButton, True, True, 0 )
 
         removeButton = Gtk.Button( "Remove" )
-        removeButton.set_tooltip_text( "Remove the selected fortune location" )
+        removeButton.set_tooltip_text( "Remove the selected fortune location." )
         removeButton.connect( "clicked", self.onFortuneRemove, tree )
         hbox.pack_start( removeButton, True, True, 0 )
 
         resetButton = Gtk.Button( "Reset" )
-        resetButton.set_tooltip_text( "Reset to factory default" )
+        resetButton.set_tooltip_text( "Reset to factory default." )
         resetButton.connect( "clicked", self.onFortuneReset, tree )
         hbox.pack_start( resetButton, True, True, 0 )
 
@@ -305,8 +305,8 @@ class IndicatorFortune:
         spinnerCharacterCount.set_tooltip_text(
            "If the fortune exceeds the limit,\n" + \
            "a new fortune is created.\n\n" + \
-           "Do not set too low (say below 50)\n" + \
-           "as many fortunes may not appear,\n" + \
+           "Do not set too low (below 50)\n" + \
+           "as many fortunes may be dropped,\n" + \
            "resulting in excessive calls to 'fortune'." )
         spinnerCharacterCount.set_margin_top( 10 )
         grid.attach( spinnerCharacterCount, 1, 2, 1, 1 )
@@ -317,17 +317,17 @@ class IndicatorFortune:
         label.set_margin_top( 10 )
         grid.attach( label, 0, 3, 2, 1 )
 
-        radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, "Shows a new fortune" )
+        radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, "Show a new fortune" )
         radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
         radioMiddleMouseClickNewFortune.set_margin_left( 15 )
         grid.attach( radioMiddleMouseClickNewFortune, 0, 4, 2, 1 )
 
-        radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "Copies current fortune to clipboard" )
+        radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "Copy current fortune to clipboard" )
         radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
         radioMiddleMouseClickCopyLastFortune.set_margin_left( 15 )
         grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 5, 2, 1 )
 
-        radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "Shows current fortune" )
+        radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "Show current fortune" )
         radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
         radioMiddleMouseClickShowLastFortune.set_margin_left( 15 )
         grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 2, 1 )
@@ -435,18 +435,18 @@ class IndicatorFortune:
         hbox.set_homogeneous( True )
 
         browseFileButton = Gtk.Button( "File" )
-        browseFileButton.set_tooltip_text( "Choose a fortune .dat file\nEnsure the corresponding text file is present!" )
+        browseFileButton.set_tooltip_text( "Choose a fortune .dat file.\nEnsure the corresponding text file is present!" )
         hbox.pack_start( browseFileButton, True, True, 0 )
 
         browseDirectoryButton = Gtk.Button( "Directory" )
-        browseDirectoryButton.set_tooltip_text( "Choose a directory containing a fortune .dat file(s)\nEnsure the corresponding text file(s) is present!" )
+        browseDirectoryButton.set_tooltip_text( "Choose a directory containing a fortune .dat file(s).\nEnsure the corresponding text file(s) is present!" )
         hbox.pack_start( browseDirectoryButton, True, True, 0 )
 
         hbox.set_halign( Gtk.Align.END )
         grid.attach( hbox, 0, 1, 2, 1 )
 
         enabledCheckbox = Gtk.CheckButton( "Enabled" )
-        enabledCheckbox.set_tooltip_text( "Ensure the fortune file/directory works by running it through 'fortune' in a terminal." )
+        enabledCheckbox.set_tooltip_text( "Ensure the fortune file/directory works by\nrunning it through 'fortune' in a terminal." )
         if rowNumber is not None: # This is an edit.
             enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
 
