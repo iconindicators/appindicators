@@ -1,6 +1,6 @@
 indicator-lunar (1.0.54-1) precise; urgency=low
 
-  * Bug fix: Removed a bogus import which caused problems when running.
+  * Bug fix: Removed a bogus import which prevented running on Xubuntu.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 28 Dec 2014 14:54:08 +1000
 
