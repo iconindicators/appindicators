@@ -50,7 +50,7 @@ class IndicatorFortune:
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
     NOTIFICATION_SUMMARY = "Fortune. . ."
 
-    COMMENTS = "Calls the 'fortune' program and shows the result in the on-screen notification."
+    COMMENTS = "Calls the 'fortune' program displaying the result in the on-screen notification."
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_FORTUNES = "fortunes"
