@@ -1,6 +1,7 @@
 indicator-lunar (1.0.55-1) precise; urgency=low
 
-  * Added sorting to the list of satellites in the Preferences dialog.
+  * Added sorting to the list of tags (icon text) and satellites in the
+    Preferences dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 1 Jan 2015 19:57:40 +1000
 

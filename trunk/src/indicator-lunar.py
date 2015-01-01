@@ -1366,8 +1366,13 @@ class IndicatorLunar:
         tree.set_hexpand( True )
         tree.set_vexpand( True )
 
-        tree.append_column( Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 ) )
-        tree.append_column( Gtk.TreeViewColumn( "Value", Gtk.CellRendererText(), text = 1 ) )
+        treeViewColumn = Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 ) 
+        treeViewColumn.set_sort_column_id( 0 )
+        tree.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( "Value", Gtk.CellRendererText(), text = 1 ) 
+        treeViewColumn.set_sort_column_id( 1 )
+        tree.append_column( treeViewColumn )
 
         tree.set_tooltip_text( "Double click to add a tag to the indicator text." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
@@ -1548,26 +1553,17 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
         tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
 
-#         tree.append_column( Gtk.TreeViewColumn( "Satellite Name", Gtk.CellRendererText(), text = 1 ) )
-#         tree.append_column( Gtk.TreeViewColumn( "Number", Gtk.CellRendererText(), text = 2 ) )
-#         tree.append_column( Gtk.TreeViewColumn( "International Designator", Gtk.CellRendererText(), text = 3 ) )
-
-
         treeViewColumn = Gtk.TreeViewColumn( "Satellite Name", Gtk.CellRendererText(), text = 1 )
         treeViewColumn.set_sort_column_id( 1 )
         tree.append_column( treeViewColumn )
- 
+
         treeViewColumn = Gtk.TreeViewColumn( "Number", Gtk.CellRendererText(), text = 2 ) 
         treeViewColumn.set_sort_column_id( 2 )
         tree.append_column( treeViewColumn )
- 
+
         treeViewColumn = Gtk.TreeViewColumn( "International Designator", Gtk.CellRendererText(), text = 3 ) 
         treeViewColumn.set_sort_column_id( 3 )
         tree.append_column( treeViewColumn )
-
-
-
-
 
         tree.set_tooltip_text( "Check a satellite, station or rocket body to display in the menu." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
