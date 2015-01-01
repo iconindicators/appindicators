@@ -50,7 +50,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.54"
+    VERSION = "1.0.55"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
@@ -260,6 +260,35 @@ class IndicatorLunar:
 
         ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
 
+
+        
+        
+        comets = [ ]
+        comets.append( "C/2014 Q2 (Lovejoy),e,80.3026,94.9756,12.3949,586.9249,0.0000693,0.99780150,0.0000,01/30.0690/2015,2000,g  4.0,8.4" )
+#         comets.append( "C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0" )
+
+        for cometData in comets:
+            city = self.getCity( ephemNow )
+            comet = ephem.readdb( cometData )
+            comet.compute( city )
+
+            print( "Name", comet.name )
+            print( "RA Dec", comet.ra, comet.dec )
+            print( "Constellation, Magnitude", ephem.constellation( comet ), comet.mag )
+            print( "Sun/Earth distance", comet.sun_distance, comet.earth_distance )
+            print( "Rise Set", city.next_rising( comet ), city.next_setting( comet ) )
+            print()
+
+# http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
+# http://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html        
+# http://www.livecometdata.com/comets/c2014-q2-comet-lovejoy/        
+# Option to hide magnitude greater than X, where X = 6 as default?  Must be a positive/negative integer.
+# Separate the coment name 'Lovejoy' which repeats from the id 'C/2014'?
+# Make the list of comets in the preferences sortable?        
+        
+
+#TODO Make the list of satellites sortable?
+
         lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
 
@@ -267,7 +296,7 @@ class IndicatorLunar:
         self.updateSun( ephemNow )
         self.updatePlanets( ephemNow )
         self.updateStars( ephemNow )
-        self.updateSatellites( ephemNow )
+#TODO         self.updateSatellites( ephemNow ) 
 
         GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
 
@@ -298,7 +327,7 @@ class IndicatorLunar:
         self.updateSunMenu( menu )
         self.updatePlanetsMenu( menu )
         self.updateStarsMenu( menu )
-        self.updateSatellitesMenu( menu )
+#TODO         self.updateSatellitesMenu( menu )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -1519,9 +1548,26 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
         tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
 
-        tree.append_column( Gtk.TreeViewColumn( "Satellite Name", Gtk.CellRendererText(), text = 1 ) )
-        tree.append_column( Gtk.TreeViewColumn( "Number", Gtk.CellRendererText(), text = 2 ) )
-        tree.append_column( Gtk.TreeViewColumn( "International Designator", Gtk.CellRendererText(), text = 3 ) )
+#         tree.append_column( Gtk.TreeViewColumn( "Satellite Name", Gtk.CellRendererText(), text = 1 ) )
+#         tree.append_column( Gtk.TreeViewColumn( "Number", Gtk.CellRendererText(), text = 2 ) )
+#         tree.append_column( Gtk.TreeViewColumn( "International Designator", Gtk.CellRendererText(), text = 3 ) )
+
+
+        treeViewColumn = Gtk.TreeViewColumn( "Satellite Name", Gtk.CellRendererText(), text = 1 )
+        treeViewColumn.set_sort_column_id( 1 )
+        tree.append_column( treeViewColumn )
+ 
+        treeViewColumn = Gtk.TreeViewColumn( "Number", Gtk.CellRendererText(), text = 2 ) 
+        treeViewColumn.set_sort_column_id( 2 )
+        tree.append_column( treeViewColumn )
+ 
+        treeViewColumn = Gtk.TreeViewColumn( "International Designator", Gtk.CellRendererText(), text = 3 ) 
+        treeViewColumn.set_sort_column_id( 3 )
+        tree.append_column( treeViewColumn )
+
+
+
+
 
         tree.set_tooltip_text( "Check a satellite, station or rocket body to display in the menu." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
