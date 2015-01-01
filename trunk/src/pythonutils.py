@@ -136,11 +136,18 @@ class AboutDialog( Gtk.AboutDialog ):
         self.changeLog = changeLog
         self.logging = logging
 
+        notebook = self.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
+
+        # Ensure the credits scrolled window never has a vertical scrollbar.
+        creditsTab = notebook.get_nth_page( 1 )
+        children = creditsTab.get_children()
+        for child in children:
+            if type( child ).__name__ == "ScrolledWindow":
+                child.set_policy( child.get_policy()[ 0 ], Gtk.PolicyType.NEVER ) 
+
         if changeLog is None: return # No point continuing as the changelog will not be displayed and this dialog reverts to the AboutDialog.
 
         self.set_resizable( True )
-
-        notebook = self.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
 
         textView = Gtk.TextView()
         textView.set_editable( False )
