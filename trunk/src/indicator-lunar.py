@@ -32,6 +32,31 @@
 #  http://lazka.github.io/pgi-docs
 
 
+#TODO Check imports for spurious includes!
+
+
+#TODO Use this
+    # http://www.livecometdata.com/comets/c2014-q2-comet-lovejoy/        
+# to verify lovejoy data.
+
+
+# TODO Have an option to hide magnitude greater than X, where X = 6 as default?  Must be a positive/negative integer.
+
+
+#TODO Sort comets by name or rise?
+
+
+#TODO Allow a text filter on the comets?
+
+
+#TODO In the satellite/stars/oe/planets lists, can the column header for the checkbox be used to capture a click event?
+#If so this can be used as a select all and clear all.
+
+
+#TODO Have some way to not fetch the data (TLE and/or orb elems)?
+#Maybe in the tooltip tell the user to have an empty url (just http://)?
+
+
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
@@ -44,6 +69,9 @@ try:
 except:
     pythonutils.showMessage( None, Gtk.MessageType.ERROR, "You must also install python3-ephem!" )
     sys.exit()
+
+
+class AstronomicalObjectType: Moon, OrbitalElement, Planet, PlanetaryMoon, Satellite, Star, Sun = range( 7 )
 
 
 class IndicatorLunar:
@@ -62,13 +90,14 @@ class IndicatorLunar:
     SVG_FULL_MOON_FILE = os.getenv( "HOME" ) + "/" + "." + NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = NAME + "-satellite"
 
-    ABOUT_COMMENTS = "Displays lunar, solar, planetary, star and satellite information."
+    ABOUT_COMMENTS = "Displays lunar, solar, planetary, orbital element, star and satellite information."
     ABOUT_CREDIT_BRIGHT_LIMB = "Bright Limb from 'Astronomical Algorithms' by Jean Meeus."
     ABOUT_CREDIT_ECLIPSE = "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov"
     ABOUT_CREDIT_PYEPHEM = "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem"
+    ABOUT_CREDIT_ORBITAL_ELEMENTS = "Orbital element data by Minor Planet Center. http://www.minorplanetcenter.net"
     ABOUT_CREDIT_SATELLITE = "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com"
     ABOUT_CREDIT_TROPICAL_SIGN = "Tropical Sign by Ignius Drake."
-    ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE ]
+    ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_ORBITAL_ELEMENTS ]
 
     DISPLAY_NEEDS_REFRESH = "(needs refresh)"
     INDENT = "    "
@@ -82,6 +111,9 @@ class IndicatorLunar:
     SETTINGS_HIDE_BODY_IF_NEVER_UP = "hideBodyIfNeverUp"
     SETTINGS_INDICATOR_TEXT = "indicatorText"
     SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS = "hideSatelliteIfNoVisiblePass"
+    SETTINGS_ORBITAL_ELEMENT_DATA_URL = "orbitalElementDataURL"
+    SETTINGS_ORBITAL_ELEMENTS = "orbitalElements"
+    SETTINGS_ORBITAL_ELEMENTS_SORT_BY_DATE_TIME = "orbitalElementsSortByDateTime"
     SETTINGS_PLANETS = "planets"
     SETTINGS_SATELLITE_MENU_TEXT = "satelliteMenuText"
     SETTINGS_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
@@ -90,6 +122,7 @@ class IndicatorLunar:
     SETTINGS_SATELLITE_TLE_URL = "satelliteTLEURL"
     SETTINGS_SATELLITES = "satellites"
     SETTINGS_SATELLITES_SORT_BY_DATE_TIME = "satellitesSortByDateTime"
+    SETTINGS_SHOW_ORBITAL_ELEMENTS_AS_SUBMENU = "showOrbitalElementsAsSubmenu"
     SETTINGS_SHOW_PLANETS_AS_SUBMENU = "showPlanetsAsSubmenu"
     SETTINGS_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
     SETTINGS_SHOW_SATELLITES_AS_SUBMENU = "showSatellitesAsSubmenu"
@@ -169,6 +202,8 @@ class IndicatorLunar:
         LUNAR_PHASE_WAXING_GIBBOUS : "Waxing Gibbous"
     }
 
+    ORBITAL_ELEMENT_DATA_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
+
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
     SATELLITE_TAG_INTERNATIONAL_DESIGNATOR = "[INTERNATIONAL DESIGNATOR]"
@@ -196,6 +231,7 @@ class IndicatorLunar:
 
     MESSAGE_BODY_ALWAYS_UP = "Always Up!"
     MESSAGE_BODY_NEVER_UP = "Never Up!"
+    MESSAGE_ORBITAL_ELEMENT_NO_DATA = "No orbital element data!"
     MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "Satellite is circumpolar."
     MESSAGE_SATELLITE_NEVER_RISES = "Satellite never rises."
     MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS = "No passes within the next 10 days."
@@ -207,6 +243,7 @@ class IndicatorLunar:
     def __init__( self ):
         self.dialog = None
         self.data = { }
+        self.orbitalElementData = { }
         self.satelliteNotifications = { }
         self.satelliteTLEData = { }
 
@@ -254,40 +291,14 @@ class IndicatorLunar:
             else:
                 self.satelliteTLEData = satelliteTLEData
 
+#         $TODO Do the same as above with TLE...only update every 12 hours or so.
+        self.orbitalElementData = self.getOrbitalElementData( self.orbitalElementDataURL )
+
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
         self.data[ ( IndicatorLunar.DATA_CITY_NAME, "" ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match the format of all other data.
         self.nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
         ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
-
-
-        
-        
-        comets = [ ]
-        comets.append( "C/2014 Q2 (Lovejoy),e,80.3026,94.9756,12.3949,586.9249,0.0000693,0.99780150,0.0000,01/30.0690/2015,2000,g  4.0,8.4" )
-#         comets.append( "C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0" )
-
-        for cometData in comets:
-            city = self.getCity( ephemNow )
-            comet = ephem.readdb( cometData )
-            comet.compute( city )
-
-            print( "Name", comet.name )
-            print( "RA Dec", comet.ra, comet.dec )
-            print( "Constellation, Magnitude", ephem.constellation( comet ), comet.mag )
-            print( "Sun/Earth distance", comet.sun_distance, comet.earth_distance )
-            print( "Rise Set", city.next_rising( comet ), city.next_setting( comet ) )
-            print()
-
-# http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
-# http://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html        
-# http://www.livecometdata.com/comets/c2014-q2-comet-lovejoy/        
-# Option to hide magnitude greater than X, where X = 6 as default?  Must be a positive/negative integer.
-# Separate the coment name 'Lovejoy' which repeats from the id 'C/2014'?
-# Make the list of comets in the preferences sortable?        
-        
-
-#TODO Make the list of satellites sortable?
 
         lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
@@ -296,6 +307,7 @@ class IndicatorLunar:
         self.updateSun( ephemNow )
         self.updatePlanets( ephemNow )
         self.updateStars( ephemNow )
+        self.updateOrbitalElements( ephemNow )
 #TODO         self.updateSatellites( ephemNow ) 
 
         GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
@@ -327,6 +339,7 @@ class IndicatorLunar:
         self.updateSunMenu( menu )
         self.updatePlanetsMenu( menu )
         self.updateStarsMenu( menu )
+        self.updateOrbitalElementsMenu( menu )
 #TODO         self.updateSatellitesMenu( menu )
 
         menu.append( Gtk.SeparatorMenuItem() )
@@ -450,7 +463,7 @@ class IndicatorLunar:
         menuItem = Gtk.MenuItem( "Moon" )
         menu.append( menuItem )
 
-        self.updateCommonMenu( menuItem, ephem.Moon(), IndicatorLunar.BODY_MOON )
+        self.updateCommonMenu( menuItem, AstronomicalObjectType.Moon, IndicatorLunar.BODY_MOON )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
         menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] ) )
@@ -483,7 +496,7 @@ class IndicatorLunar:
         menuItem = Gtk.MenuItem( "Sun" )
         menu.append( menuItem )
 
-        self.updateCommonMenu( menuItem, ephem.Sun(), IndicatorLunar.BODY_SUN )
+        self.updateCommonMenu( menuItem, AstronomicalObjectType.Sun, IndicatorLunar.BODY_SUN )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
         # Solstice/Equinox.
@@ -539,7 +552,7 @@ class IndicatorLunar:
                 menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planet[ 0 ] )
                 menu.append( menuItem )
 
-            self.updateCommonMenu( menuItem, planet[ 2 ], planet[ 1 ] )
+            self.updateCommonMenu( menuItem, AstronomicalObjectType.Planet, planet[ 1 ] )
 
             if len( planet[ 3 ] ) > 0:
                 menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
@@ -609,24 +622,80 @@ class IndicatorLunar:
                 menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starName )
                 menu.append( menuItem )
 
-            self.updateCommonMenu( menuItem, ephem.star( starName ), dataTag )
+            self.updateCommonMenu( menuItem, AstronomicalObjectType.Star, dataTag )
 
 
-    def updateCommonMenu( self, menuItem, body, dataTag ):
+    def updateOrbitalElementsMenu( self, menu ):
+        if len( self.orbitalElements ) == 0: return
+
+        allUserSpecifiedOrbitalElementsAreNeverUp = True
+        for orbitalElementName in self.orbitalElements:
+            dataTag = orbitalElementName.upper()
+ 
+            if orbitalElementName in self.orbitalElements and ( dataTag, IndicatorLunar.DATA_MESSAGE ) not in self.data:
+                allUserSpecifiedOrbitalElementsAreNeverUp = False
+                break
+ 
+            if orbitalElementName in self.stars and \
+                ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data and \
+                self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_ALWAYS_UP:
+                allUserSpecifiedOrbitalElementsAreNeverUp = False
+                break
+ 
+        if allUserSpecifiedOrbitalElementsAreNeverUp and self.hideBodyIfNeverUp: return
+
+        menuItem = Gtk.MenuItem( "Orbital Elements" )
+        menu.append( menuItem )
+
+        if self.showOrbitalElementsAsSubMenu:
+            orbitalElementsSubMenu = Gtk.Menu()
+            menuItem.set_submenu( orbitalElementsSubMenu )
+
+        for orbitalElementName in self.orbitalElements:
+            dataTag = orbitalElementName.upper()
+
+            if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data and \
+                self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
+                self.hideBodyIfNeverUp:
+                continue
+
+            if self.showOrbitalElementsAsSubMenu:
+                menuItem = Gtk.MenuItem( orbitalElementName )
+                orbitalElementsSubMenu.append( menuItem )
+            else:
+                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + orbitalElementName )
+                menu.append( menuItem )
+
+            self.updateCommonMenu( menuItem, AstronomicalObjectType.OrbitalElement, dataTag )
+
+
+    def updateCommonMenu( self, menuItem, astronomicalObjectType, dataTag ):
         subMenu = Gtk.Menu()
 
-        if self.isPlanetOrMoon( body ):
+        if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
             subMenu.append( Gtk.MenuItem( "Illumination: " + self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] ) )
 
         subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] ) )
         subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ ( dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] ) )
 
-        if self.isPlanetOrMoon( body ) or body.name == ephem.Sun().name:
+        if astronomicalObjectType == AstronomicalObjectType.Moon or \
+           astronomicalObjectType == AstronomicalObjectType.Planet or \
+           astronomicalObjectType == AstronomicalObjectType.Star or \
+           astronomicalObjectType == AstronomicalObjectType.Sun:
+            subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] ) )
+
+        if astronomicalObjectType == AstronomicalObjectType.Moon or \
+           astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
+           astronomicalObjectType == AstronomicalObjectType.Planet or \
+           astronomicalObjectType == AstronomicalObjectType.Sun:
             subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] ) )
 
-        if self.isPlanetOrMoon( body ):
+        if astronomicalObjectType == AstronomicalObjectType.Moon or \
+           astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
+           astronomicalObjectType == AstronomicalObjectType.Planet:
             subMenu.append( Gtk.MenuItem( "Distance to Sun: " + self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] ) )
+
+        if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:            
             subMenu.append( Gtk.MenuItem( "Bright Limb: " + self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
@@ -640,7 +709,8 @@ class IndicatorLunar:
             data = [ ]
             data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_RISE_TIME ) ], "Rise: " ] )
             data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_SET_TIME ) ], "Set: " ] )
-            if body.name == ephem.Sun().name:
+
+            if astronomicalObjectType == AstronomicalObjectType.Sun:
                 data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_DAWN ) ], "Dawn: " ] )
                 data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_DUSK ) ], "Dusk: " ] )
 
@@ -779,7 +849,7 @@ class IndicatorLunar:
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
     def updateMoon( self, ephemNow, lunarPhase ):
         city = self.getCity( ephemNow )
-        self.updateCommon( ephem.Moon( city ), IndicatorLunar.BODY_MOON, ephemNow )
+        self.updateCommon( ephem.Moon( city ), AstronomicalObjectType.Moon, IndicatorLunar.BODY_MOON, ephemNow )
 
         self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
         self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FIRST_QUARTER ) ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
@@ -800,7 +870,7 @@ class IndicatorLunar:
     def updateSun( self, ephemNow ):
         city = self.getCity( ephemNow )
         sun = ephem.Sun( city )
-        self.updateCommon( sun, IndicatorLunar.BODY_SUN, ephemNow )
+        self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.BODY_SUN, ephemNow )
         self.updateRightAscensionDeclinationAzimuthAltitude( sun, IndicatorLunar.BODY_SUN )
 
         # Dawn/Dusk.
@@ -833,7 +903,7 @@ class IndicatorLunar:
             if planet[ 0 ] not in self.planets: continue
 
             planet[ 2 ].compute( self.getCity( ephemNow ) )
-            self.updateCommon( planet[ 2 ], planet[ 1 ], ephemNow )
+            self.updateCommon( planet[ 2 ], AstronomicalObjectType.Planet, planet[ 1 ], ephemNow )
 
             city = self.getCity( ephemNow )
             for moon in planet[ 3 ]:
@@ -851,22 +921,45 @@ class IndicatorLunar:
             city = self.getCity( ephemNow )
             star = ephem.star( starName )
             star.compute( city )
-            self.updateCommon( star, star.name.upper(), ephemNow )
+            self.updateCommon( star, AstronomicalObjectType.Star, star.name.upper(), ephemNow )
 
 
-    def updateCommon( self, body, dataTag, ephemNow ):
-        if self.isPlanetOrMoon( body ):
+    # Computes the rise/set and other information for orbital elements, such as comets.
+    # http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
+    # http://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html        
+    def updateOrbitalElements( self, ephemNow ):
+        for key in self.orbitalElements:
+            if key in self.orbitalElementData:
+                city = self.getCity( ephemNow )
+                orbitalElement = ephem.readdb( self.orbitalElementData[ key ] )
+                orbitalElement.compute( city )
+                self.updateCommon( orbitalElement, AstronomicalObjectType.OrbitalElement, key.upper(), ephemNow )
+            else:
+                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA
+
+
+    def updateCommon( self, body, astronomicalObjectType, dataTag, ephemNow ):
+        if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
             self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] = str( int( round( body.phase ) ) ) + "%"
 
         self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] = ephem.constellation( body )[ 1 ]
         self.data[ ( dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] = str( body.mag )
-        self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( body, ephemNow )
 
-        if self.isPlanetOrMoon( body ) or body.name == ephem.Sun().name:
+        if astronomicalObjectType != AstronomicalObjectType.OrbitalElement:
+            self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( body, ephemNow )
+
+        if astronomicalObjectType == AstronomicalObjectType.Moon or \
+           astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
+           astronomicalObjectType == AstronomicalObjectType.Planet or \
+           astronomicalObjectType == AstronomicalObjectType.Sun:
             self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] = str( round( body.earth_distance, 4 ) ) + " AU"
 
-        if self.isPlanetOrMoon( body ):
+        if astronomicalObjectType == AstronomicalObjectType.Moon or \
+           astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
+           astronomicalObjectType == AstronomicalObjectType.Planet:
             self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] = str( round( body.sun_distance, 4 ) ) + " AU"
+
+        if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
             self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] = str( round( self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), body ) ) ) + "°"
 
         self.updateRightAscensionDeclinationAzimuthAltitude( body, dataTag )
@@ -883,22 +976,6 @@ class IndicatorLunar:
             self.nextUpdates.append( setting )
         except ephem.AlwaysUpError: self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
         except ephem.NeverUpError: self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
-
-
-    def isPlanetOrMoon( self, body ):
-        planetOrMoon = False
-        bodyName = body.name.upper()
-
-        for planetInfo in IndicatorLunar.PLANETS:
-            planetName = planetInfo[ 1 ]
-            if bodyName == planetName:
-                planetOrMoon = True
-                break 
-
-        if bodyName == ephem.Moon().name.upper():
-            planetOrMoon = True
-
-        return planetOrMoon
 
 
     # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
@@ -1405,14 +1482,20 @@ class IndicatorLunar:
         showStarsAsSubmenuCheckbox.set_margin_top( 20 )
         grid.attach( showStarsAsSubmenuCheckbox, 0, 1, 1, 1 )
 
+        showOrbitalElementsAsSubmenuCheckbox = Gtk.CheckButton( "Show orbital elements as submenus" )
+        showOrbitalElementsAsSubmenuCheckbox.set_tooltip_text( "Show each orbital element in its own submenu." )
+        showOrbitalElementsAsSubmenuCheckbox.set_active( self.showOrbitalElementsAsSubMenu )
+        showOrbitalElementsAsSubmenuCheckbox.set_margin_top( 20 )
+        grid.attach( showOrbitalElementsAsSubmenuCheckbox, 0, 2, 1, 1 )
+
         hideBodyIfNeverUpCheckbox = Gtk.CheckButton( "Hide bodies which are 'never up'" )
         hideBodyIfNeverUpCheckbox.set_margin_top( 20 )
         hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
         hideBodyIfNeverUpCheckbox.set_tooltip_text(
-            "If checked, only bodies (planets, moon, sun, stars)\n" + \
-            "which rise/set or are 'always up' will be shown.\n\n" + \
+            "If checked, only planets, moon, sun, orbital elements\n" + \
+            "and stars which rise/set or are 'always up' will be shown.\n\n" + \
             "Otherwise all bodies are shown." )
-        grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
+        grid.attach( hideBodyIfNeverUpCheckbox, 0, 3, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 20 )
@@ -1433,13 +1516,13 @@ class IndicatorLunar:
 
         box.pack_start( satelliteMenuText, True, True, 0 )
 
-        grid.attach( box, 0, 3, 1, 1 )
+        grid.attach( box, 0, 4, 1, 1 )
 
         showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show satellites as submenus" )
         showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
         showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
         showSatellitesAsSubmenuCheckbox.set_margin_top( 20 )
-        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 4, 1, 1 )
+        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 5, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( "Sort satellites by rise date/time" )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 20 )
@@ -1448,7 +1531,7 @@ class IndicatorLunar:
             "By default, satellites are sorted\n" + \
             "alphabetically by menu text.\n\n" + \
             "If checked, satellites will be\nsorted by rise date/time." )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 5, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 6, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( "Hide satellites which have no upcoming visible pass" )
         hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 20 )
@@ -1458,7 +1541,7 @@ class IndicatorLunar:
             "upcoming visible pass are displayed.\n\n" + \
             "Otherwise, all passes, visible or not, are shown\n" + \
             "(including error messages)." )
-        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 6, 1, 1 )
+        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 7, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 20 )
@@ -1486,7 +1569,7 @@ class IndicatorLunar:
         reset.set_tooltip_text( "Reset the satellite look-up URL to factory default." )
         box.pack_start( reset, False, False, 0 )
 
-        grid.attach( box, 0, 7, 1, 1 )
+        grid.attach( box, 0, 8, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Menu" ) )
 
@@ -1536,6 +1619,80 @@ class IndicatorLunar:
         box.pack_start( scrolledWindow, True, True, 0 )
 
         notebook.append_page( box, Gtk.Label( "Planets / Stars" ) )
+
+        # Orbital elements.
+        orbitalElementTabGrid = Gtk.Grid()
+        orbitalElementTabGrid.set_row_spacing( 10 )
+        orbitalElementTabGrid.set_margin_bottom( 10 )
+
+        orbitalElementStore = Gtk.ListStore( bool, str ) # Show/hide, orbital element name.
+
+        orbitalElementStoreSort = Gtk.TreeModelSort( model = orbitalElementStore )
+        orbitalElementStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
+
+        tree = Gtk.TreeView( orbitalElementStoreSort )
+
+        renderer_toggle = Gtk.CellRendererToggle()
+        renderer_toggle.connect( "toggled", self.onOrbitalElementToggled, orbitalElementStore, displayTagsStore, orbitalElementStoreSort )
+        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
+
+        treeViewColumn = Gtk.TreeViewColumn( "Name", Gtk.CellRendererText(), text = 1 )
+        tree.append_column( treeViewColumn )
+
+        tree.set_tooltip_text( "Check an orbital element to display in the menu." )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+        scrolledWindow.add( tree )
+        orbitalElementTabGrid.attach( scrolledWindow, 0, 0, 1, 1 )
+
+        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
+        box.set_margin_top( 10 )
+        box.set_margin_left( 10 )
+        box.set_margin_right( 10 )
+
+        label = Gtk.Label( "Orbital element data" )
+        label.set_halign( Gtk.Align.START )
+        box.pack_start( label, False, False, 0 )
+
+        # Need a local copy of the orbital element URL and orbital element data.
+        # Also, as they need to be modified in the fetch handler, use a one-element list.
+        orbitalElementURL = [ ]
+        orbitalElementURL.append( self.orbitalElementDataURL )
+        orbitalElementData = [ ]
+        orbitalElementData.append( self.orbitalElementData )
+
+        orbitalElementURLEntry = Gtk.Entry()
+        orbitalElementURLEntry.set_text( orbitalElementURL[ 0 ] )
+        orbitalElementURLEntry.set_hexpand( True )
+        orbitalElementURLEntry.set_tooltip_text(
+            "The URL from which to source orbital element data.\n" + \
+            "To specify a local file, use 'file:///'.\n\n" + \
+            "The orbital element data will be automatically\n" + \
+            "loaded each time the indicator is started\n" + \
+            "and approximately every 24 hours thereafter." )
+        box.pack_start( orbitalElementURLEntry, True, True, 0 )
+
+        fetch = Gtk.Button( "Fetch" )
+        fetch.set_tooltip_text(
+            "Retrieve the orbital element data from the URL.\n" + \
+            "If the URL is empty, the default URL will be used." )
+        fetch.connect( "clicked", self.onFetchOrbitalElementURL, orbitalElementURL, orbitalElementData, orbitalElementURLEntry, orbitalElementTabGrid, orbitalElementStore, displayTagsStore )
+        box.pack_start( fetch, False, False, 0 )
+
+        orbitalElementTabGrid.attach( box, 0, 1, 1, 1 )
+
+        label = Gtk.Label()
+        label.set_margin_left( 10 )
+        label.set_margin_right( 10 )
+        label.set_justify( Gtk.Justification.CENTER )
+        
+        orbitalElementTabGrid.attach( label, 0, 2, 1, 1 )
+
+        notebook.append_page( orbitalElementTabGrid, Gtk.Label( "Orbital Elements" ) )
 
         # Satellites.
         satelliteTabGrid = Gtk.Grid()
@@ -1843,8 +2000,9 @@ class IndicatorLunar:
         self.dialog.set_icon_name( IndicatorLunar.ICON )
         self.dialog.show_all()
 
-        # Update the tab here as some elements will be hidden, which must be done after the dialog is shown.
+        # Some GUI elements will be hidden, which must be done after the dialog is shown.
         self.updateSatellitePreferencesTab( satelliteTabGrid, satelliteStore, self.satelliteTLEData, TLEURLEntry.get_text().strip() )
+        self.updateOrbitalElementPreferencesTab( orbitalElementTabGrid, orbitalElementStore, self.orbitalElementData, orbitalElementURLEntry.get_text().strip() )
 
         while True:
             if self.dialog.run() != Gtk.ResponseType.OK: break
@@ -1886,6 +2044,7 @@ class IndicatorLunar:
             self.indicatorText = indicatorText.get_text().strip()
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
+            self.showOrbitalElementsAsSubMenu = showOrbitalElementsAsSubmenuCheckbox.get_active()
             self.hideBodyIfNeverUp = hideBodyIfNeverUpCheckbox.get_active()
             self.satelliteMenuText = satelliteMenuText.get_text().strip()
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
@@ -1900,6 +2059,18 @@ class IndicatorLunar:
             self.stars = [ ]
             for starInfo in starStore:
                 if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
+
+            self.orbitalElementDataURL = orbitalElementURL[ 0 ]
+            
+            if orbitalElementData[ 0 ] is None:
+                self.orbitalElementData = [ ]
+            else:
+                self.orbitalElementData = orbitalElementData[ 0 ]
+
+            self.orbitalElements = [ ]
+            for orbitalElement in orbitalElementStore:
+                if orbitalElement[ 0 ]:
+                    self.orbitalElements.append( orbitalElement[ 1 ] )
 
             self.satelliteTLEURL = satelliteTLEURL[ 0 ]
             
@@ -1971,8 +2142,40 @@ class IndicatorLunar:
             displayTagsStore.append( [ item[ 0 ], item[ 1 ] ] )
 
 
+    def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, url ):
+        orbitalElementStore.clear()
+
+        if orbitalElementData is None or len( orbitalElementData ) == 0: # An error or no orbital element data...
+            if orbitalElementData is None:
+                message = "Cannot access the orbital element data source <a href=\'" + url + "'>" + url + "</a>"
+            else:
+                message = "No orbital element data found at <a href=\'" + url + "'>" + url + "</a>"
+
+            # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
+            children = grid.get_children()
+            for child in children:
+                if child.__class__.__name__ == "Label":
+                    child.show()
+                    child.set_markup( message )
+                elif child.__class__.__name__ == "ScrolledWindow":
+                    child.hide()
+
+        else:
+            for key in orbitalElementData:
+                orbitalElement = orbitalElementData[ key ]
+                orbitalElementStore.append( [ key in self.orbitalElements, key ] )
+
+            # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
+            children = grid.get_children()
+            for child in children:
+                if child.__class__.__name__ == "Label":
+                    child.hide()
+                elif child.__class__.__name__ == "ScrolledWindow":
+                    child.show()
+
+
     def updateSatellitePreferencesTab( self, grid, satelliteStore, satelliteTLEData, url ):
-        satelliteStore.clear() 
+        satelliteStore.clear()
 
         if satelliteTLEData is None or len( satelliteTLEData ) == 0: # An error or no TLE data...
             if satelliteTLEData is None:
@@ -2015,7 +2218,24 @@ class IndicatorLunar:
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ 0 ] + "]", indicatorTextEntry.get_position() )
 
 
+#     def onResetOrbitalElementOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.ORBITAL_ELEMENT_DATA_URL )
+
+
     def onResetSatelliteOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_ON_CLICK_URL )
+
+
+    def onFetchOrbitalElementURL( self, button, orbitalElementURL, orbitalElementData, orbitalElementURLEntry, grid, orbitalElementStore, displayTagsStore ):
+        if orbitalElementURLEntry.get_text().strip() == "":
+            orbitalElementURLEntry.set_text( IndicatorLunar.ORBITAL_ELEMENT_DATA_URL )
+
+        del orbitalElementURL[ : ] # Remove the orbital element URL.
+        orbitalElementURL.append( orbitalElementURLEntry.get_text().strip() )
+
+        del orbitalElementData[ : ] # Remove the orbital element data.
+        orbitalElementData.append( self.getOrbitalElementData( orbitalElementURL[ 0 ] ) ) # The orbital element data can be None, empty or non-empty.
+
+        self.updateOrbitalElementPreferencesTab( grid, orbitalElementStore, orbitalElementData[ 0 ], orbitalElementURL[ 0 ] )
+#         self.updateDisplayTags( displayTagsStore, False, orbitalElementData[ 0 ] ) TODO Fix
 
 
     def onFetchTLEURL( self, button, satelliteTLEURL, satelliteTLEData, TLEURLEntry, grid, satelliteStore, displayTagsStore ):
@@ -2127,6 +2347,25 @@ class IndicatorLunar:
                     iter = displayTagsStore.iter_next( iter )
 
 
+    def onOrbitalElementToggled( self, widget, path, orbitalElementStore, displayTagsStore, orbitalElementStoreSort ):
+        childPath = orbitalElementStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) ) # Convert sorted model index to underlying (child) model index.
+        orbitalElementStore[ childPath ][ 0 ] = not orbitalElementStore[ childPath ][ 0 ]
+        orbitalElementName = orbitalElementStore[ childPath ][ 1 ].upper() + " "
+
+        if orbitalElementStore[ childPath ][ 1 ]:
+            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_RISE_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_SET_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+        else:
+            iter = displayTagsStore.get_iter_first()
+            while iter is not None:
+                if displayTagsStore[ iter ][ 0 ].startswith( orbitalElementName ):
+                    if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
+                else:
+                    iter = displayTagsStore.iter_next( iter )
+
+
     def onSatelliteToggled( self, widget, path, satelliteStore, displayTagsStore, satelliteStoreSort ):
         childPath = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) ) # Convert sorted model index to underlying (child) model index.
         satelliteStore[ childPath ][ 0 ] = not satelliteStore[ childPath ][ 0 ]
@@ -2153,6 +2392,30 @@ class IndicatorLunar:
             latitude.set_text( _city_data.get( city )[ 0 ] )
             longitude.set_text( _city_data.get( city )[ 1 ] )
             elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
+
+
+    # Returns a dict/hashtable of the orbital elements (comets) data from the specified URL (may be empty).
+    # On error, returns None.
+    def getOrbitalElementData( self, url ):
+        try:
+            # Orbital elements are read from a URL which assumes the XEphem format.
+            # For example
+            #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
+            # in which the first field (up to the first ',' is the name.
+            # Any line beginninng with a '#' is considered a comment and ignored.
+            orbitalElementsData = { } # Key: orbital element name ; Value: entire orbital element string.
+            data = urlopen( url ).read().decode( "utf8" ).splitlines()
+            for i in range( 0, len( data ) ):
+                if not data[ i ].startswith( "#" ):
+                    orbitalElementName = data[ i ][ 0 : data[ i ].index( "," ) ] 
+                    orbitalElementsData[ orbitalElementName ] = data[ i ]
+
+        except Exception as e:
+            orbitalElementsData = None # Indicates error.
+            logging.exception( e )
+            logging.error( "Error retrieving orbital element data from " + str( url ) )
+
+        return orbitalElementsData
 
 
     # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
@@ -2198,6 +2461,9 @@ class IndicatorLunar:
         self.hideBodyIfNeverUp = True
         self.hideSatelliteIfNoVisiblePass = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
+        self.orbitalElements = [ ]
+        self.orbitalElementsSortByDateTime = True
+        self.orbitalElementDataURL = IndicatorLunar.ORBITAL_ELEMENT_DATA_URL
 
         self.planets = [ ]
         for planet in IndicatorLunar.PLANETS:
@@ -2210,6 +2476,7 @@ class IndicatorLunar:
         self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
         self.satellites = [ ]
         self.satellitesSortByDateTime = True
+        self.showOrbitalElementsAsSubMenu = True
         self.showPlanetsAsSubMenu = False
         self.showSatelliteNotification = True
         self.showSatellitesAsSubMenu = True
@@ -2235,6 +2502,9 @@ class IndicatorLunar:
             self.hideBodyIfNeverUp = settings.get( IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
             self.hideSatelliteIfNoVisiblePass = settings.get( IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
             self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
+            self.orbitalElementDataURL = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENT_DATA_URL, self.orbitalElementDataURL )
+            self.orbitalElements = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS, self.orbitalElements )
+            self.orbitalElementsSortByDateTime = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_SORT_BY_DATE_TIME, self.orbitalElementsSortByDateTime )
             self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
             self.satelliteMenuText = settings.get( IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT, self.satelliteMenuText )
             self.satelliteNotificationMessage = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
@@ -2246,6 +2516,7 @@ class IndicatorLunar:
             self.satellites = [ tuple( l ) for l in self.satellites ] # Converts from a list of lists to a list of tuples...go figure!
 
             self.satellitesSortByDateTime = settings.get( IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME, self.satellitesSortByDateTime )
+            self.showOrbitalElementsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_ORBITAL_ELEMENTS_AS_SUBMENU, self.showOrbitalElementsAsSubMenu )
             self.showPlanetsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
             self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
             self.showSatellitesAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU, self.showSatellitesAsSubMenu )
@@ -2271,6 +2542,9 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
                 IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
                 IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
+                IndicatorLunar.SETTINGS_ORBITAL_ELEMENT_DATA_URL: self.orbitalElementDataURL,
+                IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS: self.orbitalElements,
+                IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_SORT_BY_DATE_TIME: self.orbitalElementsSortByDateTime,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
                 IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT: self.satelliteMenuText,
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
@@ -2279,6 +2553,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_SATELLITE_TLE_URL: self.satelliteTLEURL,
                 IndicatorLunar.SETTINGS_SATELLITES: self.satellites,
                 IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME: self.satellitesSortByDateTime,
+                IndicatorLunar.SETTINGS_SHOW_ORBITAL_ELEMENTS_AS_SUBMENU: self.showOrbitalElementsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU: self.showSatellitesAsSubMenu,
