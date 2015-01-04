@@ -583,17 +583,14 @@ class IndicatorLunar:
 
 
     def updateStarsMenu( self, menu ):
-        if len( self.stars ) == 0: return
-
-        noStarsArePresent = True
-        for name in self.stars:
-            dataTag = name.upper()
+        stars = [ ]
+        for starName in self.stars:
+            dataTag = starName.upper()
             if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data or \
                ( dataTag, IndicatorLunar.DATA_RISE_TIME ) in self.data:
-                noStarsArePresent = False
-                break
+                stars.append( starName )
 
-        if noStarsArePresent: return
+        if len( stars ) == 0: return
 
         menuItem = Gtk.MenuItem( "Stars" )
         menu.append( menuItem )
@@ -602,14 +599,13 @@ class IndicatorLunar:
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
 
-        for name in self.stars:
-            dataTag = name.upper()
-
+        for starName in stars:
+            dataTag = starName.upper()
             if self.showStarsAsSubMenu:
-                menuItem = Gtk.MenuItem( name )
+                menuItem = Gtk.MenuItem( starName )
                 subMenu.append( menuItem )
             else:
-                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + name )
+                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starName )
                 menu.append( menuItem )
 
             self.updateCommonMenu( menuItem, AstronomicalObjectType.Star, dataTag )
@@ -661,10 +657,6 @@ class IndicatorLunar:
 
 
     def updateCommonMenu( self, menuItem, astronomicalObjectType, dataTag ):
-
-        if dataTag.upper() =="ALDERAMIN" or dataTag.upper() == "ACHERNAR":
-            x = 1 
-
         if ( dataTag, IndicatorLunar.DATA_MESSAGE ) not in self.data and ( dataTag, IndicatorLunar.DATA_RISE_TIME ) not in self.data:
             return
 
@@ -930,6 +922,7 @@ class IndicatorLunar:
         if dataTag.upper() =="ACHERNAR":
             x = 1 
 
+        continueCalculations = True
         try:
             city = self.getCity( ephemNow )
             rising = city.next_rising( body )
@@ -939,8 +932,20 @@ class IndicatorLunar:
             self.nextUpdates.append( rising )
             self.nextUpdates.append( setting )
 
+        except ephem.AlwaysUpError:
+            self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
+
+        except ephem.NeverUpError:
+            if self.hideBodyIfNeverUp:
+                continueCalculations = False
+            else:
+                self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
+
+        if continueCalculations:
+
 #TODO Test with and without getting the city again...hopefully the values are the same (see comment above).
             city = self.getCity( ephemNow )
+
             if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
                 self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] = str( int( round( body.phase ) ) ) + "%"
 
@@ -967,15 +972,6 @@ class IndicatorLunar:
                 self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] = str( round( self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), body ) ) ) + "°"
 
             self.updateRightAscensionDeclinationAzimuthAltitude( body, dataTag )
-
-        except ephem.AlwaysUpError:
-            self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
-
-#TODO Need to do the stuff above too...if we hit this exception, the mag/cons/etc doesn't get done when it shold.
-
-        except ephem.NeverUpError:
-            if not self.hideBodyIfNeverUp:
-                self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
 
     # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
