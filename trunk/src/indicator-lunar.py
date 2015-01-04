@@ -657,8 +657,9 @@ class IndicatorLunar:
 
 
     def updateCommonMenu( self, menuItem, astronomicalObjectType, dataTag ):
-        if ( dataTag, IndicatorLunar.DATA_MESSAGE ) not in self.data and ( dataTag, IndicatorLunar.DATA_RISE_TIME ) not in self.data:
-            return
+#TODO I think it's NOT the responsibility of this function to do this check...the caller should check and then NOT call this function!
+#         if ( dataTag, IndicatorLunar.DATA_MESSAGE ) not in self.data and ( dataTag, IndicatorLunar.DATA_RISE_TIME ) not in self.data:
+#             return
 
         subMenu = Gtk.Menu()
 
@@ -822,8 +823,7 @@ class IndicatorLunar:
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
     def updateMoon( self, ephemNow, lunarPhase ):
-        city = self.getCity( ephemNow )
-        self.updateCommon( ephem.Moon( city ), AstronomicalObjectType.Moon, IndicatorLunar.BODY_MOON, ephemNow )
+        self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.BODY_MOON, ephemNow )
 
         self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
         self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FIRST_QUARTER ) ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
@@ -894,9 +894,8 @@ class IndicatorLunar:
     # http://aa.usno.navy.mil/data/docs/mrst.php
     def updateStars( self, ephemNow ):
         for starName in self.stars:
-            city = self.getCity( ephemNow )
             star = ephem.star( starName )
-            star.compute( city )
+            star.compute( self.getCity( ephemNow ) )
             self.updateCommon( star, AstronomicalObjectType.Star, star.name.upper(), ephemNow )
 
 
@@ -916,12 +915,6 @@ class IndicatorLunar:
 
 
     def updateCommon( self, body, astronomicalObjectType, dataTag, ephemNow ):
-#TODO This comment may go!
-# Must compute the previous information (illumination, constellation, phase and so on BEFORE rising/setting).
-# For some reason the values, most notably phase, are different (and wrong) if calculated AFTER rising/setting are calculated.
-        if dataTag.upper() =="ACHERNAR":
-            x = 1 
-
         continueCalculations = True
         try:
             city = self.getCity( ephemNow )
@@ -943,8 +936,8 @@ class IndicatorLunar:
 
         if continueCalculations:
 
-#TODO Test with and without getting the city again...hopefully the values are the same (see comment above).
-            city = self.getCity( ephemNow )
+            # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+            body.compute( self.getCity( ephemNow ) )
 
             if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
                 self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] = str( int( round( body.phase ) ) ) + "%"
@@ -955,14 +948,12 @@ class IndicatorLunar:
             if astronomicalObjectType != AstronomicalObjectType.OrbitalElement:
                 self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( body, ephemNow )
 
-#TODO Add star if it has a dist to earth    
             if astronomicalObjectType == AstronomicalObjectType.Moon or \
                astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
                astronomicalObjectType == AstronomicalObjectType.Planet or \
                astronomicalObjectType == AstronomicalObjectType.Sun:
                 self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] = str( round( body.earth_distance, 4 ) ) + " AU"
 
-#TODO Add star if it has a dist to sun    
             if astronomicalObjectType == AstronomicalObjectType.Moon or \
                astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
                astronomicalObjectType == AstronomicalObjectType.Planet:
