@@ -316,7 +316,7 @@ class IndicatorLunar:
         self.updateSun( ephemNow )
         self.updatePlanets( ephemNow )
         self.updateStars( ephemNow )
-#         self.updateOrbitalElements( ephemNow )
+        self.updateOrbitalElements( ephemNow )
         self.updateSatellites( ephemNow ) 
 
         GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
@@ -348,7 +348,7 @@ class IndicatorLunar:
         self.updateSunMenu( menu )
         self.updatePlanetsMenu( menu )
         self.updateStarsMenu( menu )
-#         self.updateOrbitalElementsMenu( menu )
+        self.updateOrbitalElementsMenu( menu )
         self.updateSatellitesMenu( menu )
 
         menu.append( Gtk.SeparatorMenuItem() )
@@ -464,97 +464,89 @@ class IndicatorLunar:
 
 
     def updateMoonMenu( self, menu ):
-#         if ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_MESSAGE ) in self.data and \
-#             self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
-#             self.hideBodyIfNeverUp:
-#             return
+        if ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_MESSAGE ) in self.data or \
+           ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_RISE_TIME ) in self.data:
 
-        menuItem = Gtk.MenuItem( "Moon" )
-        menu.append( menuItem )
+            menuItem = Gtk.MenuItem( "Moon" )
+            menu.append( menuItem )
 
-        self.updateCommonMenu( menuItem, AstronomicalObjectType.Moon, IndicatorLunar.BODY_MOON )
-        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+            self.updateCommonMenu( menuItem, AstronomicalObjectType.Moon, IndicatorLunar.BODY_MOON )
+            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
-        menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] ) )
 
-        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
+            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+            menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
 
-        # Determine which phases occur by date rather than using the phase calculated.
-        # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
-        nextPhases = [ ]
-        nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FIRST_QUARTER ) ], "First Quarter: " ] )
-        nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FULL ) ], "Full: " ] )
-        nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_THIRD_QUARTER ) ], "Third Quarter: " ] )
-        nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_NEW ) ], "New: " ] )
+            # Determine which phases occur by date rather than using the phase calculated.
+            # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
+            nextPhases = [ ]
+            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FIRST_QUARTER ) ], "First Quarter: " ] )
+            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FULL ) ], "Full: " ] )
+            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_THIRD_QUARTER ) ], "Third Quarter: " ] )
+            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_NEW ) ], "New: " ] )
 
-        nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
-        for phaseInformation in nextPhases:
-            menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
+            nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
+            for phaseInformation in nextPhases:
+                menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
 
-        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        self.updateEclipseMenu( menuItem.get_submenu(), IndicatorLunar.BODY_MOON )
+            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+            self.updateEclipseMenu( menuItem.get_submenu(), IndicatorLunar.BODY_MOON )
 
 
     def updateSunMenu( self, menu ):
-        if ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) in self.data and \
-            self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
-            self.hideBodyIfNeverUp:
-            return
+        if ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) in self.data or \
+           ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_RISE_TIME ) in self.data:
+            menuItem = Gtk.MenuItem( "Sun" )
+            menu.append( menuItem )
 
-        menuItem = Gtk.MenuItem( "Sun" )
-        menu.append( menuItem )
+            self.updateCommonMenu( menuItem, AstronomicalObjectType.Sun, IndicatorLunar.BODY_SUN )
+            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
-        self.updateCommonMenu( menuItem, AstronomicalObjectType.Sun, IndicatorLunar.BODY_SUN )
-        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+            # Solstice/Equinox.
+            equinox = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_EQUINOX ) ]
+            solstice = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_SOLSTICE ) ]
+            if equinox < solstice:
+                menuItem.get_submenu().append( Gtk.MenuItem( "Equinox: " + equinox ) )
+                menuItem.get_submenu().append( Gtk.MenuItem( "Solstice: " + solstice ) )
+            else:
+                menuItem.get_submenu().append( Gtk.MenuItem( "Solstice: " + solstice ) )
+                menuItem.get_submenu().append( Gtk.MenuItem( "Equinox: " + equinox ) )
 
-        # Solstice/Equinox.
-        equinox = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_EQUINOX ) ]
-        solstice = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_SOLSTICE ) ]
-        if equinox < solstice:
-            menuItem.get_submenu().append( Gtk.MenuItem( "Equinox: " + equinox ) )
-            menuItem.get_submenu().append( Gtk.MenuItem( "Solstice: " + solstice ) )
-        else:
-            menuItem.get_submenu().append( Gtk.MenuItem( "Solstice: " + solstice ) )
-            menuItem.get_submenu().append( Gtk.MenuItem( "Equinox: " + equinox ) )
-
-        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        self.updateEclipseMenu( menuItem.get_submenu(), IndicatorLunar.BODY_SUN )
+            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+            self.updateEclipseMenu( menuItem.get_submenu(), IndicatorLunar.BODY_SUN )
 
 
     def updatePlanetsMenu( self, menu ):
-        if len( self.planets ) == 0: return;
-
-        noPlanetsArePresent = True
-        for name in self.planets:
-            dataTag = name.upper()
+        planets = [ ]
+        for planetName in self.planets:
+            dataTag = planetName.upper()
             if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data or \
                ( dataTag, IndicatorLunar.DATA_RISE_TIME ) in self.data:
-                noPlanetsArePresent = False
-                break
+                planets.append( planetName )
 
-        if noPlanetsArePresent: return
-
-        menuItem = Gtk.MenuItem( "Planets" )
-        menu.append( menuItem )
-
-        if self.showPlanetsAsSubMenu:
-            subMenu = Gtk.Menu()
-            menuItem.set_submenu( subMenu )
-
-        for name in self.planets:
-            dataTag = name.upper()
+        if len( planets ) > 0:
+#TODO Might need to sort planet names.
+            menuItem = Gtk.MenuItem( "Planets" )
+            menu.append( menuItem )
 
             if self.showPlanetsAsSubMenu:
-                menuItem = Gtk.MenuItem( name )
-                subMenu.append( menuItem )
-            else:
-                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + name )
-                menu.append( menuItem )
+                subMenu = Gtk.Menu()
+                menuItem.set_submenu( subMenu )
 
-            self.updateCommonMenu( menuItem, AstronomicalObjectType.Planet, dataTag )
+            for name in planets:
+                dataTag = name.upper()
+                if self.showPlanetsAsSubMenu:
+                    menuItem = Gtk.MenuItem( name )
+                    subMenu.append( menuItem )
+                else:
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + name )
+                    menu.append( menuItem )
+
+                self.updateCommonMenu( menuItem, AstronomicalObjectType.Planet, dataTag )
 
 #TODO Fix
+#Need to get the list of moons from the sublist which matches the planet name.  Hopefully there's a python hacky way to do this.
 #             if len( name[ 3 ] ) > 0:
 #                 menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 #                 menuItem.get_submenu().append( Gtk.MenuItem( "Major Moons" ) )
@@ -562,12 +554,11 @@ class IndicatorLunar:
 #             for moon in name[ 3 ]:
 #                 moonMenuItem = Gtk.MenuItem( IndicatorLunar.INDENT + moon.name )
 #                 menuItem.get_submenu().append( moonMenuItem )
-#                 self.updateMoonsMenu( moonMenuItem, moon.name )
+#                 self.updatePlanetMoonsMenu( moonMenuItem, moon.name )
 
 
-    def updateMoonsMenu( self, moonMenuItem, moonName ):
+    def updatePlanetMoonsMenu( self, moonMenuItem, moonName ):
         subMenu = Gtk.Menu()
-
         self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, moonName.upper() )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -590,77 +581,57 @@ class IndicatorLunar:
                ( dataTag, IndicatorLunar.DATA_RISE_TIME ) in self.data:
                 stars.append( starName )
 
-        if len( stars ) == 0: return
+        if len( stars ) > 0:
+            menuItem = Gtk.MenuItem( "Stars" )
+            menu.append( menuItem )
 
-        menuItem = Gtk.MenuItem( "Stars" )
-        menu.append( menuItem )
-
-        if self.showStarsAsSubMenu:
-            subMenu = Gtk.Menu()
-            menuItem.set_submenu( subMenu )
-
-        for starName in stars:
-            dataTag = starName.upper()
             if self.showStarsAsSubMenu:
-                menuItem = Gtk.MenuItem( starName )
-                subMenu.append( menuItem )
-            else:
-                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starName )
-                menu.append( menuItem )
+                subMenu = Gtk.Menu()
+                menuItem.set_submenu( subMenu )
 
-            self.updateCommonMenu( menuItem, AstronomicalObjectType.Star, dataTag )
+            for starName in stars:
+                dataTag = starName.upper()
+                if self.showStarsAsSubMenu:
+                    menuItem = Gtk.MenuItem( starName )
+                    subMenu.append( menuItem )
+                else:
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starName )
+                    menu.append( menuItem )
+
+                self.updateCommonMenu( menuItem, AstronomicalObjectType.Star, dataTag )
 
 
-#TODO Fix
     def updateOrbitalElementsMenu( self, menu ):
-        if len( self.orbitalElements ) == 0: return
-
-        allUserSpecifiedOrbitalElementsAreNeverUp = True
-        for orbitalElementName in self.orbitalElements:
-            dataTag = orbitalElementName.upper()
- 
-            if orbitalElementName in self.orbitalElements and ( dataTag, IndicatorLunar.DATA_MESSAGE ) not in self.data:
-                allUserSpecifiedOrbitalElementsAreNeverUp = False
-                break
- 
-            if orbitalElementName in self.stars and \
-                ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data and \
-                self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_ALWAYS_UP:
-                allUserSpecifiedOrbitalElementsAreNeverUp = False
-                break
- 
-        if allUserSpecifiedOrbitalElementsAreNeverUp and self.hideBodyIfNeverUp: return
-
-        menuItem = Gtk.MenuItem( "Orbital Elements" )
-        menu.append( menuItem )
-
-        if self.showOrbitalElementsAsSubMenu:
-            orbitalElementsSubMenu = Gtk.Menu()
-            menuItem.set_submenu( orbitalElementsSubMenu )
-
+        orbitalElements = [ ]
         for orbitalElementName in self.orbitalElements:
             dataTag = orbitalElementName.upper()
 
-            if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data and \
-                self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
-                self.hideBodyIfNeverUp:
-                continue
+            if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data or \
+               ( dataTag, IndicatorLunar.DATA_RISE_TIME ) in self.data:
+                orbitalElements.append( orbitalElementName )
+
+        if len( orbitalElements ) > 0:
+#TODO Might need to sort the orbitalElements list by name.
+            menuItem = Gtk.MenuItem( "Orbital Elements" )
+            menu.append( menuItem )
 
             if self.showOrbitalElementsAsSubMenu:
-                menuItem = Gtk.MenuItem( orbitalElementName )
-                orbitalElementsSubMenu.append( menuItem )
-            else:
-                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + orbitalElementName )
-                menu.append( menuItem )
+                orbitalElementsSubMenu = Gtk.Menu()
+                menuItem.set_submenu( orbitalElementsSubMenu )
 
-            self.updateCommonMenu( menuItem, AstronomicalObjectType.OrbitalElement, dataTag )
+            for orbitalElementName in orbitalElements:
+                dataTag = orbitalElementName.upper()
+                if self.showOrbitalElementsAsSubMenu:
+                    menuItem = Gtk.MenuItem( orbitalElementName )
+                    orbitalElementsSubMenu.append( menuItem )
+                else:
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + orbitalElementName )
+                    menu.append( menuItem )
+
+                self.updateCommonMenu( menuItem, AstronomicalObjectType.OrbitalElement, dataTag )
 
 
     def updateCommonMenu( self, menuItem, astronomicalObjectType, dataTag ):
-#TODO I think it's NOT the responsibility of this function to do this check...the caller should check and then NOT call this function!
-#         if ( dataTag, IndicatorLunar.DATA_MESSAGE ) not in self.data and ( dataTag, IndicatorLunar.DATA_RISE_TIME ) not in self.data:
-#             return
-
         subMenu = Gtk.Menu()
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
@@ -692,6 +663,7 @@ class IndicatorLunar:
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, dataTag )
+
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data:
@@ -714,7 +686,8 @@ class IndicatorLunar:
 
 
     def updateSatellitesMenu( self, menu ):
-        if len( self.satellites ) == 0 or len( self.satelliteTLEData ) == 0: return
+        if len( self.satellites ) == 0 or len( self.satelliteTLEData ) == 0: return #TODO Do I need to do this?  Check to see if this function...
+#...makes use of the fact that data for a satellite will not be present if that satellite never rises or is not visible (if that's what the user wants).        
 
         # For each satellite, first determine if there is calculated data present (may have been dropped).
         # Then, parse the menu text to replace tags with values.
