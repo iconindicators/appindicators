@@ -42,14 +42,6 @@
 #TODO Can the hide body never up be moved to the update functions rather than the update menu functions?
 
 
-#TODO Use this
-    # http://www.livecometdata.com/comets/c2014-q2-comet-lovejoy/        
-# to verify lovejoy data.
-
-
-# TODO Have an option to hide magnitude greater than X, where X = 6 as default?  Must be a positive/negative integer.
-
-
 #TODO Sort comets by name or rise?
 
 
@@ -877,7 +869,7 @@ class IndicatorLunar:
             if orbitalElementName in self.orbitalElementData:
                 orbitalElement = ephem.readdb( self.orbitalElementData[ orbitalElementName ] )
                 orbitalElement.compute( self.getCity( ephemNow ) )
-                if float( orbitalElement.mag ) <= float( self.orbitalElementsMagnitude ): #TODO Check that this works!
+                if float( orbitalElement.mag ) <= float( self.orbitalElementsMagnitude ):
                     self.updateCommon( orbitalElement, AstronomicalObjectType.OrbitalElement, orbitalElementName.upper(), ephemNow )
             else:
                 self.data[ orbitalElementName + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA #TODO Need a hide orb elems property or similar?  Similar to satellites?
@@ -1013,7 +1005,7 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
             self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = self.localiseAndTrim( nextPass[ 4 ] )
             self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
-            self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible )  #TODO Do a check to see if we need to put in this flag?
+            self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible )  #TODO Only put in this value if the user wants any pass, right?
 
             self.nextUpdates.append( nextPass[ 4 ] )
             if ephem.Date( nextPass[ 0 ] ) > currentDateTime:
@@ -2443,7 +2435,7 @@ class IndicatorLunar:
         self.hideSatelliteIfNoVisiblePass = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.orbitalElements = [ ]
-        self.orbitalElementsMagnitude = 6
+        self.orbitalElementsMagnitude = 4 # More or less what's visible with the naked eye.
         self.orbitalElementsSortByDateTime = True
         self.orbitalElementDataURL = IndicatorLunar.ORBITAL_ELEMENT_DATA_URL
 
