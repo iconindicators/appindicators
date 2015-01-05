@@ -39,22 +39,12 @@
 #Does it make sense (and is faster and less memory usage) to do this in the satellite update section rather than the menu update?
 
 
-#TODO Can the hide body never up be moved to the update functions rather than the update menu functions?
-
-
-#TODO Sort comets by name or rise?
-
-
-#TODO Allow a text filter on the comets?
+#TODO Allow a text filter on the comets?  Or a way to search?
 
 
 #TODO In the satellite/stars/oe/planets lists, can the column header for the checkbox be used to capture a click event?
 #If so this can be used as a select all and clear all.
 # http://stackoverflow.com/questions/13707122/gtktreeview-column-header-click-event
-
-
-#TODO Have some way to not fetch the data (TLE and/or orb elems)?
-#Maybe in the tooltip tell the user to have an empty url (just http://)?
 
 
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
@@ -114,7 +104,6 @@ class IndicatorLunar:
     SETTINGS_ORBITAL_ELEMENT_DATA_URL = "orbitalElementDataURL"
     SETTINGS_ORBITAL_ELEMENTS = "orbitalElements"
     SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE = "orbitalElementsMagnitude"
-    SETTINGS_ORBITAL_ELEMENTS_SORT_BY_DATE_TIME = "orbitalElementsSortByDateTime"
     SETTINGS_PLANETS = "planets"
     SETTINGS_SATELLITE_MENU_TEXT = "satelliteMenuText"
     SETTINGS_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
@@ -518,7 +507,6 @@ class IndicatorLunar:
                 planets.append( planetName )
 
         if len( planets ) > 0:
-#TODO Might need to sort planet names.
             menuItem = Gtk.MenuItem( "Planets" )
             menu.append( menuItem )
 
@@ -526,27 +514,27 @@ class IndicatorLunar:
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
 
-            for name in planets:
-                dataTag = name.upper()
+            for planetName in sorted( planets ):
+                dataTag = planetName.upper()
                 if self.showPlanetsAsSubMenu:
-                    menuItem = Gtk.MenuItem( name )
+                    menuItem = Gtk.MenuItem( planetName )
                     subMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + name )
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planetName )
                     menu.append( menuItem )
 
                 self.updateCommonMenu( menuItem, AstronomicalObjectType.Planet, dataTag )
 
 #TODO Fix
-#Need to get the list of moons from the sublist which matches the planet name.  Hopefully there's a python hacky way to do this.
-#             if len( name[ 3 ] ) > 0:
+#Need to get the list of moons from the sublist which matches the planet planetName.  Hopefully there's a python hacky way to do this.
+#             if len( planetName[ 3 ] ) > 0:
 #                 menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 #                 menuItem.get_submenu().append( Gtk.MenuItem( "Major Moons" ) )
 # 
-#             for moon in name[ 3 ]:
-#                 moonMenuItem = Gtk.MenuItem( IndicatorLunar.INDENT + moon.name )
+#             for moon in planetName[ 3 ]:
+#                 moonMenuItem = Gtk.MenuItem( IndicatorLunar.INDENT + moon.planetName )
 #                 menuItem.get_submenu().append( moonMenuItem )
-#                 self.updatePlanetMoonsMenu( moonMenuItem, moon.name )
+#                 self.updatePlanetMoonsMenu( moonMenuItem, moon.planetName )
 
 
     def updatePlanetMoonsMenu( self, moonMenuItem, moonName ):
@@ -581,7 +569,7 @@ class IndicatorLunar:
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
 
-            for starName in stars:
+            for starName in sorted( stars ):
                 dataTag = starName.upper()
                 if self.showStarsAsSubMenu:
                     menuItem = Gtk.MenuItem( starName )
@@ -603,7 +591,6 @@ class IndicatorLunar:
                 orbitalElements.append( orbitalElementName )
 
         if len( orbitalElements ) > 0:
-#TODO Might need to sort the orbitalElements list by name.
             menuItem = Gtk.MenuItem( "Orbital Elements" )
             menu.append( menuItem )
 
@@ -611,7 +598,7 @@ class IndicatorLunar:
                 orbitalElementsSubMenu = Gtk.Menu()
                 menuItem.set_submenu( orbitalElementsSubMenu )
 
-            for orbitalElementName in orbitalElements:
+            for orbitalElementName in sorted( orbitalElements ):
                 dataTag = orbitalElementName.upper()
                 if self.showOrbitalElementsAsSubMenu:
                     menuItem = Gtk.MenuItem( orbitalElementName )
@@ -678,9 +665,6 @@ class IndicatorLunar:
 
 
     def updateSatellitesMenu( self, menu ):
-        if len( self.satellites ) == 0 or len( self.satelliteTLEData ) == 0: return #TODO Do I need to do this?  Check to see if this function...
-#...makes use of the fact that data for a satellite will not be present if that satellite never rises or is not visible (if that's what the user wants).        
-
         # For each satellite, first determine if there is calculated data present (may have been dropped).
         # Then, parse the menu text to replace tags with values.
         # Then, build a list of satellites, including rise time (or message), to allow sorting.
@@ -689,7 +673,8 @@ class IndicatorLunar:
             if key not in self.satelliteTLEData:
                 continue # This is (likely) a satellite from a previous run which is not in the current TLE data.
 
-            if ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) not in self.data and ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) not in self.data:
+            if ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) not in self.data and \
+               ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) not in self.data:
                 continue # No data for this satellite - likely it has been dropped by the backend. 
 
             menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, key[ 0 ] ) \
@@ -706,52 +691,52 @@ class IndicatorLunar:
 
             menuTextSatelliteNameNumberRiseTimes.append( [ menuText, key, riseTime ] )
 
-        # Sort by menu text or by rise time...
-        if self.satellitesSortByDateTime:
-            menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
-        else:
-            menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
-
-        # Build the menu...
-        satellitesMenuItem = Gtk.MenuItem( "Satellites" )
-
-        if self.showSatellitesAsSubMenu:
-            satellitesSubMenu = Gtk.Menu()
-            satellitesMenuItem.set_submenu( satellitesSubMenu )
-
-        firstRun = True
-        for menuText, key, RiseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
-            subMenu = Gtk.Menu()
-            if ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) in self.data:
-                subMenu.append( Gtk.MenuItem( self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] ) )
-                if self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
-                    subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] ) )
-                    subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] ) )
+        if len( menuTextSatelliteNameNumberRiseTimes ) > 0:
+            if self.satellitesSortByDateTime: # Sort by menu text or by rise time...
+                menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
             else:
-                subMenu.append( Gtk.MenuItem( "Rise" ) )
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) )
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] ) )
-                subMenu.append( Gtk.MenuItem( "Set" ) )
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] ) )
-                
-                if not self.hideSatelliteIfNoVisiblePass:
-                    subMenu.append( Gtk.MenuItem( "Visible: " + self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] ) )
+                menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
 
-            self.addOnSatelliteHandler( subMenu, key )
-
-            if firstRun:
-                firstRun = False
-                menu.append( satellitesMenuItem )
+            # Build the menu...
+            satellitesMenuItem = Gtk.MenuItem( "Satellites" )
 
             if self.showSatellitesAsSubMenu:
-                menuItem = Gtk.MenuItem( menuText )
-                satellitesSubMenu.append( menuItem )
-            else:
-                menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + menuText )
-                menu.append( menuItem )
+                satellitesSubMenu = Gtk.Menu()
+                satellitesMenuItem.set_submenu( satellitesSubMenu )
 
-            menuItem.set_submenu( subMenu )
+            firstRun = True
+            for menuText, key, RiseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
+                subMenu = Gtk.Menu()
+                if ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) in self.data:
+                    subMenu.append( Gtk.MenuItem( self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] ) )
+                    if self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
+                        subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] ) )
+                        subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] ) )
+                else:
+                    subMenu.append( Gtk.MenuItem( "Rise" ) )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] ) )
+                    subMenu.append( Gtk.MenuItem( "Set" ) )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] ) )
+
+                    if not self.hideSatelliteIfNoVisiblePass:
+                        subMenu.append( Gtk.MenuItem( "Visible: " + self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] ) )
+
+                self.addOnSatelliteHandler( subMenu, key )
+
+                if firstRun:
+                    firstRun = False
+                    menu.append( satellitesMenuItem )
+
+                if self.showSatellitesAsSubMenu:
+                    menuItem = Gtk.MenuItem( menuText )
+                    satellitesSubMenu.append( menuItem )
+                else:
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + menuText )
+                    menu.append( menuItem )
+
+                menuItem.set_submenu( subMenu )
 
 
     def addOnSatelliteHandler( self, subMenu, key ):
@@ -872,7 +857,8 @@ class IndicatorLunar:
                 if float( orbitalElement.mag ) <= float( self.orbitalElementsMagnitude ):
                     self.updateCommon( orbitalElement, AstronomicalObjectType.OrbitalElement, orbitalElementName.upper(), ephemNow )
             else:
-                self.data[ orbitalElementName + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA #TODO Need a hide orb elems property or similar?  Similar to satellites?
+                if not self.hideBodyIfNeverUp:
+                    self.data[ orbitalElementName + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA
 
 
     # Calculates common items such as rise/set, illumination, constellation, magnitude, tropical sign, distance to earth/sun, bright limb angle.
@@ -1428,27 +1414,49 @@ class IndicatorLunar:
         grid.set_margin_top( 15 )
         grid.set_margin_bottom( 15 )
 
-        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Show planets as submenus" )
+        label = Gtk.Label( "Show as submenus" )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 1, 1 )
+
+        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 40 ) # Bug in Python - must specify the parameter names!
+        box.set_margin_left( 20 )
+
+        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Planets" )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
         showPlanetsAsSubmenuCheckbox.set_tooltip_text( "Show each planet (excluding moon/sun) in its own submenu." )
-        grid.attach( showPlanetsAsSubmenuCheckbox, 0, 0, 1, 1 )
+        box.pack_start( showPlanetsAsSubmenuCheckbox, False, False, 0 )
 
-        showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Show stars as submenus" )
+        showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Stars" )
         showStarsAsSubmenuCheckbox.set_tooltip_text( "Show each star in its own submenu." )
         showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
-        showStarsAsSubmenuCheckbox.set_margin_top( 20 )
-        grid.attach( showStarsAsSubmenuCheckbox, 0, 1, 1, 1 )
+        box.pack_start( showStarsAsSubmenuCheckbox, False, False, 0 )
 
-        showOrbitalElementsAsSubmenuCheckbox = Gtk.CheckButton( "Show orbital elements as submenus" )
+        showOrbitalElementsAsSubmenuCheckbox = Gtk.CheckButton( "Orbital elements" )
         showOrbitalElementsAsSubmenuCheckbox.set_tooltip_text( "Show each orbital element in its own submenu." )
         showOrbitalElementsAsSubmenuCheckbox.set_active( self.showOrbitalElementsAsSubMenu )
-        showOrbitalElementsAsSubmenuCheckbox.set_margin_top( 20 )
-        grid.attach( showOrbitalElementsAsSubmenuCheckbox, 0, 2, 1, 1 )
+        box.pack_start( showOrbitalElementsAsSubmenuCheckbox, False, False, 0 )
+
+        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Satellites" )
+        showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
+        showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
+        box.pack_start( showSatellitesAsSubmenuCheckbox, False, False, 0 )
+
+        grid.attach( box, 0, 1, 1, 1 )
+
+        hideBodyIfNeverUpCheckbox = Gtk.CheckButton( "Hide bodies which are 'never up'" )
+        hideBodyIfNeverUpCheckbox.set_margin_top( 25 )
+        hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
+        hideBodyIfNeverUpCheckbox.set_tooltip_text(
+            "If checked, only planets, moon, sun,\n" + \
+            "orbital elements and stars which rise/set\n" + \
+            "or are 'always up' will be shown.\n\n" + \
+            "Otherwise all bodies are shown." )
+        grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_top( 20 )
+        box.set_margin_top( 25 )
 
-        label = Gtk.Label( "Show orbital elements of magnitude or less" )
+        label = Gtk.Label( "Hide orbital elements greater than magnitude" )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -1459,21 +1467,12 @@ class IndicatorLunar:
         spinnerOrbitalElementMagnitude.set_value( self.orbitalElementsMagnitude ) # ...so need to force the initial value by explicitly setting it.
         spinnerOrbitalElementMagnitude.set_tooltip_text( "Orbital elements with a magnitude greater\nthan that specified will not be shown." )
 
-        box.pack_start( spinnerOrbitalElementMagnitude, True, True, 0 )
+        box.pack_start( spinnerOrbitalElementMagnitude, False, False, 0 )
 
         grid.attach( box, 0, 3, 1, 1 )
 
-        hideBodyIfNeverUpCheckbox = Gtk.CheckButton( "Hide bodies which are 'never up'" )
-        hideBodyIfNeverUpCheckbox.set_margin_top( 20 )
-        hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
-        hideBodyIfNeverUpCheckbox.set_tooltip_text(
-            "If checked, only planets, moon, sun, orbital elements\n" + \
-            "and stars which rise/set or are 'always up' will be shown.\n\n" + \
-            "Otherwise all bodies are shown." )
-        grid.attach( hideBodyIfNeverUpCheckbox, 0, 4, 1, 1 )
-
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_top( 20 )
+        box.set_margin_top( 25 )
 
         label = Gtk.Label( "Satellite menu text" )
         label.set_halign( Gtk.Align.START )
@@ -1491,35 +1490,29 @@ class IndicatorLunar:
 
         box.pack_start( satelliteMenuText, True, True, 0 )
 
-        grid.attach( box, 0, 5, 1, 1 )
-
-        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Show satellites as submenus" )
-        showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
-        showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
-        showSatellitesAsSubmenuCheckbox.set_margin_top( 20 )
-        grid.attach( showSatellitesAsSubmenuCheckbox, 0, 6, 1, 1 )
+        grid.attach( box, 0, 4, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( "Sort satellites by rise date/time" )
-        sortSatellitesByDateTimeCheckbox.set_margin_top( 20 )
+        sortSatellitesByDateTimeCheckbox.set_margin_top( 25 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
         sortSatellitesByDateTimeCheckbox.set_tooltip_text(
             "By default, satellites are sorted\n" + \
             "alphabetically by menu text.\n\n" + \
             "If checked, satellites will be\nsorted by rise date/time." )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 7, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 5, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( "Hide satellites which have no upcoming visible pass" )
-        hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 20 )
+        hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 25 )
         hideSatelliteIfNoVisiblePassCheckbox.set_active( self.hideSatelliteIfNoVisiblePass )
         hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text(
             "If checked, only satellites with an\n" + \
             "upcoming visible pass are displayed.\n\n" + \
-            "Otherwise, all passes, visible or not, are shown\n" + \
-            "(including error messages)." )
-        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 8, 1, 1 )
+            "Otherwise, all passes, visible or not,\n" + \
+            "are shown (including error messages)." )
+        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 6, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_top( 20 )
+        box.set_margin_top( 25 )
 
         label = Gtk.Label( "Satellite 'on-click' URL" )
         label.set_halign( Gtk.Align.START )
@@ -1529,8 +1522,10 @@ class IndicatorLunar:
         satelliteURLText.set_text( self.satelliteOnClickURL )
         satelliteURLText.set_hexpand( True )
         satelliteURLText.set_tooltip_text( 
-             "The URL used to lookup a satellite (in the default browser) when\n" + \
-             "any of the satellite's child items are selected from the menu.\n\n" + \
+             "The URL used to lookup a satellite\n" + \
+             "(in the default browser) when any of\n" + \
+             "the satellite's child items are selected\n" + \
+             "from the menu.\n\n" + \
              "If empty, no lookup will be done.\n\n" + \
              "Available tags:\n\t" + \
              IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
@@ -1544,7 +1539,7 @@ class IndicatorLunar:
         reset.set_tooltip_text( "Reset the satellite look-up URL to factory default." )
         box.pack_start( reset, False, False, 0 )
 
-        grid.attach( box, 0, 9, 1, 1 )
+        grid.attach( box, 0, 7, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( "Menu" ) )
 
@@ -2436,7 +2431,6 @@ class IndicatorLunar:
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.orbitalElements = [ ]
         self.orbitalElementsMagnitude = 4 # More or less what's visible with the naked eye.
-        self.orbitalElementsSortByDateTime = True
         self.orbitalElementDataURL = IndicatorLunar.ORBITAL_ELEMENT_DATA_URL
 
         self.planets = [ ]
@@ -2479,7 +2473,6 @@ class IndicatorLunar:
             self.orbitalElementDataURL = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENT_DATA_URL, self.orbitalElementDataURL )
             self.orbitalElements = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS, self.orbitalElements )
             self.orbitalElementsMagnitude = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE, self.orbitalElementsMagnitude )
-            self.orbitalElementsSortByDateTime = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_SORT_BY_DATE_TIME, self.orbitalElementsSortByDateTime )
             self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
             self.satelliteMenuText = settings.get( IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT, self.satelliteMenuText )
             self.satelliteNotificationMessage = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
@@ -2520,7 +2513,6 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_ORBITAL_ELEMENT_DATA_URL: self.orbitalElementDataURL,
                 IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS: self.orbitalElements,
                 IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE: self.orbitalElementsMagnitude,
-                IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_SORT_BY_DATE_TIME: self.orbitalElementsSortByDateTime,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
                 IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT: self.satelliteMenuText,
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
