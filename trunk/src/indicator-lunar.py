@@ -41,6 +41,9 @@
 #TODO Allow a text filter on the comets?  Or a way to search?
 
 
+#TODO Combine the planet/stars and OE tabs in the Preferences dialog?
+
+
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
