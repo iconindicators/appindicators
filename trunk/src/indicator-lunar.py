@@ -248,6 +248,7 @@ class IndicatorLunar:
 
         Notify.init( IndicatorLunar.NAME )
 
+        self.lastUpdateOrbitalElement = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Set the last orbital element update in the past so an update occurs. 
         self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Set the last TLE update in the past so an update occurs. 
         self.lastFullMoonNotfication = ephem.Date( "2000/01/01" ) # Set a date way back in the past...
 
@@ -284,8 +285,19 @@ class IndicatorLunar:
             else:
                 self.satelliteTLEData = satelliteTLEData
 
-#         $TODO Do the same as above with TLE...only update every 12 hours or so.
-        self.orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
+        # Update the orbital element data at most every 24 hours.  If the data is invalid, use the orbital element data from the previous run.
+        if datetime.datetime.now() > ( self.lastUpdateOrbitalElement + datetime.timedelta( hours = 24 ) ):
+            orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
+            if orbitalElementData is None:
+                summary = "Error Retrieving Orbital Element Data"
+                message = "The orbital element data source could not be reached.  Previous orbital element data will be used, if available."
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            elif len( orbitalElementData ) == 0:
+                summary = "Empty Orbital Element Data"
+                message = "The orbital element data retrieved is empty.  Previous orbital element data will be used, if available."
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            else:
+                self.orbitalElementData = orbitalElementData
 
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
         self.data[ ( IndicatorLunar.DATA_CITY_NAME, "" ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match the format of all other data.
@@ -2088,6 +2100,8 @@ class IndicatorLunar:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
 
+#TODO Why is the TLE forced to update?
+#Need to do the same for orbital elements?
             self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Force the TLE data to be updated.
             self.data = { } # Erase the data as the user may have changed the satellites and/or location.
             break
