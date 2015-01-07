@@ -35,6 +35,9 @@
 #TODO Check imports for spurious includes!
 
 
+#TODO Test satellites/tle with a satellite name being all lower case (from the tle data itself, saved as a text file).
+
+
 #TODO For satellites, check where the sort by name or rise time is done.
 #Does it make sense (and is faster and less memory usage) to do this in the satellite update section rather than the menu update?
 
@@ -232,10 +235,12 @@ class IndicatorLunar:
 
     def __init__( self ):
         self.dialog = None
-        self.data = { }
-        self.orbitalElementData = { }
+        self.data = { } # Key is each a data tag, upper case, naming the type of data combined with the source of the data; value is the data ready for display.
+        self.orbitalElementData = { } # Key is the orbital element name, upper cased; value is the orbital element data string.
         self.satelliteNotifications = { }
         self.satelliteTLEData = { }
+
+        self.orbitalElementsTableToggle = True
 
         GObject.threads_init()
         self.lock = threading.Lock()
@@ -283,6 +288,7 @@ class IndicatorLunar:
 
 #         $TODO Do the same as above with TLE...only update every 12 hours or so.
         self.orbitalElementData = self.getOrbitalElementData( self.orbitalElementDataURL )
+
 
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
         self.data[ ( IndicatorLunar.DATA_CITY_NAME, "" ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match the format of all other data.
@@ -583,12 +589,10 @@ class IndicatorLunar:
 
     def updateOrbitalElementsMenu( self, menu ):
         orbitalElements = [ ]
-        for orbitalElementName in self.orbitalElements:
-            dataTag = orbitalElementName.upper()
-
-            if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data or \
-               ( dataTag, IndicatorLunar.DATA_RISE_TIME ) in self.data:
-                orbitalElements.append( orbitalElementName )
+        for key in self.orbitalElements:
+            if ( key, IndicatorLunar.DATA_MESSAGE ) in self.data or \
+               ( key, IndicatorLunar.DATA_RISE_TIME ) in self.data:
+                orbitalElements.append( key )
 
         if len( orbitalElements ) > 0:
             menuItem = Gtk.MenuItem( "Orbital Elements" )
@@ -598,16 +602,15 @@ class IndicatorLunar:
                 orbitalElementsSubMenu = Gtk.Menu()
                 menuItem.set_submenu( orbitalElementsSubMenu )
 
-            for orbitalElementName in sorted( orbitalElements ):
-                dataTag = orbitalElementName.upper()
+            for key in sorted( orbitalElements ):
                 if self.showOrbitalElementsAsSubMenu:
-                    menuItem = Gtk.MenuItem( orbitalElementName )
+                    menuItem = Gtk.MenuItem( key )
                     orbitalElementsSubMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + orbitalElementName )
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + key )
                     menu.append( menuItem )
 
-                self.updateCommonMenu( menuItem, AstronomicalObjectType.OrbitalElement, dataTag )
+                self.updateCommonMenu( menuItem, AstronomicalObjectType.OrbitalElement, key )
 
 
     def updateCommonMenu( self, menuItem, astronomicalObjectType, dataTag ):
@@ -850,15 +853,15 @@ class IndicatorLunar:
     # http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
     # http://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html        
     def updateOrbitalElements( self, ephemNow ):
-        for orbitalElementName in self.orbitalElements:
-            if orbitalElementName in self.orbitalElementData:
-                orbitalElement = ephem.readdb( self.orbitalElementData[ orbitalElementName ] )
+        for key in self.orbitalElements:
+            if key in self.orbitalElementData:
+                orbitalElement = ephem.readdb( self.orbitalElementData[ key ] )
                 orbitalElement.compute( self.getCity( ephemNow ) )
                 if float( orbitalElement.mag ) <= float( self.orbitalElementsMagnitude ):
-                    self.updateCommon( orbitalElement, AstronomicalObjectType.OrbitalElement, orbitalElementName.upper(), ephemNow )
+                    self.updateCommon( orbitalElement, AstronomicalObjectType.OrbitalElement, key, ephemNow )
             else:
                 if not self.hideBodyIfNeverUp:
-                    self.data[ orbitalElementName + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA
 
 
     # Calculates common items such as rise/set, illumination, constellation, magnitude, tropical sign, distance to earth/sun, bright limb angle.
@@ -1378,7 +1381,7 @@ class IndicatorLunar:
         grid.attach( box, 0, 0, 1, 1 )
 
         displayTagsStore = Gtk.ListStore( str, str ) # Display tag, value.
-        self.updateDisplayTags( displayTagsStore, True, None )
+        self.updateDisplayTags( displayTagsStore, None, None )
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
         displayTagsStoreSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
@@ -1604,12 +1607,15 @@ class IndicatorLunar:
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onOrbitalElementToggled, orbitalElementStore, displayTagsStore, orbitalElementStoreSort )
-        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
+        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+        treeViewColumn.set_clickable( True )
+        treeViewColumn.connect( "clicked", self.onXXX, orbitalElementStore )
+        tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( "Name", Gtk.CellRendererText(), text = 1 )
         tree.append_column( treeViewColumn )
 
-        tree.set_tooltip_text( "Check an orbital element to display in the menu." )
+        tree.set_tooltip_text( "Check an orbital element to display in the menu." ) #TODO If the select all works, add to this tooltip!
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -1631,9 +1637,9 @@ class IndicatorLunar:
         # Need a local copy of the orbital element URL and orbital element data.
         # Also, as they need to be modified in the fetch handler, use a one-element list.
         orbitalElementURL = [ ]
-        orbitalElementURL.append( self.orbitalElementDataURL )
+        orbitalElementURL.append( self.orbitalElementDataURL ) #TODO Why does the URL have to change in the called function?
         orbitalElementData = [ ]
-        orbitalElementData.append( self.orbitalElementData )
+        orbitalElementData.append( self.orbitalElementData ) # TODO Can't the dict itself be passed?
 
         orbitalElementURLEntry = Gtk.Entry()
         orbitalElementURLEntry.set_text( orbitalElementURL[ 0 ] )
@@ -1678,7 +1684,10 @@ class IndicatorLunar:
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
-        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
+        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+        treeViewColumn.set_clickable( True )
+        treeViewColumn.connect( "clicked", self.onXXX, satelliteStore )
+        tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( "Satellite Name", Gtk.CellRendererText(), text = 1 )
         treeViewColumn.set_sort_column_id( 1 )
@@ -1733,7 +1742,7 @@ class IndicatorLunar:
         fetch.set_tooltip_text(
             "Retrieve the TLE data from the specified URL.\n" + \
             "If the URL is empty, the default URL will be used." )
-        fetch.connect( "clicked", self.onFetchTLEURL, satelliteTLEURL, satelliteTLEData, TLEURLEntry, satelliteTabGrid, satelliteStore, displayTagsStore )
+        fetch.connect( "clicked", self.onFetchSatelliteTLEURL, satelliteTLEURL, satelliteTLEData, TLEURLEntry, satelliteTabGrid, satelliteStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
         satelliteTabGrid.attach( box, 0, 1, 1, 1 )
@@ -2090,27 +2099,49 @@ class IndicatorLunar:
         self.dialog = None
 
 
-    def updateDisplayTags( self, displayTagsStore, keepSatellites, satelliteTLEData ):
+#TODO Test a TLE data file with mixed case in the satellite name.
+#Perhaps ensure that satellite name/number/etc and orb elem name are always upper cased?
+
+    def updateDisplayTags( self, displayTagsStore, satelliteTLEData, orbitalElementData ):
         displayTagsStore.clear()
         sortedKeysAsStringsAndValues = [ ]
+        print( self.orbitalElements )
 
         # Refresh the display tags with all data.
         # For satellites, if the preferences dialog is initialising, keep the existing satellites and data.
         # Otherwise, the user has done a fetch and so don't add in the satellites as they are likely to be different.
         for key in self.data.keys():
-            if ( ( key[ 0 ], key[ 1 ] ) ) in self.satellites: # This key refers to a satellite...
-                if keepSatellites:
+            if ( key[ 0 ], key[ 1 ] ) in self.satellites: # This key refers to a satellite...
+                if satelliteTLEData is None:
+#                     print( ( key[ 0 ], key[ 1 ] ) )
                     sortedKeysAsStringsAndValues.append( [ " ".join( key ), self.data[ key ] ] )
-            else: # This is a non-satellite, so add it...
+#TODO Test this works!
+            elif ( key[ 0 ] ) in self.orbitalElements: # This key refers to an orbital element...
+                if orbitalElementData is None:
+                    print( key[ 0 ] )
+                    sortedKeysAsStringsAndValues.append( [ " ".join( key ), self.data[ key ] ] )
+            else: # This is a neither satellite nor orbital element, so add it...
                 sortedKeysAsStringsAndValues.append( [ " ".join( key ), self.data[ key ] ] )
 
-        # The user has fetched new TLE data, so add it...
-        if not keepSatellites and satelliteTLEData is not None:
+        # Check if new satellite TLE data is being added...
+        if satelliteTLEData is not None:
             for key in satelliteTLEData:
+                sortedKeysAsStringsAndValues.append( [ " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+
+        # Check if new orbital element data is being added...
+#TODO Check this works
+        if orbitalElementData is not None:
+            for key in orbitalElementData:
                 sortedKeysAsStringsAndValues.append( [ " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
         for item in sorted( sortedKeysAsStringsAndValues, key = lambda x: ( x[ 0 ] ) ):
             displayTagsStore.append( [ item[ 0 ], item[ 1 ] ] )
+
+
+    def onXXX( self, widget, orbitalElementStore ):
+        self.orbitalElementsTableToggle = not self.orbitalElementsTableToggle
+        for row in orbitalElementStore:
+            row[ 0 ] = self.orbitalElementsTableToggle
 
 
     def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, url ):
@@ -2192,6 +2223,10 @@ class IndicatorLunar:
     def onResetSatelliteOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_ON_CLICK_URL )
 
 
+#TODO On startup, the orb elems and satellites are NOT in the icon/tag table.
+
+#TODO After fetch, the orb elem names in the icon/tags table are of different format (like a list of chars and not a single string). 
+
     def onFetchOrbitalElementURL( self, button, orbitalElementURL, orbitalElementData, orbitalElementURLEntry, grid, orbitalElementStore, displayTagsStore ):
         if orbitalElementURLEntry.get_text().strip() == "":
             orbitalElementURLEntry.set_text( IndicatorLunar.ORBITAL_ELEMENT_DATA_URL )
@@ -2203,10 +2238,10 @@ class IndicatorLunar:
         orbitalElementData.append( self.getOrbitalElementData( orbitalElementURL[ 0 ] ) ) # The orbital element data can be None, empty or non-empty.
 
         self.updateOrbitalElementPreferencesTab( grid, orbitalElementStore, orbitalElementData[ 0 ], orbitalElementURL[ 0 ] )
-#         self.updateDisplayTags( displayTagsStore, False, orbitalElementData[ 0 ] ) TODO Fix
+        self.updateDisplayTags( displayTagsStore, None, orbitalElementData[ 0 ] )
 
 
-    def onFetchTLEURL( self, button, satelliteTLEURL, satelliteTLEData, TLEURLEntry, grid, satelliteStore, displayTagsStore ):
+    def onFetchSatelliteTLEURL( self, button, satelliteTLEURL, satelliteTLEData, TLEURLEntry, grid, satelliteStore, displayTagsStore ):
         if TLEURLEntry.get_text().strip() == "":
             TLEURLEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
@@ -2217,7 +2252,7 @@ class IndicatorLunar:
         satelliteTLEData.append( self.getSatelliteTLEData( satelliteTLEURL[ 0 ] ) ) # The TLE data can be None, empty or non-empty.
 
         self.updateSatellitePreferencesTab( grid, satelliteStore, satelliteTLEData[ 0 ], satelliteTLEURL[ 0 ] )
-        self.updateDisplayTags( displayTagsStore, False, satelliteTLEData[ 0 ] )
+        self.updateDisplayTags( displayTagsStore, satelliteTLEData[ 0 ], None )
 
 
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
@@ -2371,12 +2406,12 @@ class IndicatorLunar:
             #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
             # in which the first field (up to the first ',' is the name.
             # Any line beginninng with a '#' is considered a comment and ignored.
-            orbitalElementsData = { } # Key: orbital element name ; Value: entire orbital element string.
+            orbitalElementsData = { } # Key: orbital element name, upper cased ; Value: entire orbital element string.
             data = urlopen( url ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ) ):
                 if not data[ i ].startswith( "#" ):
                     orbitalElementName = data[ i ][ 0 : data[ i ].index( "," ) ] 
-                    orbitalElementsData[ orbitalElementName ] = data[ i ]
+                    orbitalElementsData[ orbitalElementName.upper() ] = data[ i ]
 
         except Exception as e:
             orbitalElementsData = None # Indicates error.
@@ -2384,6 +2419,9 @@ class IndicatorLunar:
             logging.error( "Error retrieving orbital element data from " + str( url ) )
 
         return orbitalElementsData
+
+
+    def getOrbitalElementDisplayName( self, orbitalElement ): return orbitalElement[ 0 : orbitalElement.index( "," ) ]
 
 
     # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
