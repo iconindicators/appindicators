@@ -1568,6 +1568,10 @@ class IndicatorLunar:
             planetStore.append( [ planet[ 0 ] in self.planets, planet[ 0 ] ] )
 
         tree = Gtk.TreeView( planetStore )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        tree.set_tooltip_text( "Check a planet to display in the menu.\n\n" + \
+                               "Clicking the header of the first column\n" + \
+                               "toggles all checkboxes." )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, displayTagsStore )
@@ -1577,10 +1581,6 @@ class IndicatorLunar:
         tree.append_column( treeViewColumn )
 
         tree.append_column( Gtk.TreeViewColumn( "Planet", Gtk.CellRendererText(), text = 1 ) )
-
-#TODO Add toggle   tooltip!
-        tree.set_tooltip_text( "Check a planet to display in the menu." )
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
@@ -1593,6 +1593,10 @@ class IndicatorLunar:
             starStore.append( [ star in self.stars, star ] )
 
         tree = Gtk.TreeView( starStore )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        tree.set_tooltip_text( "Check a star to display in the menu.\n\n" + \
+                               "Clicking the header of the first column\n" + \
+                               "toggles all checkboxes." )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onStarToggled, starStore, displayTagsStore )
@@ -1602,10 +1606,6 @@ class IndicatorLunar:
         tree.append_column( treeViewColumn )
 
         tree.append_column( Gtk.TreeViewColumn( "Star", Gtk.CellRendererText(), text = 1 ) )
-
-#TODO Add toggle   tooltip!
-        tree.set_tooltip_text( "Check a star to display in the menu." )
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -1626,6 +1626,9 @@ class IndicatorLunar:
         orbitalElementStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView( orbitalElementStoreSort )
+        tree.set_tooltip_text( "Check an orbital element to display in the menu.\n\n" + \
+                               "Clicking the header of the first column\n" + \
+                               "toggles all checkboxes." )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onOrbitalElementToggled, orbitalElementStore, displayTagsStore, orbitalElementStoreSort )
@@ -1636,10 +1639,6 @@ class IndicatorLunar:
 
         treeViewColumn = Gtk.TreeViewColumn( "Name", Gtk.CellRendererText(), text = 1 )
         tree.append_column( treeViewColumn )
-
-#TODO Add toggle   tooltip!
-        tree.set_tooltip_text( "Check an orbital element to display in the menu." )
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -1691,8 +1690,6 @@ class IndicatorLunar:
 
         notebook.append_page( orbitalElementGrid, Gtk.Label( "Orbital Elements" ) )
 
-#TODO Uncheck all satellites, click ok.  Open prefs...all are checked!
-#Same with other stuff?
         # Satellites.
         satelliteGrid = Gtk.Grid()
         satelliteGrid.set_row_spacing( 10 )
@@ -1704,6 +1701,9 @@ class IndicatorLunar:
         satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView( satelliteStoreSort )
+        tree.set_tooltip_text( "Check a satellite to display in the menu.\n\n" + \
+                               "Clicking the header of the first column\n" + \
+                               "toggles all checkboxes." )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
@@ -1723,10 +1723,6 @@ class IndicatorLunar:
         treeViewColumn = Gtk.TreeViewColumn( "International Designator", Gtk.CellRendererText(), text = 3 ) 
         treeViewColumn.set_sort_column_id( 3 )
         tree.append_column( treeViewColumn )
-
-#TODO Add toggle   tooltip!
-        tree.set_tooltip_text( "Check a satellite, station or rocket body to display in the menu." )
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -2000,8 +1996,8 @@ class IndicatorLunar:
         self.dialog.show_all()
 
         # Some GUI elements will be hidden, which must be done after the dialog is shown.
-        self.updateOrbitalElementPreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, orbitalElementURLEntry.get_text().strip() )
-        self.updateSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, TLEURLEntry.get_text().strip() )
+        self.updateOrbitalElementPreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, self.orbitalElements, orbitalElementURLEntry.get_text().strip() )
+        self.updateSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip() )
 
         while True:
             if self.dialog.run() != Gtk.ResponseType.OK: break
@@ -2159,7 +2155,7 @@ class IndicatorLunar:
             row[ 0 ] = toggle
 
 
-    def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, url ):
+    def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, orbitalElements, url ):
         if orbitalElementData is None or len( orbitalElementData ) == 0: # An error or no orbital element data...
             if orbitalElementData is None:
                 message = "Cannot access the orbital element data source\n<a href=\'" + url + "'>" + url + "</a>"
@@ -2171,7 +2167,7 @@ class IndicatorLunar:
             for key in orbitalElementData:
                 orbitalElement = orbitalElementData[ key ]
                 displayName = self.getOrbitalElementDisplayName( orbitalElement )
-                orbitalElementStore.append( [ True, displayName ] )
+                orbitalElementStore.append( [ key in orbitalElements, displayName ] )
 
         # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
         children = grid.get_children()
@@ -2189,7 +2185,7 @@ class IndicatorLunar:
                     child.hide()
 
 
-    def updateSatellitePreferencesTab( self, grid, satelliteStore, satelliteTLEData, url ):
+    def updateSatellitePreferencesTab( self, grid, satelliteStore, satelliteTLEData, satellites, url ):
         if satelliteTLEData is None or len( satelliteTLEData ) == 0: # An error or no TLE data...
             if satelliteTLEData is None:
                 message = "Cannot access the TLE data source\n<a href=\'" + url + "'>" + url + "</a>"
@@ -2200,7 +2196,8 @@ class IndicatorLunar:
             message = None
             for key in satelliteTLEData:
                 tle = satelliteTLEData[ key ]
-                satelliteStore.append( [ True, tle.getName(), tle.getNumber(), tle.getInternationalDesignator() ] )
+                checked = ( tle.getName().upper(), tle.getNumber() ) in satellites
+                satelliteStore.append( [ checked, tle.getName(), tle.getNumber(), tle.getInternationalDesignator() ] )
 
         children = grid.get_children()
         for child in children:
@@ -2231,7 +2228,13 @@ class IndicatorLunar:
 
         self.orbitalElementURLNew = entry.get_text().strip()
         self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
-        self.updateOrbitalElementPreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, self.orbitalElementURLNew )
+
+        # When fetching new data, by default check all the data.
+        orbitalElements = [ ]
+        for key in self.orbitalElementDataNew:
+            orbitalElements.append( key )
+
+        self.updateOrbitalElementPreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, orbitalElements, self.orbitalElementURLNew )
         self.updateDisplayTags( displayTagsStore, None, self.orbitalElementDataNew )
 
 
@@ -2241,7 +2244,13 @@ class IndicatorLunar:
 
         self.satelliteTLEURLNew = entry.get_text().strip()
         self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The TLE data can be None, empty or non-empty.
-        self.updateSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, self.satelliteTLEURLNew )
+
+        # When fetching new data, by default check all the data.
+        satellites = [ ]
+        for key in self.satelliteTLEDataNew:
+            satellites.append( key )
+
+        self.updateSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, satellites, self.satelliteTLEURLNew )
         self.updateDisplayTags( displayTagsStore, self.satelliteTLEDataNew, None )
 
 
@@ -2472,7 +2481,7 @@ class IndicatorLunar:
         self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
         self.satellites = [ ]
         self.satellitesSortByDateTime = True
-        self.showOrbitalElementsAsSubMenu = False # Should be one or two comets at most (assuming naked eye magnitude).
+        self.showOrbitalElementsAsSubMenu = True
         self.showPlanetsAsSubMenu = False
         self.showSatelliteNotification = True
         self.showSatellitesAsSubMenu = True
