@@ -104,7 +104,7 @@ class IndicatorLunar:
     SETTINGS_HIDE_BODY_IF_NEVER_UP = "hideBodyIfNeverUp"
     SETTINGS_INDICATOR_TEXT = "indicatorText"
     SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS = "hideSatelliteIfNoVisiblePass"
-    SETTINGS_ORBITAL_ELEMENT_DATA_URL = "orbitalElementDataURL"
+    SETTINGS_ORBITAL_ELEMENT_URL = "orbitalElementURL"
     SETTINGS_ORBITAL_ELEMENTS = "orbitalElements"
     SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE = "orbitalElementsMagnitude"
     SETTINGS_PLANETS = "planets"
@@ -287,7 +287,7 @@ class IndicatorLunar:
                 self.satelliteTLEData = satelliteTLEData
 
 #         $TODO Do the same as above with TLE...only update every 12 hours or so.
-        self.orbitalElementData = self.getOrbitalElementData( self.orbitalElementDataURL )
+        self.orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
 
 
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
@@ -295,6 +295,7 @@ class IndicatorLunar:
         self.nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
         ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
+        print( self.localiseAndTrim( ephemNow ) )
 
         lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
@@ -1645,13 +1646,11 @@ class IndicatorLunar:
 
         # Need a local copy of the orbital element URL and orbital element data.
         # Also, as they need to be modified in the fetch handler, use a one-element list.
-        orbitalElementURL = [ ]
-        orbitalElementURL.append( self.orbitalElementDataURL ) #TODO Why does the URL have to change in the called function?
-        orbitalElementData = [ ]
-        orbitalElementData.append( self.orbitalElementData ) # TODO Can't the dict itself be passed?
+        self.orbitalElementDataNew = None
+        self.orbitalElementURLNew = None
 
         orbitalElementURLEntry = Gtk.Entry()
-        orbitalElementURLEntry.set_text( orbitalElementURL[ 0 ] )
+        orbitalElementURLEntry.set_text( self.orbitalElementURL )
         orbitalElementURLEntry.set_hexpand( True )
         orbitalElementURLEntry.set_tooltip_text(
             "The URL from which to source orbital element data.\n" + \
@@ -1665,7 +1664,7 @@ class IndicatorLunar:
         fetch.set_tooltip_text(
             "Retrieve the orbital element data from the URL.\n" + \
             "If the URL is empty, the default URL will be used." )
-        fetch.connect( "clicked", self.onFetchOrbitalElementURL, orbitalElementURL, orbitalElementData, orbitalElementURLEntry, orbitalElementTabGrid, orbitalElementStore, displayTagsStore )
+        fetch.connect( "clicked", self.onFetchOrbitalElementURL, orbitalElementURLEntry, orbitalElementTabGrid, orbitalElementStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
         orbitalElementTabGrid.attach( box, 0, 1, 1, 1 )
@@ -1729,15 +1728,11 @@ class IndicatorLunar:
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
-        # Need a local copy of the satellite TLE URL and TLE data.
-        # Also, as they need to be modified in the fetch handler, use a one-element list.
-        satelliteTLEURL = [ ]
-        satelliteTLEURL.append( self.satelliteTLEURL )
-        satelliteTLEData = [ ]
-        satelliteTLEData.append( self.satelliteTLEData )
+        self.satelliteTLEDataNew = None
+        self.satelliteTLEURLNew = None
 
         TLEURLEntry = Gtk.Entry()
-        TLEURLEntry.set_text( satelliteTLEURL[ 0 ] )
+        TLEURLEntry.set_text( self.satelliteTLEURL )
         TLEURLEntry.set_hexpand( True )
         TLEURLEntry.set_tooltip_text(
             "The URL from which to source TLE satellite data.\n" + \
@@ -1751,7 +1746,7 @@ class IndicatorLunar:
         fetch.set_tooltip_text(
             "Retrieve the TLE data from the specified URL.\n" + \
             "If the URL is empty, the default URL will be used." )
-        fetch.connect( "clicked", self.onFetchSatelliteTLEURL, satelliteTLEURL, satelliteTLEData, TLEURLEntry, satelliteTabGrid, satelliteStore, displayTagsStore )
+        fetch.connect( "clicked", self.onFetchSatelliteTLEURL, TLEURLEntry, satelliteTabGrid, satelliteStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
         satelliteTabGrid.attach( box, 0, 1, 1, 1 )
@@ -2049,30 +2044,23 @@ class IndicatorLunar:
             for starInfo in starStore:
                 if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
 
-            self.orbitalElementDataURL = orbitalElementURL[ 0 ]
-            
-            if orbitalElementData[ 0 ] is None:
-                self.orbitalElementData = [ ]
-            else:
-                self.orbitalElementData = orbitalElementData[ 0 ]
+            if self.orbitalElementURLNew is not None:
+                self.orbitalElementData = self.orbitalElementDataNew
+                self.orbitalElementURL = self.orbitalElementURLNew
 
-#TODO The orbital elemnent names in the store will now be mixed case...be sure to upper case!
             self.orbitalElements = [ ]
             for orbitalElement in orbitalElementStore:
                 if orbitalElement[ 0 ]:
-                    self.orbitalElements.append( orbitalElement[ 1 ] )
+                    self.orbitalElements.append( orbitalElement[ 1 ].upper() )
 
-            self.satelliteTLEURL = satelliteTLEURL[ 0 ]
-            
-            if satelliteTLEData[ 0 ] is None:
-                self.satelliteTLEData = [ ]
-            else:
-                self.satelliteTLEData = satelliteTLEData[ 0 ]
+            if self.satelliteTLEURLNew is not None:
+                self.satelliteTLEData = self.satelliteTLEDataNew
+                self.satelliteTLEURL = self.satelliteTLEURLNew
 
             self.satellites = [ ]
             for satelliteTLE in satelliteStore:
                 if satelliteTLE[ 0 ]:
-                    self.satellites.append( ( satelliteTLE[ 1 ], satelliteTLE[ 2 ] ) )
+                    self.satellites.append( ( satelliteTLE[ 1 ].upper(), satelliteTLE[ 2 ] ) )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = satelliteNotificationSummaryText.get_text()
@@ -2217,33 +2205,24 @@ class IndicatorLunar:
 
 #TODO After fetch, the orb elem names in the icon/tags table are of different format (like a list of chars and not a single string). 
 
-    def onFetchOrbitalElementURL( self, button, orbitalElementURL, orbitalElementData, orbitalElementURLEntry, grid, orbitalElementStore, displayTagsStore ):
-        if orbitalElementURLEntry.get_text().strip() == "":
-            orbitalElementURLEntry.set_text( IndicatorLunar.ORBITAL_ELEMENT_DATA_URL )
+    def onFetchOrbitalElementURL( self, button, entry, grid, orbitalElementStore, displayTagsStore ):
+        if entry.get_text().strip() == "":
+            entry.set_text( IndicatorLunar.ORBITAL_ELEMENT_DATA_URL )
 
-        del orbitalElementURL[ : ] # Remove the orbital element URL.
-        orbitalElementURL.append( orbitalElementURLEntry.get_text().strip() )
-
-        del orbitalElementData[ : ] # Remove the orbital element data.
-        orbitalElementData.append( self.getOrbitalElementData( orbitalElementURL[ 0 ] ) ) # The orbital element data can be None, empty or non-empty.
-
-        self.updateOrbitalElementPreferencesTab( grid, orbitalElementStore, orbitalElementData[ 0 ], orbitalElementURL[ 0 ] )
-#TODO Update display tags if the data is None or empty?  Or just on success?
-        self.updateDisplayTags( displayTagsStore, None, orbitalElementData[ 0 ] )
+        self.orbitalElementURLNew = entry.get_text().strip()
+        self.orbitalElementDataNew = self.getOrbitalElementData( self.satelliteTLEURLNew ) # The orbital element data can be None, empty or non-empty.
+        self.updateOrbitalElementPreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, self.orbitalElementURLNew )
+        self.updateDisplayTags( displayTagsStore, None, self.orbitalElementDataNew )
 
 
-    def onFetchSatelliteTLEURL( self, button, satelliteTLEURL, satelliteTLEData, TLEURLEntry, grid, satelliteStore, displayTagsStore ):
-        if TLEURLEntry.get_text().strip() == "":
-            TLEURLEntry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
+    def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore, displayTagsStore ):
+        if entry.get_text().strip() == "":
+            entry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
-        del satelliteTLEURL[ : ] # Remove the satellite TLE URL.
-        satelliteTLEURL.append( TLEURLEntry.get_text().strip() )
-
-        del satelliteTLEData[ : ] # Remove the satellite TLE data.
-        satelliteTLEData.append( self.getSatelliteTLEData( satelliteTLEURL[ 0 ] ) ) # The TLE data can be None, empty or non-empty.
-
-        self.updateSatellitePreferencesTab( grid, satelliteStore, satelliteTLEData[ 0 ], satelliteTLEURL[ 0 ] )
-        self.updateDisplayTags( displayTagsStore, satelliteTLEData[ 0 ], None )
+        self.satelliteTLEURLNew = entry.get_text().strip()
+        self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The TLE data can be None, empty or non-empty.
+        self.updateSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, self.satelliteTLEURLNew )
+        self.updateDisplayTags( displayTagsStore, self.satelliteTLEDataNew, None )
 
 
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
@@ -2460,7 +2439,7 @@ class IndicatorLunar:
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.orbitalElements = [ ]
         self.orbitalElementsMagnitude = 6 # More or less what's visible with the naked eye or binoculars.
-        self.orbitalElementDataURL = IndicatorLunar.ORBITAL_ELEMENT_DATA_URL
+        self.orbitalElementURL = IndicatorLunar.ORBITAL_ELEMENT_DATA_URL
 
         self.planets = [ ]
         for planet in IndicatorLunar.PLANETS:
@@ -2499,7 +2478,7 @@ class IndicatorLunar:
             self.hideBodyIfNeverUp = settings.get( IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
             self.hideSatelliteIfNoVisiblePass = settings.get( IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
             self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
-            self.orbitalElementDataURL = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENT_DATA_URL, self.orbitalElementDataURL )
+            self.orbitalElementURL = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENT_URL, self.orbitalElementURL )
             self.orbitalElements = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS, self.orbitalElements )
             self.orbitalElementsMagnitude = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE, self.orbitalElementsMagnitude )
             self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
@@ -2539,7 +2518,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
                 IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
                 IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
-                IndicatorLunar.SETTINGS_ORBITAL_ELEMENT_DATA_URL: self.orbitalElementDataURL,
+                IndicatorLunar.SETTINGS_ORBITAL_ELEMENT_URL: self.orbitalElementURL,
                 IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS: self.orbitalElements,
                 IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE: self.orbitalElementsMagnitude,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
