@@ -602,12 +602,13 @@ class IndicatorLunar:
                 orbitalElementsSubMenu = Gtk.Menu()
                 menuItem.set_submenu( orbitalElementsSubMenu )
 
-            for key in sorted( orbitalElements ):
+            for key in sorted( orbitalElements ): # Fortunately sorting by key also sorts the display name identically!
+                displayName = self.getOrbitalElementDisplayName( self.orbitalElementData[ key ] )
                 if self.showOrbitalElementsAsSubMenu:
-                    menuItem = Gtk.MenuItem( key )
+                    menuItem = Gtk.MenuItem( displayName )
                     orbitalElementsSubMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + key )
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + displayName )
                     menu.append( menuItem )
 
                 self.updateCommonMenu( menuItem, AstronomicalObjectType.OrbitalElement, key )
@@ -1397,7 +1398,13 @@ class IndicatorLunar:
         treeViewColumn.set_sort_column_id( 1 )
         tree.append_column( treeViewColumn )
 
-        tree.set_tooltip_text( "Double click to add a tag to the indicator text." )
+        tree.set_tooltip_text( "Double click to add a tag\n" + \
+                               "to the indicator text.\n\n" + \
+                               "Depending on the menu options," + \
+                               "items such as comets which\n" + \
+                               "exceed magnitude or satellites\n" + \
+                               "with no visible pass will" + \
+                               "are omitted." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onIndicatorTextTagDoubleClick, indicatorText )
 
@@ -1576,6 +1583,8 @@ class IndicatorLunar:
 
         tree = Gtk.TreeView( starStore )
 
+#TODO Add toggle on first column to check all and uncheck all.
+#TODO Add tooltip!
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onStarToggled, starStore, displayTagsStore )
 
@@ -2047,6 +2056,7 @@ class IndicatorLunar:
             else:
                 self.orbitalElementData = orbitalElementData[ 0 ]
 
+#TODO The orbital elemnent names in the store will now be mixed case...be sure to upper case!
             self.orbitalElements = [ ]
             for orbitalElement in orbitalElementStore:
                 if orbitalElement[ 0 ]:
@@ -2103,41 +2113,33 @@ class IndicatorLunar:
 #Perhaps ensure that satellite name/number/etc and orb elem name are always upper cased?
 
     def updateDisplayTags( self, displayTagsStore, satelliteTLEData, orbitalElementData ):
-        displayTagsStore.clear()
-        sortedKeysAsStringsAndValues = [ ]
-        print( self.orbitalElements )
-
+#TODO Check this comment!
         # Refresh the display tags with all data.
         # For satellites, if the preferences dialog is initialising, keep the existing satellites and data.
         # Otherwise, the user has done a fetch and so don't add in the satellites as they are likely to be different.
+        displayTagsStore.clear()
         for key in self.data.keys():
-            if ( key[ 0 ], key[ 1 ] ) in self.satellites: # This key refers to a satellite...
+            if ( key[ 0 ], key[ 1 ] ) in self.satellites: # This key refers to a satellite.
                 if satelliteTLEData is None:
-#                     print( ( key[ 0 ], key[ 1 ] ) )
-                    sortedKeysAsStringsAndValues.append( [ " ".join( key ), self.data[ key ] ] )
-#TODO Test this works!
-            elif ( key[ 0 ] ) in self.orbitalElements: # This key refers to an orbital element...
+                    displayTagsStore.append( [ " ".join( key ), self.data[ key ] ] )
+            elif ( key[ 0 ] ) in self.orbitalElements: # This key refers to an orbital element.
                 if orbitalElementData is None:
-                    print( key[ 0 ] )
-                    sortedKeysAsStringsAndValues.append( [ " ".join( key ), self.data[ key ] ] )
-            else: # This is a neither satellite nor orbital element, so add it...
-                sortedKeysAsStringsAndValues.append( [ " ".join( key ), self.data[ key ] ] )
+                    displayTagsStore.append( [ " ".join( key ), self.data[ key ] ] )
+            else:
+                displayTagsStore.append( [ " ".join( key ), self.data[ key ] ] ) # Neither a satellite nor orbital element so add it.
 
         # Check if new satellite TLE data is being added...
         if satelliteTLEData is not None:
             for key in satelliteTLEData:
-                sortedKeysAsStringsAndValues.append( [ " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+                displayTagsStore.append( [ " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
         # Check if new orbital element data is being added...
-#TODO Check this works
         if orbitalElementData is not None:
             for key in orbitalElementData:
-                sortedKeysAsStringsAndValues.append( [ " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-
-        for item in sorted( sortedKeysAsStringsAndValues, key = lambda x: ( x[ 0 ] ) ):
-            displayTagsStore.append( [ item[ 0 ], item[ 1 ] ] )
+                displayTagsStore.append( [ " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
 
+#TODO Can this be used for stars, orbital elements and satellites?
     def onXXX( self, widget, orbitalElementStore ):
         self.orbitalElementsTableToggle = not self.orbitalElementsTableToggle
         for row in orbitalElementStore:
@@ -2145,74 +2147,62 @@ class IndicatorLunar:
 
 
     def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, url ):
-        orbitalElementStore.clear()
-
         if orbitalElementData is None or len( orbitalElementData ) == 0: # An error or no orbital element data...
             if orbitalElementData is None:
                 message = "Cannot access the orbital element data source <a href=\'" + url + "'>" + url + "</a>"
             else:
                 message = "No orbital element data found at <a href=\'" + url + "'>" + url + "</a>"
-
-            # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
-            children = grid.get_children()
-            for child in children:
-                if child.__class__.__name__ == "Label":
-                    child.show()
-                    child.set_markup( message )
-                elif child.__class__.__name__ == "ScrolledWindow":
-                    child.hide()
-
         else:
+            orbitalElementStore.clear()
+            message = None
             for key in orbitalElementData:
                 orbitalElement = orbitalElementData[ key ]
-                orbitalElementStore.append( [ key in self.orbitalElements, key ] )
+                displayName = self.getOrbitalElementDisplayName( orbitalElement )
+                orbitalElementStore.append( [ key in self.orbitalElements, displayName ] )
 
-            # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
-            children = grid.get_children()
-            for child in children:
-                if child.__class__.__name__ == "Label":
+        # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
+        children = grid.get_children()
+        for child in children:
+            if child.__class__.__name__ == "Label":
+                if message is None:
                     child.hide()
-                elif child.__class__.__name__ == "ScrolledWindow":
+                else:
                     child.show()
+                    child.set_markup( message )
+            elif child.__class__.__name__ == "ScrolledWindow":
+                if message is None:
+                    child.show()
+                else:
+                    child.hide()
 
 
     def updateSatellitePreferencesTab( self, grid, satelliteStore, satelliteTLEData, url ):
-        satelliteStore.clear()
-
         if satelliteTLEData is None or len( satelliteTLEData ) == 0: # An error or no TLE data...
             if satelliteTLEData is None:
                 message = "Cannot access the TLE data source <a href=\'" + url + "'>" + url + "</a>"
             else:
                 message = "No TLE data found at <a href=\'" + url + "'>" + url + "</a>"
+        else:
+            satelliteStore.clear()
+            message = None
+            for key in satelliteTLEData:
+                tle = satelliteTLEData[ key ]
+                checked = ( tle.getName().upper(), tle.getNumber() ) in self.satellites
+                satelliteStore.append( [ checked, tle.getName(), tle.getNumber(), tle.getInternationalDesignator() ] )
 
-            # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
-            children = grid.get_children()
-            for child in children:
-                if child.__class__.__name__ == "Label":
+        children = grid.get_children()
+        for child in children:
+            if child.__class__.__name__ == "Label":
+                if message is None:
+                    child.hide()
+                else:
                     child.show()
                     child.set_markup( message )
-                elif child.__class__.__name__ == "ScrolledWindow":
-                    child.hide()
-
-        else:
-            for key in satelliteTLEData:
-                satelliteTLE = satelliteTLEData[ key ]
-                satelliteStore.append(
-                    [
-                        ( satelliteTLE.getName(), satelliteTLE.getNumber() ) in self.satellites,
-                        satelliteTLE.getName(),
-                        satelliteTLE.getNumber(),
-                        satelliteTLE.getInternationalDesignator()
-                    ]
-                )
-
-            # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
-            children = grid.get_children()
-            for child in children:
-                if child.__class__.__name__ == "Label":
-                    child.hide()
-                elif child.__class__.__name__ == "ScrolledWindow":
+            elif child.__class__.__name__ == "ScrolledWindow":
+                if message is None:
                     child.show()
+                else:
+                    child.hide()
 
 
     def onIndicatorTextTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
@@ -2238,6 +2228,7 @@ class IndicatorLunar:
         orbitalElementData.append( self.getOrbitalElementData( orbitalElementURL[ 0 ] ) ) # The orbital element data can be None, empty or non-empty.
 
         self.updateOrbitalElementPreferencesTab( grid, orbitalElementStore, orbitalElementData[ 0 ], orbitalElementURL[ 0 ] )
+#TODO Update display tags if the data is None or empty?  Or just on success?
         self.updateDisplayTags( displayTagsStore, None, orbitalElementData[ 0 ] )
 
 
@@ -2432,7 +2423,7 @@ class IndicatorLunar:
             data = urlopen( url ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ), 3 ):
                 tle = satellite.TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
-                satelliteTLEData[ ( tle.getName(), tle.getNumber() ) ] = tle
+                satelliteTLEData[ ( tle.getName().upper(), tle.getNumber() ) ] = tle
 
         except Exception as e:
             satelliteTLEData = None # Indicates error.
@@ -2468,7 +2459,7 @@ class IndicatorLunar:
         self.hideSatelliteIfNoVisiblePass = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.orbitalElements = [ ]
-        self.orbitalElementsMagnitude = 4 # More or less what's visible with the naked eye.
+        self.orbitalElementsMagnitude = 6 # More or less what's visible with the naked eye or binoculars.
         self.orbitalElementDataURL = IndicatorLunar.ORBITAL_ELEMENT_DATA_URL
 
         self.planets = [ ]
