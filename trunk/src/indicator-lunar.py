@@ -243,7 +243,10 @@ class IndicatorLunar:
         self.satelliteNotifications = { }
         self.satelliteTLEData = { }
 
-        self.orbitalElementsTableToggle = True
+        self.toggleOrbitalElementsTable = False
+        self.togglePlanetsTable = False
+        self.toggleSatellitesTable = False
+        self.toggleStarsTable = False
 
         GObject.threads_init()
         self.lock = threading.Lock()
@@ -522,7 +525,7 @@ class IndicatorLunar:
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
 
-            for planetName in sorted( planets ):
+            for planetName in planets:
                 dataTag = planetName.upper()
                 if self.showPlanetsAsSubMenu:
                     menuItem = Gtk.MenuItem( planetName )
@@ -1566,14 +1569,16 @@ class IndicatorLunar:
 
         tree = Gtk.TreeView( planetStore )
 
-#TODO Add toggle on first column to check all and uncheck all.
-#TODO Add tooltip!
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, displayTagsStore )
+        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+        treeViewColumn.set_clickable( True )
+        treeViewColumn.connect( "clicked", self.onToggle, planetStore, AstronomicalObjectType.Planet )
+        tree.append_column( treeViewColumn )
 
-        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Planet", Gtk.CellRendererText(), text = 1 ) )
 
+#TODO Add toggle   tooltip!
         tree.set_tooltip_text( "Check a planet to display in the menu." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
@@ -1589,14 +1594,16 @@ class IndicatorLunar:
 
         tree = Gtk.TreeView( starStore )
 
-#TODO Add toggle on first column to check all and uncheck all.
-#TODO Add tooltip!
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onStarToggled, starStore, displayTagsStore )
+        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+        treeViewColumn.set_clickable( True )
+        treeViewColumn.connect( "clicked", self.onToggle, starStore, AstronomicalObjectType.Star )
+        tree.append_column( treeViewColumn )
 
-        tree.append_column( Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( "Star", Gtk.CellRendererText(), text = 1 ) )
 
+#TODO Add toggle   tooltip!
         tree.set_tooltip_text( "Check a star to display in the menu." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
@@ -1624,13 +1631,14 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onOrbitalElementToggled, orbitalElementStore, displayTagsStore, orbitalElementStoreSort )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onXXX, orbitalElementStore )
+        treeViewColumn.connect( "clicked", self.onToggle, orbitalElementStore, AstronomicalObjectType.OrbitalElement )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( "Name", Gtk.CellRendererText(), text = 1 )
         tree.append_column( treeViewColumn )
 
-        tree.set_tooltip_text( "Check an orbital element to display in the menu." ) #TODO If the select all works, add to this tooltip!
+#TODO Add toggle   tooltip!
+        tree.set_tooltip_text( "Check an orbital element to display in the menu." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -1683,6 +1691,8 @@ class IndicatorLunar:
 
         notebook.append_page( orbitalElementGrid, Gtk.Label( "Orbital Elements" ) )
 
+#TODO Uncheck all satellites, click ok.  Open prefs...all are checked!
+#Same with other stuff?
         # Satellites.
         satelliteGrid = Gtk.Grid()
         satelliteGrid.set_row_spacing( 10 )
@@ -1699,7 +1709,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onXXX, satelliteStore )
+        treeViewColumn.connect( "clicked", self.onToggle, satelliteStore, AstronomicalObjectType.Satellite )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( "Satellite Name", Gtk.CellRendererText(), text = 1 )
@@ -1714,6 +1724,7 @@ class IndicatorLunar:
         treeViewColumn.set_sort_column_id( 3 )
         tree.append_column( treeViewColumn )
 
+#TODO Add toggle   tooltip!
         tree.set_tooltip_text( "Check a satellite, station or rocket body to display in the menu." )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
 
@@ -2127,11 +2138,25 @@ class IndicatorLunar:
                 displayTagsStore.append( [ key, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
 
-#TODO Can this be used for planets, stars, orbital elements and satellites?
-    def onXXX( self, widget, orbitalElementStore ):
-        self.orbitalElementsTableToggle = not self.orbitalElementsTableToggle
-        for row in orbitalElementStore:
-            row[ 0 ] = self.orbitalElementsTableToggle
+    def onToggle( self, widget, dataStore, astronomicalObjectType ):
+        if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
+            self.toggleOrbitalElementsTable = not self.toggleOrbitalElementsTable
+            toggle = self.toggleOrbitalElementsTable
+
+        elif astronomicalObjectType == AstronomicalObjectType.Planet:
+            self.togglePlanetsTable = not self.togglePlanetsTable
+            toggle = self.togglePlanetsTable
+
+        elif astronomicalObjectType == AstronomicalObjectType.Satellite:
+            self.toggleSatellitesTable = not self.toggleSatellitesTable
+            toggle = self.toggleSatellitesTable
+
+        else: # Assume stars. 
+            self.toggleStarsTable = not self.toggleStarsTable
+            toggle = self.toggleStarsTable
+
+        for row in dataStore:
+            row[ 0 ] = toggle
 
 
     def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, url ):
