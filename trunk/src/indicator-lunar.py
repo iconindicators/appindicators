@@ -38,10 +38,6 @@
 #TODO Test satellites/tle with a satellite name being all lower case (from the tle data itself, saved as a text file).
 
 
-#TODO For satellites, check where the sort by name or rise time is done.
-#Does it make sense (and is faster and less memory usage) to do this in the satellite update section rather than the menu update?
-
-
 #TODO Allow a text filter on the comets?  Or a way to search?
 
 
@@ -1004,7 +1000,8 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
             self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = self.localiseAndTrim( nextPass[ 4 ] )
             self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
-            self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible )  #TODO Only put in this value if the user wants any pass, right?
+            if not self.hideSatelliteIfNoVisiblePass:
+                self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible )
 
             self.nextUpdates.append( nextPass[ 4 ] )
             if ephem.Date( nextPass[ 0 ] ) > currentDateTime:
