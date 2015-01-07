@@ -45,14 +45,6 @@
 #TODO Allow a text filter on the comets?  Or a way to search?
 
 
-#TODO In the satellite/stars/oe/planets lists, can the column header for the checkbox be used to capture a click event?
-#If so this can be used as a select all and clear all.
-# http://stackoverflow.com/questions/13707122/gtktreeview-column-header-click-event
-
-
-#TODO Check all self.data[]...should it be key + text or key, text???
-
-
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
@@ -951,7 +943,7 @@ class IndicatorLunar:
                 self.calculateNextSatellitePass( ephemNow, key, self.satelliteTLEData[ key ] )
             else:
                 if not self.hideSatelliteIfNoVisiblePass:
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_TLE_DATA  #TODO Check key format
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_TLE_DATA
 
 
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
@@ -965,7 +957,6 @@ class IndicatorLunar:
             try: nextPass = city.next_pass( satellite )
             except ValueError:
                 if satellite.circumpolar:
-  #TODO Check key format
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR
                     self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( satellite.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satellite.az ) ) + ")"
                     self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( satellite.dec ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satellite.dec ) ) + ")"
@@ -997,7 +988,6 @@ class IndicatorLunar:
                 continue
 
             # The pass is visible and the user wants only visible passes OR the user wants any pass...
-  #TODO Check key format
             self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = self.localiseAndTrim( nextPass[ 0 ] )
             self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
             self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = self.localiseAndTrim( nextPass[ 4 ] )
@@ -1016,7 +1006,6 @@ class IndicatorLunar:
             message = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS
 
         if message is not None and not self.hideSatelliteIfNoVisiblePass:
-  #TODO Check key format
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = message
 
 
