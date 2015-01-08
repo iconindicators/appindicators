@@ -1,3 +1,10 @@
+indicator-lunar (1.0.56-1) precise; urgency=low
+
+  * Bug fix: The 'visible' flag was missing in the satellite notification.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 8 Jan 2015 20:50:25 +1000
+
+
 indicator-lunar (1.0.55-1) precise; urgency=low
 
   * Added orbital elements (comets, et al).
