@@ -2232,8 +2232,9 @@ class IndicatorLunar:
 
         # When fetching new data, by default check all the data.
         orbitalElements = [ ]
-        for key in self.orbitalElementDataNew:
-            orbitalElements.append( key )
+        if self.orbitalElementDataNew is not None:
+            for key in self.orbitalElementDataNew:
+                orbitalElements.append( key )
 
         self.updateOrbitalElementPreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, orbitalElements, self.orbitalElementURLNew )
         self.updateDisplayTags( displayTagsStore, None, self.orbitalElementDataNew )
@@ -2248,8 +2249,9 @@ class IndicatorLunar:
 
         # When fetching new data, by default check all the data.
         satellites = [ ]
-        for key in self.satelliteTLEDataNew:
-            satellites.append( key )
+        if self.satelliteTLEDataNew is not None:
+            for key in self.satelliteTLEDataNew:
+                satellites.append( key )
 
         self.updateSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, satellites, self.satelliteTLEURLNew )
         self.updateDisplayTags( displayTagsStore, self.satelliteTLEDataNew, None )
