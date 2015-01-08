@@ -537,32 +537,34 @@ class IndicatorLunar:
 
                 self.updateCommonMenu( menuItem, AstronomicalObjectType.Planet, dataTag )
 
-#TODO Fix
-#Need to get the list of moons from the sublist which matches the planet planetName.  Hopefully there's a python hacky way to do this.
-#             if len( planetName[ 3 ] ) > 0:
-#                 menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-#                 menuItem.get_submenu().append( Gtk.MenuItem( "Major Moons" ) )
-# 
-#             for moon in planetName[ 3 ]:
-#                 moonMenuItem = Gtk.MenuItem( IndicatorLunar.INDENT + moon.planetName )
-#                 menuItem.get_submenu().append( moonMenuItem )
-#                 self.updatePlanetMoonsMenu( moonMenuItem, moon.planetName )
+                # Update moons.
+                for planetInfo in IndicatorLunar.PLANETS:
+                    if planetName == planetInfo[ 0 ] and len( planetInfo[ 3 ] ) > 0:
+                        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+                        menuItem.get_submenu().append( Gtk.MenuItem( "Major Moons" ) )
+                        self.updatePlanetMoonsMenu( menuItem, planetInfo[ 3 ] )
+                        break
 
 
-    def updatePlanetMoonsMenu( self, moonMenuItem, moonName ):
-        subMenu = Gtk.Menu()
-        self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, moonName.upper() )
-        subMenu.append( Gtk.SeparatorMenuItem() )
+    def updatePlanetMoonsMenu( self, menuItem, moons ):
+        for moon in moons:
+            moonMenuItem = Gtk.MenuItem( IndicatorLunar.INDENT + moon.name )
+            menuItem.get_submenu().append( moonMenuItem )
 
-        subMenu.append( Gtk.MenuItem( "Earth Visible: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_EARTH_VISIBLE ) ] ) )
-        subMenu.append( Gtk.SeparatorMenuItem() )
+            dataTag = moon.name.upper()
+            subMenu = Gtk.Menu()
+            self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, dataTag )
+            subMenu.append( Gtk.SeparatorMenuItem() )
 
-        subMenu.append( Gtk.MenuItem( "Offset from Planet (in planet radii)" ) )
-        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "X: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_X_OFFSET ) ] ) )
-        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Y: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_Y_OFFSET ) ] ) )
-        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Z: " + self.data[ ( moonName.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] ) )
+            subMenu.append( Gtk.MenuItem( "Earth Visible: " + self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] ) )
+            subMenu.append( Gtk.SeparatorMenuItem() )
 
-        moonMenuItem.set_submenu( subMenu )
+            subMenu.append( Gtk.MenuItem( "Offset from Planet (in planet radii)" ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "X: " + self.data[ ( dataTag, IndicatorLunar.DATA_X_OFFSET ) ] ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Y: " + self.data[ ( dataTag, IndicatorLunar.DATA_Y_OFFSET ) ] ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Z: " + self.data[ ( dataTag, IndicatorLunar.DATA_Z_OFFSET ) ] ) )
+
+            moonMenuItem.set_submenu( subMenu )
 
 
     def updateStarsMenu( self, menu ):
