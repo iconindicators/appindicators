@@ -35,9 +35,6 @@
 #TODO Check imports for spurious includes!
 
 
-#TODO Test satellites/tle with a satellite name being all lower case (from the tle data itself, saved as a text file).
-
-
 #TODO Allow a text filter on the comets?  Or a way to search?
 
 
@@ -433,8 +430,9 @@ class IndicatorLunar:
             degreeSymbolIndex = self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ].index( "°" )
             setAzimuth = self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ][ 0 : degreeSymbolIndex + 1 ]
 
+            tle = self.satelliteTLEData[ key ]
             summary = self.satelliteNotificationSummary. \
-                replace( IndicatorLunar.SATELLITE_TAG_NAME, key[ 0 ] ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
@@ -446,7 +444,7 @@ class IndicatorLunar:
             if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
 
             message = self.satelliteNotificationMessage. \
-                replace( IndicatorLunar.SATELLITE_TAG_NAME, key[ 0 ] ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
@@ -689,9 +687,10 @@ class IndicatorLunar:
                ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) not in self.data:
                 continue # No data for this satellite - likely it has been dropped by the backend. 
 
-            menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, key[ 0 ] ) \
-                                             .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ) \
-                                             .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ key ].getInternationalDesignator() )
+            tle = self.satelliteTLEData[ key ]
+            menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ) \
+                                             .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, tle.getNumber() ) \
+                                             .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() )
 
             # Add in the rise time to allow sorting by rise time.
             # If there is a message present, then no rise time will exist (so add the message in lieu of the rise time).
