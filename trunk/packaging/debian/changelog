@@ -1,10 +1,10 @@
 indicator-lunar (1.0.55-1) precise; urgency=low
 
-  * Added orbital elements (comets, et al).  Many thanks to the Minor Planet
-    Center for making available the data.
-  * Added sorting to the list of tags (icon text) Preferences dialog.
-  * Added sorting to the list of satellites in the Preferences dialog.
-  * Prevent the credits scrolled window in the About dialog from scrolling.
+  * Added orbital elements (comets, et al).
+    Many thanks to the Minor Planet Center for making the data available!
+  * Added sorting to the list of tags (icon text) and the list of satellites
+    in the Preferences dialog.
+  * Prevent the credits section in the About dialog from scrolling.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 1 Jan 2015 19:57:40 +1000
 
