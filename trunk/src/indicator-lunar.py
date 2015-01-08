@@ -2100,9 +2100,6 @@ class IndicatorLunar:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
                 except: pass
 
-#TODO Why is the TLE forced to update?
-#Need to do the same for orbital elements?
-            self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Force the TLE data to be updated.
             self.data = { } # Erase the data as the user may have changed the satellites and/or location.
             break
 
