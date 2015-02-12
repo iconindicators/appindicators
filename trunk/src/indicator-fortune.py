@@ -185,20 +185,20 @@ class IndicatorFortune:
             return
 
         self.dialog = pythonutils.AboutDialog( 
-               INDICATOR_NAME,
-               IndicatorFortune.COMMENTS, 
-               IndicatorFortune.WEBSITE, 
-               IndicatorFortune.WEBSITE, 
-               IndicatorFortune.VERSION, 
-               Gtk.License.GPL_3_0, 
-               IndicatorFortune.ICON,
-               [ IndicatorFortune.AUTHOR ],
-               IndicatorFortune.CREDITS,
-               _( "Credits" ),
-               "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
-               _( "Change _Log" ),
-               _( "translator-credits" ),
-               logging )
+                INDICATOR_NAME,
+                IndicatorFortune.COMMENTS, 
+                IndicatorFortune.WEBSITE, 
+                IndicatorFortune.WEBSITE, 
+                IndicatorFortune.VERSION, 
+                Gtk.License.GPL_3_0, 
+                IndicatorFortune.ICON,
+                [ IndicatorFortune.AUTHOR ],
+                IndicatorFortune.CREDITS,
+                _( "Credits" ),
+                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
+                _( "Change _Log" ),
+                _( "translator-credits" ),
+                logging )
 
         self.dialog.run()
         self.dialog.destroy()
