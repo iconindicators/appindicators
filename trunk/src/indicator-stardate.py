@@ -29,6 +29,11 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
+INDICATOR_NAME = "indicator-stardate"
+import gettext
+gettext.install( INDICATOR_NAME )
+
+
 from gi.repository import AppIndicator3, GLib, Gtk
 
 import datetime, gzip, json, logging, os, pythonutils, re, shutil, stardate, sys
@@ -37,20 +42,19 @@ import datetime, gzip, json, logging, os, pythonutils, re, shutil, stardate, sys
 class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
-    NAME = "indicator-stardate"
-    VERSION = "1.0.25"
-    ICON = NAME
-    LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
+    VERSION = "1.0.26"
+    ICON = INDICATOR_NAME
+    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
-    DESKTOP_FILE = NAME + ".desktop"
+    DESKTOP_FILE = INDICATOR_NAME + ".desktop"
 
-    COMMENTS = "Shows the current Star Trek™ stardate."
-    CREDITS = [ "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ]
+    COMMENTS = _( "Shows the current Star Trek™ stardate." )
+    CREDITS = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ]
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_PAD_INTEGER = "padInteger"
     SETTINGS_SHOW_CLASSIC = "showClassic"
     SETTINGS_SHOW_ISSUE = "showIssue"
@@ -65,7 +69,7 @@ class IndicatorStardate:
         self.stardateMenuItem = None
         self.loadSettings()
 
-        self.indicator = AppIndicator3.Indicator.new( IndicatorStardate.NAME, IndicatorStardate.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorStardate.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( self.buildMenu() )
 
@@ -116,7 +120,7 @@ class IndicatorStardate:
         self.stardate.setGregorian( datetime.datetime.utcnow() )
         s = self.stardate.toStardateString( self.showIssue, self.padInteger )
         self.indicator.set_label( s, "" )
-        if self.showInMenu: self.stardateMenuItem.set_label( "Stardate: " + s )
+        if self.showInMenu: self.stardateMenuItem.set_label( _( "Stardate: {0}" ).format( s ) )
 
         return True # Needed so the timer continues!
 
@@ -127,7 +131,7 @@ class IndicatorStardate:
             return
 
         self.dialog = pythonutils.AboutDialog( 
-               IndicatorStardate.NAME,
+               INDICATOR_NAME,
                IndicatorStardate.COMMENTS, 
                IndicatorStardate.WEBSITE, 
                IndicatorStardate.WEBSITE, 
@@ -136,8 +140,10 @@ class IndicatorStardate:
                IndicatorStardate.ICON,
                [ IndicatorStardate.AUTHOR ],
                IndicatorStardate.CREDITS,
-               "Credits",
-               "/usr/share/doc/" + IndicatorStardate.NAME + "/changelog.Debian.gz",
+               _( "Credits" ),
+               "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
+               _( "Change _Log" ),
+               _( "translator-credits" ),
                logging )
 
         self.dialog.run()
@@ -158,40 +164,40 @@ class IndicatorStardate:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showClassicCheckbox = Gtk.CheckButton( "Use 'classic' conversion" )
+        showClassicCheckbox = Gtk.CheckButton( _( "Use 'classic' conversion" ) )
         showClassicCheckbox.set_active( self.showClassic )
-        showClassicCheckbox.set_tooltip_text( "Stardate 'classic' is based on\n\tSTARDATES IN STAR TREK FAQ V1.6\nby Andrew Main.\n\nOtherwise the 2009 revised conversion is used\n(http://en.wikipedia.org/wiki/Stardate)." )
+        showClassicCheckbox.set_tooltip_text( _( "Stardate 'classic' is based on\n\tSTARDATES IN STAR TREK FAQ V1.6\nby Andrew Main.\n\nOtherwise the 2009 revised conversion is used\n(http://en.wikipedia.org/wiki/Stardate)." ) )
         grid.attach( showClassicCheckbox, 0, 0, 2, 1 )
 
-        showIssueCheckbox = Gtk.CheckButton( "Show ISSUE" )
+        showIssueCheckbox = Gtk.CheckButton( _( "Show ISSUE" ) )
         showIssueCheckbox.set_active( self.showIssue )
         showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
         showIssueCheckbox.set_margin_left( 15 )
-        showIssueCheckbox.set_tooltip_text( "Show the ISSUE of the stardate\n(only applies to 'classic')" )
+        showIssueCheckbox.set_tooltip_text( _( "Show the ISSUE of the stardate\n(only applies to 'classic')" ) )
         grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
 
-        padIntegerCheckbox = Gtk.CheckButton( "Pad INTEGER" )
+        padIntegerCheckbox = Gtk.CheckButton( _( "Pad INTEGER" ) )
         padIntegerCheckbox.set_active( self.padInteger )
         padIntegerCheckbox.set_sensitive( showClassicCheckbox.get_active() )
         padIntegerCheckbox.set_margin_left( 15 )
-        padIntegerCheckbox.set_tooltip_text( "Pad the INTEGER part with leading zeroes\n(only applies to 'classic')" )
+        padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part with leading zeroes\n(only applies to 'classic')" ) )
         grid.attach( padIntegerCheckbox, 0, 2, 1, 1 )
 
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
 
-        showInMenuCheckbox = Gtk.CheckButton( "Show in menu" )
+        showInMenuCheckbox = Gtk.CheckButton( _( "Show in menu" ) )
         showInMenuCheckbox.set_active( self.showInMenu )
-        showInMenuCheckbox.set_tooltip_text( "Show the stardate in the menu\n\n(for desktop environments which prohibit\ntext labels adjacent to the icon)" )
+        showInMenuCheckbox.set_tooltip_text( _( "Show the stardate in the menu\n\n(for desktop environments which prohibit\ntext labels adjacent to the icon)" ) )
         showInMenuCheckbox.set_margin_top( 10 )
         grid.attach( showInMenuCheckbox, 0, 3, 1, 1 )
 
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
-        autostartCheckbox.set_tooltip_text( "Run the indicator automatically" )
+        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically" ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 4, 2, 1 )
 
-        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( grid, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorStardate.ICON )
