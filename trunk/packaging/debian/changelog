@@ -1,5 +1,15 @@
 indicator-fortune (1.0.14-1) precise; urgency=low
 
+  * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
+    in this miracle! 
+  * About dialog changed to accept translator information.
+  * Overhaul of repository structure and build script.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 13 Feb 2015 9:47:15 +1000
+
+
+indicator-fortune (1.0.14-1) precise; urgency=low
+
   * Tidied tooltips in the Preferences dialog.
   * Cleaned up menu code.
 

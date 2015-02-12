@@ -29,6 +29,10 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
+INDICATOR_NAME = "indicator-fortune"
+import gettext
+gettext.install( INDICATOR_NAME )
+
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 
 import gzip, json, logging, os, pythonutils, re, shutil, subprocess, sys
@@ -37,10 +41,9 @@ import gzip, json, logging, os, pythonutils, re, shutil, subprocess, sys
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
-    NAME = "indicator-fortune"
     VERSION = "1.0.14"
-    ICON = NAME
-    LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
+    ICON = INDICATOR_NAME
+    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -48,9 +51,9 @@ class IndicatorFortune:
     DESKTOP_FILE = NAME + ".desktop"
 
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
-    NOTIFICATION_SUMMARY = "Fortune. . ."
+    NOTIFICATION_SUMMARY = _( "Fortune. . ." )
 
-    COMMENTS = "Calls the 'fortune' program displaying the result in the on-screen notification."
+    COMMENTS = _( "Calls the 'fortune' program displaying the result in the on-screen notification." )
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
     SETTINGS_FORTUNES = "fortunes"
@@ -71,9 +74,9 @@ class IndicatorFortune:
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
         self.fortune = ""
         self.loadSettings()
-        Notify.init( IndicatorFortune.NAME )
+        Notify.init( INDICATOR_NAME )
 
-        self.indicator = AppIndicator3.Indicator.new( IndicatorFortune.NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( self.buildMenu() )
 
@@ -99,17 +102,17 @@ class IndicatorFortune:
     def buildMenu( self ):
         menu = Gtk.Menu()
 
-        menuItem = Gtk.MenuItem( "New Fortune" )
+        menuItem = Gtk.MenuItem( _( "New Fortune" ) )
         menuItem.connect( "activate", self.onShowFortune, True )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW: self.indicator.set_secondary_activate_target( menuItem )
         menu.append( menuItem )
 
-        menuItem = Gtk.MenuItem( "Copy Last Fortune" )
+        menuItem = Gtk.MenuItem( _( "Copy Last Fortune" ) )
         menuItem.connect( "activate", self.onCopyLastFortune )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST: self.indicator.set_secondary_activate_target( menuItem )
         menu.append( menuItem )
 
-        menuItem = Gtk.MenuItem( "Show Last Fortune" )
+        menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
         menuItem.connect( "activate", self.onShowFortune, False )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST: self.indicator.set_secondary_activate_target( menuItem )
         menu.append( menuItem )
@@ -135,7 +138,7 @@ class IndicatorFortune:
 
     def refreshFortune( self ):
         if len( self.fortunes ) == 0:
-            self.fortune = "No fortunes defined!"
+            self.fortune = _( "No fortunes defined!" )
             return
 
         fortuneLocations = " "
@@ -147,7 +150,7 @@ class IndicatorFortune:
                     fortuneLocations += "'" + fortuneLocation[ 0 ].replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
 
         if fortuneLocations == " ":
-            self.fortune = "No fortunes enabled!"
+            self.fortune = _( "No fortunes enabled!" )
             return
 
         while True:
@@ -182,7 +185,7 @@ class IndicatorFortune:
             return
 
         self.dialog = pythonutils.AboutDialog( 
-               IndicatorFortune.NAME,
+               INDICATOR_NAME,
                IndicatorFortune.COMMENTS, 
                IndicatorFortune.WEBSITE, 
                IndicatorFortune.WEBSITE, 
@@ -190,9 +193,11 @@ class IndicatorFortune:
                Gtk.License.GPL_3_0, 
                IndicatorFortune.ICON,
                [ IndicatorFortune.AUTHOR ],
-                "",
-                "",
-               "/usr/share/doc/" + IndicatorFortune.NAME + "/changelog.Debian.gz",
+               IndicatorFortune.CREDITS,
+               _( "Credits" ),
+               "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
+               _( "Change _Log" ),
+               _( "translator-credits" ),
                logging )
 
         self.dialog.run()
@@ -228,9 +233,9 @@ class IndicatorFortune:
         tree.expand_all()
         tree.set_hexpand( True )
         tree.set_vexpand( True )
-        tree.append_column( Gtk.TreeViewColumn( "Fortune File/Directory", Gtk.CellRendererText(), text = 0 ) )
-        tree.append_column( Gtk.TreeViewColumn( "Enabled", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
-        tree.set_tooltip_text( "Double click to edit a fortune's properties." )
+        tree.append_column( Gtk.TreeViewColumn( _( "Fortune File/Directory" ), Gtk.CellRendererText(), text = 0 ) )
+        tree.append_column( Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = 1 ) )
+        tree.set_tooltip_text( _( "Double click to edit a fortune's properties." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onFortuneDoubleClick )
 
@@ -243,25 +248,25 @@ class IndicatorFortune:
         hbox = Gtk.Box( spacing = 6 )
         hbox.set_homogeneous( True )
 
-        addButton = Gtk.Button( "Add" )
-        addButton.set_tooltip_text( "Add a new fortune location." )
+        addButton = Gtk.Button( _( "Add" ) )
+        addButton.set_tooltip_text( _( "Add a new fortune location." ) )
         addButton.connect( "clicked", self.onFortuneAdd, tree )
         hbox.pack_start( addButton, True, True, 0 )
 
-        removeButton = Gtk.Button( "Remove" )
-        removeButton.set_tooltip_text( "Remove the selected fortune location." )
+        removeButton = Gtk.Button( _( "Remove" ) )
+        removeButton.set_tooltip_text( _( "Remove the selected fortune location." ) )
         removeButton.connect( "clicked", self.onFortuneRemove, tree )
         hbox.pack_start( removeButton, True, True, 0 )
 
-        resetButton = Gtk.Button( "Reset" )
-        resetButton.set_tooltip_text( "Reset to factory default." )
+        resetButton = Gtk.Button( _( "Reset" ) )
+        resetButton.set_tooltip_text( _( "Reset to factory default." ) )
         resetButton.connect( "clicked", self.onFortuneReset, tree )
         hbox.pack_start( resetButton, True, True, 0 )
 
         hbox.set_halign( Gtk.Align.CENTER )
         grid.attach( hbox, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "Fortunes" ) )
+        notebook.append_page( grid, Gtk.Label( _( "Fortunes" ) ) )
 
         # General settings.
         grid = Gtk.Grid()
@@ -272,29 +277,29 @@ class IndicatorFortune:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        label = Gtk.Label( "Refresh interval (minutes)" )
+        label = Gtk.Label( _( "Refresh interval (minutes)" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
         spinnerRefreshInterval = Gtk.SpinButton()
         spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60 * 24, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
-        spinnerRefreshInterval.set_tooltip_text( "How often a fortune is displayed." )
+        spinnerRefreshInterval.set_tooltip_text( _( "How often a fortune is displayed." ) )
         grid.attach( spinnerRefreshInterval, 1, 0, 1, 1 )
 
-        label = Gtk.Label( "Notification summary" )
+        label = Gtk.Label( _( "Notification summary" ) )
         label.set_halign( Gtk.Align.START )
         label.set_margin_top( 10 )
         grid.attach( label, 0, 1, 1, 1 )
 
         notificationSummary = Gtk.Entry()
         notificationSummary.set_text( self.notificationSummary )
-        notificationSummary.set_tooltip_text( "The summary text for the notification." )
+        notificationSummary.set_tooltip_text( _( "The summary text for the notification." ) )
         notificationSummary.set_hexpand( True )
         notificationSummary.set_margin_top( 10 )
         grid.attach( notificationSummary, 1, 1, 1, 1 )
 
-        label = Gtk.Label( "Message character limit" )
+        label = Gtk.Label( _( "Message character limit" ) )
         label.set_halign( Gtk.Align.START )
         label.set_margin_top( 10 )
         grid.attach( label, 0, 2, 1, 1 )
@@ -303,44 +308,44 @@ class IndicatorFortune:
         spinnerCharacterCount.set_adjustment( Gtk.Adjustment( self.skipFortuneCharacterCount, 1, 1000, 1, 50, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerCharacterCount.set_value( self.skipFortuneCharacterCount ) # ...so need to force the initial value by explicitly setting it.
         spinnerCharacterCount.set_tooltip_text(
-           "If the fortune exceeds the limit,\n" + \
+           _( "If the fortune exceeds the limit,\n" + \
            "a new fortune is created.\n\n" + \
            "Do not set too low (below 50)\n" + \
            "as many fortunes may be dropped,\n" + \
-           "resulting in excessive calls to 'fortune'." )
+           "resulting in excessive calls to 'fortune'." ) )
         spinnerCharacterCount.set_margin_top( 10 )
         grid.attach( spinnerCharacterCount, 1, 2, 1, 1 )
 
-        label = Gtk.Label( "Middle mouse click of the icon" )
-        label.set_tooltip_text( "Not supported on all versions/derivatives of Ubuntu!" )
+        label = Gtk.Label( _( "Middle mouse click of the icon" ) )
+        label.set_tooltip_text( _( "Not supported on all versions/derivatives of Ubuntu!" ) )
         label.set_halign( Gtk.Align.START )
         label.set_margin_top( 10 )
         grid.attach( label, 0, 3, 2, 1 )
 
-        radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, "Show a new fortune" )
+        radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show a new fortune" ) )
         radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
         radioMiddleMouseClickNewFortune.set_margin_left( 15 )
         grid.attach( radioMiddleMouseClickNewFortune, 0, 4, 2, 1 )
 
-        radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "Copy current fortune to clipboard" )
+        radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Copy current fortune to clipboard" ) )
         radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
         radioMiddleMouseClickCopyLastFortune.set_margin_left( 15 )
         grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 5, 2, 1 )
 
-        radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, "Show current fortune" )
+        radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Show current fortune" ) )
         radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
         radioMiddleMouseClickShowLastFortune.set_margin_left( 15 )
         grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 2, 1 )
 
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_tooltip_text( "Run the indicator automatically." )
+        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
+        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( os.path.exists( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 7, 2, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "General" ) )
+        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        self.dialog = Gtk.Dialog( "Preferences", None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorFortune.ICON )
@@ -385,7 +390,7 @@ class IndicatorFortune:
 
 
     def onFortuneReset( self, button, tree ):
-        if pythonutils.showOKCancel( None, "Remove all fortunes and set to factory default?" ) == Gtk.ResponseType.OK:
+        if pythonutils.showOKCancel( None, _( "Remove all fortunes and set to factory default?" ) ) == Gtk.ResponseType.OK:
             model, treeiter = tree.get_selection().get_selected()
             model.clear()
             model.append( [ IndicatorFortune.DEFAULT_FORTUNE[ 0 ], Gtk.STOCK_APPLY ]  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
@@ -395,11 +400,11 @@ class IndicatorFortune:
         model, treeiter = tree.get_selection().get_selected()
 
         if treeiter is None:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "No fortune has been selected for removal." )
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ) )
             return
 
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-        if pythonutils.showOKCancel( None, "Remove the selected fortune?" ) == Gtk.ResponseType.OK: model.remove( treeiter )
+        if pythonutils.showOKCancel( None, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK: model.remove( treeiter )
 
 
     def onFortuneAdd( self, button, tree ): self.onFortuneDoubleClick( tree, None, None )
@@ -416,7 +421,7 @@ class IndicatorFortune:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        label = Gtk.Label( "Fortune file/directory" )
+        label = Gtk.Label( _( "Fortune file/directory" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
@@ -427,33 +432,33 @@ class IndicatorFortune:
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
             fortuneFileDirectory.set_width_chars( len( model[ treeiter ][ 0 ] ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
-        fortuneFileDirectory.set_tooltip_text( "The full path to a fortune .dat file OR\na directory containing fortune .dat files.\n\n\nEnsure the corresponding text file(s) is present!" )
+        fortuneFileDirectory.set_tooltip_text( _( "The full path to a fortune .dat file OR\na directory containing fortune .dat files.\n\n\nEnsure the corresponding text file(s) is present!" ) )
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
 
         hbox = Gtk.Box( spacing = 6 )
         hbox.set_homogeneous( True )
 
-        browseFileButton = Gtk.Button( "File" )
-        browseFileButton.set_tooltip_text( "Choose a fortune .dat file.\nEnsure the corresponding text file is present!" )
+        browseFileButton = Gtk.Button( _( "File" ) )
+        browseFileButton.set_tooltip_text( _( "Choose a fortune .dat file.\nEnsure the corresponding text file is present!" ) )
         hbox.pack_start( browseFileButton, True, True, 0 )
 
-        browseDirectoryButton = Gtk.Button( "Directory" )
-        browseDirectoryButton.set_tooltip_text( "Choose a directory containing a fortune .dat file(s).\nEnsure the corresponding text file(s) is present!" )
+        browseDirectoryButton = Gtk.Button( _( "Directory" ) )
+        browseDirectoryButton.set_tooltip_text( _( "Choose a directory containing a fortune .dat file(s).\nEnsure the corresponding text file(s) is present!" ) )
         hbox.pack_start( browseDirectoryButton, True, True, 0 )
 
         hbox.set_halign( Gtk.Align.END )
         grid.attach( hbox, 0, 1, 2, 1 )
 
-        enabledCheckbox = Gtk.CheckButton( "Enabled" )
-        enabledCheckbox.set_tooltip_text( "Ensure the fortune file/directory works by\nrunning it through 'fortune' in a terminal." )
+        enabledCheckbox = Gtk.CheckButton( _( "Enabled" ) )
+        enabledCheckbox.set_tooltip_text( _( "Ensure the fortune file/directory works by\nrunning it through 'fortune' in a terminal." ) )
         if rowNumber is not None: # This is an edit.
             enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabledCheckbox, 0, 2, 1, 1 )
 
-        title = "Fortune Properties"
-        if rowNumber is None: title = "Add Fortune"
+        title = _( "Fortune Properties" )
+        if rowNumber is None: title = _( "Add Fortune" )
 
         dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
@@ -469,12 +474,12 @@ class IndicatorFortune:
             if dialog.run() == Gtk.ResponseType.OK:
 
                 if fortuneFileDirectory.get_text().strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The fortune path cannot be empty." )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path cannot be empty." ) )
                     fortuneFileDirectory.grab_focus()
                     continue
     
                 if not os.path.exists( fortuneFileDirectory.get_text().strip() ):
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The fortune path does not exist." )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path does not exist." ) )
                     fortuneFileDirectory.grab_focus()
                     continue
 
@@ -492,10 +497,10 @@ class IndicatorFortune:
 
     def onBrowseFortune( self, fileOrDirectoryButton, addEditDialog, fortuneFileDirectory, isFile ):
         if isFile:
-            title = "Choose a fortune .dat file"
+            title = _( "Choose a fortune .dat file" )
             action = Gtk.FileChooserAction.OPEN
         else:
-            title = "Choose a directory containing a fortune .dat file(s)"
+            title = _( "Choose a directory containing a fortune .dat file(s)" )
             action = Gtk.FileChooserAction.SELECT_FOLDER
 
         dialog = Gtk.FileChooserDialog( title, addEditDialog, action, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
