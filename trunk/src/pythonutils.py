@@ -90,22 +90,21 @@ def onRadio( self, *widgets ):
 # A GTK AboutDialog with optional change log displayed in its own tab.
 class AboutDialog( Gtk.AboutDialog ):
 
-    CHANGELOG_BUTTON_NAME = "Change _Log"
-
-
-    # programName: Program name.
-    # comments: Comments.
-    # website: Website URL (used on click).
-    # websiteLabel: Website (may or may not be the actual URL).
-    # version: String of the numeric program version.
-    # licenseType: Any of Gtk.License.*
-    # logoIconName: The name of the image icon - without extension.
-    # authors: List of authors.
-    # creditsPeople: List of creditors.
-    # creditsLabel: Credit text.
-    # changeLog: The full path to the change log; None otherwise.
-    # logging: Default Python logging mechanism; None otherwise.
-    def __init__( self, programName, comments, website, websiteLabel, version, licenseType, logoIconName, authors, creditsPeople, creditsLabel, changeLog, logging ):
+    def __init__( self, 
+        programName, # Program name.
+        comments, # Comments.
+        website, # Website URL (used on click).
+        websiteLabel, # Website (may or may not be the actual URL).
+        version, # String of the numeric program version.
+        licenseType, # Any of Gtk.License.*
+        logoIconName, # The name of the image icon - without extension.
+        authors, # List of authors.
+        creditsPeople, # List of creditors.
+        creditsLabel, # Credit text.
+        changeLog, # The full path to the change log; None otherwise.
+        changeLogButtonName, # The name of the change log button, optionally including the underscore for the keyboard shortcut.
+        translator, # Either the result of calling _( "translator-credits" ) which returns a string or None.
+        logging ):# Default Python logging mechanism; None otherwise.
 
         super( AboutDialog, self ).__init__()
 
@@ -119,11 +118,12 @@ class AboutDialog( Gtk.AboutDialog ):
             self.add_credit_section( creditsLabel, creditsPeople )
         else:
             authorsCredits = authors
-            authorsCredits.append( "" )
             for credit in creditsPeople:
                 authorsCredits.append( credit )
 
             self.set_authors( authorsCredits )
+
+        if translator is not None: self.set_translator_credits( translator )
 
         self.set_comments( comments )
         self.set_license_type( licenseType )
@@ -139,11 +139,12 @@ class AboutDialog( Gtk.AboutDialog ):
         notebook = self.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
 
         # Ensure the credits scrolled window never has a vertical scrollbar.
-        creditsTab = notebook.get_nth_page( 1 )
-        children = creditsTab.get_children()
-        for child in children:
-            if type( child ).__name__ == "ScrolledWindow":
-                child.set_policy( child.get_policy()[ 0 ], Gtk.PolicyType.NEVER ) 
+        creditsTab = notebook.get_nth_page( 1 ) # There should be three tabs/pages, but on Ubuntu 12.04 there is only one for some reason...
+        if creditsTab is not None: # ...so the credits TAB can be None!
+            children = creditsTab.get_children()
+            for child in children:
+                if type( child ).__name__ == "ScrolledWindow":
+                    child.set_policy( child.get_policy()[ 0 ], Gtk.PolicyType.NEVER ) 
 
         if changeLog is None: return # No point continuing as the changelog will not be displayed and this dialog reverts to the AboutDialog.
 
@@ -165,7 +166,7 @@ class AboutDialog( Gtk.AboutDialog ):
 
         changeLogTabIndex = notebook.append_page( scrolledWindow, Gtk.Label( "" ) ) # The tab is hidden so the label contents are irrelevant.
 
-        changeLogButton = Gtk.ToggleButton( AboutDialog.CHANGELOG_BUTTON_NAME )
+        changeLogButton = Gtk.ToggleButton( changeLogButtonName )
         changeLogButton.set_use_underline( True )
         changeLogButton.show()
 
