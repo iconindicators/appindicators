@@ -34,7 +34,6 @@ INDICATOR_NAME = "indicator-stardate"
 import gettext
 gettext.install( INDICATOR_NAME )
 
-
 from gi.repository import AppIndicator3, GLib, Gtk
 
 import datetime, gzip, json, logging, os, pythonutils, re, shutil, stardate, sys
