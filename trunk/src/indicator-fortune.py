@@ -48,14 +48,14 @@ class IndicatorFortune:
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
-    DESKTOP_FILE = NAME + ".desktop"
+    DESKTOP_FILE = INDICATOR_NAME + ".desktop"
 
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
 
     COMMENTS = _( "Calls the 'fortune' program displaying the result in the on-screen notification." )
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_FORTUNES = "fortunes"
     SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
     SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW = 1
@@ -193,8 +193,8 @@ class IndicatorFortune:
                 Gtk.License.GPL_3_0, 
                 IndicatorFortune.ICON,
                 [ IndicatorFortune.AUTHOR ],
-                IndicatorFortune.CREDITS,
-                _( "Credits" ),
+                "",
+                "",
                 "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
                 _( "Change _Log" ),
                 _( "translator-credits" ),
