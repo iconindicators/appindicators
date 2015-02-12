@@ -1,3 +1,13 @@
+indicator-stardate (1.0.26-1) precise; urgency=low
+
+  * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
+    in this miracle! 
+  * About dialog changed to accept translator information.
+  * Overhaul of repository and build script.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 12 Feb 2015 23:21:40 +1000
+
+
 indicator-stardate (1.0.25-1) precise; urgency=low
 
   * Neatened up the left alignment changelog text in the About dialog.
