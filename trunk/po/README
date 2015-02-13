@@ -1,0 +1,75 @@
+To prepare a single source .py file for translation
+---------------------------------------------------
+
+Ensure the first lines of code in the source (before imports) is:
+
+INDICATOR_NAME = "indicator-virtual-box"
+import gettext
+gettext.install( INDICATOR_NAME )
+
+
+Each simple/static string should be changed from:
+
+"This is static text without variables"
+
+to:
+
+_( "This is static text without variables" )
+
+as per http://www.gnu.org/software/gettext/manual/gettext.html#Sources
+
+
+If the About dialog from pythonutils is used, ensure that the 'translator' parameter is set to:
+
+_( "translator-credits" )
+
+which will allow a translator to add their name(s) in the eventual PO translation file.  For example:
+
+msgid "translator-credits"
+msgstr "John Smith"
+
+
+Create the PO Template
+----------------------
+
+In a terminal, generate the PO template file from the source file:
+
+xgettext inputSource.py
+
+This produces a file messages.po which should be renamed to inputSource.pot
+
+Edit inputSource.pot and modify/complete fields as per http://www.gnu.org/software/gettext/manual/gettext.html#Header-Entry.
+
+Place the inputSource.pot file in the directory po directory, located under the main project directory.
+
+
+Create a POTFILES.in and place in the po directory.  To this file list (one per line) each file to be translated.
+Initially there will be one entry only:
+
+src/indicator-virtual-box.py
+
+
+Create a LINGUAS file and place in the po directory. 
+As each PO file is created for a new language, add the language/locale code to that file on a single line, where each code separated by whitespace.
+
+
+Create a PO file for each new translation
+-----------------------------------------
+
+http://www.gnu.org/software/gettext/manual/gettext.html#Creating
+
+To create a translation file for new language (for example German, de), run from the terminal:
+
+msginit --locale=de --input=inputSource.pot‏
+
+which creates the file de.po (same name as the language code).
+
+Place de.po into a directory called de under the po directory.
+
+Rename the file from de.po to inputSource.po
+
+Edit inputSource.po and ensure that PO-Revision-Date and Last-Translator are updated.
+
+For each msgid ensure the msgstr is filled out for the language.
+
+The build-debian script at the main project directory will automatically build the .mo files and package them for distribution.

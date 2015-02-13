@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays/controls VirtualBox virtual machines.
+# Application indicator which displays/controls VirtualBox™ virtual machines.
 
 
 # References:
@@ -35,6 +36,10 @@
 # The VirtualBox.xml file does seem to reflect the change (and the indicator obeys this file).
 
 
+INDICATOR_NAME = "indicator-virtual-box"
+import gettext
+gettext.install( INDICATOR_NAME )
+
 from gi.repository import AppIndicator3, GLib, Gtk
 
 import gzip, json, locale, logging, os, pythonutils, re, shutil, subprocess, sys, time, virtualmachine
@@ -43,15 +48,14 @@ import gzip, json, locale, logging, os, pythonutils, re, shutil, subprocess, sys
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    NAME = "indicator-virtual-box"
-    VERSION = "1.0.36"
-    ICON = NAME
-    LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
+    VERSION = "1.0.37"
+    ICON = INDICATOR_NAME
+    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
-    DESKTOP_FILE = NAME + ".desktop"
+    DESKTOP_FILE = INDICATOR_NAME + ".desktop"
 
     # Seems that the configuration file has moved between versions of VirtualBox.
     # In fact the config file can exist in TWO places simultaneously...
@@ -61,9 +65,9 @@ class IndicatorVirtualBox:
 
     VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS = 5
 
-    COMMENTS = " Shows VirtualBox™ virtual machines and allows them to be started."
+    COMMENTS = _( " Shows VirtualBox™ virtual machines and allows them to be started." )
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_DELAY_BETWEEN_AUTO_START = "delayBetweenAutoStartInSeconds"
     SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     SETTINGS_SHOW_SUBMENU = "showSubmenu"
@@ -93,7 +97,7 @@ class IndicatorVirtualBox:
                 radioButton.props.name = virtualMachineInfo.getUUID()
                 self.onStartVirtualMachine( radioButton, False )
 
-        self.indicator = AppIndicator3.Indicator.new( IndicatorVirtualBox.NAME, IndicatorVirtualBox.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorVirtualBox.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
         self.buildMenu()
@@ -109,7 +113,7 @@ class IndicatorVirtualBox:
         if self.isVirtualBoxInstalled():
             self.getVirtualMachines()
             if len( self.virtualMachineInfos ) == 0:
-                menu.append( Gtk.MenuItem( "(no virtual machines exist)" ) )
+                menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
             else:
                 if self.showSubmenu == True:
                     stack = [ ]
@@ -156,11 +160,11 @@ class IndicatorVirtualBox:
 
             menu.append( Gtk.SeparatorMenuItem() )
 
-            self.virtualBoxMenuItem = Gtk.MenuItem( "Launch VirtualBox Manager" )
+            self.virtualBoxMenuItem = Gtk.MenuItem( _( "Launch VirtualBox Manager" ) )
             self.virtualBoxMenuItem.connect( "activate", self.onLaunchVirtualBox )
             menu.append( self.virtualBoxMenuItem )
         else:
-            menu.insert( Gtk.MenuItem( "(VirtualBox is not installed)" ), 0 )
+            menu.insert( Gtk.MenuItem( _( "(VirtualBox is not installed)" ) ), 0 )
             menu.append( Gtk.SeparatorMenuItem() )
 
         menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
@@ -357,10 +361,10 @@ class IndicatorVirtualBox:
         virtualMachineInfo = self.getVirtualMachineInfo( virtualMachineUUID )
         virtualMachineName = virtualMachineInfo.getName()
         if virtualMachineName is None:
-            pythonutils.showMessage( None, Gtk.MessageType.ERROR, "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
+            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." ) )
         elif virtualMachineInfo.isRunning:
             if self.duplicateVirtualMachineNameExists( virtualMachineName ):
-                pythonutils.showMessage( None, Gtk.MessageType.ERROR, "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified." )
+                pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified." ) )
             else:
                 windowID = None
                 p = subprocess.Popen( "wmctrl -l", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
@@ -372,7 +376,7 @@ class IndicatorVirtualBox:
                 p.wait()
 
                 if windowID is None:
-                    pythonutils.showMessage( None, Gtk.MessageType.ERROR, "The VM is running but its window could not be found - perhaps it is running headless" )
+                    pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM is running but its window could not be found - perhaps it is running headless" ) )
                 else:
                     # If the VM is running headless then there will be no window to display...
                     p = subprocess.Popen( "wmctrl -i -a " + windowID, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
@@ -389,7 +393,7 @@ class IndicatorVirtualBox:
                 time.sleep( IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS )
 
             except Exception as e:
-                pythonutils.showMessage( None, Gtk.MessageType.ERROR, "The VM '" + virtualMachineInfo.getName() + "' could not be started - check the log file: " + IndicatorVirtualBox.LOG )
+                pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM '{0}' could not be started - check the log file: {1}" ).format( virtualMachineInfo.getName(), IndicatorVirtualBox.LOG ) )
                 logging.exception( e )
 
         if doRefresh: self.onRefresh()
@@ -441,10 +445,10 @@ class IndicatorVirtualBox:
         tree.expand_all()
         tree.set_hexpand( True )
         tree.set_vexpand( True )
-        tree.append_column( Gtk.TreeViewColumn( "Virtual Machine", Gtk.CellRendererText(), text = 0 ) )
-        tree.append_column( Gtk.TreeViewColumn( "Autostart", Gtk.CellRendererPixbuf(), stock_id = 1 ) )
-        tree.append_column( Gtk.TreeViewColumn( "Start Command", Gtk.CellRendererText(), text = 2 ) )
-        tree.set_tooltip_text( "Double click to edit a VM's properties." )
+        tree.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = 0 ) )
+        tree.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = 1 ) )
+        tree.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = 2 ) )
+        tree.set_tooltip_text( _( "Double click to edit a VM's properties." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onVMDoubleClick )
 
@@ -452,7 +456,7 @@ class IndicatorVirtualBox:
         scrolledWindow.add( tree )
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
 
-        notebook.append_page( scrolledWindow, Gtk.Label( "Virtual Machines" ) )
+        notebook.append_page( scrolledWindow, Gtk.Label( _( "Virtual Machines" ) ) )
 
         # General settings.
         grid = Gtk.Grid()
@@ -467,16 +471,16 @@ class IndicatorVirtualBox:
         grid.set_margin_bottom( 10 )
         grid.set_margin_bottom( 10 )
 
-        showAsSubmenusCheckbox = Gtk.CheckButton( "Show groups as submenus" )
+        showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show groups as submenus" ) )
         showAsSubmenusCheckbox.set_tooltip_text(
-            "Groups can be shown with their VMs in submenus,\n" + \
-            "or shown with their VMs as an indented list." )
+            _( "Groups can be shown with their VMs in submenus,\n" + \
+            "or shown with their VMs as an indented list." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
 
-        sortAlphabeticallyCheckbox = Gtk.CheckButton( "Sort VMs alphabetically" )
+        sortAlphabeticallyCheckbox = Gtk.CheckButton( _( "Sort VMs alphabetically" ) )
         sortAlphabeticallyCheckbox.set_tooltip_text( 
-            "VMs can be sorted alphabetically or\n" + \
-            "as set in the VirtualBox Manager." )
+            _( "VMs can be sorted alphabetically or\n" + \
+            "as set in the VirtualBox Manager." ) )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
 
         # Only show one of these, depending if groups are present or not...
@@ -485,34 +489,34 @@ class IndicatorVirtualBox:
         else:
             grid.attach( sortAlphabeticallyCheckbox, 0, 0, 2, 1 )
 
-        label = Gtk.Label( "Refresh interval (minutes)" )
+        label = Gtk.Label( _( "Refresh interval (minutes)" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 1, 1 )
 
         spinnerRefreshInterval = Gtk.SpinButton()
         spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
-        spinnerRefreshInterval.set_tooltip_text( "How often the list of VMs and\nrunning status is updated." )
+        spinnerRefreshInterval.set_tooltip_text( _( "How often the list of VMs and\nrunning status is updated." ) )
         grid.attach( spinnerRefreshInterval, 1, 1, 1, 1 )
 
-        label = Gtk.Label( "Startup delay (seconds)" )
+        label = Gtk.Label( _( "Startup delay (seconds)" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 2, 1, 1 )
 
         spinnerDelay = Gtk.SpinButton()
         spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to force the initial value by explicitly setting it.
-        spinnerDelay.set_tooltip_text( "Amount of time to wait from\nstarting one VM to the next." )
+        spinnerDelay.set_tooltip_text( _( "Amount of time to wait from\nstarting one VM to the next." ) )
         grid.attach( spinnerDelay, 1, 2, 1, 1 )
 
-        autostartIndicatorCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartIndicatorCheckbox.set_tooltip_text( "Run the indicator automatically." )
+        autostartIndicatorCheckbox = Gtk.CheckButton( _( "Autostart" ) )
+        autostartIndicatorCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartIndicatorCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
         grid.attach( autostartIndicatorCheckbox, 0, 3, 2, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "General" ) )
+        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorVirtualBox.ICON )
@@ -573,7 +577,7 @@ class IndicatorVirtualBox:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        label = Gtk.Label( "Start Command" )
+        label = Gtk.Label( _( "Start Command" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
@@ -583,17 +587,17 @@ class IndicatorVirtualBox:
             startCommand.set_text( model[ treeiter ][ 2 ] )
             startCommand.set_width_chars( len( model[ treeiter ][ 2 ] ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
-        startCommand.set_tooltip_text( "The terminal command to start the VM such as\n\t'VBoxManage startvm %VM%' or\n\t'VBoxHeadless --startvm %VM% --vrde off'" )
+        startCommand.set_tooltip_text( _( "The terminal command to start the VM such as\n\t'VBoxManage startvm %VM%' or\n\t'VBoxHeadless --startvm %VM% --vrde off'" ) )
         startCommand.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( startCommand, 1, 0, 1, 1 )
 
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_tooltip_text( "Run the VM when the indicator starts" )
+        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
+        autostartCheckbox.set_tooltip_text( _( "Run the VM when the indicator starts" ) )
         autostartCheckbox.set_active( model[ treeiter ][ 1 ] is not None and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
         # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
-        dialog = Gtk.Dialog( "VM Properties", self.dialog, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog = Gtk.Dialog( _( "VM Properties" ), self.dialog, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorVirtualBox.ICON )
@@ -604,12 +608,12 @@ class IndicatorVirtualBox:
             if dialog.run() != Gtk.ResponseType.OK: break
 
             if startCommand.get_text().strip() == "":
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The start command cannot be empty." )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command cannot be empty." ) )
                 startCommand.grab_focus()
                 continue
 
             if not "%VM%" in startCommand.get_text().strip():
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "The start command must contain %VM% which is substituted for the VM name/id." )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command must contain %VM% which is substituted for the VM name/id." ) )
                 startCommand.grab_focus()
                 continue
 
@@ -642,18 +646,20 @@ class IndicatorVirtualBox:
             return
 
         self.dialog = pythonutils.AboutDialog( 
-               IndicatorVirtualBox.NAME,
-               IndicatorVirtualBox.COMMENTS, 
-               IndicatorVirtualBox.WEBSITE, 
-               IndicatorVirtualBox.WEBSITE, 
-               IndicatorVirtualBox.VERSION, 
-               Gtk.License.GPL_3_0, 
-               IndicatorVirtualBox.ICON,
-               [ IndicatorVirtualBox.AUTHOR ],
-               "",
-               "",
-               "/usr/share/doc/" + IndicatorVirtualBox.NAME + "/changelog.Debian.gz",
-               logging )
+                INDICATOR_NAME,
+                IndicatorVirtualBox.COMMENTS, 
+                IndicatorVirtualBox.WEBSITE, 
+                IndicatorVirtualBox.WEBSITE, 
+                IndicatorVirtualBox.VERSION, 
+                Gtk.License.GPL_3_0, 
+                IndicatorVirtualBox.ICON,
+                [ IndicatorVirtualBox.AUTHOR ],
+                "",
+                "",
+                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
+                _( "Change _Log" ),
+                _( "translator-credits" ),
+                logging )
 
         self.dialog.run()
         self.dialog.destroy()

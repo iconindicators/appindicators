@@ -1,50 +1,77 @@
 #!/bin/bash
+#
+# Build the DEBIAN source files for upload to LaunchPad PPA.
+# Ensure the version number below matches that in src/indicator-virtual-box.py and packaging/debian/changelog.  
 
 
-BUILD_DIR="build"
 NAME="indicator-virtual-box"
-VERSION=1.0.36
+VERSION="1.0.37"
 PYTHON_UTILS=../PythonUtils/src/pythonutils.py
+
+
+# Initialisation.
+rm -rf build
 
 if [ ! -f $PYTHON_UTILS ];
 then
     echo "$PYTHON_UTILS not found - ABORTING!" && exit 0
 fi
 
-rm -rf $BUILD_DIR
 
-mkdir -p $BUILD_DIR/$NAME-$VERSION
-cp $NAME.desktop $BUILD_DIR/$NAME-$VERSION
-cp build-debian $BUILD_DIR/$NAME-$VERSION
+# Copy top level files.
+mkdir -p build/$NAME-$VERSION
+cp $NAME.desktop build/$NAME-$VERSION
+cp build-debian build/$NAME-$VERSION
 
-mkdir -p $BUILD_DIR/$NAME-$VERSION/src
-cp src/indicator-virtual-box.py src/virtualmachine.py $PYTHON_UTILS $BUILD_DIR/$NAME-$VERSION/src
 
-mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/elementary
-cp icons/indicator-virtual-box-elementary.svg $BUILD_DIR/$NAME-$VERSION/icons/elementary/indicator-virtual-box.svg
+# Python source.
+mkdir -p build/$NAME-$VERSION/src
+cp src/indicator-virtual-box.py src/virtualmachine.py $PYTHON_UTILS build/$NAME-$VERSION/src
 
-mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/hicolor
-cp icons/indicator-virtual-box-hicolor.svg $BUILD_DIR/$NAME-$VERSION/icons/hicolor/indicator-virtual-box.svg
 
-mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/lubuntu
-cp icons/indicator-virtual-box-lubuntu.svg $BUILD_DIR/$NAME-$VERSION/icons/lubuntu/indicator-virtual-box.svg
+# Icons.
+rsync -ar --exclude=.svn --include=*.svg icons build/$NAME-$VERSION
 
-mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-dark
-cp icons/indicator-virtual-box-ubuntu-mono-dark.svg $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-dark/indicator-virtual-box.svg
 
-mkdir -p $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-light
-cp icons/indicator-virtual-box-ubuntu-mono-light.svg $BUILD_DIR/$NAME-$VERSION/icons/ubuntu-mono-light/indicator-virtual-box.svg
+# Translations.
+rsync -ar --exclude=.svn --include=*.po po build/$NAME-$VERSION
+cp po/LINGUAS po/POTFILES.in po/README build/$NAME-$VERSION/po
 
-cd $BUILD_DIR
+
+# Create .mo
+for PO_FILE in $(find build/$NAME-$VERSION/po -type f -name '*.po') ; do
+  msgfmt $PO_FILE --output-file ${PO_FILE%\.po}.mo
+done
+
+
+# Create orig.tar.gz
+cd build
 tar -czf "${NAME}_${VERSION}.orig.tar.gz" $NAME-$VERSION
 cd ..
 
-mkdir -p $BUILD_DIR/$NAME-$VERSION/debian
-cp -r packaging/debian $BUILD_DIR/$NAME-$VERSION
 
-cd $BUILD_DIR/$NAME-$VERSION
-debuild -S -sa 
+# Debian files.
+rsync -ar --exclude=.svn packaging/debian build/$NAME-$VERSION
+
+
+# Update debian/install file with .mo
+cd build/$NAME-$VERSION
+for MO_FILE in $(find po -type f -name '*.mo') ; do
+  MO_PATH=${MO_FILE#po}
+  MO_CODE=${MO_PATH%$NAME.mo}
+  echo "$MO_FILE /usr/share/locale${MO_CODE}LC_MESSAGES" >> debian/install
+done
+cd ../..
+
+
+# Build DEB source.
+cd build/$NAME-$VERSION
+debuild -S -sa         # Builds a DEB source file.
+#debuild -sa -us -uc   # Builds a DEB binary file.
 cd ..
-rm -rf $NAME-$VERSION
 
-echo "Now run from the build directory: dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes"
+
+# Clean up.
+rm -rf $NAME-$VERSION
+echo "To upload to LaunchPad, change to the 'build' directory and run:"
+echo "    dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes"

@@ -1,3 +1,13 @@
+indicator-virtual-box (1.0.37-1) precise; urgency=low
+
+  * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
+    in this miracle! 
+  * About dialog changed to accept translator information.
+  * Overhaul of repository structure and build script.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 13 Feb 2015 10:34:53 +1000
+
+
 indicator-virtual-box (1.0.36-1) precise; urgency=low
 
   * Neatened up the left alignment changelog text in the About dialog.
