@@ -32,6 +32,10 @@
 #  http://help.launchpad.net/API/Hacking
 
 
+INDICATOR_NAME = "indicator-ppa-download-statistics"
+import gettext
+gettext.install( INDICATOR_NAME )
+
 from copy import deepcopy
 from gi.repository import AppIndicator3, Gio, GLib, Gtk, Notify
 from ppa import PPA, PublishedBinary
@@ -44,24 +48,23 @@ import itertools, pythonutils, json, locale, logging, operator, os, re, shutil, 
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    NAME = "indicator-ppa-download-statistics"
-    ICON = NAME
+    ICON = INDICATOR_NAME
     VERSION = "1.0.45"
-    LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"
+    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
-    DESKTOP_FILE = NAME + ".desktop"
+    DESKTOP_FILE = INDICATOR_NAME + ".desktop"
 
     SERIES = [ "vivid", "utopic", "trusty", "saucy", "raring", "quantal", "precise", "oneiric", "natty", "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy", "gutsy", "feisty", "edgy", "dapper", "breezy", "hoary", "warty" ]
     ARCHITECTURES = [ "amd64", "i386" ]
 
-    COMMENTS = "Shows the total downloads of PPAs."
-    SVG_ICON = "." + NAME + "-icon"
+    COMMENTS = _( "Shows the total downloads of PPAs." )
+    SVG_ICON = "." + INDICATOR_NAME + "-icon"
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + NAME + ".json"
+    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER = "allowMenuItemsToLaunchBrowser"
     SETTINGS_COMBINE_PPAS = "combinePPAs"
     SETTINGS_FILTERS = "filters"
@@ -72,11 +75,11 @@ class IndicatorPPADownloadStatistics:
     SETTINGS_SORT_BY_DOWNLOAD = "sortByDownload"
     SETTINGS_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
 
-    MESSAGE_DOWNLOADING_DATA = "(downloading data...)"
-    MESSAGE_ERROR_RETRIEVING_PPA = "(error retrieving PPA)"
-    MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE = "(multiple messages - uncombine PPAs)"
-    MESSAGE_NO_PUBLISHED_BINARIES = "(no published binaries)"
-    MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED = "(published binaries completely filtered)"
+    MESSAGE_DOWNLOADING_DATA = _( "(downloading data...)" )
+    MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
+    MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE = _( "(multiple messages - uncombine PPAs)" )
+    MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
+    MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED = _( "(published binaries completely filtered)" )
 
 
     def __init__( self ):
@@ -86,7 +89,7 @@ class IndicatorPPADownloadStatistics:
         self.lock = threading.Lock()
         self.downloadInProgress = False
         self.preferencesOpen = False
-        Notify.init( IndicatorPPADownloadStatistics.NAME )
+        Notify.init( INDICATOR_NAME )
         self.quitRequested = False
 
         filehandler = pythonutils.TruncatedFileHandler( IndicatorPPADownloadStatistics.LOG, "a", 10000, None, True )
@@ -94,7 +97,7 @@ class IndicatorPPADownloadStatistics:
 
         self.loadSettings()
 
-        self.indicator = AppIndicator3.Indicator.new( IndicatorPPADownloadStatistics.NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.buildMenu()
@@ -273,19 +276,21 @@ class IndicatorPPADownloadStatistics:
             self.dialog.present()
             return
 
-        self.dialog = pythonutils.AboutDialog( 
-               IndicatorPPADownloadStatistics.NAME,
-               IndicatorPPADownloadStatistics.COMMENTS, 
-               IndicatorPPADownloadStatistics.WEBSITE, 
-               IndicatorPPADownloadStatistics.WEBSITE, 
-               IndicatorPPADownloadStatistics.VERSION, 
-               Gtk.License.GPL_3_0, 
-               IndicatorPPADownloadStatistics.ICON,
-               [ IndicatorPPADownloadStatistics.AUTHOR ],
-               "",
-               "",
-               "/usr/share/doc/" + IndicatorPPADownloadStatistics.NAME + "/changelog.Debian.gz",
-               logging )
+        self.dialog = pythonutils.AboutDialog(
+                INDICATOR_NAME,
+                IndicatorPPADownloadStatistics.COMMENTS, 
+                IndicatorPPADownloadStatistics.WEBSITE, 
+                IndicatorPPADownloadStatistics.WEBSITE, 
+                IndicatorPPADownloadStatistics.VERSION, 
+                Gtk.License.GPL_3_0, 
+                IndicatorPPADownloadStatistics.ICON,
+                [ IndicatorPPADownloadStatistics.AUTHOR ],
+                "",
+                "",
+                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
+                _( "Change _Log" ),
+                _( "translator-credits" ),
+                logging )
 
         self.dialog.run()
         self.dialog.destroy()
@@ -294,7 +299,7 @@ class IndicatorPPADownloadStatistics:
 
     def onPreferences( self, widget ):
         if self.downloadInProgress:
-            Notify.Notification.new( "Downloading data...", "Preferences are currently unavailable.", IndicatorPPADownloadStatistics.ICON ).show()
+            Notify.Notification.new( _( "Downloading data..." ), _( "Preferences are currently unavailable." ), IndicatorPPADownloadStatistics.ICON ).show()
             return
 
         if self.dialog is not None:
@@ -323,11 +328,11 @@ class IndicatorPPADownloadStatistics:
         ppaTree = Gtk.TreeView( ppaStore )
         ppaTree.set_hexpand( True )
         ppaTree.set_vexpand( True )
-        ppaTree.append_column( Gtk.TreeViewColumn( "PPA User", Gtk.CellRendererText(), text = 0 ) )
-        ppaTree.append_column( Gtk.TreeViewColumn( "PPA Name", Gtk.CellRendererText(), text = 1 ) )
-        ppaTree.append_column( Gtk.TreeViewColumn( "Series", Gtk.CellRendererText(), text = 2 ) )
-        ppaTree.append_column( Gtk.TreeViewColumn( "Architecture", Gtk.CellRendererText(), text = 3 ) )
-        ppaTree.set_tooltip_text( "Double click to edit a PPA." )
+        ppaTree.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
+        ppaTree.append_column( Gtk.TreeViewColumn( _( "PPA Name" ), Gtk.CellRendererText(), text = 1 ) )
+        ppaTree.append_column( Gtk.TreeViewColumn( _( "Series" ), Gtk.CellRendererText(), text = 2 ) )
+        ppaTree.append_column( Gtk.TreeViewColumn( _( "Architecture" ), Gtk.CellRendererText(), text = 3 ) )
+        ppaTree.set_tooltip_text( _( "Double click to edit a PPA." ) )
         ppaTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         ppaTree.connect( "row-activated", self.onPPADoubleClick )
 
@@ -339,20 +344,20 @@ class IndicatorPPADownloadStatistics:
         hbox = Gtk.Box( spacing = 6 )
         hbox.set_homogeneous( True )
 
-        addButton = Gtk.Button( "Add" )
-        addButton.set_tooltip_text( "Add a new PPA." )
+        addButton = Gtk.Button( _( "Add" ) )
+        addButton.set_tooltip_text( _( "Add a new PPA." ) )
         addButton.connect( "clicked", self.onPPAAdd, ppaTree )
         hbox.pack_start( addButton, True, True, 0 )
 
-        removeButton = Gtk.Button( "Remove" )
-        removeButton.set_tooltip_text( "Remove the selected PPA." )
+        removeButton = Gtk.Button( _( "Remove" ) )
+        removeButton.set_tooltip_text( _( "Remove the selected PPA." ) )
         removeButton.connect( "clicked", self.onPPARemove, ppaTree )
         hbox.pack_start( removeButton, True, True, 0 )
 
         hbox.set_halign( Gtk.Align.CENTER )
         grid.attach( hbox, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "PPAs" ) )
+        notebook.append_page( grid, Gtk.Label( _( "PPAs" ) ) )
 
         # Filters.
         grid = Gtk.Grid()
@@ -371,9 +376,9 @@ class IndicatorPPADownloadStatistics:
         filterTree.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
         filterTree.set_hexpand( True )
         filterTree.set_vexpand( True )
-        filterTree.append_column( Gtk.TreeViewColumn( "PPA", Gtk.CellRendererText(), text = 0 ) )
-        filterTree.append_column( Gtk.TreeViewColumn( "Filter", Gtk.CellRendererText(), text = 1 ) )
-        filterTree.set_tooltip_text( "Double click to edit a filter." )
+        filterTree.append_column( Gtk.TreeViewColumn( _( "PPA" ), Gtk.CellRendererText(), text = 0 ) )
+        filterTree.append_column( Gtk.TreeViewColumn( _( "Filter" ), Gtk.CellRendererText(), text = 1 ) )
+        filterTree.set_tooltip_text( _( "Double click to edit a filter." ) )
         filterTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         filterTree.connect( "row-activated", self.onFilterDoubleClick, ppaTree )
 
@@ -385,20 +390,20 @@ class IndicatorPPADownloadStatistics:
         hbox = Gtk.Box( spacing = 6 )
         hbox.set_homogeneous( True )
 
-        addButton = Gtk.Button( "Add" )
-        addButton.set_tooltip_text( "Add a new filter." )
+        addButton = Gtk.Button( _( "Add" ) )
+        addButton.set_tooltip_text( _( "Add a new filter." ) )
         addButton.connect( "clicked", self.onFilterAdd, filterTree, ppaTree )
         hbox.pack_start( addButton, True, True, 0 )
 
-        removeButton = Gtk.Button( "Remove" )
-        removeButton.set_tooltip_text( "Remove the selected filter." )
+        removeButton = Gtk.Button( _( "Remove" ) )
+        removeButton.set_tooltip_text( _( "Remove the selected filter." ) )
         removeButton.connect( "clicked", self.onFilterRemove, filterTree )
         hbox.pack_start( removeButton, True, True, 0 )
 
         hbox.set_halign( Gtk.Align.CENTER )
         grid.attach( hbox, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "Filters" ) )
+        notebook.append_page( grid, Gtk.Label( _( "Filters" ) ) )
 
         # General settings.
         grid = Gtk.Grid()
@@ -409,46 +414,46 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showAsSubmenusCheckbox = Gtk.CheckButton( "Show PPAs as submenus" )
-        showAsSubmenusCheckbox.set_tooltip_text( "The download statistics for each PPA\nare shown in a separate submenu." )
+        showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show PPAs as submenus" ) )
+        showAsSubmenusCheckbox.set_tooltip_text( _( "The download statistics for each PPA\nare shown in a separate submenu." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
-        combinePPAsCheckbox = Gtk.CheckButton( "Combine PPAs" )
-        toolTip =  "Combine the statistics of binary packages\n"
-        toolTip += "when the PPA user/name are the same.\n\n"
-        toolTip += "When a package is NOT architecture specific:\n"
-        toolTip += "If the package names and version numbers\n"
-        toolTip += "of two binary packages are identical,\n"
-        toolTip += "the packages are treated as the same package\n"
-        toolTip += "and the download counts are NOT summed.\n"
-        toolTip += "Packages such as Python fall into this category.\n\n"
-        toolTip += "When a package IS architecture specific:\n"
-        toolTip += "If the package names and version numbers\n"
-        toolTip += "of two binary packages are identical,\n"
-        toolTip += "the packages are treated as the same package\n"
-        toolTip += "and the download counts ARE summed.\n"
-        toolTip += "Packages such as compiled C fall into this category."
+        combinePPAsCheckbox = Gtk.CheckButton( _( "Combine PPAs" ) )
+        toolTip = _( "Combine the statistics of binary packages\n" + \
+                     "when the PPA user/name are the same.\n\n" + \
+                     "When a package is NOT architecture specific:\n" + \
+                     "If the package names and version numbers\n" + \
+                     "of two binary packages are identical,\n" + \
+                     "the packages are treated as the same package\n" + \
+                     "and the download counts are NOT summed.\n" + \
+                     "Packages such as Python fall into this category.\n\n" + \
+                     "When a package IS architecture specific:\n" + \
+                     "If the package names and version numbers\n" + \
+                     "of two binary packages are identical,\n" + \
+                     "the packages are treated as the same package\n" + \
+                     "and the download counts ARE summed.\n" + \
+                     "Packages such as compiled C fall into this category." )
         combinePPAsCheckbox.set_tooltip_text( toolTip )
         combinePPAsCheckbox.set_active( self.combinePPAs )
         combinePPAsCheckbox.set_margin_top( 10 )
         grid.attach( combinePPAsCheckbox, 0, 1, 2, 1 )
 
-        ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( "Ignore version for architecture specific" )
+        ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( _( "Ignore version for architecture specific" ) )
         ignoreVersionArchitectureSpecificCheckbox.set_margin_left( 15 )
 
-        toolTip =  "Sometimes architecture specific packages with the\n"
-        toolTip += "same package name but different version 'number'\n"
-        toolTip += "are logically the SAME package.\n\n"
-        toolTip += "For example, a C source package for both\n"
-        toolTip += "Ubuntu Saucy and Ubuntu Trusty will be compiled\n"
-        toolTip += "twice, each with a different version 'number',\n"
-        toolTip += "despite being the SAME release.\n\n"
-        toolTip += "Checking this option will ignore the version\n"
-        toolTip += "number when determining if two architecture\n"
-        toolTip += "specific packages are identical.\n\n"
-        toolTip += "The version number is retained only if it is\n"
-        toolTip += "identical across ALL instances of a published binary."
+        toolTip = _( "Sometimes architecture specific packages with the\n" + \
+                     "same package name but different version 'number'\n" + \
+                     "are logically the SAME package.\n\n" + \
+                     "For example, a C source package for both\n" + \
+                     "Ubuntu Saucy and Ubuntu Trusty will be compiled\n" + \
+                     "twice, each with a different version 'number',\n" + \
+                     "despite being the SAME release.\n\n" + \
+                     "Checking this option will ignore the version\n" + \
+                     "number when determining if two architecture\n" + \
+                     "specific packages are identical.\n\n" + \
+                     "The version number is retained only if it is\n" + \
+                     "identical across ALL instances of a published binary." )
         ignoreVersionArchitectureSpecificCheckbox.set_tooltip_text( toolTip )
         ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
@@ -456,13 +461,13 @@ class IndicatorPPADownloadStatistics:
 
         combinePPAsCheckbox.connect( "toggled", self.onCombinePPAsCheckbox, ignoreVersionArchitectureSpecificCheckbox )
 
-        sortByDownloadCheckbox = Gtk.CheckButton( "Sort by download" )
-        sortByDownloadCheckbox.set_tooltip_text( "Sort by download count\nwithin each PPA." )
+        sortByDownloadCheckbox = Gtk.CheckButton( _( "Sort by download" ) )
+        sortByDownloadCheckbox.set_tooltip_text( _( "Sort by download count\nwithin each PPA." ) )
         sortByDownloadCheckbox.set_active( self.sortByDownload )
         sortByDownloadCheckbox.set_margin_top( 10 )
         grid.attach( sortByDownloadCheckbox, 0, 3, 2, 1 )
 
-        label = Gtk.Label( "  Clip amount" )
+        label = Gtk.Label( _( "  Clip amount" ) )
         label.set_sensitive( sortByDownloadCheckbox.get_active() )
         label.set_margin_left( 15 )
         grid.attach( label, 0, 4, 1, 1 )
@@ -470,33 +475,33 @@ class IndicatorPPADownloadStatistics:
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.sortByDownloadAmount ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( "Limit the number of entries\nwhen sorting by download.\n\nA value of zero will not clip." )
+        spinner.set_tooltip_text( _( "Limit the number of entries\nwhen sorting by download.\n\nA value of zero will not clip." ) )
         spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
         grid.attach( spinner, 1, 4, 1, 1 )
 
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
-        showNotificationOnUpdateCheckbox = Gtk.CheckButton( "Notify on update" )
-        showNotificationOnUpdateCheckbox.set_tooltip_text( "Show a screen notification when the PPA\ndownload statistics have been updated AND\nare different to the last download." )
+        showNotificationOnUpdateCheckbox = Gtk.CheckButton( _( "Notify on update" ) )
+        showNotificationOnUpdateCheckbox.set_tooltip_text( _( "Show a screen notification when the PPA\ndownload statistics have been updated AND\nare different to the last download." ) )
         showNotificationOnUpdateCheckbox.set_active( self.showNotificationOnUpdate )
         showNotificationOnUpdateCheckbox.set_margin_top( 10 )
         grid.attach( showNotificationOnUpdateCheckbox, 0, 5, 2, 1 )
 
-        allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( "Open PPA in browser" )
-        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( "Clicking a PPA menu item loads the\nPPA's page in the default browser." )
+        allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( _( "Open PPA in browser" ) )
+        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( _( "Clicking a PPA menu item loads the\nPPA's page in the default browser." ) )
         allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
         allowMenuItemsToLaunchBrowserCheckbox.set_margin_top( 10 )
         grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 6, 2, 1 )
 
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
+        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
-        autostartCheckbox.set_tooltip_text( "Run the indicator automatically." )
+        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 7, 2, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "General" ) )
+        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
@@ -564,11 +569,11 @@ class IndicatorPPADownloadStatistics:
         model, treeiter = tree.get_selection().get_selected()
 
         if treeiter is None:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "No PPA has been selected for removal." )
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No PPA has been selected for removal." ) )
             return
 
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-        if pythonutils.showOKCancel( self.dialog, "Remove the selected PPA?" ) == Gtk.ResponseType.OK:
+        if pythonutils.showOKCancel( self.dialog, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:
             model.remove( treeiter )
             self.ppasOrFiltersModified = True
 
@@ -587,7 +592,7 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        label = Gtk.Label( "PPA User" )
+        label = Gtk.Label( _( "PPA User" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
@@ -611,7 +616,7 @@ class IndicatorPPADownloadStatistics:
 
         grid.attach( ppaUser, 1, 0, 1, 1 )
 
-        label = Gtk.Label( "PPA Name" )
+        label = Gtk.Label( _( "PPA Name" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 1, 1 )
 
@@ -633,7 +638,7 @@ class IndicatorPPADownloadStatistics:
 
         grid.attach( ppaName, 1, 1, 1, 1 )
 
-        label = Gtk.Label( "Series" )
+        label = Gtk.Label( _( "Series" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 2, 1, 1 )
 
@@ -646,7 +651,7 @@ class IndicatorPPADownloadStatistics:
 
         grid.attach( series, 1, 2, 1, 1 )
 
-        label = Gtk.Label( "Architecture" )
+        label = Gtk.Label( _( "Architecture" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 3, 1, 1 )
 
@@ -658,8 +663,8 @@ class IndicatorPPADownloadStatistics:
 
         grid.attach( architectures, 1, 3, 1, 1 )
 
-        title = "Edit PPA"
-        if rowNumber is None: title = "Add PPA"
+        title = _( "Edit PPA" )
+        if rowNumber is None: title = _( "Add PPA" )
 
         dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
@@ -678,12 +683,12 @@ class IndicatorPPADownloadStatistics:
                     ppaNameValue = ppaName.get_text().strip()
 
                 if ppaUserValue == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA user cannot be empty." )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "PPA user cannot be empty." ) )
                     ppaUser.grab_focus()
                     continue
 
                 if ppaNameValue == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "PPA name cannot be empty." )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "PPA name cannot be empty." ) )
                     ppaName.grab_focus()
                     continue
 
@@ -712,7 +717,7 @@ class IndicatorPPADownloadStatistics:
                                 break
 
                         if duplicate:
-                            pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "Duplicates disallowed - there is an identical PPA!" )
+                            pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Duplicates disallowed - there is an identical PPA!" ) )
                             continue
 
                 # Update the model...
@@ -730,18 +735,18 @@ class IndicatorPPADownloadStatistics:
         model, treeiter = tree.get_selection().get_selected()
 
         if treeiter is None:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "No filter has been selected for removal." )
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No filter has been selected for removal." ) )
             return
 
         # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-        if pythonutils.showOKCancel( self.dialog, "Remove the selected filter?" ) == Gtk.ResponseType.OK:
+        if pythonutils.showOKCancel( self.dialog, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:
             model.remove( treeiter )
             self.ppasOrFiltersModified = True
 
 
     def onFilterAdd( self, button, filterTree, ppaTree ):
         if len( ppaTree.get_model() ) == 0:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Please add a PPA first!" )
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Please add a PPA first!" ) )
         else:
 
             # If the number of filters equals the number of PPA User/Names, cannot add a filter!
@@ -751,7 +756,7 @@ class IndicatorPPADownloadStatistics:
                 if not ppaUserName in ppaUsersNames:
                     ppaUsersNames.append( ppaUserName )
 
-            if len( filterTree.get_model() ) == len( ppaUsersNames ): pythonutils.showMessage( self.dialog, Gtk.MessageType.INFO, "Only one filter per PPA User/Name." )
+            if len( filterTree.get_model() ) == len( ppaUsersNames ): pythonutils.showMessage( self.dialog, Gtk.MessageType.INFO, _( "Only one filter per PPA User/Name." ) )
             else: self.onFilterDoubleClick( filterTree, None, None, ppaTree )
 
 
@@ -767,7 +772,7 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        label = Gtk.Label( "PPA User/Name" )
+        label = Gtk.Label( _( "PPA User/Name" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
@@ -796,16 +801,16 @@ class IndicatorPPADownloadStatistics:
 
         grid.attach( ppaUsersNames, 1, 0, 1, 1 )
 
-        label = Gtk.Label( "Filter Text" )
+        label = Gtk.Label( _( "Filter Text" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 2, 1 )
 
         textview = Gtk.TextView()
-        toolTip = "Each line of text is a single filter which is compared\n" + \
-                  "against each package name during download.\n\n" + \
-                  "If a package name contains ANY part of ANY filter,\n" + \
-                  "that package is included in the download statistics.\n\n" + \
-                  "No wildcards nor regular expressions accepted!"
+        toolTip = _( "Each line of text is a single filter which is compared\n" + \
+                     "against each package name during download.\n\n" + \
+                     "If a package name contains ANY part of ANY filter,\n" + \
+                     "that package is included in the download statistics.\n\n" + \
+                     "No wildcards nor regular expressions accepted!" )
 
         textview.set_tooltip_text( toolTip )
         if rowNumber is not None: textview.get_buffer().set_text( filterTreeModel[ filterTreeIter ][ 1 ] ) # This is an edit.
@@ -817,8 +822,8 @@ class IndicatorPPADownloadStatistics:
 
         grid.attach( scrolledwindow, 0, 3, 2, 1 )
 
-        title = "Edit Filter"
-        if rowNumber is None: title = "Add Filter"
+        title = _( "Edit Filter" )
+        if rowNumber is None: title = _( "Add Filter" )
 
         dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
@@ -834,7 +839,7 @@ class IndicatorPPADownloadStatistics:
                 filterText = buffer.get_text( buffer.get_start_iter(), buffer.get_end_iter(), False )
                 filterText = "\n".join( filterText.split() )
                 if len( filterText ) == 0:
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, "Please enter filter text!" )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Please enter filter text!" ) )
                     continue
 
                 # Update the model...
@@ -984,7 +989,7 @@ class IndicatorPPADownloadStatistics:
         GLib.idle_add( self.buildMenu )
 
         if self.showNotificationOnUpdate and not self.quitRequested and self.ppasPrevious != self.ppas:
-            Notify.Notification.new( "Statistics downloaded!", "", IndicatorPPADownloadStatistics.ICON ).show()
+            Notify.Notification.new( _( "Statistics downloaded!" ), "", IndicatorPPADownloadStatistics.ICON ).show()
 
         self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.
 

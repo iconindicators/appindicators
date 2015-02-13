@@ -1,0 +1,323 @@
+# Portable Object Template for indicator-ppa-download-statistics.
+# Copyright (C) 2015 Bernard Giannetti
+# This file is distributed under the same license as the indicator-ppa-download-statistics package.
+# Bernard Giannetti <thebernmeister@hotmail.com>, 2015.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indicator-ppa-download-statistics 1.0.46\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2015-02-13 11:31+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: indicator-ppa-download-statistics.py:63
+msgid "Shows the total downloads of PPAs."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:78
+msgid "(downloading data...)"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:79
+msgid "(error retrieving PPA)"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:80
+msgid "(multiple messages - uncombine PPAs)"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:81
+msgid "(no published binaries)"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:82
+msgid "(published binaries completely filtered)"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:291
+msgid "Change _Log"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:292
+msgid "translator-credits"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:302
+msgid "Downloading data..."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:302
+msgid "Preferences are currently unavailable."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:331
+#: indicator-ppa-download-statistics.py:595
+msgid "PPA User"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:332
+#: indicator-ppa-download-statistics.py:619
+msgid "PPA Name"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:333
+#: indicator-ppa-download-statistics.py:641
+msgid "Series"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:334
+#: indicator-ppa-download-statistics.py:654
+msgid "Architecture"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:335
+msgid "Double click to edit a PPA."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:347
+#: indicator-ppa-download-statistics.py:393
+msgid "Add"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:348
+msgid "Add a new PPA."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:352
+#: indicator-ppa-download-statistics.py:398
+msgid "Remove"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:353
+msgid "Remove the selected PPA."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:360
+msgid "PPAs"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:379
+msgid "PPA"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:380
+msgid "Filter"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:381
+msgid "Double click to edit a filter."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:394
+msgid "Add a new filter."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:399
+msgid "Remove the selected filter."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:406
+msgid "Filters"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:417
+msgid "Show PPAs as submenus"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:418
+msgid ""
+"The download statistics for each PPA\n"
+"are shown in a separate submenu."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:422
+msgid "Combine PPAs"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:423
+msgid ""
+"Combine the statistics of binary packages\n"
+"when the PPA user/name are the same.\n"
+"\n"
+"When a package is NOT architecture specific:\n"
+"If the package names and version numbers\n"
+"of two binary packages are identical,\n"
+"the packages are treated as the same package\n"
+"and the download counts are NOT summed.\n"
+"Packages such as Python fall into this category.\n"
+"\n"
+"When a package IS architecture specific:\n"
+"If the package names and version numbers\n"
+"of two binary packages are identical,\n"
+"the packages are treated as the same package\n"
+"and the download counts ARE summed.\n"
+"Packages such as compiled C fall into this category."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:442
+msgid "Ignore version for architecture specific"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:445
+msgid ""
+"Sometimes architecture specific packages with the\n"
+"same package name but different version 'number'\n"
+"are logically the SAME package.\n"
+"\n"
+"For example, a C source package for both\n"
+"Ubuntu Saucy and Ubuntu Trusty will be compiled\n"
+"twice, each with a different version 'number',\n"
+"despite being the SAME release.\n"
+"\n"
+"Checking this option will ignore the version\n"
+"number when determining if two architecture\n"
+"specific packages are identical.\n"
+"\n"
+"The version number is retained only if it is\n"
+"identical across ALL instances of a published binary."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:464
+msgid "Sort by download"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:465
+msgid ""
+"Sort by download count\n"
+"within each PPA."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:470
+msgid "  Clip amount"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:478
+msgid ""
+"Limit the number of entries\n"
+"when sorting by download.\n"
+"\n"
+"A value of zero will not clip."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:484
+msgid "Notify on update"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:485
+msgid ""
+"Show a screen notification when the PPA\n"
+"download statistics have been updated AND\n"
+"are different to the last download."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:490
+msgid "Open PPA in browser"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:491
+msgid ""
+"Clicking a PPA menu item loads the\n"
+"PPA's page in the default browser."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:496
+msgid "Autostart"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:498
+msgid "Run the indicator automatically."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:502
+msgid "General"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:504
+msgid "Preferences"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:572
+msgid "No PPA has been selected for removal."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:576
+msgid "Remove the selected PPA?"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:666
+msgid "Edit PPA"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:667
+msgid "Add PPA"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:686
+msgid "PPA user cannot be empty."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:691
+msgid "PPA name cannot be empty."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:720
+msgid "Duplicates disallowed - there is an identical PPA!"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:738
+msgid "No filter has been selected for removal."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:742
+msgid "Remove the selected filter?"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:749
+msgid "Please add a PPA first!"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:759
+msgid "Only one filter per PPA User/Name."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:775
+msgid "PPA User/Name"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:804
+msgid "Filter Text"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:809
+msgid ""
+"Each line of text is a single filter which is compared\n"
+"against each package name during download.\n"
+"\n"
+"If a package name contains ANY part of ANY filter,\n"
+"that package is included in the download statistics.\n"
+"\n"
+"No wildcards nor regular expressions accepted!"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:825
+msgid "Edit Filter"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:826
+msgid "Add Filter"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:842
+msgid "Please enter filter text!"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:992
+msgid "Statistics downloaded!"
+msgstr ""

@@ -1,3 +1,13 @@
+indicator-ppa-download-statistics (1.0.46-1) precise; urgency=low
+
+  * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
+    in this miracle! 
+  * About dialog changed to accept translator information.
+  * Overhaul of repository structure and build script.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 13 Feb 2015 11:16:25 +1000
+
+
 indicator-ppa-download-statistics (1.0.45-1) precise; urgency=low
 
   * Added 'vivid' to the list of series.
