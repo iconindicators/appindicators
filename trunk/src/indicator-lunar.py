@@ -53,7 +53,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     NAME = "indicator-lunar"
-    VERSION = "1.0.56"
+    VERSION = "1.0.57"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = NAME
     LOG = os.getenv( "HOME" ) + "/" + NAME + ".log"

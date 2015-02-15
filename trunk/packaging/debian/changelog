@@ -1,3 +1,13 @@
+indicator-lunar (1.0.57-1) precise; urgency=low
+
+  * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
+    in this miracle!
+  * About dialog changed to accept translator information.
+  * Overhaul of repository structure and build script.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 16 Feb 2015 08:46:02 +1000
+
+
 indicator-lunar (1.0.56-1) precise; urgency=low
 
   * Bug fix: The 'visible' flag was missing in the satellite notification.
