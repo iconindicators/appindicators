@@ -1,4 +1,4 @@
-# Portable Object Template for indicator-stardate.
+# Russian translation for indicator-stardate.
 # Copyright (C) 2015 Bernard Giannetti
 # This file is distributed under the same license as the indicator-stardate package.
 # Bernard Giannetti <thebernmeister@hotmail.com>, 2015.
