@@ -276,13 +276,13 @@ class IndicatorLunar:
             else:
                 self.satelliteTLEData = satelliteTLEData
 
-            # Add in any new satellites based on the user preference.
-            if self.satellitesAddNew:
-                for key in self.satelliteTLEData:
-                    if key not in self.satellites:
-                        self.satellites.append( key )
+                # Add in any new satellites based on the user preference.
+                if self.satellitesAddNew:
+                    for key in self.satelliteTLEData:
+                        if key not in self.satellites:
+                            self.satellites.append( key )
 
-                self.saveSettings()
+                    self.saveSettings()
 
         # Update the orbital element data at most every 24 hours.  If the data is invalid, use the orbital element data from the previous run.
         if datetime.datetime.now() > ( self.lastUpdateOrbitalElement + datetime.timedelta( hours = 24 ) ):
@@ -298,13 +298,13 @@ class IndicatorLunar:
             else:
                 self.orbitalElementData = orbitalElementData
 
-            # Add in any new orbital elements based on the user preference.
-            if self.orbitalElementsAddNew:
-                for key in self.orbitalElementData:
-                    if key not in self.orbitalElements:
-                        self.orbitalElements.append( key )
+                # Add in any new orbital elements based on the user preference.
+                if self.orbitalElementsAddNew:
+                    for key in self.orbitalElementData:
+                        if key not in self.orbitalElements:
+                            self.orbitalElements.append( key )
 
-                self.saveSettings()
+                    self.saveSettings()
 
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
         self.data[ ( IndicatorLunar.DATA_CITY_NAME, "" ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match the format of all other data.
