@@ -31,6 +31,7 @@
 #  https://wiki.gnome.org/Projects/PyGObject
 #  http://lazka.github.io/pgi-docs
 
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -1454,7 +1455,7 @@ class IndicatorLunar:
 
         showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Planets" )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
-        showPlanetsAsSubmenuCheckbox.set_tooltip_text( "Show each planet (excluding moon/sun) in its own submenu." )
+        showPlanetsAsSubmenuCheckbox.set_tooltip_text( "Show planets (excluding moon/sun) in its own submenu." )
         box.pack_start( showPlanetsAsSubmenuCheckbox, False, False, 0 )
 
         showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Stars" )
