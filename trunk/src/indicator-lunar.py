@@ -446,7 +446,7 @@ class IndicatorLunar:
             summary = self.satelliteNotificationSummary. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
-                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle[ key ].getInternationalDesignator() ). \
+                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
@@ -458,7 +458,7 @@ class IndicatorLunar:
             message = self.satelliteNotificationMessage. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
-                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle[ key ].getInternationalDesignator() ). \
+                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
