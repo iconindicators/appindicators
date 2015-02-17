@@ -40,6 +40,10 @@
 
 
 #TODO Fix bug when going from http:// for tle to default tle url.
+# Ensure valid url and satellites checked.  Change url to be bad, do fetch and ok prefs.  Should get 
+#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 982, in updateSatellites
+#     if key in self.satelliteTLEData:
+# TypeError: argument of type 'NoneType' is not iterable
 
 
 #TODO Change tle/or urls to be http:// and see if the notification error comes up all the time.
