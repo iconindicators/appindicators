@@ -1,6 +1,6 @@
 indicator-lunar (1.0.57-1) precise; urgency=low
 
-  * Optionally automatically add new satellites and/or orbital elements from
+  * Option to automatically add new satellites and/or orbital elements from
     the respective data source.
   * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
     in this miracle!
