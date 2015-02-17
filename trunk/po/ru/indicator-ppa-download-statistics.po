@@ -1,0 +1,375 @@
+# Russian translation for indicator-ppa-download-statistics.
+# Copyright (C) 2015 Bernard Giannetti
+# This file is distributed under the same license as the indicator-ppa-download-statistics package.
+# Bernard Giannetti <thebernmeister@hotmail.com>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: indicator-ppa-download-statistics 1.0.46\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2015-02-13 11:31+1100\n"
+"PO-Revision-Date: 2015-02-16 19:31+0300\n"
+"Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: indicator-ppa-download-statistics.py:63
+msgid "Shows the total downloads of PPAs."
+msgstr "Показывает статистику закачек из персональных архивов пакетов (PPA)."
+
+#: indicator-ppa-download-statistics.py:78
+msgid "(downloading data...)"
+msgstr "(загружаются данные...)"
+
+#: indicator-ppa-download-statistics.py:79
+msgid "(error retrieving PPA)"
+msgstr "(невозможно найти PPA)"
+
+#: indicator-ppa-download-statistics.py:80
+msgid "(multiple messages - uncombine PPAs)"
+msgstr "(отмените объединение PPA в Параметрах)"
+
+#: indicator-ppa-download-statistics.py:81
+msgid "(no published binaries)"
+msgstr "(нет опубликованных двоичных файлов)"
+
+#: indicator-ppa-download-statistics.py:82
+msgid "(published binaries completely filtered)"
+msgstr "(двоичные файлы полностью отфильтрованы)"
+
+#: indicator-ppa-download-statistics.py:291
+msgid "Change _Log"
+msgstr "Список _изменений"
+
+#: indicator-ppa-download-statistics.py:292
+msgid "translator-credits"
+msgstr "Олег Мойсейчук"
+
+#: indicator-ppa-download-statistics.py:302
+msgid "Downloading data..."
+msgstr "Загружаются данные..."
+
+#: indicator-ppa-download-statistics.py:302
+msgid "Preferences are currently unavailable."
+msgstr "Параметры в настоящий момент недоступны."
+
+#: indicator-ppa-download-statistics.py:331
+#: indicator-ppa-download-statistics.py:595
+msgid "PPA User"
+msgstr "Пользователь PPA"
+
+#: indicator-ppa-download-statistics.py:332
+#: indicator-ppa-download-statistics.py:619
+msgid "PPA Name"
+msgstr "Имя PPA"
+
+#: indicator-ppa-download-statistics.py:333
+#: indicator-ppa-download-statistics.py:641
+msgid "Series"
+msgstr "Версия"
+
+#: indicator-ppa-download-statistics.py:334
+#: indicator-ppa-download-statistics.py:654
+msgid "Architecture"
+msgstr "Архитектура"
+
+#: indicator-ppa-download-statistics.py:335
+msgid "Double click to edit a PPA."
+msgstr "Щёлкните дважды, чтобы отредактировать PPA."
+
+#: indicator-ppa-download-statistics.py:347
+#: indicator-ppa-download-statistics.py:393
+msgid "Add"
+msgstr "Добавить"
+
+#: indicator-ppa-download-statistics.py:348
+msgid "Add a new PPA."
+msgstr "Добавить новый PPA."
+
+#: indicator-ppa-download-statistics.py:352
+#: indicator-ppa-download-statistics.py:398
+msgid "Remove"
+msgstr "Удалить"
+
+#: indicator-ppa-download-statistics.py:353
+msgid "Remove the selected PPA."
+msgstr "Удалить выбранный PPA."
+
+#: indicator-ppa-download-statistics.py:360
+msgid "PPAs"
+msgstr "PPA"
+
+#: indicator-ppa-download-statistics.py:379
+msgid "PPA"
+msgstr "PPA"
+
+#: indicator-ppa-download-statistics.py:380
+msgid "Filter"
+msgstr "Фильтр"
+
+#: indicator-ppa-download-statistics.py:381
+msgid "Double click to edit a filter."
+msgstr "Щёлкните дважды, чтобы отредактировать фильтр."
+
+#: indicator-ppa-download-statistics.py:394
+msgid "Add a new filter."
+msgstr "Добавить новый фильтр."
+
+#: indicator-ppa-download-statistics.py:399
+msgid "Remove the selected filter."
+msgstr "Удалить выбранный фильтр."
+
+#: indicator-ppa-download-statistics.py:406
+msgid "Filters"
+msgstr "Фильтры"
+
+#: indicator-ppa-download-statistics.py:417
+msgid "Show PPAs as submenus"
+msgstr "Показывать подменю для PPA"
+
+#: indicator-ppa-download-statistics.py:418
+msgid ""
+"The download statistics for each PPA\n"
+"are shown in a separate submenu."
+msgstr ""
+"Статистика загрузок для каждого PPA\n"
+"будет показана в отдельном подменю."
+
+#: indicator-ppa-download-statistics.py:422
+msgid "Combine PPAs"
+msgstr "Объединить PPA"
+
+#: indicator-ppa-download-statistics.py:423
+msgid ""
+"Combine the statistics of binary packages\n"
+"when the PPA user/name are the same.\n"
+"\n"
+"When a package is NOT architecture specific:\n"
+"If the package names and version numbers\n"
+"of two binary packages are identical,\n"
+"the packages are treated as the same package\n"
+"and the download counts are NOT summed.\n"
+"Packages such as Python fall into this category.\n"
+"\n"
+"When a package IS architecture specific:\n"
+"If the package names and version numbers\n"
+"of two binary packages are identical,\n"
+"the packages are treated as the same package\n"
+"and the download counts ARE summed.\n"
+"Packages such as compiled C fall into this category."
+msgstr ""
+"Объединить статистику по двоичным пакетам,\n"
+"если пользователь/имя PPA совпадают.\n"
+"\n"
+"Если пакет НЕ ЗАВИСИТ от архитектуры:\n"
+"если имена пакетов и номера версий\n"
+"двух двоичных пакетов совпадают,\n"
+"пакеты расцениваются как одинаковые,\n"
+"и счётчики закачек НЕ БУДУТ суммироваться.\n"
+"Пакеты с кодом Python попадают в эту категорию.\n"
+"\n"
+"Если пакет ЗАВИСИТ от архитектуры:\n"
+"если имена пакетов и номера версий\n"
+"двух двоичных пакетов совпадают,\n"
+"пакеты расцениваются как одинаковые,\n"
+"и счётчики закачек БУДУТ суммироваться.\n"
+"Пакеты с компилированным кодом C попадают в эту категорию."
+
+#: indicator-ppa-download-statistics.py:442
+msgid "Ignore version for architecture specific"
+msgstr "Игнорировать версию для архитектурно зависимых пакетов"
+
+#: indicator-ppa-download-statistics.py:445
+msgid ""
+"Sometimes architecture specific packages with the\n"
+"same package name but different version 'number'\n"
+"are logically the SAME package.\n"
+"\n"
+"For example, a C source package for both\n"
+"Ubuntu Saucy and Ubuntu Trusty will be compiled\n"
+"twice, each with a different version 'number',\n"
+"despite being the SAME release.\n"
+"\n"
+"Checking this option will ignore the version\n"
+"number when determining if two architecture\n"
+"specific packages are identical.\n"
+"\n"
+"The version number is retained only if it is\n"
+"identical across ALL instances of a published binary."
+msgstr ""
+"Иногда зависящие от архитектуры пакеты с одинаковым\n"
+"именем пакета, но различным \"номером\" версии\n"
+"логически являются одним и тем же пакетом.\n"
+"\n"
+"Например, пакет с исходным кодом на C для\n"
+"Ubuntu Saucy и Ubuntu Trusty будет скомпилирован\n"
+"дважды, с различным \"номером\" версии,\n"
+"являясь при этом совершенно одинаковым выпуском.\n"
+"\n"
+"Включение этой опции позволит игнорировать номер\n"
+"версии при определении идентичности двух\n"
+"архитектурно зависимых пакетов.\n"
+"\n"
+"Номер версии сохраняется только если он идентичен\n"
+"для ВСЕХ экземпляров опубликованного двоичного пакета."
+
+#: indicator-ppa-download-statistics.py:464
+msgid "Sort by download"
+msgstr "Сортировать по закачкам"
+
+#: indicator-ppa-download-statistics.py:465
+msgid ""
+"Sort by download count\n"
+"within each PPA."
+msgstr ""
+"Сортировать по количеству закачек\n"
+"в пределах каждого PPA."
+
+#: indicator-ppa-download-statistics.py:470
+msgid "  Clip amount"
+msgstr "  Ограничить количество"
+
+#: indicator-ppa-download-statistics.py:478
+msgid ""
+"Limit the number of entries\n"
+"when sorting by download.\n"
+"\n"
+"A value of zero will not clip."
+msgstr ""
+"Ограничить количество выводимых\n"
+"строк при сортировке по количеству закачек.\n"
+"\n"
+"При нулевом значении количество не ограничивается."
+
+#: indicator-ppa-download-statistics.py:484
+msgid "Notify on update"
+msgstr "Сообщать при обновлении"
+
+#: indicator-ppa-download-statistics.py:485
+msgid ""
+"Show a screen notification when the PPA\n"
+"download statistics have been updated AND\n"
+"are different to the last download."
+msgstr ""
+"Показывать всплывающее сообщение, когда\n"
+"статистика закачек из PPA обновилась И\n"
+"отличается от прошлых значений."
+
+#: indicator-ppa-download-statistics.py:490
+msgid "Open PPA in browser"
+msgstr "Открыть PPA в обозревателе"
+
+#: indicator-ppa-download-statistics.py:491
+msgid ""
+"Clicking a PPA menu item loads the\n"
+"PPA's page in the default browser."
+msgstr ""
+"Щелчок на пункте меню с PPA откроет\n"
+"страницу PPA в обозревателе по умолчанию."
+
+#: indicator-ppa-download-statistics.py:496
+msgid "Autostart"
+msgstr "Автозапуск"
+
+#: indicator-ppa-download-statistics.py:498
+msgid "Run the indicator automatically."
+msgstr "Запускать индикатор автоматически."
+
+#: indicator-ppa-download-statistics.py:502
+msgid "General"
+msgstr "Общие"
+
+#: indicator-ppa-download-statistics.py:504
+msgid "Preferences"
+msgstr "Параметры"
+
+#: indicator-ppa-download-statistics.py:572
+msgid "No PPA has been selected for removal."
+msgstr "Не выбран PPA для удаления."
+
+#: indicator-ppa-download-statistics.py:576
+msgid "Remove the selected PPA?"
+msgstr "Удалить выбранный PPA?"
+
+#: indicator-ppa-download-statistics.py:666
+msgid "Edit PPA"
+msgstr "Редактировать PPA"
+
+#: indicator-ppa-download-statistics.py:667
+msgid "Add PPA"
+msgstr "Добавить PPA"
+
+#: indicator-ppa-download-statistics.py:686
+msgid "PPA user cannot be empty."
+msgstr "Пользователь PPA не может быть пустым."
+
+#: indicator-ppa-download-statistics.py:691
+msgid "PPA name cannot be empty."
+msgstr "Имя PPA не может быть пустым."
+
+#: indicator-ppa-download-statistics.py:720
+msgid "Duplicates disallowed - there is an identical PPA!"
+msgstr "Дубликаты не допускаются - существует идентичный PPA!"
+
+#: indicator-ppa-download-statistics.py:738
+msgid "No filter has been selected for removal."
+msgstr "Не выбран фильтр для удаления."
+
+#: indicator-ppa-download-statistics.py:742
+msgid "Remove the selected filter?"
+msgstr "Удалить выбранный фильтр?"
+
+#: indicator-ppa-download-statistics.py:749
+msgid "Please add a PPA first!"
+msgstr "Пожалуйста, вначале добавьте PPA!"
+
+#: indicator-ppa-download-statistics.py:759
+msgid "Only one filter per PPA User/Name."
+msgstr "Только один фильтр для каждого пользователя/имени PPA."
+
+#: indicator-ppa-download-statistics.py:775
+msgid "PPA User/Name"
+msgstr "Пользователь/имя PPA"
+
+#: indicator-ppa-download-statistics.py:804
+msgid "Filter Text"
+msgstr "Текст фильтра"
+
+#: indicator-ppa-download-statistics.py:809
+msgid ""
+"Each line of text is a single filter which is compared\n"
+"against each package name during download.\n"
+"\n"
+"If a package name contains ANY part of ANY filter,\n"
+"that package is included in the download statistics.\n"
+"\n"
+"No wildcards nor regular expressions accepted!"
+msgstr ""
+"Каждая строка текста - это одиночный шаблон, который\n"
+"сравнивается с каждым именем пакета при загрузке статистики.\n"
+"\n"
+"Если имя пакета содержит ЛЮБУЮ часть ЛЮБОГО фильтра,\n"
+"то этот пакет включается в статистику загрузок.\n"
+"\n"
+"Символы группировки и регулярные выражения не допускаются!"
+
+#: indicator-ppa-download-statistics.py:825
+msgid "Edit Filter"
+msgstr "Редактировать фильтр"
+
+#: indicator-ppa-download-statistics.py:826
+msgid "Add Filter"
+msgstr "Добавить фильтр"
+
+#: indicator-ppa-download-statistics.py:842
+msgid "Please enter filter text!"
+msgstr "Пожалуйста, введите текст фильтра!"
+
+#: indicator-ppa-download-statistics.py:992
+msgid "Statistics downloaded!"
+msgstr "Статистика загружена!"
