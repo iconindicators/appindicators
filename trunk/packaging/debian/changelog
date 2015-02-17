@@ -2,6 +2,7 @@ indicator-virtual-box (1.0.37-1) precise; urgency=low
 
   * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
     in this miracle! 
+  * Added Russian translation.  Thanks to Oleg Moiseichuk. 
   * About dialog changed to accept translator information.
   * Overhaul of repository structure and build script.
 
