@@ -32,6 +32,19 @@
 #  http://lazka.github.io/pgi-docs
 
 
+#TODO Add in the clean up on quit.
+# https://docs.python.org/3/library/atexit.html
+# http://stackoverflow.com/questions/13703887/how-do-i-catch-system-logoff-shutdown-lock-events-in-python-or-pyqt4
+# http://ubuntuforums.org/showthread.php?t=1436304
+# https://danielkaes.wordpress.com/2009/06/04/how-to-catch-kill-events-with-python/
+
+
+#TODO Fix bug when going from http:// for tle to default tle url.
+
+
+#TODO Change tle/or urls to be http:// and see if the notification error comes up all the time.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -266,6 +279,8 @@ class IndicatorLunar:
         # Update the satellite TLE data at most every 12 hours.  If the data is invalid, use the TLE data from the previous run.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
             satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
+#TODO Remove            
+            print( "updateBackend::", satelliteTLEData is None, satelliteTLEData is not None and len( satelliteTLEData ) > 0 )
             if satelliteTLEData is None:
                 summary = "Error Retrieving Satellite TLE Data"
                 message = "The satellite TLE data source could not be reached.  Previous TLE data will be used, if available."
@@ -465,7 +480,8 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] )
 
-            Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+#TODO Put this back!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
 
     def updateMoonMenu( self, menu ):
@@ -2189,11 +2205,10 @@ class IndicatorLunar:
 
 
     def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, orbitalElements, url ):
-        if orbitalElementData is None or len( orbitalElementData ) == 0: # An error or no orbital element data...
-            if orbitalElementData is None:
-                message = "Cannot access the orbital element data source\n<a href=\'" + url + "'>" + url + "</a>"
-            else:
-                message = "No orbital element data found at\n<a href=\'" + url + "'>" + url + "</a>"
+        if orbitalElementData is None:
+            message = "Cannot access the orbital element data source\n<a href=\'" + url + "'>" + url + "</a>"
+        elif len( orbitalElementData ) == 0:
+            message = "No orbital element data found at\n<a href=\'" + url + "'>" + url + "</a>"
         else:
             orbitalElementStore.clear()
             message = None
@@ -2219,11 +2234,10 @@ class IndicatorLunar:
 
 
     def updateSatellitePreferencesTab( self, grid, satelliteStore, satelliteTLEData, satellites, url ):
-        if satelliteTLEData is None or len( satelliteTLEData ) == 0: # An error or no TLE data...
-            if satelliteTLEData is None:
-                message = "Cannot access the TLE data source\n<a href=\'" + url + "'>" + url + "</a>"
-            else:
-                message = "No TLE data found at\n<a href=\'" + url + "'>" + url + "</a>"
+        if satelliteTLEData is None:
+            message = "Cannot access the TLE data source\n<a href=\'" + url + "'>" + url + "</a>"
+        elif len( satelliteTLEData ) == 0:
+            message = "No TLE data found at\n<a href=\'" + url + "'>" + url + "</a>"
         else:
             satelliteStore.clear()
             message = None
@@ -2473,6 +2487,8 @@ class IndicatorLunar:
             logging.exception( e )
             logging.error( "Error retrieving satellite TLE data from " + str( url ) )
 
+#TODO Remove
+        print( "getSatelliteTLEData::", satelliteTLEData is None, satelliteTLEData is not None and len( satelliteTLEData ) > 0 )
         return satelliteTLEData
 
 
