@@ -1086,8 +1086,8 @@ class IndicatorLunar:
     def updateRightAscensionDeclinationAzimuthAltitude( self, body, dataTag ):
         self.data[ ( dataTag, IndicatorLunar.DATA_RIGHT_ASCENSION ) ] = str( round( self.convertHoursMinutesSecondsToDecimalDegrees( body.g_ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.g_ra ) ) + ")"
 
-        direction = "N"
-        if body.g_dec < 0.0: direction = "S"
+        direction = _( "N" )
+        if body.g_dec < 0.0: direction = _( "S" )
 
         self.data[ ( dataTag, IndicatorLunar.DATA_DECLINATION ) ] = str( abs( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.g_dec ) ) + ")"
         self.data[ ( dataTag, IndicatorLunar.DATA_AZIMUTH ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
