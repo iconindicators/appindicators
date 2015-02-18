@@ -32,16 +32,6 @@
 #  http://lazka.github.io/pgi-docs
 
 
-#TODO Add in the clean up on quit.
-# https://docs.python.org/3/library/atexit.html
-# http://stackoverflow.com/questions/13703887/how-do-i-catch-system-logoff-shutdown-lock-events-in-python-or-pyqt4
-# http://ubuntuforums.org/showthread.php?t=1436304
-# https://danielkaes.wordpress.com/2009/06/04/how-to-catch-kill-events-with-python/
-
-
-#TODO Change tle/or urls to be http:// and see if the notification error comes up all the time.
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -247,7 +237,6 @@ class IndicatorLunar:
 
         filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-
         Notify.init( INDICATOR_NAME )
 
         self.lastUpdateOrbitalElement = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Set the last orbital element update in the past so an update occurs. 
@@ -1341,7 +1330,7 @@ class IndicatorLunar:
         svgFiles = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + "*.svg"
         for file in glob.glob( svgFiles ):
             os.remove( file )
-
+ 
         Gtk.main_quit()
 
 
