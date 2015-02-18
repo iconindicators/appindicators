@@ -172,14 +172,14 @@ class IndicatorLunar:
     LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
     LUNAR_PHASE_NAMES = {
-        LUNAR_PHASE_FULL_MOON : "Full Moon",
-        LUNAR_PHASE_WANING_GIBBOUS : "Waning Gibbous",
-        LUNAR_PHASE_THIRD_QUARTER : "Third Quarter",
-        LUNAR_PHASE_WANING_CRESCENT : "Waning Crescent",
-        LUNAR_PHASE_NEW_MOON : "New Moon",
-        LUNAR_PHASE_WAXING_CRESCENT : "Waxing Crescent",
-        LUNAR_PHASE_FIRST_QUARTER : "First Quarter",
-        LUNAR_PHASE_WAXING_GIBBOUS : "Waxing Gibbous"
+        LUNAR_PHASE_FULL_MOON : _( "Full Moon" ),
+        LUNAR_PHASE_WANING_GIBBOUS : ( "Waning Gibbous" ),
+        LUNAR_PHASE_THIRD_QUARTER : ( "Third Quarter" ),
+        LUNAR_PHASE_WANING_CRESCENT : ( "Waning Crescent" ),
+        LUNAR_PHASE_NEW_MOON : ( "New Moon" ),
+        LUNAR_PHASE_WAXING_CRESCENT : ( "Waxing Crescent" ),
+        LUNAR_PHASE_FIRST_QUARTER : ( "First Quarter" ),
+        LUNAR_PHASE_WAXING_GIBBOUS : ( "Waxing Gibbous" )
     }
 
     ORBITAL_ELEMENT_DATA_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
@@ -476,7 +476,7 @@ class IndicatorLunar:
         if ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_MESSAGE ) in self.data or \
            ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_RISE_TIME ) in self.data:
 
-            menuItem = Gtk.MenuItem( "Moon" )
+            menuItem = Gtk.MenuItem( _( "Moon" ) )
             menu.append( menuItem )
 
             self.updateCommonMenu( menuItem, AstronomicalObjectType.Moon, IndicatorLunar.BODY_MOON )
@@ -506,7 +506,7 @@ class IndicatorLunar:
     def updateSunMenu( self, menu ):
         if ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) in self.data or \
            ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_RISE_TIME ) in self.data:
-            menuItem = Gtk.MenuItem( "Sun" )
+            menuItem = Gtk.MenuItem( _( "Sun" ) )
             menu.append( menuItem )
 
             self.updateCommonMenu( menuItem, AstronomicalObjectType.Sun, IndicatorLunar.BODY_SUN )
