@@ -261,54 +261,8 @@ class IndicatorLunar:
         if not self.lock.acquire( False ): return
 
         self.toggleIconState()
-
-        # Update the satellite TLE data at most every 12 hours.  If the data is invalid, use the TLE data from the previous run.
-        if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
-            satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
-            if satelliteTLEData is None:
-                summary = _( "Error Retrieving Satellite TLE Data" )
-                message = _( "The satellite TLE data source could not be reached.  Previous TLE data will be used, if available." )
-                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            elif len( satelliteTLEData ) == 0:
-                summary = _( "Empty Satellite TLE Data" )
-                message = _( "The satellite TLE data retrieved is empty.  Previous TLE data will be used, if available." )
-                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            else:
-                self.satelliteTLEData = satelliteTLEData
-
-                # Add in any new satellites based on the user preference.
-                if self.satellitesAddNew:
-                    for key in self.satelliteTLEData:
-                        if key not in self.satellites:
-                            self.satellites.append( key )
-
-                    self.saveSettings()
-
-            self.lastUpdateTLE = datetime.datetime.now()
-
-        # Update the orbital element data at most every 24 hours.  If the data is invalid, use the orbital element data from the previous run.
-        if datetime.datetime.now() > ( self.lastUpdateOrbitalElement + datetime.timedelta( hours = 24 ) ):
-            orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
-            if orbitalElementData is None:
-                summary = _( "Error Retrieving Orbital Element Data" )
-                message = _( "The orbital element data source could not be reached.  Previous orbital element data will be used, if available." )
-                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            elif len( orbitalElementData ) == 0:
-                summary = _( "Empty Orbital Element Data" )
-                message = _( "The orbital element data retrieved is empty.  Previous orbital element data will be used, if available." )
-                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            else:
-                self.orbitalElementData = orbitalElementData
-
-                # Add in any new orbital elements based on the user preference.
-                if self.orbitalElementsAddNew:
-                    for key in self.orbitalElementData:
-                        if key not in self.orbitalElements:
-                            self.orbitalElements.append( key )
-
-                    self.saveSettings()
-
-            self.lastUpdateOrbitalElement = datetime.datetime.now()
+        self.updateOrbitalElementData()
+        self.updateSatelliteTLEData()
 
         # Reset data on each update...
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
@@ -798,6 +752,60 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_DATE_TIME ) ] ) )
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Latitude/Longitude: " + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE ) ] ) )
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] ) )
+
+
+    def updateSatelliteTLEData( self ):
+        # Update the satellite TLE data at most every 12 hours.
+        # If the data is invalid, use the TLE data from the previous run.
+        if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
+            satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
+            if satelliteTLEData is None:
+                summary = _( "Error Retrieving Satellite TLE Data" )
+                message = _( "The satellite TLE data source could not be reached.  Previous TLE data will be used, if available." )
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            elif len( satelliteTLEData ) == 0:
+                summary = _( "Empty Satellite TLE Data" )
+                message = _( "The satellite TLE data retrieved is empty.  Previous TLE data will be used, if available." )
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            else:
+                self.satelliteTLEData = satelliteTLEData
+
+                # Add in any new satellites based on the user preference.
+                if self.satellitesAddNew:
+                    for key in self.satelliteTLEData:
+                        if key not in self.satellites:
+                            self.satellites.append( key )
+
+                    self.saveSettings()
+
+            self.lastUpdateTLE = datetime.datetime.now()
+
+
+    def updateOrbitalElementData( self ):
+        # Update the orbital element data at most every 24 hours.
+        # If the data is invalid, use the orbital element data from the previous run.
+        if datetime.datetime.now() > ( self.lastUpdateOrbitalElement + datetime.timedelta( hours = 24 ) ):
+            orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
+            if orbitalElementData is None:
+                summary = _( "Error Retrieving Orbital Element Data" )
+                message = _( "The orbital element data source could not be reached.  Previous orbital element data will be used, if available." )
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            elif len( orbitalElementData ) == 0:
+                summary = _( "Empty Orbital Element Data" )
+                message = _( "The orbital element data retrieved is empty.  Previous orbital element data will be used, if available." )
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            else:
+                self.orbitalElementData = orbitalElementData
+
+                # Add in any new orbital elements based on the user preference.
+                if self.orbitalElementsAddNew:
+                    for key in self.orbitalElementData:
+                        if key not in self.orbitalElements:
+                            self.orbitalElements.append( key )
+
+                    self.saveSettings()
+
+            self.lastUpdateOrbitalElement = datetime.datetime.now()
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
