@@ -39,7 +39,7 @@ gettext.install( INDICATOR_NAME )
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
-import copy, datetime, eclipse, glob, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys, threading, time, webbrowser
+import copy, datetime, eclipse, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys, tempfile, threading, time, webbrowser
 
 try:
     import ephem
@@ -54,7 +54,7 @@ class AstronomicalObjectType: Moon, OrbitalElement, Planet, PlanetaryMoon, Satel
 
 
 class IndicatorLunar:
-
+    
     AUTHOR = "Bernard Giannetti"
     VERSION = "1.0.57"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
@@ -65,7 +65,7 @@ class IndicatorLunar:
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
-    SVG_FULL_MOON_FILE = os.getenv( "HOME" ) + "/" + "." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
+    SVG_FULL_MOON_FILE = tempfile.gettempdir() + "/" + "." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
 
     ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, orbital element, star and satellite information." )
@@ -244,7 +244,7 @@ class IndicatorLunar:
         self.lastFullMoonNotfication = ephem.Date( "2000/01/01" ) # Set a date way back in the past...
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_icon_theme_path( os.getenv( "HOME" ) )
+        self.indicator.set_icon_theme_path( tempfile.gettempdir() )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.loadSettings()
@@ -324,7 +324,7 @@ class IndicatorLunar:
         menu.append( menuItem )
 
         menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        menuItem.connect( "activate", self.onQuit )
+        menuItem.connect( "activate", Gtk.main_quit )
         menu.append( menuItem )
 
         self.indicator.set_menu( menu )
@@ -1323,7 +1323,7 @@ class IndicatorLunar:
         return ( iconName + "-1" ) if IndicatorLunar.ICON_STATE else ( iconName + "-2" )
 
 
-    def getIconFile( self ): return os.getenv( "HOME" ) + "/" + self.getIconName() + ".svg"
+    def getIconFile( self ): return tempfile.gettempdir() + "/" + self.getIconName() + ".svg"
 
 
     # Hideous workaround because setting the icon with the same name does not change the icon any more.
@@ -1331,15 +1331,6 @@ class IndicatorLunar:
     # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     # http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
     def toggleIconState( self ): IndicatorLunar.ICON_STATE = not IndicatorLunar.ICON_STATE
-
-
-    def onQuit( self, widget ):
-        # Remove the SVG files created by the indicator (in the user's home directory).
-        svgFiles = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + "*.svg"
-        for file in glob.glob( svgFiles ):
-            os.remove( file )
- 
-        Gtk.main_quit()
 
 
     def onAbout( self, widget ):
