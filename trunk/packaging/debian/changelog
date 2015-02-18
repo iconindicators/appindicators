@@ -7,6 +7,8 @@ indicator-lunar (1.0.57-1) precise; urgency=low
     through to the indicator proper.
   * Option to automatically add new satellites and/or orbital elements from
     the respective data source.
+  * Changed astronomical unit abbreviation from AU to ua to keep in line with
+    SI (http://en.wikipedia.org/wiki/Non-SI_units_mentioned_in_the_SI).
   * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
     in this miracle!
   * Added Russian translation.  Thanks to Oleg Moiseichuk. 

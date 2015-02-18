@@ -930,12 +930,12 @@ class IndicatorLunar:
                astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
                astronomicalObjectType == AstronomicalObjectType.Planet or \
                astronomicalObjectType == AstronomicalObjectType.Sun:
-                self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] = str( round( body.earth_distance, 4 ) ) + " AU"
+                self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] = str( round( body.earth_distance, 4 ) ) + " ua"
 
             if astronomicalObjectType == AstronomicalObjectType.Moon or \
                astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
                astronomicalObjectType == AstronomicalObjectType.Planet:
-                self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] = str( round( body.sun_distance, 4 ) ) + " AU"
+                self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] = str( round( body.sun_distance, 4 ) ) + " ua"
 
             if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
                 self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] = str( round( self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), body ) ) ) + "°"
