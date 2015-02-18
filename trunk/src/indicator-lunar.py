@@ -1483,7 +1483,7 @@ class IndicatorLunar:
 
         showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( _( "Satellites" ) )
         showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
-        showSatellitesAsSubmenuCheckbox.set_tooltip_text( _( "Show each satellite in its own submenu." ) )
+        showSatellitesAsSubmenuCheckbox.set_tooltip_text( _( "Show satellites as submenus." ) )
         box.pack_start( showSatellitesAsSubmenuCheckbox, False, False, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
