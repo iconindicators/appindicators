@@ -1460,16 +1460,16 @@ class IndicatorLunar:
 
         showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( ( "Planets" ) )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
-        showPlanetsAsSubmenuCheckbox.set_tooltip_text( _( "Show planets (excluding moon/sun) in its own submenu." ) )
+        showPlanetsAsSubmenuCheckbox.set_tooltip_text( _( "Show planets (excluding moon/sun) as submenus." ) )
         box.pack_start( showPlanetsAsSubmenuCheckbox, False, False, 0 )
 
         showStarsAsSubmenuCheckbox = Gtk.CheckButton( _( "Stars" ) )
-        showStarsAsSubmenuCheckbox.set_tooltip_text( _( "Show each star in its own submenu." ) )
+        showStarsAsSubmenuCheckbox.set_tooltip_text( _( "Show stars as submenus." ) )
         showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
         box.pack_start( showStarsAsSubmenuCheckbox, False, False, 0 )
 
         showOrbitalElementsAsSubmenuCheckbox = Gtk.CheckButton( _( "Orbital elements" ) )
-        showOrbitalElementsAsSubmenuCheckbox.set_tooltip_text( _( "Show each orbital element in its own submenu." ) )
+        showOrbitalElementsAsSubmenuCheckbox.set_tooltip_text( _( "Show orbital elements as submenus." ) )
         showOrbitalElementsAsSubmenuCheckbox.set_active( self.showOrbitalElementsAsSubMenu )
         box.pack_start( showOrbitalElementsAsSubmenuCheckbox, False, False, 0 )
 
