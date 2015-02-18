@@ -46,7 +46,7 @@ try:
     from ephem.cities import _city_data
     from ephem.stars import stars
 except:
-    pythonutils.showMessage( None, Gtk.MessageType.ERROR, "You must also install python3-ephem!" )
+    pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "You must also install python3-ephem!" ) )
     sys.exit()
 
 
@@ -68,16 +68,16 @@ class IndicatorLunar:
     SVG_FULL_MOON_FILE = os.getenv( "HOME" ) + "/" + "." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
 
-    ABOUT_COMMENTS = "Displays lunar, solar, planetary, orbital element, star and satellite information."
-    ABOUT_CREDIT_BRIGHT_LIMB = "Bright Limb from 'Astronomical Algorithms' by Jean Meeus."
-    ABOUT_CREDIT_ECLIPSE = "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov"
-    ABOUT_CREDIT_PYEPHEM = "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem"
-    ABOUT_CREDIT_ORBITAL_ELEMENTS = "Orbital element data by Minor Planet Center. http://www.minorplanetcenter.net"
-    ABOUT_CREDIT_SATELLITE = "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com"
-    ABOUT_CREDIT_TROPICAL_SIGN = "Tropical Sign by Ignius Drake."
+    ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, orbital element, star and satellite information." )
+    ABOUT_CREDIT_BRIGHT_LIMB = _( "Bright Limb from 'Astronomical Algorithms' by Jean Meeus." )
+    ABOUT_CREDIT_ECLIPSE = _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" )
+    ABOUT_CREDIT_PYEPHEM = _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
+    ABOUT_CREDIT_ORBITAL_ELEMENTS = _( "Orbital element data by Minor Planet Center. http://www.minorplanetcenter.net" )
+    ABOUT_CREDIT_SATELLITE = _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" )
+    ABOUT_CREDIT_TROPICAL_SIGN = _( "Tropical Sign by Ignius Drake." )
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_ORBITAL_ELEMENTS ]
 
-    DISPLAY_NEEDS_REFRESH = "(needs refresh)"
+    DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
     INDENT = "    "
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
@@ -204,20 +204,20 @@ class IndicatorLunar:
         "\nSet Time: " + SATELLITE_TAG_SET_TIME + \
         "\nSet Azimuth: " + SATELLITE_TAG_SET_AZIMUTH
 
-    WEREWOLF_WARNING_MESSAGE_DEFAULT = "                                          ...werewolves about ! ! !"
-    WEREWOLF_WARNING_SUMMARY_DEFAULT = "W  A  R  N  I  N  G"
+    WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
+    WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
     INDICATOR_TEXT_DEFAULT = "[" + BODY_MOON + " " + DATA_PHASE + "]"
 
-    MESSAGE_BODY_ALWAYS_UP = "Always Up!"
-    MESSAGE_BODY_NEVER_UP = "Never Up!"
-    MESSAGE_ORBITAL_ELEMENT_NO_DATA = "No orbital element data!"
-    MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "Satellite is circumpolar."
-    MESSAGE_SATELLITE_NEVER_RISES = "Satellite never rises."
-    MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS = "No passes within the next 10 days."
-    MESSAGE_SATELLITE_NO_TLE_DATA = "No TLE data!"
-    MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = "Unable to compute next pass!"
-    MESSAGE_SATELLITE_VALUE_ERROR = "ValueError"
+    MESSAGE_BODY_ALWAYS_UP = _( "Always Up!" )
+    MESSAGE_BODY_NEVER_UP = _( "Never Up!" )
+    MESSAGE_ORBITAL_ELEMENT_NO_DATA = _( "No orbital element data!" )
+    MESSAGE_SATELLITE_IS_CIRCUMPOLAR = _( "Satellite is circumpolar." )
+    MESSAGE_SATELLITE_NEVER_RISES = _( "Satellite never rises." )
+    MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS = _( "No passes within the next 10 days." )
+    MESSAGE_SATELLITE_NO_TLE_DATA = _( "No TLE data!" )
+    MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
+    MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
 
     def __init__( self ):
@@ -266,12 +266,12 @@ class IndicatorLunar:
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
             satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
             if satelliteTLEData is None:
-                summary = "Error Retrieving Satellite TLE Data"
-                message = "The satellite TLE data source could not be reached.  Previous TLE data will be used, if available."
+                summary = _( "Error Retrieving Satellite TLE Data" )
+                message = _( "The satellite TLE data source could not be reached.  Previous TLE data will be used, if available." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             elif len( satelliteTLEData ) == 0:
-                summary = "Empty Satellite TLE Data"
-                message = "The satellite TLE data retrieved is empty.  Previous TLE data will be used, if available."
+                summary = _( "Empty Satellite TLE Data" )
+                message = _( "The satellite TLE data retrieved is empty.  Previous TLE data will be used, if available." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             else:
                 self.satelliteTLEData = satelliteTLEData
@@ -290,12 +290,12 @@ class IndicatorLunar:
         if datetime.datetime.now() > ( self.lastUpdateOrbitalElement + datetime.timedelta( hours = 24 ) ):
             orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
             if orbitalElementData is None:
-                summary = "Error Retrieving Orbital Element Data"
-                message = "The orbital element data source could not be reached.  Previous orbital element data will be used, if available."
+                summary = _( "Error Retrieving Orbital Element Data" )
+                message = _( "The orbital element data source could not be reached.  Previous orbital element data will be used, if available." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             elif len( orbitalElementData ) == 0:
-                summary = "Empty Orbital Element Data"
-                message = "The orbital element data retrieved is empty.  Previous orbital element data will be used, if available."
+                summary = _( "Empty Orbital Element Data" )
+                message = _( "The orbital element data retrieved is empty.  Previous orbital element data will be used, if available." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             else:
                 self.orbitalElementData = orbitalElementData
@@ -485,7 +485,7 @@ class IndicatorLunar:
             menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] ) )
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-            menuItem.get_submenu().append( Gtk.MenuItem( "Next Phases" ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( _( "Next Phases" ) ) )
 
             # Determine which phases occur by date rather than using the phase calculated.
             # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
@@ -535,7 +535,7 @@ class IndicatorLunar:
                 planets.append( planetName )
 
         if len( planets ) > 0:
-            menuItem = Gtk.MenuItem( "Planets" )
+            menuItem = Gtk.MenuItem( _( "Planets" ) )
             menu.append( menuItem )
 
             if self.showPlanetsAsSubMenu:
@@ -557,7 +557,7 @@ class IndicatorLunar:
                 for planetInfo in IndicatorLunar.PLANETS:
                     if planetName == planetInfo[ 0 ] and len( planetInfo[ 3 ] ) > 0:
                         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-                        menuItem.get_submenu().append( Gtk.MenuItem( "Major Moons" ) )
+                        menuItem.get_submenu().append( Gtk.MenuItem( _( "Major Moons" ) ) )
                         self.updatePlanetMoonsMenu( menuItem, planetInfo[ 3 ] )
                         break
 
@@ -575,7 +575,7 @@ class IndicatorLunar:
             subMenu.append( Gtk.MenuItem( "Earth Visible: " + self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] ) )
             subMenu.append( Gtk.SeparatorMenuItem() )
 
-            subMenu.append( Gtk.MenuItem( "Offset from Planet (in planet radii)" ) )
+            subMenu.append( Gtk.MenuItem( _( "Offset from Planet (in planet radii)" ) ) )
             subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "X: " + self.data[ ( dataTag, IndicatorLunar.DATA_X_OFFSET ) ] ) )
             subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Y: " + self.data[ ( dataTag, IndicatorLunar.DATA_Y_OFFSET ) ] ) )
             subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Z: " + self.data[ ( dataTag, IndicatorLunar.DATA_Z_OFFSET ) ] ) )
@@ -592,7 +592,7 @@ class IndicatorLunar:
                 stars.append( starName )
 
         if len( stars ) > 0:
-            menuItem = Gtk.MenuItem( "Stars" )
+            menuItem = Gtk.MenuItem( _( "Stars" ) )
             menu.append( menuItem )
 
             if self.showStarsAsSubMenu:
@@ -619,7 +619,7 @@ class IndicatorLunar:
                 orbitalElements.append( key )
 
         if len( orbitalElements ) > 0:
-            menuItem = Gtk.MenuItem( "Orbital Elements" )
+            menuItem = Gtk.MenuItem( _( "Orbital Elements" ) )
             menu.append( menuItem )
 
             if self.showOrbitalElementsAsSubMenu:
@@ -727,7 +727,7 @@ class IndicatorLunar:
                 menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
 
             # Build the menu...
-            satellitesMenuItem = Gtk.MenuItem( "Satellites" )
+            satellitesMenuItem = Gtk.MenuItem( _( "Satellites" ) )
 
             if self.showSatellitesAsSubMenu:
                 satellitesSubMenu = Gtk.Menu()
@@ -794,7 +794,7 @@ class IndicatorLunar:
 
 
     def updateEclipseMenu( self, menu, dataTag ):
-        menu.append( Gtk.MenuItem( "Eclipse" ) )
+        menu.append( Gtk.MenuItem( _( "Eclipse" ) ) )
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_DATE_TIME ) ] ) )
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Latitude/Longitude: " + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE ) ] ) )
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] ) )
@@ -1146,7 +1146,7 @@ class IndicatorLunar:
 
     # Code courtesy of Ignius Drake.
     def getTropicalSign( self, body, ephemNow ):
-        signList = [ "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces" ]
+        signList = [ _( "Aries" ), _( "Taurus" ), _( "Gemini" ), _( "Cancer" ), _( "Leo" ), _( "Virgo" ), _( "Libra" ), _( "Scorpio" ), _( "Sagittarius" ), _( "Capricorn" ), _( "Aquarius" ), _( "Pisces" ) ]
 
         ( year, month, day ) = ephemNow.triple()
         epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
@@ -1377,8 +1377,8 @@ class IndicatorLunar:
         if self.lock.acquire( blocking = False ):
             self.onPreferencesInternal( widget )
         else:
-            summary = "Preferences unavailable..."
-            message = "The lunar indicator is momentarily refreshing; preferences will be available shortly."
+            summary = _( "Preferences unavailable..." )
+            message = _( "The lunar indicator is momentarily refreshing; preferences will be available shortly." )
             Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start()
 
@@ -1398,12 +1398,12 @@ class IndicatorLunar:
         box.set_margin_left( 10 )
         box.set_margin_right( 10 )
 
-        label = Gtk.Label( "Icon Text" )
+        label = Gtk.Label( _( "Icon Text" ) )
         box.pack_start( label, False, False, 0 )
 
         indicatorText = Gtk.Entry()
         indicatorText.set_text( self.indicatorText )
-        indicatorText.set_tooltip_text( "The text shown next to the indicator icon\n(or shown as a tooltip, where applicable)." )
+        indicatorText.set_tooltip_text( _( "The text shown next to the indicator icon\n(or shown as a tooltip, where applicable)." ) )
         box.pack_start( indicatorText, True, True, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )
@@ -1417,20 +1417,21 @@ class IndicatorLunar:
         tree.set_hexpand( True )
         tree.set_vexpand( True )
 
-        treeViewColumn = Gtk.TreeViewColumn( "Tag", Gtk.CellRendererText(), text = 0 ) 
+        treeViewColumn = Gtk.TreeViewColumn( _( "Tag" ), Gtk.CellRendererText(), text = 0 ) 
         treeViewColumn.set_sort_column_id( 0 )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( "Value", Gtk.CellRendererText(), text = 1 ) 
+        treeViewColumn = Gtk.TreeViewColumn( _( "Value" ), Gtk.CellRendererText(), text = 1 ) 
         treeViewColumn.set_sort_column_id( 1 )
         tree.append_column( treeViewColumn )
 
-        tree.set_tooltip_text( "Double click to add a tag to the\n" + \
-                               "indicator text.\n\n" + \
-                               "Depending on the menu options,\n" + \
-                               "items such as comets which exceed\n" + \
-                               "magnitude or satellites with no\n" + \
-                               "visible pass are omitted." )
+        tree.set_tooltip_text( _( 
+            "Double click to add a tag to the\n" + \
+            "indicator text.\n\n" + \
+            "Depending on the menu options,\n" + \
+            "items such as comets which exceed\n" + \
+            "magnitude or satellites with no\n" + \
+            "visible pass are omitted." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onIndicatorTextTagDoubleClick, indicatorText )
 
@@ -1439,7 +1440,7 @@ class IndicatorLunar:
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "Icon" ) )
+        notebook.append_page( grid, Gtk.Label( _( "Icon" ) ) )
 
         # Menu.
         grid = Gtk.Grid()
@@ -1450,49 +1451,49 @@ class IndicatorLunar:
         grid.set_margin_top( 15 )
         grid.set_margin_bottom( 15 )
 
-        label = Gtk.Label( "Show as submenus" )
+        label = Gtk.Label( _( "Show as submenus" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 40 ) # Bug in Python - must specify the parameter names!
         box.set_margin_left( 20 )
 
-        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( "Planets" )
+        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( ( "Planets" ) )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
-        showPlanetsAsSubmenuCheckbox.set_tooltip_text( "Show planets (excluding moon/sun) in its own submenu." )
+        showPlanetsAsSubmenuCheckbox.set_tooltip_text( _( "Show planets (excluding moon/sun) in its own submenu." ) )
         box.pack_start( showPlanetsAsSubmenuCheckbox, False, False, 0 )
 
-        showStarsAsSubmenuCheckbox = Gtk.CheckButton( "Stars" )
-        showStarsAsSubmenuCheckbox.set_tooltip_text( "Show each star in its own submenu." )
+        showStarsAsSubmenuCheckbox = Gtk.CheckButton( _( "Stars" ) )
+        showStarsAsSubmenuCheckbox.set_tooltip_text( _( "Show each star in its own submenu." ) )
         showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
         box.pack_start( showStarsAsSubmenuCheckbox, False, False, 0 )
 
-        showOrbitalElementsAsSubmenuCheckbox = Gtk.CheckButton( "Orbital elements" )
-        showOrbitalElementsAsSubmenuCheckbox.set_tooltip_text( "Show each orbital element in its own submenu." )
+        showOrbitalElementsAsSubmenuCheckbox = Gtk.CheckButton( _( "Orbital elements" ) )
+        showOrbitalElementsAsSubmenuCheckbox.set_tooltip_text( _( "Show each orbital element in its own submenu." ) )
         showOrbitalElementsAsSubmenuCheckbox.set_active( self.showOrbitalElementsAsSubMenu )
         box.pack_start( showOrbitalElementsAsSubmenuCheckbox, False, False, 0 )
 
-        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( "Satellites" )
+        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( _( "Satellites" ) )
         showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
-        showSatellitesAsSubmenuCheckbox.set_tooltip_text( "Show each satellite in its own submenu." )
+        showSatellitesAsSubmenuCheckbox.set_tooltip_text( _( "Show each satellite in its own submenu." ) )
         box.pack_start( showSatellitesAsSubmenuCheckbox, False, False, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
 
-        hideBodyIfNeverUpCheckbox = Gtk.CheckButton( "Hide bodies which are 'never up'" )
+        hideBodyIfNeverUpCheckbox = Gtk.CheckButton( _( "Hide bodies which are 'never up'" ) )
         hideBodyIfNeverUpCheckbox.set_margin_top( 15 )
         hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
-        hideBodyIfNeverUpCheckbox.set_tooltip_text(
+        hideBodyIfNeverUpCheckbox.set_tooltip_text( _( 
             "If checked, only planets, moon, sun,\n" + \
             "orbital elements and stars which rise/set\n" + \
             "or are 'always up' will be shown.\n\n" + \
-            "Otherwise all bodies are shown." )
+            "Otherwise all bodies are shown." ) )
         grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
 
-        label = Gtk.Label( "Hide orbital elements greater than magnitude" )
+        label = Gtk.Label( _( "Hide orbital elements greater than magnitude" ) )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -1501,25 +1502,25 @@ class IndicatorLunar:
         spinnerOrbitalElementMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
         spinnerOrbitalElementMagnitude.set_adjustment( Gtk.Adjustment( self.orbitalElementsMagnitude, -30, 30, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerOrbitalElementMagnitude.set_value( self.orbitalElementsMagnitude ) # ...so need to force the initial value by explicitly setting it.
-        spinnerOrbitalElementMagnitude.set_tooltip_text( "Orbital elements with a magnitude greater\nthan that specified will not be shown." )
+        spinnerOrbitalElementMagnitude.set_tooltip_text( _( "Orbital elements with a magnitude greater\nthan that specified will not be shown." ) )
 
         box.pack_start( spinnerOrbitalElementMagnitude, False, False, 0 )
 
         grid.attach( box, 0, 3, 1, 1 )
 
-        orbitalElementsAddNewCheckbox = Gtk.CheckButton( "Automatically add new orbital elements" )
+        orbitalElementsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new orbital elements" ) )
         orbitalElementsAddNewCheckbox.set_margin_top( 15 )
         orbitalElementsAddNewCheckbox.set_active( self.orbitalElementsAddNew )
-        orbitalElementsAddNewCheckbox.set_tooltip_text(
+        orbitalElementsAddNewCheckbox.set_tooltip_text( _( 
             "If checked, new orbital elements in the\n" + \
             "downloaded data will be added to your\n" + \
-            "list of checked orbital elements." )
+            "list of checked orbital elements." ) )
         grid.attach( orbitalElementsAddNewCheckbox, 0, 4, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
 
-        label = Gtk.Label( "Satellite menu text" )
+        label = Gtk.Label( _( "Satellite menu text" ) )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -1537,37 +1538,37 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 5, 1, 1 )
 
-        sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( "Sort satellites by rise date/time" )
+        sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 15 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
-        sortSatellitesByDateTimeCheckbox.set_tooltip_text(
+        sortSatellitesByDateTimeCheckbox.set_tooltip_text( _( 
             "By default, satellites are sorted\n" + \
             "alphabetically by menu text.\n\n" + \
-            "If checked, satellites will be\nsorted by rise date/time." )
+            "If checked, satellites will be\nsorted by rise date/time." ) )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 6, 1, 1 )
 
-        hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( "Hide satellites which have no upcoming visible pass" )
+        hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( _( "Hide satellites which have no upcoming visible pass" ) )
         hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 15 )
         hideSatelliteIfNoVisiblePassCheckbox.set_active( self.hideSatelliteIfNoVisiblePass )
-        hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text(
+        hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text( _( 
             "If checked, only satellites with an\n" + \
             "upcoming visible pass are displayed.\n\n" + \
             "Otherwise, all passes, visible or not,\n" + \
-            "are shown (including error messages)." )
+            "are shown (including error messages)." ) )
         grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 7, 1, 1 )
 
-        satellitesAddNewCheckbox = Gtk.CheckButton( "Automatically add new satellites" )
+        satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 15 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
-        satellitesAddNewCheckbox.set_tooltip_text(
+        satellitesAddNewCheckbox.set_tooltip_text( _( 
             "If checked, new satellites in the TLE data will\n" + \
-            "be added to your list of checked satellites." )
+            "be added to your list of checked satellites." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 8, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
 
-        label = Gtk.Label( "Satellite 'on-click' URL" )
+        label = Gtk.Label( _( "Satellite 'on-click' URL" ) )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -1575,26 +1576,26 @@ class IndicatorLunar:
         satelliteURLText.set_text( self.satelliteOnClickURL )
         satelliteURLText.set_hexpand( True )
         satelliteURLText.set_tooltip_text( 
-             "The URL used to lookup a satellite\n" + \
-             "(in the default browser) when any of\n" + \
-             "the satellite's child items are selected\n" + \
-             "from the menu.\n\n" + \
-             "If empty, no lookup will be done.\n\n" + \
-             "Available tags:\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR )
+            "The URL used to lookup a satellite\n" + \
+            "(in the default browser) when any of\n" + \
+            "the satellite's child items are selected\n" + \
+            "from the menu.\n\n" + \
+            "If empty, no lookup will be done.\n\n" + \
+            "Available tags:\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR )
 
         box.pack_start( satelliteURLText, True, True, 0 )
 
-        reset = Gtk.Button( "Reset" )
+        reset = Gtk.Button( _( "Reset" ) )
         reset.connect( "clicked", self.onResetSatelliteOnClickURL, satelliteURLText )
-        reset.set_tooltip_text( "Reset the satellite look-up URL to factory default." )
+        reset.set_tooltip_text( _( "Reset the satellite look-up URL to factory default." ) )
         box.pack_start( reset, False, False, 0 )
 
         grid.attach( box, 0, 9, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "Menu" ) )
+        notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
         # Planets/Stars.
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 15 ) # Bug in Python - must specify the parameter names!
@@ -1605,9 +1606,10 @@ class IndicatorLunar:
 
         tree = Gtk.TreeView( planetStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.set_tooltip_text( "Check a planet to display in the menu.\n\n" + \
-                               "Clicking the header of the first column\n" + \
-                               "toggles all checkboxes." )
+        tree.set_tooltip_text( _( 
+            "Check a planet to display in the menu.\n\n" + \
+            "Clicking the header of the first column\n" + \
+            "toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, displayTagsStore )
@@ -1616,7 +1618,7 @@ class IndicatorLunar:
         treeViewColumn.connect( "clicked", self.onToggle, planetStore, AstronomicalObjectType.Planet )
         tree.append_column( treeViewColumn )
 
-        tree.append_column( Gtk.TreeViewColumn( "Planet", Gtk.CellRendererText(), text = 1 ) )
+        tree.append_column( Gtk.TreeViewColumn( _( "Planet" ), Gtk.CellRendererText(), text = 1 ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
@@ -1630,9 +1632,10 @@ class IndicatorLunar:
 
         tree = Gtk.TreeView( starStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.set_tooltip_text( "Check a star to display in the menu.\n\n" + \
-                               "Clicking the header of the first column\n" + \
-                               "toggles all checkboxes." )
+        tree.set_tooltip_text( _( 
+            "Check a star to display in the menu.\n\n" + \
+            "Clicking the header of the first column\n" + \
+            "toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onStarToggled, starStore, displayTagsStore )
@@ -1641,7 +1644,7 @@ class IndicatorLunar:
         treeViewColumn.connect( "clicked", self.onToggle, starStore, AstronomicalObjectType.Star )
         tree.append_column( treeViewColumn )
 
-        tree.append_column( Gtk.TreeViewColumn( "Star", Gtk.CellRendererText(), text = 1 ) )
+        tree.append_column( Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 1 ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -1649,7 +1652,7 @@ class IndicatorLunar:
 
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        notebook.append_page( box, Gtk.Label( "Planets / Stars" ) )
+        notebook.append_page( box, Gtk.Label( _( "Planets / Stars" ) ) )
 
         # Orbital elements.
         orbitalElementGrid = Gtk.Grid()
@@ -1662,9 +1665,10 @@ class IndicatorLunar:
         orbitalElementStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView( orbitalElementStoreSort )
-        tree.set_tooltip_text( "Check an orbital element to display in the menu.\n\n" + \
-                               "Clicking the header of the first column\n" + \
-                               "toggles all checkboxes." )
+        tree.set_tooltip_text( _( 
+            "Check an orbital element to display in the menu.\n\n" + \
+            "Clicking the header of the first column\n" + \
+            "toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onOrbitalElementToggled, orbitalElementStore, displayTagsStore, orbitalElementStoreSort )
@@ -1673,7 +1677,7 @@ class IndicatorLunar:
         treeViewColumn.connect( "clicked", self.onToggle, orbitalElementStore, AstronomicalObjectType.OrbitalElement )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( "Name", Gtk.CellRendererText(), text = 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
         tree.append_column( treeViewColumn )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -1688,7 +1692,7 @@ class IndicatorLunar:
         box.set_margin_left( 10 )
         box.set_margin_right( 10 )
 
-        label = Gtk.Label( "Orbital element data" )
+        label = Gtk.Label( _( "Orbital element data" ) )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -1700,18 +1704,18 @@ class IndicatorLunar:
         orbitalElementURLEntry = Gtk.Entry()
         orbitalElementURLEntry.set_text( self.orbitalElementURL )
         orbitalElementURLEntry.set_hexpand( True )
-        orbitalElementURLEntry.set_tooltip_text(
+        orbitalElementURLEntry.set_tooltip_text( _( 
             "The URL from which to source orbital element data.\n" + \
             "To specify a local file, use 'file:///'.\n\n" + \
             "The orbital element data will be automatically\n" + \
             "loaded each time the indicator is started\n" + \
-            "and approximately every 24 hours thereafter." )
+            "and approximately every 24 hours thereafter." ) )
         box.pack_start( orbitalElementURLEntry, True, True, 0 )
 
-        fetch = Gtk.Button( "Fetch" )
-        fetch.set_tooltip_text(
+        fetch = Gtk.Button( _( "Fetch" ) )
+        fetch.set_tooltip_text( _( 
             "Retrieve the orbital element data from the URL.\n" + \
-            "If the URL is empty, the default URL will be used." )
+            "If the URL is empty, the default URL will be used." ) )
         fetch.connect( "clicked", self.onFetchOrbitalElementURL, orbitalElementURLEntry, orbitalElementGrid, orbitalElementStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
@@ -1724,7 +1728,7 @@ class IndicatorLunar:
         
         orbitalElementGrid.attach( label, 0, 2, 1, 1 )
 
-        notebook.append_page( orbitalElementGrid, Gtk.Label( "Orbital Elements" ) )
+        notebook.append_page( orbitalElementGrid, Gtk.Label( _( "Orbital Elements" ) ) )
 
         # Satellites.
         satelliteGrid = Gtk.Grid()
@@ -1737,9 +1741,10 @@ class IndicatorLunar:
         satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView( satelliteStoreSort )
-        tree.set_tooltip_text( "Check a satellite to display in the menu.\n\n" + \
-                               "Clicking the header of the first column\n" + \
-                               "toggles all checkboxes." )
+        tree.set_tooltip_text( _( 
+            "Check a satellite to display in the menu.\n\n" + \
+            "Clicking the header of the first column\n" + \
+            "toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
@@ -1748,15 +1753,15 @@ class IndicatorLunar:
         treeViewColumn.connect( "clicked", self.onToggle, satelliteStore, AstronomicalObjectType.Satellite )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( "Satellite Name", Gtk.CellRendererText(), text = 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Satellite Name" ), Gtk.CellRendererText(), text = 1 )
         treeViewColumn.set_sort_column_id( 1 )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( "Number", Gtk.CellRendererText(), text = 2 ) 
+        treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = 2 ) 
         treeViewColumn.set_sort_column_id( 2 )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( "International Designator", Gtk.CellRendererText(), text = 3 ) 
+        treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = 3 ) 
         treeViewColumn.set_sort_column_id( 3 )
         tree.append_column( treeViewColumn )
 
@@ -1772,7 +1777,7 @@ class IndicatorLunar:
         box.set_margin_left( 10 )
         box.set_margin_right( 10 )
 
-        label = Gtk.Label( "Satellite TLE data" )
+        label = Gtk.Label( _( "Satellite TLE data" ) )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -1782,18 +1787,18 @@ class IndicatorLunar:
         TLEURLEntry = Gtk.Entry()
         TLEURLEntry.set_text( self.satelliteTLEURL )
         TLEURLEntry.set_hexpand( True )
-        TLEURLEntry.set_tooltip_text(
+        TLEURLEntry.set_tooltip_text( _( 
             "The URL from which to source TLE satellite data.\n" + \
             "To specify a local file, use 'file:///'.\n\n" + \
             "The satellite TLE data will be automatically\n" + \
             "loaded each time the indicator is started\n" + \
-            "and approximately every 12 hours thereafter." )
+            "and approximately every 12 hours thereafter." ) )
         box.pack_start( TLEURLEntry, True, True, 0 )
 
-        fetch = Gtk.Button( "Fetch" )
-        fetch.set_tooltip_text(
+        fetch = Gtk.Button( _( "Fetch" ) )
+        fetch.set_tooltip_text( _( 
             "Retrieve the TLE data from the specified URL.\n" + \
-            "If the URL is empty, the default URL will be used." )
+            "If the URL is empty, the default URL will be used." ) )
         fetch.connect( "clicked", self.onFetchSatelliteTLEURL, TLEURLEntry, satelliteGrid, satelliteStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
@@ -1806,7 +1811,7 @@ class IndicatorLunar:
         
         satelliteGrid.attach( label, 0, 2, 1, 1 )
 
-        notebook.append_page( satelliteGrid, Gtk.Label( "Satellites" ) )
+        notebook.append_page( satelliteGrid, Gtk.Label( _( "Satellites" ) ) )
 
         # OSD (satellite and full moon).
         grid = Gtk.Grid()
@@ -1817,12 +1822,12 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showSatelliteNotificationCheckbox = Gtk.CheckButton( "Satellite rise" )
+        showSatelliteNotificationCheckbox = Gtk.CheckButton( _( "Satellite rise" ) )
         showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
-        showSatelliteNotificationCheckbox.set_tooltip_text( "Screen notification when a satellite rises above the horizon." )
+        showSatelliteNotificationCheckbox.set_tooltip_text( _( "Screen notification when a satellite rises above the horizon." ) )
         grid.attach( showSatelliteNotificationCheckbox, 0, 0, 2, 1 )
  
-        label = Gtk.Label( "Summary" )
+        label = Gtk.Label( _( "Summary" ) )
         label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         label.set_halign( Gtk.Align.START )
         label.set_margin_left( 25 )
@@ -1848,7 +1853,7 @@ class IndicatorLunar:
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteNotificationSummaryText )
 
-        label = Gtk.Label( "Message" )
+        label = Gtk.Label( _( "Message" ) )
         label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         label.set_halign( Gtk.Align.START )
         label.set_margin_left( 25 )
@@ -1879,11 +1884,11 @@ class IndicatorLunar:
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, scrolledWindow )
 
-        test = Gtk.Button( "Test" )
+        test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         test.connect( "clicked", self.onTestClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, False )
-        test.set_tooltip_text( "Show the notification bubble.\nTags will be substituted with mock text." )
+        test.set_tooltip_text( _( "Show the notification bubble.\nTags will be substituted with mock text." ) )
         grid.attach( test, 1, 3, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
@@ -1891,14 +1896,14 @@ class IndicatorLunar:
         separator = Gtk.Separator.new( Gtk.Orientation.HORIZONTAL )
         grid.attach( separator, 0, 4, 2, 1 )
 
-        showWerewolfWarningCheckbox = Gtk.CheckButton( "Werewolf warning" )
+        showWerewolfWarningCheckbox = Gtk.CheckButton( _( "Werewolf warning" ) )
         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
-        showWerewolfWarningCheckbox.set_tooltip_text(
+        showWerewolfWarningCheckbox.set_tooltip_text( _( 
             "Screen notification (approximately hourly)\n" + \
-            "at full moon (or leading up to)." )
+            "at full moon (or leading up to)." ) )
         grid.attach( showWerewolfWarningCheckbox, 0, 5, 2, 1 )
 
-        label = Gtk.Label( "Illumination" )
+        label = Gtk.Label( _( "Illumination" ) )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         label.set_halign( Gtk.Align.START )
         label.set_margin_left( 25 )
@@ -1907,16 +1912,16 @@ class IndicatorLunar:
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 0, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.werewolfWarningStartIlluminationPercentage ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text(
+        spinner.set_tooltip_text( _( 
             "The notification commences at the\n" + \
             "specified illumination (%),\n" + \
-            "starting after a new moon (0%)." )
+            "starting after a new moon (0%)." ) )
         spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( spinner, 1, 6, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, spinner )
 
-        label = Gtk.Label( "Summary" )
+        label = Gtk.Label( _( "Summary" ) )
         label.set_margin_left( 25 )
         label.set_halign( Gtk.Align.START )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
@@ -1924,15 +1929,15 @@ class IndicatorLunar:
 
         werewolfNotificationSummaryText = Gtk.Entry()
         werewolfNotificationSummaryText.set_text( self.werewolfWarningSummary )
-        werewolfNotificationSummaryText.set_tooltip_text(
+        werewolfNotificationSummaryText.set_tooltip_text( _( 
             "The summary for the werewolf notification.\n\n" + \
-            "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
+            "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" ) )
         werewolfNotificationSummaryText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( werewolfNotificationSummaryText, 1, 7, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationSummaryText )
 
-        label = Gtk.Label( "Message" )
+        label = Gtk.Label( _( "Message" ) )
         label.set_margin_left( 25 )
         label.set_halign( Gtk.Align.START )
         label.set_valign( Gtk.Align.START )
@@ -1941,9 +1946,9 @@ class IndicatorLunar:
 
         werewolfNotificationMessageText = Gtk.TextView()
         werewolfNotificationMessageText.get_buffer().set_text( self.werewolfWarningMessage )
-        werewolfNotificationMessageText.set_tooltip_text(
+        werewolfNotificationMessageText.set_tooltip_text( _( 
             "The message for the werewolf notification.\n\n" + \
-            "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
+            "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" ) )
         werewolfNotificationMessageText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -1954,16 +1959,16 @@ class IndicatorLunar:
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationMessageText )
 
-        test = Gtk.Button( "Test" )
+        test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         test.connect( "clicked", self.onTestClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, True )
-        test.set_tooltip_text( "Show the notification using the current settings." )
+        test.set_tooltip_text( _( "Show the notification using the current settings." ) )
         grid.attach( test, 1, 9, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
-        notebook.append_page( grid, Gtk.Label( "Notifications" ) )
+        notebook.append_page( grid, Gtk.Label( _( "Notifications" ) ) )
 
         # Location.
         grid = Gtk.Grid()
@@ -1974,7 +1979,7 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        label = Gtk.Label( "City" )
+        label = Gtk.Label( _( "City" ) )
         label.set_halign( Gtk.Align.START )
 
         grid.attach( label, 0, 0, 1, 1 )
@@ -1982,50 +1987,50 @@ class IndicatorLunar:
         global _city_data
         cities = sorted( _city_data.keys(), key = locale.strxfrm )
         city = Gtk.ComboBoxText.new_with_entry()
-        city.set_tooltip_text(
+        city.set_tooltip_text( _( 
             "To reset the cities to default lat/long/elev,\n" + \
-            "add a bogus city and restart the indicator." )
+            "add a bogus city and restart the indicator." ) )
         for c in cities:
             city.append_text( c )
 
         grid.attach( city, 1, 0, 1, 1 )
 
-        label = Gtk.Label( "Latitude (DD)" )
+        label = Gtk.Label( _( "Latitude (DD)" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 1, 1 )
 
         latitude = Gtk.Entry()
-        latitude.set_tooltip_text( "Latitude of your location in decimal degrees." )
+        latitude.set_tooltip_text( _( "Latitude of your location in decimal degrees." ) )
         grid.attach( latitude, 1, 1, 1, 1 )
 
-        label = Gtk.Label( "Longitude (DD)" )
+        label = Gtk.Label( _( "Longitude (DD)" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 2, 1, 1 )
 
         longitude = Gtk.Entry()
-        longitude.set_tooltip_text( "Longitude of your location in decimal degrees." )
+        longitude.set_tooltip_text( _( "Longitude of your location in decimal degrees." ) )
         grid.attach( longitude, 1, 2, 1, 1 )
 
-        label = Gtk.Label( "Elevation (m)" )
+        label = Gtk.Label( _( "Elevation (m)" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 3, 1, 1 )
 
         elevation = Gtk.Entry()
-        elevation.set_tooltip_text( "Height in metres above sea level." )
+        elevation.set_tooltip_text( _( "Height in metres above sea level." ) )
         grid.attach( elevation, 1, 3, 1, 1 )
 
         city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
         city.set_active( cities.index( self.cityName ) )
 
-        autostartCheckbox = Gtk.CheckButton( "Autostart" )
-        autostartCheckbox.set_tooltip_text( "Run the indicator automatically." )
+        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
+        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
         autostartCheckbox.set_margin_top( 20 )
         grid.attach( autostartCheckbox, 0, 4, 2, 1 )
 
-        notebook.append_page( grid, Gtk.Label( "General" ) )
+        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        self.dialog = Gtk.Dialog( "Preferences", None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorLunar.ICON )
@@ -2039,35 +2044,35 @@ class IndicatorLunar:
             if self.dialog.run() != Gtk.ResponseType.OK: break
 
             if satelliteMenuText.get_text().strip() == "":
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Satellite menu text cannot be empty." )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Satellite menu text cannot be empty." ) )
                 notebook.set_current_page( 1 )
                 satelliteMenuText.grab_focus()
                 continue
 
             cityValue = city.get_active_text()
             if cityValue == "":
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "City cannot be empty." )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ) )
                 notebook.set_current_page( 5 )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
             if latitudeValue == "" or not pythonutils.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Latitude must be a number between 90 and -90 inclusive." )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Latitude must be a number between 90 and -90 inclusive." ) )
                 notebook.set_current_page( 5 )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
             if longitudeValue == "" or not pythonutils.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Longitude must be a number between 180 and -180 inclusive." )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Longitude must be a number between 180 and -180 inclusive." ) )
                 notebook.set_current_page( 5 )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
             if elevationValue == "" or not pythonutils.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, "Elevation must be a number number between 0 and 10000 inclusive." )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number number between 0 and 10000 inclusive." ) )
                 notebook.set_current_page( 5 )
                 elevation.grab_focus()
                 continue
