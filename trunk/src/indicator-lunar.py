@@ -39,13 +39,6 @@
 # https://danielkaes.wordpress.com/2009/06/04/how-to-catch-kill-events-with-python/
 
 
-#TODO Fix bug when going from http:// for tle to default tle url.
-# Ensure valid url and satellites checked.  Change url to be bad, do fetch and ok prefs.  Should get 
-#   File "/home/bernard/Programming/IndicatorLunar/src/indicator-lunar.py", line 982, in updateSatellites
-#     if key in self.satelliteTLEData:
-# TypeError: argument of type 'NoneType' is not iterable
-
-
 #TODO Change tle/or urls to be http:// and see if the notification error comes up all the time.
 
 
@@ -283,8 +276,6 @@ class IndicatorLunar:
         # Update the satellite TLE data at most every 12 hours.  If the data is invalid, use the TLE data from the previous run.
         if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
             satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
-#TODO Remove            
-            print( "updateBackend::", satelliteTLEData is None, satelliteTLEData is not None and len( satelliteTLEData ) > 0 )
             if satelliteTLEData is None:
                 summary = "Error Retrieving Satellite TLE Data"
                 message = "The satellite TLE data source could not be reached.  Previous TLE data will be used, if available."
@@ -303,6 +294,8 @@ class IndicatorLunar:
                             self.satellites.append( key )
 
                     self.saveSettings()
+
+            self.lastUpdateTLE = datetime.datetime.now()
 
         # Update the orbital element data at most every 24 hours.  If the data is invalid, use the orbital element data from the previous run.
         if datetime.datetime.now() > ( self.lastUpdateOrbitalElement + datetime.timedelta( hours = 24 ) ):
@@ -326,6 +319,9 @@ class IndicatorLunar:
 
                     self.saveSettings()
 
+            self.lastUpdateOrbitalElement = datetime.datetime.now()
+
+        # Reset data on each update...
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
         self.data[ ( IndicatorLunar.DATA_CITY_NAME, "" ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match the format of all other data.
         self.nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
@@ -484,8 +480,7 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] )
 
-#TODO Put this back!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+            Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
 
     def updateMoonMenu( self, menu ):
@@ -2110,18 +2105,26 @@ class IndicatorLunar:
             for starInfo in starStore:
                 if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
 
-            if self.orbitalElementURLNew is not None:
-                self.orbitalElementData = self.orbitalElementDataNew
-                self.orbitalElementURL = self.orbitalElementURLNew
+            if self.orbitalElementURLNew is not None: # The URL will only be None on intialisation.
+                self.orbitalElementURL = self.orbitalElementURLNew # The URL could still be invalid, but it will not be None.
+  
+            if self.orbitalElementDataNew is None:
+                self.orbitalElementData = { } # The retrieved orbital element data was bad, so reset to empty data.
+            else:
+                self.orbitalElementData = self.orbitalElementDataNew # The retrieved orbital element data is good (but still could be empty).
 
             self.orbitalElements = [ ]
             for orbitalElement in orbitalElementStore:
                 if orbitalElement[ 0 ]:
                     self.orbitalElements.append( orbitalElement[ 1 ].upper() )
 
-            if self.satelliteTLEURLNew is not None:
-                self.satelliteTLEData = self.satelliteTLEDataNew
-                self.satelliteTLEURL = self.satelliteTLEURLNew
+            if self.satelliteTLEURLNew is not None: # The URL will only be None on intialisation.
+                self.satelliteTLEURL = self.satelliteTLEURLNew # The URL could still be invalid, but it will not be None.
+  
+            if self.satelliteTLEDataNew is None:
+                self.satelliteTLEData = { } # The retrieved TLE data was bad, so reset to empty data.
+            else:
+                self.satelliteTLEData = self.satelliteTLEDataNew # The retrieved TLE data is good (but still could be empty).
 
             self.satellites = [ ]
             for satelliteTLE in satelliteStore:
@@ -2491,8 +2494,6 @@ class IndicatorLunar:
             logging.exception( e )
             logging.error( "Error retrieving satellite TLE data from " + str( url ) )
 
-#TODO Remove
-        print( "getSatelliteTLEData::", satelliteTLEData is None, satelliteTLEData is not None and len( satelliteTLEData ) > 0 )
         return satelliteTLEData
 
 

@@ -1,5 +1,10 @@
 indicator-lunar (1.0.57-1) precise; urgency=low
 
+  * Bug fix: The last update for satellite TLE data and orbital element data
+    was not being set to the current time after an update.
+  * Bug fix: In the Preferences, if a bad URL for satellite TLE data or
+    orbital element data was entered, the resulting bad data was carried
+    through to the indicator proper.
   * Option to automatically add new satellites and/or orbital elements from
     the respective data source.
   * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
