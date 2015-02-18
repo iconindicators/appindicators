@@ -436,7 +436,7 @@ class IndicatorLunar:
             self.updateCommonMenu( menuItem, AstronomicalObjectType.Moon, IndicatorLunar.BODY_MOON )
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
-            menuItem.get_submenu().append( Gtk.MenuItem( "Phase: " + self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( _( "Phase: " ) + self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] ) )
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
             menuItem.get_submenu().append( Gtk.MenuItem( _( "Next Phases" ) ) )
@@ -444,10 +444,10 @@ class IndicatorLunar:
             # Determine which phases occur by date rather than using the phase calculated.
             # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
             nextPhases = [ ]
-            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FIRST_QUARTER ) ], "First Quarter: " ] )
-            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FULL ) ], "Full: " ] )
-            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_THIRD_QUARTER ) ], "Third Quarter: " ] )
-            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_NEW ) ], "New: " ] )
+            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FIRST_QUARTER ) ], _( "First Quarter: " ) ] )
+            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FULL ) ], _( "Full: " ) ] )
+            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_THIRD_QUARTER ) ], _( "Third Quarter: " ) ] )
+            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_NEW ) ], _( "New: " ) ] )
 
             nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
             for phaseInformation in nextPhases:
@@ -470,11 +470,11 @@ class IndicatorLunar:
             equinox = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_EQUINOX ) ]
             solstice = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_SOLSTICE ) ]
             if equinox < solstice:
-                menuItem.get_submenu().append( Gtk.MenuItem( "Equinox: " + equinox ) )
-                menuItem.get_submenu().append( Gtk.MenuItem( "Solstice: " + solstice ) )
+                menuItem.get_submenu().append( Gtk.MenuItem( _( "Equinox: " ) + equinox ) )
+                menuItem.get_submenu().append( Gtk.MenuItem( _( "Solstice: " ) + solstice ) )
             else:
-                menuItem.get_submenu().append( Gtk.MenuItem( "Solstice: " + solstice ) )
-                menuItem.get_submenu().append( Gtk.MenuItem( "Equinox: " + equinox ) )
+                menuItem.get_submenu().append( Gtk.MenuItem( _( "Solstice: " ) + solstice ) )
+                menuItem.get_submenu().append( Gtk.MenuItem( _( "Equinox: " ) + equinox ) )
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
             self.updateEclipseMenu( menuItem.get_submenu(), IndicatorLunar.BODY_SUN )
@@ -526,13 +526,13 @@ class IndicatorLunar:
             self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, dataTag )
             subMenu.append( Gtk.SeparatorMenuItem() )
 
-            subMenu.append( Gtk.MenuItem( "Earth Visible: " + self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] ) )
             subMenu.append( Gtk.SeparatorMenuItem() )
 
             subMenu.append( Gtk.MenuItem( _( "Offset from Planet (in planet radii)" ) ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "X: " + self.data[ ( dataTag, IndicatorLunar.DATA_X_OFFSET ) ] ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Y: " + self.data[ ( dataTag, IndicatorLunar.DATA_Y_OFFSET ) ] ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Z: " + self.data[ ( dataTag, IndicatorLunar.DATA_Z_OFFSET ) ] ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "X: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_X_OFFSET ) ] ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Y: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_Y_OFFSET ) ] ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Z: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_Z_OFFSET ) ] ) )
 
             moonMenuItem.set_submenu( subMenu )
 
@@ -596,30 +596,30 @@ class IndicatorLunar:
         subMenu = Gtk.Menu()
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
-            subMenu.append( Gtk.MenuItem( "Illumination: " + self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Illumination: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] ) )
 
-        subMenu.append( Gtk.MenuItem( "Constellation: " + self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] ) )
-        subMenu.append( Gtk.MenuItem( "Magnitude: " + self.data[ ( dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] ) )
+        subMenu.append( Gtk.MenuItem( _( "Constellation: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] ) )
+        subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
            astronomicalObjectType == AstronomicalObjectType.Planet or \
            astronomicalObjectType == AstronomicalObjectType.Star or \
            astronomicalObjectType == AstronomicalObjectType.Sun:
-            subMenu.append( Gtk.MenuItem( "Tropical Sign: " + self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Tropical Sign: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
            astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
            astronomicalObjectType == AstronomicalObjectType.Planet or \
            astronomicalObjectType == AstronomicalObjectType.Sun:
-            subMenu.append( Gtk.MenuItem( "Distance to Earth: " + self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
            astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
            astronomicalObjectType == AstronomicalObjectType.Planet:
-            subMenu.append( Gtk.MenuItem( "Distance to Sun: " + self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Distance to Sun: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:            
-            subMenu.append( Gtk.MenuItem( "Bright Limb: " + self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Bright Limb: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -631,12 +631,12 @@ class IndicatorLunar:
             subMenu.append( Gtk.MenuItem( self.data[ ( dataTag, IndicatorLunar.DATA_MESSAGE ) ] ) )
         else:
             data = [ ]
-            data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_RISE_TIME ) ], "Rise: " ] )
-            data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_SET_TIME ) ], "Set: " ] )
+            data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_RISE_TIME ) ], _( "Rise: " ) ] )
+            data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_SET_TIME ) ], _( "Set: " ) ] )
 
             if astronomicalObjectType == AstronomicalObjectType.Sun:
-                data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_DAWN ) ], "Dawn: " ] )
-                data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_DUSK ) ], "Dusk: " ] )
+                data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_DAWN ) ], _( "Dawn: " ) ] )
+                data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_DUSK ) ], _( "Dusk: " ) ] )
 
             data = sorted( data, key = lambda x: ( x[ 0 ] ) )
 
@@ -693,18 +693,18 @@ class IndicatorLunar:
                 if ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) in self.data:
                     subMenu.append( Gtk.MenuItem( self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] ) )
                     if self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
-                        subMenu.append( Gtk.MenuItem( "Azimuth: " + self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] ) )
-                        subMenu.append( Gtk.MenuItem( "Declination: " + self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] ) )
+                        subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] ) )
+                        subMenu.append( Gtk.MenuItem( _( "Declination: " ) + self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] ) )
                 else:
-                    subMenu.append( Gtk.MenuItem( "Rise" ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] ) )
-                    subMenu.append( Gtk.MenuItem( "Set" ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Azimuth: " + self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] ) )
+                    subMenu.append( Gtk.MenuItem( _( "Rise" ) ) )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] ) )
+                    subMenu.append( Gtk.MenuItem( _( "Set" ) ) )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] ) )
 
                     if not self.hideSatelliteIfNoVisiblePass:
-                        subMenu.append( Gtk.MenuItem( "Visible: " + self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] ) )
+                        subMenu.append( Gtk.MenuItem( _( "Visible: " ) + self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] ) )
 
                 self.addOnSatelliteHandler( subMenu, key )
 
@@ -741,17 +741,17 @@ class IndicatorLunar:
 
 
     def updateRightAscensionDeclinationAzimuthAltitudeMenu( self, menu, dataTag ):
-        menu.append( Gtk.MenuItem( "Right Ascension: " + self.data[ ( dataTag, IndicatorLunar.DATA_RIGHT_ASCENSION ) ] ) )
-        menu.append( Gtk.MenuItem( "Declination: " + self.data[ ( dataTag, IndicatorLunar.DATA_DECLINATION ) ] ) )
-        menu.append( Gtk.MenuItem( "Azimuth: " + self.data[ ( dataTag, IndicatorLunar.DATA_AZIMUTH ) ] ) )
-        menu.append( Gtk.MenuItem( "Altitude: " + self.data[ ( dataTag, IndicatorLunar.DATA_ALTITUDE ) ] ) )
+        menu.append( Gtk.MenuItem( _( "Right Ascension: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_RIGHT_ASCENSION ) ] ) )
+        menu.append( Gtk.MenuItem( _( "Declination: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_DECLINATION ) ] ) )
+        menu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_AZIMUTH ) ] ) )
+        menu.append( Gtk.MenuItem( _( "Altitude: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_ALTITUDE ) ] ) )
 
 
     def updateEclipseMenu( self, menu, dataTag ):
         menu.append( Gtk.MenuItem( _( "Eclipse" ) ) )
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Date/Time: " + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_DATE_TIME ) ] ) )
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Latitude/Longitude: " + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE ) ] ) )
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + "Type: " + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_DATE_TIME ) ] ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Latitude/Longitude: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE ) ] ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Type: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] ) )
 
 
     def updateSatelliteTLEData( self ):
