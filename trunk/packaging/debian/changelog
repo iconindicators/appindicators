@@ -108,8 +108,8 @@ indicator-lunar (1.0.50-1) precise; urgency=low
   * Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a
     segmentation fault).
   * Bug fix: Using the same name for the icon causes the icon to appear the
-    same so appindicator (or something) decides not to reload the icon.
-    The workaround is to give the icon a new name - really, alternate the name.
+    same and so appindicator (or something) decides not to reload the icon.
+    The workaround is to alternate the icon name on each refresh.
     https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 8 Jul 2014 11:11:14 +1000
@@ -148,7 +148,7 @@ indicator-lunar (1.0.46-1) precise; urgency=low
 
   * Put in a fix to handle Gtk.TreeModelSort bug reported at 
     https://bugs.launchpad.net/ubuntu/+source/pygobject/+bug/1114406.
-  * When only showing visible satellites, the visible label/tag is now dropped.
+  * When showing only visible satellites, the visible label is now dropped.
   * Added option to hide satellites when no transit information is available.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Jun 2014 17:33:16 +1000
@@ -187,8 +187,8 @@ indicator-lunar (1.0.42-1) precise; urgency=low
   * Bug fix: The star data was not being removed after a star was unchecked.
   * Bug fix: Each time the preferences was closed (on clicking OK) an update
     was kicked off (in addition to the main update).
-  * Bug fix: Handle "extreme" latitudes when encountering always up or never up
-    for rise/set of a body.
+  * Bug fix: Handle "extreme" latitudes when encountering always up or never
+    up for rise/set of a body.
   * Planets can now be chosen by the user (for display in the menu).
   * Added rise/set times and constellation to stars.
   * Added URLs to credits section in About dialog.
@@ -259,7 +259,8 @@ indicator-lunar (1.0.34-1) precise; urgency=low
   * Added RA/Dec in hh:mm:ss/dd:mm:ss respectively.
   * Uses AboutDialog and showMessage from common library.
   * Moved theme methods to common library.
-  * Moved eclipse information into a separate file and removed Ephem dependency.
+  * Moved eclipse information into a separate file and removed Ephem
+    dependency.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 26 Dec 2013 12:05:57 +1000
 
