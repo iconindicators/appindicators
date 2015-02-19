@@ -1221,12 +1221,24 @@ class IndicatorLunar:
             elif eclipseInformation[ 1 ] == eclipse.EclipseType.Penumbral: eclipseType = _( "Penumbral" )
             elif eclipseInformation[ 1 ] == eclipse.EclipseType.Total: eclipseType = _( "Total" )
 
+            northOrSouth = None
+            if   eclipseInformation[ 3 ] == eclipse.CardinalDirection.N: northOrSouth = _( "N" )
+            elif eclipseInformation[ 3 ] == eclipse.CardinalDirection.S: northOrSouth = _( "S" )
+
+            eastOrWest = None
+            if   eclipseInformation[ 5 ] == eclipse.CardinalDirection.E: eastOrWest = _( "E" )
+            elif eclipseInformation[ 5 ] == eclipse.CardinalDirection.W: eastOrWest = _( "W" )
+
             if eclipseType is None:
                 logging.error( "Unknown eclipse type", eclipseInformation )
+            elif northOrSouth is None:
+                logging.error( "Unknown latitude cardinal direction", eclipseInformation )
+            elif eastOrWest is None:
+                logging.error( "Unknown longitude cardinal direction", eclipseInformation )
             else:
                 localisedAndTrimmedDateTime = self.localiseAndTrim( ephem.Date( eclipseInformation[ 0 ] ) )
                 self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_DATE_TIME ) ] = localisedAndTrimmedDateTime
-                self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE ) ] = eclipseInformation[ 2 ] + " " + eclipseInformation[ 3 ]
+                self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE ) ] = eclipseInformation[ 2 ] + " " + northOrSouth + " " + eclipseInformation[ 4 ] + " " + eastOrWest 
                 self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] = eclipseType
 
 

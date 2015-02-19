@@ -21,6 +21,9 @@
 import datetime
 
 
+class CardinalDirection: N, S, E, W = range( 4 )
+
+
 class EclipseType: Annular, Hybrid, Partial, Penumbral, Total = range( 5 )
 
 
@@ -39,24 +42,40 @@ def __getEclipseForUTC( eclipseData, dateTimeUTC ):
         dateTime = dateTime - datetime.timedelta( seconds = int( eclipse[ 4 ] ) )
 
         if dateTimeUTC <= dateTime:
+            latitude = eclipse[ 6 ][ 0 : len( eclipse[ 6 ] ) - 1 ] + "°"
+            northOrSouth = __getCardinalDirection( eclipse[ 6 ][ -1 ] )
 
-            # Add in the degrees symbol and add a space before the N/S/E/W.
-            latitude = eclipse[ 6 ][ 0 : len( eclipse[ 6 ] ) - 1 ] + "° " + eclipse[ 6 ][ -1 ]
-            longitude = eclipse[ 7 ][ 0 : len( eclipse[ 7 ] ) - 1 ] + "° " + eclipse[ 7 ][ -1 ]
+            longitude = eclipse[ 7 ][ 0 : len( eclipse[ 7 ] ) - 1 ] + "°"
+            eastOrWest = __getCardinalDirection( eclipse[ 7 ][ -1 ] )
 
-            eclipseType = None
-            if   eclipse[ 5 ] == "A": eclipseType = EclipseType.Annular
-            elif eclipse[ 5 ] == "H": eclipseType = EclipseType.Hybrid
-            elif eclipse[ 5 ] == "N": eclipseType = EclipseType.Penumbral
-            elif eclipse[ 5 ] == "P": eclipseType = EclipseType.Partial
-            elif eclipse[ 5 ] == "T": eclipseType = EclipseType.Total
+            eclipseType = __getEclipseType( eclipse[ 5 ] )
 
-            if eclipseType is not None: 
-                eclipseInfo = [ dateTime, eclipseType, latitude, longitude ]
-
-            break
+            if northOrSouth is not None and eastOrWest is not None and eclipseType is not None:
+                eclipseInfo = [ dateTime, eclipseType, latitude, northOrSouth, longitude, eastOrWest ]
+                break
 
     return eclipseInfo
+
+
+def __getEclipseType( eclipseTypeAsString ): 
+    eclipseType = None
+    if   eclipseTypeAsString == "A": eclipseType = EclipseType.Annular
+    elif eclipseTypeAsString == "H": eclipseType = EclipseType.Hybrid
+    elif eclipseTypeAsString == "N": eclipseType = EclipseType.Penumbral
+    elif eclipseTypeAsString == "P": eclipseType = EclipseType.Partial
+    elif eclipseTypeAsString == "T": eclipseType = EclipseType.Total
+
+    return eclipseType
+
+
+def __getCardinalDirection( cardinalDirectionAsString ): 
+    cardinalDirection = None
+    if   cardinalDirectionAsString == "N": cardinalDirection = CardinalDirection.N
+    elif cardinalDirectionAsString == "S": cardinalDirection = CardinalDirection.S
+    elif cardinalDirectionAsString == "E": cardinalDirection = CardinalDirection.E
+    elif cardinalDirectionAsString == "W": cardinalDirection = CardinalDirection.W
+
+    return cardinalDirection
 
 
 # http://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
