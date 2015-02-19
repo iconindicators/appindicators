@@ -182,14 +182,14 @@ class IndicatorLunar:
     LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
     LUNAR_PHASE_NAMES = {
-        LUNAR_PHASE_FULL_MOON : _( "Full Moon" ),
-        LUNAR_PHASE_WANING_GIBBOUS : ( "Waning Gibbous" ),
-        LUNAR_PHASE_THIRD_QUARTER : ( "Third Quarter" ),
-        LUNAR_PHASE_WANING_CRESCENT : ( "Waning Crescent" ),
-        LUNAR_PHASE_NEW_MOON : ( "New Moon" ),
-        LUNAR_PHASE_WAXING_CRESCENT : ( "Waxing Crescent" ),
-        LUNAR_PHASE_FIRST_QUARTER : ( "First Quarter" ),
-        LUNAR_PHASE_WAXING_GIBBOUS : ( "Waxing Gibbous" )
+        LUNAR_PHASE_FULL_MOON       : _( "Full Moon" ),
+        LUNAR_PHASE_WANING_GIBBOUS  : _( "Waning Gibbous" ),
+        LUNAR_PHASE_THIRD_QUARTER   : _( "Third Quarter" ),
+        LUNAR_PHASE_WANING_CRESCENT : _( "Waning Crescent" ),
+        LUNAR_PHASE_NEW_MOON        : _( "New Moon" ),
+        LUNAR_PHASE_WAXING_CRESCENT : _( "Waxing Crescent" ),
+        LUNAR_PHASE_FIRST_QUARTER   : _( "First Quarter" ),
+        LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" )
     }
 
     ORBITAL_ELEMENT_DATA_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
@@ -1721,9 +1721,10 @@ class IndicatorLunar:
         tree = Gtk.TreeView( planetStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.set_tooltip_text( _( 
-            "Check a planet to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "toggles all checkboxes." ) )
+            "Check a planet (or dwarf planet)\n" + \
+            "to display in the menu.\n\n" + \
+            "Clicking the header of the first\n" + \
+            "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, displayTagsStore )
