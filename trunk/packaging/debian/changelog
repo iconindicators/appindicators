@@ -14,6 +14,7 @@ indicator-lunar (1.0.57-1) precise; urgency=low
       the indicator icon proper which changes according to the current
       lunar illumination percentage;
     are now saved to the /tmp directory (or equivalent).
+  * Eclipse type information uses a class, so no longer reliant on strings.
   * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
     in this miracle!
   * Added Russian translation.  Thanks to Oleg Moiseichuk. 

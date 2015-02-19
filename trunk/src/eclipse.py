@@ -21,19 +21,17 @@
 import datetime
 
 
-lunarEclipseTypes = { "N" : "Penumbral", "P" : "Partial", "T" : "Total" }
+class EclipseType: Annular, Hybrid, Partial, Penumbral, Total = range( 5 )
 
 
-solarEclipseTypes = { "P" : "Partial", "A" : "Annular", "T" : "Total", "H" : "Hybrid (Annular/Total)" }
+def getLunarEclipseForUTC( dateTimeUTC ): return __getEclipseForUTC( lunarEclipseData, dateTimeUTC )
 
 
-def getLunarEclipseForUTC( dateTimeUTC ): return __getEclipseForUTC( lunarEclipseData, lunarEclipseTypes, dateTimeUTC )
+def getSolarEclipseForUTC( dateTimeUTC ): return __getEclipseForUTC( solarEclipseData, dateTimeUTC )
 
 
-def getSolarEclipseForUTC( dateTimeUTC ): return __getEclipseForUTC( solarEclipseData, solarEclipseTypes, dateTimeUTC )
-
-
-def __getEclipseForUTC( eclipseData, eclipseTypes, dateTimeUTC ):
+def __getEclipseForUTC( eclipseData, dateTimeUTC ):
+    eclipseInfo = None
     for eclipse in eclipseData:
         dateTime = datetime.datetime.strptime( eclipse[ 0 ] + ", " + eclipse[ 1 ] + ", " + eclipse[ 2 ] + ", " + eclipse[ 3 ], "%Y, %m, %d, %H:%M:%S" )
 
@@ -46,9 +44,19 @@ def __getEclipseForUTC( eclipseData, eclipseTypes, dateTimeUTC ):
             latitude = eclipse[ 6 ][ 0 : len( eclipse[ 6 ] ) - 1 ] + "° " + eclipse[ 6 ][ -1 ]
             longitude = eclipse[ 7 ][ 0 : len( eclipse[ 7 ] ) - 1 ] + "° " + eclipse[ 7 ][ -1 ]
 
-            return [ dateTime, eclipseTypes[ eclipse[ 5 ] ], latitude, longitude ]
+            eclipseType = None
+            if   eclipse[ 5 ] == "A": eclipseType = EclipseType.Annular
+            elif eclipse[ 5 ] == "H": eclipseType = EclipseType.Hybrid
+            elif eclipse[ 5 ] == "N": eclipseType = EclipseType.Penumbral
+            elif eclipse[ 5 ] == "P": eclipseType = EclipseType.Partial
+            elif eclipse[ 5 ] == "T": eclipseType = EclipseType.Total
 
-    return None
+            if eclipseType is not None: 
+                eclipseInfo = [ dateTime, eclipseType, latitude, longitude ]
+
+            break
+
+    return eclipseInfo
 
 
 # http://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt

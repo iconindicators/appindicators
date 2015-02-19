@@ -54,7 +54,7 @@ class AstronomicalObjectType: Moon, OrbitalElement, Planet, PlanetaryMoon, Satel
 
 
 class IndicatorLunar:
-    
+
     AUTHOR = "Bernard Giannetti"
     VERSION = "1.0.57"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
@@ -1108,11 +1108,23 @@ class IndicatorLunar:
         else:
             eclipseInformation = eclipse.getLunarEclipseForUTC( ephemNow.datetime() )
 
-        if eclipseInformation is not None:
-            localisedAndTrimmedDateTime = self.localiseAndTrim( ephem.Date( eclipseInformation[ 0 ] ) )
-            self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_DATE_TIME ) ] = localisedAndTrimmedDateTime
-            self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE ) ] = eclipseInformation[ 2 ] + " " + eclipseInformation[ 3 ]
-            self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] = eclipseInformation[ 1 ]
+        if eclipseInformation is None:
+            logging.error( "No eclipse information found!" )
+        else:
+            eclipseType = None
+            if   eclipseInformation[ 1 ] == eclipse.EclipseType.Annular: eclipseType = _( "Annular" )
+            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Hybrid: eclipseType = _( "Hybrid (Annular/Total)" )
+            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Partial: eclipseType = _( "Partial" )
+            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Penumbral: eclipseType = _( "Penumbral" )
+            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Total: eclipseType = _( "Total" )
+
+            if eclipseType is None:
+                logging.error( "Unknown eclipse type", eclipseInformation )
+            else:
+                localisedAndTrimmedDateTime = self.localiseAndTrim( ephem.Date( eclipseInformation[ 0 ] ) )
+                self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_DATE_TIME ) ] = localisedAndTrimmedDateTime
+                self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE ) ] = eclipseInformation[ 2 ] + " " + eclipseInformation[ 3 ]
+                self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] = eclipseType
 
 
     # Takes a float pyEphem DateTime and converts to local time, trims off fractional seconds and returns a string.
