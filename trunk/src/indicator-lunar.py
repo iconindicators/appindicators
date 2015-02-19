@@ -1708,9 +1708,8 @@ class IndicatorLunar:
         box.pack_start( label, False, False, 0 )
 
         # Need a local copy of the orbital element URL and orbital element data.
-        # Also, as they need to be modified in the fetch handler, use a one-element list.
-        self.orbitalElementDataNew = None
-        self.orbitalElementURLNew = None
+        self.orbitalElementDataNew = self.orbitalElementData
+        self.orbitalElementURLNew = self.orbitalElementURL
 
         orbitalElementURLEntry = Gtk.Entry()
         orbitalElementURLEntry.set_text( self.orbitalElementURL )
@@ -1792,8 +1791,9 @@ class IndicatorLunar:
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
-        self.satelliteTLEDataNew = None
-        self.satelliteTLEURLNew = None
+        # Need a local copy of the satellite TLE URL and satellite TLE data.
+        self.satelliteTLEDataNew = self.satelliteTLEData
+        self.satelliteTLEURLNew = self.satelliteTLEURL
 
         TLEURLEntry = Gtk.Entry()
         TLEURLEntry.set_text( self.satelliteTLEURL )
