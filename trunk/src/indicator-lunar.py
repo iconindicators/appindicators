@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 
 
+#TODO Translation work still to tackle...
+
+# Planets - manually build a dict of planet names and translations
+
+# Planet moons - manually build a dict of moon names and translations.
+
+# Stars - can loop over ephem.stars.stars and build a dict of star name to translation.
+
+# Constellations - Need the list from cns_namemap in libastro/constel.c to build a dict to map the constellation name to a translation.
+
+
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
