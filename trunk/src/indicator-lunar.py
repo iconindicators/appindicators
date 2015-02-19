@@ -9,7 +9,6 @@
 
 # Stars - can loop over ephem.stars.stars and build a dict of star name to translation.
 
-# Constellations - Need the list from cns_namemap in libastro/constel.c to build a dict to map the constellation name to a translation.
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -229,6 +228,99 @@ class IndicatorLunar:
     MESSAGE_SATELLITE_NO_TLE_DATA = _( "No TLE data!" )
     MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
+
+    # Used to translate constellations.
+    # Sourced from cns_namemap in ephem/libastro/constel.c
+    CONSTELLATIONS = {
+        "Andromeda"           : _( "Andromeda" ),
+        "Antlia"              : _( "Antlia" ),
+        "Apus"                : _( "Apus" ),
+        "Aquila"              : _( "Aquila" ),
+        "Aquarius"            : _( "Aquarius" ),
+        "Ara"                 : _( "Ara" ),
+        "Aries"               : _( "Aries" ),
+        "Auriga"              : _( "Auriga" ),
+        "Bootes"              : _( "Bootes" ),
+        "Canis Major"         : _( "Canis Major" ),
+        "Canis Minor"         : _( "Canis Minor" ),
+        "Canes Venatici"      : _( "Canes Venatici" ),
+        "Caelum"              : _( "Caelum" ),
+        "Camelopardalis"      : _( "Camelopardalis" ),
+        "Capricornus"         : _( "Capricornus" ),
+        "Carina"              : _( "Carina" ),
+        "Cassiopeia"          : _( "Cassiopeia" ),
+        "Centaurus"           : _( "Centaurus" ),
+        "Cepheus"             : _( "Cepheus" ),
+        "Cetus"               : _( "Cetus" ),
+        "Chamaeleon"          : _( "Chamaeleon" ),
+        "Circinus"            : _( "Circinus" ),
+        "Cancer"              : _( "Cancer" ),
+        "Columba"             : _( "Columba" ),
+        "Coma Berenices"      : _( "Coma Berenices" ),
+        "Corona Australis"    : _( "Corona Australis" ),
+        "Corona Borealis"     : _( "Corona Borealis" ),
+        "Crater"              : _( "Crater" ),
+        "Crux"                : _( "Crux" ),
+        "Corvus"              : _( "Corvus" ),
+        "Cygnus"              : _( "Cygnus" ),
+        "Delphinus"           : _( "Delphinus" ),
+        "Dorado"              : _( "Dorado" ),
+        "Draco"               : _( "Draco" ),
+        "Equuleus"            : _( "Equuleus" ),
+        "Eridanus"            : _( "Eridanus" ),
+        "Fornax"              : _( "Fornax" ),
+        "Gemini"              : _( "Gemini" ),
+        "Grus"                : _( "Grus" ),
+        "Hercules"            : _( "Hercules" ),
+        "Horologium"          : _( "Horologium" ),
+        "Hydra"               : _( "Hydra" ),
+        "Hydrus"              : _( "Hydrus" ),
+        "Indus"               : _( "Indus" ),
+        "Leo Minor"           : _( "Leo Minor" ),
+        "Lacerta"             : _( "Lacerta" ),
+        "Leo"                 : _( "Leo" ),
+        "Lepus"               : _( "Lepus" ),
+        "Libra"               : _( "Libra" ),
+        "Lupus"               : _( "Lupus" ),
+        "Lynx"                : _( "Lynx" ),
+        "Lyra"                : _( "Lyra" ),
+        "Mensa"               : _( "Mensa" ),
+        "Microscopium"        : _( "Microscopium" ),
+        "Monoceros"           : _( "Monoceros" ),
+        "Musca"               : _( "Musca" ),
+        "Norma"               : _( "Norma" ),
+        "Octans"              : _( "Octans" ),
+        "Ophiuchus"           : _( "Ophiuchus" ),
+        "Orion"               : _( "Orion" ),
+        "Pavo"                : _( "Pavo" ),
+        "Pegasus"             : _( "Pegasus" ),
+        "Perseus"             : _( "Perseus" ),
+        "Phoenix"             : _( "Phoenix" ),
+        "Pictor"              : _( "Pictor" ),
+        "Piscis Austrinus"    : _( "Piscis Austrinus" ),
+        "Pisces"              : _( "Pisces" ),
+        "Puppis"              : _( "Puppis" ),
+        "Pyxis"               : _( "Pyxis" ),
+        "Reticulum"           : _( "Reticulum" ),
+        "Sculptor"            : _( "Sculptor" ),
+        "Scorpius"            : _( "Scorpius" ),
+        "Scutum"              : _( "Scutum" ),
+        "Serpens Caput"       : _( "Serpens Caput" ),
+        "Sextans"             : _( "Sextans" ),
+        "Sagitta"             : _( "Sagitta" ),
+        "Sagittarius"         : _( "Sagittarius" ),
+        "Taurus"              : _( "Taurus" ),
+        "Telescopium"         : _( "Telescopium" ),
+        "Triangulum Australe" : _( "Triangulum Australe" ),
+        "Triangulum"          : _( "Triangulum" ),
+        "Tucana"              : _( "Tucana" ),
+        "Ursa Major"          : _( "Ursa Major" ),
+        "Ursa Minor"          : _( "Ursa Minor" ),
+        "Vela"                : _( "Vela" ),
+        "Virgo"               : _( "Virgo" ),
+        "Volans"              : _( "Volans" ),
+        "Vulpecula"           : _( "Vulpecula" ),
+        "Serpens Cauda"       : _( "Serpens Cauda" ) }
 
 
     def __init__( self ):
@@ -939,7 +1031,7 @@ class IndicatorLunar:
             if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
                 self.data[ ( dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] = str( int( round( body.phase ) ) ) + "%"
 
-            self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] = ephem.constellation( body )[ 1 ]
+            self.data[ ( dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] = IndicatorLunar.CONSTELLATIONS[ ephem.constellation( body )[ 1 ] ]
             self.data[ ( dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] = str( body.mag )
 
             if astronomicalObjectType != AstronomicalObjectType.OrbitalElement:
