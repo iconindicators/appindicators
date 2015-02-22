@@ -422,7 +422,6 @@ class IndicatorLunar:
 
 
     BODY_TRANSLATIONS = dict( 
-        list( CONSTELLATIONS.items() ) +
         list( STARS.items() ) +
         list(
             {
