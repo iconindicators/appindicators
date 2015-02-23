@@ -194,6 +194,7 @@ class IndicatorLunar:
         DATA_TROPICAL_SIGN              : _( "TROPICAL SIGN" ),
         DATA_VISIBLE                    : _( "VISIBLE" ) }
 
+#TODO Not sure what to do with these...
     BODY_MOON = ephem.Moon().name.upper()
     BODY_SUN = ephem.Sun().name.upper()
 
@@ -357,6 +358,83 @@ class IndicatorLunar:
         "Volans"              : _( "Volans" ),
         "Vulpecula"           : _( "Vulpecula" ),
         "Serpens Cauda"       : _( "Serpens Cauda" ) }
+
+    PLANET_AND_MOON_NAMES = {
+        "Mercury"   : _( "Mercury" ),
+        "Venus"     : _( "Venus" ),
+        "Mars"      : _( "Mars" ),
+        "Jupiter"   : _( "Jupiter" ), 
+        "Saturn"    : _( "Saturn" ),
+        "Uranus"    : _( "Uranus" ),
+        "Neptune"   : _( "Neptune" ),
+        "Pluto"     : _( "Pluto" ),
+
+        # Moons of Mars.
+        "Deimos"    : _( "Deimos" ),
+        "Phobos"    : _( "Phobos" ),
+
+        # Moons of Jupiter.
+        "Callisto"  : _( "Callisto" ),
+        "Europa"    : _( "Europa" ),
+        "Ganymede"  : _( "Ganymede" ),
+        "Io"        : _( "Io" ),
+
+        # Moons of Saturn.
+        "Dione"     : _( "Dione" ),
+        "Enceladus" : _( "Enceladus" ),
+        "Hyperion"  : _( "Hyperion" ),
+        "Iapetus"   : _( "Iapetus" ),
+        "Mimas"     : _( "Mimas" ),
+        "Rhea"      : _( "Rhea" ),
+        "Tethys"    : _( "Tethys" ),
+        "Titan"     : _( "Titan" ),
+
+        # Moons of Uranus.    
+        "Ariel"     : _( "Ariel" ),
+        "Miranda"   : _( "Miranda" ),
+        "Oberon"    : _( "Oberon" ),
+        "Titania"   : _( "Titania" ),
+        "Umbrial"   : _( "Umbrial" ) }
+
+    PLANET_JUPITER = "Jupiter"
+    PLANET_MARS = "Mars"
+    PLANET_MERCURY = "Mercury"
+    PLANET_NEPTUNE = "Neptune"
+    PLANET_PLUTO = "Pluto"
+    PLANET_SATURN = "Saturn"
+    PLANET_URANUS = "Uranus"
+    PLANET_VENUS = "Venus"
+
+    MOON_JUPITER_CALLISTO = "Callisto"
+    MOON_JUPITER_EUROPA = "Europa"
+    MOON_JUPITER_GANYMEDE = "Ganymede"
+    MOON_JUPITER_IO = "Io"
+
+    MOON_MARS_DEIMOS = "Deimos"
+    MOON_MARS_PHOBOS = "Phobos"
+
+    MOON_SATURN_DIONE = "Dione"
+    MOON_SATURN_ENCELADUS = "Enceladus"
+    MOON_SATURN_HYPERION = "Hyperion"
+    MOON_SATURN_IAPETUS = "Iapetus"
+    MOON_SATURN_MIMAS = "Mimas"
+    MOON_SATURN_RHEA = "Rhea"
+    MOON_SATURN_TETHYS = "Tethys"
+    MOON_SATURN_TITAN = "Titan"
+
+    MOON_URANUS_ARIEL = "Ariel"
+    MOON_URANUS_MIRANDA = "Miranda"
+    MOON_URANUS_OBERON = "Oberon"
+    MOON_URANUS_TITANIA = "Titania"
+    MOON_URANUS_UMBRIAL = "Umbrial"
+
+    PLANETS_NEW = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
+    PLANET_MOONS = { 
+        PLANET_JUPITER : [ MOON_JUPITER_CALLISTO, MOON_JUPITER_EUROPA, MOON_JUPITER_GANYMEDE, MOON_JUPITER_IO ],
+        PLANET_MARS : [ MOON_MARS_DEIMOS, MOON_MARS_PHOBOS ],
+        PLANET_SATURN : [ MOON_SATURN_DIONE, MOON_SATURN_ENCELADUS, MOON_SATURN_HYPERION, MOON_SATURN_IAPETUS, MOON_SATURN_MIMAS, MOON_SATURN_RHEA, MOON_SATURN_TETHYS, MOON_SATURN_TITAN ],
+        PLANET_URANUS : [ MOON_URANUS_ARIEL, MOON_URANUS_MIRANDA, MOON_URANUS_OBERON, MOON_URANUS_TITANIA, MOON_URANUS_UMBRIAL ] }
+
 
     # Translated star names.
     # Sourced from cns_namemap in ephem.stars.stars
