@@ -195,8 +195,8 @@ class IndicatorLunar:
         DATA_VISIBLE                    : _( "VISIBLE" ) }
 
 #TODO Not sure what to do with these...
-    BODY_MOON = ephem.Moon().name.upper()
-    BODY_SUN = ephem.Sun().name.upper()
+    BODY_MOON = "Moon"
+    BODY_SUN = "Sun"
 
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
     LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
