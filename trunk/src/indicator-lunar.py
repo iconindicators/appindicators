@@ -389,7 +389,7 @@ class IndicatorLunar:
     MOON_URANUS_MIRANDA = "Miranda"
     MOON_URANUS_OBERON = "Oberon"
     MOON_URANUS_TITANIA = "Titania"
-    MOON_URANUS_UMBRIAL = "Umbrial"
+    MOON_URANUS_UMBRIEL = "Umbriel"
 
 #TODO CHange name if used.
     PLANETS_NEW = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
@@ -398,7 +398,7 @@ class IndicatorLunar:
         PLANET_JUPITER : [ MOON_JUPITER_CALLISTO, MOON_JUPITER_EUROPA, MOON_JUPITER_GANYMEDE, MOON_JUPITER_IO ],
         PLANET_MARS : [ MOON_MARS_DEIMOS, MOON_MARS_PHOBOS ],
         PLANET_SATURN : [ MOON_SATURN_DIONE, MOON_SATURN_ENCELADUS, MOON_SATURN_HYPERION, MOON_SATURN_IAPETUS, MOON_SATURN_MIMAS, MOON_SATURN_RHEA, MOON_SATURN_TETHYS, MOON_SATURN_TITAN ],
-        PLANET_URANUS : [ MOON_URANUS_ARIEL, MOON_URANUS_MIRANDA, MOON_URANUS_OBERON, MOON_URANUS_TITANIA, MOON_URANUS_UMBRIAL ] }
+        PLANET_URANUS : [ MOON_URANUS_ARIEL, MOON_URANUS_MIRANDA, MOON_URANUS_OBERON, MOON_URANUS_TITANIA, MOON_URANUS_UMBRIEL ] }
 
     PLANET_AND_MOON_NAMES = {
         PLANET_MERCURY        : _( "Mercury" ),
@@ -431,7 +431,7 @@ class IndicatorLunar:
         MOON_URANUS_MIRANDA   : _( "Miranda" ),
         MOON_URANUS_OBERON    : _( "Oberon" ),
         MOON_URANUS_TITANIA   : _( "Titania" ),
-        MOON_URANUS_UMBRIAL   : _( "Umbrial" ) }
+        MOON_URANUS_UMBRIEL   : _( "Umbriel" ) }
 
     PLANET_AND_MOON_TAGS = {
         "MERCURY"   : _( "MERCURY" ), 
@@ -464,7 +464,7 @@ class IndicatorLunar:
         "MIRANDA"   : _( "MIRANDA" ), 
         "OBERON"    : _( "OBERON" ), 
         "TITANIA"   : _( "TITANIA" ), 
-        "UMBRIAL"   : _( "UMBRIAL" ) }
+        "UMBRIEL"   : _( "UMBRIEL" ) }
 
     # Translated star names.
     # Sourced from cns_namemap in ephem.stars.stars
