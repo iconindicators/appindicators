@@ -158,6 +158,42 @@ class IndicatorLunar:
     DATA_TROPICAL_SIGN = "TROPICAL SIGN"
     DATA_VISIBLE = "VISIBLE"
 
+    DATA_TAGS = {
+        DATA_ALTITUDE                   : _( "ALTITUDE" ),
+        DATA_AZIMUTH                    : _( "AZIMUTH" ),
+        DATA_BRIGHT_LIMB                : _( "BRIGHT LIMB" ),
+        DATA_CITY_NAME                  : _( "CITY NAME" ),
+        DATA_CONSTELLATION              : _( "CONSTELLATION" ),
+        DATA_DAWN                       : _( "DAWN" ),
+        DATA_DECLINATION                : _( "DECLINATION" ),
+        DATA_DISTANCE_TO_EARTH          : _( "DISTANCE TO EARTH" ),
+        DATA_DISTANCE_TO_SUN            : _( "DISTANCE TO SUN" ),
+        DATA_DUSK                       : _( "DUSK" ),
+        DATA_EARTH_VISIBLE              : _( "EARTH VISIBLE" ),
+        DATA_ECLIPSE_DATE_TIME          : _( "ECLIPSE DATE TIME" ),
+        DATA_ECLIPSE_LATITUDE_LONGITUDE : _( "ECLIPSE LATITUDE LONGITUDE" ),
+        DATA_ECLIPSE_TYPE               : _( "ECLIPSE TYPE" ),
+        DATA_EQUINOX                    : _( "EQUINOX" ),
+        DATA_FIRST_QUARTER              : _( "FIRST QUARTER" ),
+        DATA_FULL                       : _( "FULL" ),
+        DATA_ILLUMINATION               : _( "ILLUMINATION" ),
+        DATA_MAGNITUDE                  : _( "MAGNITUDE" ),
+        DATA_MESSAGE                    : _( "MESSAGE" ),
+        DATA_X_OFFSET                   : _( "X OFFSET" ),
+        DATA_Y_OFFSET                   : _( "Y OFFSET" ),
+        DATA_Z_OFFSET                   : _( "Z OFFSET" ),
+        DATA_NEW                        : _( "NEW" ),
+        DATA_PHASE                      : _( "PHASE" ),
+        DATA_RIGHT_ASCENSION            : _( "RIGHT ASCENSION" ),
+        DATA_RISE_AZIMUTH               : _( "RISE AZIMUTH" ),
+        DATA_RISE_TIME                  : _( "RISE TIME" ),
+        DATA_SET_AZIMUTH                : _( "SET AZIMUTH" ),
+        DATA_SET_TIME                   : _( "SET TIME" ),
+        DATA_SOLSTICE                   : _( "SOLSTICE" ),
+        DATA_THIRD_QUARTER              : _( "THIRD QUARTER" ),
+        DATA_TROPICAL_SIGN              : _( "TROPICAL SIGN" ),
+        DATA_VISIBLE                    : _( "VISIBLE" ) }
+
     BODY_MOON = ephem.Moon().name.upper()
     BODY_SUN = ephem.Sun().name.upper()
 
@@ -229,7 +265,7 @@ class IndicatorLunar:
     MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
-    # Used to translate constellations.
+    # Translated constellations.
     # Sourced from cns_namemap in ephem/libastro/constel.c
     CONSTELLATIONS = {
         "Andromeda"           : _( "Andromeda" ),
@@ -322,9 +358,9 @@ class IndicatorLunar:
         "Vulpecula"           : _( "Vulpecula" ),
         "Serpens Cauda"       : _( "Serpens Cauda" ) }
 
-    # Used to translate stars.
+    # Translated star names.
     # Sourced from cns_namemap in ephem.stars.stars
-    STARS = {
+    STAR_NAMES = {
         "Achernar"        : _( "Achernar" ), 
         "Adara"           : _( "Adara" ), 
         "Agena"           : _( "Agena" ), 
@@ -420,48 +456,145 @@ class IndicatorLunar:
         "Wezen"           : _( "Wezen" ), 
         "Zaurak"          : _( "Zaurak" ) }
 
+    # Data tag star names.
+    # Sourced from cns_namemap in ephem.stars.stars
+    STAR_TAGS = {
+        "ACHERNAR"        : _( "ACHERNAR" ), 
+        "ADARA"           : _( "ADARA" ), 
+        "AGENA"           : _( "AGENA" ), 
+        "ALBEREO"         : _( "ALBEREO" ), 
+        "ALCAID"          : _( "ALCAID" ), 
+        "ALCOR"           : _( "ALCOR" ), 
+        "ALCYONE"         : _( "ALCYONE" ), 
+        "ALDEBARAN"       : _( "ALDEBARAN" ), 
+        "ALDERAMIN"       : _( "ALDERAMIN" ), 
+        "ALFIRK"          : _( "ALFIRK" ), 
+        "ALGENIB"         : _( "ALGENIB" ), 
+        "ALGIEBA"         : _( "ALGIEBA" ), 
+        "ALGOL"           : _( "ALGOL" ), 
+        "ALHENA"          : _( "ALHENA" ), 
+        "ALIOTH"          : _( "ALIOTH" ), 
+        "ALMACH"          : _( "ALMACH" ), 
+        "ALNAIR"          : _( "ALNAIR" ), 
+        "ALNILAM"         : _( "ALNILAM" ), 
+        "ALNITAK"         : _( "ALNITAK" ), 
+        "ALPHARD"         : _( "ALPHARD" ), 
+        "ALPHECCA"        : _( "ALPHECCA" ), 
+        "ALSHAIN"         : _( "ALSHAIN" ), 
+        "ALTAIR"          : _( "ALTAIR" ), 
+        "ANTARES"         : _( "ANTARES" ), 
+        "ARCTURUS"        : _( "ARCTURUS" ), 
+        "ARKAB POSTERIOR" : _( "ARKAB POSTERIOR" ), 
+        "ARKAB PRIOR"     : _( "ARKAB PRIOR" ), 
+        "ARNEB"           : _( "ARNEB" ), 
+        "ATLAS"           : _( "ATLAS" ), 
+        "BELLATRIX"       : _( "BELLATRIX" ), 
+        "BETELGEUSE"      : _( "BETELGEUSE" ), 
+        "CANOPUS"         : _( "CANOPUS" ), 
+        "CAPELLA"         : _( "CAPELLA" ), 
+        "CAPH"            : _( "CAPH" ), 
+        "CASTOR"          : _( "CASTOR" ), 
+        "CEBALRAI"        : _( "CEBALRAI" ), 
+        "DENEB"           : _( "DENEB" ), 
+        "DENEBOLA"        : _( "DENEBOLA" ), 
+        "DUBHE"           : _( "DUBHE" ), 
+        "ELECTRA"         : _( "ELECTRA" ), 
+        "ELNATH"          : _( "ELNATH" ), 
+        "ENIF"            : _( "ENIF" ), 
+        "ETAMIN"          : _( "ETAMIN" ), 
+        "FOMALHAUT"       : _( "FOMALHAUT" ), 
+        "GIENAH CORVI"    : _( "GIENAH CORVI" ), 
+        "HAMAL"           : _( "HAMAL" ), 
+        "IZAR"            : _( "IZAR" ), 
+        "KAUS AUSTRALIS"  : _( "KAUS AUSTRALIS" ), 
+        "KOCHAB"          : _( "KOCHAB" ), 
+        "MAIA"            : _( "MAIA" ), 
+        "MARKAB"          : _( "MARKAB" ), 
+        "MEGREZ"          : _( "MEGREZ" ), 
+        "MENKALINAN"      : _( "MENKALINAN" ), 
+        "MENKAR"          : _( "MENKAR" ), 
+        "MERAK"           : _( "MERAK" ), 
+        "MEROPE"          : _( "MEROPE" ), 
+        "MIMOSA"          : _( "MIMOSA" ), 
+        "MINKAR"          : _( "MINKAR" ), 
+        "MINTAKA"         : _( "MINTAKA" ), 
+        "MIRACH"          : _( "MIRACH" ), 
+        "MIRZAM"          : _( "MIRZAM" ), 
+        "MIZAR"           : _( "MIZAR" ), 
+        "NAOS"            : _( "NAOS" ), 
+        "NIHAL"           : _( "NIHAL" ), 
+        "NUNKI"           : _( "NUNKI" ), 
+        "PEACOCK"         : _( "PEACOCK" ), 
+        "PHECDA"          : _( "PHECDA" ), 
+        "POLARIS"         : _( "POLARIS" ), 
+        "POLLUX"          : _( "POLLUX" ), 
+        "PROCYON"         : _( "PROCYON" ), 
+        "RASALGETHI"      : _( "RASALGETHI" ), 
+        "RASALHAGUE"      : _( "RASALHAGUE" ), 
+        "REGULUS"         : _( "REGULUS" ), 
+        "RIGEL"           : _( "RIGEL" ), 
+        "RUKBAT"          : _( "RUKBAT" ), 
+        "SADALMELIK"      : _( "SADALMELIK" ), 
+        "SADR"            : _( "SADR" ), 
+        "SAIPH"           : _( "SAIPH" ), 
+        "SCHEAT"          : _( "SCHEAT" ), 
+        "SCHEDAR"         : _( "SCHEDAR" ), 
+        "SHAULA"          : _( "SHAULA" ), 
+        "SHELIAK"         : _( "SHELIAK" ), 
+        "SIRIUS"          : _( "SIRIUS" ), 
+        "SIRRAH"          : _( "SIRRAH" ), 
+        "SPICA"           : _( "SPICA" ), 
+        "SULAFAT"         : _( "SULAFAT" ), 
+        "TARAZED"         : _( "TARAZED" ), 
+        "TAYGETA"         : _( "TAYGETA" ), 
+        "THUBAN"          : _( "THUBAN" ), 
+        "UNUKALHAI"       : _( "UNUKALHAI" ), 
+        "VEGA"            : _( "VEGA" ), 
+        "VINDEMIATRIX"    : _( "VINDEMIATRIX" ), 
+        "WEZEN"           : _( "WEZEN" ), 
+        "ZAURAK"          : _( "ZAURAK" ) }
 
-    BODY_TRANSLATIONS = dict( 
-        list( STARS.items() ) +
-        list(
-            {
-                "Moon" : _( "Moon" ),
-                "Sun" : _( "Sun" ),
-                "Mercury" : _( "Mercury" ),
-                "Venus" : _( "Venus" ),
-                "Mars" : _( "Mars" ),
-                "Deimos" : _( "Deimos" ),
-                "Phobos" : _( "Phobos" ),
-                "Jupiter" : _( "Jupiter" ),
-                "Callisto" : _( "Callisto" ),
-                "Europa" : _( "Europa" ),
-                "Ganymede" : _( "Ganymede" ),
-                "Io" : _( "Io" ),
-                "Saturn" : _( "Saturn" ),
-                "Dione" : _( "Dione" ),
-                "Enceladus" : _( "Enceladus" ),
-                "Hyperion" : _( "Hyperion" ),
-                "Iapetus" : _( "Iapetus" ),
-                "Mimas" : _( "Mimas" ),
-                "Rhea" : _( "Rhea" ),
-                "Tethys" : _( "Tethys" ),
-                "Titan" : _( "Titan" ),
-                "Uranus" : _( "Uranus" ),
-                "Ariel" : _( "Ariel" ),
-                "Miranda" : _( "Miranda" ),
-                "Oberon" : _( "Oberon" ),
-                "Titania" : _( "Titania" ),
-                "Umbriel" : _( "Umbriel" ),
-                "Neptune" : _( "Neptune" ),
-                "Pluto" : _( "Pluto" )                
-            }.items() )
-        )
+    # Used to translate bodies.
+    BODIES = {
+        "MOON"      : _( "Moon" ),
+        "SUN"       : _( "Sun" ),
+        "MERCURY"   : _( "Mercury" ),
+        "VENUS"     : _( "Venus" ),
+        "MARS"      : _( "Mars" ),
+        "DEIMOS"    : _( "Deimos" ),
+        "PHOBOS"    : _( "Phobos" ),
+        "JUPITER"   : _( "Jupiter" ),
+        "CALLISTO"  : _( "Callisto" ),
+        "EUROPA"    : _( "Europa" ),
+        "GANYMEDE"  : _( "Ganymede" ),
+        "IO"        : _( "Io" ),
+        "SATURN"    : _( "Saturn" ),
+        "DIONE"     : _( "Dione" ),
+        "ENCELADUS" : _( "Enceladus" ),
+        "HYPERION"  : _( "Hyperion" ),
+        "IAPETUS"   : _( "Iapetus" ),
+        "MIMAS"     : _( "Mimas" ),
+        "RHEA"      : _( "Rhea" ),
+        "TETHYS"    : _( "Tethys" ),
+        "TITAN"     : _( "Titan" ),
+        "URANUS"    : _( "Uranus" ),
+        "ARIEL"     : _( "Ariel" ),
+        "MIRANDA"   : _( "Miranda" ),
+        "OBERON"    : _( "Oberon" ),
+        "TITANIA"   : _( "Titania" ),
+        "UMBRIEL"   : _( "Umbriel" ),
+        "NEPTUNE"   : _( "Neptune" ),
+        "PLUTO"     : _( "Pluto" ) }
+
+#         s = getattr( ephem, "Saturn" )()
+#         print( type(s))
+#         print( s.name)
+
+    TAGS_FIRST_KEY = dict( list( BODIES.items() ) + list( STAR_TAGS.items() ) )
+#     TAGS_SECOND_KEY = dict( list( DATA_TAGS.items() ) )
 
 
     def __init__( self ):
-        print( IndicatorLunar.CONSTELLATIONS )
-        print( IndicatorLunar.STARS )
-        print( IndicatorLunar.BODY_TRANSLATIONS )
         self.dialog = None
         self.data = { } # Key is each a data tag, upper case, naming the type of data combined with the source of the data; value is the data ready for display.
         self.orbitalElementData = { } # Key is the orbital element name, upper cased; value is the orbital element data string.
@@ -507,7 +640,7 @@ class IndicatorLunar:
 
         # Reset data on each update...
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
-        self.data[ ( IndicatorLunar.DATA_CITY_NAME, "" ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match the format of all other data.
+        self.data[ ( "", IndicatorLunar.DATA_CITY_NAME ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match the format of all other data.
         self.nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
         ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
@@ -779,12 +912,12 @@ class IndicatorLunar:
 
 
     def updateStarsMenu( self, menu ):
-        stars = [ ]
+        stars = [ ] # List of lists.  Each sublist contains the star name followed by the translated name.
         for starName in self.stars:
             dataTag = starName.upper()
             if ( dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data or \
                ( dataTag, IndicatorLunar.DATA_RISE_TIME ) in self.data:
-                stars.append( starName )
+                stars.append( [ starName, IndicatorLunar.STAR_NAMES[ starName ] ] )
 
         if len( stars ) > 0:
             menuItem = Gtk.MenuItem( _( "Stars" ) )
@@ -794,13 +927,14 @@ class IndicatorLunar:
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
 
-            for starName in sorted( stars ):
+            stars = sorted( stars, key = lambda x: ( x[ 1 ] ) )
+            for starName, starNameTranslated in stars:
                 dataTag = starName.upper()
                 if self.showStarsAsSubMenu:
-                    menuItem = Gtk.MenuItem( starName )
+                    menuItem = Gtk.MenuItem( starNameTranslated )
                     subMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starName )
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starNameTranslated )
                     menu.append( menuItem )
 
                 self.updateCommonMenu( menuItem, AstronomicalObjectType.Star, dataTag )
@@ -1672,7 +1806,7 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 0, 1, 1 )
 
-        displayTagsStore = Gtk.ListStore( str, str ) # Display tag, value.
+        displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.updateDisplayTags( displayTagsStore, None, None )
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
         displayTagsStoreSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
@@ -1681,11 +1815,11 @@ class IndicatorLunar:
         tree.set_hexpand( True )
         tree.set_vexpand( True )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Tag" ), Gtk.CellRendererText(), text = 0 ) 
+        treeViewColumn = Gtk.TreeViewColumn( _( "Tag" ), Gtk.CellRendererText(), text = 1 ) 
         treeViewColumn.set_sort_column_id( 0 )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Value" ), Gtk.CellRendererText(), text = 1 ) 
+        treeViewColumn = Gtk.TreeViewColumn( _( "Value" ), Gtk.CellRendererText(), text = 2 ) 
         treeViewColumn.set_sort_column_id( 1 )
         tree.append_column( treeViewColumn )
 
@@ -1891,9 +2025,14 @@ class IndicatorLunar:
 
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        starStore = Gtk.ListStore( bool, str ) # Show/hide, star name.
-        for star in sorted( ephem.stars.stars ):
-            starStore.append( [ star in self.stars, star ] )
+        stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
+        for starName in IndicatorLunar.STAR_NAMES.keys():
+            stars.append( [ starName in self.stars, starName, IndicatorLunar.STAR_NAMES[ starName ] ] )
+
+        stars = sorted( stars, key = lambda x: ( x[ 2 ] ) )
+        starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name (not displayed), translated star name.
+        for star in stars:
+            starStore.append( star )
 
         tree = Gtk.TreeView( starStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
@@ -1909,7 +2048,7 @@ class IndicatorLunar:
         treeViewColumn.connect( "clicked", self.onToggle, starStore, AstronomicalObjectType.Star )
         tree.append_column( treeViewColumn )
 
-        tree.append_column( Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 1 ) )
+        tree.append_column( Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -2361,8 +2500,8 @@ class IndicatorLunar:
                 if planetInfo[ 0 ]: self.planets.append( planetInfo[ 1 ] )
 
             self.stars = [ ]
-            for starInfo in starStore:
-                if starInfo[ 0 ]: self.stars.append( starInfo[ 1 ] )
+            for row in starStore:
+                if row[ 0 ]: self.stars.append( row[ 1 ] )
 
             if self.orbitalElementURLNew is not None: # The URL will only be None on intialisation.
                 self.orbitalElementURL = self.orbitalElementURLNew # The URL could still be invalid, but it will not be None.
@@ -2431,12 +2570,19 @@ class IndicatorLunar:
         for key in self.data.keys():
             if ( key[ 0 ], key[ 1 ] ) in self.satellites: # This key refers to a satellite.
                 if satelliteTLEData is None:
-                    displayTagsStore.append( [ " ".join( key ), self.data[ key ] ] )
+                    displayTagsStore.append( [ " ".join( key ), self.data[ key ], "N/A" ] ) #TODO Added N/A for tag translation.
             elif ( key[ 0 ] ) in self.orbitalElements: # This key refers to an orbital element.
                 if orbitalElementData is None:
-                    displayTagsStore.append( [ " ".join( key ), self.data[ key ] ] )
+                    displayTagsStore.append( [ " ".join( key ), self.data[ key ], "N/A" ] ) #TODO Added N/A for tag translation.
             else:
-                displayTagsStore.append( [ " ".join( key ), self.data[ key ] ] ) # Neither a satellite nor orbital element so add it.
+#                 displayTagsStore.append( [ " ".join( key ), self.data[ key ] ] ) # Neither a satellite nor orbital element so add it.
+ #TODO Adding tag translation...
+                # Neither a satellite nor orbital element so add it.
+#                 if key[ 1 ] == IndicatorLunar.DATA_CITY_NAME: # Special case: the city name data tag has no associated body tag.
+#                     displayTagsStore.append( [ key[ 1 ], self.data[ key ], IndicatorLunar.TAGS_SECOND_KEY [ key[ 1 ] ] ] )
+#                 else:
+#                     displayTagsStore.append( [ " ".join( key ), self.data[ key ], IndicatorLunar.TAGS_FIRST_KEY [ key[ 0 ] ] + " " + IndicatorLunar.TAGS_SECOND_KEY [ key[ 1 ] ] ] )
+                x = 1
 
         # Check if new satellite TLE data is being added...
         if satelliteTLEData is not None:
@@ -2641,6 +2787,9 @@ class IndicatorLunar:
     def onStarToggled( self, widget, path, starStore, displayTagsStore ):
         starStore[ path ][ 0 ] = not starStore[ path ][ 0 ]
         starName = starStore[ path ][ 1 ].upper()
+
+#TODO Remove and fix code below...depends on how displayTagStore ends up.
+        if True: return
 
         if starStore[ path ][ 0 ]:
             displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_CONSTELLATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
@@ -2899,3 +3048,9 @@ class IndicatorLunar:
 
 
 if __name__ == "__main__": IndicatorLunar().main()
+    
+    
+    
+    
+    
+    
