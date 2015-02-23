@@ -2818,10 +2818,10 @@ class IndicatorLunar:
         orbitalElementName = orbitalElementStore[ childPath ][ 1 ].upper() + " "
 
         if orbitalElementStore[ childPath ][ 1 ]:
-            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_RISE_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_SET_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_RISE_TIME, orbitalElementName + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RISE_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_RISE_AZIMUTH, orbitalElementName + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RISE_AZIMUTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_SET_TIME, orbitalElementName + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_SET_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_SET_AZIMUTH, orbitalElementName + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_SET_AZIMUTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
         else:
             iter = displayTagsStore.get_iter_first()
             while iter is not None:
@@ -2837,10 +2837,10 @@ class IndicatorLunar:
         satelliteNameNumber = satelliteStore[ childPath ][ 1 ].upper() + " " + satelliteStore[ childPath ][ 2 ] + " "
 
         if satelliteStore[ childPath ][ 2 ]:
-            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_RISE_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_SET_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_RISE_TIME, satelliteNameNumber + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RISE_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_RISE_AZIMUTH, satelliteNameNumber + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RISE_AZIMUTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_SET_TIME, satelliteNameNumber + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_SET_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_SET_AZIMUTH, satelliteNameNumber + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_SET_AZIMUTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
         else:
             iter = displayTagsStore.get_iter_first()
             while iter is not None:
