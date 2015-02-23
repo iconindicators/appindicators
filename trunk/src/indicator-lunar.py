@@ -694,10 +694,6 @@ class IndicatorLunar:
         "NEPTUNE"   : _( "Neptune" ),
         "PLUTO"     : _( "Pluto" ) }
 
-#         s = getattr( ephem, "Saturn" )()
-#         print( type(s))
-#         print( s.name)
-
     BODY_STAR_TAGS = dict( list( BODIES.items() ) + list( STAR_TAGS.items() ) )
 
 
@@ -980,29 +976,27 @@ class IndicatorLunar:
             for planetName in planets:
                 dataTag = planetName.upper()
                 if self.showPlanetsAsSubMenu:
-                    menuItem = Gtk.MenuItem( planetName )
+                    menuItem = Gtk.MenuItem( IndicatorLunar.PLANET_AND_MOON_NAMES[ planetName ] )
                     subMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + planetName )
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.PLANET_AND_MOON_NAMES[ planetName ] )
                     menu.append( menuItem )
 
                 self.updateCommonMenu( menuItem, AstronomicalObjectType.Planet, dataTag )
 
                 # Update moons.
-                for planetInfo in IndicatorLunar.PLANETS:
-                    if planetName == planetInfo[ 0 ] and len( planetInfo[ 3 ] ) > 0:
-                        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-                        menuItem.get_submenu().append( Gtk.MenuItem( _( "Major Moons" ) ) )
-                        self.updatePlanetMoonsMenu( menuItem, planetInfo[ 3 ] )
-                        break
+                if planetName in IndicatorLunar.PLANET_MOONS:
+                    menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+                    menuItem.get_submenu().append( Gtk.MenuItem( _( "Major Moons" ) ) )
+                    self.updatePlanetMoonsMenu( menuItem, IndicatorLunar.PLANET_MOONS[ planetName ] )
 
 
-    def updatePlanetMoonsMenu( self, menuItem, moons ):
-        for moon in moons:
-            moonMenuItem = Gtk.MenuItem( IndicatorLunar.INDENT + moon.name )
+    def updatePlanetMoonsMenu( self, menuItem, moonNames ):
+        for moonName in moonNames:
+            moonMenuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.PLANET_AND_MOON_NAMES[ moonName ] )
             menuItem.get_submenu().append( moonMenuItem )
 
-            dataTag = moon.name.upper()
+            dataTag = moonName.upper()
             subMenu = Gtk.Menu()
             self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, dataTag )
             subMenu.append( Gtk.SeparatorMenuItem() )
@@ -1343,18 +1337,20 @@ class IndicatorLunar:
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     def updatePlanets( self, ephemNow ):
-        for planetName, dataTag, planet, moons in IndicatorLunar.PLANETS:
-            if planetName in self.planets:
-                planet.compute( self.getCity( ephemNow ) )
-                if self.updateCommon( planet, AstronomicalObjectType.Planet, dataTag, ephemNow ):
-                    city = self.getCity( ephemNow )
-                    for moon in moons:
+        for planetName in self.planets:
+            planet = getattr( ephem, planetName )() # Dynamically instantiate the planet object.
+            planet.compute( self.getCity( ephemNow ) )
+            if self.updateCommon( planet, AstronomicalObjectType.Planet, planetName.upper(), ephemNow ):
+                city = self.getCity( ephemNow )
+                if planetName in IndicatorLunar.PLANET_MOONS:
+                    for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
+                        moon = getattr( ephem, moonName )() # Dynamically instantiate the moon object.
                         moon.compute( city )
-                        self.updateRightAscensionDeclinationAzimuthAltitude( moon, moon.name.upper() )
-                        self.data[ ( moon.name.upper(), IndicatorLunar.DATA_EARTH_VISIBLE ) ] = str( bool( moon.earth_visible ) )
-                        self.data[ ( moon.name.upper(), IndicatorLunar.DATA_X_OFFSET ) ] = str( round( moon.x, 1 ) )
-                        self.data[ ( moon.name.upper(), IndicatorLunar.DATA_Y_OFFSET ) ] = str( round( moon.y, 1 ) )
-                        self.data[ ( moon.name.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] = str( round( moon.z, 1 ) )
+                        self.updateRightAscensionDeclinationAzimuthAltitude( moon, moonName.upper() )
+                        self.data[ ( moonName.upper(), IndicatorLunar.DATA_EARTH_VISIBLE ) ] = str( bool( moon.earth_visible ) )
+                        self.data[ ( moonName.upper(), IndicatorLunar.DATA_X_OFFSET ) ] = str( round( moon.x, 1 ) )
+                        self.data[ ( moonName.upper(), IndicatorLunar.DATA_Y_OFFSET ) ] = str( round( moon.y, 1 ) )
+                        self.data[ ( moonName.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] = str( round( moon.z, 1 ) )
 
 
     # http://aa.usno.navy.mil/data/docs/mrst.php
