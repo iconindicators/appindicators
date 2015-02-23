@@ -198,17 +198,6 @@ class IndicatorLunar:
     BODY_MOON = ephem.Moon().name.upper()
     BODY_SUN = ephem.Sun().name.upper()
 
-    # Planet name, data tag, body, moons.
-    PLANETS = [
-        [ ephem.Mercury().name, ephem.Mercury().name.upper(), ephem.Mercury(), [ ] ],
-        [ ephem.Venus().name, ephem.Venus().name.upper(), ephem.Venus(), [ ] ],
-        [ ephem.Mars().name, ephem.Mars().name.upper(), ephem.Mars(), [ ephem.Deimos(), ephem.Phobos() ] ],
-        [ ephem.Jupiter().name, ephem.Jupiter().name.upper(), ephem.Jupiter(), [ ephem.Callisto(), ephem.Europa(), ephem.Ganymede(), ephem.Io() ] ],
-        [ ephem.Saturn().name, ephem.Saturn().name.upper(), ephem.Saturn(), [ ephem.Dione(), ephem.Enceladus(), ephem.Hyperion(), ephem.Iapetus(), ephem.Mimas(), ephem.Rhea(), ephem.Tethys(), ephem.Titan() ] ],
-        [ ephem.Uranus().name, ephem.Uranus().name.upper(), ephem.Uranus(), [ ephem.Ariel(), ephem.Miranda(), ephem.Oberon(), ephem.Titania(), ephem.Umbriel() ] ],
-        [ ephem.Neptune().name, ephem.Neptune().name.upper(), ephem.Neptune(), [ ] ],
-        [ ephem.Pluto().name, ephem.Pluto().name.upper(), ephem.Pluto(), [ ] ] ]
-
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
     LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
     LUNAR_PHASE_THIRD_QUARTER = "THIRD_QUARTER"
@@ -391,8 +380,7 @@ class IndicatorLunar:
     MOON_URANUS_TITANIA = "Titania"
     MOON_URANUS_UMBRIEL = "Umbriel"
 
-#TODO CHange name if used.
-    PLANETS_NEW = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
+    PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
     PLANET_MOONS = { 
         PLANET_JUPITER : [ MOON_JUPITER_CALLISTO, MOON_JUPITER_EUROPA, MOON_JUPITER_GANYMEDE, MOON_JUPITER_IO ],
@@ -2102,8 +2090,8 @@ class IndicatorLunar:
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 15 ) # Bug in Python - must specify the parameter names!
 
         planetStore = Gtk.ListStore( bool, str ) # Show/hide, planet name.
-        for planet in IndicatorLunar.PLANETS:
-            planetStore.append( [ planet[ 0 ] in self.planets, planet[ 0 ] ] )
+        for planetName in IndicatorLunar.PLANETS:
+            planetStore.append( [ planetName in self.planets, planetName ] )
 
         tree = Gtk.TreeView( planetStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
@@ -3039,8 +3027,8 @@ class IndicatorLunar:
         self.orbitalElementURL = IndicatorLunar.ORBITAL_ELEMENT_DATA_URL
 
         self.planets = [ ]
-        for planet in IndicatorLunar.PLANETS:
-            self.planets.append( planet[ 0 ] )
+        for planetName in IndicatorLunar.PLANETS:
+            self.planets.append( planetName )
 
         self.satelliteMenuText = IndicatorLunar.SATELLITE_MENU_TEXT_DEFAULT
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
