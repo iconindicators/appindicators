@@ -2336,8 +2336,8 @@ class IndicatorLunar:
             IndicatorLunar.SATELLITE_TAG_RISE_TIME + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_SET_TIME + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_VISIBLE + \
-            "\n\nFor formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
+            IndicatorLunar.SATELLITE_TAG_VISIBLE + "\n\n" + \
+            notifyOSDInformation )
 
         grid.attach( satelliteNotificationSummaryText, 1, 1, 1, 1 )
 
@@ -2363,8 +2363,8 @@ class IndicatorLunar:
             IndicatorLunar.SATELLITE_TAG_RISE_TIME + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_SET_TIME + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_VISIBLE + \
-            "\n\nFor formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
+            IndicatorLunar.SATELLITE_TAG_VISIBLE + "\n\n" + \
+            notifyOSDInformation )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
@@ -2420,9 +2420,7 @@ class IndicatorLunar:
 
         werewolfNotificationSummaryText = Gtk.Entry()
         werewolfNotificationSummaryText.set_text( self.werewolfWarningSummary )
-        werewolfNotificationSummaryText.set_tooltip_text( _( 
-            "The summary for the werewolf notification.\n\n" + \
-            "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" ) )
+        werewolfNotificationSummaryText.set_tooltip_text( _( "The summary for the werewolf notification.\n\n" ) + notifyOSDInformation )
         werewolfNotificationSummaryText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( werewolfNotificationSummaryText, 1, 7, 1, 1 )
 
@@ -2437,9 +2435,7 @@ class IndicatorLunar:
 
         werewolfNotificationMessageText = Gtk.TextView()
         werewolfNotificationMessageText.get_buffer().set_text( self.werewolfWarningMessage )
-        werewolfNotificationMessageText.set_tooltip_text( _( 
-            "The message for the werewolf notification.\n\n" + \
-            "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" ) )
+        werewolfNotificationMessageText.set_tooltip_text( _( "The message for the werewolf notification.\n\n" ) + notifyOSDInformation )
         werewolfNotificationMessageText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
 
         scrolledWindow = Gtk.ScrolledWindow()
