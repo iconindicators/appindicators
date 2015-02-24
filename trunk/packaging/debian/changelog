@@ -10,8 +10,8 @@ indicator-lunar (1.0.57-1) precise; urgency=low
   * Changed astronomical unit abbreviation from AU to ua to keep in line with
     SI (http://en.wikipedia.org/wiki/Non-SI_units_mentioned_in_the_SI).
   * Dynamically created icons, such as
-      when testing the full moon notification in the preferences;
-      the indicator icon proper which changes according to the current
+      the full moon notification when testing in the preferences;
+      the indicator icon which changes according to the current
       lunar illumination percentage;
     are now saved to the /tmp directory (or equivalent).
   * Eclipse type information uses a class, so no longer reliant on strings.
