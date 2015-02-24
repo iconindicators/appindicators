@@ -194,67 +194,6 @@ class IndicatorLunar:
         DATA_TROPICAL_SIGN              : _( "TROPICAL SIGN" ),
         DATA_VISIBLE                    : _( "VISIBLE" ) }
 
-#TODO Not sure what to do with these...
-    BODY_MOON = "Moon"
-    BODY_SUN = "Sun"
-
-    LUNAR_PHASE_FULL_MOON = "FULL_MOON"
-    LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
-    LUNAR_PHASE_THIRD_QUARTER = "THIRD_QUARTER"
-    LUNAR_PHASE_WANING_CRESCENT = "WANING_CRESCENT"
-    LUNAR_PHASE_NEW_MOON = "NEW_MOON"
-    LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
-    LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
-    LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
-
-    LUNAR_PHASE_NAMES = {
-        LUNAR_PHASE_FULL_MOON       : _( "Full Moon" ),
-        LUNAR_PHASE_WANING_GIBBOUS  : _( "Waning Gibbous" ),
-        LUNAR_PHASE_THIRD_QUARTER   : _( "Third Quarter" ),
-        LUNAR_PHASE_WANING_CRESCENT : _( "Waning Crescent" ),
-        LUNAR_PHASE_NEW_MOON        : _( "New Moon" ),
-        LUNAR_PHASE_WAXING_CRESCENT : _( "Waxing Crescent" ),
-        LUNAR_PHASE_FIRST_QUARTER   : _( "First Quarter" ),
-        LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" )
-    }
-
-    ORBITAL_ELEMENT_DATA_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
-
-    SATELLITE_TAG_NAME = "[NAME]"
-    SATELLITE_TAG_NUMBER = "[NUMBER]"
-    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR = "[INTERNATIONAL DESIGNATOR]"
-    SATELLITE_TAG_RISE_AZIMUTH = "[RISE AZIMUTH]"
-    SATELLITE_TAG_RISE_TIME = "[RISE TIME]"
-    SATELLITE_TAG_SET_AZIMUTH = "[SET AZIMUTH]"
-    SATELLITE_TAG_SET_TIME = "[SET TIME]"
-    SATELLITE_TAG_VISIBLE = "[VISIBLE]"
-
-    SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
-    SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
-
-    SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER
-    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
-    SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
-        "Rise Time: " + SATELLITE_TAG_RISE_TIME + \
-        "\nRise Azimuth: " + SATELLITE_TAG_RISE_AZIMUTH + \
-        "\nSet Time: " + SATELLITE_TAG_SET_TIME + \
-        "\nSet Azimuth: " + SATELLITE_TAG_SET_AZIMUTH
-
-    WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
-    WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
-
-    INDICATOR_TEXT_DEFAULT = "[" + BODY_MOON + " " + DATA_PHASE + "]"
-
-    MESSAGE_BODY_ALWAYS_UP = _( "Always Up!" )
-    MESSAGE_BODY_NEVER_UP = _( "Never Up!" )
-    MESSAGE_ORBITAL_ELEMENT_NO_DATA = _( "No orbital element data!" )
-    MESSAGE_SATELLITE_IS_CIRCUMPOLAR = _( "Satellite is circumpolar." )
-    MESSAGE_SATELLITE_NEVER_RISES = _( "Satellite never rises." )
-    MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS = _( "No passes within the next 10 days." )
-    MESSAGE_SATELLITE_NO_TLE_DATA = _( "No TLE data!" )
-    MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
-    MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
-
     # Translated constellations.
     # Sourced from cns_namemap in ephem/libastro/constel.c
     CONSTELLATIONS = {
@@ -347,6 +286,12 @@ class IndicatorLunar:
         "Volans"              : _( "Volans" ),
         "Vulpecula"           : _( "Vulpecula" ),
         "Serpens Cauda"       : _( "Serpens Cauda" ) }
+
+    MOON_TAG = "MOON"
+    MOON_TAG_TRANSLATION = { MOON_TAG : _( "MOON" ) }
+
+    SUN_TAG = "SUN"
+    SUN_TAG_TRANSLATION = { SUN_TAG : _( "SUN" ) }
 
     PLANET_MERCURY = "Mercury"
     PLANET_VENUS = "Venus"
@@ -650,39 +595,68 @@ class IndicatorLunar:
         "WEZEN"           : _( "WEZEN" ), 
         "ZAURAK"          : _( "ZAURAK" ) }
 
-    # Used to translate bodies.
-    BODIES = {
-        "MOON"      : _( "Moon" ),
-        "SUN"       : _( "Sun" ),
-        "MERCURY"   : _( "Mercury" ),
-        "VENUS"     : _( "Venus" ),
-        "MARS"      : _( "Mars" ),
-        "DEIMOS"    : _( "Deimos" ),
-        "PHOBOS"    : _( "Phobos" ),
-        "JUPITER"   : _( "Jupiter" ),
-        "CALLISTO"  : _( "Callisto" ),
-        "EUROPA"    : _( "Europa" ),
-        "GANYMEDE"  : _( "Ganymede" ),
-        "IO"        : _( "Io" ),
-        "SATURN"    : _( "Saturn" ),
-        "DIONE"     : _( "Dione" ),
-        "ENCELADUS" : _( "Enceladus" ),
-        "HYPERION"  : _( "Hyperion" ),
-        "IAPETUS"   : _( "Iapetus" ),
-        "MIMAS"     : _( "Mimas" ),
-        "RHEA"      : _( "Rhea" ),
-        "TETHYS"    : _( "Tethys" ),
-        "TITAN"     : _( "Titan" ),
-        "URANUS"    : _( "Uranus" ),
-        "ARIEL"     : _( "Ariel" ),
-        "MIRANDA"   : _( "Miranda" ),
-        "OBERON"    : _( "Oberon" ),
-        "TITANIA"   : _( "Titania" ),
-        "UMBRIEL"   : _( "Umbriel" ),
-        "NEPTUNE"   : _( "Neptune" ),
-        "PLUTO"     : _( "Pluto" ) }
+    BODY_TAGS = dict(
+        list( PLANET_AND_MOON_TAGS.items() ) + 
+        list( STAR_TAGS.items() ) + 
+        list( MOON_TAG_TRANSLATION.items() )+ 
+        list( SUN_TAG_TRANSLATION.items() ) )
 
-    BODY_STAR_TAGS = dict( list( BODIES.items() ) + list( STAR_TAGS.items() ) )
+    LUNAR_PHASE_FULL_MOON = "FULL_MOON"
+    LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
+    LUNAR_PHASE_THIRD_QUARTER = "THIRD_QUARTER"
+    LUNAR_PHASE_WANING_CRESCENT = "WANING_CRESCENT"
+    LUNAR_PHASE_NEW_MOON = "NEW_MOON"
+    LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
+    LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
+    LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
+
+    LUNAR_PHASE_NAMES = {
+        LUNAR_PHASE_FULL_MOON       : _( "Full Moon" ),
+        LUNAR_PHASE_WANING_GIBBOUS  : _( "Waning Gibbous" ),
+        LUNAR_PHASE_THIRD_QUARTER   : _( "Third Quarter" ),
+        LUNAR_PHASE_WANING_CRESCENT : _( "Waning Crescent" ),
+        LUNAR_PHASE_NEW_MOON        : _( "New Moon" ),
+        LUNAR_PHASE_WAXING_CRESCENT : _( "Waxing Crescent" ),
+        LUNAR_PHASE_FIRST_QUARTER   : _( "First Quarter" ),
+        LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" )
+    }
+
+    ORBITAL_ELEMENT_DATA_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
+
+    SATELLITE_TAG_NAME = "[NAME]"
+    SATELLITE_TAG_NUMBER = "[NUMBER]"
+    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR = "[INTERNATIONAL DESIGNATOR]"
+    SATELLITE_TAG_RISE_AZIMUTH = "[RISE AZIMUTH]"
+    SATELLITE_TAG_RISE_TIME = "[RISE TIME]"
+    SATELLITE_TAG_SET_AZIMUTH = "[SET AZIMUTH]"
+    SATELLITE_TAG_SET_TIME = "[SET TIME]"
+    SATELLITE_TAG_VISIBLE = "[VISIBLE]"
+
+    SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
+    SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
+
+    SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER
+    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
+    SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
+        "Rise Time: " + SATELLITE_TAG_RISE_TIME + \
+        "\nRise Azimuth: " + SATELLITE_TAG_RISE_AZIMUTH + \
+        "\nSet Time: " + SATELLITE_TAG_SET_TIME + \
+        "\nSet Azimuth: " + SATELLITE_TAG_SET_AZIMUTH
+
+    WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
+    WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
+
+    INDICATOR_TEXT_DEFAULT = "[" + MOON_TAG + " " + DATA_PHASE + "]"
+
+    MESSAGE_BODY_ALWAYS_UP = _( "Always Up!" )
+    MESSAGE_BODY_NEVER_UP = _( "Never Up!" )
+    MESSAGE_ORBITAL_ELEMENT_NO_DATA = _( "No orbital element data!" )
+    MESSAGE_SATELLITE_IS_CIRCUMPOLAR = _( "Satellite is circumpolar." )
+    MESSAGE_SATELLITE_NEVER_RISES = _( "Satellite never rises." )
+    MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS = _( "No passes within the next 10 days." )
+    MESSAGE_SATELLITE_NO_TLE_DATA = _( "No TLE data!" )
+    MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
+    MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
 
     def __init__( self ):
@@ -892,16 +866,16 @@ class IndicatorLunar:
 
 
     def updateMoonMenu( self, menu ):
-        if ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_MESSAGE ) in self.data or \
-           ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_RISE_TIME ) in self.data:
+        if ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_MESSAGE ) in self.data or \
+           ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_RISE_TIME ) in self.data:
 
             menuItem = Gtk.MenuItem( _( "Moon" ) )
             menu.append( menuItem )
 
-            self.updateCommonMenu( menuItem, AstronomicalObjectType.Moon, IndicatorLunar.BODY_MOON )
+            self.updateCommonMenu( menuItem, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
-            menuItem.get_submenu().append( Gtk.MenuItem( _( "Phase: " ) + self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( _( "Phase: " ) + self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_PHASE ) ] ) )
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
             menuItem.get_submenu().append( Gtk.MenuItem( _( "Next Phases" ) ) )
@@ -909,31 +883,31 @@ class IndicatorLunar:
             # Determine which phases occur by date rather than using the phase calculated.
             # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
             nextPhases = [ ]
-            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FIRST_QUARTER ) ], _( "First Quarter: " ) ] )
-            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FULL ) ], _( "Full: " ) ] )
-            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_THIRD_QUARTER ) ], _( "Third Quarter: " ) ] )
-            nextPhases.append( [ self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_NEW ) ], _( "New: " ) ] )
+            nextPhases.append( [ self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FIRST_QUARTER ) ], _( "First Quarter: " ) ] )
+            nextPhases.append( [ self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FULL ) ], _( "Full: " ) ] )
+            nextPhases.append( [ self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_THIRD_QUARTER ) ], _( "Third Quarter: " ) ] )
+            nextPhases.append( [ self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_NEW ) ], _( "New: " ) ] )
 
             nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
             for phaseInformation in nextPhases:
                 menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-            self.updateEclipseMenu( menuItem.get_submenu(), IndicatorLunar.BODY_MOON )
+            self.updateEclipseMenu( menuItem.get_submenu(), IndicatorLunar.MOON_TAG )
 
 
     def updateSunMenu( self, menu ):
-        if ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) in self.data or \
-           ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_RISE_TIME ) in self.data:
+        if ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_MESSAGE ) in self.data or \
+           ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_RISE_TIME ) in self.data:
             menuItem = Gtk.MenuItem( _( "Sun" ) )
             menu.append( menuItem )
 
-            self.updateCommonMenu( menuItem, AstronomicalObjectType.Sun, IndicatorLunar.BODY_SUN )
+            self.updateCommonMenu( menuItem, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
             # Solstice/Equinox.
-            equinox = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_EQUINOX ) ]
-            solstice = self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_SOLSTICE ) ]
+            equinox = self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_EQUINOX ) ]
+            solstice = self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_SOLSTICE ) ]
             if equinox < solstice:
                 menuItem.get_submenu().append( Gtk.MenuItem( _( "Equinox: " ) + equinox ) )
                 menuItem.get_submenu().append( Gtk.MenuItem( _( "Solstice: " ) + solstice ) )
@@ -942,7 +916,7 @@ class IndicatorLunar:
                 menuItem.get_submenu().append( Gtk.MenuItem( _( "Equinox: " ) + equinox ) )
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-            self.updateEclipseMenu( menuItem.get_submenu(), IndicatorLunar.BODY_SUN )
+            self.updateEclipseMenu( menuItem.get_submenu(), IndicatorLunar.SUN_TAG )
 
 
     def updatePlanetsMenu( self, menu ):
@@ -1274,20 +1248,20 @@ class IndicatorLunar:
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
     def updateMoon( self, ephemNow, lunarPhase ):
-        if self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.BODY_MOON, ephemNow ):
+        if self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow ):
 
-            self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_PHASE ) ] = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
-            self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FIRST_QUARTER ) ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
-            self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_FULL ) ] = self.localiseAndTrim( ephem.next_full_moon( ephemNow ) )
-            self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_THIRD_QUARTER ) ] = self.localiseAndTrim( ephem.next_last_quarter_moon( ephemNow ) )
-            self.data[ ( IndicatorLunar.BODY_MOON, IndicatorLunar.DATA_NEW ) ] = self.localiseAndTrim( ephem.next_new_moon( ephemNow ) )
+            self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_PHASE ) ] = IndicatorLunar.LUNAR_PHASE_NAMES[ lunarPhase ]
+            self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FIRST_QUARTER ) ] = self.localiseAndTrim( ephem.next_first_quarter_moon( ephemNow ) )
+            self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FULL ) ] = self.localiseAndTrim( ephem.next_full_moon( ephemNow ) )
+            self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_THIRD_QUARTER ) ] = self.localiseAndTrim( ephem.next_last_quarter_moon( ephemNow ) )
+            self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_NEW ) ] = self.localiseAndTrim( ephem.next_new_moon( ephemNow ) )
 
             self.nextUpdates.append( ephem.next_first_quarter_moon( ephemNow ) )
             self.nextUpdates.append( ephem.next_full_moon( ephemNow ) )
             self.nextUpdates.append( ephem.next_last_quarter_moon( ephemNow ) )
             self.nextUpdates.append( ephem.next_new_moon( ephemNow ) )
 
-            self.updateEclipse( ephemNow, IndicatorLunar.BODY_MOON )
+            self.updateEclipse( ephemNow, IndicatorLunar.MOON_TAG )
 
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
@@ -1295,7 +1269,7 @@ class IndicatorLunar:
     def updateSun( self, ephemNow ):
         city = self.getCity( ephemNow )
         sun = ephem.Sun( city )
-        if self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.BODY_SUN, ephemNow ):
+        if self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, ephemNow ):
 
             # Dawn/Dusk.
             try:
@@ -1303,24 +1277,24 @@ class IndicatorLunar:
                 city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
                 dawn = city.next_rising( sun, use_center = True )
                 dusk = city.next_setting( sun, use_center = True )
-                self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DAWN ) ] = self.localiseAndTrim( dawn )
-                self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_DUSK ) ] = self.localiseAndTrim( dusk )
+                self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_DAWN ) ] = self.localiseAndTrim( dawn )
+                self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_DUSK ) ] = self.localiseAndTrim( dusk )
                 self.nextUpdates.append( dawn )
                 self.nextUpdates.append( dusk )
-            except ephem.AlwaysUpError: self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
+            except ephem.AlwaysUpError: self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
             except ephem.NeverUpError:
                 if not self.hideBodyIfNeverUp:
-                    self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
+                    self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
             # Solstice/Equinox.
             equinox = ephem.next_equinox( ephemNow )
-            self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_EQUINOX ) ] = self.localiseAndTrim( equinox )
+            self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_EQUINOX ) ] = self.localiseAndTrim( equinox )
             solstice = ephem.next_solstice( ephemNow )
-            self.data[ ( IndicatorLunar.BODY_SUN, IndicatorLunar.DATA_SOLSTICE ) ] = self.localiseAndTrim( solstice )
+            self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_SOLSTICE ) ] = self.localiseAndTrim( solstice )
             self.nextUpdates.append( equinox )
             self.nextUpdates.append( solstice )
 
-            self.updateEclipse( ephemNow, IndicatorLunar.BODY_SUN )
+            self.updateEclipse( ephemNow, IndicatorLunar.SUN_TAG )
 
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
@@ -1569,7 +1543,7 @@ class IndicatorLunar:
 
 
     def updateEclipse( self, ephemNow, dataTag ):
-        if dataTag == IndicatorLunar.BODY_SUN:
+        if dataTag == IndicatorLunar.SUN_TAG:
             eclipseInformation = eclipse.getSolarEclipseForUTC( ephemNow.datetime() )
         else:
             eclipseInformation = eclipse.getLunarEclipseForUTC( ephemNow.datetime() )
@@ -2089,9 +2063,9 @@ class IndicatorLunar:
         # Planets/Stars.
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 15 ) # Bug in Python - must specify the parameter names!
 
-        planetStore = Gtk.ListStore( bool, str ) # Show/hide, planet name.
+        planetStore = Gtk.ListStore( bool, str, str ) # Show/hide, planet name (not displayed), translated planet name.
         for planetName in IndicatorLunar.PLANETS:
-            planetStore.append( [ planetName in self.planets, planetName ] )
+            planetStore.append( [ planetName in self.planets, planetName, IndicatorLunar.PLANET_AND_MOON_NAMES[ planetName ] ] )
 
         tree = Gtk.TreeView( planetStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
@@ -2108,7 +2082,7 @@ class IndicatorLunar:
         treeViewColumn.connect( "clicked", self.onToggle, planetStore, AstronomicalObjectType.Planet )
         tree.append_column( treeViewColumn )
 
-        tree.append_column( Gtk.TreeViewColumn( _( "Planet" ), Gtk.CellRendererText(), text = 1 ) )
+        tree.append_column( Gtk.TreeViewColumn( _( "Planet" ), Gtk.CellRendererText(), text = 2 ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
@@ -2590,8 +2564,8 @@ class IndicatorLunar:
             self.satelliteOnClickURL = satelliteURLText.get_text().strip()
 
             self.planets = [ ]
-            for planetInfo in planetStore:
-                if planetInfo[ 0 ]: self.planets.append( planetInfo[ 1 ] )
+            for row in planetStore:
+                if row[ 0 ]: self.planets.append( row[ 1 ] )
 
             self.stars = [ ]
             for row in starStore:
@@ -2673,7 +2647,7 @@ class IndicatorLunar:
                 if key[ 1 ] == IndicatorLunar.DATA_CITY_NAME: # Special case: the city name data tag has no associated body tag.
                     displayTagsStore.append( [ key[ 1 ], IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
                 else:
-                    displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_STAR_TAGS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
+                    displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_TAGS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
 
         # Check if new satellite TLE data is being added...
         if satelliteTLEData is not None:
@@ -2844,29 +2818,32 @@ class IndicatorLunar:
         if isFullMoon: os.remove( svgFile )
 
 
-    def onPlanetToggled( self, widget, path, planetStore, displayTagsStore ):
+    def onPlanetToggled( self, widget, 
+                         path, # Index to the selected row in the table. 
+                         planetStore, # List of lists, each sublist contains checked flag, planet name, translated planet name.
+                         displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
         planetStore[ path ][ 0 ] = not planetStore[ path ][ 0 ]
         planetName = planetStore[ path ][ 1 ].upper()
 
-        if planetStore[ path ][ 0 ]:
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_ILLUMINATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_CONSTELLATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_MAGNITUDE, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_TROPICAL_SIGN, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DISTANCE_TO_EARTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DISTANCE_TO_SUN, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_BRIGHT_LIMB, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_RIGHT_ASCENSION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DECLINATION, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_AZIMUTH, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_ALTITUDE, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+        if planetStore[ path ][ 0 ]: # Item has been checked, so add in a default value for each tag.
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_ILLUMINATION, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_ILLUMINATION ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_CONSTELLATION, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_CONSTELLATION ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_MAGNITUDE, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_MAGNITUDE ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_TROPICAL_SIGN, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_TROPICAL_SIGN ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DISTANCE_TO_EARTH, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_DISTANCE_TO_EARTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DISTANCE_TO_SUN, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_DISTANCE_TO_SUN ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_BRIGHT_LIMB, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_BRIGHT_LIMB ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_RIGHT_ASCENSION, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RIGHT_ASCENSION ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DECLINATION, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_DECLINATION ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_AZIMUTH, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_AZIMUTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_ALTITUDE, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_ALTITUDE ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
             if ( planetName, IndicatorLunar.DATA_MESSAGE ) in self.data:
-                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_MESSAGE, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_MESSAGE, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_MESSAGE ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
             else:
-                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-        else:
+                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RISE_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_SET_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+        else: # Item has been unchecked, so remove.
             iter = displayTagsStore.get_iter_first()
             while iter is not None:
                 if displayTagsStore[ iter ][ 0 ].startswith( planetName ):
