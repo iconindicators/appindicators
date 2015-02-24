@@ -3106,9 +3106,3 @@ class IndicatorLunar:
 
 
 if __name__ == "__main__": IndicatorLunar().main()
-    
-    
-    
-    
-    
-    
