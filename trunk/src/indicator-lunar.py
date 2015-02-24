@@ -947,7 +947,12 @@ class IndicatorLunar:
 
 
     def updatePlanetMoonsMenu( self, menuItem, moonNames ):
+        moonNamesTranslated = [ ] # Used to list the moon names in alphabetical order of the local language.
         for moonName in moonNames:
+            moonNamesTranslated.append( [ moonName, IndicatorLunar.PLANET_AND_MOON_NAMES[ moonName ] ] )
+
+        moonNamesTranslated = sorted( moonNamesTranslated, key = lambda x: ( x[ 1 ] ) )
+        for moonName, moonNameTranslated in moonNamesTranslated:
             moonMenuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.PLANET_AND_MOON_NAMES[ moonName ] )
             menuItem.get_submenu().append( moonMenuItem )
 
@@ -1864,20 +1869,9 @@ class IndicatorLunar:
         label = Gtk.Label( _( "Icon Text" ) )
         box.pack_start( label, False, False, 0 )
 
-        #TODO Split the self.indicatorText by [.
-        # Each chunk starts with a [.  The can only be one [ at the start of each chunk.  
-        # From the start of each chunk, find the first ].  Test the text between if it's a tag.
-
-        leftBracketChunks = self.indicatorText.split( "[" )
-        for chunk in leftBracketChunks:
-            print( chunk )
-
-
-#         for tag in IndicatorLunar.DATA_TAGS:
-#             if self.
-#         
-        
-        
+#TODO Split the self.indicatorText by [.
+# Each chunk starts with a [.  The can only be one [ at the start of each chunk.  
+# From the start of each chunk, find the first ].  Test the text between if it's a tag.
         indicatorText = Gtk.Entry()
         indicatorText.set_text( self.indicatorText ) #TODO Does this text need to be converted into translated tags?
         indicatorText.set_tooltip_text( _( "The text shown next to the indicator icon\n(or shown as a tooltip, where applicable)." ) )
@@ -1888,7 +1882,7 @@ class IndicatorLunar:
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.updateDisplayTags( displayTagsStore, None, None )
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
-        displayTagsStoreSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+        displayTagsStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView( displayTagsStoreSort )
         tree.set_hexpand( True )
@@ -2652,10 +2646,10 @@ class IndicatorLunar:
         for key in self.data.keys():
             if ( key[ 0 ], key[ 1 ] ) in self.satellites: # This key refers to a satellite.
                 if satelliteTLEData is None:
-                    displayTagsStore.append( [ " ".join( key ), " ".join( key ), self.data[ key ] ] )
+                    displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + key[ 1 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 2 ] ], self.data[ key ] ] )
             elif ( key[ 0 ] ) in self.orbitalElements: # This key refers to an orbital element.
                 if orbitalElementData is None:
-                    displayTagsStore.append( [ " ".join( key ), " ".join( key ), self.data[ key ] ] )
+                    displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
             else:
                 # Neither satellite nor orbital element.
                 if key[ 1 ] == IndicatorLunar.DATA_CITY_NAME: # Special case: the city name data tag has no associated body tag.
@@ -3087,20 +3081,6 @@ class IndicatorLunar:
             logging.error( "Error reading settings: " + IndicatorLunar.SETTINGS_FILE )
 
 
-#         self.indicatorText = "[MOON PHASE]"
-#         self.indicatorText = "Y [MOON PHASE] X [TEST THING] Z"
-#         print( "------------------------------------")
-#         leftBracketChunks = self.indicatorText.split( "[" )
-#         for chunk in leftBracketChunks:
-# #             if chunk != "":
-#             print( chunk )
-#             
-#         
-#         print( "------------------------------------")
-#         sys.exit()
-
-
-
     def saveSettings( self ):
         try:
             settings = {
@@ -3143,4 +3123,23 @@ class IndicatorLunar:
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
 
 
-if __name__ == "__main__": IndicatorLunar().main()
+    def indicatorTextToLocal( self, text ):
+        print( "------------------------------------")
+        leftBracketChunks = text.split( "[" )
+        for chunk in leftBracketChunks:
+            print( chunk )
+        print( "------------------------------------")
+
+        return None
+
+
+    def indicatorTextToOriginal( self, text ):
+        return None
+
+
+if __name__ == "__main__": 
+#     it = "Y [MOON PHASE] X [TEST THING] Z"
+#     it = "[MOON PHASE]"
+#     print( IndicatorLunar().indicatorTextToLocal( it ) )
+    
+     IndicatorLunar().main()
