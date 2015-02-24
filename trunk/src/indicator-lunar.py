@@ -2301,6 +2301,8 @@ class IndicatorLunar:
         notebook.append_page( satelliteGrid, Gtk.Label( _( "Satellites" ) ) )
 
         # OSD (satellite and full moon).
+        notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
+
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
