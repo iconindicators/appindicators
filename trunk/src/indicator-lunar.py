@@ -2644,18 +2644,27 @@ class IndicatorLunar:
     def updateDisplayTags( self, displayTagsStore, satelliteTLEData, orbitalElementData ):
         displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
         for key in self.data.keys():
-            if ( key[ 0 ], key[ 1 ] ) in self.satellites: # This key refers to a satellite.
-                if satelliteTLEData is None:
-                    displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + key[ 1 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 2 ] ], self.data[ key ] ] )
-            elif ( key[ 0 ] ) in self.orbitalElements: # This key refers to an orbital element.
-                if orbitalElementData is None:
-                    displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
-            else:
-                # Neither satellite nor orbital element.
+            if ( key[ 0 ], key[ 1 ] ) in self.satellites and satelliteTLEData is None: # This key refers to a satellite.
+                data = self.data[ key ]
+                if key[ 2 ] == IndicatorLunar.DATA_VISIBLE: # This data value is either True or False and needs to be translated.
+                    if data == "True": data = IndicatorLunar.TRUE_TEXT
+                    else: data = IndicatorLunar.FALSE_TEXT
+
+                displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + key[ 1 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 2 ] ], data ] )
+
+            elif ( key[ 0 ] ) in self.orbitalElements and orbitalElementData is None: # This key refers to an orbital element.
+                displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
+
+            else: # Neither satellite nor orbital element.
                 if key[ 1 ] == IndicatorLunar.DATA_CITY_NAME: # Special case: the city name data tag has no associated body tag.
                     displayTagsStore.append( [ key[ 1 ], IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
                 else:
-                    displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_TAGS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
+                    data = self.data[ key ]
+                    if key[ 1 ] == IndicatorLunar.DATA_EARTH_VISIBLE: # Special case: the earth visible data is boolean and needs to be translated.
+                        if self.data[ key ] == "True": data = IndicatorLunar.TRUE_TEXT
+                        else: data = IndicatorLunar.FALSE_TEXT
+
+                    displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_TAGS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], data ] )
 
         # Check if new satellite TLE data is being added...
         if satelliteTLEData is not None:
