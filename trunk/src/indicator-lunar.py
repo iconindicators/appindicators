@@ -113,6 +113,9 @@ class IndicatorLunar:
     SETTINGS_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     SETTINGS_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
+    TRUE_TEXT = _( "True" )
+    FALSE_TEXT = _( "False" )
+    
     DATA_ALTITUDE = "ALTITUDE"
     DATA_AZIMUTH = "AZIMUTH"
     DATA_BRIGHT_LIMB = "BRIGHT LIMB"
@@ -953,7 +956,11 @@ class IndicatorLunar:
             self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, dataTag )
             subMenu.append( Gtk.SeparatorMenuItem() )
 
-            subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] ) )
+            if self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] == "True":
+                subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + IndicatorLunar.TRUE_TEXT  ) )
+            else:
+                subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + IndicatorLunar.FALSE_TEXT  ) )
+
             subMenu.append( Gtk.SeparatorMenuItem() )
 
             subMenu.append( Gtk.MenuItem( _( "Offset from Planet (in planet radii)" ) ) )
@@ -1132,7 +1139,10 @@ class IndicatorLunar:
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] ) )
 
                     if not self.hideSatelliteIfNoVisiblePass:
-                        subMenu.append( Gtk.MenuItem( _( "Visible: " ) + self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] ) )
+                        if self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == "True":
+                            subMenu.append( Gtk.MenuItem( _( "Visible: " ) + IndicatorLunar.TRUE_TEXT ) )
+                        else:
+                            subMenu.append( Gtk.MenuItem( _( "Visible: " ) + IndicatorLunar.FALSE_TEXT ) )
 
                 self.addOnSatelliteHandler( subMenu, key )
 
@@ -1854,6 +1864,20 @@ class IndicatorLunar:
         label = Gtk.Label( _( "Icon Text" ) )
         box.pack_start( label, False, False, 0 )
 
+        #TODO Split the self.indicatorText by [.
+        # Each chunk starts with a [.  The can only be one [ at the start of each chunk.  
+        # From the start of each chunk, find the first ].  Test the text between if it's a tag.
+
+        leftBracketChunks = self.indicatorText.split( "[" )
+        for chunk in leftBracketChunks:
+            print( chunk )
+
+
+#         for tag in IndicatorLunar.DATA_TAGS:
+#             if self.
+#         
+        
+        
         indicatorText = Gtk.Entry()
         indicatorText.set_text( self.indicatorText ) #TODO Does this text need to be converted into translated tags?
         indicatorText.set_tooltip_text( _( "The text shown next to the indicator icon\n(or shown as a tooltip, where applicable)." ) )
@@ -3061,6 +3085,20 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error reading settings: " + IndicatorLunar.SETTINGS_FILE )
+
+
+#         self.indicatorText = "[MOON PHASE]"
+#         self.indicatorText = "Y [MOON PHASE] X [TEST THING] Z"
+#         print( "------------------------------------")
+#         leftBracketChunks = self.indicatorText.split( "[" )
+#         for chunk in leftBracketChunks:
+# #             if chunk != "":
+#             print( chunk )
+#             
+#         
+#         print( "------------------------------------")
+#         sys.exit()
+
 
 
     def saveSettings( self ):
