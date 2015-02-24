@@ -176,7 +176,7 @@ class IndicatorLunar:
         DATA_Y_OFFSET                   : _( "Y OFFSET" ),
         DATA_Z_OFFSET                   : _( "Z OFFSET" ),
         DATA_NEW                        : _( "NEW" ),
-        DATA_PHASE                      : _( "PHASE X" ),  #TODO Change back!
+        DATA_PHASE                      : _( "PHASE" ),
         DATA_RIGHT_ASCENSION            : _( "RIGHT ASCENSION" ),
         DATA_RISE_AZIMUTH               : _( "RISE AZIMUTH" ),
         DATA_RISE_TIME                  : _( "RISE TIME" ),
