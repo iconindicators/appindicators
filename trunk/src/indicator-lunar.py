@@ -152,7 +152,7 @@ class IndicatorLunar:
     DATA_VISIBLE = "VISIBLE"
 
     DATA_TAGS = {
-        DATA_ALTITUDE                   : _( "ALTITUDE" ),
+        DATA_ALTITUDE                   : _( "ALTITUDE XXX" ),
         DATA_AZIMUTH                    : _( "AZIMUTH" ),
         DATA_BRIGHT_LIMB                : _( "BRIGHT LIMB" ),
         DATA_CITY_NAME                  : _( "CITY NAME" ),
@@ -176,7 +176,7 @@ class IndicatorLunar:
         DATA_Y_OFFSET                   : _( "Y OFFSET" ),
         DATA_Z_OFFSET                   : _( "Z OFFSET" ),
         DATA_NEW                        : _( "NEW" ),
-        DATA_PHASE                      : _( "PHASE" ),
+        DATA_PHASE                      : _( "PHASE X" ),  #TODO Change back!
         DATA_RIGHT_ASCENSION            : _( "RIGHT ASCENSION" ),
         DATA_RISE_AZIMUTH               : _( "RISE AZIMUTH" ),
         DATA_RISE_TIME                  : _( "RISE TIME" ),
@@ -1881,6 +1881,14 @@ class IndicatorLunar:
 
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.updateDisplayTags( displayTagsStore, None, None )
+
+#TODO Testing
+#         iter = displayTagsStore.get_iter_first()
+#         while iter is not None:
+#             row = displayTagsStore[ iter ]
+#             print( row[ 0 ], " | ", row[ 1 ], " | ", row[ 2 ] )
+#             iter = displayTagsStore.iter_next( iter )
+
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
         displayTagsStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
@@ -1929,7 +1937,7 @@ class IndicatorLunar:
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 40 ) # Bug in Python - must specify the parameter names!
         box.set_margin_left( 20 )
 
-        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( ( "Planets" ) )
+        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( _( "Planets" ) )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
         showPlanetsAsSubmenuCheckbox.set_tooltip_text( _( "Show planets (excluding moon/sun) as submenus." ) )
         box.pack_start( showPlanetsAsSubmenuCheckbox, False, False, 0 )
@@ -1998,6 +2006,7 @@ class IndicatorLunar:
         satelliteMenuText = Gtk.Entry()
         satelliteMenuText.set_text( self.satelliteMenuText )
         satelliteMenuText.set_hexpand( True )
+#TODO Needs translation.
         satelliteMenuText.set_tooltip_text( 
              "The text for each satellite item in the menu.\n\n" + \
              "Available tags:\n\t" + \
@@ -2046,6 +2055,7 @@ class IndicatorLunar:
         satelliteURLText = Gtk.Entry()
         satelliteURLText.set_text( self.satelliteOnClickURL )
         satelliteURLText.set_hexpand( True )
+#TODO Needs translation.
         satelliteURLText.set_tooltip_text( 
             "The URL used to lookup a satellite\n" + \
             "(in the default browser) when any of\n" + \
@@ -2313,6 +2323,7 @@ class IndicatorLunar:
         satelliteNotificationSummaryText = Gtk.Entry()
         satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         satelliteNotificationSummaryText.set_text( self.satelliteNotificationSummary )
+#TODO Needs translation.
         satelliteNotificationSummaryText.set_tooltip_text(
             "The summary for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" + \
@@ -2339,6 +2350,7 @@ class IndicatorLunar:
 
         satelliteNotificationMessageText = Gtk.TextView()
         satelliteNotificationMessageText.get_buffer().set_text( self.satelliteNotificationMessage )
+#TODO Needs translation.
         satelliteNotificationMessageText.set_tooltip_text(
             "The message for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" + \
@@ -2549,7 +2561,7 @@ class IndicatorLunar:
 
             elevationValue = elevation.get_text().strip()
             if elevationValue == "" or not pythonutils.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number number between 0 and 10000 inclusive." ) )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number between 0 and 10000 inclusive." ) )
                 notebook.set_current_page( 5 )
                 elevation.grab_focus()
                 continue
@@ -3133,13 +3145,33 @@ class IndicatorLunar:
 
 
     def indicatorTextToLocal( self, text ):
-        print( "------------------------------------")
         leftBracketChunks = text.split( "[" )
+        if len( leftBracketChunks ) < 2:
+            return text # No left brackets found.
+
+        translatedText = ""
+        print( "------------------------------------")
         for chunk in leftBracketChunks:
-            print( chunk )
+            rightBracket = chunk.find( "]" )
+            if rightBracket == -1:
+                translatedText += chunk
+                continue
+
+            tag = chunk[ 0 : rightBracket ]
+            found = False
+            for key in IndicatorLunar.DATA_TAGS.keys():
+                if tag.endswith( key ):
+                    translatedText += "[" + IndicatorLunar.DATA_TAGS[ key ] + "]"
+                    found = True
+                    break
+
+            if not found: translatedText += "[" + tag + "]"
+                
+#                     print( key, IndicatorLunar.DATA_TAGS[ key ] )
+#             print( chunk, rightBracket, tag )
         print( "------------------------------------")
 
-        return None
+        return translatedText
 
 
     def indicatorTextToOriginal( self, text ):
@@ -3150,5 +3182,5 @@ if __name__ == "__main__":
 #     it = "Y [MOON PHASE] X [TEST THING] Z"
 #     it = "[MOON PHASE]"
 #     print( IndicatorLunar().indicatorTextToLocal( it ) )
-    
-     IndicatorLunar().main()
+
+    IndicatorLunar().main()
