@@ -2680,6 +2680,57 @@ class IndicatorLunar:
                 displayTagsStore.append( [ key, key, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
 
+    def translateIndicatorText( self, displayTagsStore, originalToLocal, text ):
+        # The display tags store contains 3 columns.
+        # First column are the original/untranslated tags.
+        # Second column are the translated tags.
+        # Depending on which direction the translation is going,
+        # the first column or the second column contains the the source tags to match.
+        if originalToLocal:
+            i = 0
+            j = 1
+        else:
+            i = 1
+            j = 0
+
+        translatedText = ""
+        chunks = text.split( "[" )
+        if len( chunks ) < 2:
+            translatedText = text # No left brackets found.
+        else:
+            for chunk in chunks:
+                rightBracket = chunk.find( "]" )
+                if rightBracket == -1:
+                    translatedText += chunk
+                    continue
+
+                tag = chunk[ 0 : rightBracket ]
+                found = False
+                iter = displayTagsStore.get_iter_first()
+                while iter is not None:
+                    row = displayTagsStore[ iter ]
+                    if row[ i ] == tag:
+                        translatedText += "[" + row[ j ] + chunk[ rightBracket : ]
+                        found = True
+                        break
+
+                    iter = displayTagsStore.iter_next( iter )
+
+                if not found: translatedText += "[" + tag + chunk[ rightBracket : ]
+
+#TODO Remove after testing...
+        if originalToLocal:
+            print( "Translating from original to local:" )
+            print( text )
+            print( translatedText )
+        else:
+            print( "Translating from local to original:" )
+            print( translatedText )
+            print( text )
+
+        return translatedText
+
+
     def onToggle( self, widget, dataStore, astronomicalObjectType ):
         if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
             self.toggleOrbitalElementsTable = not self.toggleOrbitalElementsTable
@@ -3133,86 +3184,6 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
-
-
-
-#TODO Test...
-#A [MOON PHASE] B [SUN DAWN] C [MOON DAWN] D
-#A MOON PHASESUN DAWN XXXHASE[MOON DAWN]
-
-
-    def indicatorTextToLocal( self, displayTagsStore, text ):
-        translatedText = ""
-        chunks = text.split( "[" )
-        if len( chunks ) < 2:
-            translatedText = text # No left brackets found.
-        else:
-            for chunk in chunks:
-                rightBracket = chunk.find( "]" )
-                if rightBracket == -1:
-                    translatedText += chunk
-                    continue
-
-                tag = chunk[ 0 : rightBracket ]
-                found = False
-                iter = displayTagsStore.get_iter_first()
-                while iter is not None:
-                    row = displayTagsStore[ iter ]
-                    if row[ 0 ] == tag:
-                        translatedText += "[" + row[ 1 ] + chunk[ rightBracket : ]
-                        found = True
-                        break
-
-                    iter = displayTagsStore.iter_next( iter )
-
-                if not found: translatedText += "[" + tag + chunk[ rightBracket : ]
-
-        return translatedText
-
-
-    def translateIndicatorText( self, displayTagsStore, originalToLocal, text ):
-        # The display tags store contains 3 columns.
-        # First column are the original/untranslated tags.
-        # Second column are the translated tags.
-        # Depending on which direction the translation is going,
-        # the first column or the second column contains the the source tags to match.
-        if originalToLocal:
-            i = 0
-            j = 1
-        else:
-            i = 1
-            j = 0
-
-        translatedText = ""
-        chunks = text.split( "[" )
-        if len( chunks ) < 2:
-            translatedText = text # No left brackets found.
-        else:
-            for chunk in chunks:
-                rightBracket = chunk.find( "]" )
-                if rightBracket == -1:
-                    translatedText += chunk
-                    continue
-
-                tag = chunk[ 0 : rightBracket ]
-                found = False
-                iter = displayTagsStore.get_iter_first()
-                while iter is not None:
-                    row = displayTagsStore[ iter ]
-                    if row[ i ] == tag:
-                        translatedText += "[" + row[ j ] + chunk[ rightBracket : ]
-                        found = True
-                        break
-
-                    iter = displayTagsStore.iter_next( iter )
-
-                if not found: translatedText += "[" + tag + chunk[ rightBracket : ]
-
-        return translatedText
-
-
-    def indicatorTextToOriginal( self, displayTagsStore, text ):
-        return None
 
 
 if __name__ == "__main__": IndicatorLunar().main()
