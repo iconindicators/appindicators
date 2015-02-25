@@ -152,7 +152,7 @@ class IndicatorLunar:
     DATA_VISIBLE = "VISIBLE"
 
     DATA_TAGS = {
-        DATA_ALTITUDE                   : _( "ALTITUDE XXX" ),
+        DATA_ALTITUDE                   : _( "ALTITUDE" ),
         DATA_AZIMUTH                    : _( "AZIMUTH" ),
         DATA_BRIGHT_LIMB                : _( "BRIGHT LIMB" ),
         DATA_CITY_NAME                  : _( "CITY NAME" ),
@@ -625,16 +625,25 @@ class IndicatorLunar:
     SATELLITE_TAG_SET_TIME = "[SET TIME]"
     SATELLITE_TAG_VISIBLE = "[VISIBLE]"
 
+    SATELLITE_TAG_NAME_TRANSLATION = _( "[NAME]" )
+    SATELLITE_TAG_NUMBER_TRANSLATION = _( "[NUMBER]" )
+    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION = _( "[INTERNATIONAL DESIGNATOR]" )
+    SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION = _( "[RISE AZIMUTH]" )
+    SATELLITE_TAG_RISE_TIME_TRANSLATION = _( "[RISE TIME]" )
+    SATELLITE_TAG_SET_AZIMUTH_TRANSLATION = _( "[SET AZIMUTH]" )
+    SATELLITE_TAG_SET_TIME_TRANSLATION = _( "[SET TIME]" )
+    SATELLITE_TAG_VISIBLE_TRANSLATION = _( "[VISIBLE]" )
+
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
 
     SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
-    SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
-        "Rise Time: " + SATELLITE_TAG_RISE_TIME + \
-        "\nRise Azimuth: " + SATELLITE_TAG_RISE_AZIMUTH + \
-        "\nSet Time: " + SATELLITE_TAG_SET_TIME + \
-        "\nSet Azimuth: " + SATELLITE_TAG_SET_AZIMUTH
+    SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( \
+        "Rise Time: " + SATELLITE_TAG_RISE_TIME_TRANSLATION + \
+        "\nRise Azimuth: " + SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + \
+        "\nSet Time: " + SATELLITE_TAG_SET_TIME_TRANSLATION + \
+        "\nSet Azimuth: " + SATELLITE_TAG_SET_AZIMUTH_TRANSLATION )
 
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
@@ -2006,13 +2015,12 @@ class IndicatorLunar:
         satelliteMenuText = Gtk.Entry()
         satelliteMenuText.set_text( self.satelliteMenuText )
         satelliteMenuText.set_hexpand( True )
-#TODO Needs translation.
-        satelliteMenuText.set_tooltip_text( 
+        satelliteMenuText.set_tooltip_text( _(
              "The text for each satellite item in the menu.\n\n" + \
              "Available tags:\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR )
+             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
+             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION ) )
 
         box.pack_start( satelliteMenuText, True, True, 0 )
 
@@ -2055,17 +2063,16 @@ class IndicatorLunar:
         satelliteURLText = Gtk.Entry()
         satelliteURLText.set_text( self.satelliteOnClickURL )
         satelliteURLText.set_hexpand( True )
-#TODO Needs translation.
-        satelliteURLText.set_tooltip_text( 
+        satelliteURLText.set_tooltip_text( _(
             "The URL used to lookup a satellite\n" + \
             "(in the default browser) when any of\n" + \
             "the satellite's child items are selected\n" + \
             "from the menu.\n\n" + \
             "If empty, no lookup will be done.\n\n" + \
             "Available tags:\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR )
+            IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION ) )
 
         box.pack_start( satelliteURLText, True, True, 0 )
 
@@ -2325,19 +2332,18 @@ class IndicatorLunar:
         satelliteNotificationSummaryText = Gtk.Entry()
         satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         satelliteNotificationSummaryText.set_text( self.satelliteNotificationSummary )
-#TODO Needs translation.
-        satelliteNotificationSummaryText.set_tooltip_text(
+        satelliteNotificationSummaryText.set_tooltip_text( _(
             "The summary for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_TIME + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_TIME + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_VISIBLE + "\n\n" + \
-            notifyOSDInformation )
+            IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION + "\n\n" + \
+            notifyOSDInformation ) )
 
         grid.attach( satelliteNotificationSummaryText, 1, 1, 1, 1 )
 
@@ -2352,19 +2358,18 @@ class IndicatorLunar:
 
         satelliteNotificationMessageText = Gtk.TextView()
         satelliteNotificationMessageText.get_buffer().set_text( self.satelliteNotificationMessage )
-#TODO Needs translation.
-        satelliteNotificationMessageText.set_tooltip_text(
+        satelliteNotificationMessageText.set_tooltip_text( _(
             "The message for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_NAME + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_NUMBER + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_TIME + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_TIME + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_VISIBLE + "\n\n" + \
-            notifyOSDInformation )
+            IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
+            IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION + "\n\n" + \
+            notifyOSDInformation ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
