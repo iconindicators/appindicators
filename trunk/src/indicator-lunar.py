@@ -1878,11 +1878,7 @@ class IndicatorLunar:
         label = Gtk.Label( _( "Icon Text" ) )
         box.pack_start( label, False, False, 0 )
 
-#TODO Split the self.indicatorText by [.
-# Each chunk starts with a [.  The can only be one [ at the start of each chunk.  
-# From the start of each chunk, find the first ].  Test the text between if it's a tag.
         indicatorText = Gtk.Entry()
-        indicatorText.set_text( self.indicatorText ) #TODO Does this text need to be converted into translated tags?
         indicatorText.set_tooltip_text( _( "The text shown next to the indicator icon\n(or shown as a tooltip, where applicable)." ) )
         box.pack_start( indicatorText, True, True, 0 )
 
@@ -1890,13 +1886,7 @@ class IndicatorLunar:
 
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.updateDisplayTags( displayTagsStore, None, None )
-
-#TODO Testing
-#         iter = displayTagsStore.get_iter_first()
-#         while iter is not None:
-#             row = displayTagsStore[ iter ]
-#             print( row[ 0 ], " | ", row[ 1 ], " | ", row[ 2 ] )
-#             iter = displayTagsStore.iter_next( iter )
+        indicatorText.set_text( self.translateIndicatorText( displayTagsStore, True, self.indicatorText ) ) # Need to translate the tags into the local language.
 
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
         displayTagsStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
@@ -2569,10 +2559,8 @@ class IndicatorLunar:
                 elevation.grab_focus()
                 continue
 
-# TODO Need to parse this to swap out the translated tags.
-#Make use of the list store somehow???
-#Maybe the same functionality can be used for the actual icon text tag substitution?
-#             self.indicatorText = indicatorText.get_text().strip()
+            self.indicatorText = self.translateIndicatorText( displayTagsStore, False, indicatorText.get_text().strip() )
+            print( self.indicatorText )
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showOrbitalElementsAsSubMenu = showOrbitalElementsAsSubmenuCheckbox.get_active()
@@ -3147,43 +3135,84 @@ class IndicatorLunar:
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
 
 
-    def indicatorTextToLocal( self, text ):
-        leftBracketChunks = text.split( "[" )
-        if len( leftBracketChunks ) < 2:
-            return text # No left brackets found.
 
+#TODO Test...
+#A [MOON PHASE] B [SUN DAWN] C [MOON DAWN] D
+#A MOON PHASESUN DAWN XXXHASE[MOON DAWN]
+
+
+    def indicatorTextToLocal( self, displayTagsStore, text ):
         translatedText = ""
-        print( "------------------------------------")
-        for chunk in leftBracketChunks:
-            rightBracket = chunk.find( "]" )
-            if rightBracket == -1:
-                translatedText += chunk
-                continue
+        chunks = text.split( "[" )
+        if len( chunks ) < 2:
+            translatedText = text # No left brackets found.
+        else:
+            for chunk in chunks:
+                rightBracket = chunk.find( "]" )
+                if rightBracket == -1:
+                    translatedText += chunk
+                    continue
 
-            tag = chunk[ 0 : rightBracket ]
-            found = False
-            for key in IndicatorLunar.DATA_TAGS.keys():
-                if tag.endswith( key ):
-                    translatedText += "[" + IndicatorLunar.DATA_TAGS[ key ] + "]"
-                    found = True
-                    break
+                tag = chunk[ 0 : rightBracket ]
+                found = False
+                iter = displayTagsStore.get_iter_first()
+                while iter is not None:
+                    row = displayTagsStore[ iter ]
+                    if row[ 0 ] == tag:
+                        translatedText += "[" + row[ 1 ] + chunk[ rightBracket : ]
+                        found = True
+                        break
 
-            if not found: translatedText += "[" + tag + "]"
-                
-#                     print( key, IndicatorLunar.DATA_TAGS[ key ] )
-#             print( chunk, rightBracket, tag )
-        print( "------------------------------------")
+                    iter = displayTagsStore.iter_next( iter )
+
+                if not found: translatedText += "[" + tag + chunk[ rightBracket : ]
 
         return translatedText
 
 
-    def indicatorTextToOriginal( self, text ):
+    def translateIndicatorText( self, displayTagsStore, originalToLocal, text ):
+        # The display tags store contains 3 columns.
+        # First column are the original/untranslated tags.
+        # Second column are the translated tags.
+        # Depending on which direction the translation is going,
+        # the first column or the second column contains the the source tags to match.
+        if originalToLocal:
+            i = 0
+            j = 1
+        else:
+            i = 1
+            j = 0
+
+        translatedText = ""
+        chunks = text.split( "[" )
+        if len( chunks ) < 2:
+            translatedText = text # No left brackets found.
+        else:
+            for chunk in chunks:
+                rightBracket = chunk.find( "]" )
+                if rightBracket == -1:
+                    translatedText += chunk
+                    continue
+
+                tag = chunk[ 0 : rightBracket ]
+                found = False
+                iter = displayTagsStore.get_iter_first()
+                while iter is not None:
+                    row = displayTagsStore[ iter ]
+                    if row[ i ] == tag:
+                        translatedText += "[" + row[ j ] + chunk[ rightBracket : ]
+                        found = True
+                        break
+
+                    iter = displayTagsStore.iter_next( iter )
+
+                if not found: translatedText += "[" + tag + chunk[ rightBracket : ]
+
+        return translatedText
+
+
+    def indicatorTextToOriginal( self, displayTagsStore, text ):
         return None
 
 
-if __name__ == "__main__": 
-#     it = "Y [MOON PHASE] X [TEST THING] Z"
-#     it = "[MOON PHASE]"
-#     print( IndicatorLunar().indicatorTextToLocal( it ) )
-
-    IndicatorLunar().main()
+if __name__ == "__main__": IndicatorLunar().main()
