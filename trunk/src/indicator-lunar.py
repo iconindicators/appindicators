@@ -2560,7 +2560,6 @@ class IndicatorLunar:
                 continue
 
             self.indicatorText = self.translateIndicatorText( displayTagsStore, False, indicatorText.get_text().strip() )
-            print( self.indicatorText )
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showOrbitalElementsAsSubMenu = showOrbitalElementsAsSubmenuCheckbox.get_active()
