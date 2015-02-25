@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -625,25 +626,35 @@ class IndicatorLunar:
     SATELLITE_TAG_SET_TIME = "[SET TIME]"
     SATELLITE_TAG_VISIBLE = "[VISIBLE]"
 
-    SATELLITE_TAG_NAME_TRANSLATION = _( "[NAME]" )
-    SATELLITE_TAG_NUMBER_TRANSLATION = _( "[NUMBER]" )
-    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION = _( "[INTERNATIONAL DESIGNATOR]" )
-    SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION = _( "[RISE AZIMUTH]" )
-    SATELLITE_TAG_RISE_TIME_TRANSLATION = _( "[RISE TIME]" )
-    SATELLITE_TAG_SET_AZIMUTH_TRANSLATION = _( "[SET AZIMUTH]" )
-    SATELLITE_TAG_SET_TIME_TRANSLATION = _( "[SET TIME]" )
-    SATELLITE_TAG_VISIBLE_TRANSLATION = _( "[VISIBLE]" )
+    SATELLITE_TAG_NAME_TRANSLATION = "[" + _( "NAME" ) + "]"
+    SATELLITE_TAG_NUMBER_TRANSLATION = "[" + _( "NUMBER" ) + "]"
+    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION = "[" + _( "INTERNATIONAL DESIGNATOR" ) + "]"
+    SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION = "[" + _( "RISE AZIMUTH" ) + "]"
+    SATELLITE_TAG_RISE_TIME_TRANSLATION = "[" + _( "RISE TIME" ) + "]"
+    SATELLITE_TAG_SET_AZIMUTH_TRANSLATION = "[" + _( "SET AZIMUTH" ) + "]"
+    SATELLITE_TAG_SET_TIME_TRANSLATION = "[" + _( "SET TIME" ) + "]"
+    SATELLITE_TAG_VISIBLE_TRANSLATION = "[" + _( "VISIBLE" ) + "]"
+
+    SATELLITE_TAG_TRANSLATIONS = Gtk.ListStore( str, str ) # Tag, translated tag.
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_NAME.strip( "[]" ), SATELLITE_TAG_NAME_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_NUMBER.strip( "[]" ), SATELLITE_TAG_NUMBER_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_INTERNATIONAL_DESIGNATOR.strip( "[]" ), SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_AZIMUTH.strip( "[]" ), SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_TIME.strip( "[]" ), SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ), SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_VISIBLE.strip( "[]" ), SATELLITE_TAG_VISIBLE_TRANSLATION.strip( "[]" ) ] )
 
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
 
     SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
-    SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( \
-        "Rise Time: " + SATELLITE_TAG_RISE_TIME_TRANSLATION + \
-        "\nRise Azimuth: " + SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + \
-        "\nSet Time: " + SATELLITE_TAG_SET_TIME_TRANSLATION + \
-        "\nSet Azimuth: " + SATELLITE_TAG_SET_AZIMUTH_TRANSLATION )
+    SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
+        _( "Rise Time: " ) + SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
+        _( "Rise Azimuth: " ) + SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n" + \
+        _( "Set Time: " ) + SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
+        _( "Set Azimuth: " ) + SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
 
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
@@ -2003,14 +2014,13 @@ class IndicatorLunar:
         box.pack_start( label, False, False, 0 )
 
         satelliteMenuText = Gtk.Entry()
-        satelliteMenuText.set_text( self.satelliteMenuText )
+        satelliteMenuText.set_text( self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteMenuText ) )
         satelliteMenuText.set_hexpand( True )
-        satelliteMenuText.set_tooltip_text( _(
-             "The text for each satellite item in the menu.\n\n" + \
-             "Available tags:\n\t" + \
+        satelliteMenuText.set_tooltip_text(
+            _( "The text for each satellite item in the menu.\n\nAvailable tags:\n\t" ) + \
              IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
              IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION ) )
+             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION )
 
         box.pack_start( satelliteMenuText, True, True, 0 )
 
@@ -2051,7 +2061,7 @@ class IndicatorLunar:
         box.pack_start( label, False, False, 0 )
 
         satelliteURLText = Gtk.Entry()
-        satelliteURLText.set_text( self.satelliteOnClickURL )
+        satelliteURLText.set_text( self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteOnClickURL ) )
         satelliteURLText.set_hexpand( True )
         satelliteURLText.set_tooltip_text( _(
             "The URL used to lookup a satellite\n" + \
@@ -2059,10 +2069,10 @@ class IndicatorLunar:
             "the satellite's child items are selected\n" + \
             "from the menu.\n\n" + \
             "If empty, no lookup will be done.\n\n" + \
-            "Available tags:\n\t" + \
+            "Available tags:\n\t" ) + \
             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION ) )
+            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION )
 
         box.pack_start( satelliteURLText, True, True, 0 )
 
@@ -2321,10 +2331,8 @@ class IndicatorLunar:
 
         satelliteNotificationSummaryText = Gtk.Entry()
         satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        satelliteNotificationSummaryText.set_text( self.satelliteNotificationSummary )
-        satelliteNotificationSummaryText.set_tooltip_text( _(
-            "The summary for the satellite rise notification.\n\n" + \
-            "Available tags:\n\t" + \
+        satelliteNotificationSummaryText.set_text( self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationSummary ) )
+        satelliteNotificationSummaryText.set_tooltip_text( _( "The summary for the satellite rise notification.\n\nAvailable tags:\n\t" ) + \
             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
@@ -2333,7 +2341,7 @@ class IndicatorLunar:
             IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION + "\n\n" + \
-            notifyOSDInformation ) )
+            _( notifyOSDInformation ) )
 
         grid.attach( satelliteNotificationSummaryText, 1, 1, 1, 1 )
 
@@ -2347,10 +2355,8 @@ class IndicatorLunar:
         grid.attach( label, 0, 2, 1, 1 )
 
         satelliteNotificationMessageText = Gtk.TextView()
-        satelliteNotificationMessageText.get_buffer().set_text( self.satelliteNotificationMessage )
-        satelliteNotificationMessageText.set_tooltip_text( _(
-            "The message for the satellite rise notification.\n\n" + \
-            "Available tags:\n\t" + \
+        satelliteNotificationMessageText.get_buffer().set_text( self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationMessage ) )
+        satelliteNotificationMessageText.set_tooltip_text( _( "The message for the satellite rise notification.\n\nAvailable tags:\n\t" ) + \
             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
@@ -2359,7 +2365,7 @@ class IndicatorLunar:
             IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION + "\n\n" + \
-            notifyOSDInformation ) )
+            _( notifyOSDInformation ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
@@ -2566,12 +2572,12 @@ class IndicatorLunar:
             self.orbitalElementsAddNew = orbitalElementsAddNewCheckbox.get_active()
             self.orbitalElementsMagnitude = spinnerOrbitalElementMagnitude.get_value_as_int()
             self.hideBodyIfNeverUp = hideBodyIfNeverUpCheckbox.get_active()
-            self.satelliteMenuText = satelliteMenuText.get_text().strip()
+            self.satelliteMenuText = self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteMenuText.get_text().strip() ) 
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.hideSatelliteIfNoVisiblePass = hideSatelliteIfNoVisiblePassCheckbox.get_active()
-            self.satelliteOnClickURL = satelliteURLText.get_text().strip()
+            self.satelliteOnClickURL = self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteURLText.get_text().strip() )
 
             self.planets = [ ]
             for row in planetStore:
@@ -2608,8 +2614,8 @@ class IndicatorLunar:
                     self.satellites.append( ( satelliteTLE[ 1 ].upper(), satelliteTLE[ 2 ] ) )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
-            self.satelliteNotificationSummary = satelliteNotificationSummaryText.get_text()
-            self.satelliteNotificationMessage = pythonutils.getTextViewText( satelliteNotificationMessageText )
+            self.satelliteNotificationSummary = self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
+            self.satelliteNotificationMessage = self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, pythonutils.getTextViewText( satelliteNotificationMessageText ) )
 
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
@@ -2679,12 +2685,12 @@ class IndicatorLunar:
                 displayTagsStore.append( [ key, key, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
 
-    def translateIndicatorText( self, displayTagsStore, originalToLocal, text ):
-        # The display tags store contains 3 columns.
-        # First column are the original/untranslated tags.
-        # Second column are the translated tags.
+    def translateIndicatorText( self, tagsStore, originalToLocal, text ):
+        # The tags store contains 2 columns (if more, those are ignored).
+        # First column contains the original/untranslated tags.
+        # Second column contains the translated tags.
         # Depending on which direction the translation is going,
-        # the first column or the second column contains the the source tags to match.
+        # the first column or the second column contains the source tags to match.
         if originalToLocal:
             i = 0
             j = 1
@@ -2705,27 +2711,17 @@ class IndicatorLunar:
 
                 tag = chunk[ 0 : rightBracket ]
                 found = False
-                iter = displayTagsStore.get_iter_first()
+                iter = tagsStore.get_iter_first()
                 while iter is not None:
-                    row = displayTagsStore[ iter ]
+                    row = tagsStore[ iter ]
                     if row[ i ] == tag:
                         translatedText += "[" + row[ j ] + chunk[ rightBracket : ]
                         found = True
                         break
 
-                    iter = displayTagsStore.iter_next( iter )
+                    iter = tagsStore.iter_next( iter )
 
                 if not found: translatedText += "[" + tag + chunk[ rightBracket : ]
-
-#TODO Remove after testing...
-        if originalToLocal:
-            print( "Translating from original to local:" )
-            print( text )
-            print( translatedText )
-        else:
-            print( "Translating from local to original:" )
-            print( translatedText )
-            print( text )
 
         return translatedText
 
@@ -2813,7 +2809,12 @@ class IndicatorLunar:
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ 1 ] + "]", indicatorTextEntry.get_position() )
 
 
-    def onResetSatelliteOnClickURL( self, button, textEntry ): textEntry.set_text( IndicatorLunar.SATELLITE_ON_CLICK_URL )
+    def onResetSatelliteOnClickURL( self, button, textEntry ):
+        textEntry.set_text(
+            self.translateIndicatorText(
+                IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, 
+                True, 
+                IndicatorLunar.SATELLITE_ON_CLICK_URL ) )
 
 
     def onFetchOrbitalElementURL( self, button, entry, grid, orbitalElementStore, displayTagsStore ):
@@ -2862,24 +2863,24 @@ class IndicatorLunar:
 
             # Mock data...
             summary = summary. \
-                replace( IndicatorLunar.SATELLITE_TAG_NAME, "ISS (ZARYA)" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, "25544" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, "1998-067A" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, "123.45°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, self.localiseAndTrim( ephem.now() ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, "321.54°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, self.localiseAndTrim( ephem.Date( ephem.now() + 10 * ephem.minute ) ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, "True" )
+                replace( IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123.45°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.localiseAndTrim( ephem.now() ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321.54°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.localiseAndTrim( ephem.Date( ephem.now() + 10 * ephem.minute ) ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, "True" )
 
             message = message. \
-                replace( IndicatorLunar.SATELLITE_TAG_NAME, "ISS (ZARYA)" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, "25544" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, "1998-067A" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, "123.45°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, self.localiseAndTrim( ephem.now() ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, "321.54°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, self.localiseAndTrim( ephem.Date( ephem.now() + 10 * ephem.minute ) ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, "True" )
+                replace( IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123.45°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.localiseAndTrim( ephem.now() ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321.54°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.localiseAndTrim( ephem.Date( ephem.now() + 10 * ephem.minute ) ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, "True" )
 
         if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
 
