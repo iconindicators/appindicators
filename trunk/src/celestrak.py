@@ -31,8 +31,10 @@ def getSatelliteTLEData( url ):
     return satelliteTLEData
 
 
+useSatCat = True
+if useSatCat:
+    satCat = getSatCat( "http://celestrak.com/pub/satcat.txt" )
 
-satCat = getSatCat( "http://celestrak.com/pub/satcat.txt" )
 satelliteTLEData = getSatelliteTLEData( "http://celestrak.com/NORAD/elements/visual.txt" )
 unknowns = [ ]
 rb = [ ]
@@ -68,14 +70,17 @@ for key in satelliteTLEData:
         plat.append( name )
         continue
 
-    payload = satCat[ number ][ 20 ]
-    if "*" in payload:
-        pay.append( name )
-        continue
+    if useSatCat:
+        payload = satCat[ number ][ 20 ]
+        if "*" in payload:
+            pay.append( name )
+            continue
 
     unknowns.append( name )
 
-print( "SatCat size:", len( satCat ) )
+if useSatCat:
+    print( "SatCat size:", len( satCat ) )
+
 print( "TLE data size:", len( satelliteTLEData ) )
 print( "R/B:", len( rb ), sorted( rb ) )
 print( "DEB:", len( deb ), sorted( deb ) )
