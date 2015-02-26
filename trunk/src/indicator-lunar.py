@@ -1501,8 +1501,6 @@ class IndicatorLunar:
 
             break
 
-            currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
-
         if currentDateTime >= endDateTime:
             message = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS
 
