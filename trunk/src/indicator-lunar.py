@@ -2746,9 +2746,9 @@ class IndicatorLunar:
 
     def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, orbitalElements, url ):
         if orbitalElementData is None:
-            message = "Cannot access the orbital element data source\n<a href=\'" + url + "'>" + url + "</a>"
+            message = _( "Cannot access the orbital element data source\n<a href=\'{0}'>{0}</a>" ).format( url )
         elif len( orbitalElementData ) == 0:
-            message = "No orbital element data found at\n<a href=\'" + url + "'>" + url + "</a>"
+            message = _( "No orbital element data found at\n<a href=\'{0}'>{0}</a>" ).format( url )
         else:
             orbitalElementStore.clear()
             message = None
@@ -2775,9 +2775,9 @@ class IndicatorLunar:
 
     def updateSatellitePreferencesTab( self, grid, satelliteStore, satelliteTLEData, satellites, url ):
         if satelliteTLEData is None:
-            message = "Cannot access the TLE data source\n<a href=\'" + url + "'>" + url + "</a>"
+            message = _( "Cannot access the TLE data source\n<a href=\'{0}'>{0}</a>" ).format( url )
         elif len( satelliteTLEData ) == 0:
-            message = "No TLE data found at\n<a href=\'" + url + "'>" + url + "</a>"
+            message = _( "No TLE data found at\n<a href=\'{0}'>{0}</a>" ).format( url )
         else:
             satelliteStore.clear()
             message = None
@@ -2867,7 +2867,7 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.localiseAndTrim( ephem.now() ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321.54°" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.localiseAndTrim( ephem.Date( ephem.now() + 10 * ephem.minute ) ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, "True" )
+                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
 
             message = message. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
@@ -2877,7 +2877,7 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.localiseAndTrim( ephem.now() ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321.54°" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.localiseAndTrim( ephem.Date( ephem.now() + 10 * ephem.minute ) ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, "True" )
+                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
 
         if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
 
