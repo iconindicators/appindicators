@@ -1475,7 +1475,7 @@ class IndicatorLunar:
             # Need to get the rise/transit/set for the satellite.
             # If the satellite is passing, need to work out when it rose...
             if nextPass[ 0 ] > nextPass[ 4 ]:
-                # The rise time is after set time, meaning the satellite is current passing.
+                # The rise time is after set time, meaning the satellite is currently passing.
                 setTime = nextPass[ 4 ]
                 nextPass = self.calculateSatellitePassForRisingPriorToNow( currentDateTime, key, satelliteTLE )
                 if nextPass is None:
