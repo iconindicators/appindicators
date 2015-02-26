@@ -114,9 +114,12 @@ class IndicatorLunar:
     SETTINGS_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     SETTINGS_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
-    TRUE_TEXT = _( "True" )
-    FALSE_TEXT = _( "False" )
-    
+    TRUE_TEXT = "True"
+    FALSE_TEXT = "FALSE"
+
+    TRUE_TEXT_TRANSLATION = _( "True" )
+    FALSE_TEXT_TRANSLATION = _( "False" )
+
     DATA_ALTITUDE = "ALTITUDE"
     DATA_AZIMUTH = "AZIMUTH"
     DATA_BRIGHT_LIMB = "BRIGHT LIMB"
@@ -852,6 +855,8 @@ class IndicatorLunar:
             degreeSymbolIndex = self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ].index( "°" )
             setAzimuth = self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ][ 0 : degreeSymbolIndex + 1 ]
 
+            visibleText = IndicatorLunar.TRUE_TEXT_TRANSLATION if self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
+
             tle = self.satelliteTLEData[ key ]
             summary = self.satelliteNotificationSummary. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
@@ -861,7 +866,7 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
-                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] )
+                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, visibleText )
 
             if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
 
@@ -873,7 +878,7 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
-                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] )
+                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, visibleText )
 
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
@@ -981,10 +986,8 @@ class IndicatorLunar:
             self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, dataTag )
             subMenu.append( Gtk.SeparatorMenuItem() )
 
-            if self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] == "True":
-                subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + IndicatorLunar.TRUE_TEXT  ) )
-            else:
-                subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + IndicatorLunar.FALSE_TEXT  ) )
+            text = IndicatorLunar.TRUE_TEXT_TRANSLATION if self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
+            subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + text ) )
 
             subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -1164,10 +1167,8 @@ class IndicatorLunar:
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] ) )
 
                     if not self.hideSatelliteIfNoVisiblePass:
-                        if self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == "True":
-                            subMenu.append( Gtk.MenuItem( _( "Visible: " ) + IndicatorLunar.TRUE_TEXT ) )
-                        else:
-                            subMenu.append( Gtk.MenuItem( _( "Visible: " ) + IndicatorLunar.FALSE_TEXT ) )
+                        text = IndicatorLunar.TRUE_TEXT_TRANSLATION if self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
+                        subMenu.append( Gtk.MenuItem( _( "Visible: " ) + text ) )
 
                 self.addOnSatelliteHandler( subMenu, key )
 
@@ -2653,8 +2654,7 @@ class IndicatorLunar:
             if ( key[ 0 ], key[ 1 ] ) in self.satellites and satelliteTLEData is None: # This key refers to a satellite.
                 data = self.data[ key ]
                 if key[ 2 ] == IndicatorLunar.DATA_VISIBLE: # This data value is either True or False and needs to be translated.
-                    if data == "True": data = IndicatorLunar.TRUE_TEXT
-                    else: data = IndicatorLunar.FALSE_TEXT
+                    data = IndicatorLunar.TRUE_TEXT_TRANSLATION if data == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
 
                 displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + key[ 1 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 2 ] ], data ] )
 
@@ -2667,8 +2667,7 @@ class IndicatorLunar:
                 else:
                     data = self.data[ key ]
                     if key[ 1 ] == IndicatorLunar.DATA_EARTH_VISIBLE: # Special case: the earth visible data is boolean and needs to be translated.
-                        if self.data[ key ] == "True": data = IndicatorLunar.TRUE_TEXT
-                        else: data = IndicatorLunar.FALSE_TEXT
+                        data = IndicatorLunar.TRUE_TEXT_TRANSLATION if data == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
 
                     displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_TAGS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], data ] )
 
