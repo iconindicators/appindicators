@@ -1497,7 +1497,7 @@ class IndicatorLunar:
 
             self.nextUpdates.append( nextPass[ 4 ] )
             if ephem.Date( nextPass[ 0 ] ) > currentDateTime:
-                self.nextUpdates.append( nextPass[ 0 ] ) # No point adding a time in the past.
+                self.nextUpdates.append( nextPass[ 0 ] ) # Only add the rise time if it is after now.
 
             break
 
