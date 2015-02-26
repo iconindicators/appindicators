@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-lunar 1.0.57\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-02-26 13:01+1100\n"
+"POT-Creation-Date: 2015-02-26 22:35+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2347,4 +2347,32 @@ msgstr ""
 
 #: ../src/indicator-lunar.py:2562
 msgid "Elevation must be a number between 0 and 10000 inclusive."
+msgstr ""
+
+#: ../src/indicator-lunar.py:2749
+#, python-brace-format
+msgid ""
+"Cannot access the orbital element data source\n"
+"<a href='{0}'>{0}</a>"
+msgstr ""
+
+#: ../src/indicator-lunar.py:2751
+#, python-brace-format
+msgid ""
+"No orbital element data found at\n"
+"<a href='{0}'>{0}</a>"
+msgstr ""
+
+#: ../src/indicator-lunar.py:2778
+#, python-brace-format
+msgid ""
+"Cannot access the TLE data source\n"
+"<a href='{0}'>{0}</a>"
+msgstr ""
+
+#: ../src/indicator-lunar.py:2780
+#, python-brace-format
+msgid ""
+"No TLE data found at\n"
+"<a href='{0}'>{0}</a>"
 msgstr ""
