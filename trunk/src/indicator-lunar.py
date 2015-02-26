@@ -743,7 +743,7 @@ class IndicatorLunar:
         self.satelliteNotification( ephemNow )
 
         self.nextUpdates.sort()
-        nextUpdateInSeconds = int( ( ephem.localtime( self.nextUpdates[ 0 ] ) - ephem.localtime( ephemNow ) ).total_seconds() )
+        nextUpdateInSeconds = int( ( ephem.localtime( self.nextUpdates[ 0 ] ) - ephem.localtime( ephem.now() ) ).total_seconds() ) # Calculate next update from time now.
 
         # Ensure the update period is positive, at most every minute and at least every hour.
         if nextUpdateInSeconds < 60:
