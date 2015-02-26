@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
 
+# Icons...
+# http://www.flaticon.com/search/satellite
+
+
 # Determine how many of the satellites et al from Celestrak
 # are rocket booster, debris, platform, payload or unknown
 # by looking at the full text database from Celestrak.
