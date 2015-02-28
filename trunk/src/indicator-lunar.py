@@ -1896,7 +1896,7 @@ class IndicatorLunar:
 
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.updateDisplayTags( displayTagsStore, None, None )
-        indicatorText.set_text( self.translateIndicatorText( displayTagsStore, True, self.indicatorText ) ) # Need to translate the tags into the local language.
+        indicatorText.set_text( self.translateTags( displayTagsStore, True, self.indicatorText ) ) # Need to translate the tags into the local language.
 
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
         displayTagsStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
@@ -2013,7 +2013,7 @@ class IndicatorLunar:
         box.pack_start( label, False, False, 0 )
 
         satelliteMenuText = Gtk.Entry()
-        satelliteMenuText.set_text( self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteMenuText ) )
+        satelliteMenuText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteMenuText ) )
         satelliteMenuText.set_hexpand( True )
         satelliteMenuText.set_tooltip_text(
             _( "The text for each satellite item in the menu.\n\nAvailable tags:\n\t" ) + \
@@ -2060,7 +2060,7 @@ class IndicatorLunar:
         box.pack_start( label, False, False, 0 )
 
         satelliteURLText = Gtk.Entry()
-        satelliteURLText.set_text( self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteOnClickURL ) )
+        satelliteURLText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteOnClickURL ) )
         satelliteURLText.set_hexpand( True )
         satelliteURLText.set_tooltip_text( _(
             "The URL used to lookup a satellite\n" + \
@@ -2330,7 +2330,7 @@ class IndicatorLunar:
 
         satelliteNotificationSummaryText = Gtk.Entry()
         satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        satelliteNotificationSummaryText.set_text( self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationSummary ) )
+        satelliteNotificationSummaryText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationSummary ) )
         satelliteNotificationSummaryText.set_tooltip_text( _( "The summary for the satellite rise notification.\n\nAvailable tags:\n\t" ) + \
             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
@@ -2354,7 +2354,7 @@ class IndicatorLunar:
         grid.attach( label, 0, 2, 1, 1 )
 
         satelliteNotificationMessageText = Gtk.TextView()
-        satelliteNotificationMessageText.get_buffer().set_text( self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationMessage ) )
+        satelliteNotificationMessageText.get_buffer().set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationMessage ) )
         satelliteNotificationMessageText.set_tooltip_text( _( "The message for the satellite rise notification.\n\nAvailable tags:\n\t" ) + \
             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
@@ -2564,19 +2564,19 @@ class IndicatorLunar:
                 elevation.grab_focus()
                 continue
 
-            self.indicatorText = self.translateIndicatorText( displayTagsStore, False, indicatorText.get_text().strip() )
+            self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text().strip() )
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showOrbitalElementsAsSubMenu = showOrbitalElementsAsSubmenuCheckbox.get_active()
             self.orbitalElementsAddNew = orbitalElementsAddNewCheckbox.get_active()
             self.orbitalElementsMagnitude = spinnerOrbitalElementMagnitude.get_value_as_int()
             self.hideBodyIfNeverUp = hideBodyIfNeverUpCheckbox.get_active()
-            self.satelliteMenuText = self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteMenuText.get_text().strip() ) 
+            self.satelliteMenuText = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteMenuText.get_text().strip() ) 
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.hideSatelliteIfNoVisiblePass = hideSatelliteIfNoVisiblePassCheckbox.get_active()
-            self.satelliteOnClickURL = self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteURLText.get_text().strip() )
+            self.satelliteOnClickURL = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteURLText.get_text().strip() )
 
             self.planets = [ ]
             for row in planetStore:
@@ -2613,8 +2613,8 @@ class IndicatorLunar:
                     self.satellites.append( ( satelliteTLE[ 1 ].upper(), satelliteTLE[ 2 ] ) )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
-            self.satelliteNotificationSummary = self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
-            self.satelliteNotificationMessage = self.translateIndicatorText( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, pythonutils.getTextViewText( satelliteNotificationMessageText ) )
+            self.satelliteNotificationSummary = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
+            self.satelliteNotificationMessage = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, pythonutils.getTextViewText( satelliteNotificationMessageText ) )
 
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
@@ -2682,7 +2682,7 @@ class IndicatorLunar:
                 displayTagsStore.append( [ key, key, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
 
-    def translateIndicatorText( self, tagsStore, originalToLocal, text ):
+    def translateTags( self, tagsStore, originalToLocal, text ):
         # The tags store contains 2 columns (if more, those are ignored).
         # First column contains the original/untranslated tags.
         # Second column contains the translated tags.
@@ -2808,7 +2808,7 @@ class IndicatorLunar:
 
     def onResetSatelliteOnClickURL( self, button, textEntry ):
         textEntry.set_text(
-            self.translateIndicatorText(
+            self.translateTags(
                 IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, 
                 True, 
                 IndicatorLunar.SATELLITE_ON_CLICK_URL ) )
