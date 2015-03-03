@@ -2474,9 +2474,9 @@ class IndicatorLunar:
         global _city_data
         cities = sorted( _city_data.keys(), key = locale.strxfrm )
         city = Gtk.ComboBoxText.new_with_entry()
-        city.set_tooltip_text( _( 
-            "To reset the cities to default lat/long/elev,\n" + \
-            "add a bogus city and restart the indicator." ) )
+        city.set_tooltip_text( _(
+            "Choose a city from the list.\n" + \
+            "Or, add in your own city name." ) )
         for c in cities:
             city.append_text( c )
 
