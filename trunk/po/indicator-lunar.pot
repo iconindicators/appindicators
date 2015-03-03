@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-lunar 1.0.57\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-02-26 22:35+1100\n"
+"POT-Creation-Date: 2015-03-03 21:27+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2285,8 +2285,8 @@ msgstr ""
 
 #: ../src/indicator-lunar.py:2478
 msgid ""
-"To reset the cities to default lat/long/elev,\n"
-"add a bogus city and restart the indicator."
+"Choose a city from the list.\n"
+"Or, add in your own city name."
 msgstr ""
 
 #: ../src/indicator-lunar.py:2485
