@@ -2,6 +2,23 @@
 # -*- coding: utf-8 -*-
 
 
+#TODO The OE data from the Minor Planet Center However now has a restriction on the file download to be once every 12 hours.
+# http://www.minorplanetcenter.net/iau/MPCStatus.html#limits
+# So either
+#     Do the download - if it succeeds, cache the file and resuse that (up to 48 hours); if it fails check the cache for a file no older than 48 hours.
+# or
+#    Check the cache for a file no older than 48 hours.  If there use it.  If not there, do a download (if that succeeds write to the cache; otherwise simply no data).
+
+
+#TODO How to stop TLE/OE from actually doing a download outright?‏
+#Need a tooltip to say just put in a bogus URL or just the protocol (http://)?
+
+
+#TODO After the i18n release the startup took a while.
+#The OE data download was blocked...so was this the reason for the slow startup?
+#Do some timing tests and so on.
+
+
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -40,7 +57,7 @@ gettext.install( INDICATOR_NAME )
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
-import copy, datetime, eclipse, json, locale, logging, math, os, pythonutils, re, satellite, shutil, subprocess, sys, tempfile, threading, time, webbrowser
+import copy, datetime, eclipse, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, subprocess, sys, tempfile, threading, time, webbrowser
 
 try:
     import ephem
@@ -64,6 +81,7 @@ class IndicatorLunar:
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+    CACHE_PATH = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
     DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
     SVG_FULL_MOON_FILE = tempfile.gettempdir() + "/" + "." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
@@ -77,6 +95,14 @@ class IndicatorLunar:
     ABOUT_CREDIT_SATELLITE = _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" )
     ABOUT_CREDIT_TROPICAL_SIGN = _( "Tropical Sign by Ignius Drake." )
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_ORBITAL_ELEMENTS ]
+
+    DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+
+    CACHE_OE_BASENAME = "oe-"
+    CACHE_OE_MAXIMUM_AGE_HOURS = 48
+
+    CACHE_TLE_BASENAME = "tle-"
+    CACHE_TLE_MAXIMUM_AGE_HOURS = 12
 
     DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
     INDENT = "    "
@@ -687,6 +713,8 @@ class IndicatorLunar:
         self.toggleSatellitesTable = False
         self.toggleStarsTable = False
 
+        if not os.path.exists( IndicatorLunar.CACHE_PATH ): os.makedirs( IndicatorLunar.CACHE_PATH )
+
         GObject.threads_init()
         self.lock = threading.Lock()
 
@@ -694,7 +722,7 @@ class IndicatorLunar:
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         Notify.init( INDICATOR_NAME )
 
-        self.lastUpdateOrbitalElement = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Set the last orbital element update in the past so an update occurs. 
+        self.lastUpdateOE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Set the last orbital element update in the past so an update occurs. 
         self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Set the last TLE update in the past so an update occurs. 
         self.lastFullMoonNotfication = ephem.Date( "2000/01/01" ) # Set a date way back in the past...
 
@@ -716,8 +744,8 @@ class IndicatorLunar:
         if not self.lock.acquire( False ): return
 
         self.toggleIconState()
-        self.updateOrbitalElementData()
-        self.updateSatelliteTLEData()
+#         self.updateOrbitalElementData() TODO Uncomment
+        self.updateSatelliteTLEData() 
 
         # Reset data on each update...
         self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
@@ -1218,6 +1246,20 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Type: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] ) )
 
 
+
+
+#         tle = self.getSatelliteTLEData( IndicatorLunar.SATELLITE_TLE_URL )
+#         self.writeToCache( tle, IndicatorLunar.CACHE_TLE_BASENAME )
+# 
+#         data = self.readFromCache( IndicatorLunar.CACHE_TLE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.CACHE_TLE_MAXIMUM_AGE_HOURS ) )
+# 
+#         sys.exit( 1 ) #TODO Remove
+# 
+#         self.readFromCache( IndicatorLunar.CACHE_OE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.CACHE_OE_MAXIMUM_AGE_HOURS ) )
+#         self.readFromCache( IndicatorLunar.CACHE_TLE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.CACHE_TLE_MAXIMUM_AGE_HOURS ) )
+#         sys.exit( 1 ) #TODO Remove
+
+
     def updateSatelliteTLEData( self ):
         # Update the satellite TLE data at most every 12 hours.
         # If the data is invalid, use the TLE data from the previous run.
@@ -1248,7 +1290,7 @@ class IndicatorLunar:
     def updateOrbitalElementData( self ):
         # Update the orbital element data at most every 24 hours.
         # If the data is invalid, use the orbital element data from the previous run.
-        if datetime.datetime.now() > ( self.lastUpdateOrbitalElement + datetime.timedelta( hours = 24 ) ):
+        if datetime.datetime.now() > ( self.lastUpdateOE + datetime.timedelta( hours = 24 ) ):
             orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
             if orbitalElementData is None:
                 summary = _( "Error Retrieving Orbital Element Data" )
@@ -1269,7 +1311,7 @@ class IndicatorLunar:
 
                     self.saveSettings()
 
-            self.lastUpdateOrbitalElement = datetime.datetime.now()
+            self.lastUpdateOE = datetime.datetime.now()
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -2474,7 +2516,7 @@ class IndicatorLunar:
         global _city_data
         cities = sorted( _city_data.keys(), key = locale.strxfrm )
         city = Gtk.ComboBoxText.new_with_entry()
-        city.set_tooltip_text( _(
+        city.set_tooltip_text( _( 
             "Choose a city from the list.\n" + \
             "Or, add in your own city name." ) )
         for c in cities:
@@ -3181,6 +3223,59 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing settings: " + IndicatorLunar.SETTINGS_FILE )
+
+
+    # Writes the data (dict) to the cache.
+    def writeToCache( self, data, baseName ):
+        filename = IndicatorLunar.CACHE_PATH + baseName + datetime.datetime.now().strftime( IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+        try:
+            with open( filename, "wb" ) as f:
+                pickle.dump( data, f )
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing to cache: " + filename )
+
+
+    # Reads the most recent file from the cache for the given base name (tle or oe).
+    # Removes out of date cache files.
+    # Returns either None or a non-empty dict.
+    def readFromCache( self, baseName, cacheMaximumDateTime ):
+        # Read all files in the cache and keep a list of those which match the base name.
+        # Any file matching the base name but is older than the cache maximum date/time id deleted.
+        cacheMaximumDateTimeString = cacheMaximumDateTime.strftime( IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+        files = [ ]
+        for file in os.listdir( IndicatorLunar.CACHE_PATH ):
+            if file.startswith( baseName ):
+                fileDateTime = file[ file.index( baseName ) + len( baseName ) : ]
+                if fileDateTime < cacheMaximumDateTimeString:
+#TODO Delete the file!
+                    print( "\tDeleting", fileDateTime )
+                else:
+                    files.append( file )
+
+        # Sort the matching files by date.  All file(s) will be newer than the cache maximum date/time.
+        files.sort()
+        data = None
+        for file in reversed( files ): # Look at the most recent file first.
+            filename = IndicatorLunar.CACHE_PATH + file
+            try:
+                with open( filename, "rb" ) as f:
+                    data = pickle.load( f )
+
+                if data is not None and len( data ) > 0:
+                    break
+
+            except Exception as e:
+                data = None
+                logging.exception( e )
+                logging.error( "Error reading from cache: " + filename )
+
+        # Only return None or non-empty.
+        if data is None or len( data ) == 0:
+            date = None
+
+        return data
 
 
 if __name__ == "__main__": IndicatorLunar().main()
