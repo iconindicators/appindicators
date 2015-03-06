@@ -3261,8 +3261,7 @@ class IndicatorLunar:
             if file.startswith( baseName ):
                 fileDateTime = file[ file.index( baseName ) + len( baseName ) : ]
                 if fileDateTime < cacheMaximumDateTimeString:
-#TODO Delete the file!
-                    print( "\tDeleting", fileDateTime )
+                    os.remove( IndicatorLunar.CACHE_PATH + file )
                 else:
                     files.append( file )
 
