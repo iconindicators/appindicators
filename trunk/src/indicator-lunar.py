@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
+#TODO In the fetch for oe/tle, maybe make a note about blocking...that a fetch might fail if you are blocked.
+
+
 #TODO The OE data from the Minor Planet Center However now has a restriction on the file download to be once every 12 hours.
 # http://www.minorplanetcenter.net/iau/MPCStatus.html#limits
 # So either
@@ -74,7 +77,7 @@ class AstronomicalObjectType: Moon, OrbitalElement, Planet, PlanetaryMoon, Satel
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.57"
+    VERSION = "1.0.58"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -86,6 +89,7 @@ class IndicatorLunar:
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
     SVG_FULL_MOON_FILE = tempfile.gettempdir() + "/" + "." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
+    URL_TIMEOUT_IN_SECONDS = 2
 
     ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, orbital element, star and satellite information." )
     ABOUT_CREDIT_BRIGHT_LIMB = _( "Bright Limb from 'Astronomical Algorithms' by Jean Meeus." )
@@ -97,12 +101,6 @@ class IndicatorLunar:
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_ORBITAL_ELEMENTS ]
 
     DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
-
-    CACHE_OE_BASENAME = "oe-"
-    CACHE_OE_MAXIMUM_AGE_HOURS = 48
-
-    CACHE_TLE_BASENAME = "tle-"
-    CACHE_TLE_MAXIMUM_AGE_HOURS = 12
 
     DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
     INDENT = "    "
@@ -644,7 +642,10 @@ class IndicatorLunar:
         LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" )
     }
 
+    ORBITAL_ELEMENT_CACHE_BASENAME = "oe-"
+    ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS = 48
     ORBITAL_ELEMENT_DATA_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
+    ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS = 12
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -674,9 +675,12 @@ class IndicatorLunar:
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_VISIBLE.strip( "[]" ), SATELLITE_TAG_VISIBLE_TRANSLATION.strip( "[]" ) ] )
 
+    SATELLITE_TLE_CACHE_BASENAME = "tle-"
+    SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS = 12
+    SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 12
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
-    SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
 
+    SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
     SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
@@ -722,8 +726,8 @@ class IndicatorLunar:
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         Notify.init( INDICATOR_NAME )
 
-        self.lastUpdateOE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Set the last orbital element update in the past so an update occurs. 
-        self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 24 ) # Set the last TLE update in the past so an update occurs. 
+        self.lastUpdateOE = datetime.datetime.now() - datetime.timedelta( hours = 1000 ) # Set the last orbital element update in the past so an update occurs. 
+        self.lastUpdateTLE = datetime.datetime.now() - datetime.timedelta( hours = 1000 ) # Set the last TLE update in the past so an update occurs. 
         self.lastFullMoonNotfication = ephem.Date( "2000/01/01" ) # Set a date way back in the past...
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
@@ -744,7 +748,7 @@ class IndicatorLunar:
         if not self.lock.acquire( False ): return
 
         self.toggleIconState()
-#         self.updateOrbitalElementData() TODO Uncomment
+        self.updateOrbitalElementData()
         self.updateSatelliteTLEData() 
 
         # Reset data on each update...
@@ -1246,72 +1250,80 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Type: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] ) )
 
 
-
-
-#         tle = self.getSatelliteTLEData( IndicatorLunar.SATELLITE_TLE_URL )
-#         self.writeToCache( tle, IndicatorLunar.CACHE_TLE_BASENAME )
-# 
-#         data = self.readFromCache( IndicatorLunar.CACHE_TLE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.CACHE_TLE_MAXIMUM_AGE_HOURS ) )
-# 
-#         sys.exit( 1 ) #TODO Remove
-# 
-#         self.readFromCache( IndicatorLunar.CACHE_OE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.CACHE_OE_MAXIMUM_AGE_HOURS ) )
-#         self.readFromCache( IndicatorLunar.CACHE_TLE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.CACHE_TLE_MAXIMUM_AGE_HOURS ) )
-#         sys.exit( 1 ) #TODO Remove
-
-
     def updateSatelliteTLEData( self ):
-        # Update the satellite TLE data at most every 12 hours.
-        # If the data is invalid, use the TLE data from the previous run.
-        if datetime.datetime.now() > ( self.lastUpdateTLE + datetime.timedelta( hours = 12 ) ):
-            satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
-            if satelliteTLEData is None:
-                summary = _( "Error Retrieving Satellite TLE Data" )
-                message = _( "The satellite TLE data source could not be reached.  Previous TLE data will be used, if available." )
-                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            elif len( satelliteTLEData ) == 0:
-                summary = _( "Empty Satellite TLE Data" )
-                message = _( "The satellite TLE data retrieved is empty.  Previous TLE data will be used, if available." )
-                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            else:
-                self.satelliteTLEData = satelliteTLEData
+        if datetime.datetime.now() < ( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
+            return
 
-                # Add in any new satellites based on the user preference.
-                if self.satellitesAddNew:
-                    for key in self.satelliteTLEData:
-                        if key not in self.satellites:
-                            self.satellites.append( key )
+        # Typically the download period and cache age are the same.
+        # This means that when a update needs to be done, the cache age has also expired,
+        # which requires a download, rendering the cache pointless.
+        # The cache comes in to play if the indicator is restarted before the download period has expired
+        # (as measured by the download source which may block). 
+        self.satelliteTLEData = self.readFromCache( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
+        if self.satelliteTLEData is not None:
+            return
 
-                    self.saveSettings()
+        # Cache returned no result so download from the source.
+        self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
+        if self.satelliteTLEData is None:
+            summary = _( "Error Retrieving Satellite TLE Data" )
+            message = _( "The satellite TLE data source could not be reached." )
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+        elif len( self.satelliteTLEData ) == 0:
+            summary = _( "Empty Satellite TLE Data" )
+            message = _( "The satellite TLE data retrieved is empty." )
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+        else:
+            self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
 
-            self.lastUpdateTLE = datetime.datetime.now()
+            # Add in any new satellites based on the user preference.
+            if self.satellitesAddNew:
+                for key in self.satelliteTLEData:
+                    if key not in self.satellites:
+                        self.satellites.append( key )
+
+                self.saveSettings()
+
+        # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
+        self.lastUpdateTLE = datetime.datetime.now()
 
 
     def updateOrbitalElementData( self ):
-        # Update the orbital element data at most every 24 hours.
-        # If the data is invalid, use the orbital element data from the previous run.
-        if datetime.datetime.now() > ( self.lastUpdateOE + datetime.timedelta( hours = 24 ) ):
-            orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
-            if orbitalElementData is None:
-                summary = _( "Error Retrieving Orbital Element Data" )
-                message = _( "The orbital element data source could not be reached.  Previous orbital element data will be used, if available." )
-                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            elif len( orbitalElementData ) == 0:
-                summary = _( "Empty Orbital Element Data" )
-                message = _( "The orbital element data retrieved is empty.  Previous orbital element data will be used, if available." )
-                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            else:
-                self.orbitalElementData = orbitalElementData
+        if datetime.datetime.now() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) ):
+            return
 
-                # Add in any new orbital elements based on the user preference.
-                if self.orbitalElementsAddNew:
-                    for key in self.orbitalElementData:
-                        if key not in self.orbitalElements:
-                            self.orbitalElements.append( key )
+        # Typically the download period and cache age are the same.
+        # This means that when a update needs to be done, the cache age has also expired,
+        # which requires a download, rendering the cache pointless.
+        # The cache comes in to play if the indicator is restarted before the download period has expired
+        # (as measured by the download source which may block). 
+        self.orbitalElementData = self.readFromCache( IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
+        if self.orbitalElementData is not None:
+            return
 
-                    self.saveSettings()
+        # Cache returned no result so download from the source.
+        self.orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
+        if self.orbitalElementData is None:
+            summary = _( "Error Retrieving Orbital Element Data" )
+            message = _( "The orbital element data source could not be reached." )
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+        elif len( self.orbitalElementData ) == 0:
+            summary = _( "Empty Orbital Element Data" )
+            message = _( "The orbital element data retrieved is empty." )
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+        else:
+            self.writeToCache( self.orbitalElementData, IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME )
 
-            self.lastUpdateOE = datetime.datetime.now()
+            # Add in any new orbital elements based on the user preference.
+            if self.orbitalElementsAddNew:
+                for key in self.orbitalElementData:
+                    if key not in self.orbitalElements:
+                        self.orbitalElements.append( key )
+
+                self.saveSettings()
+
+        # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
+        self.lastUpdateOE = datetime.datetime.now()
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -3048,7 +3060,7 @@ class IndicatorLunar:
             # in which the first field (up to the first ',' is the name.
             # Any line beginninng with a '#' is considered a comment and ignored.
             orbitalElementsData = { } # Key: orbital element name, upper cased ; Value: entire orbital element string.
-            data = urlopen( url ).read().decode( "utf8" ).splitlines()
+            data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ) ):
                 if not data[ i ].startswith( "#" ):
                     orbitalElementName = data[ i ][ 0 : data[ i ].index( "," ) ] 
@@ -3070,7 +3082,7 @@ class IndicatorLunar:
     def getSatelliteTLEData( self, url ):
         try:
             satelliteTLEData = { } # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
-            data = urlopen( url ).read().decode( "utf8" ).splitlines()
+            data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ), 3 ):
                 tle = satellite.TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
                 satelliteTLEData[ ( tle.getName().upper(), tle.getNumber() ) ] = tle
@@ -3273,7 +3285,7 @@ class IndicatorLunar:
 
         # Only return None or non-empty.
         if data is None or len( data ) == 0:
-            date = None
+            data = None
 
         return data
 
