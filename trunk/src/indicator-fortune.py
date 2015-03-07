@@ -239,7 +239,7 @@ class IndicatorFortune:
         tree.connect( "row-activated", self.onFortuneDoubleClick )
 
         tooltip = _( "Double click to edit a fortune's properties." )
-        if not self.isEnglish():
+        if self.isEnglish():
             tree.set_tooltip_text( tooltip )
         else:
             tree.set_tooltip_text( tooltip + "\n\n" + _( "English language fortunes are installed by default.\nHowever there may be fortune packages in your\nnative language." ) )
