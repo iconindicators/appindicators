@@ -35,13 +35,13 @@ gettext.install( INDICATOR_NAME )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 
-import gzip, json, logging, os, pythonutils, re, shutil, subprocess, sys
+import gzip, json, locale, logging, os, pythonutils, re, shutil, subprocess, sys
 
 
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.15"
+    VERSION = "1.0.16"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -235,9 +235,14 @@ class IndicatorFortune:
         tree.set_vexpand( True )
         tree.append_column( Gtk.TreeViewColumn( _( "Fortune File/Directory" ), Gtk.CellRendererText(), text = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = 1 ) )
-        tree.set_tooltip_text( _( "Double click to edit a fortune's properties." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onFortuneDoubleClick )
+
+        tooltip = _( "Double click to edit a fortune's properties." )
+        if not self.isEnglish():
+            tree.set_tooltip_text( tooltip )
+        else:
+            tree.set_tooltip_text( tooltip + "\n\n" + _( "English language fortunes are installed by default.\nHowever there may be fortune packages in your\nnative language." ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -432,7 +437,7 @@ class IndicatorFortune:
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
             fortuneFileDirectory.set_width_chars( len( model[ treeiter ][ 0 ] ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
-        fortuneFileDirectory.set_tooltip_text( _( "The full path to a fortune .dat file OR\na directory containing fortune .dat files.\n\n\nEnsure the corresponding text file(s) is present!" ) )
+        fortuneFileDirectory.set_tooltip_text( _( "The full path to a fortune .dat file OR\na directory containing fortune .dat files.\n\nEnsure the corresponding text file(s) is present!" ) )
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
 
@@ -511,6 +516,18 @@ class IndicatorFortune:
             fortuneFileDirectory.set_text( dialog.get_filename() )
 
         dialog.destroy()
+
+
+    def isEnglish( self ):
+        l = locale.getlocale()
+        isEnglish = \
+            l is not None and \
+            l.__class__.__name__ == "tuple" and \
+            len( l ) == 2 and \
+            l[ 0 ] is not None and \
+            l[ 0 ].lower().startswith( "en" )
+
+        return isEnglish
 
 
     def loadSettings( self ):
