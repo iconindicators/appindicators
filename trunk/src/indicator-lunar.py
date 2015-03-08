@@ -5,21 +5,8 @@
 #TODO In the fetch for oe/tle, maybe make a note about blocking...that a fetch might fail if you are blocked.
 
 
-#TODO The OE data from the Minor Planet Center However now has a restriction on the file download to be once every 12 hours.
-# http://www.minorplanetcenter.net/iau/MPCStatus.html#limits
-# So either
-#     Do the download - if it succeeds, cache the file and resuse that (up to 48 hours); if it fails check the cache for a file no older than 48 hours.
-# or
-#    Check the cache for a file no older than 48 hours.  If there use it.  If not there, do a download (if that succeeds write to the cache; otherwise simply no data).
-
-
 #TODO How to stop TLE/OE from actually doing a download outright?‏
 #Need a tooltip to say just put in a bogus URL or just the protocol (http://)?
-
-
-#TODO After the i18n release the startup took a while.
-#The OE data download was blocked...so was this the reason for the slow startup?
-#Do some timing tests and so on.
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -2255,13 +2242,13 @@ class IndicatorLunar:
             "To specify a local file, use 'file:///'.\n\n" + \
             "The orbital element data will be automatically\n" + \
             "loaded each time the indicator is started\n" + \
-            "and approximately every 24 hours thereafter." ) )
+            "and approximately every 24 hours thereafter." ) ) #TODO Remove the 12 hours...add periodically or similar.
         box.pack_start( orbitalElementURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
         fetch.set_tooltip_text( _( 
             "Retrieve the orbital element data from the URL.\n" + \
-            "If the URL is empty, the default URL will be used." ) )
+            "If the URL is empty, the default URL will be used." ) )#TODO Add a note about blocking and then cancelling.
         fetch.connect( "clicked", self.onFetchOrbitalElementURL, orbitalElementURLEntry, orbitalElementGrid, orbitalElementStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
@@ -2339,13 +2326,13 @@ class IndicatorLunar:
             "To specify a local file, use 'file:///'.\n\n" + \
             "The satellite TLE data will be automatically\n" + \
             "loaded each time the indicator is started\n" + \
-            "and approximately every 12 hours thereafter." ) )
+            "and approximately every 12 hours thereafter." ) ) #TODO Remove the 12 hours...add periodically or similar.
         box.pack_start( TLEURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
         fetch.set_tooltip_text( _( 
             "Retrieve the TLE data from the specified URL.\n" + \
-            "If the URL is empty, the default URL will be used." ) )
+            "If the URL is empty, the default URL will be used." ) )#TODO Add a note about blocking and then cancelling.
         fetch.connect( "clicked", self.onFetchSatelliteTLEURL, TLEURLEntry, satelliteGrid, satelliteStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
