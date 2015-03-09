@@ -35,7 +35,7 @@ gettext.install( INDICATOR_NAME )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 
-import gzip, json, locale, logging, os, pythonutils, re, shutil, subprocess, sys
+import json, locale, logging, os, pythonutils, re, shutil, subprocess
 
 
 class IndicatorFortune:
@@ -69,7 +69,6 @@ class IndicatorFortune:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-
         self.dialog = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
         self.fortune = ""
@@ -79,12 +78,11 @@ class IndicatorFortune:
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( self.buildMenu() )
-
-
-    def main( self ):
         self.update()
         self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.update )
-        Gtk.main()
+
+
+    def main( self ): Gtk.main()
 
 
     def update( self ):
@@ -104,18 +102,21 @@ class IndicatorFortune:
 
         menuItem = Gtk.MenuItem( _( "New Fortune" ) )
         menuItem.connect( "activate", self.onShowFortune, True )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW: self.indicator.set_secondary_activate_target( menuItem )
         menu.append( menuItem )
+        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
+            self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Copy Last Fortune" ) )
         menuItem.connect( "activate", self.onCopyLastFortune )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST: self.indicator.set_secondary_activate_target( menuItem )
         menu.append( menuItem )
+        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
+            self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
         menuItem.connect( "activate", self.onShowFortune, False )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST: self.indicator.set_secondary_activate_target( menuItem )
         menu.append( menuItem )
+        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
+            self.indicator.set_secondary_activate_target( menuItem )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -132,7 +133,6 @@ class IndicatorFortune:
         menu.append( menuItem )
 
         menu.show_all()
-        
         return menu
 
 
@@ -156,18 +156,21 @@ class IndicatorFortune:
         while True:
             self.fortune = ""
             p = subprocess.Popen( "fortune" + fortuneLocations, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-            for line in p.stdout.readlines(): self.fortune += str( line.decode() )
+            for line in p.stdout.readlines():
+                self.fortune += str( line.decode() )
 
             p.wait()
 
             # If the fortune exceeds the user-specified character limit, John West it...
-            if len( self.fortune ) > self.skipFortuneCharacterCount: continue
+            if len( self.fortune ) > self.skipFortuneCharacterCount:
+                continue
 
             break
 
 
-    def onShowFortune( self, widget, new ):
-        if new: self.refreshFortune()
+    def onShowFortune( self, widget, showNew ):
+        if showNew:
+            self.refreshFortune()
 
         notificationSummary = self.notificationSummary
         if notificationSummary == "":
@@ -226,8 +229,10 @@ class IndicatorFortune:
         store = Gtk.ListStore( str, str ) # Path to fortune file, tick icon (Gtk.STOCK_APPLY) or None.
         store.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
         for fortune in self.fortunes:
-            if fortune[ 1 ]: store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
-            else: store.append( [ fortune[ 0 ], None ] )
+            if fortune[ 1 ]:
+                store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
+            else:
+                store.append( [ fortune[ 0 ], None ] )
 
         tree = Gtk.TreeView( store )
         tree.expand_all()
@@ -357,9 +362,12 @@ class IndicatorFortune:
         self.dialog.show_all()
 
         if self.dialog.run() == Gtk.ResponseType.OK:
-            if radioMiddleMouseClickNewFortune.get_active(): self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
-            elif radioMiddleMouseClickCopyLastFortune.get_active(): self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST
-            else: self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
+            if radioMiddleMouseClickNewFortune.get_active():
+                self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
+            elif radioMiddleMouseClickCopyLastFortune.get_active():
+                self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST
+            else:
+                self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
 
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.skipFortuneCharacterCount = spinnerCharacterCount.get_value_as_int()
@@ -371,14 +379,17 @@ class IndicatorFortune:
             self.fortunes = [ ]
             treeiter = store.get_iter_first()
             while treeiter != None:
-                if store[ treeiter ][ 1 ] == Gtk.STOCK_APPLY: self.fortunes.append( [ store[ treeiter ][ 0 ], True ] )
-                else: self.fortunes.append( [ store[ treeiter ][ 0 ], False ] )
+                if store[ treeiter ][ 1 ] == Gtk.STOCK_APPLY:
+                    self.fortunes.append( [ store[ treeiter ][ 0 ], True ] )
+                else:
+                    self.fortunes.append( [ store[ treeiter ][ 0 ], False ] )
 
                 treeiter = store.iter_next( treeiter )
 
             self.saveSettings()
 
-            if not os.path.exists( IndicatorFortune.AUTOSTART_PATH ): os.makedirs( IndicatorFortune.AUTOSTART_PATH )
+            if not os.path.exists( IndicatorFortune.AUTOSTART_PATH ):
+                os.makedirs( IndicatorFortune.AUTOSTART_PATH )
 
             if autostartCheckbox.get_active():
                 try: shutil.copy( IndicatorFortune.DESKTOP_PATH + IndicatorFortune.DESKTOP_FILE, IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
@@ -387,8 +398,7 @@ class IndicatorFortune:
                 try: os.remove( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
                 except: pass
 
-            self.indicator.set_menu( self.buildMenu() )
-            self.update()
+            self.indicator.set_menu( self.buildMenu() ) # Results in an assertion, but don't know how to fix...Gtk-CRITICAL **: gtk_widget_get_parent: assertion 'GTK_IS_WIDGET (widget)' failed
 
         self.dialog.destroy()
         self.dialog = None
@@ -403,13 +413,10 @@ class IndicatorFortune:
 
     def onFortuneRemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
-
         if treeiter is None:
             pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ) )
-            return
-
-        # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-        if pythonutils.showOKCancel( None, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK: model.remove( treeiter )
+        elif pythonutils.showOKCancel( None, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+            model.remove( treeiter )
 
 
     def onFortuneAdd( self, button, tree ): self.onFortuneDoubleClick( tree, None, None )
@@ -463,7 +470,8 @@ class IndicatorFortune:
         grid.attach( enabledCheckbox, 0, 2, 1, 1 )
 
         title = _( "Fortune Properties" )
-        if rowNumber is None: title = _( "Add Fortune" )
+        if rowNumber is None:
+            title = _( "Add Fortune" )
 
         dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
@@ -488,7 +496,8 @@ class IndicatorFortune:
                     fortuneFileDirectory.grab_focus()
                     continue
 
-                if rowNumber is not None: model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
+                if rowNumber is not None:
+                    model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
     
                 if enabledCheckbox.get_active():
                     model.append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY ] )
