@@ -3040,6 +3040,7 @@ class IndicatorLunar:
     # Returns a dict/hashtable of the orbital elements (comets) data from the specified URL (may be empty).
     # On error, returns None.
     def getOrbitalElementData( self, url ):
+        pythonutils.showMessage( None, Gtk.MessageType.INFORMATION, _( "Getting OE data" ) ) #TODO Remove
         try:
             # Orbital elements are read from a URL which assumes the XEphem format.
             # For example
@@ -3067,6 +3068,7 @@ class IndicatorLunar:
     # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
     # On error, returns None.
     def getSatelliteTLEData( self, url ):
+        pythonutils.showMessage( None, Gtk.MessageType.INFORMATION, _( "Getting TLE data" ) ) #TODO Remove
         try:
             satelliteTLEData = { } # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
             data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
