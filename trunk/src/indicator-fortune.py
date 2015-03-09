@@ -242,12 +242,11 @@ class IndicatorFortune:
         tree.append_column( Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = 1 ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onFortuneDoubleClick )
-
-        tooltip = _( "Double click to edit a fortune's properties." )
-        if self.isEnglish():
-            tree.set_tooltip_text( tooltip )
-        else:
-            tree.set_tooltip_text( tooltip + "\n\n" + _( "English language fortunes are installed by default.\nHowever there may be fortune packages in your\nnative language." ) )
+        tree.set_tooltip_text( _(
+            "Double click to edit a fortune's properties.\n\n" + \
+            "Basic English language fortunes are installed by default.\n" + \
+            "However there may be additional fortune packages,\n" + \
+            "as well as the fortunes in your native language." ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -525,18 +524,6 @@ class IndicatorFortune:
             fortuneFileDirectory.set_text( dialog.get_filename() )
 
         dialog.destroy()
-
-
-    def isEnglish( self ):
-        l = locale.getlocale()
-        isEnglish = \
-            l is not None and \
-            l.__class__.__name__ == "tuple" and \
-            len( l ) == 2 and \
-            l[ 0 ] is not None and \
-            l[ 0 ].lower().startswith( "en" )
-
-        return isEnglish
 
 
     def loadSettings( self ):
