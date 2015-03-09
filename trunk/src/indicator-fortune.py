@@ -439,10 +439,12 @@ class IndicatorFortune:
         fortuneFileDirectory = Gtk.Entry()
         fortuneFileDirectory.set_width_chars( 20 )
 
-        if rowNumber is not None: # This is an edit.
+        if rowNumber is None: # This is an add.
+            fortuneFileDirectory.set_text( IndicatorFortune.DEFAULT_FORTUNE[ 0 ] )
+        else: # This is an edit.
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
-            fortuneFileDirectory.set_width_chars( len( model[ treeiter ][ 0 ] ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
+        fortuneFileDirectory.set_width_chars( len( fortuneFileDirectory.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
         fortuneFileDirectory.set_tooltip_text( _( "The full path to a fortune .dat file OR\na directory containing fortune .dat files.\n\nEnsure the corresponding text file(s) is present!" ) )
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
