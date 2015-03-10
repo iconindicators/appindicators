@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-fortune 1.0.16\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-03-09 22:34+1100\n"
-"PO-Revision-Date: 2015-02-13 18:00+0300\n"
+"POT-Creation-Date: 2015-03-10 09:01+1100\n"
+"PO-Revision-Date: 2015-03-10 10:20+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -62,7 +62,7 @@ msgstr "Олег Мойсейчук"
 msgid "Fortune File/Directory"
 msgstr "Файл/папка с изречениями"
 
-#: indicator-fortune.py:242 indicator-fortune.py:464
+#: indicator-fortune.py:242 indicator-fortune.py:466
 msgid "Enabled"
 msgstr "Включен"
 
@@ -196,7 +196,7 @@ msgstr "Удалить выбранный элемент?"
 msgid "Fortune file/directory"
 msgstr "Файл/папка с изречениями"
 
-#: indicator-fortune.py:446
+#: indicator-fortune.py:448
 msgid ""
 "The full path to a fortune .dat file OR\n"
 "a directory containing fortune .dat files.\n"
@@ -208,11 +208,11 @@ msgstr ""
 "\n"
 "Убедитесь, что соответствующие файлы существуют!"
 
-#: indicator-fortune.py:453
+#: indicator-fortune.py:455
 msgid "File"
 msgstr "Файл"
 
-#: indicator-fortune.py:454
+#: indicator-fortune.py:456
 msgid ""
 "Choose a fortune .dat file.\n"
 "Ensure the corresponding text file is present!"
@@ -220,11 +220,11 @@ msgstr ""
 "Выберите файл .dat с изречениями.\n"
 "Убедитесь, что соответствующий файл существует!"
 
-#: indicator-fortune.py:457
+#: indicator-fortune.py:459
 msgid "Directory"
 msgstr "Папка"
 
-#: indicator-fortune.py:458
+#: indicator-fortune.py:460
 msgid ""
 "Choose a directory containing a fortune .dat file(s).\n"
 "Ensure the corresponding text file(s) is present!"
@@ -232,7 +232,7 @@ msgstr ""
 "Выберите папку, содержащую файлы .dat с изречениями.\n"
 "Убедитесь, что соответствующие файлы существуют!"
 
-#: indicator-fortune.py:465
+#: indicator-fortune.py:467
 msgid ""
 "Ensure the fortune file/directory works by\n"
 "running it through 'fortune' in a terminal."
@@ -240,26 +240,26 @@ msgstr ""
 "Убедитесь, что файл/папка с изречениями работает,\n"
 "используя команду 'fortune' в терминале."
 
-#: indicator-fortune.py:471
+#: indicator-fortune.py:473
 msgid "Fortune Properties"
 msgstr "Свойства"
 
-#: indicator-fortune.py:473
+#: indicator-fortune.py:475
 msgid "Add Fortune"
 msgstr "Добавить изречения"
 
-#: indicator-fortune.py:489
+#: indicator-fortune.py:491
 msgid "The fortune path cannot be empty."
 msgstr "Заданный путь не может быть пустым."
 
-#: indicator-fortune.py:494
+#: indicator-fortune.py:496
 msgid "The fortune path does not exist."
 msgstr "Заданный путь не существует."
 
-#: indicator-fortune.py:513
+#: indicator-fortune.py:515
 msgid "Choose a fortune .dat file"
 msgstr "Выберите файл .dat с изречениями"
 
-#: indicator-fortune.py:516
+#: indicator-fortune.py:518
 msgid "Choose a directory containing a fortune .dat file(s)"
 msgstr "Выберите папку, содержащую файл(ы) .dat с изречениями"
