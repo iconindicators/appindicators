@@ -2234,7 +2234,8 @@ class IndicatorLunar:
             "The URL from which to source orbital element data.\n" + \
             "A local file may be used with 'file:///' and the filename.\n\n" + \
             "The data will be automatically loaded, either from\n" + \
-            "the specified location or from the internal cache.\n\n" ) )
+            "the specified location or from the internal cache.\n\n" + \
+            "To disable orbital elements, set a bogus URL such as 'http://'." ) )
         box.pack_start( orbitalElementURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
@@ -2315,7 +2316,8 @@ class IndicatorLunar:
             "The URL from which to source satellite TLE data.\n" + \
             "A local file may be used with 'file:///' and the filename.\n\n" + \
             "The data will be automatically loaded, either from\n" + \
-            "the specified location or from the internal cache.\n\n" ) )
+            "the specified location or from the internal cache.\n\n" + \
+            "To disable satellites, set a bogus URL such as 'http://'." ) )
         box.pack_start( TLEURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
