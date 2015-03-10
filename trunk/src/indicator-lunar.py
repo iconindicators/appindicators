@@ -2239,7 +2239,12 @@ class IndicatorLunar:
         box.pack_start( orbitalElementURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
-        fetch.set_tooltip_text( _( "Retrieve the orbital element data from the URL.\nIf the URL is empty, the default URL will be used." ) )
+        fetch.set_tooltip_text( _(
+            "Retrieve the orbital element data from the URL.\n" + \
+            "If the URL is empty, the default URL will be used.\n\n" + \
+            "Note: If using the default URL, to avoid over taxing" + \
+            "the data source, the download will be blocked if" + \
+            "attempted too often." ) )
         fetch.connect( "clicked", self.onFetchOrbitalElementURL, orbitalElementURLEntry, orbitalElementGrid, orbitalElementStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
@@ -2321,7 +2326,12 @@ class IndicatorLunar:
         box.pack_start( TLEURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
-        fetch.set_tooltip_text( _( "Retrieve the TLE data from the URL.\nIf the URL is empty, the default URL will be used." ) )
+        fetch.set_tooltip_text( _(
+            "Retrieve the satellite TLE data from the URL.\n" + \
+            "If the URL is empty, the default URL will be used.\n\n" + \
+            "Note: If using the default URL, to avoid over taxing" + \
+            "the data source, the download will be blocked if" + \
+            "attempted too often." ) )
         fetch.connect( "clicked", self.onFetchSatelliteTLEURL, TLEURLEntry, satelliteGrid, satelliteStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
@@ -2849,7 +2859,22 @@ class IndicatorLunar:
             entry.set_text( IndicatorLunar.ORBITAL_ELEMENT_DATA_URL )
 
         self.orbitalElementURLNew = entry.get_text().strip()
-        self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
+
+        # If the URL is the default,  use the cache if possible, to avoid annoying the default data source.
+        if self.orbitalElementURLNew == IndicatorLunar.ORBITAL_ELEMENT_DATA_URL:
+            self.orbitalElementDataNew = self.readFromCache( IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
+            self.orbitalElementDataNew = None
+            if self.orbitalElementDataNew is None:
+                # No cache data (either too old or just not there), so do a download only if it won't exceed the download time limit.
+                if datetime.datetime.now() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) ):
+                    summary = "sum"
+                    message = "mess"
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+                else:
+                    print( "new dl") #TODO Think lots!
+#                     self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
+        else:
+            self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
 
         # When fetching new data, by default check all the data.
         orbitalElements = [ ]
@@ -2859,8 +2884,8 @@ class IndicatorLunar:
 
         self.updateOrbitalElementPreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, orbitalElements, self.orbitalElementURLNew )
         self.updateDisplayTags( displayTagsStore, None, self.orbitalElementDataNew )
-
-
+    
+    
     def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore, displayTagsStore ):
         if entry.get_text().strip() == "":
             entry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
