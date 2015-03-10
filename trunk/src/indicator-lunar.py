@@ -2,13 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-#TODO In the fetch for oe/tle, maybe make a note about blocking...that a fetch might fail if you are blocked.
-
-
-#TODO How to stop TLE/OE from actually doing a download outright?‏
-#Need a tooltip to say just put in a bogus URL or just the protocol (http://)?
-
-
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -630,7 +623,7 @@ class IndicatorLunar:
     }
 
     ORBITAL_ELEMENT_CACHE_BASENAME = "oe-"
-    ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS = 48
+    ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS = 24
     ORBITAL_ELEMENT_DATA_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
     ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS = 12
 
@@ -2237,18 +2230,15 @@ class IndicatorLunar:
         orbitalElementURLEntry = Gtk.Entry()
         orbitalElementURLEntry.set_text( self.orbitalElementURL )
         orbitalElementURLEntry.set_hexpand( True )
-        orbitalElementURLEntry.set_tooltip_text( _( 
+        orbitalElementURLEntry.set_tooltip_text( _(
             "The URL from which to source orbital element data.\n" + \
-            "To specify a local file, use 'file:///'.\n\n" + \
-            "The orbital element data will be automatically\n" + \
-            "loaded each time the indicator is started\n" + \
-            "and approximately every 24 hours thereafter." ) ) #TODO Remove the 12 hours...add periodically or similar.
+            "A local file may be used with 'file:///' and the filename.\n\n" + \
+            "The data will be automatically loaded, either from\n" + \
+            "the specified location or from the internal cache.\n\n" ) )
         box.pack_start( orbitalElementURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
-        fetch.set_tooltip_text( _( 
-            "Retrieve the orbital element data from the URL.\n" + \
-            "If the URL is empty, the default URL will be used." ) )#TODO Add a note about blocking and then cancelling.
+        fetch.set_tooltip_text( _( "Retrieve the orbital element data from the URL.\nIf the URL is empty, the default URL will be used." ) )
         fetch.connect( "clicked", self.onFetchOrbitalElementURL, orbitalElementURLEntry, orbitalElementGrid, orbitalElementStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
@@ -2322,17 +2312,14 @@ class IndicatorLunar:
         TLEURLEntry.set_text( self.satelliteTLEURL )
         TLEURLEntry.set_hexpand( True )
         TLEURLEntry.set_tooltip_text( _( 
-            "The URL from which to source TLE satellite data.\n" + \
-            "To specify a local file, use 'file:///'.\n\n" + \
-            "The satellite TLE data will be automatically\n" + \
-            "loaded each time the indicator is started\n" + \
-            "and approximately every 12 hours thereafter." ) ) #TODO Remove the 12 hours...add periodically or similar.
+            "The URL from which to source satellite TLE data.\n" + \
+            "A local file may be used with 'file:///' and the filename.\n\n" + \
+            "The data will be automatically loaded, either from\n" + \
+            "the specified location or from the internal cache.\n\n" ) )
         box.pack_start( TLEURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
-        fetch.set_tooltip_text( _( 
-            "Retrieve the TLE data from the specified URL.\n" + \
-            "If the URL is empty, the default URL will be used." ) )#TODO Add a note about blocking and then cancelling.
+        fetch.set_tooltip_text( _( "Retrieve the TLE data from the URL.\nIf the URL is empty, the default URL will be used." ) )
         fetch.connect( "clicked", self.onFetchSatelliteTLEURL, TLEURLEntry, satelliteGrid, satelliteStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
@@ -3040,13 +3027,11 @@ class IndicatorLunar:
     # Returns a dict/hashtable of the orbital elements (comets) data from the specified URL (may be empty).
     # On error, returns None.
     def getOrbitalElementData( self, url ):
-        pythonutils.showMessage( None, Gtk.MessageType.INFORMATION, _( "Getting OE data" ) ) #TODO Remove
         try:
             # Orbital elements are read from a URL which assumes the XEphem format.
             # For example
             #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
             # in which the first field (up to the first ',' is the name.
-            # Any line beginninng with a '#' is considered a comment and ignored.
             orbitalElementsData = { } # Key: orbital element name, upper cased ; Value: entire orbital element string.
             data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ) ):
@@ -3068,7 +3053,6 @@ class IndicatorLunar:
     # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
     # On error, returns None.
     def getSatelliteTLEData( self, url ):
-        pythonutils.showMessage( None, Gtk.MessageType.INFORMATION, _( "Getting TLE data" ) ) #TODO Remove
         try:
             satelliteTLEData = { } # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
             data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
