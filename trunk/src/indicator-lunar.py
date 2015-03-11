@@ -2639,6 +2639,7 @@ class IndicatorLunar:
                 self.orbitalElementData = { } # The retrieved orbital element data was bad, so reset to empty data.
             else:
                 self.orbitalElementData = self.orbitalElementDataNew # The retrieved orbital element data is good (but still could be empty).
+                self.writeToCache( self.orbitalElementData, IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME )
 
             self.orbitalElements = [ ]
             for orbitalElement in orbitalElementStore:
@@ -2652,6 +2653,7 @@ class IndicatorLunar:
                 self.satelliteTLEData = { } # The retrieved TLE data was bad, so reset to empty data.
             else:
                 self.satelliteTLEData = self.satelliteTLEDataNew # The retrieved TLE data is good (but still could be empty).
+                self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
 
             self.satellites = [ ]
             for satelliteTLE in satelliteStore:
@@ -2866,19 +2868,18 @@ class IndicatorLunar:
 
         self.orbitalElementURLNew = entry.get_text().strip()
 
-        # If the URL is the default,  use the cache if possible, to avoid annoying the default data source.
+        # If the URL is the default, use the cache if possible, to avoid annoying the default data source.
         if self.orbitalElementURLNew == IndicatorLunar.ORBITAL_ELEMENT_DATA_URL:
             self.orbitalElementDataNew = self.readFromCache( IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
-            self.orbitalElementDataNew = None
             if self.orbitalElementDataNew is None:
-                # No cache data (either too old or just not there), so do a download only if it won't exceed the download time limit.
+                # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
                 if datetime.datetime.now() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) ):
-                    summary = "sum"
-                    message = "mess"
+                    nextDownload = str( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) )
+                    summary = _( "Orbital Element data fetch aborted" )
+                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}" ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
                     Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
                 else:
-                    print( "new dl") #TODO Think lots!
-#                     self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
+                    self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
         else:
             self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
 
@@ -2890,14 +2891,28 @@ class IndicatorLunar:
 
         self.updateOrbitalElementPreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, orbitalElements, self.orbitalElementURLNew )
         self.updateDisplayTags( displayTagsStore, None, self.orbitalElementDataNew )
-    
-    
+
+
     def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore, displayTagsStore ):
         if entry.get_text().strip() == "":
             entry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
         self.satelliteTLEURLNew = entry.get_text().strip()
-        self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The TLE data can be None, empty or non-empty.
+
+        # If the URL is the default, use the cache if possible, to avoid annoying the default data source.
+        if self.satelliteTLEURLNew == IndicatorLunar.SATELLITE_TLE_URL:
+            self.satelliteTLEDataNew = self.readFromCache( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
+            if self.satelliteTLEDataNew is None:
+                # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
+                if datetime.datetime.now() < ( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
+                    nextDownload = str( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) )
+                    summary = _( "Satellite TLE data fetch aborted" )
+                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}" ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+                else:
+                    self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
+        else:
+            self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
 
         # When fetching new data, by default check all the data.
         satellites = [ ]
@@ -2906,9 +2921,9 @@ class IndicatorLunar:
                 satellites.append( key )
 
         self.updateSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, satellites, self.satelliteTLEURLNew )
-        self.updateDisplayTags( displayTagsStore, self.satelliteTLEDataNew, None )
-
-
+        self.updateDisplayTags( displayTagsStore, None, self.satelliteTLEDataNew )
+    
+    
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
         summary = summaryEntry.get_text()
         message = pythonutils.getTextViewText( messageTextView )
