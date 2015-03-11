@@ -1246,6 +1246,7 @@ class IndicatorLunar:
             # Cache returned no result so download from the source.
             self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
             if self.satelliteTLEData is None:
+                self.satelliteTLEData = { } #TODO Is this needed?
                 summary = _( "Error Retrieving Satellite TLE Data" )
                 message = _( "The satellite TLE data source could not be reached." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
@@ -1287,6 +1288,7 @@ class IndicatorLunar:
             # Cache returned no result so download from the source.
             self.orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
             if self.orbitalElementData is None:
+                self.orbitalElementData = { }#TODO Is this needed?
                 summary = _( "Error Retrieving Orbital Element Data" )
                 message = _( "The orbital element data source could not be reached." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
