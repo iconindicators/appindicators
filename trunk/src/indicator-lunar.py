@@ -728,7 +728,7 @@ class IndicatorLunar:
         if not self.lock.acquire( False ): return
 
         self.toggleIconState()
-        self.updateOrbitalElementData()
+#         self.updateOrbitalElementData()
         self.updateSatelliteTLEData() 
 
         # Reset data on each update...
@@ -2903,6 +2903,7 @@ class IndicatorLunar:
 
         # If the URL is the default, use the cache if possible, to avoid annoying the default data source.
         if self.satelliteTLEURLNew == IndicatorLunar.SATELLITE_TLE_URL:
+#TODO Both here and OE, get the data, date tuple return from the cache!
             self.satelliteTLEDataNew = self.readFromCache( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
             if self.satelliteTLEDataNew is None:
                 # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
