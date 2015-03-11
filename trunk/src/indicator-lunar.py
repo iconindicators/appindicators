@@ -625,7 +625,7 @@ class IndicatorLunar:
     ORBITAL_ELEMENT_CACHE_BASENAME = "oe-"
     ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS = 24
     ORBITAL_ELEMENT_DATA_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
-    ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS = 12
+    ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS = 24
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -1234,76 +1234,82 @@ class IndicatorLunar:
         if datetime.datetime.now() < ( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
             return
 
-        # Typically the download period and cache age are the same.
-        # This means that when a update needs to be done, the cache age has also expired,
-        # which requires a download, rendering the cache pointless.
-        # The cache comes in to play if the indicator is restarted before the download period has expired
-        # (as measured by the download source which may block). 
-        self.satelliteTLEData = self.readFromCache( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
-        if self.satelliteTLEData is not None:
-            return
-
-        # Cache returned no result so download from the source.
-        self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
+        # The download period and cache age are the same, which means
+        # when a update needs to be done, the cache age has also expired,
+        # requiring a download, rendering the cache pointless.
+        # The cache becomes useful only when the indicator is restarted
+        # before the download period has expired.
+        # The cache attempts to avoid the download source blocking a user
+        # as a ressult of too many downloads in a given period.
+        self.satelliteTLEData, cacheDateTime = self.readFromCache( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
         if self.satelliteTLEData is None:
-            summary = _( "Error Retrieving Satellite TLE Data" )
-            message = _( "The satellite TLE data source could not be reached." )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-        elif len( self.satelliteTLEData ) == 0:
-            summary = _( "Empty Satellite TLE Data" )
-            message = _( "The satellite TLE data retrieved is empty." )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            # Cache returned no result so download from the source.
+            self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
+            if self.satelliteTLEData is None:
+                summary = _( "Error Retrieving Satellite TLE Data" )
+                message = _( "The satellite TLE data source could not be reached." )
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            elif len( self.satelliteTLEData ) == 0:
+                summary = _( "Empty Satellite TLE Data" )
+                message = _( "The satellite TLE data retrieved was empty." )
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            else:
+                self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
+
+                # Add in any new satellites based on the user preference.
+                if self.satellitesAddNew:
+                    for key in self.satelliteTLEData:
+                        if key not in self.satellites:
+                            self.satellites.append( key )
+
+                    self.saveSettings()
+
+            # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
+            self.lastUpdateTLE = datetime.datetime.now()
         else:
-            self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
-
-            # Add in any new satellites based on the user preference.
-            if self.satellitesAddNew:
-                for key in self.satelliteTLEData:
-                    if key not in self.satellites:
-                        self.satellites.append( key )
-
-                self.saveSettings()
-
-        # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
-        self.lastUpdateTLE = datetime.datetime.now()
+            # Set the next update to occur when the cache is due to expire.
+            self.lastUpdateTLE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
 
 
     def updateOrbitalElementData( self ):
         if datetime.datetime.now() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) ):
             return
 
-        # Typically the download period and cache age are the same.
-        # This means that when a update needs to be done, the cache age has also expired,
-        # which requires a download, rendering the cache pointless.
-        # The cache comes in to play if the indicator is restarted before the download period has expired
-        # (as measured by the download source which may block). 
-        self.orbitalElementData = self.readFromCache( IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
-        if self.orbitalElementData is not None:
-            return
-
-        # Cache returned no result so download from the source.
-        self.orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
+        # The download period and cache age are the same, which means
+        # when a update needs to be done, the cache age has also expired,
+        # requiring a download, rendering the cache pointless.
+        # The cache becomes useful only when the indicator is restarted
+        # before the download period has expired.
+        # The cache attempts to avoid the download source blocking a user
+        # as a ressult of too many downloads in a given period.
+        self.orbitalElementData, cacheDateTime = self.readFromCache( IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
         if self.orbitalElementData is None:
-            summary = _( "Error Retrieving Orbital Element Data" )
-            message = _( "The orbital element data source could not be reached." )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-        elif len( self.orbitalElementData ) == 0:
-            summary = _( "Empty Orbital Element Data" )
-            message = _( "The orbital element data retrieved is empty." )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            # Cache returned no result so download from the source.
+            self.orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
+            if self.orbitalElementData is None:
+                summary = _( "Error Retrieving Orbital Element Data" )
+                message = _( "The orbital element data source could not be reached." )
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            elif len( self.orbitalElementData ) == 0:
+                summary = _( "Empty Orbital Element Data" )
+                message = _( "The orbital element data retrieved was empty." )
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            else:
+                self.writeToCache( self.orbitalElementData, IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME )
+
+                # Add in any new orbital elements based on the user preference.
+                if self.orbitalElementsAddNew:
+                    for key in self.orbitalElementData:
+                        if key not in self.orbitalElements:
+                            self.orbitalElements.append( key )
+
+                    self.saveSettings()
+
+            # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
+            self.lastUpdateOE = datetime.datetime.now()
         else:
-            self.writeToCache( self.orbitalElementData, IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME )
-
-            # Add in any new orbital elements based on the user preference.
-            if self.orbitalElementsAddNew:
-                for key in self.orbitalElementData:
-                    if key not in self.orbitalElements:
-                        self.orbitalElements.append( key )
-
-                self.saveSettings()
-
-        # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
-        self.lastUpdateOE = datetime.datetime.now()
+            # Set the next update to occur when the cache is due to expire.
+            self.lastUpdateOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS )
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -3251,7 +3257,7 @@ class IndicatorLunar:
 
     # Reads the most recent file from the cache for the given base name (tle or oe).
     # Removes out of date cache files.
-    # Returns either None or a non-empty dict.
+    # Returns a tuple of the data (either None or a non-empty dict) and the corresponding date/time as string (either None or the date/time).
     def readFromCache( self, baseName, cacheMaximumDateTime ):
         # Read all files in the cache and keep a list of those which match the base name.
         # Any file matching the base name but is older than the cache maximum date/time id deleted.
@@ -3268,6 +3274,7 @@ class IndicatorLunar:
         # Sort the matching files by date.  All file(s) will be newer than the cache maximum date/time.
         files.sort()
         data = None
+        dateTime = None
         for file in reversed( files ): # Look at the most recent file first.
             filename = IndicatorLunar.CACHE_PATH + file
             try:
@@ -3275,18 +3282,21 @@ class IndicatorLunar:
                     data = pickle.load( f )
 
                 if data is not None and len( data ) > 0:
+                    dateTime = file[ len( baseName ) : ]
                     break
 
             except Exception as e:
                 data = None
+                dateTime = None
                 logging.exception( e )
                 logging.error( "Error reading from cache: " + filename )
 
         # Only return None or non-empty.
         if data is None or len( data ) == 0:
             data = None
+            dateTime = None
 
-        return data
+        return ( data, dateTime )
 
 
 if __name__ == "__main__": IndicatorLunar().main()
