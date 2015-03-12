@@ -2995,9 +2995,10 @@ class IndicatorLunar:
 
 
 #TODO When an object is added/removed the treeview sometimes does not update until the mouse moves or scroll happens.
-    def onObjectToggled( self, checked, objectName, displayTagsStore, tagList, translatedTag, dataStore, path ):
+    def onObjectToggled( self, objectName, displayTagsStore, tagList, translatedTag, dataStore, path ):
         dataStore[ path ][ 0 ] = not dataStore[ path ][ 0 ]
-        if checked:
+
+        if dataStore[ path ][ 0 ]: # Item is checked so add to the display store.
             for tag in tagList:
                 displayTagsStore.append( [ objectName + " " + tag, translatedTag + " " + IndicatorLunar.DATA_TAGS[ tag ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
@@ -3015,7 +3016,6 @@ class IndicatorLunar:
                          planetStore, # List of lists, each sublist contains checked flag, planet name, translated planet name.
                          displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
 
-#TODO Planet moons need to be added/removed.
         tags = [
             IndicatorLunar.DATA_ALTITUDE,
             IndicatorLunar.DATA_AZIMUTH,
@@ -3033,7 +3033,25 @@ class IndicatorLunar:
             IndicatorLunar.DATA_TROPICAL_SIGN ]
 
         planetName = planetStore[ path ][ 1 ].upper()
-        self.onObjectToggled( not planetStore[ path ][ 0 ], planetName, displayTagsStore, tags, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ], planetStore, path )
+        self.onObjectToggled( planetName, displayTagsStore, tags, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ], planetStore, path )
+
+        # Handle the planet's moons.
+        planetName = planetStore[ path ][ 1 ]
+        if planetName in IndicatorLunar.PLANET_MOONS:
+            tags = [
+                IndicatorLunar.DATA_ALTITUDE,
+                IndicatorLunar.DATA_AZIMUTH,
+                IndicatorLunar.DATA_DECLINATION,
+                IndicatorLunar.DATA_EARTH_VISIBLE,
+                IndicatorLunar.DATA_RIGHT_ASCENSION,
+                IndicatorLunar.DATA_X_OFFSET,
+                IndicatorLunar.DATA_Y_OFFSET,
+                IndicatorLunar.DATA_Z_OFFSET ]
+
+            for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
+                moonStore = Gtk.ListStore( bool )
+                moonStore.append( [ not planetStore[ path ][ 0 ] ] ) # Create a bogus liststore using the same checkbox status of the planet before it was toggled.
+                self.onObjectToggled( moonName.upper(), displayTagsStore, tags, IndicatorLunar.PLANET_AND_MOON_TAGS[ moonName.upper() ], moonStore, 0 )
 
 
     def onStarToggled( self, widget,
@@ -3054,7 +3072,7 @@ class IndicatorLunar:
             IndicatorLunar.DATA_TROPICAL_SIGN ]
 
         starName = starStore[ path ][ 1 ].upper()
-        self.onObjectToggled( not starStore[ path ][ 0 ], starName, displayTagsStore, tags, IndicatorLunar.STAR_TAGS[ starName ], starStore, path )
+        self.onObjectToggled( starName, displayTagsStore, tags, IndicatorLunar.STAR_TAGS[ starName ], starStore, path )
 
 
     def onOrbitalElementToggled( self, widget,
@@ -3070,7 +3088,7 @@ class IndicatorLunar:
 
         childPath = orbitalElementStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) ) # Convert sorted model index to underlying (child) model index.
         orbitalElementName = orbitalElementStore[ childPath ][ 1 ].upper()
-        self.onObjectToggled( not orbitalElementStore[ childPath ][ 0 ], orbitalElementName, displayTagsStore, tags, orbitalElementName, orbitalElementStore, childPath )
+        self.onObjectToggled( orbitalElementName, displayTagsStore, tags, orbitalElementName, orbitalElementStore, childPath )
 #TODO In the old code, the orbitalElementStore[ childPath ][ 0 ] was actually orbitalElementStore[ childPath ][ 1 ].
 #Seems to work...but keep an eye on it!
 
@@ -3090,7 +3108,7 @@ class IndicatorLunar:
 
         childPath = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) ) # Convert sorted model index to underlying (child) model index.
         satelliteNameNumber = satelliteStore[ childPath ][ 1 ].upper() + " " + satelliteStore[ childPath ][ 2 ]
-        self.onObjectToggled( not satelliteStore[ childPath ][ 0 ], satelliteNameNumber, displayTagsStore, tags, satelliteNameNumber, satelliteStore, childPath )
+        self.onObjectToggled( satelliteNameNumber, displayTagsStore, tags, satelliteNameNumber, satelliteStore, childPath )
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
