@@ -728,7 +728,7 @@ class IndicatorLunar:
         if not self.lock.acquire( False ): return
 
         self.toggleIconState()
-#         self.updateOrbitalElementData() #TODO fix
+        self.updateOrbitalElementData()
         self.updateSatelliteTLEData() 
 
         # Reset data on each update...
@@ -1937,7 +1937,27 @@ class IndicatorLunar:
         grid.attach( box, 0, 0, 1, 1 )
 
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
-        self.updateDisplayTags( displayTagsStore, None, None )
+        for key in self.data.keys():
+            if ( key[ 0 ], key[ 1 ] ) in self.satellites: # This key refers to a satellite.
+                data = self.data[ key ]
+                if key[ 2 ] == IndicatorLunar.DATA_VISIBLE: # This data value is either True or False and needs to be translated.
+                    data = IndicatorLunar.TRUE_TEXT_TRANSLATION if data == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
+
+                displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + key[ 1 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 2 ] ], data ] )
+
+            elif ( key[ 0 ] ) in self.orbitalElements: # This key refers to an orbital element.
+                displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
+
+            elif key[ 1 ] == IndicatorLunar.DATA_CITY_NAME: # Special case: the city name data tag has no associated body tag.
+                displayTagsStore.append( [ key[ 1 ], IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
+
+            elif key[ 1 ] == IndicatorLunar.DATA_EARTH_VISIBLE: # Special case: the earth visible data is boolean and needs to be translated.
+                data = IndicatorLunar.TRUE_TEXT_TRANSLATION if self.data[ key ] == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
+                displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_TAGS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], data ] )
+
+            else: # Everything else...
+                displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_TAGS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
+
         indicatorText.set_text( self.translateTags( displayTagsStore, True, self.indicatorText ) ) # Need to translate the tags into the local language.
 
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
@@ -2145,7 +2165,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, displayTagsStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onToggle, planetStore, AstronomicalObjectType.Planet )
+#         treeViewColumn.connect( "clicked", self.onToggle, planetStore, AstronomicalObjectType.Planet )
         tree.append_column( treeViewColumn )
 
         tree.append_column( Gtk.TreeViewColumn( _( "Planet" ), Gtk.CellRendererText(), text = 2 ) )
@@ -2176,7 +2196,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onStarToggled, starStore, displayTagsStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onToggle, starStore, AstronomicalObjectType.Star )
+#         treeViewColumn.connect( "clicked", self.onToggle, starStore, AstronomicalObjectType.Star )
         tree.append_column( treeViewColumn )
 
         tree.append_column( Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 ) )
@@ -2209,7 +2229,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onOrbitalElementToggled, orbitalElementStore, displayTagsStore, orbitalElementStoreSort )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onToggle, orbitalElementStore, AstronomicalObjectType.OrbitalElement )
+#         treeViewColumn.connect( "clicked", self.onToggle, orbitalElementStore, AstronomicalObjectType.OrbitalElement )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2285,7 +2305,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onToggle, satelliteStore, AstronomicalObjectType.Satellite )
+#         treeViewColumn.connect( "clicked", self.onToggle, satelliteStore, AstronomicalObjectType.Satellite )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Satellite Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2698,6 +2718,9 @@ class IndicatorLunar:
 
     # Refreshes the display tags with all data.
     # If the user has done a fetch of new satellite or orbital element data, the new data is added instead.
+#TODO Think about this method.
+# Are keys/values being removed properly?
+# Why does this handle the case when the tle/oe data is None and not None?  Why can it be both values?
     def updateDisplayTags( self, displayTagsStore, satelliteTLEData, orbitalElementData ):
         displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
         for key in self.data.keys():
@@ -2926,7 +2949,11 @@ class IndicatorLunar:
                 satellites.append( key )
 
         self.updateSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, satellites, self.satelliteTLEURLNew )
-        self.updateDisplayTags( displayTagsStore, None, self.satelliteTLEDataNew )
+#         self.updateDisplayTags( displayTagsStore, None, self.satelliteTLEDataNew )
+        # Check if new satellite TLE data is being added...
+#         if satelliteTLEData is not None:
+#             for key in satelliteTLEData:
+#                 displayTagsStore.append( [ " ".join( key ), " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
     
     
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
@@ -2967,105 +2994,106 @@ class IndicatorLunar:
         if isFullMoon: os.remove( svgFile )
 
 
+#TODO When an object is added/removed the treeview sometimes does not update until the mouse moves or scroll happens.
+    def onObjectToggled( self, checked, objectName, displayTagsStore, tagList, translatedTag, dataStore, path ):
+        dataStore[ path ][ 0 ] = not dataStore[ path ][ 0 ]
+        if checked:
+            for tag in tagList:
+                displayTagsStore.append( [ objectName + " " + tag, translatedTag + " " + IndicatorLunar.DATA_TAGS[ tag ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+
+        else: # Item has been unchecked, so remove.
+            iter = displayTagsStore.get_iter_first()
+            while iter is not None:
+                if displayTagsStore[ iter ][ 0 ].startswith( objectName ):
+                    if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
+                else:
+                    iter = displayTagsStore.iter_next( iter )
+
+
     def onPlanetToggled( self, widget, 
                          path, # Index to the selected row in the table. 
                          planetStore, # List of lists, each sublist contains checked flag, planet name, translated planet name.
                          displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
-        planetStore[ path ][ 0 ] = not planetStore[ path ][ 0 ]
+
+#TODO Are there visible/messages tags to worry about?
+#TODO Planet moons need to be added/removed.
+        tags = [
+            IndicatorLunar.DATA_ALTITUDE,
+            IndicatorLunar.DATA_AZIMUTH,
+            IndicatorLunar.DATA_BRIGHT_LIMB,
+            IndicatorLunar.DATA_CONSTELLATION,
+            IndicatorLunar.DATA_DECLINATION,
+            IndicatorLunar.DATA_DISTANCE_TO_EARTH,
+            IndicatorLunar.DATA_DISTANCE_TO_SUN,
+            IndicatorLunar.DATA_ILLUMINATION,
+            IndicatorLunar.DATA_MAGNITUDE,
+            IndicatorLunar.DATA_MESSAGE,
+            IndicatorLunar.DATA_RIGHT_ASCENSION,
+            IndicatorLunar.DATA_RISE_TIME,
+            IndicatorLunar.DATA_SET_TIME,
+            IndicatorLunar.DATA_TROPICAL_SIGN ]
+
         planetName = planetStore[ path ][ 1 ].upper()
-
-        if planetStore[ path ][ 0 ]: # Item has been checked, so add in a default value for each tag.
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_ILLUMINATION, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_ILLUMINATION ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_CONSTELLATION, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_CONSTELLATION ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_MAGNITUDE, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_MAGNITUDE ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_TROPICAL_SIGN, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_TROPICAL_SIGN ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DISTANCE_TO_EARTH, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_DISTANCE_TO_EARTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DISTANCE_TO_SUN, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_DISTANCE_TO_SUN ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_BRIGHT_LIMB, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_BRIGHT_LIMB ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_RIGHT_ASCENSION, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RIGHT_ASCENSION ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_DECLINATION, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_DECLINATION ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_AZIMUTH, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_AZIMUTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_ALTITUDE, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_ALTITUDE ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-
-            if ( planetName, IndicatorLunar.DATA_MESSAGE ) in self.data:
-                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_MESSAGE, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_MESSAGE ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            else:
-                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RISE_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-                displayTagsStore.append( [ planetName + " " + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_SET_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-        else: # Item has been unchecked, so remove.
-            iter = displayTagsStore.get_iter_first()
-            while iter is not None:
-                if displayTagsStore[ iter ][ 0 ].startswith( planetName ):
-                    if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
-                else:
-                    iter = displayTagsStore.iter_next( iter )
+        self.onObjectToggled( not planetStore[ path ][ 0 ], planetName, displayTagsStore, tags, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ], planetStore, path )
 
 
-    def onStarToggled( self, widget, 
+    def onStarToggled( self, widget,
                        path, # Index to the selected row in the table. 
                        starStore, # List of lists, each sublist contains checked flag, star name, translated star name.
                        displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
-        starStore[ path ][ 0 ] = not starStore[ path ][ 0 ]
+
+#TODO Are there visible/messages tags to worry about?
+        tags = [
+            IndicatorLunar.DATA_ALTITUDE,
+            IndicatorLunar.DATA_AZIMUTH,
+            IndicatorLunar.DATA_CONSTELLATION,
+            IndicatorLunar.DATA_DECLINATION,
+            IndicatorLunar.DATA_MAGNITUDE,
+            IndicatorLunar.DATA_MESSAGE,
+            IndicatorLunar.DATA_RIGHT_ASCENSION,
+            IndicatorLunar.DATA_RISE_TIME,
+            IndicatorLunar.DATA_SET_TIME ]
+
         starName = starStore[ path ][ 1 ].upper()
-
-        if starStore[ path ][ 0 ]: # Item has been checked, so add in a default value for each tag.
-            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_CONSTELLATION, IndicatorLunar.STAR_TAGS[ starName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_CONSTELLATION ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_MAGNITUDE, IndicatorLunar.STAR_TAGS[ starName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_MAGNITUDE ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_RIGHT_ASCENSION, IndicatorLunar.STAR_TAGS[ starName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RIGHT_ASCENSION ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_DECLINATION, IndicatorLunar.STAR_TAGS[ starName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_DECLINATION ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_AZIMUTH, IndicatorLunar.STAR_TAGS[ starName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_AZIMUTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_ALTITUDE, IndicatorLunar.STAR_TAGS[ starName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_ALTITUDE ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-
-            if ( starName, IndicatorLunar.DATA_MESSAGE ) in self.data:
-                displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_MESSAGE, IndicatorLunar.STAR_TAGS[ starName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_MESSAGE ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            else:
-                displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_RISE_TIME, IndicatorLunar.STAR_TAGS[ starName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RISE_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-                displayTagsStore.append( [ starName + " " + IndicatorLunar.DATA_SET_TIME, IndicatorLunar.STAR_TAGS[ starName ] + " " + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_SET_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-        else: # Item has been unchecked, so remove.
-            iter = displayTagsStore.get_iter_first()
-            while iter is not None:
-                if displayTagsStore[ iter ][ 0 ].startswith( starName ):
-                    if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
-                else:
-                    iter = displayTagsStore.iter_next( iter )
+        self.onObjectToggled( not starStore[ path ][ 0 ], starName, displayTagsStore, tags, IndicatorLunar.STAR_TAGS[ starName ], starStore, path )
 
 
-    def onOrbitalElementToggled( self, widget, path, orbitalElementStore, displayTagsStore, orbitalElementStoreSort ):
+    def onOrbitalElementToggled( self, widget,
+                                 path, # Index to the selected row in the table. 
+                                 orbitalElementStore, # List of lists, each sublist contains checked flag, orbital element name.
+                                 displayTagsStore, # List of lists, each sublist contains the tag, translated tag, value.
+                                 orbitalElementStoreSort ): 
+        tags = [
+            IndicatorLunar.DATA_RISE_AZIMUTH,
+            IndicatorLunar.DATA_RISE_TIME,
+            IndicatorLunar.DATA_SET_AZIMUTH,
+            IndicatorLunar.DATA_SET_TIME ]
+
         childPath = orbitalElementStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) ) # Convert sorted model index to underlying (child) model index.
-        orbitalElementStore[ childPath ][ 0 ] = not orbitalElementStore[ childPath ][ 0 ]
-        orbitalElementName = orbitalElementStore[ childPath ][ 1 ].upper() + " "
-
-        if orbitalElementStore[ childPath ][ 1 ]:
-            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_RISE_TIME, orbitalElementName + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RISE_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_RISE_AZIMUTH, orbitalElementName + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RISE_AZIMUTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_SET_TIME, orbitalElementName + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_SET_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ orbitalElementName + IndicatorLunar.DATA_SET_AZIMUTH, orbitalElementName + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_SET_AZIMUTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-        else:
-            iter = displayTagsStore.get_iter_first()
-            while iter is not None:
-                if displayTagsStore[ iter ][ 0 ].startswith( orbitalElementName ):
-                    if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
-                else:
-                    iter = displayTagsStore.iter_next( iter )
+        orbitalElementName = orbitalElementStore[ childPath ][ 1 ].upper()
+        self.onObjectToggled( not orbitalElementStore[ childPath ][ 0 ], orbitalElementName, displayTagsStore, tags, orbitalElementName, orbitalElementStore, childPath )
+#TODO In the old code, the orbitalElementStore[ childPath ][ 0 ] was actually orbitalElementStore[ childPath ][ 1 ].
+#Seems to work...but keep an eye on it!
 
 
-    def onSatelliteToggled( self, widget, path, satelliteStore, displayTagsStore, satelliteStoreSort ):
+    def onSatelliteToggled( self, widget,
+                            path, # Index to the selected row in the table. 
+                            satelliteStore, # List of lists, each sublist contains checked flag, satellite name, satellite number, international designator.
+                            displayTagsStore, # List of lists, each sublist contains the tag, translated tag, value.
+                            satelliteStoreSort ):
+
+#TODO Add the visible tag?
+#TODO Add the message tag?
+        tags = [
+            IndicatorLunar.DATA_RISE_AZIMUTH,
+            IndicatorLunar.DATA_RISE_TIME,
+            IndicatorLunar.DATA_SET_AZIMUTH,
+            IndicatorLunar.DATA_SET_TIME,
+            IndicatorLunar.DATA_VISIBLE ]
+
         childPath = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) ) # Convert sorted model index to underlying (child) model index.
-        satelliteStore[ childPath ][ 0 ] = not satelliteStore[ childPath ][ 0 ]
-        satelliteNameNumber = satelliteStore[ childPath ][ 1 ].upper() + " " + satelliteStore[ childPath ][ 2 ] + " "
-
-        if satelliteStore[ childPath ][ 2 ]:
-            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_RISE_TIME, satelliteNameNumber + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RISE_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_RISE_AZIMUTH, satelliteNameNumber + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_RISE_AZIMUTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_SET_TIME, satelliteNameNumber + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_SET_TIME ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-            displayTagsStore.append( [ satelliteNameNumber + IndicatorLunar.DATA_SET_AZIMUTH, satelliteNameNumber + IndicatorLunar.DATA_TAGS[ IndicatorLunar.DATA_SET_AZIMUTH ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-        else:
-            iter = displayTagsStore.get_iter_first()
-            while iter is not None:
-                if displayTagsStore[ iter ][ 0 ].startswith( satelliteNameNumber ):
-                    if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
-                else:
-                    iter = displayTagsStore.iter_next( iter )
+        satelliteNameNumber = satelliteStore[ childPath ][ 1 ].upper() + " " + satelliteStore[ childPath ][ 2 ]
+        self.onObjectToggled( not satelliteStore[ childPath ][ 0 ], satelliteNameNumber, displayTagsStore, tags, satelliteNameNumber, satelliteStore, childPath )
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
@@ -3080,6 +3108,10 @@ class IndicatorLunar:
     # Returns a dict/hashtable of the orbital elements (comets) data from the specified URL (may be empty).
     # On error, returns None.
     def getOrbitalElementData( self, url ):
+#TODO Remove
+        if True:
+            print( "OE ALERT" )
+            return None
         try:
             # Orbital elements are read from a URL which assumes the XEphem format.
             # For example
@@ -3106,6 +3138,10 @@ class IndicatorLunar:
     # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
     # On error, returns None.
     def getSatelliteTLEData( self, url ):
+#TODO Remove
+        if True:
+            print( "TLE ALERT" )
+            return None
         try:
             satelliteTLEData = { } # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
             data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
