@@ -3042,7 +3042,6 @@ class IndicatorLunar:
                        starStore, # List of lists, each sublist contains checked flag, star name, translated star name.
                        displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
 
-#TODO Are there visible/messages tags to worry about?
         tags = [
             IndicatorLunar.DATA_ALTITUDE,
             IndicatorLunar.DATA_AZIMUTH,
@@ -3052,7 +3051,8 @@ class IndicatorLunar:
             IndicatorLunar.DATA_MESSAGE,
             IndicatorLunar.DATA_RIGHT_ASCENSION,
             IndicatorLunar.DATA_RISE_TIME,
-            IndicatorLunar.DATA_SET_TIME ]
+            IndicatorLunar.DATA_SET_TIME,
+            IndicatorLunar.DATA_TROPICAL_SIGN ]
 
         starName = starStore[ path ][ 1 ].upper()
         self.onObjectToggled( not starStore[ path ][ 0 ], starName, displayTagsStore, tags, IndicatorLunar.STAR_TAGS[ starName ], starStore, path )
@@ -3082,8 +3082,6 @@ class IndicatorLunar:
                             displayTagsStore, # List of lists, each sublist contains the tag, translated tag, value.
                             satelliteStoreSort ):
 
-#TODO Add the visible tag?
-#TODO Add the message tag?
         tags = [
             IndicatorLunar.DATA_RISE_AZIMUTH,
             IndicatorLunar.DATA_RISE_TIME,

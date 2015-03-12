@@ -1,5 +1,6 @@
 indicator-lunar (1.0.58-1) precise; urgency=low
 
+  * Bug fix: Tropical Sign tag was missing for stars in the available tags.
   * Added timeouts to the TLE/OE download.
   * Added caching of TLE/OE downloaded data to avoid over-taxing any
     particular data source.
