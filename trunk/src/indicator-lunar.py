@@ -3015,7 +3015,6 @@ class IndicatorLunar:
                          planetStore, # List of lists, each sublist contains checked flag, planet name, translated planet name.
                          displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
 
-#TODO Are there visible/messages tags to worry about?
 #TODO Planet moons need to be added/removed.
         tags = [
             IndicatorLunar.DATA_ALTITUDE,
