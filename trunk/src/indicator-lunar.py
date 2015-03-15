@@ -3117,6 +3117,7 @@ class IndicatorLunar:
             toggle = self.togglePlanetsTable
             self.togglePlanetsTable = not self.togglePlanetsTable
 
+#TODO Satellites don't ALL check nor uncheck.
         elif astronomicalObjectType == AstronomicalObjectType.Satellite:
             functionName = "onSatelliteToggled"
             toggle = self.toggleSatellitesTable
@@ -3129,7 +3130,7 @@ class IndicatorLunar:
 
         for path in range( len( dataStore ) ):
             dataStore[ path ][ 0 ] = bool( not toggle )
-            getattr( self, functionName )( widget, path, dataStore, sortStore, displayTagsStore )
+            getattr( self, functionName )( widget, str( path ), dataStore, sortStore, displayTagsStore )
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
