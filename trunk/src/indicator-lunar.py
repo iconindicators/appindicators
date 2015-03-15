@@ -2162,10 +2162,10 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, displayTagsStore )
+        renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, None, displayTagsStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore, displayTagsStore, AstronomicalObjectType.Planet )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore, None, displayTagsStore, AstronomicalObjectType.Planet )
         tree.append_column( treeViewColumn )
 
         tree.append_column( Gtk.TreeViewColumn( _( "Planet" ), Gtk.CellRendererText(), text = 2 ) )
@@ -2193,10 +2193,10 @@ class IndicatorLunar:
             "toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onStarToggled, starStore, displayTagsStore )
+        renderer_toggle.connect( "toggled", self.onStarToggled, starStore, None, displayTagsStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, displayTagsStore, AstronomicalObjectType.Star )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, None, displayTagsStore, AstronomicalObjectType.Star )
         tree.append_column( treeViewColumn )
 
         tree.append_column( Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 ) )
@@ -2226,10 +2226,10 @@ class IndicatorLunar:
             "toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onOrbitalElementToggled, orbitalElementStore, displayTagsStore, orbitalElementStoreSort )
+        renderer_toggle.connect( "toggled", self.onOrbitalElementToggled, orbitalElementStore, orbitalElementStoreSort, displayTagsStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, orbitalElementStore, displayTagsStore, AstronomicalObjectType.OrbitalElement )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, orbitalElementStore, orbitalElementStoreSort, displayTagsStore, AstronomicalObjectType.OrbitalElement )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2302,10 +2302,10 @@ class IndicatorLunar:
             "toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
+        renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, satelliteStoreSort, displayTagsStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, displayTagsStore, AstronomicalObjectType.Satellite )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, AstronomicalObjectType.Satellite )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Satellite Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2807,43 +2807,6 @@ class IndicatorLunar:
 
 
 
-#TODO This does not remove/add the data from the tags list!
-    def onColumnHeaderClick( self, widget, dataStore, displayTagsStore, astronomicalObjectType ):
-        path = ""
-        for i in range( len( dataStore ) ):
-            path += str( i ) + ":"
-
-        path = path[ 0 : -1 ] #TODO Is it possible to have an empty list but the column header is clicked making this call dangerous?
-        treePath = Gtk.TreePath.new_from_string( path )
-
-        if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
-            self.toggleOrbitalElementsTable = not self.toggleOrbitalElementsTable
-            toggle = self.toggleOrbitalElementsTable
-
-        elif astronomicalObjectType == AstronomicalObjectType.Planet:
-            iter = dataStore.get_iter_first()
-            while iter is not None:
-                print( type( dataStore[ iter ][ 0 ] ), dataStore[ iter ][ 0 ], dataStore[ iter ][ 1 ], dataStore[ iter ][ 2 ] )
-#                 print( type( bool( "True" ) ), type( bool( "False" ) ) )
-                dataStore[ iter ][ 0 ] = bool( not self.togglePlanetsTable )
-                print( type( dataStore[ iter ][ 0 ] ), dataStore[ iter ][ 0 ], dataStore[ iter ][ 1 ], dataStore[ iter ][ 2 ] )
-                iter = dataStore.iter_next( iter )
-
-            self.onPlanetToggled( widget, treePath, dataStore, displayTagsStore )
-            self.togglePlanetsTable = not self.togglePlanetsTable
-
-        elif astronomicalObjectType == AstronomicalObjectType.Satellite:
-            self.toggleSatellitesTable = not self.toggleSatellitesTable
-            toggle = self.toggleSatellitesTable
-
-        else: # Assume stars. 
-            self.toggleStarsTable = not self.toggleStarsTable
-            toggle = self.toggleStarsTable
-
-#         for row in dataStore:
-#             row[ 0 ] = toggle
-
-
 
 
     def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, orbitalElements, url ):
@@ -3043,6 +3006,7 @@ class IndicatorLunar:
     def onPlanetToggled( self, widget, 
                          path, # Index to the selected row in the table. 
                          planetStore, # List of lists, each sublist contains checked flag, planet name, translated planet name.
+                         planetStoreSort, # Always None - used to make life easier in the toggle checkbox for all table headers.
                          displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
 
         tags = [
@@ -3086,6 +3050,7 @@ class IndicatorLunar:
     def onStarToggled( self, widget,
                        path, # Index to the selected row in the table. 
                        starStore, # List of lists, each sublist contains checked flag, star name, translated star name.
+                       starStoreSort, # Always None - used to make life easier in the toggle checkbox for all table headers.
                        displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
 
         tags = [
@@ -3107,8 +3072,9 @@ class IndicatorLunar:
     def onOrbitalElementToggled( self, widget,
                                  path, # Index to the selected row in the table. 
                                  orbitalElementStore, # List of lists, each sublist contains checked flag, orbital element name.
-                                 displayTagsStore, # List of lists, each sublist contains the tag, translated tag, value.
-                                 orbitalElementStoreSort ): 
+                                 orbitalElementStoreSort,
+                                 displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
+
         tags = [
             IndicatorLunar.DATA_RISE_AZIMUTH,
             IndicatorLunar.DATA_RISE_TIME,
@@ -3125,8 +3091,8 @@ class IndicatorLunar:
     def onSatelliteToggled( self, widget,
                             path, # Index to the selected row in the table. 
                             satelliteStore, # List of lists, each sublist contains checked flag, satellite name, satellite number, international designator.
-                            displayTagsStore, # List of lists, each sublist contains the tag, translated tag, value.
-                            satelliteStoreSort ):
+                            satelliteStoreSort,
+                            displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
 
         tags = [
             IndicatorLunar.DATA_RISE_AZIMUTH,
@@ -3138,6 +3104,32 @@ class IndicatorLunar:
         childPath = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) ) # Convert sorted model index to underlying (child) model index.
         satelliteNameNumber = satelliteStore[ childPath ][ 1 ].upper() + " " + satelliteStore[ childPath ][ 2 ]
         self.onObjectToggled( satelliteNameNumber, displayTagsStore, tags, satelliteNameNumber, satelliteStore, childPath )
+
+
+    def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
+        if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
+            functionName = "onOrbitalElementToggled"
+            toggle = self.toggleOrbitalElementsTable
+            self.toggleOrbitalElementsTable = not self.toggleOrbitalElementsTable
+
+        elif astronomicalObjectType == AstronomicalObjectType.Planet:
+            functionName = "onPlanetToggled"
+            toggle = self.togglePlanetsTable
+            self.togglePlanetsTable = not self.togglePlanetsTable
+
+        elif astronomicalObjectType == AstronomicalObjectType.Satellite:
+            functionName = "onSatelliteToggled"
+            toggle = self.toggleSatellitesTable
+            self.toggleSatellitesTable = not self.toggleSatellitesTable
+
+        elif astronomicalObjectType == AstronomicalObjectType.Star:
+            functionName = "onStarToggled"
+            toggle = self.toggleStarsTable
+            self.toggleStarsTable = not self.toggleStarsTable
+
+        for path in range( len( dataStore ) ):
+            dataStore[ path ][ 0 ] = bool( not toggle )
+            getattr( self, functionName )( widget, path, dataStore, sortStore, displayTagsStore )
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
