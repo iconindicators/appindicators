@@ -2165,7 +2165,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, displayTagsStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-#         treeViewColumn.connect( "clicked", self.onToggle, planetStore, AstronomicalObjectType.Planet )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore, displayTagsStore, AstronomicalObjectType.Planet )
         tree.append_column( treeViewColumn )
 
         tree.append_column( Gtk.TreeViewColumn( _( "Planet" ), Gtk.CellRendererText(), text = 2 ) )
@@ -2196,7 +2196,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onStarToggled, starStore, displayTagsStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-#         treeViewColumn.connect( "clicked", self.onToggle, starStore, AstronomicalObjectType.Star )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, displayTagsStore, AstronomicalObjectType.Star )
         tree.append_column( treeViewColumn )
 
         tree.append_column( Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 ) )
@@ -2229,7 +2229,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onOrbitalElementToggled, orbitalElementStore, displayTagsStore, orbitalElementStoreSort )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-#         treeViewColumn.connect( "clicked", self.onToggle, orbitalElementStore, AstronomicalObjectType.OrbitalElement )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, orbitalElementStore, displayTagsStore, AstronomicalObjectType.OrbitalElement )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2305,7 +2305,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, displayTagsStore, satelliteStoreSort )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-#         treeViewColumn.connect( "clicked", self.onToggle, satelliteStore, AstronomicalObjectType.Satellite )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, displayTagsStore, AstronomicalObjectType.Satellite )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Satellite Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2796,14 +2796,41 @@ class IndicatorLunar:
         return translatedText
 
 
-    def onToggle( self, widget, dataStore, astronomicalObjectType ):
+#TODO Links!
+# http://python-gtk-3-tutorial.readthedocs.org/en/latest/button_widgets.html
+# http://lazka.github.io/pgi-docs/Gtk-3.0/classes/ListStore.html
+# http://lazka.github.io/pgi-docs/Gtk-3.0/structs/TreePath.html#Gtk.TreePath.new_from_indices
+# http://scentric.net/tutorial/sec-treemodel-rowref.html
+# http://stackoverflow.com/questions/2256243/in-gtk-whats-the-difference-between-a-treepath-and-a-treeiter
+# http://ruby-gnome2.sourceforge.jp/hiki.cgi?tut-treeview-model-reference
+# http://python-gtk-3-tutorial.readthedocs.org/en/latest/treeview.html
+
+
+
+#TODO This does not remove/add the data from the tags list!
+    def onColumnHeaderClick( self, widget, dataStore, displayTagsStore, astronomicalObjectType ):
+        path = ""
+        for i in range( len( dataStore ) ):
+            path += str( i ) + ":"
+
+        path = path[ 0 : -1 ] #TODO Is it possible to have an empty list but the column header is clicked making this call dangerous?
+        treePath = Gtk.TreePath.new_from_string( path )
+
         if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
             self.toggleOrbitalElementsTable = not self.toggleOrbitalElementsTable
             toggle = self.toggleOrbitalElementsTable
 
         elif astronomicalObjectType == AstronomicalObjectType.Planet:
+            iter = dataStore.get_iter_first()
+            while iter is not None:
+                print( type( dataStore[ iter ][ 0 ] ), dataStore[ iter ][ 0 ], dataStore[ iter ][ 1 ], dataStore[ iter ][ 2 ] )
+#                 print( type( bool( "True" ) ), type( bool( "False" ) ) )
+                dataStore[ iter ][ 0 ] = bool( not self.togglePlanetsTable )
+                print( type( dataStore[ iter ][ 0 ] ), dataStore[ iter ][ 0 ], dataStore[ iter ][ 1 ], dataStore[ iter ][ 2 ] )
+                iter = dataStore.iter_next( iter )
+
+            self.onPlanetToggled( widget, treePath, dataStore, displayTagsStore )
             self.togglePlanetsTable = not self.togglePlanetsTable
-            toggle = self.togglePlanetsTable
 
         elif astronomicalObjectType == AstronomicalObjectType.Satellite:
             self.toggleSatellitesTable = not self.toggleSatellitesTable
@@ -2813,8 +2840,10 @@ class IndicatorLunar:
             self.toggleStarsTable = not self.toggleStarsTable
             toggle = self.toggleStarsTable
 
-        for row in dataStore:
-            row[ 0 ] = toggle
+#         for row in dataStore:
+#             row[ 0 ] = toggle
+
+
 
 
     def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, orbitalElements, url ):
