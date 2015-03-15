@@ -3094,6 +3094,8 @@ class IndicatorLunar:
                             satelliteStoreSort,
                             displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
 
+
+#TODO Maybe put the tags as a global...runs very slowly when clicking the column header!        
         tags = [
             IndicatorLunar.DATA_RISE_AZIMUTH,
             IndicatorLunar.DATA_RISE_TIME,
