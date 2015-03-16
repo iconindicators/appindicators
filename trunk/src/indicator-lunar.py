@@ -2995,12 +2995,13 @@ class IndicatorLunar:
                 displayTagsStore.append( [ objectName + " " + tag, translatedTag + " " + IndicatorLunar.DATA_TAGS[ tag ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
         else: # Item has been unchecked, so remove.
-            iter = displayTagsStore.get_iter_first()
-            while iter is not None:
-                if displayTagsStore[ iter ][ 0 ].startswith( objectName ):
-                    if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
-                else:
-                    iter = displayTagsStore.iter_next( iter )
+            displayTagsStore.remove( displayTagsStore.get_iter_from_string( path ) )
+#             iter = displayTagsStore.get_iter_first()
+#             while iter is not None:
+#                 if displayTagsStore[ iter ][ 0 ].startswith( objectName ):
+#                     if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
+#                 else:
+#                     iter = displayTagsStore.iter_next( iter )
 
 
     def onPlanetToggled( self, widget, 
@@ -3044,7 +3045,7 @@ class IndicatorLunar:
             for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
                 moonStore = Gtk.ListStore( bool )
                 moonStore.append( [ not planetStore[ path ][ 0 ] ] ) # Create a bogus liststore using the same checkbox status of the planet before it was toggled.
-                self.onObjectToggled( moonName.upper(), displayTagsStore, tags, IndicatorLunar.PLANET_AND_MOON_TAGS[ moonName.upper() ], moonStore, 0 )
+                self.onObjectToggled( moonName.upper(), displayTagsStore, tags, IndicatorLunar.PLANET_AND_MOON_TAGS[ moonName.upper() ], moonStore, str( 0 ) )
 
 
     def onStarToggled( self, widget,
@@ -3083,7 +3084,7 @@ class IndicatorLunar:
 
         childPath = orbitalElementStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) ) # Convert sorted model index to underlying (child) model index.
         orbitalElementName = orbitalElementStore[ childPath ][ 1 ].upper()
-        self.onObjectToggled( orbitalElementName, displayTagsStore, tags, orbitalElementName, orbitalElementStore, childPath )
+        self.onObjectToggled( orbitalElementName, displayTagsStore, tags, orbitalElementName, orbitalElementStore, str( childPath ) )
 #TODO In the old code, the orbitalElementStore[ childPath ][ 0 ] was actually orbitalElementStore[ childPath ][ 1 ].
 #Seems to work...but keep an eye on it!
 
@@ -3105,7 +3106,7 @@ class IndicatorLunar:
 
         childPath = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) ) # Convert sorted model index to underlying (child) model index.
         satelliteNameNumber = satelliteStore[ childPath ][ 1 ].upper() + " " + satelliteStore[ childPath ][ 2 ]
-        self.onObjectToggled( satelliteNameNumber, displayTagsStore, tags, satelliteNameNumber, satelliteStore, childPath )
+        self.onObjectToggled( satelliteNameNumber, displayTagsStore, tags, satelliteNameNumber, satelliteStore, str( childPath ) )
 
 
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
