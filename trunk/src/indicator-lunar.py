@@ -1936,6 +1936,8 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 0, 1, 1 )
 
+        self.tagsAdded = [ ]
+        self.tagsRemoved = [ ]
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         for key in self.data.keys():
             if ( key[ 0 ], key[ 1 ] ) in self.satellites: # This key refers to a satellite.
@@ -2590,6 +2592,7 @@ class IndicatorLunar:
         # Some GUI elements will be hidden, which must be done after the dialog is shown.
         self.updateOrbitalElementPreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, self.orbitalElements, orbitalElementURLEntry.get_text().strip() )
         self.updateSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip() )
+        notebook.connect( "switch-page", self.onSwitchPage )
 
         while True:
             if self.dialog.run() != Gtk.ResponseType.OK: break
@@ -2716,6 +2719,11 @@ class IndicatorLunar:
         self.dialog = None
 
 
+    def onSwitchPage( self, notebook, page, pageNumber ):
+        if pageNumber == 0:
+            print( str( datetime.datetime.now() ) )
+
+
     # Refreshes the display tags with all data.
     # If the user has done a fetch of new satellite or orbital element data, the new data is added instead.
 #TODO Think about this method.
@@ -2804,9 +2812,6 @@ class IndicatorLunar:
 # http://stackoverflow.com/questions/2256243/in-gtk-whats-the-difference-between-a-treepath-and-a-treeiter
 # http://ruby-gnome2.sourceforge.jp/hiki.cgi?tut-treeview-model-reference
 # http://python-gtk-3-tutorial.readthedocs.org/en/latest/treeview.html
-
-
-
 
 
     def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, orbitalElements, url ):
@@ -3010,6 +3015,72 @@ class IndicatorLunar:
                          planetStoreSort, # Always None - used to make life easier in the toggle checkbox for all table headers.
                          displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
 
+        dataStore[ path ][ 0 ] = not dataStore[ path ][ 0 ]
+
+        tags = [
+            IndicatorLunar.DATA_ALTITUDE,
+            IndicatorLunar.DATA_AZIMUTH,
+            IndicatorLunar.DATA_BRIGHT_LIMB,
+            IndicatorLunar.DATA_CONSTELLATION,
+            IndicatorLunar.DATA_DECLINATION,
+            IndicatorLunar.DATA_DISTANCE_TO_EARTH,
+            IndicatorLunar.DATA_DISTANCE_TO_SUN,
+            IndicatorLunar.DATA_ILLUMINATION,
+            IndicatorLunar.DATA_MAGNITUDE,
+            IndicatorLunar.DATA_MESSAGE,
+            IndicatorLunar.DATA_RIGHT_ASCENSION,
+            IndicatorLunar.DATA_RISE_TIME,
+            IndicatorLunar.DATA_SET_TIME,
+            IndicatorLunar.DATA_TROPICAL_SIGN ]
+
+        planetName = planetStore[ path ][ 1 ].upper()
+
+        if dataStore[ path ][ 0 ]: # Item is checked so add to the display store.
+            for tag in tagList:
+                displayTagsStore.append( [ objectName + " " + tag, translatedTag + " " + IndicatorLunar.DATA_TAGS[ tag ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+
+        else: # Item has been unchecked, so remove.
+            displayTagsStore.remove( displayTagsStore.get_iter_from_string( path ) )
+#             iter = displayTagsStore.get_iter_first()
+#             while iter is not None:
+#                 if displayTagsStore[ iter ][ 0 ].startswith( objectName ):
+#                     if displayTagsStore.remove( iter ) == False: iter = None # Remove returns True if there are more items (and iter automatically moves to that item).
+#                 else:
+#                     iter = displayTagsStore.iter_next( iter )
+
+        
+        
+        self.onObjectToggled( planetName, displayTagsStore, tags, IndicatorLunar.PLANET_AND_MOON_TAGS[ planetName ], planetStore, path )
+
+        # Handle the planet's moons.
+        planetName = planetStore[ path ][ 1 ]
+        if planetName in IndicatorLunar.PLANET_MOONS:
+            tags = [
+                IndicatorLunar.DATA_ALTITUDE,
+                IndicatorLunar.DATA_AZIMUTH,
+                IndicatorLunar.DATA_DECLINATION,
+                IndicatorLunar.DATA_EARTH_VISIBLE,
+                IndicatorLunar.DATA_RIGHT_ASCENSION,
+                IndicatorLunar.DATA_X_OFFSET,
+                IndicatorLunar.DATA_Y_OFFSET,
+                IndicatorLunar.DATA_Z_OFFSET ]
+
+            for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
+                moonStore = Gtk.ListStore( bool )
+                moonStore.append( [ not planetStore[ path ][ 0 ] ] ) # Create a bogus liststore using the same checkbox status of the planet before it was toggled.
+                self.onObjectToggled( moonName.upper(), displayTagsStore, tags, IndicatorLunar.PLANET_AND_MOON_TAGS[ moonName.upper() ], moonStore, str( 0 ) )
+
+
+
+
+    def onPlanetToggledOLD( self, widget, 
+                         path, # Index to the selected row in the table. 
+                         planetStore, # List of lists, each sublist contains checked flag, planet name, translated planet name.
+                         planetStoreSort, # Always None - used to make life easier in the toggle checkbox for all table headers.
+                         displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
+        
+        if True: return
+            
         tags = [
             IndicatorLunar.DATA_ALTITUDE,
             IndicatorLunar.DATA_AZIMUTH,
