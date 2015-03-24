@@ -805,7 +805,8 @@ class IndicatorLunar:
         for key in self.data.keys():
             parsedOutput = parsedOutput.replace( "[" + " ".join( key ) + "]", self.data[ key ] )
 
-        self.createIcon( lunarIlluminationPercentage, self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), ephem.Moon( self.getCity( ephemNow ) ) ) )
+        brightLimbAngleWithoutDegreesSymbol = float( self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_BRIGHT_LIMB ) ][ : -1 ] )
+        self.createIcon( lunarIlluminationPercentage, brightLimbAngleWithoutDegreesSymbol )
         self.indicator.set_icon( self.getIconName() )
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
@@ -1779,6 +1780,8 @@ class IndicatorLunar:
         x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
         parallacticAngle = math.atan2( y, x )
 
+        if body.name == "Moon":
+            print( math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) ) )
         return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
