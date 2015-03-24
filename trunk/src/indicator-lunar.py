@@ -1598,14 +1598,17 @@ class IndicatorLunar:
 
     # Compute the right ascension, declination, azimuth and altitude for a body.
     def updateRightAscensionDeclinationAzimuthAltitude( self, body, dataTag ):
-        self.data[ ( dataTag, IndicatorLunar.DATA_RIGHT_ASCENSION ) ] = str( round( self.convertHoursMinutesSecondsToDecimalDegrees( body.g_ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.g_ra ) ) + ")"
+        # All data values are stored as radians.  When passing to str() the result is expressed in DD:MM:SS or HH:MM:SS.
 
-        direction = _( "N" )
-        if body.g_dec < 0.0: direction = _( "S" )
+        if body.g_dec < 0.0:
+            direction = _( "S" )
+        else:
+            direction = _( "N" )
 
-        self.data[ ( dataTag, IndicatorLunar.DATA_DECLINATION ) ] = str( abs( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.g_dec ), 2 ) ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.g_dec ) ) + ")"
-        self.data[ ( dataTag, IndicatorLunar.DATA_AZIMUTH ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
-        self.data[ ( dataTag, IndicatorLunar.DATA_ALTITUDE ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( body.alt ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
+        self.data[ ( dataTag, IndicatorLunar.DATA_RIGHT_ASCENSION ) ] = str( pythonutils.radiansToDegrees( body.ra ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.ra ) ) + ")"
+        self.data[ ( dataTag, IndicatorLunar.DATA_DECLINATION ) ] = str( pythonutils.radiansToDegrees( body.dec ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.dec ) ) + ")"
+        self.data[ ( dataTag, IndicatorLunar.DATA_AZIMUTH ) ] = str( pythonutils.radiansToDegrees( body.az ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
+        self.data[ ( dataTag, IndicatorLunar.DATA_ALTITUDE ) ] = str( pythonutils.radiansToDegrees( body.alt ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
 
 
     def updateEclipse( self, ephemNow, dataTag ):
@@ -1737,6 +1740,7 @@ class IndicatorLunar:
     #  http://futureboy.us/fsp/moon.fsp
     #
     # Other references...
+    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
     #  http://www.nightskynotebook.com/Moon.php
     #  http://www.calsky.com/cs.cgi/Moon/6
     #  http://www.calsky.com/cs.cgi/Sun/3
@@ -1746,7 +1750,6 @@ class IndicatorLunar:
     #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
-    #  http://web.archiveorange.com/archive/v/74jMQyHUOwbskBYwisCl
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     def getBrightLimbAngleRelativeToZenith( self, city, body ):
         sun = ephem.Sun( city )
@@ -2592,7 +2595,7 @@ class IndicatorLunar:
         # Some GUI elements will be hidden, which must be done after the dialog is shown.
         self.updateOrbitalElementPreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, self.orbitalElements, orbitalElementURLEntry.get_text().strip() )
         self.updateSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip() )
-        notebook.connect( "switch-page", self.onSwitchPage )
+        notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
 
         while True:
             if self.dialog.run() != Gtk.ResponseType.OK: break
@@ -2719,9 +2722,48 @@ class IndicatorLunar:
         self.dialog = None
 
 
-    def onSwitchPage( self, notebook, page, pageNumber ):
-        if pageNumber == 0:
-            print( str( datetime.datetime.now() ) )
+    def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
+        if pageNumber != 0:
+            return
+
+        displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
+        for key in self.data.keys():
+            if ( key[ 0 ], key[ 1 ] ) in self.tagsAdded: # Satellite key.
+                displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + key[ 1 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 2 ] ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+
+            elif ( key[ 0 ] ) in self.tagsAdded:
+                if ( key[ 0 ] ) in self.orbitalElements: # Orbital Element key.
+                    displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+                else: # All other data.
+                    displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_TAGS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+
+            elif ( key[ 0 ], key[ 1 ], ) in self.tagsRemoved or ( key[ 0 ], ) in self.tagsRemoved:
+                continue
+
+            elif ( key[ 0 ], key[ 1 ] ) in self.satellites: # This key refers to a satellite.
+                data = self.data[ key ]
+                if key[ 2 ] == IndicatorLunar.DATA_VISIBLE: # This data value is either True or False and needs to be translated.
+                    data = IndicatorLunar.TRUE_TEXT_TRANSLATION if data == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
+
+                displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + key[ 1 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 2 ] ], data ] )
+
+            elif ( key[ 0 ] ) in self.orbitalElements: # This key refers to an orbital element.
+                displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
+
+            elif key[ 1 ] == IndicatorLunar.DATA_CITY_NAME: # Special case: the city name data tag has no associated body tag.
+                displayTagsStore.append( [ key[ 1 ], IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
+
+            elif key[ 1 ] == IndicatorLunar.DATA_EARTH_VISIBLE: # Special case: the earth visible data is boolean and needs to be translated.
+                data = IndicatorLunar.TRUE_TEXT_TRANSLATION if self.data[ key ] == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
+                displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_TAGS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], data ] )
+
+            else: # Everything else...
+                displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_TAGS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
+
+#TODO Update the whole table...build from scratch,
+# adding tags from the add list and 
+# don't add tags in the remove list and
+# add remaing tags which are neither in the add nor remove lists.
 
 
     # Refreshes the display tags with all data.
@@ -3009,13 +3051,36 @@ class IndicatorLunar:
 #                     iter = displayTagsStore.iter_next( iter )
 
 
+    def addTag( self, objectName ):
+        print( type( objectName ))
+        print( objectName )
+        self.tagsAdded.append( objectName )
+        if objectName in self.tagsRemoved:
+            self.tagsRemoved.remove( objectName )
+
+
+    def removeTag( self, objectName ):
+        self.tagsRemoved.append( objectName )
+        if objectName in self.tagsAdded:
+            self.tagsAdded.remove( objectName )
+
+
     def onPlanetToggled( self, widget, 
                          path, # Index to the selected row in the table. 
                          planetStore, # List of lists, each sublist contains checked flag, planet name, translated planet name.
                          planetStoreSort, # Always None - used to make life easier in the toggle checkbox for all table headers.
                          displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
 
-        dataStore[ path ][ 0 ] = not dataStore[ path ][ 0 ]
+        planetStore[ path ][ 0 ] = not planetStore[ path ][ 0 ]
+
+        planetName = planetStore[ path ][ 1 ].upper()
+        if planetStore[ path ][ 0 ]:
+            self.addTag( ( planetName, ) )
+        else:
+            self.removeTag( ( planetName, ) )
+
+
+        if True: return
 
         tags = [
             IndicatorLunar.DATA_ALTITUDE,
@@ -3178,6 +3243,22 @@ class IndicatorLunar:
         childPath = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( path ) ) # Convert sorted model index to underlying (child) model index.
         satelliteNameNumber = satelliteStore[ childPath ][ 1 ].upper() + " " + satelliteStore[ childPath ][ 2 ]
         self.onObjectToggled( satelliteNameNumber, displayTagsStore, tags, satelliteNameNumber, satelliteStore, str( childPath ) )
+
+
+
+    def onPlanetToggled( self, widget, 
+                         path, # Index to the selected row in the table. 
+                         planetStore, # List of lists, each sublist contains checked flag, planet name, translated planet name.
+                         planetStoreSort, # Always None - used to make life easier in the toggle checkbox for all table headers.
+                         displayTagsStore ): # List of lists, each sublist contains the tag, translated tag, value.
+
+        planetStore[ path ][ 0 ] = not planetStore[ path ][ 0 ]
+
+        planetName = planetStore[ path ][ 1 ].upper()
+        if planetStore[ path ][ 0 ]:
+            self.addTag( ( planetName, ) )
+        else:
+            self.removeTag( ( planetName, ) )
 
 
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
