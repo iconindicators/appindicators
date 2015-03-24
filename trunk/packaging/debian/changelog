@@ -1,16 +1,16 @@
 indicator-lunar (1.0.58-1) precise; urgency=low
 
-  * Bug fix: The Tropical Sign tag was missing for stars in the Icon Text tag list.
-  * Bug fix: The planetary moons tags were missing in the Icon Text tag list.
+  * Bug fix: The Icon Text tag list in the Preferences dialog was missing the
+    Tropical Sign tag for stars and all planetary moons tags.
   * Bug fix: The Right Ascension value for all objects when displayed as
     degrees was incorrect.
   * Bug fix: The Bright Limb angle calculation was erroneous due to mixing of
     degrees and radians!
-  * For the Moon, added distance to Earth in kilometres.    
+  * Added distance to Earth in kilometres for the Moon's menu item.    
   * Added timeouts to the TLE/OE download.
   * Added caching of TLE/OE downloaded data to avoid over-taxing any
     particular data source.
-  * Removed outdated solar eclipse.
+  * Removed outdated eclipse data.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Mar 2015 10:11:04 +1000
 
