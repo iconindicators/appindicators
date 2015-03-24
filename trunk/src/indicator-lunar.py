@@ -132,6 +132,7 @@ class IndicatorLunar:
     DATA_DAWN = "DAWN"
     DATA_DECLINATION = "DECLINATION"
     DATA_DISTANCE_TO_EARTH = "DISTANCE TO EARTH"
+    DATA_DISTANCE_TO_EARTH_KM = "DISTANCE TO EARTH KM"
     DATA_DISTANCE_TO_SUN = "DISTANCE TO SUN"
     DATA_DUSK = "DUSK"
     DATA_EARTH_VISIBLE = "EARTH VISIBLE"
@@ -168,6 +169,7 @@ class IndicatorLunar:
         DATA_DAWN                       : _( "DAWN" ),
         DATA_DECLINATION                : _( "DECLINATION" ),
         DATA_DISTANCE_TO_EARTH          : _( "DISTANCE TO EARTH" ),
+        DATA_DISTANCE_TO_EARTH_KM       : _( "DISTANCE TO EARTH KM" ),
         DATA_DISTANCE_TO_SUN            : _( "DISTANCE TO SUN" ),
         DATA_DUSK                       : _( "DUSK" ),
         DATA_EARTH_VISIBLE              : _( "EARTH VISIBLE" ),
@@ -803,7 +805,7 @@ class IndicatorLunar:
         for key in self.data.keys():
             parsedOutput = parsedOutput.replace( "[" + " ".join( key ) + "]", self.data[ key ] )
 
-        self.createIcon( lunarIlluminationPercentage, self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), ephem.Moon( self.getCity( ephemNow ) ) ) )
+        self.createIcon( lunarIlluminationPercentage, self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), ephem.Moon( self.getCity( ephemNow ) ) ) )
         self.indicator.set_icon( self.getIconName() )
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
@@ -1082,6 +1084,9 @@ class IndicatorLunar:
            astronomicalObjectType == AstronomicalObjectType.Sun:
             subMenu.append( Gtk.MenuItem( _( "Tropical Sign: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] ) )
 
+        if astronomicalObjectType == AstronomicalObjectType.Moon:
+            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM ) ] ) )
+
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
            astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
            astronomicalObjectType == AstronomicalObjectType.Planet or \
@@ -1315,6 +1320,13 @@ class IndicatorLunar:
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
+    # http://futureboy.us/fsp/moon.fsp
+    # http://www.geoastro.de/moondata/index.html
+    # http://www.geoastro.de/SME/index.htm
+    # http://www.geoastro.de/elevazmoon/index.htm
+    # http://www.geoastro.de/altazsunmoon/index.htm
+    # http://www.geoastro.de/sundata/index.html
+    # http://www.satellite-calculations.com/Satellite/suncalc.htm
     def updateMoon( self, ephemNow, lunarPhase ):
         if self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow ):
 
@@ -1334,6 +1346,11 @@ class IndicatorLunar:
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     # http://www.ga.gov.au/geodesy/astro/sunrise.jsp
+    # http://www.geoastro.de/elevaz/index.htm
+    # http://www.geoastro.de/SME/index.htm
+    # http://www.geoastro.de/altazsunmoon/index.htm
+    # http://futureboy.us/fsp/sun.fsp
+    # http://www.satellite-calculations.com/Satellite/suncalc.htm
     def updateSun( self, ephemNow ):
         city = self.getCity( ephemNow )
         sun = ephem.Sun( city )
@@ -1442,6 +1459,9 @@ class IndicatorLunar:
             if astronomicalObjectType != AstronomicalObjectType.OrbitalElement:
                 self.data[ ( dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( body, ephemNow )
 
+            if astronomicalObjectType == AstronomicalObjectType.Moon:
+                self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM ) ] = str( round( body.earth_distance * 149597871, 2 ) ) + " " + _( "km" )
+
             if astronomicalObjectType == AstronomicalObjectType.Moon or \
                astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
                astronomicalObjectType == AstronomicalObjectType.Planet or \
@@ -1454,7 +1474,7 @@ class IndicatorLunar:
                 self.data[ ( dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] = str( round( body.sun_distance, 4 ) ) + " " + _( "ua" )
 
             if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
-                self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] = str( round( self.getBrightLimbAngleRelativeToZenith( self.getCity( ephemNow ), body ) ) ) + "°"
+                self.data[ ( dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] = str( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), body ) ) ) + "°"
 
             self.updateRightAscensionDeclinationAzimuthAltitude( body, dataTag )
 
@@ -1502,8 +1522,8 @@ class IndicatorLunar:
             except ValueError:
                 if satellite.circumpolar:
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR
-                    self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( satellite.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satellite.az ) ) + ")"
-                    self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( satellite.dec ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satellite.dec ) ) + ")"
+                    self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( round( math.degrees( satellite.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satellite.az ) ) + ")"
+                    self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] = str( round( math.degrees( satellite.dec ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( satellite.dec ) ) + ")"
                 elif satellite.neverup:
                     message = IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES
                 else:
@@ -1533,9 +1553,9 @@ class IndicatorLunar:
 
             # The pass is visible and the user wants only visible passes OR the user wants any pass...
             self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = self.localiseAndTrim( nextPass[ 0 ] )
-            self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
+            self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = str( round( math.degrees( nextPass[ 1 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 1 ] ) ) + ")"
             self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = self.localiseAndTrim( nextPass[ 4 ] )
-            self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( self.convertDegreesMinutesSecondsToDecimalDegrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
+            self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( math.degrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
             self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible ) # Put this in as it's likely needed in the notification.
 
             self.nextUpdates.append( nextPass[ 4 ] )
@@ -1598,17 +1618,16 @@ class IndicatorLunar:
 
     # Compute the right ascension, declination, azimuth and altitude for a body.
     def updateRightAscensionDeclinationAzimuthAltitude( self, body, dataTag ):
-        # All data values are stored as radians.  When passing to str() the result is expressed in DD:MM:SS or HH:MM:SS.
-
-        if body.g_dec < 0.0:
+        if body.dec < 0.0:
             direction = _( "S" )
         else:
             direction = _( "N" )
 
-        self.data[ ( dataTag, IndicatorLunar.DATA_RIGHT_ASCENSION ) ] = str( pythonutils.radiansToDegrees( body.ra ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.ra ) ) + ")"
-        self.data[ ( dataTag, IndicatorLunar.DATA_DECLINATION ) ] = str( pythonutils.radiansToDegrees( body.dec ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.dec ) ) + ")"
-        self.data[ ( dataTag, IndicatorLunar.DATA_AZIMUTH ) ] = str( pythonutils.radiansToDegrees( body.az ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
-        self.data[ ( dataTag, IndicatorLunar.DATA_ALTITUDE ) ] = str( pythonutils.radiansToDegrees( body.alt ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
+        # All data values are stored as radians.  When passing to str() the result is expressed in DD:MM:SS or HH:MM:SS.
+        self.data[ ( dataTag, IndicatorLunar.DATA_RIGHT_ASCENSION ) ] = str( round( math.degrees( body.ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.ra ) ) + ")"
+        self.data[ ( dataTag, IndicatorLunar.DATA_DECLINATION ) ] = str( round( math.degrees( body.dec ), 2 ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.dec ) ) + ")"
+        self.data[ ( dataTag, IndicatorLunar.DATA_AZIMUTH ) ] = str( round( math.degrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
+        self.data[ ( dataTag, IndicatorLunar.DATA_ALTITUDE ) ] = str( round( math.degrees( body.alt ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
 
 
     def updateEclipse( self, ephemNow, dataTag ):
@@ -1729,11 +1748,11 @@ class IndicatorLunar:
         return bodyCopy
 
 
-    # Compute the bright limb angle (relative to zenith) between the sun and a planetary bodyCopy.
+    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body.
     # Measured in degrees counter clockwise from a positive y axis.
     #
     # References:
-    #  'Astronomical Algorithms' by Jean Meeus (chapters 14 and 48).
+    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
     #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
     #  http://www.geoastro.de/moonlibration/
     #  http://www.geoastro.de/SME/
@@ -1741,52 +1760,26 @@ class IndicatorLunar:
     #
     # Other references...
     #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
-    #  http://www.nightskynotebook.com/Moon.php
-    #  http://www.calsky.com/cs.cgi/Moon/6
-    #  http://www.calsky.com/cs.cgi/Sun/3
-    #  https://github.com/soniakeys/meeus
-    #  http://godoc.org/github.com/soniakeys/meeus
     #  https://sites.google.com/site/astronomicalalgorithms
     #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
-    #  https://github.com/brandon-rhodes/pyephem/issues/24
-    def getBrightLimbAngleRelativeToZenith( self, city, body ):
+    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
+    def getZenithAngleOfBrightLimb( self, city, body ):
         sun = ephem.Sun( city )
 
-        # Using the Apparent Geocentric Position as this is closest to the Meeus example 25.a for RA/Dec.
-        sunRA = math.radians( self.convertHoursMinutesSecondsToDecimalDegrees( sun.g_ra ) )
-        sunDec = math.radians( self.convertDegreesMinutesSecondsToDecimalDegrees( sun.g_dec ) )
-        bodyRA = math.radians( self.convertHoursMinutesSecondsToDecimalDegrees( body.g_ra ) )
-        bodyDec = math.radians( self.convertDegreesMinutesSecondsToDecimalDegrees( body.g_dec ) )
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+        y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
+        x = math.cos( body.dec ) * math.sin( sun.dec ) - math.sin( body.dec ) * math.cos( sun.dec ) * math.cos( sun.ra - body.ra )
+        positionAngleOfBrightLimb = math.atan2( y, x )
 
-        y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
-        x = math.cos( bodyDec ) * math.sin( sunDec ) - math.sin( bodyDec ) * math.cos( sunDec ) * math.cos( sunRA - bodyRA )
-        brightLimbAngle = math.degrees( math.atan2( y, x ) )
-
-        hourAngle = math.radians( self.convertHoursMinutesSecondsToDecimalDegrees( city.sidereal_time() ) ) - bodyRA
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation  48.5
+        hourAngle = city.sidereal_time() - body.ra
         y = math.sin( hourAngle )
-        x = math.tan( math.radians( self.convertDegreesMinutesSecondsToDecimalDegrees( city.lat ) ) ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
-        parallacticAngle = math.degrees( math.atan2( y, x ) )
+        x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+        parallacticAngle = math.atan2( y, x )
 
-        zenithAngle = brightLimbAngle - parallacticAngle
-        if zenithAngle < 0.0: zenithAngle += 360.0
-
-        return zenithAngle
-
-
-    def convertHoursMinutesSecondsToDecimalDegrees( self, hms ):
-        t = tuple( str( hms ).split( ":" ) )
-        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) ) * 15.0
-        y = float( t[ 0 ] )
-        return math.copysign( x, y )
-
-
-    def convertDegreesMinutesSecondsToDecimalDegrees( self, dms ):
-        t = tuple( str( dms ).split( ":" ) )
-        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
-        y = float( t[ 0 ] )
-        return math.copysign( x, y )
+        return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
     # Used to instantiate a new city object/observer.
