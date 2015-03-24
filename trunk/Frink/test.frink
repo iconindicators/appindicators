@@ -11,175 +11,85 @@
 use sun.frink
 
 
-sunRA[]
-sunDec[]
-moonRA[]
-moonDec[]
-//calculateMoonPositionAngleRelativeToZenithUsingEval[]
-calculateMoonPositionAngleRelativeToZenithUsingLatLong[]
+// Observer position, etc.
+lat = -33 degree
+long = -151 degree
+now = now[]
 
 
-// There are some strange results - I've commented on each at the relevant section.
-// RA should be positive and less than 2 pi...so shouldn't sunApparentRADecl[] do the "mod 2 pi" internally?
-// Regardless, RA from Frink and PyEphem don't match (for example -269 degrees versus -256 degrees).
-sunRA[] :=
-{
-	[ alpha0, delta0 ] = sunApparentRADecl[ now[] ]
+// Compare against
+//	http://www.geoastro.de/elevaz/index.htm
+//	http://www.satellite-calculations.com/Satellite/suncalc.htm
+[ ra, dec ] = sunApparentRADecl[ now ]
+println[ "Sun RA " + ra + " radians" ]
+println[ "Sun RA " + ( ra -> degrees ) + " degrees" ]
+println[]
+println[ "Sun Dec " + dec + " radians" ]
+println[ "Sun Dec " + ( dec -> degrees ) + " degrees" ]
+println[]
 
-	// These results are close to Ephem/PyEphem...
-	println[ "sunRA " + alpha0 ]
-	println[ "sunRA " + ( alpha0 -> degrees ) + " degrees" ]
-	println[ "sunRA " + ( ( alpha0 mod ( 2 pi radians ) ) -> degrees ) + " degrees (corrected)" ]
-
-
-	// This causes an "Error: Unsupported type in comparison ( < ):"
-//	if ( alpha0 -> degrees ) < 0.0 degrees
-//		println[ "sunRA " + ( ( alpha0 -> degrees ) + 360.0 ) + " degrees" ]
-
-
-	// This causes an "Error: Unsupported type in comparison ( < ):"
-//	a = ( alpha0 -> degrees )
-//	if a < 0.0 then a = a + 360.0
-//	println[ "sunRA " + a + " degrees" ]
+[ az, alt ] = airlessSunAzimuthAltitude[ now, lat, long ]
+println[ "Sun Az " + ( az + 180 degrees ) mod circle + " radians" ]
+println[ "Sun Az " + ( ( ( az + 180 degrees ) mod circle ) -> degrees ) + " degrees" ]
+println[]
+println[ "Sun Alt " + alt + " radians" ]
+println[ "Sun Alt " + ( alt -> degrees ) + " degrees" ]
+println[]
 
 
-	// No error here, but the value for degrees does not match the corrected value above!
-	a = alpha0 degrees // I assume this is the shorthand for converting to degrees?
-	if a < 0.0 then a = a + 360.0
-	println[ "sunRA " + a + " degrees (corrected)" ]
+positionAngleOfBrightLimb = moonPositionAngle[ now ]
+[ra, dec ] = moonApparentRADecl[ now ]
+parallacticAngle = parallacticAngle[ now, lat, long, ra, dec ]
+zenithAngleOfBrightLimb = moonPositionAngleRelativeToZenith[ now, lat, long ] mod circle
+
+println[ "Position angle of bright limb " + positionAngleOfBrightLimb ]
+println[ "Parallactic angle " + parallacticAngle ]
+println[ "Zenith Angle of Bright Limb (degrees) " + ( zenithAngleOfBrightLimb -> degrees ) ]  
 
 
-	// Took a wild guess and reversed the direction...crazy thing worked!
-	// At least the result is consistent with the previous (corrected) result one (but still doesn't match the original corrected value).
-	( alpha0 degrees ) -> a // I assume this is the shorthand for converting to degrees?
-	if a < 0.0 then a = a + 360.0
-	println[ "sunRA " + a + " degrees (corrected)" ]
-}
+// Compare against the following Python script...
+/*
+import ephem, math
 
+# RA/Dec - independent of the observer.
+# Compare against
+#    http://www.geoastro.de/elevaz/index.htm
+#    http://www.satellite-calculations.com/Satellite/suncalc.htm
+city = ephem.Observer()
+city.lon = '151'
+city.lat = '-33'
+city.elevation = 0
+city.date = ephem.now()
+sun = ephem.Sun( city )
+body = ephem.Moon( city )
 
-// The declination checks out (matches PyEphem)...but then I didn't do any comparison (< >) nor arithmetic.
-sunDec[] :=
-{
-	[ alpha0, delta0 ] = sunApparentRADecl[ now[] ]
+print( "Sun RA", sun.ra + 0, "radians" ) # Adding a dummy zero turns the value into a float giving the decimal value.
+print( "Sun RA", sun.ra / math.pi * 180, "degrees" )
+print( "Sun RA", sun.ra, "HMS" )
+print()
+print( "Sun Dec", sun.dec + 0, "radians" ) # Adding a dummy zero turns the value into a float giving the decimal value.
+print( "Sun Dec", sun.dec / math.pi * 180, "degrees" )
+print( "Sun Dec", sun.dec, "DMS" )
+print()
 
-	println[ "sunDec " + delta0 ]
-	println[ "sunDec " + ( delta0 -> degrees ) + " degrees" ]
+print( "Sun Az", sun.az + 0, "radians" ) # Adding a dummy zero turns the value into a float giving the decimal value.
+print( "Sun Az", sun.az / math.pi * 180, "degrees" )
+print( "Sun Az", sun.az, "HMS" )
+print()
+print( "Sun Alt", sun.alt + 0, "radians" ) # Adding a dummy zero turns the value into a float giving the decimal value.
+print( "Sun Alt", sun.alt / math.pi * 180, "degrees" )
+print( "Sun Alt", sun.alt, "DMS" )
 
-	d = ( delta0 -> degrees )
-	println[ "sunDec " + d ]
+y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
+x = math.cos( body.dec ) * math.sin( sun.dec ) - math.sin( body.dec ) * math.cos( sun.dec ) * math.cos( sun.ra - body.ra )
+positionAngleOfBrightLimb = math.atan2( y, x )
 
-	( delta0 degrees ) -> d
-	println[ "sunDec " + d ]
-}
+hourAngle = city.sidereal_time() - body.ra
+y = math.sin( hourAngle )
+x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+parallacticAngle = math.atan2( y, x )
 
-
-// As with the sun RA, the moon RA from Frink and PyEphem don't quite match (for example 133 degrees versus 121 degrees).
-moonRA[] :=
-{
-	[ alpha, delta ] = moonApparentRADecl[ now[] ]
-
-	// These results are close to Ephem/PyEphem...
-	println[ "moonRA " + alpha ]
-	println[ "moonRA " + ( alpha -> degrees ) + " degrees" ]
-	println[ "moonRA " + ( ( alpha mod ( 2 pi radians ) ) -> degrees ) + " degrees (corrected)" ]
-}
-
-
-// Again, as with the sun, the moon declination checks out.
-moonDec[] :=
-{
-	[ alpha, delta ] = moonApparentRADecl[ now[] ]
-
-	println[ "moonDec " + delta ]
-	println[ "moonDec " + ( delta -> degrees ) + " degrees" ]
-
-	d = ( delta -> degrees )
-	println[ "moonDec " + d ]
-
-	( delta degrees ) -> d
-	println[ "moonDec " + d ]
-}
-
-
-// Reproduce what happens in http://futureboy.us/fsp/highlight.fsp?f=moon.fsp
-// Results in an exception
-//		SingleArgNumericFunction: Bad argument: -0.7696308093500552147 + -0.017453292519943295767 1 151.20699 in calculatemoonPositionAngleRelativeToZenithUsingEval[]
-// I understand that the latNum/longNum are 3 values when printed (and hence this exception)...
-// ..but I don't understand why this doesn't happen in the webpage as it's essentially the same code!
-calculateMoonPositionAngleRelativeToZenithUsingEval[] :=
-{
-	latitude = "33.867487"
-	latHemi = "-1"
-	latNum = eval[ "latitude * latHemi" ] degree
-	println[ "latNum " + latNum ]
-
-	longitude = "151.20699"
-	longHemi = "1"
-	longNum = eval[ "longitude * longHemi" ] degree
-	println[ "longNum " + longNum ]
-
-	limb = moonPositionAngleRelativeToZenith[ now[], latNum, longNum ] mod circle
-	clockwiseLimb = 360 degrees - limb
-
-	println[ "limb " + limb ]
-	println[ "clockwiseLimb " + clockwiseLimb ]
-}
-
-
-// Given the exception when calling calculatemoonPositionAngleRelativeToZenithUsingEval[]
-// simplify as much as possible...
-// The value calculated here and on moon.fsp do not match, for example limb degrees = 314 versus limb degrees = 349 - why? 
-calculateMoonPositionAngleRelativeToZenithUsingLatLong[] :=
-{
-	latitude = -33.867487 degrees
-	println[ "latitude " + latitude ]
-
-	longitude = 151.20699 degrees
-	println[ "longitude " + longitude ]
-
-	limb = moonPositionAngleRelativeToZenith[ now[], latitude, longitude ] mod circle
-	println[ "limb " + limb ]
-	println[ "limb (degrees) " + ( limb -> degrees ) ]
-
-	clockwiseLimb = 360 degrees - limb
-	println[ "clockwiseLimb " + clockwiseLimb ]
-	println[ "clockwiseLimb (degrees) " + ( clockwiseLimb -> degrees ) ]
-}
-
-
-// When the above stuff is sorted...can then proceed to work out the bright limb stuff!
-stuff[] :=
-{
-	// Sydney, Australia
-	latitude = -33.867487
-	longitude = 151.20699
-	
-	// Need to setDefaultTimezone[ "UTC" ]?
-	currentDateTime = now[]
-	
-	[ alpha0, delta0 ] = sunApparentRADecl[ currentDateTime ]
-	println[ "sunRA " + alpha0 ] degree
-	println[ "sunDec " + delta0 ]
-	
-	[alpha, delta] = moonApparentRADecl[ currentDateTime ]
-	println[ "moonRA " + alpha ]
-	println[ "moonDec " + delta ]
-	
-	moonPositionAngle = arctan[ cos[ delta0 ] sin[ alpha0 - alpha ], sin[ delta0 ] cos[ delta ] - cos[ delta0 ] sin[ delta ] cos[ alpha0 - alpha ] ]
-	println[ "moonPositionAngle " + moonPositionAngle ]
-	
-	hourAngle = hourAngle[ currentDateTime, longitude, alpha ]
-	println[ "hourAngle " + hourAngle ]
-	
-	parallacticAngle = arctan[ sin[ hourAngle ], tan[ latitude ] cos[ delta ] - sin[ delta ] cos[ hourAngle ] ]
-	println[ "parallacticAngle " + parallacticAngle ]
-	
-	moonPositionAngleRelativeToZenith = moonPositionAngle - parallacticAngle
-	println[ "moonPositionAngleRelativeToZenith " + moonPositionAngleRelativeToZenith ]
-	
-	mparz = moonPositionAngleRelativeToZenith[ currentDateTime, latitude, longitude ]
-	println[ "moonPositionAngleRelativeToZenith " + mparz ]
-	
-	mparz = mparz -> degrees
-	println[ "moonPositionAngleRelativeToZenith " + mparz ]
-}
+print( "Position Angle of Bright Limb", positionAngleOfBrightLimb )
+print( "Parallactic Angle", parallacticAngle )
+print( "Zenith Angle of Bright Limb (degrees)", math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) ) )
+*/
