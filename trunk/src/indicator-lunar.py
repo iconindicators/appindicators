@@ -33,6 +33,12 @@
 #  http://lazka.github.io/pgi-docs
 
 
+#TODO Remove print statements.
+
+
+#TODO Work out, not during satellite season, how often updates occur.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -727,6 +733,7 @@ class IndicatorLunar:
 
 
     def updateBackend( self ):
+        print( "updateBackend - start ", datetime.datetime.now() )
         if not self.lock.acquire( False ): return
 
         self.toggleIconState()
@@ -734,7 +741,7 @@ class IndicatorLunar:
         self.updateSatelliteTLEData() 
 
         # Reset data on each update...
-        self.data = { } # Must reset the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
+        self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).
         self.data[ ( "", IndicatorLunar.DATA_CITY_NAME ) ] = self.cityName # Need to add a dummy "" as a second element to the list to match the format of all other data.
         self.nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
 
@@ -751,9 +758,11 @@ class IndicatorLunar:
         self.updateSatellites( ephemNow ) 
 
         GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
+#         print( "updateBackend - end   ", datetime.datetime.now() )
 
 
     def updateFrontend( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
+#         print( "updateFrontend - start", datetime.datetime.now() )
         self.updateMenu( ephemNow, lunarPhase )
         self.updateIcon( ephemNow, lunarIlluminationPercentage )
         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
@@ -768,8 +777,12 @@ class IndicatorLunar:
         elif nextUpdateInSeconds > ( 60 * 60 ):
             nextUpdateInSeconds = ( 60 * 60 )
 
+#TODO The frequent updates, even without satellites, slow down or even lock up the indicator panel at times.
+        nextUpdateInSeconds = 6000
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
+        print( "updateFrontend - end  ", datetime.datetime.now() )
+        print()
 
 
     def updateMenu( self, ephemNow, lunarPhase ):
@@ -780,7 +793,7 @@ class IndicatorLunar:
         self.updatePlanetsMenu( menu )
         self.updateStarsMenu( menu )
         self.updateOrbitalElementsMenu( menu )
-        self.updateSatellitesMenu( menu )
+#         self.updateSatellitesMenu( menu )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -899,6 +912,11 @@ class IndicatorLunar:
 
 
     def updateMoonMenu( self, menu ):
+        messageKey = ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_MESSAGE )
+        if messageKey in self.data and self.data[ messageKey ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP:
+            return
+
+
         if ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_MESSAGE ) in self.data or \
            ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_RISE_TIME ) in self.data:
 
@@ -1427,7 +1445,7 @@ class IndicatorLunar:
     # Calculates common items such as rise/set, illumination, constellation, magnitude, tropical sign, distance to earth/sun, bright limb angle.
     # Returns
     #    True if all calculations were performed (the body either rises/sets or is always up).
-    #    False if the body never rises, informing the caller that perhaps subsequent calculations should be aborted.
+    #    False if the body never rises, informing the caller that perhaps subsequent calculations chould be aborted.
     def updateCommon( self, body, astronomicalObjectType, dataTag, ephemNow ):
         continueCalculations = True
         try:
@@ -1758,6 +1776,7 @@ class IndicatorLunar:
     #  http://www.geoastro.de/moonlibration/
     #  http://www.geoastro.de/SME/
     #  http://futureboy.us/fsp/moon.fsp
+    #  http://www.timeanddate.com/moon/australia/sydney
     #
     # Other references...
     #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
@@ -1780,8 +1799,6 @@ class IndicatorLunar:
         x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
         parallacticAngle = math.atan2( y, x )
 
-        if body.name == "Moon":
-            print( math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) ) )
         return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
