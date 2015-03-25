@@ -36,9 +36,6 @@
 #TODO Remove print statements.
 
 
-#TODO Work out, not during satellite season, how often updates occur.
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -705,7 +702,8 @@ class IndicatorLunar:
         self.toggleSatellitesTable = False
         self.toggleStarsTable = False
 
-        if not os.path.exists( IndicatorLunar.CACHE_PATH ): os.makedirs( IndicatorLunar.CACHE_PATH )
+        if not os.path.exists( IndicatorLunar.CACHE_PATH ):
+            os.makedirs( IndicatorLunar.CACHE_PATH )
 
         GObject.threads_init()
         self.lock = threading.Lock()
@@ -734,7 +732,8 @@ class IndicatorLunar:
 
     def updateBackend( self ):
         print( "updateBackend - start ", datetime.datetime.now() )
-        if not self.lock.acquire( False ): return
+        if not self.lock.acquire( False ):
+            return
 
         self.toggleIconState()
         self.updateOrbitalElementData()
@@ -773,7 +772,7 @@ class IndicatorLunar:
 
         # Ensure the update period is positive, at most every minute and at least every hour.
         if nextUpdateInSeconds < 60:
-            nextUpdateInSeconds = 60
+            nextUpdateInSeconds = 60 # TODO Maybe make this 120 seconds?  Will this compromise the satellite stuff too much?
         elif nextUpdateInSeconds > ( 60 * 60 ):
             nextUpdateInSeconds = ( 60 * 60 )
 
@@ -825,19 +824,23 @@ class IndicatorLunar:
 
 
     def fullMoonNotification( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
-        if not self.showWerewolfWarning: return
+        if not self.showWerewolfWarning:
+            return
 
-        if lunarIlluminationPercentage < self.werewolfWarningStartIlluminationPercentage: return
+        if lunarIlluminationPercentage < self.werewolfWarningStartIlluminationPercentage:
+            return
 
-        if ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) > ephemNow ): return
+        if ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) > ephemNow ):
+            return
 
         phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
-            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
-            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
-            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
-            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
+                                            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
+                                            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
+                                            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
+                                            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-        if not phaseIsBetweenNewAndFullInclusive: return
+        if not phaseIsBetweenNewAndFullInclusive:
+            return
 
         summary = self.werewolfWarningSummary
         if self.werewolfWarningSummary == "":
@@ -848,13 +851,14 @@ class IndicatorLunar:
 
 
     def satelliteNotification( self, ephemNow ):
-        if not self.showSatelliteNotification: return
+        if not self.showSatelliteNotification:
+            return
 
         # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
         satelliteNameNumberRiseTimes = [ ]
         for key in self.satellites:
             if ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.data: # Assume all other information is present!
-                satelliteNameNumberRiseTimes.append( [ key, self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
+               satelliteNameNumberRiseTimes.append( [ key, self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
 
         if self.satellitesSortByDateTime:
             satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 1 ], x[ 0 ] ) )
@@ -896,7 +900,8 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, visibleText )
 
-            if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
+            if summary == "":
+                summary = " " # The notification summary text must not be empty (at least on Unity).
 
             message = self.satelliteNotificationMessage. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
@@ -913,10 +918,9 @@ class IndicatorLunar:
 
     def updateMoonMenu( self, menu, hideIfNeverUp ):
         messageKey = ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_MESSAGE )
-        abort = \
-            hideIfNeverUp and \
-            messageKey in self.data and \
-            self.data[ messageKey ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP
+        abort = hideIfNeverUp and \
+                messageKey in self.data and \
+                self.data[ messageKey ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
         if not abort:
             menuItem = Gtk.MenuItem( _( "Moon" ) )
@@ -945,10 +949,9 @@ class IndicatorLunar:
 
     def updateSunMenu( self, menu, hideIfNeverUp ):
         messageKey = ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_MESSAGE )
-        abort = \
-            hideIfNeverUp and \
-            messageKey in self.data and \
-            self.data[ messageKey ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP
+        abort = hideIfNeverUp and \
+                messageKey in self.data and \
+                self.data[ messageKey ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
         if not abort:
             menuItem = Gtk.MenuItem( _( "Sun" ) )
@@ -1019,8 +1022,10 @@ class IndicatorLunar:
             self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, dataTag )
             subMenu.append( Gtk.SeparatorMenuItem() )
 
-            text = IndicatorLunar.TRUE_TEXT_TRANSLATION if self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
-            subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + text ) )
+            if self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] == IndicatorLunar.TRUE_TEXT:
+                subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + IndicatorLunar.TRUE_TEXT_TRANSLATION ) )
+            else:
+                subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + IndicatorLunar.FALSE_TEXT_TRANSLATION ) )
 
             subMenu.append( Gtk.SeparatorMenuItem() )
 
@@ -1247,7 +1252,8 @@ class IndicatorLunar:
             replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteTLE.getNumber() ). \
             replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, satelliteTLE.getInternationalDesignator() )
 
-        if len( url ) > 0: webbrowser.open( url )
+        if len( url ) > 0:
+            webbrowser.open( url )
 
 
     def updateRightAscensionDeclinationAzimuthAltitudeMenu( self, menu, dataTag ):
@@ -1609,24 +1615,27 @@ class IndicatorLunar:
             satellite.compute( city )
             try:
                 nextPass = city.next_pass( satellite )
-                if not self.isSatellitePassValid( nextPass ): return None # Unlikely to happen but better to be safe!
+                if not self.isSatellitePassValid( nextPass ):
+                    return None # Unlikely to happen but better to be safe!
 
-                if nextPass[ 0 ] < nextPass[ 4 ]: return nextPass
+                if nextPass[ 0 ] < nextPass[ 4 ]:
+                    return nextPass
 
                 currentDateTime = ephem.Date( currentDateTime - ephem.minute )
 
-            except: return None # This should never happen as the satellite has a rise and set (is not circumpolar or never up).
+            except:
+                return None # This should never happen as the satellite has a rise and set (is not circumpolar or never up).
 
 
     def isSatellitePassValid( self, satellitePass ):
         return satellitePass is not None and \
-            len( satellitePass ) == 6 and \
-            satellitePass[ 0 ] is not None and \
-            satellitePass[ 1 ] is not None and \
-            satellitePass[ 2 ] is not None and \
-            satellitePass[ 3 ] is not None and \
-            satellitePass[ 4 ] is not None and \
-            satellitePass[ 5 ] is not None
+               len( satellitePass ) == 6 and \
+               satellitePass[ 0 ] is not None and \
+               satellitePass[ 1 ] is not None and \
+               satellitePass[ 2 ] is not None and \
+               satellitePass[ 3 ] is not None and \
+               satellitePass[ 4 ] is not None and \
+               satellitePass[ 5 ] is not None
 
 
     # Determine if a satellite pass is visible or not...
@@ -1642,7 +1651,9 @@ class IndicatorLunar:
         sun = ephem.Sun()
         sun.compute( city )
 
-        return ( satellite.eclipsed is False ) and ( sun.alt > ephem.degrees( "-18" ) ) and ( sun.alt < ephem.degrees( "-6" ) )
+        return ( satellite.eclipsed is False ) and \
+               ( sun.alt > ephem.degrees( "-18" ) ) and \
+               ( sun.alt < ephem.degrees( "-6" ) )
 
 
     # Compute the right ascension, declination, azimuth and altitude for a body.
@@ -1762,16 +1773,16 @@ class IndicatorLunar:
         bodyName = body.name
         bodyCopy = None
 
-        if bodyName == "Sun": bodyCopy = ephem.Sun()
-        elif bodyName == "Moon": bodyCopy = ephem.Moon()
-        elif bodyName == "Mercury": bodyCopy = ephem.Mercury()
-        elif bodyName == "Venus": bodyCopy = ephem.Venus()
-        elif bodyName == "Mars": bodyCopy = ephem.Mars()
-        elif bodyName == "Jupiter": bodyCopy = ephem.Jupiter()
-        elif bodyName == "Saturn": bodyCopy = ephem.Saturn()
-        elif bodyName == "Uranus": bodyCopy = ephem.Uranus()
-        elif bodyName == "Neptune": bodyCopy = ephem.Neptune()
-        elif bodyName == "Pluto": bodyCopy = ephem.Pluto()
+        if    bodyName == "Sun": bodyCopy = ephem.Sun()
+        elif  bodyName == "Moon": bodyCopy = ephem.Moon()
+        elif  bodyName == "Mercury": bodyCopy = ephem.Mercury()
+        elif  bodyName == "Venus": bodyCopy = ephem.Venus()
+        elif  bodyName == "Mars": bodyCopy = ephem.Mars()
+        elif  bodyName == "Jupiter": bodyCopy = ephem.Jupiter()
+        elif  bodyName == "Saturn": bodyCopy = ephem.Saturn()
+        elif  bodyName == "Uranus": bodyCopy = ephem.Uranus()
+        elif  bodyName == "Neptune": bodyCopy = ephem.Neptune()
+        elif  bodyName == "Pluto": bodyCopy = ephem.Pluto()
         else: bodyCopy = ephem.star( bodyName ) # If not the sun/moon/planet, assume a star.
 
         return bodyCopy
@@ -1816,7 +1827,9 @@ class IndicatorLunar:
     # Typically after calculations (or exceptions) the city date is altered.
     def getCity( self, date = None ):
         city = ephem.city( self.cityName )
-        if date is not None: city.date = date
+        if date is not None:
+            city.date = date
+
         return city
 
 
@@ -1843,7 +1856,6 @@ class IndicatorLunar:
 
         else:
             svgStart = '<path d="M ' + str( width / 2 ) + ' ' + str( height / 2 ) + ' h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0'
-
             svgEnd = ' transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="' + pythonutils.getColourForIconTheme() + '" />'
 
             if illuminationPercentage == 50: # Quarter
@@ -1854,8 +1866,8 @@ class IndicatorLunar:
                 svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( illuminationPercentage - 50 ) / 50.0 * radius ) + ' 0 1 1 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd
 
         header = '<?xml version="1.0" standalone="no"?>' \
-            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
+                 '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
+                 '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
 
         footer = '</svg>'
 
@@ -1875,8 +1887,13 @@ class IndicatorLunar:
 
 
     def getIconName( self ):
-        iconName = "." + INDICATOR_NAME + "-illumination-icon"
-        return ( iconName + "-1" ) if IndicatorLunar.ICON_STATE else ( iconName + "-2" )
+        iconNameBase = "." + INDICATOR_NAME + "-illumination-icon"
+        if IndicatorLunar.ICON_STATE:
+            iconName = iconNameBase + "-1"
+        else:
+            iconName = iconNameBase + "-2"
+
+        return iconName
 
 
     def getIconFile( self ): return tempfile.gettempdir() + "/" + self.getIconName() + ".svg"
