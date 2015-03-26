@@ -5,6 +5,8 @@ indicator-lunar (1.0.58-1) precise; urgency=low
   * Bug fix: The Right Ascension in degrees was incorrect for all objects.
   * Bug fix: The Bright Limb angle calculation was erroneous due to mixing of
     degrees and radians!
+  * Bug fix: When the moon never rises, the icon generation failed (no bright
+    limb value was calculated).  
   * Added distance to Earth in kilometres for the Moon's menu item.    
   * Added timeouts to the TLE/OE download.
   * Added caching of TLE/OE downloaded data to avoid over-taxing the

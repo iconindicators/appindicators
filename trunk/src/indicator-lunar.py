@@ -817,10 +817,17 @@ class IndicatorLunar:
         for key in self.data.keys():
             parsedOutput = parsedOutput.replace( "[" + " ".join( key ) + "]", self.data[ key ] )
 
-        brightLimbAngleWithoutDegreesSymbol = float( self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_BRIGHT_LIMB ) ][ : -1 ] )
-        self.createIcon( lunarIlluminationPercentage, brightLimbAngleWithoutDegreesSymbol )
-        self.indicator.set_icon( self.getIconName() )
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
+
+        if ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_BRIGHT_LIMB ) in self.data:
+            brightLimbAngleWithoutDegreesSymbol = float( self.data[ ( IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_BRIGHT_LIMB ) ][ : -1 ] )
+            self.createIcon( lunarIlluminationPercentage, brightLimbAngleWithoutDegreesSymbol )
+            self.indicator.set_icon( self.getIconName() )
+        else:
+            self.indicator.set_icon( IndicatorLunar.ICON )
+            summary = _( "No Bright Limb Angle" )
+            message = _( "The moon never rises and so there is no bright limb.  The indicator icon will be generic and some tags may not be parsed." )
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
 
 
     def fullMoonNotification( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
@@ -1538,14 +1545,14 @@ class IndicatorLunar:
 # When running with all stars/sats/OE displayed, the indicator grinds to a halt and locks up all other indicators (and main menu bar)...what can be done?
 # Limit the number of satellite passes shown to be 10 (or a user pref)?
 # Whatever the solution, test for the polar (extreme latitudes).
-        sunRise = datetime.datetime.strptime( self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_RISE_TIME ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYY_dash_MM_dashDD_space_HH_colon_MM_colon_SS )
-        sunSet = datetime.datetime.strptime( self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_SET_TIME ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYY_dash_MM_dashDD_space_HH_colon_MM_colon_SS )
-        if sunRise < sunSet:
-            hours = ( sunSet - sunRise ) / datetime.timedelta( hours = 1 )
-        else:
-            hours = ( sunRise - sunSet ) / datetime.timedelta( hours = 1 )
-
-        hours = round( hours ) + 3
+#         sunRise = datetime.datetime.strptime( self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_RISE_TIME ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYY_dash_MM_dashDD_space_HH_colon_MM_colon_SS )
+#         sunSet = datetime.datetime.strptime( self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_SET_TIME ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYY_dash_MM_dashDD_space_HH_colon_MM_colon_SS )
+#         if sunRise < sunSet:
+#             hours = ( sunSet - sunRise ) / datetime.timedelta( hours = 1 )
+#         else:
+#             hours = ( sunRise - sunSet ) / datetime.timedelta( hours = 1 )
+# 
+#         hours = round( hours ) + 3
 #TODO Remove ABOVE if not used...        
         for key in self.satellites:
             if key in self.satelliteTLEData:
@@ -2100,7 +2107,7 @@ class IndicatorLunar:
             "If checked, only planets, moon, sun,\n" + \
             "orbital elements and stars which rise/set\n" + \
             "or are 'always up' will be shown.\n\n" + \
-            "If checked, any orbital element for\n" + \
+            "In addition, any orbital element for\n" + \
             "which there is no data will also be hidden.\n\n" + \
             "Otherwise all bodies are shown." ) )
         grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
