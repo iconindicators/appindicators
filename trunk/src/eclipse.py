@@ -89,7 +89,6 @@ def __getCardinalDirection( cardinalDirectionAsString ):
 # 
 #      Year   Month   Day   HH:MM:SS    DT   Type  Lat   Long
 lunarEclipseData = [
-    [ "2015", "04", "04", "12:01:24", "69", "T", "5S", "179W" ],
     [ "2015", "09", "28", "02:48:17", "69", "T", "2N", "44W" ],
     [ "2016", "03", "23", "11:48:21", "70", "N", "0S", "175W" ],
     [ "2016", "09", "16", "18:55:27", "70", "N", "3S", "75E" ],
