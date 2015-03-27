@@ -894,10 +894,7 @@ class IndicatorLunar:
             degreeSymbolIndex = self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ].index( "°" )
             setAzimuth = self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ][ 0 : degreeSymbolIndex + 1 ]
 
-            if self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == IndicatorLunar.TRUE_TEXT:
-                visibleText = IndicatorLunar.TRUE_TEXT_TRANSLATION
-            else:
-                visibleText = IndicatorLunar.FALSE_TEXT_TRANSLATION
+            visibleText = self.getBooleanTranslatedText( self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] )
 
             tle = self.satelliteTLEData[ key ]
             summary = self.satelliteNotificationSummary. \
@@ -1024,11 +1021,8 @@ class IndicatorLunar:
             self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, dataTag )
             subMenu.append( Gtk.SeparatorMenuItem() )
 
-            if self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] == IndicatorLunar.TRUE_TEXT:
-                subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + IndicatorLunar.TRUE_TEXT_TRANSLATION ) )
-            else:
-                subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + IndicatorLunar.FALSE_TEXT_TRANSLATION ) )
-
+            earthVisibleTranslatedText = self.getBooleanTranslatedText( self.data[ ( dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ] )
+            subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + earthVisibleTranslatedText ) )
             subMenu.append( Gtk.SeparatorMenuItem() )
 
             subMenu.append( Gtk.MenuItem( _( "Offset from Planet (in planet radii)" ) ) )
@@ -1213,10 +1207,8 @@ class IndicatorLunar:
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] ) )
 
                     if not self.hideSatelliteIfNoVisiblePass:
-                        if self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == IndicatorLunar.TRUE_TEXT:
-                            subMenu.append( Gtk.MenuItem( _( "Visible: " ) + IndicatorLunar.TRUE_TEXT_TRANSLATION ) )
-                        else:
-                            subMenu.append( Gtk.MenuItem( _( "Visible: " ) + IndicatorLunar.FALSE_TEXT_TRANSLATION ) )
+                        visibleTranslatedText = self.getBooleanTranslatedText( self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] )
+                        subMenu.append( Gtk.MenuItem( _( "Visible: " ) + visibleTranslatedText ) )
 
                 self.addOnSatelliteHandler( subMenu, key )
 
@@ -1834,6 +1826,13 @@ class IndicatorLunar:
         return localDateTimeAsString[ 0 : localDateTimeAsString.rfind( ":" ) + 3 ]
 
 
+    def getBooleanTranslatedText( self, booleanText ):
+            if booleanText == IndicatorLunar.TRUE_TEXT:
+                return IndicatorLunar.TRUE_TEXT_TRANSLATION
+            
+            return IndicatorLunar.FALSE_TEXT_TRANSLATION
+
+
     # Used to instantiate a new city object/observer.
     # Typically after calculations (or exceptions) the city date is altered.
     def getCity( self, date = None ):
@@ -1998,8 +1997,8 @@ class IndicatorLunar:
         for key in self.data.keys():
             if ( key[ 0 ], key[ 1 ] ) in self.satellites: # This key refers to a satellite.
                 data = self.data[ key ]
-                if key[ 2 ] == IndicatorLunar.DATA_VISIBLE: # This data value is either True or False and needs to be translated.
-                    data = IndicatorLunar.TRUE_TEXT_TRANSLATION if data == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
+                if key[ 2 ] == IndicatorLunar.DATA_VISIBLE:
+                    data = self.getBooleanTranslatedText( data )
 
                 displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + key[ 1 ] + " " + IndicatorLunar.DATA_TAGS[ key[ 2 ] ], data ] )
 
@@ -2010,7 +2009,7 @@ class IndicatorLunar:
                 displayTagsStore.append( [ key[ 1 ], IndicatorLunar.DATA_TAGS[ key[ 1 ] ], self.data[ key ] ] )
 
             elif key[ 1 ] == IndicatorLunar.DATA_EARTH_VISIBLE: # Special case: the earth visible data is boolean and needs to be translated.
-                data = IndicatorLunar.TRUE_TEXT_TRANSLATION if self.data[ key ] == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
+                data = self.getBooleanTranslatedText( data )
                 displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_TAGS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS[ key[ 1 ] ], data ] )
 
             else: # Everything else...
@@ -2778,6 +2777,7 @@ class IndicatorLunar:
         self.dialog = None
 
 
+#TODO use getbooleantranslatedtext()
     def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
         if pageNumber != 0:
             return
