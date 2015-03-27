@@ -894,31 +894,34 @@ class IndicatorLunar:
             degreeSymbolIndex = self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ].index( "°" )
             setAzimuth = self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ][ 0 : degreeSymbolIndex + 1 ]
 
-            visibleText = IndicatorLunar.TRUE_TEXT_TRANSLATION if self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
+            if self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] == IndicatorLunar.TRUE_TEXT:
+                visibleText = IndicatorLunar.TRUE_TEXT_TRANSLATION
+            else:
+                visibleText = IndicatorLunar.FALSE_TEXT_TRANSLATION
 
             tle = self.satelliteTLEData[ key ]
             summary = self.satelliteNotificationSummary. \
-                replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
-                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
-                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
-                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, visibleText )
+                      replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, visibleText )
 
             if summary == "":
                 summary = " " # The notification summary text must not be empty (at least on Unity).
 
             message = self.satelliteNotificationMessage. \
-                replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
-                replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
-                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
-                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, visibleText )
+                      replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, visibleText )
 
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
@@ -1144,7 +1147,6 @@ class IndicatorLunar:
                 data.append( [ self.data[ ( dataTag, IndicatorLunar.DATA_DUSK ) ], _( "Dusk: " ) ] )
 
             data = sorted( data, key = lambda x: ( x[ 0 ] ) )
-
             for dateTime, text in data:
                 subMenu.append( Gtk.MenuItem( text + dateTime ) )
 
@@ -1239,9 +1241,9 @@ class IndicatorLunar:
         satelliteTLE = self.satelliteTLEData.get( t )
 
         url = self.satelliteOnClickURL. \
-            replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteTLE.getName() ). \
-            replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteTLE.getNumber() ). \
-            replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, satelliteTLE.getInternationalDesignator() )
+              replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteTLE.getName() ). \
+              replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteTLE.getNumber() ). \
+              replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, satelliteTLE.getInternationalDesignator() )
 
         if len( url ) > 0:
             webbrowser.open( url )
@@ -1541,19 +1543,6 @@ class IndicatorLunar:
     # This allows the user to see the rise/set time for the current pass as it is happening.
     # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
     def updateSatellites( self, ephemNow ):
-#TODO Remove BELOW if not used...        
-# When running with all stars/sats/OE displayed, the indicator grinds to a halt and locks up all other indicators (and main menu bar)...what can be done?
-# Limit the number of satellite passes shown to be 10 (or a user pref)?
-# Whatever the solution, test for the polar (extreme latitudes).
-#         sunRise = datetime.datetime.strptime( self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_RISE_TIME ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYY_dash_MM_dashDD_space_HH_colon_MM_colon_SS )
-#         sunSet = datetime.datetime.strptime( self.data[ ( IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_SET_TIME ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYY_dash_MM_dashDD_space_HH_colon_MM_colon_SS )
-#         if sunRise < sunSet:
-#             hours = ( sunSet - sunRise ) / datetime.timedelta( hours = 1 )
-#         else:
-#             hours = ( sunRise - sunSet ) / datetime.timedelta( hours = 1 )
-# 
-#         hours = round( hours ) + 3
-#TODO Remove ABOVE if not used...        
         for key in self.satellites:
             if key in self.satelliteTLEData:
                 self.calculateNextSatellitePass( ephemNow, key, self.satelliteTLEData[ key ] )
