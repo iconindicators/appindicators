@@ -2817,8 +2817,8 @@ class IndicatorLunar:
         self.dialog = None
 
 
-    def appendToDisplayTagsStore( self, tag, key, value, displayTagsStore ):
 #TODO Later on might be able to not have the tag passed in, since by defalt the tag = " ".join( key ) and the key is passed in.
+    def appendToDisplayTagsStore( self, tag, key, value, displayTagsStore ):
         if ( key[ 0 ], key[ 1 ] ) in self.satellites: # Special: satellites.
             translatedTag = key[ 0 ] + " " + key[ 1 ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ key[ 2 ] ]
             if key[ 2 ] == IndicatorLunar.DATA_VISIBLE:
@@ -2843,49 +2843,32 @@ class IndicatorLunar:
 
 
     def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
-        if pageNumber != 0:
-            return
+        if pageNumber == 0:
+            displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
+            for key in self.data.keys():
+                if ( key[ 0 ], key[ 1 ] ) in self.tagsRemoved or ( key[ 0 ] ) in self.tagsRemoved: # Satellites have two keys, the rest of the objects have one.
+                    continue
 
-        displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
-        for key in self.data.keys():
-            if ( key[ 0 ], key[ 1 ] ) in self.tagsRemoved or ( key[ 0 ] ) in self.tagsRemoved: # Satellites have two keys, rest have one.
-                continue
+                self.appendToDisplayTagsStore( " ".join( key ), key, self.data[ key ], displayTagsStore )
 
-            self.appendToDisplayTagsStore( " ".join( key ), key, self.data[ key ], displayTagsStore )
+            # Add tags for newly checked items (which don't exist in the current data).
+            value = IndicatorLunar.DISPLAY_NEEDS_REFRESH
+            for key in self.tagsAdded:
+                astronomicalObjectType = self.tagsAdded[ key ]
+                if astronomicalObjectType == AstronomicalObjectType.Planet:
+                    tags = IndicatorLunar.DATA_TAGS_PLANET
+                elif astronomicalObjectType == AstronomicalObjectType.PlanetaryMoon:
+                    tags = IndicatorLunar.DATA_TAGS_PLANETARY_MOON
+                elif astronomicalObjectType == AstronomicalObjectType.Star:
+                    tags = IndicatorLunar.DATA_TAGS_STAR
+                elif astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
+                    tags = IndicatorLunar.DATA_TAGS_ORBITAL_ELEMENT
+                elif astronomicalObjectType == AstronomicalObjectType.Satellite:
+                    tags = IndicatorLunar.DATA_TAGS_SATELLITE
 
-        # Add tags for newly checked items (which don't exist in the current data).
-        value = IndicatorLunar.DISPLAY_NEEDS_REFRESH
-        for key in self.tagsAdded:
-            print( "onSwitchPage:", type( key ) ) #TODO Remove
-            astronomicalObjectType = self.tagsAdded[ key ]
-            if astronomicalObjectType == AstronomicalObjectType.Planet:
-                tags = IndicatorLunar.DATA_TAGS_PLANET
                 for tag in tags:
-                    self.appendToDisplayTagsStore( key + " " + tag, ( key, tag ), value, displayTagsStore )
-
-            elif astronomicalObjectType == AstronomicalObjectType.PlanetaryMoon:
-                tags = IndicatorLunar.DATA_TAGS_PLANETARY_MOON
-                for tag in tags:
-                    self.appendToDisplayTagsStore( key + " " + tag, ( key, tag ), value, displayTagsStore )
-
-            elif astronomicalObjectType == AstronomicalObjectType.Star:
-                tags = IndicatorLunar.DATA_TAGS_STAR
-                for tag in tags:
-                    self.appendToDisplayTagsStore( key + " " + tag, ( key, tag ), value, displayTagsStore )
-
-            elif astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
-                tags = IndicatorLunar.DATA_TAGS_ORBITAL_ELEMENT
-                for tag in tags:
-                    self.appendToDisplayTagsStore( key + " " + tag + tag, ( key, tag ), value, displayTagsStore )
-
-            elif astronomicalObjectType == AstronomicalObjectType.Satellite:
-                tags = IndicatorLunar.DATA_TAGS_SATELLITE
-                for tag in tags:
-                    print( key )
-#                     self.appendToDisplayTagsStore( " ".join( key ) + " " + tag, ( key, tag ), value, displayTagsStore )
-
-#TODO Handle planetary moons and the rest!
-
+                    t = key + ( tag, )
+                    self.appendToDisplayTagsStore( " ".join( t ), t, value, displayTagsStore )
 
 
     # Refreshes the display tags with all data.
@@ -3161,10 +3144,10 @@ class IndicatorLunar:
 
 
     def checkboxToggled( self, tagAsTuple, astronomicalObjectType, checked ):
-        print( "checkboxToggled:", type( tagAsTuple ) ) #TODO Remove
         preExists = False
         for key in self.data.keys():
-            if tagAsTuple == key[ 0 ]:
+            key = key[ 0 : len( tagAsTuple ) ] # Only want to compare the "first part" of the key - the body, not the attribute.
+            if tagAsTuple == key:
                 preExists = True
                 break
 
