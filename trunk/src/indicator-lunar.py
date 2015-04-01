@@ -36,6 +36,23 @@
 #TODO Remove print statements.
 
 
+#TODO Going to change the key in self.data from a tuple to a string concatenation of the body name (MOON for example)
+#and attribute (RISE TIME for example), separated by a space.
+
+# TODO
+# When the display tags table is created, iterating through self.data is a bit flaky.  
+# Currently depends on determining if a key has two parts (is a satellite) or one part.
+# Then a check is made to see if the key exists in the satellite list or in the OE list.
+#
+# If the user then changes the TLE/OE URL and a different set of satellites/OEs appear
+# and one or more are checked, those checked items will NOT appear in the display tags table
+# since they are not part of the current list of satellites/OEs.
+
+
+#TODO Can the CITY NAME be put in as some special tag, say CITY (the body) and NAME (an attribute)?
+
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -2134,11 +2151,15 @@ class IndicatorLunar:
 #TODO Test the case for no OE data for a specific OE.
         hideBodyIfNeverUpCheckbox.set_tooltip_text( _( 
             "If checked, only planets, moon, sun,\n" + \
-            "orbital elements and stars which rise/set\n" + \
-            "or are 'always up' will be shown.\n\n" + \
-            "In addition, any orbital element for\n" + \
-            "which there is no data will also be hidden.\n\n" + \
-            "Otherwise all bodies are shown." ) )
+            "orbital elements and stars which\n" + \
+            "rise/set or are 'always up' will be\n" + \
+            "shown.\n\n" + \
+            "Any orbital element for which there\n" + \
+            "is no data will also be hidden.\n\n" + \
+            "Otherwise all bodies are shown.\n\n" + \
+            "When showing all bodies, there may\n" + \
+            "be a lot of information displayed\n" + \
+            "impacting the indicator's performance." ) )
         grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
@@ -2153,7 +2174,14 @@ class IndicatorLunar:
         spinnerOrbitalElementMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
         spinnerOrbitalElementMagnitude.set_adjustment( Gtk.Adjustment( self.orbitalElementsMagnitude, -30, 30, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerOrbitalElementMagnitude.set_value( self.orbitalElementsMagnitude ) # ...so need to force the initial value by explicitly setting it.
-        spinnerOrbitalElementMagnitude.set_tooltip_text( _( "Orbital elements with a magnitude greater\nthan that specified will not be shown." ) )
+        spinnerOrbitalElementMagnitude.set_tooltip_text( _( 
+            "Orbital elements with a magnitude\n" + \
+            "greater than that specified will\n" + \
+            "not be shown.\n\n" + \
+            "If a high magnitude value is set,\n" + \
+            "there may be a lot of information\n" + \
+            "displayed impacting the indicator's\n" + \
+            "performance." ) )
 
         box.pack_start( spinnerOrbitalElementMagnitude, False, False, 0 )
 
@@ -2204,7 +2232,12 @@ class IndicatorLunar:
             "If checked, only satellites with an\n" + \
             "upcoming visible pass are displayed.\n\n" + \
             "Otherwise, all passes, visible or not,\n" + \
-            "are shown (including error messages)." ) )
+            "are shown (including error messages).\n\n" + \
+            "If non-visible passes are shown,\n" + \
+            "there may be a lot of information\n" + \
+            "displayed impacting the indicator's\n" + \
+            "performance." ) )
+
         grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 7, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
