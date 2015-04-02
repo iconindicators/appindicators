@@ -766,6 +766,16 @@ class IndicatorLunar:
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
 
+#TODO Making change to self.data dict.
+# Key is a tuple comprising AstronomicalObjectType, body tag, data tag. The body/data tags are upper cased strings.
+# For example,
+#    ( AstronomicalObjectType.Moon, MOON, RISE TIME )
+#    ( AstronomicalObjectType.Planet, MARS, MAGNITUDE )
+#    ( AstronomicalObjectType.Satellite, SATELLITE NAME SATELLITE NUMBER, VISIBLE )
+#
+# Value is the actual calculated data, translated/localised as necessary, ready for display.
+#
+# Not sure how CITY NAME should be treated.  Should CITY be a body tag and NAME be a data tag?  With the AstronomicalObjectType set to None?
     def __init__( self ):
         self.dialog = None
         self.data = { } # Key is each a data tag, upper case, naming the type of data combined with the source of the data; value is the data ready for display.
