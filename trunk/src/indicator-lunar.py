@@ -36,23 +36,6 @@
 #TODO Remove print statements.
 
 
-#TODO Going to change the key in self.data from a tuple to a string concatenation of the body name (MOON for example)
-#and attribute (RISE TIME for example), separated by a space.
-
-# TODO
-# When the display tags table is created, iterating through self.data is a bit flaky.  
-# Currently depends on determining if a key has two parts (is a satellite) or one part.
-# Then a check is made to see if the key exists in the satellite list or in the OE list.
-#
-# If the user then changes the TLE/OE URL and a different set of satellites/OEs appear
-# and one or more are checked, those checked items will NOT appear in the display tags table
-# since they are not part of the current list of satellites/OEs.
-
-
-#TODO Can the CITY NAME be put in as some special tag, say CITY (the body) and NAME (an attribute)?
-
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -770,19 +753,9 @@ class IndicatorLunar:
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
 
-#TODO Making change to self.data dict.
-# Key is a tuple comprising AstronomicalObjectType, body tag, data tag. The body/data tags are upper cased strings.
-# For example,
-#    ( AstronomicalObjectType.Moon, MOON, RISE TIME )
-#    ( AstronomicalObjectType.Planet, MARS, MAGNITUDE )
-#    ( AstronomicalObjectType.Satellite, SATELLITE NAME SATELLITE NUMBER, VISIBLE )
-#
-# Value is the actual calculated data, translated/localised as necessary, ready for display.
-#
-# Not sure how CITY NAME should be treated.  Should CITY be a body tag and NAME be a data tag?  With the AstronomicalObjectType set to None?
     def __init__( self ):
         self.dialog = None
-        self.data = { } # Key is each a data tag, upper case, naming the type of data combined with the source of the data; value is the data ready for display.
+        self.data = { } # Key is a tuple of AstronomicalObjectType, a data tag (upper case( and data tag (upper case).  Value is the data ready for display.
         self.orbitalElementData = { } # Key is the orbital element name, upper cased; value is the orbital element data string.
         self.satelliteNotifications = { }
         self.satelliteTLEData = { }
@@ -951,29 +924,30 @@ class IndicatorLunar:
             return
 
         # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
-#TODO Not sure yet if satellite name/number should be combined as a single string in the self.data.
         satelliteNameNumberRiseTimes = [ ]
-        for key in self.satellites:
+        for satelliteName, satelliteNumber, in self.satellites:
+            key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
             if ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.data: # Assume all other information is present!
-               satelliteNameNumberRiseTimes.append( [ key, self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
+               satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
 
         if self.satellitesSortByDateTime:
-            satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 1 ], x[ 0 ] ) )
+            satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
         else:
-            satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
+            satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
 
         ephemNowInLocalTime = ephem.Date( self.getLocalDateTime( ephemNow ) )
-        for key, riseTime in satelliteNameNumberRiseTimes:
+        for satelliteName, satelliteNumber, riseTime in satelliteNameNumberRiseTimes:
+            key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
 
             # Ensure the current time is within the rise/set...
             if ephemNowInLocalTime < ephem.Date( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) or \
                ephemNowInLocalTime > ephem.Date( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ): continue
 
             # Show the notification for the particular satellite only once per pass...
-            if key in self.satelliteNotifications and ephemNowInLocalTime < ephem.Date( self.satelliteNotifications[ key ] ):
+            if ( satelliteName, satelliteNumber ) in self.satelliteNotifications and ephemNowInLocalTime < ephem.Date( self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] ):
                 continue
 
-            self.satelliteNotifications[ key ] = self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] # Ensures the notification happens once per satellite pass.
+            self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] # Ensures the notification happens once per satellite pass.
 
             # Parse the satellite summary/message to create the notification...
             riseTime = self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
@@ -986,10 +960,10 @@ class IndicatorLunar:
 
             visibleText = self.getBooleanTranslatedText( self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] )
 
-            tle = self.satelliteTLEData[ key ]
+            tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
             summary = self.satelliteNotificationSummary. \
                       replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_NUMBER, tle.getNumber() ). \
                       replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
                       replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
                       replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
@@ -1002,7 +976,7 @@ class IndicatorLunar:
 
             message = self.satelliteNotificationMessage. \
                       replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_NUMBER, key[ 1 ] ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_NUMBER, tle.getNumber() ). \
                       replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
                       replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
                       replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
@@ -1237,22 +1211,22 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
-#TODO Not sure yet how satellites will work with AstronoicalObjectType.
     def updateSatellitesMenu( self, menu ):
         # For each satellite, first determine if there is calculated data present (may have been dropped).
         # Then, parse the menu text to replace tags with values.
         # Then, build a list of satellites, including rise time (or message), to allow sorting.
         menuTextSatelliteNameNumberRiseTimes = [ ]
-        for key in self.satellites: # key is satellite name/number.
-            if key not in self.satelliteTLEData:
+        for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
+            if ( satelliteName, satelliteNumber) not in self.satelliteTLEData:
                 continue # This is (likely) a satellite from a previous run which is not in the current TLE data.
 
+            key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
             if ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) not in self.data and \
                ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) not in self.data:
                 continue # No data for this satellite - it has been dropped by the backend. 
 
             # Parse the menu text.
-            tle = self.satelliteTLEData[ key ]
+            tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
             menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ) \
                                              .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, tle.getNumber() ) \
                                              .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() )
@@ -1265,14 +1239,14 @@ class IndicatorLunar:
             else:
                 riseTime = self.data[ ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) ]
 
-            menuTextSatelliteNameNumberRiseTimes.append( [ menuText, key, riseTime ] )
+            menuTextSatelliteNameNumberRiseTimes.append( [ menuText, satelliteName, satelliteNumber, riseTime ] )
 
         # Build the menu...
         if len( menuTextSatelliteNameNumberRiseTimes ) > 0:
             if self.satellitesSortByDateTime:
-                menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
+                menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 3 ], x[ 0 ], x[ 1 ], x[ 2 ] ) )
             else:
-                menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
+                menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ], x[ 3 ] ) )
 
             satellitesMenuItem = Gtk.MenuItem( _( "Satellites" ) )
             menu.append( satellitesMenuItem )
@@ -1281,7 +1255,8 @@ class IndicatorLunar:
                 satellitesSubMenu = Gtk.Menu()
                 satellitesMenuItem.set_submenu( satellitesSubMenu )
 
-            for menuText, key, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
+            for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
+                key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
                 subMenu = Gtk.Menu()
                 if ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) in self.data: # No need to check to see if the message should be displayed or not - if not, the backend did not add the message!
                     if self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
@@ -1301,7 +1276,7 @@ class IndicatorLunar:
                         visibleTranslatedText = self.getBooleanTranslatedText( self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] )
                         subMenu.append( Gtk.MenuItem( _( "Visible: " ) + visibleTranslatedText ) )
 
-                self.addOnSatelliteHandler( subMenu, key )
+                self.addOnSatelliteHandler( subMenu, satelliteName, satelliteNumber )
 
                 if self.showSatellitesAsSubMenu:
                     menuItem = Gtk.MenuItem( menuText )
@@ -1313,15 +1288,14 @@ class IndicatorLunar:
                 menuItem.set_submenu( subMenu )
 
 
-    def addOnSatelliteHandler( self, subMenu, key ):
+    def addOnSatelliteHandler( self, subMenu, satelliteName, satelliteNumber ):
         for child in subMenu.get_children():
-            child.set_name( str( key ) ) # Cannot pass the tuple - must be a string.
+            child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
             child.connect( "activate", self.onSatellite )
 
 
     def onSatellite( self, widget ):
-        t = tuple( widget.props.name.replace( "('", "" ).replace( "')", "" ).split( "', '" ) ) # Need to convert from string back to tuple.
-        satelliteTLE = self.satelliteTLEData.get( t )
+        satelliteTLE = self.satelliteTLEData.get( tuple( widget.props.name.split( "-----" ) ) )
 
         url = self.satelliteOnClickURL. \
               replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteTLE.getName() ). \
@@ -1631,13 +1605,12 @@ class IndicatorLunar:
                 self.calculateNextSatellitePass( ephemNow, key, self.satelliteTLEData[ key ] )
             else:
                 if not self.hideSatelliteIfNoVisiblePass:
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_NO_TLE_DATA
-
-
-#TODO Not sure how AOT works above and below.
+                    key = ( AstronomicalObjectType.Satellite, " ".join( key ), IndicatorLunar.DATA_MESSAGE )
+                    self.data[ key ] = IndicatorLunar.MESSAGE_SATELLITE_NO_TLE_DATA
 
 
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
+        key = ( AstronomicalObjectType.Satellite, " ".join( key ) )
         currentDateTime = ephemNow
 #TODO Put back to 24 * 10
         endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 1 ) # Stop looking for passes 10 days from ephemNow.
@@ -1666,7 +1639,7 @@ class IndicatorLunar:
             # The pass is valid.  If the satellite is currently passing, work out when it rose...
             if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
                 setTime = nextPass[ 4 ]
-                nextPass = self.calculateSatellitePassForRisingPriorToNow( currentDateTime, key, satelliteTLE )
+                nextPass = self.calculateSatellitePassForRisingPriorToNow( currentDateTime, satelliteTLE )
                 if nextPass is None:
                     currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
                     continue
@@ -1697,7 +1670,7 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = message
 
 
-    def calculateSatellitePassForRisingPriorToNow( self, ephemNow, key, satelliteTLE ):
+    def calculateSatellitePassForRisingPriorToNow( self, ephemNow, satelliteTLE ):
         currentDateTime = ephem.Date( ephemNow - ephem.minute ) # Start looking from one minute ago.
         endDateTime = ephem.Date( ephemNow - ephem.hour * 1 ) # Only look back an hour for the rise time (then just give up).
         nextPass = None
@@ -3322,9 +3295,9 @@ class IndicatorLunar:
     # On error, returns None.
     def getSatelliteTLEData( self, url ):
 #TODO Remove
-        if True:
-            print( "TLE ALERT" )
-            return None
+#         if True:
+#             print( "TLE ALERT" )
+#             return None
         try:
             satelliteTLEData = { } # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
             data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
@@ -3421,7 +3394,6 @@ class IndicatorLunar:
 
             self.satellites = settings.get( IndicatorLunar.SETTINGS_SATELLITES, self.satellites )
             self.satellites = [ tuple( l ) for l in self.satellites ] # Converts from a list of lists to a list of tuples...go figure!
-            self.satellites = []#TODO Remove
 
             self.satellitesAddNew = settings.get( IndicatorLunar.SETTINGS_SATELLITES_ADD_NEW, self.satellitesAddNew )
             self.satellitesSortByDateTime = settings.get( IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME, self.satellitesSortByDateTime )
