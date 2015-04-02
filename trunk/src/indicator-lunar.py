@@ -36,6 +36,12 @@
 #TODO Remove print statements.
 
 
+#TODO The source of the OE names is NOT controlled by me...so make sure that when the OE data is originally loaded, it's always capitalised.
+
+
+#TODO Make sure the satellite name is always upper cased at the point of loading.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -691,9 +697,9 @@ class IndicatorLunar:
     }
 
     ORBITAL_ELEMENT_CACHE_BASENAME = "oe-"
-    ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS = 24
+    ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS = 30
     ORBITAL_ELEMENT_DATA_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
-    ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS = 24
+    ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS = 30
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -724,8 +730,8 @@ class IndicatorLunar:
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_VISIBLE.strip( "[]" ), SATELLITE_TAG_VISIBLE_TRANSLATION.strip( "[]" ) ] )
 
     SATELLITE_TLE_CACHE_BASENAME = "tle-"
-    SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS = 12
-    SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 12
+    SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS = 18
+    SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 18
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
     SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
@@ -1612,8 +1618,7 @@ class IndicatorLunar:
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
         key = ( AstronomicalObjectType.Satellite, " ".join( key ) )
         currentDateTime = ephemNow
-#TODO Put back to 24 * 10
-        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 1 ) # Stop looking for passes 10 days from ephemNow.
+        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 10 ) # Stop looking for passes 10 days from ephemNow.
         message = None
         while currentDateTime < endDateTime:
             city = self.getCity( currentDateTime )
@@ -2076,11 +2081,11 @@ class IndicatorLunar:
         tree.set_vexpand( True )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Tag" ), Gtk.CellRendererText(), text = 1 ) 
-        treeViewColumn.set_sort_column_id( 0 )
+        treeViewColumn.set_sort_column_id( 1 )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Value" ), Gtk.CellRendererText(), text = 2 ) 
-        treeViewColumn.set_sort_column_id( 1 )
+        treeViewColumn.set_sort_column_id( 2 )
         tree.append_column( treeViewColumn )
 
         tree.set_tooltip_text( _( 
@@ -2846,6 +2851,7 @@ class IndicatorLunar:
 #TODO If the user does a load of OE/TLE data giving different objects,
 #the existing objects in self.data should NOT be shown in the table!
 #But also the new loaded items SHOULD be in the table!
+#Maybe wipe existing data from the self.data on a reload?
     def appendToDisplayTagsStore( self, key, value, displayTagsStore ):
         astronomicalObjectType = key[ 0 ]
         bodyTag = key[ 1 ]
@@ -2891,13 +2897,23 @@ class IndicatorLunar:
                     tags = IndicatorLunar.DATA_TAGS_PLANET
                 elif astronomicalObjectType == AstronomicalObjectType.PlanetaryMoon:
                     tags = IndicatorLunar.DATA_TAGS_PLANETARY_MOON
-                elif astronomicalObjectType == AstronomicalObjectType.Satellite: #TODO Check that satellite works!
+                elif astronomicalObjectType == AstronomicalObjectType.Satellite:
                     tags = IndicatorLunar.DATA_TAGS_SATELLITE
                 elif astronomicalObjectType == AstronomicalObjectType.Star:
                     tags = IndicatorLunar.DATA_TAGS_STAR
 
                 for tag in tags:
                     self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.DISPLAY_NEEDS_REFRESH, displayTagsStore )
+
+
+    def onIndicatorTextTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
+        model, treeiter = tree.get_selection().get_selected()
+        indicatorTextEntry.insert_text( "[" + model[ treeiter ][ 1 ] + "]", indicatorTextEntry.get_position() )
+
+
+    def onResetSatelliteOnClickURL( self, button, textEntry ):
+        translatedTags = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, IndicatorLunar.SATELLITE_ON_CLICK_URL )
+        textEntry.set_text( translatedTags )
 
 
     # Refreshes the display tags with all data.
@@ -2939,10 +2955,8 @@ class IndicatorLunar:
                 displayTagsStore.append( [ key, key, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
 
 
-#TODO When sorting the display tags table by value, it does not sort...
-# ...so is it something to do with the sort mechanism...and if so, does it also affect this function?
     def translateTags( self, tagsStore, originalToLocal, text ):
-        # The tags store contains 2 columns (if more, those are ignored).
+        # The tags store contains at least 2 columns (if more, those columns are ignored).
         # First column contains the original/untranslated tags.
         # Second column contains the translated tags.
         # Depending on which direction the translation is going,
@@ -2980,16 +2994,6 @@ class IndicatorLunar:
                 if not found: translatedText += "[" + tag + chunk[ rightBracket : ]
 
         return translatedText
-
-
-#TODO Links!
-# http://python-gtk-3-tutorial.readthedocs.org/en/latest/button_widgets.html
-# http://lazka.github.io/pgi-docs/Gtk-3.0/classes/ListStore.html
-# http://lazka.github.io/pgi-docs/Gtk-3.0/structs/TreePath.html#Gtk.TreePath.new_from_indices
-# http://scentric.net/tutorial/sec-treemodel-rowref.html
-# http://stackoverflow.com/questions/2256243/in-gtk-whats-the-difference-between-a-treepath-and-a-treeiter
-# http://ruby-gnome2.sourceforge.jp/hiki.cgi?tut-treeview-model-reference
-# http://python-gtk-3-tutorial.readthedocs.org/en/latest/treeview.html
 
 
     def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, orbitalElements, url ):
@@ -3050,20 +3054,6 @@ class IndicatorLunar:
                     child.show()
                 else:
                     child.hide()
-
-
-#TODO Make sure if the table is sorted by say value that the correct tag is selected!
-    def onIndicatorTextTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
-        model, treeiter = tree.get_selection().get_selected()
-        indicatorTextEntry.insert_text( "[" + model[ treeiter ][ 1 ] + "]", indicatorTextEntry.get_position() )
-
-
-    def onResetSatelliteOnClickURL( self, button, textEntry ):
-        textEntry.set_text(
-            self.translateTags(
-                IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, 
-                True, 
-                IndicatorLunar.SATELLITE_ON_CLICK_URL ) )
 
 
     def onFetchOrbitalElementURL( self, button, entry, grid, orbitalElementStore, displayTagsStore ):
@@ -3133,8 +3123,84 @@ class IndicatorLunar:
 #         if satelliteTLEData is not None:
 #             for key in satelliteTLEData:
 #                 displayTagsStore.append( [ " ".join( key ), " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-    
-    
+
+
+    def onPlanetToggled( self, widget, row, planetStore ):
+        planetStore[ row ][ 0 ] = not planetStore[ row ][ 0 ]
+        self.checkboxToggled( planetStore[ row ][ 1 ].upper(), AstronomicalObjectType.Planet, planetStore[ row ][ 0 ] )
+
+        planetName = planetStore[ row ][ 1 ]
+        if planetName in IndicatorLunar.PLANET_MOONS:
+            for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
+                self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, planetStore[ row ][ 0 ] )
+
+
+    def onStarToggled( self, widget, row, starStore ):
+        starStore[ row ][ 0 ] = not starStore[ row ][ 0 ]
+        self.checkboxToggled( starStore[ row ][ 1 ].upper(), AstronomicalObjectType.Star, starStore[ row ][ 0 ] )
+
+
+    def onOrbitalElementToggled( self, widget, row, orbitalElementStore ):
+        orbitalElementStore[ row ][ 0 ] = not orbitalElementStore[ row ][ 0 ]
+        self.checkboxToggled( orbitalElementStore[ row ][ 1 ].upper(), AstronomicalObjectType.OrbitalElement, orbitalElementStore[ row ][ 0 ] )
+
+
+    def onSatelliteToggled( self, widget, row, satelliteStore, satelliteSortStore ):
+        actualRow = satelliteSortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
+        satelliteStore[ actualRow ][ 0 ] = not satelliteStore[ actualRow ][ 0 ]
+        bodyTag = satelliteStore[ actualRow ][ 1 ] + " " + satelliteStore[ actualRow ][ 2 ]
+        self.checkboxToggled( bodyTag, AstronomicalObjectType.Satellite, satelliteStore[ actualRow ][ 0 ] )
+
+
+    def checkboxToggled( self, bodyTag, astronomicalObjectType, checked ):
+        preExists = False
+        t = ( astronomicalObjectType, bodyTag )
+        for key in self.data.keys():
+            if t == ( key[ 0 ], key[ 1 ] ): # Only compare the AstronomicalObjectType and body tag.
+                preExists = True
+                break
+
+        if checked:
+            if preExists:
+                self.tagsRemoved.pop( t, None )
+            else:
+                self.tagsAdded[ t ] = None # The value is not actually used.
+        else:
+            if preExists:
+                self.tagsRemoved[ t ] = None # The value is not actually used.
+            else:
+                self.tagsAdded.pop( t ) #TODO Not sure if None should be put in as the second parameter (as above in tagsRemoved).
+
+
+    def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
+        if astronomicalObjectType == AstronomicalObjectType.Satellite:
+            toggle = self.toggleSatellitesTable
+            self.toggleSatellitesTable = not self.toggleSatellitesTable
+            for row in range( len( dataStore ) ):
+                dataStore[ row ][ 0 ] = bool( not toggle )
+                row = str( sortStore.convert_child_path_to_path( Gtk.TreePath.new_from_string( str( row ) ) ) ) # Need to convert the data store row to the sort store row.
+                self.onSatelliteToggled( widget, row, dataStore, sortStore )
+        else:
+            if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
+                functionName = "onOrbitalElementToggled"
+                toggle = self.toggleOrbitalElementsTable
+                self.toggleOrbitalElementsTable = not self.toggleOrbitalElementsTable
+
+            elif astronomicalObjectType == AstronomicalObjectType.Planet:
+                functionName = "onPlanetToggled"
+                toggle = self.togglePlanetsTable
+                self.togglePlanetsTable = not self.togglePlanetsTable
+
+            elif astronomicalObjectType == AstronomicalObjectType.Star:
+                functionName = "onStarToggled"
+                toggle = self.toggleStarsTable
+                self.toggleStarsTable = not self.toggleStarsTable
+
+            for row in range( len( dataStore ) ):
+                dataStore[ row ][ 0 ] = bool( not toggle )
+                getattr( self, functionName )( widget, str( row ), dataStore )
+
+
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
         summary = summaryEntry.get_text()
         message = pythonutils.getTextViewText( messageTextView )
@@ -3166,90 +3232,13 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( ephem.Date( ephem.now() + 10 * ephem.minute ) ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
 
-        if summary == "": summary = " " # The notification summary text must not be empty (at least on Unity).
+        if summary == "":
+            summary = " " # The notification summary text must not be empty (at least on Unity).
 
         Notify.Notification.new( summary, message, svgFile ).show()
 
-        if isFullMoon: os.remove( svgFile )
-
-
-    def checkboxToggled( self, bodyTag, astronomicalObjectType, checked ):
-        preExists = False
-        t = ( astronomicalObjectType, bodyTag )
-        for key in self.data.keys():
-            if t == ( key[ 0 ], key[ 1 ] ): # Only compare the AstronomicalObjectType and body tag.
-                preExists = True
-                break
-
-        if checked:
-            if preExists:
-                self.tagsRemoved.pop( t, None )
-            else:
-                self.tagsAdded[ t ] = None # The value is not actually used.
-        else:
-            if preExists:
-                self.tagsRemoved[ t ] = None # The value is not actually used.
-            else:
-                self.tagsAdded.pop( t ) #TODO Not sure if None should be put in as the second parameter (as above in tagsRemoved).
-
-
-    def onPlanetToggled( self, widget, row, planetStore ):
-        planetStore[ row ][ 0 ] = not planetStore[ row ][ 0 ]
-        self.checkboxToggled( planetStore[ row ][ 1 ].upper(), AstronomicalObjectType.Planet, planetStore[ row ][ 0 ] )
-
-        # Planet's moons...
-        planetName = planetStore[ row ][ 1 ]
-        if planetName in IndicatorLunar.PLANET_MOONS:
-            for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
-                self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, planetStore[ row ][ 0 ] )
-
-
-    def onStarToggled( self, widget, row, starStore ):
-        starStore[ row ][ 0 ] = not starStore[ row ][ 0 ]
-        self.checkboxToggled( starStore[ row ][ 1 ].upper(), AstronomicalObjectType.Star, starStore[ row ][ 0 ] )
-
-
-#TODO The source of the OE names is NOT controlled by me...so make sure that when the OE data is originally loaded, it's always capitalised.
-    def onOrbitalElementToggled( self, widget, row, orbitalElementStore ):
-        orbitalElementStore[ row ][ 0 ] = not orbitalElementStore[ row ][ 0 ]
-        self.checkboxToggled( orbitalElementStore[ row ][ 1 ].upper(), AstronomicalObjectType.OrbitalElement, orbitalElementStore[ row ][ 0 ] )
-
-
- #TODO Make sure the satellite name is always upper cased at the point of loading.
-    def onSatelliteToggled( self, widget, row, satelliteStore, satelliteStoreSort ):
-        actualRow = satelliteStoreSort.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
-        tagAsTuple = ( satelliteStore[ actualRow ][ 1 ].upper(), satelliteStore[ actualRow ][ 2 ], )
-        satelliteStore[ actualRow ][ 0 ] = not satelliteStore[ actualRow ][ 0 ] # TODO Make sure this checks the correct row...sort the table and then check a check box.
-        self.checkboxToggled( tagAsTuple, AstronomicalObjectType.Satellite, satelliteStore[ actualRow ][ 0 ] ) #TODO Change first arg to string.
-
-
-#TODO Probably don't need the sortStore.
-    def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
-#TODO When clicking the header for OEs, get an exception in the function which adds to the display store.
-        if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
-            functionName = "onOrbitalElementToggled"
-            toggle = self.toggleOrbitalElementsTable
-            self.toggleOrbitalElementsTable = not self.toggleOrbitalElementsTable
-
-        elif astronomicalObjectType == AstronomicalObjectType.Planet:
-            functionName = "onPlanetToggled"
-            toggle = self.togglePlanetsTable
-            self.togglePlanetsTable = not self.togglePlanetsTable
-
-#TODO Satellites don't ALL check nor uncheck.
-        elif astronomicalObjectType == AstronomicalObjectType.Satellite:
-            functionName = "onSatelliteToggled"
-            toggle = self.toggleSatellitesTable
-            self.toggleSatellitesTable = not self.toggleSatellitesTable
-
-        elif astronomicalObjectType == AstronomicalObjectType.Star:
-            functionName = "onStarToggled"
-            toggle = self.toggleStarsTable
-            self.toggleStarsTable = not self.toggleStarsTable
-
-        for row in range( len( dataStore ) ):
-            dataStore[ row ][ 0 ] = bool( not toggle )
-            getattr( self, functionName )( widget, str( row ), dataStore )
+        if isFullMoon:
+            os.remove( svgFile )
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
@@ -3264,10 +3253,6 @@ class IndicatorLunar:
     # Returns a dict/hashtable of the orbital elements (comets) data from the specified URL (may be empty).
     # On error, returns None.
     def getOrbitalElementData( self, url ):
-#TODO Remove
-        if True:
-            print( "OE ALERT" )
-            return None
         try:
             # Orbital elements are read from a URL which assumes the XEphem format.
             # For example
@@ -3294,10 +3279,6 @@ class IndicatorLunar:
     # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
     # On error, returns None.
     def getSatelliteTLEData( self, url ):
-#TODO Remove
-#         if True:
-#             print( "TLE ALERT" )
-#             return None
         try:
             satelliteTLEData = { } # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
             data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
@@ -3339,7 +3320,7 @@ class IndicatorLunar:
         self.hideSatelliteIfNoVisiblePass = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
         self.orbitalElements = [ ]
-        self.orbitalElementsAddNew = True
+        self.orbitalElementsAddNew = False
         self.orbitalElementsMagnitude = 6 # More or less what's visible with the naked eye or binoculars.
         self.orbitalElementURL = IndicatorLunar.ORBITAL_ELEMENT_DATA_URL
 
@@ -3353,7 +3334,7 @@ class IndicatorLunar:
         self.satelliteOnClickURL = IndicatorLunar.SATELLITE_ON_CLICK_URL
         self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
         self.satellites = [ ]
-        self.satellitesAddNew = True
+        self.satellitesAddNew = False
         self.satellitesSortByDateTime = True
         self.showOrbitalElementsAsSubMenu = True
         self.showPlanetsAsSubMenu = False
