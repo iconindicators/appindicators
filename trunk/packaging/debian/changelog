@@ -11,6 +11,8 @@ indicator-lunar (1.0.58-1) precise; urgency=low
   * Added timeouts to the TLE/OE download.
   * Added caching of TLE/OE downloaded data to avoid over-taxing the
     respective data sources.
+  * Added warnings to some tooltips about having too many bodies might slow
+    down the indicator.
   * Removed outdated eclipse data.
   * Removed redundant functions to convert hours/minutes/seconds and
     degrees/minutes/seconds to decimal degrees as PyEphem does it for free!
