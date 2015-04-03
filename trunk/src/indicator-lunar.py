@@ -2841,10 +2841,6 @@ class IndicatorLunar:
         self.dialog = None
 
 
-#TODO If the user does a load of OE/TLE data giving different objects,
-#the existing objects in self.data should NOT be shown in the table!
-#But also the new loaded items SHOULD be in the table!
-#Maybe wipe existing data from the self.data on a reload?
     def appendToDisplayTagsStore( self, key, value, displayTagsStore ):
         astronomicalObjectType = key[ 0 ]
         bodyTag = key[ 1 ]
@@ -3062,53 +3058,14 @@ class IndicatorLunar:
                 getattr( self, functionName )( widget, str( row ), dataStore )
 
 
-    # Refreshes the display tags with all data.
-    # If the user has done a fetch of new satellite or orbital element data, the new data is added instead.
-#TODO Think about this method.
-# Are keys/values being removed properly?
-# Why does this handle the case when the tle/oe data is None and not None?  Why can it be both values?
-    def updateDisplayTags( self, displayTagsStore, satelliteTLEData, orbitalElementData ):
-        displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
-        for key in self.data.keys():
-            if ( key[ 0 ], key[ 1 ] ) in self.satellites and satelliteTLEData is None: # This key refers to a satellite.
-                data = self.data[ key ]
-                if key[ 2 ] == IndicatorLunar.DATA_VISIBLE: # This data value is either True or False and needs to be translated.
-                    data = IndicatorLunar.TRUE_TEXT_TRANSLATION if data == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
-
-                displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + key[ 1 ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ key[ 2 ] ], data ] )
-
-            elif ( key[ 0 ] ) in self.orbitalElements and orbitalElementData is None: # This key refers to an orbital element.
-                displayTagsStore.append( [ " ".join( key ), key[ 0 ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ key[ 1 ] ], self.data[ key ] ] )
-
-            else: # Neither satellite nor orbital element.
-                if key[ 1 ] == IndicatorLunar.DATA_CITY_NAME: # Special case: the city name data tag has no associated body tag.
-                    displayTagsStore.append( [ key[ 1 ], IndicatorLunar.DATA_TAGS_TRANSLATIONS[ key[ 1 ] ], self.data[ key ] ] )
-                else:
-                    data = self.data[ key ]
-                    if key[ 1 ] == IndicatorLunar.DATA_EARTH_VISIBLE: # Special case: the earth visible data is boolean and needs to be translated.
-                        data = IndicatorLunar.TRUE_TEXT_TRANSLATION if data == IndicatorLunar.TRUE_TEXT else IndicatorLunar.FALSE_TEXT_TRANSLATION
-
-                    displayTagsStore.append( [ " ".join( key ), IndicatorLunar.BODY_TAGS_TRANSLATIONS[ key[ 0 ] ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ key[ 1 ] ], data ] )
-
-        # Check if new satellite TLE data is being added...
-        if satelliteTLEData is not None:
-            for key in satelliteTLEData:
-                displayTagsStore.append( [ " ".join( key ), " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-
-        # Check if new orbital element data is being added...
-        if orbitalElementData is not None:
-            for key in orbitalElementData:
-                displayTagsStore.append( [ key, key, IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
-
-
-#TODO Check this is kosher.
     def onFetchOrbitalElementURL( self, button, entry, grid, orbitalElementStore, displayTagsStore ):
+        self.removeFromData( False )
         if entry.get_text().strip() == "":
             entry.set_text( IndicatorLunar.ORBITAL_ELEMENT_DATA_URL )
 
         self.orbitalElementURLNew = entry.get_text().strip()
 
-        # If the URL is the default, use the cache if possible, to avoid annoying the default data source.
+        # If the URL is the default, use the cache to avoid annoying the default data source.
         if self.orbitalElementURLNew == IndicatorLunar.ORBITAL_ELEMENT_DATA_URL:
             self.orbitalElementDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
             if self.orbitalElementDataNew is None:
@@ -3123,25 +3080,17 @@ class IndicatorLunar:
         else:
             self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
 
-        # When fetching new data, by default check all the data.
-        orbitalElements = [ ]
-        if self.orbitalElementDataNew is not None:
-            for key in self.orbitalElementDataNew:
-                orbitalElements.append( key )
-
-        self.updateOrbitalElementOrSatellitePreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, orbitalElements, self.orbitalElementURLNew, False, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA )
-        self.updateDisplayTags( displayTagsStore, None, self.orbitalElementDataNew )
+        self.updateOrbitalElementOrSatellitePreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, [ ], self.orbitalElementURLNew, False, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA )
 
 
-#TODO Check this is kosher.
     def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore, displayTagsStore ):
+        self.removeFromData( True )
         if entry.get_text().strip() == "":
             entry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
 
         self.satelliteTLEURLNew = entry.get_text().strip()
 
-        # If the URL is the default, use the cache if possible, to avoid annoying the default data source.
-        self.updateCacheTLE = False
+        # If the URL is the default, use the cache to avoid annoying the default data source.
         if self.satelliteTLEURLNew == IndicatorLunar.SATELLITE_TLE_URL:
             self.satelliteTLEDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
             if self.satelliteTLEDataNew is None:
@@ -3153,23 +3102,22 @@ class IndicatorLunar:
                     Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
                 else:
                     self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
-                    self.updateCacheTLE = True
         else:
             self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
-            self.updateCacheTLE = True
 
-        # When fetching new data, by default check all the data.
-        satellites = [ ]
-        if self.satelliteTLEDataNew is not None:
-            for key in self.satelliteTLEDataNew:
-                satellites.append( key )
+        self.updateOrbitalElementOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, True, IndicatorLunar.MESSAGE_SATELLITE_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_SATELLITE_NO_DATA )
 
-        self.updateOrbitalElementOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, satellites, self.satelliteTLEURLNew, True, IndicatorLunar.MESSAGE_SATELLITE_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_SATELLITE_NO_DATA )
-#         self.updateDisplayTags( displayTagsStore, None, self.satelliteTLEDataNew )
-        # Check if new satellite TLE data is being added...
-#         if satelliteTLEData is not None:
-#             for key in satelliteTLEData:
-#                 displayTagsStore.append( [ " ".join( key ), " ".join( key ), IndicatorLunar.DISPLAY_NEEDS_REFRESH ] )
+
+#TODO Test that this works!
+    def removeFromData( self, isSatellite ):
+        if isSatellite:
+            astronomicalObjectType = AstronomicalObjectType.Satellite
+        else:
+            astronomicalObjectType = AstronomicalObjectType.OrbitalElement
+
+        for key in list( self.data ): # Gets the keys and allows iteration with removal.
+            if key[ 0 ] == astronomicalObjectType:
+                self.data.pop( key )
 
 
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
@@ -3466,4 +3414,38 @@ class IndicatorLunar:
         return ( data, dateTime )
 
 
-if __name__ == "__main__": IndicatorLunar().main()
+if __name__ == "__main__": 
+    #IndicatorLunar().main()
+    
+    
+    
+    x = { }
+    x[ 1 ] = 'a'
+    x[ 2 ] = 'b'
+    x[ 3 ] = 'c'
+    x[ 4 ] = 'd'
+    x[ 5 ] = 'e'
+    x[ 6 ] = 'f'
+    x[ 7 ] = 'g'
+    x[ 8 ] = 'h'
+    x[ 9 ] = 'i'
+    x[ 10 ] = 'j'
+    x[ 11] = 'k'
+    x[ 12 ] = 'l'
+    x[ 13 ] = 'm'
+    x[ 14 ] = 'n'
+    x[ 15 ] = 'o'
+    x[ 16 ] = 'p'
+    x[ 17 ] = 'q'
+    x[ 18 ] = 'r'
+    x[ 19 ] = 's'
+    
+    print( len(x ) )
+
+
+    for key in list( x ):
+        if key == 3:
+            x.pop( 3 )
+
+    print( len(x ) )
+    
