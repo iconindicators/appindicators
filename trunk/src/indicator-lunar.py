@@ -36,10 +36,7 @@
 #TODO Remove print statements.
 
 
-#TODO The source of the OE names is NOT controlled by me...so make sure that when the OE data is originally loaded, it's always capitalised.
-
-
-#TODO Make sure the satellite name is always upper cased at the point of loading.
+#TODO The frequent updates, even without satellites, slow down or even lock up the indicator panel at times.  Can something be done?
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -400,13 +397,6 @@ class IndicatorLunar:
         PLANET_SATURN : [ MOON_SATURN_DIONE, MOON_SATURN_ENCELADUS, MOON_SATURN_HYPERION, MOON_SATURN_IAPETUS, MOON_SATURN_MIMAS, MOON_SATURN_RHEA, MOON_SATURN_TETHYS, MOON_SATURN_TITAN ],
         PLANET_URANUS : [ MOON_URANUS_ARIEL, MOON_URANUS_MIRANDA, MOON_URANUS_OBERON, MOON_URANUS_TITANIA, MOON_URANUS_UMBRIEL ] }
 
-    #TODO Likely delete
-    PLANETARY_MOONS = [
-        MOON_JUPITER_CALLISTO, MOON_JUPITER_EUROPA, MOON_JUPITER_GANYMEDE, MOON_JUPITER_IO,
-        MOON_MARS_DEIMOS, MOON_MARS_PHOBOS,
-        MOON_SATURN_DIONE, MOON_SATURN_ENCELADUS, MOON_SATURN_HYPERION, MOON_SATURN_IAPETUS, MOON_SATURN_MIMAS, MOON_SATURN_RHEA, MOON_SATURN_TETHYS, MOON_SATURN_TITAN,
-        MOON_URANUS_ARIEL, MOON_URANUS_MIRANDA, MOON_URANUS_OBERON, MOON_URANUS_TITANIA, MOON_URANUS_UMBRIEL ]
-
     PLANET_AND_MOON_NAMES_TRANSLATIONS = {
         PLANET_MERCURY        : _( "Mercury" ),
         PLANET_VENUS          : _( "Venus" ),
@@ -762,9 +752,9 @@ class IndicatorLunar:
     def __init__( self ):
         self.dialog = None
         self.data = { } # Key is a tuple of AstronomicalObjectType, a data tag (upper case( and data tag (upper case).  Value is the data ready for display.
-        self.orbitalElementData = { } # Key is the orbital element name, upper cased; value is the orbital element data string.
+        self.orbitalElementData = { } # Key is the orbital element name, upper cased; value is the orbital element data string.  Can be empty but never None.
         self.satelliteNotifications = { }
-        self.satelliteTLEData = { }
+        self.satelliteTLEData = { } # Key: ( satellite name upper cased, satellite number ) ; Value: satellite.TLE object.  Can be empty but never None.
 
         self.toggleOrbitalElementsTable = True
         self.togglePlanetsTable = True
@@ -841,11 +831,10 @@ class IndicatorLunar:
 
         # Ensure the update period is positive, at most every minute and at least every hour.
         if nextUpdateInSeconds < 60:
-            nextUpdateInSeconds = 60 # TODO Maybe make this 120 seconds?  Will this compromise the satellite stuff too much?
+            nextUpdateInSeconds = 60
         elif nextUpdateInSeconds > ( 60 * 60 ):
             nextUpdateInSeconds = ( 60 * 60 )
 
-#TODO The frequent updates, even without satellites, slow down or even lock up the indicator panel at times.  Can something be done?
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
         print( "updateFrontend - end  ", datetime.datetime.now() )
@@ -2064,7 +2053,7 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 0, 1, 1 )
 
-#TODO COnsider using lists instead.  Need to check on removal (and maybe add to avoid duplicates).
+#TODO Consider using lists instead.  Need to check on removal (and maybe append to avoid duplicates).
         self.tagsAdded = { }
         self.tagsRemoved = { } # Really just need a list but using a dict is easier to remove an item with checking if it exists.
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
@@ -2717,6 +2706,7 @@ class IndicatorLunar:
         self.dialog.show_all()
 
         # Some GUI elements will be hidden, which must be done after the dialog is shown.
+#TODO Test to see if these can be called at the point of construction and now after set to visible.
         self.updateOrbitalElementPreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, self.orbitalElements, orbitalElementURLEntry.get_text().strip() )
         self.updateSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip() )
 
@@ -3251,6 +3241,7 @@ class IndicatorLunar:
 
 
     # Returns a dict/hashtable of the orbital elements (comets) data from the specified URL (may be empty).
+    # Key: orbital element name, upper cased ; Value: entire orbital element string.
     # On error, returns None.
     def getOrbitalElementData( self, url ):
         try:
@@ -3258,7 +3249,7 @@ class IndicatorLunar:
             # For example
             #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
             # in which the first field (up to the first ',' is the name.
-            orbitalElementsData = { } # Key: orbital element name, upper cased ; Value: entire orbital element string.
+            orbitalElementsData = { }
             data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ) ):
                 if not data[ i ].startswith( "#" ):
@@ -3277,10 +3268,11 @@ class IndicatorLunar:
 
 
     # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
+    # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
     # On error, returns None.
     def getSatelliteTLEData( self, url ):
         try:
-            satelliteTLEData = { } # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
+            satelliteTLEData = { }
             data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ), 3 ):
                 tle = satellite.TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
