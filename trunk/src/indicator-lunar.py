@@ -741,7 +741,11 @@ class IndicatorLunar:
     MESSAGE_BODY_ALWAYS_UP = _( "Always Up!" )
     MESSAGE_BODY_NEVER_UP = _( "Never Up!" )
     MESSAGE_ORBITAL_ELEMENT_NO_DATA = _( "No orbital element data!" )
+    MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE = _( "Cannot access the orbital element data source\n<a href=\'{0}'>{0}</a>" )
+    MESSAGE_ORBITAL_ELEMENT_NO_DATA = _( "No orbital element data found at\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_SATELLITE_IS_CIRCUMPOLAR = _( "Satellite is circumpolar." )
+    MESSAGE_SATELLITE_BAD_DATA_SOURCE = _( "Cannot access the TLE data source\n<a href=\'{0}'>{0}</a>" )
+    MESSAGE_SATELLITE_NO_DATA = _( "No TLE data found at\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_SATELLITE_NEVER_RISES = _( "Satellite never rises." )
     MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS = _( "No passes within the next 10 days." )
     MESSAGE_SATELLITE_NO_TLE_DATA = _( "No TLE data!" )
@@ -2706,9 +2710,8 @@ class IndicatorLunar:
         self.dialog.show_all()
 
         # Some GUI elements will be hidden, which must be done after the dialog is shown.
-#TODO Test to see if these can be called at the point of construction and now after set to visible.
-        self.updateOrbitalElementPreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, self.orbitalElements, orbitalElementURLEntry.get_text().strip() )
-        self.updateSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip() )
+        self.updateOrbitalElementOrSatellitePreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, self.orbitalElements, orbitalElementURLEntry.get_text().strip(), False, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA )
+        self.updateOrbitalElementOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), True, IndicatorLunar.MESSAGE_SATELLITE_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_SATELLITE_NO_DATA )
 
         # Last thing to do after everything else is built, but before setting visible.        
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
@@ -2986,18 +2989,24 @@ class IndicatorLunar:
         return translatedText
 
 
-    def updateOrbitalElementPreferencesTab( self, grid, orbitalElementStore, orbitalElementData, orbitalElements, url ):
-        if orbitalElementData is None:
-            message = _( "Cannot access the orbital element data source\n<a href=\'{0}'>{0}</a>" ).format( url )
-        elif len( orbitalElementData ) == 0:
-            message = _( "No orbital element data found at\n<a href=\'{0}'>{0}</a>" ).format( url )
+    def updateOrbitalElementOrSatellitePreferencesTab( self, grid, store, data, objects, url, isSatellite, badDataSourceMessage, noDataMessage ):
+        if data is None:
+            message = badDataSourceMessage.format( url )
+        elif len( data ) == 0:
+            message = noDataMessage.format( url )
         else:
-            orbitalElementStore.clear()
+            store.clear()
             message = None
-            for key in orbitalElementData:
-                orbitalElement = orbitalElementData[ key ]
-                displayName = self.getOrbitalElementDisplayName( orbitalElement )
-                orbitalElementStore.append( [ key in orbitalElements, displayName ] )
+            if isSatellite:
+                for key in data:
+                    tle = data[ key ]
+                    checked = ( tle.getName().upper(), tle.getNumber() ) in objects
+                    store.append( [ checked, tle.getName(), tle.getNumber(), tle.getInternationalDesignator() ] )
+            else:
+                for key in data:
+                    orbitalElement = data[ key ]
+                    displayName = self.getOrbitalElementDisplayName( orbitalElement )
+                    store.append( [ key in objects, displayName ] )
 
         # Hide/show the label and scrolled window as appropriate.
         # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
@@ -3016,36 +3025,7 @@ class IndicatorLunar:
                     child.hide()
 
 
-    def updateSatellitePreferencesTab( self, grid, satelliteStore, satelliteTLEData, satellites, url ):
-        if satelliteTLEData is None:
-            message = _( "Cannot access the TLE data source\n<a href=\'{0}'>{0}</a>" ).format( url )
-        elif len( satelliteTLEData ) == 0:
-            message = _( "No TLE data found at\n<a href=\'{0}'>{0}</a>" ).format( url )
-        else:
-            satelliteStore.clear()
-            message = None
-            for key in satelliteTLEData:
-                tle = satelliteTLEData[ key ]
-                checked = ( tle.getName().upper(), tle.getNumber() ) in satellites
-                satelliteStore.append( [ checked, tle.getName(), tle.getNumber(), tle.getInternationalDesignator() ] )
-
-        # Hide/show the label and scrolled window as appropriate.
-        # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
-        children = grid.get_children()
-        for child in children:
-            if child.__class__.__name__ == "Label":
-                if message is None:
-                    child.hide()
-                else:
-                    child.show()
-                    child.set_markup( message )
-            elif child.__class__.__name__ == "ScrolledWindow":
-                if message is None:
-                    child.show()
-                else:
-                    child.hide()
-
-
+#TODO Check this is kosher.
     def onFetchOrbitalElementURL( self, button, entry, grid, orbitalElementStore, displayTagsStore ):
         if entry.get_text().strip() == "":
             entry.set_text( IndicatorLunar.ORBITAL_ELEMENT_DATA_URL )
@@ -3073,10 +3053,11 @@ class IndicatorLunar:
             for key in self.orbitalElementDataNew:
                 orbitalElements.append( key )
 
-        self.updateOrbitalElementPreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, orbitalElements, self.orbitalElementURLNew )
+        self.updateOrbitalElementOrSatellitePreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, orbitalElements, self.orbitalElementURLNew, False, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA )
         self.updateDisplayTags( displayTagsStore, None, self.orbitalElementDataNew )
 
 
+#TODO Check this is kosher.
     def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore, displayTagsStore ):
         if entry.get_text().strip() == "":
             entry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
@@ -3107,7 +3088,7 @@ class IndicatorLunar:
             for key in self.satelliteTLEDataNew:
                 satellites.append( key )
 
-        self.updateSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, satellites, self.satelliteTLEURLNew )
+        self.updateOrbitalElementOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, satellites, self.satelliteTLEURLNew, True, IndicatorLunar.MESSAGE_SATELLITE_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_SATELLITE_NO_DATA )
 #         self.updateDisplayTags( displayTagsStore, None, self.satelliteTLEDataNew )
         # Check if new satellite TLE data is being added...
 #         if satelliteTLEData is not None:
