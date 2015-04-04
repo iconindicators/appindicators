@@ -940,7 +940,8 @@ class IndicatorLunar:
 
             # Ensure the current time is within the rise/set...
             if ephemNowInLocalTime < ephem.Date( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) or \
-               ephemNowInLocalTime > ephem.Date( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ): continue
+               ephemNowInLocalTime > ephem.Date( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ):
+                continue
 
             # Show the notification for the particular satellite only once per pass...
             if ( satelliteName, satelliteNumber ) in self.satelliteNotifications and ephemNowInLocalTime < ephem.Date( self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] ):
@@ -1617,7 +1618,9 @@ class IndicatorLunar:
             city = self.getCity( currentDateTime )
             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
             satellite.compute( city )
-            try: nextPass = city.next_pass( satellite )
+            try:
+                nextPass = city.next_pass( satellite )
+
             except ValueError:
                 if satellite.circumpolar:
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR
@@ -1748,19 +1751,28 @@ class IndicatorLunar:
             logging.error( "No eclipse information found!" )
         else:
             eclipseType = None
-            if   eclipseInformation[ 1 ] == eclipse.EclipseType.Annular: eclipseType = _( "Annular" )
-            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Hybrid: eclipseType = _( "Hybrid (Annular/Total)" )
-            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Partial: eclipseType = _( "Partial" )
-            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Penumbral: eclipseType = _( "Penumbral" )
-            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Total: eclipseType = _( "Total" )
+            if eclipseInformation[ 1 ] == eclipse.EclipseType.Annular:
+                eclipseType = _( "Annular" )
+            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Hybrid:
+                eclipseType = _( "Hybrid (Annular/Total)" )
+            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Partial:
+                eclipseType = _( "Partial" )
+            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Penumbral:
+                eclipseType = _( "Penumbral" )
+            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Total:
+                eclipseType = _( "Total" )
 
             northOrSouth = None
-            if   eclipseInformation[ 3 ] == eclipse.CardinalDirection.N: northOrSouth = _( "N" )
-            elif eclipseInformation[ 3 ] == eclipse.CardinalDirection.S: northOrSouth = _( "S" )
+            if eclipseInformation[ 3 ] == eclipse.CardinalDirection.N:
+                northOrSouth = _( "N" )
+            elif eclipseInformation[ 3 ] == eclipse.CardinalDirection.S:
+                northOrSouth = _( "S" )
 
             eastOrWest = None
-            if   eclipseInformation[ 5 ] == eclipse.CardinalDirection.E: eastOrWest = _( "E" )
-            elif eclipseInformation[ 5 ] == eclipse.CardinalDirection.W: eastOrWest = _( "W" )
+            if eclipseInformation[ 5 ] == eclipse.CardinalDirection.E:
+                eastOrWest = _( "E" )
+            elif eclipseInformation[ 5 ] == eclipse.CardinalDirection.W:
+                eastOrWest = _( "W" )
 
             if eclipseType is None:
                 logging.error( "Unknown eclipse type", eclipseInformation )
@@ -1836,16 +1848,26 @@ class IndicatorLunar:
         bodyName = body.name
         bodyCopy = None
 
-        if    bodyName == "Sun": bodyCopy = ephem.Sun()
-        elif  bodyName == "Moon": bodyCopy = ephem.Moon()
-        elif  bodyName == "Mercury": bodyCopy = ephem.Mercury()
-        elif  bodyName == "Venus": bodyCopy = ephem.Venus()
-        elif  bodyName == "Mars": bodyCopy = ephem.Mars()
-        elif  bodyName == "Jupiter": bodyCopy = ephem.Jupiter()
-        elif  bodyName == "Saturn": bodyCopy = ephem.Saturn()
-        elif  bodyName == "Uranus": bodyCopy = ephem.Uranus()
-        elif  bodyName == "Neptune": bodyCopy = ephem.Neptune()
-        elif  bodyName == "Pluto": bodyCopy = ephem.Pluto()
+        if bodyName == "Sun":
+            bodyCopy = ephem.Sun()
+        elif bodyName == "Moon":
+            bodyCopy = ephem.Moon()
+        elif bodyName == "Mercury":
+            bodyCopy = ephem.Mercury()
+        elif bodyName == "Venus":
+            bodyCopy = ephem.Venus()
+        elif bodyName == "Mars":
+            bodyCopy = ephem.Mars()
+        elif bodyName == "Jupiter":
+            bodyCopy = ephem.Jupiter()
+        elif bodyName == "Saturn":
+            bodyCopy = ephem.Saturn()
+        elif bodyName == "Uranus":
+            bodyCopy = ephem.Uranus()
+        elif bodyName == "Neptune":
+            bodyCopy = ephem.Neptune()
+        elif bodyName == "Pluto":
+            bodyCopy = ephem.Pluto()
         else: bodyCopy = ephem.star( bodyName ) # If not the sun/moon/planet, assume a star.
 
         return bodyCopy
@@ -1893,10 +1915,10 @@ class IndicatorLunar:
 
 
     def getBooleanTranslatedText( self, booleanText ):
-            if booleanText == IndicatorLunar.TRUE_TEXT:
-                return IndicatorLunar.TRUE_TEXT_TRANSLATION
+        if booleanText == IndicatorLunar.TRUE_TEXT:
+            return IndicatorLunar.TRUE_TEXT_TRANSLATION
             
-            return IndicatorLunar.FALSE_TEXT_TRANSLATION
+        return IndicatorLunar.FALSE_TEXT_TRANSLATION
 
 
     # Used to instantiate a new city object/observer.
@@ -2057,9 +2079,8 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 0, 1, 1 )
 
-#TODO Consider using lists instead.  Need to check on removal (and maybe append to avoid duplicates).
-        self.tagsAdded = { }
-        self.tagsRemoved = { } # Really just need a list but using a dict is easier to remove an item with checking if it exists.
+        self.tagsAdded = { } # A list would use less memory, but a dict (after running timing tests) is significantly faster!
+        self.tagsRemoved = { } # See above!
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         for key in self.data.keys():
             self.appendToDisplayTagsStore( key, self.data[ key ], displayTagsStore )
@@ -2717,7 +2738,8 @@ class IndicatorLunar:
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
 
         while True:
-            if self.dialog.run() != Gtk.ResponseType.OK: break
+            if self.dialog.run() != Gtk.ResponseType.OK:
+                break
 
             if satelliteMenuText.get_text().strip() == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Satellite menu text cannot be empty." ) )
@@ -2769,11 +2791,13 @@ class IndicatorLunar:
 
             self.planets = [ ]
             for row in planetStore:
-                if row[ 0 ]: self.planets.append( row[ 1 ] )
+                if row[ 0 ]:
+                    self.planets.append( row[ 1 ] )
 
             self.stars = [ ]
             for row in starStore:
-                if row[ 0 ]: self.stars.append( row[ 1 ] )
+                if row[ 0 ]:
+                    self.stars.append( row[ 1 ] )
 
             if self.orbitalElementURLNew is not None: # The URL will only be None on intialisation.
                 self.orbitalElementURL = self.orbitalElementURLNew # The URL could still be invalid, but it will not be None.
@@ -2821,7 +2845,9 @@ class IndicatorLunar:
 
             self.saveSettings()
 
-            if not os.path.exists( IndicatorLunar.AUTOSTART_PATH ): os.makedirs( IndicatorLunar.AUTOSTART_PATH )
+            if not os.path.exists( IndicatorLunar.AUTOSTART_PATH ):
+                os.makedirs( IndicatorLunar.AUTOSTART_PATH )
+
             if autostartCheckbox.get_active():
                 try:
                     shutil.copy( IndicatorLunar.DESKTOP_PATH + IndicatorLunar.DESKTOP_FILE, IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
@@ -2830,7 +2856,8 @@ class IndicatorLunar:
             else:
                 try:
                     os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
-                except: pass
+                except:
+                    pass
 
             self.data = { } # Erase the data as the user may have changed the satellites and/or location.
             break
@@ -2931,7 +2958,8 @@ class IndicatorLunar:
 
                     iter = tagsStore.iter_next( iter )
 
-                if not found: translatedText += "[" + tag + chunk[ rightBracket : ]
+                if not found:
+                    translatedText += "[" + tag + chunk[ rightBracket : ]
 
         return translatedText
 
@@ -3268,10 +3296,12 @@ class IndicatorLunar:
         self.werewolfWarningMessage = IndicatorLunar.WEREWOLF_WARNING_MESSAGE_DEFAULT
         self.werewolfWarningSummary = IndicatorLunar.WEREWOLF_WARNING_SUMMARY_DEFAULT
 
-        if not os.path.isfile( IndicatorLunar.SETTINGS_FILE ): return
+        if not os.path.isfile( IndicatorLunar.SETTINGS_FILE ):
+            return
 
         try:
-            with open( IndicatorLunar.SETTINGS_FILE, "r" ) as f: settings = json.load( f )
+            with open( IndicatorLunar.SETTINGS_FILE, "r" ) as f:
+                settings = json.load( f )
 
             global _city_data
             cityElevation = settings.get( IndicatorLunar.SETTINGS_CITY_ELEVATION, _city_data.get( self.cityName )[ 2 ] )
@@ -3350,7 +3380,8 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_SUMMARY: self.werewolfWarningSummary
             }
 
-            with open( IndicatorLunar.SETTINGS_FILE, "w" ) as f: f.write( json.dumps( settings ) )
+            with open( IndicatorLunar.SETTINGS_FILE, "w" ) as f:
+                f.write( json.dumps( settings ) )
 
         except Exception as e:
             logging.exception( e )
