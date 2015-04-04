@@ -3026,7 +3026,7 @@ class IndicatorLunar:
             if preExists:
                 self.tagsRemoved[ t ] = None # The value is not actually used.
             else:
-                self.tagsAdded.pop( t ) #TODO Not sure if None should be put in as the second parameter (as above in tagsRemoved).
+                self.tagsAdded.pop( t )
 
 
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
@@ -3414,38 +3414,4 @@ class IndicatorLunar:
         return ( data, dateTime )
 
 
-if __name__ == "__main__": 
-    #IndicatorLunar().main()
-    
-    
-    
-    x = { }
-    x[ 1 ] = 'a'
-    x[ 2 ] = 'b'
-    x[ 3 ] = 'c'
-    x[ 4 ] = 'd'
-    x[ 5 ] = 'e'
-    x[ 6 ] = 'f'
-    x[ 7 ] = 'g'
-    x[ 8 ] = 'h'
-    x[ 9 ] = 'i'
-    x[ 10 ] = 'j'
-    x[ 11] = 'k'
-    x[ 12 ] = 'l'
-    x[ 13 ] = 'm'
-    x[ 14 ] = 'n'
-    x[ 15 ] = 'o'
-    x[ 16 ] = 'p'
-    x[ 17 ] = 'q'
-    x[ 18 ] = 'r'
-    x[ 19 ] = 's'
-    
-    print( len(x ) )
-
-
-    for key in list( x ):
-        if key == 3:
-            x.pop( 3 )
-
-    print( len(x ) )
-    
+if __name__ == "__main__": IndicatorLunar().main()
