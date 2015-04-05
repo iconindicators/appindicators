@@ -2823,6 +2823,9 @@ class IndicatorLunar:
             else:
                 self.satelliteTLEData = self.satelliteTLEDataNew # The retrieved TLE data is good (but still could be empty).
 
+#TODO Why are we writing to the cache here (and for OE above)?
+#Surely should only write to the cache if a fetch was done right?
+#More to the point...if a user does a fetch, when they hit ok only then should the data be written to the cache right?
             self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
             self.lastUpdateTLE = datetime.datetime.now() #TODO Should this be updated only if the url is NOT the default or always?  Ditto for OE above.
 
