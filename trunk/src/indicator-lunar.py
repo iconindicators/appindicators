@@ -39,6 +39,10 @@
 #TODO The frequent updates, even without satellites, slow down or even lock up the indicator panel at times.  Can something be done?
 
 
+#TODO When satellites are enabled with only show visible passes, startup takes 10 seconds.
+#Also when ok/cancel on the Preferences, the update takes the same time...shorten it!!!
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -151,7 +155,7 @@ class IndicatorLunar:
     DATA_ILLUMINATION = "ILLUMINATION"
     DATA_MAGNITUDE = "MAGNITUDE"
     DATA_MESSAGE = "MESSAGE"
-    DATA_NAME = "NAME" # Used for CITY "body" tag.
+    DATA_NAME = "NAME" # Only used for the CITY "body" tag.
     DATA_NEW = "NEW"
     DATA_PHASE = "PHASE"
     DATA_RIGHT_ASCENSION = "RIGHT ASCENSION"
@@ -239,7 +243,7 @@ class IndicatorLunar:
         DATA_ILLUMINATION               : _( "ILLUMINATION" ),
         DATA_MAGNITUDE                  : _( "MAGNITUDE" ),
         DATA_MESSAGE                    : _( "MESSAGE" ),
-        DATA_NAME                       : _( "NAME" ), # Used only for CITY "body" tag only.
+        DATA_NAME                       : _( "NAME" ), # Only used for CITY "body" tag.
         DATA_NEW                        : _( "NEW" ),
         DATA_PHASE                      : _( "PHASE" ),
         DATA_RIGHT_ASCENSION            : _( "RIGHT ASCENSION" ),
@@ -2394,9 +2398,8 @@ class IndicatorLunar:
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
-        # Need a local copy of the orbital element URL and orbital element data.
-        self.orbitalElementDataNew = self.orbitalElementData
-        self.orbitalElementURLNew = self.orbitalElementURL
+        self.orbitalElementDataNew = None
+        self.orbitalElementURLNew = None
 
         orbitalElementURLEntry = Gtk.Entry()
         orbitalElementURLEntry.set_text( self.orbitalElementURL )
@@ -2404,7 +2407,7 @@ class IndicatorLunar:
         orbitalElementURLEntry.set_tooltip_text( _(
             "The URL from which to source orbital element data.\n" + \
             "For a local file, use 'file:///' and the filename.\n\n" + \
-            "If you change the URL, you must fetch the new data.\n" + \
+            "If you change the URL, you must fetch the new data.\n\n" + \
             "To disable, set a bogus URL such as 'http://'." ) )
         box.pack_start( orbitalElementURLEntry, True, True, 0 )
 
@@ -2479,9 +2482,8 @@ class IndicatorLunar:
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
-        # Need a local copy of the satellite TLE URL and satellite TLE data.
-        self.satelliteTLEDataNew = self.satelliteTLEData
-        self.satelliteTLEURLNew = self.satelliteTLEURL
+        self.satelliteTLEDataNew = None
+        self.satelliteTLEURLNew = None
 
         TLEURLEntry = Gtk.Entry()
         TLEURLEntry.set_text( self.satelliteTLEURL )
@@ -2799,40 +2801,43 @@ class IndicatorLunar:
                 if row[ 0 ]:
                     self.stars.append( row[ 1 ] )
 
-            if self.orbitalElementURLNew is not None: # The URL will only be None on intialisation.
-                self.orbitalElementURL = self.orbitalElementURLNew # The URL could still be invalid, but it will not be None.
-  
-            if self.orbitalElementDataNew is None:
-                self.orbitalElementData = { } # The retrieved orbital element data was bad, so reset to empty data.
-            else:
-                self.orbitalElementData = self.orbitalElementDataNew # The retrieved orbital element data is good (but still could be empty).
+            if self.orbitalElementURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
+                self.orbitalElementURL = self.orbitalElementURLNew # The URL may or may not be valie, but it will not be None.
+                if self.orbitalElementDataNew is None:
+                    print( "Bad OE data" )
+                    self.orbitalElementData = { } # The retrieved data was bad, so reset to empty data.
+                else:
+                    self.orbitalElementData = self.orbitalElementDataNew # The retrieved data is good (but still could be empty).
+                    print( "Good OE data of length", len(self.orbitalElementData))
 
-            self.writeToCache( self.orbitalElementData, IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME )
-            self.lastUpdateOE = datetime.datetime.now()
+                self.writeToCache( self.orbitalElementData, IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME )
+                self.lastUpdateOE = datetime.datetime.now()
 
             self.orbitalElements = [ ]
             for orbitalElement in orbitalElementStore:
                 if orbitalElement[ 0 ]:
                     self.orbitalElements.append( orbitalElement[ 1 ].upper() )
 
-            if self.satelliteTLEURLNew is not None: # The URL will only be None on intialisation.
-                self.satelliteTLEURL = self.satelliteTLEURLNew # The URL could still be invalid, but it will not be None.
-  
-            if self.satelliteTLEDataNew is None:
-                self.satelliteTLEData = { } # The retrieved TLE data was bad, so reset to empty data.
-            else:
-                self.satelliteTLEData = self.satelliteTLEDataNew # The retrieved TLE data is good (but still could be empty).
+            print( self.orbitalElements)
 
-#TODO Why are we writing to the cache here (and for OE above)?
-#Surely should only write to the cache if a fetch was done right?
-#More to the point...if a user does a fetch, when they hit ok only then should the data be written to the cache right?
-            self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
-            self.lastUpdateTLE = datetime.datetime.now() #TODO Should this be updated only if the url is NOT the default or always?  Ditto for OE above.
+            if self.satelliteTLEURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
+                self.satelliteTLEURL = self.satelliteTLEURLNew # The URL may or may not be valie, but it will not be None.
+                if self.satelliteTLEDataNew is None:
+                    print( "Bad TLE data" )
+                    self.satelliteTLEData = { } # The retrieved data was bad, so reset to empty data.
+                else:
+                    self.satelliteTLEData = self.satelliteTLEDataNew # The retrieved data is good (but still could be empty).
+                    print( "Good TLE data of length", len(self.satelliteTLEData))
+
+                self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
+                self.lastUpdateTLE = datetime.datetime.now()
 
             self.satellites = [ ]
             for satelliteTLE in satelliteStore:
                 if satelliteTLE[ 0 ]:
                     self.satellites.append( ( satelliteTLE[ 1 ].upper(), satelliteTLE[ 2 ] ) )
+
+            print( self.satellites)
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
@@ -2978,12 +2983,12 @@ class IndicatorLunar:
 
 
     def updateOrbitalElementOrSatellitePreferencesTab( self, grid, dataStore, data, objects, url, isSatellite, badDataSourceMessage, noDataMessage ):
+        dataStore.clear()
         if data is None:
             message = badDataSourceMessage.format( url )
         elif len( data ) == 0:
             message = noDataMessage.format( url )
         else:
-            dataStore.clear()
             message = None
             if isSatellite:
                 for key in data:
@@ -3011,6 +3016,68 @@ class IndicatorLunar:
                     child.show()
                 else:
                     child.hide()
+
+
+    def onFetchOrbitalElementURL( self, button, entry, grid, orbitalElementStore, displayTagsStore ):
+        self.removeFromData( False )
+        if entry.get_text().strip() == "":
+            entry.set_text( IndicatorLunar.ORBITAL_ELEMENT_DATA_URL )
+
+        self.orbitalElementURLNew = entry.get_text().strip()
+
+        # If the URL is the default, use the cache to avoid annoying the default data source.
+        if self.orbitalElementURLNew == IndicatorLunar.ORBITAL_ELEMENT_DATA_URL:
+            self.orbitalElementDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
+            if self.orbitalElementDataNew is None:
+                # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
+                if datetime.datetime.now() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) ):
+                    nextDownload = str( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) )
+                    summary = _( "Orbital Element data fetch aborted" )
+                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}" ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+                else:
+                    self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
+        else:
+            self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
+
+        self.updateOrbitalElementOrSatellitePreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, [ ], self.orbitalElementURLNew, False, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA )
+
+
+    def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore, displayTagsStore ):
+        self.removeFromData( True )
+        if entry.get_text().strip() == "":
+            entry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
+
+        self.satelliteTLEURLNew = entry.get_text().strip()
+
+        # If the URL is the default, use the cache to avoid annoying the default data source.
+        if self.satelliteTLEURLNew == IndicatorLunar.SATELLITE_TLE_URL:
+            self.satelliteTLEDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
+            if self.satelliteTLEDataNew is None:
+                # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
+                if datetime.datetime.now() < ( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
+                    nextDownload = str( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) )
+                    summary = _( "Satellite TLE data fetch aborted" )
+                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}" ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+                else:
+                    self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
+        else:
+            self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
+
+        self.updateOrbitalElementOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, True, IndicatorLunar.MESSAGE_SATELLITE_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_SATELLITE_NO_DATA )
+
+
+#TODO Test that this works!
+    def removeFromData( self, isSatellite ):
+        if isSatellite:
+            astronomicalObjectType = AstronomicalObjectType.Satellite
+        else:
+            astronomicalObjectType = AstronomicalObjectType.OrbitalElement
+
+        for key in list( self.data ): # Gets the keys and allows iteration with removal.
+            if key[ 0 ] == astronomicalObjectType:
+                self.data.pop( key )
 
 
     def onPlanetToggled( self, widget, row, planetStore ):
@@ -3087,68 +3154,6 @@ class IndicatorLunar:
             for row in range( len( dataStore ) ):
                 dataStore[ row ][ 0 ] = bool( not toggle )
                 getattr( self, functionName )( widget, str( row ), dataStore )
-
-
-    def onFetchOrbitalElementURL( self, button, entry, grid, orbitalElementStore, displayTagsStore ):
-        self.removeFromData( False )
-        if entry.get_text().strip() == "":
-            entry.set_text( IndicatorLunar.ORBITAL_ELEMENT_DATA_URL )
-
-        self.orbitalElementURLNew = entry.get_text().strip()
-
-        # If the URL is the default, use the cache to avoid annoying the default data source.
-        if self.orbitalElementURLNew == IndicatorLunar.ORBITAL_ELEMENT_DATA_URL:
-            self.orbitalElementDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
-            if self.orbitalElementDataNew is None:
-                # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
-                if datetime.datetime.now() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) ):
-                    nextDownload = str( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) )
-                    summary = _( "Orbital Element data fetch aborted" )
-                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}" ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-                else:
-                    self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
-        else:
-            self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
-
-        self.updateOrbitalElementOrSatellitePreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, [ ], self.orbitalElementURLNew, False, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA )
-
-
-    def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore, displayTagsStore ):
-        self.removeFromData( True )
-        if entry.get_text().strip() == "":
-            entry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
-
-        self.satelliteTLEURLNew = entry.get_text().strip()
-
-        # If the URL is the default, use the cache to avoid annoying the default data source.
-        if self.satelliteTLEURLNew == IndicatorLunar.SATELLITE_TLE_URL:
-            self.satelliteTLEDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
-            if self.satelliteTLEDataNew is None:
-                # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
-                if datetime.datetime.now() < ( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
-                    nextDownload = str( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) )
-                    summary = _( "Satellite TLE data fetch aborted" )
-                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}" ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-                else:
-                    self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
-        else:
-            self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
-
-        self.updateOrbitalElementOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, True, IndicatorLunar.MESSAGE_SATELLITE_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_SATELLITE_NO_DATA )
-
-
-#TODO Test that this works!
-    def removeFromData( self, isSatellite ):
-        if isSatellite:
-            astronomicalObjectType = AstronomicalObjectType.Satellite
-        else:
-            astronomicalObjectType = AstronomicalObjectType.OrbitalElement
-
-        for key in list( self.data ): # Gets the keys and allows iteration with removal.
-            if key[ 0 ] == astronomicalObjectType:
-                self.data.pop( key )
 
 
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
