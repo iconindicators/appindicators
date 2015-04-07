@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 
 
-# Icons...
+# Possible source of icons...
 # http://www.flaticon.com/search/satellite
-
-
-# Determine how many of the satellites et al from Celestrak
-# are rocket booster, debris, platform, payload or unknown
-# by looking at the full text database from Celestrak.
 
 
 from urllib.request import urlopen
@@ -35,46 +30,43 @@ def getSatelliteTLEData( url ):
     return satelliteTLEData
 
 
-useSatCat = True
-if useSatCat:
-    satCat = getSatCat( "http://celestrak.com/pub/satcat.txt" )
+# Determine how many of the satellites from Celestrak are
+# rocket booster, debris, platform, payload or unknown.
+def getCountsOfSatelliteTypes( satelliteTLEData, satCat ):
+    unknowns = [ ]
+    rb = [ ]
+    deb = [ ]
+    plat = [ ]
+    pay = [ ]
+    for key in satelliteTLEData:
+        title = key
+        line1 = satelliteTLEData[ key ][ 0 ]
+        line2 = satelliteTLEData[ key ][ 1 ]
 
-satelliteTLEData = getSatelliteTLEData( "http://celestrak.com/NORAD/elements/visual.txt" )
-unknowns = [ ]
-rb = [ ]
-deb = [ ]
-plat = [ ]
-pay = [ ]
-for key in satelliteTLEData:
-    title = key
-    line1 = satelliteTLEData[ key ][ 0 ]
-    line2 = satelliteTLEData[ key ][ 1 ]
+        launchYear = line1[ 9 : 11 ]
+        if int( launchYear ) < 57:
+            launchYear = "20" + launchYear
+        else:
+            launchYear = "19" + launchYear 
 
-    launchYear = line1[ 9 : 11 ]
-    if int( launchYear ) < 57:
-        launchYear = "20" + launchYear
-    else:
-        launchYear = "19" + launchYear 
+        launchYear + "-" + line1[ 11 : 17 ].strip()
 
-    launchYear + "-" + line1[ 11 : 17 ].strip()
+        name = title
+        number = line1[ 2 : 7 ]
+        internationalDesignator = launchYear
 
-    name = title
-    number = line1[ 2 : 7 ]
-    internationalDesignator = launchYear
+        if "R/B" in name.upper():
+            rb.append( name )
+            continue
 
-    if "R/B" in name.upper():
-        rb.append( name )
-        continue
+        if "DEB" in name.upper():
+            deb.append( name )
+            continue
 
-    if "DEB" in name.upper():
-        deb.append( name )
-        continue
+        if "PLAT" in name.upper():
+            plat.append( name )
+            continue
 
-    if "PLAT" in name.upper():
-        plat.append( name )
-        continue
-
-    if useSatCat:
         payload = satCat[ number ][ 20 ]
         if "*" in payload:
             pay.append( name )
@@ -82,12 +74,44 @@ for key in satelliteTLEData:
 
     unknowns.append( name )
 
-if useSatCat:
-    print( "SatCat size:", len( satCat ) )
+    return ( rb, deb, plat, pay, unknowns )
 
-print( "TLE data size:", len( satelliteTLEData ) )
+
+
+# If a satellite in the satcat data...
+#    Has a D or ? in column 22 as per http://celestrak.com/satcat/status.asp
+#    Has a date in columns 76-85 inclusive (is not whitespace/empty) 
+# drop it as it is decayed as per http://celestrak.com/satcat/satcat-format.asp
+def getSatellitesNonDecayed( satCat ):
+    satellitesNonDecayed = [ ]
+    for key in satCat:
+        operationalStatusCode = satCat[ key ][ 21 ]
+        if operationalStatusCode.upper() == "D" or operationalStatusCode.upper() == "?":
+            continue
+
+        decayDate = satCat[ key ][ 75 : 85 ]
+        if decayDate.strip() == "":
+            satellitesNonDecayed.append( satCat[ key ][ 23 : 47 ].strip() )
+
+    return satellitesNonDecayed
+
+
+satelliteTLEData = getSatelliteTLEData( "http://celestrak.com/NORAD/elements/visual.txt" )
+print( "Number of satellites in TLE data:", len( satelliteTLEData ) )
+
+
+satCat = getSatCat( "file:///home/bernard/Desktop/satcat.txt" )
+#satCat = getSatCat( "http://celestrak.com/pub/satcat.txt" )
+print( "Number of satellites in the catalogue:", len( satCat ) )
+
+
+rb, deb, plat, pay, unknowns = getCountsOfSatelliteTypes( satelliteTLEData, satCat )
 print( "R/B:", len( rb ), sorted( rb ) )
 print( "DEB:", len( deb ), sorted( deb ) )
 print( "PLAT:", len( plat ), sorted( plat ) )
 print( "PAYLOAD:", len( pay ), sorted( pay ) )
 print( "Unknowns:", len( unknowns ), sorted( unknowns ) )
+
+
+satellitesNonDecayed = getSatellitesNonDecayed( satCat )
+print( "Number of satellites not decayed in the catalogue:", len( satellitesNonDecayed ) )
