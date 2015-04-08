@@ -1616,7 +1616,8 @@ class IndicatorLunar:
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
         key = ( AstronomicalObjectType.Satellite, " ".join( key ) )
         currentDateTime = ephemNow
-        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 10 ) # Stop looking for passes 10 days from ephemNow.
+#TODO Change to 3 days?        
+        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 3 ) # Stop looking for passes 10 days from ephemNow.
         message = None
         while currentDateTime < endDateTime:
             city = self.getCity( currentDateTime )
