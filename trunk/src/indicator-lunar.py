@@ -32,6 +32,9 @@
 #  https://wiki.gnome.org/Projects/PyGObject
 #  http://lazka.github.io/pgi-docs
 
+#TODO Maybe add a period to the end of the texts
+#         message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}" ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
+
 
 #TODO Remove print statements.
 
@@ -41,6 +44,11 @@
 
 #TODO When satellites are enabled with only show visible passes, startup takes 10 seconds.
 #Also when ok/cancel on the Preferences, the update takes the same time...shorten it!!!
+
+
+#TODO Remove the satellites and OE.  Run indicator and click the "auto add" options.
+#Click OK...nothing auto adds.
+#Close indicator, run again, nothing adds.
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -1616,8 +1624,8 @@ class IndicatorLunar:
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
         key = ( AstronomicalObjectType.Satellite, " ".join( key ) )
         currentDateTime = ephemNow
-#TODO Change to 3 days?        
-        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 3 ) # Stop looking for passes 10 days from ephemNow.
+#TODO Add a tooltip saying it's 3 days.
+        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 3 ) # Stop looking for passes 3 days from ephemNow.
         message = None
         while currentDateTime < endDateTime:
             city = self.getCity( currentDateTime )
