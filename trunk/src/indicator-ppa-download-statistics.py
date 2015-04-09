@@ -105,7 +105,7 @@ class IndicatorPPADownloadStatistics:
 
     def main( self ):
         self.requestPPADownloadAndMenuRefresh( False )
-        GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every 6 hours.
+        GLib.timeout_add_seconds( 12 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every 12 hours.
         Gtk.main()
 
 

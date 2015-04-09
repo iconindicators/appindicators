@@ -1,5 +1,13 @@
 indicator-ppa-download-statistics (1.0.46-1) precise; urgency=low
 
+  * Reduced the update frequency to every 12 hours (increased from 6) to avoid
+    taxing LaunchPad.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 9 Feb 2015 15:03:37 +1000
+
+
+indicator-ppa-download-statistics (1.0.46-1) precise; urgency=low
+
   * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
     in this miracle! 
   * Added Russian translation.  Thanks to Oleg Moiseichuk. 
