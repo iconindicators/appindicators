@@ -45,13 +45,14 @@ class PPA( object ):
 
 
     def setStatus( self, status ):
-        if status == PPA.STATUS_OK: self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
+        if status == PPA.STATUS_OK:
+            self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
 
         if status == PPA.STATUS_ERROR_RETRIEVING_PPA or \
-            status == PPA.STATUS_MULTIPLE_ERRORS or \
-            status == PPA.STATUS_NEEDS_DOWNLOAD or \
-            status == PPA.STATUS_NO_PUBLISHED_BINARIES or \
-            status == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+           status == PPA.STATUS_MULTIPLE_ERRORS or \
+           status == PPA.STATUS_NEEDS_DOWNLOAD or \
+           status == PPA.STATUS_NO_PUBLISHED_BINARIES or \
+           status == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             self.publishedBinaries = [ ]
 
         self.status = status
@@ -77,7 +78,8 @@ class PPA( object ):
 
     # Returns a key of the form 'PPA User | PPA Name | Series | Architecture' or 'PPA User | PPA Name' if series/architecture are undefined. 
     def getKey( self ):
-        if self.series is None or self.architecture is None: return str( self.user ) + " | " + str( self.name )
+        if self.series is None or self.architecture is None:
+            return str( self.user ) + " | " + str( self.name )
 
         return str( self.user ) + " | " + str( self.name ) + " | " + str( self.series ) + " | " + str( self.architecture )
 
@@ -94,7 +96,8 @@ class PPA( object ):
 
     def sortPublishedBinariesByDownloadCountAndClip( self, clipAmount ):
         self.publishedBinaries.sort( key = operator.methodcaller( "getDownloadCount" ), reverse = True )
-        if clipAmount > 0: del self.publishedBinaries[ clipAmount : ]
+        if clipAmount > 0:
+            del self.publishedBinaries[ clipAmount : ]
 
 
     def resetPublishedBinaries( self ): self.publishedBinaries = [ ]
