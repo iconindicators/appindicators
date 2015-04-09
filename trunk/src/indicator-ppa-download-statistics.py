@@ -252,7 +252,9 @@ class IndicatorPPADownloadStatistics:
                     temp[ key ].setDownloadCount( temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount() ) # Append the download count.
 
             ppa.resetPublishedBinaries()
-            for key in temp: ppa.addPublishedBinary( temp[ key ] )
+            for key in temp:
+                ppa.addPublishedBinary( temp[ key ] )
+
             if ppa.getStatus() == PPA.STATUS_OK:
                 ppa.setStatus( PPA.STATUS_OK ) # This will force the published binaries to be sorted.
 
@@ -294,20 +296,20 @@ class IndicatorPPADownloadStatistics:
             return
 
         self.dialog = pythonutils.AboutDialog(
-                INDICATOR_NAME,
-                IndicatorPPADownloadStatistics.COMMENTS, 
-                IndicatorPPADownloadStatistics.WEBSITE, 
-                IndicatorPPADownloadStatistics.WEBSITE, 
-                IndicatorPPADownloadStatistics.VERSION, 
-                Gtk.License.GPL_3_0, 
-                IndicatorPPADownloadStatistics.ICON,
-                [ IndicatorPPADownloadStatistics.AUTHOR ],
-                "",
-                "",
-                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
-                _( "Change _Log" ),
-                _( "translator-credits" ),
-                logging )
+            INDICATOR_NAME,
+            IndicatorPPADownloadStatistics.COMMENTS, 
+            IndicatorPPADownloadStatistics.WEBSITE, 
+            IndicatorPPADownloadStatistics.WEBSITE, 
+            IndicatorPPADownloadStatistics.VERSION, 
+            Gtk.License.GPL_3_0, 
+            IndicatorPPADownloadStatistics.ICON,
+            [ IndicatorPPADownloadStatistics.AUTHOR ],
+            "",
+            "",
+            "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
+            _( "Change _Log" ),
+            _( "translator-credits" ),
+            logging )
 
         self.dialog.run()
         self.dialog.destroy()
@@ -440,41 +442,40 @@ class IndicatorPPADownloadStatistics:
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
         combinePPAsCheckbox = Gtk.CheckButton( _( "Combine PPAs" ) )
-        toolTip = _( "Combine the statistics of binary packages\n" + \
-                     "when the PPA user/name are the same.\n\n" + \
-                     "When a package is NOT architecture specific:\n" + \
-                     "If the package names and version numbers\n" + \
-                     "of two binary packages are identical,\n" + \
-                     "the packages are treated as the same package\n" + \
-                     "and the download counts are NOT summed.\n" + \
-                     "Packages such as Python fall into this category.\n\n" + \
-                     "When a package IS architecture specific:\n" + \
-                     "If the package names and version numbers\n" + \
-                     "of two binary packages are identical,\n" + \
-                     "the packages are treated as the same package\n" + \
-                     "and the download counts ARE summed.\n" + \
-                     "Packages such as compiled C fall into this category." )
-        combinePPAsCheckbox.set_tooltip_text( toolTip )
+        combinePPAsCheckbox.set_tooltip_text( _( 
+            "Combine the statistics of binary packages\n" + \
+             "when the PPA user/name are the same.\n\n" + \
+             "When a package is NOT architecture specific:\n" + \
+             "If the package names and version numbers\n" + \
+             "of two binary packages are identical,\n" + \
+             "the packages are treated as the same package\n" + \
+             "and the download counts are NOT summed.\n" + \
+             "Packages such as Python fall into this category.\n\n" + \
+             "When a package IS architecture specific:\n" + \
+             "If the package names and version numbers\n" + \
+             "of two binary packages are identical,\n" + \
+             "the packages are treated as the same package\n" + \
+             "and the download counts ARE summed.\n" + \
+             "Packages such as compiled C fall into this category." ) )
         combinePPAsCheckbox.set_active( self.combinePPAs )
         combinePPAsCheckbox.set_margin_top( 10 )
         grid.attach( combinePPAsCheckbox, 0, 1, 2, 1 )
 
         ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( _( "Ignore version for architecture specific" ) )
         ignoreVersionArchitectureSpecificCheckbox.set_margin_left( 15 )
-
-        toolTip = _( "Sometimes architecture specific packages with the\n" + \
-                     "same package name but different version 'number'\n" + \
-                     "are logically the SAME package.\n\n" + \
-                     "For example, a C source package for both\n" + \
-                     "Ubuntu Saucy and Ubuntu Trusty will be compiled\n" + \
-                     "twice, each with a different version 'number',\n" + \
-                     "despite being the SAME release.\n\n" + \
-                     "Checking this option will ignore the version\n" + \
-                     "number when determining if two architecture\n" + \
-                     "specific packages are identical.\n\n" + \
-                     "The version number is retained only if it is\n" + \
-                     "identical across ALL instances of a published binary." )
-        ignoreVersionArchitectureSpecificCheckbox.set_tooltip_text( toolTip )
+        ignoreVersionArchitectureSpecificCheckbox.set_tooltip_text( _(
+            "Sometimes architecture specific packages with the\n" + \
+            "same package name but different version 'number'\n" + \
+            "are logically the SAME package.\n\n" + \
+            "For example, a C source package for both\n" + \
+            "Ubuntu Saucy and Ubuntu Trusty will be compiled\n" + \
+            "twice, each with a different version 'number',\n" + \
+            "despite being the SAME release.\n\n" + \
+            "Checking this option will ignore the version\n" + \
+            "number when determining if two architecture\n" + \
+            "specific packages are identical.\n\n" + \
+            "The version number is retained only if it is\n" + \
+            "identical across ALL instances of a published binary." ) )
         ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
         grid.attach( ignoreVersionArchitectureSpecificCheckbox, 0, 2, 2, 1 )
@@ -573,7 +574,8 @@ class IndicatorPPADownloadStatistics:
 
             if self.ppasOrFiltersModified:
                 GLib.timeout_add_seconds( 10, self.requestPPADownloadAndMenuRefresh, False ) # Hopefully 10 seconds is sufficient to rebuild the menu!
-                with self.lock: self.downloadInProgress = True # Although the download hasn't actually started, this ensures the preferences cannot be opened until the download completes.
+                with self.lock:
+                    self.downloadInProgress = True # Although the download hasn't actually started, this ensures the preferences cannot be opened until the download completes.
 
         self.dialog.destroy()
         self.dialog = None
@@ -740,11 +742,10 @@ class IndicatorPPADownloadStatistics:
                     if dataHasBeenChanged:
                         duplicate = False
                         for row in range( len( model ) ):
-                            if \
-                                ppaUserValue == model[ row ][ 0 ] and \
-                                ppaNameValue == model[ row ][ 1 ] and \
-                                series.get_active_text() == model[ row ][ 2 ] and \
-                                architectures.get_active_text() == model[ row ][ 3 ]:
+                            if ppaUserValue == model[ row ][ 0 ] and \
+                               ppaNameValue == model[ row ][ 1 ] and \
+                               series.get_active_text() == model[ row ][ 2 ] and \
+                               architectures.get_active_text() == model[ row ][ 3 ]:
 
                                 duplicate = True
                                 break
@@ -844,13 +845,12 @@ class IndicatorPPADownloadStatistics:
         grid.attach( label, 0, 1, 2, 1 )
 
         textview = Gtk.TextView()
-        toolTip = _( "Each line of text is a single filter which is compared\n" + \
-                     "against each package name during download.\n\n" + \
-                     "If a package name contains ANY part of ANY filter,\n" + \
-                     "that package is included in the download statistics.\n\n" + \
-                     "No wildcards nor regular expressions accepted!" )
-
-        textview.set_tooltip_text( toolTip )
+        textview.set_tooltip_text( _(
+            "Each line of text is a single filter which is compared\n" + \
+            "against each package name during download.\n\n" + \
+            "If a package name contains ANY part of ANY filter,\n" + \
+            "that package is included in the download statistics.\n\n" + \
+            "No wildcards nor regular expressions accepted!" ) )
         if rowNumber is not None:
             textview.get_buffer().set_text( filterTreeModel[ filterTreeIter ][ 1 ] ) # This is an edit.
 
@@ -1014,7 +1014,8 @@ class IndicatorPPADownloadStatistics:
             GLib.timeout_add_seconds( 60, self.requestPPADownloadAndMenuRefresh, False )
             return
 
-        with self.lock: self.downloadInProgress = True
+        with self.lock:
+            self.downloadInProgress = True
 
         for ppa in self.ppas:
             ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
@@ -1150,7 +1151,6 @@ class IndicatorPPADownloadStatistics:
 
         try:
             downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
-
             with self.lock:
                 if str( downloadCount ).isnumeric():
                     ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
