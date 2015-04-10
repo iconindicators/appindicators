@@ -104,8 +104,8 @@ class IndicatorPPADownloadStatistics:
 
 
     def main( self ):
-        self.requestPPADownloadAndMenuRefresh( False )
-        GLib.timeout_add_seconds( 12 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every 12 hours.
+#         self.requestPPADownloadAndMenuRefresh( False )
+#         GLib.timeout_add_seconds( 12 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every 12 hours.
         Gtk.main()
 
 
@@ -437,26 +437,33 @@ class IndicatorPPADownloadStatistics:
         grid.set_margin_bottom( 10 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show PPAs as submenus" ) )
-        showAsSubmenusCheckbox.set_tooltip_text( _( "The download statistics for each PPA\nare shown in a separate submenu." ) )
+        showAsSubmenusCheckbox.set_tooltip_text( _(
+            "The download statistics for each PPA\n" +\
+            "are shown in a separate submenu." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
         combinePPAsCheckbox = Gtk.CheckButton( _( "Combine PPAs" ) )
-        combinePPAsCheckbox.set_tooltip_text( _( 
-            "Combine the statistics of binary packages\n" + \
-             "when the PPA user/name are the same.\n\n" + \
-             "When a package is NOT architecture specific:\n" + \
-             "If the package names and version numbers\n" + \
-             "of two binary packages are identical,\n" + \
-             "the packages are treated as the same package\n" + \
-             "and the download counts are NOT summed.\n" + \
-             "Packages such as Python fall into this category.\n\n" + \
-             "When a package IS architecture specific:\n" + \
-             "If the package names and version numbers\n" + \
-             "of two binary packages are identical,\n" + \
-             "the packages are treated as the same package\n" + \
-             "and the download counts ARE summed.\n" + \
-             "Packages such as compiled C fall into this category." ) )
+        combinePPAsCheckbox.set_tooltip_text( _(
+            "Combine the statistics of binary\n" + \
+            "packages when the PPA user/name\n" + \
+            "are the same.\n\n" + \
+            "Non-architecture specific packages:\n" + \
+            "If the package names and version\n" + \
+            "numbers of two binary packages are\n" + \
+            "identical, the packages are treated\n" + \
+            "as the same package and the\n" + \
+            "download counts are NOT summed.\n" + \
+            "Packages such as Python fall into\n" + \
+            "this category.\n\n" + \
+            "Architecture specific packages:\n" + \
+            "If the package names and version\n" + \
+            "numbers of two binary packages are\n" + \
+            "identical, the packages are treated\n" + \
+            "as the same package and the download\n" + \
+            "counts ARE summed.\n" + \
+            "Packages such as compiled C fall into\n" + \
+            "this category." ) )
         combinePPAsCheckbox.set_active( self.combinePPAs )
         combinePPAsCheckbox.set_margin_top( 10 )
         grid.attach( combinePPAsCheckbox, 0, 1, 2, 1 )
@@ -464,18 +471,22 @@ class IndicatorPPADownloadStatistics:
         ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( _( "Ignore version for architecture specific" ) )
         ignoreVersionArchitectureSpecificCheckbox.set_margin_left( 15 )
         ignoreVersionArchitectureSpecificCheckbox.set_tooltip_text( _(
-            "Sometimes architecture specific packages with the\n" + \
-            "same package name but different version 'number'\n" + \
+            "Sometimes architecture specific\n" + \
+            "packages with the same package\n" + \
+            "name but different version 'number'\n" + \
             "are logically the SAME package.\n\n" + \
-            "For example, a C source package for both\n" + \
-            "Ubuntu Saucy and Ubuntu Trusty will be compiled\n" + \
-            "twice, each with a different version 'number',\n" + \
-            "despite being the SAME release.\n\n" + \
-            "Checking this option will ignore the version\n" + \
-            "number when determining if two architecture\n" + \
-            "specific packages are identical.\n\n" + \
-            "The version number is retained only if it is\n" + \
-            "identical across ALL instances of a published binary." ) )
+            "For example, a C source package for\n" + \
+            "both Ubuntu Saucy and Ubuntu Trusty\n" + \
+            "will be compiled twice, each with a\n" + \
+            "different 'number', despite being\n" + \
+            "the SAME release.\n\n" + \
+            "Checking this option will ignore the\n" + \
+            "version number when determining if\n" + \
+            "two architecture specific packages\n" + \
+            "are identical.\n\n" + \
+            "The version number is retained only\n" + \
+            "if it is identical across ALL\n" + \
+            "instances of a published binary." ) )
         ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
         grid.attach( ignoreVersionArchitectureSpecificCheckbox, 0, 2, 2, 1 )
@@ -496,20 +507,30 @@ class IndicatorPPADownloadStatistics:
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.sortByDownloadAmount ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( _( "Limit the number of entries\nwhen sorting by download.\n\nA value of zero will not clip." ) )
+        spinner.set_tooltip_text( _(
+            "Limit the number of entries\n" + \
+            "when sorting by download.\n\n" + \
+            "A value of zero will not clip." ) )
         spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
         grid.attach( spinner, 1, 4, 1, 1 )
 
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
         showNotificationOnUpdateCheckbox = Gtk.CheckButton( _( "Notify on update" ) )
-        showNotificationOnUpdateCheckbox.set_tooltip_text( _( "Show a screen notification when\nthe PPA download statistics have\nbeen updated AND are different\nto the last download." ) )
+        showNotificationOnUpdateCheckbox.set_tooltip_text( _(
+            "Show a screen notification\n" + \
+            "when the PPA download statistics\n" + \
+            "have been updated AND are\n" + \
+            "different to the last download." ) )
         showNotificationOnUpdateCheckbox.set_active( self.showNotificationOnUpdate )
         showNotificationOnUpdateCheckbox.set_margin_top( 10 )
         grid.attach( showNotificationOnUpdateCheckbox, 0, 5, 2, 1 )
 
         allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( _( "Open PPA in browser" ) )
-        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( _( "Clicking a PPA menu item loads the\nPPA's page in the default browser." ) )
+        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( _(
+            "Clicking a PPA menu item loads\n" + \
+            "the PPA's page in the default\n" + \
+            "web browser." ) )
         allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
         allowMenuItemsToLaunchBrowserCheckbox.set_margin_top( 10 )
         grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 6, 2, 1 )
@@ -846,13 +867,15 @@ class IndicatorPPADownloadStatistics:
 
         textview = Gtk.TextView()
         textview.set_tooltip_text( _(
-            "Each line of text is a single filter\n" + \
-            "which is compared against each package\n" + \
-            "during download.\n\n" + \
-            "If a package name contains ANY part of\n" + \
-            "ANY filter,\nthat package is included\n" + \
-            "in the download statistics.\n\n" + \
-            "No wildcards nor regular expressions accepted!" ) )
+            "Each line of text is a single\n" + \
+            "filter which is compared against\n" + \
+            "each package during download.\n\n" + \
+            "If a package name contains ANY\n" + \
+            "part of ANY filter, that package\n" + \
+            "is included in the download\n" + \
+            "statistics.\n\n" + \
+            "Regular expressions and wild\n" + \
+            "cards are not accepted!" ) )
         if rowNumber is not None:
             textview.get_buffer().set_text( filterTreeModel[ filterTreeIter ][ 1 ] ) # This is an edit.
 
