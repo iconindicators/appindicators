@@ -34,7 +34,7 @@ Create the PO Template
 
 In a terminal, generate the PO template file from the source file:
 
-xgettext --no-wrap inputSource.py
+xgettext inputSource.py
 
 This produces a file messages.po which should be renamed to inputSource.pot
 
