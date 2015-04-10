@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-virtual-box 1.0.38\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-04-10 09:59+1000\n"
+"POT-Creation-Date: 2015-04-11 00:50+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,12 +54,12 @@ msgstr ""
 msgid "Virtual Machine"
 msgstr ""
 
-#: indicator-virtual-box.py:449 indicator-virtual-box.py:511
-#: indicator-virtual-box.py:593
+#: indicator-virtual-box.py:449 indicator-virtual-box.py:517
+#: indicator-virtual-box.py:603
 msgid "Autostart"
 msgstr ""
 
-#: indicator-virtual-box.py:450 indicator-virtual-box.py:579
+#: indicator-virtual-box.py:450 indicator-virtual-box.py:585
 msgid "Start Command"
 msgstr ""
 
@@ -86,71 +86,72 @@ msgstr ""
 msgid "Sort VMs alphabetically"
 msgstr ""
 
-#: indicator-virtual-box.py:482
+#: indicator-virtual-box.py:483
 msgid ""
 "VMs can be sorted alphabetically or\n"
 "as set in the VirtualBox Manager."
 msgstr ""
 
-#: indicator-virtual-box.py:491
+#: indicator-virtual-box.py:493
 msgid "Refresh interval (minutes)"
 msgstr ""
 
-#: indicator-virtual-box.py:498
+#: indicator-virtual-box.py:501
 msgid ""
 "How often the list of VMs and\n"
 "running status is updated."
 msgstr ""
 
-#: indicator-virtual-box.py:501
+#: indicator-virtual-box.py:505
 msgid "Startup delay (seconds)"
 msgstr ""
 
-#: indicator-virtual-box.py:508
+#: indicator-virtual-box.py:513
 msgid ""
 "Amount of time to wait from\n"
 "starting one VM to the next."
 msgstr ""
 
-#: indicator-virtual-box.py:512
+#: indicator-virtual-box.py:518
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-virtual-box.py:516
+#: indicator-virtual-box.py:522
 msgid "General"
 msgstr ""
 
-#: indicator-virtual-box.py:518
+#: indicator-virtual-box.py:524
 msgid "Preferences"
 msgstr ""
 
-#: indicator-virtual-box.py:589
+#: indicator-virtual-box.py:596
 msgid ""
-"The terminal command to start the VM such as\n"
+"The terminal command to start the\n"
+"VM such as\n"
 "\t'VBoxManage startvm %VM%' or\n"
 "\t'VBoxHeadless --startvm %VM% --vrde off'"
 msgstr ""
 
-#: indicator-virtual-box.py:594
-msgid "Run the VM when the indicator starts"
+#: indicator-virtual-box.py:604
+msgid "Run the VM when the indicator starts."
 msgstr ""
 
-#: indicator-virtual-box.py:599
+#: indicator-virtual-box.py:609
 msgid "VM Properties"
 msgstr ""
 
-#: indicator-virtual-box.py:610
+#: indicator-virtual-box.py:620
 msgid "The start command cannot be empty."
 msgstr ""
 
-#: indicator-virtual-box.py:615
+#: indicator-virtual-box.py:625
 msgid "The start command must contain %VM% which is substituted for the VM name/id."
 msgstr ""
 
-#: indicator-virtual-box.py:659
+#: indicator-virtual-box.py:669
 msgid "Change _Log"
 msgstr ""
 
-#: indicator-virtual-box.py:660
+#: indicator-virtual-box.py:670
 msgid "translator-credits"
 msgstr ""

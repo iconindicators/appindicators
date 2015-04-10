@@ -479,7 +479,9 @@ class IndicatorVirtualBox:
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
 
         sortAlphabeticallyCheckbox = Gtk.CheckButton( _( "Sort VMs alphabetically" ) )
-        sortAlphabeticallyCheckbox.set_tooltip_text( _( "VMs can be sorted alphabetically or\nas set in the VirtualBox Manager." ) )
+        sortAlphabeticallyCheckbox.set_tooltip_text( _(
+            "VMs can be sorted alphabetically or\n" + \
+            "as set in the VirtualBox Manager." ) )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
 
         # Only show one of these, depending if groups are present or not...
@@ -495,7 +497,9 @@ class IndicatorVirtualBox:
         spinnerRefreshInterval = Gtk.SpinButton()
         spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
-        spinnerRefreshInterval.set_tooltip_text( _( "How often the list of VMs and\nrunning status is updated." ) )
+        spinnerRefreshInterval.set_tooltip_text( _(
+            "How often the list of VMs and\n" + \
+            "running status is updated." ) )
         grid.attach( spinnerRefreshInterval, 1, 1, 1, 1 )
 
         label = Gtk.Label( _( "Startup delay (seconds)" ) )
@@ -505,7 +509,9 @@ class IndicatorVirtualBox:
         spinnerDelay = Gtk.SpinButton()
         spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to force the initial value by explicitly setting it.
-        spinnerDelay.set_tooltip_text( _( "Amount of time to wait from\nstarting one VM to the next." ) )
+        spinnerDelay.set_tooltip_text( _(
+            "Amount of time to wait from\n" + \
+            "starting one VM to the next." ) )
         grid.attach( spinnerDelay, 1, 2, 1, 1 )
 
         autostartIndicatorCheckbox = Gtk.CheckButton( _( "Autostart" ) )
@@ -586,12 +592,16 @@ class IndicatorVirtualBox:
             startCommand.set_text( model[ treeiter ][ 2 ] )
             startCommand.set_width_chars( len( model[ treeiter ][ 2 ] ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
-        startCommand.set_tooltip_text( _( "The terminal command to start the VM such as\n\t'VBoxManage startvm %VM%' or\n\t'VBoxHeadless --startvm %VM% --vrde off'" ) )
+        startCommand.set_tooltip_text( _(
+            "The terminal command to start the\n" + \
+            "VM such as\n" + \
+            "\t'VBoxManage startvm %VM%' or\n" + \
+            "\t'VBoxHeadless --startvm %VM% --vrde off'" ) )
         startCommand.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( startCommand, 1, 0, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_tooltip_text( _( "Run the VM when the indicator starts" ) )
+        autostartCheckbox.set_tooltip_text( _( "Run the VM when the indicator starts." ) )
         autostartCheckbox.set_active( model[ treeiter ][ 1 ] is not None and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
