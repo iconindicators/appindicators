@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-stardate 1.0.26\n"
+"Project-Id-Version: indicator-stardate 1.0.27\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-02-12 23:56+1100\n"
+"POT-Creation-Date: 2015-04-10 09:58+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,85 +17,88 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicator-stardate.py:55
+#: indicator-stardate.py:54
 msgid "Shows the current Star Trek™ stardate."
 msgstr ""
 
-#: indicator-stardate.py:56
+#: indicator-stardate.py:55
 msgid "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main."
 msgstr ""
 
-#: indicator-stardate.py:124
+#: indicator-stardate.py:123
 #, python-brace-format
 msgid "Stardate: {0}"
 msgstr ""
 
-#: indicator-stardate.py:144
+#: indicator-stardate.py:143
 msgid "Credits"
 msgstr ""
 
-#: indicator-stardate.py:146
+#: indicator-stardate.py:145
 msgid "Change _Log"
 msgstr ""
 
-#: indicator-stardate.py:147
+#: indicator-stardate.py:146
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-stardate.py:168
+#: indicator-stardate.py:167
 msgid "Use 'classic' conversion"
 msgstr ""
 
-#: indicator-stardate.py:170
+#: indicator-stardate.py:169
 msgid ""
 "Stardate 'classic' is based on\n"
+"\n"
 "\tSTARDATES IN STAR TREK FAQ V1.6\n"
+"\n"
 "by Andrew Main.\n"
 "\n"
 "Otherwise the 2009 revised conversion is used\n"
 "(http://en.wikipedia.org/wiki/Stardate)."
 msgstr ""
 
-#: indicator-stardate.py:173
+#: indicator-stardate.py:172
 msgid "Show ISSUE"
 msgstr ""
 
-#: indicator-stardate.py:177
+#: indicator-stardate.py:176
 msgid ""
 "Show the ISSUE of the stardate\n"
-"(only applies to 'classic')"
+"(only applies to 'classic')."
 msgstr ""
 
-#: indicator-stardate.py:180
+#: indicator-stardate.py:179
 msgid "Pad INTEGER"
 msgstr ""
 
-#: indicator-stardate.py:184
+#: indicator-stardate.py:183
 msgid ""
 "Pad the INTEGER part with leading zeroes\n"
-"(only applies to 'classic')"
+"(only applies to 'classic')."
 msgstr ""
 
-#: indicator-stardate.py:189
+#: indicator-stardate.py:188
 msgid "Show in menu"
 msgstr ""
 
-#: indicator-stardate.py:191
+#: indicator-stardate.py:190
 msgid ""
-"Show the stardate in the menu\n"
+"Show the stardate in the menu.\n"
 "\n"
-"(for desktop environments which prohibit\n"
-"text labels adjacent to the icon)"
+"Useful for desktop environments\n"
+"which prohibit text labels adjacent\n"
+"to the icon."
 msgstr ""
 
-#: indicator-stardate.py:195
+#: indicator-stardate.py:194
 msgid "Autostart"
 msgstr ""
 
-#: indicator-stardate.py:197
-msgid "Run the indicator automatically"
+#: indicator-stardate.py:196
+msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-stardate.py:201
+#: indicator-stardate.py:200
 msgid "Preferences"
 msgstr ""

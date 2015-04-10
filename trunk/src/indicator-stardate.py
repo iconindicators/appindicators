@@ -42,7 +42,7 @@ import datetime, gzip, json, logging, os, pythonutils, re, shutil, stardate, sys
 class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.26"
+    VERSION = "1.0.27"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -166,34 +166,34 @@ class IndicatorStardate:
 
         showClassicCheckbox = Gtk.CheckButton( _( "Use 'classic' conversion" ) )
         showClassicCheckbox.set_active( self.showClassic )
-        showClassicCheckbox.set_tooltip_text( _( "Stardate 'classic' is based on\n\tSTARDATES IN STAR TREK FAQ V1.6\nby Andrew Main.\n\nOtherwise the 2009 revised conversion is used\n(http://en.wikipedia.org/wiki/Stardate)." ) )
+        showClassicCheckbox.set_tooltip_text( _( "Stardate 'classic' is based on\n\n\tSTARDATES IN STAR TREK FAQ V1.6\n\nby Andrew Main.\n\nOtherwise the 2009 revised conversion is used\n(http://en.wikipedia.org/wiki/Stardate)." ) )
         grid.attach( showClassicCheckbox, 0, 0, 2, 1 )
 
         showIssueCheckbox = Gtk.CheckButton( _( "Show ISSUE" ) )
         showIssueCheckbox.set_active( self.showIssue )
         showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
         showIssueCheckbox.set_margin_left( 15 )
-        showIssueCheckbox.set_tooltip_text( _( "Show the ISSUE of the stardate\n(only applies to 'classic')" ) )
+        showIssueCheckbox.set_tooltip_text( _( "Show the ISSUE of the stardate\n(only applies to 'classic')." ) )
         grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
 
         padIntegerCheckbox = Gtk.CheckButton( _( "Pad INTEGER" ) )
         padIntegerCheckbox.set_active( self.padInteger )
         padIntegerCheckbox.set_sensitive( showClassicCheckbox.get_active() )
         padIntegerCheckbox.set_margin_left( 15 )
-        padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part with leading zeroes\n(only applies to 'classic')" ) )
+        padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part with leading zeroes\n(only applies to 'classic')." ) )
         grid.attach( padIntegerCheckbox, 0, 2, 1, 1 )
 
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
 
         showInMenuCheckbox = Gtk.CheckButton( _( "Show in menu" ) )
         showInMenuCheckbox.set_active( self.showInMenu )
-        showInMenuCheckbox.set_tooltip_text( _( "Show the stardate in the menu\n\n(for desktop environments which prohibit\ntext labels adjacent to the icon)" ) )
+        showInMenuCheckbox.set_tooltip_text( _( "Show the stardate in the menu.\n\nUseful for desktop environments\nwhich prohibit text labels adjacent\nto the icon." ) )
         showInMenuCheckbox.set_margin_top( 10 )
         grid.attach( showInMenuCheckbox, 0, 3, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
-        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically" ) )
+        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 4, 2, 1 )
 
