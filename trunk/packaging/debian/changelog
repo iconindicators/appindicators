@@ -19,10 +19,9 @@ indicator-lunar (1.0.58-1) precise; urgency=low
   * Changed some defaults to reduce the amount of data that is displayed.
     When loading satellites or orbital elements, these are not checked.
     Stars are not checked on initial run of the indicator.
-  * When computing satellite passes, the look ahead period is now 3 days,
-    whereas it was 10 days.  This speeds up the refresh time (down from 11
-    seconds to 3 seconds on average) and only drops a couple of satellites as
-    a result. 
+  * When computing satellite passes, the look ahead period has been reduced to
+    3 days, whereas it was 10 days.  This speeds up the refresh time by about
+    two thirds and only drops a couple of satellites. 
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Mar 2015 10:11:04 +1000
 
