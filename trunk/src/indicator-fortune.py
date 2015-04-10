@@ -243,12 +243,13 @@ class IndicatorFortune:
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onFortuneDoubleClick )
         tree.set_tooltip_text( _(
-            "Double click to edit a fortune's properties.\n\n" + \
-            "Basic English language fortunes are\n" + \
-            "installed by default.\n\n" + \
-            "However there may be additional fortune\n" + \
-            "packages, in addition to the fortunes\n" + \
-            "in your native language." ) )
+            "Double click to edit a fortune.\n\n" + \
+            "Basic English language fortunes\n" + \
+            "are installed by default.\n\n" + \
+            "However, there may be be other\n" + \
+            "fortune packages available,\n" + \
+            "in addition to fortunes in your\n" + \
+            "native language." ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -323,7 +324,8 @@ class IndicatorFortune:
             "a new fortune is created.\n\n" + \
             "Do not set too low (below 50)\n" + \
             "as many fortunes may be dropped,\n" + \
-            "resulting in excessive calls to 'fortune'." ) )
+            "resulting in excessive calls to\n" + \
+            "the 'fortune' program." ) )
         spinnerCharacterCount.set_margin_top( 10 )
         grid.attach( spinnerCharacterCount, 1, 2, 1, 1 )
 
@@ -406,7 +408,7 @@ class IndicatorFortune:
 
 
     def onFortuneReset( self, button, tree ):
-        if pythonutils.showOKCancel( None, _( "Remove all fortunes and set to factory default?" ) ) == Gtk.ResponseType.OK:
+        if pythonutils.showOKCancel( None, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
             model, treeiter = tree.get_selection().get_selected()
             model.clear()
             model.append( [ IndicatorFortune.DEFAULT_FORTUNE[ 0 ], Gtk.STOCK_APPLY ]  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
@@ -447,7 +449,12 @@ class IndicatorFortune:
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
 
         fortuneFileDirectory.set_width_chars( len( fortuneFileDirectory.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
-        fortuneFileDirectory.set_tooltip_text( _( "The full path to a fortune .dat file OR\na directory containing fortune .dat files.\n\nEnsure the corresponding text file(s) is present!" ) )
+        fortuneFileDirectory.set_tooltip_text( _(
+            "The full path to a fortune .dat file,\n" + \
+            "or a directory which contains fortune\n" + \
+            ".dat files.\n\n" + \
+            "Ensure the corresponding fortune text" + \
+            "file(s) is present!" ) )
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
 
@@ -455,18 +462,28 @@ class IndicatorFortune:
         hbox.set_homogeneous( True )
 
         browseFileButton = Gtk.Button( _( "File" ) )
-        browseFileButton.set_tooltip_text( _( "Choose a fortune .dat file.\nEnsure the corresponding text file is present!" ) )
+        browseFileButton.set_tooltip_text( _(
+            "Choose a fortune .dat file.\n" + \
+            "Ensure the corresponding text" + \
+            "file is present!" ) )
         hbox.pack_start( browseFileButton, True, True, 0 )
 
         browseDirectoryButton = Gtk.Button( _( "Directory" ) )
-        browseDirectoryButton.set_tooltip_text( _( "Choose a directory containing a fortune .dat file(s).\nEnsure the corresponding text file(s) is present!" ) )
+        browseDirectoryButton.set_tooltip_text( _(
+            "Choose a directory containing a" + \
+            "fortune .dat file(s).\n" + \
+            "Ensure the corresponding text" + \
+            "file(s) is present!" ) )
         hbox.pack_start( browseDirectoryButton, True, True, 0 )
 
         hbox.set_halign( Gtk.Align.END )
         grid.attach( hbox, 0, 1, 2, 1 )
 
         enabledCheckbox = Gtk.CheckButton( _( "Enabled" ) )
-        enabledCheckbox.set_tooltip_text( _( "Ensure the fortune file/directory works by\nrunning it through 'fortune' in a terminal." ) )
+        enabledCheckbox.set_tooltip_text( _(
+            "Ensure the fortune file/directory\n" + \
+            "works by running it through 'fortune'\n" + \
+            "in a terminal." ) )
         if rowNumber is not None: # This is an edit.
             enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
 
