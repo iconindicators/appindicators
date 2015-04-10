@@ -1,9 +1,11 @@
-indicator-ppa-download-statistics (1.0.46-1) precise; urgency=low
+indicator-ppa-download-statistics (1.0.47-1) precise; urgency=low
 
   * Reduced the update frequency to every 12 hours (increased from 6) to avoid
     taxing LaunchPad.
+  * Tidy up of tooltips.
+  * Remove wrap from POT files.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 9 Feb 2015 15:03:37 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 10 Apr 2015 9:27:01 +1000
 
 
 indicator-ppa-download-statistics (1.0.46-1) precise; urgency=low

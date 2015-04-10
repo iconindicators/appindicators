@@ -49,7 +49,7 @@ class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
     ICON = INDICATOR_NAME
-    VERSION = "1.0.45"
+    VERSION = "1.0.47"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -483,7 +483,7 @@ class IndicatorPPADownloadStatistics:
         combinePPAsCheckbox.connect( "toggled", self.onCombinePPAsCheckbox, ignoreVersionArchitectureSpecificCheckbox )
 
         sortByDownloadCheckbox = Gtk.CheckButton( _( "Sort by download" ) )
-        sortByDownloadCheckbox.set_tooltip_text( _( "Sort by download count\nwithin each PPA." ) )
+        sortByDownloadCheckbox.set_tooltip_text( _( "Sort by download count within each PPA." ) )
         sortByDownloadCheckbox.set_active( self.sortByDownload )
         sortByDownloadCheckbox.set_margin_top( 10 )
         grid.attach( sortByDownloadCheckbox, 0, 3, 2, 1 )
@@ -503,7 +503,7 @@ class IndicatorPPADownloadStatistics:
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
         showNotificationOnUpdateCheckbox = Gtk.CheckButton( _( "Notify on update" ) )
-        showNotificationOnUpdateCheckbox.set_tooltip_text( _( "Show a screen notification when the PPA\ndownload statistics have been updated AND\nare different to the last download." ) )
+        showNotificationOnUpdateCheckbox.set_tooltip_text( _( "Show a screen notification when\nthe PPA download statistics have\nbeen updated AND are different\nto the last download." ) )
         showNotificationOnUpdateCheckbox.set_active( self.showNotificationOnUpdate )
         showNotificationOnUpdateCheckbox.set_margin_top( 10 )
         grid.attach( showNotificationOnUpdateCheckbox, 0, 5, 2, 1 )
@@ -846,10 +846,12 @@ class IndicatorPPADownloadStatistics:
 
         textview = Gtk.TextView()
         textview.set_tooltip_text( _(
-            "Each line of text is a single filter which is compared\n" + \
-            "against each package name during download.\n\n" + \
-            "If a package name contains ANY part of ANY filter,\n" + \
-            "that package is included in the download statistics.\n\n" + \
+            "Each line of text is a single filter\n" + \
+            "which is compared against each package\n" + \
+            "during download.\n\n" + \
+            "If a package name contains ANY part of\n" + \
+            "ANY filter,\nthat package is included\n" + \
+            "in the download statistics.\n\n" + \
             "No wildcards nor regular expressions accepted!" ) )
         if rowNumber is not None:
             textview.get_buffer().set_text( filterTreeModel[ filterTreeIter ][ 1 ] ) # This is an edit.
