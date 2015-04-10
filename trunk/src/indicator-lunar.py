@@ -32,18 +32,11 @@
 #  https://wiki.gnome.org/Projects/PyGObject
 #  http://lazka.github.io/pgi-docs
 
-#TODO Maybe add a period to the end of the texts
-#         message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}" ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
-
 
 #TODO Remove print statements.
 
 
 #TODO The frequent updates, even without satellites, slow down or even lock up the indicator panel at times.  Can something be done?
-
-
-#TODO When satellites are enabled with only show visible passes, startup takes 10 seconds.
-#Also when ok/cancel on the Preferences, the update takes the same time...shorten it!!!
 
 
 #TODO Remove the satellites and OE.  Run indicator and click the "auto add" options.
@@ -1624,7 +1617,6 @@ class IndicatorLunar:
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
         key = ( AstronomicalObjectType.Satellite, " ".join( key ) )
         currentDateTime = ephemNow
-#TODO Add a tooltip saying it's 3 days.
         endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 3 ) # Stop looking for passes 3 days from ephemNow.
         message = None
         while currentDateTime < endDateTime:
@@ -2501,7 +2493,7 @@ class IndicatorLunar:
             "The URL from which to source satellite TLE data.\n" + \
             "For a local file, use 'file:///' and the filename.\n\n" + \
             "If you change the URL, you must fetch the new data.\n\n" + \
-            "To disable, set a bogus URL such as 'http://'." ) )
+            "To disable, set a bogus URL such as 'http://'" ) )
         box.pack_start( TLEURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
@@ -3042,7 +3034,7 @@ class IndicatorLunar:
                 if datetime.datetime.now() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) ):
                     nextDownload = str( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) )
                     summary = _( "Orbital Element data fetch aborted" )
-                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}" ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
+                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
                     Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
                 else:
                     self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
@@ -3067,7 +3059,7 @@ class IndicatorLunar:
                 if datetime.datetime.now() < ( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
                     nextDownload = str( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) )
                     summary = _( "Satellite TLE data fetch aborted" )
-                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}" ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
+                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
                     Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
                 else:
                     self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
