@@ -33,6 +33,8 @@
 #  http://lazka.github.io/pgi-docs
 
 
+#TODO Remove prints
+
 #TODO Remove the satellites and OE.  Run indicator and click the "auto add" options.
 #Click OK...nothing auto adds.
 #Close indicator, run again, nothing adds.
@@ -793,6 +795,7 @@ class IndicatorLunar:
 
 
     def updateBackend( self ):
+        print( "updateBackend - start ", datetime.datetime.now() )
         if not self.lock.acquire( False ):
             return
 
@@ -837,6 +840,8 @@ class IndicatorLunar:
 
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
+        print( "updateFrontend - end  ", datetime.datetime.now() )
+        print()
 
 
     def updateMenu( self, ephemNow, lunarPhase ):
@@ -1606,7 +1611,7 @@ class IndicatorLunar:
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
         key = ( AstronomicalObjectType.Satellite, " ".join( key ) )
         currentDateTime = ephemNow
-        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 3 ) # Stop looking for passes 3 days from ephemNow.
+        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 2 ) # Stop looking for passes 2 days from ephemNow.
         message = None
         while currentDateTime < endDateTime:
             city = self.getCity( currentDateTime )
@@ -2198,7 +2203,8 @@ class IndicatorLunar:
         orbitalElementsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new orbital elements" ) )
         orbitalElementsAddNewCheckbox.set_margin_top( 15 )
         orbitalElementsAddNewCheckbox.set_active( self.orbitalElementsAddNew )
-        orbitalElementsAddNewCheckbox.set_tooltip_text( _( 
+        orbitalElementsAddNewCheckbox.set_tooltip_text( _(
+#TODO Add a note about when clicking OK all OEs will also be added.                                                          
             "If checked, new orbital elements in\n" + \
             "the downloaded data will be added\n" + \
             "to the list of checked orbital elements." ) )
@@ -2254,6 +2260,7 @@ class IndicatorLunar:
         satellitesAddNewCheckbox.set_margin_top( 15 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
         satellitesAddNewCheckbox.set_tooltip_text( _( 
+#TODO Add a note about when clicking OK all satellites will also be added.                                                          
             "If checked, new satellites in the TLE\n" + \
             "data will be added to your list of\n" + \
             "checked satellites." ) )
