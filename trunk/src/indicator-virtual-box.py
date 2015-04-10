@@ -376,7 +376,7 @@ class IndicatorVirtualBox:
                 p.wait()
 
                 if windowID is None:
-                    pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM is running but its window could not be found - perhaps it is running headless" ) )
+                    pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM is running but its window could not be found - perhaps it is running headless." ) )
                 else:
                     # If the VM is running headless then there will be no window to display...
                     p = subprocess.Popen( "wmctrl -i -a " + windowID, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
