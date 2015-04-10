@@ -41,7 +41,7 @@ import json, locale, logging, os, pythonutils, re, shutil, subprocess
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.16"
+    VERSION = "1.0.17"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -244,9 +244,11 @@ class IndicatorFortune:
         tree.connect( "row-activated", self.onFortuneDoubleClick )
         tree.set_tooltip_text( _(
             "Double click to edit a fortune's properties.\n\n" + \
-            "Basic English language fortunes are installed by default.\n" + \
-            "However there may be additional fortune packages,\n" + \
-            "as well as the fortunes in your native language." ) )
+            "Basic English language fortunes are\n" + \
+            "installed by default.\n\n" + \
+            "However there may be additional fortune\n" + \
+            "packages, in addition to the fortunes\n" + \
+            "in your native language." ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -316,12 +318,12 @@ class IndicatorFortune:
         spinnerCharacterCount = Gtk.SpinButton()
         spinnerCharacterCount.set_adjustment( Gtk.Adjustment( self.skipFortuneCharacterCount, 1, 1000, 1, 50, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerCharacterCount.set_value( self.skipFortuneCharacterCount ) # ...so need to force the initial value by explicitly setting it.
-        spinnerCharacterCount.set_tooltip_text(
-           _( "If the fortune exceeds the limit,\n" + \
-           "a new fortune is created.\n\n" + \
-           "Do not set too low (below 50)\n" + \
-           "as many fortunes may be dropped,\n" + \
-           "resulting in excessive calls to 'fortune'." ) )
+        spinnerCharacterCount.set_tooltip_text( _(
+            "If the fortune exceeds the limit,\n" + \
+            "a new fortune is created.\n\n" + \
+            "Do not set too low (below 50)\n" + \
+            "as many fortunes may be dropped,\n" + \
+            "resulting in excessive calls to 'fortune'." ) )
         spinnerCharacterCount.set_margin_top( 10 )
         grid.attach( spinnerCharacterCount, 1, 2, 1, 1 )
 
