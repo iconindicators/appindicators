@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-virtual-box 1.0.37\n"
+"Project-Id-Version: indicator-virtual-box 1.0.38\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-02-13 10:59+1100\n"
+"POT-Creation-Date: 2015-04-10 09:59+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,21 +34,15 @@ msgid "(VirtualBox is not installed)"
 msgstr ""
 
 #: indicator-virtual-box.py:364
-msgid ""
-"The VM could not be found - either it has been renamed or deleted.  The list "
-"of VMs has been refreshed - please try again."
+msgid "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again."
 msgstr ""
 
 #: indicator-virtual-box.py:367
-msgid ""
-"There is more than one VM with the same name - unfortunately your VM cannot "
-"be uniquely identified."
+msgid "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified."
 msgstr ""
 
 #: indicator-virtual-box.py:379
-msgid ""
-"The VM is running but its window could not be found - perhaps it is running "
-"headless"
+msgid "The VM is running but its window could not be found - perhaps it is running headless"
 msgstr ""
 
 #: indicator-virtual-box.py:396
@@ -60,12 +54,12 @@ msgstr ""
 msgid "Virtual Machine"
 msgstr ""
 
-#: indicator-virtual-box.py:449 indicator-virtual-box.py:512
-#: indicator-virtual-box.py:594
+#: indicator-virtual-box.py:449 indicator-virtual-box.py:511
+#: indicator-virtual-box.py:593
 msgid "Autostart"
 msgstr ""
 
-#: indicator-virtual-box.py:450 indicator-virtual-box.py:580
+#: indicator-virtual-box.py:450 indicator-virtual-box.py:579
 msgid "Start Command"
 msgstr ""
 
@@ -83,11 +77,12 @@ msgstr ""
 
 #: indicator-virtual-box.py:476
 msgid ""
-"Groups can be shown with their VMs in submenus,\n"
-"or shown with their VMs as an indented list."
+"Groups can be shown with their VMs\n"
+"in submenus, or shown with their\n"
+"VMs as an indented list."
 msgstr ""
 
-#: indicator-virtual-box.py:480
+#: indicator-virtual-box.py:481
 msgid "Sort VMs alphabetically"
 msgstr ""
 
@@ -97,66 +92,65 @@ msgid ""
 "as set in the VirtualBox Manager."
 msgstr ""
 
-#: indicator-virtual-box.py:492
+#: indicator-virtual-box.py:491
 msgid "Refresh interval (minutes)"
 msgstr ""
 
-#: indicator-virtual-box.py:499
+#: indicator-virtual-box.py:498
 msgid ""
 "How often the list of VMs and\n"
 "running status is updated."
 msgstr ""
 
-#: indicator-virtual-box.py:502
+#: indicator-virtual-box.py:501
 msgid "Startup delay (seconds)"
 msgstr ""
 
-#: indicator-virtual-box.py:509
+#: indicator-virtual-box.py:508
 msgid ""
 "Amount of time to wait from\n"
 "starting one VM to the next."
 msgstr ""
 
-#: indicator-virtual-box.py:513
+#: indicator-virtual-box.py:512
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-virtual-box.py:517
+#: indicator-virtual-box.py:516
 msgid "General"
 msgstr ""
 
-#: indicator-virtual-box.py:519
+#: indicator-virtual-box.py:518
 msgid "Preferences"
 msgstr ""
 
-#: indicator-virtual-box.py:590
+#: indicator-virtual-box.py:589
 msgid ""
 "The terminal command to start the VM such as\n"
 "\t'VBoxManage startvm %VM%' or\n"
 "\t'VBoxHeadless --startvm %VM% --vrde off'"
 msgstr ""
 
-#: indicator-virtual-box.py:595
+#: indicator-virtual-box.py:594
 msgid "Run the VM when the indicator starts"
 msgstr ""
 
-#: indicator-virtual-box.py:600
+#: indicator-virtual-box.py:599
 msgid "VM Properties"
 msgstr ""
 
-#: indicator-virtual-box.py:611
+#: indicator-virtual-box.py:610
 msgid "The start command cannot be empty."
 msgstr ""
 
-#: indicator-virtual-box.py:616
-msgid ""
-"The start command must contain %VM% which is substituted for the VM name/id."
+#: indicator-virtual-box.py:615
+msgid "The start command must contain %VM% which is substituted for the VM name/id."
 msgstr ""
 
-#: indicator-virtual-box.py:660
+#: indicator-virtual-box.py:659
 msgid "Change _Log"
 msgstr ""
 
-#: indicator-virtual-box.py:661
+#: indicator-virtual-box.py:660
 msgid "translator-credits"
 msgstr ""

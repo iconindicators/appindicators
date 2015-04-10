@@ -48,7 +48,7 @@ import gzip, json, locale, logging, os, pythonutils, re, shutil, subprocess, sys
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.37"
+    VERSION = "1.0.38"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -472,15 +472,14 @@ class IndicatorVirtualBox:
         grid.set_margin_bottom( 10 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show groups as submenus" ) )
-        showAsSubmenusCheckbox.set_tooltip_text(
-            _( "Groups can be shown with their VMs in submenus,\n" + \
-            "or shown with their VMs as an indented list." ) )
+        showAsSubmenusCheckbox.set_tooltip_text( _(
+            "Groups can be shown with their VMs\n" + \
+            "in submenus, or shown with their\n" + \
+            "VMs as an indented list." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
 
         sortAlphabeticallyCheckbox = Gtk.CheckButton( _( "Sort VMs alphabetically" ) )
-        sortAlphabeticallyCheckbox.set_tooltip_text( 
-            _( "VMs can be sorted alphabetically or\n" + \
-            "as set in the VirtualBox Manager." ) )
+        sortAlphabeticallyCheckbox.set_tooltip_text( _( "VMs can be sorted alphabetically or\nas set in the VirtualBox Manager." ) )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
 
         # Only show one of these, depending if groups are present or not...

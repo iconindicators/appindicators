@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.38-1) precise; urgency=low
+
+  * Tidy up of tooltips.
+  * Remove wrap from POT files.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 10 Apr 2015 9:19:18 +1000
+
+
 indicator-virtual-box (1.0.37-1) precise; urgency=low
 
   * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
