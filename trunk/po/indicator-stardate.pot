@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-stardate 1.0.27\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-04-10 09:58+1000\n"
+"POT-Creation-Date: 2015-04-11 00:45+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,7 +46,7 @@ msgstr ""
 msgid "Use 'classic' conversion"
 msgstr ""
 
-#: indicator-stardate.py:169
+#: indicator-stardate.py:170
 msgid ""
 "Stardate 'classic' is based on\n"
 "\n"
@@ -54,35 +54,35 @@ msgid ""
 "\n"
 "by Andrew Main.\n"
 "\n"
-"Otherwise the 2009 revised conversion is used\n"
+"Otherwise the 2009 revision is used\n"
 "(http://en.wikipedia.org/wiki/Stardate)."
 msgstr ""
 
-#: indicator-stardate.py:172
+#: indicator-stardate.py:177
 msgid "Show ISSUE"
 msgstr ""
 
-#: indicator-stardate.py:176
+#: indicator-stardate.py:182
 msgid ""
 "Show the ISSUE of the stardate\n"
 "(only applies to 'classic')."
 msgstr ""
 
-#: indicator-stardate.py:179
+#: indicator-stardate.py:186
 msgid "Pad INTEGER"
 msgstr ""
 
-#: indicator-stardate.py:183
+#: indicator-stardate.py:191
 msgid ""
-"Pad the INTEGER part with leading zeroes\n"
-"(only applies to 'classic')."
+"Pad the INTEGER part with leading\n"
+"zeros (only applies to 'classic')."
 msgstr ""
 
-#: indicator-stardate.py:188
+#: indicator-stardate.py:197
 msgid "Show in menu"
 msgstr ""
 
-#: indicator-stardate.py:190
+#: indicator-stardate.py:200
 msgid ""
 "Show the stardate in the menu.\n"
 "\n"
@@ -91,14 +91,14 @@ msgid ""
 "to the icon."
 msgstr ""
 
-#: indicator-stardate.py:194
+#: indicator-stardate.py:207
 msgid "Autostart"
 msgstr ""
 
-#: indicator-stardate.py:196
+#: indicator-stardate.py:209
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-stardate.py:200
+#: indicator-stardate.py:213
 msgid "Preferences"
 msgstr ""
