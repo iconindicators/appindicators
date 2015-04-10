@@ -33,12 +33,6 @@
 #  http://lazka.github.io/pgi-docs
 
 
-#TODO Remove print statements.
-
-
-#TODO The frequent updates, even without satellites, slow down or even lock up the indicator panel at times.  Can something be done?
-
-
 #TODO Remove the satellites and OE.  Run indicator and click the "auto add" options.
 #Click OK...nothing auto adds.
 #Close indicator, run again, nothing adds.
@@ -799,7 +793,6 @@ class IndicatorLunar:
 
 
     def updateBackend( self ):
-        print( "updateBackend - start ", datetime.datetime.now() )
         if not self.lock.acquire( False ):
             return
 
@@ -825,11 +818,9 @@ class IndicatorLunar:
         self.updateSatellites( ephemNow ) 
 
         GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
-#         print( "updateBackend - end   ", datetime.datetime.now() )
 
 
     def updateFrontend( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
-#         print( "updateFrontend - start", datetime.datetime.now() )
         self.updateMenu( ephemNow, lunarPhase )
         self.updateIcon( ephemNow, lunarIlluminationPercentage )
         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
@@ -846,8 +837,6 @@ class IndicatorLunar:
 
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
-        print( "updateFrontend - end  ", datetime.datetime.now() )
-        print()
 
 
     def updateMenu( self, ephemNow, lunarPhase ):
@@ -2079,7 +2068,9 @@ class IndicatorLunar:
         box.pack_start( label, False, False, 0 )
 
         indicatorText = Gtk.Entry()
-        indicatorText.set_tooltip_text( _( "The text shown next to the indicator icon\n(or shown as a tooltip, where applicable)." ) )
+        indicatorText.set_tooltip_text( _(
+            "The text shown next to the indicator icon\n" + \
+            "(or shown as a tooltip, where applicable)." ) )
         box.pack_start( indicatorText, True, True, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )
@@ -2113,7 +2104,7 @@ class IndicatorLunar:
             "Depending on the menu options,\n" + \
             "items such as comets which exceed\n" + \
             "magnitude or satellites with no\n" + \
-            "visible pass are omitted." ) )
+            "visible pass, are omitted." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onIndicatorTextTagDoubleClick, indicatorText )
 
@@ -2208,9 +2199,9 @@ class IndicatorLunar:
         orbitalElementsAddNewCheckbox.set_margin_top( 15 )
         orbitalElementsAddNewCheckbox.set_active( self.orbitalElementsAddNew )
         orbitalElementsAddNewCheckbox.set_tooltip_text( _( 
-            "If checked, new orbital elements in the\n" + \
-            "downloaded data will be added to your\n" + \
-            "list of checked orbital elements." ) )
+            "If checked, new orbital elements in\n" + \
+            "the downloaded data will be added\n" + \
+            "to the list of checked orbital elements." ) )
         grid.attach( orbitalElementsAddNewCheckbox, 0, 4, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
@@ -2223,8 +2214,9 @@ class IndicatorLunar:
         satelliteMenuText = Gtk.Entry()
         satelliteMenuText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteMenuText ) )
         satelliteMenuText.set_hexpand( True )
-        satelliteMenuText.set_tooltip_text(
-            _( "The text for each satellite item in the menu.\n\nAvailable tags:\n\t" ) + \
+        satelliteMenuText.set_tooltip_text( _(
+            "The text for each satellite item in the menu.\n\n" + \
+            "Available tags:\n\t" ) + \
              IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
              IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
              IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION )
@@ -2239,7 +2231,8 @@ class IndicatorLunar:
         sortSatellitesByDateTimeCheckbox.set_tooltip_text( _( 
             "By default, satellites are sorted\n" + \
             "alphabetically by menu text.\n\n" + \
-            "If checked, satellites will be\nsorted by rise date/time." ) )
+            "If checked, satellites will be\n" + \
+            "sorted by rise date/time." ) )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 6, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( _( "Hide satellites which have no upcoming visible pass" ) )
@@ -2261,8 +2254,9 @@ class IndicatorLunar:
         satellitesAddNewCheckbox.set_margin_top( 15 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
         satellitesAddNewCheckbox.set_tooltip_text( _( 
-            "If checked, new satellites in the TLE data will\n" + \
-            "be added to your list of checked satellites." ) )
+            "If checked, new satellites in the TLE\n" + \
+            "data will be added to your list of\n" + \
+            "checked satellites." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 8, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
@@ -2278,8 +2272,8 @@ class IndicatorLunar:
         satelliteURLText.set_tooltip_text( _(
             "The URL used to lookup a satellite\n" + \
             "(in the default browser) when any of\n" + \
-            "the satellite's child items are selected\n" + \
-            "from the menu.\n\n" + \
+            "the satellite's child items are\n" + \
+            "selected from the menu.\n\n" + \
             "If empty, no lookup will be done.\n\n" + \
             "Available tags:\n\t" ) + \
             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
@@ -2340,8 +2334,8 @@ class IndicatorLunar:
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.set_tooltip_text( _( 
             "Check a star to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "toggles all checkboxes." ) )
+            "Clicking the header of the first\n" + \
+            "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onStarToggled, starStore )
@@ -2368,10 +2362,11 @@ class IndicatorLunar:
         orbitalElementStore = Gtk.ListStore( bool, str ) # Show/hide, orbital element name.
 
         tree = Gtk.TreeView( orbitalElementStore )
-        tree.set_tooltip_text( _( 
-            "Check an orbital element to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "toggles all checkboxes." ) )
+        tree.set_tooltip_text( _(
+            "Check an orbital element to display\n" + \
+            "in the menu.\n\n" + \
+            "Clicking the header of the first\n" + \
+            "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onOrbitalElementToggled, orbitalElementStore )
@@ -2406,18 +2401,24 @@ class IndicatorLunar:
         orbitalElementURLEntry.set_text( self.orbitalElementURL )
         orbitalElementURLEntry.set_hexpand( True )
         orbitalElementURLEntry.set_tooltip_text( _(
-            "The URL from which to source orbital element data.\n" + \
-            "For a local file, use 'file:///' and the filename.\n\n" + \
-            "If you change the URL, you must fetch the new data.\n\n" + \
-            "To disable, set a bogus URL such as 'http://'." ) )
+            "The URL from which to source\n" + \
+            "orbital element data. For a local\n" + \
+            "file, use 'file:///' and the\n" + \
+            "filename.\n\n" + \
+            "If you change the URL, you must\n" + \
+            "fetch the new data.\n\n" + \
+            "To disable, set a bogus URL such\n" + \
+            "as 'http://'." ) )
         box.pack_start( orbitalElementURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
         fetch.set_tooltip_text( _(
-            "Retrieve the orbital element data from the URL.\n" + \
-            "If the URL is empty, the default URL will be used.\n\n" + \
-            "If using the default URL, the download may be\n" + \
-            "blocked to avoid burdening the data source." ) )
+            "Retrieve the orbital element data\n" + \
+            "from the URL. If the URL is empty,\n" + \
+            "the default URL will be used.\n\n" + \
+            "If using the default URL, the\n" + \
+            "download may be blocked to avoid\n" + \
+            "burdening the data source." ) )
         fetch.connect( "clicked", self.onFetchOrbitalElementURL, orbitalElementURLEntry, orbitalElementGrid, orbitalElementStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
@@ -2444,9 +2445,10 @@ class IndicatorLunar:
 
         tree = Gtk.TreeView( satelliteStoreSort )
         tree.set_tooltip_text( _( 
-            "Check a satellite to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "toggles all checkboxes." ) )
+            "Check a satellite to display in\n" + \
+            "the menu.\n\n" + \
+            "Clicking the header of the first\n" + \
+            "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, satelliteStoreSort )
@@ -2490,18 +2492,26 @@ class IndicatorLunar:
         TLEURLEntry.set_text( self.satelliteTLEURL )
         TLEURLEntry.set_hexpand( True )
         TLEURLEntry.set_tooltip_text( _( 
-            "The URL from which to source satellite TLE data.\n" + \
-            "For a local file, use 'file:///' and the filename.\n\n" + \
-            "If you change the URL, you must fetch the new data.\n\n" + \
-            "To disable, set a bogus URL such as 'http://'" ) )
+            "The URL from which to source the\n" + \
+            "satellite TLE data.\n" + \
+            "For a local file, use 'file:///'\n" + \
+            "and the filename.\n\n" + \
+            "If you change the URL, you must\n" + \
+            "fetch the new data.\n\n" + \
+            "To disable, set a bogus URL such\n" + \
+            "as 'http://'" ) )
         box.pack_start( TLEURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
         fetch.set_tooltip_text( _(
-            "Retrieve the satellite TLE data from the URL.\n" + \
-            "If the URL is empty, the default URL will be used.\n\n" + \
-            "If using the default URL, the download may be\n" + \
-            "blocked to avoid burdening the data source." ) )
+            "Retrieve the satellite TLE data\n" + \
+            "from the URL.\n" + \
+            "If the URL is empty, the default\n" + \
+            "URL will be used.\n\n" + \
+            "If using the default URL, the\n" + \
+            "download may be\n" + \
+            "blocked to avoid burdening the\n" + \
+            "data source." ) )
         fetch.connect( "clicked", self.onFetchSatelliteTLEURL, TLEURLEntry, satelliteGrid, satelliteStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
@@ -2541,7 +2551,9 @@ class IndicatorLunar:
         satelliteNotificationSummaryText = Gtk.Entry()
         satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         satelliteNotificationSummaryText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationSummary ) )
-        satelliteNotificationSummaryText.set_tooltip_text( _( "The summary for the satellite rise notification.\n\nAvailable tags:\n\t" ) + \
+        satelliteNotificationSummaryText.set_tooltip_text( _(
+            "The summary for the satellite rise\n" + \
+            "notification. Available tags:\n\t" ) + \
             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
@@ -2565,7 +2577,9 @@ class IndicatorLunar:
 
         satelliteNotificationMessageText = Gtk.TextView()
         satelliteNotificationMessageText.get_buffer().set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationMessage ) )
-        satelliteNotificationMessageText.set_tooltip_text( _( "The message for the satellite rise notification.\n\nAvailable tags:\n\t" ) + \
+        satelliteNotificationMessageText.set_tooltip_text( _(
+            "The message for the satellite rise\n" + \
+            "notification. Available tags:\n\t" ) + \
             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
@@ -2589,7 +2603,10 @@ class IndicatorLunar:
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         test.connect( "clicked", self.onTestClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, False )
-        test.set_tooltip_text( _( "Show the notification bubble.\nTags will be substituted with mock text." ) )
+        test.set_tooltip_text( _(
+            "Show the notification bubble.\n" + \
+            "Tags will be substituted with\n" + \
+            "mock text." ) )
         grid.attach( test, 1, 3, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
@@ -2805,11 +2822,9 @@ class IndicatorLunar:
             if self.orbitalElementURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
                 self.orbitalElementURL = self.orbitalElementURLNew # The URL may or may not be valie, but it will not be None.
                 if self.orbitalElementDataNew is None:
-                    print( "Bad OE data" )
                     self.orbitalElementData = { } # The retrieved data was bad, so reset to empty data.
                 else:
                     self.orbitalElementData = self.orbitalElementDataNew # The retrieved data is good (but still could be empty).
-                    print( "Good OE data of length", len(self.orbitalElementData))
 
                 self.writeToCache( self.orbitalElementData, IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME )
                 self.lastUpdateOE = datetime.datetime.now()
@@ -2819,16 +2834,13 @@ class IndicatorLunar:
                 if orbitalElement[ 0 ]:
                     self.orbitalElements.append( orbitalElement[ 1 ].upper() )
 
-            print( self.orbitalElements)
 
             if self.satelliteTLEURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
                 self.satelliteTLEURL = self.satelliteTLEURLNew # The URL may or may not be valie, but it will not be None.
                 if self.satelliteTLEDataNew is None:
-                    print( "Bad TLE data" )
                     self.satelliteTLEData = { } # The retrieved data was bad, so reset to empty data.
                 else:
                     self.satelliteTLEData = self.satelliteTLEDataNew # The retrieved data is good (but still could be empty).
-                    print( "Good TLE data of length", len(self.satelliteTLEData))
 
                 self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
                 self.lastUpdateTLE = datetime.datetime.now()
@@ -2837,8 +2849,6 @@ class IndicatorLunar:
             for satelliteTLE in satelliteStore:
                 if satelliteTLE[ 0 ]:
                     self.satellites.append( ( satelliteTLE[ 1 ].upper(), satelliteTLE[ 2 ] ) )
-
-            print( self.satellites)
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
