@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-virtual-box 1.0.38\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-04-11 00:50+1000\n"
+"POT-Creation-Date: 2015-04-11 08:17+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,15 +34,21 @@ msgid "(VirtualBox is not installed)"
 msgstr ""
 
 #: indicator-virtual-box.py:364
-msgid "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again."
+msgid ""
+"The VM could not be found - either it has been renamed or deleted.  The list "
+"of VMs has been refreshed - please try again."
 msgstr ""
 
 #: indicator-virtual-box.py:367
-msgid "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified."
+msgid ""
+"There is more than one VM with the same name - unfortunately your VM cannot "
+"be uniquely identified."
 msgstr ""
 
 #: indicator-virtual-box.py:379
-msgid "The VM is running but its window could not be found - perhaps it is running headless"
+msgid ""
+"The VM is running but its window could not be found - perhaps it is running "
+"headless."
 msgstr ""
 
 #: indicator-virtual-box.py:396
@@ -145,7 +151,8 @@ msgid "The start command cannot be empty."
 msgstr ""
 
 #: indicator-virtual-box.py:625
-msgid "The start command must contain %VM% which is substituted for the VM name/id."
+msgid ""
+"The start command must contain %VM% which is substituted for the VM name/id."
 msgstr ""
 
 #: indicator-virtual-box.py:669
