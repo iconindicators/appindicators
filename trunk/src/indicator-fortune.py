@@ -139,33 +139,31 @@ class IndicatorFortune:
     def refreshFortune( self ):
         if len( self.fortunes ) == 0:
             self.fortune = _( "No fortunes defined!" )
-            return
+        else:
+            fortuneLocations = " "
+            for fortuneLocation in self.fortunes:
+                if fortuneLocation[ 1 ]:
+                    if( os.path.isdir( fortuneLocation[ 0 ] ) ):
+                        fortuneLocations += "'" + fortuneLocation[ 0 ].rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
+                    else:
+                        fortuneLocations += "'" + fortuneLocation[ 0 ].replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
 
-        fortuneLocations = " "
-        for fortuneLocation in self.fortunes:
-            if fortuneLocation[ 1 ]:
-                if( os.path.isdir( fortuneLocation[ 0 ] ) ):
-                    fortuneLocations += "'" + fortuneLocation[ 0 ].rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
-                else:
-                    fortuneLocations += "'" + fortuneLocation[ 0 ].replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
+            if fortuneLocations == " ":
+                self.fortune = _( "No fortunes enabled!" )
+            else:
+                while True:
+                    self.fortune = ""
+                    p = subprocess.Popen( "fortune" + fortuneLocations, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+                    for line in p.stdout.readlines():
+                        self.fortune += str( line.decode() )
 
-        if fortuneLocations == " ":
-            self.fortune = _( "No fortunes enabled!" )
-            return
+                    p.wait()
 
-        while True:
-            self.fortune = ""
-            p = subprocess.Popen( "fortune" + fortuneLocations, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-            for line in p.stdout.readlines():
-                self.fortune += str( line.decode() )
+                    # If the fortune exceeds the user-specified character limit, John West it...
+                    if len( self.fortune ) > self.skipFortuneCharacterCount:
+                        continue
 
-            p.wait()
-
-            # If the fortune exceeds the user-specified character limit, John West it...
-            if len( self.fortune ) > self.skipFortuneCharacterCount:
-                continue
-
-            break
+                    break
 
 
     def onShowFortune( self, widget, showNew ):
@@ -183,11 +181,8 @@ class IndicatorFortune:
 
 
     def onAbout( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
-
-        self.dialog = pythonutils.AboutDialog( 
+        if self.dialog is None:
+            self.dialog = pythonutils.AboutDialog( 
                 INDICATOR_NAME,
                 IndicatorFortune.COMMENTS, 
                 IndicatorFortune.WEBSITE, 
@@ -203,9 +198,11 @@ class IndicatorFortune:
                 _( "translator-credits" ),
                 logging )
 
-        self.dialog.run()
-        self.dialog.destroy()
-        self.dialog = None
+            self.dialog.run()
+            self.dialog.destroy()
+            self.dialog = None
+        else:
+            self.dialog.present()
 
 
     def onPreferences( self, widget ):
@@ -556,7 +553,8 @@ class IndicatorFortune:
 
         if os.path.isfile( IndicatorFortune.SETTINGS_FILE ):
             try:
-                with open( IndicatorFortune.SETTINGS_FILE, "r" ) as f: settings = json.load( f )
+                with open( IndicatorFortune.SETTINGS_FILE, "r" ) as f:
+                    settings = json.load( f )
 
                 self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes )
                 if self.fortunes == [ ]:
@@ -584,7 +582,8 @@ class IndicatorFortune:
                 IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
             }
 
-            with open( IndicatorFortune.SETTINGS_FILE, "w" ) as f: f.write( json.dumps( settings ) )
+            with open( IndicatorFortune.SETTINGS_FILE, "w" ) as f:
+                f.write( json.dumps( settings ) )
 
         except Exception as e:
             logging.exception( e )
