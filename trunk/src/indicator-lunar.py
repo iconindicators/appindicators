@@ -793,37 +793,38 @@ class IndicatorLunar:
 
 
     def updateBackend( self ):
-        if not self.lock.acquire( False ):
-            return
+        if self.lock.acquire( False ):
 
-        self.toggleIconState()
-        self.updateOrbitalElementData()
-        self.updateSatelliteTLEData() 
+            self.toggleIconState()
+            self.updateOrbitalElementData()
+            self.updateSatelliteTLEData() 
 
-        self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
-        self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_NAME ) ] = self.cityName
+            self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
+            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_NAME ) ] = self.cityName
 
-        self.nextUpdate = ephem.Date( datetime.datetime.now() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
-        ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
+            self.nextUpdate = ephem.Date( datetime.datetime.now() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
+            ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
 
-        lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
-        lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
+            lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
+            lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
 
-        self.updateMoon( ephemNow, lunarPhase, self.hideBodyIfNeverUp )
-        self.updateSun( ephemNow, self.hideBodyIfNeverUp )
-        self.updatePlanets( ephemNow, self.hideBodyIfNeverUp )
-        self.updateStars( ephemNow, self.hideBodyIfNeverUp )
-        self.updateOrbitalElements( ephemNow, self.orbitalElementsMagnitude, self.hideBodyIfNeverUp )
-        self.updateSatellites( ephemNow ) 
+            self.updateMoon( ephemNow, lunarPhase, self.hideBodyIfNeverUp )
+            self.updateSun( ephemNow, self.hideBodyIfNeverUp )
+            self.updatePlanets( ephemNow, self.hideBodyIfNeverUp )
+            self.updateStars( ephemNow, self.hideBodyIfNeverUp )
+            self.updateOrbitalElements( ephemNow, self.orbitalElementsMagnitude, self.hideBodyIfNeverUp )
+            self.updateSatellites( ephemNow ) 
 
-        GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
+            GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
 
 
     def updateFrontend( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
         self.updateMenu( ephemNow, lunarPhase )
         self.updateIcon( ephemNow, lunarIlluminationPercentage )
         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
-        self.satelliteNotification( ephemNow )
+
+        if self.showSatelliteNotification:
+            self.satelliteNotification( ephemNow )
 
         nextUpdateInSeconds = int( ( ephem.localtime( self.nextUpdate ) - ephem.localtime( ephem.now() ) ).total_seconds() ) # Calculate next update from time now.
 
@@ -884,36 +885,27 @@ class IndicatorLunar:
 
 
     def fullMoonNotification( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
-        if not self.showWerewolfWarning:
-            return
+        phaseIsBetweenNewAndFullInclusive = \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
+            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-        if lunarIlluminationPercentage < self.werewolfWarningStartIlluminationPercentage:
-            return
+        if self.showWerewolfWarning and \
+           lunarIlluminationPercentage < self.werewolfWarningStartIlluminationPercentage and \
+           ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) > ephemNow ) and \
+           phaseIsBetweenNewAndFullInclusive:
 
-        if ( ephem.Date( self.lastFullMoonNotfication + ephem.hour ) > ephemNow ):
-            return
+            summary = self.werewolfWarningSummary
+            if self.werewolfWarningSummary == "":
+                summary = " " # The notification summary text cannot be empty (at least on Unity).
 
-        phaseIsBetweenNewAndFullInclusive = ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
-                                            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
-                                            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER ) or \
-                                            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
-                                            ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
-
-        if not phaseIsBetweenNewAndFullInclusive:
-            return
-
-        summary = self.werewolfWarningSummary
-        if self.werewolfWarningSummary == "":
-            summary = " " # The notification summary text cannot be empty (at least on Unity).
-
-        Notify.Notification.new( summary, self.werewolfWarningMessage, self.getIconFile() ).show()
-        self.lastFullMoonNotfication = ephemNow
+            Notify.Notification.new( summary, self.werewolfWarningMessage, self.getIconFile() ).show()
+            self.lastFullMoonNotfication = ephemNow
 
 
     def satelliteNotification( self, ephemNow ):
-        if not self.showSatelliteNotification:
-            return
-
         # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
         satelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber, in self.satellites:
@@ -2003,29 +1995,28 @@ class IndicatorLunar:
 
 
     def onAbout( self, widget ):
-        if self.dialog is not None:
+        if self.dialog is None:
+            self.dialog = pythonutils.AboutDialog( 
+                INDICATOR_NAME,
+                IndicatorLunar.ABOUT_COMMENTS, 
+                IndicatorLunar.WEBSITE, 
+                IndicatorLunar.WEBSITE, 
+                IndicatorLunar.VERSION, 
+                Gtk.License.GPL_3_0, 
+                IndicatorLunar.ICON,
+                [ IndicatorLunar.AUTHOR ],
+                IndicatorLunar.ABOUT_CREDITS,
+                _( "Credits" ),
+                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
+                _( "Change _Log" ),
+                _( "translator-credits" ),
+                logging )
+
+            self.dialog.run()
+            self.dialog.destroy()
+            self.dialog = None
+        else:
             self.dialog.present()
-            return
-
-        self.dialog = pythonutils.AboutDialog( 
-            INDICATOR_NAME,
-            IndicatorLunar.ABOUT_COMMENTS, 
-            IndicatorLunar.WEBSITE, 
-            IndicatorLunar.WEBSITE, 
-            IndicatorLunar.VERSION, 
-            Gtk.License.GPL_3_0, 
-            IndicatorLunar.ICON,
-            [ IndicatorLunar.AUTHOR ],
-            IndicatorLunar.ABOUT_CREDITS,
-            _( "Credits" ),
-            "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
-            _( "Change _Log" ),
-            _( "translator-credits" ),
-            logging )
-
-        self.dialog.run()
-        self.dialog.destroy()
-        self.dialog = None
 
 
     def waitForUpdateToFinish( self, widget ):
@@ -2036,19 +2027,18 @@ class IndicatorLunar:
 
 
     def onPreferences( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
-
-        # If the preferences were open and accessing the backend data (self.data) and an update occurs, that's not good.
-        # So ensure that no update is occurring...if it is, wait for it to end.
-        if self.lock.acquire( blocking = False ):
-            self.onPreferencesInternal( widget )
+        if self.dialog is None:
+            # If the preferences were open and accessing the backend data (self.data) and an update occurs, that's not good.
+            # So ensure that no update is occurring...if it is, wait for it to end.
+            if self.lock.acquire( blocking = False ):
+                self.onPreferencesInternal( widget )
+            else:
+                summary = _( "Preferences unavailable..." )
+                message = _( "The lunar indicator is momentarily refreshing; preferences will be available shortly." )
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+                Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start()
         else:
-            summary = _( "Preferences unavailable..." )
-            message = _( "The lunar indicator is momentarily refreshing; preferences will be available shortly." )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start()
+            self.dialog.present()
 
 
     def onPreferencesInternal( self, widget ):
