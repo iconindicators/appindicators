@@ -272,7 +272,6 @@ class IndicatorPPADownloadStatistics:
         if self.allowMenuItemsToLaunchBrowser == True:
             firstPipe = str.find( widget.props.name, "|" )
             ppaUser = widget.props.name[ 0 : firstPipe ].strip()
-
             secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
             if secondPipe == -1:
                 # This is a combined PPA...
@@ -280,7 +279,6 @@ class IndicatorPPADownloadStatistics:
                 url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName
             else:
                 ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
-
                 thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
                 series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
                 url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
@@ -611,7 +609,6 @@ class IndicatorPPADownloadStatistics:
 
     def onPPARemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
-
         if treeiter is None:
             pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No PPA has been selected for removal." ) )
         else:
@@ -785,7 +782,6 @@ class IndicatorPPADownloadStatistics:
 
     def onFilterRemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
-
         if treeiter is None:
             pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No filter has been selected for removal." ) )
         else:
@@ -870,6 +866,7 @@ class IndicatorPPADownloadStatistics:
             "statistics.\n\n" + \
             "Regular expressions and wild\n" + \
             "cards are not accepted!" ) )
+
         if rowNumber is not None:
             textview.get_buffer().set_text( filterTreeModel[ filterTreeIter ][ 1 ] ) # This is an edit.
 
@@ -893,7 +890,6 @@ class IndicatorPPADownloadStatistics:
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
-
                 buffer = textview.get_buffer()
                 filterText = buffer.get_text( buffer.get_start_iter(), buffer.get_end_iter(), False )
                 filterText = "\n".join( filterText.split() )
