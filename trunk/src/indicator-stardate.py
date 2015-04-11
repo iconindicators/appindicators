@@ -109,7 +109,8 @@ class IndicatorStardate:
         # The stardate calculation and WHEN the stardate changes are not synchronised,
         # so update at ten times speed (but no less than once per second).
         period = int( self.stardate.getStardateFractionalPeriod() / 10 ) 
-        if period < 1: period = 1
+        if period < 1:
+            period = 1
 
         GLib.timeout_add_seconds( period, self.update )
         Gtk.main()
@@ -120,17 +121,15 @@ class IndicatorStardate:
         self.stardate.setGregorian( datetime.datetime.utcnow() )
         s = self.stardate.toStardateString( self.showIssue, self.padInteger )
         self.indicator.set_label( s, "" )
-        if self.showInMenu: self.stardateMenuItem.set_label( _( "Stardate: {0}" ).format( s ) )
+        if self.showInMenu:
+            self.stardateMenuItem.set_label( _( "Stardate: {0}" ).format( s ) )
 
         return True # Needed so the timer continues!
 
 
     def onAbout( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
-
-        self.dialog = pythonutils.AboutDialog( 
+        if self.dialog is None:
+            self.dialog = pythonutils.AboutDialog( 
                 INDICATOR_NAME,
                 IndicatorStardate.COMMENTS, 
                 IndicatorStardate.WEBSITE, 
@@ -146,9 +145,11 @@ class IndicatorStardate:
                 _( "translator-credits" ),
                 logging )
 
-        self.dialog.run()
-        self.dialog.destroy()
-        self.dialog = None
+            self.dialog.run()
+            self.dialog.destroy()
+            self.dialog = None
+        else:
+            self.dialog.present()
 
 
     def onPreferences( self, widget ):
@@ -257,7 +258,8 @@ class IndicatorStardate:
 
         if os.path.isfile( IndicatorStardate.SETTINGS_FILE ):
             try:
-                with open( IndicatorStardate.SETTINGS_FILE, "r" ) as f: settings = json.load( f )
+                with open( IndicatorStardate.SETTINGS_FILE, "r" ) as f:
+                    settings = json.load( f )
 
                 self.padInteger = settings.get( IndicatorStardate.SETTINGS_PAD_INTEGER, self.padInteger )
                 self.showClassic = settings.get( IndicatorStardate.SETTINGS_SHOW_CLASSIC, self.showClassic )
@@ -277,7 +279,8 @@ class IndicatorStardate:
                 IndicatorStardate.SETTINGS_SHOW_IN_MENU: self.showInMenu,
                 IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showIssue
             }
-            with open( IndicatorStardate.SETTINGS_FILE, "w" ) as f: f.write( json.dumps( settings ) )
+            with open( IndicatorStardate.SETTINGS_FILE, "w" ) as f:
+                f.write( json.dumps( settings ) )
 
         except Exception as e:
             logging.exception( e )
