@@ -33,8 +33,6 @@
 #  http://lazka.github.io/pgi-docs
 
 
-#TODO Remove prints
-
 #TODO Remove the satellites and OE.  Run indicator and click the "auto add" options.
 #Click OK...nothing auto adds.
 #Close indicator, run again, nothing adds.
@@ -795,7 +793,6 @@ class IndicatorLunar:
 
 
     def updateBackend( self ):
-        print( "updateBackend - start ", datetime.datetime.now() )
         if not self.lock.acquire( False ):
             return
 
@@ -829,7 +826,6 @@ class IndicatorLunar:
         self.satelliteNotification( ephemNow )
 
         nextUpdateInSeconds = int( ( ephem.localtime( self.nextUpdate ) - ephem.localtime( ephem.now() ) ).total_seconds() ) # Calculate next update from time now.
-        print(nextUpdateInSeconds )
 
         # Ensure the update period is positive, at most every minute and at least every hour.
         if nextUpdateInSeconds < 60:
@@ -839,8 +835,6 @@ class IndicatorLunar:
 
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
-        print( "updateFrontend - end  ", datetime.datetime.now() )
-        print()
 
 
     def updateMenu( self, ephemNow, lunarPhase ):
