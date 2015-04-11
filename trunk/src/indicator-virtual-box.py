@@ -190,49 +190,46 @@ class IndicatorVirtualBox:
 
     def getVirtualMachines( self ):
         self.virtualMachineInfos = [ ] # A list of VirtualBox items.
+        if self.isVirtualBoxInstalled():
+            self.virtualMachineInfos = self.getVirtualMachinesFromBackend()
+            if len( self.virtualMachineInfos ) > 0:
+                # We have a list of VMs and UUIDs - now obtain groups or sort order.
+                # The configuration file can exist in different locations depending on the version of VirtualBox.
+                # Further, two config files can be in active use simultaneously - one for groups and the other for general GUI.
+                # So need to parse both files...if they exist.
+                virtualMachineInfosA = self.getVirtualMachinesFromConfigFile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_A ) 
+                virtualMachineInfosB = self.getVirtualMachinesFromConfigFile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_B ) 
 
-        if not self.isVirtualBoxInstalled(): return
+                # Information from config A takes precedence over config B as it appears config A is what the latest VirtualBox release uses.
+                # If neither config has information, use what was obtained from the backend.
+                if len( virtualMachineInfosA ) > 0 or len( virtualMachineInfosB ) > 0:
+                    if len( virtualMachineInfosA ) > 0:
+                        self.virtualMachineInfos = virtualMachineInfosA
+                    else:
+                        self.virtualMachineInfos = virtualMachineInfosB
 
-        self.virtualMachineInfos = self.getVirtualMachinesFromBackend()
-        if len( self.virtualMachineInfos ) == 0: return
+                # Determine which VMs are running...
+                p = subprocess.Popen( "VBoxManage list runningvms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+                for line in p.stdout.readlines():
+                    try:
+                        info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
+                        for virtualMachineInfo in self.virtualMachineInfos:
+                            if virtualMachineInfo.getUUID() == info[ 1 ]:
+                                virtualMachineInfo.setRunning()
+                    except: pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
-        # We have a list of VMs and UUIDs - now obtain groups or sort order.
-        # The configuration file can exist in different locations depending on the version of VirtualBox.
-        # Further, two config files can be in active use simultaneously - one for groups and the other for general GUI.
-        # So need to parse both files...if they exist.
-        virtualMachineInfosA = self.getVirtualMachinesFromConfigFile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_A ) 
-        virtualMachineInfosB = self.getVirtualMachinesFromConfigFile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_B ) 
+                p.wait()
 
-        # Information from config A takes precedence over config B as it appears config A is what the latest VirtualBox release uses.
-        # If neither config has information, use what was obtained from the backend.
-        if len( virtualMachineInfosA ) > 0 or len( virtualMachineInfosB ) > 0:
-            if len( virtualMachineInfosA ) > 0:
-                self.virtualMachineInfos = virtualMachineInfosA
-            else:
-                self.virtualMachineInfos = virtualMachineInfosB
+                # Alphabetically sort...
+                if self.sortDefault == False and not self.groupsExist():
+                    self.virtualMachineInfos = sorted( self.virtualMachineInfos, key = lambda virtualMachineInfo: virtualMachineInfo.name )
 
-        # Determine which VMs are running...
-        p = subprocess.Popen( "VBoxManage list runningvms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-        for line in p.stdout.readlines():
-            try:
-                info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
-                for virtualMachineInfo in self.virtualMachineInfos:
-                    if virtualMachineInfo.getUUID() == info[ 1 ]:
-                        virtualMachineInfo.setRunning()
-            except: pass # Sometimes VBoxManage emits a warning message along with the VM information.
-
-        p.wait()
-
-        # Alphabetically sort...
-        if self.sortDefault == False and not self.groupsExist():
-            self.virtualMachineInfos = sorted( self.virtualMachineInfos, key = lambda virtualMachineInfo: virtualMachineInfo.name )
-
-        # Add to each VM its properties (autostart and the start command).
-        for uuid in self.virtualMachinePreferences:
-            virtualMachineInfo = self.getVirtualMachineInfo( uuid )
-            if virtualMachineInfo is not None:
-                virtualMachineInfo.setAutoStart( self.virtualMachinePreferences[ uuid ][ 0 ] == Gtk.STOCK_APPLY )
-                virtualMachineInfo.setStartCommand( self.virtualMachinePreferences[ uuid ][ 1 ] )
+                # Add to each VM its properties (autostart and the start command).
+                for uuid in self.virtualMachinePreferences:
+                    virtualMachineInfo = self.getVirtualMachineInfo( uuid )
+                    if virtualMachineInfo is not None:
+                        virtualMachineInfo.setAutoStart( self.virtualMachinePreferences[ uuid ][ 0 ] == Gtk.STOCK_APPLY )
+                        virtualMachineInfo.setStartCommand( self.virtualMachinePreferences[ uuid ][ 1 ] )
 
 
     # Obtain a list of VMs using VBoxManage.
@@ -300,7 +297,8 @@ class IndicatorVirtualBox:
             for uuid in uuids:
                 virtualMachineInfo = virtualmachine.Info( "", False, uuid, 0 )
                 virtualMachineInfos.append( virtualMachineInfo )                
-        except: virtualMachineInfos = [] # The VM order has never been altered giving an empty result (and exception).
+        except:
+            virtualMachineInfos = [] # The VM order has never been altered giving an empty result (and exception).
             
         return virtualMachineInfos
 
@@ -332,7 +330,8 @@ class IndicatorVirtualBox:
 
     def groupsExist( self ):
         for virtualMachineInfo in self.virtualMachineInfos:
-            if virtualMachineInfo.isGroup(): return True
+            if virtualMachineInfo.isGroup():
+                return True
 
         return False
 
@@ -355,7 +354,8 @@ class IndicatorVirtualBox:
 
 
     def onStartVirtualMachine( self, widget, doRefresh ):
-        if doRefresh: self.getVirtualMachines() # Refresh the VMs as the list could have changed (deletion, creation, rename) since the last refresh.
+        if doRefresh:
+            self.getVirtualMachines() # Refresh the VMs as the list could have changed (deletion, creation, rename) since the last refresh.
 
         virtualMachineUUID = widget.props.name
         virtualMachineInfo = self.getVirtualMachineInfo( virtualMachineUUID )
@@ -414,6 +414,31 @@ class IndicatorVirtualBox:
                 count += 1
 
         return count > 1
+
+
+    def onAbout( self, widget ):
+        if self.dialog is None:
+            self.dialog = pythonutils.AboutDialog( 
+                INDICATOR_NAME,
+                IndicatorVirtualBox.COMMENTS, 
+                IndicatorVirtualBox.WEBSITE, 
+                IndicatorVirtualBox.WEBSITE, 
+                IndicatorVirtualBox.VERSION, 
+                Gtk.License.GPL_3_0, 
+                IndicatorVirtualBox.ICON,
+                [ IndicatorVirtualBox.AUTHOR ],
+                "",
+                "",
+                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
+                _( "Change _Log" ),
+                _( "translator-credits" ),
+                logging )
+
+            self.dialog.run()
+            self.dialog.destroy()
+            self.dialog = None
+        else:
+            self.dialog.present()
 
 
     def onPreferences( self, widget ):
@@ -543,11 +568,15 @@ class IndicatorVirtualBox:
             if not os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ): os.makedirs( IndicatorVirtualBox.AUTOSTART_PATH )
 
             if autostartIndicatorCheckbox.get_active():
-                try: shutil.copy( IndicatorVirtualBox.DESKTOP_PATH + IndicatorVirtualBox.DESKTOP_FILE, IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
-                except Exception as e: logging.exception( e )
+                try:
+                    shutil.copy( IndicatorVirtualBox.DESKTOP_PATH + IndicatorVirtualBox.DESKTOP_FILE, IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
+                except Exception as e:
+                    logging.exception( e )
             else:
-                try: os.remove( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
-                except: pass
+                try:
+                    os.remove( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
+                except:
+                    pass
 
             self.onRefresh()
 
@@ -570,9 +599,11 @@ class IndicatorVirtualBox:
     def onVMDoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
 
-        if treeiter == None: return
+        if treeiter == None:
+            return
 
-        if model[ treeiter ][ 3 ] == "": return # The 4th element is the UUID for a VM/group.  If the UUID is empty, this is a group.
+        if model[ treeiter ][ 3 ] == "":
+            return # The 4th element is the UUID for a VM/group.  If the UUID is empty, this is a group.
 
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -649,32 +680,6 @@ class IndicatorVirtualBox:
         dialog.destroy()
 
 
-    def onAbout( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
-
-        self.dialog = pythonutils.AboutDialog( 
-                INDICATOR_NAME,
-                IndicatorVirtualBox.COMMENTS, 
-                IndicatorVirtualBox.WEBSITE, 
-                IndicatorVirtualBox.WEBSITE, 
-                IndicatorVirtualBox.VERSION, 
-                Gtk.License.GPL_3_0, 
-                IndicatorVirtualBox.ICON,
-                [ IndicatorVirtualBox.AUTHOR ],
-                "",
-                "",
-                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
-                _( "Change _Log" ),
-                _( "translator-credits" ),
-                logging )
-
-        self.dialog.run()
-        self.dialog.destroy()
-        self.dialog = None
-
-
     def loadSettings( self ):
         self.delayBetweenAutoStartInSeconds = 30
         self.refreshIntervalInMinutes = 15
@@ -684,7 +689,8 @@ class IndicatorVirtualBox:
 
         if os.path.isfile( IndicatorVirtualBox.SETTINGS_FILE ):
             try:
-                with open( IndicatorVirtualBox.SETTINGS_FILE, "r" ) as f: settings = json.load( f )
+                with open( IndicatorVirtualBox.SETTINGS_FILE, "r" ) as f:
+                    settings = json.load( f )
 
                 self.delayBetweenAutoStartInSeconds = settings.get( IndicatorVirtualBox.SETTINGS_DELAY_BETWEEN_AUTO_START, self.delayBetweenAutoStartInSeconds )
                 self.refreshIntervalInMinutes = settings.get( IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
@@ -707,7 +713,8 @@ class IndicatorVirtualBox:
                 IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences
             }
 
-            with open( IndicatorVirtualBox.SETTINGS_FILE, "w" ) as f: f.write( json.dumps( settings ) )
+            with open( IndicatorVirtualBox.SETTINGS_FILE, "w" ) as f:
+                f.write( json.dumps( settings ) )
 
         except Exception as e:
             logging.exception( e )
