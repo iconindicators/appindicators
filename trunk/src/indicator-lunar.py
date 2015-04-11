@@ -2133,16 +2133,17 @@ class IndicatorLunar:
         hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
 #TODO Test the case for no OE data for a specific OE.
         hideBodyIfNeverUpCheckbox.set_tooltip_text( _( 
-            "If checked, only planets, moon, sun,\n" + \
-            "orbital elements and stars which\n" + \
-            "rise/set or are 'always up' will be\n" + \
-            "shown.\n\n" + \
-            "Any orbital element for which there\n" + \
-            "is no data will also be hidden.\n\n" + \
-            "Otherwise all bodies are shown.\n\n" + \
+            "If checked, only planets, moon,\n" + \
+            "sun, orbital elements and stars\n" + \
+            "which rise/set or are 'always up'\n" + \
+            "will be shown.\n\n" + \
+            "Any orbital element for which\n" + \
+            "there is no data will be hidden.\n\n" + \
+            "Otherwise, all bodies are shown.\n" + \
             "When showing all bodies, there may\n" + \
             "be a lot of information displayed\n" + \
-            "impacting the indicator's performance." ) )
+            "which could impact the indicator's\n" + \
+            "performance." ) )
         grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
@@ -2220,8 +2221,9 @@ class IndicatorLunar:
         hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text( _( 
             "If checked, only satellites with an\n" + \
             "upcoming visible pass are displayed.\n\n" + \
-            "Otherwise, all passes, visible or not,\n" + \
-            "are shown (including error messages).\n\n" + \
+            "Otherwise, all passes, visible or\n" + \
+            "not, are shown (including error\n" + \
+            "messages).\n\n" + \
             "If non-visible passes are shown,\n" + \
             "there may be a lot of information\n" + \
             "displayed impacting the indicator's\n" + \
@@ -2237,8 +2239,8 @@ class IndicatorLunar:
             "downloaded data will be added to\n" + \
             "the list of checked satellites.\n\n" + \
             "In addition, any satellites which\n" + \
-            "are currently unchecked will become\n" + \
-            "checked." ) )
+            "are currently unchecked will\n" + \
+            "become checked." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 8, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
@@ -2253,8 +2255,8 @@ class IndicatorLunar:
         satelliteURLText.set_hexpand( True )
         satelliteURLText.set_tooltip_text( _(
             "The URL used to lookup a satellite\n" + \
-            "(in the default browser) when any of\n" + \
-            "the satellite's child items are\n" + \
+            "(in the default browser) when any\n" + \
+            "of the satellite's child items are\n" + \
             "selected from the menu.\n\n" + \
             "If empty, no lookup will be done.\n\n" + \
             "Available tags:\n\t" ) + \
