@@ -1025,24 +1025,12 @@ class IndicatorPPADownloadStatistics:
     #}
     def getPPADownloadStatistics( self ):
         if self.preferencesOpen:
-            # If the user has the preferences open and an automatic update has kicked off, reschedule the update.
-            GLib.timeout_add_seconds( 60, self.requestPPADownloadAndMenuRefresh, False )
-            return
+            GLib.timeout_add_seconds( 60, self.requestPPADownloadAndMenuRefresh, False ) # If the user has the preferences open and an automatic update has kicked off, reschedule the update.
+        else:
+            with self.lock:
+                self.downloadInProgress = True
 
-        with self.lock:
-            self.downloadInProgress = True
-
-        for ppa in self.ppas:
-            ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
-            key = ppa.getUser() + " | " + ppa.getName()
-            if key in self.filters:
-                self.getPublishedBinariesWithFilters( ppa )
-            else:
-                self.getPublishedBinariesNoFilters( ppa )
-
-        # Have a second attempt at failures...
-        for ppa in self.ppas:
-            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+            for ppa in self.ppas:
                 ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
                 key = ppa.getUser() + " | " + ppa.getName()
                 if key in self.filters:
@@ -1050,15 +1038,25 @@ class IndicatorPPADownloadStatistics:
                 else:
                     self.getPublishedBinariesNoFilters( ppa )
 
-        with self.lock:
-            self.downloadInProgress = False
+            # Have a second attempt at failures...
+            for ppa in self.ppas:
+                if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                    ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
+                    key = ppa.getUser() + " | " + ppa.getName()
+                    if key in self.filters:
+                        self.getPublishedBinariesWithFilters( ppa )
+                    else:
+                        self.getPublishedBinariesNoFilters( ppa )
 
-        GLib.idle_add( self.buildMenu )
+            with self.lock:
+                self.downloadInProgress = False
 
-        if self.showNotificationOnUpdate and not self.quitRequested and self.ppasPrevious != self.ppas:
-            Notify.Notification.new( _( "Statistics downloaded!" ), "", IndicatorPPADownloadStatistics.ICON ).show()
+            GLib.idle_add( self.buildMenu )
 
-        self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.
+            if self.showNotificationOnUpdate and not self.quitRequested and self.ppasPrevious != self.ppas:
+                Notify.Notification.new( _( "Statistics downloaded!" ), "", IndicatorPPADownloadStatistics.ICON ).show()
+
+            self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.
 
 
     def getPublishedBinariesNoFilters( self, ppa ):
@@ -1084,7 +1082,6 @@ class IndicatorPPADownloadStatistics:
 
     def getPublishedBinariesWithFilters( self, ppa ):
         for filter in self.filters.get( ppa.getUser() + " | " + ppa.getName() ):
-
             baseURL = \
                 "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
                 "?ws.op=getPublishedBinaries" + \
@@ -1163,7 +1160,6 @@ class IndicatorPPADownloadStatistics:
 
     def getDownloadCount( self, ppa, packageName, packageVersion, architectureSpecific, packageId ):
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
-
         try:
             downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
             with self.lock:
