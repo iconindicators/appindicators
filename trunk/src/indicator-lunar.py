@@ -806,8 +806,7 @@ class IndicatorLunar:
         self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
         self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_NAME ) ] = self.cityName
 
-        self.nextUpdates = [ ] # Stores the date/time for each upcoming rise/set/phase...used to find the date/time closest to now and that will be the next time for an update.
-
+        self.nextUpdate = ephem.Date( datetime.datetime.now() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
         ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
 
         lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
@@ -829,9 +828,8 @@ class IndicatorLunar:
         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
         self.satelliteNotification( ephemNow )
 
-        self.nextUpdates.sort()
-        print(len(self.nextUpdates)) #TODO Remove
-        nextUpdateInSeconds = int( ( ephem.localtime( self.nextUpdates[ 0 ] ) - ephem.localtime( ephem.now() ) ).total_seconds() ) # Calculate next update from time now.
+        nextUpdateInSeconds = int( ( ephem.localtime( self.nextUpdate ) - ephem.localtime( ephem.now() ) ).total_seconds() ) # Calculate next update from time now.
+        print(nextUpdateInSeconds )
 
         # Ensure the update period is positive, at most every minute and at least every hour.
         if nextUpdateInSeconds < 60:
@@ -1415,15 +1413,16 @@ class IndicatorLunar:
     def updateMoon( self, ephemNow, lunarPhase, hideIfNeverUp ):
         if self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp ):
             self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_PHASE ) ] = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ lunarPhase ]
-            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FIRST_QUARTER ) ] = self.getLocalDateTime( ephem.next_first_quarter_moon( ephemNow ) )
-            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FULL ) ] = self.getLocalDateTime( ephem.next_full_moon( ephemNow ) )
-            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_THIRD_QUARTER ) ] = self.getLocalDateTime( ephem.next_last_quarter_moon( ephemNow ) )
-            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_NEW ) ] = self.getLocalDateTime( ephem.next_new_moon( ephemNow ) )
 
-            self.nextUpdates.append( ephem.next_first_quarter_moon( ephemNow ) )
-            self.nextUpdates.append( ephem.next_full_moon( ephemNow ) )
-            self.nextUpdates.append( ephem.next_last_quarter_moon( ephemNow ) )
-            self.nextUpdates.append( ephem.next_new_moon( ephemNow ) )
+            firstQuarter = ephem.next_first_quarter_moon( ephemNow )
+            fullMoon = ephem.next_full_moon( ephemNow )
+            lastQuarter = ephem.next_last_quarter_moon( ephemNow )
+            newMoon = ephem.next_new_moon( ephemNow )
+            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FIRST_QUARTER ) ] = self.getLocalDateTime( firstQuarter )
+            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FULL ) ] = self.getLocalDateTime( fullMoon )
+            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_THIRD_QUARTER ) ] = self.getLocalDateTime( lastQuarter )
+            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_NEW ) ] = self.getLocalDateTime( newMoon )
+            self.nextUpdate = self.getSmallestDate( firstQuarter, self.getSmallestDate( fullMoon, self.getSmallestDate( lastQuarter, self.getSmallestDate( self.nextUpdate, newMoon ) ) ) )
 
             self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
 
@@ -1449,8 +1448,7 @@ class IndicatorLunar:
                 dusk = city.next_setting( sun, use_center = True )
                 self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_DAWN ) ] = self.getLocalDateTime( dawn )
                 self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_DUSK ) ] = self.getLocalDateTime( dusk )
-                self.nextUpdates.append( dawn )
-                self.nextUpdates.append( dusk )
+                self.nextUpdate = self.getSmallestDate( dawn, self.getSmallestDate( self.nextUpdate, dusk ) )
 
             except ephem.AlwaysUpError:
                 self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
@@ -1463,12 +1461,10 @@ class IndicatorLunar:
 
             if continueCalculations:
                 equinox = ephem.next_equinox( ephemNow )
-                self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_EQUINOX ) ] = self.getLocalDateTime( equinox )
-                self.nextUpdates.append( equinox )
-
                 solstice = ephem.next_solstice( ephemNow )
+                self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_EQUINOX ) ] = self.getLocalDateTime( equinox )
                 self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_SOLSTICE ) ] = self.getLocalDateTime( solstice )
-                self.nextUpdates.append( solstice )
+                self.nextUpdate = self.getSmallestDate( equinox, self.getSmallestDate( self.nextUpdate, solstice ) )
 
                 self.updateEclipse( ephemNow, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
 
@@ -1530,8 +1526,7 @@ class IndicatorLunar:
             setting = city.next_setting( body )
             self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_RISE_TIME ) ] = str( self.getLocalDateTime( rising ) )
             self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_SET_TIME ) ] = str( self.getLocalDateTime( setting ) )
-            self.nextUpdates.append( rising )
-            self.nextUpdates.append( setting )
+            self.nextUpdate = self.getSmallestDate( rising, self.getSmallestDate( self.nextUpdate, setting ) )
 
         except ephem.AlwaysUpError:
             self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
@@ -1658,9 +1653,9 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( math.degrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
             self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible ) # Put this in as it's likely needed in the notification.
 
-            self.nextUpdates.append( nextPass[ 4 ] )
+            self.nextUpdate = self.getSmallestDate( self.nextUpdate, nextPass[ 4 ] )
             if ephem.Date( nextPass[ 0 ] ) > currentDateTime:
-                self.nextUpdates.append( nextPass[ 0 ] ) # Only add the rise time if it is after now.
+                self.nextUpdate = self.getSmallestDate( self.nextUpdate, nextPass[ 0 ] ) # Only add the rise time if it is after now.
 
             break
 
@@ -1906,6 +1901,13 @@ class IndicatorLunar:
         parallacticAngle = math.atan2( y, x )
 
         return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+
+
+    def getSmallestDate( self, firstEphemDate, secondEphemDate ):
+        if firstEphemDate < secondEphemDate:
+            return firstEphemDate
+
+        return secondEphemDate
 
 
     # Takes a float pyEphem DateTime and converts to local date/time, trims off fractional seconds and returns as a string.
