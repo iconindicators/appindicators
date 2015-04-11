@@ -2191,10 +2191,13 @@ class IndicatorLunar:
         orbitalElementsAddNewCheckbox.set_margin_top( 15 )
         orbitalElementsAddNewCheckbox.set_active( self.orbitalElementsAddNew )
         orbitalElementsAddNewCheckbox.set_tooltip_text( _(
-#TODO Add a note about when clicking OK all OEs will also be added.                                                          
-            "If checked, new orbital elements in\n" + \
-            "the downloaded data will be added\n" + \
-            "to the list of checked orbital elements." ) )
+            "If checked, new orbital elements\n" + \
+            "in the downloaded data will be\n" + \
+            "added to the list of checked\n" + \
+            "orbital elements.\n\n" + \
+            "In addition, any orbital elements\n" + \
+            "which are currently unchecked will\n" + \
+            "become checked." ) )
         grid.attach( orbitalElementsAddNewCheckbox, 0, 4, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
@@ -2247,10 +2250,12 @@ class IndicatorLunar:
         satellitesAddNewCheckbox.set_margin_top( 15 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
         satellitesAddNewCheckbox.set_tooltip_text( _( 
-#TODO Add a note about when clicking OK all satellites will also be added.                                                          
-            "If checked, new satellites in the TLE\n" + \
-            "data will be added to your list of\n" + \
-            "checked satellites." ) )
+            "If checked, new satellites in the\n" + \
+            "downloaded data will be added to\n" + \
+            "the list of checked satellites.\n\n" + \
+            "In addition, any satellites which\n" + \
+            "are currently unchecked will become\n" + \
+            "checked." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 8, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
