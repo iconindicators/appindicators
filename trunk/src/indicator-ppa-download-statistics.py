@@ -269,51 +269,48 @@ class IndicatorPPADownloadStatistics:
 
 
     def onPPA( self, widget ):
-        if self.allowMenuItemsToLaunchBrowser == False:
-            return
+        if self.allowMenuItemsToLaunchBrowser == True:
+            firstPipe = str.find( widget.props.name, "|" )
+            ppaUser = widget.props.name[ 0 : firstPipe ].strip()
 
-        firstPipe = str.find( widget.props.name, "|" )
-        ppaUser = widget.props.name[ 0 : firstPipe ].strip()
+            secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
+            if secondPipe == -1:
+                # This is a combined PPA...
+                ppaName = widget.props.name[ firstPipe + 1 : ].strip()
+                url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName
+            else:
+                ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
 
-        secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
-        if secondPipe == -1:
-            # This is a combined PPA...
-            ppaName = widget.props.name[ firstPipe + 1 : ].strip()
-            url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName
-        else:
-            ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
+                thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
+                series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
+                url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
 
-            thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
-            series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
-            url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
-
-        webbrowser.open( url ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
+            webbrowser.open( url ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
 
 
     def onAbout( self, widget ):
-        if self.dialog is not None:
+        if self.dialog is None:
+            self.dialog = pythonutils.AboutDialog(
+                INDICATOR_NAME,
+                IndicatorPPADownloadStatistics.COMMENTS, 
+                IndicatorPPADownloadStatistics.WEBSITE, 
+                IndicatorPPADownloadStatistics.WEBSITE, 
+                IndicatorPPADownloadStatistics.VERSION, 
+                Gtk.License.GPL_3_0, 
+                IndicatorPPADownloadStatistics.ICON,
+                [ IndicatorPPADownloadStatistics.AUTHOR ],
+                "",
+                "",
+                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
+                _( "Change _Log" ),
+                _( "translator-credits" ),
+                logging )
+
+            self.dialog.run()
+            self.dialog.destroy()
+            self.dialog = None
+        else:
             self.dialog.present()
-            return
-
-        self.dialog = pythonutils.AboutDialog(
-            INDICATOR_NAME,
-            IndicatorPPADownloadStatistics.COMMENTS, 
-            IndicatorPPADownloadStatistics.WEBSITE, 
-            IndicatorPPADownloadStatistics.WEBSITE, 
-            IndicatorPPADownloadStatistics.VERSION, 
-            Gtk.License.GPL_3_0, 
-            IndicatorPPADownloadStatistics.ICON,
-            [ IndicatorPPADownloadStatistics.AUTHOR ],
-            "",
-            "",
-            "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
-            _( "Change _Log" ),
-            _( "translator-credits" ),
-            logging )
-
-        self.dialog.run()
-        self.dialog.destroy()
-        self.dialog = None
 
 
     def onPreferences( self, widget ):
@@ -617,12 +614,11 @@ class IndicatorPPADownloadStatistics:
 
         if treeiter is None:
             pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No PPA has been selected for removal." ) )
-            return
-
-        # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-        if pythonutils.showOKCancel( self.dialog, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:
-            model.remove( treeiter )
-            self.ppasOrFiltersModified = True
+        else:
+            # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+            if pythonutils.showOKCancel( self.dialog, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:
+                model.remove( treeiter )
+                self.ppasOrFiltersModified = True
 
 
     def onPPAAdd( self, button, tree ): self.onPPADoubleClick( tree, None, None )
@@ -792,19 +788,17 @@ class IndicatorPPADownloadStatistics:
 
         if treeiter is None:
             pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No filter has been selected for removal." ) )
-            return
-
-        # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-        if pythonutils.showOKCancel( self.dialog, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:
-            model.remove( treeiter )
-            self.ppasOrFiltersModified = True
+        else:
+            # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+            if pythonutils.showOKCancel( self.dialog, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:
+                model.remove( treeiter )
+                self.ppasOrFiltersModified = True
 
 
     def onFilterAdd( self, button, filterTree, ppaTree ):
         if len( ppaTree.get_model() ) == 0:
             pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Please add a PPA first!" ) )
         else:
-
             # If the number of filters equals the number of PPA User/Names, cannot add a filter!
             ppaUsersNames = [ ]
             for ppa in range( len( ppaTree.get_model() ) ):
