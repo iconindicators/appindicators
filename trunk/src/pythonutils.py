@@ -29,24 +29,25 @@ def isNumber( numberAsString ):
         float( numberAsString )
         return True
 
-    except ValueError: return False
+    except ValueError:
+        return False
 
 
 # Returns the colour (as #xxyyzz) for the current GTK icon theme.
 def getColourForIconTheme():
+    colour = "#fff200" # Use hicolor as a default
     iconTheme = getIconTheme()
+    if iconTheme is not None:
+        if iconTheme == "elementary":
+            colour = "#f4f4f4"
+        elif iconTheme == "lubuntu":
+            colour = "#5a5a5a"
+        elif iconTheme == "ubuntu-mono-dark":
+            colour = "#dfdbd2"
+        elif iconTheme == "ubuntu-mono-light":
+            colour = "#3c3c3c"
 
-    if iconTheme is None: return "#fff200" # Use hicolor as a default.
-
-    if iconTheme == "elementary": return "#f4f4f4"
-
-    if iconTheme == "lubuntu": return "#5a5a5a"
-
-    if iconTheme == "ubuntu-mono-dark": return "#dfdbd2"
-
-    if iconTheme == "ubuntu-mono-light": return "#3c3c3c"
-
-    return "#fff200" # Use hicolor as a default
+    return colour
 
 
 # Returns the name of the current GTK icon theme.
@@ -72,7 +73,6 @@ def showOKCancel( parent, message ):
 
 # Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
 def getTextViewText( textView ): return textView.get_buffer().get_text( textView.get_buffer().get_start_iter(), textView.get_buffer().get_end_iter(), True )
-
 
 
 # Listens to checkbox events and toggles the visibility of the widgets.
@@ -123,7 +123,8 @@ class AboutDialog( Gtk.AboutDialog ):
 
             self.set_authors( authorsCredits )
 
-        if translator is not None: self.set_translator_credits( translator )
+        if translator is not None:
+            self.set_translator_credits( translator )
 
         self.set_comments( comments )
         self.set_license_type( licenseType )
@@ -146,42 +147,41 @@ class AboutDialog( Gtk.AboutDialog ):
                 if type( child ).__name__ == "ScrolledWindow":
                     child.set_policy( child.get_policy()[ 0 ], Gtk.PolicyType.NEVER ) 
 
-        if changeLog is None: return # No point continuing as the changelog will not be displayed and this dialog reverts to the AboutDialog.
+        if changeLog is not None: # If there is no change log this dialog reverts to the AboutDialog.
+            self.set_resizable( True )
 
-        self.set_resizable( True )
+            textView = Gtk.TextView()
+            textView.set_editable( False )
+            textBuffer = textView.get_buffer()
+            textBuffer.set_text( self.getChangeLog() )
 
-        textView = Gtk.TextView()
-        textView.set_editable( False )
-        textBuffer = textView.get_buffer()
-        textBuffer.set_text( self.getChangeLog() )
+            # Reference https://gitorious.org/ghelp/gtk/raw/5c4f2ef0c1e658827091aadf4fc3c4d5f5964785:gtk/gtkaboutdialog.c
+            scrolledWindow = Gtk.ScrolledWindow()
+            scrolledWindow.set_shadow_type( Gtk.ShadowType.IN );
+            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+            scrolledWindow.set_hexpand( True )
+            scrolledWindow.set_vexpand( True )
+            scrolledWindow.add( textView )
+            scrolledWindow.show_all()
 
-        # Reference https://gitorious.org/ghelp/gtk/raw/5c4f2ef0c1e658827091aadf4fc3c4d5f5964785:gtk/gtkaboutdialog.c
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_shadow_type( Gtk.ShadowType.IN );
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( textView )
-        scrolledWindow.show_all()
+            changeLogTabIndex = notebook.append_page( scrolledWindow, Gtk.Label( "" ) ) # The tab is hidden so the label contents are irrelevant.
 
-        changeLogTabIndex = notebook.append_page( scrolledWindow, Gtk.Label( "" ) ) # The tab is hidden so the label contents are irrelevant.
+            changeLogButton = Gtk.ToggleButton( changeLogButtonName )
+            changeLogButton.set_use_underline( True )
+            changeLogButton.show()
 
-        changeLogButton = Gtk.ToggleButton( changeLogButtonName )
-        changeLogButton.set_use_underline( True )
-        changeLogButton.show()
+            buttonBox = self.get_content_area().get_children()[ 1 ]
+            buttonBox.pack_start( changeLogButton, True, True, 0 )
+            buttonBox.set_child_secondary( changeLogButton, True )
 
-        buttonBox = self.get_content_area().get_children()[ 1 ]
-        buttonBox.pack_start( changeLogButton, True, True, 0 )
-        buttonBox.set_child_secondary( changeLogButton, True )
+            buttons = buttonBox.get_children()
+            buttonsForToggle = [ ]
+            for button in buttons:
+                if button != changeLogButton and type( button ) == Gtk.ToggleButton:
+                    buttonsForToggle.append( button )
+                    button.connect( "toggled", self.onOtherToggledButtons, changeLogButton )
 
-        buttons = buttonBox.get_children()
-        buttonsForToggle = [ ]
-        for button in buttons:
-            if button != changeLogButton and type( button ) == Gtk.ToggleButton:
-                buttonsForToggle.append( button )
-                button.connect( "toggled", self.onOtherToggledButtons, changeLogButton )
-
-        changeLogButton.connect( "toggled", self.onChangeLogButtonToggled, notebook, changeLogTabIndex, buttonsForToggle )
+            changeLogButton.connect( "toggled", self.onChangeLogButtonToggled, notebook, changeLogTabIndex, buttonsForToggle )
 
 
     def onChangeLogButtonToggled( self, changeLogButton, notebook, changeLogTabIndex, buttonsForToggle ):
@@ -203,30 +203,29 @@ class AboutDialog( Gtk.AboutDialog ):
 
     # Assumes a typical format for a Debian change log file.
     def getChangeLog( self ):
-        if not os.path.exists( self.changeLog ): return None
-
         contents = None
-        try:
-            with gzip.open( self.changeLog, "rb" ) as f:
-                changeLogContents = re.split( "\n\n\n", f.read().decode() )
+        if os.path.exists( self.changeLog ): 
+            try:
+                with gzip.open( self.changeLog, "rb" ) as f:
+                    changeLogContents = re.split( "\n\n\n", f.read().decode() )
 
-            contents = ""
-            for changeLogEntry in changeLogContents:
-                changeLogEntry = changeLogEntry.split( "\n" )
-                version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
-                dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
-                changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
-                changes = changes.replace( "    ", "     " )
-                contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
+                contents = ""
+                for changeLogEntry in changeLogContents:
+                    changeLogEntry = changeLogEntry.split( "\n" )
+                    version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
+                    dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
+                    changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
+                    changes = changes.replace( "    ", "     " )
+                    contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
 
-            contents = contents.strip()
+                contents = contents.strip()
 
-        except Exception as e:
-            if not self.logging is None:
-                self.logging.exception( e )
-                self.logging.error( "Error reading change log: " + self.changeLog )
+            except Exception as e:
+                if not self.logging is None:
+                    self.logging.exception( e )
+                    self.logging.error( "Error reading change log: " + self.changeLog )
 
-            contents = "Error reading change log: " + self.changeLog
+                contents = "Error reading change log: " + self.changeLog
 
         return contents
 
@@ -240,9 +239,11 @@ class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
 
 
     def doRollover( self ):
-        if self.stream: self.stream.close()
+        if self.stream:
+            self.stream.close()
 
-        if os.path.exists( self.baseFilename ): os.remove( self.baseFilename )
+        if os.path.exists( self.baseFilename ):
+            os.remove( self.baseFilename )
 
         self.mode = "a" # Using "w" instead works in the same way as does append...why?  Surely "w" would write from the beginning each time?
         self.stream = self._open()
