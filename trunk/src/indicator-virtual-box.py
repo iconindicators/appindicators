@@ -585,7 +585,7 @@ class IndicatorVirtualBox:
 
 
     def updateVirtualMachinePreferences( self, store, treeiter ):
-        while treeiter != None:
+        while treeiter is not None:
             if store[ treeiter ][ 3 ] != "": # UUID is not empty, so this is a VM and not a group...
                 self.virtualMachinePreferences[ store[ treeiter ][ 3 ] ] = [ store[ treeiter ][ 1 ], store[ treeiter ][ 2 ] ]
 
@@ -598,13 +598,11 @@ class IndicatorVirtualBox:
 
     def onVMDoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
+        if treeiter is not None and model[ treeiter ][ 3 ] != "":
+            self.editVM( model, treeiter )
 
-        if treeiter == None:
-            return
 
-        if model[ treeiter ][ 3 ] == "":
-            return # The 4th element is the UUID for a VM/group.  If the UUID is empty, this is a group.
-
+    def editVM( self, model, treeiter ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
