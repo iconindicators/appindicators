@@ -33,11 +33,6 @@
 #  http://lazka.github.io/pgi-docs
 
 
-#TODO Remove the satellites and OE.  Run indicator and click the "auto add" options.
-#Click OK...nothing auto adds.
-#Close indicator, run again, nothing adds.
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -1330,13 +1325,7 @@ class IndicatorLunar:
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             else:
                 self.writeToCache( self.orbitalElementData, IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME )
-
-                # Add in any new orbital elements based on the user preference.
-                if self.orbitalElementsAddNew:
-                    for key in self.orbitalElementData:
-                        if key not in self.orbitalElements:
-                            self.orbitalElements.append( key )
-
+                if self.addNewOrbitalElements():
                     self.saveSettings()
 
             # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
@@ -1372,13 +1361,7 @@ class IndicatorLunar:
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             else:
                 self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
-
-                # Add in any new satellites based on the user preference.
-                if self.satellitesAddNew:
-                    for key in self.satelliteTLEData:
-                        if key not in self.satellites:
-                            self.satellites.append( key )
-
+                if self.addNewSatellites():
                     self.saveSettings()
 
             # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
@@ -2833,6 +2816,7 @@ class IndicatorLunar:
                 if orbitalElement[ 0 ]:
                     self.orbitalElements.append( orbitalElement[ 1 ].upper() )
 
+            self.addNewOrbitalElements()
 
             if self.satelliteTLEURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
                 self.satelliteTLEURL = self.satelliteTLEURLNew # The URL may or may not be valie, but it will not be None.
@@ -2848,6 +2832,8 @@ class IndicatorLunar:
             for satelliteTLE in satelliteStore:
                 if satelliteTLE[ 0 ]:
                     self.satellites.append( ( satelliteTLE[ 1 ].upper(), satelliteTLE[ 2 ] ) )
+
+            self.addNewSatellites()
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
@@ -3213,6 +3199,24 @@ class IndicatorLunar:
             latitude.set_text( _city_data.get( city )[ 0 ] )
             longitude.set_text( _city_data.get( city )[ 1 ] )
             elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
+
+
+    def addNewSatellites( self ):
+        if self.satellitesAddNew:
+            for key in self.satelliteTLEData:
+                if key not in self.satellites:
+                    self.satellites.append( key )
+
+        return self.satellitesAddNew
+
+
+    def addNewOrbitalElements( self ):
+        if self.orbitalElementsAddNew:
+            for key in self.orbitalElementData:
+                if key not in self.orbitalElements:
+                    self.orbitalElements.append( key )
+
+        return self.orbitalElementsAddNew
 
 
     # Returns a dict/hashtable of the orbital elements (comets) data from the specified URL (may be empty).
