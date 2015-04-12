@@ -2291,7 +2291,7 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore )
+        renderer_toggle.connect( "toggled", self.onPlanetOrStarToggled, planetStore, AstronomicalObjectType.Planet )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore, None, displayTagsStore, AstronomicalObjectType.Planet )
@@ -2322,7 +2322,7 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onStarToggled, starStore )
+        renderer_toggle.connect( "toggled", self.onPlanetOrStarToggled, starStore, AstronomicalObjectType.Star )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, None, displayTagsStore, AstronomicalObjectType.Star )
@@ -2344,8 +2344,10 @@ class IndicatorLunar:
         orbitalElementGrid.set_margin_bottom( 10 )
 
         orbitalElementStore = Gtk.ListStore( bool, str ) # Show/hide, orbital element name.
+        orbitalElementStoreSort = Gtk.TreeModelSort( model = orbitalElementStore )
+        orbitalElementStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
-        tree = Gtk.TreeView( orbitalElementStore )
+        tree = Gtk.TreeView( orbitalElementStoreSort )
         tree.set_tooltip_text( _(
             "Check an orbital element to display\n" + \
             "in the menu.\n\n" + \
@@ -2353,10 +2355,10 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onOrbitalElementToggled, orbitalElementStore )
+        renderer_toggle.connect( "toggled", self.onOrbitalElementOrSateliteToggled, orbitalElementStore, orbitalElementStoreSort, AstronomicalObjectType.OrbitalElement )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, orbitalElementStore, None, displayTagsStore, AstronomicalObjectType.OrbitalElement )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, orbitalElementStore, orbitalElementStoreSort, displayTagsStore, AstronomicalObjectType.OrbitalElement )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2423,7 +2425,6 @@ class IndicatorLunar:
         satelliteGrid.set_margin_bottom( 10 )
 
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
-
         satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
         satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
@@ -2435,7 +2436,7 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onSatelliteToggled, satelliteStore, satelliteStoreSort )
+        renderer_toggle.connect( "toggled", self.onOrbitalElementOrSateliteToggled, satelliteStore, satelliteStoreSort, AstronomicalObjectType.Satellite )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, AstronomicalObjectType.Satellite )
@@ -2735,8 +2736,13 @@ class IndicatorLunar:
         self.dialog.show_all()
 
         # Some GUI elements will be hidden, which must be done after the dialog is shown.
+#TODO Added 297pp to .json but does not appear in list...why? 
+        print( "297P/BESHORE" in  self.orbitalElements )
+        print( "297PP/BESHORE" in  self.orbitalElements )
         self.updateOrbitalElementOrSatellitePreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, self.orbitalElements, orbitalElementURLEntry.get_text().strip(), False, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA )
         self.updateOrbitalElementOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), True, IndicatorLunar.MESSAGE_SATELLITE_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_SATELLITE_NO_DATA )
+        print( "297P/BESHORE" in  self.orbitalElements )
+        print( "297PP/BESHORE" in  self.orbitalElements )
 
         # Last thing to do after everything else is built, but before setting visible.        
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
@@ -3066,7 +3072,6 @@ class IndicatorLunar:
         self.updateOrbitalElementOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, True, IndicatorLunar.MESSAGE_SATELLITE_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_SATELLITE_NO_DATA )
 
 
-#TODO Test that this works!
     def removeFromData( self, isSatellite ):
         if isSatellite:
             astronomicalObjectType = AstronomicalObjectType.Satellite
@@ -3078,31 +3083,26 @@ class IndicatorLunar:
                 self.data.pop( key )
 
 
-    def onPlanetToggled( self, widget, row, planetStore ):
-        planetStore[ row ][ 0 ] = not planetStore[ row ][ 0 ]
-        self.checkboxToggled( planetStore[ row ][ 1 ].upper(), AstronomicalObjectType.Planet, planetStore[ row ][ 0 ] )
+    def onPlanetOrStarToggled( self, widget, row, dataStore, astronomicalObjectType ):
+        dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
+        self.checkboxToggled( dataStore[ row ][ 1 ].upper(), astronomicalObjectType, dataStore[ row ][ 0 ] )
 
-        planetName = planetStore[ row ][ 1 ]
-        if planetName in IndicatorLunar.PLANET_MOONS:
-            for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
-                self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, planetStore[ row ][ 0 ] )
-
-
-    def onStarToggled( self, widget, row, starStore ):
-        starStore[ row ][ 0 ] = not starStore[ row ][ 0 ]
-        self.checkboxToggled( starStore[ row ][ 1 ].upper(), AstronomicalObjectType.Star, starStore[ row ][ 0 ] )
+        if astronomicalObjectType == AstronomicalObjectType.Planet:
+            planetName = dataStore[ row ][ 1 ]
+            if planetName in IndicatorLunar.PLANET_MOONS:
+                for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
+                    self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, dataStore[ row ][ 0 ] )
 
 
-    def onOrbitalElementToggled( self, widget, row, orbitalElementStore ):
-        orbitalElementStore[ row ][ 0 ] = not orbitalElementStore[ row ][ 0 ]
-        self.checkboxToggled( orbitalElementStore[ row ][ 1 ].upper(), AstronomicalObjectType.OrbitalElement, orbitalElementStore[ row ][ 0 ] )
+    def onOrbitalElementOrSateliteToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
+        actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
+        dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
+        if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
+            bodyTag = dataStore[ actualRow ][ 1 ].upper()
+        else:
+            bodyTag = dataStore[ actualRow ][ 1 ] + " " + dataStore[ actualRow ][ 2 ]
 
-
-    def onSatelliteToggled( self, widget, row, satelliteStore, satelliteSortStore ):
-        actualRow = satelliteSortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
-        satelliteStore[ actualRow ][ 0 ] = not satelliteStore[ actualRow ][ 0 ]
-        bodyTag = satelliteStore[ actualRow ][ 1 ] + " " + satelliteStore[ actualRow ][ 2 ]
-        self.checkboxToggled( bodyTag, AstronomicalObjectType.Satellite, satelliteStore[ actualRow ][ 0 ] )
+        self.checkboxToggled( bodyTag, astronomicalObjectType, dataStore[ actualRow ][ 0 ] )
 
 
     def checkboxToggled( self, bodyTag, astronomicalObjectType, checked ):
@@ -3126,32 +3126,30 @@ class IndicatorLunar:
 
 
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
-        if astronomicalObjectType == AstronomicalObjectType.Satellite:
-            toggle = self.toggleSatellitesTable
-            self.toggleSatellitesTable = not self.toggleSatellitesTable
-            for row in range( len( dataStore ) ):
-                dataStore[ row ][ 0 ] = bool( not toggle )
-                row = str( sortStore.convert_child_path_to_path( Gtk.TreePath.new_from_string( str( row ) ) ) ) # Need to convert the data store row to the sort store row.
-                self.onSatelliteToggled( widget, row, dataStore, sortStore )
-        else:
-            if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
-                functionName = "onOrbitalElementToggled"
-                toggle = self.toggleOrbitalElementsTable
-                self.toggleOrbitalElementsTable = not self.toggleOrbitalElementsTable
-
-            elif astronomicalObjectType == AstronomicalObjectType.Planet:
-                functionName = "onPlanetToggled"
+        if astronomicalObjectType == AstronomicalObjectType.Planet or astronomicalObjectType == AstronomicalObjectType.Star:
+            if astronomicalObjectType == AstronomicalObjectType.Planet:
                 toggle = self.togglePlanetsTable
                 self.togglePlanetsTable = not self.togglePlanetsTable
-
-            elif astronomicalObjectType == AstronomicalObjectType.Star:
-                functionName = "onStarToggled"
+            else:
                 toggle = self.toggleStarsTable
                 self.toggleStarsTable = not self.toggleStarsTable
 
             for row in range( len( dataStore ) ):
                 dataStore[ row ][ 0 ] = bool( not toggle )
-                getattr( self, functionName )( widget, str( row ), dataStore )
+                self.onPlanetOrStarToggled( widget, row, dataStore, astronomicalObjectType )
+
+        elif astronomicalObjectType == AstronomicalObjectType.OrbitalElement or astronomicalObjectType == AstronomicalObjectType.Satellite:
+            if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
+                toggle = self.toggleOrbitalElementsTable
+                self.toggleOrbitalElementsTable = not self.toggleOrbitalElementsTable
+            else:
+                toggle = self.toggleSatellitesTable
+                self.toggleSatellitesTable = not self.toggleSatellitesTable
+
+            for row in range( len( dataStore ) ):
+                dataStore[ row ][ 0 ] = bool( not toggle )
+                row = str( sortStore.convert_child_path_to_path( Gtk.TreePath.new_from_string( str( row ) ) ) ) # Need to convert the data store row to the sort store row.
+                self.onOrbitalElementOrSateliteToggled( widget, row, dataStore, sortStore, astronomicalObjectType )
 
 
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
