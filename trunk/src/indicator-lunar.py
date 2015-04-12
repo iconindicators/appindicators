@@ -738,15 +738,12 @@ class IndicatorLunar:
 
     MESSAGE_BODY_ALWAYS_UP = _( "Always Up!" )
     MESSAGE_BODY_NEVER_UP = _( "Never Up!" )
-    MESSAGE_ORBITAL_ELEMENT_NO_DATA = _( "No orbital element data!" )
-    MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE = _( "Cannot access the orbital element data source\n<a href=\'{0}'>{0}</a>" )
-    MESSAGE_ORBITAL_ELEMENT_NO_DATA = _( "No orbital element data found at\n<a href=\'{0}'>{0}</a>" )
+    MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE = _( "Cannot access the data source\n<a href=\'{0}'>{0}</a>" )
+    MESSAGE_DATA_NO_DATA = _( "No data!" )
+    MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE = _( "No data found at\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_SATELLITE_IS_CIRCUMPOLAR = _( "Satellite is circumpolar." )
-    MESSAGE_SATELLITE_BAD_DATA_SOURCE = _( "Cannot access the TLE data source\n<a href=\'{0}'>{0}</a>" )
-    MESSAGE_SATELLITE_NO_DATA = _( "No TLE data found at\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_SATELLITE_NEVER_RISES = _( "Satellite never rises." )
     MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS = _( "No passes within the next 10 days." )
-    MESSAGE_SATELLITE_NO_TLE_DATA = _( "No TLE data!" )
     MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
@@ -1125,7 +1122,11 @@ class IndicatorLunar:
                 menuItem.set_submenu( orbitalElementsSubMenu )
 
             for key in sorted( orbitalElements ): # Sorting by key also sorts the display name identically.
-                displayName = self.getOrbitalElementDisplayName( self.orbitalElementData[ key ] )
+                if key in self.orbitalElementData:
+                    displayName = self.getOrbitalElementDisplayName( self.orbitalElementData[ key ] )
+                else:
+                    displayName = key # There is an orbital element but no data for it.
+
                 if self.showOrbitalElementsAsSubMenu:
                     menuItem = Gtk.MenuItem( displayName )
                     orbitalElementsSubMenu.append( menuItem )
@@ -1133,7 +1134,12 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + displayName )
                     menu.append( menuItem )
 
-                self.updateCommonMenu( menuItem, AstronomicalObjectType.OrbitalElement, key )
+                if key in self.orbitalElementData:
+                    self.updateCommonMenu( menuItem, AstronomicalObjectType.OrbitalElement, key )
+                else: # Can only be a message...I hope!
+                    subMenu = Gtk.Menu()
+                    subMenu.append( Gtk.MenuItem( self.data[ ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_MESSAGE ) ] ) )
+                    menuItem.set_submenu( subMenu )
 
 
     def updateCommonMenu( self, menuItem, astronomicalObjectType, dataTag ):
@@ -1415,7 +1421,6 @@ class IndicatorLunar:
         sun = ephem.Sun( city )
         if self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, ephemNow, hideIfNeverUp ):
             continueCalculations = True
-
             try:
                 # Dawn/Dusk.
                 city = self.getCity( ephemNow )
@@ -1483,9 +1488,8 @@ class IndicatorLunar:
                 orbitalElement.compute( self.getCity( ephemNow ) )
                 if float( orbitalElement.mag ) <= float( maximumMagnitude ):
                     self.updateCommon( orbitalElement, AstronomicalObjectType.OrbitalElement, key, ephemNow, hideIfNeverUp )
-            else:
-                if not hideIfNeverUp:
-                    self.data[ ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA
+            elif not hideIfNeverUp:
+                self.data[ ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
     # Calculates the common items of rise/set, illumination, constellation, magnitude, tropical sign, distance to earth/sun, bright limb angle and RA/Dec/Az/Alt.
@@ -1581,7 +1585,7 @@ class IndicatorLunar:
             else:
                 if not self.hideSatelliteIfNoVisiblePass:
                     key = ( AstronomicalObjectType.Satellite, " ".join( key ), IndicatorLunar.DATA_MESSAGE )
-                    self.data[ key ] = IndicatorLunar.MESSAGE_SATELLITE_NO_TLE_DATA
+                    self.data[ key ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
@@ -1593,6 +1597,13 @@ class IndicatorLunar:
             city = self.getCity( currentDateTime )
             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
             satellite.compute( city )
+#             print(
+#                 "Mean Motion (revolutions/day):", satellite._n,
+#                 ", Orbit Number:", satellite._orbit,
+#                 ", Epoch:", satellite._epoch,
+#                 ", Range (km):", round( satellite.range / 1000 ),
+#                 ", Elevation (km):", round( satellite.elevation / 1000 ),
+#                 ", Range velocity (km/h):", round( satellite.range_velocity * 3.6 ) )  #TODO Remove
             try:
                 nextPass = city.next_pass( satellite )
 
@@ -1632,14 +1643,6 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = self.getLocalDateTime( nextPass[ 4 ] )
             self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( math.degrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
             self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible ) # Put this in as it's likely needed in the notification.
-
-#             print(
-#                 "Mean Motion (revolutions/day):", satellite._n,
-#                 ", Orbit Number:", satellite._orbit,
-#                 ", Range (km):", round( satellite.range / 1000, 1 ),
-#                 ", Elevation (km):", round( satellite.elevation / 1000, 1 ),
-#                 ", Earth Eclipsed:", satellite.eclipsed,
-#                 ", Range velocity (m/s):", round( satellite.range_velocity, 1 ) )  #TODO Remove
 
             self.nextUpdate = self.getSmallestDate( self.nextUpdate, nextPass[ 4 ] )
             if ephem.Date( nextPass[ 0 ] ) > currentDateTime:
@@ -2752,8 +2755,8 @@ class IndicatorLunar:
         self.dialog.show_all()
 
         # Some GUI elements will be hidden, which must be done after the dialog is shown.
-        self.updateOrbitalElementOrSatellitePreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, self.orbitalElements, orbitalElementURLEntry.get_text().strip(), False, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA )
-        self.updateOrbitalElementOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), True, IndicatorLunar.MESSAGE_SATELLITE_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_SATELLITE_NO_DATA )
+        self.updateOrbitalElementOrSatellitePreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, self.orbitalElements, orbitalElementURLEntry.get_text().strip(), False )
+        self.updateOrbitalElementOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), True )
 
         # Last thing to do after everything else is built, but before setting visible.        
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
@@ -2999,12 +3002,12 @@ class IndicatorLunar:
         textEntry.set_text( translatedTags )
 
 
-    def updateOrbitalElementOrSatellitePreferencesTab( self, grid, dataStore, data, objects, url, isSatellite, badDataSourceMessage, noDataMessage ):
+    def updateOrbitalElementOrSatellitePreferencesTab( self, grid, dataStore, data, objects, url, isSatellite ):
         dataStore.clear()
         if data is None:
-            message = badDataSourceMessage.format( url )
+            message = IndicatorLunar.MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE.format( url )
         elif len( data ) == 0:
-            message = noDataMessage.format( url )
+            message = IndicatorLunar.MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE.format( url )
         else:
             message = None
             if isSatellite:
@@ -3057,7 +3060,7 @@ class IndicatorLunar:
         else:
             self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
 
-        self.updateOrbitalElementOrSatellitePreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, [ ], self.orbitalElementURLNew, False, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA )
+        self.updateOrbitalElementOrSatellitePreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, [ ], self.orbitalElementURLNew, False )
 
 
     def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore, displayTagsStore ):
@@ -3082,7 +3085,7 @@ class IndicatorLunar:
         else:
             self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
 
-        self.updateOrbitalElementOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, True, IndicatorLunar.MESSAGE_SATELLITE_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_SATELLITE_NO_DATA )
+        self.updateOrbitalElementOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, True )
 
 
     def removeFromData( self, isSatellite ):
