@@ -2863,7 +2863,6 @@ class IndicatorLunar:
                 except:
                     pass
 
-            self.data = { } # Erase the data as the user may have changed the satellites and/or location.
             break
 
         self.lock.release()
