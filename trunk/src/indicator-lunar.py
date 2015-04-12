@@ -2131,14 +2131,11 @@ class IndicatorLunar:
         hideBodyIfNeverUpCheckbox = Gtk.CheckButton( _( "Hide bodies which are 'never up'" ) )
         hideBodyIfNeverUpCheckbox.set_margin_top( 15 )
         hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
-#TODO Test the case for no OE data for a specific OE.
         hideBodyIfNeverUpCheckbox.set_tooltip_text( _( 
             "If checked, only planets, moon,\n" + \
             "sun, orbital elements and stars\n" + \
             "which rise/set or are 'always up'\n" + \
             "will be shown.\n\n" + \
-            "Any orbital element for which\n" + \
-            "there is no data will be hidden.\n\n" + \
             "Otherwise, all bodies are shown.\n" + \
             "When showing all bodies, there may\n" + \
             "be a lot of information displayed\n" + \
@@ -2736,13 +2733,8 @@ class IndicatorLunar:
         self.dialog.show_all()
 
         # Some GUI elements will be hidden, which must be done after the dialog is shown.
-#TODO Added 297pp to .json but does not appear in list...why? 
-        print( "297P/BESHORE" in  self.orbitalElements )
-        print( "297PP/BESHORE" in  self.orbitalElements )
         self.updateOrbitalElementOrSatellitePreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, self.orbitalElements, orbitalElementURLEntry.get_text().strip(), False, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_ORBITAL_ELEMENT_NO_DATA )
         self.updateOrbitalElementOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), True, IndicatorLunar.MESSAGE_SATELLITE_BAD_DATA_SOURCE, IndicatorLunar.MESSAGE_SATELLITE_NO_DATA )
-        print( "297P/BESHORE" in  self.orbitalElements )
-        print( "297PP/BESHORE" in  self.orbitalElements )
 
         # Last thing to do after everything else is built, but before setting visible.        
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
