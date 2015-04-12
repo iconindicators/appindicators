@@ -135,6 +135,7 @@ class IndicatorLunar:
     DATA_DISTANCE_TO_EARTH_KM = "DISTANCE TO EARTH KM"
     DATA_DISTANCE_TO_SUN = "DISTANCE TO SUN"
     DATA_DUSK = "DUSK"
+    DATA_EARTH_TILT = "EARTH TILT"
     DATA_EARTH_VISIBLE = "EARTH VISIBLE"
     DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
     DATA_ECLIPSE_LATITUDE_LONGITUDE = "ECLIPSE LATITUDE LONGITUDE"
@@ -154,6 +155,7 @@ class IndicatorLunar:
     DATA_SET_AZIMUTH = "SET AZIMUTH"
     DATA_SET_TIME = "SET TIME"
     DATA_SOLSTICE = "SOLSTICE"
+    DATA_SUN_TILT = "SUN TILT"
     DATA_THIRD_QUARTER = "THIRD QUARTER"
     DATA_TROPICAL_SIGN = "TROPICAL SIGN"
     DATA_VISIBLE = "VISIBLE"
@@ -223,6 +225,7 @@ class IndicatorLunar:
         DATA_DISTANCE_TO_EARTH_KM       : _( "DISTANCE TO EARTH KM" ),
         DATA_DISTANCE_TO_SUN            : _( "DISTANCE TO SUN" ),
         DATA_DUSK                       : _( "DUSK" ),
+        DATA_EARTH_TILT                 : _( "EARTH TILT" ),
         DATA_EARTH_VISIBLE              : _( "EARTH VISIBLE" ),
         DATA_ECLIPSE_DATE_TIME          : _( "ECLIPSE DATE TIME" ),
         DATA_ECLIPSE_LATITUDE_LONGITUDE : _( "ECLIPSE LATITUDE LONGITUDE" ),
@@ -242,6 +245,7 @@ class IndicatorLunar:
         DATA_SET_AZIMUTH                : _( "SET AZIMUTH" ),
         DATA_SET_TIME                   : _( "SET TIME" ),
         DATA_SOLSTICE                   : _( "SOLSTICE" ),
+        DATA_SUN_TILT                   : _( "SUN TILT" ),
         DATA_THIRD_QUARTER              : _( "THIRD QUARTER" ),
         DATA_TROPICAL_SIGN              : _( "TROPICAL SIGN" ),
         DATA_VISIBLE                    : _( "VISIBLE" ),
@@ -1166,10 +1170,13 @@ class IndicatorLunar:
            astronomicalObjectType == AstronomicalObjectType.Planet:            
             subMenu.append( Gtk.MenuItem( _( "Bright Limb: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] ) )
 
+        if astronomicalObjectType == AstronomicalObjectType.Planet and \
+           dataTag == IndicatorLunar.PLANET_SATURN.upper():
+            subMenu.append( Gtk.MenuItem( _( "Earth Tilt: " ) + self.data[ ( AstronomicalObjectType.Planet, dataTag, IndicatorLunar.DATA_EARTH_TILT ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Sun Tilt: " ) + self.data[ ( AstronomicalObjectType.Planet, dataTag, IndicatorLunar.DATA_SUN_TILT ) ] ) )
+
         subMenu.append( Gtk.SeparatorMenuItem() )
-
         self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, astronomicalObjectType, dataTag )
-
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         if ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data:
@@ -1519,7 +1526,7 @@ class IndicatorLunar:
                 self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( body, ephemNow )
 
             if astronomicalObjectType == AstronomicalObjectType.Moon:
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM ) ] = str( round( body.earth_distance * 149597871, 2 ) ) + " " + _( "km" )
+                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM ) ] = str( round( body.earth_distance * ephem.meters_per_au / 1000, 2 ) ) + " " + _( "km" )
 
             if astronomicalObjectType == AstronomicalObjectType.Moon or \
                astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
@@ -1533,7 +1540,11 @@ class IndicatorLunar:
                 self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] = str( round( body.sun_distance, 4 ) ) + " " + _( "ua" )
 
             if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] = str( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), body ) ) ) + "°"
+                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] = str( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), body ), 1 ) ) + "°"
+
+            if astronomicalObjectType == AstronomicalObjectType.Planet and body.name == IndicatorLunar.PLANET_SATURN:
+                self.data[ ( AstronomicalObjectType.Planet, body.name.upper(), IndicatorLunar.DATA_EARTH_TILT ) ] = str( round( math.degrees( body.earth_tilt ), 1 ) ) + "°"
+                self.data[ ( AstronomicalObjectType.Planet, body.name.upper(), IndicatorLunar.DATA_SUN_TILT ) ] = str( round( math.degrees( body.sun_tilt ), 1 ) ) + "°"
 
             self.updateRightAscensionDeclinationAzimuthAltitude( body, astronomicalObjectType, dataTag )
 
@@ -1621,6 +1632,14 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = self.getLocalDateTime( nextPass[ 4 ] )
             self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( math.degrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
             self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible ) # Put this in as it's likely needed in the notification.
+
+#             print(
+#                 "Mean Motion (revolutions/day):", satellite._n,
+#                 ", Orbit Number:", satellite._orbit,
+#                 ", Range (km):", round( satellite.range / 1000, 1 ),
+#                 ", Elevation (km):", round( satellite.elevation / 1000, 1 ),
+#                 ", Earth Eclipsed:", satellite.eclipsed,
+#                 ", Range velocity (m/s):", round( satellite.range_velocity, 1 ) )  #TODO Remove
 
             self.nextUpdate = self.getSmallestDate( self.nextUpdate, nextPass[ 4 ] )
             if ephem.Date( nextPass[ 0 ] ) > currentDateTime:
@@ -2914,6 +2933,9 @@ class IndicatorLunar:
                     tags = IndicatorLunar.DATA_TAGS_ORBITAL_ELEMENT
                 elif astronomicalObjectType == AstronomicalObjectType.Planet:
                     tags = IndicatorLunar.DATA_TAGS_PLANET
+                    if bodyTag == IndicatorLunar.PLANET_SATURN.upper():
+                        tags.append( IndicatorLunar.DATA_EARTH_TILT )
+                        tags.append( IndicatorLunar.DATA_SUN_TILT )
                 elif astronomicalObjectType == AstronomicalObjectType.PlanetaryMoon:
                     tags = IndicatorLunar.DATA_TAGS_PLANETARY_MOON
                 elif astronomicalObjectType == AstronomicalObjectType.Satellite:
