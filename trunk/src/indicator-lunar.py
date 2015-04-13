@@ -873,15 +873,9 @@ class IndicatorLunar:
 
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
-        if ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_BRIGHT_LIMB ) in self.data:
-            brightLimbAngleWithoutDegreesSymbol = float( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_BRIGHT_LIMB ) ][ : -1 ] )
-            self.createIcon( lunarIlluminationPercentage, brightLimbAngleWithoutDegreesSymbol )
-            self.indicator.set_icon( self.getIconName() )
-        else: #TODO Might not need this.  Fix also in changelog.
-            self.indicator.set_icon( IndicatorLunar.ICON )
-            summary = _( "No Bright Limb Angle" )
-            message = _( "The moon never rises and so there is no bright limb.  The indicator icon will be generic and some tags may not be parsed." )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+        brightLimbAngleWithoutDegreesSymbol = float( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_BRIGHT_LIMB ) ][ : -1 ] )
+        self.createIcon( lunarIlluminationPercentage, brightLimbAngleWithoutDegreesSymbol )
+        self.indicator.set_icon( self.getIconName() )
 
 
     def fullMoonNotification( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
