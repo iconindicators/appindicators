@@ -392,11 +392,15 @@ class IndicatorFortune:
                 os.makedirs( IndicatorFortune.AUTOSTART_PATH )
 
             if autostartCheckbox.get_active():
-                try: shutil.copy( IndicatorFortune.DESKTOP_PATH + IndicatorFortune.DESKTOP_FILE, IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
-                except Exception as e: logging.exception( e )
+                try:
+                    shutil.copy( IndicatorFortune.DESKTOP_PATH + IndicatorFortune.DESKTOP_FILE, IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
+                except Exception as e:
+                    logging.exception( e )
             else:
-                try: os.remove( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
-                except: pass
+                try:
+                    os.remove( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
+                except:
+                    pass
 
             self.indicator.set_menu( self.buildMenu() ) # Results in an assertion, but don't know how to fix...Gtk-CRITICAL **: gtk_widget_get_parent: assertion 'GTK_IS_WIDGET (widget)' failed
 
