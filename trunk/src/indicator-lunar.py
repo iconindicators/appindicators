@@ -33,6 +33,11 @@
 #  http://lazka.github.io/pgi-docs
 
 
+#TODO Now that data is not dropped at calculation time,
+#it is possible to have a next update for a piece of data that is never displayed.
+#Can this be fixed?  If not it means refreshing more than is required.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -743,7 +748,7 @@ class IndicatorLunar:
     MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE = _( "No data found at\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_SATELLITE_IS_CIRCUMPOLAR = _( "Satellite is circumpolar." )
     MESSAGE_SATELLITE_NEVER_RISES = _( "Satellite never rises." )
-    MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS = _( "No passes within the next 10 days." )
+    MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TWO_DAYS = _( "No passes within the next two days." )
     MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
@@ -790,7 +795,6 @@ class IndicatorLunar:
 
     def updateBackend( self ):
         if self.lock.acquire( False ):
-
             self.toggleIconState()
             self.updateOrbitalElementData()
             self.updateSatelliteTLEData() 
@@ -804,12 +808,12 @@ class IndicatorLunar:
             lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
             lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
 
-            self.updateMoon( ephemNow, lunarPhase, self.hideBodyIfNeverUp )
-            self.updateSun( ephemNow, self.hideBodyIfNeverUp )
-            self.updatePlanets( ephemNow, self.hideBodyIfNeverUp )
-            self.updateStars( ephemNow, self.hideBodyIfNeverUp )
-            self.updateOrbitalElements( ephemNow, self.orbitalElementsMagnitude, self.hideBodyIfNeverUp )
-            self.updateSatellites( ephemNow ) 
+            self.updateMoon( ephemNow, lunarPhase )
+            self.updateSun( ephemNow )
+            self.updatePlanets( ephemNow )
+            self.updateStars( ephemNow )
+            self.updateOrbitalElements( ephemNow, self.orbitalElementsMagnitude )
+            self.updateSatellites( ephemNow, self.hideSatelliteIfNoVisiblePass ) 
 
             GLib.idle_add( self.updateFrontend, ephemNow, lunarPhase, lunarIlluminationPercentage )
 
@@ -873,7 +877,7 @@ class IndicatorLunar:
             brightLimbAngleWithoutDegreesSymbol = float( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_BRIGHT_LIMB ) ][ : -1 ] )
             self.createIcon( lunarIlluminationPercentage, brightLimbAngleWithoutDegreesSymbol )
             self.indicator.set_icon( self.getIconName() )
-        else:
+        else: #TODO Might not need this.  Fix also in changelog.
             self.indicator.set_icon( IndicatorLunar.ICON )
             summary = _( "No Bright Limb Angle" )
             message = _( "The moon never rises and so there is no bright limb.  The indicator icon will be generic and some tags may not be parsed." )
@@ -968,23 +972,26 @@ class IndicatorLunar:
 
 
     def updateMoonMenu( self, menu ):
-        if ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_MESSAGE ) in self.data or \
-           ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_RISE_TIME ) in self.data:
+        key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+        abort = key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
+                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
+                self.hideBodyIfNeverUp
+
+        if not abort:
             menuItem = Gtk.MenuItem( _( "Moon" ) )
             menu.append( menuItem )
             self.updateCommonMenu( menuItem, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-            menuItem.get_submenu().append( Gtk.MenuItem( _( "Phase: " ) + self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_PHASE ) ] ) )
-            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+            menuItem.get_submenu().append( Gtk.MenuItem( _( "Phase: " ) + self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] ) )
             menuItem.get_submenu().append( Gtk.MenuItem( _( "Next Phases" ) ) )
 
             # Determine which phases occur by date rather than using the phase calculated.
             # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
             nextPhases = [ ]
-            nextPhases.append( [ self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FIRST_QUARTER ) ], _( "First Quarter: " ) ] )
-            nextPhases.append( [ self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FULL ) ], _( "Full: " ) ] )
-            nextPhases.append( [ self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_THIRD_QUARTER ) ], _( "Third Quarter: " ) ] )
-            nextPhases.append( [ self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_NEW ) ], _( "New: " ) ] )
+            nextPhases.append( [ self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ], _( "First Quarter: " ) ] )
+            nextPhases.append( [ self.data[ key + ( IndicatorLunar.DATA_FULL, ) ], _( "Full: " ) ] )
+            nextPhases.append( [ self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ], _( "Third Quarter: " ) ] )
+            nextPhases.append( [ self.data[ key + ( IndicatorLunar.DATA_NEW, ) ], _( "New: " ) ] )
 
             nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
             for phaseInformation in nextPhases:
@@ -995,16 +1002,20 @@ class IndicatorLunar:
 
 
     def updateSunMenu( self, menu ):
-        if ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_MESSAGE ) in self.data or \
-           ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_RISE_TIME ) in self.data:
+        key = ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
+        abort = key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
+                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
+                self.hideBodyIfNeverUp
+
+        if not abort:
             menuItem = Gtk.MenuItem( _( "Sun" ) )
             menu.append( menuItem )
             self.updateCommonMenu( menuItem, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
             # Solstice/Equinox.
-            equinox = self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_EQUINOX ) ]
-            solstice = self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_SOLSTICE ) ]
+            equinox = self.data[ key + ( IndicatorLunar.DATA_EQUINOX, ) ]
+            solstice = self.data[ key + ( IndicatorLunar.DATA_SOLSTICE, ) ]
             if equinox < solstice:
                 menuItem.get_submenu().append( Gtk.MenuItem( _( "Equinox: " ) + equinox ) )
                 menuItem.get_submenu().append( Gtk.MenuItem( _( "Solstice: " ) + solstice ) )
@@ -1019,10 +1030,13 @@ class IndicatorLunar:
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planetName in self.planets:
-            dataTag = planetName.upper()
-            if ( AstronomicalObjectType.Planet, dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data or \
-               ( AstronomicalObjectType.Planet, dataTag, IndicatorLunar.DATA_RISE_TIME ) in self.data:
-                planets.append( planetName )
+            key = ( AstronomicalObjectType.Planet, planetName.upper() )
+            if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
+               self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
+               self.hideBodyIfNeverUp:
+                continue
+
+            planets.append( planetName )
 
         if len( planets ) > 0:
             menuItem = Gtk.MenuItem( _( "Planets" ) )
@@ -1080,10 +1094,13 @@ class IndicatorLunar:
     def updateStarsMenu( self, menu ):
         stars = [ ] # List of lists.  Each sublist contains the star name followed by the translated name.
         for starName in self.stars:
-            dataTag = starName.upper()
-            if ( AstronomicalObjectType.Star, dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data or \
-               ( AstronomicalObjectType.Star, dataTag, IndicatorLunar.DATA_RISE_TIME ) in self.data:
-                stars.append( [ starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
+            key = ( AstronomicalObjectType.Star, starName.upper() )
+            if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
+               self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
+               self.hideBodyIfNeverUp:
+                continue
+
+            stars.append( [ starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
 
         if len( stars ) > 0:
             menuItem = Gtk.MenuItem( _( "Stars" ) )
@@ -1108,15 +1125,26 @@ class IndicatorLunar:
 
     def updateOrbitalElementsMenu( self, menu ):
         orbitalElements = [ ]
-        for key in self.orbitalElements:
-            if ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_MESSAGE ) in self.data or \
-               ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_RISE_TIME ) in self.data:
-                orbitalElements.append( key )
+        for orbitalElement in self.orbitalElements:
+            key = ( AstronomicalObjectType.OrbitalElement, orbitalElement )
+            if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
+               self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
+               self.hideBodyIfNeverUp:
+                continue # Orbital element never rises and user wants to hide bodies which never rise.
+
+            if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
+               self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA and \
+               self.hideBodyIfNeverUp:
+                continue # Orbital element had no data.
+
+            if not key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and not key + ( IndicatorLunar.DATA_RISE_TIME, ) in self.data:
+                continue # An orbital element may have been dropped if its magnitude was above the filter.
+
+            orbitalElements.append( orbitalElement )
 
         if len( orbitalElements ) > 0:
             menuItem = Gtk.MenuItem( _( "Orbital Elements" ) )
             menu.append( menuItem )
-
             if self.showOrbitalElementsAsSubMenu:
                 orbitalElementsSubMenu = Gtk.Menu()
                 menuItem.set_submenu( orbitalElementsSubMenu )
@@ -1136,65 +1164,66 @@ class IndicatorLunar:
 
                 if key in self.orbitalElementData:
                     self.updateCommonMenu( menuItem, AstronomicalObjectType.OrbitalElement, key )
-                else: # Can only be a message...I hope!
+                else: # Should only be a no data message...I hope!
                     subMenu = Gtk.Menu()
                     subMenu.append( Gtk.MenuItem( self.data[ ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_MESSAGE ) ] ) )
                     menuItem.set_submenu( subMenu )
 
 
     def updateCommonMenu( self, menuItem, astronomicalObjectType, dataTag ):
+        key = ( astronomicalObjectType, dataTag )
         subMenu = Gtk.Menu()
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
            astronomicalObjectType == AstronomicalObjectType.Planet:
-            subMenu.append( Gtk.MenuItem( _( "Illumination: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Illumination: " ) + self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] ) )
 
-        subMenu.append( Gtk.MenuItem( _( "Constellation: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] ) )
-        subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] ) )
+        subMenu.append( Gtk.MenuItem( _( "Constellation: " ) + self.data[ key + ( IndicatorLunar.DATA_CONSTELLATION, ) ] ) )
+        subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
            astronomicalObjectType == AstronomicalObjectType.Planet or \
            astronomicalObjectType == AstronomicalObjectType.Star or \
            astronomicalObjectType == AstronomicalObjectType.Sun:
-            subMenu.append( Gtk.MenuItem( _( "Tropical Sign: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Tropical Sign: " ) + self.data[ key + ( IndicatorLunar.DATA_TROPICAL_SIGN, ) ] ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon:
-            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ] ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
            astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
            astronomicalObjectType == AstronomicalObjectType.Planet or \
            astronomicalObjectType == AstronomicalObjectType.Sun:
-            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
            astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
            astronomicalObjectType == AstronomicalObjectType.Planet:
-            subMenu.append( Gtk.MenuItem( _( "Distance to Sun: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Distance to Sun: " ) + self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ] ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
            astronomicalObjectType == AstronomicalObjectType.Planet:            
-            subMenu.append( Gtk.MenuItem( _( "Bright Limb: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Bright Limb: " ) + self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Planet and \
            dataTag == IndicatorLunar.PLANET_SATURN.upper():
-            subMenu.append( Gtk.MenuItem( _( "Earth Tilt: " ) + self.data[ ( AstronomicalObjectType.Planet, dataTag, IndicatorLunar.DATA_EARTH_TILT ) ] ) )
-            subMenu.append( Gtk.MenuItem( _( "Sun Tilt: " ) + self.data[ ( AstronomicalObjectType.Planet, dataTag, IndicatorLunar.DATA_SUN_TILT ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Earth Tilt: " ) + self.data[ key + ( IndicatorLunar.DATA_EARTH_TILT, ) ] ) )
+            subMenu.append( Gtk.MenuItem( _( "Sun Tilt: " ) + self.data[ key + ( IndicatorLunar.DATA_SUN_TILT, ) ] ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
         self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, astronomicalObjectType, dataTag )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
-        if ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_MESSAGE ) in self.data:
-            subMenu.append( Gtk.MenuItem( self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_MESSAGE ) ] ) )
+        if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data:
+            subMenu.append( Gtk.MenuItem( self.data[key + ( IndicatorLunar.DATA_MESSAGE, ) ] ) )
         else:
             data = [ ]
-            data.append( [ self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_RISE_TIME ) ], _( "Rise: " ) ] )
-            data.append( [ self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_SET_TIME ) ], _( "Set: " ) ] )
+            data.append( [ self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], _( "Rise: " ) ] )
+            data.append( [ self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], _( "Set: " ) ] )
 
             if astronomicalObjectType == AstronomicalObjectType.Sun:
-                data.append( [ self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DAWN ) ], _( "Dawn: " ) ] )
-                data.append( [ self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DUSK ) ], _( "Dusk: " ) ] )
+                data.append( [ self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ], _( "Dawn: " ) ] )
+                data.append( [ self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ], _( "Dusk: " ) ] )
 
             data = sorted( data, key = lambda x: ( x[ 0 ] ) )
             for dateTime, text in data:
@@ -1203,33 +1232,26 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
+#TODO Handle data not dropped.
     def updateSatellitesMenu( self, menu ):
-        # For each satellite, first determine if there is calculated data present (may have been dropped).
-        # Then, parse the menu text to replace tags with values.
-        # Then, build a list of satellites, including rise time (or message), to allow sorting.
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
-            if ( satelliteName, satelliteNumber) not in self.satelliteTLEData:
-                continue # This is (likely) a satellite from a previous run which is not in the current TLE data.
-
             key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
-            if ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) not in self.data and \
-               ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) not in self.data:
-                continue # No data for this satellite - it has been dropped by the backend. 
+            if key + ( IndicatorLunar.DATA_RISE_TIME, ) in self.data:
+                internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
+                riseTime = self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
 
-            # Parse the menu text.
-            tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
-            menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ) \
-                                             .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, tle.getNumber() ) \
-                                             .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() )
+            elif key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and not self.hideSatelliteIfNoVisiblePass:
+#TODO Test this clause by putting in a bogus satellite.
+                internationalDesignator = "TODO" # TODO What to put here?
+                riseTime = self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ]
 
-            # Add the rise time to allow sorting by rise time.
-            # If there is a message present, then no rise time will exist (so add the message in lieu of the rise time).
-            # The (text) message gets sorted after the (numeric) rise time.
-            if ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) in self.data:
-                riseTime = self.data[ ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ]
             else:
-                riseTime = self.data[ ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) ]
+                continue # Should never hit this clause, but better to be safe than sorry!
+
+            menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
+                                             .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
+                                             .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, internationalDesignator )
 
             menuTextSatelliteNameNumberRiseTimes.append( [ menuText, satelliteName, satelliteNumber, riseTime ] )
 
@@ -1242,7 +1264,6 @@ class IndicatorLunar:
 
             satellitesMenuItem = Gtk.MenuItem( _( "Satellites" ) )
             menu.append( satellitesMenuItem )
-
             if self.showSatellitesAsSubMenu:
                 satellitesSubMenu = Gtk.Menu()
                 satellitesMenuItem.set_submenu( satellitesSubMenu )
@@ -1250,7 +1271,7 @@ class IndicatorLunar:
             for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
                 key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
                 subMenu = Gtk.Menu()
-                if ( key + ( IndicatorLunar.DATA_MESSAGE, ) ) in self.data: # No need to check to see if the message should be displayed or not - if not, the backend did not add the message!
+                if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data:
                     if self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
                         subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] ) )
                         subMenu.append( Gtk.MenuItem( _( "Declination: " ) + self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] ) )
@@ -1299,17 +1320,19 @@ class IndicatorLunar:
 
 
     def updateRightAscensionDeclinationAzimuthAltitudeMenu( self, menu, astronomicalObjectType, dataTag ):
-        menu.append( Gtk.MenuItem( _( "Right Ascension: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_RIGHT_ASCENSION ) ] ) )
-        menu.append( Gtk.MenuItem( _( "Declination: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DECLINATION ) ] ) )
-        menu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_AZIMUTH ) ] ) )
-        menu.append( Gtk.MenuItem( _( "Altitude: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_ALTITUDE ) ] ) )
+        key = ( astronomicalObjectType, dataTag )
+        menu.append( Gtk.MenuItem( _( "Right Ascension: " ) + self.data[ key + ( IndicatorLunar.DATA_RIGHT_ASCENSION, ) ] ) )
+        menu.append( Gtk.MenuItem( _( "Declination: " ) + self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] ) )
+        menu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] ) )
+        menu.append( Gtk.MenuItem( _( "Altitude: " ) + self.data[ key + ( IndicatorLunar.DATA_ALTITUDE, ) ] ) )
 
 
     def updateEclipseMenu( self, menu, astronomicalObjectType, dataTag ):
+        key = ( astronomicalObjectType, dataTag )
         menu.append( Gtk.MenuItem( _( "Eclipse" ) ) )
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_ECLIPSE_DATE_TIME ) ] ) )
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Latitude/Longitude: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE ) ] ) )
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Type: " ) + self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_DATE_TIME, ) ] ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Latitude/Longitude: " ) + self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE, ) ] ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Type: " ) + self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_TYPE, ) ] ) )
 
 
     def updateOrbitalElementData( self ):
@@ -1392,21 +1415,24 @@ class IndicatorLunar:
     # http://www.geoastro.de/altazsunmoon/index.htm
     # http://www.geoastro.de/sundata/index.html
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
-    def updateMoon( self, ephemNow, lunarPhase, hideIfNeverUp ):
-        if self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp ):
-            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_PHASE ) ] = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ lunarPhase ]
+    def updateMoon( self, ephemNow, lunarPhase ):
+        self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow )
+        key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+        self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ lunarPhase ]
 
-            firstQuarter = ephem.next_first_quarter_moon( ephemNow )
-            fullMoon = ephem.next_full_moon( ephemNow )
-            lastQuarter = ephem.next_last_quarter_moon( ephemNow )
-            newMoon = ephem.next_new_moon( ephemNow )
-            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FIRST_QUARTER ) ] = self.getLocalDateTime( firstQuarter )
-            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_FULL ) ] = self.getLocalDateTime( fullMoon )
-            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_THIRD_QUARTER ) ] = self.getLocalDateTime( lastQuarter )
-            self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_NEW ) ] = self.getLocalDateTime( newMoon )
-            self.nextUpdate = self.getSmallestDate( firstQuarter, self.getSmallestDate( fullMoon, self.getSmallestDate( lastQuarter, self.getSmallestDate( self.nextUpdate, newMoon ) ) ) )
+        firstQuarter = ephem.next_first_quarter_moon( ephemNow )
+        fullMoon = ephem.next_full_moon( ephemNow )
+        lastQuarter = ephem.next_last_quarter_moon( ephemNow )
+        newMoon = ephem.next_new_moon( ephemNow )
 
-            self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+        self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = self.getLocalDateTime( firstQuarter )
+        self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = self.getLocalDateTime( fullMoon )
+        self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = self.getLocalDateTime( lastQuarter )
+        self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = self.getLocalDateTime( newMoon )
+
+        self.nextUpdate = self.getSmallestDate( firstQuarter, self.getSmallestDate( fullMoon, self.getSmallestDate( lastQuarter, self.getSmallestDate( self.nextUpdate, newMoon ) ) ) )
+
+        self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
 
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
@@ -1416,143 +1442,132 @@ class IndicatorLunar:
     # http://www.geoastro.de/altazsunmoon/index.htm
     # http://futureboy.us/fsp/sun.fsp
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
-    def updateSun( self, ephemNow, hideIfNeverUp ):
+    def updateSun( self, ephemNow ):
         city = self.getCity( ephemNow )
         sun = ephem.Sun( city )
-        if self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, ephemNow, hideIfNeverUp ):
-            continueCalculations = True
-            try:
-                # Dawn/Dusk.
-                city = self.getCity( ephemNow )
-                city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
-                dawn = city.next_rising( sun, use_center = True )
-                dusk = city.next_setting( sun, use_center = True )
-                self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_DAWN ) ] = self.getLocalDateTime( dawn )
-                self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_DUSK ) ] = self.getLocalDateTime( dusk )
-                self.nextUpdate = self.getSmallestDate( dawn, self.getSmallestDate( self.nextUpdate, dusk ) )
+        self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, ephemNow )
+        key = ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
+        try:
+            # Dawn/Dusk.
+            city = self.getCity( ephemNow )
+            city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
+            dawn = city.next_rising( sun, use_center = True )
+            dusk = city.next_setting( sun, use_center = True )
+            self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] = self.getLocalDateTime( dawn )
+            self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] = self.getLocalDateTime( dusk )
+            self.nextUpdate = self.getSmallestDate( dawn, self.getSmallestDate( self.nextUpdate, dusk ) )
 
-            except ephem.AlwaysUpError:
-                self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
+        except ephem.AlwaysUpError:
+            pass # A message would have be put in update common.
 
-            except ephem.NeverUpError:
-                if hideIfNeverUp:
-                    continueCalculations = False # Abort any further calculations.
-                else:
-                    self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
+        except ephem.NeverUpError:
+            pass # A message would have be put in update common.
 
-            if continueCalculations:
-                equinox = ephem.next_equinox( ephemNow )
-                solstice = ephem.next_solstice( ephemNow )
-                self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_EQUINOX ) ] = self.getLocalDateTime( equinox )
-                self.data[ ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, IndicatorLunar.DATA_SOLSTICE ) ] = self.getLocalDateTime( solstice )
-                self.nextUpdate = self.getSmallestDate( equinox, self.getSmallestDate( self.nextUpdate, solstice ) )
+        equinox = ephem.next_equinox( ephemNow )
+        solstice = ephem.next_solstice( ephemNow )
+        self.data[ key + ( IndicatorLunar.DATA_EQUINOX, ) ] = self.getLocalDateTime( equinox )
+        self.data[ key + ( IndicatorLunar.DATA_SOLSTICE, ) ] = self.getLocalDateTime( solstice )
+        self.nextUpdate = self.getSmallestDate( equinox, self.getSmallestDate( self.nextUpdate, solstice ) )
 
-                self.updateEclipse( ephemNow, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
+        self.updateEclipse( ephemNow, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
 
 
     # http://www.geoastro.de/planets/index.html
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
-    def updatePlanets( self, ephemNow, hideIfNeverUp ):
+    def updatePlanets( self, ephemNow ):
         for planetName in self.planets:
             planet = getattr( ephem, planetName )() # Dynamically instantiate the planet object.
             planet.compute( self.getCity( ephemNow ) )
-            if self.updateCommon( planet, AstronomicalObjectType.Planet, planetName.upper(), ephemNow, hideIfNeverUp ):
-                city = self.getCity( ephemNow )
-                if planetName in IndicatorLunar.PLANET_MOONS:
-                    for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
-                        moon = getattr( ephem, moonName )() # Dynamically instantiate the moon object.
-                        moon.compute( city )
-                        self.updateRightAscensionDeclinationAzimuthAltitude( moon, AstronomicalObjectType.PlanetaryMoon, moonName.upper() )
-                        self.data[ ( AstronomicalObjectType.PlanetaryMoon, moonName.upper(), IndicatorLunar.DATA_EARTH_VISIBLE ) ] = str( bool( moon.earth_visible ) )
-                        self.data[ ( AstronomicalObjectType.PlanetaryMoon, moonName.upper(), IndicatorLunar.DATA_X_OFFSET ) ] = str( round( moon.x, 1 ) )
-                        self.data[ ( AstronomicalObjectType.PlanetaryMoon, moonName.upper(), IndicatorLunar.DATA_Y_OFFSET ) ] = str( round( moon.y, 1 ) )
-                        self.data[ ( AstronomicalObjectType.PlanetaryMoon, moonName.upper(), IndicatorLunar.DATA_Z_OFFSET ) ] = str( round( moon.z, 1 ) )
+            self.updateCommon( planet, AstronomicalObjectType.Planet, planetName.upper(), ephemNow )
+
+            if planetName == IndicatorLunar.PLANET_SATURN:
+                key = ( AstronomicalObjectType.Planet, planetName.upper() )
+                self.data[ key + ( IndicatorLunar.DATA_EARTH_TILT, ) ] = str( round( math.degrees( planet.earth_tilt ), 1 ) ) + "°"
+                self.data[ key + ( IndicatorLunar.DATA_SUN_TILT, ) ] = str( round( math.degrees( planet.sun_tilt ), 1 ) ) + "°"
+
+            city = self.getCity( ephemNow )
+            if planetName in IndicatorLunar.PLANET_MOONS:
+                for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
+                    moon = getattr( ephem, moonName )() # Dynamically instantiate the moon object.
+                    moon.compute( city )
+                    self.updateRightAscensionDeclinationAzimuthAltitude( moon, AstronomicalObjectType.PlanetaryMoon, moonName.upper() )
+                    key = ( AstronomicalObjectType.PlanetaryMoon, moonName.upper() )
+                    self.data[ key + ( IndicatorLunar.DATA_EARTH_VISIBLE, ) ] = str( bool( moon.earth_visible ) )
+                    self.data[ key + ( IndicatorLunar.DATA_X_OFFSET, ) ] = str( round( moon.x, 1 ) )
+                    self.data[ key + ( IndicatorLunar.DATA_Y_OFFSET, ) ] = str( round( moon.y, 1 ) )
+                    self.data[ key + ( IndicatorLunar.DATA_Z_OFFSET, ) ] = str( round( moon.z, 1 ) )
 
 
     # http://aa.usno.navy.mil/data/docs/mrst.php
-    def updateStars( self, ephemNow, hideIfNeverUp ):
+    def updateStars( self, ephemNow ):
         for starName in self.stars:
             star = ephem.star( starName )
             star.compute( self.getCity( ephemNow ) )
-            self.updateCommon( star, AstronomicalObjectType.Star, star.name.upper(), ephemNow, hideIfNeverUp )
+            self.updateCommon( star, AstronomicalObjectType.Star, star.name.upper(), ephemNow )
 
 
     # Computes the rise/set and other information for orbital elements, such as comets.
     #
     # http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
     # http://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html        
-    def updateOrbitalElements( self, ephemNow, maximumMagnitude, hideIfNeverUp ):
+    def updateOrbitalElements( self, ephemNow, maximumMagnitude ):
         for key in self.orbitalElements:
             if key in self.orbitalElementData:
                 orbitalElement = ephem.readdb( self.orbitalElementData[ key ] )
                 orbitalElement.compute( self.getCity( ephemNow ) )
                 if float( orbitalElement.mag ) <= float( maximumMagnitude ):
-                    self.updateCommon( orbitalElement, AstronomicalObjectType.OrbitalElement, key, ephemNow, hideIfNeverUp )
-            elif not hideIfNeverUp:
+                    self.updateCommon( orbitalElement, AstronomicalObjectType.OrbitalElement, key, ephemNow )
+            else:
                 self.data[ ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
-    # Calculates the common items of rise/set, illumination, constellation, magnitude, tropical sign, distance to earth/sun, bright limb angle and RA/Dec/Az/Alt.
-    # Data tags such as RISE_TIME, MESSAGE and so on may be added to the data dict.
-    #
-    # Returns
-    #    False if the object is never up and 'hide if never up' is true.  No data tags will be added to the data dict.
-    #    True in all other situations (object has a rise/set, is always up, or is never up and 'hide if never up' is false. Data tags such as RISE_TIME or MESSAGE will be present.
-    def updateCommon( self, body, astronomicalObjectType, dataTag, ephemNow, hideIfNeverUp ):
-        continueCalculations = True
+    # Calculates the common attributes such as rise/set, illumination, constellation, magnitude, tropical sign, distance, bright limb angle and RA/Dec/Az/Alt.
+    # Data tags such as RISE_TIME and/or MESSAGE will be added to the data dict.
+    def updateCommon( self, body, astronomicalObjectType, dataTag, ephemNow ):
+        key = ( astronomicalObjectType, dataTag )
         try:
             city = self.getCity( ephemNow )
             rising = city.next_rising( body )
             setting = city.next_setting( body )
-            self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_RISE_TIME ) ] = str( self.getLocalDateTime( rising ) )
-            self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_SET_TIME ) ] = str( self.getLocalDateTime( setting ) )
+            self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = str( self.getLocalDateTime( rising ) )
+            self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = str( self.getLocalDateTime( setting ) )
             self.nextUpdate = self.getSmallestDate( rising, self.getSmallestDate( self.nextUpdate, setting ) )
 
         except ephem.AlwaysUpError:
-            self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
+            self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
 
         except ephem.NeverUpError:
-            if hideIfNeverUp:
-                continueCalculations = False # Abort any further calculations.
-            else:
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
+            self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
-        if continueCalculations:
-            body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+        body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
 
-            if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_ILLUMINATION ) ] = str( int( round( body.phase ) ) ) + "%"
+        if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
+            self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] = str( int( round( body.phase ) ) ) + "%"
 
-            self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_CONSTELLATION ) ] = IndicatorLunar.CONSTELLATIONS_TRANSLATIONS[ ephem.constellation( body )[ 1 ] ]
-            self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_MAGNITUDE ) ] = str( body.mag )
+        self.data[ key + ( IndicatorLunar.DATA_CONSTELLATION, ) ] = IndicatorLunar.CONSTELLATIONS_TRANSLATIONS[ ephem.constellation( body )[ 1 ] ]
+        self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] = str( body.mag )
 
-            if astronomicalObjectType != AstronomicalObjectType.OrbitalElement:
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_TROPICAL_SIGN ) ] = self.getTropicalSign( body, ephemNow )
+        if astronomicalObjectType != AstronomicalObjectType.OrbitalElement:
+            self.data[ key + ( IndicatorLunar.DATA_TROPICAL_SIGN, ) ] = self.getTropicalSign( body, ephemNow )
 
-            if astronomicalObjectType == AstronomicalObjectType.Moon:
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM ) ] = str( round( body.earth_distance * ephem.meters_per_au / 1000, 2 ) ) + " " + _( "km" )
+        if astronomicalObjectType == AstronomicalObjectType.Moon:
+            self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ] = str( round( body.earth_distance * ephem.meters_per_au / 1000, 2 ) ) + " " + _( "km" )
 
-            if astronomicalObjectType == AstronomicalObjectType.Moon or \
-               astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
-               astronomicalObjectType == AstronomicalObjectType.Planet or \
-               astronomicalObjectType == AstronomicalObjectType.Sun:
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DISTANCE_TO_EARTH ) ] = str( round( body.earth_distance, 4 ) ) + " " + _( "ua" )
+        if astronomicalObjectType == AstronomicalObjectType.Moon or \
+           astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
+           astronomicalObjectType == AstronomicalObjectType.Planet or \
+           astronomicalObjectType == AstronomicalObjectType.Sun:
+            self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 4 ) ) + " " + _( "ua" )
 
-            if astronomicalObjectType == AstronomicalObjectType.Moon or \
-               astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
-               astronomicalObjectType == AstronomicalObjectType.Planet:
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DISTANCE_TO_SUN ) ] = str( round( body.sun_distance, 4 ) ) + " " + _( "ua" )
+        if astronomicalObjectType == AstronomicalObjectType.Moon or \
+           astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
+           astronomicalObjectType == AstronomicalObjectType.Planet:
+            self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ] = str( round( body.sun_distance, 4 ) ) + " " + _( "ua" )
 
-            if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_BRIGHT_LIMB ) ] = str( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), body ), 1 ) ) + "°"
+        if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
+            self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] = str( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), body ), 1 ) ) + "°"
 
-            if astronomicalObjectType == AstronomicalObjectType.Planet and body.name == IndicatorLunar.PLANET_SATURN:
-                self.data[ ( AstronomicalObjectType.Planet, body.name.upper(), IndicatorLunar.DATA_EARTH_TILT ) ] = str( round( math.degrees( body.earth_tilt ), 1 ) ) + "°"
-                self.data[ ( AstronomicalObjectType.Planet, body.name.upper(), IndicatorLunar.DATA_SUN_TILT ) ] = str( round( math.degrees( body.sun_tilt ), 1 ) ) + "°"
-
-            self.updateRightAscensionDeclinationAzimuthAltitude( body, astronomicalObjectType, dataTag )
-
-        return continueCalculations
+        self.updateRightAscensionDeclinationAzimuthAltitude( body, astronomicalObjectType, dataTag )
 
 
     # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
@@ -1578,17 +1593,15 @@ class IndicatorLunar:
     #
     # This allows the user to see the rise/set time for the current pass as it is happening.
     # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
-    def updateSatellites( self, ephemNow ):
+    def updateSatellites( self, ephemNow, hideOnNoVisiblePass ):
         for key in self.satellites:
             if key in self.satelliteTLEData:
-                self.calculateNextSatellitePass( ephemNow, key, self.satelliteTLEData[ key ] )
+                self.calculateNextSatellitePass( ephemNow, key, self.satelliteTLEData[ key ], hideOnNoVisiblePass )
             else:
-                if not self.hideSatelliteIfNoVisiblePass:
-                    key = ( AstronomicalObjectType.Satellite, " ".join( key ), IndicatorLunar.DATA_MESSAGE )
-                    self.data[ key ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
+                self.data[ ( AstronomicalObjectType.Satellite, " ".join( key ), IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
-    def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
+    def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE, hideOnNoVisiblePass ):
         key = ( AstronomicalObjectType.Satellite, " ".join( key ) )
         currentDateTime = ephemNow
         endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 2 ) # Stop looking for passes 2 days from ephemNow.
@@ -1633,7 +1646,7 @@ class IndicatorLunar:
 
             # Now have a satellite rise/transit/set; determine if the pass is visible (and if the user wants only visible passes).
             passIsVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
-            if self.hideSatelliteIfNoVisiblePass and not passIsVisible:
+            if hideOnNoVisiblePass and not passIsVisible:
                 currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
                 continue
 
@@ -1651,9 +1664,9 @@ class IndicatorLunar:
             break
 
         if currentDateTime >= endDateTime:
-            message = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TEN_DAYS
+            message = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TWO_DAYS
 
-        if message is not None and not self.hideSatelliteIfNoVisiblePass:
+        if message is not None:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = message
 
 
@@ -1721,10 +1734,11 @@ class IndicatorLunar:
             direction = _( "N" )
 
         # All data values are stored as radians.  When passing to str() the result is expressed in DD:MM:SS or HH:MM:SS.
-        self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_RIGHT_ASCENSION ) ] = str( round( math.degrees( body.ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.ra ) ) + ")"
-        self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_DECLINATION ) ] = str( round( math.degrees( body.dec ), 2 ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.dec ) ) + ")"
-        self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_AZIMUTH ) ] = str( round( math.degrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
-        self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_ALTITUDE ) ] = str( round( math.degrees( body.alt ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
+        key = ( astronomicalObjectType, dataTag )
+        self.data[ key + ( IndicatorLunar.DATA_RIGHT_ASCENSION, ) ] = str( round( math.degrees( body.ra ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.ra ) ) + ")"
+        self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] = str( round( math.degrees( body.dec ), 2 ) ) + "° " + direction + " (" + re.sub( "\.(\d+)", "", str( body.dec ) ) + ")"
+        self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( round( math.degrees( body.az ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.az ) ) + ")"
+        self.data[ key + ( IndicatorLunar.DATA_ALTITUDE, ) ] = str( round( math.degrees( body.alt ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( body.alt ) ) + ")"
 
 
     def updateEclipse( self, ephemNow, astronomicalObjectType, dataTag ):
@@ -1768,9 +1782,10 @@ class IndicatorLunar:
                 logging.error( "Unknown longitude cardinal direction", eclipseInformation )
             else:
                 localisedAndTrimmedDateTime = self.getLocalDateTime( ephem.Date( eclipseInformation[ 0 ] ) )
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_ECLIPSE_DATE_TIME ) ] = localisedAndTrimmedDateTime
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE ) ] = eclipseInformation[ 2 ] + " " + northOrSouth + " " + eclipseInformation[ 4 ] + " " + eastOrWest 
-                self.data[ ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_ECLIPSE_TYPE ) ] = eclipseType
+                key = ( astronomicalObjectType, dataTag )
+                self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_DATE_TIME, ) ] = localisedAndTrimmedDateTime
+                self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE, ) ] = eclipseInformation[ 2 ] + " " + northOrSouth + " " + eclipseInformation[ 4 ] + " " + eastOrWest 
+                self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_TYPE, ) ] = eclipseType
 
 
     def getLunarPhase( self, ephemNow, illuminationPercentage ):
@@ -2095,13 +2110,9 @@ class IndicatorLunar:
         treeViewColumn.set_sort_column_id( 2 )
         tree.append_column( treeViewColumn )
 
-        tree.set_tooltip_text( _( 
-            "Double click to add a tag to the\n" + \
-            "indicator text.\n\n" + \
-            "Depending on the menu options,\n" + \
-            "items such as comets which exceed\n" + \
-            "magnitude or satellites with no\n" + \
-            "visible pass, are omitted." ) )
+        tree.set_tooltip_text( _(
+            "Double click to add a tag\n" + \
+            "to the indicator text." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onIndicatorTextTagDoubleClick, indicatorText )
 
