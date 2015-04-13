@@ -922,7 +922,8 @@ class IndicatorLunar:
                 continue
 
             # Show the notification for the particular satellite only once per pass...
-            if ( satelliteName, satelliteNumber ) in self.satelliteNotifications and ephemNowInLocalTime < ephem.Date( self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] ):
+            if ( satelliteName, satelliteNumber ) in self.satelliteNotifications and \
+               ephemNowInLocalTime < ephem.Date( self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] ):
                 continue
 
             self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] # Ensures the notification happens once per satellite pass.
