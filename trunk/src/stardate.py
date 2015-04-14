@@ -130,11 +130,14 @@ class Stardate( object ):
     #
     # Raises an exception if the Gregorian year is out the defined range.
     def setGregorian( self, gregorianDateTime ):
-        if ( gregorianDateTime.year < 1900 ) or ( gregorianDateTime.year > 9500 ): raise Exception( "Gregorian year out of range: 1900 <= year <= 9500." )
+        if ( gregorianDateTime.year < 1900 ) or ( gregorianDateTime.year > 9500 ):
+            raise Exception( "Gregorian year out of range: 1900 <= year <= 9500." )
 
         self.gregorianDateTime = gregorianDateTime
-        if self.classic: self.__gregorianToStardateClassic()
-        else: self.__gregorianToStardate2009Revised()
+        if self.classic:
+            self.__gregorianToStardateClassic()
+        else:
+            self.__gregorianToStardate2009Revised()
 
 
     # Sets a 'classic' stardate for conversion to a Gregorian date/time.
@@ -150,13 +153,17 @@ class Stardate( object ):
     #
     # Raises an exception if the issue/integer/fraction are out of the defined ranges.
     def setStardateClassic( self, issue, integer, fraction ):
-        if issue <= 19 and ( integer < 0 or integer > 9999 ): raise Exception( "Integer out of range: 0 <= integer <= 9999" )
+        if issue <= 19 and ( integer < 0 or integer > 9999 ):
+            raise Exception( "Integer out of range: 0 <= integer <= 9999" )
 
-        if issue == 20 and ( integer < 0 or integer >= 5006 ): raise Exception( "Integer out of range: 0 <= integer < 5006" )
+        if issue == 20 and ( integer < 0 or integer >= 5006 ):
+            raise Exception( "Integer out of range: 0 <= integer < 5006" )
 
-        if issue >= 21 and ( integer < 0 or integer > 99999 ): raise Exception( "Integer out of range: 0 <= integer <= 99999" )
+        if issue >= 21 and ( integer < 0 or integer > 99999 ):
+            raise Exception( "Integer out of range: 0 <= integer <= 99999" )
 
-        if fraction < 0: raise Exception( "Fraction cannot be negative." )
+        if fraction < 0:
+            raise Exception( "Fraction cannot be negative." )
 
         self.stardateIssue = issue
         self.stardateInteger = integer
@@ -175,9 +182,11 @@ class Stardate( object ):
 
         isLeapYear = ( integer % 4 == 0 and integer % 100 != 0 ) or integer % 400 == 0
         if isLeapYear:
-            if fraction > 366: raise Exception( "Integer cannot exceed 366." )
+            if fraction > 366:
+                raise Exception( "Integer cannot exceed 366." )
         else:
-            if fraction > 365: raise Exception( "Integer cannot exceed 365." )
+            if fraction > 365:
+                raise Exception( "Integer cannot exceed 365." )
 
         self.stardateInteger = integer
         self.stardateFraction = fraction
@@ -206,13 +215,15 @@ class Stardate( object ):
     #  padInteger   If True, the integer part of the 'classic' stardate will be padded with zeros at the start (ignored for '2009 revised').
     def toStardateString( self, showIssue, padInteger ):
         stringBuilder = ""
-
         if self.classic:
-            if showIssue: stringBuilder = "[" + str( self.stardateIssue ) + "] "
+            if showIssue:
+                stringBuilder = "[" + str( self.stardateIssue ) + "] "
 
             if padInteger:
-                if self.stardateIssue < 21: padding = len( "1000" ) - len( str( self.stardateInteger ) )
-                else: padding = len( "10000" ) - len( str( self.stardateInteger ) )
+                if self.stardateIssue < 21:
+                    padding = len( "1000" ) - len( str( self.stardateInteger ) )
+                else:
+                    padding = len( "10000" ) - len( str( self.stardateInteger ) )
 
                 integer = str( self.stardateInteger )
                 for i in range( padding ):
@@ -220,18 +231,21 @@ class Stardate( object ):
 
                 stringBuilder += str( integer )
 
-            else: stringBuilder += str( self.stardateInteger )
+            else:
+                stringBuilder += str( self.stardateInteger )
 
             stringBuilder += "." + str( self.stardateFraction )
 
-        else: stringBuilder = str( self.stardateInteger ) + "." + str( self.stardateFraction )
+        else:
+            stringBuilder = str( self.stardateInteger ) + "." + str( self.stardateFraction )
 
         return stringBuilder
 
 
     # Returns the current value of the Gregorian date/time in string format "%Y-%m-%d %H:%M:%S".
     def toGregorianString( self ): 
-        if self.gregorianDateTime is None: return "Please set either a gregorian date or a stardate!"
+        if self.gregorianDateTime is None:
+            return "Please set either a gregorian date or a stardate!"
 
         return self.gregorianDateTime.strftime( "%Y-%m-%d %H:%M:%S" )
 
