@@ -1649,15 +1649,6 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( math.degrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
             self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible ) # Put this in as it's likely needed in the notification.
 
-#             print(
-#                 satelliteTLE.getName(), satelliteTLE.getNumber(),
-#                 ", Mean Motion (revs/day):", satellite._n,
-#                 ", Orbit Number:", satellite._orbit,
-#                 ", Epoch:", satellite._epoch,
-#                 ", Range (km):", round( satellite.range / 1000 ),
-#                 ", Elevation (km):", round( satellite.elevation / 1000 ),
-#                 ", Range velocity (km/h):", round( satellite.range_velocity * 3.6 ) )  #TODO Remove
-
             break
 
         if currentDateTime >= endDateTime:
