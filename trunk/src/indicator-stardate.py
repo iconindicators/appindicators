@@ -236,7 +236,8 @@ class IndicatorStardate:
             else:
                 try:
                     os.remove( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
-                except: pass
+                except:
+                    pass
 
             self.indicator.set_menu( self.buildMenu() )
             self.update()
