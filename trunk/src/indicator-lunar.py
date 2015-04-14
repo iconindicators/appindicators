@@ -987,7 +987,7 @@ class IndicatorLunar:
             nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
             for phaseInformation in nextPhases:
                 menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
-                self.nextUpdate = self.getSmallestDateTimeAfterNow( self.nextUpdate, phaseInformation[ 0 ] )
+                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, phaseInformation[ 0 ] )
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
             self.updateEclipseMenu( menuItem.get_submenu(), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
@@ -1008,7 +1008,7 @@ class IndicatorLunar:
             # Solstice/Equinox.
             equinox = self.data[ key + ( IndicatorLunar.DATA_EQUINOX, ) ]
             solstice = self.data[ key + ( IndicatorLunar.DATA_SOLSTICE, ) ]
-            self.nextUpdate = self.getSmallestDateTimeAfterNow( equinox, self.getSmallestDateTimeAfterNow( self.nextUpdate, solstice ) )
+            self.nextUpdate = self.getSmallestDateTime( equinox, self.getSmallestDateTime( self.nextUpdate, solstice ) )
             if equinox < solstice:
                 menuItem.get_submenu().append( Gtk.MenuItem( _( "Equinox: " ) + equinox ) )
                 menuItem.get_submenu().append( Gtk.MenuItem( _( "Solstice: " ) + solstice ) )
@@ -1210,12 +1210,12 @@ class IndicatorLunar:
             data = [ ]
             data.append( [ self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], _( "Rise: " ) ] )
             data.append( [ self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], _( "Set: " ) ] )
-            self.nextUpdate = self.getSmallestDateTimeAfterNow( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.getSmallestDateTimeAfterNow( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
+            self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
 
             if astronomicalObjectType == AstronomicalObjectType.Sun:
                 data.append( [ self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ], _( "Dawn: " ) ] )
                 data.append( [ self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ], _( "Dusk: " ) ] )
-                self.nextUpdate = self.getSmallestDateTimeAfterNow( self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ], self.getSmallestDateTimeAfterNow( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ) )
+                self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ) )
 
             data = sorted( data, key = lambda x: ( x[ 0 ] ) )
             for dateTime, text in data:
@@ -1289,7 +1289,14 @@ class IndicatorLunar:
                         visibleTranslatedText = self.getBooleanTranslatedText( self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] )
                         subMenu.append( Gtk.MenuItem( _( "Visible: " ) + visibleTranslatedText ) )
 
-                self.nextUpdate = self.getSmallestDateTimeAfterNow( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.getSmallestDateTimeAfterNow( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
+                # Add the rise/set times to the next update, ensuring they are not in the past (the rise time will be in the past at times). 
+                now = str( datetime.datetime.now() )
+                if self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] > now:
+                    self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.nextUpdate )
+
+                if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > now:
+                    self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
+
                 self.addOnSatelliteHandler( subMenu, satelliteName, satelliteNumber )
 
                 if self.showSatellitesAsSubMenu:
@@ -1640,14 +1647,14 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( math.degrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
             self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible ) # Put this in as it's likely needed in the notification.
 
-            print(
-                satelliteTLE.getName(), satelliteTLE.getNumber(),
-                ", Mean Motion (revs/day):", satellite._n,
-                ", Orbit Number:", satellite._orbit,
-                ", Epoch:", satellite._epoch,
-                ", Range (km):", round( satellite.range / 1000 ),
-                ", Elevation (km):", round( satellite.elevation / 1000 ),
-                ", Range velocity (km/h):", round( satellite.range_velocity * 3.6 ) )  #TODO Remove
+#             print(
+#                 satelliteTLE.getName(), satelliteTLE.getNumber(),
+#                 ", Mean Motion (revs/day):", satellite._n,
+#                 ", Orbit Number:", satellite._orbit,
+#                 ", Epoch:", satellite._epoch,
+#                 ", Range (km):", round( satellite.range / 1000 ),
+#                 ", Elevation (km):", round( satellite.elevation / 1000 ),
+#                 ", Range velocity (km/h):", round( satellite.range_velocity * 3.6 ) )  #TODO Remove
 
             break
 
@@ -1897,21 +1904,8 @@ class IndicatorLunar:
         return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
-    # Compare two dates in YYYYMMDDHHMMSS STRING format, returning the earliest date, but no earlier than the current date/time.
-    def getSmallestDateTimeAfterNow( self, firstEphemDate, secondEphemDate ):
-        now = str( datetime.datetime.now() )
-        if firstEphemDate < now:
-            if secondEphemDate < now:
-                return now
-
-            return secondEphemDate
-
-        elif secondEphemDate < now:
-            if firstEphemDate < now:
-                return now
-
-            return firstEphemDate
-
+    # Compare two dates as a YYYY MM DD HH:MM:SS string, returning the earliest date.
+    def getSmallestDateTime( self, firstEphemDate, secondEphemDate ):
         if firstEphemDate < secondEphemDate:
             return firstEphemDate
 
