@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-virtual-box 1.0.38\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-04-11 08:17+1000\n"
+"POT-Creation-Date: 2015-04-15 09:48+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,112 +25,120 @@ msgstr ""
 msgid "(no virtual machines exist)"
 msgstr ""
 
-#: indicator-virtual-box.py:163
+#: indicator-virtual-box.py:162
 msgid "Launch VirtualBox Manager"
 msgstr ""
 
-#: indicator-virtual-box.py:167
+#: indicator-virtual-box.py:166
 msgid "(VirtualBox is not installed)"
 msgstr ""
 
-#: indicator-virtual-box.py:364
+#: indicator-virtual-box.py:366
 msgid ""
 "The VM could not be found - either it has been renamed or deleted.  The list "
 "of VMs has been refreshed - please try again."
 msgstr ""
 
-#: indicator-virtual-box.py:367
+#: indicator-virtual-box.py:369
 msgid ""
 "There is more than one VM with the same name - unfortunately your VM cannot "
 "be uniquely identified."
 msgstr ""
 
-#: indicator-virtual-box.py:379
+#: indicator-virtual-box.py:381
 msgid ""
 "The VM is running but its window could not be found - perhaps it is running "
 "headless."
 msgstr ""
 
-#: indicator-virtual-box.py:396
+#: indicator-virtual-box.py:398
 #, python-brace-format
 msgid "The VM '{0}' could not be started - check the log file: {1}"
 msgstr ""
 
-#: indicator-virtual-box.py:448
+#: indicator-virtual-box.py:436
+msgid "Change _Log"
+msgstr ""
+
+#: indicator-virtual-box.py:437
+msgid "translator-credits"
+msgstr ""
+
+#: indicator-virtual-box.py:477
 msgid "Virtual Machine"
 msgstr ""
 
-#: indicator-virtual-box.py:449 indicator-virtual-box.py:517
-#: indicator-virtual-box.py:603
+#: indicator-virtual-box.py:478 indicator-virtual-box.py:546
+#: indicator-virtual-box.py:637
 msgid "Autostart"
 msgstr ""
 
-#: indicator-virtual-box.py:450 indicator-virtual-box.py:585
+#: indicator-virtual-box.py:479 indicator-virtual-box.py:619
 msgid "Start Command"
 msgstr ""
 
-#: indicator-virtual-box.py:451
+#: indicator-virtual-box.py:480
 msgid "Double click to edit a VM's properties."
 msgstr ""
 
-#: indicator-virtual-box.py:459
+#: indicator-virtual-box.py:488
 msgid "Virtual Machines"
 msgstr ""
 
-#: indicator-virtual-box.py:474
+#: indicator-virtual-box.py:503
 msgid "Show groups as submenus"
 msgstr ""
 
-#: indicator-virtual-box.py:476
+#: indicator-virtual-box.py:505
 msgid ""
 "Groups can be shown with their VMs\n"
 "in submenus, or shown with their\n"
 "VMs as an indented list."
 msgstr ""
 
-#: indicator-virtual-box.py:481
+#: indicator-virtual-box.py:510
 msgid "Sort VMs alphabetically"
 msgstr ""
 
-#: indicator-virtual-box.py:483
+#: indicator-virtual-box.py:512
 msgid ""
 "VMs can be sorted alphabetically or\n"
 "as set in the VirtualBox Manager."
 msgstr ""
 
-#: indicator-virtual-box.py:493
+#: indicator-virtual-box.py:522
 msgid "Refresh interval (minutes)"
 msgstr ""
 
-#: indicator-virtual-box.py:501
+#: indicator-virtual-box.py:530
 msgid ""
 "How often the list of VMs and\n"
 "running status is updated."
 msgstr ""
 
-#: indicator-virtual-box.py:505
+#: indicator-virtual-box.py:534
 msgid "Startup delay (seconds)"
 msgstr ""
 
-#: indicator-virtual-box.py:513
+#: indicator-virtual-box.py:542
 msgid ""
 "Amount of time to wait from\n"
 "starting one VM to the next."
 msgstr ""
 
-#: indicator-virtual-box.py:518
+#: indicator-virtual-box.py:547
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-virtual-box.py:522
+#: indicator-virtual-box.py:551
 msgid "General"
 msgstr ""
 
-#: indicator-virtual-box.py:524
+#: indicator-virtual-box.py:553
 msgid "Preferences"
 msgstr ""
 
-#: indicator-virtual-box.py:596
+#: indicator-virtual-box.py:630
 msgid ""
 "The terminal command to start the\n"
 "VM such as\n"
@@ -138,27 +146,19 @@ msgid ""
 "\t'VBoxHeadless --startvm %VM% --vrde off'"
 msgstr ""
 
-#: indicator-virtual-box.py:604
+#: indicator-virtual-box.py:638
 msgid "Run the VM when the indicator starts."
 msgstr ""
 
-#: indicator-virtual-box.py:609
+#: indicator-virtual-box.py:643
 msgid "VM Properties"
 msgstr ""
 
-#: indicator-virtual-box.py:620
+#: indicator-virtual-box.py:655
 msgid "The start command cannot be empty."
 msgstr ""
 
-#: indicator-virtual-box.py:625
+#: indicator-virtual-box.py:660
 msgid ""
 "The start command must contain %VM% which is substituted for the VM name/id."
-msgstr ""
-
-#: indicator-virtual-box.py:669
-msgid "Change _Log"
-msgstr ""
-
-#: indicator-virtual-box.py:670
-msgid "translator-credits"
 msgstr ""
