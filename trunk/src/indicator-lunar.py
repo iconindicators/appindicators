@@ -31,6 +31,7 @@
 #  https://wiki.gnome.org/Projects/PyGObject/Threading
 #  https://wiki.gnome.org/Projects/PyGObject
 #  http://lazka.github.io/pgi-docs
+#  http://www.flaticon.com/search/satellite
 
 
 INDICATOR_NAME = "indicator-lunar"
