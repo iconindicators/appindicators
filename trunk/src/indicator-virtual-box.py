@@ -125,7 +125,6 @@ class IndicatorVirtualBox:
 
                         if virtualMachineInfo.isGroup():
                             menuItem = Gtk.MenuItem( virtualMachineInfo.getName() )
-
                             currentMenu.append( menuItem )
                             subMenu = Gtk.Menu()
                             menuItem.set_submenu( subMenu )
@@ -216,7 +215,8 @@ class IndicatorVirtualBox:
                         for virtualMachineInfo in self.virtualMachineInfos:
                             if virtualMachineInfo.getUUID() == info[ 1 ]:
                                 virtualMachineInfo.setRunning()
-                    except: pass # Sometimes VBoxManage emits a warning message along with the VM information.
+                    except:
+                        pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
                 p.wait()
 
@@ -242,7 +242,8 @@ class IndicatorVirtualBox:
                 info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
                 virtualMachineInfo = virtualmachine.Info( info[ 0 ], False, info[ 1 ], 0 )
                 virtualMachineInfos.append( virtualMachineInfo )
-            except: pass # Sometimes VBoxManage emits a warning message along with the VM information.
+            except:
+                pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
         p.wait()
         return virtualMachineInfos
@@ -323,7 +324,8 @@ class IndicatorVirtualBox:
                     virtualMachineInfo = virtualmachine.Info( "", False, itemName, indentAmount ) # This is a VM: we have it's UUID but not its name...so the caller needs to add it in.
                     virtualMachineInfos.append( virtualMachineInfo )
 
-        except: virtualMachineInfos = []
+        except:
+            virtualMachineInfos = []
 
         return virtualMachineInfos
 
@@ -396,7 +398,8 @@ class IndicatorVirtualBox:
                 pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM '{0}' could not be started - check the log file: {1}" ).format( virtualMachineInfo.getName(), IndicatorVirtualBox.LOG ) )
                 logging.exception( e )
 
-        if doRefresh: self.onRefresh()
+        if doRefresh:
+            self.onRefresh()
 
 
     def getVirtualMachineInfo( self, virtualMachineUUID ):
@@ -455,7 +458,8 @@ class IndicatorVirtualBox:
         store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon (Gtk.STOCK_APPLY) or None for autostart of VM, VM start command, VM/Group UUID.
         parent = None
         for virtualMachineInfo in self.virtualMachineInfos:
-            if virtualMachineInfo.getIndent() < len( stack ): parent = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
+            if virtualMachineInfo.getIndent() < len( stack ):
+                parent = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
 
             if virtualMachineInfo.isGroup():
                 stack.append( parent )
@@ -565,7 +569,8 @@ class IndicatorVirtualBox:
 
             self.saveSettings()
 
-            if not os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ): os.makedirs( IndicatorVirtualBox.AUTOSTART_PATH )
+            if not os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ):
+                os.makedirs( IndicatorVirtualBox.AUTOSTART_PATH )
 
             if autostartIndicatorCheckbox.get_active():
                 try:
@@ -643,7 +648,8 @@ class IndicatorVirtualBox:
         while True:
             dialog.show_all()
 
-            if dialog.run() != Gtk.ResponseType.OK: break
+            if dialog.run() != Gtk.ResponseType.OK:
+                break
 
             if startCommand.get_text().strip() == "":
                 pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command cannot be empty." ) )
