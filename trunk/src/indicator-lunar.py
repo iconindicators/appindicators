@@ -748,7 +748,7 @@ class IndicatorLunar:
     MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE = _( "No data found at\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_SATELLITE_IS_CIRCUMPOLAR = _( "Satellite is circumpolar." )
     MESSAGE_SATELLITE_NEVER_RISES = _( "Satellite never rises." )
-    MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TWO_DAYS = _( "No passes within the next two days." )
+    MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIMEFRAME = _( "No passes within the next two days." )
     MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
@@ -1123,19 +1123,16 @@ class IndicatorLunar:
         for orbitalElement in self.orbitalElements:
             key = ( AstronomicalObjectType.OrbitalElement, orbitalElement )
             if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
-               self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
-               self.hideBodyIfNeverUp:
-                continue # Orbital element never rises and user wants to hide bodies which never rise.
+               self.hideBodyIfNeverUp and \
+               (
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP or \
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA
+               ):
+                continue
 
-            if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
-               self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA and \
-               self.hideBodyIfNeverUp:
-                continue # Orbital element had no data.
-
-            if not key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and not key + ( IndicatorLunar.DATA_RISE_TIME, ) in self.data:
-                continue # An orbital element may have been dropped if its magnitude was above the filter.
-
-            orbitalElements.append( orbitalElement )
+            if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data or \
+               key + ( IndicatorLunar.DATA_RISE_TIME, ) in self.data:
+                orbitalElements.append( orbitalElement ) # Either key must be present - otherwise the orbital element has been dropped due to having too large a magnitude.
 
         if len( orbitalElements ) > 0:
             menuItem = Gtk.MenuItem( _( "Orbital Elements" ) )
@@ -1227,22 +1224,31 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
-#TODO Handle data not dropped.
     def updateSatellitesMenu( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
             key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
+            if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
+               self.hideSatelliteIfNoVisiblePass and \
+               (
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA or \
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES or \
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIMEFRAME or \
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
+               ):
+                continue
+
             if key + ( IndicatorLunar.DATA_RISE_TIME, ) in self.data:
                 internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
                 riseTime = self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
-
-            elif key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and not self.hideSatelliteIfNoVisiblePass:
-#TODO Test this clause by putting in a bogus satellite.
-                internationalDesignator = "TODO" # TODO What to put here?
+            elif key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
+                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] != IndicatorLunar.MESSAGE_DATA_NO_DATA: # Any message other than "no data" will have satellite TLE data.
+                internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
                 riseTime = self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ]
-
             else:
-                continue # Should never hit this clause, but better to be safe than sorry!
+                internationalDesignator = "" # No TLE data so cannot retrieve any information about the satellite.
+                riseTime = self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ]
 
             menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
                                              .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
@@ -1250,7 +1256,6 @@ class IndicatorLunar:
 
             menuTextSatelliteNameNumberRiseTimes.append( [ menuText, satelliteName, satelliteNumber, riseTime ] )
 
-        # Build the menu...
         if len( menuTextSatelliteNameNumberRiseTimes ) > 0:
             if self.satellitesSortByDateTime:
                 menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 3 ], x[ 0 ], x[ 1 ], x[ 2 ] ) )
@@ -1605,13 +1610,14 @@ class IndicatorLunar:
             city = self.getCity( currentDateTime )
             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
             satellite.compute( city )
-#             print(
-#                 "Mean Motion (revolutions/day):", satellite._n,
-#                 ", Orbit Number:", satellite._orbit,
-#                 ", Epoch:", satellite._epoch,
-#                 ", Range (km):", round( satellite.range / 1000 ),
-#                 ", Elevation (km):", round( satellite.elevation / 1000 ),
-#                 ", Range velocity (km/h):", round( satellite.range_velocity * 3.6 ) )  #TODO Remove
+            print(
+                satelliteTLE.getName(), satelliteTLE.getNumber(),
+                ", Mean Motion (revs/day):", satellite._n,
+                ", Orbit Number:", satellite._orbit,
+                ", Epoch:", satellite._epoch,
+                ", Range (km):", round( satellite.range / 1000 ),
+                ", Elevation (km):", round( satellite.elevation / 1000 ),
+                ", Range velocity (km/h):", round( satellite.range_velocity * 3.6 ) )  #TODO Remove
             try:
                 nextPass = city.next_pass( satellite )
 
@@ -1659,7 +1665,7 @@ class IndicatorLunar:
             break
 
         if currentDateTime >= endDateTime:
-            message = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_NEXT_TWO_DAYS
+            message = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIMEFRAME
 
         if message is not None:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = message
