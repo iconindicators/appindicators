@@ -5,25 +5,25 @@ indicator-lunar (1.0.58-1) precise; urgency=low
   * Bug fix: The Right Ascension in degrees was incorrect for all objects.
   * Bug fix: The Bright Limb angle calculation was erroneous due to mixing of
     degrees and radians!
-  * Bug fix: The option to automatically add new satellites and orbital
-    elements was not working when clicking OK in the preferences.
+  * The option to automatically add new satellites and orbital
+    elements now also works when clicking OK in the preferences.
   * Added distance to Earth in kilometres for the Moon's menu item.    
   * Added timeouts to the TLE/OE download.
   * Added caching of TLE/OE downloaded data to avoid over-taxing the
-    respective data sources.
+    respective data sources and to run the indicator off-line.
   * Added warnings to some tooltips about having too many bodies might slow
     down the indicator.
-  * Removed outdated eclipse data.
+  * Removed elapsed eclipse data.
   * Removed redundant functions to convert hours/minutes/seconds and
     degrees/minutes/seconds to decimal degrees as PyEphem does it for free!
   * Changed some defaults to reduce the amount of data that is displayed.
     When loading satellites or orbital elements, these are not checked.
     Stars are not checked on initial run of the indicator.
-  * When computing satellite passes, the look ahead period has been reduced to
-    2 days, whereas it was 10 days.  This reduces the time to refresh by about
-    three quarters and only drops a handful of satellites (which were several
-    days out).  This change should only be noticeable if only visible passes
-    are shown.
+  * The lookahead period for computing satellite passes has been reduced to
+    two days (previously it was ten days).  This reduces the time to refresh
+    by about three quarters and only drops a handful of satellites (which
+    were several days out).  This change should only be noticeable if only
+    visible passes are shown.
   * For Saturn, added the earth tilt and sun tilt angles. 
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Mar 2015 10:11:04 +1000
