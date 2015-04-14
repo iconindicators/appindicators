@@ -105,7 +105,7 @@ class IndicatorPPADownloadStatistics:
 
     def main( self ):
         self.requestPPADownloadAndMenuRefresh( False )
-        GLib.timeout_add_seconds( 12 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every 12 hours.
+        GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every six hours.
         Gtk.main()
 
 
@@ -185,7 +185,8 @@ class IndicatorPPADownloadStatistics:
                         message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
                     elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
                         message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
-                    else: message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
+                    else:
+                        message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
                     menuItem = Gtk.MenuItem( indent + message )
                     menu.append( menuItem )
@@ -1060,11 +1061,10 @@ class IndicatorPPADownloadStatistics:
 
 
     def getPublishedBinariesNoFilters( self, ppa ):
-        baseURL = \
-            "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
-            "?ws.op=getPublishedBinaries" + \
-            "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
-            "&status=Published"
+        baseURL = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
+                  "?ws.op=getPublishedBinaries" + \
+                  "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
+                  "&status=Published"
 
         url = baseURL
         try:
@@ -1082,14 +1082,13 @@ class IndicatorPPADownloadStatistics:
 
     def getPublishedBinariesWithFilters( self, ppa ):
         for filter in self.filters.get( ppa.getUser() + " | " + ppa.getName() ):
-            baseURL = \
-                "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
-                "?ws.op=getPublishedBinaries" + \
-                "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
-                "&status=Published" + \
-                "&exact_match=false" + \
-                "&ordered=false" + \
-                "&binary_name=" + filter
+            baseURL = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
+                      "?ws.op=getPublishedBinaries" + \
+                      "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
+                      "&status=Published" + \
+                      "&exact_match=false" + \
+                      "&ordered=false" + \
+                      "&binary_name=" + filter
 
             url = baseURL
             try:
