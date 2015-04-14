@@ -1425,7 +1425,6 @@ class IndicatorLunar:
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     def updateMoon( self, ephemNow, lunarPhase ):
         self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow )
-        self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
 
         key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
         self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ lunarPhase ]
@@ -1433,6 +1432,8 @@ class IndicatorLunar:
         self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = self.getLocalDateTime( ephem.next_full_moon( ephemNow ) )
         self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = self.getLocalDateTime( ephem.next_last_quarter_moon( ephemNow ) )
         self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = self.getLocalDateTime( ephem.next_new_moon( ephemNow ) )
+
+        self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
 
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
@@ -1446,6 +1447,7 @@ class IndicatorLunar:
         city = self.getCity( ephemNow )
         sun = ephem.Sun( city )
         self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, ephemNow )
+
         key = ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
         try:
             # Dawn/Dusk.
@@ -1716,9 +1718,9 @@ class IndicatorLunar:
         sun = ephem.Sun()
         sun.compute( city )
 
-        return ( satellite.eclipsed is False ) and \
-               ( sun.alt > ephem.degrees( "-18" ) ) and \
-               ( sun.alt < ephem.degrees( "-6" ) )
+        return satellite.eclipsed is False and \
+               sun.alt > ephem.degrees( "-18" ) and \
+               sun.alt < ephem.degrees( "-6" )
 
 
     # Compute the right ascension, declination, azimuth and altitude for a body.
@@ -1895,7 +1897,7 @@ class IndicatorLunar:
         x = math.cos( body.dec ) * math.sin( sun.dec ) - math.sin( body.dec ) * math.cos( sun.dec ) * math.cos( sun.ra - body.ra )
         positionAngleOfBrightLimb = math.atan2( y, x )
 
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation  48.5
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
         hourAngle = city.sidereal_time() - body.ra
         y = math.sin( hourAngle )
         x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
@@ -1904,12 +1906,12 @@ class IndicatorLunar:
         return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
-    # Compare two dates as a YYYY MM DD HH:MM:SS string, returning the earliest date.
-    def getSmallestDateTime( self, firstEphemDate, secondEphemDate ):
-        if firstEphemDate < secondEphemDate:
-            return firstEphemDate
+    # Compare two string dates in the format YYYY MM DD HH:MM:SS, returning the earliest.
+    def getSmallestDateTime( self, firstDateTimeAsString, secondDateTimeAsString ):
+        if firstDateTimeAsString < secondDateTimeAsString:
+            return firstDateTimeAsString
 
-        return secondEphemDate
+        return secondDateTimeAsString
 
 
     # Takes a float pyEphem DateTime and converts to local date/time, trims off fractional seconds and returns as a string.
