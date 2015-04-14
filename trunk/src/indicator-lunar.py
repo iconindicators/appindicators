@@ -33,11 +33,6 @@
 #  http://lazka.github.io/pgi-docs
 
 
-#TODO Now that data is not dropped at calculation time,
-#it is possible to have a next update for a piece of data that is never displayed.
-#Can this be fixed?  If not it means refreshing more than is required.
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -86,6 +81,7 @@ class IndicatorLunar:
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_ORBITAL_ELEMENTS ]
 
     DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
 
     DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
     INDENT = "    "
@@ -801,7 +797,6 @@ class IndicatorLunar:
             self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_NAME ) ] = self.cityName
 
-            self.nextUpdate = ephem.Date( datetime.datetime.now() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
             ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
 
             lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
@@ -818,6 +813,7 @@ class IndicatorLunar:
 
 
     def updateFrontend( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
+        self.nextUpdate = str( datetime.datetime.now() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
         self.updateMenu( ephemNow, lunarPhase )
         self.updateIcon( ephemNow, lunarIlluminationPercentage )
         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
@@ -825,7 +821,8 @@ class IndicatorLunar:
         if self.showSatelliteNotification:
             self.satelliteNotification( ephemNow )
 
-        nextUpdateInSeconds = int( ( ephem.localtime( self.nextUpdate ) - ephem.localtime( ephem.now() ) ).total_seconds() ) # Calculate next update from time now.
+        self.nextUpdate = datetime.datetime.strptime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) # Parse from string back into a datetime.
+        nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.now() ).total_seconds() )
 
         # Ensure the update period is positive, at most every minute and at least every hour.
         if nextUpdateInSeconds < 60:
@@ -990,6 +987,7 @@ class IndicatorLunar:
             nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
             for phaseInformation in nextPhases:
                 menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + phaseInformation[ 1 ] + phaseInformation[ 0 ] ) )
+                self.nextUpdate = self.getSmallestDateTimeAfterNow( self.nextUpdate, phaseInformation[ 0 ] )
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
             self.updateEclipseMenu( menuItem.get_submenu(), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
@@ -1010,6 +1008,7 @@ class IndicatorLunar:
             # Solstice/Equinox.
             equinox = self.data[ key + ( IndicatorLunar.DATA_EQUINOX, ) ]
             solstice = self.data[ key + ( IndicatorLunar.DATA_SOLSTICE, ) ]
+            self.nextUpdate = self.getSmallestDateTimeAfterNow( equinox, self.getSmallestDateTimeAfterNow( self.nextUpdate, solstice ) )
             if equinox < solstice:
                 menuItem.get_submenu().append( Gtk.MenuItem( _( "Equinox: " ) + equinox ) )
                 menuItem.get_submenu().append( Gtk.MenuItem( _( "Solstice: " ) + solstice ) )
@@ -1211,10 +1210,12 @@ class IndicatorLunar:
             data = [ ]
             data.append( [ self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], _( "Rise: " ) ] )
             data.append( [ self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], _( "Set: " ) ] )
+            self.nextUpdate = self.getSmallestDateTimeAfterNow( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.getSmallestDateTimeAfterNow( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
 
             if astronomicalObjectType == AstronomicalObjectType.Sun:
                 data.append( [ self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ], _( "Dawn: " ) ] )
                 data.append( [ self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ], _( "Dusk: " ) ] )
+                self.nextUpdate = self.getSmallestDateTimeAfterNow( self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ], self.getSmallestDateTimeAfterNow( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ) )
 
             data = sorted( data, key = lambda x: ( x[ 0 ] ) )
             for dateTime, text in data:
@@ -1288,6 +1289,7 @@ class IndicatorLunar:
                         visibleTranslatedText = self.getBooleanTranslatedText( self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] )
                         subMenu.append( Gtk.MenuItem( _( "Visible: " ) + visibleTranslatedText ) )
 
+                self.nextUpdate = self.getSmallestDateTimeAfterNow( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.getSmallestDateTimeAfterNow( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
                 self.addOnSatelliteHandler( subMenu, satelliteName, satelliteNumber )
 
                 if self.showSatellitesAsSubMenu:
@@ -1416,22 +1418,14 @@ class IndicatorLunar:
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     def updateMoon( self, ephemNow, lunarPhase ):
         self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow )
+        self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+
         key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
         self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ lunarPhase ]
-
-        firstQuarter = ephem.next_first_quarter_moon( ephemNow )
-        fullMoon = ephem.next_full_moon( ephemNow )
-        lastQuarter = ephem.next_last_quarter_moon( ephemNow )
-        newMoon = ephem.next_new_moon( ephemNow )
-
-        self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = self.getLocalDateTime( firstQuarter )
-        self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = self.getLocalDateTime( fullMoon )
-        self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = self.getLocalDateTime( lastQuarter )
-        self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = self.getLocalDateTime( newMoon )
-
-        self.nextUpdate = self.getSmallestDate( firstQuarter, self.getSmallestDate( fullMoon, self.getSmallestDate( lastQuarter, self.getSmallestDate( self.nextUpdate, newMoon ) ) ) )
-
-        self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+        self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = self.getLocalDateTime( ephem.next_first_quarter_moon( ephemNow ) )
+        self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = self.getLocalDateTime( ephem.next_full_moon( ephemNow ) )
+        self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = self.getLocalDateTime( ephem.next_last_quarter_moon( ephemNow ) )
+        self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = self.getLocalDateTime( ephem.next_new_moon( ephemNow ) )
 
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
@@ -1454,7 +1448,6 @@ class IndicatorLunar:
             dusk = city.next_setting( sun, use_center = True )
             self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] = self.getLocalDateTime( dawn )
             self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] = self.getLocalDateTime( dusk )
-            self.nextUpdate = self.getSmallestDate( dawn, self.getSmallestDate( self.nextUpdate, dusk ) )
 
         except ephem.AlwaysUpError:
             pass # A message would have be put in update common.
@@ -1466,7 +1459,6 @@ class IndicatorLunar:
         solstice = ephem.next_solstice( ephemNow )
         self.data[ key + ( IndicatorLunar.DATA_EQUINOX, ) ] = self.getLocalDateTime( equinox )
         self.data[ key + ( IndicatorLunar.DATA_SOLSTICE, ) ] = self.getLocalDateTime( solstice )
-        self.nextUpdate = self.getSmallestDate( equinox, self.getSmallestDate( self.nextUpdate, solstice ) )
 
         self.updateEclipse( ephemNow, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
 
@@ -1530,7 +1522,6 @@ class IndicatorLunar:
             setting = city.next_setting( body )
             self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = str( self.getLocalDateTime( rising ) )
             self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = str( self.getLocalDateTime( setting ) )
-            self.nextUpdate = self.getSmallestDate( rising, self.getSmallestDate( self.nextUpdate, setting ) )
 
         except ephem.AlwaysUpError:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
@@ -1609,14 +1600,6 @@ class IndicatorLunar:
             city = self.getCity( currentDateTime )
             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
             satellite.compute( city )
-            print(
-                satelliteTLE.getName(), satelliteTLE.getNumber(),
-                ", Mean Motion (revs/day):", satellite._n,
-                ", Orbit Number:", satellite._orbit,
-                ", Epoch:", satellite._epoch,
-                ", Range (km):", round( satellite.range / 1000 ),
-                ", Elevation (km):", round( satellite.elevation / 1000 ),
-                ", Range velocity (km/h):", round( satellite.range_velocity * 3.6 ) )  #TODO Remove
             try:
                 nextPass = city.next_pass( satellite )
 
@@ -1657,9 +1640,14 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( round( math.degrees( nextPass[ 5 ] ), 2 ) ) + "° (" + re.sub( "\.(\d+)", "", str( nextPass[ 5 ] ) ) + ")"
             self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible ) # Put this in as it's likely needed in the notification.
 
-            self.nextUpdate = self.getSmallestDate( self.nextUpdate, nextPass[ 4 ] )
-            if ephem.Date( nextPass[ 0 ] ) > currentDateTime:
-                self.nextUpdate = self.getSmallestDate( self.nextUpdate, nextPass[ 0 ] ) # Only add the rise time if it is after now.
+#             print(
+#                 satelliteTLE.getName(), satelliteTLE.getNumber(),
+#                 ", Mean Motion (revs/day):", satellite._n,
+#                 ", Orbit Number:", satellite._orbit,
+#                 ", Epoch:", satellite._epoch,
+#                 ", Range (km):", round( satellite.range / 1000 ),
+#                 ", Elevation (km):", round( satellite.elevation / 1000 ),
+#                 ", Range velocity (km/h):", round( satellite.range_velocity * 3.6 ) )  #TODO Remove
 
             break
 
@@ -1909,7 +1897,21 @@ class IndicatorLunar:
         return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
-    def getSmallestDate( self, firstEphemDate, secondEphemDate ):
+    # Compare two dates in YYYYMMDDHHMMSS STRING format, returning the earliest date, but no earlier than the current date/time.
+    def getSmallestDateTimeAfterNow( self, firstEphemDate, secondEphemDate ):
+        now = str( datetime.datetime.now() )
+        if firstEphemDate < now:
+            if secondEphemDate < now:
+                return now
+
+            return secondEphemDate
+
+        elif secondEphemDate < now:
+            if firstEphemDate < now:
+                return now
+
+            return firstEphemDate
+
         if firstEphemDate < secondEphemDate:
             return firstEphemDate
 
