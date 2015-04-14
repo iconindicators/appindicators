@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-stardate 1.0.27\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-04-11 08:17+1000\n"
+"POT-Creation-Date: 2015-04-15 09:47+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,28 +25,28 @@ msgstr ""
 msgid "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main."
 msgstr ""
 
-#: indicator-stardate.py:123
+#: indicator-stardate.py:125
 #, python-brace-format
 msgid "Stardate: {0}"
 msgstr ""
 
-#: indicator-stardate.py:143
+#: indicator-stardate.py:142
 msgid "Credits"
 msgstr ""
 
-#: indicator-stardate.py:145
+#: indicator-stardate.py:144
 msgid "Change _Log"
 msgstr ""
 
-#: indicator-stardate.py:146
+#: indicator-stardate.py:145
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-stardate.py:167
+#: indicator-stardate.py:168
 msgid "Use 'classic' conversion"
 msgstr ""
 
-#: indicator-stardate.py:170
+#: indicator-stardate.py:171
 msgid ""
 "Stardate 'classic' is based on\n"
 "\n"
@@ -58,31 +58,31 @@ msgid ""
 "(http://en.wikipedia.org/wiki/Stardate)."
 msgstr ""
 
-#: indicator-stardate.py:177
+#: indicator-stardate.py:178
 msgid "Show ISSUE"
 msgstr ""
 
-#: indicator-stardate.py:182
+#: indicator-stardate.py:183
 msgid ""
 "Show the ISSUE of the stardate\n"
 "(only applies to 'classic')."
 msgstr ""
 
-#: indicator-stardate.py:186
+#: indicator-stardate.py:187
 msgid "Pad INTEGER"
 msgstr ""
 
-#: indicator-stardate.py:191
+#: indicator-stardate.py:192
 msgid ""
 "Pad the INTEGER part with leading\n"
 "zeros (only applies to 'classic')."
 msgstr ""
 
-#: indicator-stardate.py:197
+#: indicator-stardate.py:198
 msgid "Show in menu"
 msgstr ""
 
-#: indicator-stardate.py:200
+#: indicator-stardate.py:201
 msgid ""
 "Show the stardate in the menu.\n"
 "\n"
@@ -91,14 +91,14 @@ msgid ""
 "to the icon."
 msgstr ""
 
-#: indicator-stardate.py:207
+#: indicator-stardate.py:208
 msgid "Autostart"
 msgstr ""
 
-#: indicator-stardate.py:209
+#: indicator-stardate.py:210
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-stardate.py:213
+#: indicator-stardate.py:214
 msgid "Preferences"
 msgstr ""
