@@ -86,7 +86,6 @@ class IndicatorLunar:
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_ORBITAL_ELEMENTS ]
 
     DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
-    DATE_TIME_FORMAT_YYYY_dash_MM_dashDD_space_HH_colon_MM_colon_SS = "%Y-%m-%d %H:%M:%S"
 
     DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
     INDENT = "    "
@@ -125,7 +124,7 @@ class IndicatorLunar:
     SETTINGS_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
     TRUE_TEXT = "True"
-    FALSE_TEXT = "FALSE"
+    FALSE_TEXT = "False"
 
     TRUE_TEXT_TRANSLATION = _( "True" )
     FALSE_TEXT_TRANSLATION = _( "False" )
