@@ -20,10 +20,8 @@ indicator-lunar (1.0.58-1) precise; urgency=low
     When loading satellites or orbital elements, these are not checked.
     Stars are not checked on initial run of the indicator.
   * The lookahead period for computing satellite passes has been reduced to
-    two days (previously it was ten days).  This reduces the time to refresh
-    by about three quarters and only drops a handful of satellites (which
-    were several days out).  This change is noticeable only when visible
-    passes are shown.
+    two days (previously it was ten days).  This significantly reduces the
+    time to refresh whilst only dropping a handful of satellites.
   * For Saturn, added the earth tilt and sun tilt angles. 
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Mar 2015 10:11:04 +1000
