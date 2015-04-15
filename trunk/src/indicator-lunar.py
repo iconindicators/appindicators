@@ -781,7 +781,10 @@ class IndicatorLunar:
 
         self.loadSettings()
         self.update()
-
+        
+#TODO Memory leak
+        from pympler import tracker
+        self.memory_tracker = tracker.SummaryTracker()
 
     def main( self ): Gtk.main()
 
@@ -831,8 +834,12 @@ class IndicatorLunar:
         elif nextUpdateInSeconds > ( 60 * 60 ):
             nextUpdateInSeconds = ( 60 * 60 )
 
+        nextUpdateInSeconds = 120
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
+
+#TODO Memory leak        
+        self.memory_tracker.print_diff()
 
 
     def updateMenu( self, ephemNow, lunarPhase ):
@@ -1269,6 +1276,7 @@ class IndicatorLunar:
                 satellitesSubMenu = Gtk.Menu()
                 satellitesMenuItem.set_submenu( satellitesSubMenu )
 
+            now = str( datetime.datetime.now() )
             for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
                 key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
                 subMenu = Gtk.Menu()
@@ -1290,13 +1298,12 @@ class IndicatorLunar:
                         visibleTranslatedText = self.getBooleanTranslatedText( self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] )
                         subMenu.append( Gtk.MenuItem( _( "Visible: " ) + visibleTranslatedText ) )
 
-                # Add the rise/set times to the next update, ensuring they are not in the past (the rise time will be in the past at times). 
-                now = str( datetime.datetime.now() )
-                if self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] > now:
-                    self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.nextUpdate )
+                    # Add the rise/set times to the next update, ensuring they are not in the past (the rise time will be in the past at times). 
+                    if self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] > now:
+                        self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.nextUpdate )
 
-                if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > now:
-                    self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
+                    if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > now:
+                        self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
 
                 self.addOnSatelliteHandler( subMenu, satelliteName, satelliteNumber )
 
