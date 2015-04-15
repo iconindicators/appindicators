@@ -782,9 +782,6 @@ class IndicatorLunar:
         self.loadSettings()
         self.update()
         
-#TODO Memory leak
-        from pympler import tracker
-        self.memory_tracker = tracker.SummaryTracker()
 
     def main( self ): Gtk.main()
 
@@ -834,12 +831,8 @@ class IndicatorLunar:
         elif nextUpdateInSeconds > ( 60 * 60 ):
             nextUpdateInSeconds = ( 60 * 60 )
 
-        nextUpdateInSeconds = 120
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
-
-#TODO Memory leak        
-        self.memory_tracker.print_diff()
 
 
     def updateMenu( self, ephemNow, lunarPhase ):
