@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-lunar 1.0.58\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-04-15 09:43+1000\n"
+"POT-Creation-Date: 2015-04-16 09:44+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1792,28 +1792,28 @@ msgstr ""
 msgid "Satellites"
 msgstr ""
 
-#: indicator-lunar.py:1277 indicator-lunar.py:1284 indicator-lunar.py:1287
+#: indicator-lunar.py:1278 indicator-lunar.py:1285 indicator-lunar.py:1288
 #: indicator-lunar.py:1335
 msgid "Azimuth: "
 msgstr ""
 
-#: indicator-lunar.py:1278 indicator-lunar.py:1334
+#: indicator-lunar.py:1279 indicator-lunar.py:1334
 msgid "Declination: "
 msgstr ""
 
-#: indicator-lunar.py:1282
+#: indicator-lunar.py:1283
 msgid "Rise"
 msgstr ""
 
-#: indicator-lunar.py:1283 indicator-lunar.py:1286 indicator-lunar.py:1342
+#: indicator-lunar.py:1284 indicator-lunar.py:1287 indicator-lunar.py:1342
 msgid "Date/Time: "
 msgstr ""
 
-#: indicator-lunar.py:1285
+#: indicator-lunar.py:1286
 msgid "Set"
 msgstr ""
 
-#: indicator-lunar.py:1291
+#: indicator-lunar.py:1292
 msgid "Visible: "
 msgstr ""
 
