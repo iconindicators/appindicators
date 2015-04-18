@@ -1355,17 +1355,7 @@ class IndicatorLunar:
                     if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > now:
                         self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
 
-#                 self.addOnSatelliteHandler( subMenu, satelliteName, satelliteNumber )
-                    url = self.satelliteOnClickURL. \
-                          replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ). \
-                          replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber )
-#                           . \
-#                           replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, satelliteTLE.getInternationalDesignator() )
-        
-#             def addOnSatelliteHandler( self, subMenu, satelliteName, satelliteNumber ):
-                    for child in subMenu.get_children():
-#                         child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
-                        child.connect( "activate", IndicatorLunar.onSatellite, url )
+                self.addOnSatelliteHandler( subMenu, satelliteName, satelliteNumber )
 
                 if self.showSatellitesAsSubMenu:
                     menuItem = Gtk.MenuItem( menuText )
@@ -1377,21 +1367,7 @@ class IndicatorLunar:
                 menuItem.set_submenu( subMenu )
 
 
-    def addOnSatelliteHandler( self, subMenu, satelliteName, satelliteNumber ):
-        for child in subMenu.get_children():
-            child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
-            child.connect( "activate", self.onSatellite )
-
-
-    @staticmethod
-    def onSatellite( widget, url ):
-        print( type(widget))
-        print( type(url))
-        if len( url ) > 0:
-            webbrowser.open( url )
-
-
-    def onSatelliteSS( self, widget ):
+    def onSatellite( self, widget ):
         satelliteTLE = self.satelliteTLEData.get( tuple( widget.props.name.split( "-----" ) ) )
 
         url = self.satelliteOnClickURL. \
