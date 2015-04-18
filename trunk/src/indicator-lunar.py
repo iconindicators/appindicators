@@ -1367,6 +1367,12 @@ class IndicatorLunar:
                 menuItem.set_submenu( subMenu )
 
 
+    def addOnSatelliteHandler( self, subMenu, satelliteName, satelliteNumber ):
+        for child in subMenu.get_children():
+            child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
+            child.connect( "activate", self.onSatellite )
+
+
     def onSatellite( self, widget ):
         satelliteTLE = self.satelliteTLEData.get( tuple( widget.props.name.split( "-----" ) ) )
 
