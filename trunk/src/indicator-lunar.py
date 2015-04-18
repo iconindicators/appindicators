@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from kazam.frontend import widgets
 
 
 # This program is free software: you can redistribute it and/or modify
