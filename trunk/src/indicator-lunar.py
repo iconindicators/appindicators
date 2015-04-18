@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from kazam.frontend import widgets
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -42,6 +43,10 @@ from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
 import copy, datetime, eclipse, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, subprocess, sys, tempfile, threading, time, webbrowser
+
+#TODO Remove
+import objgraph, time
+
 
 try:
     import ephem
@@ -781,12 +786,45 @@ class IndicatorLunar:
 
         self.loadSettings()
         self.update()
+
+        #TODO Remove
+#         import objgraph, time
+#         objgraph.show_growth( limit = 3 )
+#         print()
         
 
     def main( self ): Gtk.main()
 
 
-    def update( self ): Thread( target = self.updateBackend ).start()
+    def update( self ): 
+        #TODO Remove
+#         objgraph.show_growth()         
+# function                       3949     +3949
+# dict                           1882     +1882
+# tuple                          1716     +1716
+# weakref                        1239     +1239
+# wrapper_descriptor             1168     +1168
+# builtin_function_or_method     1150     +1150
+# method_descriptor               919      +919
+# getset_descriptor               791      +791
+# list                            789      +789
+# type                            586      +586
+# 
+# method                         1022      +989
+# TLE                             141      +141
+# tuple                          1776       +60
+# list                            805       +16
+# function                       3964       +15
+# dict                           1897       +15
+# builtin_function_or_method     1164       +14
+# property                        344        +7
+# weakref                        1246        +7
+# getset_descriptor               797        +6
+
+# 6 hours
+# 34MB
+# 70MB
+        Thread( target = self.updateBackend ).start()
 
 
     def updateBackend( self ):
@@ -833,6 +871,25 @@ class IndicatorLunar:
 
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
+
+        objgraph.show_backrefs( [ self.data ], filename = "/home/bernard/Desktop/image" + str( time.time() ) + ".png" )
+#TODO Remove
+#         roots = objgraph.get_leaking_objects()
+#         print( len( roots ) )
+#         mct = objgraph.show_most_common_types( objects = roots )
+#         print( mct )
+# 1659
+# method       991
+# dict         586
+# list         44
+# tuple        2
+# RuntimeError 1
+# Div          1
+# Param        1
+# Store        1
+# Sub          1
+# IsNot        1
+# None
 
 
     def updateMenu( self, ephemNow, lunarPhase ):
@@ -1298,7 +1355,17 @@ class IndicatorLunar:
                     if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > now:
                         self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
 
-                self.addOnSatelliteHandler( subMenu, satelliteName, satelliteNumber )
+#                 self.addOnSatelliteHandler( subMenu, satelliteName, satelliteNumber )
+                    url = self.satelliteOnClickURL. \
+                          replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ). \
+                          replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber )
+#                           . \
+#                           replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, satelliteTLE.getInternationalDesignator() )
+        
+#             def addOnSatelliteHandler( self, subMenu, satelliteName, satelliteNumber ):
+                    for child in subMenu.get_children():
+#                         child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
+                        child.connect( "activate", IndicatorLunar.onSatellite, url )
 
                 if self.showSatellitesAsSubMenu:
                     menuItem = Gtk.MenuItem( menuText )
@@ -1316,7 +1383,15 @@ class IndicatorLunar:
             child.connect( "activate", self.onSatellite )
 
 
-    def onSatellite( self, widget ):
+    @staticmethod
+    def onSatellite( widget, url ):
+        print( type(widget))
+        print( type(url))
+        if len( url ) > 0:
+            webbrowser.open( url )
+
+
+    def onSatelliteSS( self, widget ):
         satelliteTLE = self.satelliteTLEData.get( tuple( widget.props.name.split( "-----" ) ) )
 
         url = self.satelliteOnClickURL. \
