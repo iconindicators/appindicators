@@ -43,10 +43,6 @@ from threading import Thread
 from urllib.request import urlopen
 import copy, datetime, eclipse, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, subprocess, sys, tempfile, threading, time, webbrowser
 
-#TODO Remove
-# import objgraph, time
-# import gc
-
 
 try:
     import ephem
@@ -787,44 +783,11 @@ class IndicatorLunar:
         self.loadSettings()
         self.update()
 
-        #TODO Remove
-#         import objgraph, time
-#         objgraph.show_growth( limit = 3 )
-#         print()
-        
 
     def main( self ): Gtk.main()
 
 
-    def update( self ): 
-        #TODO Remove
-#         objgraph.show_growth()         
-# function                       3949     +3949
-# dict                           1882     +1882
-# tuple                          1716     +1716
-# weakref                        1239     +1239
-# wrapper_descriptor             1168     +1168
-# builtin_function_or_method     1150     +1150
-# method_descriptor               919      +919
-# getset_descriptor               791      +791
-# list                            789      +789
-# type                            586      +586
-# 
-# method                         1022      +989
-# TLE                             141      +141
-# tuple                          1776       +60
-# list                            805       +16
-# function                       3964       +15
-# dict                           1897       +15
-# builtin_function_or_method     1164       +14
-# property                        344        +7
-# weakref                        1246        +7
-# getset_descriptor               797        +6
-
-# 6 hours
-# 34MB
-# 70MB
-        Thread( target = self.updateBackend ).start()
+    def update( self ): Thread( target = self.updateBackend ).start()
 
 
     def updateBackend( self ):
@@ -871,28 +834,6 @@ class IndicatorLunar:
 
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
-
-        
-#         gc.collect()
-#         print( str( datetime.datetime.now() ), memory_usage_in_MB(), len( gc.get_objects() ) )
-#         objgraph.show_backrefs( [ self.data ], filename = "/home/bernard/Desktop/image" + str( time.time() ) + ".png" )
-#TODO Remove
-#         roots = objgraph.get_leaking_objects()
-#         print( len( roots ) )
-#         mct = objgraph.show_most_common_types( objects = roots )
-#         print( mct )
-# 1659
-# method       991
-# dict         586
-# list         44
-# tuple        2
-# RuntimeError 1
-# Div          1
-# Param        1
-# Store        1
-# Sub          1
-# IsNot        1
-# None
 
 
     def updateMenu( self ):
@@ -3542,13 +3483,6 @@ class IndicatorLunar:
             dateTime = None
 
         return ( data, dateTime )
-
-
-#TODO Remove
-def memory_usage_in_MB():
-    import psutil
-    process = psutil.Process( os.getpid() )
-    return process.get_memory_info()[ 0 ] / float( 2 ** 20 )
 
 
 if __name__ == "__main__": IndicatorLunar().main()
