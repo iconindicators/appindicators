@@ -44,7 +44,8 @@ from urllib.request import urlopen
 import copy, datetime, eclipse, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, subprocess, sys, tempfile, threading, time, webbrowser
 
 #TODO Remove
-import objgraph, time
+# import objgraph, time
+# import gc
 
 
 try:
@@ -871,7 +872,10 @@ class IndicatorLunar:
         self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
         self.lock.release()
 
-        objgraph.show_backrefs( [ self.data ], filename = "/home/bernard/Desktop/image" + str( time.time() ) + ".png" )
+        
+#         gc.collect()
+#         print( str( datetime.datetime.now() ), memory_usage_in_MB(), len( gc.get_objects() ) )
+#         objgraph.show_backrefs( [ self.data ], filename = "/home/bernard/Desktop/image" + str( time.time() ) + ".png" )
 #TODO Remove
 #         roots = objgraph.get_leaking_objects()
 #         print( len( roots ) )
@@ -3538,6 +3542,13 @@ class IndicatorLunar:
             dateTime = None
 
         return ( data, dateTime )
+
+
+#TODO Remove
+def memory_usage_in_MB():
+    import psutil
+    process = psutil.Process( os.getpid() )
+    return process.get_memory_info()[ 0 ] / float( 2 ** 20 )
 
 
 if __name__ == "__main__": IndicatorLunar().main()
