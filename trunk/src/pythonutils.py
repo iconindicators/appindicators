@@ -20,7 +20,10 @@
 
 from gi.repository import Gtk
 
-import gzip, logging.handlers, os, re, sys
+import gzip, logging.handlers, os, psutil, re, sys
+
+
+def getMemoryUsageInMB(): return psutil.Process( os.getpid() ).get_memory_info()[ 0 ] / float( 2 ** 20 )
 
 
 # Returns True if a number; False otherwise.
