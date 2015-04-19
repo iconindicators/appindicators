@@ -853,7 +853,7 @@ class IndicatorLunar:
 
     def updateFrontend( self, ephemNow, lunarPhase, lunarIlluminationPercentage ):
         self.nextUpdate = str( datetime.datetime.now() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
-        self.updateMenu( lunarPhase )
+        self.updateMenu()
         self.updateIcon( lunarIlluminationPercentage )
         self.fullMoonNotification( ephemNow, lunarPhase, lunarIlluminationPercentage )
 
@@ -895,7 +895,7 @@ class IndicatorLunar:
 # None
 
 
-    def updateMenu( self, lunarPhase ):
+    def updateMenu( self ):
         menu = Gtk.Menu()
 
         self.updateMoonMenu( menu )
