@@ -85,18 +85,7 @@ class IndicatorStardate:
             menu.append( self.stardateMenuItem )
             menu.append( Gtk.SeparatorMenuItem() )
 
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        menuItem.connect( "activate", self.onPreferences )
-        menu.append( menuItem )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
-        menuItem.connect( "activate", self.onAbout )
-        menu.append( menuItem )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        menuItem.connect( "activate", Gtk.main_quit )
-        menu.append( menuItem )
-
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, self.onPreferences, self.onAbout, Gtk.main_quit )
         menu.show_all()
         return menu
 
