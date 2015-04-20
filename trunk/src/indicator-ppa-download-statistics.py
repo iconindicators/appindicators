@@ -61,6 +61,7 @@ class IndicatorPPADownloadStatistics:
     ARCHITECTURES = [ "amd64", "i386" ]
 
     COMMENTS = _( "Shows the total downloads of PPAs." )
+    INDENT = "    "
     SVG_ICON = "." + INDICATOR_NAME + "-icon"
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
 
@@ -111,8 +112,6 @@ class IndicatorPPADownloadStatistics:
 
     def buildMenu( self ):
         menu = Gtk.Menu()
-
-        # Add PPAs to the menu...
         ppas = deepcopy( self.ppas ) # Leave the original download data as is - makes dynamic (user) changes faster (don't have to re-download).
 
         if self.combinePPAs:
@@ -121,40 +120,18 @@ class IndicatorPPADownloadStatistics:
         if self.sortByDownload:
             self.sortByDownloadAndClip( ppas )
 
-        indent = "    "
         if self.showSubmenu:
             for ppa in ppas:
                 menuItem = Gtk.MenuItem( ppa.getKey() )
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
-
                 if ppa.getStatus() == PPA.STATUS_OK:
                     publishedBinaries = ppa.getPublishedBinaries()
                     for publishedBinary in publishedBinaries:
-                        if publishedBinary.getPackageVersion() is None:
-                            label = indent + publishedBinary.getPackageName() + ": " + str( publishedBinary.getDownloadCount() )
-                        else:
-                            label = indent + publishedBinary.getPackageName() + " (" + publishedBinary.getPackageVersion() + "): " + str( publishedBinary.getDownloadCount() )
-
-                        subMenuItem = Gtk.MenuItem( label )
-                        subMenuItem.set_name( ppa.getKey() )
-                        subMenuItem.connect( "activate", self.onPPA )
-                        subMenu.append( subMenuItem )
+                        self.createMenuItemForPublishedBinary( subMenu, ppa, publishedBinary )
                         menuItem.set_submenu( subMenu )
                 else:
-                    if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
-                        message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
-                    elif ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
-                        message = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
-                    elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
-                        message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
-                    elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
-                        message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
-                    else:
-                        message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
-
-                    subMenuItem = Gtk.MenuItem( indent + message )
-                    subMenu.append( subMenuItem )
+                    self.createMenuItemForStatusMessage( subMenu, ppa )
                     menuItem.set_submenu( subMenu )
 
         else:
@@ -163,50 +140,61 @@ class IndicatorPPADownloadStatistics:
                 menu.append( menuItem )
                 menuItem.set_name( ppa.getKey() )
                 menuItem.connect( "activate", self.onPPA )
-
                 if ppa.getStatus() == PPA.STATUS_OK:
                     publishedBinaries = ppa.getPublishedBinaries()
                     for publishedBinary in publishedBinaries:
-                        if publishedBinary.getPackageVersion() is None:
-                            label = indent + publishedBinary.getPackageName() + ": " + str( publishedBinary.getDownloadCount() )
-                        else:
-                            label = indent + publishedBinary.getPackageName() + " (" + publishedBinary.getPackageVersion() + "): " + str( publishedBinary.getDownloadCount() )
-
-                        menuItem = Gtk.MenuItem( label )
-                        menuItem.set_name( ppa.getKey() )
-                        menuItem.connect( "activate", self.onPPA )
-                        menu.append( menuItem )
+                        self.createMenuItemForPublishedBinary( menu, ppa, publishedBinary )
                 else:
-                    if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
-                        message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
-                    elif ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
-                        message = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
-                    elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
-                        message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
-                    elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
-                        message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
-                    else:
-                        message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
-
-                    menuItem = Gtk.MenuItem( indent + message )
-                    menu.append( menuItem )
+                    self.createMenuItemForStatusMessage( menu, ppa )
 
         menu.append( Gtk.SeparatorMenuItem() )
-
-        preferencesMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        preferencesMenuItem.connect( "activate", self.onPreferences )
-        menu.append( preferencesMenuItem )
-
-        aboutMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
-        aboutMenuItem.connect( "activate", self.onAbout )
-        menu.append( aboutMenuItem )
-
-        quitMenuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        quitMenuItem.connect( "activate", self.quit )
-        menu.append( quitMenuItem )
-
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, self.onPreferences, self.onAbout, self.quit )
         self.indicator.set_menu( menu )
         menu.show_all()
+
+
+    def createMenuItemForPublishedBinary( self, menu, ppa, publishedBinary ):
+        label = IndicatorPPADownloadStatistics.INDENT + publishedBinary.getPackageName()
+        if publishedBinary.getPackageVersion() is None:
+            label += ": " + str( publishedBinary.getDownloadCount() )
+        else:
+            label += " (" + publishedBinary.getPackageVersion() + "): " + str( publishedBinary.getDownloadCount() )
+
+        menuItem = Gtk.MenuItem( label )
+        menuItem.set_name( ppa.getKey() )
+        menuItem.connect( "activate", self.onPPA )
+        menu.append( menuItem )
+
+
+    def createMenuItemForStatusMessage( self, menu, ppa ):
+        if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+            message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
+        elif ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
+            message = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
+        elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
+            message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
+        elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+            message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
+        else:
+            message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
+
+        menuItem = Gtk.MenuItem( IndicatorPPADownloadStatistics.INDENT + self.getStatusMessage( ppa ) )
+        menu.append( menuItem )
+
+
+    def getStatusMessage( self, ppa ):
+        if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+            message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
+        elif ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
+            message = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
+        elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
+            message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
+        elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+            message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
+        else:
+            message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
+
+        return message
 
 
     def quit( self, widget ):
