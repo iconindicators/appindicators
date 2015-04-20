@@ -20,10 +20,13 @@
 
 from gi.repository import Gtk
 
-import gzip, logging.handlers, os, psutil, re, sys
+import gzip, logging.handlers, os, psutil, re, subprocess, sys
 
 
 def getMemoryUsageInMB(): return psutil.Process( os.getpid() ).get_memory_info()[ 0 ] / float( 2 ** 20 )
+
+
+def callProcess( command ): return subprocess.Popen( command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
 
 
 # Returns True if a number; False otherwise.
