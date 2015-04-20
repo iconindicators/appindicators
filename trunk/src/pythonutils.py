@@ -90,6 +90,20 @@ def onRadio( self, *widgets ):
         widget.set_sensitive( self.get_active() )
 
 
+def createPreferencesAboutQuitMenuItems( menu, onPreferencesHandler, onAboutHandler, onQuitHandler ):
+    menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
+    menuItem.connect( "activate", onPreferencesHandler )
+    menu.append( menuItem )
+
+    menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
+    menuItem.connect( "activate", onAboutHandler )
+    menu.append( menuItem )
+
+    menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
+    menuItem.connect( "activate", onQuitHandler )
+    menu.append( menuItem )
+
+
 # A GTK AboutDialog with optional change log displayed in its own tab.
 class AboutDialog( Gtk.AboutDialog ):
 
