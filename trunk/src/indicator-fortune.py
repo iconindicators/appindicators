@@ -35,7 +35,7 @@ gettext.install( INDICATOR_NAME )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 
-import json, locale, logging, os, pythonutils, re, shutil, subprocess
+import json, locale, logging, os, pythonutils, re, shutil
 
 
 class IndicatorFortune:
@@ -119,19 +119,7 @@ class IndicatorFortune:
             self.indicator.set_secondary_activate_target( menuItem )
 
         menu.append( Gtk.SeparatorMenuItem() )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        menuItem.connect( "activate", self.onPreferences )
-        menu.append( menuItem )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
-        menuItem.connect( "activate", self.onAbout )
-        menu.append( menuItem )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        menuItem.connect( "activate", Gtk.main_quit )
-        menu.append( menuItem )
-
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, self.onPreferences, self.onAbout, Gtk.main_quit )
         menu.show_all()
         return menu
 
@@ -153,7 +141,7 @@ class IndicatorFortune:
             else:
                 while True:
                     self.fortune = ""
-                    p = subprocess.Popen( "fortune" + fortuneLocations, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+                    p = pythonutils.callProcess( "fortune" + fortuneLocations )
                     for line in p.stdout.readlines():
                         self.fortune += str( line.decode() )
 
