@@ -131,29 +131,14 @@ class IndicatorVirtualBox:
                             stack.append( currentMenu ) # Whatever we create next is a child of this group, so save the current menu.
                             currentMenu = subMenu
                         else:
-                            if virtualMachineInfo.isRunning: # No need to check if this is a group...groups never "run"!
-                                menuItem = Gtk.RadioMenuItem.new_with_label( [], virtualMachineInfo.getName() )
-                                menuItem.set_active( True )
-                            else:
-                                menuItem = Gtk.MenuItem( virtualMachineInfo.getName() )
-
-                            menuItem.props.name = virtualMachineInfo.getUUID()
-                            menuItem.connect( "activate", self.onStartVirtualMachine, True )
-                            currentMenu.append( menuItem )
+                            currentMenu.append( self.createMenuItemForVM( virtualMachineInfo, "" ) )
                 else:
                     for virtualMachineInfo in self.virtualMachineInfos:
                         indent = "    " * virtualMachineInfo.getIndent()
                         if virtualMachineInfo.isGroup():
                             vmMenuItem = Gtk.MenuItem( indent + virtualMachineInfo.getName() )
                         else:
-                            if virtualMachineInfo.isRunning:
-                                vmMenuItem = Gtk.RadioMenuItem.new_with_label( [], indent + virtualMachineInfo.getName() )
-                                vmMenuItem.set_active( True )
-                            else:
-                                vmMenuItem = Gtk.MenuItem( indent + virtualMachineInfo.getName() )
-    
-                            vmMenuItem.props.name = virtualMachineInfo.getUUID()
-                            vmMenuItem.connect( "activate", self.onStartVirtualMachine, True )
+                            vmMenuItem = self.createMenuItemForVM( virtualMachineInfo, indent )
 
                         menu.append( vmMenuItem )
 
@@ -161,25 +146,25 @@ class IndicatorVirtualBox:
 
             self.virtualBoxMenuItem = Gtk.MenuItem( _( "Launch VirtualBox Manager" ) )
             self.virtualBoxMenuItem.connect( "activate", self.onLaunchVirtualBox )
-            menu.append( self.virtualBoxMenuItem )
         else:
             menu.insert( Gtk.MenuItem( _( "(VirtualBox is not installed)" ) ), 0 )
-            menu.append( Gtk.SeparatorMenuItem() )
 
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        menuItem.connect( "activate", self.onPreferences )
-        menu.append( menuItem )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
-        menuItem.connect( "activate", self.onAbout )
-        menu.append( menuItem )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        menuItem.connect( "activate", Gtk.main_quit )
-        menu.append( menuItem )
-
+        menu.append( Gtk.SeparatorMenuItem() )
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
+
+
+    def createMenuItemForVM( self, virtualMachineInfo, indent ):
+        if virtualMachineInfo.isRunning: # No need to check if this is a group...groups never "run"!
+            menuItem = Gtk.RadioMenuItem.new_with_label( [], indent + virtualMachineInfo.getName() )
+            menuItem.set_active( True )
+        else:
+            menuItem = Gtk.MenuItem( indent + virtualMachineInfo.getName() )
+
+        menuItem.props.name = virtualMachineInfo.getUUID()
+        menuItem.connect( "activate", self.onStartVirtualMachine, True )
+        return menuItem
 
 
     def isVirtualBoxInstalled( self ):
@@ -190,14 +175,14 @@ class IndicatorVirtualBox:
     def getVirtualMachines( self ):
         self.virtualMachineInfos = [ ] # A list of VirtualBox items.
         if self.isVirtualBoxInstalled():
-            self.virtualMachineInfos = self.getVirtualMachinesFromBackend()
+            self.virtualMachineInfos = self.getVirtualMachinesFromVBoxManage()
             if len( self.virtualMachineInfos ) > 0:
-                # We have a list of VMs and UUIDs - now obtain groups or sort order.
-                # The configuration file can exist in different locations depending on the version of VirtualBox.
-                # Further, two config files can be in active use simultaneously - one for groups and the other for general GUI.
+                # The list of VMs and UUIDs from VBoxManage does not contain groups (if any) and sort order which must be obtained from the configuration file.
+                # The configuration file may exist in two locations, sometimes simultaneously, depending on the version of VirtualBox.
+                # One configuration file will contain group information whereas the other contains general GUI information.
                 # So need to parse both files...if they exist.
-                virtualMachineInfosA = self.getVirtualMachinesFromConfigFile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_A ) 
-                virtualMachineInfosB = self.getVirtualMachinesFromConfigFile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_B ) 
+                virtualMachineInfosA = self.getVirtualMachinesFromConfig( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_A ) 
+                virtualMachineInfosB = self.getVirtualMachinesFromConfig( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_B ) 
 
                 # Information from config A takes precedence over config B as it appears config A is what the latest VirtualBox release uses.
                 # If neither config has information, use what was obtained from the backend.
@@ -234,7 +219,7 @@ class IndicatorVirtualBox:
 
     # Obtain a list of VMs using VBoxManage.
     # This does not include any groups (if present) nor any order set by the user in the GUI.
-    def getVirtualMachinesFromBackend( self ):
+    def getVirtualMachinesFromVBoxManage( self ):
         p = subprocess.Popen( "VBoxManage list vms", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
         virtualMachineInfos = []
         for line in p.stdout.readlines():
@@ -250,7 +235,7 @@ class IndicatorVirtualBox:
 
 
     # Parse the specified VirtualBox.xml file to obtain a list of VMs together with groups or sort order. 
-    def getVirtualMachinesFromConfigFile( self, configFile ):
+    def getVirtualMachinesFromConfig( self, configFile ):
         virtualMachineInfos = [ ]
         if os.path.exists( configFile ):
             virtualMachineInfos = self.parseGroupDefinitions( configFile, "GUI/GroupDefinitions/", 0 ) # Attempt to get the groups and UUIDs.
@@ -288,22 +273,6 @@ class IndicatorVirtualBox:
         return virtualMachineInfos
 
 
-    # Obtain a list of VMs and their sort order by parsing the specified VirtualBox.xml configuration file.
-    # This approach works when no groups have been created by the user or the version of VirtualBox does not support groups.
-    def parseSelectorVMPositions( self, configFile ):
-        virtualMachineInfos = []
-        p = subprocess.Popen( "grep GUI/SelectorVMPositions " + configFile, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-        try:
-            uuids = list( p.communicate()[ 0 ].decode().rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
-            for uuid in uuids:
-                virtualMachineInfo = virtualmachine.Info( "", False, uuid, 0 )
-                virtualMachineInfos.append( virtualMachineInfo )                
-        except:
-            virtualMachineInfos = [] # The VM order has never been altered giving an empty result (and exception).
-            
-        return virtualMachineInfos
-
-
     # Obtain a list of VMs including group names and group structure by parsing the specified VirtualBox.xml configuration file.
     # The returned information contains no VM names - these need to be filled in by the caller.
     def parseGroupDefinitions( self, configFile, grepString, indentAmount ):
@@ -327,6 +296,22 @@ class IndicatorVirtualBox:
         except:
             virtualMachineInfos = []
 
+        return virtualMachineInfos
+
+
+    # Obtain a list of VMs and their sort order by parsing the specified VirtualBox.xml configuration file.
+    # This approach works when no groups have been created by the user or the version of VirtualBox does not support groups.
+    def parseSelectorVMPositions( self, configFile ):
+        virtualMachineInfos = []
+        p = subprocess.Popen( "grep GUI/SelectorVMPositions " + configFile, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+        try:
+            uuids = list( p.communicate()[ 0 ].decode().rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
+            for uuid in uuids:
+                virtualMachineInfo = virtualmachine.Info( "", False, uuid, 0 )
+                virtualMachineInfos.append( virtualMachineInfo )                
+        except:
+            virtualMachineInfos = [] # The VM order has never been altered giving an empty result (and exception).
+            
         return virtualMachineInfos
 
 
