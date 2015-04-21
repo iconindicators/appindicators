@@ -20,7 +20,7 @@
 
 class Info:
 
-    # Name of VM or Group.
+    # Name of VM or Group (when group contains the full group hierarchy).
     # Boolean True if a group; False otherwise.
     # UUID of VM/Group.
     # Numeric amount to indent when groups are used. 
