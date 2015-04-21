@@ -147,8 +147,7 @@ class IndicatorPPADownloadStatistics:
                 else:
                     self.createMenuItemForStatusMessage( menu, ppa )
 
-        menu.append( Gtk.SeparatorMenuItem() )
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, self.onPreferences, self.onAbout, self.quit )
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, self.quit )
         self.indicator.set_menu( menu )
         menu.show_all()
 
