@@ -1,5 +1,7 @@
 indicator-virtual-box (1.0.38-1) precise; urgency=low
 
+  * Bug fix: Submenus were not correctly rendering the tree of VMs.
+  * Bug fix: Tree of VMs in the Preferences was not correctly rendered.
   * Bug fix: When editing a VM's properties, was testing incorrectly for None.
   * Tidy up of tooltips and code clean up.
 
