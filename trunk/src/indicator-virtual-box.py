@@ -132,33 +132,30 @@ class IndicatorVirtualBox:
                 menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) ) #TODO Test...
             else:
                 if self.showSubmenu == True:
-#TODO I suspect something is broken here...does not handle a group containing a group with a vm...then followed by a vm (not in any group).
                     stack = [ ]
                     currentMenu = menu
                     for i in range( len( virtualMachineInfos ) ):
                         virtualMachineInfo = virtualMachineInfos[ i ]
-                        if virtualMachineInfo.getIndent() < len( stack ):
-                            currentMenu = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
+                        while virtualMachineInfo.getIndent() < len( stack ):
+                            currentMenu = stack.pop()
 
                         if virtualMachineInfo.isGroup():
-                            menuItem = Gtk.MenuItem( virtualMachineInfo.getName() )
+                            menuItem = Gtk.MenuItem( virtualMachineInfo.getName()[ virtualMachineInfo.getName().rfind( "/" ) + 1 : ] )
                             currentMenu.append( menuItem )
                             subMenu = Gtk.Menu()
                             menuItem.set_submenu( subMenu )
-                            stack.append( currentMenu ) # Whatever we create next is a child of this group, so save the current menu.
+                            stack.append( currentMenu )
                             currentMenu = subMenu
                         else:
                             currentMenu.append( self.createMenuItemForVM( virtualMachineInfo, "" ) )
                 else:
                     for virtualMachineInfo in virtualMachineInfos:
-#TODO May be able to determine the indent from the virtualmachine.Info.name by counting / ... and then can drop the indent.
                         indent = "    " * virtualMachineInfo.getIndent()
                         if virtualMachineInfo.isGroup():
                             menu.append( Gtk.MenuItem( indent + virtualMachineInfo.getName()[ virtualMachineInfo.getName().rfind( "/" ) + 1 : ] ) )
                         else:
                             menu.append( self.createMenuItemForVM( virtualMachineInfo, indent ) )
 
-#TODO Is not appearing
             menu.append( Gtk.SeparatorMenuItem() )
             menuItem = Gtk.MenuItem( _( "Launch VirtualBox Manager" ) )
             menuItem.connect( "activate", self.onLaunchVirtualBox )
@@ -334,7 +331,7 @@ class IndicatorVirtualBox:
 
 
     def onLaunchVirtualBox( self, widget ):
-        p = pythonutils.callProcess( 'wmctrl -l | grep "Oracle VM VirtualBox Manager"' )
+        p = pythonutils.callProcess( 'wmctrl -l | grep "Oracle VM VirtualBox Manager"' ) #TODO Check this works in Russian!
         result = p.communicate()[ 0 ].decode()
         p.wait()
         if result == "":
@@ -443,8 +440,6 @@ class IndicatorVirtualBox:
 
 
     def onPreferences( self, widget ):
-        self.getVirtualMachines() # Refresh the VMs as the list could have changed (deletion, creation, rename) since the last refresh.
-
         if self.dialog is not None:
             self.dialog.present()
             return
@@ -453,11 +448,12 @@ class IndicatorVirtualBox:
 
         # List of VMs.
         stack = [ ]
-        store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon (Gtk.STOCK_APPLY) or None for autostart of VM, VM start command, VM/Group UUID.
+        store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon (Gtk.STOCK_APPLY) or None for autostart of VM, VM start command, UUID.
         parent = None
-        for virtualMachineInfo in self.virtualMachineInfos:
-            if virtualMachineInfo.getIndent() < len( stack ):
-                parent = stack.pop() # We previously added a VM in a group and now we are adding a VM at the same indent as the group.
+        virtualMachineInfos = self.getVirtualMachines()
+        for virtualMachineInfo in virtualMachineInfos:
+            while virtualMachineInfo.getIndent() < len( stack ):
+                parent = stack.pop()
 
             if virtualMachineInfo.isGroup():
                 stack.append( parent )
