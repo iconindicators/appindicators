@@ -67,7 +67,7 @@ class Info:
     def isRunning( self ): return self.isRunning
 
 
-    def __str__( self ): return self.getName() + " | " + str( self.isGroup() ) + " | " + self.getUUID()
+    def __str__( self ): return self.getName() + " | " + str( self.isGroup() ) + " | " + self.getUUID() + " | " + str( self.getIndent() )
 
 
     def __repr__( self ): return self.__str__()
