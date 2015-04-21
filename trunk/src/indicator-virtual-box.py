@@ -207,11 +207,11 @@ class IndicatorVirtualBox:
 
                 print( virtualMachineInfosFromConfig )
 
-                # Going forward, the virtual machine infos from the config file is the definitive list of VMs (and groups if any).
+                # Going forward, the virtual machine infos from the config is the definitive list of VMs (and groups if any).
                 virtualMachineInfos = virtualMachineInfosFromConfig
 
-                # The virtual machine infos from the config file do not contain the names of virtual machines.
-                # So obtain the names from the list of virtual machine infos from VBoxManage.
+                # The virtual machine infos from the config do not contain the names of virtual machines.
+                # Obtain the names from the virtual machine infos from VBoxManage.
                 for virtualmachineInfoFromVBoxManage in virtualMachineInfosFromVBoxManage:
                     for virtualMachineInfo in virtualMachineInfos:
                         if virtualmachineInfoFromVBoxManage.getUUID() == virtualMachineInfo.getUUID():
@@ -233,17 +233,10 @@ class IndicatorVirtualBox:
 
                 p.wait()
 
+#TODO Should this be done in the prefs/menu instead?  If not, where else...not in multiple places!
                 # Alphabetically sort...
                 if self.sortDefault == False and not self.groupsExist( virtualMachineInfos ):
                     virtualMachineInfos = sorted( virtualMachineInfos, key = lambda virtualMachineInfo: virtualMachineInfo.name )
-
-#TODO Why do this here....or at all?
-                # Add to each VM its properties (autostart and the start command).
-#                 for uuid in self.virtualMachinePreferences:
-#                     virtualMachineInfo = self.getVirtualMachineInfo( uuid )
-#                     if virtualMachineInfo is not None:
-#                         virtualMachineInfo.setAutoStart( self.virtualMachinePreferences[ uuid ][ 0 ] == Gtk.STOCK_APPLY )
-#                         virtualMachineInfo.setStartCommand( self.virtualMachinePreferences[ uuid ][ 1 ] )
 
         return virtualMachineInfos
 
