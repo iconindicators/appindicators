@@ -93,7 +93,10 @@ def onRadio( self, *widgets ):
         widget.set_sensitive( self.get_active() )
 
 
-def createPreferencesAboutQuitMenuItems( menu, onPreferencesHandler, onAboutHandler, onQuitHandler ):
+def createPreferencesAboutQuitMenuItems( menu, prependSeparator, onPreferencesHandler, onAboutHandler, onQuitHandler ):
+    if prependSeparator:
+        menu.append( Gtk.SeparatorMenuItem() )
+
     menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
     menuItem.connect( "activate", onPreferencesHandler )
     menu.append( menuItem )
