@@ -79,7 +79,7 @@ class IndicatorVirtualBox:
 
     VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
     VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
-    VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION = "4.3" # Configuration file location and format changed. https://www.virtualbox.org/manual/ch10.html#idp99351072
+    VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION = "4.3" # Configuration file location and format changed at this version (https://www.virtualbox.org/manual/ch10.html#idp99351072).
 
     VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS = 5
 
@@ -155,7 +155,7 @@ class IndicatorVirtualBox:
 #TODO May be able to determine the indent from the virtualmachine.Info.name by counting / ... and then can drop the indent.
                         indent = "    " * virtualMachineInfo.getIndent()
                         if virtualMachineInfo.isGroup():
-                            vmMenuItem = Gtk.MenuItem( indent + virtualMachineInfo.getName() )
+                            vmMenuItem = Gtk.MenuItem( indent + virtualMachineInfo.getName()[ virtualMachineInfo.getName().rfind( "/" ) + 1 : ] )
                         else:
                             vmMenuItem = self.createMenuItemForVM( virtualMachineInfo, indent )
 
@@ -168,8 +168,7 @@ class IndicatorVirtualBox:
         else:
             menu.insert( Gtk.MenuItem( _( "(VirtualBox is not installed)" ) ), 0 )
 
-        menu.append( Gtk.SeparatorMenuItem() )
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, self.onPreferences, self.onAbout, Gtk.main_quit )
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
 
@@ -322,35 +321,6 @@ class IndicatorVirtualBox:
         return virtualMachineInfos
 
 
-#TODO Probably not as useful as I thought...if there is no config file (or entry in the file) there will be differences...but these are not a bug/error.
-    # Checks for VMs present in VBoxManage but not in the config file and vice versa and log any anomalies.
-    def logAnomaliesBetweenVBoxManageAndConfig( self, virtualMachineInfosFromVBoxManage, virtualMachineInfosFromConfig ):
-        if self.getVirtualBoxVersion() < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
-            configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3
-        else:
-            configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER
-
-        for virtualmachineInfoFromVBoxManage in virtualMachineInfosFromVBoxManage:
-            found = False
-            for virtualMachineInfoFromConfig in virtualMachineInfosFromConfig:
-                if virtualmachineInfoFromVBoxManage.getUUID() == virtualMachineInfoFromConfig.getUUID():
-                    found = True
-                    break
-
-            if not found:
-                logging.error( "The VM with UUID " + virtualmachineInfoFromVBoxManage.getUUID() + " exists in VBoxManage but not in the config file " + configFile )
-
-        for virtualMachineInfoFromConfig in virtualMachineInfosFromConfig:
-            found = False
-            for virtualmachineInfoFromVBoxManage in virtualMachineInfosFromVBoxManage:
-                if virtualMachineInfoFromConfig.getUUID() == virtualmachineInfoFromVBoxManage.getUUID():
-                    found = True
-                    break
-
-            if not found:
-                logging.error( "The VM with UUID " + virtualMachineInfoFromConfig.getUUID() + " exists in the config file " + configFile + " but not in VBoxManage." )
-
-
     def groupsExist( self, virtualMachineInfos ):
         for virtualMachineInfo in virtualMachineInfos:
             if virtualMachineInfo.isGroup():
@@ -424,9 +394,9 @@ class IndicatorVirtualBox:
     def isVirtualMachineAutostart( self, uuid ): return uuid in self.virtualMachinePreferences and self.virtualMachinePreferences[ uuid ][ 0 ] == Gtk.STOCK_APPLY
 
 
-    def getVirtualMachineInfo( self, virtualMachineUUID ):
+    def getVirtualMachineInfo( self, uuid ):
         for virtualMachineInfo in self.virtualMachineInfos:
-            if virtualMachineInfo.getUUID() == virtualMachineUUID:
+            if virtualMachineInfo.getUUID() == uuid:
                 return virtualMachineInfo
 
         return None
