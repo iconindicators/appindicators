@@ -125,12 +125,11 @@ class IndicatorVirtualBox:
     def main( self ): Gtk.main()
 
 
-#TODO Maybe pass in the virtualMachineInfos from the caller?
     def buildMenu( self, virtualMachineInfos ):
         menu = Gtk.Menu()
         if self.isVirtualBoxInstalled():
             if len( virtualMachineInfos ) == 0:
-                menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
+                menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) ) #TODO Test...
             else:
                 if self.showSubmenu == True:
 #TODO I suspect something is broken here...does not handle a group containing a group with a vm...then followed by a vm (not in any group).
@@ -155,26 +154,26 @@ class IndicatorVirtualBox:
 #TODO May be able to determine the indent from the virtualmachine.Info.name by counting / ... and then can drop the indent.
                         indent = "    " * virtualMachineInfo.getIndent()
                         if virtualMachineInfo.isGroup():
-                            vmMenuItem = Gtk.MenuItem( indent + virtualMachineInfo.getName()[ virtualMachineInfo.getName().rfind( "/" ) + 1 : ] )
+                            menu.append( Gtk.MenuItem( indent + virtualMachineInfo.getName()[ virtualMachineInfo.getName().rfind( "/" ) + 1 : ] ) )
                         else:
-                            vmMenuItem = self.createMenuItemForVM( virtualMachineInfo, indent )
+                            menu.append( self.createMenuItemForVM( virtualMachineInfo, indent ) )
 
-                        menu.append( vmMenuItem )
-
+#TODO Is not appearing
             menu.append( Gtk.SeparatorMenuItem() )
-
-            self.virtualBoxMenuItem = Gtk.MenuItem( _( "Launch VirtualBox Manager" ) )
-            self.virtualBoxMenuItem.connect( "activate", self.onLaunchVirtualBox )
+            menuItem = Gtk.MenuItem( _( "Launch VirtualBox Manager" ) )
+            menuItem.connect( "activate", self.onLaunchVirtualBox )
+            menu.append( menuItem )
+            
         else:
             menu.insert( Gtk.MenuItem( _( "(VirtualBox is not installed)" ) ), 0 )
 
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, False, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
 
 
     def createMenuItemForVM( self, virtualMachineInfo, indent ):
-        if virtualMachineInfo.isRunning: # No need to check if this is a group...groups never "run"!
+        if virtualMachineInfo.isRunning: # No need to check if this is a group...groups never "run" and this function should only be called for a VM and never a group.
             menuItem = Gtk.RadioMenuItem.new_with_label( [], indent + virtualMachineInfo.getName() )
             menuItem.set_active( True )
         else:
