@@ -838,28 +838,13 @@ class IndicatorLunar:
 
     def updateMenu( self ):
         menu = Gtk.Menu()
-
         self.updateMoonMenu( menu )
         self.updateSunMenu( menu )
         self.updatePlanetsMenu( menu )
         self.updateStarsMenu( menu )
         self.updateOrbitalElementsMenu( menu )
         self.updateSatellitesMenu( menu )
-
-        menu.append( Gtk.SeparatorMenuItem() )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
-        menuItem.connect( "activate", self.onPreferences )
-        menu.append( menuItem )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
-        menuItem.connect( "activate", self.onAbout )
-        menu.append( menuItem )
-
-        menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
-        menuItem.connect( "activate", Gtk.main_quit )
-        menu.append( menuItem )
-
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
 
