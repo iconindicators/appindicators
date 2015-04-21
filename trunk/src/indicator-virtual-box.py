@@ -102,6 +102,7 @@ class IndicatorVirtualBox:
         virtualMachineInfos = self.getVirtualMachines()
         # Start up VMs...
 #TODO Maybe do this in a separate thread?  Might need to block the preferences until it's finished.
+#Rather than lockout, maybe rebuild the menu with a flag to enable the prefernces menu item?  Or just enable the preferences item?
         previousVMNeededStarting = False
         for virtualMachineInfo in virtualMachineInfos:
             if self.isVirtualMachineAutostart( virtualMachineInfo.getUUID() ):
@@ -120,6 +121,11 @@ class IndicatorVirtualBox:
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
         self.buildMenu( virtualMachineInfos )
         self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
+
+#         menu = self.indicator.get_menu()
+#         for menuItem in menu.get_children():
+#             if menuItem.__class__.__name__ == "ImageMenuItem" and menuItem.get_label() == "gtk-preferences":
+#                 menuItem.set_sensitive( False )
 
 
     def main( self ): Gtk.main()
