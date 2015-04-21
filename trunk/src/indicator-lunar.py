@@ -41,8 +41,8 @@ gettext.install( INDICATOR_NAME )
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
-import copy, datetime, eclipse, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, subprocess, sys, tempfile, threading, time, webbrowser
 
+import copy, datetime, eclipse, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, subprocess, sys, tempfile, threading, time, webbrowser
 
 try:
     import ephem
