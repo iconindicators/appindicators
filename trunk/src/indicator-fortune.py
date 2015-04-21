@@ -118,8 +118,7 @@ class IndicatorFortune:
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
             self.indicator.set_secondary_activate_target( menuItem )
 
-        menu.append( Gtk.SeparatorMenuItem() )
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, self.onPreferences, self.onAbout, Gtk.main_quit )
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         menu.show_all()
         return menu
 
