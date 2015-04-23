@@ -47,8 +47,6 @@ class IndicatorStardate:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
-    DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
 
     COMMENTS = _( "Shows the current Star Trek™ stardate." )
@@ -195,7 +193,7 @@ class IndicatorStardate:
         grid.attach( showInMenuCheckbox, 0, 3, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_active( os.path.exists( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorStardate.DESKTOP_FILE ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 4, 2, 1 )
@@ -213,22 +211,8 @@ class IndicatorStardate:
             self.showInMenu = showInMenuCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
             self.saveSettings()
-
-            if not os.path.exists( IndicatorStardate.AUTOSTART_PATH ):
-                os.makedirs( IndicatorStardate.AUTOSTART_PATH )
-
-            if autostartCheckbox.get_active():
-                try:
-                    shutil.copy( IndicatorStardate.DESKTOP_PATH + IndicatorStardate.DESKTOP_FILE, IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
-                except Exception as e:
-                    logging.exception( e )
-            else:
-                try:
-                    os.remove( IndicatorStardate.AUTOSTART_PATH + IndicatorStardate.DESKTOP_FILE )
-                except:
-                    pass
-
-            self.indicator.set_menu( self.buildMenu() )
+            pythonutils.setAutoStart( IndicatorStardate.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+            self.indicator.set_menu( self.buildMenu() )  #TODO Does thie assert like fortune?
             self.update()
 
         self.dialog.destroy()
