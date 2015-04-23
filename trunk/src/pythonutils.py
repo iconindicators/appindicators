@@ -20,7 +20,7 @@
 
 from gi.repository import Gtk
 
-import gzip, logging.handlers, os, psutil, re, subprocess, sys
+import gzip, logging.handlers, os, psutil, re, shutil, subprocess, sys
 
 
 def getMemoryUsageInMB(): return psutil.Process( os.getpid() ).get_memory_info()[ 0 ] / float( 2 ** 20 )
@@ -37,6 +37,25 @@ def isNumber( numberAsString ):
 
     except ValueError:
         return False
+
+
+def isAutoStart( desktopFile, autoStartPath = os.getenv( "HOME" ) + "/.config/autostart/" ): return os.path.exists( autoStartPath + desktopFile )
+
+
+def setAutoStart( desktopFile, isSet, logging, autoStartPath = os.getenv( "HOME" ) + "/.config/autostart/", desktopPath = "/usr/share/applications/" ):
+    if not os.path.exists( autoStartPath ):
+        os.makedirs( autoStartPath )
+
+    if isSet:
+        try:
+            shutil.copy( desktopPath + desktopFile, autoStartPath + desktopFile )
+        except Exception as e:
+            logging.exception( e )
+    else:
+        try:
+            os.remove( autoStartPath + desktopFile )
+        except:
+            pass
 
 
 # Returns the colour (as #xxyyzz) for the current GTK icon theme.
