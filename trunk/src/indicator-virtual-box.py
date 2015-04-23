@@ -48,19 +48,13 @@
 #
 # So take what information the groups gave and append to that the VMs which are missing (from the backend information).
 
-#TODO Can these be ditched?
-#         self.isRunning = False
-#         self.autoStart = False
-#         self.startCommand = "VBoxManage startvm %VM%"
-
-
-
 
 INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
 
 from gi.repository import AppIndicator3, GLib, Gtk
+from threading import Thread
 
 import gzip, json, locale, logging, os, pythonutils, re, shutil, sys, time, virtualmachine
 
@@ -73,15 +67,14 @@ class IndicatorVirtualBox:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
-    DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
 
     VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
     VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
     VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION = "4.3" # Configuration file location and format changed at this version (https://www.virtualbox.org/manual/ch10.html#idp99351072).
 
-    VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS = 5
+    VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
+    VIRTUAL_MACHINE_STARTUP_MINIMUM_DELAY_IN_SECONDS = 5
 
     COMMENTS = _( " Shows VirtualBox™ virtual machines and allows them to be started." )
 
@@ -96,75 +89,63 @@ class IndicatorVirtualBox:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.loadSettings()
         self.dialog = None
-
-        virtualMachineInfos = self.getVirtualMachines()
-        # Start up VMs...
-#TODO Maybe do this in a separate thread?  Might need to block the preferences until it's finished.
-#Rather than lockout, maybe rebuild the menu with a flag to enable the prefernces menu item?  Or just enable the preferences item?
-        previousVMNeededStarting = False
-        for virtualMachineInfo in virtualMachineInfos:
-            if self.isVirtualMachineAutostart( virtualMachineInfo.getUUID() ):
-                if previousVMNeededStarting and not virtualMachineInfo.isRunning:
-                    time.sleep( self.delayBetweenAutoStartInSeconds )
-
-                previousVMNeededStarting = not virtualMachineInfo.isRunning
-
-                # Create a dummy widget (radio button) and use that to kick off the start VM function...
-                radioButton = Gtk.RadioButton.new_with_label_from_widget( None, "" )                    
-                radioButton.props.name = virtualMachineInfo.getUUID()
-                self.onStartVirtualMachine( radioButton, False )
-
+        self.loadSettings()
+        virtualMachines = self.getVirtualMachines()
+        Thread( target = self.autoStartVirtualMachines, args = ( virtualMachines, ) ).start()
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorVirtualBox.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-        self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
-        self.buildMenu( virtualMachineInfos )
+        self.buildMenu( virtualMachines )
         self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
-
-#         menu = self.indicator.get_menu()
-#         for menuItem in menu.get_children():
-#             if menuItem.__class__.__name__ == "ImageMenuItem" and menuItem.get_label() == "gtk-preferences":
-#                 menuItem.set_sensitive( False )
 
 
     def main( self ): Gtk.main()
 
 
-    def buildMenu( self, virtualMachineInfos ):
+#TODO Might need to block the preferences until this is finished?
+# Rather than lockout, maybe rebuild the menu with a flag to enable the prefernces menu item?
+# Or just enable the preferences item?
+# What is bad if the prefs are opened (and modified/saved) if we are still autostarting?
+    def autoStartVirtualMachines( self, virtualMachines ):
+        for virtualMachine in virtualMachines:
+            if self.isAutostart( virtualMachine.getUUID() ):
+                self.startVirtualMachine( virtualMachine, virtualMachines, self.delayBetweenAutoStartInSeconds )
+
+
+    def buildMenu( self, virtualMachines ):
         menu = Gtk.Menu()
         if self.isVirtualBoxInstalled():
-            if len( virtualMachineInfos ) == 0:
+            if len( virtualMachines ) == 0:
                 menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) ) #TODO Test...
             else:
                 if self.showSubmenu == True:
                     stack = [ ]
                     currentMenu = menu
-                    for i in range( len( virtualMachineInfos ) ):
-                        virtualMachineInfo = virtualMachineInfos[ i ]
-                        while virtualMachineInfo.getIndent() < len( stack ):
+                    for i in range( len( virtualMachines ) ):
+                        virtualMachine = virtualMachines[ i ]
+                        while virtualMachine.getIndent() < len( stack ):
                             currentMenu = stack.pop()
 
-                        if virtualMachineInfo.isGroup():
-                            menuItem = Gtk.MenuItem( virtualMachineInfo.getName()[ virtualMachineInfo.getName().rfind( "/" ) + 1 : ] )
+                        if virtualMachine.isGroup():
+                            menuItem = Gtk.MenuItem( virtualMachine.getName()[ virtualMachine.getName().rfind( "/" ) + 1 : ] )
                             currentMenu.append( menuItem )
                             subMenu = Gtk.Menu()
                             menuItem.set_submenu( subMenu )
                             stack.append( currentMenu )
                             currentMenu = subMenu
                         else:
-                            currentMenu.append( self.createMenuItemForVM( virtualMachineInfo, "" ) )
+                            currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, "" ) )
                 else:
-                    for virtualMachineInfo in virtualMachineInfos:
-                        indent = "    " * virtualMachineInfo.getIndent()
-                        if virtualMachineInfo.isGroup():
-                            menu.append( Gtk.MenuItem( indent + virtualMachineInfo.getName()[ virtualMachineInfo.getName().rfind( "/" ) + 1 : ] ) )
+                    for virtualMachine in virtualMachines:
+                        indent = "    " * virtualMachine.getIndent()
+                        if virtualMachine.isGroup():
+                            menu.append( Gtk.MenuItem( indent + virtualMachine.getName()[ virtualMachine.getName().rfind( "/" ) + 1 : ] ) )
                         else:
-                            menu.append( self.createMenuItemForVM( virtualMachineInfo, indent ) )
+                            menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent ) )
 
             menu.append( Gtk.SeparatorMenuItem() )
             menuItem = Gtk.MenuItem( _( "Launch VirtualBox Manager" ) )
-            menuItem.connect( "activate", self.onLaunchVirtualBox )
+            menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
             menu.append( menuItem )
             
         else:
@@ -175,16 +156,33 @@ class IndicatorVirtualBox:
         menu.show_all()
 
 
-    def createMenuItemForVM( self, virtualMachineInfo, indent ):
-        if virtualMachineInfo.isRunning: # No need to check if this is a group...groups never "run" and this function should only be called for a VM and never a group.
-            menuItem = Gtk.RadioMenuItem.new_with_label( [], indent + virtualMachineInfo.getName() )
+    def createMenuItemForVirtualMachine( self, virtualMachine, indent ):
+        if virtualMachine.isRunning(): # No need to check if this is a group...groups never "run" and this function should only be called for a VM and never a group.
+            menuItem = Gtk.RadioMenuItem.new_with_label( [], indent + virtualMachine.getName() )
             menuItem.set_active( True )
         else:
-            menuItem = Gtk.MenuItem( indent + virtualMachineInfo.getName() )
+            menuItem = Gtk.MenuItem( indent + virtualMachine.getName() )
 
-        menuItem.props.name = virtualMachineInfo.getUUID()
-        menuItem.connect( "activate", self.onStartVirtualMachine, True )
+        menuItem.props.name = virtualMachine.getUUID()
+        menuItem.connect( "activate", self.onVirtualMachine )
         return menuItem
+
+
+    def onLaunchVirtualBoxManager( self, widget ):
+        p = pythonutils.callProcess( 'wmctrl -l | grep "Oracle VM VirtualBox Manager"' ) #TODO Check this works in Russian!
+        result = p.communicate()[ 0 ].decode()
+        p.wait()
+        if result == "":
+            pythonutils.callProcess( "VirtualBox &" )
+        else:
+            windowID = result[ 0 : result.find( " " ) ]
+            pythonutils.callProcess( "wmctrl -i -a " + windowID ).wait()
+
+
+    def onVirtualMachine( self, widget ):
+        virtualMachines = self.getVirtualMachines()
+        virtualMachine = self.getVirtualMachine( widget.props.name, virtualMachines )
+        self.startVirtualMachine( virtualMachine, virtualMachines, IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_MINIMUM_DELAY_IN_SECONDS )
 
 
     def isVirtualBoxInstalled( self ): return pythonutils.callProcess( "which VBoxManage" ).communicate()[ 0 ].decode() != ''
@@ -194,86 +192,81 @@ class IndicatorVirtualBox:
 
 
     def getVirtualMachines( self ):
-        virtualMachineInfos = [ ]
+        virtualMachines = [ ]
         if self.isVirtualBoxInstalled():
-            virtualMachineInfosFromVBoxManage = self.getVirtualMachinesFromVBoxManage() # Does not contain group information, nor sort order.
-            print( virtualMachineInfosFromVBoxManage )
-            if len( virtualMachineInfosFromVBoxManage ) > 0:
+            virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage() # Does not contain group information, nor sort order.
+            if len( virtualMachinesFromVBoxManage ) > 0:
                 if self.getVirtualBoxVersion() < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION: #TODO Test this works with different versions.
-                    print( "Get config for version less than 4.3" )
-                    virtualMachineInfosFromConfig = self.getVirtualMachinesFromConfigPrior4dot3()
+                    virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPrior4dot3()
                 else:
-                    print( "Get config for version 4.3+" )
-                    virtualMachineInfosFromConfig = self.getVirtualMachinesFromConfig4dot3()
-
-                print( virtualMachineInfosFromConfig )
+                    virtualMachinesFromConfig = self.getVirtualMachinesFromConfig4dot3()
 
                 # Going forward, the virtual machine infos from the config is the definitive list of VMs (and groups if any).
-                virtualMachineInfos = virtualMachineInfosFromConfig
+                virtualMachines = virtualMachinesFromConfig
 
                 # The virtual machine infos from the config do not contain the names of virtual machines.
                 # Obtain the names from the virtual machine infos from VBoxManage.
-                for virtualmachineInfoFromVBoxManage in virtualMachineInfosFromVBoxManage:
-                    for virtualMachineInfo in virtualMachineInfos:
-                        if virtualmachineInfoFromVBoxManage.getUUID() == virtualMachineInfo.getUUID():
-                            virtualMachineInfo.setName( virtualmachineInfoFromVBoxManage.getName() )
+                for virtualmachineFromVBoxManage in virtualMachinesFromVBoxManage:
+                    for virtualMachine in virtualMachines:
+                        if virtualmachineFromVBoxManage.getUUID() == virtualMachine.getUUID():
+                            virtualMachine.setName( virtualmachineFromVBoxManage.getName() )
                             break
 
-                print( virtualMachineInfos )
+#TODO What about VMs from the config which are not in the backend?  This is an error right?  Can it ever happen?
+#maybe log these as warnings?
 
                 # Determine which VMs are running.
                 p = pythonutils.callProcess( "VBoxManage list runningvms" )
                 for line in p.stdout.readlines():
                     try:
                         info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
-                        for virtualMachineInfo in virtualMachineInfos:
-                            if virtualMachineInfo.getUUID() == info[ 1 ]:
-                                virtualMachineInfo.setRunning()
+                        for virtualMachine in virtualMachines:
+                            if virtualMachine.getUUID() == info[ 1 ]:
+                                virtualMachine.setRunning()
                     except:
                         pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
                 p.wait()
 
-#TODO Should this be done in the prefs/menu instead?  If not, where else...not in multiple places!
                 # Alphabetically sort...
-                if self.sortDefault == False and not self.groupsExist( virtualMachineInfos ):
-                    virtualMachineInfos = sorted( virtualMachineInfos, key = lambda virtualMachineInfo: virtualMachineInfo.name )
+                if self.sortDefault == False and not self.groupsExist( virtualMachines ):
+                    virtualMachines = sorted( virtualMachines, key = lambda virtualMachine: virtualMachine.name )
 
-        return virtualMachineInfos
+        return virtualMachines
 
 
     # The returned list of virtualmachine.Info objects does not include any groups (if present) nor any order set by the user in the GUI.
     def getVirtualMachinesFromVBoxManage( self ):
         p = pythonutils.callProcess( "VBoxManage list vms" )
-        virtualMachineInfos = []
+        virtualMachines = []
         for line in p.stdout.readlines():
             try:
                 info = str( line.decode() )[ 1 : -2 ].split( "\" {" )
-                virtualMachineInfo = virtualmachine.Info( info[ 0 ], False, info[ 1 ], 0 )
-                virtualMachineInfos.append( virtualMachineInfo )
+                virtualMachine = virtualmachine.Info( info[ 0 ], False, info[ 1 ], 0 )
+                virtualMachines.append( virtualMachine )
             except:
                 pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
         p.wait()
-        return virtualMachineInfos
+        return virtualMachines
 
 
     def getVirtualMachinesFromConfigPrior4dot3( self ):
-        virtualMachineInfos = []
+        virtualMachines = []
         p = pythonutils.callProcess( "grep GUI/SelectorVMPositions " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 )
         try:
             uuids = list( p.communicate()[ 0 ].decode().rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
             for uuid in uuids:
-                virtualMachineInfos.append( virtualmachine.Info( "", False, uuid, 0 ) )                
+                virtualMachines.append( virtualmachine.Info( "", False, uuid, 0 ) )                
         except:
 #TODO Should something be logged?
-            virtualMachineInfos = [] # The VM order has never been altered giving an empty result (and exception).
+            virtualMachines = [] # The VM order has never been altered giving an empty result (and exception).
 
-        return virtualMachineInfos
+        return virtualMachines
 
 
     def getVirtualMachinesFromConfig4dot3( self ):
-        virtualMachineInfos = []
+        virtualMachines = []
         try:
             with open( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER, "r" ) as f:
                 content = f.readlines()
@@ -291,26 +284,26 @@ class IndicatorVirtualBox:
             values = groupDefinitions[ key ].split( "," )
             for value in values:
                 if value.startswith( "go=" ):
-                    virtualMachineInfos.insert( i, virtualmachine.Info( key + value.replace( "go=", "" ), True, "", 0 ) )
+                    virtualMachines.insert( i, virtualmachine.Info( key + value.replace( "go=", "" ), True, "", 0 ) )
                 else:
-                    virtualMachineInfos.insert( i, virtualmachine.Info( "", False, value.replace( "m=", "" ), 0 ) )
+                    virtualMachines.insert( i, virtualmachine.Info( "", False, value.replace( "m=", "" ), 0 ) )
 
                 i += 1
 
             # Now have a list of virtual machine infos containing top level groups and/or VMs.
-            # Process this list and where a group is found, add in its children (groups and/or VMs).
+            # Process the list and where a group is found, add in its children (groups and/or VMs).
             i = 0
-            while i < len( virtualMachineInfos ):
-                if virtualMachineInfos[ i ].isGroup():
-                    indent = virtualMachineInfos[ i ].getIndent() + 1
-                    key = virtualMachineInfos[ i ].getName()
+            while i < len( virtualMachines ):
+                if virtualMachines[ i ].isGroup():
+                    indent = virtualMachines[ i ].getIndent() + 1
+                    key = virtualMachines[ i ].getName()
                     values = groupDefinitions[ key ].split( "," )
                     j = i + 1
                     for value in values:
                         if value.startswith( "go=" ):
-                            virtualMachineInfos.insert( j, virtualmachine.Info( key + "/" + value.replace( "go=", "" ), True, "", indent ) )
+                            virtualMachines.insert( j, virtualmachine.Info( key + "/" + value.replace( "go=", "" ), True, "", indent ) )
                         else:
-                            virtualMachineInfos.insert( j, virtualmachine.Info( "", False, value.replace( "m=", "" ), indent ) )
+                            virtualMachines.insert( j, virtualmachine.Info( "", False, value.replace( "m=", "" ), indent ) )
 
                         j += 1
 
@@ -318,14 +311,14 @@ class IndicatorVirtualBox:
 
         except Exception as e:
 #TODO Should something be logged?
-            virtualMachineInfos = []
+            virtualMachines = []
 
-        return virtualMachineInfos
+        return virtualMachines
 
 
-    def groupsExist( self, virtualMachineInfos ):
-        for virtualMachineInfo in virtualMachineInfos:
-            if virtualMachineInfo.isGroup():
+    def groupsExist( self, virtualMachines ):
+        for virtualMachine in virtualMachines:
+            if virtualMachine.isGroup():
                 return True
 
         return False
@@ -333,91 +326,78 @@ class IndicatorVirtualBox:
 
     def onRefresh( self ):
         GLib.idle_add( self.buildMenu, self.getVirtualMachines() )
-        return True # Must return true so that we continue to be called (http://www.pygtk.org/pygtk2reference/gobject-functions.html#function-gi--timeout-add).
+        return True # http://www.pygtk.org/pygtk2reference/gobject-functions.html#function-gi--timeout-add
 
 
-    def onLaunchVirtualBox( self, widget ):
-        p = pythonutils.callProcess( 'wmctrl -l | grep "Oracle VM VirtualBox Manager"' ) #TODO Check this works in Russian!
-        result = p.communicate()[ 0 ].decode()
-        p.wait()
-        if result == "":
-            pythonutils.callProcess( "VirtualBox &" )
-        else:
-            windowID = result[ 0 : result.find( " " ) ]
-            pythonutils.callProcess( "wmctrl -i -a " + windowID ).wait()
-
-
-    def onStartVirtualMachine( self, widget, doRefresh ):
-#TODO Isn't it too late at this point to do a refresh???        
-        if doRefresh:
-            self.getVirtualMachines() # Refresh the VMs as the list could have changed (deletion, creation, rename) since the last refresh.
-
-        virtualMachineUUID = widget.props.name
-        virtualMachineInfo = self.getVirtualMachineInfo( virtualMachineUUID )
-        virtualMachineName = virtualMachineInfo.getName()
-        if virtualMachineName is None:
+#TODO Not sure if this delay (user specified between auto start multiple vms) is the same as delaying to give VBoxManage time to refresh...think!
+    def startVirtualMachine( self, virtualMachine, virtualMachines, delayInSeconds ):
+        if virtualMachine is None:
             pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." ) )
-        elif virtualMachineInfo.isRunning:
-            if self.duplicateVirtualMachineNameExists( virtualMachineName ):
-                pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified." ) )
-            else:
+
+        elif virtualMachine.isRunning(): # Attempt to use the window manager to bring the VM window to the front.
+            if self.isVirtualMachineNameUnique( virtualMachine.getName(), virtualMachines ):
                 windowID = None
                 p = pythonutils.callProcess( "wmctrl -l" )
                 for line in p.stdout.readlines():
                     lineAsString = str( line.decode() )
-                    if virtualMachineName in lineAsString:
+                    if virtualMachine.getName() in lineAsString:
                         windowID = lineAsString[ 0 : lineAsString.find( " " ) ]
+                        break
 
                 p.wait()
 
                 if windowID is None:
-                    pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM is running but its window could not be found - perhaps it is running headless." ) )
+                    pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "The VM is running but its window could not be found - perhaps it is running headless." ) )
                 else:
-                    # If the VM is running headless then there will be no window to display...
                     pythonutils.callProcess( "wmctrl -i -a " + windowID ).wait()
-        else:
+
+            else:
+                pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified." ) )
+
+        else: # Run the VM!
             try:
-                startCommand = virtualMachineInfo.getStartCommand().replace( "%VM%", virtualMachineInfo.getUUID() ) + " &"
+                startCommand = self.getStartCommand( virtualMachine.getUUID() ).replace( "%VM%", virtualMachine.getUUID() ) + " &"
                 pythonutils.callProcess( startCommand ).wait()
 
-                # Since the start command returns immediately, the running status (from VBoxManage) may not be updated as yet.
-                # Pause after kicking off the VM to give VBoxManage a chance to catch up...
-                # ...then when the indicator is updated, we (hopefully) will be updated correctly!
-                time.sleep( IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_DELAY_IN_SECONDS )
+                # The start command returns immediately due to '&', so give VBoxManage a moment to catch up and refresh.
+                # Use the specified delay but don't delay less than the minimum.
+                if delayInSeconds < IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_MINIMUM_DELAY_IN_SECONDS:
+                    time.sleep( IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_MINIMUM_DELAY_IN_SECONDS )
+                else:
+                    time.sleep( delayInSeconds )
 
             except Exception as e:
                 logging.exception( e )
-                pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM '{0}' could not be started - check the log file: {1}" ).format( virtualMachineInfo.getName(), IndicatorVirtualBox.LOG ) )
+                pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM '{0}' could not be started - check the log file: {1}" ).format( virtualMachine.getUUID(), IndicatorVirtualBox.LOG ) )
 
-        if doRefresh:
-            self.onRefresh()
-
-
-    def isVirtualMachineAutostart( self, uuid ): return uuid in self.virtualMachinePreferences and self.virtualMachinePreferences[ uuid ][ 0 ] == Gtk.STOCK_APPLY
+        self.onRefresh()
 
 
-    def getVirtualMachineInfo( self, uuid ):
-        for virtualMachineInfo in self.virtualMachineInfos:
-            if virtualMachineInfo.getUUID() == uuid:
-                return virtualMachineInfo
+    def getVirtualMachine( self, uuid, virtualMachines ):
+        for virtualMachine in virtualMachines:
+            if virtualMachine.getUUID() == uuid:
+                return virtualMachine
 
         return None
 
 
-#TODO Search for
-# self.virtualMachineInfos
-# and remove!
+    def getStartCommand( self, uuid ):
+        if uuid in self.virtualMachinePreferences:
+            return self.virtualMachinePreferences[ uuid ][ 1 ]
+
+        return IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
 
 
+    def isAutostart( self, uuid ): return uuid in self.virtualMachinePreferences and self.virtualMachinePreferences[ uuid ][ 0 ]
 
-#TODO Is this needed?
-    def duplicateVirtualMachineNameExists( self, virtualMachineName ):
+
+    def isVirtualMachineNameUnique( self, name, virtualMachines ):
         count = 0
-        for virtualMachineInfo in self.virtualMachineInfos:
-            if virtualMachineInfo.getName() == virtualMachineName:
+        for virtualMachine in virtualMachines:
+            if virtualMachine.getName() == name:
                 count += 1
 
-        return count > 1
+        return count == 1
 
 
     def onAbout( self, widget ):
@@ -456,19 +436,20 @@ class IndicatorVirtualBox:
         stack = [ ]
         store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon (Gtk.STOCK_APPLY) or None for autostart of VM, VM start command, UUID.
         parent = None
-        virtualMachineInfos = self.getVirtualMachines()
-        for virtualMachineInfo in virtualMachineInfos:
-            while virtualMachineInfo.getIndent() < len( stack ):
+        virtualMachines = self.getVirtualMachines()
+        for virtualMachine in virtualMachines:
+            while virtualMachine.getIndent() < len( stack ):
                 parent = stack.pop()
 
-            if virtualMachineInfo.isGroup():
+            if virtualMachine.isGroup():
                 stack.append( parent )
-                parent = store.append( parent, [ virtualMachineInfo.getName(), None, "", virtualMachineInfo.getUUID() ] )
+                parent = store.append( parent, [ virtualMachine.getName(), None, "", virtualMachine.getUUID() ] )
             else:
-                if virtualMachineInfo.getAutoStart():
-                    store.append( parent, [ virtualMachineInfo.getName(), Gtk.STOCK_APPLY, virtualMachineInfo.getStartCommand(), virtualMachineInfo.getUUID() ] )
-                else:
-                    store.append( parent, [ virtualMachineInfo.getName(), None, virtualMachineInfo.getStartCommand(), virtualMachineInfo.getUUID() ] )
+                autoStart = None
+                if self.isAutostart( virtualMachine.getUUID() ):
+                    autoStart = Gtk.STOCK_APPLY
+
+                store.append( parent, [ virtualMachine.getName(), autoStart, self.getStartCommand( virtualMachine.getUUID() ), virtualMachine.getUUID() ] )
 
         tree = Gtk.TreeView( store )
         tree.expand_all()
@@ -479,7 +460,7 @@ class IndicatorVirtualBox:
         tree.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = 2 ) )
         tree.set_tooltip_text( _( "Double click to edit a VM's properties." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.connect( "row-activated", self.onVMDoubleClick )
+        tree.connect( "row-activated", self.onVirtualMachineDoubleClick )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( tree )
@@ -513,11 +494,11 @@ class IndicatorVirtualBox:
             "as set in the VirtualBox Manager." ) )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
 
-        # Only show one of these, depending if groups are present or not...
-        if self.groupsExist( virtualMachineInfos ):
-            grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
-        else:
+        if self.getVirtualBoxVersion() < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
             grid.attach( sortAlphabeticallyCheckbox, 0, 0, 2, 1 )
+        else:
+            if self.groupsExist( virtualMachines ):
+                grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 ) # TODO Test for when groups don't exist...does the dialog look odd?
 
         label = Gtk.Label( _( "Refresh interval (minutes)" ) )
         label.set_halign( Gtk.Align.START )
@@ -543,10 +524,10 @@ class IndicatorVirtualBox:
             "starting one VM to the next." ) )
         grid.attach( spinnerDelay, 1, 2, 1, 1 )
 
-        autostartIndicatorCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartIndicatorCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartIndicatorCheckbox.set_active( os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE ) )
-        grid.attach( autostartIndicatorCheckbox, 0, 3, 2, 1 )
+        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
+        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorVirtualBox.DESKTOP_FILE ) )
+        grid.attach( autostartCheckbox, 0, 3, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
@@ -555,7 +536,7 @@ class IndicatorVirtualBox:
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorVirtualBox.ICON )
         self.dialog.show_all()
-        
+
         if self.dialog.run() == Gtk.ResponseType.OK:
             self.delayBetweenAutoStartInSeconds = spinnerDelay.get_value_as_int()
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
@@ -566,23 +547,8 @@ class IndicatorVirtualBox:
             self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
 
             self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
-
             self.saveSettings()
-
-            if not os.path.exists( IndicatorVirtualBox.AUTOSTART_PATH ):
-                os.makedirs( IndicatorVirtualBox.AUTOSTART_PATH )
-
-            if autostartIndicatorCheckbox.get_active():
-                try:
-                    shutil.copy( IndicatorVirtualBox.DESKTOP_PATH + IndicatorVirtualBox.DESKTOP_FILE, IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
-                except Exception as e:
-                    logging.exception( e )
-            else:
-                try:
-                    os.remove( IndicatorVirtualBox.AUTOSTART_PATH + IndicatorVirtualBox.DESKTOP_FILE )
-                except:
-                    pass
-
+            pythonutils.setAutoStart( IndicatorVirtualBox.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             self.onRefresh()
 
         self.dialog.destroy()
@@ -592,7 +558,7 @@ class IndicatorVirtualBox:
     def updateVirtualMachinePreferences( self, store, treeiter ):
         while treeiter is not None:
             if store[ treeiter ][ 3 ] != "": # UUID is not empty, so this is a VM and not a group...
-                self.virtualMachinePreferences[ store[ treeiter ][ 3 ] ] = [ store[ treeiter ][ 1 ], store[ treeiter ][ 2 ] ]
+                self.virtualMachinePreferences[ store[ treeiter ][ 3 ] ] = [ store[ treeiter ][ 1 ], store[ treeiter ][ 2 ] ] #TODO Make sure a bool is written instead of gtk=apply or whatever.
 
             if store.iter_has_child( treeiter ):
                 childiter = store.iter_children( treeiter )
@@ -601,13 +567,13 @@ class IndicatorVirtualBox:
             treeiter = store.iter_next( treeiter )
 
 
-    def onVMDoubleClick( self, tree, rowNumber, treeViewColumn ):
+    def onVirtualMachineDoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is not None and model[ treeiter ][ 3 ] != "":
-            self.editVM( model, treeiter )
+            self.editVirtualMachine( model, treeiter )
 
 
-    def editVM( self, model, treeiter ):
+    def editVirtualMachine( self, model, treeiter ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -689,7 +655,7 @@ class IndicatorVirtualBox:
         self.refreshIntervalInMinutes = 15
         self.showSubmenu = False
         self.sortDefault = True
-        self.virtualMachinePreferences = { } # Store information about VMs, not groups. Key is VM UUID; value is [ autostart (bool), start command (str) ]
+        self.virtualMachinePreferences = { } # Store information about VMs (not groups). Key is VM UUID; value is [ autostart (bool), start command (str) ]
 
         if os.path.isfile( IndicatorVirtualBox.SETTINGS_FILE ):
             try:
@@ -701,6 +667,7 @@ class IndicatorVirtualBox:
                 self.showSubmenu = settings.get( IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
                 self.sortDefault = settings.get( IndicatorVirtualBox.SETTINGS_SORT_DEFAULT, self.sortDefault )
                 self.virtualMachinePreferences = settings.get( IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES, self.virtualMachinePreferences )
+                print( self.virtualMachinePreferences ) #TODO Remove
 
             except Exception as e:
                 logging.exception( e )
@@ -715,6 +682,8 @@ class IndicatorVirtualBox:
                 IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
                 IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault,
                 IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences
+                #TODO I think here is where the data which is same as default should/could be stripped out...
+                #Only keep an item if autostart is true or the start command != default.
             }
 
             with open( IndicatorVirtualBox.SETTINGS_FILE, "w" ) as f:
