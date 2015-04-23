@@ -1853,7 +1853,7 @@ class IndicatorLunar:
     # References:
     #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
     #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
-    #  http://www.geoastro.de/moonlibration/
+    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
     #  http://www.geoastro.de/SME/
     #  http://futureboy.us/fsp/moon.fsp
     #  http://www.timeanddate.com/moon/australia/sydney
