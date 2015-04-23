@@ -20,36 +20,22 @@
 
 class Info:
 
-    # Name of VM or Group (when group contains the full group hierarchy).
-    # Boolean True if a group; False otherwise.
-    # UUID of VM/Group.
+    # Name of VM or Group.
+    # True if a group; False is a VM.
+    # UUID of VM.
     # Numeric amount to indent when groups are used. 
     def __init__( self, name, group, uuid, indent ):
         self.name = name
         self.group = group
         self.uuid = uuid
         self.indent = indent
-        self.isRunning = False
-        self.autoStart = False
-        self.startCommand = "VBoxManage startvm %VM%"
+        self.running = False
 
 
     def getName( self ): return self.name
 
 
     def setName( self, name ): self.name = name
-
-
-    def getStartCommand( self ): return self.startCommand
-
-
-    def setStartCommand( self, startCommand ): self.startCommand = startCommand
-
-
-    def getAutoStart( self ): return self.autoStart
-
-
-    def setAutoStart( self, autoStart ): self.autoStart = autoStart
 
 
     def isGroup( self ): return self.group
@@ -61,13 +47,13 @@ class Info:
     def getIndent( self ): return self.indent
 
 
-    def setRunning( self ): self.isRunning = True
+    def setRunning( self ): self.running = True
 
 
-    def isRunning( self ): return self.isRunning
+    def isRunning( self ): return self.running
 
 
-    def __str__( self ): return self.getName() + " | " + str( self.isGroup() ) + " | " + self.getUUID() + " | " + str( self.getIndent() )
+    def __str__( self ): return self.getName() + " | " + str( self.isGroup() ) + " | " + self.getUUID() + " | " + str( self.getIndent() ) + " | " + str( self.isRunning() )
 
 
     def __repr__( self ): return self.__str__()
