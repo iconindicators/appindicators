@@ -46,8 +46,6 @@ class IndicatorFortune:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
-    DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
 
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
@@ -336,7 +334,7 @@ class IndicatorFortune:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( os.path.exists( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorFortune.DESKTOP_FILE ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 7, 2, 1 )
 
@@ -374,21 +372,9 @@ class IndicatorFortune:
                 treeiter = store.iter_next( treeiter )
 
             self.saveSettings()
+            pythonutils.setAutoStart( IndicatorFortune.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
 
-            if not os.path.exists( IndicatorFortune.AUTOSTART_PATH ):
-                os.makedirs( IndicatorFortune.AUTOSTART_PATH )
-
-            if autostartCheckbox.get_active():
-                try:
-                    shutil.copy( IndicatorFortune.DESKTOP_PATH + IndicatorFortune.DESKTOP_FILE, IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
-                except Exception as e:
-                    logging.exception( e )
-            else:
-                try:
-                    os.remove( IndicatorFortune.AUTOSTART_PATH + IndicatorFortune.DESKTOP_FILE )
-                except:
-                    pass
-
+#TODO Maybe use the onRefresh as per virtualbox indicator...uses Glib.            
             self.indicator.set_menu( self.buildMenu() ) # Results in an assertion, but don't know how to fix...Gtk-CRITICAL **: gtk_widget_get_parent: assertion 'GTK_IS_WIDGET (widget)' failed
 
         self.dialog.destroy()
