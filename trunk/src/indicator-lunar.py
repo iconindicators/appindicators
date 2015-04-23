@@ -65,9 +65,7 @@ class IndicatorLunar:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     CACHE_PATH = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
-    DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
     SVG_FULL_MOON_FILE = tempfile.gettempdir() + "/" + "." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
@@ -2729,7 +2727,7 @@ class IndicatorLunar:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( os.path.exists( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorLunar.DESKTOP_FILE ) )
         autostartCheckbox.set_margin_top( 20 )
         grid.attach( autostartCheckbox, 0, 4, 2, 1 )
 
@@ -2857,21 +2855,7 @@ class IndicatorLunar:
             _city_data[ self.cityName ] = ( str( latitudeValue ), str( longitudeValue ), float( elevationValue ) )
 
             self.saveSettings()
-
-            if not os.path.exists( IndicatorLunar.AUTOSTART_PATH ):
-                os.makedirs( IndicatorLunar.AUTOSTART_PATH )
-
-            if autostartCheckbox.get_active():
-                try:
-                    shutil.copy( IndicatorLunar.DESKTOP_PATH + IndicatorLunar.DESKTOP_FILE, IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
-                except Exception as e:
-                    logging.exception( e )
-            else:
-                try:
-                    os.remove( IndicatorLunar.AUTOSTART_PATH + IndicatorLunar.DESKTOP_FILE )
-                except:
-                    pass
-
+            pythonutils.setAutoStart( IndicatorLunar.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             break
 
         self.lock.release()
