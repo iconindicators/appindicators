@@ -53,8 +53,6 @@ class IndicatorPPADownloadStatistics:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
-    DESKTOP_PATH = "/usr/share/applications/"
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
 
     SERIES = [ "vivid", "utopic", "trusty", "saucy", "raring", "quantal", "precise", "oneiric", "natty", "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy", "gutsy", "feisty", "edgy", "dapper", "breezy", "hoary", "warty" ]
@@ -519,7 +517,7 @@ class IndicatorPPADownloadStatistics:
         grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 6, 2, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_active( os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorPPADownloadStatistics.DESKTOP_FILE ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 7, 2, 1 )
@@ -559,20 +557,7 @@ class IndicatorPPADownloadStatistics:
                     treeiter = filterStore.iter_next( treeiter )
 
             self.saveSettings()
-
-            if not os.path.exists( IndicatorPPADownloadStatistics.AUTOSTART_PATH ):
-                os.makedirs( IndicatorPPADownloadStatistics.AUTOSTART_PATH )
-
-            if autostartCheckbox.get_active():
-                try:
-                    shutil.copy( IndicatorPPADownloadStatistics.DESKTOP_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE, IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
-                except Exception as e:
-                    logging.exception( e )
-            else:
-                try:
-                    os.remove( IndicatorPPADownloadStatistics.AUTOSTART_PATH + IndicatorPPADownloadStatistics.DESKTOP_FILE )
-                except:
-                    pass
+            pythonutils.setAutoStart( IndicatorPPADownloadStatistics.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
 
             GLib.timeout_add_seconds( 1, self.buildMenu )
 
