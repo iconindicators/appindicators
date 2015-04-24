@@ -196,7 +196,7 @@ class IndicatorVirtualBox:
         if self.isVirtualBoxInstalled():
             virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage() # Does not contain group information, nor sort order.
             if len( virtualMachinesFromVBoxManage ) > 0:
-                if self.getVirtualBoxVersion() < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION: #TODO Test this works with different versions.
+                if self.getVirtualBoxVersion() < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
                     virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPrior4dot3()
                 else:
                     virtualMachinesFromConfig = self.getVirtualMachinesFromConfig4dot3()
@@ -546,6 +546,7 @@ class IndicatorVirtualBox:
             GLib.source_remove( self.timeoutID )
             self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh )
 
+            self.virtualMachinePreferences.clear()
             self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorVirtualBox.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
@@ -557,8 +558,11 @@ class IndicatorVirtualBox:
 
     def updateVirtualMachinePreferences( self, store, treeiter ):
         while treeiter is not None:
-            if store[ treeiter ][ 3 ] != "": # UUID is not empty, so this is a VM and not a group...
-                self.virtualMachinePreferences[ store[ treeiter ][ 3 ] ] = [ store[ treeiter ][ 1 ], store[ treeiter ][ 2 ] ] #TODO Make sure a bool is written instead of gtk=apply or whatever.
+            isVM = store[ treeiter ][ 3 ] != "" # UUID is not empty, so this is a VM and not a group.
+            isAutostart = store[ treeiter ][ 1 ] == "gtk-apply"
+            isDefaultStartCommand = store[ treeiter ][ 2 ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
+            if ( isVM and isAutostart ) or ( isVM and not isDefaultStartCommand ): # Only record VMs with different settings to default.
+                self.virtualMachinePreferences[ store[ treeiter ][ 3 ] ] = [ store[ treeiter ][ 1 ] == "gtk-apply", store[ treeiter ][ 2 ] ]
 
             if store.iter_has_child( treeiter ):
                 childiter = store.iter_children( treeiter )
@@ -590,7 +594,7 @@ class IndicatorVirtualBox:
         startCommand.set_width_chars( 20 )
         if model[ treeiter ][ 2 ] is not None:
             startCommand.set_text( model[ treeiter ][ 2 ] )
-            startCommand.set_width_chars( len( model[ treeiter ][ 2 ] ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
+            startCommand.set_width_chars( len( model[ treeiter ][ 2 ] ) * 5 / 4 ) # Sometimes the length is shorter than specified due to packing, so make it longer.
 
         startCommand.set_tooltip_text( _(
             "The terminal command to start the\n" + \
@@ -667,7 +671,6 @@ class IndicatorVirtualBox:
                 self.showSubmenu = settings.get( IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
                 self.sortDefault = settings.get( IndicatorVirtualBox.SETTINGS_SORT_DEFAULT, self.sortDefault )
                 self.virtualMachinePreferences = settings.get( IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES, self.virtualMachinePreferences )
-                print( self.virtualMachinePreferences ) #TODO Remove
 
             except Exception as e:
                 logging.exception( e )
@@ -682,8 +685,6 @@ class IndicatorVirtualBox:
                 IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
                 IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault,
                 IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences
-                #TODO I think here is where the data which is same as default should/could be stripped out...
-                #Only keep an item if autostart is true or the start command != default.
             }
 
             with open( IndicatorVirtualBox.SETTINGS_FILE, "w" ) as f:
