@@ -563,6 +563,7 @@ class IndicatorVirtualBox:
 
             self.virtualMachinePreferences.clear()
             self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
+
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorVirtualBox.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             self.onRefresh()
