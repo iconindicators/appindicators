@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-fortune 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-04-24 23:47+1000\n"
+"POT-Creation-Date: 2015-04-24 23:48+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,7 +59,7 @@ msgstr ""
 msgid "Fortune File/Directory"
 msgstr ""
 
-#: indicator-fortune.py:224 indicator-fortune.py:456
+#: indicator-fortune.py:224 indicator-fortune.py:455
 msgid "Enabled"
 msgstr ""
 
@@ -171,23 +171,23 @@ msgstr ""
 msgid "Preferences"
 msgstr ""
 
-#: indicator-fortune.py:385
+#: indicator-fortune.py:384
 msgid "Reset fortunes to factory default?"
 msgstr ""
 
-#: indicator-fortune.py:394
+#: indicator-fortune.py:393
 msgid "No fortune has been selected for removal."
 msgstr ""
 
-#: indicator-fortune.py:395
+#: indicator-fortune.py:394
 msgid "Remove the selected fortune?"
 msgstr ""
 
-#: indicator-fortune.py:413
+#: indicator-fortune.py:412
 msgid "Fortune file/directory"
 msgstr ""
 
-#: indicator-fortune.py:427
+#: indicator-fortune.py:426
 msgid ""
 "The full path to a fortune .dat file,\n"
 "or a directory which contains fortune\n"
@@ -197,22 +197,22 @@ msgid ""
 "file(s) is present!"
 msgstr ""
 
-#: indicator-fortune.py:438
+#: indicator-fortune.py:437
 msgid "File"
 msgstr ""
 
-#: indicator-fortune.py:440
+#: indicator-fortune.py:439
 msgid ""
 "Choose a fortune .dat file.\n"
 "Ensure the corresponding text\n"
 "file is present!"
 msgstr ""
 
-#: indicator-fortune.py:445
+#: indicator-fortune.py:444
 msgid "Directory"
 msgstr ""
 
-#: indicator-fortune.py:447
+#: indicator-fortune.py:446
 msgid ""
 "Choose a directory containing a\n"
 "fortune .dat file(s).\n"
@@ -220,33 +220,33 @@ msgid ""
 "file(s) is present!"
 msgstr ""
 
-#: indicator-fortune.py:458
+#: indicator-fortune.py:457
 msgid ""
 "Ensure the fortune file/directory\n"
 "works by running it through 'fortune'\n"
 "in a terminal."
 msgstr ""
 
-#: indicator-fortune.py:466
+#: indicator-fortune.py:465
 msgid "Fortune Properties"
 msgstr ""
 
-#: indicator-fortune.py:468
+#: indicator-fortune.py:467
 msgid "Add Fortune"
 msgstr ""
 
-#: indicator-fortune.py:484
+#: indicator-fortune.py:483
 msgid "The fortune path cannot be empty."
 msgstr ""
 
-#: indicator-fortune.py:489
+#: indicator-fortune.py:488
 msgid "The fortune path does not exist."
 msgstr ""
 
-#: indicator-fortune.py:508
+#: indicator-fortune.py:507
 msgid "Choose a fortune .dat file"
 msgstr ""
 
-#: indicator-fortune.py:511
+#: indicator-fortune.py:510
 msgid "Choose a directory containing a fortune .dat file(s)"
 msgstr ""
