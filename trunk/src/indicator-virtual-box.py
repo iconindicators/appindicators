@@ -513,7 +513,7 @@ class IndicatorVirtualBox:
             grid.attach( sortAlphabeticallyCheckbox, 0, 0, 2, 1 )
         else:
             if self.groupsExist( virtualMachines ):
-                grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 ) # TODO Test for when groups don't exist...does the dialog look odd?
+                grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
         label = Gtk.Label( _( "Refresh interval (minutes)" ) )
         label.set_halign( Gtk.Align.START )
