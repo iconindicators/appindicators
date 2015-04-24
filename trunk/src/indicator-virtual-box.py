@@ -102,10 +102,6 @@ class IndicatorVirtualBox:
     def main( self ): Gtk.main()
 
 
-#TODO Might need to block the preferences until this is finished?
-# Rather than lockout, maybe rebuild the menu with a flag to enable the prefernces menu item?
-# Or just enable the preferences item?
-# What is bad if the prefs are opened (and modified/saved) if we are still autostarting?
     def autoStartVirtualMachines( self, virtualMachines ):
         for virtualMachine in virtualMachines:
             if self.isAutostart( virtualMachine.getUUID() ):
@@ -116,7 +112,7 @@ class IndicatorVirtualBox:
         menu = Gtk.Menu()
         if self.isVirtualBoxInstalled():
             if len( virtualMachines ) == 0:
-                menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) ) #TODO Test...
+                menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
             else:
                 if self.showSubmenu == True:
                     stack = [ ]
@@ -212,8 +208,19 @@ class IndicatorVirtualBox:
                             virtualMachine.setName( virtualmachineFromVBoxManage.getName() )
                             break
 
-#TODO What about VMs from the config which are not in the backend?  This is an error right?  Can it ever happen?
-#maybe log these as warnings?
+                # Sanity check - ensure all VMs present in the config file are also present according to VBoxManage.
+                for virtualMachine in virtualMachines:
+                    if virtualMachine.isGroup():
+                        continue
+
+                    found = False
+                    for virtualmachineFromVBoxManage in virtualMachinesFromVBoxManage:
+                        if virtualMachine.getUUID() == virtualmachineFromVBoxManage.getUUID():
+                            found = True
+                            break
+
+                    if not found:
+                        logging.warning( "The VM with UUID " + virtualMachine.getUUID() + " and name '" + virtualMachine.getName() + "' was found in the config file " + self.getConfigFilename() + " but is not present in 'VBoxManage list vms'." )
 
                 # Determine which VMs are running.
                 p = pythonutils.callProcess( "VBoxManage list runningvms" )
@@ -258,8 +265,9 @@ class IndicatorVirtualBox:
             uuids = list( p.communicate()[ 0 ].decode().rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
             for uuid in uuids:
                 virtualMachines.append( virtualmachine.Info( "", False, uuid, 0 ) )                
-        except:
-#TODO Should something be logged?
+
+        except Exception as e:
+            logging.exception( e )
             virtualMachines = [] # The VM order has never been altered giving an empty result (and exception).
 
         return virtualMachines
@@ -310,10 +318,17 @@ class IndicatorVirtualBox:
                 i += 1
 
         except Exception as e:
-#TODO Should something be logged?
+            logging.exception( e )
             virtualMachines = []
 
         return virtualMachines
+
+
+    def getConfigFilename( self ):
+        if self.getVirtualBoxVersion() < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
+            return IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3
+
+        return IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER
 
 
     def groupsExist( self, virtualMachines ):
