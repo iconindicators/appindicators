@@ -427,7 +427,7 @@ class IndicatorFortune:
             "The full path to a fortune .dat file,\n" + \
             "or a directory which contains fortune\n" + \
             ".dat files.\n\n" + \
-            "Ensure the corresponding fortune text" + \
+            "Ensure the corresponding fortune text\n" + \
             "file(s) is present!" ) )
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
@@ -438,15 +438,15 @@ class IndicatorFortune:
         browseFileButton = Gtk.Button( _( "File" ) )
         browseFileButton.set_tooltip_text( _(
             "Choose a fortune .dat file.\n" + \
-            "Ensure the corresponding text" + \
+            "Ensure the corresponding text\n" + \
             "file is present!" ) )
         hbox.pack_start( browseFileButton, True, True, 0 )
 
         browseDirectoryButton = Gtk.Button( _( "Directory" ) )
         browseDirectoryButton.set_tooltip_text( _(
-            "Choose a directory containing a" + \
+            "Choose a directory containing a\n" + \
             "fortune .dat file(s).\n" + \
-            "Ensure the corresponding text" + \
+            "Ensure the corresponding text\n" + \
             "file(s) is present!" ) )
         hbox.pack_start( browseDirectoryButton, True, True, 0 )
 
