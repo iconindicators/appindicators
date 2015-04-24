@@ -165,7 +165,7 @@ class IndicatorVirtualBox:
 
 
     def onLaunchVirtualBoxManager( self, widget ):
-        p = pythonutils.callProcess( 'wmctrl -l | grep "Oracle VM VirtualBox Manager"' ) #TODO Check this works in Russian!
+        p = pythonutils.callProcess( 'wmctrl -l | grep "Oracle VM VirtualBox"' )
         result = p.communicate()[ 0 ].decode()
         p.wait()
         if result == "":
