@@ -5,6 +5,9 @@ indicator-lunar (1.0.58-1) precise; urgency=low
   * Bug fix: The Right Ascension in degrees was incorrect for all objects.
   * Bug fix: The Bright Limb angle calculation was erroneous due to mixing of
     degrees and radians!
+  * Only write out the list of orbital elements and satellites if the user
+    elects to not add new.  This reduces the volume of information stored in
+    the preferences file by an order of magnitude.
   * The option to automatically add new satellites and orbital
     elements now also works when clicking OK in the preferences.
   * Added distance to Earth in kilometres for the Moon's menu item.    

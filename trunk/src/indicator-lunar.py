@@ -1354,14 +1354,14 @@ class IndicatorLunar:
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             else:
                 self.writeToCache( self.orbitalElementData, IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME )
-                if self.addNewOrbitalElements():
-                    self.saveSettings()
 
             # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
             self.lastUpdateOE = datetime.datetime.now()
         else:
             # Set the next update to occur when the cache is due to expire.
             self.lastUpdateOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS )
+
+        self.addNewOrbitalElements()
 
 
     def updateSatelliteTLEData( self ):
@@ -1390,14 +1390,14 @@ class IndicatorLunar:
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             else:
                 self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
-                if self.addNewSatellites():
-                    self.saveSettings()
 
             # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
             self.lastUpdateTLE = datetime.datetime.now()
         else:
             # Set the next update to occur when the cache is due to expire.
             self.lastUpdateTLE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
+
+        self.addNewSatellites()
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -3194,16 +3194,12 @@ class IndicatorLunar:
                 if key not in self.satellites:
                     self.satellites.append( key )
 
-        return self.satellitesAddNew
-
 
     def addNewOrbitalElements( self ):
         if self.orbitalElementsAddNew:
             for key in self.orbitalElementData:
                 if key not in self.orbitalElements:
                     self.orbitalElements.append( key )
-
-        return self.orbitalElementsAddNew
 
 
     # Returns a dict/hashtable of the orbital elements (comets) data from the specified URL (may be empty).
@@ -3355,6 +3351,16 @@ class IndicatorLunar:
 
 
     def saveSettings( self ):
+        if self.orbitalElementsAddNew:
+            orbitalElements = [ ] 
+        else:
+            orbitalElements = self.orbitalElements # Only write out the list of orbital elements if the user elects to not add new.
+
+        if self.satellitesAddNew:
+            satellites = [ ]
+        else:
+            satellites = self.satellites # Only write out the list of satellites if the user elects to not add new.
+
         try:
             settings = {
                 IndicatorLunar.SETTINGS_CITY_ELEVATION: _city_data.get( self.cityName )[ 2 ],
@@ -3365,7 +3371,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
                 IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
                 IndicatorLunar.SETTINGS_ORBITAL_ELEMENT_URL: self.orbitalElementURL,
-                IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS: self.orbitalElements,
+                IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS: orbitalElements,
                 IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_ADD_NEW: self.orbitalElementsAddNew,
                 IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE: self.orbitalElementsMagnitude,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
@@ -3374,7 +3380,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,
                 IndicatorLunar.SETTINGS_SATELLITE_ON_CLICK_URL: self.satelliteOnClickURL,
                 IndicatorLunar.SETTINGS_SATELLITE_TLE_URL: self.satelliteTLEURL,
-                IndicatorLunar.SETTINGS_SATELLITES: self.satellites,
+                IndicatorLunar.SETTINGS_SATELLITES: satellites,
                 IndicatorLunar.SETTINGS_SATELLITES_ADD_NEW: self.satellitesAddNew,
                 IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME: self.satellitesSortByDateTime,
                 IndicatorLunar.SETTINGS_SHOW_ORBITAL_ELEMENTS_AS_SUBMENU: self.showOrbitalElementsAsSubMenu,
