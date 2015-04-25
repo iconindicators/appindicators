@@ -63,6 +63,10 @@ class IndicatorFortune:
     SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
+    FORTUNE_ACTION_COPY = "COPY"
+    FORTUNE_ACTION_NEW = "NEW"
+    FORTUNE_ACTION_SHOW = "SHOW"
+
 
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
@@ -99,26 +103,62 @@ class IndicatorFortune:
         menu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem( _( "New Fortune" ) )
-        menuItem.connect( "activate", self.onShowFortune, True )
+        menuItem.connect( "activate", self.test, IndicatorFortune.FORTUNE_ACTION_NEW )
+#         menuItem.connect( "activate", self.onShowFortune, True )
         menu.append( menuItem )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
-            self.indicator.set_secondary_activate_target( menuItem )
+#         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
+#             self.indicator.set_secondary_activate_target( menuItem )
+#         self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Copy Last Fortune" ) )
-        menuItem.connect( "activate", self.onCopyLastFortune )
+        menuItem.connect( "activate", self.test, IndicatorFortune.FORTUNE_ACTION_COPY )
+#         menuItem.connect( "activate", self.onCopyLastFortune )
         menu.append( menuItem )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
-            self.indicator.set_secondary_activate_target( menuItem )
+#         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
+#             self.indicator.set_secondary_activate_target( menuItem )
+#         self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
-        menuItem.connect( "activate", self.onShowFortune, False )
+        menuItem.connect( "activate", self.test, IndicatorFortune.FORTUNE_ACTION_SHOW )
+#         menuItem.connect( "activate", self.onShowFortune, False )
         menu.append( menuItem )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
-            self.indicator.set_secondary_activate_target( menuItem )
+#         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
+#             self.indicator.set_secondary_activate_target( menuItem )
+#         self.indicator.set_secondary_activate_target( menuItem )
+
+        menuItem = Gtk.MenuItem( _( "Middle Mouse Click" ) )
+        menuItem.connect( "activate", self.test, "XXX" )
+#         menuItem.connect( "activate", self.onShowFortune, False )
+        menu.append( menuItem )
+#         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
+#             self.indicator.set_secondary_activate_target( menuItem )
+        self.indicator.set_secondary_activate_target( menuItem )
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         menu.show_all()
+        menuItem.set_visible( False )
         return menu
+
+
+    def test( self, menuItem, fortuneAction ):
+        if fortuneAction == IndicatorFortune.FORTUNE_ACTION_NEW:
+            print( "NEW" )
+#             self.onShowFortune( True )
+        elif fortuneAction == IndicatorFortune.FORTUNE_ACTION_COPY:
+            print( "COPY" )
+#             self.onCopyLastFortune()
+        elif fortuneAction == IndicatorFortune.FORTUNE_ACTION_SHOW:
+            print( "'SHOW'" )
+        else:
+            if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
+                print( "\tNEW" )
+#                 self.onShowFortune( True )
+            elif self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
+                print( "\tCOPY" )
+#                 self.onCopyLastFortune()
+            else:
+                print( "\tSHOW" )
+#                 self.onShowFortune( False )
 
 
     def refreshFortune( self ):
@@ -151,7 +191,7 @@ class IndicatorFortune:
                     break
 
 
-    def onShowFortune( self, widget, showNew ):
+    def onShowFortune( self, showNew ):
         if showNew:
             self.refreshFortune()
 
@@ -162,7 +202,7 @@ class IndicatorFortune:
         Notify.Notification.new( notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
 
 
-    def onCopyLastFortune( self, widget ): self.clipboard.set_text( self.fortune, -1 )
+    def onCopyLastFortune( self ): self.clipboard.set_text( self.fortune, -1 )
 
 
     def onAbout( self, widget ):
@@ -374,8 +414,7 @@ class IndicatorFortune:
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorFortune.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
 
-#TODO Maybe use the onRefresh as per virtualbox indicator...uses Glib.            
-            self.indicator.set_menu( self.buildMenu() ) # Results in an assertion, but don't know how to fix...Gtk-CRITICAL **: gtk_widget_get_parent: assertion 'GTK_IS_WIDGET (widget)' failed
+#             self.indicator.set_menu( self.buildMenu() ) # Results in an assertion, but don't know how to fix...Gtk-CRITICAL **: gtk_widget_get_parent: assertion 'GTK_IS_WIDGET (widget)' failed   #TODO Maybe use the onRefresh as per virtualbox indicator...uses Glib.            
 
         self.dialog.destroy()
         self.dialog = None
