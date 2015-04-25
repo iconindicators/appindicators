@@ -743,7 +743,7 @@ class IndicatorLunar:
     MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE = _( "No data found at\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_SATELLITE_IS_CIRCUMPOLAR = _( "Satellite is circumpolar." )
     MESSAGE_SATELLITE_NEVER_RISES = _( "Satellite never rises." )
-    MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIMEFRAME = _( "No passes within the next two days." )
+    MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME = _( "No passes within the next two days." )
     MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
@@ -1218,7 +1218,7 @@ class IndicatorLunar:
                (
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA or \
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES or \
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIMEFRAME or \
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
                ):
@@ -1444,10 +1444,10 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] = self.getLocalDateTime( dusk )
 
         except ephem.AlwaysUpError:
-            pass # A message would have be put in update common.
+            pass # No need to add a message here as update common would already have done so.
 
         except ephem.NeverUpError:
-            pass # A message would have be put in update common.
+            pass # No need to add a message here as update common would already have done so.
 
         equinox = ephem.next_equinox( ephemNow )
         solstice = ephem.next_solstice( ephemNow )
@@ -1637,7 +1637,7 @@ class IndicatorLunar:
             break
 
         if currentDateTime >= endDateTime:
-            message = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIMEFRAME
+            message = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME
 
         if message is not None:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = message
