@@ -55,7 +55,6 @@ class IndicatorVirtualBox:
     VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION = "4.3" # Configuration file location and format changed at this version (https://www.virtualbox.org/manual/ch10.html#idp99351072).
 
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
-    VIRTUAL_MACHINE_STARTUP_MINIMUM_DELAY_IN_SECONDS = 5
 
     COMMENTS = _( " Shows VirtualBox™ virtual machines and allows them to be started." )
 
@@ -159,7 +158,7 @@ class IndicatorVirtualBox:
     def onVirtualMachine( self, widget ):
         virtualMachines = self.getVirtualMachines()
         virtualMachine = self.getVirtualMachine( widget.props.name, virtualMachines )
-        self.startVirtualMachine( virtualMachine, virtualMachines, IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_MINIMUM_DELAY_IN_SECONDS )
+        self.startVirtualMachine( virtualMachine, virtualMachines, 0 ) # Set a zero delay as this is not an autostart.
 
 
     def isVirtualBoxInstalled( self ): return pythonutils.callProcess( "which VBoxManage" ).communicate()[ 0 ].decode() != ''
@@ -325,7 +324,6 @@ class IndicatorVirtualBox:
         return True # http://www.pygtk.org/pygtk2reference/gobject-functions.html#function-gi--timeout-add
 
 
-#TODO Not sure if this delay (user specified between auto start multiple vms) is the same as delaying to give VBoxManage time to refresh...think!
     def startVirtualMachine( self, virtualMachine, virtualMachines, delayInSeconds ):
         if virtualMachine is None:
             pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." ) )
@@ -354,19 +352,13 @@ class IndicatorVirtualBox:
             try:
                 startCommand = self.getStartCommand( virtualMachine.getUUID() ).replace( "%VM%", virtualMachine.getUUID() ) + " &"
                 pythonutils.callProcess( startCommand ).wait()
-
-                # The start command returns immediately due to '&', so give VBoxManage a moment to catch up and refresh.
-                # Use the specified delay but don't delay less than the minimum.
-                if delayInSeconds < IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_MINIMUM_DELAY_IN_SECONDS:
-                    time.sleep( IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_MINIMUM_DELAY_IN_SECONDS )
-                else:
-                    time.sleep( delayInSeconds )
+                time.sleep( delayInSeconds )
 
             except Exception as e:
                 logging.exception( e )
                 pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM '{0}' could not be started - check the log file: {1}" ).format( virtualMachine.getUUID(), IndicatorVirtualBox.LOG ) )
 
-        self.onRefresh()
+        self.timeoutID = GLib.timeout_add_seconds( 5, self.onRefresh ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
 
 
     def getVirtualMachine( self, uuid, virtualMachines ):
