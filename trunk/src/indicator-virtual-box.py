@@ -30,25 +30,6 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
-#TODO Is this still relevant?
-# Have noticed that if a VM exists in a group and there is another VM of the same name but not in a group
-# and the group is then ungrouped, the VirtualBox UI doesn't handle it well...
-# ...the UI keeps the group and the VM within it (but removes all unique VMs from the group).
-# The VirtualBox.xml file does seem to reflect the change (and the indicator obeys this file).
-
-
-#TODO Old comment...use this to test!
-# Sometimes the VirtualBox.xml file does not accurately reflect changes made in the VirtualBox GUI...
-#
-#    If a VM is added to a group and then group is ungrouped, the GUI/GroupDefinition remains, listing that VM.  
-#    If another VM is created, the GUI/GroupDefinitions only lists the original/first VM...giving an incorrect reading.
-#
-#    If a VM is created and added to a group and a VM is later created of the same name but not in a group,
-#    that new VM is not listed (and neither are subsequent VMs).
-#
-# So take what information the groups gave and append to that the VMs which are missing (from the backend information).
-
-
 INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
