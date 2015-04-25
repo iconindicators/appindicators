@@ -71,6 +71,18 @@ class IndicatorStardate:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( self.buildMenu() )
 
+        self.stardate = stardate.Stardate()
+        self.update()
+
+        # Use the stardate update period to set a refresh timer.
+        # The stardate calculation and WHEN the stardate changes are not synchronised,
+        # so update at ten times speed (but no less than once per second).
+        period = int( self.stardate.getStardateFractionalPeriod() / 10 ) 
+        if period < 1:
+            period = 1
+
+        GLib.timeout_add_seconds( period, self.update )
+
 
     def buildMenu( self ):
         menu = Gtk.Menu()
@@ -88,19 +100,7 @@ class IndicatorStardate:
         return menu
 
 
-    def main( self ):
-        self.stardate = stardate.Stardate()
-        self.update()
-
-        # Use the stardate update period to set a refresh timer.
-        # The stardate calculation and WHEN the stardate changes are not synchronised,
-        # so update at ten times speed (but no less than once per second).
-        period = int( self.stardate.getStardateFractionalPeriod() / 10 ) 
-        if period < 1:
-            period = 1
-
-        GLib.timeout_add_seconds( period, self.update )
-        Gtk.main()
+    def main( self ): Gtk.main()
 
 
     def update( self ):
@@ -212,7 +212,7 @@ class IndicatorStardate:
             self.showIssue = showIssueCheckbox.get_active()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorStardate.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            self.indicator.set_menu( self.buildMenu() )  #TODO Does thie assert like fortune?
+            self.indicator.set_menu( self.buildMenu() )
             self.update()
 
         self.dialog.destroy()
