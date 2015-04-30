@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: indicator-lunar 1.0.58\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2015-04-25 10:18+1000\n"
-"PO-Revision-Date: 2015-04-28 17:04+0300\n"
+"PO-Revision-Date: 2015-04-30 16:45+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -119,7 +119,7 @@ msgstr "СУМЕРКИ"
 
 #: indicator-lunar.py:228
 msgid "EARTH TILT"
-msgstr "НАКЛОН ОСИ ЗЕМЛИ"
+msgstr "НАКЛОН КОЛЕЦ К ЗЕМЛЕ"
 
 #: indicator-lunar.py:229
 msgid "EARTH VISIBLE"
@@ -199,7 +199,7 @@ msgstr "СОЛНЦЕСТОЯНИЕ"
 
 #: indicator-lunar.py:248
 msgid "SUN TILT"
-msgstr "НАКЛОН ОСИ СОЛНЦА"
+msgstr "НАКЛОН КОЛЕЦ К СОЛНЦУ"
 
 #: indicator-lunar.py:249
 msgid "THIRD QUARTER"
@@ -1779,11 +1779,11 @@ msgstr "Угол экватора интенсивности: "
 
 #: indicator-lunar.py:1185
 msgid "Earth Tilt: "
-msgstr "Наклон оси Земли: "
+msgstr "Наклон колец относительно Земли: "
 
 #: indicator-lunar.py:1186
 msgid "Sun Tilt: "
-msgstr "Наклон оси Солнца"
+msgstr "Наклон колец относительно Солнца: "
 
 #: indicator-lunar.py:1196
 msgid "Rise: "
@@ -2289,7 +2289,7 @@ msgstr ""
 "получить новые данные.\n"
 "\n"
 "Для деактивации задайте фиктивный URL,\n"
-"например 'http://'."
+"например: 'http://'."
 
 #: indicator-lunar.py:2404 indicator-lunar.py:2494
 msgid "Fetch"
@@ -2363,7 +2363,7 @@ msgstr ""
 "получить новые данные.\n"
 "\n"
 "Для деактивации задайте фиктивный URL,\n"
-"например 'http://'."
+"например: 'http://'."
 
 #: indicator-lunar.py:2496
 msgid ""
@@ -2407,8 +2407,8 @@ msgid ""
 "notification. Available tags:\n"
 "\t"
 msgstr ""
-"Заголовок всплывающего сообщения\n"
-"о восходе спутника. Доступные метки:\n"
+"Заголовок всплывающего сообщения о восходе спутника.\n"
+"Доступные метки:\n"
 "\t"
 
 #: indicator-lunar.py:2560 indicator-lunar.py:2645
@@ -2421,8 +2421,8 @@ msgid ""
 "notification. Available tags:\n"
 "\t"
 msgstr ""
-"Текст всплывающего сообщения о восходе\n"
-"спутника. Доступные метки:\n"
+"Текст всплывающего сообщения о восходе спутника.\n"
+"Доступные метки:\n"
 "\t"
 
 #: indicator-lunar.py:2591 indicator-lunar.py:2665
