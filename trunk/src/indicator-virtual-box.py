@@ -43,7 +43,7 @@ import gzip, json, locale, logging, os, pythonutils, re, shutil, sys, time, virt
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.38"
+    VERSION = "1.0.39"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -164,7 +164,17 @@ class IndicatorVirtualBox:
     def isVirtualBoxInstalled( self ): return pythonutils.callProcess( "which VBoxManage" ).communicate()[ 0 ].decode() != ''
 
 
-    def getVirtualBoxVersion( self ): return pythonutils.callProcess( "VBoxManage --version" ).communicate()[ 0 ].decode().strip()
+    def getVirtualBoxVersion( self ):
+        version = ""
+        p = pythonutils.callProcess( "VBoxManage --version" )
+        for line in p.stdout.readlines():
+            line = str( line.decode() )
+            if line[ 0 ].isdigit(): # The result from calling 'VBoxManage --version' may including compile warnings in addition to the actual version number.
+                version = line
+                break
+
+        p.wait()
+        return version
 
 
     def getVirtualMachines( self ):
@@ -176,6 +186,9 @@ class IndicatorVirtualBox:
                     virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPrior4dot3()
                 else:
                     virtualMachinesFromConfig = self.getVirtualMachinesFromConfig4dot3()
+
+                if len( virtualMachinesFromConfig ) == 0: # If the user did not modify the sort order of the VMs, there will be no list of VMs in the config file, so use what the backend gave.
+                    virtualMachinesFromConfig = virtualMachinesFromVBoxManage
 
                 # Going forward, the virtual machine infos from the config is the definitive list of VMs (and groups if any).
                 virtualMachines = virtualMachinesFromConfig
@@ -269,14 +282,15 @@ class IndicatorVirtualBox:
             # Process the top level tag first...
             i = 0
             key = "GUI/GroupDefinitions/"
-            values = groupDefinitions[ key ].split( "," )
-            for value in values:
-                if value.startswith( "go=" ):
-                    virtualMachines.insert( i, virtualmachine.Info( key + value.replace( "go=", "" ), True, "", 0 ) )
-                else:
-                    virtualMachines.insert( i, virtualmachine.Info( "", False, value.replace( "m=", "" ), 0 ) )
+            if len( groupDefinitions ) > 0 and key in groupDefinitions: 
+                values = groupDefinitions[ key ].split( "," )
+                for value in values:
+                    if value.startswith( "go=" ):
+                        virtualMachines.insert( i, virtualmachine.Info( key + value.replace( "go=", "" ), True, "", 0 ) )
+                    else:
+                        virtualMachines.insert( i, virtualmachine.Info( "", False, value.replace( "m=", "" ), 0 ) )
 
-                i += 1
+                    i += 1
 
             # Now have a list of virtual machine infos containing top level groups and/or VMs.
             # Process the list and where a group is found, add in its children (groups and/or VMs).

@@ -1,3 +1,12 @@
+indicator-virtual-box (1.0.39-1) precise; urgency=low
+
+  * Bug fix: Handle the case when the VirtualBox configuration file does not
+    contain any VMs (typically when the user has made no sort order changes
+    via VBoxManage).
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 2 May 2015 15:14:20 +1000
+
+
 indicator-virtual-box (1.0.38-1) precise; urgency=low
 
   * Bug fix: Submenus were not correctly rendering the tree of VMs.
