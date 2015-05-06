@@ -1,3 +1,10 @@
+indicator-fortune (1.0.18-1) precise; urgency=low
+
+  * Incorrectly called the process to get fortunes.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 6 May 2015 23:19:57 +1000
+
+
 indicator-fortune (1.0.17-1) precise; urgency=low
 
   * Tidy up of tooltips and code clean up.

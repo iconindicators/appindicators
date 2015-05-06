@@ -41,7 +41,7 @@ import json, locale, logging, os, pythonutils, re, shutil
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.17"
+    VERSION = "1.0.18"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -138,15 +138,8 @@ class IndicatorFortune:
                 self.fortune = _( "No fortunes enabled!" )
             else:
                 while True:
-                    self.fortune = ""
-                    p = pythonutils.callProcess( "fortune" + fortuneLocations )
-                    for line in p.stdout.readlines():
-                        self.fortune += str( line.decode() )
-
-                    p.wait()
-
-                    # If the fortune exceeds the user-specified character limit, John West it...
-                    if len( self.fortune ) > self.skipFortuneCharacterCount:
+                    self.fortune = pythonutils.processGet( "fortune" + fortuneLocations )
+                    if len( self.fortune ) > self.skipFortuneCharacterCount: # If the fortune exceeds the user-specified character limit, John West it...
                         continue
 
                     break
