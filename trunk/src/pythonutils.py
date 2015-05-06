@@ -23,7 +23,18 @@ from gi.repository import Gtk
 import gzip, logging.handlers, os, re, shutil, subprocess, sys
 
 
-def callProcess( command ): return subprocess.Popen( command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
+def processCall( command ):
+    try:
+        subprocess.call( command, shell = True )
+    except subprocess.CalledProcessError:
+        pass
+
+
+def processGet( command ):
+    try:
+        return subprocess.check_output( command, shell = True, universal_newlines = True )
+    except subprocess.CalledProcessError:
+        return None
 
 
 # Returns True if a number; False otherwise.
