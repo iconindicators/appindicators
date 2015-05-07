@@ -1,7 +1,8 @@
 indicator-virtual-box (1.0.40-1) precise; urgency=low
 
-  * Bug fix: Incorrectly calling the processes.
+  * Bug fix: Incorrectly calling processes to list/run VMs.
   * Bug fix: Incorrectly referring to the VirtualBox manage GUI.
+  * Bug fix: The update interval was reset when starting a VM.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 6 May 2015 23:22:51 +1000
 
