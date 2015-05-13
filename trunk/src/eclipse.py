@@ -21,19 +21,25 @@
 import datetime
 
 
-class CardinalDirection: N, S, E, W = range( 4 )
+# Eclipse Types.
+ECLIPSE_TYPE_ANNULAR = "A"
+ECLIPSE_TYPE_HYBRID = "H"
+ECLIPSE_TYPE_PENUMBRAL = "N"
+ECLIPSE_TYPE_PARTIAL = "P"
+ECLIPSE_TYPE_TOTAL = "T"
 
 
-class EclipseType: Annular, Hybrid, Partial, Penumbral, Total = range( 5 )
+# Returns a tuple of strings describing the next eclipse:
+#    dateTime
+#    eclipseType ("A" = Annular, "H" = Hybrid, "N" = Penumbral, "P" = Partial, "T" = Total)
+#    latitude (south is negative)
+#    longitude (east is negative).
+def getEclipseForUTC( dateTimeUTC, isLunar ):
+    if isLunar:
+        eclipseData = lunarEclipseData
+    else:
+        eclipseData = solarEclipseData
 
-
-def getLunarEclipseForUTC( dateTimeUTC ): return __getEclipseForUTC( lunarEclipseData, dateTimeUTC )
-
-
-def getSolarEclipseForUTC( dateTimeUTC ): return __getEclipseForUTC( solarEclipseData, dateTimeUTC )
-
-
-def __getEclipseForUTC( eclipseData, dateTimeUTC ):
     eclipseInfo = None
     for eclipse in eclipseData:
         dateTime = datetime.datetime.strptime( eclipse[ 0 ] + ", " + eclipse[ 1 ] + ", " + eclipse[ 2 ] + ", " + eclipse[ 3 ], "%Y, %m, %d, %H:%M:%S" )
@@ -42,40 +48,18 @@ def __getEclipseForUTC( eclipseData, dateTimeUTC ):
         dateTime = dateTime - datetime.timedelta( seconds = int( eclipse[ 4 ] ) )
 
         if dateTimeUTC <= dateTime:
-            latitude = eclipse[ 6 ][ 0 : len( eclipse[ 6 ] ) - 1 ] + "°"
-            northOrSouth = __getCardinalDirection( eclipse[ 6 ][ -1 ] )
+            latitude = eclipse[ 6 ][ 0 : len( eclipse[ 6 ] ) - 1 ]
+            if eclipse[ 6 ][ -1 ] == "S":
+                latitude = "-" + latitude
 
-            longitude = eclipse[ 7 ][ 0 : len( eclipse[ 7 ] ) - 1 ] + "°"
-            eastOrWest = __getCardinalDirection( eclipse[ 7 ][ -1 ] )
+            longitude = eclipse[ 7 ][ 0 : len( eclipse[ 7 ] ) - 1 ]
+            if eclipse[ 7 ][ -1 ] == "E":
+                longitude = "-" + longitude
 
-            eclipseType = __getEclipseType( eclipse[ 5 ] )
-
-            if northOrSouth is not None and eastOrWest is not None and eclipseType is not None:
-                eclipseInfo = [ dateTime, eclipseType, latitude, northOrSouth, longitude, eastOrWest ]
-                break
+            eclipseInfo = ( str( dateTime ), eclipse[ 5 ], latitude, longitude )
+            break
 
     return eclipseInfo
-
-
-def __getEclipseType( eclipseTypeAsString ): 
-    eclipseType = None
-    if   eclipseTypeAsString == "A": eclipseType = EclipseType.Annular
-    elif eclipseTypeAsString == "H": eclipseType = EclipseType.Hybrid
-    elif eclipseTypeAsString == "N": eclipseType = EclipseType.Penumbral
-    elif eclipseTypeAsString == "P": eclipseType = EclipseType.Partial
-    elif eclipseTypeAsString == "T": eclipseType = EclipseType.Total
-
-    return eclipseType
-
-
-def __getCardinalDirection( cardinalDirectionAsString ): 
-    cardinalDirection = None
-    if   cardinalDirectionAsString == "N": cardinalDirection = CardinalDirection.N
-    elif cardinalDirectionAsString == "S": cardinalDirection = CardinalDirection.S
-    elif cardinalDirectionAsString == "E": cardinalDirection = CardinalDirection.E
-    elif cardinalDirectionAsString == "W": cardinalDirection = CardinalDirection.W
-
-    return cardinalDirection
 
 
 # http://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
