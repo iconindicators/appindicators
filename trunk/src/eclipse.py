@@ -68,7 +68,7 @@ def getEclipseForUTC( dateTimeUTC, isLunar ):
 # Catalog Key: http://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
 # Date: 2011 May 23
 # 
-#      Year   Month   Day   HH:MM:SS    DT   Type  Lat   Long
+#      Year   Month  Day   HH:MM:SS    DT   Type  Lat   Long
 __lunarEclipseData = [
     [ "2015", "09", "28", "02:48:17", "69", "T", "2N", "44W" ],
     [ "2016", "03", "23", "11:48:21", "70", "N", "0S", "175W" ],
@@ -273,7 +273,7 @@ __lunarEclipseData = [
 # Catalog Key: http://sunearth.gsfc.nasa.gov/eclipse/SEcat5/catkey.html
 # Date: 2008 10 07
 #
-#      Year   Month   Day   HH:MM:SS    DT   Type  Lat   Long
+#      Year   Month  Day   HH:MM:SS    DT   Type  Lat      Long
 __solarEclipseData = [
     [ "2015", "09", "13", "06:55:19", "69", "P", "72.1S", "2.3W" ],
     [ "2016", "03", "09", "01:58:19", "70", "T", "10.1N", "148.8E" ],
