@@ -24,8 +24,8 @@ import datetime
 # Eclipse Types.
 ECLIPSE_TYPE_ANNULAR = "A"
 ECLIPSE_TYPE_HYBRID = "H"
-ECLIPSE_TYPE_PENUMBRAL = "N"
 ECLIPSE_TYPE_PARTIAL = "P"
+ECLIPSE_TYPE_PENUMBRAL = "N"
 ECLIPSE_TYPE_TOTAL = "T"
 
 
@@ -36,17 +36,14 @@ ECLIPSE_TYPE_TOTAL = "T"
 #    longitude (east is negative).
 def getEclipseForUTC( dateTimeUTC, isLunar ):
     if isLunar:
-        eclipseData = lunarEclipseData
+        eclipseData = __lunarEclipseData
     else:
-        eclipseData = solarEclipseData
+        eclipseData = __solarEclipseData
 
     eclipseInfo = None
     for eclipse in eclipseData:
         dateTime = datetime.datetime.strptime( eclipse[ 0 ] + ", " + eclipse[ 1 ] + ", " + eclipse[ 2 ] + ", " + eclipse[ 3 ], "%Y, %m, %d, %H:%M:%S" )
-
-        # Need to subtract delta T (http://eclipse.gsfc.nasa.gov/LEcat5/deltat.html).
-        dateTime = dateTime - datetime.timedelta( seconds = int( eclipse[ 4 ] ) )
-
+        dateTime = dateTime - datetime.timedelta( seconds = int( eclipse[ 4 ] ) ) # Need to subtract delta T (http://eclipse.gsfc.nasa.gov/LEcat5/deltat.html).
         if dateTimeUTC <= dateTime:
             latitude = eclipse[ 6 ][ 0 : len( eclipse[ 6 ] ) - 1 ]
             if eclipse[ 6 ][ -1 ] == "S":
@@ -72,7 +69,7 @@ def getEclipseForUTC( dateTimeUTC, isLunar ):
 # Date: 2011 May 23
 # 
 #      Year   Month   Day   HH:MM:SS    DT   Type  Lat   Long
-lunarEclipseData = [
+__lunarEclipseData = [
     [ "2015", "09", "28", "02:48:17", "69", "T", "2N", "44W" ],
     [ "2016", "03", "23", "11:48:21", "70", "N", "0S", "175W" ],
     [ "2016", "09", "16", "18:55:27", "70", "N", "3S", "75E" ],
@@ -277,7 +274,7 @@ lunarEclipseData = [
 # Date: 2008 10 07
 #
 #      Year   Month   Day   HH:MM:SS    DT   Type  Lat   Long
-solarEclipseData = [
+__solarEclipseData = [
     [ "2015", "09", "13", "06:55:19", "69", "P", "72.1S", "2.3W" ],
     [ "2016", "03", "09", "01:58:19", "70", "T", "10.1N", "148.8E" ],
     [ "2016", "09", "01", "09:08:02", "70", "A", "10.7S", "37.8E" ],
