@@ -30,7 +30,7 @@ ECLIPSE_TYPE_TOTAL = "T"
 
 
 # Returns a tuple of strings describing the next eclipse:
-#    dateTime
+#    dateTime (YYYY-MM-DD HH:MM:SS
 #    eclipseType ("A" = Annular, "H" = Hybrid, "N" = Penumbral, "P" = Partial, "T" = Total)
 #    latitude (south is negative)
 #    longitude (east is negative).
