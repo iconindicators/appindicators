@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-lunar 1.0.58\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-04-25 10:18+1000\n"
-"PO-Revision-Date: 2015-04-30 16:45+0300\n"
+"POT-Creation-Date: 2015-05-12 10:18+1000\n"
+"PO-Revision-Date: 2015-05-13 16:45+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -130,8 +130,11 @@ msgid "ECLIPSE DATE TIME"
 msgstr "ЗАТМЕНИЕ ДАТА ВРЕМЯ"
 
 #: indicator-lunar.py:231
-msgid "ECLIPSE LATITUDE LONGITUDE"
-msgstr "ЗАТМЕНИЕ ШИРОТА ДОЛГОТА"
+msgid "ECLIPSE LATITUDE"
+msgstr "ЗАТМЕНИЕ ШИРОТА"
+
+msgid "ECLIPSE LONGITUDE"
+msgstr "ЗАТМЕНИЕ ДОЛГОТА"
 
 #: indicator-lunar.py:232
 msgid "ECLIPSE TYPE"
@@ -206,8 +209,14 @@ msgid "THIRD QUARTER"
 msgstr "ПОСЛЕДНЯЯ ЧЕТВЕРТЬ"
 
 #: indicator-lunar.py:250
-msgid "TROPICAL SIGN"
-msgstr "ТРОПИЧЕСКИЙ ЗОДИАК"
+msgid "TROPICAL SIGN NAME"
+msgstr "ТРОПИЧЕСКИЙ ЗОДИАК ИМЯ"
+
+msgid "TROPICAL SIGN DEGREE"
+msgstr "ТРОПИЧЕСКИЙ ЗОДИАК ГРАДУСЫ"
+
+msgid "TROPICAL SIGN MINUTE"
+msgstr "ТРОПИЧЕСКИЙ ЗОДИАК МИНУТЫ"
 
 #: indicator-lunar.py:251 indicator-lunar.py:708
 msgid "VISIBLE"
