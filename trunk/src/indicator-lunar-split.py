@@ -902,12 +902,14 @@ class IndicatorLunar:
             displayData = self.getLocalDateTime( self.data[ key ] )
 
         elif key[ 2 ] == IndicatorLunar.DATA_DECLINATION:
+            dec = self.data[ key ]
             if self.getDecimalDegrees( self.data[ key ], False, 0 ) < 0.0:
+                dec = dec [ 1 : ]
                 direction = _( "S" )
             else:
                 direction = _( "N" )
 
-            displayData = str( self.getDecimalDegrees( self.data[ key ], False, 2 ) ) + "° " + direction + " (" + self.trimDecimal( self.data[ key ] ) + ")"
+            displayData = str( self.getDecimalDegrees( dec, False, 2 ) ) + "° " + direction + " (" + self.trimDecimal( self.data[ key ] ) + ")"
 
         elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH or \
              key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_SUN:
