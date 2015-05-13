@@ -68,7 +68,7 @@ class AstronomicalObjectType: Moon, OrbitalElement, Planet, PlanetaryMoon, Satel
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.58"
+    VERSION = "1.0.59"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -832,27 +832,19 @@ class IndicatorLunar:
             self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_NAME ) ] = self.cityName
 
-            utcNow = datetime.datetime.utcnow()
-            ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
+            self.updateAstronomicalInformation()
 
-            self.updateMoon( ephemNow )
-            self.updateSun( ephemNow )
-            self.updatePlanets( ephemNow )
-            self.updateStars( ephemNow )
-            self.updateOrbitalElements( ephemNow, self.orbitalElementsMagnitude )
-            self.updateSatellites( ephemNow, self.hideSatelliteIfNoVisiblePass ) 
-
-            GLib.idle_add( self.updateFrontend, utcNow )
+            GLib.idle_add( self.updateFrontend )
 
 
-    def updateFrontend( self, utcNow ):
+    def updateFrontend( self ):
         self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
         self.updateMenu()
         self.updateIcon()
-        self.fullMoonNotification( utcNow )
+        self.fullMoonNotification()
 
         if self.showSatelliteNotification:
-            self.satelliteNotification( utcNow )
+            self.satelliteNotification()
 
         self.nextUpdate = datetime.datetime.strptime( self.nextUpdate[ 0 : self.nextUpdate.rfind( ":" ) + 3 ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) # Parse from string back into a datetime.
         nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
@@ -974,11 +966,20 @@ class IndicatorLunar:
         return displayData
 
 
-    def updateIcon( self ):
-#TODO Likely not needed.
-#         tags = re.findall( "\[([^\[^\]]+)\]", self.indicatorText ) #TODO Use this to parse tags out and then for each tag look up how to convert for display (adding degree symbol, etc).        parsedOutput = self.indicatorText
-#             parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.data[ key ] )
+    def getDecimalDegrees( self, stringInput, isHours, roundAmount ):
+        t = tuple( stringInput.split( ":" ) )
+        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
+        if isHours:
+            x = x * 15.0
 
+        y = float( t[ 0 ] )
+        return round( math.copysign( x, y ), roundAmount )
+
+
+    def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
+
+
+    def updateIcon( self ):
         parsedOutput = self.indicatorText
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
@@ -992,7 +993,7 @@ class IndicatorLunar:
         self.indicator.set_icon( self.getIconName() )
 
 
-    def fullMoonNotification( self, utcNow ):
+    def fullMoonNotification( self ):
         lunarPhase = self.data[ AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_PHASE ]
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
@@ -1004,7 +1005,7 @@ class IndicatorLunar:
         lunarIlluminationPercentage = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_ILLUMINATION ) ] )
         if self.showWerewolfWarning and \
            lunarIlluminationPercentage < self.werewolfWarningStartIlluminationPercentage and \
-           ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) > utcNow ) and \
+           ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) > datetime.datetime.utcnow() ) and \
            phaseIsBetweenNewAndFullInclusive:
 
             summary = self.werewolfWarningSummary
@@ -1012,10 +1013,10 @@ class IndicatorLunar:
                 summary = " " # The notification summary text cannot be empty (at least on Unity).
 
             Notify.Notification.new( summary, self.werewolfWarningMessage, self.getIconFile() ).show()
-            self.lastFullMoonNotfication = utcNow
+            self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
-    def satelliteNotification( self, utcNow ):
+    def satelliteNotification( self ):
         # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
         satelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber, in self.satellites:
@@ -1028,6 +1029,7 @@ class IndicatorLunar:
         else:
             satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
 
+        utcNow = datetime.datetime.utcnow()
         for satelliteName, satelliteNumber, riseTime in satelliteNameNumberRiseTimes:
             key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
 
@@ -1135,6 +1137,16 @@ class IndicatorLunar:
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
             self.updateEclipseMenu( menuItem.get_submenu(), AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
+
+
+    def updateEclipseMenu( self, menu, astronomicalObjectType, dataTag ):
+        key = ( astronomicalObjectType, dataTag )
+        menu.append( Gtk.MenuItem( _( "Eclipse" ) ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ECLIPSE_DATE_TIME, ) ) ) )
+        latitude = self.getDisplayData( key + ( IndicatorLunar.DATA_ECLIPSE_LATITUDE, ) )
+        longitude = self.getDisplayData( key + ( IndicatorLunar.DATA_ECLIPSE_LONGITUDE, ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
+        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Type: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ECLIPSE_TYPE, ) ) ) )
 
 
     def updatePlanetsMenu( self, menu ):
@@ -1343,6 +1355,14 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
+    def updateRightAscensionDeclinationAzimuthAltitudeMenu( self, menu, astronomicalObjectType, dataTag ):
+        key = ( astronomicalObjectType, dataTag )
+        menu.append( Gtk.MenuItem( _( "Right Ascension: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RIGHT_ASCENSION, ) ) ) )
+        menu.append( Gtk.MenuItem( _( "Declination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DECLINATION, ) ) ) )
+        menu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
+        menu.append( Gtk.MenuItem( _( "Altitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ALTITUDE, ) ) ) )
+
+
     def updateSatellitesMenu( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
@@ -1428,6 +1448,25 @@ class IndicatorLunar:
                 menuItem.set_submenu( subMenu )
 
 
+    # Compare two string dates in the format YYYY MM DD HH:MM:SS, returning the earliest.
+    def getSmallestDateTime( self, firstDateTimeAsString, secondDateTimeAsString ):
+        if firstDateTimeAsString < secondDateTimeAsString:
+            return firstDateTimeAsString
+
+        return secondDateTimeAsString
+
+
+    # Converts a UTC datetime string in the format 2015-05-11 22:51:42 to local datetime string.
+    # http://stackoverflow.com/a/13287083/2156453
+    def getLocalDateTime( self, utcDateTimeString ):
+        utcDateTimeStringWithoutFractional = utcDateTimeString[ 0 : utcDateTimeString.rfind( ":" ) + 3 ]
+        utcDateTime = datetime.datetime.strptime( utcDateTimeStringWithoutFractional, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
+        timestamp = calendar.timegm( utcDateTime.timetuple() )
+        localDateTime = datetime.datetime.fromtimestamp( timestamp )
+        localDateTime.replace( microsecond = utcDateTime.microsecond )        
+        return str( localDateTime )
+
+
     def addOnSatelliteHandler( self, subMenu, satelliteName, satelliteNumber ):
         for child in subMenu.get_children():
             child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
@@ -1444,37 +1483,6 @@ class IndicatorLunar:
 
         if len( url ) > 0:
             webbrowser.open( url )
-
-
-    def updateRightAscensionDeclinationAzimuthAltitudeMenu( self, menu, astronomicalObjectType, dataTag ):
-        key = ( astronomicalObjectType, dataTag )
-        menu.append( Gtk.MenuItem( _( "Right Ascension: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RIGHT_ASCENSION, ) ) ) )
-        menu.append( Gtk.MenuItem( _( "Declination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DECLINATION, ) ) ) )
-        menu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
-        menu.append( Gtk.MenuItem( _( "Altitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ALTITUDE, ) ) ) )
-
-
-    def updateEclipseMenu( self, menu, astronomicalObjectType, dataTag ):
-        key = ( astronomicalObjectType, dataTag )
-        menu.append( Gtk.MenuItem( _( "Eclipse" ) ) )
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ECLIPSE_DATE_TIME, ) ) ) )
-        latitude = self.getDisplayData( key + ( IndicatorLunar.DATA_ECLIPSE_LATITUDE, ) )
-        longitude = self.getDisplayData( key + ( IndicatorLunar.DATA_ECLIPSE_LONGITUDE, ) )
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
-        menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Type: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ECLIPSE_TYPE, ) ) ) )
-
-
-    def getDecimalDegrees( self, stringInput, isHours, roundAmount ):
-        t = tuple( stringInput.split( ":" ) )
-        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
-        if isHours:
-            x = x * 15.0
-
-        y = float( t[ 0 ] )
-        return round( math.copysign( x, y ), roundAmount )
-
-
-    def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
 
 
     def getBooleanTranslatedText( self, booleanText ):
@@ -1554,6 +1562,91 @@ class IndicatorLunar:
             self.lastUpdateTLE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
 
         self.addNewSatellites()
+
+
+    # Creates an SVG icon file representing the moon given the illumination and bright limb angle (relative to zenith).
+    #
+    #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
+    #
+    #    brightLimbAngleInDegrees The angle of the (relative to zenith) bright limb ranging from 0 to 360 inclusive.
+    #                             If the bright limb is None, a full moon will be rendered and saved to a full moon file (for the notification).
+    def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees ):
+        # Size of view box.
+        width = 100
+        height = 100
+
+        # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
+        # A radius of 50 is too big and 25 is too small...so compute a radius half way between, based on the width/height of the viewing area.
+        radius = float ( str( ( width / 2 ) - ( ( width / 2 ) - ( width / 4 ) ) / 2 ) )
+
+        if illuminationPercentage == 0 or illuminationPercentage == 100:
+            svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
+
+            if illuminationPercentage == 0: # New
+                svg = svgStart + '" fill="none" stroke="' + pythonutils.getColourForIconTheme() + '" stroke-width="2" />'
+            else: # Full
+                svg = svgStart + '" fill="' + pythonutils.getColourForIconTheme() + '" />'
+
+        else:
+            svgStart = '<path d="M ' + str( width / 2 ) + ' ' + str( height / 2 ) + ' h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0'
+            svgEnd = ' transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="' + pythonutils.getColourForIconTheme() + '" />'
+
+            if illuminationPercentage == 50: # Quarter
+                svg = svgStart + '"' + svgEnd
+            elif illuminationPercentage < 50: # Crescent
+                svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( 50 - illuminationPercentage ) / 50.0 * radius ) + ' 0 0 0 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd 
+            else: # Gibbous
+                svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( illuminationPercentage - 50 ) / 50.0 * radius ) + ' 0 1 1 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd
+
+        header = '<?xml version="1.0" standalone="no"?>' \
+                 '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
+                 '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
+
+        footer = '</svg>'
+
+        if brightLimbAngleInDegrees is None:
+            filename = IndicatorLunar.SVG_FULL_MOON_FILE
+        else:
+            filename = self.getIconFile()
+
+        try:
+            with open( filename, "w" ) as f:
+                f.write( header + svg + footer )
+                f.close()
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing SVG: " + filename )
+
+
+    def getIconName( self ):
+        iconNameBase = "." + INDICATOR_NAME + "-illumination-icon"
+        if IndicatorLunar.ICON_STATE:
+            iconName = iconNameBase + "-1"
+        else:
+            iconName = iconNameBase + "-2"
+
+        return iconName
+
+
+    def getIconFile( self ): return tempfile.gettempdir() + "/" + self.getIconName() + ".svg"
+
+
+    # Hideous workaround because setting the icon with the same name does not change the icon any more...so alternate the name of the icon!
+    #
+    # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
+    # http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
+    def toggleIconState( self ): IndicatorLunar.ICON_STATE = not IndicatorLunar.ICON_STATE
+
+
+    def updateAstronomicalInformation( self ):
+        ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
+        self.updateMoon( ephemNow )
+        self.updateSun( ephemNow )
+        self.updatePlanets( ephemNow )
+        self.updateStars( ephemNow )
+        self.updateOrbitalElements( ephemNow, self.orbitalElementsMagnitude )
+        self.updateSatellites( ephemNow, self.hideSatelliteIfNoVisiblePass ) 
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -2004,25 +2097,6 @@ class IndicatorLunar:
         return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
-    # Compare two string dates in the format YYYY MM DD HH:MM:SS, returning the earliest.
-    def getSmallestDateTime( self, firstDateTimeAsString, secondDateTimeAsString ):
-        if firstDateTimeAsString < secondDateTimeAsString:
-            return firstDateTimeAsString
-
-        return secondDateTimeAsString
-
-
-    # Converts a UTC datetime string in the format 2015-05-11 22:51:42 to local datetime string.
-    # http://stackoverflow.com/a/13287083/2156453
-    def getLocalDateTime( self, utcDateTimeString ):
-        utcDateTimeStringWithoutFractional = utcDateTimeString[ 0 : utcDateTimeString.rfind( ":" ) + 3 ]
-        utcDateTime = datetime.datetime.strptime( utcDateTimeStringWithoutFractional, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-        timestamp = calendar.timegm( utcDateTime.timetuple() )
-        localDateTime = datetime.datetime.fromtimestamp( timestamp )
-        localDateTime.replace( microsecond = utcDateTime.microsecond )        
-        return str( localDateTime )
-
-
     # Used to instantiate a new city object/observer.
     # Typically after calculations (or exceptions) the city date is altered.
     def getCity( self, date = None ):
@@ -2031,81 +2105,6 @@ class IndicatorLunar:
             city.date = date
 
         return city
-
-
-    # Creates an SVG icon file representing the moon given the illumination and bright limb angle (relative to zenith).
-    #
-    #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
-    #
-    #    brightLimbAngleInDegrees The angle of the (relative to zenith) bright limb ranging from 0 to 360 inclusive.
-    #                             If the bright limb is None, a full moon will be rendered and saved to a full moon file (for the notification).
-    def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees ):
-        # Size of view box.
-        width = 100
-        height = 100
-
-        # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
-        # A radius of 50 is too big and 25 is too small...so compute a radius half way between, based on the width/height of the viewing area.
-        radius = float ( str( ( width / 2 ) - ( ( width / 2 ) - ( width / 4 ) ) / 2 ) )
-
-        if illuminationPercentage == 0 or illuminationPercentage == 100:
-            svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
-
-            if illuminationPercentage == 0: # New
-                svg = svgStart + '" fill="none" stroke="' + pythonutils.getColourForIconTheme() + '" stroke-width="2" />'
-            else: # Full
-                svg = svgStart + '" fill="' + pythonutils.getColourForIconTheme() + '" />'
-
-        else:
-            svgStart = '<path d="M ' + str( width / 2 ) + ' ' + str( height / 2 ) + ' h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0'
-            svgEnd = ' transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="' + pythonutils.getColourForIconTheme() + '" />'
-
-            if illuminationPercentage == 50: # Quarter
-                svg = svgStart + '"' + svgEnd
-            elif illuminationPercentage < 50: # Crescent
-                svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( 50 - illuminationPercentage ) / 50.0 * radius ) + ' 0 0 0 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd 
-            else: # Gibbous
-                svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( illuminationPercentage - 50 ) / 50.0 * radius ) + ' 0 1 1 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd
-
-        header = '<?xml version="1.0" standalone="no"?>' \
-                 '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-                 '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
-
-        footer = '</svg>'
-
-        if brightLimbAngleInDegrees is None:
-            filename = IndicatorLunar.SVG_FULL_MOON_FILE
-        else:
-            filename = self.getIconFile()
-
-        try:
-            with open( filename, "w" ) as f:
-                f.write( header + svg + footer )
-                f.close()
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing SVG: " + filename )
-
-
-    def getIconName( self ):
-        iconNameBase = "." + INDICATOR_NAME + "-illumination-icon"
-        if IndicatorLunar.ICON_STATE:
-            iconName = iconNameBase + "-1"
-        else:
-            iconName = iconNameBase + "-2"
-
-        return iconName
-
-
-    def getIconFile( self ): return tempfile.gettempdir() + "/" + self.getIconName() + ".svg"
-
-
-    # Hideous workaround because setting the icon with the same name does not change the icon any more...so alternate the name of the icon!
-    #
-    # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
-    # http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
-    def toggleIconState( self ): IndicatorLunar.ICON_STATE = not IndicatorLunar.ICON_STATE
 
 
     def onAbout( self, widget ):
@@ -3054,31 +3053,17 @@ class IndicatorLunar:
             i = 1
             j = 0
 
-        translatedText = ""
-        chunks = text.split( "[" )
-        if len( chunks ) < 2:
-            translatedText = text # No left brackets found.
-        else:
-            for chunk in chunks:
-                rightBracket = chunk.find( "]" )
-                if rightBracket == -1:
-                    translatedText += chunk
-                    continue
+        translatedText = text
+        tags = re.findall( "\[([^\[^\]]+)\]", translatedText )
+        for tag in tags:
+            iter = tagsStore.get_iter_first()
+            while iter is not None:
+                row = tagsStore[ iter ]
+                if row[ i ] == tag:
+                    translatedText = translatedText.replace( "[" + tag + "]", "[" + row[ j ] + "]" )
+                    break
 
-                tag = chunk[ 0 : rightBracket ]
-                found = False
-                iter = tagsStore.get_iter_first()
-                while iter is not None:
-                    row = tagsStore[ iter ]
-                    if row[ i ] == tag:
-                        translatedText += "[" + row[ j ] + chunk[ rightBracket : ]
-                        found = True
-                        break
-
-                    iter = tagsStore.iter_next( iter )
-
-                if not found:
-                    translatedText += "[" + tag + chunk[ rightBracket : ]
+                iter = tagsStore.iter_next( iter )
 
         return translatedText
 
