@@ -1,3 +1,14 @@
+indicator-virtual-box (1.0.41-1) precise; urgency=low
+
+  * Bug fix: When autostarting a VM (or VMs), the time delay of 5 seconds
+    after the VM is started and before updating the menu was insufficient when
+    the host was cold booting.  The delay has been increased to 1 minute to
+    give ample time for the host to start up and VBoxManage to correctly
+    identify running VMs.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 18 May 2015 16:13:04 +1000
+
+
 indicator-virtual-box (1.0.40-1) precise; urgency=low
 
   * Bug fix: Incorrectly calling processes to list/run VMs.

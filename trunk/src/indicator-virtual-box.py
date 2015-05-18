@@ -43,7 +43,7 @@ import gzip, json, locale, logging, os, pythonutils, re, shutil, sys, time, virt
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.40"
+    VERSION = "1.0.41"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -353,7 +353,7 @@ class IndicatorVirtualBox:
             try:
                 startCommand = self.getStartCommand( virtualMachine.getUUID() ).replace( "%VM%", virtualMachine.getUUID() ) + " &"
                 pythonutils.processCall( startCommand )
-                GLib.timeout_add_seconds( 5, self.onRefresh, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
+                GLib.timeout_add_seconds( 60, self.onRefresh, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
                 if delayInSeconds > 0:
                     time.sleep( delayInSeconds )
 
