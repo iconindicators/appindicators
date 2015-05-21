@@ -137,148 +137,87 @@ def createPreferencesAboutQuitMenuItems( menu, prependSeparator, onPreferencesHa
     menu.append( menuItem )
 
 
-# A GTK AboutDialog with optional change log displayed in its own tab.
-class AboutDialog( Gtk.AboutDialog ):
-
-    def __init__( self, 
-        programName, # Program name.
+def createAboutDialog(
+        authors, # List of authors.
         comments, # Comments.
-        website, # Website URL (used on click).
-        websiteLabel, # Website (may or may not be the actual URL).
-        version, # String of the numeric program version.
+        creditsPeople, # List of credits.
+        creditsLabel, # Credit text.
         licenseType, # Any of Gtk.License.*
         logoIconName, # The name of the image icon - without extension.
-        authors, # List of authors.
-        creditsPeople, # List of creditors.
-        creditsLabel, # Credit text.
-        changeLog, # The full path to the change log; None otherwise.
-        changeLogButtonName, # The name of the change log button, optionally including the underscore for the keyboard shortcut.
-        translator, # Either the result of calling _( "translator-credits" ) which returns a string or None.
-        logging ):# Default Python logging mechanism; None otherwise.
+        programName, # Program name.
+        website, # Website URL (used on click).
+        version, # String of the numeric program version.
+        translatorCredit ): # The result of calling _( "translator-credits" ) which returns a string or None.
 
-        super( AboutDialog, self ).__init__()
+        aboutDialog = Gtk.AboutDialog()
 
-        # The function 'add_credit_section' is/was not available on Ubuntu 12.04 (GTK 3.2 and python 3.2).
-        # Previously I was using a try/except to trap a call to 'add_credit_section' - on the except, set the authors a different (older) way.
-        # However something has changed and 'add_credit_section' appears to exist but causes a segmentation fault when called.
-        # The workaround is to test the python version and use that to discriminate and avoid the try/except.
-        # The function 'add_credit_section' IS available on Ubuntu 14.04 (python 3.4).
         if sys.version_info.major == 3 and sys.version_info.minor >= 4:
-            self.set_authors( authors )
-            self.add_credit_section( creditsLabel, creditsPeople )
+            aboutDialog.set_authors( authors )
+            if len( creditsPeople ) > 0:
+                aboutDialog.add_credit_section( creditsLabel, creditsPeople )
         else:
-            authorsCredits = authors
+            authorsAndCredits = authors
             for credit in creditsPeople:
-                authorsCredits.append( credit )
+                authorsAndCredits.append( credit )
 
-            self.set_authors( authorsCredits )
+            aboutDialog.set_authors( authorsAndCredits )
 
-        if translator is not None:
-            self.set_translator_credits( translator )
+        aboutDialog.set_comments( comments )
+        aboutDialog.set_license_type( licenseType )
+        aboutDialog.set_logo_icon_name( logoIconName )
+        aboutDialog.set_program_name( programName )
+        aboutDialog.set_version( version )
+        aboutDialog.set_website( website )
+        aboutDialog.set_website_label( website )
 
-        self.set_comments( comments )
-        self.set_license_type( licenseType )
-        self.set_logo_icon_name( logoIconName )
-        self.set_program_name( programName )
-        self.set_version( version )
-        self.set_website( website )
-        self.set_website_label( websiteLabel )
-        self.set_position( Gtk.WindowPosition.CENTER_ALWAYS )
-        self.changeLog = changeLog
-        self.logging = logging
+        if translatorCredit is not None:
+            aboutDialog.set_translator_credits( translatorCredit )
 
-        notebook = self.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
-
-        # Ensure the credits scrolled window never has a vertical scrollbar.
-        creditsTab = notebook.get_nth_page( 1 ) # There should be three tabs/pages, but on Ubuntu 12.04 there is only one for some reason...
-        if creditsTab is not None: # ...so the credits TAB can be None!
-            children = creditsTab.get_children()
-            for child in children:
-                if type( child ).__name__ == "ScrolledWindow":
-                    child.set_policy( child.get_policy()[ 0 ], Gtk.PolicyType.NEVER ) 
-
-        if changeLog is not None: # If there is no change log this dialog reverts to the AboutDialog.
-            self.set_resizable( True )
-
-            textView = Gtk.TextView()
-            textView.set_editable( False )
-            textBuffer = textView.get_buffer()
-            textBuffer.set_text( self.getChangeLog() )
-
-            # Reference https://gitorious.org/ghelp/gtk/raw/5c4f2ef0c1e658827091aadf4fc3c4d5f5964785:gtk/gtkaboutdialog.c
-            scrolledWindow = Gtk.ScrolledWindow()
-            scrolledWindow.set_shadow_type( Gtk.ShadowType.IN );
-            scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-            scrolledWindow.set_hexpand( True )
-            scrolledWindow.set_vexpand( True )
-            scrolledWindow.add( textView )
-            scrolledWindow.show_all()
-
-            changeLogTabIndex = notebook.append_page( scrolledWindow, Gtk.Label( "" ) ) # The tab is hidden so the label contents are irrelevant.
-
-            changeLogButton = Gtk.ToggleButton( changeLogButtonName )
-            changeLogButton.set_use_underline( True )
-            changeLogButton.show()
-
-            buttonBox = self.get_content_area().get_children()[ 1 ]
-            buttonBox.pack_start( changeLogButton, True, True, 0 )
-            buttonBox.set_child_secondary( changeLogButton, True )
-
-            buttons = buttonBox.get_children()
-            buttonsForToggle = [ ]
-            for button in buttons:
-                if button != changeLogButton and type( button ) == Gtk.ToggleButton:
-                    buttonsForToggle.append( button )
-                    button.connect( "toggled", self.onOtherToggledButtons, changeLogButton )
-
-            changeLogButton.connect( "toggled", self.onChangeLogButtonToggled, notebook, changeLogTabIndex, buttonsForToggle )
+        return aboutDialog
 
 
-    def onChangeLogButtonToggled( self, changeLogButton, notebook, changeLogTabIndex, buttonsForToggle ):
-        if changeLogButton.get_active():
-            if notebook.get_current_page() != 0:
-                for button in buttonsForToggle:
-                    button.set_active( False )
+def createChangeLogScrollableWindow( changeLogPathAndFileName, errorMessage, logging ):
+    textView = Gtk.TextView()
+    textView.set_editable( False )
+    textBuffer = textView.get_buffer()
+    textBuffer.set_text( getChangeLog( changeLogPathAndFileName, errorMessage, logging ) )
 
-            notebook.set_current_page( changeLogTabIndex )
-        else:
-            if notebook.get_current_page() == changeLogTabIndex:
-                notebook.set_current_page( 0 )
-
-
-    def onOtherToggledButtons( self, toggleButton, changeLogButton ):
-        if toggleButton.get_active() and changeLogButton.get_active():
-            changeLogButton.set_active( False )
+    scrolledWindow = Gtk.ScrolledWindow()
+    scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+    scrolledWindow.set_hexpand( True )
+    scrolledWindow.set_vexpand( True )
+    scrolledWindow.add( textView )
+    scrolledWindow.show_all()
+    return scrolledWindow
 
 
-    # Assumes a typical format for a Debian change log file.
-    def getChangeLog( self ):
-        contents = None
-        if os.path.exists( self.changeLog ): 
-            try:
-                with gzip.open( self.changeLog, "rb" ) as f:
-                    changeLogContents = re.split( "\n\n\n", f.read().decode() )
+# Assumes a typical format for a Debian change log file.
+def getChangeLog( changeLogPathAndFileName, errorMessage, logging ):
+    contents = None
+    if os.path.exists( changeLogPathAndFileName ): 
+        try:
+            with gzip.open( changeLogPathAndFileName, "rb" ) as f:
+                changeLogContents = re.split( "\n\n\n", f.read().decode() )
 
-                contents = ""
-                for changeLogEntry in changeLogContents:
-                    changeLogEntry = changeLogEntry.split( "\n" )
-                    version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
-                    dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
-                    changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
-                    changes = changes.replace( "    ", "     " )
-                    contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
+            contents = ""
+            for changeLogEntry in changeLogContents:
+                changeLogEntry = changeLogEntry.split( "\n" )
+                version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
+                dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
+                changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
+                changes = changes.replace( "    ", "     " )
+                contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
 
-                contents = contents.strip()
+            contents = contents.strip()
 
-            except Exception as e:
-                if not self.logging is None:
-                    self.logging.exception( e )
-                    self.logging.error( "Error reading change log: " + self.changeLog )
+        except Exception as e:
+            if not logging is None:
+                logging.exception( e )
+                logging.error( "Error reading change log: " + changeLogPathAndFileName )
 
-                contents = "Error reading change log: " + self.changeLog
+            contents = errorMessage
 
-        return contents
-
+    return contents
 
 # Log file handler.  Truncates the file when the file size limit is reached.
 # http://stackoverflow.com/questions/24157278/limit-python-log-file
