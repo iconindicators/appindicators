@@ -41,8 +41,9 @@ import json, locale, logging, os, pythonutils, re, shutil
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.18"
+    VERSION = "1.0.19"
     ICON = INDICATOR_NAME
+    CHANGELOG = "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -161,21 +162,17 @@ class IndicatorFortune:
 
     def onAbout( self, widget ):
         if self.dialog is None:
-            self.dialog = pythonutils.AboutDialog( 
-                INDICATOR_NAME,
-                IndicatorFortune.COMMENTS, 
-                IndicatorFortune.WEBSITE, 
-                IndicatorFortune.WEBSITE, 
-                IndicatorFortune.VERSION, 
-                Gtk.License.GPL_3_0, 
-                IndicatorFortune.ICON,
+            self.dialog = pythonutils.createAboutDialog(
                 [ IndicatorFortune.AUTHOR ],
+                IndicatorFortune.COMMENTS, 
+                [ ],
                 "",
-                "",
-                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
-                _( "Change _Log" ),
-                _( "translator-credits" ),
-                logging )
+                Gtk.License.GPL_3_0,
+                IndicatorFortune.ICON,
+                INDICATOR_NAME,
+                IndicatorFortune.WEBSITE,
+                IndicatorFortune.VERSION,
+                ( "translator-credits" ) )
 
             self.dialog.run()
             self.dialog.destroy()
@@ -334,11 +331,19 @@ class IndicatorFortune:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
+         # Change Log.
+        scrolledWindow = pythonutils.createChangeLogScrollableWindow(
+            IndicatorFortune.CHANGELOG,
+            _( "Unable to read the change log:\n\n\t{0}" ).format( IndicatorFortune.CHANGELOG ),
+            logging )
+        notebook.append_page( scrolledWindow, Gtk.Label( _( "Change Log" ) ) )
+
         self.dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorFortune.ICON )
         self.dialog.show_all()
+        notebook.set_current_page( 0 )
 
         if self.dialog.run() == Gtk.ResponseType.OK:
             if radioMiddleMouseClickNewFortune.get_active():

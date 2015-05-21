@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-fortune 1.0.17\n"
+"Project-Id-Version: indicator-fortune 1.0.19\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-04-24 23:48+1000\n"
-"PO-Revision-Date: 2015-04-25 11:59+0300\n"
+"POT-Creation-Date: 2015-05-21 16:14+1000\n"
+"PO-Revision-Date: 2015-05-21 16:15+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -51,8 +51,8 @@ msgid "No fortunes enabled!"
 msgstr "Изречения не включены!"
 
 #: indicator-fortune.py:182
-msgid "Change _Log"
-msgstr "Список _изменений"
+msgid "Change Log"
+msgstr "Список изменений"
 
 #: indicator-fortune.py:183
 msgid "translator-credits"
