@@ -1716,49 +1716,42 @@ class IndicatorLunar:
 
     def updateEclipse( self, ephemNow, astronomicalObjectType, dataTag ):
         if dataTag == IndicatorLunar.SUN_TAG:
-            eclipseInformation = eclipse.getSolarEclipseForUTC( ephemNow.datetime() )
+            eclipseInformation = eclipse.getEclipseForUTC( ephemNow.datetime(), False )
         else:
-            eclipseInformation = eclipse.getLunarEclipseForUTC( ephemNow.datetime() )
+            eclipseInformation = eclipse.getEclipseForUTC( ephemNow.datetime(), True )
 
         if eclipseInformation is None:
             logging.error( "No eclipse information found!" )
         else:
             eclipseType = None
-            if eclipseInformation[ 1 ] == eclipse.EclipseType.Annular:
+            if eclipseInformation[ 1 ] == eclipse.ECLIPSE_TYPE_ANNULAR:
                 eclipseType = _( "Annular" )
-            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Hybrid:
+            elif eclipseInformation[ 1 ] == eclipse.ECLIPSE_TYPE_HYBRID:
                 eclipseType = _( "Hybrid (Annular/Total)" )
-            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Partial:
+            elif eclipseInformation[ 1 ] == eclipse.ECLIPSE_TYPE_PARTIAL:
                 eclipseType = _( "Partial" )
-            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Penumbral:
+            elif eclipseInformation[ 1 ] == eclipse.ECLIPSE_TYPE_PENUMBRAL:
                 eclipseType = _( "Penumbral" )
-            elif eclipseInformation[ 1 ] == eclipse.EclipseType.Total:
+            else: # eclipse.ECLIPSE_TYPE_TOTAL
                 eclipseType = _( "Total" )
 
-            northOrSouth = None
-            if eclipseInformation[ 3 ] == eclipse.CardinalDirection.N:
-                northOrSouth = _( "N" )
-            elif eclipseInformation[ 3 ] == eclipse.CardinalDirection.S:
-                northOrSouth = _( "S" )
-
-            eastOrWest = None
-            if eclipseInformation[ 5 ] == eclipse.CardinalDirection.E:
-                eastOrWest = _( "E" )
-            elif eclipseInformation[ 5 ] == eclipse.CardinalDirection.W:
-                eastOrWest = _( "W" )
-
-            if eclipseType is None:
-                logging.error( "Unknown eclipse type", eclipseInformation )
-            elif northOrSouth is None:
-                logging.error( "Unknown latitude cardinal direction", eclipseInformation )
-            elif eastOrWest is None:
-                logging.error( "Unknown longitude cardinal direction", eclipseInformation )
+            latitude = eclipseInformation[ 2 ]
+            if latitude[ 0 ] == "-":
+                northOrSouth = latitude[ 1 : ] + "° " + _( "S" )
             else:
-                localisedAndTrimmedDateTime = self.getLocalDateTime( ephem.Date( eclipseInformation[ 0 ] ) )
-                key = ( astronomicalObjectType, dataTag )
-                self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_DATE_TIME, ) ] = localisedAndTrimmedDateTime
-                self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE, ) ] = eclipseInformation[ 2 ] + " " + northOrSouth + " " + eclipseInformation[ 4 ] + " " + eastOrWest 
-                self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_TYPE, ) ] = eclipseType
+                northOrSouth = latitude + "° " +_( "N" )
+
+            longitude = eclipseInformation[ 3 ]
+            if longitude[ 0 ] == "-":
+                eastOrWest = longitude[ 1 : ] + "° " + _( "E" )
+            else:
+                eastOrWest = longitude + "° " +_( "W" )
+
+            key = ( astronomicalObjectType, dataTag )
+            localisedAndTrimmedDateTime = self.getLocalDateTime( ephem.Date( eclipseInformation[ 0 ] ) )
+            self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_DATE_TIME, ) ] = localisedAndTrimmedDateTime
+            self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_LATITUDE_LONGITUDE, ) ] = northOrSouth + " " + eastOrWest 
+            self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_TYPE, ) ] = eclipseType
 
 
     def getLunarPhase( self, ephemNow, illuminationPercentage ):

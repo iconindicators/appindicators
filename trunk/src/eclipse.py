@@ -28,9 +28,13 @@ ECLIPSE_TYPE_PARTIAL = "P"
 ECLIPSE_TYPE_PENUMBRAL = "N"
 ECLIPSE_TYPE_TOTAL = "T"
 
-
+# Gets the upcoming eclipse, lunar or solar.
+#
+# dateTimeUTC - Current date/time in UTC as a python datetime.datetime object. 
+# isLunar - If True, finds the next lunar eclipse; otherwise finds the next solar eclipse.
+#
 # Returns a tuple of strings describing the next eclipse:
-#    dateTime (YYYY-MM-DD HH:MM:SS
+#    dateTime (format of YYYY-MM-DD HH:MM:SS)
 #    eclipseType ("A" = Annular, "H" = Hybrid, "N" = Penumbral, "P" = Partial, "T" = Total)
 #    latitude (south is negative)
 #    longitude (east is negative).
