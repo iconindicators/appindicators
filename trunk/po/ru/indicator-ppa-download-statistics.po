@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-ppa-download-statistics 1.0.47\n"
+"Project-Id-Version: indicator-ppa-download-statistics 1.0.48\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-04-24 23:51+1000\n"
-"PO-Revision-Date: 2015-04-25 14:10+0300\n"
+"POT-Creation-Date: 2015-05-21 15:51+1000\n"
+"PO-Revision-Date: 2015-05-21 15:55+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -43,8 +43,8 @@ msgid "(published binaries completely filtered)"
 msgstr "(двоичные файлы полностью отфильтрованы)"
 
 #: indicator-ppa-download-statistics.py:289
-msgid "Change _Log"
-msgstr "Список _изменений"
+msgid "Change Log"
+msgstr "Список изменений"
 
 #: indicator-ppa-download-statistics.py:290
 msgid "translator-credits"

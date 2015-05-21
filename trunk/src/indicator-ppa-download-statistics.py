@@ -48,8 +48,9 @@ import itertools, pythonutils, json, locale, logging, operator, os, re, shutil, 
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
+    VERSION = "1.0.48"
     ICON = INDICATOR_NAME
-    VERSION = "1.0.47"
+    CHANGELOG = "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -274,21 +275,17 @@ class IndicatorPPADownloadStatistics:
 
     def onAbout( self, widget ):
         if self.dialog is None:
-            self.dialog = pythonutils.AboutDialog(
-                INDICATOR_NAME,
-                IndicatorPPADownloadStatistics.COMMENTS, 
-                IndicatorPPADownloadStatistics.WEBSITE, 
-                IndicatorPPADownloadStatistics.WEBSITE, 
-                IndicatorPPADownloadStatistics.VERSION, 
-                Gtk.License.GPL_3_0, 
-                IndicatorPPADownloadStatistics.ICON,
+            self.dialog = pythonutils.createAboutDialog(
                 [ IndicatorPPADownloadStatistics.AUTHOR ],
+                IndicatorPPADownloadStatistics.COMMENTS, 
+                [ ],
                 "",
-                "",
-                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
-                _( "Change _Log" ),
-                _( "translator-credits" ),
-                logging )
+                Gtk.License.GPL_3_0,
+                IndicatorPPADownloadStatistics.ICON,
+                INDICATOR_NAME,
+                IndicatorPPADownloadStatistics.WEBSITE,
+                IndicatorPPADownloadStatistics.VERSION,
+                ( "translator-credits" ) )
 
             self.dialog.run()
             self.dialog.destroy()
@@ -524,11 +521,19 @@ class IndicatorPPADownloadStatistics:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
+         # Change Log.
+        scrolledWindow = pythonutils.createChangeLogScrollableWindow(
+            IndicatorPPADownloadStatistics.CHANGELOG,
+            _( "Unable to read the change log:\n\n\t{0}" ).format( IndicatorPPADownloadStatistics.CHANGELOG ),
+            logging )
+        notebook.append_page( scrolledWindow, Gtk.Label( _( "Change Log" ) ) )
+
         self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
         self.dialog.show_all()
+        notebook.set_current_page( 0 )
 
         if self.dialog.run() == Gtk.ResponseType.OK:
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
