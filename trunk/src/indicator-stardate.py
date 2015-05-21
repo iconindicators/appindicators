@@ -42,8 +42,9 @@ import datetime, gzip, json, logging, os, pythonutils, re, shutil, stardate, sys
 class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.27"
+    VERSION = "1.0.28"
     ICON = INDICATOR_NAME
+    CHANGELOG = "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -116,21 +117,17 @@ class IndicatorStardate:
 
     def onAbout( self, widget ):
         if self.dialog is None:
-            self.dialog = pythonutils.AboutDialog( 
-                INDICATOR_NAME,
-                IndicatorStardate.COMMENTS, 
-                IndicatorStardate.WEBSITE, 
-                IndicatorStardate.WEBSITE, 
-                IndicatorStardate.VERSION, 
-                Gtk.License.GPL_3_0, 
-                IndicatorStardate.ICON,
+            self.dialog = pythonutils.createAboutDialog(
                 [ IndicatorStardate.AUTHOR ],
+                IndicatorStardate.COMMENTS, 
                 IndicatorStardate.CREDITS,
                 _( "Credits" ),
-                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
-                _( "Change _Log" ),
-                _( "translator-credits" ),
-                logging )
+                Gtk.License.GPL_3_0,
+                IndicatorStardate.ICON,
+                INDICATOR_NAME,
+                IndicatorStardate.WEBSITE,
+                IndicatorStardate.VERSION,
+                ( "translator-credits" ) )
 
             self.dialog.run()
             self.dialog.destroy()
@@ -143,6 +140,8 @@ class IndicatorStardate:
         if self.dialog is not None:
             self.dialog.present()
             return
+
+        notebook = Gtk.Notebook()
 
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -198,11 +197,21 @@ class IndicatorStardate:
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 4, 2, 1 )
 
+        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
+
+         # Change Log.
+        scrolledWindow = pythonutils.createChangeLogScrollableWindow(
+            IndicatorStardate.CHANGELOG,
+            _( "Unable to read the change log:\n\n\t{0}" ).format( IndicatorStardate.CHANGELOG ),
+            logging )
+        notebook.append_page( scrolledWindow, Gtk.Label( _( "Change Log" ) ) )
+
         self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( grid, True, True, 0 )
+        self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorStardate.ICON )
         self.dialog.show_all()
+        notebook.set_current_page( 0 )
 
         response = self.dialog.run()
         if response == Gtk.ResponseType.OK:

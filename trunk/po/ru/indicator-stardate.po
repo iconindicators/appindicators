@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-stardate 1.0.27\n"
+"Project-Id-Version: indicator-stardate 1.0.28\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-04-15 09:47+1000\n"
-"PO-Revision-Date: 2015-04-24 16:19+0300\n"
+"POT-Creation-Date: 2015-05-21 15:30+1000\n"
+"PO-Revision-Date: 2015-05-21 15:31+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -119,3 +119,6 @@ msgstr "Запускать индикатор автоматически."
 #: indicator-stardate.py:214
 msgid "Preferences"
 msgstr "Параметры"
+
+msgid "General"
+msgstr "Общие"
