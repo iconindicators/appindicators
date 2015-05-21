@@ -35,8 +35,8 @@ msgid "Credits"
 msgstr "Благодарность"
 
 #: indicator-stardate.py:144
-msgid "Change _Log"
-msgstr "Список _изменений"
+msgid "Change Log"
+msgstr "Список изменений"
 
 #: indicator-stardate.py:145
 msgid "translator-credits"
