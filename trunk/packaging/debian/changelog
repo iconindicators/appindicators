@@ -1,3 +1,17 @@
+indicator-virtual-box (1.0.42-1) precise; urgency=low
+
+  * Bug fix: The test to determine if VBoxManage is installed failed if
+    VBoxManage was not in fact installed!
+  * Bug fix: If VBoxManage was not installed the Preferences dialog crashed.
+  * GTK.AboutDialog now uses a Stack rather than Notebook to hold the
+    underlying widgets.  Rather than try to (constantly) reverse engineer
+    the GTK.AboutDialog to retrofit the changelog tab, the default
+    GTK.AboutDialog will be used and the changelog will be shown in a final
+    tab of the Preferences dialog.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 20 May 2015 23:37:11 +1000
+
+
 indicator-virtual-box (1.0.41-1) precise; urgency=low
 
   * Bug fix: When autostarting a VM (or VMs), the time delay of 5 seconds

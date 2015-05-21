@@ -43,8 +43,9 @@ import gzip, json, locale, logging, os, pythonutils, re, shutil, sys, time, virt
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.41"
+    VERSION = "1.0.42"
     ICON = INDICATOR_NAME
+    CHANGELOG = "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -138,6 +139,7 @@ class IndicatorVirtualBox:
         return menuItem
 
 
+    # It is assumed that VirtualBox is installed!
     def onLaunchVirtualBoxManager( self, widget ):
         result = pythonutils.processGet( 'wmctrl -l | grep "`hostname` Oracle VM VirtualBox"' )
         if result is None:
@@ -153,9 +155,15 @@ class IndicatorVirtualBox:
         self.startVirtualMachine( virtualMachine, virtualMachines, 0 ) # Set a zero delay as this is not an autostart.
 
 
-    def isVirtualBoxInstalled( self ): return pythonutils.processGet( "which VBoxManage" ).find( "VBoxManage" ) > -1
+    def isVirtualBoxInstalled( self ): 
+        result = pythonutils.processGet( "which VBoxManage" )
+        if result is None:
+            return False
+        
+        return result.find( "VBoxManage" ) > -1
 
 
+    # It is assumed that VBoxManage is installed!
     def getVirtualBoxVersion( self ):
         version = ""
         for line in pythonutils.processGet( "VBoxManage --version" ).splitlines():
@@ -228,6 +236,7 @@ class IndicatorVirtualBox:
 
 
     # The returned list of virtualmachine.Info objects does not include any groups (if present) nor any order set by the user in the GUI.
+    # It is assumed that VBoxManage is installed!
     def getVirtualMachinesFromVBoxManage( self ):
         virtualMachines = []
         for line in pythonutils.processGet( "VBoxManage list vms" ).splitlines():
@@ -241,6 +250,7 @@ class IndicatorVirtualBox:
         return virtualMachines
 
 
+    # It is assumed that VBoxManage is installed!
     def getVirtualMachinesFromConfigPrior4dot3( self ):
         virtualMachines = []
         line = pythonutils.processGet( "grep GUI/SelectorVMPositions " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 )
@@ -391,21 +401,17 @@ class IndicatorVirtualBox:
 
     def onAbout( self, widget ):
         if self.dialog is None:
-            self.dialog = pythonutils.AboutDialog( 
-                INDICATOR_NAME,
-                IndicatorVirtualBox.COMMENTS, 
-                IndicatorVirtualBox.WEBSITE, 
-                IndicatorVirtualBox.WEBSITE, 
-                IndicatorVirtualBox.VERSION, 
-                Gtk.License.GPL_3_0, 
-                IndicatorVirtualBox.ICON,
+            self.dialog = pythonutils.createAboutDialog(
                 [ IndicatorVirtualBox.AUTHOR ],
+                IndicatorVirtualBox.COMMENTS, 
+                [ ],
                 "",
-                "",
-                "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz",
-                _( "Change _Log" ),
-                _( "translator-credits" ),
-                logging )
+                Gtk.License.GPL_3_0,
+                IndicatorVirtualBox.ICON,
+                INDICATOR_NAME,
+                IndicatorVirtualBox.WEBSITE,
+                IndicatorVirtualBox.VERSION,
+                ( "translator-credits" ) )
 
             self.dialog.run()
             self.dialog.destroy()
@@ -464,10 +470,6 @@ class IndicatorVirtualBox:
         grid.set_margin_left( 10 )
         grid.set_margin_right( 10 )
         grid.set_margin_top( 10 )        
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
         grid.set_margin_bottom( 10 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show groups as submenus" ) )
@@ -483,11 +485,12 @@ class IndicatorVirtualBox:
             "as set in the VirtualBox Manager." ) )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
 
-        if self.getVirtualBoxVersion() < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
-            grid.attach( sortAlphabeticallyCheckbox, 0, 0, 2, 1 )
-        else:
-            if self.groupsExist( virtualMachines ):
-                grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
+        if self.isVirtualBoxInstalled():
+            if self.getVirtualBoxVersion() < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
+                grid.attach( sortAlphabeticallyCheckbox, 0, 0, 2, 1 )
+            else:
+                if self.groupsExist( virtualMachines ):
+                    grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
 
         label = Gtk.Label( _( "Refresh interval (minutes)" ) )
         label.set_halign( Gtk.Align.START )
@@ -520,11 +523,19 @@ class IndicatorVirtualBox:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
+        # Change Log.
+        scrolledWindow = pythonutils.createChangeLogScrollableWindow(
+            IndicatorVirtualBox.CHANGELOG,
+            _( "Unable to read the change log:\n\n\t{0}" ).format( IndicatorVirtualBox.CHANGELOG ),
+            logging )
+        notebook.append_page( scrolledWindow, Gtk.Label( _( "Change Log" ) ) )
+
         self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorVirtualBox.ICON )
         self.dialog.show_all()
+        notebook.set_current_page( 0 )
 
         if self.dialog.run() == Gtk.ResponseType.OK:
             self.delayBetweenAutoStartInSeconds = spinnerDelay.get_value_as_int()
