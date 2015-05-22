@@ -158,3 +158,12 @@ msgstr ""
 msgid ""
 "The start command must contain %VM% which is substituted for the VM name/id."
 msgstr ""
+
+msgid "View the"
+msgstr ""
+
+msgid "changelog"
+msgstr ""
+
+msgid "text file."
+msgstr ""
