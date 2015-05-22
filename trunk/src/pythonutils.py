@@ -177,8 +177,8 @@ def createAboutDialog(
         if not( translatorCredit is None or translatorCredit == "" ):
             aboutDialog.set_translator_credits( translatorCredit )
 
-        changeLogURL = "file://" + os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog"
-        if os.path.exists( changeLogURL ):
+        changeLog = os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog"
+        if os.path.exists( changeLog ):
             notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
             if type( notebookOrStack ).__name__ == "Notebook":
                 notebookOrStack = notebookOrStack.get_nth_page( 0 )
@@ -187,7 +187,7 @@ def createAboutDialog(
 
             changeLogLabelToolTip = "file://" + os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog"
             label = Gtk.Label()
-            label.set_markup( changeLogLabelBeforeLink + " <a href=\'" + changeLogURL + "\' title=\'" + changeLogLabelToolTip + "\'>" + changeLogLabelAnchor + "</a> " + changeLogLabelAfterLink )
+            label.set_markup( changeLogLabelBeforeLink + " <a href=\'" + "file://" + changeLog + "\' title=\'" + changeLogLabelToolTip + "\'>" + changeLogLabelAnchor + "</a> " + changeLogLabelAfterLink )
             label.show()
             notebookOrStack.add( label )
 
