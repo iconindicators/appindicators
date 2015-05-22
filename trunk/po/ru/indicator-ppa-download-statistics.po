@@ -42,10 +42,6 @@ msgstr "(нет опубликованных двоичных файлов)"
 msgid "(published binaries completely filtered)"
 msgstr "(двоичные файлы полностью отфильтрованы)"
 
-#: indicator-ppa-download-statistics.py:289
-msgid "Change Log"
-msgstr "Список изменений"
-
 #: indicator-ppa-download-statistics.py:290
 msgid "translator-credits"
 msgstr "Олег Мойсейчук"

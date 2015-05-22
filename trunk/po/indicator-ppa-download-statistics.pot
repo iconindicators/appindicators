@@ -41,10 +41,6 @@ msgstr ""
 msgid "(published binaries completely filtered)"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:289
-msgid "Change Log"
-msgstr ""
-
 #: indicator-ppa-download-statistics.py:290
 msgid "translator-credits"
 msgstr ""
