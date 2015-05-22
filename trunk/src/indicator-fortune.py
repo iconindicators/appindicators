@@ -174,7 +174,6 @@ class IndicatorFortune:
                 ( "translator-credits" ),
                 _( "View the" ),
                 _( "text file." ),
-                _( "{0}" ).format( "file://" + os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog" ),
                 _( "changelog" ) )
 
             self.dialog.run()
