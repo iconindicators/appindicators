@@ -34,10 +34,6 @@ msgstr "Звёздная дата: {0}"
 msgid "Credits"
 msgstr "Благодарность"
 
-#: indicator-stardate.py:144
-msgid "Change Log"
-msgstr "Список изменений"
-
 #: indicator-stardate.py:145
 msgid "translator-credits"
 msgstr "Олег Мойсейчук"

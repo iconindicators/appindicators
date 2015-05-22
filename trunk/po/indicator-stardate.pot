@@ -34,10 +34,6 @@ msgstr ""
 msgid "Credits"
 msgstr ""
 
-#: indicator-stardate.py:131
-msgid "Change Log"
-msgstr ""
-
 #: indicator-stardate.py:132
 msgid "translator-credits"
 msgstr ""

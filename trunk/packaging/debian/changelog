@@ -3,8 +3,7 @@ indicator-stardate (1.0.28-1) precise; urgency=low
   * GTK.AboutDialog now uses a Stack rather than Notebook to hold the
     underlying widgets.  Rather than try to (constantly) reverse engineer
     the GTK.AboutDialog to retrofit the changelog tab, the default
-    GTK.AboutDialog will be used and the changelog will be shown in a final
-    tab of the Preferences dialog.
+    GTK.AboutDialog is used with a hyperlink to the changelog inserted.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 20 May 2015 23:37:11 +1000
 
