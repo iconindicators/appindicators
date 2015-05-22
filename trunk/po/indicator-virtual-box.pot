@@ -56,10 +56,6 @@ msgstr ""
 msgid "The VM '{0}' could not be started - check the log file: {1}"
 msgstr ""
 
-#: indicator-virtual-box.py:405
-msgid "Change Log"
-msgstr ""
-
 #: indicator-virtual-box.py:406
 msgid "translator-credits"
 msgstr ""

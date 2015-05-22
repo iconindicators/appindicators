@@ -62,10 +62,6 @@ msgstr ""
 msgid "The VM '{0}' could not be started - check the log file: {1}"
 msgstr "ВМ '{0}' не может быть запущена, проверьте журнал: {1}"
 
-#: indicator-virtual-box.py:405
-msgid "Change Log"
-msgstr "Список изменений"
-
 #: indicator-virtual-box.py:406
 msgid "translator-credits"
 msgstr "Олег Мойсейчук"

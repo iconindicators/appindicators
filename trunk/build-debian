@@ -24,9 +24,10 @@ cp $NAME.desktop build/$NAME-$VERSION
 cp build-debian build/$NAME-$VERSION
 
 
-# Python source.
+# Python source and changelog.
 mkdir -p build/$NAME-$VERSION/src
 cp src/indicator-virtual-box.py src/virtualmachine.py $PYTHON_UTILS build/$NAME-$VERSION/src
+cp packaging/debian/changelog build/$NAME-$VERSION/src
 
 
 # Icons.
