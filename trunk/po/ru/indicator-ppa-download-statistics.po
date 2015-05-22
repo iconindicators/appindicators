@@ -387,3 +387,12 @@ msgstr "Пожалуйста, введите текст фильтра!"
 #: indicator-ppa-download-statistics.py:1030
 msgid "Statistics downloaded!"
 msgstr "Статистика загружена!"
+
+msgid "View the"
+msgstr "Просмотреть"
+
+msgid "changelog"
+msgstr "список изменений"
+
+msgid "text file."
+msgstr "."

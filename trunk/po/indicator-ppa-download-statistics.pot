@@ -330,3 +330,12 @@ msgstr ""
 #: indicator-ppa-download-statistics.py:1030
 msgid "Statistics downloaded!"
 msgstr ""
+
+msgid "View the"
+msgstr ""
+
+msgid "changelog"
+msgstr ""
+
+msgid "text file."
+msgstr ""
