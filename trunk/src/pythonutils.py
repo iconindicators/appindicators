@@ -20,7 +20,7 @@
 
 from gi.repository import Gtk
 
-import gzip, logging.handlers, os, re, shutil, subprocess, sys
+import logging.handlers, os, shutil, subprocess, sys
 
 
 def processCall( command ):
@@ -30,6 +30,7 @@ def processCall( command ):
         pass
 
 
+# Returns the result of calling the command.  On exception, returns None.
 def processGet( command ):
     try:
         return subprocess.check_output( command, shell = True, universal_newlines = True )
@@ -147,7 +148,10 @@ def createAboutDialog(
         programName, # Program name.
         website, # Website URL (used on click).
         version, # String of the numeric program version.
-        translatorCredit ): # The result of calling _( "translator-credits" ) which returns a string or None.
+        translatorCredit, # The result of calling _( "translator-credits" ) which returns a string or None.
+        changeLogLabelBeforeLink, # Text to the left of the hyperlink in the changelog label.
+        changeLogLabelAfterLink, # Text to the right of the hyperlink in the changelog label.
+        changeLogLabelAnchor ): # The anchor text of the hyperlink in the changelog label.
 
         aboutDialog = Gtk.AboutDialog()
 
@@ -170,54 +174,24 @@ def createAboutDialog(
         aboutDialog.set_website( website )
         aboutDialog.set_website_label( website )
 
-        if translatorCredit is not None:
+        if not( translatorCredit is None or translatorCredit == "" ):
             aboutDialog.set_translator_credits( translatorCredit )
+
+        notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
+        if type( notebookOrStack ).__name__ == "Notebook":
+            notebookOrStack = notebookOrStack.get_nth_page( 0 )
+        else: # Stack
+            notebookOrStack = notebookOrStack.get_children()[ 0 ]
+
+        changeLogURL = "file://" + os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog"
+        changeLogLabelToolTip = "file://" + os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog"
+        label = Gtk.Label()
+        label.set_markup( changeLogLabelBeforeLink + " <a href=\'" + changeLogURL + "\' title=\'" + changeLogLabelToolTip + "\'>" + changeLogLabelAnchor + "</a> " + changeLogLabelAfterLink )
+        label.show()
+        notebookOrStack.add( label )
 
         return aboutDialog
 
-
-def createChangeLogScrollableWindow( changeLogPathAndFileName, errorMessage, logging ):
-    textView = Gtk.TextView()
-    textView.set_editable( False )
-    textBuffer = textView.get_buffer()
-    textBuffer.set_text( getChangeLog( changeLogPathAndFileName, errorMessage, logging ) )
-
-    scrolledWindow = Gtk.ScrolledWindow()
-    scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-    scrolledWindow.set_hexpand( True )
-    scrolledWindow.set_vexpand( True )
-    scrolledWindow.add( textView )
-    scrolledWindow.show_all()
-    return scrolledWindow
-
-
-# Assumes a typical format for a Debian change log file.
-def getChangeLog( changeLogPathAndFileName, errorMessage, logging ):
-    contents = None
-    if os.path.exists( changeLogPathAndFileName ): 
-        try:
-            with gzip.open( changeLogPathAndFileName, "rb" ) as f:
-                changeLogContents = re.split( "\n\n\n", f.read().decode() )
-
-            contents = ""
-            for changeLogEntry in changeLogContents:
-                changeLogEntry = changeLogEntry.split( "\n" )
-                version = changeLogEntry[ 0 ].split( "(" )[ 1 ].split( "-1)" )[ 0 ]
-                dateTime = changeLogEntry[ len( changeLogEntry ) - 1 ].split( ">" )[ 1 ].split( "+" )[ 0 ].strip()
-                changes = "\n".join( changeLogEntry[ 2 : len( changeLogEntry ) - 2 ] )
-                changes = changes.replace( "    ", "     " )
-                contents += "Version " + version + " (" + dateTime + ")\n" + changes + "\n\n"
-
-            contents = contents.strip()
-
-        except Exception as e:
-            if not logging is None:
-                logging.exception( e )
-                logging.error( "Error reading change log: " + changeLogPathAndFileName )
-
-            contents = errorMessage
-
-    return contents
 
 # Log file handler.  Truncates the file when the file size limit is reached.
 # http://stackoverflow.com/questions/24157278/limit-python-log-file
