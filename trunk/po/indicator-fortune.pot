@@ -47,10 +47,6 @@ msgstr ""
 msgid "No fortunes enabled!"
 msgstr ""
 
-#: indicator-fortune.py:182
-msgid "Change Log"
-msgstr ""
-
 #: indicator-fortune.py:183
 msgid "translator-credits"
 msgstr ""

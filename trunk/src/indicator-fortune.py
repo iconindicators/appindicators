@@ -43,7 +43,6 @@ class IndicatorFortune:
     AUTHOR = "Bernard Giannetti"
     VERSION = "1.0.19"
     ICON = INDICATOR_NAME
-    CHANGELOG = "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
@@ -172,7 +171,11 @@ class IndicatorFortune:
                 INDICATOR_NAME,
                 IndicatorFortune.WEBSITE,
                 IndicatorFortune.VERSION,
-                ( "translator-credits" ) )
+                ( "translator-credits" ),
+                _( "View the" ),
+                _( "text file." ),
+                _( "{0}" ).format( "file://" + os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog" ),
+                _( "changelog" ) )
 
             self.dialog.run()
             self.dialog.destroy()
@@ -331,19 +334,11 @@ class IndicatorFortune:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-         # Change Log.
-        scrolledWindow = pythonutils.createChangeLogScrollableWindow(
-            IndicatorFortune.CHANGELOG,
-            _( "Unable to read the change log:\n\n\t{0}" ).format( IndicatorFortune.CHANGELOG ),
-            logging )
-        notebook.append_page( scrolledWindow, Gtk.Label( _( "Change Log" ) ) )
-
         self.dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorFortune.ICON )
         self.dialog.show_all()
-        notebook.set_current_page( 0 )
 
         if self.dialog.run() == Gtk.ResponseType.OK:
             if radioMiddleMouseClickNewFortune.get_active():

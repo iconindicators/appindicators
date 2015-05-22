@@ -50,10 +50,6 @@ msgstr "Изречения не заданы!"
 msgid "No fortunes enabled!"
 msgstr "Изречения не включены!"
 
-#: indicator-fortune.py:182
-msgid "Change Log"
-msgstr "Список изменений"
-
 #: indicator-fortune.py:183
 msgid "translator-credits"
 msgstr "Олег Мойсейчук"
