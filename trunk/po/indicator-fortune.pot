@@ -246,3 +246,12 @@ msgstr ""
 #: indicator-fortune.py:510
 msgid "Choose a directory containing a fortune .dat file(s)"
 msgstr ""
+
+msgid "View the"
+msgstr ""
+
+msgid "changelog"
+msgstr ""
+
+msgid "text file."
+msgstr ""

@@ -278,3 +278,12 @@ msgstr "Выберите файл .dat с изречениями"
 #: indicator-fortune.py:510
 msgid "Choose a directory containing a fortune .dat file(s)"
 msgstr "Выберите папку, содержащую файл(ы) .dat с изречениями"
+
+msgid "View the"
+msgstr "Просмотреть"
+
+msgid "changelog"
+msgstr "список изменений"
+
+msgid "text file."
+msgstr "."
