@@ -1,3 +1,10 @@
+indicator-stardate (1.0.29-1) precise; urgency=low
+
+  * Bug fix: The changelog path was incorrect.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 22 May 2015 18:05:07 +1000
+
+
 indicator-stardate (1.0.28-1) precise; urgency=low
 
   * GTK.AboutDialog now uses a Stack rather than Notebook to hold the
