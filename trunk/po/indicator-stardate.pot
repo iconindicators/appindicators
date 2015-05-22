@@ -99,5 +99,11 @@ msgstr ""
 msgid "Preferences"
 msgstr ""
 
-msgid "General"
+msgid "View the"
+msgstr ""
+
+msgid "changelog"
+msgstr ""
+
+msgid "text file."
 msgstr ""

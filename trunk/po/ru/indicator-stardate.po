@@ -116,5 +116,11 @@ msgstr "Запускать индикатор автоматически."
 msgid "Preferences"
 msgstr "Параметры"
 
-msgid "General"
-msgstr "Общие"
+msgid "View the"
+msgstr "Просмотреть"
+
+msgid "changelog"
+msgstr "список изменений"
+
+msgid "text file."
+msgstr "."
