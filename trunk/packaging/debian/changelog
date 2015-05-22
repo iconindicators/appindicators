@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.43-1) precise; urgency=low
+
+  * Bug fix: The changelog path was incorrect.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 22 May 2015 18:05:07 +1000
+
+
 indicator-virtual-box (1.0.42-1) precise; urgency=low
 
   * Bug fix: The test to determine if VBoxManage is installed failed if
