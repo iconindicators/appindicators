@@ -19,6 +19,7 @@ icons/ubuntu-mono-light/indicator-virtual-box.svg usr/share/icons/ubuntu-mono-li
 icons/ubuntu-mono-light/indicator-virtual-box.svg usr/share/icons/ubuntu-mono-light/apps/24
 icons/ubuntu-mono-light/indicator-virtual-box.svg usr/share/icons/ubuntu-mono-light/apps/48
 indicator-virtual-box.desktop usr/share/applications
+src/changelog usr/share/indicator-virtual-box
 src/indicator-virtual-box.py usr/share/indicator-virtual-box
 src/virtualmachine.py usr/share/indicator-virtual-box
 src/pythonutils.py usr/share/indicator-virtual-box
