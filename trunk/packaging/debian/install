@@ -19,6 +19,7 @@ icons/ubuntu-mono-light/indicator-ppa-download-statistics.svg usr/share/icons/ub
 icons/ubuntu-mono-light/indicator-ppa-download-statistics.svg usr/share/icons/ubuntu-mono-light/apps/24
 icons/ubuntu-mono-light/indicator-ppa-download-statistics.svg usr/share/icons/ubuntu-mono-light/apps/48
 indicator-ppa-download-statistics.desktop usr/share/applications
+src/changelog usr/share/indicator-ppa-download-statistics
 src/indicator-ppa-download-statistics.py usr/share/indicator-ppa-download-statistics
 src/ppa.py usr/share/indicator-ppa-download-statistics
 src/pythonutils.py usr/share/indicator-ppa-download-statistics
