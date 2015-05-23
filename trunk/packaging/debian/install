@@ -19,6 +19,7 @@ icons/ubuntu-mono-light/*.svg usr/share/icons/ubuntu-mono-light/apps/22
 icons/ubuntu-mono-light/*.svg usr/share/icons/ubuntu-mono-light/apps/24
 icons/ubuntu-mono-light/*.svg usr/share/icons/ubuntu-mono-light/apps/48
 indicator-lunar.desktop usr/share/applications
+src/changelog usr/share/indicator-lunar
 src/indicator-lunar.py usr/share/indicator-lunar
 src/eclipse.py usr/share/indicator-lunar
 src/satellite.py usr/share/indicator-lunar

@@ -1,3 +1,10 @@
+indicator-lunar (1.0.61-1) precise; urgency=low
+
+  * Bug fix: The changelog was not added to the debian/rules file.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 22 May 2015 23:55:10 +1000
+
+
 indicator-lunar (1.0.60-1) precise; urgency=low
 
   * Bug fix: Satellite notification failed due to badly parsed strings.
