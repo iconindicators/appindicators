@@ -1,4 +1,4 @@
-indicator-stardate (1.0.39-1) precise; urgency=low
+indicator-stardate (1.0.30-1) precise; urgency=low
 
   * Bug fix: The changelog was not added to the debian/rules file.
 
