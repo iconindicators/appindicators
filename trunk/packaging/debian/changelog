@@ -1,3 +1,10 @@
+indicator-stardate (1.0.39-1) precise; urgency=low
+
+  * Bug fix: The changelog was not added to the debian/rules file.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 22 May 2015 23:55:10 +1000
+
+
 indicator-stardate (1.0.29-1) precise; urgency=low
 
   * Bug fix: The changelog path was incorrect.
