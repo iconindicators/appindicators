@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.45-1) precise; urgency=low
+
+  * Bug fix: When a corrupt/missing VM is present, VBoxManage can give back
+    empty results.  All calls now to VBoxManage now handles this situation.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 26 May 2015 16:03:29 +1000
+
+
 indicator-virtual-box (1.0.44-1) precise; urgency=low
 
   * Bug fix: The changelog was not added to the debian/rules file.
