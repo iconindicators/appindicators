@@ -48,7 +48,7 @@ import itertools, pythonutils, json, locale, logging, operator, os, re, shutil, 
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.50"
+    VERSION = "1.0.51"
     ICON = INDICATOR_NAME
     CHANGELOG = "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -285,7 +285,7 @@ class IndicatorPPADownloadStatistics:
                 INDICATOR_NAME,
                 IndicatorPPADownloadStatistics.WEBSITE,
                 IndicatorPPADownloadStatistics.VERSION,
-                ( "translator-credits" ),
+                _( "translator-credits" ),
                 _( "View the" ),
                 _( "text file." ),
                 _( "changelog" ) )
