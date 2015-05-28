@@ -59,7 +59,7 @@ class AstronomicalObjectType: Moon, OrbitalElement, Planet, PlanetaryMoon, Satel
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.61"
+    VERSION = "1.0.62"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -2110,7 +2110,7 @@ class IndicatorLunar:
                 INDICATOR_NAME,
                 IndicatorLunar.WEBSITE,
                 IndicatorLunar.VERSION,
-                ( "translator-credits" ),
+                _( "translator-credits" ),
                 _( "View the" ),
                 _( "text file." ),
                 _( "changelog" ) )
