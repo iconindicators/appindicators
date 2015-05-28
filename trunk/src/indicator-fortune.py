@@ -41,7 +41,7 @@ import json, locale, logging, os, pythonutils, re, shutil
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.21"
+    VERSION = "1.0.22"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -171,7 +171,7 @@ class IndicatorFortune:
                 INDICATOR_NAME,
                 IndicatorFortune.WEBSITE,
                 IndicatorFortune.VERSION,
-                ( "translator-credits" ),
+                _( "translator-credits" ),
                 _( "View the" ),
                 _( "text file." ),
                 _( "changelog" ) )
