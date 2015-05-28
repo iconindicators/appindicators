@@ -404,7 +404,7 @@ class IndicatorVirtualBox:
                 INDICATOR_NAME,
                 IndicatorVirtualBox.WEBSITE,
                 IndicatorVirtualBox.VERSION,
-                ( "translator-credits" ),
+                _( "translator-credits" ),
                 _( "View the" ),
                 _( "text file." ),
                 _( "changelog" ) )
