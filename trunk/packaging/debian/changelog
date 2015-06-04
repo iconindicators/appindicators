@@ -3,6 +3,7 @@ indicator-virtual-box (1.0.45-1) precise; urgency=low
   * Bug fix: When a corrupt/missing VM is present, VBoxManage can give back
     empty results.  All calls now to VBoxManage now handles this situation.
   * Bug fix: Omitted the '_' from 'translator-credits' in the About dialog.
+  * Added Czech translation.  Thanks to Filip Oščádal. 
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 26 May 2015 16:03:29 +1000
 
@@ -79,7 +80,7 @@ indicator-virtual-box (1.0.38-1) precise; urgency=low
 indicator-virtual-box (1.0.37-1) precise; urgency=low
 
   * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
-    in this miracle! 
+    in this miracle!
   * Added Russian translation.  Thanks to Oleg Moiseichuk. 
   * About dialog changed to accept translator information.
   * Overhaul of repository structure and build script.
