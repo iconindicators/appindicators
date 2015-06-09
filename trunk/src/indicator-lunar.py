@@ -1039,10 +1039,10 @@ class IndicatorLunar:
             self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] # Ensures the notification happens once per satellite pass.
 
             # Parse the satellite summary/message to create the notification...
-            riseTime = self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
-            riseAzimuth = self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] +  "°"
-            setTime = self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ]
-            setAzimuth = self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] + "°"
+            riseTime = self.getLocalDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] )
+            riseAzimuth = str( self.getDecimalDegrees( self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ], False, 2 ) ) + "° (" + self.trimDecimal( self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] ) + ")" 
+            setTime = self.getLocalDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] )
+            setAzimuth = str( self.getDecimalDegrees( self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ], False, 2 ) ) + "° (" + self.trimDecimal( self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] ) + ")" 
             tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
 
             summary = self.satelliteNotificationSummary. \

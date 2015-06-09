@@ -1,6 +1,8 @@
 indicator-lunar (1.0.62-1) precise; urgency=low
 
   * Bug fix: Omitted the '_' from 'translator-credits' in the About dialog.
+  * Bug fix: Satellite notification rise/set azimuth mixed degrees with HMS.
+  * Satellite notification rise/set time now in local rather than UTC.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 26 May 2015 16:03:29 +1000
 
