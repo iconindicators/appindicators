@@ -1,4 +1,4 @@
-# Russian translation for indicator-virtual-box.
+# Czech translation for indicator-virtual-box.
 # Copyright (C) 2015 Bernard Giannetti
 # This file is distributed under the same license as the indicator-virtual-box package.
 # Bernard Giannetti <thebernmeister@hotmail.com>, 2015.
@@ -9,87 +9,87 @@ msgstr ""
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2015-05-22 18:05+1000\n"
 "PO-Revision-Date: 2015-07-02 12:25+1000\n"
-"Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
-"Language-Team: Russian\n"
-"Language: ru\n"
+"Last-Translator: Filip Oščádal <filip@mxd.cz>\n"
+"Language-Team: Czech\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: indicator-virtual-box.py:59
 msgid " Shows VirtualBox™ virtual machines and allows them to be started."
-msgstr "Показывает виртуальные машины VirtualBox и позволяет их запускать."
+msgstr " Zobrazuje virtuální stroje VirtualBox™ a umožňuje jejich start."
 
 #: indicator-virtual-box.py:95
 msgid "(no virtual machines exist)"
-msgstr "(виртуальные машины не найдены)"
+msgstr "(neexistuje žádný virtuální stroj)"
 
 #: indicator-virtual-box.py:123
 msgid "Launch VirtualBox Manager"
-msgstr "Запустить Менеджер VirtualBox"
+msgstr "Spustit VirtualBox Manager"
 
 #: indicator-virtual-box.py:128
 msgid "(VirtualBox is not installed)"
-msgstr "(VirtualBox не установлен)"
+msgstr "(Virtualbox není nainstalován)"
 
 #: indicator-virtual-box.py:329
 msgid ""
 "The VM could not be found - either it has been renamed or deleted.  The list "
 "of VMs has been refreshed - please try again."
 msgstr ""
-"ВМ не найдена - она была переименована или удалена. Список ВМ был обновлён, "
-"пожалуйста, повторите попытку."
+"Není možno nalézt VM - Buď byl přejmenován nebo smazán. Seznam "
+"aktuálních VM byl aktualizován - zkuste to znovu."
 
 #: indicator-virtual-box.py:344
 msgid ""
 "The VM is running but its window could not be found - perhaps it is running "
 "headless."
 msgstr ""
-"ВМ запущена, но её окно не найдено - вероятно, она выполняется в автономном "
-"режиме."
+"Virtuální stroj běží, ale jeho ohno se nedá nalézy - možná běží "
+"v režimu headless."
 
 #: indicator-virtual-box.py:349
 msgid ""
 "There is more than one VM with the same name - unfortunately your VM cannot "
 "be uniquely identified."
 msgstr ""
-"Существует более одной ВМ с уникальным именем - к сожалению, ваша ВМ не "
-"может быть однозначно распознана."
+"Bohužel již existuje VM se stejným názvem - není možné pojmenovat "
+"další VM stejně."
 
 #: indicator-virtual-box.py:359
+#, python-brace-format
 msgid "The VM '{0}' could not be started - check the log file: {1}"
-msgstr "ВМ '{0}' не может быть запущена, проверьте журнал: {1}"
+msgstr "Stroj '{0}' nelze spustit - zkontrolujte soubor logu: {1}"
 
 #: indicator-virtual-box.py:406
 msgid "translator-credits"
-msgstr "Олег Мойсейчук"
+msgstr "překladatel"
 
 #: indicator-virtual-box.py:446
 msgid "Virtual Machine"
-msgstr "Виртуальная машина"
+msgstr "Virtuální stroj"
 
 #: indicator-virtual-box.py:447 indicator-virtual-box.py:515
 #: indicator-virtual-box.py:596
 msgid "Autostart"
-msgstr "Автозапуск"
+msgstr "Automatický start"
 
 #: indicator-virtual-box.py:448 indicator-virtual-box.py:578
 msgid "Start Command"
-msgstr "Команда запуска"
+msgstr "Startovací příkaz"
 
 #: indicator-virtual-box.py:449
 msgid "Double click to edit a VM's properties."
-msgstr "Щёлкните дважды, чтобы отредактировать свойства ВМ."
+msgstr "Dvojklikem editujte nastavení stroje."
 
 #: indicator-virtual-box.py:457
 msgid "Virtual Machines"
-msgstr "Виртуальные машины"
+msgstr "Virtuální stroje"
 
 #: indicator-virtual-box.py:472
 msgid "Show groups as submenus"
-msgstr "Показывать подменю для групп"
+msgstr "Skupiny jako podřízená menu"
 
 #: indicator-virtual-box.py:474
 msgid ""
@@ -97,56 +97,57 @@ msgid ""
 "in submenus, or shown with their\n"
 "VMs as an indented list."
 msgstr ""
-"Группы с ВМ могут быть отображены в виде\n"
-"подменю или в виде списка с отступом."
+"Skupiny mohou být zobrazeny\n"
+"v podemnu, nebo tak jak je určeno\n"
+"v seznamu VM."
 
 #: indicator-virtual-box.py:479
 msgid "Sort VMs alphabetically"
-msgstr "Сортировать ВМ по алфавиту"
+msgstr "Třídit stroje abecedně"
 
 #: indicator-virtual-box.py:481
 msgid ""
 "VMs can be sorted alphabetically or\n"
 "as set in the VirtualBox Manager."
 msgstr ""
-"ВМ могут быть отсортированы по алфавиту\n"
-"или так, как задано в Менеджере VirtualBox."
+"VM mohou být setříděny dle abecedy\n"
+"nebo dle VirtualBox Manageru."
 
 #: indicator-virtual-box.py:491
 msgid "Refresh interval (minutes)"
-msgstr "Интервал обновления (в минутах)"
+msgstr "Obnovovací interval (minuty)"
 
 #: indicator-virtual-box.py:499
 msgid ""
 "How often the list of VMs and\n"
 "running status is updated."
 msgstr ""
-"Насколько часто обновляется список\n"
-"ВМ и статус запущенных машин."
+"Jak často je seznam VM\n"
+"aktualizován."
 
 #: indicator-virtual-box.py:503
 msgid "Startup delay (seconds)"
-msgstr "Задержка запуска (в секундах)"
+msgstr "Zpoždění startu (sekundy)"
 
 #: indicator-virtual-box.py:511
 msgid ""
 "Amount of time to wait from\n"
 "starting one VM to the next."
 msgstr ""
-"Интервал времени после запуска\n"
-"одной ВМ до запуска следующей."
+"Časová prodleva před\n"
+"startem dalšího stroje."
 
 #: indicator-virtual-box.py:516
 msgid "Run the indicator automatically."
-msgstr "Запускать индикатор автоматически."
+msgstr "Spustit indikátor automaticky."
 
 #: indicator-virtual-box.py:520
 msgid "General"
-msgstr "Общие"
+msgstr "Obecné"
 
 #: indicator-virtual-box.py:522
 msgid "Preferences"
-msgstr "Параметры"
+msgstr "Nastavení"
 
 #: indicator-virtual-box.py:589
 msgid ""
@@ -155,33 +156,34 @@ msgid ""
 "\t'VBoxManage startvm %VM%' or\n"
 "\t'VBoxHeadless --startvm %VM% --vrde off'"
 msgstr ""
-"Консольная команда для запуска ВМ, например:\n"
-"\t'VBoxManage startvm %VM%' или\n"
+"Příkaz z řádky ke spuštění\n"
+"VM stroje jako\n"
+"\t'VBoxManage startvm %VM%' or\n"
 "\t'VBoxHeadless --startvm %VM% --vrde off'"
 
 #: indicator-virtual-box.py:597
 msgid "Run the VM when the indicator starts."
-msgstr "Запускать ВМ при старте индикатора."
+msgstr "Spustit VM po startu indikátoru."
 
 #: indicator-virtual-box.py:602
 msgid "VM Properties"
-msgstr "Свойства ВМ"
+msgstr "Vlastnosti stroje"
 
 #: indicator-virtual-box.py:614
 msgid "The start command cannot be empty."
-msgstr "Команда запуска не может быть пустой."
+msgstr "Startovací příkaz nemůže být prázdný."
 
 #: indicator-virtual-box.py:619
 msgid ""
 "The start command must contain %VM% which is substituted for the VM name/id."
 msgstr ""
-"Команда запуска должна содержать %VM%, этот параметр будет заменён именем ВМ."
+"Příkaz ke startu musí obsahovat %VM% kde je nahrazeno jméno VM stroje/id."
 
 msgid "View the"
-msgstr "Просмотреть"
+msgstr "Zobrazit"
 
 msgid "changelog"
-msgstr "список изменений"
+msgstr "změnový"
 
 msgid "text file."
-msgstr "."
+msgstr "textový soubor."
