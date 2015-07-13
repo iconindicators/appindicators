@@ -105,7 +105,9 @@ class Stardate( object ):
     # Gets the period (in seconds) between updates/changes to the current stardate.
     def getStardateFractionalPeriod( self ):
         if self.classic:
-            if self.index == -1: raise Exception( "Please set a valid gregorian date or stardate." )
+            if self.index == -1:
+                raise Exception( "Please set a valid gregorian date or stardate." )
+
             return int( 1.0 / ( self.stardateRates[ self.index ] / 24.0 / 60.0 / 60.0 ) / 10.0 )
 
         return ( 24 * 60 * 60 )
