@@ -158,7 +158,8 @@ class IndicatorVirtualBox:
         if virtualMachine is not None:
             self.startVirtualMachine( virtualMachine, virtualMachines, 0 ) # Set a zero delay as this is not an autostart.
         else:
-            logging.error( "Unknown VM: " + widget.props.name )
+            GLib.timeout_add_seconds( 1, self.onRefresh, False )
+            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "Missing VM...\n\nName: {0}\nID: {1}" ).format( widget.props.label, widget.props.name ) )
 
 
     def getVirtualMachine( self, uuid, virtualMachines ):

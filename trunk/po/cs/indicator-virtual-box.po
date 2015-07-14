@@ -33,6 +33,9 @@ msgstr "Spustit VirtualBox Manager"
 msgid "(VirtualBox is not installed)"
 msgstr "(Virtualbox není nainstalován)"
 
+msgid "Missing VM...\n\nName: {0}\nID: {1}"
+msgstr "Chybějící VM...\n\nJméno: {0}\nID: {1}"
+
 #: indicator-virtual-box.py:329
 msgid ""
 "The VM could not be found - either it has been renamed or deleted.  The list "

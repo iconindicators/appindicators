@@ -1,6 +1,7 @@
 indicator-virtual-box (1.0.46-1) precise; urgency=low
 
   * Added Czech translation.  Thanks to Filip Oščádal.
+  * Report directly to the user when a VM cannot be located.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 2 Jul 2015 12:30:09 +1000
 
