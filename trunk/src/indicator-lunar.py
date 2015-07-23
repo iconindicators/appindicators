@@ -59,7 +59,7 @@ class AstronomicalObjectType: Moon, OrbitalElement, Planet, PlanetaryMoon, Satel
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.62"
+    VERSION = "1.0.63"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -1068,7 +1068,8 @@ class IndicatorLunar:
                       replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
                       replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, self.getDisplayData( key + ( IndicatorLunar.DATA_VISIBLE, ) ) )
 
-            Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+#TODO Uncomment!
+#             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
 
     def updateMoonMenu( self, menu ):
@@ -1349,6 +1350,7 @@ class IndicatorLunar:
         key = ( astronomicalObjectType, dataTag )
         menu.append( Gtk.MenuItem( _( "Right Ascension: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RIGHT_ASCENSION, ) ) ) )
         menu.append( Gtk.MenuItem( _( "Declination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DECLINATION, ) ) ) )
+        menu.append( Gtk.SeparatorMenuItem() )
         menu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
         menu.append( Gtk.MenuItem( _( "Altitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ALTITUDE, ) ) ) )
 
@@ -2418,16 +2420,21 @@ class IndicatorLunar:
 
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
+        stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name, constellation translated name.
         for starName in IndicatorLunar.STAR_NAMES_TRANSLATIONS.keys():
-            stars.append( [ starName in self.stars, starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
+            starTranslated = IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ]
+            constellationTranslated = self.getDisplayData( ( AstronomicalObjectType.Star, starName.upper(), IndicatorLunar.DATA_CONSTELLATION ) )
+            stars.append( [ starName in self.stars, starName, starTranslated, constellationTranslated ] )
 
         stars = sorted( stars, key = lambda x: ( x[ 2 ] ) )
-        starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name (not displayed), translated star name.
+        starStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, star name (not displayed), translated star name, constellation translated name.
         for star in stars:
             starStore.append( star )
 
-        tree = Gtk.TreeView( starStore )
+        starStoreSort = Gtk.TreeModelSort( model = starStore )
+        starStoreSort.set_sort_column_id( 2, Gtk.SortType.ASCENDING )
+
+        tree = Gtk.TreeView( starStoreSort )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.set_tooltip_text( _( 
             "Check a star to display in the menu.\n\n" + \
@@ -2441,7 +2448,13 @@ class IndicatorLunar:
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, None, displayTagsStore, AstronomicalObjectType.Star )
         tree.append_column( treeViewColumn )
 
-        tree.append_column( Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 ) )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 )
+        treeViewColumn.set_sort_column_id( 2 )
+        tree.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Constellation" ), Gtk.CellRendererText(), text = 3 )
+        treeViewColumn.set_sort_column_id( 3 )
+        tree.append_column( treeViewColumn )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
