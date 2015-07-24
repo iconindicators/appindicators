@@ -94,6 +94,7 @@ class IndicatorLunar:
     SETTINGS_CITY_NAME = "cityName"
     SETTINGS_HIDE_BODY_IF_NEVER_UP = "hideBodyIfNeverUp"
     SETTINGS_INDICATOR_TEXT = "indicatorText"
+    SETTINGS_GROUP_STARS_BY_CONSTELLATION = "groupStarsByConstellation"
     SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS = "hideSatelliteIfNoVisiblePass"
     SETTINGS_ORBITAL_ELEMENT_URL = "orbitalElementURL"
     SETTINGS_ORBITAL_ELEMENTS = "orbitalElements"
@@ -1068,8 +1069,7 @@ class IndicatorLunar:
                       replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
                       replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, self.getDisplayData( key + ( IndicatorLunar.DATA_VISIBLE, ) ) )
 
-#TODO Uncomment!
-#             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+            Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
 
     def updateMoonMenu( self, menu ):
@@ -1215,24 +1215,55 @@ class IndicatorLunar:
             stars.append( [ starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
 
         if len( stars ) > 0:
-            menuItem = Gtk.MenuItem( _( "Stars" ) )
-            menu.append( menuItem )
+            starsMenuItem = Gtk.MenuItem( _( "Stars" ) )
+            menu.append( starsMenuItem )
 
             if self.showStarsAsSubMenu:
-                subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
+                starsSubMenu = Gtk.Menu()
+                starsMenuItem.set_submenu( starsSubMenu )
 
-            stars = sorted( stars, key = lambda x: ( x[ 1 ] ) )
-            for starName, starNameTranslated in stars:
-                dataTag = starName.upper()
-                if self.showStarsAsSubMenu:
-                    menuItem = Gtk.MenuItem( starNameTranslated )
-                    subMenu.append( menuItem )
-                else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starNameTranslated )
-                    menu.append( menuItem )
+            if self.groupStarsByConstellation:
+                constellations = { }
+                for starName, starNameTranslated in stars:
+                    constellationTranslated = self.getDisplayData( ( AstronomicalObjectType.Star, starName.upper(), IndicatorLunar.DATA_CONSTELLATION ) )
+                    if constellationTranslated not in constellations:
+                        constellations[ constellationTranslated ] = [ ]
 
-                self.updateCommonMenu( menuItem, AstronomicalObjectType.Star, dataTag )
+                    constellations[ constellationTranslated ].append( [ starName, starNameTranslated ] )
+
+                for constellationTranslated in sorted( constellations ):
+                    if self.showStarsAsSubMenu:
+                        constellationMenuItem = Gtk.MenuItem( constellationTranslated )
+                        starsSubMenu.append( constellationMenuItem )
+                        constellationSubMenu = Gtk.Menu()
+                        constellationMenuItem.set_submenu( constellationSubMenu )
+                    else:
+                        menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + constellationTranslated )
+                        menu.append( menuItem )
+
+                    stars = sorted( constellations[ constellationTranslated ], key = lambda x: ( x[ 1 ] ) )
+                    for starName, starNameTranslated in stars:
+                        dataTag = starName.upper()
+                        if self.showStarsAsSubMenu:
+                            menuItem = Gtk.MenuItem( starNameTranslated )
+                            constellationSubMenu.append( menuItem )
+                        else:
+                            menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.INDENT + starNameTranslated )
+                            menu.append( menuItem )
+  
+                        self.updateCommonMenu( menuItem, AstronomicalObjectType.Star, dataTag )
+            else:
+                stars = sorted( stars, key = lambda x: ( x[ 1 ] ) )
+                for starName, starNameTranslated in stars:
+                    dataTag = starName.upper()
+                    if self.showStarsAsSubMenu:
+                        menuItem = Gtk.MenuItem( starNameTranslated )
+                        starsSubMenu.append( menuItem )
+                    else:
+                        menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starNameTranslated )
+                        menu.append( menuItem )
+
+                    self.updateCommonMenu( menuItem, AstronomicalObjectType.Star, dataTag )
 
 
     def updateOrbitalElementsMenu( self, menu ):
@@ -1287,7 +1318,9 @@ class IndicatorLunar:
            astronomicalObjectType == AstronomicalObjectType.Planet:
             subMenu.append( Gtk.MenuItem( _( "Illumination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ILLUMINATION, ) ) ) )
 
-        subMenu.append( Gtk.MenuItem( _( "Constellation: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_CONSTELLATION, ) ) ) )
+        if ( astronomicalObjectType == AstronomicalObjectType.Star and not self.groupStarsByConstellation ) or not astronomicalObjectType == AstronomicalObjectType.Star:
+            subMenu.append( Gtk.MenuItem( _( "Constellation: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_CONSTELLATION, ) ) ) )
+
         subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
@@ -2261,6 +2294,11 @@ class IndicatorLunar:
             "performance." ) )
         grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
 
+        groupStarsByConstellationCheckbox = Gtk.CheckButton( _( "Group stars by constellation" ) )
+        groupStarsByConstellationCheckbox.set_margin_top( 15 )
+        groupStarsByConstellationCheckbox.set_active( self.groupStarsByConstellation )
+        grid.attach( groupStarsByConstellationCheckbox, 0, 3, 1, 1 )
+
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
 
@@ -2284,7 +2322,7 @@ class IndicatorLunar:
 
         box.pack_start( spinnerOrbitalElementMagnitude, False, False, 0 )
 
-        grid.attach( box, 0, 3, 1, 1 )
+        grid.attach( box, 0, 4, 1, 1 )
 
         orbitalElementsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new orbital elements" ) )
         orbitalElementsAddNewCheckbox.set_margin_top( 15 )
@@ -2297,7 +2335,7 @@ class IndicatorLunar:
             "In addition, any orbital elements\n" + \
             "which are currently unchecked will\n" + \
             "become checked." ) )
-        grid.attach( orbitalElementsAddNewCheckbox, 0, 4, 1, 1 )
+        grid.attach( orbitalElementsAddNewCheckbox, 0, 5, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
@@ -2318,7 +2356,7 @@ class IndicatorLunar:
 
         box.pack_start( satelliteMenuText, True, True, 0 )
 
-        grid.attach( box, 0, 5, 1, 1 )
+        grid.attach( box, 0, 6, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 15 )
@@ -2328,7 +2366,7 @@ class IndicatorLunar:
             "alphabetically by menu text.\n\n" + \
             "If checked, satellites will be\n" + \
             "sorted by rise date/time." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 6, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 7, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( _( "Hide satellites which have no upcoming visible pass" ) )
         hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 15 )
@@ -2344,7 +2382,7 @@ class IndicatorLunar:
             "displayed impacting the indicator's\n" + \
             "performance." ) )
 
-        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 7, 1, 1 )
+        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 8, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 15 )
@@ -2356,7 +2394,7 @@ class IndicatorLunar:
             "In addition, any satellites which\n" + \
             "are currently unchecked will\n" + \
             "become checked." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 8, 1, 1 )
+        grid.attach( satellitesAddNewCheckbox, 0, 9, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
@@ -2386,7 +2424,7 @@ class IndicatorLunar:
         reset.set_tooltip_text( _( "Reset the satellite look-up URL to factory default." ) )
         box.pack_start( reset, False, False, 0 )
 
-        grid.attach( box, 0, 9, 1, 1 )
+        grid.attach( box, 0, 10, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -2913,6 +2951,7 @@ class IndicatorLunar:
             self.orbitalElementsAddNew = orbitalElementsAddNewCheckbox.get_active()
             self.orbitalElementsMagnitude = spinnerOrbitalElementMagnitude.get_value_as_int()
             self.hideBodyIfNeverUp = hideBodyIfNeverUpCheckbox.get_active()
+            self.groupStarsByConstellation = groupStarsByConstellationCheckbox.get_active()
             self.satelliteMenuText = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteMenuText.get_text().strip() ) 
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active()
@@ -3380,6 +3419,7 @@ class IndicatorLunar:
 
     def loadSettings( self ):
         self.getDefaultCity()
+        self.groupStarsByConstellation = False
         self.hideBodyIfNeverUp = True
         self.hideSatelliteIfNoVisiblePass = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
@@ -3425,6 +3465,7 @@ class IndicatorLunar:
             self.cityName = settings.get( IndicatorLunar.SETTINGS_CITY_NAME, self.cityName )
             _city_data[ self.cityName ] = ( str( cityLatitude ), str( cityLongitude ), float( cityElevation ) ) # Insert/overwrite the cityName and information into the cities.
 
+            self.groupStarsByConstellation = settings.get( IndicatorLunar.SETTINGS_GROUP_STARS_BY_CONSTELLATION, self.groupStarsByConstellation )
             self.hideBodyIfNeverUp = settings.get( IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
             self.hideSatelliteIfNoVisiblePass = settings.get( IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
             self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
@@ -3477,6 +3518,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
                 IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
                 IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
+                IndicatorLunar.SETTINGS_GROUP_STARS_BY_CONSTELLATION: self.groupStarsByConstellation,
                 IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
                 IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
                 IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,

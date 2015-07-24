@@ -2,6 +2,8 @@ indicator-lunar (1.0.63-1) precise; urgency=low
 
   * Added a separator between RA/Dec and Az/Alt as these are independent.
   * Added the constellation adjacent to each star in the preferences.
+  * Stars can now be grouped by their constellation - when activated the
+    constellation will be dropped from the star's information.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 23 Jul 2015 22:30:13 +1000
 

@@ -1769,6 +1769,9 @@ msgstr "Созвездие: "
 msgid "Constellation"
 msgstr "Созвездие"
 
+msgid "Group stars by constellation"
+msgstr "Группировать звёзды по созвездиям"
+
 #: indicator-lunar.py:1157
 msgid "Magnitude: "
 msgstr "Звёздная величина: "
