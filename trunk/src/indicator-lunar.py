@@ -835,7 +835,8 @@ class IndicatorLunar:
         GObject.threads_init()
         self.lock = threading.Lock()
 
-        filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
+#TODO Put back to 10000
+        filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 1000000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         Notify.init( INDICATOR_NAME )
 
@@ -1041,9 +1042,9 @@ class IndicatorLunar:
 
         lunarIlluminationPercentage = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_ILLUMINATION ) ] )
         if self.showWerewolfWarning and \
-           lunarIlluminationPercentage < self.werewolfWarningStartIlluminationPercentage and \
-           ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) > datetime.datetime.utcnow() ) and \
-           phaseIsBetweenNewAndFullInclusive:
+           phaseIsBetweenNewAndFullInclusive and \
+           lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
+           ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) < datetime.datetime.utcnow() ):
 
             summary = self.werewolfWarningSummary
             if self.werewolfWarningSummary == "":
@@ -1066,21 +1067,35 @@ class IndicatorLunar:
         else:
             satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
 
-        utcNow = datetime.datetime.utcnow()
+        utcNow = str( datetime.datetime.utcnow() )
         for satelliteName, satelliteNumber, riseTime in satelliteNameNumberRiseTimes:
             key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
 
+            if ( satelliteName, satelliteNumber ) in self.satelliteNotifications:
+                # There has been a previous notification for this satellite.
+                # Ensure that the current rise/set matches that of the previous notification.
+                # Due to a quirk of the astro backend, the date/time may not match exactly (be out by a few seconds or more).
+                # So need to ensure that the current rise/set and the previous rise/set overlap to be sure it is the same transit.
+                currentRise = self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
+                currentSet = self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ]
+                previousRise, previousSet = self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ]
+                overlap = ( currentRise < previousSet ) and ( currentSet > previousRise )
+                if overlap:
+                    continue
+
             # Ensure the current time is within the rise/set...
-            if str( utcNow ) < self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] or \
-               str( utcNow ) > self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ]:
+            if utcNow < self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] or \
+               utcNow > self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ]:
                 continue
 
-            # Show the notification for the particular satellite only once per pass...
-            if ( satelliteName, satelliteNumber ) in self.satelliteNotifications and \
-               str( utcNow ) < self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ]:
-                continue
-
-            self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] # Ensures the notification happens once per satellite pass.
+            self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] )
+                
+            logging.info(
+                str( utcNow ) + "\t" +
+                self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] + "\t" +
+                self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] + "\t" +
+                satelliteName + " - " + satelliteNumber )
+            #TODO testing
 
             # Parse the satellite summary/message to create the notification...
             riseTime = self.getLocalDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] )
@@ -1112,7 +1127,8 @@ class IndicatorLunar:
                       replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
                       replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, self.getDisplayData( key + ( IndicatorLunar.DATA_VISIBLE, ) ) )
 
-            Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+#TODO Uncomment
+#             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
 
     def updateMoonMenu( self, menu ):
@@ -3657,4 +3673,35 @@ class IndicatorLunar:
         return ( data, dateTime )
 
 
-if __name__ == "__main__": IndicatorLunar().main()
+if __name__ == "__main__": 
+
+#TODO    
+    test = True
+    if test:
+        data = { }
+        with open( "/home/bernard/indicator-lunar.log" ) as f:
+            lines = [ ]
+            for line in f:
+                splitLine = line.split( "\t" )
+                satelliteNameNumber = splitLine[ 3 ].strip() 
+                if satelliteNameNumber not in data:
+                    data[ satelliteNameNumber ] = [ ]
+
+                data[ satelliteNameNumber ].append( ( splitLine[ 1 ].strip(), splitLine[ 2 ].strip() ) )
+
+        for satelliteNameNumber in data:
+            riseSetPairs = data[ satelliteNameNumber ]
+#             print( len( riseSetPairs ) )
+            for i in range( len( riseSetPairs ) ):
+                j = i + 1
+                while j < len( riseSetPairs ):
+                    rise1, set1 = riseSetPairs[ i ]
+                    rise2, set2 = riseSetPairs[ j ]
+                    if rise2 < set1 and set2 > rise1:
+                        print( satelliteNameNumber, rise1, set1, rise2, set2 )
+
+                    j += 1
+
+        print( len( data ) )
+    else:
+        IndicatorLunar().main()
