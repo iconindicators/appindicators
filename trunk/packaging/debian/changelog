@@ -5,6 +5,8 @@ indicator-lunar (1.0.63-1) precise; urgency=low
     percentage and the hourly frequency.
   * Bug fix: The satellite notification would sometimes appear multiple times
     for a given satellite's transit.
+  * Made the satellite notification appear about a minute prior to when the
+    satellite rises.
   * Added a separator between RA/Dec and Az/Alt as these are independent.
   * Added the constellation adjacent to each star in the preferences.
   * Stars can now be grouped by their constellation - when activated the

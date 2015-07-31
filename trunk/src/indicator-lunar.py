@@ -81,7 +81,7 @@ class IndicatorLunar:
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_ORBITAL_ELEMENTS ]
 
     DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT = "%Y-%m-%d %H:%M:%S.%f"
 
     DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
     INDENT = "    "
@@ -881,7 +881,7 @@ class IndicatorLunar:
         if self.showSatelliteNotification:
             self.satelliteNotification()
 
-        self.nextUpdate = datetime.datetime.strptime( self.nextUpdate[ 0 : self.nextUpdate.rfind( ":" ) + 3 ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) # Parse from string back into a datetime.
+        self.nextUpdate = datetime.datetime.strptime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT ) # Parse from string back into a datetime.
         nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
 
         # Ensure the update period is positive, at most every minute and at least every hour.
@@ -1083,7 +1083,9 @@ class IndicatorLunar:
                     continue
 
             # Ensure the current time is within the rise/set...
-            if utcNow < self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] or \
+            # Subtract a minute from the rise time to force the notification to take place just prior to the satellite rise.
+            riseTimeMinusOneMinute = str( datetime.datetime.strptime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT ) - datetime.timedelta( minutes = 1 ) )
+            if utcNow < riseTimeMinusOneMinute or \
                utcNow > self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ]:
                 continue
 
@@ -1504,10 +1506,14 @@ class IndicatorLunar:
                     if not self.hideSatelliteIfNoVisiblePass:
                         subMenu.append( Gtk.MenuItem( _( "Visible: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_VISIBLE, ) ) ) )
 
-                    # Add the rise/set times to the next update, ensuring they are not in the past (the rise time will be in the past at times). 
-                    if self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] > now:
-                        self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.nextUpdate )
+                    # Add the rise to the next update, ensuring it is not in the past.
+                    # Subtract a minute from the rise time to spoof the next update to happen earlier.
+                    # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
+                    riseTimeMinusOneMinute = str( datetime.datetime.strptime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT ) - datetime.timedelta( minutes = 1 ) )
+                    if riseTimeMinusOneMinute > now:
+                        self.nextUpdate = self.getSmallestDateTime( riseTimeMinusOneMinute, self.nextUpdate )
 
+                    # Add the set time to the next update, ensuring it is not in the past.
                     if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > now:
                         self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
 
@@ -1531,11 +1537,9 @@ class IndicatorLunar:
         return secondDateTimeAsString
 
 
-    # Converts a UTC datetime string in the format 2015-05-11 22:51:42 to local datetime string.
-    # http://stackoverflow.com/a/13287083/2156453
+    # Converts a UTC datetime string in the format 2015-05-11 22:51:42.429093 to local datetime string.
     def getLocalDateTime( self, utcDateTimeString ):
-        utcDateTimeStringWithoutFractional = utcDateTimeString[ 0 : utcDateTimeString.rfind( ":" ) + 3 ]
-        utcDateTime = datetime.datetime.strptime( utcDateTimeStringWithoutFractional, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
+        utcDateTime = datetime.datetime.strptime( utcDateTimeString, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT )
         timestamp = calendar.timegm( utcDateTime.timetuple() )
         localDateTime = datetime.datetime.fromtimestamp( timestamp )
         localDateTime.replace( microsecond = utcDateTime.microsecond )        
@@ -2081,7 +2085,7 @@ class IndicatorLunar:
             logging.error( "No eclipse information found!" )
         else:
             key = ( astronomicalObjectType, dataTag )
-            self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
+            self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ] + ".0" # Needed to bring the date/time format into line with date/time generated by PyEphem.
             self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
             self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ] 
             self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
