@@ -8,6 +8,7 @@ indicator-lunar (1.0.63-1) precise; urgency=low
   * Made the satellite notification appear about a minute prior to when the
     satellite rises.
   * Added a separator between RA/Dec and Az/Alt as these are independent.
+  * Swapped order of RA/Dec and Az/Alt around as Az/Alt is easier to apply.
   * Added the constellation adjacent to each star in the preferences.
   * Stars can now be grouped by their constellation - when activated the
     constellation will be dropped from the star's information.
