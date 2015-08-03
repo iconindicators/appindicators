@@ -23,6 +23,9 @@
 # http://celestrak.com/columns/v04n03
 
 
+class SatelliteType: Debris, Platform, RocketBooster, Unknown = range( 4 )
+
+
 class TLE:
     def __init__( self, tleTitle, tleLine1, tleLine2 ):
         self.tleTitle = tleTitle
@@ -47,10 +50,24 @@ class TLE:
 
     def getInternationalDesignator( self ): 
         launchYear = self.tleLine1[ 9 : 11 ]
-        if int( launchYear ) < 57:  launchYear = "20" + launchYear
-        else: launchYear = "19" + launchYear 
+        if int( launchYear ) < 57:
+            launchYear = "20" + launchYear
+        else:
+            launchYear = "19" + launchYear 
 
         return launchYear + "-" + self.tleLine1[ 11 : 17 ].strip()
+
+
+    def getType( self ):
+        satelliteType = SatelliteType.Unknown
+        if "DEB" in self.getName().upper():
+            satelliteType = SatelliteType.Debris
+        elif "PLAT" in self.getName().upper():
+            satelliteType = SatelliteType.Platform
+        elif "R/B" in self.getName().upper():
+            satelliteType = SatelliteType.RocketBooster
+
+        return satelliteType
 
 
     def __str__( self ): return str( self.tleTitle ) + " | " + str( self.tleLine1 ) + " | " + str( self.tleLine2 )
