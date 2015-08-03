@@ -1,3 +1,11 @@
+indicator-lunar (1.0.64-1) precise; urgency=low
+
+  * Removed DD:MM:SS from satellite notification as the notification looked
+    too crowded/busy.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 4 Aug 2015 08:06:09 +1000
+
+
 indicator-lunar (1.0.63-1) precise; urgency=low
 
   * Bug fix: The calculation to determine when the full moon notification

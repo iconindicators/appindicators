@@ -59,7 +59,7 @@ class AstronomicalObjectType: Moon, OrbitalElement, Planet, PlanetaryMoon, Satel
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.63"
+    VERSION = "1.0.64"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -1093,9 +1093,9 @@ class IndicatorLunar:
 
             # Parse the satellite summary/message to create the notification...
             riseTime = self.getLocalDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] )
-            riseAzimuth = str( self.getDecimalDegrees( self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ], False, 2 ) ) + "° (" + self.trimDecimal( self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] ) + ")" 
+            riseAzimuth = str( self.getDecimalDegrees( self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ], False, 2 ) ) + "°" 
             setTime = self.getLocalDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] )
-            setAzimuth = str( self.getDecimalDegrees( self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ], False, 2 ) ) + "° (" + self.trimDecimal( self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] ) + ")" 
+            setAzimuth = str( self.getDecimalDegrees( self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ], False, 2 ) ) + "°" 
             tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
 
             summary = self.satelliteNotificationSummary. \
