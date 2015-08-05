@@ -908,6 +908,7 @@ class IndicatorLunar:
 
 
     def getDisplayData( self, key ):
+        displayData = None
         if key[ 2 ] == IndicatorLunar.DATA_ALTITUDE or \
            key[ 2 ] == IndicatorLunar.DATA_AZIMUTH or \
            key[ 2 ] == IndicatorLunar.DATA_RISE_AZIMUTH or \
@@ -2264,7 +2265,11 @@ class IndicatorLunar:
         self.tagsRemoved = { } # See above!
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         for key in self.data.keys():
-            self.appendToDisplayTagsStore( key, self.data[ key ], displayTagsStore )
+            displayData = self.getDisplayData( key )
+            if displayData is not None:
+                self.appendToDisplayTagsStore( key, displayData, displayTagsStore )
+            else:
+                self.appendToDisplayTagsStore( key, self.data[ key ], displayTagsStore )
 
         indicatorText.set_text( self.translateTags( displayTagsStore, True, self.indicatorText ) ) # Need to translate the tags into the local language.
 
@@ -3114,7 +3119,11 @@ class IndicatorLunar:
                 if ( astronomicalObjectType, bodyTag ) in self.tagsRemoved:
                     continue
 
-                self.appendToDisplayTagsStore( key, self.data[ key ], displayTagsStore )
+                displayData = self.getDisplayData( key )
+                if displayData is not None:
+                    self.appendToDisplayTagsStore( key, displayData, displayTagsStore )
+                else:
+                    self.appendToDisplayTagsStore( key, self.data[ key ], displayTagsStore )
 
             # Add tags for newly checked items (which don't exist in the current data).
             for key in self.tagsAdded:
