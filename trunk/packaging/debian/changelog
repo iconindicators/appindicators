@@ -1,5 +1,8 @@
 indicator-lunar (1.0.64-1) precise; urgency=low
 
+  * Bug fix: The values for date/time were appearing in UTC in the Preferences
+    dialog.  Although valid values, they should strictly appear in local
+    date/time to match the values in the indicator menu.
   * Removed DD:MM:SS from satellite notification as the notification looked
     too crowded/busy.
 
