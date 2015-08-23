@@ -2,11 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-# TODO
-# inidicator lunar crashed on the date format
-# I suspect somewhere due to reading/writing the cache of TLE or OE. Not sure...
-
-
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
