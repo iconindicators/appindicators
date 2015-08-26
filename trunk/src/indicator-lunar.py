@@ -59,7 +59,7 @@ class AstronomicalObjectType: Moon, OrbitalElement, Planet, PlanetaryMoon, Satel
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.64"
+    VERSION = "1.0.65"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -2098,8 +2098,7 @@ class IndicatorLunar:
         epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
         ephemNowDate = str( ephemNow ).split( " " )
 
-        bodyCopy = self.getBodyCopy( body ) # Used to workaround https://github.com/brandon-rhodes/pyephem/issues/44 until a formal release of pyephem is made.
-#         bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
+        bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
         bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
         planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
 
@@ -2112,36 +2111,6 @@ class IndicatorLunar:
         tropicalSignName = IndicatorLunar.TROPICAL_SIGNS[ int( tropicalSignIndex ) ]
 
         return ( tropicalSignName, str( tropicalSignDegree ), tropicalSignMinute )
-
-
-    # Used to workaround https://github.com/brandon-rhodes/pyephem/issues/44 until a formal release of pyephem is made.
-    def getBodyCopy( self, body ):
-        bodyName = body.name
-        bodyCopy = None
-
-        if bodyName == "Sun":
-            bodyCopy = ephem.Sun()
-        elif bodyName == "Moon":
-            bodyCopy = ephem.Moon()
-        elif bodyName == "Mercury":
-            bodyCopy = ephem.Mercury()
-        elif bodyName == "Venus":
-            bodyCopy = ephem.Venus()
-        elif bodyName == "Mars":
-            bodyCopy = ephem.Mars()
-        elif bodyName == "Jupiter":
-            bodyCopy = ephem.Jupiter()
-        elif bodyName == "Saturn":
-            bodyCopy = ephem.Saturn()
-        elif bodyName == "Uranus":
-            bodyCopy = ephem.Uranus()
-        elif bodyName == "Neptune":
-            bodyCopy = ephem.Neptune()
-        elif bodyName == "Pluto":
-            bodyCopy = ephem.Pluto()
-        else: bodyCopy = ephem.star( bodyName ) # If not the sun/moon/planet, assume a star.
-
-        return bodyCopy
 
 
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body.
