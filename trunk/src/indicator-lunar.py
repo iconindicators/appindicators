@@ -42,7 +42,7 @@ from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
 
-import calendar, copy, datetime, eclipse, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, subprocess, sys, tempfile, threading, time, webbrowser
+import calendar, copy, datetime, eclipse, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, sys, tempfile, threading, time, webbrowser
 
 try:
     import ephem
@@ -59,7 +59,7 @@ class AstronomicalObjectType: Moon, OrbitalElement, Planet, PlanetaryMoon, Satel
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.65"
+    VERSION = "1.0.66"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -3433,8 +3433,7 @@ class IndicatorLunar:
 
     def getDefaultCity( self ):
         try:
-            p = subprocess.Popen( "cat /etc/timezone", shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT )
-            timezone = p.communicate()[ 0 ].decode()
+            timezone = pythonutils.processGet( "cat /etc/timezone" )
             self.cityName = None
             global _city_data
             for city in _city_data.keys():
