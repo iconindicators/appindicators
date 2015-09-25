@@ -27,6 +27,13 @@
 #TODO How to handle the bad locations?
 # Waiting on UKHO to let me know the status of their investigation...
 
+#TODO Icons...
+#     http://reeltorqueyachts.com/images/tide_icon.png
+#     https://www.premiermarinas.com/~/media/Common/tides-icon-large.ashx?h=220&la=en&w=230&hash=AB4BAC775676ECD14BE24E79DD5BC20B1DD5D260
+#     http://www.education.noaa.gov/images/icons/theme_oceans_90.gif
+#     https://cdn1.iconfinder.com/data/icons/weather-19/32/water-512.png
+#     http://reeltorqueyachts.com/images/tide_icon.png
+
 
 INDICATOR_NAME = "indicator-tide"
 import gettext
