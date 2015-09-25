@@ -1,0 +1,405 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.         
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Application indicator which displays tidal information.
+
+
+# References:
+#     http://www.ukho.gov.uk/easytide/EasyTide
+#     http://docs.python.org/3/library/datetime.html
+
+
+#TODO How to handle the bad locations?
+# Waiting on UKHO to let me know the status of their investigation...
+
+
+INDICATOR_NAME = "indicator-tide"
+import gettext
+gettext.install( INDICATOR_NAME )
+
+from gi.repository import AppIndicator3, GLib, Gtk
+from urllib.request import urlopen
+
+import datetime, gzip, json, locale, locations, logging, os, pythonutils, re, shutil, subprocess, sys, tide, webbrowser
+
+
+class IndicatorTide:
+
+    AUTHOR = "Bernard Giannetti"
+    VERSION = "1.0.0"
+    ICON = INDICATOR_NAME
+    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
+    WEBSITE = "https://launchpad.net/~thebernmeister"
+
+    DESKTOP_FILE = INDICATOR_NAME + ".desktop"
+    URL_TIMEOUT_IN_SECONDS = 5
+
+    COMMENTS = _( "Displays tidal information." )
+    CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tide information licensed from Admiralty EasyTide. http://www.ukho.gov.uk/easytide/EasyTide" ) #TODO Check with final license what needs to go here.
+    CREDITS = [ CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE ]
+
+    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
+    SETTINGS_DAYLIGHT_SAVINGS_OFFSET = "daylightSavingsOffset"
+    SETTINGS_PORT_ID = "portID"
+    SETTINGS_SHOW_AS_SUBMENUS = "showAsSubmenus"
+
+
+    def __init__( self ):
+        filehandler = pythonutils.TruncatedFileHandler( IndicatorTide.LOG, "a", 10000, None, True )
+        logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+
+        self.dialog = None
+        self.stardateMenuItem = None
+        self.loadSettings()
+
+        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorTide.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
+        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
+
+    def main( self ):
+        self.update()
+        GLib.timeout_add_seconds( 12 * 60 * 60, self.update, True ) # Auto update every twelve hours.
+        Gtk.main()
+
+
+    def buildMenu( self, tideReadings ):
+        indent = "    "
+        menu = Gtk.Menu()
+
+        if tideReadings is None:
+            menu.append( Gtk.MenuItem( _( "Error - check log file!" ) ) )
+        elif len( tideReadings ) == 0:
+            menu.append( Gtk.MenuItem( _( "No data for your location!" ) ) )
+        else:
+            year = datetime.datetime.now().year
+            previousMonth = -1
+            previousDay = -1
+            previousPortName = ""
+            for tideReading in tideReadings:
+                if previousPortName != tideReading.getPortName():
+                    previousPortName = tideReading.getPortName()
+                    self.createMenuItem( menu, tideReading.getPortName(), tideReading.getURL() )
+
+                month = tideReading.getMonth()
+                day = tideReading.getDay()
+                hour = tideReading.getHour()
+                minute = tideReading.getMinute()
+                tideDateTime = datetime.datetime( year, month, day, hour, minute, 0 )
+
+                if not( previousMonth == month and previousDay == day ):
+                    menuItemText = indent + tideDateTime.strftime( "%A, %B %d" ) #TODO Have a preference letting the user configure the date/time (below)?
+                    if self.showAsSubMenus:
+                        subMenu = Gtk.Menu()
+                        self.createMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
+                    else:
+                        self.createMenuItem( menu, menuItemText, tideReading.getURL() )
+
+                previousMonth = month
+                previousDay = day
+
+                menuItemText = tideDateTime.strftime( "%I:%M %p" ) + indent + tideReading.getType() + indent + tideReading.getLevelInMetres() + "m" #TODO Does metres need i18n?
+                if self.showAsSubMenus:
+                    self.createMenuItem( subMenu, menuItemText, tideReading.getURL() )
+                else:
+                    self.createMenuItem( menu, indent + indent + menuItemText, tideReading.getURL() )
+
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
+        self.indicator.set_menu( menu )
+        menu.show_all()
+
+
+    def createMenuItem( self, menu, menuItemText, url ):
+        menuItem = Gtk.MenuItem( menuItemText )
+        
+        if url is not None:
+            menuItem.connect( "activate", self.onTideMenuItem )
+            menuItem.set_name( url )
+
+        menu.append( menuItem )
+        return menuItem
+
+
+    def update( self ):
+        self.buildMenu( self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.daylightSavingsOffset ) )
+        return True # Needed so the timer continues!
+
+
+    def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
+
+
+    def onAbout( self, widget ):
+        if self.dialog is None:
+            self.dialog = pythonutils.createAboutDialog(
+                [ IndicatorTide.AUTHOR ],
+                IndicatorTide.COMMENTS, 
+                IndicatorTide.CREDITS,
+                _( "Credits" ),
+                Gtk.License.GPL_3_0,
+                IndicatorTide.ICON,
+                INDICATOR_NAME,
+                IndicatorTide.WEBSITE,
+                IndicatorTide.VERSION,
+                _( "translator-credits" ),
+                _( "View the" ),
+                _( "text file." ),
+                _( "changelog" ) )
+
+            self.dialog.run()
+            self.dialog.destroy()
+            self.dialog = None
+        else:
+            self.dialog.present()
+
+
+    def onPreferences( self, widget ):
+        if self.dialog is not None:
+            self.dialog.present()
+            return
+
+        grid = Gtk.Grid()
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label( _( "Country" ) ), False, False, 0 )
+
+        countriesComboBox = Gtk.ComboBoxText()
+        countriesComboBox.set_tooltip_text( _( "Choose your country." ) )
+        for country in locations.getCountries():
+            countriesComboBox.append_text( country )
+
+        box.pack_start( countriesComboBox, True, True, 1 )
+
+        grid.attach( box, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+
+        ports = Gtk.ListStore( str ) # Port.
+        ports.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+
+        portsTree = Gtk.TreeView( ports )
+        portsTree.set_tooltip_text( _( "Choose your port." ) )
+        portsTree.set_hexpand( True )
+        portsTree.set_vexpand( True )
+        portsTree.append_column( Gtk.TreeViewColumn( _( "Port" ), Gtk.CellRendererText(), text = 0 ) )
+        portsTree.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( portsTree )
+ 
+        countriesComboBox.connect( "changed", self.onCountry, ports, portsTree )
+        countriesComboBox.set_active( locations.getCountries().index( locations.getCountry( self.portID ) ) )
+
+        box.pack_start( scrolledWindow, True, True, 0 )
+
+        grid.attach( box, 0, 1, 1, 20 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label( _( "Daylight savings offset" ) ), False, False, 0 )
+
+        spinnerDaylightSavingsOffset = Gtk.SpinButton()
+        spinnerDaylightSavingsOffset.set_adjustment( Gtk.Adjustment( int( self.daylightSavingsOffset ), 0, 180, 1, 10, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerDaylightSavingsOffset.set_value( int( self.daylightSavingsOffset ) ) # ...so need to force the initial value by explicitly setting it.
+        spinnerDaylightSavingsOffset.set_tooltip_text( _(
+            "If your timezone is currently in daylight savings,\n" + \
+            "specify the offset amount, in minutes." ) )
+
+        box.pack_start( spinnerDaylightSavingsOffset, True, True, 1 )
+        grid.attach( box, 0, 21, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show as submenus" ) )
+        showAsSubmenusCheckbox.set_active( self.showAsSubMenus )
+        showAsSubmenusCheckbox.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
+
+        box.pack_start( showAsSubmenusCheckbox, True, True, 1 )
+        grid.attach( box, 0, 22, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorTide.DESKTOP_FILE ) )
+        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
+
+        box.pack_start( autostartCheckbox, True, True, 1 )
+        grid.attach( box, 0, 23, 1, 1 )
+
+        self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialog.vbox.pack_start( grid, True, True, 0 )
+        self.dialog.set_border_width( 5 )
+        self.dialog.set_icon_name( IndicatorTide.ICON )
+        self.dialog.show_all()
+
+        response = self.dialog.run()
+        if response == Gtk.ResponseType.OK:
+            country = countriesComboBox.get_active_text()
+            model, treeiter = portsTree.get_selection().get_selected()
+            port = model[ treeiter ][ 0 ]
+            self.portID = locations.getPortIDForCountryAndPort( country, port )
+            self.daylightSavingsOffset = spinnerDaylightSavingsOffset.get_value_as_int()
+            self.showAsSubMenus = showAsSubmenusCheckbox.get_active()
+            self.saveSettings()
+            pythonutils.setAutoStart( IndicatorTide.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+            self.update()
+
+        self.dialog.destroy()
+        self.dialog = None
+
+
+    def onCountry( self, countriesComboBox, portsListStore, portsTree ):
+        country = countriesComboBox.get_active_text()
+        portsListStore.clear()
+        ports = locations.getPortsForCountry( country ) 
+        for port in ports:
+            portsListStore.append( [ port ] )
+
+        portIndex = "0"
+        if locations.getCountry( self.portID ) == country:
+            portIndex = str( ports.index( locations.getPortForPortID( self.portID ) ) )
+
+        portsTree.get_selection().select_path( portIndex )
+        portsTree.scroll_to_cell( Gtk.TreePath.new_from_string( portIndex ) )
+
+
+    def loadSettings( self ):
+        self.daylightSavingsOffset = "0"
+        self.portID = None
+        self.showAsSubMenus = True
+
+        if os.path.isfile( IndicatorTide.SETTINGS_FILE ):
+            try:
+                with open( IndicatorTide.SETTINGS_FILE, "r" ) as f:
+                    settings = json.load( f )
+
+                self.daylightSavingsOffset = settings.get( IndicatorTide.SETTINGS_DAYLIGHT_SAVINGS_OFFSET, self.daylightSavingsOffset )
+                self.portID = settings.get( IndicatorTide.SETTINGS_PORT_ID, self.portID )
+                self.showAsSubMenus = settings.get( IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS, self.showAsSubMenus )
+
+            except Exception as e:
+                logging.exception( e )
+                logging.error( "Error reading settings: " + IndicatorTide.SETTINGS_FILE )
+
+        # Validate the port...
+        if not locations.isValidPortID( self.portID ):
+            country = None
+            try: # Set a geographically sensible default...
+                timezone = pythonutils.processGet( "cat /etc/timezone" )
+                country = timezone[ 0 : timezone.find( "/" ) ]
+
+            except Exception as e:
+                logging.exception( e )
+                logging.error( "Error getting country/city from timezone." )
+
+            self.portID = locations.getPortIDForCountry( country )
+
+        # Ensure the daylight savings is numeric and sensible...
+        try:
+            if int( self.daylightSavingsOffset ) < 0:
+                self.daylightSavingsOffset = "0" 
+        except ValueError:
+            self.daylightSavingsOffset = "0" 
+
+        # Ensure the daylight savings is numeric and sensible...
+        try:
+            bool( self.showAsSubMenus )
+        except ValueError:
+            self.showAsSubMenus = False
+
+
+    def saveSettings( self ):
+        try:
+            settings = {
+                IndicatorTide.SETTINGS_DAYLIGHT_SAVINGS_OFFSET: self.daylightSavingsOffset,
+                IndicatorTide.SETTINGS_PORT_ID: self.portID,
+                IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS: self.showAsSubMenus
+            }
+
+            with open( IndicatorTide.SETTINGS_FILE, "w" ) as f:
+                f.write( json.dumps( settings ) )
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing settings: " + IndicatorTide.SETTINGS_FILE )
+
+
+    def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
+        url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + \
+               str( portID ) + "&PredictionLength=7&DaylightSavingOffset=" + \
+               str( daylightSavingOffset ) + \
+               "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+        tidalReadings = [ ]
+        defaultLocale = locale.getlocale( locale.LC_TIME )
+        locale.setlocale( locale.LC_ALL, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
+        todayMonth = datetime.datetime.now().month
+        todayDay = datetime.datetime.now().day
+        try:
+            lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+            for index, line in enumerate( lines ):
+                if "class=\"PortName\"" in line:
+                    portName = line[ line.find( ">" ) + 1 : line.find( "</span>" ) ]
+
+                if "HWLWTableHeaderCell" in line:
+                    date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ]
+
+                    waterLevelTypes = [ ]
+                    line = lines[ index + 2 ]
+                    for item in line.split( "<th class=\"HWLWTableHWLWCellPrintFriendly\">" ):
+                        if len( item.strip() ) > 0:
+                            waterLevelTypes.append( item[ 0 : 1 ] )
+
+                    times = [ ]
+                    line = lines[ index + 4 ]
+                    for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\"> " ):
+                        if len( item.strip() ) > 0:
+                            times.append( item[ 0 : 5 ] )
+
+                    waterLevelsInMetres = [ ]
+                    line = lines[ index + 6 ]
+                    for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
+                        if len( item.strip() ) > 0:
+                            waterLevelsInMetres.append( item[ 0 : 3 ] )
+
+                    for index, item in enumerate( waterLevelTypes ):
+                        monthDay = datetime.datetime.strptime( date, "%a %d %b" )
+                        hourMinute = datetime.datetime.strptime( times[ index ], "%H:%M" )
+
+                        # Only add data from today onwards (drop data previous days' data) OR for when the month changes (always add that data). 
+                        if monthDay.month == todayMonth and monthDay.day >= todayDay or \
+                           monthDay.month != todayMonth:
+                            tidalReadings.append( tide.Reading( portName, monthDay.month, monthDay.day, hourMinute.hour, hourMinute.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error retrieving tidal data from " + str( url ) )
+            tidalReadings = None
+
+        locale.setlocale( locale.LC_TIME, defaultLocale )
+        return tidalReadings
+
+
+if __name__ == "__main__": IndicatorTide().main()
