@@ -22,9 +22,7 @@ msgid "Displays tidal information."
 msgstr ""
 
 #: indicator-tide.py:60
-msgid ""
-"Tide information licensed from Admiralty EasyTide. http://www.ukho.gov.uk/"
-"easytide/EasyTide"
+msgid "TODO"
 msgstr ""
 
 #: indicator-tide.py:93
