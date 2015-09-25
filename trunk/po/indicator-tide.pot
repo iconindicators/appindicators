@@ -1,0 +1,102 @@
+# Portable Object Template for indicator-tide.
+# Copyright (C) 2015 Bernard Giannetti
+# This file is distributed under the same license as the indicator-tide package.
+# Bernard Giannetti <thebernmeister@hotmail.com>, 2015.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indicator-tide 1.0.0\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2015-09-25 10:45+1000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: indicator-tide.py:59
+msgid "Displays tidal information."
+msgstr ""
+
+#: indicator-tide.py:60
+msgid ""
+"Tide information licensed from Admiralty EasyTide. http://www.ukho.gov.uk/"
+"easytide/EasyTide"
+msgstr ""
+
+#: indicator-tide.py:93
+msgid "Error - check log file!"
+msgstr ""
+
+#: indicator-tide.py:95
+msgid "No data for your location!"
+msgstr ""
+
+#: indicator-tide.py:159
+msgid "Credits"
+msgstr ""
+
+#: indicator-tide.py:165
+msgid "translator-credits"
+msgstr ""
+
+#: indicator-tide.py:166
+msgid "View the"
+msgstr ""
+
+#: indicator-tide.py:167
+msgid "text file."
+msgstr ""
+
+#: indicator-tide.py:168
+msgid "changelog"
+msgstr ""
+
+#: indicator-tide.py:189
+msgid "Country"
+msgstr ""
+
+#: indicator-tide.py:192
+msgid "Choose your country."
+msgstr ""
+
+#: indicator-tide.py:206
+msgid "Choose your port."
+msgstr ""
+
+#: indicator-tide.py:209
+msgid "Port"
+msgstr ""
+
+#: indicator-tide.py:226
+msgid "Daylight savings offset"
+msgstr ""
+
+#: indicator-tide.py:232
+msgid ""
+"If your timezone is currently in daylight savings,\n"
+"specify the offset amount, in minutes."
+msgstr ""
+
+#: indicator-tide.py:241
+msgid "Show as submenus"
+msgstr ""
+
+#: indicator-tide.py:243
+msgid "Show each day's tides in a submenu."
+msgstr ""
+
+#: indicator-tide.py:251
+msgid "Autostart"
+msgstr ""
+
+#: indicator-tide.py:253
+msgid "Run the indicator automatically."
+msgstr ""
+
+#: indicator-tide.py:258
+msgid "Preferences"
+msgstr ""
