@@ -308,7 +308,7 @@ class IndicatorTide:
     def loadSettings( self ):
         self.daylightSavingsOffset = "0"
         self.portID = None
-        self.showAsSubMenus = True
+        self.showAsSubMenus = False
 
         if os.path.isfile( IndicatorTide.SETTINGS_FILE ):
             try:
