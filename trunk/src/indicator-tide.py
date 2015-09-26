@@ -27,6 +27,11 @@
 #TODO How to handle the bad locations?
 # Waiting on UKHO to let me know the status of their investigation...
 
+
+#TODO Need to let user specify just the time part of each tide.  Or force it always to be 24 hour time?
+# The H/L needs to be translated too...so maybe let the user specify the whole lot?
+
+
 #TODO Icons...
 #     http://reeltorqueyachts.com/images/tide_icon.png
 #     https://www.premiermarinas.com/~/media/Common/tides-icon-large.ashx?h=220&la=en&w=230&hash=AB4BAC775676ECD14BE24E79DD5BC20B1DD5D260
@@ -57,7 +62,7 @@ class IndicatorTide:
     URL_TIMEOUT_IN_SECONDS = 5
 
     COMMENTS = _( "Displays tidal information." )
-    CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tide information licensed from Admiralty EasyTide. http://www.ukho.gov.uk/easytide/EasyTide" ) #TODO Check with final license what needs to go here.
+    CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "TODO" ) #TODO Check with final license what needs to go here.
     CREDITS = [ CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
@@ -110,7 +115,7 @@ class IndicatorTide:
                 tideDateTime = datetime.datetime( year, month, day, hour, minute, 0 )
 
                 if not( previousMonth == month and previousDay == day ):
-                    menuItemText = indent + tideDateTime.strftime( "%A, %B %d" ) #TODO Have a preference letting the user configure the date/time (below)?
+                    menuItemText = indent + tideDateTime.strftime( "%A, %B %d" ) #TODO Have a preference letting the user configure the date format?
                     if self.showAsSubMenus:
                         subMenu = Gtk.Menu()
                         self.createMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
@@ -120,7 +125,15 @@ class IndicatorTide:
                 previousMonth = month
                 previousDay = day
 
-                menuItemText = tideDateTime.strftime( "%I:%M %p" ) + indent + tideReading.getType() + indent + tideReading.getLevelInMetres() + "m" #TODO Does metres need i18n?
+                if tideReading.getType() == tide.Type.H:
+                    tideType = _( "H" )
+                else:
+                    tideType = _( "L" )
+
+                #TODO Does metres need i18n?
+                #TODO Let the user format the whole line?  Needs additional tags for [TYPE] and [LEVEL]. 
+                menuItemText = tideDateTime.strftime( "%I:%M %p" ) + indent + tideType + indent + str( tideReading.getLevelInMetres() ) + " m"
+
                 if self.showAsSubMenus:
                     self.createMenuItem( subMenu, menuItemText, tideReading.getURL() )
                 else:
@@ -133,7 +146,7 @@ class IndicatorTide:
 
     def createMenuItem( self, menu, menuItemText, url ):
         menuItem = Gtk.MenuItem( menuItemText )
-        
+
         if url is not None:
             menuItem.connect( "activate", self.onTideMenuItem )
             menuItem.set_name( url )
