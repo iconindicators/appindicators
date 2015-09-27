@@ -28,10 +28,6 @@
 # Waiting on UKHO to let me know the status of their investigation...
 
 
-#TODO Need to let user specify just the time part of each tide.  Or force it always to be 24 hour time?
-# The H/L needs to be translated too...so maybe let the user specify the whole lot?
-
-
 #TODO Icons...
 #     http://reeltorqueyachts.com/images/tide_icon.png
 #     https://www.premiermarinas.com/~/media/Common/tides-icon-large.ashx?h=220&la=en&w=230&hash=AB4BAC775676ECD14BE24E79DD5BC20B1DD5D260
@@ -67,8 +63,16 @@ class IndicatorTide:
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_DAYLIGHT_SAVINGS_OFFSET = "daylightSavingsOffset"
+    SETTINGS_MENU_ITEM_DATE_FORMAT = "menuItemDateFormat"
+    SETTINGS_MENU_ITEM_TIDE_FORMAT = "menuItemTideFormat"
     SETTINGS_PORT_ID = "portID"
     SETTINGS_SHOW_AS_SUBMENUS = "showAsSubmenus"
+
+    MENU_ITEM_DATE_DEFAULT_FORMAT = "%A, %d %B"
+    MENU_ITEM_TIME_DEFAULT_FORMAT = "%I:%M %p"
+    MENU_ITEM_TIDE_LEVEL_TAG = "[LEVEL]" # The level of the tide in metres.
+    MENU_ITEM_TIDE_TYPE_TAG = "[TYPE]" # The tide type, either high or low.
+    MENU_ITEM_TIDE_DEFAULT_FORMAT = MENU_ITEM_TIME_DEFAULT_FORMAT + "    " + MENU_ITEM_TIDE_TYPE_TAG + "    " + MENU_ITEM_TIDE_LEVEL_TAG
 
 
     def __init__( self ):
@@ -115,7 +119,7 @@ class IndicatorTide:
                 tideDateTime = datetime.datetime( year, month, day, hour, minute, 0 )
 
                 if not( previousMonth == month and previousDay == day ):
-                    menuItemText = indent + tideDateTime.strftime( "%A, %B %d" ) #TODO Have a preference letting the user configure the date format?
+                    menuItemText = indent + tideDateTime.strftime( self.menuItemDateFormat )
                     if self.showAsSubMenus:
                         subMenu = Gtk.Menu()
                         self.createMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
@@ -125,14 +129,14 @@ class IndicatorTide:
                 previousMonth = month
                 previousDay = day
 
-                if tideReading.getType() == tide.Type.H:
-                    tideType = _( "H" )
-                else:
-                    tideType = _( "L" )
+                menuItemText = tideDateTime.strftime( self.menuItemTideFormat )
 
-                #TODO Does metres need i18n?
-                #TODO Let the user format the whole line?  Needs additional tags for [TYPE] and [LEVEL]. 
-                menuItemText = tideDateTime.strftime( "%I:%M %p" ) + indent + tideType + indent + str( tideReading.getLevelInMetres() ) + " m"
+                if tideReading.getType() == tide.Type.H:
+                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
+                else:
+                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "L" ) )
+
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tideReading.getLevelInMetres() ) + " m" )
 
                 if self.showAsSubMenus:
                     self.createMenuItem( subMenu, menuItemText, tideReading.getURL() )
@@ -261,12 +265,44 @@ class IndicatorTide:
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
+        box.pack_start( Gtk.Label( _( "Date format" ) ), False, False, 0 )
+
+        dateFormat = Gtk.Entry()
+        dateFormat.set_text( self.menuItemDateFormat )
+        dateFormat.set_tooltip_text( _(
+            "Formatting options are specified at\n" + \
+            "http://docs.python.org/3/library/datetime.html" ) )
+
+        box.pack_start( dateFormat, True, True, 0 )
+
+        grid.attach( box, 0, 23, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label( _( "Tide format" ) ), False, False, 0 )
+
+        tideFormat = Gtk.Entry()
+        tideFormat.set_text( self.menuItemTideFormat )
+        tideFormat.set_tooltip_text( _(
+            "Tide information is specified using:\n\n" + \
+            "    [TYPE] - the tide is high or low.\n" + \
+            "    [LEVEL] - the tide level, measured in metres.\n\n" + \
+            "Formatting options for the time are specified at\n" + \
+            "http://docs.python.org/3/library/datetime.html" ) )
+        box.pack_start( tideFormat, True, True, 0 )
+
+        grid.attach( box, 0, 24, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorTide.DESKTOP_FILE ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
 
         box.pack_start( autostartCheckbox, True, True, 1 )
-        grid.attach( box, 0, 23, 1, 1 )
+        grid.attach( box, 0, 25, 1, 1 )
 
         self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( grid, True, True, 0 )
@@ -282,6 +318,8 @@ class IndicatorTide:
             self.portID = locations.getPortIDForCountryAndPort( country, port )
             self.daylightSavingsOffset = spinnerDaylightSavingsOffset.get_value_as_int()
             self.showAsSubMenus = showAsSubmenusCheckbox.get_active()
+            self.menuItemDateFormat = dateFormat.get_text().strip()
+            self.menuItemTideFormat = tideFormat.get_text().strip()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorTide.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             self.update()
@@ -307,6 +345,8 @@ class IndicatorTide:
 
     def loadSettings( self ):
         self.daylightSavingsOffset = "0"
+        self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
+        self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
         self.portID = None
         self.showAsSubMenus = False
 
@@ -316,6 +356,8 @@ class IndicatorTide:
                     settings = json.load( f )
 
                 self.daylightSavingsOffset = settings.get( IndicatorTide.SETTINGS_DAYLIGHT_SAVINGS_OFFSET, self.daylightSavingsOffset )
+                self.menuItemDateFormat = settings.get( IndicatorTide.SETTINGS_MENU_ITEM_DATE_FORMAT, self.menuItemDateFormat )
+                self.menuItemTideFormat = settings.get( IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT, self.menuItemTideFormat )
                 self.portID = settings.get( IndicatorTide.SETTINGS_PORT_ID, self.portID )
                 self.showAsSubMenus = settings.get( IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS, self.showAsSubMenus )
 
@@ -349,11 +391,16 @@ class IndicatorTide:
         except ValueError:
             self.showAsSubMenus = False
 
+        if self.menuItemDateFormat is None:
+            self.menuItemDateFormat = ""
+
 
     def saveSettings( self ):
         try:
             settings = {
                 IndicatorTide.SETTINGS_DAYLIGHT_SAVINGS_OFFSET: self.daylightSavingsOffset,
+                IndicatorTide.SETTINGS_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
+                IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
                 IndicatorTide.SETTINGS_PORT_ID: self.portID,
                 IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS: self.showAsSubMenus
             }
