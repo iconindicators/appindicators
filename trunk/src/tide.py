@@ -65,7 +65,7 @@ class Reading:
     def getURL( self ): return self.url
 
 
-    def __str__( self ): return self.portName + " | " + str( self.month ) + " | " + str( self.day ) + " | " + str( self.hour ) + " | " + str( self.minute ) + " | " + str( self.levelInMetres ) + " | " + str( self.tideType )
+    def __str__( self ): return self.portName + " | " + str( self.month ) + "-" + str( self.day ) + "-" + str( self.hour ) + "-" + str( self.minute ) + " | " + str( self.levelInMetres ) + " | " + str( self.tideType )
 
 
     def __repr__( self ): return self.__str__()
