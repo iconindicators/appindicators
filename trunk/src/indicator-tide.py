@@ -414,11 +414,8 @@ class IndicatorTide:
 
 
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
-        if len( portID ) == 3:
-            portID = "0" + portID
-
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + \
-               str( portID ) + "&PredictionLength=7&DaylightSavingOffset=" + \
+               str( portID.rjust( 4, "0" ) ) + "&PredictionLength=7&DaylightSavingOffset=" + \
                str( daylightSavingOffset ) + \
                "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
