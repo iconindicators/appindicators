@@ -55,7 +55,7 @@ class IndicatorTide:
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
-    URL_TIMEOUT_IN_SECONDS = 5
+    URL_TIMEOUT_IN_SECONDS = 10
 
     COMMENTS = _( "Displays tidal information." )
     CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "TODO" ) #TODO Check with final license what needs to go here.
@@ -414,6 +414,9 @@ class IndicatorTide:
 
 
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
+        if len( portID ) == 3:
+            portID = "0" + portID
+
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + \
                str( portID ) + "&PredictionLength=7&DaylightSavingOffset=" + \
                str( daylightSavingOffset ) + \
