@@ -1,6 +1,7 @@
 indicator-lunar (1.0.66-1) precise; urgency=low
 
-  * Use the process wrapper utilities rather than directly calling.
+  * Use the process wrapper utilities rather than direct calls.
+  * Removed expired eclipse information.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 23 Seo 2015 13:20:45 +1000
 
