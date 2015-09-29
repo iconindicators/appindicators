@@ -403,10 +403,21 @@ class IndicatorTide:
 
 
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
+#         print( portID )
+        if portID[ -1 ].isalpha():
+            portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
+#             print( True, portIDForURL )
+        else:
+            portIDForURL = portID.rjust( 4, "0" )
+#             print( False, portIDForURL )
+
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + \
-               str( portID.rjust( 4, "0" ) ) + "&PredictionLength=7&DaylightSavingOffset=" + \
+               str( portIDForURL ) + "&PredictionLength=7&DaylightSavingOffset=" + \
                str( daylightSavingOffset ) + \
                "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+#         print()
+#         if True: return []
 
         tidalReadings = [ ]
         defaultLocale = locale.getlocale( locale.LC_TIME )

@@ -25,7 +25,7 @@ def isValidPortID( portID ):
 	isValid = False
 	if portID is not None:
 		for location in locationData.__locationsUnitedKingdomHydrographicOffice:
-			if portID == location[ 2 ]:
+			if portID == location[ 0 ]:
 				isValid = True
 				break
 
@@ -37,8 +37,8 @@ def getCountry( portID ):
 	country = DEFAULT_COUNTRY
 	if portID is not None:
 		for location in locationData.__locationsUnitedKingdomHydrographicOffice:
-			if portID == location[ 2 ]:
-				country = location[ 0 ]
+			if portID == location[ 0 ]:
+				country = location[ 2 ]
 				break
 
 	return country
@@ -49,8 +49,8 @@ def getPortIDForCountry( country ):
 	portID = DEFAULT_PORT_ID
 	if country is not None:
 		for location in locationData.__locationsUnitedKingdomHydrographicOffice:
-			if country == location[ 0 ]:
-				portID = location[ 2 ]
+			if country == location[ 2 ]:
+				portID = location[ 0 ]
 				break
 
 	return portID
@@ -60,8 +60,8 @@ def getPortIDForCountryAndPort( country, port ):
 	portID = DEFAULT_PORT_ID
 	if country is not None and port is not None:
 		for location in locationData.__locationsUnitedKingdomHydrographicOffice:
-			if country == location[ 0 ] and port == location[ 1 ]:
-				portID = location[ 2 ]
+			if country == location[ 2 ] and port == location[ 1 ]:
+				portID = location[ 0 ]
 				break
 
 	return portID
@@ -73,7 +73,7 @@ def getPortsForCountry( country ):
 
 	ports = [ ]
 	for location in locationData.__locationsUnitedKingdomHydrographicOffice:
-		if location[ 0 ] == country and location[ 1 ] not in ports:
+		if location[ 2 ] == country and location[ 1 ] not in ports:
 			ports.append( location[ 1 ] )
 
 	return ports
@@ -82,7 +82,7 @@ def getPortsForCountry( country ):
 def getCountries():
 	countries = [ ]
 	for location in locationData.__locationsUnitedKingdomHydrographicOffice:
-		if location[ 0 ] not in countries:
-			countries.append( location[ 0 ] )
+		if location[ 2 ] not in countries:
+			countries.append( location[ 2 ] )
 
 	return countries
