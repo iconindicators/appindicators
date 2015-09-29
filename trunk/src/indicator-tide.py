@@ -24,10 +24,6 @@
 #     http://docs.python.org/3/library/datetime.html
 
 
-#TODO How to handle the bad locations?
-# Waiting on UKHO to let me know the status of their investigation...
-
-
 #TODO Icons...
 #     http://reeltorqueyachts.com/images/tide_icon.png
 #     https://www.premiermarinas.com/~/media/Common/tides-icon-large.ashx?h=220&la=en&w=230&hash=AB4BAC775676ECD14BE24E79DD5BC20B1DD5D260
@@ -334,13 +330,6 @@ class IndicatorTide:
         ports = locations.getPortsForCountry( country ) 
         for port in ports:
             portsListStore.append( [ port ] )
-
-        portIndex = "0"
-        if locations.getCountry( self.portID ) == country:
-            portIndex = str( ports.index( locations.getPortForPortID( self.portID ) ) )
-
-        portsTree.get_selection().select_path( portIndex )
-        portsTree.scroll_to_cell( Gtk.TreePath.new_from_string( portIndex ) )
 
 
     def loadSettings( self ):
