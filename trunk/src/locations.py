@@ -32,7 +32,6 @@ def isValidPortID( portID ):
 	return isValid
 
 
-# PortID may not be unique, but duplicates (hopefully) match the same country.
 def getCountry( portID ): 
 	country = DEFAULT_COUNTRY
 	if portID is not None:
