@@ -32,6 +32,10 @@
 #     http://reeltorqueyachts.com/images/tide_icon.png
 
 
+#TODO Need some way to remember to renew the license
+# c. This licence is valid for a period of one year beginning on 28 Sep 2015.
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -54,7 +58,7 @@ class IndicatorTide:
     URL_TIMEOUT_IN_SECONDS = 10
 
     COMMENTS = _( "Displays tidal information." )
-    CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "TODO" ) #TODO Check with final license what needs to go here.
+    CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tidal information gratefully sourced from UK Hydrographic Office. http://www.ukho.gov.uk" ) #TODO Check with final license what needs to go here.
     CREDITS = [ CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
