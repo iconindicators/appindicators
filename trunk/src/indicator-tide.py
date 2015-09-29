@@ -25,6 +25,7 @@
 #     http://www.education.noaa.gov/images/icons/theme_oceans_90.gif
 #     https://cdn1.iconfinder.com/data/icons/weather-19/32/water-512.png
 #     http://reeltorqueyachts.com/images/tide_icon.png
+#     http://seriss.com/people/erco/gifs/tide-icon.gif
 
 
 INDICATOR_NAME = "indicator-tide"
@@ -89,10 +90,8 @@ class IndicatorTide:
         indent = "    "
         menu = Gtk.Menu()
 
-        if tideReadings is None:
-            menu.append( Gtk.MenuItem( _( "Error - check log file!" ) ) )
-        elif len( tideReadings ) == 0:
-            menu.append( Gtk.MenuItem( _( "No data for your location!" ) ) )
+        if tideReadings is None or len( tideReadings ) == 0:
+            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( locations.getPort( self.portID ) ) ) )
         else:
             year = datetime.datetime.now().year
             previousMonth = -1
@@ -326,7 +325,13 @@ class IndicatorTide:
         for port in ports:
             portsListStore.append( [ port ] )
 
-        portsTree.get_selection().select_path( 0 ) # Select first item by default.
+        portIndex = "0"
+        if locations.getCountry( self.portID ) == country:
+            portIndex = str( ports.index( locations.getPort( self.portID ) ) )
+
+        portsTree.get_selection().select_path( portIndex )
+        portsTree.scroll_to_cell( Gtk.TreePath.new_from_string( portIndex ) )
+
 
 
     def loadSettings( self ):
@@ -400,6 +405,12 @@ class IndicatorTide:
 
 
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
+        tidalReadings = [ ]
+        defaultLocale = locale.getlocale( locale.LC_TIME )
+        locale.setlocale( locale.LC_ALL, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
+        todayMonth = datetime.datetime.now().month
+        todayDay = datetime.datetime.now().day
+
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
         else:
@@ -410,11 +421,6 @@ class IndicatorTide:
                str( daylightSavingOffset ) + \
                "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
-        tidalReadings = [ ]
-        defaultLocale = locale.getlocale( locale.LC_TIME )
-        locale.setlocale( locale.LC_ALL, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
-        todayMonth = datetime.datetime.now().month
-        todayDay = datetime.datetime.now().day
         try:
             lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for index, line in enumerate( lines ):
@@ -453,7 +459,7 @@ class IndicatorTide:
 
         except Exception as e:
             logging.exception( e )
-            logging.error( "Error retrieving tidal data from " + str( url ) )
+            logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = None
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
