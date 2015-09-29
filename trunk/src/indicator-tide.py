@@ -19,21 +19,12 @@
 # Application indicator which displays tidal information.
 
 
-# References:
-#     http://www.ukho.gov.uk/easytide/EasyTide
-#     http://docs.python.org/3/library/datetime.html
-
-
 #TODO Icons...
 #     http://reeltorqueyachts.com/images/tide_icon.png
 #     https://www.premiermarinas.com/~/media/Common/tides-icon-large.ashx?h=220&la=en&w=230&hash=AB4BAC775676ECD14BE24E79DD5BC20B1DD5D260
 #     http://www.education.noaa.gov/images/icons/theme_oceans_90.gif
 #     https://cdn1.iconfinder.com/data/icons/weather-19/32/water-512.png
 #     http://reeltorqueyachts.com/images/tide_icon.png
-
-
-#TODO Need some way to remember to renew the license
-# c. This licence is valid for a period of one year beginning on 28 Sep 2015.
 
 
 INDICATOR_NAME = "indicator-tide"
@@ -57,7 +48,7 @@ class IndicatorTide:
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
     URL_TIMEOUT_IN_SECONDS = 10
 
-    COMMENTS = _( "Displays tidal information." )
+    COMMENTS = _( "Displays tidal information.\n(this software will expire after {0})" ).format( locations.EXPIRY )
     CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tidal information gratefully sourced from UK Hydrographic Office. http://www.ukho.gov.uk" ) #TODO Check with final license what needs to go here.
     CREDITS = [ CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE ]
 
@@ -469,4 +460,8 @@ class IndicatorTide:
         return tidalReadings
 
 
-if __name__ == "__main__": IndicatorTide().main()
+if __name__ == "__main__":
+    if datetime.datetime.now().strftime( "%Y-%m-%d" ) >= locations.EXPIRY:
+        pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The tidal data license has expired!\n\nPlease download the latest version of this software." ), INDICATOR_NAME )
+    else:
+        IndicatorTide().main()
