@@ -19,6 +19,7 @@ import locationData
 
 
 DEFAULT_COUNTRY = "England"
+DEFAULT_PORT = "LONDON BRIDGE (TOWER PIER)"
 DEFAULT_PORT_ID = "113"
 
 
@@ -46,6 +47,17 @@ def getCountry( portID ):
 				break
 
 	return country
+
+
+def getPort( portID ): 
+	port = DEFAULT_PORT
+	if portID is not None:
+		for location in locationData.__locationsUnitedKingdomHydrographicOffice:
+			if portID == location[ 0 ]:
+				port = location[ 1 ]
+				break
+
+	return port
 
 
 # Returns the port ID for the first matching country.
