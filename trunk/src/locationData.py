@@ -2917,20 +2917,3 @@ __locationsUnitedKingdomHydrographicOffice = [
     [ "2439", "St. George's Harbour", "Windward Islands" ],
     [ "2442", "Tobago Cays", "Windward Islands" ],
     [ "2446A", "Vieuxfort Bay", "Windward Islands" ] ]
-
-
-portIDs = { }
-for location in __locationsUnitedKingdomHydrographicOffice:
-	if location[ 0 ] in portIDs:
-		portIDs[ location[ 0 ] ].append( [ location[ 1 ], location[ 2 ] ] )
-	else:
-		portIDs[ location[ 0 ] ] = [ [ location[ 1 ], location[ 2 ] ] ]
-
-
-duplicates = 0
-for portID in portIDs:
-	if len( portIDs[ portID ] ) > 2:
-		print( portID )
-		duplicates += 1
-
-print( duplicates )
