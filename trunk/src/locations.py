@@ -17,8 +17,13 @@
 
 import locationData
 
+
 DEFAULT_COUNTRY = "England"
 DEFAULT_PORT_ID = "113"
+
+
+# The license for the UKHO data expires one year from 2015-09-28.
+EXPIRY = "2016-09-28"
 
 
 def isValidPortID( portID ):
