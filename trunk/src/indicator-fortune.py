@@ -41,7 +41,7 @@ import json, locale, logging, os, pythonutils, re, shutil
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.22"
+    VERSION = "1.0.23"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -373,7 +373,7 @@ class IndicatorFortune:
 
 
     def onFortuneReset( self, button, tree ):
-        if pythonutils.showOKCancel( None, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
+        if pythonutils.showOKCancel( None, _( "Reset fortunes to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
             model, treeiter = tree.get_selection().get_selected()
             model.clear()
             model.append( [ IndicatorFortune.DEFAULT_FORTUNE[ 0 ], Gtk.STOCK_APPLY ]  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
@@ -382,8 +382,8 @@ class IndicatorFortune:
     def onFortuneRemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is None:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ) )
-        elif pythonutils.showOKCancel( None, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ), INDICATOR_NAME )
+        elif pythonutils.showOKCancel( None, _( "Remove the selected fortune?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
             model.remove( treeiter )
 
 
@@ -472,12 +472,12 @@ class IndicatorFortune:
             if dialog.run() == Gtk.ResponseType.OK:
 
                 if fortuneFileDirectory.get_text().strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path cannot be empty." ) )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path cannot be empty." ), INDICATOR_NAME )
                     fortuneFileDirectory.grab_focus()
                     continue
     
                 if not os.path.exists( fortuneFileDirectory.get_text().strip() ):
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path does not exist." ) )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path does not exist." ), INDICATOR_NAME )
                     fortuneFileDirectory.grab_focus()
                     continue
 
