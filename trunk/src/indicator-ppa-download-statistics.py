@@ -48,7 +48,7 @@ import itertools, pythonutils, json, locale, logging, operator, os, re, shutil, 
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.51"
+    VERSION = "1.0.52"
     ICON = INDICATOR_NAME
     CHANGELOG = "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -583,10 +583,10 @@ class IndicatorPPADownloadStatistics:
     def onPPARemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is None:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No PPA has been selected for removal." ) )
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No PPA has been selected for removal." ), INDICATOR_NAME )
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            if pythonutils.showOKCancel( self.dialog, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:
+            if pythonutils.showOKCancel( self.dialog, _( "Remove the selected PPA?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
                 self.ppasOrFiltersModified = True
 
@@ -705,12 +705,12 @@ class IndicatorPPADownloadStatistics:
                     ppaNameValue = ppaName.get_text().strip()
 
                 if ppaUserValue == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "PPA user cannot be empty." ) )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "PPA user cannot be empty." ), INDICATOR_NAME )
                     ppaUser.grab_focus()
                     continue
 
                 if ppaNameValue == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "PPA name cannot be empty." ) )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "PPA name cannot be empty." ), INDICATOR_NAME )
                     ppaName.grab_focus()
                     continue
 
@@ -738,7 +738,7 @@ class IndicatorPPADownloadStatistics:
                                 break
 
                         if duplicate:
-                            pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Duplicates disallowed - there is an identical PPA!" ) )
+                            pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Duplicates disallowed - there is an identical PPA!" ), INDICATOR_NAME )
                             continue
 
                 # Update the model...
@@ -756,17 +756,17 @@ class IndicatorPPADownloadStatistics:
     def onFilterRemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is None:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No filter has been selected for removal." ) )
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No filter has been selected for removal." ), INDICATOR_NAME )
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            if pythonutils.showOKCancel( self.dialog, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:
+            if pythonutils.showOKCancel( self.dialog, _( "Remove the selected filter?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
                 self.ppasOrFiltersModified = True
 
 
     def onFilterAdd( self, button, filterTree, ppaTree ):
         if len( ppaTree.get_model() ) == 0:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Please add a PPA first!" ) )
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Please add a PPA first!" ), INDICATOR_NAME )
         else:
             # If the number of filters equals the number of PPA User/Names, cannot add a filter!
             ppaUsersNames = [ ]
@@ -776,7 +776,7 @@ class IndicatorPPADownloadStatistics:
                     ppaUsersNames.append( ppaUserName )
 
             if len( filterTree.get_model() ) == len( ppaUsersNames ):
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.INFO, _( "Only one filter per PPA User/Name." ) )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.INFO, _( "Only one filter per PPA User/Name." ), INDICATOR_NAME )
             else:
                 self.onFilterDoubleClick( filterTree, None, None, ppaTree )
 
@@ -867,7 +867,7 @@ class IndicatorPPADownloadStatistics:
                 filterText = buffer.get_text( buffer.get_start_iter(), buffer.get_end_iter(), False )
                 filterText = "\n".join( filterText.split() )
                 if len( filterText ) == 0:
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Please enter filter text!" ) )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Please enter filter text!" ), INDICATOR_NAME )
                     continue
 
                 # Update the model...
