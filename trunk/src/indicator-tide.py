@@ -19,13 +19,7 @@
 # Application indicator which displays tidal information.
 
 
-#TODO Icons...
-#     http://reeltorqueyachts.com/images/tide_icon.png
-#     https://www.premiermarinas.com/~/media/Common/tides-icon-large.ashx?h=220&la=en&w=230&hash=AB4BAC775676ECD14BE24E79DD5BC20B1DD5D260
-#     http://www.education.noaa.gov/images/icons/theme_oceans_90.gif
-#     https://cdn1.iconfinder.com/data/icons/weather-19/32/water-512.png
-#     http://reeltorqueyachts.com/images/tide_icon.png
-#     http://seriss.com/people/erco/gifs/tide-icon.gif
+#TODO Need to make a hicolor icon.
 
 
 INDICATOR_NAME = "indicator-tide"
@@ -332,7 +326,6 @@ class IndicatorTide:
 
         portsTree.get_selection().select_path( portIndex )
         portsTree.scroll_to_cell( Gtk.TreePath.new_from_string( portIndex ) )
-
 
 
     def loadSettings( self ):
