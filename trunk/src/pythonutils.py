@@ -90,16 +90,17 @@ def getIconTheme(): return Gtk.Settings().get_default().get_property( "gtk-icon-
 
 # Shows a message dialog.
 #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
-#    message: The message.
-def showMessage( parent, messageType, message ):
+def showMessage( parent, messageType, message, title ):
     dialog = Gtk.MessageDialog( parent, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
+    dialog.set_title( title )
     dialog.run()
     dialog.destroy()
 
 
 # Shows and OK/Cancel dialog prompt and returns either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
-def showOKCancel( parent, message ):
+def showOKCancel( parent, message, title ):
     dialog = Gtk.MessageDialog( parent, Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, message )
+    dialog.set_title( title )
     response = dialog.run()
     dialog.destroy()
     return response
