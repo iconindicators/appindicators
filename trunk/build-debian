@@ -26,7 +26,7 @@ cp build-debian build/$NAME-$VERSION
 
 # Python source and changelog.
 mkdir -p build/$NAME-$VERSION/src
-src/indicator-tide.py src/locations.py src/tide.py $PYTHON_UTILS build/$NAME-$VERSION/src
+cp src/indicator-tide.py src/locationData.py src/locations.py src/tide.py $PYTHON_UTILS build/$NAME-$VERSION/src
 cp packaging/debian/changelog build/$NAME-$VERSION/src
 
 
@@ -75,4 +75,4 @@ cd ..
 # Clean up.
 rm -rf $NAME-$VERSION
 echo "To upload to LaunchPad, change to the 'build' directory and run:"
-echo "    dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes"ntu-404930.shtml
+echo "    dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes"
