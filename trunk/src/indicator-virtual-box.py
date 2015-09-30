@@ -43,7 +43,7 @@ import gzip, json, locale, logging, os, pythonutils, re, shutil, sys, time, virt
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.46"
+    VERSION = "1.0.47"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -159,7 +159,7 @@ class IndicatorVirtualBox:
             self.startVirtualMachine( virtualMachine, virtualMachines, 0 ) # Set a zero delay as this is not an autostart.
         else:
             GLib.timeout_add_seconds( 1, self.onRefresh, False )
-            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "Missing VM...\n\nName: {0}\nID: {1}" ).format( widget.props.label, widget.props.name ) )
+            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "Missing VM...\n\nName: {0}\nID: {1}" ).format( widget.props.label, widget.props.name ), INDICATOR_NAME )
 
 
     def getVirtualMachine( self, uuid, virtualMachines ):
@@ -337,7 +337,7 @@ class IndicatorVirtualBox:
 
     def startVirtualMachine( self, virtualMachine, virtualMachines, delayInSeconds ):
         if virtualMachine is None:
-            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." ) )
+            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." ), INDICATOR_NAME )
 
         elif virtualMachine.isRunning(): # Attempt to use the window manager to bring the VM window to the front.
             if self.isVirtualMachineNameUnique( virtualMachine.getName(), virtualMachines ):
@@ -348,12 +348,12 @@ class IndicatorVirtualBox:
                         break
 
                 if windowID is None:
-                    pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "The VM is running but its window could not be found - perhaps it is running headless." ) )
+                    pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "The VM is running but its window could not be found - perhaps it is running headless." ), INDICATOR_NAME )
                 else:
                     pythonutils.processCall( "wmctrl -i -a " + windowID )
 
             else:
-                pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified." ) )
+                pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified." ), INDICATOR_NAME )
 
         else: # Run the VM!
             try:
@@ -365,7 +365,7 @@ class IndicatorVirtualBox:
 
             except Exception as e:
                 logging.exception( e )
-                pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM '{0}' could not be started - check the log file: {1}" ).format( virtualMachine.getUUID(), IndicatorVirtualBox.LOG ) )
+                pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM '{0}' could not be started - check the log file: {1}" ).format( virtualMachine.getUUID(), IndicatorVirtualBox.LOG ), INDICATOR_NAME )
 
 
     # repeat: If True, will return True resulting in onRefresh being repeatedly called.  On False, onRefresh will no longer be called.
@@ -613,12 +613,12 @@ class IndicatorVirtualBox:
                 break
 
             if startCommand.get_text().strip() == "":
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command cannot be empty." ) )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command cannot be empty." ), INDICATOR_NAME )
                 startCommand.grab_focus()
                 continue
 
             if not "%VM%" in startCommand.get_text().strip():
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command must contain %VM% which is substituted for the VM name/id." ) )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command must contain %VM% which is substituted for the VM name/id." ), INDICATOR_NAME )
                 startCommand.grab_focus()
                 continue
 
