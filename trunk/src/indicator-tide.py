@@ -91,7 +91,7 @@ class IndicatorTide:
         menu = Gtk.Menu()
 
         if tideReadings is None or len( tideReadings ) == 0:
-            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( locations.getPort( self.portID ) ) ) )
+            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( locations.getPort( self.portID ).title() ) ) )
         else:
             year = datetime.datetime.now().year
             previousMonth = -1
@@ -197,7 +197,8 @@ class IndicatorTide:
 
         countriesComboBox = Gtk.ComboBoxText()
         countriesComboBox.set_tooltip_text( _( "Choose your country." ) )
-        for country in locations.getCountries():
+        countries = sorted( locations.getCountries() )
+        for country in countries:
             countriesComboBox.append_text( country )
 
         box.pack_start( countriesComboBox, True, True, 1 )
@@ -221,7 +222,7 @@ class IndicatorTide:
         scrolledWindow.add( portsTree )
  
         countriesComboBox.connect( "changed", self.onCountry, ports, portsTree )
-        countriesComboBox.set_active( locations.getCountries().index( locations.getCountry( self.portID ) ) )
+        countriesComboBox.set_active( countries.index( locations.getCountry( self.portID ) ) )
 
         box.pack_start( scrolledWindow, True, True, 0 )
 
@@ -321,7 +322,7 @@ class IndicatorTide:
     def onCountry( self, countriesComboBox, portsListStore, portsTree ):
         country = countriesComboBox.get_active_text()
         portsListStore.clear()
-        ports = locations.getPortsForCountry( country ) 
+        ports = sorted( locations.getPortsForCountry( country ) ) 
         for port in ports:
             portsListStore.append( [ port ] )
 
@@ -455,7 +456,7 @@ class IndicatorTide:
                         # Only add data from today onwards (drop data previous days' data) OR for when the month changes (always add that data). 
                         if monthDay.month == todayMonth and monthDay.day >= todayDay or \
                            monthDay.month != todayMonth:
-                            tidalReadings.append( tide.Reading( portName, monthDay.month, monthDay.day, hourMinute.hour, hourMinute.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
+                            tidalReadings.append( tide.Reading( portName.title(), monthDay.month, monthDay.day, hourMinute.hour, hourMinute.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
 
         except Exception as e:
             logging.exception( e )
