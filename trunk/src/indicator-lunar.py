@@ -49,7 +49,7 @@ try:
     from ephem.cities import _city_data
     from ephem.stars import stars
 except:
-    pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "You must also install python3-ephem!" ) )
+    pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "You must also install python3-ephem!" ), INDICATOR_NAME )
     sys.exit()
 
 
@@ -2941,35 +2941,35 @@ class IndicatorLunar:
                 break
 
             if satelliteMenuText.get_text().strip() == "":
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Satellite menu text cannot be empty." ) )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Satellite menu text cannot be empty." ), INDICATOR_NAME )
                 notebook.set_current_page( 1 )
                 satelliteMenuText.grab_focus()
                 continue
 
             cityValue = city.get_active_text()
             if cityValue == "":
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ) )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ), INDICATOR_NAME )
                 notebook.set_current_page( 5 )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
             if latitudeValue == "" or not pythonutils.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Latitude must be a number between 90 and -90 inclusive." ) )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Latitude must be a number between 90 and -90 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( 5 )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
             if longitudeValue == "" or not pythonutils.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Longitude must be a number between 180 and -180 inclusive." ) )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Longitude must be a number between 180 and -180 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( 5 )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
             if elevationValue == "" or not pythonutils.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number between 0 and 10000 inclusive." ) )
+                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number between 0 and 10000 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( 5 )
                 elevation.grab_focus()
                 continue
