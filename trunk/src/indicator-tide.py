@@ -19,9 +19,6 @@
 # Application indicator which displays tidal information.
 
 
-#TODO Need to make a hicolor icon.
-
-
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
