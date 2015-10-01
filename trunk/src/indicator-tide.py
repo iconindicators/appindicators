@@ -440,13 +440,15 @@ class IndicatorTide:
                             waterLevelsInMetres.append( item[ 0 : 3 ] )
 
                     for index, item in enumerate( waterLevelTypes ):
-                        monthDay = datetime.datetime.strptime( date, "%a %d %b" )
+                        tideDate = datetime.datetime.strptime( date, "%a %d %b" )
                         hourMinute = datetime.datetime.strptime( times[ index ], "%H:%M" )
 
-                        # Only add data from today onwards (drop data previous days' data) OR for when the month changes (always add that data). 
-                        if monthDay.month == todayMonth and monthDay.day >= todayDay or \
-                           monthDay.month != todayMonth:
-                            tidalReadings.append( tide.Reading( portName.title(), monthDay.month, monthDay.day, hourMinute.hour, hourMinute.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
+# TODO Busted ... see test code at end...
+                        # Only add data from today onward, taking care when the month/year changes... 
+                        if tideDate.month == todayMonth and tideDate.day >= todayDay or \
+                           tideDate.month > todayMonth and tideDate.day < todayDay or \
+                           tideDate.month < todayMonth and tideDate.day < todayDay:
+                            tidalReadings.append( tide.Reading( portName.title(), tideDate.month, tideDate.day, hourMinute.hour, hourMinute.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
 
         except Exception as e:
             logging.exception( e )
@@ -458,7 +460,50 @@ class IndicatorTide:
 
 
 if __name__ == "__main__":
-    if datetime.datetime.now().strftime( "%Y-%m-%d" ) >= locations.EXPIRY:
-        pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The tidal data license has expired!\n\nPlease download the latest version of this software." ), INDICATOR_NAME )
-    else:
-        IndicatorTide().main()
+    
+
+# Test to ensure only tide data from today onwards is kept,
+# ensuring also month boundaries and year boundaries don't cause a problem. 
+#
+#    Today       Tide Date      Keep
+#
+#    June 15 
+#                June 14        False
+#                June 15        True
+#                June 16        True
+# 
+#    June 30 
+#                June 30        True    
+#                July 1         True    
+# 
+#    July 1 
+#                June 30        False
+#                July 1         True
+# 
+#    December 31
+#                December 31    True
+#                January 1      True
+# 
+#    January 1
+#                December 31    False
+#                January 1      True
+
+    todayMonth = [ 6,     6,    6,    6,    6,    7,     7,    12,   12,   1,     1 ]
+    todayDay =   [ 15,    15,   15,   30,   30,   1,     1,    31,   31,   1,     1 ]
+
+    tideMonth =  [ 6,     6,    6,    6,    7,    6,     7,    12,   1,    12,    1 ]
+    tideDay =    [ 14,    15,   16,   30,   1,    30,    1,    31,   1,    31,    1 ]
+
+    result =     [ False, True, True, True, True, False, True, True, True, False, True ] 
+
+    for i in range( len( todayMonth ) ):
+        if tideMonth[ i ] == todayMonth[ i ] and tideDay[ i ] >= todayDay[ i ] or \
+           tideMonth[ i ] > todayMonth[ i ] and tideDay[ i ] < todayDay[ i ] or \
+           tideMonth[ i ] < todayMonth[ i ] and tideDay[ i ] < todayDay[ i ]:
+            print( i, True, result[ i ] )
+
+
+#     if datetime.datetime.now().strftime( "%Y-%m-%d" ) >= locations.EXPIRY:
+#         pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The tidal data license has expired!\n\nPlease download the latest version of this software." ), INDICATOR_NAME )
+#     else:
+#         IndicatorTide().main()
