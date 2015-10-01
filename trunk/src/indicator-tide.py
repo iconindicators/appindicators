@@ -73,7 +73,7 @@ class IndicatorTide:
 
     def main( self ):
         self.update()
-        GLib.timeout_add_seconds( 12 * 60 * 60, self.update, True ) # Auto update every twelve hours.
+        GLib.timeout_add_seconds( 12 * 60 * 60, self.update ) # Auto update every twelve hours.
         Gtk.main()
 
 
