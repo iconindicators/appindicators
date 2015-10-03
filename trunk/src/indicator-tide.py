@@ -41,7 +41,7 @@ class IndicatorTide:
     URL_TIMEOUT_IN_SECONDS = 10
 
     COMMENTS = _( "Displays tidal information.\n(this software will expire after {0})" ).format( locations.EXPIRY )
-    CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tidal information gratefully sourced from UK Hydrographic Office. http://www.ukho.gov.uk" ) #TODO Check with final license what needs to go here.
+    CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tidal information reproduced by permission of the\nController of Her Majesty’s Stationery Office\nand the UK Hydrographic Office. http://www.ukho.gov.uk" )
     CREDITS = [ CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
@@ -63,7 +63,6 @@ class IndicatorTide:
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
         self.dialog = None
-        self.stardateMenuItem = None
         self.loadSettings()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorTide.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
