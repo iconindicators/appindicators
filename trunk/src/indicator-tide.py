@@ -36,11 +36,11 @@ class IndicatorTide:
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
-
+    EXPIRY = "2016-09-28" # The license for the UKHO data expires one year from 2015-09-28.
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
     URL_TIMEOUT_IN_SECONDS = 10
 
-    COMMENTS = _( "Displays tidal information.\n(this software will expire after {0})" ).format( locations.EXPIRY )
+    COMMENTS = _( "Displays tidal information.\n(this software will expire after {0})" ).format( EXPIRY )
     CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tidal information reproduced by permission of the\nController of Her Majesty’s Stationery Office\nand the UK Hydrographic Office. http://www.ukho.gov.uk" )
     CREDITS = [ CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE ]
 
@@ -458,7 +458,7 @@ class IndicatorTide:
 
 
 if __name__ == "__main__":
-    if datetime.datetime.now().strftime( "%Y-%m-%d" ) >= locations.EXPIRY:
+    if datetime.datetime.now().strftime( "%Y-%m-%d" ) >= IndicatorTide.EXPIRY:
         pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The tidal data license has expired!\n\nPlease download the latest version of this software." ), INDICATOR_NAME )
     else:
         IndicatorTide().main()
