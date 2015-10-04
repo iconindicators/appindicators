@@ -72,7 +72,7 @@ class IndicatorTide:
 
     def main( self ):
         self.update()
-        GLib.timeout_add_seconds( 12 * 60 * 60, self.update ) # Auto update every twelve hours.
+        self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
         Gtk.main()
 
 
@@ -145,6 +145,15 @@ class IndicatorTide:
 
 
     def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
+
+
+    def getNextUpdateTimeInSeconds( self ):
+        now = datetime.datetime.now()
+        oneMinuteAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 1, second = 0 )
+        numberOfSecondsUntilOneMinuteAfterMidnight = ( oneMinuteAfterMidnight - now ).total_seconds()
+        numberOfSecondsTwelveHoursFromNow = 43200
+
+        return min( numberOfSecondsTwelveHoursFromNow, numberOfSecondsUntilOneMinuteAfterMidnight )
 
 
     def onAbout( self, widget ):
@@ -303,6 +312,9 @@ class IndicatorTide:
             self.menuItemTideFormat = tideFormat.get_text().strip()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorTide.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+
+            GLib.source_remove( self.timeoutID )
+            self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
             self.update()
 
         self.dialog.destroy()

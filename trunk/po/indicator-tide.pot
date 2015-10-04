@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-tide 1.0.0\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-10-04 10:58+1100\n"
+"POT-Creation-Date: 2015-10-04 15:47+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,75 +44,75 @@ msgstr ""
 msgid "L"
 msgstr ""
 
-#: indicator-tide.py:156
+#: indicator-tide.py:165
 msgid "Credits"
 msgstr ""
 
-#: indicator-tide.py:162
+#: indicator-tide.py:171
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-tide.py:163
+#: indicator-tide.py:172
 msgid "View the"
 msgstr ""
 
-#: indicator-tide.py:164
+#: indicator-tide.py:173
 msgid "text file."
 msgstr ""
 
-#: indicator-tide.py:165
+#: indicator-tide.py:174
 msgid "changelog"
 msgstr ""
 
-#: indicator-tide.py:186
+#: indicator-tide.py:195
 msgid "Country"
 msgstr ""
 
-#: indicator-tide.py:189
+#: indicator-tide.py:198
 msgid "Choose your country."
 msgstr ""
 
-#: indicator-tide.py:204
+#: indicator-tide.py:213
 msgid "Choose your port."
 msgstr ""
 
-#: indicator-tide.py:207
+#: indicator-tide.py:216
 msgid "Port"
 msgstr ""
 
-#: indicator-tide.py:224
+#: indicator-tide.py:233
 msgid "Daylight savings offset"
 msgstr ""
 
-#: indicator-tide.py:230
+#: indicator-tide.py:239
 msgid ""
 "If your timezone is currently in daylight savings,\n"
 "specify the offset amount, in minutes."
 msgstr ""
 
-#: indicator-tide.py:239
+#: indicator-tide.py:248
 msgid "Show as submenus"
 msgstr ""
 
-#: indicator-tide.py:241
+#: indicator-tide.py:250
 msgid "Show each day's tides in a submenu."
 msgstr ""
 
-#: indicator-tide.py:249
+#: indicator-tide.py:258
 msgid "Date format"
 msgstr ""
 
-#: indicator-tide.py:254
+#: indicator-tide.py:263
 msgid ""
 "Formatting options are specified at\n"
 "http://docs.python.org/3/library/datetime.html"
 msgstr ""
 
-#: indicator-tide.py:264
+#: indicator-tide.py:273
 msgid "Tide format"
 msgstr ""
 
-#: indicator-tide.py:269
+#: indicator-tide.py:278
 msgid ""
 "Tide information is specified using:\n"
 "\n"
@@ -123,19 +123,19 @@ msgid ""
 "http://docs.python.org/3/library/datetime.html"
 msgstr ""
 
-#: indicator-tide.py:281
+#: indicator-tide.py:290
 msgid "Autostart"
 msgstr ""
 
-#: indicator-tide.py:283
+#: indicator-tide.py:292
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-tide.py:288
+#: indicator-tide.py:297
 msgid "Preferences"
 msgstr ""
 
-#: indicator-tide.py:462
+#: indicator-tide.py:474
 msgid ""
 "The tidal data license has expired!\n"
 "\n"
