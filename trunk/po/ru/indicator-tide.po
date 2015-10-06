@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-tide 1.0.0\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-10-01 12:06+1000\n"
-"PO-Revision-Date: 2015-10-01 14:26+0300\n"
+"POT-Creation-Date: 2015-10-04 15:47+1100\n"
+"PO-Revision-Date: 2015-10-06 15:00+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -28,65 +28,67 @@ msgstr ""
 
 #: indicator-tide.py:44
 msgid ""
-"Tidal information gratefully sourced from UK Hydrographic Office. http://www."
-"ukho.gov.uk"
+"Tidal information reproduced by permission of the\n"
+"Controller of Her Majesty’s Stationery Office\n"
+"and the UK Hydrographic Office. http://www.ukho.gov.uk"
 msgstr ""
-"Информация о приливах любезно предоставлена Гидрографической службой"
-"Великобритании. http://www.ukho.gov.uk"
+"Информация о приливах воспроизведена с разрешения\n"
+"Управляющего Издательства Её Величества\n"
+"и Гидрографической службы Великобритании. http://www.ukho.gov.uk"
 
-#: indicator-tide.py:85
+#: indicator-tide.py:84
 msgid "No port data available for {0}!"
 msgstr "Данные для порта {0} недоступны!"
 
-#: indicator-tide.py:116
+#: indicator-tide.py:115
 msgid "H"
 msgstr "П"
 
-#: indicator-tide.py:118
+#: indicator-tide.py:117
 msgid "L"
 msgstr "О"
 
-#: indicator-tide.py:157
+#: indicator-tide.py:165
 msgid "Credits"
 msgstr "Благодарность"
 
-#: indicator-tide.py:163
+#: indicator-tide.py:171
 msgid "translator-credits"
 msgstr "Олег Мойсейчук"
 
-#: indicator-tide.py:164
+#: indicator-tide.py:172
 msgid "View the"
 msgstr "Просмотреть"
 
-#: indicator-tide.py:165
+#: indicator-tide.py:173
 msgid "text file."
 msgstr "."
 
-#: indicator-tide.py:166
+#: indicator-tide.py:174
 msgid "changelog"
 msgstr "список изменений"
 
-#: indicator-tide.py:187
+#: indicator-tide.py:195
 msgid "Country"
 msgstr "Страна"
 
-#: indicator-tide.py:190
+#: indicator-tide.py:198
 msgid "Choose your country."
 msgstr "Выберите вашу страну."
 
-#: indicator-tide.py:205
+#: indicator-tide.py:213
 msgid "Choose your port."
 msgstr "Выберите ваш порт."
 
-#: indicator-tide.py:208
+#: indicator-tide.py:216
 msgid "Port"
 msgstr "Порт"
 
-#: indicator-tide.py:225
+#: indicator-tide.py:233
 msgid "Daylight savings offset"
 msgstr "Поправка летнего времени"
 
-#: indicator-tide.py:231
+#: indicator-tide.py:239
 msgid ""
 "If your timezone is currently in daylight savings,\n"
 "specify the offset amount, in minutes."
@@ -94,19 +96,19 @@ msgstr ""
 "Если в вашей часовой зоне сейчас действует летнее время,\n"
 "задайте величину поправки в минутах."
 
-#: indicator-tide.py:240
+#: indicator-tide.py:248
 msgid "Show as submenus"
 msgstr "Отображать в подменю"
 
-#: indicator-tide.py:242
+#: indicator-tide.py:250
 msgid "Show each day's tides in a submenu."
 msgstr "Отображать приливы каждого дня в подменю."
 
-#: indicator-tide.py:250
+#: indicator-tide.py:258
 msgid "Date format"
 msgstr "Формат даты"
 
-#: indicator-tide.py:255
+#: indicator-tide.py:263
 msgid ""
 "Formatting options are specified at\n"
 "http://docs.python.org/3/library/datetime.html"
@@ -114,11 +116,11 @@ msgstr ""
 "Варианты формата времени описаны на странице\n"
 "http://docs.python.org/3/library/datetime.html"
 
-#: indicator-tide.py:265
+#: indicator-tide.py:273
 msgid "Tide format"
 msgstr "Формат данных"
 
-#: indicator-tide.py:270
+#: indicator-tide.py:278
 msgid ""
 "Tide information is specified using:\n"
 "\n"
@@ -136,19 +138,19 @@ msgstr ""
 "Варианты формата времени описаны на странице\n"
 "http://docs.python.org/3/library/datetime.html"
 
-#: indicator-tide.py:282
+#: indicator-tide.py:290
 msgid "Autostart"
 msgstr "Автозапуск"
 
-#: indicator-tide.py:284
+#: indicator-tide.py:292
 msgid "Run the indicator automatically."
 msgstr "Запускать индикатор автоматически."
 
-#: indicator-tide.py:289
+#: indicator-tide.py:297
 msgid "Preferences"
 msgstr "Параметры"
 
-#: indicator-tide.py:463
+#: indicator-tide.py:474
 msgid ""
 "The tidal data license has expired!\n"
 "\n"
