@@ -153,7 +153,7 @@ class IndicatorTide:
         numberOfSecondsUntilOneMinuteAfterMidnight = ( oneMinuteAfterMidnight - now ).total_seconds()
         numberOfSecondsTwelveHoursFromNow = 43200
 
-        return min( numberOfSecondsTwelveHoursFromNow, numberOfSecondsUntilOneMinuteAfterMidnight )
+        return int( min( numberOfSecondsTwelveHoursFromNow, numberOfSecondsUntilOneMinuteAfterMidnight ) )
 
 
     def onAbout( self, widget ):
