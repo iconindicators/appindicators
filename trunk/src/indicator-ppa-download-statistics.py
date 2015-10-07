@@ -1052,6 +1052,7 @@ class IndicatorPPADownloadStatistics:
 
 
     def getPublishedBinariesWithFilters( self, ppa ):
+        noPublishedBinaries = True
         for filter in self.filters.get( ppa.getUser() + " | " + ppa.getName() ):
             url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
                       "?ws.op=getPublishedBinaries" + \
@@ -1064,14 +1065,16 @@ class IndicatorPPADownloadStatistics:
             try:
                 publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
                 numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
-                if numberOfPublishedBinaries == 0:
-                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
-                else:
+                if numberOfPublishedBinaries > 0: # Only fetch if there is data, that is, was not filtered.
+                    noPublishedBinaries = False
                     self.processPublishedBinaries( ppa, url, publishedBinaries, numberOfPublishedBinaries )
 
             except Exception as e:
                 logging.exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+
+        if noPublishedBinaries: # Will occur if all the data was filtered.
+            ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
 
 
     # Takes the published binary and extracts the information needed to get the download count (for each package).
