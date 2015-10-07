@@ -1053,7 +1053,7 @@ class IndicatorPPADownloadStatistics:
 
     def getPublishedBinariesWithFilters( self, ppa ):
         for filter in self.filters.get( ppa.getUser() + " | " + ppa.getName() ):
-            baseURL = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
+            url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
                       "?ws.op=getPublishedBinaries" + \
                       "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
                       "&status=Published" + \
@@ -1061,14 +1061,13 @@ class IndicatorPPADownloadStatistics:
                       "&ordered=false" + \
                       "&binary_name=" + filter
 
-            url = baseURL
             try:
                 publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
                 numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
                 if numberOfPublishedBinaries == 0:
                     ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
                 else:
-                    self.processPublishedBinaries( ppa, baseURL, publishedBinaries, numberOfPublishedBinaries )
+                    self.processPublishedBinaries( ppa, url, publishedBinaries, numberOfPublishedBinaries )
 
             except Exception as e:
                 logging.exception( e )
