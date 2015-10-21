@@ -56,7 +56,7 @@ class IndicatorPPADownloadStatistics:
 
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
 
-    SERIES = [ "wily", "vivid", "utopic", "trusty", "saucy", "raring", "quantal", "precise", "oneiric", "natty", "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy", "gutsy", "feisty", "edgy", "dapper", "breezy", "hoary", "warty" ]
+    SERIES = [ "xenial", "wily", "vivid", "utopic", "trusty", "saucy", "raring", "quantal", "precise", "oneiric", "natty", "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy", "gutsy", "feisty", "edgy", "dapper", "breezy", "hoary", "warty" ]
     ARCHITECTURES = [ "amd64", "i386" ]
 
     COMMENTS = _( "Shows the total downloads of PPAs." )
