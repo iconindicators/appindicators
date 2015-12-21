@@ -226,7 +226,7 @@ class IndicatorVirtualBox:
         result = pythonutils.processGet( "VBoxManage --version" )
         if result is not None: # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
             for line in result.splitlines():
-                if line[ 0 ].isdigit(): # The result may including compile warnings in addition to the actual version number.
+                if len( line ) > 0 and line[ 0 ].isdigit(): # The result may include compile warnings in addition to the actual version number or even empty lines.
                     version = line
                     break
 

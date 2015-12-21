@@ -1,5 +1,7 @@
 indicator-virtual-box (1.0.47-1) precise; urgency=low
 
+  * Bug fix: Handle empty lines when calling "VBoxManage --version".
+    Thanks to Piotr Szuszkiewicz <piotr@szuszkiewi.cz> for the fix!
   * Changes to API for showing message dialogs.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 30 Sep 2015 12:47:33 +1000
