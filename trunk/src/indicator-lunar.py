@@ -34,6 +34,15 @@
 #  http://www.flaticon.com/search/satellite
 
 
+#TODO Click on the final submenu for a star and load the wikipedia page using the URL:
+# http://www.google.com/search?btnI=I%27m+Feeling+Lucky&ie=UTF-8&oe=UTF-8&q=schedar%20star%20wikipedia
+# which works for the star "schedar".
+# Go through list of stars from /home/bernard/Desktop/pyephem-3.7.6.0/ephem/stars.py and make sure each star loads the wikipedia page.
+
+#TODO Load the relevant wikipedia page for each planet and moon, and the moon and sun?
+
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
