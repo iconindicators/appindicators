@@ -151,7 +151,7 @@ class IndicatorTide:
         now = datetime.datetime.now()
         oneMinuteAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 1, second = 0 )
         numberOfSecondsUntilOneMinuteAfterMidnight = ( oneMinuteAfterMidnight - now ).total_seconds()
-        numberOfSecondsTwelveHoursFromNow = 43200
+        numberOfSecondsTwelveHoursFromNow = 43200 # At most, automatically update the tidal information every 12 hours.
 
         return int( min( numberOfSecondsTwelveHoursFromNow, numberOfSecondsUntilOneMinuteAfterMidnight ) )
 
