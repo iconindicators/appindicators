@@ -32,7 +32,7 @@ import datetime, gzip, json, locale, locations, logging, os, pythonutils, re, sh
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.0"
+    VERSION = "1.0.1"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -68,12 +68,10 @@ class IndicatorTide:
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorTide.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
-
-    def main( self ):
         self.update()
-        self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
-        Gtk.main()
+
+
+    def main( self ): Gtk.main()
 
 
     def buildMenu( self, tideReadings ):
@@ -141,7 +139,7 @@ class IndicatorTide:
 
     def update( self ):
         self.buildMenu( self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.daylightSavingsOffset ) )
-        return True # Needed so the timer continues!
+        self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
 
 
     def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
@@ -149,11 +147,11 @@ class IndicatorTide:
 
     def getNextUpdateTimeInSeconds( self ):
         now = datetime.datetime.now()
-        oneMinuteAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 1, second = 0 )
-        numberOfSecondsUntilOneMinuteAfterMidnight = ( oneMinuteAfterMidnight - now ).total_seconds()
-        numberOfSecondsTwelveHoursFromNow = 43200 # At most, automatically update the tidal information every 12 hours.
+        fiveMinutesAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 ) # Tidal information (appears to be) updated not long after local midnight.
+        numberOfSecondsUntilFiveMinutesAfterMidnight = ( fiveMinutesAfterMidnight - now ).total_seconds()
+        numberOfSecondsInTwelveHours = 12 * 60 * 60 # Automatically update the tidal information at least every 12 hours.
 
-        return int( min( numberOfSecondsTwelveHoursFromNow, numberOfSecondsUntilOneMinuteAfterMidnight ) )
+        return int( min( numberOfSecondsInTwelveHours, numberOfSecondsUntilFiveMinutesAfterMidnight ) )
 
 
     def onAbout( self, widget ):
