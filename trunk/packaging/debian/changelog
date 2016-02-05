@@ -4,9 +4,9 @@ indicator-tide (1.0.1-1) precise; urgency=low
     occur.  Now updates every twelve hours or just after (local) midnight.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 5 Feb 2016 14:07:38 +1000
- 
- 
- indicator-tide (1.0.0-1) precise; urgency=low
+
+
+indicator-tide (1.0.0-1) precise; urgency=low
 
   * Initial release.  
 
