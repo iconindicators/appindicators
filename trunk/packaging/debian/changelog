@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.48-1) precise; urgency=low
+
+  * Bug fix: Handle previously installed (older) versions of VirtualBox which
+    have their config file in a different location.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 6 Feb 2015 12:12:13 +1000
+
+
 indicator-virtual-box (1.0.47-1) precise; urgency=low
 
   * Bug fix: Handle empty lines when calling "VBoxManage --version".

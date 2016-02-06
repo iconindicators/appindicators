@@ -43,7 +43,7 @@ import gzip, json, locale, logging, os, pythonutils, re, shutil, sys, time, virt
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.47"
+    VERSION = "1.0.48"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -276,9 +276,17 @@ class IndicatorVirtualBox:
 
 
     def getVirtualMachinesFromConfig4dot3( self ):
+        # The config file may exist in one of two places, particularly if the user has done an upgrade or uses an older version of Ubuntu.
+        # https://www.virtualbox.org/manual/ch10.html#idp46730491656240
+        configFile = None
+        if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER ):
+            configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER
+        elif os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_PRIOR ):
+            configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_PRIOR
+
         virtualMachines = [ ]
         try:
-            with open( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER, "r" ) as f:
+            with open( configFile, "r" ) as f:
                 content = f.readlines()
 
             # Parse all group definition tags extracting each group name and contents (which may be group names and/or VMs).
