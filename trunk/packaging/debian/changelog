@@ -1,5 +1,6 @@
 indicator-lunar (1.0.66-1) precise; urgency=low
 
+  * Bug fix: Would crash when the CITY NAME tag was present in the icon text. 
   * Added latitude/longitude/elevation of location to the icon text tags.
   * Use the process wrapper utilities rather than direct calls.
   * Removed expired eclipse information.
