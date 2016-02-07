@@ -151,10 +151,13 @@ class IndicatorLunar:
     DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
     DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
     DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
+    DATA_ELEVATION = "ELEVATION" # Only used for the CITY "body" tag.
     DATA_EQUINOX = "EQUINOX"
     DATA_FIRST_QUARTER = "FIRST QUARTER"
     DATA_FULL = "FULL"
     DATA_ILLUMINATION = "ILLUMINATION"
+    DATA_LATITUDE = "LATITUDE" # Only used for the CITY "body" tag.
+    DATA_LONGITUDE = "LONGITUDE" # Only used for the CITY "body" tag.
     DATA_MAGNITUDE = "MAGNITUDE"
     DATA_MESSAGE = "MESSAGE"
     DATA_NAME = "NAME" # Only used for the CITY "body" tag.
@@ -249,9 +252,12 @@ class IndicatorLunar:
         DATA_ECLIPSE_LONGITUDE          : _( "ECLIPSE LONGITUDE" ),
         DATA_ECLIPSE_TYPE               : _( "ECLIPSE TYPE" ),
         DATA_EQUINOX                    : _( "EQUINOX" ),
+        DATA_ELEVATION                  : _( "ELEVATION" ),
         DATA_FIRST_QUARTER              : _( "FIRST QUARTER" ),
         DATA_FULL                       : _( "FULL" ),
         DATA_ILLUMINATION               : _( "ILLUMINATION" ),
+        DATA_LATITUDE                   : _( "LATITUDE" ),
+        DATA_LONGITUDE                  : _( "LONGITUDE" ),
         DATA_MAGNITUDE                  : _( "MAGNITUDE" ),
         DATA_MESSAGE                    : _( "MESSAGE" ),
         DATA_NAME                       : _( "NAME" ), # Only used for CITY "body" tag.
@@ -875,6 +881,11 @@ class IndicatorLunar:
 
             self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_NAME ) ] = self.cityName
+
+            global _city_data
+            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LATITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 0 ] ), 1 ) ) + "°"
+            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LONGITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 1 ] ), 1 ) ) + "°"
+            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_ELEVATION ) ] = str( _city_data.get( self.cityName )[ 2 ] ) + " " + _( "m" )
 
             self.updateAstronomicalInformation()
 

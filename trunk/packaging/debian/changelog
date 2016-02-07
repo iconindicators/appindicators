@@ -1,5 +1,7 @@
 indicator-lunar (1.0.66-1) precise; urgency=low
 
+  * Added latitude, longitude and elevation of location to available tags for
+    the icon text.
   * Use the process wrapper utilities rather than direct calls.
   * Removed expired eclipse information.
   * Changes to API for showing message dialogs.
