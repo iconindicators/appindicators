@@ -1692,10 +1692,6 @@ msgstr ""
 msgid "ValueError"
 msgstr ""
 
-#: indicator-lunar.py:888
-msgid "m"
-msgstr ""
-
 #: indicator-lunar.py:964 indicator-lunar.py:984
 msgid "S"
 msgstr ""
@@ -1740,302 +1736,306 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: indicator-lunar.py:1155
+#: indicator-lunar.py:1008
+msgid "m"
+msgstr ""
+
+#: indicator-lunar.py:1163
 msgid "Moon"
 msgstr ""
 
-#: indicator-lunar.py:1159
+#: indicator-lunar.py:1167
 msgid "Phase: "
 msgstr ""
 
-#: indicator-lunar.py:1160
+#: indicator-lunar.py:1168
 msgid "Next Phases"
 msgstr ""
 
-#: indicator-lunar.py:1165
+#: indicator-lunar.py:1173
 msgid "First Quarter: "
 msgstr ""
 
-#: indicator-lunar.py:1166
+#: indicator-lunar.py:1174
 msgid "Full: "
 msgstr ""
 
-#: indicator-lunar.py:1167
+#: indicator-lunar.py:1175
 msgid "Third Quarter: "
 msgstr ""
 
-#: indicator-lunar.py:1168
+#: indicator-lunar.py:1176
 msgid "New: "
 msgstr ""
 
-#: indicator-lunar.py:1186
+#: indicator-lunar.py:1194
 msgid "Sun"
 msgstr ""
 
-#: indicator-lunar.py:1196 indicator-lunar.py:1200
+#: indicator-lunar.py:1204 indicator-lunar.py:1208
 msgid "Equinox: "
 msgstr ""
 
-#: indicator-lunar.py:1197 indicator-lunar.py:1199
+#: indicator-lunar.py:1205 indicator-lunar.py:1207
 msgid "Solstice: "
 msgstr ""
 
-#: indicator-lunar.py:1208
+#: indicator-lunar.py:1216
 msgid "Eclipse"
 msgstr ""
 
-#: indicator-lunar.py:1209 indicator-lunar.py:1520 indicator-lunar.py:1524
+#: indicator-lunar.py:1217 indicator-lunar.py:1528 indicator-lunar.py:1532
 msgid "Date/Time: "
 msgstr ""
 
-#: indicator-lunar.py:1212
+#: indicator-lunar.py:1220
 msgid "Latitude/Longitude: "
 msgstr ""
 
-#: indicator-lunar.py:1213
+#: indicator-lunar.py:1221
 msgid "Type: "
 msgstr ""
 
-#: indicator-lunar.py:1228 indicator-lunar.py:2309
+#: indicator-lunar.py:1236 indicator-lunar.py:2317
 msgid "Planets"
 msgstr ""
 
-#: indicator-lunar.py:1249
+#: indicator-lunar.py:1257
 msgid "Major Moons"
 msgstr ""
 
-#: indicator-lunar.py:1268
+#: indicator-lunar.py:1276
 msgid "Earth Visible: "
 msgstr ""
 
-#: indicator-lunar.py:1271
+#: indicator-lunar.py:1279
 msgid "Offset from Planet (in planet radii)"
 msgstr ""
 
-#: indicator-lunar.py:1272
+#: indicator-lunar.py:1280
 msgid "X: "
 msgstr ""
 
-#: indicator-lunar.py:1273
+#: indicator-lunar.py:1281
 msgid "Y: "
 msgstr ""
 
-#: indicator-lunar.py:1274
+#: indicator-lunar.py:1282
 msgid "Z: "
 msgstr ""
 
-#: indicator-lunar.py:1291 indicator-lunar.py:2314
+#: indicator-lunar.py:1299 indicator-lunar.py:2322
 msgid "Stars"
 msgstr ""
 
-#: indicator-lunar.py:1359 indicator-lunar.py:2634
+#: indicator-lunar.py:1367 indicator-lunar.py:2642
 msgid "Orbital Elements"
 msgstr ""
 
-#: indicator-lunar.py:1392
+#: indicator-lunar.py:1400
 msgid "Illumination: "
 msgstr ""
 
-#: indicator-lunar.py:1395
+#: indicator-lunar.py:1403
 msgid "Constellation: "
 msgstr ""
 
-#: indicator-lunar.py:1397
+#: indicator-lunar.py:1405
 msgid "Magnitude: "
 msgstr ""
 
-#: indicator-lunar.py:1406
+#: indicator-lunar.py:1414
 msgid "Tropical Sign: "
 msgstr ""
 
-#: indicator-lunar.py:1409 indicator-lunar.py:1415
+#: indicator-lunar.py:1417 indicator-lunar.py:1423
 msgid "Distance to Earth: "
 msgstr ""
 
-#: indicator-lunar.py:1420
+#: indicator-lunar.py:1428
 msgid "Distance to Sun: "
 msgstr ""
 
-#: indicator-lunar.py:1424
+#: indicator-lunar.py:1432
 msgid "Bright Limb: "
 msgstr ""
 
-#: indicator-lunar.py:1428
+#: indicator-lunar.py:1436
 msgid "Earth Tilt: "
 msgstr ""
 
-#: indicator-lunar.py:1429
+#: indicator-lunar.py:1437
 msgid "Sun Tilt: "
 msgstr ""
 
-#: indicator-lunar.py:1439
+#: indicator-lunar.py:1447
 msgid "Rise: "
 msgstr ""
 
-#: indicator-lunar.py:1440
+#: indicator-lunar.py:1448
 msgid "Set: "
 msgstr ""
 
-#: indicator-lunar.py:1444
+#: indicator-lunar.py:1452
 msgid "Dawn: "
 msgstr ""
 
-#: indicator-lunar.py:1445
+#: indicator-lunar.py:1453
 msgid "Dusk: "
 msgstr ""
 
-#: indicator-lunar.py:1457 indicator-lunar.py:1514 indicator-lunar.py:1521
-#: indicator-lunar.py:1525
+#: indicator-lunar.py:1465 indicator-lunar.py:1522 indicator-lunar.py:1529
+#: indicator-lunar.py:1533
 msgid "Azimuth: "
 msgstr ""
 
-#: indicator-lunar.py:1458
+#: indicator-lunar.py:1466
 msgid "Altitude: "
 msgstr ""
 
-#: indicator-lunar.py:1460
+#: indicator-lunar.py:1468
 msgid "Right Ascension: "
 msgstr ""
 
-#: indicator-lunar.py:1461 indicator-lunar.py:1515
+#: indicator-lunar.py:1469 indicator-lunar.py:1523
 msgid "Declination: "
 msgstr ""
 
-#: indicator-lunar.py:1502 indicator-lunar.py:2324 indicator-lunar.py:2726
+#: indicator-lunar.py:1510 indicator-lunar.py:2332 indicator-lunar.py:2734
 msgid "Satellites"
 msgstr ""
 
-#: indicator-lunar.py:1519
+#: indicator-lunar.py:1527
 msgid "Rise"
 msgstr ""
 
-#: indicator-lunar.py:1523
+#: indicator-lunar.py:1531
 msgid "Set"
 msgstr ""
 
-#: indicator-lunar.py:1528
+#: indicator-lunar.py:1536
 msgid "Visible: "
 msgstr ""
 
-#: indicator-lunar.py:1612
+#: indicator-lunar.py:1620
 msgid "Error Retrieving Orbital Element Data"
 msgstr ""
 
-#: indicator-lunar.py:1613
+#: indicator-lunar.py:1621
 msgid "The orbital element data source could not be reached."
 msgstr ""
 
-#: indicator-lunar.py:1616
+#: indicator-lunar.py:1624
 msgid "Empty Orbital Element Data"
 msgstr ""
 
-#: indicator-lunar.py:1617
+#: indicator-lunar.py:1625
 msgid "The orbital element data retrieved was empty."
 msgstr ""
 
-#: indicator-lunar.py:1648
+#: indicator-lunar.py:1656
 msgid "Error Retrieving Satellite TLE Data"
 msgstr ""
 
-#: indicator-lunar.py:1649
+#: indicator-lunar.py:1657
 msgid "The satellite TLE data source could not be reached."
 msgstr ""
 
-#: indicator-lunar.py:1652
+#: indicator-lunar.py:1660
 msgid "Empty Satellite TLE Data"
 msgstr ""
 
-#: indicator-lunar.py:1653
+#: indicator-lunar.py:1661
 msgid "The satellite TLE data retrieved was empty."
 msgstr ""
 
-#: indicator-lunar.py:2187
+#: indicator-lunar.py:2195
 msgid "Credits"
 msgstr ""
 
-#: indicator-lunar.py:2193
+#: indicator-lunar.py:2201
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-lunar.py:2194
+#: indicator-lunar.py:2202
 msgid "View the"
 msgstr ""
 
-#: indicator-lunar.py:2195
+#: indicator-lunar.py:2203
 msgid "text file."
 msgstr ""
 
-#: indicator-lunar.py:2196
+#: indicator-lunar.py:2204
 msgid "changelog"
 msgstr ""
 
-#: indicator-lunar.py:2219
+#: indicator-lunar.py:2227
 msgid "Preferences unavailable..."
 msgstr ""
 
-#: indicator-lunar.py:2220
+#: indicator-lunar.py:2228
 msgid ""
 "The lunar indicator is momentarily refreshing; preferences will be available "
 "shortly."
 msgstr ""
 
-#: indicator-lunar.py:2242
+#: indicator-lunar.py:2250
 msgid "Icon Text"
 msgstr ""
 
-#: indicator-lunar.py:2247
+#: indicator-lunar.py:2255
 msgid ""
 "The text shown next to the indicator icon\n"
 "(or shown as a tooltip, where applicable)."
 msgstr ""
 
-#: indicator-lunar.py:2272
+#: indicator-lunar.py:2280
 msgid "Tag"
 msgstr ""
 
-#: indicator-lunar.py:2276
+#: indicator-lunar.py:2284
 msgid "Value"
 msgstr ""
 
-#: indicator-lunar.py:2281
+#: indicator-lunar.py:2289
 msgid ""
 "Double click to add a tag\n"
 "to the indicator text."
 msgstr ""
 
-#: indicator-lunar.py:2291
+#: indicator-lunar.py:2299
 msgid "Icon"
 msgstr ""
 
-#: indicator-lunar.py:2302
+#: indicator-lunar.py:2310
 msgid "Show as submenus"
 msgstr ""
 
-#: indicator-lunar.py:2311
+#: indicator-lunar.py:2319
 msgid "Show planets (excluding moon/sun) as submenus."
 msgstr ""
 
-#: indicator-lunar.py:2315
+#: indicator-lunar.py:2323
 msgid "Show stars as submenus."
 msgstr ""
 
-#: indicator-lunar.py:2319
+#: indicator-lunar.py:2327
 msgid "Orbital elements"
 msgstr ""
 
-#: indicator-lunar.py:2320
+#: indicator-lunar.py:2328
 msgid "Show orbital elements as submenus."
 msgstr ""
 
-#: indicator-lunar.py:2326
+#: indicator-lunar.py:2334
 msgid "Show satellites as submenus."
 msgstr ""
 
-#: indicator-lunar.py:2331
+#: indicator-lunar.py:2339
 msgid "Hide bodies which are 'never up'"
 msgstr ""
 
-#: indicator-lunar.py:2335
+#: indicator-lunar.py:2343
 msgid ""
 "If checked, only planets, moon,\n"
 "sun, orbital elements and stars\n"
@@ -2049,15 +2049,15 @@ msgid ""
 "performance."
 msgstr ""
 
-#: indicator-lunar.py:2346
+#: indicator-lunar.py:2354
 msgid "Group stars by constellation"
 msgstr ""
 
-#: indicator-lunar.py:2354
+#: indicator-lunar.py:2362
 msgid "Hide orbital elements greater than magnitude"
 msgstr ""
 
-#: indicator-lunar.py:2364
+#: indicator-lunar.py:2372
 msgid ""
 "Orbital elements with a magnitude\n"
 "greater than that specified will\n"
@@ -2069,11 +2069,11 @@ msgid ""
 "performance."
 msgstr ""
 
-#: indicator-lunar.py:2376
+#: indicator-lunar.py:2384
 msgid "Automatically add new orbital elements"
 msgstr ""
 
-#: indicator-lunar.py:2380
+#: indicator-lunar.py:2388
 msgid ""
 "If checked, new orbital elements\n"
 "in the downloaded data will be\n"
@@ -2085,11 +2085,11 @@ msgid ""
 "become checked."
 msgstr ""
 
-#: indicator-lunar.py:2392
+#: indicator-lunar.py:2400
 msgid "Satellite menu text"
 msgstr ""
 
-#: indicator-lunar.py:2400
+#: indicator-lunar.py:2408
 msgid ""
 "The text for each satellite item in the menu.\n"
 "\n"
@@ -2097,11 +2097,11 @@ msgid ""
 "\t"
 msgstr ""
 
-#: indicator-lunar.py:2410
+#: indicator-lunar.py:2418
 msgid "Sort satellites by rise date/time"
 msgstr ""
 
-#: indicator-lunar.py:2414
+#: indicator-lunar.py:2422
 msgid ""
 "By default, satellites are sorted\n"
 "alphabetically by menu text.\n"
@@ -2110,11 +2110,11 @@ msgid ""
 "sorted by rise date/time."
 msgstr ""
 
-#: indicator-lunar.py:2420
+#: indicator-lunar.py:2428
 msgid "Hide satellites which have no upcoming visible pass"
 msgstr ""
 
-#: indicator-lunar.py:2424
+#: indicator-lunar.py:2432
 msgid ""
 "If checked, only satellites with an\n"
 "upcoming visible pass are displayed.\n"
@@ -2129,11 +2129,11 @@ msgid ""
 "performance."
 msgstr ""
 
-#: indicator-lunar.py:2436
+#: indicator-lunar.py:2444
 msgid "Automatically add new satellites"
 msgstr ""
 
-#: indicator-lunar.py:2440
+#: indicator-lunar.py:2448
 msgid ""
 "If checked, new satellites in the\n"
 "downloaded data will be added to\n"
@@ -2144,11 +2144,11 @@ msgid ""
 "become checked."
 msgstr ""
 
-#: indicator-lunar.py:2451
+#: indicator-lunar.py:2459
 msgid "Satellite 'on-click' URL"
 msgstr ""
 
-#: indicator-lunar.py:2459
+#: indicator-lunar.py:2467
 msgid ""
 "The URL used to lookup a satellite\n"
 "(in the default browser) when any\n"
@@ -2161,19 +2161,19 @@ msgid ""
 "\t"
 msgstr ""
 
-#: indicator-lunar.py:2471
+#: indicator-lunar.py:2479
 msgid "Reset"
 msgstr ""
 
-#: indicator-lunar.py:2473
+#: indicator-lunar.py:2481
 msgid "Reset the satellite look-up URL to factory default."
 msgstr ""
 
-#: indicator-lunar.py:2478
+#: indicator-lunar.py:2486
 msgid "Menu"
 msgstr ""
 
-#: indicator-lunar.py:2490
+#: indicator-lunar.py:2498
 msgid ""
 "Check a planet (or dwarf planet)\n"
 "to display in the menu.\n"
@@ -2182,11 +2182,11 @@ msgid ""
 "column toggles all checkboxes."
 msgstr ""
 
-#: indicator-lunar.py:2502
+#: indicator-lunar.py:2510
 msgid "Planet"
 msgstr ""
 
-#: indicator-lunar.py:2528
+#: indicator-lunar.py:2536
 msgid ""
 "Check a star to display in the menu.\n"
 "\n"
@@ -2194,19 +2194,19 @@ msgid ""
 "column toggles all checkboxes."
 msgstr ""
 
-#: indicator-lunar.py:2539
+#: indicator-lunar.py:2547
 msgid "Star"
 msgstr ""
 
-#: indicator-lunar.py:2543
+#: indicator-lunar.py:2551
 msgid "Constellation"
 msgstr ""
 
-#: indicator-lunar.py:2553
+#: indicator-lunar.py:2561
 msgid "Planets / Stars"
 msgstr ""
 
-#: indicator-lunar.py:2566
+#: indicator-lunar.py:2574
 msgid ""
 "Check an orbital element to display\n"
 "in the menu.\n"
@@ -2215,15 +2215,15 @@ msgid ""
 "column toggles all checkboxes."
 msgstr ""
 
-#: indicator-lunar.py:2578
+#: indicator-lunar.py:2586
 msgid "Name"
 msgstr ""
 
-#: indicator-lunar.py:2593
+#: indicator-lunar.py:2601
 msgid "Orbital element data"
 msgstr ""
 
-#: indicator-lunar.py:2604
+#: indicator-lunar.py:2612
 msgid ""
 "The URL from which to source\n"
 "orbital element data. For a local\n"
@@ -2237,11 +2237,11 @@ msgid ""
 "as 'http://'."
 msgstr ""
 
-#: indicator-lunar.py:2614 indicator-lunar.py:2704
+#: indicator-lunar.py:2622 indicator-lunar.py:2712
 msgid "Fetch"
 msgstr ""
 
-#: indicator-lunar.py:2616
+#: indicator-lunar.py:2624
 msgid ""
 "Retrieve the orbital element data\n"
 "from the URL. If the URL is empty,\n"
@@ -2252,7 +2252,7 @@ msgid ""
 "burdening the data source."
 msgstr ""
 
-#: indicator-lunar.py:2647
+#: indicator-lunar.py:2655
 msgid ""
 "Check a satellite to display in\n"
 "the menu.\n"
@@ -2261,23 +2261,23 @@ msgid ""
 "column toggles all checkboxes."
 msgstr ""
 
-#: indicator-lunar.py:2659
+#: indicator-lunar.py:2667
 msgid "Satellite Name"
 msgstr ""
 
-#: indicator-lunar.py:2663
+#: indicator-lunar.py:2671
 msgid "Number"
 msgstr ""
 
-#: indicator-lunar.py:2667
+#: indicator-lunar.py:2675
 msgid "International Designator"
 msgstr ""
 
-#: indicator-lunar.py:2683
+#: indicator-lunar.py:2691
 msgid "Satellite TLE data"
 msgstr ""
 
-#: indicator-lunar.py:2694
+#: indicator-lunar.py:2702
 msgid ""
 "The URL from which to source the\n"
 "satellite TLE data.\n"
@@ -2291,7 +2291,7 @@ msgid ""
 "as 'http://'"
 msgstr ""
 
-#: indicator-lunar.py:2706
+#: indicator-lunar.py:2714
 msgid ""
 "Retrieve the satellite TLE data\n"
 "from the URL.\n"
@@ -2304,173 +2304,173 @@ msgid ""
 "data source."
 msgstr ""
 
-#: indicator-lunar.py:2729
+#: indicator-lunar.py:2737
 msgid "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD"
 msgstr ""
 
-#: indicator-lunar.py:2739
+#: indicator-lunar.py:2747
 msgid "Satellite rise"
 msgstr ""
 
-#: indicator-lunar.py:2741
+#: indicator-lunar.py:2749
 msgid "Screen notification when a satellite rises above the horizon."
 msgstr ""
 
-#: indicator-lunar.py:2744 indicator-lunar.py:2841
+#: indicator-lunar.py:2752 indicator-lunar.py:2849
 msgid "Summary"
 msgstr ""
 
-#: indicator-lunar.py:2754
+#: indicator-lunar.py:2762
 msgid ""
 "The summary for the satellite rise\n"
 "notification. Available tags:\n"
 "\t"
 msgstr ""
 
-#: indicator-lunar.py:2770 indicator-lunar.py:2855
+#: indicator-lunar.py:2778 indicator-lunar.py:2863
 msgid "Message"
 msgstr ""
 
-#: indicator-lunar.py:2780
+#: indicator-lunar.py:2788
 msgid ""
 "The message for the satellite rise\n"
 "notification. Available tags:\n"
 "\t"
 msgstr ""
 
-#: indicator-lunar.py:2801 indicator-lunar.py:2875
+#: indicator-lunar.py:2809 indicator-lunar.py:2883
 msgid "Test"
 msgstr ""
 
-#: indicator-lunar.py:2806
+#: indicator-lunar.py:2814
 msgid ""
 "Show the notification bubble.\n"
 "Tags will be substituted with\n"
 "mock text."
 msgstr ""
 
-#: indicator-lunar.py:2816
+#: indicator-lunar.py:2824
 msgid "Werewolf warning"
 msgstr ""
 
-#: indicator-lunar.py:2819
+#: indicator-lunar.py:2827
 msgid ""
 "Screen notification (approximately hourly)\n"
 "at full moon (or leading up to)."
 msgstr ""
 
-#: indicator-lunar.py:2823
+#: indicator-lunar.py:2831
 msgid "Illumination"
 msgstr ""
 
-#: indicator-lunar.py:2833
+#: indicator-lunar.py:2841
 msgid ""
 "The notification commences at the\n"
 "specified illumination (%),\n"
 "starting after a new moon (0%)."
 msgstr ""
 
-#: indicator-lunar.py:2849
+#: indicator-lunar.py:2857
 msgid ""
 "The summary for the werewolf notification.\n"
 "\n"
 msgstr ""
 
-#: indicator-lunar.py:2864
+#: indicator-lunar.py:2872
 msgid ""
 "The message for the werewolf notification.\n"
 "\n"
 msgstr ""
 
-#: indicator-lunar.py:2879
+#: indicator-lunar.py:2887
 msgid "Show the notification using the current settings."
 msgstr ""
 
-#: indicator-lunar.py:2884
+#: indicator-lunar.py:2892
 msgid "Notifications"
 msgstr ""
 
-#: indicator-lunar.py:2895
+#: indicator-lunar.py:2903
 msgid "City"
 msgstr ""
 
-#: indicator-lunar.py:2904
+#: indicator-lunar.py:2912
 msgid ""
 "Choose a city from the list.\n"
 "Or, add in your own city name."
 msgstr ""
 
-#: indicator-lunar.py:2911
+#: indicator-lunar.py:2919
 msgid "Latitude (DD)"
 msgstr ""
 
-#: indicator-lunar.py:2916
+#: indicator-lunar.py:2924
 msgid "Latitude of your location in decimal degrees."
 msgstr ""
 
-#: indicator-lunar.py:2919
+#: indicator-lunar.py:2927
 msgid "Longitude (DD)"
 msgstr ""
 
-#: indicator-lunar.py:2924
+#: indicator-lunar.py:2932
 msgid "Longitude of your location in decimal degrees."
 msgstr ""
 
-#: indicator-lunar.py:2927
+#: indicator-lunar.py:2935
 msgid "Elevation (m)"
 msgstr ""
 
-#: indicator-lunar.py:2932
+#: indicator-lunar.py:2940
 msgid "Height in metres above sea level."
 msgstr ""
 
-#: indicator-lunar.py:2938
+#: indicator-lunar.py:2946
 msgid "Autostart"
 msgstr ""
 
-#: indicator-lunar.py:2939
+#: indicator-lunar.py:2947
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-lunar.py:2944
+#: indicator-lunar.py:2952
 msgid "General"
 msgstr ""
 
-#: indicator-lunar.py:2946
+#: indicator-lunar.py:2954
 msgid "Preferences"
 msgstr ""
 
-#: indicator-lunar.py:2964
+#: indicator-lunar.py:2972
 msgid "Satellite menu text cannot be empty."
 msgstr ""
 
-#: indicator-lunar.py:2971
+#: indicator-lunar.py:2979
 msgid "City cannot be empty."
 msgstr ""
 
-#: indicator-lunar.py:2978
+#: indicator-lunar.py:2986
 msgid "Latitude must be a number between 90 and -90 inclusive."
 msgstr ""
 
-#: indicator-lunar.py:2985
+#: indicator-lunar.py:2993
 msgid "Longitude must be a number between 180 and -180 inclusive."
 msgstr ""
 
-#: indicator-lunar.py:2992
+#: indicator-lunar.py:3000
 msgid "Elevation must be a number between 0 and 10000 inclusive."
 msgstr ""
 
-#: indicator-lunar.py:3227
+#: indicator-lunar.py:3235
 msgid "Orbital Element data fetch aborted"
 msgstr ""
 
-#: indicator-lunar.py:3228 indicator-lunar.py:3253
+#: indicator-lunar.py:3236 indicator-lunar.py:3261
 #, python-brace-format
 msgid ""
 "To avoid taxing the data source, the download was aborted. The next time the "
 "download will occur will be at {0}."
 msgstr ""
 
-#: indicator-lunar.py:3252
+#: indicator-lunar.py:3260
 msgid "Satellite TLE data fetch aborted"
 msgstr ""

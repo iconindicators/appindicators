@@ -883,9 +883,9 @@ class IndicatorLunar:
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_NAME ) ] = self.cityName
 
             global _city_data
-            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LATITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 0 ] ), 1 ) ) + "°"
-            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LONGITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 1 ] ), 1 ) ) + "°"
-            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_ELEVATION ) ] = str( _city_data.get( self.cityName )[ 2 ] ) + " " + _( "m" )
+            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LATITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 0 ] ), 1 ) )
+            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LONGITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 1 ] ), 1 ) )
+            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_ELEVATION ) ] = str( _city_data.get( self.cityName )[ 2 ] )
 
             self.updateAstronomicalInformation()
 
@@ -1004,11 +1004,21 @@ class IndicatorLunar:
             else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
                 displayData = _( "Total" )
 
+        elif key[ 2 ] == IndicatorLunar.DATA_ELEVATION:
+            displayData = self.data[ key ] + " " + _( "m" )
+
         elif key[ 2 ] == IndicatorLunar.DATA_ILLUMINATION:
             displayData = self.data[ key ] + "%"
 
+        elif key[ 2 ] == IndicatorLunar.DATA_LATITUDE or \
+             key[ 2 ] == IndicatorLunar.DATA_LONGITUDE:
+            displayData = self.data[ key ] + "°"
+
         elif key[ 2 ] == IndicatorLunar.DATA_PHASE:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
+
+        elif key[ 2 ] == IndicatorLunar.DATA_NAME:
+            displayData = self.data[ key ]
 
         elif key[ 2 ] == IndicatorLunar.DATA_RIGHT_ASCENSION:
             displayData = str( self.getDecimalDegrees( self.data[ key ], True, 2 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
@@ -1018,8 +1028,6 @@ class IndicatorLunar:
 
         elif key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_MINUTE:
             displayData = self.data[ key ] + "'"
-
-        # There is no else clause as all other items are straight, dimensionless data and should not call this function!
 
         return displayData
 
