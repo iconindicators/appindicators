@@ -39,8 +39,11 @@
 # which works for the star "schedar".
 # Go through list of stars from /home/bernard/Desktop/pyephem-3.7.6.0/ephem/stars.py and make sure each star loads the wikipedia page.
 
+
 #TODO Load the relevant wikipedia page for each planet and moon, and the moon and sun?
 
+
+#TODO Generate a new pot file and send to Oleg.
 
 
 INDICATOR_NAME = "indicator-lunar"
