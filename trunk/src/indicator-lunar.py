@@ -42,6 +42,11 @@
 
 #TODO Load the relevant wikipedia page for each planet and moon, and the moon and sun?
 
+#TODO Use MPC to load OE using   
+# http://www.minorplanetcenter.net/db_search/show_object?object_id=100P
+# http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=P%2F2015+M2
+# Might have to do some clever trimming of the name ... if there are () at the end, drop them including what's in between.
+# If no (), drop everything after the / if there is one.
 
 #TODO Generate a new pot file and send to Oleg.
 
@@ -121,11 +126,13 @@ class IndicatorLunar:
     SETTINGS_SATELLITES = "satellites"
     SETTINGS_SATELLITES_ADD_NEW = "satellitesAddNew"
     SETTINGS_SATELLITES_SORT_BY_DATE_TIME = "satellitesSortByDateTime"
+    SETTINGS_SHOW_MOON = "showMoon"
     SETTINGS_SHOW_ORBITAL_ELEMENTS_AS_SUBMENU = "showOrbitalElementsAsSubmenu"
     SETTINGS_SHOW_PLANETS_AS_SUBMENU = "showPlanetsAsSubmenu"
     SETTINGS_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
     SETTINGS_SHOW_SATELLITES_AS_SUBMENU = "showSatellitesAsSubmenu"
     SETTINGS_SHOW_STARS_AS_SUBMENU = "showStarsAsSubmenu"
+    SETTINGS_SHOW_SUN = "showSun"
     SETTINGS_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     SETTINGS_STARS = "stars"
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
@@ -1162,7 +1169,7 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
                 self.hideBodyIfNeverUp
 
-        if not abort:
+        if not abort and self.showMoon:
             menuItem = Gtk.MenuItem( _( "Moon" ) )
             menu.append( menuItem )
             self.updateCommonMenu( menuItem, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
@@ -1193,7 +1200,7 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
                 self.hideBodyIfNeverUp
 
-        if not abort:
+        if not abort and self.showSun:
             menuItem = Gtk.MenuItem( _( "Sun" ) )
             menu.append( menuItem )
             self.updateCommonMenu( menuItem, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
@@ -2310,16 +2317,36 @@ class IndicatorLunar:
         grid.set_margin_top( 15 )
         grid.set_margin_bottom( 15 )
 
-        label = Gtk.Label( _( "Show as submenus" ) )
+        label = Gtk.Label( _( "Show" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 40 ) # Bug in Python - must specify the parameter names!
         box.set_margin_left( 20 )
 
+        showMoonCheckbox = Gtk.CheckButton( _( "Moon" ) )
+        showMoonCheckbox.set_active( self.showMoon )
+        showMoonCheckbox.set_tooltip_text( _( "Show/hide the moon" ) )
+        box.pack_start( showMoonCheckbox, False, False, 0 )
+
+        showSunCheckbox = Gtk.CheckButton( _( "Sun" ) )
+        showSunCheckbox.set_active( self.showSun )
+        showSunCheckbox.set_tooltip_text( _( "Show/hide the sun" ) )
+        box.pack_start( showSunCheckbox, False, False, 0 )
+
+        grid.attach( box, 0, 1, 1, 1 )
+
+        label = Gtk.Label( _( "Show as submenus" ) )
+        label.set_halign( Gtk.Align.START )
+        label.set_margin_top( 15 )
+        grid.attach( label, 0, 2, 1, 1 )
+
+        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 40 ) # Bug in Python - must specify the parameter names!
+        box.set_margin_left( 20 )
+
         showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( _( "Planets" ) )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
-        showPlanetsAsSubmenuCheckbox.set_tooltip_text( _( "Show planets (excluding moon/sun) as submenus." ) )
+        showPlanetsAsSubmenuCheckbox.set_tooltip_text( _( "Show planets as submenus." ) )
         box.pack_start( showPlanetsAsSubmenuCheckbox, False, False, 0 )
 
         showStarsAsSubmenuCheckbox = Gtk.CheckButton( _( "Stars" ) )
@@ -2337,7 +2364,7 @@ class IndicatorLunar:
         showSatellitesAsSubmenuCheckbox.set_tooltip_text( _( "Show satellites as submenus." ) )
         box.pack_start( showSatellitesAsSubmenuCheckbox, False, False, 0 )
 
-        grid.attach( box, 0, 1, 1, 1 )
+        grid.attach( box, 0, 3, 1, 1 )
 
         hideBodyIfNeverUpCheckbox = Gtk.CheckButton( _( "Hide bodies which are 'never up'" ) )
         hideBodyIfNeverUpCheckbox.set_margin_top( 15 )
@@ -2352,12 +2379,12 @@ class IndicatorLunar:
             "be a lot of information displayed\n" + \
             "which could impact the indicator's\n" + \
             "performance." ) )
-        grid.attach( hideBodyIfNeverUpCheckbox, 0, 2, 1, 1 )
+        grid.attach( hideBodyIfNeverUpCheckbox, 0, 4, 1, 1 )
 
         groupStarsByConstellationCheckbox = Gtk.CheckButton( _( "Group stars by constellation" ) )
         groupStarsByConstellationCheckbox.set_margin_top( 15 )
         groupStarsByConstellationCheckbox.set_active( self.groupStarsByConstellation )
-        grid.attach( groupStarsByConstellationCheckbox, 0, 3, 1, 1 )
+        grid.attach( groupStarsByConstellationCheckbox, 0, 5, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
@@ -2382,7 +2409,7 @@ class IndicatorLunar:
 
         box.pack_start( spinnerOrbitalElementMagnitude, False, False, 0 )
 
-        grid.attach( box, 0, 4, 1, 1 )
+        grid.attach( box, 0, 6, 1, 1 )
 
         orbitalElementsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new orbital elements" ) )
         orbitalElementsAddNewCheckbox.set_margin_top( 15 )
@@ -2395,7 +2422,7 @@ class IndicatorLunar:
             "In addition, any orbital elements\n" + \
             "which are currently unchecked will\n" + \
             "become checked." ) )
-        grid.attach( orbitalElementsAddNewCheckbox, 0, 5, 1, 1 )
+        grid.attach( orbitalElementsAddNewCheckbox, 0, 7, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
@@ -2416,7 +2443,7 @@ class IndicatorLunar:
 
         box.pack_start( satelliteMenuText, True, True, 0 )
 
-        grid.attach( box, 0, 6, 1, 1 )
+        grid.attach( box, 0, 8, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 15 )
@@ -2426,7 +2453,7 @@ class IndicatorLunar:
             "alphabetically by menu text.\n\n" + \
             "If checked, satellites will be\n" + \
             "sorted by rise date/time." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 7, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 9, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( _( "Hide satellites which have no upcoming visible pass" ) )
         hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 15 )
@@ -2442,7 +2469,7 @@ class IndicatorLunar:
             "displayed impacting the indicator's\n" + \
             "performance." ) )
 
-        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 8, 1, 1 )
+        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 10, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 15 )
@@ -2454,7 +2481,7 @@ class IndicatorLunar:
             "In addition, any satellites which\n" + \
             "are currently unchecked will\n" + \
             "become checked." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 9, 1, 1 )
+        grid.attach( satellitesAddNewCheckbox, 0, 11, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
@@ -2484,7 +2511,7 @@ class IndicatorLunar:
         reset.set_tooltip_text( _( "Reset the satellite look-up URL to factory default." ) )
         box.pack_start( reset, False, False, 0 )
 
-        grid.attach( box, 0, 10, 1, 1 )
+        grid.attach( box, 0, 12, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -3006,6 +3033,8 @@ class IndicatorLunar:
                 continue
 
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text().strip() )
+            self.showMoon = showMoonCheckbox.get_active()
+            self.showSun = showSunCheckbox.get_active()
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showOrbitalElementsAsSubMenu = showOrbitalElementsAsSubmenuCheckbox.get_active()
@@ -3504,11 +3533,13 @@ class IndicatorLunar:
         self.satellites = [ ]
         self.satellitesAddNew = False
         self.satellitesSortByDateTime = True
+        self.showMoon = True
         self.showOrbitalElementsAsSubMenu = True
         self.showPlanetsAsSubMenu = False
         self.showSatelliteNotification = True
         self.showSatellitesAsSubMenu = True
         self.showStarsAsSubMenu = True
+        self.showSun = True
         self.showWerewolfWarning = True
         self.stars = [ ]
         self.werewolfWarningStartIlluminationPercentage = 99
@@ -3549,11 +3580,13 @@ class IndicatorLunar:
 
             self.satellitesAddNew = settings.get( IndicatorLunar.SETTINGS_SATELLITES_ADD_NEW, self.satellitesAddNew )
             self.satellitesSortByDateTime = settings.get( IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME, self.satellitesSortByDateTime )
+            self.showMoon = settings.get( IndicatorLunar.SETTINGS_SHOW_MOON, self.showMoon )
             self.showOrbitalElementsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_ORBITAL_ELEMENTS_AS_SUBMENU, self.showOrbitalElementsAsSubMenu )
             self.showPlanetsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
             self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
             self.showSatellitesAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU, self.showSatellitesAsSubMenu )
             self.showStarsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
+            self.showSun = settings.get( IndicatorLunar.SETTINGS_SHOW_SUN, self.showSun )
             self.showWerewolfWarning = settings.get( IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
             self.stars = settings.get( IndicatorLunar.SETTINGS_STARS, self.stars )
             self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
@@ -3599,11 +3632,13 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_SATELLITES: satellites,
                 IndicatorLunar.SETTINGS_SATELLITES_ADD_NEW: self.satellitesAddNew,
                 IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME: self.satellitesSortByDateTime,
+                IndicatorLunar.SETTINGS_SHOW_MOON: self.showMoon,
                 IndicatorLunar.SETTINGS_SHOW_ORBITAL_ELEMENTS_AS_SUBMENU: self.showOrbitalElementsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU: self.showSatellitesAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU: self.showStarsAsSubMenu,
+                IndicatorLunar.SETTINGS_SHOW_SUN: self.showSun,
                 IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
                 IndicatorLunar.SETTINGS_STARS: self.stars,
                 IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
