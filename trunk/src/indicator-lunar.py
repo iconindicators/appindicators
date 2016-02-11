@@ -38,15 +38,23 @@
 # http://www.google.com/search?btnI=I%27m+Feeling+Lucky&ie=UTF-8&oe=UTF-8&q=schedar%20star%20wikipedia
 # which works for the star "schedar".
 # Go through list of stars from /home/bernard/Desktop/pyephem-3.7.6.0/ephem/stars.py and make sure each star loads the wikipedia page.
-
-
-#TODO Load the relevant wikipedia page for each planet and moon, and the moon and sun?
+# Load the relevant wikipedia page for each planet and moon, and the moon and sun?
+#Wikipedia does not always work via the Google search so...
+# Here's a database of planets and moons:
+#  http://www.windows2universe.org/our_solar_system/planets.html
+#  http://www.windows2universe.org/our_solar_system/moons_table.html
+#  
+#  Planet links are easily constructed:
+#  http://www.windows2universe.org/PlanetName/PlanetName.html
+#  The moons are also have the easy naming scheme.
 
 #TODO Use MPC to load OE using   
 # http://www.minorplanetcenter.net/db_search/show_object?object_id=100P
 # http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=P%2F2015+M2
 # Might have to do some clever trimming of the name ... if there are () at the end, drop them including what's in between.
 # If no (), drop everything after the / if there is one.
+
+
 
 #TODO Generate a new pot file and send to Oleg.
 
@@ -188,6 +196,20 @@ class IndicatorLunar:
     DATA_X_OFFSET = "X OFFSET"
     DATA_Y_OFFSET = "Y OFFSET"
     DATA_Z_OFFSET = "Z OFFSET"
+
+    DATA_TAGS_MOON = [
+        DATA_ALTITUDE,
+        DATA_AZIMUTH,
+        DATA_CONSTELLATION,
+        DATA_DECLINATION,
+        DATA_MAGNITUDE,
+        DATA_MESSAGE,
+        DATA_RIGHT_ASCENSION,
+        DATA_RISE_TIME,
+        DATA_SET_TIME,
+        DATA_TROPICAL_SIGN_NAME,
+        DATA_TROPICAL_SIGN_DEGREE,
+        DATA_TROPICAL_SIGN_MINUTE ]
 
     DATA_TAGS_ORBITAL_ELEMENT = [
         DATA_RISE_AZIMUTH,
@@ -1055,6 +1077,8 @@ class IndicatorLunar:
     def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
 
 
+#TODO Need to computer the moon illum/phase for icon/notificiation.
+
     def updateIcon( self ):
         parsedOutput = self.indicatorText
         for key in self.data.keys():
@@ -1192,6 +1216,20 @@ class IndicatorLunar:
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
             self.updateEclipseMenu( menuItem.get_submenu(), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+
+            self.addOnClickHandlerToAllChildren( menuItem.get_submenu(), "moon" )
+
+
+    def addOnClickHandlerToAllChildren( self, subMenu, name ):
+        for child in subMenu.get_children():
+            child.set_name( name )
+            child.connect( "activate", self.onChildClick )
+
+
+    def onChildClick( self, widget ):
+        url = "http://www.google.com/search?btnI=I%27m+Feeling+Lucky&ie=UTF-8&oe=UTF-8&q=" + widget.props.name + "%20wikipedia" 
+        if len( url ) > 0:
+            webbrowser.open( url )
 
 
     def updateSunMenu( self, menu ):
@@ -1790,35 +1828,36 @@ class IndicatorLunar:
 
 
     def getLunarPhase( self, ephemNow, illuminationPercentage ):
-        nextFullMoonDate = ephem.next_full_moon( ephemNow )
-        nextNewMoonDate = ephem.next_new_moon( ephemNow )
-        phase = None
-        if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
-            # Between a new moon and a full moon...
-            if( illuminationPercentage > 99 ):
-                phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
-            elif illuminationPercentage <= 99 and illuminationPercentage > 50:
-                phase = IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS
-            elif illuminationPercentage == 50:
-                phase = IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER
-            elif illuminationPercentage < 50 and illuminationPercentage >= 1:
-                phase = IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT
-            else: # illuminationPercentage < 1
-                phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
-        else:
-            # Between a full moon and the next new moon...
-            if( illuminationPercentage > 99 ):
-                phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
-            elif illuminationPercentage <= 99 and illuminationPercentage > 50:
-                phase = IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS
-            elif illuminationPercentage == 50:
-                phase = IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER
-            elif illuminationPercentage < 50 and illuminationPercentage >= 1:
-                phase = IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT
-            else: # illuminationPercentage < 1
-                phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
+        if self.showMoon:
+            nextFullMoonDate = ephem.next_full_moon( ephemNow )
+            nextNewMoonDate = ephem.next_new_moon( ephemNow )
+            phase = None
+            if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
+                # Between a new moon and a full moon...
+                if( illuminationPercentage > 99 ):
+                    phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
+                elif illuminationPercentage <= 99 and illuminationPercentage > 50:
+                    phase = IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS
+                elif illuminationPercentage == 50:
+                    phase = IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER
+                elif illuminationPercentage < 50 and illuminationPercentage >= 1:
+                    phase = IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT
+                else: # illuminationPercentage < 1
+                    phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
+            else:
+                # Between a full moon and the next new moon...
+                if( illuminationPercentage > 99 ):
+                    phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
+                elif illuminationPercentage <= 99 and illuminationPercentage > 50:
+                    phase = IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS
+                elif illuminationPercentage == 50:
+                    phase = IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER
+                elif illuminationPercentage < 50 and illuminationPercentage >= 1:
+                    phase = IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT
+                else: # illuminationPercentage < 1
+                    phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
 
-        return phase
+            return phase
 
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
@@ -1829,32 +1868,33 @@ class IndicatorLunar:
     # http://futureboy.us/fsp/sun.fsp
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     def updateSun( self, ephemNow ):
-        city = self.getCity( ephemNow )
-        sun = ephem.Sun( city )
-        self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, ephemNow )
-
-        key = ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
-        try:
-            # Dawn/Dusk.
+        if self.showSun:
             city = self.getCity( ephemNow )
-            city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
-            dawn = city.next_rising( sun, use_center = True )
-            dusk = city.next_setting( sun, use_center = True )
-            self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] = str( dawn.datetime() )
-            self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] = str( dusk.datetime() )
+            sun = ephem.Sun( city )
+            self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, ephemNow )
 
-        except ephem.AlwaysUpError:
-            pass # No need to add a message here as update common would already have done so.
+            key = ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
+            try:
+                # Dawn/Dusk.
+                city = self.getCity( ephemNow )
+                city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
+                dawn = city.next_rising( sun, use_center = True )
+                dusk = city.next_setting( sun, use_center = True )
+                self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] = str( dawn.datetime() )
+                self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] = str( dusk.datetime() )
 
-        except ephem.NeverUpError:
-            pass # No need to add a message here as update common would already have done so.
+            except ephem.AlwaysUpError:
+                pass # No need to add a message here as update common would already have done so.
 
-        equinox = ephem.next_equinox( ephemNow )
-        solstice = ephem.next_solstice( ephemNow )
-        self.data[ key + ( IndicatorLunar.DATA_EQUINOX, ) ] = str( equinox.datetime() )
-        self.data[ key + ( IndicatorLunar.DATA_SOLSTICE, ) ] = str( solstice.datetime() )
+            except ephem.NeverUpError:
+                pass # No need to add a message here as update common would already have done so.
 
-        self.updateEclipse( ephemNow, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
+            equinox = ephem.next_equinox( ephemNow )
+            solstice = ephem.next_solstice( ephemNow )
+            self.data[ key + ( IndicatorLunar.DATA_EQUINOX, ) ] = str( equinox.datetime() )
+            self.data[ key + ( IndicatorLunar.DATA_SOLSTICE, ) ] = str( solstice.datetime() )
+
+            self.updateEclipse( ephemNow, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
 
 
     # http://www.geoastro.de/planets/index.html
@@ -2326,12 +2366,14 @@ class IndicatorLunar:
 
         showMoonCheckbox = Gtk.CheckButton( _( "Moon" ) )
         showMoonCheckbox.set_active( self.showMoon )
-        showMoonCheckbox.set_tooltip_text( _( "Show/hide the moon" ) )
+        showMoonCheckbox.set_tooltip_text( _( "Show the moon." ) )
+        showMoonCheckbox.connect( "toggled", self.onMoonSunToggled, IndicatorLunar.MOON_TAG, AstronomicalObjectType.Moon )
         box.pack_start( showMoonCheckbox, False, False, 0 )
 
         showSunCheckbox = Gtk.CheckButton( _( "Sun" ) )
         showSunCheckbox.set_active( self.showSun )
-        showSunCheckbox.set_tooltip_text( _( "Show/hide the sun" ) )
+        showSunCheckbox.set_tooltip_text( _( "Show the sun." ) )
+        showSunCheckbox.connect( "toggled", self.onMoonSunToggled, IndicatorLunar.SUN_TAG, AstronomicalObjectType.Sun )
         box.pack_start( showSunCheckbox, False, False, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
@@ -3309,6 +3351,9 @@ class IndicatorLunar:
         for key in list( self.data ): # Gets the keys and allows iteration with removal.
             if key[ 0 ] == astronomicalObjectType:
                 self.data.pop( key )
+
+
+    def onMoonSunToggled( self, widget, moonSunTag, astronomicalObjectType ): self.checkboxToggled( moonSunTag, astronomicalObjectType, widget.get_active() )
 
 
     def onPlanetToggled( self, widget, row, dataStore, astronomicalObjectType ):
