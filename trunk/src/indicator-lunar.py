@@ -202,6 +202,10 @@ class IndicatorLunar:
         DATA_AZIMUTH,
         DATA_CONSTELLATION,
         DATA_DECLINATION,
+        DATA_ECLIPSE_DATE_TIME,
+        DATA_ECLIPSE_LATITUDE,
+        DATA_ECLIPSE_LONGITUDE,
+        DATA_ECLIPSE_TYPE,
         DATA_MAGNITUDE,
         DATA_MESSAGE,
         DATA_RIGHT_ASCENSION,
@@ -262,6 +266,28 @@ class IndicatorLunar:
         DATA_RIGHT_ASCENSION,
         DATA_RISE_TIME,
         DATA_SET_TIME,
+        DATA_TROPICAL_SIGN_NAME,
+        DATA_TROPICAL_SIGN_DEGREE,
+        DATA_TROPICAL_SIGN_MINUTE ]
+
+    DATA_TAGS_SUN = [
+        DATA_ALTITUDE,
+        DATA_AZIMUTH,
+        DATA_CONSTELLATION,
+        DATA_DAWN,
+        DATA_DECLINATION,
+        DATA_DUSK,
+        DATA_ECLIPSE_DATE_TIME,
+        DATA_ECLIPSE_LATITUDE,
+        DATA_ECLIPSE_LONGITUDE,
+        DATA_ECLIPSE_TYPE,
+        DATA_EQUINOX,
+        DATA_MAGNITUDE,
+        DATA_MESSAGE,
+        DATA_RIGHT_ASCENSION,
+        DATA_RISE_TIME,
+        DATA_SET_TIME,
+        DATA_SOLSTICE,
         DATA_TROPICAL_SIGN_NAME,
         DATA_TROPICAL_SIGN_DEGREE,
         DATA_TROPICAL_SIGN_MINUTE ]
@@ -919,16 +945,16 @@ class IndicatorLunar:
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LONGITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 1 ] ), 1 ) )
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_ELEVATION ) ] = str( _city_data.get( self.cityName )[ 2 ] )
 
-            self.updateAstronomicalInformation()
+            ephemNow = self.updateAstronomicalInformation()
 
-            GLib.idle_add( self.updateFrontend )
+            GLib.idle_add( self.updateFrontend, ephemNow )
 
 
-    def updateFrontend( self ):
+    def updateFrontend( self, ephemNow ):
         self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
         self.updateMenu()
-        self.updateIcon()
-        self.fullMoonNotification()
+        lunarIlluminationPercentage = self.updateIcon( ephemNow )
+        self.fullMoonNotification( ephemNow, lunarIlluminationPercentage )
 
         if self.showSatelliteNotification:
             self.satelliteNotification()
@@ -954,7 +980,7 @@ class IndicatorLunar:
         self.updateStarsMenu( menu )
         self.updateOrbitalElementsMenu( menu )
         self.updateSatellitesMenu( menu )
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
 
@@ -1077,9 +1103,7 @@ class IndicatorLunar:
     def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
 
 
-#TODO Need to computer the moon illum/phase for icon/notificiation.
-
-    def updateIcon( self ):
+    def updateIcon( self, ephemNow ):
         parsedOutput = self.indicatorText
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
@@ -1087,14 +1111,20 @@ class IndicatorLunar:
 
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
-        lunarIlluminationPercentage = self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_ILLUMINATION ) ]
-        brightLimbAngle = self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_BRIGHT_LIMB ) ]
-        self.createIcon( int( lunarIlluminationPercentage ), float( brightLimbAngle ) )
+        city = self.getCity( ephemNow )
+        moon = ephem.Moon( city )
+#         lunarIlluminationPercentage = self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_ILLUMINATION ) ]
+        lunarIlluminationPercentage = int( round( moon.phase ) )
+#         brightLimbAngle = self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_BRIGHT_LIMB ) ]
+        brightLimbAngle = round( self.getZenithAngleOfBrightLimb( city, moon ), 1 )
+        self.createIcon( lunarIlluminationPercentage, float( brightLimbAngle ) )
         self.indicator.set_icon( self.getIconName() )
+        return lunarIlluminationPercentage
 
 
-    def fullMoonNotification( self ):
-        lunarPhase = self.data[ AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_PHASE ]
+    def fullMoonNotification( self, ephemNow, lunarIlluminationPercentage ):
+#         lunarPhase = self.data[ AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_PHASE ]
+        lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
@@ -1102,7 +1132,7 @@ class IndicatorLunar:
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-        lunarIlluminationPercentage = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_ILLUMINATION ) ] )
+#         lunarIlluminationPercentage = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_ILLUMINATION ) ] )
         if self.showWerewolfWarning and \
            phaseIsBetweenNewAndFullInclusive and \
            lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
@@ -1802,7 +1832,8 @@ class IndicatorLunar:
         self.updatePlanets( ephemNow )
         self.updateStars( ephemNow )
         self.updateOrbitalElements( ephemNow, self.orbitalElementsMagnitude )
-        self.updateSatellites( ephemNow, self.hideSatelliteIfNoVisiblePass ) 
+        self.updateSatellites( ephemNow, self.hideSatelliteIfNoVisiblePass )
+        return ephemNow
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -1814,50 +1845,50 @@ class IndicatorLunar:
     # http://www.geoastro.de/sundata/index.html
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     def updateMoon( self, ephemNow ):
-        self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow )
+        if self.showMoon:
+            self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow )
 
-        lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
-        key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
-        self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
-        self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
-        self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
-        self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
-        self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
+            lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
+            key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+            self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
+            self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+            self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
+            self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+            self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
 
-        self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+            self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
 
 
     def getLunarPhase( self, ephemNow, illuminationPercentage ):
-        if self.showMoon:
-            nextFullMoonDate = ephem.next_full_moon( ephemNow )
-            nextNewMoonDate = ephem.next_new_moon( ephemNow )
-            phase = None
-            if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
-                # Between a new moon and a full moon...
-                if( illuminationPercentage > 99 ):
-                    phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
-                elif illuminationPercentage <= 99 and illuminationPercentage > 50:
-                    phase = IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS
-                elif illuminationPercentage == 50:
-                    phase = IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER
-                elif illuminationPercentage < 50 and illuminationPercentage >= 1:
-                    phase = IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT
-                else: # illuminationPercentage < 1
-                    phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
-            else:
-                # Between a full moon and the next new moon...
-                if( illuminationPercentage > 99 ):
-                    phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
-                elif illuminationPercentage <= 99 and illuminationPercentage > 50:
-                    phase = IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS
-                elif illuminationPercentage == 50:
-                    phase = IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER
-                elif illuminationPercentage < 50 and illuminationPercentage >= 1:
-                    phase = IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT
-                else: # illuminationPercentage < 1
-                    phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
+        nextFullMoonDate = ephem.next_full_moon( ephemNow )
+        nextNewMoonDate = ephem.next_new_moon( ephemNow )
+        phase = None
+        if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
+            # Between a new moon and a full moon...
+            if( illuminationPercentage > 99 ):
+                phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
+            elif illuminationPercentage <= 99 and illuminationPercentage > 50:
+                phase = IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS
+            elif illuminationPercentage == 50:
+                phase = IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER
+            elif illuminationPercentage < 50 and illuminationPercentage >= 1:
+                phase = IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT
+            else: # illuminationPercentage < 1
+                phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
+        else:
+            # Between a full moon and the next new moon...
+            if( illuminationPercentage > 99 ):
+                phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
+            elif illuminationPercentage <= 99 and illuminationPercentage > 50:
+                phase = IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS
+            elif illuminationPercentage == 50:
+                phase = IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER
+            elif illuminationPercentage < 50 and illuminationPercentage >= 1:
+                phase = IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT
+            else: # illuminationPercentage < 1
+                phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
 
-            return phase
+        return phase
 
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
@@ -3200,7 +3231,9 @@ class IndicatorLunar:
             for key in self.tagsAdded:
                 astronomicalObjectType = key[ 0 ]
                 bodyTag = key[ 1 ]
-                if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
+                if astronomicalObjectType == AstronomicalObjectType.Moon:
+                    tags = IndicatorLunar.DATA_TAGS_MOON
+                elif astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
                     tags = IndicatorLunar.DATA_TAGS_ORBITAL_ELEMENT
                 elif astronomicalObjectType == AstronomicalObjectType.Planet:
                     tags = IndicatorLunar.DATA_TAGS_PLANET
@@ -3213,6 +3246,8 @@ class IndicatorLunar:
                     tags = IndicatorLunar.DATA_TAGS_SATELLITE
                 elif astronomicalObjectType == AstronomicalObjectType.Star:
                     tags = IndicatorLunar.DATA_TAGS_STAR
+                elif astronomicalObjectType == AstronomicalObjectType.Sun:
+                    tags = IndicatorLunar.DATA_TAGS_SUN
 
                 for tag in tags:
                     self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.DISPLAY_NEEDS_REFRESH, displayTagsStore )
@@ -3395,7 +3430,7 @@ class IndicatorLunar:
             if preExists:
                 self.tagsRemoved[ t ] = None # The value is not actually used.
             else:
-                self.tagsAdded.pop( t )
+                self.tagsAdded.pop( t, None ) # It is possible tags for the checked item were not previously added because the object (OE or Satellite for example) is not visible - so pass in None to safely pop.
 
 
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
