@@ -48,13 +48,6 @@
 #  http://www.windows2universe.org/PlanetName/PlanetName.html
 #  The moons are also have the easy naming scheme.
 
-#TODO Use MPC to load OE using   
-# http://www.minorplanetcenter.net/db_search/show_object?object_id=100P
-# http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=P%2F2015+M2
-# Might have to do some clever trimming of the name ... if there are () at the end, drop them including what's in between.
-# If no (), drop everything after the / if there is one.
-
-
 
 #TODO Generate a new pot file and send to Oleg.
 
@@ -1463,10 +1456,49 @@ class IndicatorLunar:
 
                 if key in self.orbitalElementData:
                     self.updateCommonMenu( menuItem, AstronomicalObjectType.OrbitalElement, key )
+                    self.addOnOrbitalElementHandler( menuItem.get_submenu(), key )
                 else: # Should only be a no data message...I hope!
                     subMenu = Gtk.Menu()
                     subMenu.append( Gtk.MenuItem( self.data[ ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_MESSAGE ) ] ) )
                     menuItem.set_submenu( subMenu )
+
+
+    def addOnOrbitalElementHandler( self, subMenu, orbitalElement ):
+        for child in subMenu.get_children():
+            child.set_name( orbitalElement )
+            child.connect( "activate", self.onOrbitalElement )
+
+
+    def onOrbitalElement( self, widget ):
+        url = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+
+        if "(" in widget.props.name:
+            objectID = widget.props.name[ : widget.props.name.find( "(" ) ]
+            objectID.strip()
+        else:
+            objectID = widget.props.name[ : widget.props.name.find( "/" ) ]
+            objectID.strip()
+
+# P%2F1996+R2
+#         if len( url ) > 0:
+#             webbrowser.open( url )
+
+        print( url + objectID )
+
+#TODO Use MPC to load OE using   
+# http://www.minorplanetcenter.net/db_search/show_object?object_id=100P
+# http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=P%2F2015+M2
+# Might have to do some clever trimming of the name ... if there are () at the end, drop them including what's in between.
+# If no (), drop everything after the / if there is one.
+# 
+# http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=P%2F1996+R2
+
+# 100P/HARTLEY
+# 282P/
+# C/1995 O1 (HALE-BOPP)
+# C/2002 VQ94 (LINEAR)
+# P/1996 R2 (LAGERKVIST)
+
 
 
     def updateCommonMenu( self, menuItem, astronomicalObjectType, dataTag ):
