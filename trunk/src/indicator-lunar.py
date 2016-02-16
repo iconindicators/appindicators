@@ -1106,9 +1106,7 @@ class IndicatorLunar:
 
         city = self.getCity( ephemNow )
         moon = ephem.Moon( city )
-#         lunarIlluminationPercentage = self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_ILLUMINATION ) ]
         lunarIlluminationPercentage = int( round( moon.phase ) )
-#         brightLimbAngle = self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_BRIGHT_LIMB ) ]
         brightLimbAngle = round( self.getZenithAngleOfBrightLimb( city, moon ), 1 )
         self.createIcon( lunarIlluminationPercentage, float( brightLimbAngle ) )
         self.indicator.set_icon( self.getIconName() )
@@ -1116,7 +1114,6 @@ class IndicatorLunar:
 
 
     def fullMoonNotification( self, ephemNow, lunarIlluminationPercentage ):
-#         lunarPhase = self.data[ AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_PHASE ]
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
@@ -1125,7 +1122,6 @@ class IndicatorLunar:
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-#         lunarIlluminationPercentage = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_ILLUMINATION ) ] )
         if self.showWerewolfWarning and \
            phaseIsBetweenNewAndFullInclusive and \
            lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
