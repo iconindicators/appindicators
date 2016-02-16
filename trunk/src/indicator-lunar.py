@@ -1242,7 +1242,7 @@ class IndicatorLunar:
 
             self.addOnClickHandlerToAllChildren( menuItem.get_submenu(), "moon" )
 
-
+#TODO This likely has to go!
     def addOnClickHandlerToAllChildren( self, subMenu, name ):
         for child in subMenu.get_children():
             child.set_name( name )
@@ -1463,6 +1463,7 @@ class IndicatorLunar:
                     menuItem.set_submenu( subMenu )
 
 
+#TODO Will this make the cut?
     def addOnOrbitalElementHandler( self, subMenu, orbitalElement ):
         for child in subMenu.get_children():
             child.set_name( orbitalElement )
@@ -1470,35 +1471,16 @@ class IndicatorLunar:
 
 
     def onOrbitalElement( self, widget ):
-        url = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+        url = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="  #TODO Needs to be a Preference?  What tag do I provide to the user?
 
         if "(" in widget.props.name:
-            objectID = widget.props.name[ : widget.props.name.find( "(" ) ]
-            objectID.strip()
+            objectID = widget.props.name[ : widget.props.name.find( "(" ) ].strip()
         else:
-            objectID = widget.props.name[ : widget.props.name.find( "/" ) ]
-            objectID.strip()
+            objectID = widget.props.name[ : widget.props.name.find( "/" ) ].strip()
 
-# P%2F1996+R2
-#         if len( url ) > 0:
-#             webbrowser.open( url )
-
-        print( url + objectID )
-
-#TODO Use MPC to load OE using   
-# http://www.minorplanetcenter.net/db_search/show_object?object_id=100P
-# http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=P%2F2015+M2
-# Might have to do some clever trimming of the name ... if there are () at the end, drop them including what's in between.
-# If no (), drop everything after the / if there is one.
-# 
-# http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=P%2F1996+R2
-
-# 100P/HARTLEY
-# 282P/
-# C/1995 O1 (HALE-BOPP)
-# C/2002 VQ94 (LINEAR)
-# P/1996 R2 (LAGERKVIST)
-
+        url += objectID.replace( "/", "%2F" ).replace( " ", "+" )
+        if len( url ) > 0:
+            webbrowser.open( url )
 
 
     def updateCommonMenu( self, menuItem, astronomicalObjectType, dataTag ):
