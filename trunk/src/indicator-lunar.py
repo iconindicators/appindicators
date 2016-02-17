@@ -1100,6 +1100,7 @@ class IndicatorLunar:
         parsedOutput = self.indicatorText
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
+                print( key )
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
@@ -3080,6 +3081,8 @@ class IndicatorLunar:
         while True:
             if self.dialog.run() != Gtk.ResponseType.OK:
                 break
+
+            self.onSwitchPage( notebook, None, 0, displayTagsStore ) # If the user makes a change to an object but does not click on the first tab, the display tags don't get refreshed.
 
             if satelliteMenuText.get_text().strip() == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Satellite menu text cannot be empty." ), INDICATOR_NAME )
