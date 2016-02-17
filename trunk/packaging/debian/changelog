@@ -1,6 +1,6 @@
 indicator-lunar (1.0.66-1) precise; urgency=low
 
-  * Bug fix: Would crash when the CITY NAME tag was present in the icon text. 
+  * Bug fix: Some tags when present in the icon text were not being parsed. 
   * Bug fix: Display tags in the Preferences were not being refreshed if the
     user made a change and did not click on the first tab (but instead hit OK). 
   * Added latitude/longitude/elevation of location to the icon text tags.

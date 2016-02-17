@@ -49,6 +49,9 @@
 #  The moons are also have the easy naming scheme.
 
 
+#TODO Noticed that in the Preferences dialog, Notifications tab that some stuff is not translated to Russian.
+
+
 #TODO Generate a new pot file and send to Oleg.
 
 
@@ -1065,6 +1068,9 @@ class IndicatorLunar:
              key[ 2 ] == IndicatorLunar.DATA_LONGITUDE:
             displayData = self.data[ key ] + "°"
 
+        elif key[ 2 ] == IndicatorLunar.DATA_MAGNITUDE:
+            displayData = self.data[ key ]
+
         elif key[ 2 ] == IndicatorLunar.DATA_PHASE:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
 
@@ -1079,6 +1085,11 @@ class IndicatorLunar:
 
         elif key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_MINUTE:
             displayData = self.data[ key ] + "'"
+
+        elif key[ 2 ] == IndicatorLunar.DATA_X_OFFSET or \
+             key[ 2 ] == IndicatorLunar.DATA_Y_OFFSET or \
+             key[ 2 ] == IndicatorLunar.DATA_Z_OFFSET:
+            displayData = self.data[ key ]
 
         return displayData
 
@@ -1100,7 +1111,6 @@ class IndicatorLunar:
         parsedOutput = self.indicatorText
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
-                print( key )
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
@@ -1491,7 +1501,7 @@ class IndicatorLunar:
         if ( astronomicalObjectType == AstronomicalObjectType.Star and not self.groupStarsByConstellation ) or not astronomicalObjectType == AstronomicalObjectType.Star:
             subMenu.append( Gtk.MenuItem( _( "Constellation: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_CONSTELLATION, ) ) ) )
 
-        subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] ) )
+        subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_MAGNITUDE, ) ) ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
            astronomicalObjectType == AstronomicalObjectType.Planet or \
