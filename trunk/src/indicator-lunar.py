@@ -1094,6 +1094,15 @@ class IndicatorLunar:
         return displayData
 
 
+    # Converts a UTC datetime string in the format 2015-05-11 22:51:42.429093 to local datetime string.
+    def getLocalDateTime( self, utcDateTimeString ):
+        utcDateTime = datetime.datetime.strptime( utcDateTimeString, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT )
+        timestamp = calendar.timegm( utcDateTime.timetuple() )
+        localDateTime = datetime.datetime.fromtimestamp( timestamp )
+        localDateTime.replace( microsecond = utcDateTime.microsecond )        
+        return str( localDateTime )
+
+
     def getDecimalDegrees( self, stringInput, isHours, roundAmount ):
         t = tuple( stringInput.split( ":" ) )
         x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
@@ -1185,9 +1194,9 @@ class IndicatorLunar:
             self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] )
 
             # Parse the satellite summary/message to create the notification...
-            riseTime = self.getLocalDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] )
+            riseTime = self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ) )
             riseAzimuth = str( self.getDecimalDegrees( self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ], False, 2 ) ) + "°" 
-            setTime = self.getLocalDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] )
+            setTime = self.getDisplayData( key + ( IndicatorLunar.DATA_SET_TIME, ) )
             setAzimuth = str( self.getDecimalDegrees( self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ], False, 2 ) ) + "°" 
             tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
 
@@ -1624,11 +1633,11 @@ class IndicatorLunar:
                     subMenu.append( Gtk.MenuItem( self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] ) )
                 else:
                     subMenu.append( Gtk.MenuItem( _( "Rise" ) ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getLocalDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) ) )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) ) )
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ) ) )
 
                     subMenu.append( Gtk.MenuItem( _( "Set" ) ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getLocalDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) ) )
+                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SET_TIME, ) ) ) )
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ) ) )
 
                     if not self.hideSatelliteIfNoVisiblePass:
@@ -1663,15 +1672,6 @@ class IndicatorLunar:
             return firstDateTimeAsString
 
         return secondDateTimeAsString
-
-
-    # Converts a UTC datetime string in the format 2015-05-11 22:51:42.429093 to local datetime string.
-    def getLocalDateTime( self, utcDateTimeString ):
-        utcDateTime = datetime.datetime.strptime( utcDateTimeString, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT )
-        timestamp = calendar.timegm( utcDateTime.timetuple() )
-        localDateTime = datetime.datetime.fromtimestamp( timestamp )
-        localDateTime.replace( microsecond = utcDateTime.microsecond )        
-        return str( localDateTime )
 
 
     def addOnSatelliteHandler( self, subMenu, satelliteName, satelliteNumber ):
