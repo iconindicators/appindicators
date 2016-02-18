@@ -1119,6 +1119,13 @@ class IndicatorLunar:
     def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
 
 
+    def getBooleanTranslatedText( self, booleanText ):
+        if booleanText == IndicatorLunar.TRUE_TEXT:
+            return IndicatorLunar.TRUE_TEXT_TRANSLATION
+            
+        return IndicatorLunar.FALSE_TEXT_TRANSLATION
+
+
     def updateIcon( self, ephemNow ):
         parsedOutput = self.indicatorText
         for key in self.data.keys():
@@ -1692,13 +1699,6 @@ class IndicatorLunar:
 
         if len( url ) > 0:
             webbrowser.open( url )
-
-
-    def getBooleanTranslatedText( self, booleanText ):
-        if booleanText == IndicatorLunar.TRUE_TEXT:
-            return IndicatorLunar.TRUE_TEXT_TRANSLATION
-            
-        return IndicatorLunar.FALSE_TEXT_TRANSLATION
 
 
     def updateOrbitalElementData( self ):
