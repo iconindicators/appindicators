@@ -122,7 +122,6 @@ class IndicatorLunar:
     SETTINGS_ORBITAL_ELEMENTS_ADD_NEW = "orbitalElementsAddNew"
     SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE = "orbitalElementsMagnitude"
     SETTINGS_PLANETS = "planets"
-    SETTINGS_SATELLITE_MENU_TEXT = "satelliteMenuText"
     SETTINGS_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
     SETTINGS_SATELLITE_NOTIFICATION_SUMMARY = "satelliteNotificationSummary"
     SETTINGS_SATELLITE_ON_CLICK_URL = "satelliteOnClickURL"
@@ -846,7 +845,7 @@ class IndicatorLunar:
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
     SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
-    SATELLITE_MENU_TEXT_DEFAULT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER + " - " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
+    SATELLITE_MENU_TEXT = SATELLITE_TAG_NAME + " - " + SATELLITE_TAG_NUMBER + " - " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + _( " now rising..." )
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
         _( "NORAD ID: " ) + SATELLITE_TAG_NUMBER_TRANSLATION + "\n" + \
@@ -1614,9 +1613,9 @@ class IndicatorLunar:
                 internationalDesignator = "" # No TLE data so cannot retrieve any information about the satellite.
                 riseTime = self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ]
 
-            menuText = self.satelliteMenuText.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
-                                             .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
-                                             .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, internationalDesignator )
+            menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
+                                                         .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
+                                                         .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, internationalDesignator )
 
             menuTextSatelliteNameNumberRiseTimes.append( [ menuText, satelliteName, satelliteNumber, riseTime ] )
 
@@ -2525,24 +2524,6 @@ class IndicatorLunar:
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
 
-        label = Gtk.Label( _( "Satellite menu text" ) )
-        label.set_halign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
-
-        satelliteMenuText = Gtk.Entry()
-        satelliteMenuText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteMenuText ) )
-        satelliteMenuText.set_hexpand( True )
-        satelliteMenuText.set_tooltip_text( _(
-            "The text for each satellite item in the menu.\n\n" + \
-            "Available tags:\n\t" ) + \
-             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
-             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION )
-
-        box.pack_start( satelliteMenuText, True, True, 0 )
-
-        grid.attach( box, 0, 8, 1, 1 )
-
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 15 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
@@ -2551,7 +2532,7 @@ class IndicatorLunar:
             "alphabetically by menu text.\n\n" + \
             "If checked, satellites will be\n" + \
             "sorted by rise date/time." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 9, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 8, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( _( "Hide satellites which have no upcoming visible pass" ) )
         hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 15 )
@@ -2567,7 +2548,7 @@ class IndicatorLunar:
             "displayed impacting the indicator's\n" + \
             "performance." ) )
 
-        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 10, 1, 1 )
+        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 9, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 15 )
@@ -2579,7 +2560,7 @@ class IndicatorLunar:
             "In addition, any satellites which\n" + \
             "are currently unchecked will\n" + \
             "become checked." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 11, 1, 1 )
+        grid.attach( satellitesAddNewCheckbox, 0, 10, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
@@ -2609,7 +2590,7 @@ class IndicatorLunar:
         reset.set_tooltip_text( _( "Reset the satellite look-up URL to factory default." ) )
         box.pack_start( reset, False, False, 0 )
 
-        grid.attach( box, 0, 12, 1, 1 )
+        grid.attach( box, 0, 11, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -3098,12 +3079,6 @@ class IndicatorLunar:
 
             self.onSwitchPage( notebook, None, 0, displayTagsStore ) # If the user makes a change to an object but does not click on the first tab, the display tags don't get refreshed.
 
-            if satelliteMenuText.get_text().strip() == "":
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Satellite menu text cannot be empty." ), INDICATOR_NAME )
-                notebook.set_current_page( 1 )
-                satelliteMenuText.grab_focus()
-                continue
-
             cityValue = city.get_active_text()
             if cityValue == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ), INDICATOR_NAME )
@@ -3142,7 +3117,6 @@ class IndicatorLunar:
             self.orbitalElementsMagnitude = spinnerOrbitalElementMagnitude.get_value_as_int()
             self.hideBodyIfNeverUp = hideBodyIfNeverUpCheckbox.get_active()
             self.groupStarsByConstellation = groupStarsByConstellationCheckbox.get_active()
-            self.satelliteMenuText = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteMenuText.get_text().strip() ) 
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
@@ -3632,7 +3606,6 @@ class IndicatorLunar:
         for planetName in IndicatorLunar.PLANETS:
             self.planets.append( planetName )
 
-        self.satelliteMenuText = IndicatorLunar.SATELLITE_MENU_TEXT_DEFAULT
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
         self.satelliteNotificationSummary = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT
         self.satelliteOnClickURL = IndicatorLunar.SATELLITE_ON_CLICK_URL
@@ -3676,7 +3649,6 @@ class IndicatorLunar:
             self.orbitalElementsAddNew = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_ADD_NEW, self.orbitalElementsAddNew )
             self.orbitalElementsMagnitude = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE, self.orbitalElementsMagnitude )
             self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
-            self.satelliteMenuText = settings.get( IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT, self.satelliteMenuText )
             self.satelliteNotificationMessage = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
             self.satelliteNotificationSummary = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
             self.satelliteOnClickURL = settings.get( IndicatorLunar.SETTINGS_SATELLITE_ON_CLICK_URL, self.satelliteOnClickURL )
@@ -3731,7 +3703,6 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_ADD_NEW: self.orbitalElementsAddNew,
                 IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE: self.orbitalElementsMagnitude,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
-                IndicatorLunar.SETTINGS_SATELLITE_MENU_TEXT: self.satelliteMenuText,
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,
                 IndicatorLunar.SETTINGS_SATELLITE_ON_CLICK_URL: self.satelliteOnClickURL,

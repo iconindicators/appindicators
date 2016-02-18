@@ -5,7 +5,9 @@ indicator-lunar (1.0.66-1) precise; urgency=low
     user made a change and did not click on the first tab (but instead hit OK). 
   * Changed the default text for the summary/message for satellite
     notification.
-  * Changed the default satellite menu text to include International ID.
+  * Changed the satellite menu text to include the International ID.  The
+    format is 'Name - NORAD ID - International ID'.
+  * Removed the user preference to change the satellite menu text.
   * Added latitude/longitude/elevation of location to the icon text tags.
   * Now able to hide/show the moon/sun.
   * Use the process wrapper utilities rather than direct calls.
