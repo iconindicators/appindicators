@@ -1071,6 +1071,9 @@ class IndicatorLunar:
         elif key[ 2 ] == IndicatorLunar.DATA_MAGNITUDE:
             displayData = self.data[ key ]
 
+        elif key[ 2 ] == IndicatorLunar.DATA_MESSAGE:
+            displayData = self.data[ key ]
+
         elif key[ 2 ] == IndicatorLunar.DATA_PHASE:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
 
@@ -1195,9 +1198,9 @@ class IndicatorLunar:
 
             # Parse the satellite summary/message to create the notification...
             riseTime = self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ) )
-            riseAzimuth = str( self.getDecimalDegrees( self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ], False, 2 ) ) + "°" 
+            riseAzimuth = self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) )
             setTime = self.getDisplayData( key + ( IndicatorLunar.DATA_SET_TIME, ) )
-            setAzimuth = str( self.getDecimalDegrees( self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ], False, 2 ) ) + "°" 
+            setAzimuth = self.getDisplayData( key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) )
             tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
 
             summary = self.satelliteNotificationSummary. \
@@ -1364,10 +1367,9 @@ class IndicatorLunar:
             subMenu.append( Gtk.SeparatorMenuItem() )
 
             subMenu.append( Gtk.MenuItem( _( "Offset from Planet (in planet radii)" ) ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "X: " ) + self.data[ ( AstronomicalObjectType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_X_OFFSET ) ] ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Y: " ) + self.data[ ( AstronomicalObjectType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_Y_OFFSET ) ] ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Z: " ) + self.data[ ( AstronomicalObjectType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_Z_OFFSET ) ] ) )
-
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "X: " ) + self.getDisplayData( ( AstronomicalObjectType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_X_OFFSET ) ) ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Y: " ) + self.getDisplayData( ( AstronomicalObjectType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_Y_OFFSET ) ) ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Z: " ) + self.getDisplayData( ( AstronomicalObjectType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_Z_OFFSET ) ) ) )
             moonMenuItem.set_submenu( subMenu )
 
 
@@ -1475,7 +1477,7 @@ class IndicatorLunar:
                     self.addOnOrbitalElementHandler( menuItem.get_submenu(), key )
                 else: # Should only be a no data message...I hope!
                     subMenu = Gtk.Menu()
-                    subMenu.append( Gtk.MenuItem( self.data[ ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_MESSAGE ) ] ) )
+                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_MESSAGE ) ) ) )
                     menuItem.set_submenu( subMenu )
 
 
@@ -1549,7 +1551,7 @@ class IndicatorLunar:
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data:
-            subMenu.append( Gtk.MenuItem( self.data[key + ( IndicatorLunar.DATA_MESSAGE, ) ] ) )
+            subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ) )
         else:
             data = [ ]
             data.append( [ key + ( IndicatorLunar.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
@@ -1630,7 +1632,7 @@ class IndicatorLunar:
                         subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
                         subMenu.append( Gtk.MenuItem( _( "Declination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DECLINATION, ) ) ) )
 
-                    subMenu.append( Gtk.MenuItem( self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] ) )
+                    subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ) )
                 else:
                     subMenu.append( Gtk.MenuItem( _( "Rise" ) ) )
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) ) )
