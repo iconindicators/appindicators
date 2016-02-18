@@ -49,9 +49,6 @@
 #  The moons are also have the easy naming scheme.
 
 
-#TODO Noticed that in the Preferences dialog, Notifications tab that some stuff is not translated to Russian.
-
-
 #TODO Generate a new pot file and send to Oleg.
 
 
@@ -1497,7 +1494,7 @@ class IndicatorLunar:
 
 
     def onOrbitalElement( self, widget ):
-        url = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="  #TODO Needs to be a Preference?  What tag do I provide to the user?
+        url = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
         if "(" in widget.props.name:
             objectID = widget.props.name[ : widget.props.name.find( "(" ) ].strip()
