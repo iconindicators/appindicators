@@ -34,6 +34,11 @@
 #  http://www.flaticon.com/search/satellite
 
 
+# TODO In RUssion version, remove the .json file.
+# The notification for satellites seems to contain English.
+# Test by changing the text (forces a save of the .json file).
+
+
 #TODO Click on the final submenu for a star and load the wikipedia page using the URL:
 # http://www.google.com/search?btnI=I%27m+Feeling+Lucky&ie=UTF-8&oe=UTF-8&q=schedar%20star%20wikipedia
 # which works for the star "schedar".
