@@ -35,6 +35,13 @@
 
 
 # TODO In RUssion version, remove the .json file.
+# Enable the moon and add a moon tag to the icon text.
+# OK the prefs.
+# Open prefs, disable the moon and OK.  Should get the tag in the top panel.
+# Open prefs, enable the moon and OK.  Tag is not converted.
+
+
+# TODO In RUssion version, remove the .json file.
 # The notification for satellites seems to contain English.
 # Test by changing the text (forces a save of the .json file).
 
@@ -1097,7 +1104,10 @@ class IndicatorLunar:
              key[ 2 ] == IndicatorLunar.DATA_Z_OFFSET:
             displayData = self.data[ key ]
 
-        return displayData
+        if displayData is None:
+            logging.error( "Unknown/unhandled key: " + key )
+
+        return displayData # Returning None is not good but better to let it crash and find out about it than hide the problem.
 
 
     # Converts a UTC datetime string in the format 2015-05-11 22:51:42.429093 to local datetime string.
@@ -2369,13 +2379,11 @@ class IndicatorLunar:
         self.tagsRemoved = { } # See above!
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         for key in self.data.keys():
-            displayData = self.getDisplayData( key )
-            if displayData is not None:
-                self.appendToDisplayTagsStore( key, displayData, displayTagsStore )
-            else:
-                self.appendToDisplayTagsStore( key, self.data[ key ], displayTagsStore )
+            self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
 
+#TODO Verify that self.indicatorText is always in English. 
         indicatorText.set_text( self.translateTags( displayTagsStore, True, self.indicatorText ) ) # Need to translate the tags into the local language.
+#TODO Verify that the text set is now in the local language.  Sat/OE names will not be translated. 
 
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
         displayTagsStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
@@ -3079,6 +3087,7 @@ class IndicatorLunar:
             if self.dialog.run() != Gtk.ResponseType.OK:
                 break
 
+#TODO Does this need to be called?
             self.onSwitchPage( notebook, None, 0, displayTagsStore ) # If the user makes a change to an object but does not click on the first tab, the display tags don't get refreshed.
 
             cityValue = city.get_active_text()
@@ -3195,7 +3204,6 @@ class IndicatorLunar:
         astronomicalObjectType = key[ 0 ]
         bodyTag = key[ 1 ]
         dataTag = key[ 2 ]
-        tag = bodyTag + " " + dataTag 
 
         # Special case: translated boolean values to local true/false (but only if the value is indeed boolean).
         if ( dataTag == IndicatorLunar.DATA_VISIBLE or dataTag == IndicatorLunar.DATA_EARTH_VISIBLE ) and value != IndicatorLunar.DISPLAY_NEEDS_REFRESH:
@@ -3206,11 +3214,11 @@ class IndicatorLunar:
             ( astronomicalObjectType == AstronomicalObjectType.Satellite or astronomicalObjectType == AstronomicalObjectType.OrbitalElement )
 
         if isSatelliteOrOrbitalElement:
-            translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+            translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Don't translate the names of the satellites/OEs.
         else:
-            translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag  ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+            translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag  ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets/starts, etc.
 
-        displayTagsStore.append( [ tag, translatedTag, value ] )
+        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
 
     def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
@@ -3270,16 +3278,16 @@ class IndicatorLunar:
             j = 0
 
         translatedText = text
-        tags = re.findall( "\[([^\[^\]]+)\]", translatedText )
+        tags = re.findall( "\[([^\[^\]]+)\]", translatedText ) # TODO DOuble check this RE - does it handle nesting of brackets/tags?
         for tag in tags:
             iter = tagsStore.get_iter_first()
             while iter is not None:
                 row = tagsStore[ iter ]
                 if row[ i ] == tag:
                     translatedText = translatedText.replace( "[" + tag + "]", "[" + row[ j ] + "]" )
-                    break
-
-                iter = tagsStore.iter_next( iter )
+                    iter = None # Break and move on to next tag.
+                else:
+                    iter = tagsStore.iter_next( iter )
 
         return translatedText
 
