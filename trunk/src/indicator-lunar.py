@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays lunar, solar, planetary, star, orbital element and satellite information.
+# Application indicator which displays lunar, solar, planetary, star, comet and satellite information.
 
 
 # References:
@@ -83,7 +83,7 @@ except:
     sys.exit()
 
 
-class AstronomicalObjectType: Moon, OrbitalElement, Planet, PlanetaryMoon, Satellite, Star, Sun = range( 7 )
+class AstronomicalObjectType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star, Sun = range( 7 )
 
 
 class IndicatorLunar:
@@ -101,14 +101,14 @@ class IndicatorLunar:
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
     URL_TIMEOUT_IN_SECONDS = 2
 
-    ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, orbital element, star and satellite information." )
+    ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, comet, star and satellite information." )
     ABOUT_CREDIT_BRIGHT_LIMB = _( "Bright Limb from 'Astronomical Algorithms' by Jean Meeus." )
     ABOUT_CREDIT_ECLIPSE = _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" )
     ABOUT_CREDIT_PYEPHEM = _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
-    ABOUT_CREDIT_ORBITAL_ELEMENTS = _( "Orbital element data by Minor Planet Center. http://www.minorplanetcenter.net" )
+    ABOUT_CREDIT_COMET = _( "Comet data by Minor Planet Center. http://www.minorplanetcenter.net" )
     ABOUT_CREDIT_SATELLITE = _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" )
     ABOUT_CREDIT_TROPICAL_SIGN = _( "Tropical Sign by Ignius Drake." )
-    ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_ORBITAL_ELEMENTS ]
+    ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
     DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT = "%Y-%m-%d %H:%M:%S.%f"
@@ -122,14 +122,14 @@ class IndicatorLunar:
     SETTINGS_CITY_LATITUDE = "cityLatitude"
     SETTINGS_CITY_LONGITUDE = "cityLongitude"
     SETTINGS_CITY_NAME = "cityName"
+    SETTINGS_COMETS_URL = "cometsURL"
+    SETTINGS_COMETS = "comets"
+    SETTINGS_COMETS_ADD_NEW = "cometsAddNew"
+    SETTINGS_COMETS_MAGNITUDE = "cometsMagnitude"
     SETTINGS_HIDE_BODY_IF_NEVER_UP = "hideBodyIfNeverUp"
     SETTINGS_INDICATOR_TEXT = "indicatorText"
     SETTINGS_GROUP_STARS_BY_CONSTELLATION = "groupStarsByConstellation"
     SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS = "hideSatelliteIfNoVisiblePass"
-    SETTINGS_ORBITAL_ELEMENT_URL = "orbitalElementURL"
-    SETTINGS_ORBITAL_ELEMENTS = "orbitalElements"
-    SETTINGS_ORBITAL_ELEMENTS_ADD_NEW = "orbitalElementsAddNew"
-    SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE = "orbitalElementsMagnitude"
     SETTINGS_PLANETS = "planets"
     SETTINGS_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
     SETTINGS_SATELLITE_NOTIFICATION_SUMMARY = "satelliteNotificationSummary"
@@ -138,8 +138,8 @@ class IndicatorLunar:
     SETTINGS_SATELLITES = "satellites"
     SETTINGS_SATELLITES_ADD_NEW = "satellitesAddNew"
     SETTINGS_SATELLITES_SORT_BY_DATE_TIME = "satellitesSortByDateTime"
+    SETTINGS_SHOW_COMETS_AS_SUBMENU = "showCometsAsSubmenu"
     SETTINGS_SHOW_MOON = "showMoon"
-    SETTINGS_SHOW_ORBITAL_ELEMENTS_AS_SUBMENU = "showOrbitalElementsAsSubmenu"
     SETTINGS_SHOW_PLANETS_AS_SUBMENU = "showPlanetsAsSubmenu"
     SETTINGS_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
     SETTINGS_SHOW_SATELLITES_AS_SUBMENU = "showSatellitesAsSubmenu"
@@ -219,7 +219,7 @@ class IndicatorLunar:
         DATA_TROPICAL_SIGN_DEGREE,
         DATA_TROPICAL_SIGN_MINUTE ]
 
-    DATA_TAGS_ORBITAL_ELEMENT = [
+    DATA_TAGS_COMET = [
         DATA_RISE_AZIMUTH,
         DATA_RISE_TIME,
         DATA_SET_AZIMUTH,
@@ -815,10 +815,10 @@ class IndicatorLunar:
         LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" )
     }
 
-    ORBITAL_ELEMENT_CACHE_BASENAME = "oe-"
-    ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS = 30
-    ORBITAL_ELEMENT_DATA_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
-    ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS = 30
+    COMET_CACHE_BASENAME = "comet-"
+    COMET_CACHE_MAXIMUM_AGE_HOURS = 30
+    COMET_DATA_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
+    COMET_DOWNLOAD_PERIOD_HOURS = 30
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -848,7 +848,7 @@ class IndicatorLunar:
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_VISIBLE.strip( "[]" ), SATELLITE_TAG_VISIBLE_TRANSLATION.strip( "[]" ) ] )
 
-    SATELLITE_TLE_CACHE_BASENAME = "tle-"
+    SATELLITE_TLE_CACHE_BASENAME = "satellite-"
     SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS = 18
     SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 18
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
@@ -899,11 +899,11 @@ class IndicatorLunar:
     def __init__( self ):
         self.dialog = None
         self.data = { } # Key is a tuple of AstronomicalObjectType, a data tag (upper case( and data tag (upper case).  Value is the data ready for display.
-        self.orbitalElementData = { } # Key is the orbital element name, upper cased; value is the orbital element data string.  Can be empty but never None.
+        self.cometData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
         self.satelliteNotifications = { }
         self.satelliteTLEData = { } # Key: ( satellite name upper cased, satellite number ) ; Value: satellite.TLE object.  Can be empty but never None.
 
-        self.toggleOrbitalElementsTable = True
+        self.toggleCometsTable = True
         self.togglePlanetsTable = True
         self.toggleSatellitesTable = True
         self.toggleStarsTable = True
@@ -940,7 +940,7 @@ class IndicatorLunar:
     def updateBackend( self ):
         if self.lock.acquire( False ):
             self.toggleIconState()
-            self.updateOrbitalElementData()
+            self.updateCometData()
             self.updateSatelliteTLEData() 
 
             self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
@@ -984,7 +984,7 @@ class IndicatorLunar:
         self.updateSunMenu( menu )
         self.updatePlanetsMenu( menu )
         self.updateStarsMenu( menu )
-        self.updateOrbitalElementsMenu( menu )
+        self.updateCometsMenu( menu )
         self.updateSatellitesMenu( menu )
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
@@ -1456,10 +1456,10 @@ class IndicatorLunar:
                     self.updateCommonMenu( menuItem, AstronomicalObjectType.Star, dataTag )
 
 
-    def updateOrbitalElementsMenu( self, menu ):
-        orbitalElements = [ ]
-        for orbitalElement in self.orbitalElements:
-            key = ( AstronomicalObjectType.OrbitalElement, orbitalElement )
+    def updateCometsMenu( self, menu ):
+        comets = [ ]
+        for comet in self.comets:
+            key = ( AstronomicalObjectType.Comet, comet )
             if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
                self.hideBodyIfNeverUp and \
                (
@@ -1470,45 +1470,45 @@ class IndicatorLunar:
 
             if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data or \
                key + ( IndicatorLunar.DATA_RISE_TIME, ) in self.data:
-                orbitalElements.append( orbitalElement ) # Either key must be present - otherwise the orbital element has been dropped due to having too large a magnitude.
+                comets.append( comet ) # Either key must be present - otherwise the comet has been dropped due to having too large a magnitude.
 
-        if len( orbitalElements ) > 0:
-            menuItem = Gtk.MenuItem( _( "Orbital Elements" ) )
+        if len( comets ) > 0:
+            menuItem = Gtk.MenuItem( _( "Comets" ) )
             menu.append( menuItem )
-            if self.showOrbitalElementsAsSubMenu:
-                orbitalElementsSubMenu = Gtk.Menu()
-                menuItem.set_submenu( orbitalElementsSubMenu )
+            if self.showCometsAsSubMenu:
+                cometsSubMenu = Gtk.Menu()
+                menuItem.set_submenu( cometsSubMenu )
 
-            for key in sorted( orbitalElements ): # Sorting by key also sorts the display name identically.
-                if key in self.orbitalElementData:
-                    displayName = self.getOrbitalElementDisplayName( self.orbitalElementData[ key ] )
+            for key in sorted( comets ): # Sorting by key also sorts the display name identically.
+                if key in self.cometData:
+                    displayName = self.getCometDisplayName( self.cometData[ key ] )
                 else:
-                    displayName = key # There is an orbital element but no data for it.
+                    displayName = key # There is an comet but no data for it.
 
-                if self.showOrbitalElementsAsSubMenu:
+                if self.showCometsAsSubMenu:
                     menuItem = Gtk.MenuItem( displayName )
-                    orbitalElementsSubMenu.append( menuItem )
+                    cometsSubMenu.append( menuItem )
                 else:
                     menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + displayName )
                     menu.append( menuItem )
 
-                if key in self.orbitalElementData:
-                    self.updateCommonMenu( menuItem, AstronomicalObjectType.OrbitalElement, key )
-                    self.addOnOrbitalElementHandler( menuItem.get_submenu(), key )
+                if key in self.cometData:
+                    self.updateCommonMenu( menuItem, AstronomicalObjectType.Comet, key )
+                    self.addOnCometHandler( menuItem.get_submenu(), key )
                 else: # Should only be a no data message...I hope!
                     subMenu = Gtk.Menu()
-                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_MESSAGE ) ) ) )
+                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( AstronomicalObjectType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ) ) )
                     menuItem.set_submenu( subMenu )
 
 
 #TODO Will this make the cut?
-    def addOnOrbitalElementHandler( self, subMenu, orbitalElement ):
+    def addOnCometHandler( self, subMenu, comet ):
         for child in subMenu.get_children():
-            child.set_name( orbitalElement )
-            child.connect( "activate", self.onOrbitalElement )
+            child.set_name( comet )
+            child.connect( "activate", self.onComet )
 
 
-    def onOrbitalElement( self, widget ):
+    def onComet( self, widget ):
         url = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
         if "(" in widget.props.name:
@@ -1547,13 +1547,13 @@ class IndicatorLunar:
             subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ) ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
-           astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
+           astronomicalObjectType == AstronomicalObjectType.Comet or \
            astronomicalObjectType == AstronomicalObjectType.Planet or \
            astronomicalObjectType == AstronomicalObjectType.Sun:
             subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ) ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
-           astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
+           astronomicalObjectType == AstronomicalObjectType.Comet or \
            astronomicalObjectType == AstronomicalObjectType.Planet:
             subMenu.append( Gtk.MenuItem( _( "Distance to Sun: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ) ) )
 
@@ -1714,8 +1714,8 @@ class IndicatorLunar:
             webbrowser.open( url )
 
 
-    def updateOrbitalElementData( self ):
-        if datetime.datetime.utcnow() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) ):
+    def updateCometData( self ):
+        if datetime.datetime.utcnow() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.COMET_DOWNLOAD_PERIOD_HOURS ) ):
             return
 
         # The download period and cache age are the same, which means
@@ -1725,29 +1725,29 @@ class IndicatorLunar:
         # before the download period has expired.
         # The cache attempts to avoid the download source blocking a user
         # as a ressult of too many downloads in a given period.
-        self.orbitalElementData, cacheDateTime = self.readFromCache( IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
-        if self.orbitalElementData is None:
+        self.cometData, cacheDateTime = self.readFromCache( IndicatorLunar.COMET_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
+        if self.cometData is None:
             # Cache returned no result so download from the source.
-            self.orbitalElementData = self.getOrbitalElementData( self.orbitalElementURL )
-            if self.orbitalElementData is None:
-                self.orbitalElementData = { }
-                summary = _( "Error Retrieving Orbital Element Data" )
-                message = _( "The orbital element data source could not be reached." )
+            self.cometData = self.getCometData( self.cometURL )
+            if self.cometData is None:
+                self.cometData = { }
+                summary = _( "Error Retrieving Comet Data" )
+                message = _( "The comet data source could not be reached." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            elif len( self.orbitalElementData ) == 0:
-                summary = _( "Empty Orbital Element Data" )
-                message = _( "The orbital element data retrieved was empty." )
+            elif len( self.cometData ) == 0:
+                summary = _( "Empty Comet Data" )
+                message = _( "The comet data retrieved was empty." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             else:
-                self.writeToCache( self.orbitalElementData, IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME )
+                self.writeToCache( self.cometData, IndicatorLunar.COMET_CACHE_BASENAME )
 
             # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
             self.lastUpdateOE = datetime.datetime.utcnow()
         else:
             # Set the next update to occur when the cache is due to expire.
-            self.lastUpdateOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS )
+            self.lastUpdateOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
 
-        self.addNewOrbitalElements()
+        self.addNewComets()
 
 
     def updateSatelliteTLEData( self ):
@@ -1867,7 +1867,7 @@ class IndicatorLunar:
         self.updateSun( ephemNow )
         self.updatePlanets( ephemNow )
         self.updateStars( ephemNow )
-        self.updateOrbitalElements( ephemNow, self.orbitalElementsMagnitude )
+        self.updateComets( ephemNow, self.cometsMagnitude )
         self.updateSatellites( ephemNow, self.hideSatelliteIfNoVisiblePass )
         return ephemNow
 
@@ -1999,19 +1999,19 @@ class IndicatorLunar:
             self.updateCommon( star, AstronomicalObjectType.Star, star.name.upper(), ephemNow )
 
 
-    # Computes the rise/set and other information for orbital elements, such as comets.
+    # Computes the rise/set and other information for comets.
     #
     # http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
     # http://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html        
-    def updateOrbitalElements( self, ephemNow, maximumMagnitude ):
-        for key in self.orbitalElements:
-            if key in self.orbitalElementData:
-                orbitalElement = ephem.readdb( self.orbitalElementData[ key ] )
-                orbitalElement.compute( self.getCity( ephemNow ) )
-                if float( orbitalElement.mag ) <= float( maximumMagnitude ):
-                    self.updateCommon( orbitalElement, AstronomicalObjectType.OrbitalElement, key, ephemNow )
+    def updateComets( self, ephemNow, maximumMagnitude ):
+        for key in self.comets:
+            if key in self.cometData:
+                comet = ephem.readdb( self.cometData[ key ] )
+                comet.compute( self.getCity( ephemNow ) )
+                if float( comet.mag ) <= float( maximumMagnitude ):
+                    self.updateCommon( comet, AstronomicalObjectType.Comet, key, ephemNow )
             else:
-                self.data[ ( AstronomicalObjectType.OrbitalElement, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
+                self.data[ ( AstronomicalObjectType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
     # Calculates the common attributes such as rise/set, illumination, constellation, magnitude, tropical sign, distance, bright limb angle and RA/Dec/Az/Alt.
@@ -2039,7 +2039,7 @@ class IndicatorLunar:
         self.data[ key + ( IndicatorLunar.DATA_CONSTELLATION, ) ] = ephem.constellation( body )[ 1 ]
         self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] = str( body.mag )
 
-        if astronomicalObjectType != AstronomicalObjectType.OrbitalElement:
+        if astronomicalObjectType != AstronomicalObjectType.Comet:
             tropicalSignName, tropicalSignDegree, tropicalSignMinute = self.getTropicalSign( body, ephemNow )
             self.data[ key + ( IndicatorLunar.DATA_TROPICAL_SIGN_NAME, ) ] = tropicalSignName
             self.data[ key + ( IndicatorLunar.DATA_TROPICAL_SIGN_DEGREE, ) ] = tropicalSignDegree
@@ -2049,13 +2049,13 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ] = str( round( body.earth_distance * ephem.meters_per_au / 1000, 1 ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
-           astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
+           astronomicalObjectType == AstronomicalObjectType.Comet or \
            astronomicalObjectType == AstronomicalObjectType.Planet or \
            astronomicalObjectType == AstronomicalObjectType.Sun:
             self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 4 ) )
 
         if astronomicalObjectType == AstronomicalObjectType.Moon or \
-           astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
+           astronomicalObjectType == AstronomicalObjectType.Comet or \
            astronomicalObjectType == AstronomicalObjectType.Planet:
             self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ] = str( round( body.sun_distance, 4 ) )
 
@@ -2461,10 +2461,10 @@ class IndicatorLunar:
         showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
         box.pack_start( showStarsAsSubmenuCheckbox, False, False, 0 )
 
-        showOrbitalElementsAsSubmenuCheckbox = Gtk.CheckButton( _( "Orbital elements" ) )
-        showOrbitalElementsAsSubmenuCheckbox.set_tooltip_text( _( "Show orbital elements as submenus." ) )
-        showOrbitalElementsAsSubmenuCheckbox.set_active( self.showOrbitalElementsAsSubMenu )
-        box.pack_start( showOrbitalElementsAsSubmenuCheckbox, False, False, 0 )
+        showCometsAsSubmenuCheckbox = Gtk.CheckButton( _( "Comets" ) )
+        showCometsAsSubmenuCheckbox.set_tooltip_text( _( "Show comets as submenus." ) )
+        showCometsAsSubmenuCheckbox.set_active( self.showCometsAsSubMenu )
+        box.pack_start( showCometsAsSubmenuCheckbox, False, False, 0 )
 
         showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( _( "Satellites" ) )
         showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
@@ -2478,8 +2478,8 @@ class IndicatorLunar:
         hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
         hideBodyIfNeverUpCheckbox.set_tooltip_text( _( 
             "If checked, only planets, moon,\n" + \
-            "sun, orbital elements and stars\n" + \
-            "which rise/set or are 'always up'\n" + \
+            "sun, comets and stars which\n" + \
+            "rise/set or are 'always up'\n" + \
             "will be shown.\n\n" + \
             "Otherwise, all bodies are shown.\n" + \
             "When showing all bodies, there may\n" + \
@@ -2496,40 +2496,37 @@ class IndicatorLunar:
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
 
-        label = Gtk.Label( _( "Hide orbital elements greater than magnitude" ) )
+        label = Gtk.Label( _( "Hide comets greater than magnitude" ) )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
-        spinnerOrbitalElementMagnitude = Gtk.SpinButton()
-        spinnerOrbitalElementMagnitude.set_numeric( True )
-        spinnerOrbitalElementMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
-        spinnerOrbitalElementMagnitude.set_adjustment( Gtk.Adjustment( self.orbitalElementsMagnitude, -30, 30, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinnerOrbitalElementMagnitude.set_value( self.orbitalElementsMagnitude ) # ...so need to force the initial value by explicitly setting it.
-        spinnerOrbitalElementMagnitude.set_tooltip_text( _( 
-            "Orbital elements with a magnitude\n" + \
-            "greater than that specified will\n" + \
-            "not be shown.\n\n" + \
+        spinnerCometMagnitude = Gtk.SpinButton()
+        spinnerCometMagnitude.set_numeric( True )
+        spinnerCometMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
+        spinnerCometMagnitude.set_adjustment( Gtk.Adjustment( self.cometsMagnitude, -30, 30, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerCometMagnitude.set_value( self.cometsMagnitude ) # ...so need to force the initial value by explicitly setting it.
+        spinnerCometMagnitude.set_tooltip_text( _( 
+            "Comets with a magnitude greater\n" + \
+            "than that specified are hidden.\n\n" + \
             "If a high magnitude value is set,\n" + \
             "there may be a lot of information\n" + \
             "displayed impacting the indicator's\n" + \
             "performance." ) )
 
-        box.pack_start( spinnerOrbitalElementMagnitude, False, False, 0 )
+        box.pack_start( spinnerCometMagnitude, False, False, 0 )
 
         grid.attach( box, 0, 6, 1, 1 )
 
-        orbitalElementsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new orbital elements" ) )
-        orbitalElementsAddNewCheckbox.set_margin_top( 15 )
-        orbitalElementsAddNewCheckbox.set_active( self.orbitalElementsAddNew )
-        orbitalElementsAddNewCheckbox.set_tooltip_text( _(
-            "If checked, new orbital elements\n" + \
-            "in the downloaded data will be\n" + \
-            "added to the list of checked\n" + \
-            "orbital elements.\n\n" + \
-            "In addition, any orbital elements\n" + \
-            "which are currently unchecked will\n" + \
-            "become checked." ) )
-        grid.attach( orbitalElementsAddNewCheckbox, 0, 7, 1, 1 )
+        cometsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new comets" ) )
+        cometsAddNewCheckbox.set_margin_top( 15 )
+        cometsAddNewCheckbox.set_active( self.cometsAddNew )
+        cometsAddNewCheckbox.set_tooltip_text( _(
+            "If checked, new comets in the\n" + \
+            "downloaded data will be added\n" + \
+            "to the list of checked comets.\n\n" + \
+            "In addition, any comets\n" + \
+            "unchecked will become checked." ) )
+        grid.attach( cometsAddNewCheckbox, 0, 7, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
@@ -2657,7 +2654,7 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onOrbitalElementOrSateliteOrStarToggled, starStore, starStoreSort, AstronomicalObjectType.Star )
+        renderer_toggle.connect( "toggled", self.onCometOrSateliteOrStarToggled, starStore, starStoreSort, AstronomicalObjectType.Star )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, starStoreSort, displayTagsStore, AstronomicalObjectType.Star )
@@ -2679,27 +2676,27 @@ class IndicatorLunar:
 
         notebook.append_page( box, Gtk.Label( _( "Planets / Stars" ) ) )
 
-        # Orbital elements.
-        orbitalElementGrid = Gtk.Grid()
-        orbitalElementGrid.set_row_spacing( 10 )
-        orbitalElementGrid.set_margin_bottom( 10 )
+        # Comets.
+        cometGrid = Gtk.Grid()
+        cometGrid.set_row_spacing( 10 )
+        cometGrid.set_margin_bottom( 10 )
 
-        orbitalElementStore = Gtk.ListStore( bool, str ) # Show/hide, orbital element name.
-        orbitalElementStoreSort = Gtk.TreeModelSort( model = orbitalElementStore )
-        orbitalElementStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
+        cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
+        cometStoreSort = Gtk.TreeModelSort( model = cometStore )
+        cometStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
-        tree = Gtk.TreeView( orbitalElementStoreSort )
-        tree.set_tooltip_text( _(
-            "Check an orbital element to display\n" + \
+        tree = Gtk.TreeView( cometStoreSort )
+        tree.set_tooltip_text( _( #TOD Fix this text.
+            "Check a comet to display in\n" + \
             "in the menu.\n\n" + \
-            "Clicking the header of the first\n" + \
-            "column toggles all checkboxes." ) )
+            "Clicking the header of the\n" + \
+            "first column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onOrbitalElementOrSateliteOrStarToggled, orbitalElementStore, orbitalElementStoreSort, AstronomicalObjectType.OrbitalElement )
+        renderer_toggle.connect( "toggled", self.onCometOrSateliteOrStarToggled, cometStore, cometStoreSort, AstronomicalObjectType.Comet )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, orbitalElementStore, orbitalElementStoreSort, displayTagsStore, AstronomicalObjectType.OrbitalElement )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore, cometStoreSort, displayTagsStore, AstronomicalObjectType.Comet )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2710,55 +2707,55 @@ class IndicatorLunar:
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( tree )
-        orbitalElementGrid.attach( scrolledWindow, 0, 0, 1, 1 )
+        cometGrid.attach( scrolledWindow, 0, 0, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 10 )
         box.set_margin_left( 10 )
         box.set_margin_right( 10 )
 
-        label = Gtk.Label( _( "Orbital element data" ) )
+        label = Gtk.Label( _( "Comet data" ) )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
-        self.orbitalElementDataNew = None
-        self.orbitalElementURLNew = None
+        self.cometDataNew = None
+        self.cometURLNew = None
 
-        orbitalElementURLEntry = Gtk.Entry()
-        orbitalElementURLEntry.set_text( self.orbitalElementURL )
-        orbitalElementURLEntry.set_hexpand( True )
-        orbitalElementURLEntry.set_tooltip_text( _(
+        cometURLEntry = Gtk.Entry()
+        cometURLEntry.set_text( self.cometURL )
+        cometURLEntry.set_hexpand( True )
+        cometURLEntry.set_tooltip_text( _(
             "The URL from which to source\n" + \
-            "orbital element data. For a local\n" + \
+            "comet data. For a local\n" + \
             "file, use 'file:///' and the\n" + \
             "filename.\n\n" + \
             "If you change the URL, you must\n" + \
             "fetch the new data.\n\n" + \
             "To disable, set a bogus URL such\n" + \
             "as 'http://'." ) )
-        box.pack_start( orbitalElementURLEntry, True, True, 0 )
+        box.pack_start( cometURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
         fetch.set_tooltip_text( _(
-            "Retrieve the orbital element data\n" + \
-            "from the URL. If the URL is empty,\n" + \
+            "Retrieve the comet data from\n" + \
+            "the URL. If the URL is empty,\n" + \
             "the default URL will be used.\n\n" + \
             "If using the default URL, the\n" + \
             "download may be blocked to avoid\n" + \
             "burdening the data source." ) )
-        fetch.connect( "clicked", self.onFetchOrbitalElementURL, orbitalElementURLEntry, orbitalElementGrid, orbitalElementStore, displayTagsStore )
+        fetch.connect( "clicked", self.onFetchCometURL, cometURLEntry, cometGrid, cometStore, displayTagsStore )
         box.pack_start( fetch, False, False, 0 )
 
-        orbitalElementGrid.attach( box, 0, 1, 1, 1 )
+        cometGrid.attach( box, 0, 1, 1, 1 )
 
         label = Gtk.Label()
         label.set_margin_left( 10 )
         label.set_margin_right( 10 )
         label.set_justify( Gtk.Justification.CENTER )
         
-        orbitalElementGrid.attach( label, 0, 2, 1, 1 )
+        cometGrid.attach( label, 0, 2, 1, 1 )
 
-        notebook.append_page( orbitalElementGrid, Gtk.Label( _( "Orbital Elements" ) ) )
+        notebook.append_page( cometGrid, Gtk.Label( _( "Comets" ) ) )
 
         # Satellites.
         satelliteGrid = Gtk.Grid()
@@ -2777,7 +2774,7 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onOrbitalElementOrSateliteOrStarToggled, satelliteStore, satelliteStoreSort, AstronomicalObjectType.Satellite )
+        renderer_toggle.connect( "toggled", self.onCometOrSateliteOrStarToggled, satelliteStore, satelliteStoreSort, AstronomicalObjectType.Satellite )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, AstronomicalObjectType.Satellite )
@@ -3077,8 +3074,8 @@ class IndicatorLunar:
         self.dialog.show_all()
 
         # Some GUI elements will be hidden, which must be done after the dialog is shown.
-        self.updateOrbitalElementOrSatellitePreferencesTab( orbitalElementGrid, orbitalElementStore, self.orbitalElementData, self.orbitalElements, orbitalElementURLEntry.get_text().strip(), False )
-        self.updateOrbitalElementOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), True )
+        self.updateCometOrSatellitePreferencesTab( cometGrid, cometStore, self.cometData, self.comets, cometURLEntry.get_text().strip(), False )
+        self.updateCometOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), True )
 
         # Last thing to do after everything else is built, but before setting visible.        
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
@@ -3123,9 +3120,9 @@ class IndicatorLunar:
             self.showSun = showSunCheckbox.get_active()
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
-            self.showOrbitalElementsAsSubMenu = showOrbitalElementsAsSubmenuCheckbox.get_active()
-            self.orbitalElementsAddNew = orbitalElementsAddNewCheckbox.get_active()
-            self.orbitalElementsMagnitude = spinnerOrbitalElementMagnitude.get_value_as_int()
+            self.showCometsAsSubMenu = showCometsAsSubmenuCheckbox.get_active()
+            self.cometsAddNew = cometsAddNewCheckbox.get_active()
+            self.cometsMagnitude = spinnerCometMagnitude.get_value_as_int()
             self.hideBodyIfNeverUp = hideBodyIfNeverUpCheckbox.get_active()
             self.groupStarsByConstellation = groupStarsByConstellationCheckbox.get_active()
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
@@ -3144,22 +3141,22 @@ class IndicatorLunar:
                 if row[ 0 ]:
                     self.stars.append( row[ 1 ] )
 
-            if self.orbitalElementURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
-                self.orbitalElementURL = self.orbitalElementURLNew # The URL may or may not be valie, but it will not be None.
-                if self.orbitalElementDataNew is None:
-                    self.orbitalElementData = { } # The retrieved data was bad, so reset to empty data.
+            if self.cometURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
+                self.cometURL = self.cometURLNew # The URL may or may not be valie, but it will not be None.
+                if self.cometDataNew is None:
+                    self.cometData = { } # The retrieved data was bad, so reset to empty data.
                 else:
-                    self.orbitalElementData = self.orbitalElementDataNew # The retrieved data is good (but still could be empty).
+                    self.cometData = self.cometDataNew # The retrieved data is good (but still could be empty).
 
-                self.writeToCache( self.orbitalElementData, IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME )
+                self.writeToCache( self.cometData, IndicatorLunar.COMET_CACHE_BASENAME )
                 self.lastUpdateOE = datetime.datetime.utcnow()
 
-            self.orbitalElements = [ ]
-            for orbitalElement in orbitalElementStore:
-                if orbitalElement[ 0 ]:
-                    self.orbitalElements.append( orbitalElement[ 1 ].upper() )
+            self.comets = [ ]
+            for comet in cometStore:
+                if comet[ 0 ]:
+                    self.comets.append( comet[ 1 ].upper() )
 
-            self.addNewOrbitalElements()
+            self.addNewComets()
 
             if self.satelliteTLEURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
                 self.satelliteTLEURL = self.satelliteTLEURLNew # The URL may or may not be valie, but it will not be None.
@@ -3209,11 +3206,11 @@ class IndicatorLunar:
         if ( dataTag == IndicatorLunar.DATA_VISIBLE or dataTag == IndicatorLunar.DATA_EARTH_VISIBLE ) and value != IndicatorLunar.DISPLAY_NEEDS_REFRESH:
             value = self.getBooleanTranslatedText( value )
 
-        isSatelliteOrOrbitalElement = \
+        isSatelliteOrComet = \
             astronomicalObjectType is not None and \
-            ( astronomicalObjectType == AstronomicalObjectType.Satellite or astronomicalObjectType == AstronomicalObjectType.OrbitalElement )
+            ( astronomicalObjectType == AstronomicalObjectType.Satellite or astronomicalObjectType == AstronomicalObjectType.Comet )
 
-        if isSatelliteOrOrbitalElement:
+        if isSatelliteOrComet:
             translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Don't translate the names of the satellites/OEs.
         else:
             translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag  ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets/starts, etc.
@@ -3244,8 +3241,8 @@ class IndicatorLunar:
                 bodyTag = key[ 1 ]
                 if astronomicalObjectType == AstronomicalObjectType.Moon:
                     tags = IndicatorLunar.DATA_TAGS_MOON
-                elif astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
-                    tags = IndicatorLunar.DATA_TAGS_ORBITAL_ELEMENT
+                elif astronomicalObjectType == AstronomicalObjectType.Comet:
+                    tags = IndicatorLunar.DATA_TAGS_COMET
                 elif astronomicalObjectType == AstronomicalObjectType.Planet:
                     tags = IndicatorLunar.DATA_TAGS_PLANET
                     if bodyTag == IndicatorLunar.PLANET_SATURN.upper():
@@ -3302,7 +3299,7 @@ class IndicatorLunar:
         textEntry.set_text( translatedTags )
 
 
-    def updateOrbitalElementOrSatellitePreferencesTab( self, grid, dataStore, data, objects, url, isSatellite ):
+    def updateCometOrSatellitePreferencesTab( self, grid, dataStore, data, objects, url, isSatellite ):
         dataStore.clear()
         if data is None:
             message = IndicatorLunar.MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE.format( url )
@@ -3317,8 +3314,8 @@ class IndicatorLunar:
                     dataStore.append( [ checked, tle.getName(), tle.getNumber(), tle.getInternationalDesignator() ] )
             else:
                 for key in data:
-                    orbitalElement = data[ key ]
-                    displayName = self.getOrbitalElementDisplayName( orbitalElement )
+                    comet = data[ key ]
+                    displayName = self.getCometDisplayName( comet )
                     dataStore.append( [ key in objects, displayName ] )
 
         # Hide/show the label and scrolled window as appropriate.
@@ -3338,29 +3335,29 @@ class IndicatorLunar:
                     child.hide()
 
 
-    def onFetchOrbitalElementURL( self, button, entry, grid, orbitalElementStore, displayTagsStore ):
+    def onFetchCometURL( self, button, entry, grid, cometStore, displayTagsStore ):
         self.removeFromData( False )
         if entry.get_text().strip() == "":
-            entry.set_text( IndicatorLunar.ORBITAL_ELEMENT_DATA_URL )
+            entry.set_text( IndicatorLunar.COMET_DATA_URL )
 
-        self.orbitalElementURLNew = entry.get_text().strip()
+        self.cometURLNew = entry.get_text().strip()
 
         # If the URL is the default, use the cache to avoid annoying the default data source.
-        if self.orbitalElementURLNew == IndicatorLunar.ORBITAL_ELEMENT_DATA_URL:
-            self.orbitalElementDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.ORBITAL_ELEMENT_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
-            if self.orbitalElementDataNew is None:
+        if self.cometURLNew == IndicatorLunar.COMET_DATA_URL:
+            self.cometDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.COMET_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
+            if self.cometDataNew is None:
                 # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
-                if datetime.datetime.utcnow() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) ):
-                    nextDownload = str( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.ORBITAL_ELEMENT_DOWNLOAD_PERIOD_HOURS ) )
-                    summary = _( "Orbital Element data fetch aborted" )
+                if datetime.datetime.utcnow() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.COMET_DOWNLOAD_PERIOD_HOURS ) ):
+                    nextDownload = str( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.COMET_DOWNLOAD_PERIOD_HOURS ) )
+                    summary = _( "Comet data fetch aborted" )
                     message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
                     Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
                 else:
-                    self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
+                    self.cometDataNew = self.getCometData( self.cometURLNew ) # The comet data can be None, empty or non-empty.
         else:
-            self.orbitalElementDataNew = self.getOrbitalElementData( self.orbitalElementURLNew ) # The orbital element data can be None, empty or non-empty.
+            self.cometDataNew = self.getCometData( self.cometURLNew ) # The comet data can be None, empty or non-empty.
 
-        self.updateOrbitalElementOrSatellitePreferencesTab( grid, orbitalElementStore, self.orbitalElementDataNew, [ ], self.orbitalElementURLNew, False )
+        self.updateCometOrSatellitePreferencesTab( grid, cometStore, self.cometDataNew, [ ], self.cometURLNew, False )
 
 
     def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore, displayTagsStore ):
@@ -3385,14 +3382,14 @@ class IndicatorLunar:
         else:
             self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
 
-        self.updateOrbitalElementOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, True )
+        self.updateCometOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, True )
 
 
     def removeFromData( self, isSatellite ):
         if isSatellite:
             astronomicalObjectType = AstronomicalObjectType.Satellite
         else:
-            astronomicalObjectType = AstronomicalObjectType.OrbitalElement
+            astronomicalObjectType = AstronomicalObjectType.Comet
 
         for key in list( self.data ): # Gets the keys and allows iteration with removal.
             if key[ 0 ] == astronomicalObjectType:
@@ -3411,10 +3408,10 @@ class IndicatorLunar:
                 self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, dataStore[ row ][ 0 ] )
 
 
-    def onOrbitalElementOrSateliteOrStarToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
+    def onCometOrSateliteOrStarToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
-        if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
+        if astronomicalObjectType == AstronomicalObjectType.Comet:
             bodyTag = dataStore[ actualRow ][ 1 ].upper()
         if astronomicalObjectType == AstronomicalObjectType.Satellite:
             bodyTag = dataStore[ actualRow ][ 1 ] + " " + dataStore[ actualRow ][ 2 ]
@@ -3452,12 +3449,12 @@ class IndicatorLunar:
                 dataStore[ row ][ 0 ] = bool( not toggle )
                 self.onPlanetToggled( widget, row, dataStore, astronomicalObjectType )
 
-        elif astronomicalObjectType == AstronomicalObjectType.OrbitalElement or \
+        elif astronomicalObjectType == AstronomicalObjectType.Comet or \
              astronomicalObjectType == AstronomicalObjectType.Satellite or \
              astronomicalObjectType == AstronomicalObjectType.Star:
-            if astronomicalObjectType == AstronomicalObjectType.OrbitalElement:
-                toggle = self.toggleOrbitalElementsTable
-                self.toggleOrbitalElementsTable = not self.toggleOrbitalElementsTable
+            if astronomicalObjectType == AstronomicalObjectType.Comet:
+                toggle = self.toggleCometsTable
+                self.toggleCometsTable = not self.toggleCometsTable
             elif astronomicalObjectType == AstronomicalObjectType.Satellite:
                 toggle = self.toggleSatellitesTable
                 self.toggleSatellitesTable = not self.toggleSatellitesTable
@@ -3468,7 +3465,7 @@ class IndicatorLunar:
             for row in range( len( dataStore ) ):
                 dataStore[ row ][ 0 ] = bool( not toggle )
                 row = str( sortStore.convert_child_path_to_path( Gtk.TreePath.new_from_string( str( row ) ) ) ) # Need to convert the data store row to the sort store row.
-                self.onOrbitalElementOrSateliteOrStarToggled( widget, row, dataStore, sortStore, astronomicalObjectType )
+                self.onCometOrSateliteOrStarToggled( widget, row, dataStore, sortStore, astronomicalObjectType )
 
 
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
@@ -3529,38 +3526,38 @@ class IndicatorLunar:
                     self.satellites.append( key )
 
 
-    def addNewOrbitalElements( self ):
-        if self.orbitalElementsAddNew:
-            for key in self.orbitalElementData:
-                if key not in self.orbitalElements:
-                    self.orbitalElements.append( key )
+    def addNewComets( self ):
+        if self.cometsAddNew:
+            for key in self.cometData:
+                if key not in self.comets:
+                    self.comets.append( key )
 
 
-    # Returns a dict/hashtable of the orbital elements (comets) data from the specified URL (may be empty).
-    # Key: orbital element name, upper cased ; Value: entire orbital element string.
+    # Returns a dict/hashtable of the comets (comets) data from the specified URL (may be empty).
+    # Key: comet name, upper cased ; Value: entire comet string.
     # On error, returns None.
-    def getOrbitalElementData( self, url ):
+    def getCometData( self, url ):
         try:
-            # Orbital elements are read from a URL which assumes the XEphem format.
+            # Comets are read from a URL which assumes the XEphem format.
             # For example
             #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
             # in which the first field (up to the first ',' is the name.
-            orbitalElementsData = { }
+            cometsData = { }
             data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ) ):
                 if not data[ i ].startswith( "#" ):
-                    orbitalElementName = data[ i ][ 0 : data[ i ].index( "," ) ] 
-                    orbitalElementsData[ orbitalElementName.upper() ] = data[ i ]
+                    cometName = data[ i ][ 0 : data[ i ].index( "," ) ] 
+                    cometsData[ cometName.upper() ] = data[ i ]
 
         except Exception as e:
-            orbitalElementsData = None # Indicates error.
+            cometsData = None # Indicates error.
             logging.exception( e )
-            logging.error( "Error retrieving orbital element data from " + str( url ) )
+            logging.error( "Error retrieving comet data from " + str( url ) )
 
-        return orbitalElementsData
+        return cometsData
 
 
-    def getOrbitalElementDisplayName( self, orbitalElement ): return orbitalElement[ 0 : orbitalElement.index( "," ) ]
+    def getCometDisplayName( self, comet ): return comet[ 0 : comet.index( "," ) ]
 
 
     # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
@@ -3607,10 +3604,10 @@ class IndicatorLunar:
         self.hideBodyIfNeverUp = True
         self.hideSatelliteIfNoVisiblePass = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
-        self.orbitalElements = [ ]
-        self.orbitalElementsAddNew = False
-        self.orbitalElementsMagnitude = 6 # More or less what's visible with the naked eye or binoculars.
-        self.orbitalElementURL = IndicatorLunar.ORBITAL_ELEMENT_DATA_URL
+        self.comets = [ ]
+        self.cometsAddNew = False
+        self.cometsMagnitude = 6 # More or less what's visible with the naked eye or binoculars.
+        self.cometURL = IndicatorLunar.COMET_DATA_URL
 
         self.planets = [ ]
         for planetName in IndicatorLunar.PLANETS:
@@ -3624,7 +3621,7 @@ class IndicatorLunar:
         self.satellitesAddNew = False
         self.satellitesSortByDateTime = True
         self.showMoon = True
-        self.showOrbitalElementsAsSubMenu = True
+        self.showCometsAsSubMenu = True
         self.showPlanetsAsSubMenu = False
         self.showSatelliteNotification = True
         self.showSatellitesAsSubMenu = True
@@ -3654,10 +3651,10 @@ class IndicatorLunar:
             self.hideBodyIfNeverUp = settings.get( IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
             self.hideSatelliteIfNoVisiblePass = settings.get( IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
             self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
-            self.orbitalElementURL = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENT_URL, self.orbitalElementURL )
-            self.orbitalElements = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS, self.orbitalElements )
-            self.orbitalElementsAddNew = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_ADD_NEW, self.orbitalElementsAddNew )
-            self.orbitalElementsMagnitude = settings.get( IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE, self.orbitalElementsMagnitude )
+            self.cometURL = settings.get( IndicatorLunar.SETTINGS_COMETS_URL, self.cometURL )
+            self.comets = settings.get( IndicatorLunar.SETTINGS_COMETS, self.comets )
+            self.cometsAddNew = settings.get( IndicatorLunar.SETTINGS_COMETS_ADD_NEW, self.cometsAddNew )
+            self.cometsMagnitude = settings.get( IndicatorLunar.SETTINGS_COMETS_MAGNITUDE, self.cometsMagnitude )
             self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
             self.satelliteNotificationMessage = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
             self.satelliteNotificationSummary = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
@@ -3670,7 +3667,7 @@ class IndicatorLunar:
             self.satellitesAddNew = settings.get( IndicatorLunar.SETTINGS_SATELLITES_ADD_NEW, self.satellitesAddNew )
             self.satellitesSortByDateTime = settings.get( IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME, self.satellitesSortByDateTime )
             self.showMoon = settings.get( IndicatorLunar.SETTINGS_SHOW_MOON, self.showMoon )
-            self.showOrbitalElementsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_ORBITAL_ELEMENTS_AS_SUBMENU, self.showOrbitalElementsAsSubMenu )
+            self.showCometsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_COMETS_AS_SUBMENU, self.showCometsAsSubMenu )
             self.showPlanetsAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
             self.showSatelliteNotification = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
             self.showSatellitesAsSubMenu = settings.get( IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU, self.showSatellitesAsSubMenu )
@@ -3688,10 +3685,10 @@ class IndicatorLunar:
 
 
     def saveSettings( self ):
-        if self.orbitalElementsAddNew:
-            orbitalElements = [ ] 
+        if self.cometsAddNew:
+            comets = [ ] 
         else:
-            orbitalElements = self.orbitalElements # Only write out the list of orbital elements if the user elects to not add new.
+            comets = self.comets # Only write out the list of comets if the user elects to not add new.
 
         if self.satellitesAddNew:
             satellites = [ ]
@@ -3708,10 +3705,10 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
                 IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
                 IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
-                IndicatorLunar.SETTINGS_ORBITAL_ELEMENT_URL: self.orbitalElementURL,
-                IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS: orbitalElements,
-                IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_ADD_NEW: self.orbitalElementsAddNew,
-                IndicatorLunar.SETTINGS_ORBITAL_ELEMENTS_MAGNITUDE: self.orbitalElementsMagnitude,
+                IndicatorLunar.SETTINGS_COMETS_URL: self.cometURL,
+                IndicatorLunar.SETTINGS_COMETS: comets,
+                IndicatorLunar.SETTINGS_COMETS_ADD_NEW: self.cometsAddNew,
+                IndicatorLunar.SETTINGS_COMETS_MAGNITUDE: self.cometsMagnitude,
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,
@@ -3721,7 +3718,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_SATELLITES_ADD_NEW: self.satellitesAddNew,
                 IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME: self.satellitesSortByDateTime,
                 IndicatorLunar.SETTINGS_SHOW_MOON: self.showMoon,
-                IndicatorLunar.SETTINGS_SHOW_ORBITAL_ELEMENTS_AS_SUBMENU: self.showOrbitalElementsAsSubMenu,
+                IndicatorLunar.SETTINGS_SHOW_COMETS_AS_SUBMENU: self.showCometsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
                 IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU: self.showSatellitesAsSubMenu,
