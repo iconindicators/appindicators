@@ -34,6 +34,10 @@
 #  http://www.flaticon.com/search/satellite
 
 
+#TODO Remove the satellite on-click URL from the user preferences - so the URL is fixed?
+#Ditto for the comet stuff?
+
+
 # TODO In RUssion version, remove the .json file.
 # Enable the moon and add a moon tag to the icon text.
 # OK the prefs.
