@@ -2686,11 +2686,12 @@ class IndicatorLunar:
         cometStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView( cometStoreSort )
-        tree.set_tooltip_text( _( #TOD Fix this text.
-            "Check a comet to display in\n" + \
+        tree.set_tooltip_text( _(
+            "Check a comet to display\n" + \
             "in the menu.\n\n" + \
-            "Clicking the header of the\n" + \
-            "first column toggles all checkboxes." ) )
+            "Clicking the header of\n" + \
+            "the first column toggles\n" + \
+            "all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onCometOrSateliteOrStarToggled, cometStore, cometStoreSort, AstronomicalObjectType.Comet )
