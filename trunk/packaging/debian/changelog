@@ -1,6 +1,8 @@
 indicator-lunar (1.0.66-1) precise; urgency=low
 
   * Bug fix: Some tags when present in the icon text were not being parsed. 
+  * Bug fix: Tags for which their underlying object is unchecked or no longer
+    exists are stripped from the indicator text.  Thanks to Oleg Moiseichuk!
   * Bug fix: Display tags in the Preferences were not being refreshed if the
     user made a change and did not click on the first tab (but instead hit OK).
   * Bug fix: "Orbital Element" should have been named "Comet".  Complete

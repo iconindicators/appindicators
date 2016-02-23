@@ -216,6 +216,51 @@ class IndicatorLunar:
     DATA_Y_OFFSET = "Y OFFSET"
     DATA_Z_OFFSET = "Z OFFSET"
 
+    DATA_TAGS_ALL = [
+        DATA_ALTITUDE,
+        DATA_AZIMUTH,
+        DATA_BRIGHT_LIMB,
+        DATA_CONSTELLATION,
+        DATA_DAWN,
+        DATA_DECLINATION,
+        DATA_DISTANCE_TO_EARTH,
+        DATA_DISTANCE_TO_EARTH_KM,
+        DATA_DISTANCE_TO_SUN,
+        DATA_DUSK,
+        DATA_EARTH_TILT,
+        DATA_EARTH_VISIBLE,
+        DATA_ECLIPSE_DATE_TIME,
+        DATA_ECLIPSE_LATITUDE,
+        DATA_ECLIPSE_LONGITUDE,
+        DATA_ECLIPSE_TYPE,
+        DATA_ELEVATION,
+        DATA_EQUINOX,
+        DATA_FIRST_QUARTER,
+        DATA_FULL,
+        DATA_ILLUMINATION,
+        DATA_LATITUDE,
+        DATA_LONGITUDE,
+        DATA_MAGNITUDE,
+        DATA_MESSAGE,
+        DATA_NAME,
+        DATA_NEW,
+        DATA_PHASE,
+        DATA_RIGHT_ASCENSION,
+        DATA_RISE_AZIMUTH,
+        DATA_RISE_TIME,
+        DATA_SET_AZIMUTH,
+        DATA_SET_TIME,
+        DATA_SOLSTICE,
+        DATA_SUN_TILT,
+        DATA_THIRD_QUARTER,
+        DATA_TROPICAL_SIGN_NAME,
+        DATA_TROPICAL_SIGN_DEGREE,
+        DATA_TROPICAL_SIGN_MINUTE,
+        DATA_VISIBLE,
+        DATA_X_OFFSET,
+        DATA_Y_OFFSET,
+        DATA_Z_OFFSET ]
+    
     DATA_TAGS_MOON = [
         DATA_ALTITUDE,
         DATA_AZIMUTH,
@@ -328,8 +373,8 @@ class IndicatorLunar:
         DATA_ECLIPSE_LATITUDE           : _( "ECLIPSE LATITUDE" ),
         DATA_ECLIPSE_LONGITUDE          : _( "ECLIPSE LONGITUDE" ),
         DATA_ECLIPSE_TYPE               : _( "ECLIPSE TYPE" ),
-        DATA_EQUINOX                    : _( "EQUINOX" ),
         DATA_ELEVATION                  : _( "ELEVATION" ),
+        DATA_EQUINOX                    : _( "EQUINOX" ),
         DATA_FIRST_QUARTER              : _( "FIRST QUARTER" ),
         DATA_FULL                       : _( "FULL" ),
         DATA_ILLUMINATION               : _( "ILLUMINATION" ),
@@ -1156,26 +1201,16 @@ class IndicatorLunar:
 
     def updateIcon( self, ephemNow ):
         parsedOutput = self.indicatorText
+
+        # Substitute tags for values.
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
-
-#TODO Need to remove or translate left over tags...
-#Unfortunately it's not possible to screen for all tags from a list of known tags - only have the tag endings.
-# What to do?
-# displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
-# for key in self.data.keys():
-# self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
-# 
-# indicatorText.set_text( self.translateTags( displayTagsStore, True, self.indicatorText ) ) # Need to translate the tags into the local language.
-        print( parsedOutput )
-        parsedOutput = re.sub( "\[ (^\[+|(.+))\]", "", parsedOutput )
-#         parsedOutput = re.sub( "\[(.+[[^\[\]])\]", "", parsedOutput )
-#         parsedOutput = re.sub( "\[[(.+)(^\[)(^\])]\]", "", parsedOutput )
-#         parsedOutput = re.sub( "\[[.+^\[^\]]\]", "", parsedOutput )
-#         parsedOutput = re.sub( "\[XYZ ALTITUDE\]", "", parsedOutput )
-
+        # It is possible that some tags do not have values - the underlying object has been unchecked or the object (satellite/comet) no longer exists.
+        # Regardless, remove these tags.
+        for tag in IndicatorLunar.DATA_TAGS_ALL:
+            parsedOutput = re.sub( "\[[^\[\]]*" + tag + "\]", "", parsedOutput )
 
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
