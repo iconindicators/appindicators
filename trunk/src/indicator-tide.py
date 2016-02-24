@@ -32,7 +32,7 @@ import datetime, gzip, json, locale, locations, logging, os, pythonutils, re, sh
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.1"
+    VERSION = "1.0.2"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -449,7 +449,15 @@ class IndicatorTide:
                             waterLevelsInMetres.append( item[ 0 : 3 ] )
 
                     for index, item in enumerate( waterLevelTypes ):
-                        tideDate = datetime.datetime.strptime( date, "%a %d %b" )
+                        # Bit of a hack needed to handle Feb 29.
+                        # Only need the day/month for comparing dates (and the year defaults to 1900).
+                        # However for Feb 29, 1900 is not a leap year and so an exception is thrown.
+                        # Cannot simply add the current year in all the time because of the year change at Dec to Jan rollover. 
+                        if date.find( "Feb" ) == -1:
+                            tideDate = datetime.datetime.strptime( date, "%a %d %b" )
+                        else:
+                            tideDate = datetime.datetime.strptime( date + " " + str( datetime.date.today().year ), "%a %d %b %Y" )
+
                         hourMinute = datetime.datetime.strptime( times[ index ], "%H:%M" )
 
                         # Only add data from today onward, taking care when the month/year changes... 

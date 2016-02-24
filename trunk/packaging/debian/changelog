@@ -1,3 +1,10 @@
+indicator-tide (1.0.2-1) precise; urgency=low
+
+  * Bug fix: Incorrectly handled Feb 29.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 25 Feb 2016 10:13:40 +1000
+
+
 indicator-tide (1.0.1-1) precise; urgency=low
 
   * Bug fix: Only the first update would occur, subsequent updates did not
