@@ -1795,7 +1795,7 @@ class IndicatorLunar:
         self.cometOEData, cacheDateTime = self.readFromCache( IndicatorLunar.COMET_OE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
         if self.cometOEData is None:
             # Cache returned no result so download from the source.
-            self.cometOEData = self.getCometData( self.cometDataURL )
+            self.cometOEData = self.getCometOEData( self.cometDataURL )
             if self.cometOEData is None:
                 self.cometOEData = { }
                 summary = _( "Error Retrieving Comet Data" )
@@ -2811,7 +2811,21 @@ class IndicatorLunar:
             "If using the default URL, the\n" + \
             "download may be blocked to avoid\n" + \
             "burdening the data source." ) )
-        fetch.connect( "clicked", self.onFetchCometURL, cometURLEntry, cometGrid, cometStore, displayTagsStore )
+#         fetch.connect( "clicked", self.onFetchCometURL, cometURLEntry, cometGrid, cometStore ) #TODO Hopefull will go
+        fetch.connect( "clicked",
+                       self.onFetchCometOrSatelliteURL,
+                       cometURLEntry,
+                       cometGrid,
+                       cometStore,
+                       AstronomicalObjectType.Comet,
+                       IndicatorLunar.COMET_OE_URL,
+                       IndicatorLunar.COMET_OE_CACHE_BASENAME,
+                       IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS,
+                       self.lastUpdateOE,
+                       IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS,
+                       _( "Comet data fetch aborted" ),
+                       _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
+                       self.getCometOEData )
         box.pack_start( fetch, False, False, 0 )
 
         cometGrid.attach( box, 0, 1, 1, 1 )
@@ -2903,7 +2917,22 @@ class IndicatorLunar:
             "download may be\n" + \
             "blocked to avoid burdening the\n" + \
             "data source." ) )
-        fetch.connect( "clicked", self.onFetchSatelliteTLEURL, TLEURLEntry, satelliteGrid, satelliteStore, displayTagsStore )
+#         fetch.connect( "clicked", self.onFetchSatelliteTLEURL, TLEURLEntry, satelliteGrid, satelliteStore ) #TODO Hopefull will go.
+        fetch.connect( "clicked",
+                       self.onFetchCometOrSatelliteURL,
+                       TLEURLEntry,
+                       satelliteGrid,
+                       satelliteStore,
+                       AstronomicalObjectType.Satellite,
+                       IndicatorLunar.SATELLITE_TLE_URL,
+                       IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME,
+                       IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS,
+                       self.lastUpdateTLE,
+                       IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS,
+                       _( "Satellite TLE data fetch aborted" ),
+                       _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
+                       self.getSatelliteTLEData )
+
         box.pack_start( fetch, False, False, 0 )
 
         satelliteGrid.attach( box, 0, 1, 1, 1 )
@@ -3141,7 +3170,7 @@ class IndicatorLunar:
         self.dialog.set_icon_name( IndicatorLunar.ICON )
         self.dialog.show_all()
 
-        # Some GUI elements will be hidden, which must be done after the dialog is shown.
+        # Some GUI ojbects will be hidden, which must be done after the dialog is shown.
         self.updateCometOrSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), False )
         self.updateCometOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), True )
 
@@ -3406,7 +3435,20 @@ class IndicatorLunar:
 
 #TODO Test this function - ensure that functions are called from within this function!
 # Before testing this function (and making code changes), do a commit!
-    def onFetchCometOrSatelliteURL( self, button, entry, grid, store, displayTagsStore, astronomicalObjectType, url, urlNew, dataNew, cacheBasename, cacheMaximumAgeHours, lastUpdate, downloadPeriodHours, summary, message, getDataFunction ):
+    def onFetchCometOrSatelliteURL( self,
+                                    button,
+                                    entry,
+                                    grid, 
+                                    store, 
+                                    astronomicalObjectType, 
+                                    url, 
+                                    cacheBasename, 
+                                    cacheMaximumAgeHours, 
+                                    lastUpdate, 
+                                    downloadPeriodHours, 
+                                    summary, 
+                                    message, 
+                                    getDataFunction ):
         # Flush all comet/satellite keys.
         for key in list( self.data ): # Gets the keys and allows iteration with removal.
             if key[ 0 ] == astronomicalObjectType:
@@ -3424,10 +3466,7 @@ class IndicatorLunar:
                 # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
                 if datetime.datetime.utcnow() < ( lastUpdate + datetime.timedelta( hours = downloadPeriodHours ) ):
                     nextDownload = str( lastUpdate + datetime.timedelta( hours = downloadPeriodHours ) )
-                    Notify.Notification.new(
-                        summary,
-                        message.format( nextDownload[ 0 : nextDownload.index( "." ) ] ),
-                        IndicatorLunar.ICON ).show()
+                    Notify.Notification.new( summary, message.format( nextDownload[ 0 : nextDownload.index( "." ) ] ), IndicatorLunar.ICON ).show()
                 else:
                     dataNew = getDataFunction( urlNew ) # The comet/satellite data can be None, empty or non-empty.
         else:
@@ -3435,8 +3474,17 @@ class IndicatorLunar:
 
         self.updateCometOrSatellitePreferencesTab( grid, store, dataNew, [ ], urlNew, astronomicalObjectType == AstronomicalObjectType.Satellite )
 
+        # Assign back to original objects...
+        if astronomicalObjectType == AstronomicalObjectType.Comet:
+            self.cometOEURLNew = urlNew
+            self.cometOEDataNew = dataNew
+        else: # Assume it's a satellite.
+            self.satelliteTLEURLNew = urlNew
+            self.satelliteTLEDataNew = dataNew
 
-    def onFetchCometURL( self, button, entry, grid, cometStore, displayTagsStore ):
+
+#TODO Eventually/hopefully soon to be redundant!
+    def onFetchCometURL( self, button, entry, grid, cometStore ):
         # Flush all comet keys.
         for key in list( self.data ): # Gets the keys and allows iteration with removal.
             if key[ 0 ] == AstronomicalObjectType.Comet:
@@ -3458,14 +3506,15 @@ class IndicatorLunar:
                     message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
                     Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
                 else:
-                    self.cometOEDataNew = self.getCometData( self.cometOEURLNew ) # The comet data can be None, empty or non-empty.
+                    self.cometOEDataNew = self.getCometOEData( self.cometOEURLNew ) # The comet data can be None, empty or non-empty.
         else:
-            self.cometOEDataNew = self.getCometData( self.cometOEURLNew ) # The comet data can be None, empty or non-empty.
+            self.cometOEDataNew = self.getCometOEData( self.cometOEURLNew ) # The comet data can be None, empty or non-empty.
 
         self.updateCometOrSatellitePreferencesTab( grid, cometStore, self.cometOEDataNew, [ ], self.cometOEURLNew, False )
 
 
-    def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore, displayTagsStore ):
+#TODO Eventually/hopefully soon to be redundant!
+    def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore ):
         # Flush all satellite keys.
         for key in list( self.data ): # Gets the keys and allows iteration with removal.
             if key[ 0 ] == AstronomicalObjectType.Satellite:
@@ -3634,7 +3683,7 @@ class IndicatorLunar:
     # Returns a dict/hashtable of the comets (comets) data from the specified URL (may be empty).
     # Key: comet name, upper cased ; Value: entire comet string.
     # On error, returns None.
-    def getCometData( self, url ):
+    def getCometOEData( self, url ):
         try:
             # Comets are read from a URL which assumes the XEphem format.
             # For example
