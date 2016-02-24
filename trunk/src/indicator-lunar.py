@@ -2684,7 +2684,7 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore, AstronomicalObjectType.Planet )
+        renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore, None, displayTagsStore, AstronomicalObjectType.Planet )
@@ -2721,7 +2721,7 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometOrSateliteOrStarToggled, starStore, starStoreSort, AstronomicalObjectType.Star )
+        renderer_toggle.connect( "toggled", self.onStarOrCometOrSatelliteToggled, starStore, starStoreSort, AstronomicalObjectType.Star )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, starStoreSort, displayTagsStore, AstronomicalObjectType.Star )
@@ -2761,7 +2761,7 @@ class IndicatorLunar:
             "all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometOrSateliteOrStarToggled, cometStore, cometStoreSort, AstronomicalObjectType.Comet )
+        renderer_toggle.connect( "toggled", self.onStarOrCometOrSatelliteToggled, cometStore, cometStoreSort, AstronomicalObjectType.Comet )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore, cometStoreSort, displayTagsStore, AstronomicalObjectType.Comet )
@@ -2856,7 +2856,7 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometOrSateliteOrStarToggled, satelliteStore, satelliteStoreSort, AstronomicalObjectType.Satellite )
+        renderer_toggle.connect( "toggled", self.onStarOrCometOrSatelliteToggled, satelliteStore, satelliteStoreSort, AstronomicalObjectType.Satellite )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, AstronomicalObjectType.Satellite )
@@ -3170,11 +3170,11 @@ class IndicatorLunar:
         self.dialog.set_icon_name( IndicatorLunar.ICON )
         self.dialog.show_all()
 
-        # Some GUI ojbects will be hidden, which must be done after the dialog is shown.
+        # The visibility of some GUI objects must be determined AFTER the dialog is shown.
         self.updateCometOrSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), False )
         self.updateCometOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), True )
 
-        # Last thing to do after everything else is built, but before setting visible.        
+        # Last thing to do after everything else is built.
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
 
         while True:
@@ -3294,6 +3294,7 @@ class IndicatorLunar:
         self.dialog = None
 
 
+#TODO Verify
     def appendToDisplayTagsStore( self, key, value, displayTagsStore ):
         astronomicalObjectType = key[ 0 ]
         bodyTag = key[ 1 ]
@@ -3315,6 +3316,7 @@ class IndicatorLunar:
         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
 
+#TODO Verify
     def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
         if pageNumber == 0: # User has clicked the first tab.
             displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
@@ -3358,6 +3360,7 @@ class IndicatorLunar:
                     self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.DISPLAY_NEEDS_REFRESH, displayTagsStore )
 
 
+#TODO Verify
     def translateTags( self, tagsStore, originalToLocal, text ):
         # The tags store contains at least 2 columns (if more, those columns are ignored).
         # First column contains the original/untranslated tags.
@@ -3386,6 +3389,7 @@ class IndicatorLunar:
         return translatedText
 
 
+#TODO Verify
     def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
         model, treeiter = tree.get_selection().get_selected()
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ 1 ] + "]", indicatorTextEntry.get_position() ) # Column 1 of the model is the translated tag which is always shown to the user.
@@ -3397,6 +3401,7 @@ class IndicatorLunar:
         textEntry.set_text( translatedTags )
 
 
+#TODO Verify
     def updateCometOrSatellitePreferencesTab( self, grid, dataStore, data, objects, url, isSatellite ):
         dataStore.clear()
         if data is None:
@@ -3433,8 +3438,7 @@ class IndicatorLunar:
                     child.hide()
 
 
-#TODO Test this function - ensure that functions are called from within this function!
-# Before testing this function (and making code changes), do a commit!
+#TODO Verify
     def onFetchCometOrSatelliteURL( self,
                                     button,
                                     entry,
@@ -3449,6 +3453,8 @@ class IndicatorLunar:
                                     summary, 
                                     message, 
                                     getDataFunction ):
+# TODO If the user has added/removed comets/satellites, then does a fetch, at what point, if at all, should those comets/satellites be flushed?
+        
         # Flush all comet/satellite keys.
         for key in list( self.data ): # Gets the keys and allows iteration with removal.
             if key[ 0 ] == astronomicalObjectType:
@@ -3543,19 +3549,22 @@ class IndicatorLunar:
         self.updateCometOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, True )
 
 
+#TODO Verify
     def onMoonSunToggled( self, widget, moonSunTag, astronomicalObjectType ): self.checkboxToggled( moonSunTag, astronomicalObjectType, widget.get_active() )
 
 
-    def onPlanetToggled( self, widget, row, dataStore, astronomicalObjectType ):
+#TODO Verify
+    def onPlanetToggled( self, widget, row, dataStore ):
         dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
-        self.checkboxToggled( dataStore[ row ][ 1 ].upper(), astronomicalObjectType, dataStore[ row ][ 0 ] )
+        self.checkboxToggled( dataStore[ row ][ 1 ].upper(), AstronomicalObjectType.Planet, dataStore[ row ][ 0 ] )
         planetName = dataStore[ row ][ 1 ]
         if planetName in IndicatorLunar.PLANET_MOONS:
             for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
                 self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, dataStore[ row ][ 0 ] )
 
 
-    def onCometOrSateliteOrStarToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
+#TODO Verify
+    def onStarOrCometOrSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
         if astronomicalObjectType == AstronomicalObjectType.Comet:
@@ -3568,6 +3577,7 @@ class IndicatorLunar:
         self.checkboxToggled( bodyTag, astronomicalObjectType, dataStore[ actualRow ][ 0 ] )
 
 
+#TODO Verify
     def checkboxToggled( self, bodyTag, astronomicalObjectType, checked ):
         preExists = False
         t = ( astronomicalObjectType, bodyTag )
@@ -3588,6 +3598,7 @@ class IndicatorLunar:
                 self.tagsAdded.pop( t, None ) # It is possible tags for the checked item were not previously added because the object (OE or Satellite for example) is not visible - so pass in None to safely pop.
 
 
+#TODO Verify
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
         if astronomicalObjectType == AstronomicalObjectType.Planet:
             toggle = self.togglePlanetsTable
@@ -3612,9 +3623,10 @@ class IndicatorLunar:
             for row in range( len( dataStore ) ):
                 dataStore[ row ][ 0 ] = bool( not toggle )
                 row = str( sortStore.convert_child_path_to_path( Gtk.TreePath.new_from_string( str( row ) ) ) ) # Need to convert the data store row to the sort store row.
-                self.onCometOrSateliteOrStarToggled( widget, row, dataStore, sortStore, astronomicalObjectType )
+                self.onStarOrCometOrSatelliteToggled( widget, row, dataStore, sortStore, astronomicalObjectType )
 
 
+#TODO Verify
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
         summary = summaryEntry.get_text()
         message = pythonutils.getTextViewText( messageTextView )
@@ -3657,6 +3669,7 @@ class IndicatorLunar:
             os.remove( svgFile )
 
 
+#TODO Verify
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
         global _city_data
@@ -3666,6 +3679,7 @@ class IndicatorLunar:
             elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
 
 
+#TODO Verify
     def addNewSatellites( self ):
         if self.satellitesAddNew:
             for key in self.satelliteTLEData:
@@ -3673,6 +3687,7 @@ class IndicatorLunar:
                     self.satellites.append( key )
 
 
+#TODO Verify
     def addNewComets( self ):
         if self.cometsAddNew:
             for key in self.cometOEData:
@@ -3687,8 +3702,10 @@ class IndicatorLunar:
         try:
             # Comets are read from a URL which assumes the XEphem format.
             # For example
+            #
             #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
-            # in which the first field (up to the first ',' is the name.
+            #
+            # from which the first field (up to the first ',') is the name.
             cometsData = { }
             data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ) ):
@@ -3704,6 +3721,7 @@ class IndicatorLunar:
         return cometsData
 
 
+#TODO Why does this exist?
     def getCometDisplayName( self, comet ): return comet[ 0 : comet.index( "," ) ]
 
 
