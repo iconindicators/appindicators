@@ -3,10 +3,8 @@ indicator-lunar (1.0.66-1) precise; urgency=low
   * Bug fix: Tags in which the underlying object is unchecked or no longer
     exists (such as a comet/satellite) are stripped from the indicator text.
     Thanks to Oleg Moiseichuk for the regular expression code and testing!
-  * Bug fix: Display tags in the Preferences were not being refreshed if the
-    user made a change and did not click on the first tab (but instead hit OK).
-  * Bug fix: "Orbital Element" now been correcty renamed to "Comet".  Some of
-    the user preferences may have to be reset!
+  * Bug fix: "Orbital Element" now been renamed to "Comet".  Some user
+    preferences may have to be reset!
   * Changed the default text for the summary/message for satellite
     notification to now include the NORAD ID and International ID.
   * Changed the satellite menu text to include the International ID.
