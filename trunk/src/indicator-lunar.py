@@ -3355,7 +3355,6 @@ class IndicatorLunar:
         textEntry.set_text( translatedTags )
 
 
-#TODO Verify
     def onPlanetToggled( self, widget, row, dataStore ):
         dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
         self.checkboxToggled( dataStore[ row ][ 1 ].upper(), AstronomicalObjectType.Planet, dataStore[ row ][ 0 ] )
@@ -3365,7 +3364,6 @@ class IndicatorLunar:
                 self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, dataStore[ row ][ 0 ] )
 
 
-#TODO Verify
     def onStarOrCometOrSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
@@ -3544,14 +3542,13 @@ class IndicatorLunar:
                 self.tagsAdded.pop( t, None ) # It is possible tags for the checked item were not previously added because the object (comet/satellite) is not visible - so pass in None to safely pop.
 
 
-#TODO Verify
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
         if astronomicalObjectType == AstronomicalObjectType.Planet:
             toggle = self.togglePlanetsTable
             self.togglePlanetsTable = not self.togglePlanetsTable
             for row in range( len( dataStore ) ):
                 dataStore[ row ][ 0 ] = bool( not toggle )
-                self.onPlanetToggled( widget, row, dataStore, astronomicalObjectType )
+                self.onPlanetToggled( widget, row, dataStore )
 
         elif astronomicalObjectType == AstronomicalObjectType.Comet or \
              astronomicalObjectType == AstronomicalObjectType.Satellite or \
@@ -3572,7 +3569,6 @@ class IndicatorLunar:
                 self.onStarOrCometOrSatelliteToggled( widget, row, dataStore, sortStore, astronomicalObjectType )
 
 
-#TODO Verify
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
         summary = summaryEntry.get_text()
         message = pythonutils.getTextViewText( messageTextView )
@@ -3625,7 +3621,6 @@ class IndicatorLunar:
             elevation.set_text( str( _city_data.get( city )[ 2 ] ) )
 
 
-#TODO Verify
     def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
         if pageNumber == 0: # User has clicked the first tab.
             displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
@@ -3681,6 +3676,9 @@ class IndicatorLunar:
                     self.comets.append( key )
 
 
+    def getCometDisplayName( self, comet ): return comet[ 0 : comet.index( "," ) ]
+
+
     # Returns a dict/hashtable of the comets (comets) data from the specified URL (may be empty).
     # Key: comet name, upper cased ; Value: entire comet string.
     # On error, returns None.
@@ -3705,9 +3703,6 @@ class IndicatorLunar:
             logging.error( "Error retrieving comet OE data from " + str( url ) )
 
         return cometOEData
-
-
-    def getCometDisplayName( self, comet ): return comet[ 0 : comet.index( "," ) ]
 
 
     # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
