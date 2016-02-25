@@ -112,7 +112,7 @@ class IndicatorLunar:
     ABOUT_CREDIT_BRIGHT_LIMB = _( "Bright Limb from 'Astronomical Algorithms' by Jean Meeus." )
     ABOUT_CREDIT_ECLIPSE = _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" )
     ABOUT_CREDIT_PYEPHEM = _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
-    ABOUT_CREDIT_COMET = _( "Comet data by Minor Planet Center. http://www.minorplanetcenter.net" )
+    ABOUT_CREDIT_COMET = _( "Comet OE data by Minor Planet Center. http://www.minorplanetcenter.net" )
     ABOUT_CREDIT_SATELLITE = _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" )
     ABOUT_CREDIT_TROPICAL_SIGN = _( "Tropical Sign by Ignius Drake." )
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
@@ -129,7 +129,7 @@ class IndicatorLunar:
     SETTINGS_CITY_LATITUDE = "cityLatitude"
     SETTINGS_CITY_LONGITUDE = "cityLongitude"
     SETTINGS_CITY_NAME = "cityName"
-    SETTINGS_COMETS_URL = "cometsURL"
+    SETTINGS_COMET_OE_URL = "cometOEURL"
     SETTINGS_COMETS = "comets"
     SETTINGS_COMETS_ADD_NEW = "cometsAddNew"
     SETTINGS_COMETS_MAGNITUDE = "cometsMagnitude"
@@ -157,14 +157,6 @@ class IndicatorLunar:
     SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
     SETTINGS_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     SETTINGS_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
-
-    PREFERENCES_TAB_ICON = 0
-    PREFERENCES_TAB_MENU = 1
-    PREFERENCES_TAB_PLANETS_STARS = 2
-    PREFERENCES_TAB_COMETS = 3
-    PREFERENCES_TAB_SATELLITES = 4
-    PREFERENCES_TAB_NOTIFICATIONS = 5
-    PREFERENCES_TAB_GENERAL = 6
 
     TRUE_TEXT = "True"
     FALSE_TEXT = "False"
@@ -979,8 +971,8 @@ class IndicatorLunar:
         Notify.init( INDICATOR_NAME )
 
         # Initialise last update date/times to the past...
-        self.lastUpdateOE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
-        self.lastUpdateTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+        self.lastUpdateCometOE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+        self.lastUpdateSatelliteTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
@@ -1000,7 +992,7 @@ class IndicatorLunar:
     def updateBackend( self ):
         if self.lock.acquire( False ):
             self.toggleIconState()
-            self.updateCometData()
+            self.updateCometOEData()
             self.updateSatelliteTLEData() 
 
             self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
@@ -1195,7 +1187,7 @@ class IndicatorLunar:
     def getBooleanTranslatedText( self, booleanText ):
         if booleanText == IndicatorLunar.TRUE_TEXT:
             return IndicatorLunar.TRUE_TEXT_TRANSLATION
-            
+
         return IndicatorLunar.FALSE_TEXT_TRANSLATION
 
 
@@ -1781,8 +1773,8 @@ class IndicatorLunar:
             webbrowser.open( url )
 
 
-    def updateCometData( self ):
-        if datetime.datetime.utcnow() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) ):
+    def updateCometOEData( self ):
+        if datetime.datetime.utcnow() < ( self.lastUpdateCometOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) ):
             return
 
         # The download period and cache age are the same, which means
@@ -1795,30 +1787,30 @@ class IndicatorLunar:
         self.cometOEData, cacheDateTime = self.readFromCache( IndicatorLunar.COMET_OE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
         if self.cometOEData is None:
             # Cache returned no result so download from the source.
-            self.cometOEData = self.getCometOEData( self.cometDataURL )
+            self.cometOEData = self.getCometOEData( self.cometOEURL )
             if self.cometOEData is None:
                 self.cometOEData = { }
-                summary = _( "Error Retrieving Comet Data" )
-                message = _( "The comet data source could not be reached." )
+                summary = _( "Error Retrieving Comet OE Data" )
+                message = _( "The comet OE data source could not be reached." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             elif len( self.cometOEData ) == 0:
-                summary = _( "Empty Comet Data" )
-                message = _( "The comet data retrieved was empty." )
+                summary = _( "Empty Comet OE Data" )
+                message = _( "The comet OE data retrieved was empty." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             else:
                 self.writeToCache( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME )
 
             # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
-            self.lastUpdateOE = datetime.datetime.utcnow()
+            self.lastUpdateCometOE = datetime.datetime.utcnow()
         else:
             # Set the next update to occur when the cache is due to expire.
-            self.lastUpdateOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
+            self.lastUpdateCometOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
 
         self.addNewComets()
 
 
     def updateSatelliteTLEData( self ):
-        if datetime.datetime.utcnow() < ( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
+        if datetime.datetime.utcnow() < ( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
             return
 
         # The download period and cache age are the same, which means
@@ -1845,10 +1837,10 @@ class IndicatorLunar:
                 self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
 
             # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
-            self.lastUpdateTLE = datetime.datetime.utcnow()
+            self.lastUpdateSatelliteTLE = datetime.datetime.utcnow()
         else:
             # Set the next update to occur when the cache is due to expire.
-            self.lastUpdateTLE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
+            self.lastUpdateSatelliteTLE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
 
         self.addNewSatellites()
 
@@ -2419,6 +2411,14 @@ class IndicatorLunar:
     def onPreferencesInternal( self, widget ):
         GLib.source_remove( self.eventSourceID ) # Ensure no update occurs whilst the preferences are open.
 
+        TAB_ICON = 0
+        TAB_MENU = 1
+        TAB_PLANETS_STARS = 2
+        TAB_COMETS = 3
+        TAB_SATELLITES = 4
+        TAB_NOTIFICATIONS = 5
+        TAB_GENERAL = 6
+
         notebook = Gtk.Notebook()
 
         # Icon.
@@ -2444,34 +2444,36 @@ class IndicatorLunar:
 
         self.tagsAdded = { } # A list would use less memory, but a dict (after running timing tests) is significantly faster!
         self.tagsRemoved = { } # See above!
+
+        COLUMN_TAG = 0
+        COLUMN_TRANSLATED_TAG = 1
+        COLUMN_VALUE = 2
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         for key in self.data.keys():
             self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
 
-#TODO Verify that self.indicatorText is always in English. 
         indicatorText.set_text( self.translateTags( displayTagsStore, True, self.indicatorText ) ) # Need to translate the tags into the local language.
-#TODO Verify that the text set is now in the local language.  Sat/OE names will not be translated. 
 
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
-        displayTagsStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
+        displayTagsStoreSort.set_sort_column_id( COLUMN_TRANSLATED_TAG, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView( displayTagsStoreSort )
         tree.set_hexpand( True )
         tree.set_vexpand( True )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Tag" ), Gtk.CellRendererText(), text = 1 ) 
-        treeViewColumn.set_sort_column_id( 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Tag" ), Gtk.CellRendererText(), text = COLUMN_TRANSLATED_TAG )
+        treeViewColumn.set_sort_column_id( COLUMN_TRANSLATED_TAG )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Value" ), Gtk.CellRendererText(), text = 2 ) 
-        treeViewColumn.set_sort_column_id( 2 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Value" ), Gtk.CellRendererText(), text = COLUMN_VALUE )
+        treeViewColumn.set_sort_column_id( COLUMN_VALUE )
         tree.append_column( treeViewColumn )
 
         tree.set_tooltip_text( _(
             "Double click to add a tag\n" + \
             "to the indicator text." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.connect( "row-activated", self.onTagDoubleClick, indicatorText )
+        tree.connect( "row-activated", self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -2782,7 +2784,7 @@ class IndicatorLunar:
         box.set_margin_left( 10 )
         box.set_margin_right( 10 )
 
-        label = Gtk.Label( _( "Comet data" ) )
+        label = Gtk.Label( _( "Comet OE data" ) )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -2790,11 +2792,11 @@ class IndicatorLunar:
         self.cometOEURLNew = None
 
         cometURLEntry = Gtk.Entry()
-        cometURLEntry.set_text( self.cometDataURL )
+        cometURLEntry.set_text( self.cometOEURL )
         cometURLEntry.set_hexpand( True )
         cometURLEntry.set_tooltip_text( _(
             "The URL from which to source\n" + \
-            "comet data. For a local\n" + \
+            "comet OE data. For a local\n" + \
             "file, use 'file:///' and the\n" + \
             "filename.\n\n" + \
             "If you change the URL, you must\n" + \
@@ -2805,7 +2807,7 @@ class IndicatorLunar:
 
         fetch = Gtk.Button( _( "Fetch" ) )
         fetch.set_tooltip_text( _(
-            "Retrieve the comet data from\n" + \
+            "Retrieve the comet OE data from\n" + \
             "the URL. If the URL is empty,\n" + \
             "the default URL will be used.\n\n" + \
             "If using the default URL, the\n" + \
@@ -2821,7 +2823,7 @@ class IndicatorLunar:
                        IndicatorLunar.COMET_OE_URL,
                        IndicatorLunar.COMET_OE_CACHE_BASENAME,
                        IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS,
-                       self.lastUpdateOE,
+                       self.lastUpdateCometOE,
                        IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS,
                        _( "Comet data fetch aborted" ),
                        _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
@@ -2927,7 +2929,7 @@ class IndicatorLunar:
                        IndicatorLunar.SATELLITE_TLE_URL,
                        IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME,
                        IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS,
-                       self.lastUpdateTLE,
+                       self.lastUpdateSatelliteTLE,
                        IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS,
                        _( "Satellite TLE data fetch aborted" ),
                        _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
@@ -3171,8 +3173,8 @@ class IndicatorLunar:
         self.dialog.show_all()
 
         # The visibility of some GUI objects must be determined AFTER the dialog is shown.
-        self.updateCometOrSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), False )
-        self.updateCometOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), True )
+        self.updateCometOrSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), AstronomicalObjectType.Comet )
+        self.updateCometOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), AstronomicalObjectType.Satellite )
 
         # Last thing to do after everything else is built.
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
@@ -3187,28 +3189,28 @@ class IndicatorLunar:
             cityValue = city.get_active_text()
             if cityValue == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ), INDICATOR_NAME )
-                notebook.set_current_page( IndicatorLunar.PREFERENCES_TAB_GENERAL )
+                notebook.set_current_page( TAB_GENERAL )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
             if latitudeValue == "" or not pythonutils.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Latitude must be a number between 90 and -90 inclusive." ), INDICATOR_NAME )
-                notebook.set_current_page( IndicatorLunar.PREFERENCES_TAB_GENERAL )
+                notebook.set_current_page( TAB_GENERAL )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
             if longitudeValue == "" or not pythonutils.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Longitude must be a number between 180 and -180 inclusive." ), INDICATOR_NAME )
-                notebook.set_current_page( IndicatorLunar.PREFERENCES_TAB_GENERAL )
+                notebook.set_current_page( TAB_GENERAL )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
             if elevationValue == "" or not pythonutils.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number between 0 and 10000 inclusive." ), INDICATOR_NAME )
-                notebook.set_current_page( IndicatorLunar.PREFERENCES_TAB_GENERAL )
+                notebook.set_current_page( TAB_GENERAL )
                 elevation.grab_focus()
                 continue
 
@@ -3218,14 +3220,14 @@ class IndicatorLunar:
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showCometsAsSubMenu = showCometsAsSubmenuCheckbox.get_active()
-            self.cometsAddNew = cometsAddNewCheckbox.get_active()
-            self.cometsMagnitude = spinnerCometMagnitude.get_value_as_int()
+            self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
             self.hideBodyIfNeverUp = hideBodyIfNeverUpCheckbox.get_active()
             self.groupStarsByConstellation = groupStarsByConstellationCheckbox.get_active()
-            self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
-            self.satellitesAddNew = satellitesAddNewCheckbox.get_active()
+            self.cometsMagnitude = spinnerCometMagnitude.get_value_as_int()
+            self.cometsAddNew = cometsAddNewCheckbox.get_active()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.hideSatelliteIfNoVisiblePass = hideSatelliteIfNoVisiblePassCheckbox.get_active()
+            self.satellitesAddNew = satellitesAddNewCheckbox.get_active()
             self.satelliteOnClickURL = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteURLText.get_text().strip() )
 
             self.planets = [ ]
@@ -3239,14 +3241,14 @@ class IndicatorLunar:
                     self.stars.append( row[ 1 ] )
 
             if self.cometOEURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
-                self.cometDataURL = self.cometOEURLNew # The URL may or may not be valid, but it will not be None.
+                self.cometOEURL = self.cometOEURLNew # The URL may or may not be valid, but it will not be None.
                 if self.cometOEDataNew is None:
                     self.cometOEData = { } # The retrieved data was bad, so reset to empty data.
                 else:
                     self.cometOEData = self.cometOEDataNew # The retrieved data is good (but still could be empty).
 
                 self.writeToCache( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME )
-                self.lastUpdateOE = datetime.datetime.utcnow()
+                self.lastUpdateCometOE = datetime.datetime.utcnow()
 
             self.comets = [ ]
             for comet in cometStore:
@@ -3263,7 +3265,7 @@ class IndicatorLunar:
                     self.satelliteTLEData = self.satelliteTLEDataNew # The retrieved data is good (but still could be empty).
 
                 self.writeToCache( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME )
-                self.lastUpdateTLE = datetime.datetime.utcnow()
+                self.lastUpdateSatelliteTLE = datetime.datetime.utcnow()
 
             self.satellites = [ ]
             for satelliteTLE in satelliteStore:
@@ -3294,78 +3296,28 @@ class IndicatorLunar:
         self.dialog = None
 
 
-#TODO Verify
     def appendToDisplayTagsStore( self, key, value, displayTagsStore ):
         astronomicalObjectType = key[ 0 ]
         bodyTag = key[ 1 ]
         dataTag = key[ 2 ]
 
-        # Special case: translated boolean values to local true/false (but only if the value is indeed boolean).
-        if ( dataTag == IndicatorLunar.DATA_VISIBLE or dataTag == IndicatorLunar.DATA_EARTH_VISIBLE ) and value != IndicatorLunar.DISPLAY_NEEDS_REFRESH:
-            value = self.getBooleanTranslatedText( value )
-
-        isSatelliteOrComet = \
+        isCometOrSatellite = \
             astronomicalObjectType is not None and \
-            ( astronomicalObjectType == AstronomicalObjectType.Satellite or astronomicalObjectType == AstronomicalObjectType.Comet )
+            ( astronomicalObjectType == AstronomicalObjectType.Comet or astronomicalObjectType == AstronomicalObjectType.Satellite )
 
-        if isSatelliteOrComet:
-            translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Don't translate the names of the satellites/OEs.
+        if isCometOrSatellite:
+            translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Don't translate the names of the comets/satellites.
         else:
             translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag  ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets/starts, etc.
 
         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
 
-#TODO Verify
-    def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
-        if pageNumber == 0: # User has clicked the first tab.
-            displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
-            for key in self.data.keys():
-                astronomicalObjectType = key[ 0 ]
-                bodyTag = key[ 1 ]
-                dataTag = key[ 2 ]
-
-                if ( astronomicalObjectType, bodyTag ) in self.tagsRemoved:
-                    continue
-
-                displayData = self.getDisplayData( key )
-                if displayData is not None:
-                    self.appendToDisplayTagsStore( key, displayData, displayTagsStore )
-                else:
-                    self.appendToDisplayTagsStore( key, self.data[ key ], displayTagsStore )
-
-            # Add tags for newly checked items (which don't exist in the current data).
-            for key in self.tagsAdded:
-                astronomicalObjectType = key[ 0 ]
-                bodyTag = key[ 1 ]
-                if astronomicalObjectType == AstronomicalObjectType.Moon:
-                    tags = IndicatorLunar.DATA_TAGS_MOON
-                elif astronomicalObjectType == AstronomicalObjectType.Comet:
-                    tags = IndicatorLunar.DATA_TAGS_COMET
-                elif astronomicalObjectType == AstronomicalObjectType.Planet:
-                    tags = IndicatorLunar.DATA_TAGS_PLANET
-                    if bodyTag == IndicatorLunar.PLANET_SATURN.upper():
-                        tags.append( IndicatorLunar.DATA_EARTH_TILT )
-                        tags.append( IndicatorLunar.DATA_SUN_TILT )
-                elif astronomicalObjectType == AstronomicalObjectType.PlanetaryMoon:
-                    tags = IndicatorLunar.DATA_TAGS_PLANETARY_MOON
-                elif astronomicalObjectType == AstronomicalObjectType.Satellite:
-                    tags = IndicatorLunar.DATA_TAGS_SATELLITE
-                elif astronomicalObjectType == AstronomicalObjectType.Star:
-                    tags = IndicatorLunar.DATA_TAGS_STAR
-                elif astronomicalObjectType == AstronomicalObjectType.Sun:
-                    tags = IndicatorLunar.DATA_TAGS_SUN
-
-                for tag in tags:
-                    self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.DISPLAY_NEEDS_REFRESH, displayTagsStore )
-
-
-#TODO Verify
     def translateTags( self, tagsStore, originalToLocal, text ):
         # The tags store contains at least 2 columns (if more, those columns are ignored).
         # First column contains the original/untranslated tags.
         # Second column contains the translated tags.
-        # Depending on which direction the translation is going,
+        # Depending on the direction the translation,
         # the first column or the second column contains the source tags to match.
         if originalToLocal:
             i = 0
@@ -3375,7 +3327,7 @@ class IndicatorLunar:
             j = 0
 
         translatedText = text
-        tags = re.findall( "\[([^\[^\]]+)\]", translatedText ) # TODO DOuble check this RE - does it handle nesting of brackets/tags?
+        tags = re.findall( "\[([^\[^\]]+)\]", translatedText )
         for tag in tags:
             iter = tagsStore.get_iter_first()
             while iter is not None:
@@ -3389,10 +3341,13 @@ class IndicatorLunar:
         return translatedText
 
 
-#TODO Verify
-    def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, indicatorTextEntry ):
+    def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, translatedTagColumnIndex, indicatorTextEntry ):
         model, treeiter = tree.get_selection().get_selected()
-        indicatorTextEntry.insert_text( "[" + model[ treeiter ][ 1 ] + "]", indicatorTextEntry.get_position() ) # Column 1 of the model is the translated tag which is always shown to the user.
+        indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
+
+
+#TODO Verify
+    def onMoonSunToggled( self, widget, moonSunTag, astronomicalObjectType ): self.checkboxToggled( moonSunTag, astronomicalObjectType, widget.get_active() )
 
 
 #TODO May not be needed.
@@ -3402,7 +3357,30 @@ class IndicatorLunar:
 
 
 #TODO Verify
-    def updateCometOrSatellitePreferencesTab( self, grid, dataStore, data, objects, url, isSatellite ):
+    def onPlanetToggled( self, widget, row, dataStore ):
+        dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
+        self.checkboxToggled( dataStore[ row ][ 1 ].upper(), AstronomicalObjectType.Planet, dataStore[ row ][ 0 ] )
+        planetName = dataStore[ row ][ 1 ]
+        if planetName in IndicatorLunar.PLANET_MOONS:
+            for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
+                self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, dataStore[ row ][ 0 ] )
+
+
+#TODO Verify
+    def onStarOrCometOrSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
+        actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
+        dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
+        if astronomicalObjectType == AstronomicalObjectType.Comet:
+            bodyTag = dataStore[ actualRow ][ 1 ].upper()
+        if astronomicalObjectType == AstronomicalObjectType.Satellite:
+            bodyTag = dataStore[ actualRow ][ 1 ] + " " + dataStore[ actualRow ][ 2 ]
+        else: # Assume star.
+            bodyTag = dataStore[ actualRow ][ 1 ].upper()
+
+        self.checkboxToggled( bodyTag, astronomicalObjectType, dataStore[ actualRow ][ 0 ] )
+
+
+    def updateCometOrSatellitePreferencesTab( self, grid, dataStore, data, objects, url, astronomicalObjectType ):
         dataStore.clear()
         if data is None:
             message = IndicatorLunar.MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE.format( url )
@@ -3410,21 +3388,19 @@ class IndicatorLunar:
             message = IndicatorLunar.MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE.format( url )
         else:
             message = None
-            if isSatellite:
+            if astronomicalObjectType == AstronomicalObjectType.Satellite:
                 for key in data:
                     tle = data[ key ]
                     checked = ( tle.getName().upper(), tle.getNumber() ) in objects
                     dataStore.append( [ checked, tle.getName(), tle.getNumber(), tle.getInternationalDesignator() ] )
             else:
                 for key in data:
-                    comet = data[ key ]
-                    displayName = self.getCometDisplayName( comet )
-                    dataStore.append( [ key in objects, displayName ] )
+                    oe = data[ key ]
+                    dataStore.append( [ key in objects, self.getCometDisplayName( oe ) ] )
 
         # Hide/show the label and scrolled window as appropriate.
         # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
-        children = grid.get_children()
-        for child in children:
+        for child in grid.get_children():
             if child.__class__.__name__ == "Label":
                 if message is None:
                     child.hide()
@@ -3453,7 +3429,7 @@ class IndicatorLunar:
                                     summary, 
                                     message, 
                                     getDataFunction ):
-# TODO If the user has added/removed comets/satellites, then does a fetch, at what point, if at all, should those comets/satellites be flushed?
+# TODO If the user has added/removed comets/satellites and then does a fetch, at what point, if at all, should the list of checked/unchecked comets/satellites be flushed?
         
         # Flush all comet/satellite keys.
         for key in list( self.data ): # Gets the keys and allows iteration with removal.
@@ -3478,7 +3454,7 @@ class IndicatorLunar:
         else:
             dataNew = getDataFunction( urlNew ) # The comet/satellite data can be None, empty or non-empty.
 
-        self.updateCometOrSatellitePreferencesTab( grid, store, dataNew, [ ], urlNew, astronomicalObjectType == AstronomicalObjectType.Satellite )
+        self.updateCometOrSatellitePreferencesTab( grid, store, dataNew, [ ], urlNew, astronomicalObjectType )
 
         # Assign back to original objects...
         if astronomicalObjectType == AstronomicalObjectType.Comet:
@@ -3506,8 +3482,8 @@ class IndicatorLunar:
             self.cometOEDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.COMET_OE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
             if self.cometOEDataNew is None:
                 # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
-                if datetime.datetime.utcnow() < ( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) ):
-                    nextDownload = str( self.lastUpdateOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) )
+                if datetime.datetime.utcnow() < ( self.lastUpdateCometOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) ):
+                    nextDownload = str( self.lastUpdateCometOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) )
                     summary = _( "Comet data fetch aborted" )
                     message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
                     Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
@@ -3516,7 +3492,7 @@ class IndicatorLunar:
         else:
             self.cometOEDataNew = self.getCometOEData( self.cometOEURLNew ) # The comet data can be None, empty or non-empty.
 
-        self.updateCometOrSatellitePreferencesTab( grid, cometStore, self.cometOEDataNew, [ ], self.cometOEURLNew, False )
+        self.updateCometOrSatellitePreferencesTab( grid, cometStore, self.cometOEDataNew, [ ], self.cometOEURLNew, AstronomicalObjectType.Comet )
 
 
 #TODO Eventually/hopefully soon to be redundant!
@@ -3536,8 +3512,8 @@ class IndicatorLunar:
             self.satelliteTLEDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
             if self.satelliteTLEDataNew is None:
                 # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
-                if datetime.datetime.utcnow() < ( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
-                    nextDownload = str( self.lastUpdateTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) )
+                if datetime.datetime.utcnow() < ( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
+                    nextDownload = str( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) )
                     summary = _( "Satellite TLE data fetch aborted" )
                     message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
                     Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
@@ -3546,35 +3522,7 @@ class IndicatorLunar:
         else:
             self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
 
-        self.updateCometOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, True )
-
-
-#TODO Verify
-    def onMoonSunToggled( self, widget, moonSunTag, astronomicalObjectType ): self.checkboxToggled( moonSunTag, astronomicalObjectType, widget.get_active() )
-
-
-#TODO Verify
-    def onPlanetToggled( self, widget, row, dataStore ):
-        dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
-        self.checkboxToggled( dataStore[ row ][ 1 ].upper(), AstronomicalObjectType.Planet, dataStore[ row ][ 0 ] )
-        planetName = dataStore[ row ][ 1 ]
-        if planetName in IndicatorLunar.PLANET_MOONS:
-            for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
-                self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, dataStore[ row ][ 0 ] )
-
-
-#TODO Verify
-    def onStarOrCometOrSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
-        actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
-        dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
-        if astronomicalObjectType == AstronomicalObjectType.Comet:
-            bodyTag = dataStore[ actualRow ][ 1 ].upper()
-        if astronomicalObjectType == AstronomicalObjectType.Satellite:
-            bodyTag = dataStore[ actualRow ][ 1 ] + " " + dataStore[ actualRow ][ 2 ]
-        else: # Assume star.
-            bodyTag = dataStore[ actualRow ][ 1 ].upper()
-
-        self.checkboxToggled( bodyTag, astronomicalObjectType, dataStore[ actualRow ][ 0 ] )
+        self.updateCometOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, AstronomicalObjectType.Satellite )
 
 
 #TODO Verify
@@ -3680,6 +3628,50 @@ class IndicatorLunar:
 
 
 #TODO Verify
+    def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
+        if pageNumber == 0: # User has clicked the first tab.
+            displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
+            for key in self.data.keys():
+                astronomicalObjectType = key[ 0 ]
+                bodyTag = key[ 1 ]
+                dataTag = key[ 2 ]
+
+                if ( astronomicalObjectType, bodyTag ) in self.tagsRemoved:
+                    continue
+
+                displayData = self.getDisplayData( key )
+                if displayData is not None:
+                    self.appendToDisplayTagsStore( key, displayData, displayTagsStore )
+                else:
+                    self.appendToDisplayTagsStore( key, self.data[ key ], displayTagsStore )  #TODO Why does this clause exist?  The display data should NEVER be None, right?
+
+            # Add tags for newly checked items (which don't exist in the current data).
+            for key in self.tagsAdded:
+                astronomicalObjectType = key[ 0 ]
+                bodyTag = key[ 1 ]
+                if astronomicalObjectType == AstronomicalObjectType.Moon:
+                    tags = IndicatorLunar.DATA_TAGS_MOON
+                elif astronomicalObjectType == AstronomicalObjectType.Comet:
+                    tags = IndicatorLunar.DATA_TAGS_COMET
+                elif astronomicalObjectType == AstronomicalObjectType.Planet:
+                    tags = IndicatorLunar.DATA_TAGS_PLANET
+                    if bodyTag == IndicatorLunar.PLANET_SATURN.upper():
+                        tags.append( IndicatorLunar.DATA_EARTH_TILT )
+                        tags.append( IndicatorLunar.DATA_SUN_TILT )
+                elif astronomicalObjectType == AstronomicalObjectType.PlanetaryMoon:
+                    tags = IndicatorLunar.DATA_TAGS_PLANETARY_MOON
+                elif astronomicalObjectType == AstronomicalObjectType.Satellite:
+                    tags = IndicatorLunar.DATA_TAGS_SATELLITE
+                elif astronomicalObjectType == AstronomicalObjectType.Star:
+                    tags = IndicatorLunar.DATA_TAGS_STAR
+                elif astronomicalObjectType == AstronomicalObjectType.Sun:
+                    tags = IndicatorLunar.DATA_TAGS_SUN
+
+                for tag in tags:
+                    self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.DISPLAY_NEEDS_REFRESH, displayTagsStore )
+
+
+#TODO Verify
     def addNewSatellites( self ):
         if self.satellitesAddNew:
             for key in self.satelliteTLEData:
@@ -3772,7 +3764,7 @@ class IndicatorLunar:
         self.comets = [ ]
         self.cometsAddNew = False
         self.cometsMagnitude = 6 # More or less what's visible with the naked eye or binoculars.
-        self.cometDataURL = IndicatorLunar.COMET_OE_URL
+        self.cometOEURL = IndicatorLunar.COMET_OE_URL
 
         self.planets = [ ]
         for planetName in IndicatorLunar.PLANETS:
@@ -3816,7 +3808,7 @@ class IndicatorLunar:
             self.hideBodyIfNeverUp = settings.get( IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
             self.hideSatelliteIfNoVisiblePass = settings.get( IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
             self.indicatorText = settings.get( IndicatorLunar.SETTINGS_INDICATOR_TEXT, self.indicatorText )
-            self.cometDataURL = settings.get( IndicatorLunar.SETTINGS_COMETS_URL, self.cometDataURL )
+            self.cometOEURL = settings.get( IndicatorLunar.SETTINGS_COMET_OE_URL, self.cometOEURL )
             self.comets = settings.get( IndicatorLunar.SETTINGS_COMETS, self.comets )
             self.cometsAddNew = settings.get( IndicatorLunar.SETTINGS_COMETS_ADD_NEW, self.cometsAddNew )
             self.cometsMagnitude = settings.get( IndicatorLunar.SETTINGS_COMETS_MAGNITUDE, self.cometsMagnitude )
@@ -3870,7 +3862,7 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
                 IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
                 IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
-                IndicatorLunar.SETTINGS_COMETS_URL: self.cometDataURL,
+                IndicatorLunar.SETTINGS_COMET_OE_URL: self.cometOEURL,
                 IndicatorLunar.SETTINGS_COMETS: comets,
                 IndicatorLunar.SETTINGS_COMETS_ADD_NEW: self.cometsAddNew,
                 IndicatorLunar.SETTINGS_COMETS_MAGNITUDE: self.cometsMagnitude,
