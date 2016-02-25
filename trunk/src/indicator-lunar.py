@@ -1542,7 +1542,7 @@ class IndicatorLunar:
                 if key in self.cometOEData:
                     displayName = self.getCometDisplayName( self.cometOEData[ key ] )
                 else:
-                    displayName = key # There is an comet but no data for it.
+                    displayName = key # There is a comet but no data for it.
 
                 if self.showCometsAsSubMenu:
                     menuItem = Gtk.MenuItem( displayName )
@@ -2437,7 +2437,7 @@ class IndicatorLunar:
         indicatorText = Gtk.Entry()
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon\n" + \
-            "(or shown as a tooltip, where applicable)." ) )
+            "(or shown as a tooltip, where applicable)." ) )  #TODO Add to tooltip that any tag that has no data will be removed.
         box.pack_start( indicatorText, True, True, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )
@@ -3346,7 +3346,6 @@ class IndicatorLunar:
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
 
 
-#TODO Verify
     def onMoonSunToggled( self, widget, moonSunTag, astronomicalObjectType ): self.checkboxToggled( moonSunTag, astronomicalObjectType, widget.get_active() )
 
 
@@ -3525,7 +3524,6 @@ class IndicatorLunar:
         self.updateCometOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, AstronomicalObjectType.Satellite )
 
 
-#TODO Verify
     def checkboxToggled( self, bodyTag, astronomicalObjectType, checked ):
         preExists = False
         t = ( astronomicalObjectType, bodyTag )
@@ -3543,7 +3541,7 @@ class IndicatorLunar:
             if preExists:
                 self.tagsRemoved[ t ] = None # The value is not actually used.
             else:
-                self.tagsAdded.pop( t, None ) # It is possible tags for the checked item were not previously added because the object (OE or Satellite for example) is not visible - so pass in None to safely pop.
+                self.tagsAdded.pop( t, None ) # It is possible tags for the checked item were not previously added because the object (comet/satellite) is not visible - so pass in None to safely pop.
 
 
 #TODO Verify
@@ -3639,20 +3637,16 @@ class IndicatorLunar:
                 if ( astronomicalObjectType, bodyTag ) in self.tagsRemoved:
                     continue
 
-                displayData = self.getDisplayData( key )
-                if displayData is not None:
-                    self.appendToDisplayTagsStore( key, displayData, displayTagsStore )
-                else:
-                    self.appendToDisplayTagsStore( key, self.data[ key ], displayTagsStore )  #TODO Why does this clause exist?  The display data should NEVER be None, right?
+                self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
 
             # Add tags for newly checked items (which don't exist in the current data).
             for key in self.tagsAdded:
                 astronomicalObjectType = key[ 0 ]
                 bodyTag = key[ 1 ]
-                if astronomicalObjectType == AstronomicalObjectType.Moon:
-                    tags = IndicatorLunar.DATA_TAGS_MOON
-                elif astronomicalObjectType == AstronomicalObjectType.Comet:
+                if astronomicalObjectType == AstronomicalObjectType.Comet:
                     tags = IndicatorLunar.DATA_TAGS_COMET
+                elif astronomicalObjectType == AstronomicalObjectType.Moon:
+                    tags = IndicatorLunar.DATA_TAGS_MOON
                 elif astronomicalObjectType == AstronomicalObjectType.Planet:
                     tags = IndicatorLunar.DATA_TAGS_PLANET
                     if bodyTag == IndicatorLunar.PLANET_SATURN.upper():
@@ -3698,22 +3692,21 @@ class IndicatorLunar:
             #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
             #
             # from which the first field (up to the first ',') is the name.
-            cometsData = { }
+            cometOEData = { }
             data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for i in range( 0, len( data ) ):
                 if not data[ i ].startswith( "#" ):
                     cometName = data[ i ][ 0 : data[ i ].index( "," ) ] 
-                    cometsData[ cometName.upper() ] = data[ i ]
+                    cometOEData[ cometName.upper() ] = data[ i ]
 
         except Exception as e:
-            cometsData = None # Indicates error.
+            cometOEData = None # Indicates error.
             logging.exception( e )
-            logging.error( "Error retrieving comet data from " + str( url ) )
+            logging.error( "Error retrieving comet OE data from " + str( url ) )
 
-        return cometsData
+        return cometOEData
 
 
-#TODO Why does this exist?
     def getCometDisplayName( self, comet ): return comet[ 0 : comet.index( "," ) ]
 
 
