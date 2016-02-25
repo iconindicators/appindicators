@@ -41,6 +41,32 @@
 #Ditto for the comet stuff?
 
 
+# (18:13:41) Bernmeister: As for the untranslated tags...can you do a test now?  I'll do it with you, starting with removing the .json file.
+# (18:13:43) Oleg Moiseichuk: Yesterday's evening was much better.
+# (18:13:55) Oleg Moiseichuk: Okay, one minute.
+# (18:15:09) Oleg Moiseichuk: I'm ready. I deleted my json and started fresh.
+# (18:15:54) Oleg Moiseichuk: Only [MOON PHASE] is shown in its translated form.
+# (18:16:57) Bernmeister: Shown where?  Top/icon panel?
+# (18:17:04) Oleg Moiseichuk: Both.
+# (18:17:13) Bernmeister: Both what/where?
+# (18:17:20) Bernmeister: I ran the indicator and that's it.
+# (18:17:32) Bernmeister: I see Russian text (no tag) in the top/icon panel.
+# (18:18:03) Oleg Moiseichuk: On the Panel I see Waning Gibbous in Russian. Icon text shows [MOON PHASE] in Russian.
+# (18:18:52) Bernmeister: Icon text:  what/where is this?
+# (18:19:09) Oleg Moiseichuk: 1st tab of Prefs.
+# (18:19:22) Bernmeister: OK - I thought you meant only top panel.
+# (18:19:39) Bernmeister: I am now running dialog prefs and see same as you.
+# (18:20:20) Oleg Moiseichuk: That's good. Now I go to the 2nd tab and disable Moon. Staying on that tab I press OK.
+# (18:20:39) Bernmeister: Done.  The text from top panel is now gone.
+# (18:20:47) Bernmeister: (so just moon icon)
+# (18:21:20) Oleg Moiseichuk: Yep. But when I open Prefs now I see English tag [MOON PHASE] in the Icon text.
+# (18:21:52) Bernmeister: Bingo!  Thanks...now that I can reproduce I can look into fixing it.  Somehow I didn't catch this during testing today - sorry.
+# (18:21:53) Oleg Moiseichuk: It reverted to English somehow.
+# (18:22:30) Oleg Moiseichuk: If I go to 2nd once again and re-enable Moon, all reverts back.
+# (18:23:14) Bernmeister: Huh?  If you enable the moon then OK or then click first tab?
+# (18:23:25) Bernmeister: I enable moon then click first tab and still broken.
+# (18:23:53) Oleg Moiseichuk: Go to 2nd tab, enable Moon, press OK, revisit Prefs. All seems normal.
+
 # TODO In RUssion version, remove the .json file.
 # Enable the moon and add a moon tag to the icon text.
 # OK the prefs.
