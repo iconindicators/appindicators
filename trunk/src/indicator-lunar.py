@@ -95,15 +95,6 @@
 # should the tag be stripped away?
 
 
-
-
-# TODO In RUssion version, remove the .json file.
-# Enable the moon and add a moon tag to the icon text.
-# OK the prefs.
-# Open prefs, disable the moon and OK.  Should get the tag in the top panel.
-# Open prefs, enable the moon and OK.  Tag is not converted.
-
-
 # TODO In RUssion version, remove the .json file.
 # The notification for satellites seems to contain English.
 # Test by changing the text (forces a save of the .json file).
@@ -1255,13 +1246,9 @@ class IndicatorLunar:
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
-        # It is possible that some tags do not have values - the underlying object has been unchecked or the object (satellite/comet) no longer exists.
-        # Regardless, remove these tags.
-        for tag in IndicatorLunar.DATA_TAGS_ALL:
-            parsedOutput = re.sub( "\[([^\[^\]])" + tag + "\]", "", parsedOutput ) #TODO This no longer works...[A BOGUS TAG] remains!
-
-# 1 | [EUROPA RIGHT ASCENSION] | 2 | [DEIMOS Z OFFSET] | 3 | [CITY LATITUDE] | 4 | [ARIEL ALTITUDE] | 5 | [MOON PHASE] | 6 | [A BOGUS TAG] | 7
-
+        # If the underlying object has been unchecked or the object (satellite/comet) no longer exists,
+        # a tag for this object will not be substituded; so remove.
+        parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput )
 
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
@@ -2496,7 +2483,10 @@ class IndicatorLunar:
         indicatorText = Gtk.Entry()
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon\n" + \
-            "(or shown as a tooltip, where applicable)." ) )  #TODO Add to tooltip that any tag that has no data will be removed.
+            "(or shown as a tooltip, where applicable).\n\n" + \
+            "If an object is unchecked or no longer exists\n" + \
+            "(such as a comet/satellite not on the list),\n" + \
+            "the tag will be automatically removed." ) )
         box.pack_start( indicatorText, True, True, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )
@@ -2504,7 +2494,6 @@ class IndicatorLunar:
         self.tagsAdded = { } # A list would use less memory, but a dict (after running timing tests) is significantly faster!
         self.tagsRemoved = { } # See above!
 
-        print( "Before:", self.indicatorText ) #TODO Remove
         COLUMN_TAG = 0
         COLUMN_TRANSLATED_TAG = 1
         COLUMN_VALUE = 2
@@ -2522,8 +2511,6 @@ class IndicatorLunar:
             if re.match( "\[[^\[^\]]+\]", tag ) is not None:
                 self.indicatorText = self.indicatorText.replace( tag, "" )
 
-        print( "After:", self.indicatorText ) # TODO Remove
-        
         indicatorText.set_text( self.translateTags( displayTagsStore, True, self.indicatorText ) ) # Need to translate the tags into the local language.
 
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
@@ -3255,9 +3242,6 @@ class IndicatorLunar:
             if self.dialog.run() != Gtk.ResponseType.OK:
                 break
 
-#TODO Does this need to be called?
-#             self.onSwitchPage( notebook, None, 0, displayTagsStore ) # If the user makes a change to an object but does not click on the first tab, the display tags don't get refreshed.
-
             cityValue = city.get_active_text()
             if cityValue == "":
                 pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ), INDICATOR_NAME )
@@ -3683,7 +3667,6 @@ class IndicatorLunar:
             os.remove( svgFile )
 
 
-#TODO Verify
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
         global _city_data
