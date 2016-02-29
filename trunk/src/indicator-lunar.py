@@ -2871,7 +2871,7 @@ class IndicatorLunar:
             "burdening the data source." ) )
 #         fetch.connect( "clicked", self.onFetchCometURL, cometURLEntry, cometGrid, cometStore ) #TODO Hopefull will go
         fetch.connect( "clicked",
-                       self.onFetchCometOrSatelliteURL,
+                       self.onFetchCometOrSatelliteData,
                        cometURLEntry,
                        cometGrid,
                        cometStore,
@@ -2977,7 +2977,7 @@ class IndicatorLunar:
             "data source." ) )
 #         fetch.connect( "clicked", self.onFetchSatelliteTLEURL, TLEURLEntry, satelliteGrid, satelliteStore ) #TODO Hopefull will go.
         fetch.connect( "clicked",
-                       self.onFetchCometOrSatelliteURL,
+                       self.onFetchCometOrSatelliteData,
                        TLEURLEntry,
                        satelliteGrid,
                        satelliteStore,
@@ -3465,7 +3465,7 @@ class IndicatorLunar:
 
 
 #TODO Verify
-    def onFetchCometOrSatelliteURL( self,
+    def onFetchCometOrSatelliteData( self,
                                     button,
                                     entry,
                                     grid, 
@@ -3513,66 +3513,6 @@ class IndicatorLunar:
         else: # Assume it's a satellite.
             self.satelliteTLEURLNew = urlNew
             self.satelliteTLEDataNew = dataNew
-
-
-#TODO Eventually/hopefully soon to be redundant!
-    def onFetchCometURL( self, button, entry, grid, cometStore ):
-        # Flush all comet keys.
-        for key in list( self.data ): # Gets the keys and allows iteration with removal.
-            if key[ 0 ] == AstronomicalObjectType.Comet:
-                self.data.pop( key )
-
-        if entry.get_text().strip() == "":
-            entry.set_text( IndicatorLunar.COMET_OE_URL )
-
-        self.cometOEURLNew = entry.get_text().strip()
-
-        # If the URL is the default, use the cache to avoid annoying the default data source.
-        if self.cometOEURLNew == IndicatorLunar.COMET_OE_URL:
-            self.cometOEDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.COMET_OE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
-            if self.cometOEDataNew is None:
-                # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
-                if datetime.datetime.utcnow() < ( self.lastUpdateCometOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) ):
-                    nextDownload = str( self.lastUpdateCometOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) )
-                    summary = _( "Comet data fetch aborted" )
-                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-                else:
-                    self.cometOEDataNew = self.getCometOEData( self.cometOEURLNew ) # The comet data can be None, empty or non-empty.
-        else:
-            self.cometOEDataNew = self.getCometOEData( self.cometOEURLNew ) # The comet data can be None, empty or non-empty.
-
-        self.updateCometOrSatellitePreferencesTab( grid, cometStore, self.cometOEDataNew, [ ], self.cometOEURLNew, AstronomicalObjectType.Comet )
-
-
-#TODO Eventually/hopefully soon to be redundant!
-    def onFetchSatelliteTLEURL( self, button, entry, grid, satelliteStore ):
-        # Flush all satellite keys.
-        for key in list( self.data ): # Gets the keys and allows iteration with removal.
-            if key[ 0 ] == AstronomicalObjectType.Satellite:
-                self.data.pop( key )
-
-        if entry.get_text().strip() == "":
-            entry.set_text( IndicatorLunar.SATELLITE_TLE_URL )
-
-        self.satelliteTLEURLNew = entry.get_text().strip()
-
-        # If the URL is the default, use the cache to avoid annoying the default data source.
-        if self.satelliteTLEURLNew == IndicatorLunar.SATELLITE_TLE_URL:
-            self.satelliteTLEDataNew, cacheDateTime = self.readFromCache( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, datetime.datetime.now() - datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) ) # Returned data is either None or non-empty.
-            if self.satelliteTLEDataNew is None:
-                # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
-                if datetime.datetime.utcnow() < ( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
-                    nextDownload = str( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) )
-                    summary = _( "Satellite TLE data fetch aborted" )
-                    message = _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ).format( nextDownload[ 0 : nextDownload.index( "." ) ] )
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-                else:
-                    self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
-        else:
-            self.satelliteTLEDataNew = self.getSatelliteTLEData( self.satelliteTLEURLNew ) # The satellite TLE data can be None, empty or non-empty.
-
-        self.updateCometOrSatellitePreferencesTab( grid, satelliteStore, self.satelliteTLEDataNew, [ ], self.satelliteTLEURLNew, AstronomicalObjectType.Satellite )
 
 
     def checkboxToggled( self, bodyTag, astronomicalObjectType, checked ):
