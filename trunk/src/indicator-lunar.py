@@ -34,9 +34,6 @@
 #  http://www.flaticon.com/search/satellite
 
 
-#TODO Add tags for full moon notification?  Which ones?
-
-
 #TODO Remove the satellite on-click URL from the user preferences - so the URL is fixed?
 #Ditto for the comet stuff?
 
