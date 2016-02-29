@@ -1849,7 +1849,8 @@ class IndicatorLunar:
             # Set the next update to occur when the cache is due to expire.
             self.lastUpdateCometOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
 
-        self.addNewComets()
+        if self.cometsAddNew:
+            self.addNewComets()
 
 
     def updateSatelliteTLEData( self ):
@@ -1885,7 +1886,8 @@ class IndicatorLunar:
             # Set the next update to occur when the cache is due to expire.
             self.lastUpdateSatelliteTLE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
 
-        self.addNewSatellites()
+        if self.satellitesAddNew:
+            self.addNewSatellites()
 
 
     # Creates an SVG icon file representing the moon given the illumination and bright limb angle (relative to zenith).
@@ -2722,7 +2724,7 @@ class IndicatorLunar:
         reset.set_tooltip_text( _( "Reset the satellite look-up URL to factory default." ) )
         box.pack_start( reset, False, False, 0 )
 
-        grid.attach( box, 0, 11, 1, 1 )
+#         grid.attach( box, 0, 11, 1, 1 ) #TODO Eventually will go ... I think/hope.
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -3302,11 +3304,12 @@ class IndicatorLunar:
                 self.lastUpdateCometOE = datetime.datetime.utcnow()
 
             self.comets = [ ]
-            for comet in cometStore:
-                if comet[ 0 ]:
-                    self.comets.append( comet[ 1 ].upper() )
-
-            self.addNewComets()
+            if self.cometsAddNew:
+                self.addNewComets()
+            else:
+                for comet in cometStore:
+                    if comet[ 0 ]:
+                        self.comets.append( comet[ 1 ].upper() )
 
             if self.satelliteTLEURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
                 self.satelliteTLEURL = self.satelliteTLEURLNew # The URL may or may not be valie, but it will not be None.
@@ -3319,11 +3322,12 @@ class IndicatorLunar:
                 self.lastUpdateSatelliteTLE = datetime.datetime.utcnow()
 
             self.satellites = [ ]
-            for satelliteTLE in satelliteStore:
-                if satelliteTLE[ 0 ]:
-                    self.satellites.append( ( satelliteTLE[ 1 ].upper(), satelliteTLE[ 2 ] ) )
-
-            self.addNewSatellites()
+            if self.satellitesAddNew:
+                self.addNewSatellites()
+            else:
+                for satellite in satelliteStore:
+                    if satellite[ 0 ]:
+                        self.satellites.append( ( satellite[ 1 ].upper(), satellite[ 2 ] ) )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
@@ -3368,8 +3372,7 @@ class IndicatorLunar:
         # The tags store contains at least 2 columns (if more, those columns are ignored).
         # First column contains the original/untranslated tags.
         # Second column contains the translated tags.
-        # Depending on the direction the translation,
-        # the first column or the second column contains the source tags to match.
+        # Depending on the direction the translation, one of the columns contains the source tags to match.
         if originalToLocal:
             i = 0
             j = 1
@@ -3462,7 +3465,6 @@ class IndicatorLunar:
                     child.hide()
 
 
-#TODO Verify
     def onFetchCometOrSatelliteData( self,
                                     button,
                                     entry,
@@ -3479,11 +3481,39 @@ class IndicatorLunar:
                                     getDataFunction ):
 # TODO If the user has added/removed comets/satellites and then does a fetch, at what point, if at all, should the list of checked/unchecked comets/satellites be flushed?
         
-        # Flush all comet/satellite keys.
+        # Flush all comet/satellite data.
         for key in list( self.data ): # Gets the keys and allows iteration with removal.
             if key[ 0 ] == astronomicalObjectType:
                 self.data.pop( key )
 
+#         print( "Added tags")
+#         for key in self.tagsAdded:
+#             if key[ 0 ] == astronomicalObjectType:
+#                 print( key )
+
+#         print( "Removed tags")
+#         for key in self.tagsRemoved:
+#             if key[ 0 ] == astronomicalObjectType:
+#                 print( key )
+
+#         t = ( astronomicalObjectType, bodyTag )
+#         for key in self.data.keys():
+#             if t == ( key[ 0 ], key[ 1 ] ): # Only compare the AstronomicalObjectType and body tag.
+#                 preExists = True
+#                 break
+# 
+#         if checked:
+#             if preExists:
+#                 self.tagsRemoved.pop( t, None )
+#             else:
+#                 self.tagsAdded[ t ] = None # The value is not actually used.
+#         else:
+#             if preExists:
+#                 self.tagsRemoved[ t ] = None # The value is not actually used.
+#             else:
+#                 self.tagsAdded.pop( t, None ) # It is possible tags for the checked item were not previously added because the object (comet/satellite) is not visible - so pass in None to safely pop.
+
+        
         if entry.get_text().strip() == "":
             entry.set_text( url )
 
@@ -3513,14 +3543,20 @@ class IndicatorLunar:
             self.satelliteTLEDataNew = dataNew
 
 
+#TODO When a comet is checked it is not added (or really, does not match in name between tagsAdded and self.data)...likely due to a case mismatch.
     def checkboxToggled( self, bodyTag, astronomicalObjectType, checked ):
         preExists = False
         t = ( astronomicalObjectType, bodyTag )
+        print( self.data)
         for key in self.data.keys():
+#             if key[ 1 ].startswith( "108" ):
+#                 print( key, bodyTag )
             if t == ( key[ 0 ], key[ 1 ] ): # Only compare the AstronomicalObjectType and body tag.
                 preExists = True
                 break
 
+#         print( bodyTag, preExists )
+        
         if checked:
             if preExists:
                 self.tagsRemoved.pop( t, None )
@@ -3531,6 +3567,10 @@ class IndicatorLunar:
                 self.tagsRemoved[ t ] = None # The value is not actually used.
             else:
                 self.tagsAdded.pop( t, None ) # It is possible tags for the checked item were not previously added because the object (comet/satellite) is not visible - so pass in None to safely pop.
+
+#         print( self.tagsAdded )
+#         print( "===" )
+#         print( self.tagsRemoved )
 
 
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
@@ -3651,17 +3691,15 @@ class IndicatorLunar:
 
 
     def addNewSatellites( self ):
-        if self.satellitesAddNew:
-            for key in self.satelliteTLEData:
-                if key not in self.satellites:
-                    self.satellites.append( key )
+        for key in self.satelliteTLEData:
+            if key not in self.satellites:
+                self.satellites.append( key )
 
 
     def addNewComets( self ):
-        if self.cometsAddNew:
-            for key in self.cometOEData:
-                if key not in self.comets:
-                    self.comets.append( key )
+        for key in self.cometOEData:
+            if key not in self.comets:
+                self.comets.append( key )
 
 
     def getCometDisplayName( self, comet ): return comet[ 0 : comet.index( "," ) ]
