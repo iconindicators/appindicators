@@ -92,11 +92,6 @@
 # should the tag be stripped away?
 
 
-#TODO One thing I've done is been inconsistent with International:
-#sometimes I have used ID and sometimes I have used DESIGNATOR.  
-#I need to double check this and clean up if necessary.
-
-
 #TODO Click on the final submenu for a star and load the wikipedia page using the URL:
 # http://www.google.com/search?btnI=I%27m+Feeling+Lucky&ie=UTF-8&oe=UTF-8&q=schedar%20star%20wikipedia
 # which works for the star "schedar".
@@ -2661,9 +2656,10 @@ class IndicatorLunar:
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 15 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
-        sortSatellitesByDateTimeCheckbox.set_tooltip_text( _( #TODO Add something about the order of the menu text - name, number, int. desig.
+        sortSatellitesByDateTimeCheckbox.set_tooltip_text( _(
             "By default, satellites are sorted\n" + \
-            "alphabetically by menu text.\n\n" + \
+            "alphabetically by Name, Number,\n" + \
+            "then International Designator.\n\n" + \
             "If checked, satellites will be\n" + \
             "sorted by rise date/time." ) )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 8, 1, 1 )
