@@ -92,9 +92,9 @@
 # should the tag be stripped away?
 
 
-# TODO In RUssion version, remove the .json file.
-# The notification for satellites seems to contain English.
-# Test by changing the text (forces a save of the .json file).
+#TODO One thing I've done is been inconsistent with International:
+#sometimes I have used ID and sometimes I have used DESIGNATOR.  
+#I need to double check this and clean up if necessary.
 
 
 #TODO Click on the final submenu for a star and load the wikipedia page using the URL:
@@ -953,8 +953,8 @@ class IndicatorLunar:
     SATELLITE_MENU_TEXT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + _( " now rising..." )
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
-        _( "NORAD ID: " ) + SATELLITE_TAG_NUMBER_TRANSLATION + "\n" + \
-        _( "International ID: " ) + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n" + \
+        _( "Number: " ) + SATELLITE_TAG_NUMBER_TRANSLATION + "\n" + \
+        _( "International Designator: " ) + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n" + \
         _( "Rise Time: " ) + SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
         _( "Rise Azimuth: " ) + SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n" + \
         _( "Set Time: " ) + SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
@@ -2661,7 +2661,7 @@ class IndicatorLunar:
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 15 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
-        sortSatellitesByDateTimeCheckbox.set_tooltip_text( _( 
+        sortSatellitesByDateTimeCheckbox.set_tooltip_text( _( #TODO Add something about the order of the menu text - name, number, int. desig.
             "By default, satellites are sorted\n" + \
             "alphabetically by menu text.\n\n" + \
             "If checked, satellites will be\n" + \
@@ -2781,7 +2781,7 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onStarOrCometOrSatelliteToggled, starStore, starStoreSort, AstronomicalObjectType.Star )
+        renderer_toggle.connect( "toggled", self.onStarCometSatelliteToggled, starStore, starStoreSort, AstronomicalObjectType.Star )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, starStoreSort, displayTagsStore, AstronomicalObjectType.Star )
@@ -2821,7 +2821,7 @@ class IndicatorLunar:
             "all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onStarOrCometOrSatelliteToggled, cometStore, cometStoreSort, AstronomicalObjectType.Comet )
+        renderer_toggle.connect( "toggled", self.onStarCometSatelliteToggled, cometStore, cometStoreSort, AstronomicalObjectType.Comet )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore, cometStoreSort, displayTagsStore, AstronomicalObjectType.Comet )
@@ -2872,7 +2872,7 @@ class IndicatorLunar:
             "download may be blocked to avoid\n" + \
             "burdening the data source." ) )
         fetch.connect( "clicked",
-                       self.onFetchCometOrSatelliteData,
+                       self.onFetchCometSatelliteData,
                        cometURLEntry,
                        cometGrid,
                        cometStore,
@@ -2915,13 +2915,13 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onStarOrCometOrSatelliteToggled, satelliteStore, satelliteStoreSort, AstronomicalObjectType.Satellite )
+        renderer_toggle.connect( "toggled", self.onStarCometSatelliteToggled, satelliteStore, satelliteStoreSort, AstronomicalObjectType.Satellite )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, AstronomicalObjectType.Satellite )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Satellite Name" ), Gtk.CellRendererText(), text = 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
         treeViewColumn.set_sort_column_id( 1 )
         tree.append_column( treeViewColumn )
 
@@ -2977,7 +2977,7 @@ class IndicatorLunar:
             "blocked to avoid burdening the\n" + \
             "data source." ) )
         fetch.connect( "clicked",
-                       self.onFetchCometOrSatelliteData,
+                       self.onFetchCometSatelliteData,
                        TLEURLEntry,
                        satelliteGrid,
                        satelliteStore,
@@ -3229,8 +3229,8 @@ class IndicatorLunar:
         self.dialog.show_all()
 
         # The visibility of some GUI objects must be determined AFTER the dialog is shown.
-        self.updateCometOrSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), AstronomicalObjectType.Comet )
-        self.updateCometOrSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), AstronomicalObjectType.Satellite )
+        self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), AstronomicalObjectType.Comet )
+        self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), AstronomicalObjectType.Satellite )
 
         # Last thing to do after everything else is built.
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
@@ -3418,7 +3418,7 @@ class IndicatorLunar:
                 self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, dataStore[ row ][ 0 ] )
 
 
-    def onStarOrCometOrSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
+    def onStarCometSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
         if astronomicalObjectType == AstronomicalObjectType.Comet:
@@ -3431,7 +3431,7 @@ class IndicatorLunar:
         self.checkboxToggled( bodyTag, astronomicalObjectType, dataStore[ actualRow ][ 0 ] )
 
 
-    def updateCometOrSatellitePreferencesTab( self, grid, dataStore, data, objects, url, astronomicalObjectType ):
+    def updateCometSatellitePreferencesTab( self, grid, dataStore, data, objects, url, astronomicalObjectType ):
         dataStore.clear()
         if data is None:
             message = IndicatorLunar.MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE.format( url )
@@ -3465,7 +3465,7 @@ class IndicatorLunar:
                     child.hide()
 
 
-    def onFetchCometOrSatelliteData( self,
+    def onFetchCometSatelliteData( self,
                                     button,
                                     entry,
                                     grid, 
@@ -3532,7 +3532,7 @@ class IndicatorLunar:
         else:
             dataNew = getDataFunction( urlNew ) # The comet/satellite data can be None, empty or non-empty.
 
-        self.updateCometOrSatellitePreferencesTab( grid, store, dataNew, [ ], urlNew, astronomicalObjectType )
+        self.updateCometSatellitePreferencesTab( grid, store, dataNew, [ ], urlNew, astronomicalObjectType )
 
         # Assign back to original objects...
         if astronomicalObjectType == AstronomicalObjectType.Comet:
@@ -3545,32 +3545,13 @@ class IndicatorLunar:
 
 #TODO When a comet is checked it is not added (or really, does not match in name between tagsAdded and self.data)...likely due to a case mismatch.
     def checkboxToggled( self, bodyTag, astronomicalObjectType, checked ):
-        preExists = False
         t = ( astronomicalObjectType, bodyTag )
-        print( self.data)
-        for key in self.data.keys():
-#             if key[ 1 ].startswith( "108" ):
-#                 print( key, bodyTag )
-            if t == ( key[ 0 ], key[ 1 ] ): # Only compare the AstronomicalObjectType and body tag.
-                preExists = True
-                break
-
-#         print( bodyTag, preExists )
-        
         if checked:
-            if preExists:
-                self.tagsRemoved.pop( t, None )
-            else:
-                self.tagsAdded[ t ] = None # The value is not actually used.
+            self.tagsRemoved.pop( t, None )
+            self.tagsAdded[ t ] = None # The value is not actually used.
         else:
-            if preExists:
-                self.tagsRemoved[ t ] = None # The value is not actually used.
-            else:
-                self.tagsAdded.pop( t, None ) # It is possible tags for the checked item were not previously added because the object (comet/satellite) is not visible - so pass in None to safely pop.
-
-#         print( self.tagsAdded )
-#         print( "===" )
-#         print( self.tagsRemoved )
+            self.tagsRemoved[ t ] = None # The value is not actually used.
+            self.tagsAdded.pop( t, None ) # It is possible tags for the checked item were not previously added because the object (comet/satellite) is not visible - so pass in None to safely pop.
 
 
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
@@ -3597,7 +3578,7 @@ class IndicatorLunar:
             for row in range( len( dataStore ) ):
                 dataStore[ row ][ 0 ] = bool( not toggle )
                 row = str( sortStore.convert_child_path_to_path( Gtk.TreePath.new_from_string( str( row ) ) ) ) # Need to convert the data store row to the sort store row.
-                self.onStarOrCometOrSatelliteToggled( widget, row, dataStore, sortStore, astronomicalObjectType )
+                self.onStarCometSatelliteToggled( widget, row, dataStore, sortStore, astronomicalObjectType )
 
 
     def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
@@ -3654,15 +3635,15 @@ class IndicatorLunar:
     def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
         if pageNumber == 0: # User has clicked the first tab.
             displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
+
+            # Only add tags for data which has not been removed.
             for key in self.data.keys():
                 astronomicalObjectType = key[ 0 ]
                 bodyTag = key[ 1 ]
                 dataTag = key[ 2 ]
 
-                if ( astronomicalObjectType, bodyTag ) in self.tagsRemoved:
-                    continue
-
-                self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
+                if ( astronomicalObjectType, bodyTag ) not in self.tagsRemoved:
+                    self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
 
             # Add tags for newly checked items (which don't exist in the current data).
             for key in self.tagsAdded:
@@ -3686,6 +3667,7 @@ class IndicatorLunar:
                 elif astronomicalObjectType == AstronomicalObjectType.Sun:
                     tags = IndicatorLunar.DATA_TAGS_SUN
 
+#TODO Might need to check to see if the tag(s) is already present?
                 for tag in tags:
                     self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.DISPLAY_NEEDS_REFRESH, displayTagsStore )
 
