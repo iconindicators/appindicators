@@ -911,7 +911,7 @@ class IndicatorLunar:
         LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" )
     }
 
-    COMET_OE_CACHE_BASENAME = "comet-"
+    COMET_OE_CACHE_BASENAME = "comet-oe-"
     COMET_OE_CACHE_MAXIMUM_AGE_HOURS = 30
     COMET_OE_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
     COMET_OE_DOWNLOAD_PERIOD_HOURS = 30
@@ -944,7 +944,7 @@ class IndicatorLunar:
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_VISIBLE.strip( "[]" ), SATELLITE_TAG_VISIBLE_TRANSLATION.strip( "[]" ) ] )
 
-    SATELLITE_TLE_CACHE_BASENAME = "satellite-"
+    SATELLITE_TLE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS = 18
     SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 18
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
@@ -2869,7 +2869,6 @@ class IndicatorLunar:
             "If using the default URL, the\n" + \
             "download may be blocked to avoid\n" + \
             "burdening the data source." ) )
-#         fetch.connect( "clicked", self.onFetchCometURL, cometURLEntry, cometGrid, cometStore ) #TODO Hopefull will go
         fetch.connect( "clicked",
                        self.onFetchCometOrSatelliteData,
                        cometURLEntry,
@@ -2975,7 +2974,6 @@ class IndicatorLunar:
             "download may be\n" + \
             "blocked to avoid burdening the\n" + \
             "data source." ) )
-#         fetch.connect( "clicked", self.onFetchSatelliteTLEURL, TLEURLEntry, satelliteGrid, satelliteStore ) #TODO Hopefull will go.
         fetch.connect( "clicked",
                        self.onFetchCometOrSatelliteData,
                        TLEURLEntry,
