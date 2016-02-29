@@ -3712,7 +3712,6 @@ class IndicatorLunar:
                     self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.DISPLAY_NEEDS_REFRESH, displayTagsStore )
 
 
-#TODO Verify
     def addNewSatellites( self ):
         if self.satellitesAddNew:
             for key in self.satelliteTLEData:
@@ -3720,7 +3719,6 @@ class IndicatorLunar:
                     self.satellites.append( key )
 
 
-#TODO Verify
     def addNewComets( self ):
         if self.cometsAddNew:
             for key in self.cometOEData:
