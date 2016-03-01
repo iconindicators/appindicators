@@ -852,6 +852,8 @@ class IndicatorLunar:
     COMET_OE_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
     COMET_OE_DOWNLOAD_PERIOD_HOURS = 30
 
+    COMET_ON_CLICK_URL = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" #TODO Need to get permission for this?
+
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
     SATELLITE_TAG_INTERNATIONAL_DESIGNATOR = "[INTERNATIONAL DESIGNATOR]"
@@ -992,10 +994,10 @@ class IndicatorLunar:
         self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
         self.updateMenu()
         lunarIlluminationPercentage = self.updateIcon( ephemNow )
-        self.fullMoonNotification( ephemNow, lunarIlluminationPercentage )
+        self.notificationFullMoon( ephemNow, lunarIlluminationPercentage )
 
         if self.showSatelliteNotification:
-            self.satelliteNotification()
+            self.notificationSatellite()
 
         self.nextUpdate = datetime.datetime.strptime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT ) # Parse from string back into a datetime.
         nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
@@ -1072,7 +1074,10 @@ class IndicatorLunar:
 
         elif key[ 2 ] == IndicatorLunar.DATA_EARTH_VISIBLE or \
              key[ 2 ] == IndicatorLunar.DATA_VISIBLE:
-            displayData = self.getBooleanTranslatedText( self.data[ key ] )
+            if self.data[ key ] == IndicatorLunar.TRUE_TEXT:
+                displayData = IndicatorLunar.TRUE_TEXT_TRANSLATION
+            else:
+                displayData = IndicatorLunar.FALSE_TEXT_TRANSLATION
 
         elif key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_LATITUDE:
             latitude = self.data[ key ]
@@ -1151,6 +1156,7 @@ class IndicatorLunar:
         return str( localDateTime )
 
 
+    # Takes a string in the format of HH:MM:SS.S and converts to degrees (°) in decimal. 
     def getDecimalDegrees( self, stringInput, isHours, roundAmount ):
         t = tuple( stringInput.split( ":" ) )
         x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
@@ -1162,13 +1168,6 @@ class IndicatorLunar:
 
 
     def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
-
-
-    def getBooleanTranslatedText( self, booleanText ):
-        if booleanText == IndicatorLunar.TRUE_TEXT:
-            return IndicatorLunar.TRUE_TEXT_TRANSLATION
-
-        return IndicatorLunar.FALSE_TEXT_TRANSLATION
 
 
     def updateIcon( self, ephemNow ):
@@ -1194,7 +1193,7 @@ class IndicatorLunar:
         return lunarIlluminationPercentage
 
 
-    def fullMoonNotification( self, ephemNow, lunarIlluminationPercentage ):
+    def notificationFullMoon( self, ephemNow, lunarIlluminationPercentage ):
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
@@ -1216,7 +1215,7 @@ class IndicatorLunar:
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
-    def satelliteNotification( self ):
+    def notificationSatellite( self ):
         # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
         satelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber, in self.satellites:
@@ -1532,14 +1531,12 @@ class IndicatorLunar:
 
 
     def onComet( self, widget ):
-        url = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" #TODO Make this a constant?
-
         if "(" in widget.props.name:
             objectID = widget.props.name[ : widget.props.name.find( "(" ) ].strip()
         else:
             objectID = widget.props.name[ : widget.props.name.find( "/" ) ].strip()
 
-        url += objectID.replace( "/", "%2F" ).replace( " ", "+" )
+        url = IndicatorLunar.COMET_ON_CLICK_URL + objectID.replace( "/", "%2F" ).replace( " ", "+" )
         if len( url ) > 0:
             webbrowser.open( url )
 
@@ -2618,9 +2615,6 @@ class IndicatorLunar:
             "become checked." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 10, 1, 1 )
 
-        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_top( 15 )
-
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
         # Planets/Stars.
@@ -2676,7 +2670,7 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onStarCometSatelliteToggled, starStore, starStoreSort, AstronomicalObjectType.Star )
+        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, starStore, starStoreSort, AstronomicalObjectType.Star )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, starStoreSort, displayTagsStore, AstronomicalObjectType.Star )
@@ -2716,7 +2710,7 @@ class IndicatorLunar:
             "all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onStarCometSatelliteToggled, cometStore, cometStoreSort, AstronomicalObjectType.Comet )
+        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, cometStore, cometStoreSort, AstronomicalObjectType.Comet )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore, cometStoreSort, displayTagsStore, AstronomicalObjectType.Comet )
@@ -2810,7 +2804,7 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onStarCometSatelliteToggled, satelliteStore, satelliteStoreSort, AstronomicalObjectType.Satellite )
+        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, satelliteStore, satelliteStoreSort, AstronomicalObjectType.Satellite )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, AstronomicalObjectType.Satellite )
@@ -2975,7 +2969,7 @@ class IndicatorLunar:
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        test.connect( "clicked", self.onTestClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, False )
+        test.connect( "clicked", self.onTestNotificationClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, False )
         test.set_tooltip_text( _(
             "Show the notification bubble.\n" + \
             "Tags will be substituted with\n" + \
@@ -3049,7 +3043,7 @@ class IndicatorLunar:
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        test.connect( "clicked", self.onTestClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, True )
+        test.connect( "clicked", self.onTestNotificationClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, True )
         test.set_tooltip_text( _( "Show the notification using the current settings." ) )
         grid.attach( test, 1, 9, 1, 1 )
 
@@ -3306,7 +3300,7 @@ class IndicatorLunar:
                 self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, dataStore[ row ][ 0 ] )
 
 
-    def onStarCometSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
+    def onCometStarSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
         if astronomicalObjectType == AstronomicalObjectType.Comet:
@@ -3440,10 +3434,10 @@ class IndicatorLunar:
             for row in range( len( dataStore ) ):
                 dataStore[ row ][ 0 ] = bool( not toggle )
                 row = str( sortStore.convert_child_path_to_path( Gtk.TreePath.new_from_string( str( row ) ) ) ) # Need to convert the data store row to the sort store row.
-                self.onStarCometSatelliteToggled( widget, row, dataStore, sortStore, astronomicalObjectType )
+                self.onCometStarSatelliteToggled( widget, row, dataStore, sortStore, astronomicalObjectType )
 
 
-    def onTestClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
+    def onTestNotificationClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
         summary = summaryEntry.get_text()
         message = pythonutils.getTextViewText( messageTextView )
 
