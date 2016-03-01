@@ -34,10 +34,6 @@
 #  http://www.flaticon.com/search/satellite
 
 
-#TODO Remove the satellite on-click URL from the user preferences - so the URL is fixed?
-#Ditto for the comet stuff?
-
-
 #TODO Click on the final submenu for a star and load the wikipedia page using the URL:
 # http://www.google.com/search?btnI=I%27m+Feeling+Lucky&ie=UTF-8&oe=UTF-8&q=schedar%20star%20wikipedia
 # which works for the star "schedar".
@@ -125,7 +121,6 @@ class IndicatorLunar:
     SETTINGS_PLANETS = "planets"
     SETTINGS_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
     SETTINGS_SATELLITE_NOTIFICATION_SUMMARY = "satelliteNotificationSummary"
-    SETTINGS_SATELLITE_ON_CLICK_URL = "satelliteOnClickURL"
     SETTINGS_SATELLITE_TLE_URL = "satelliteTLEURL"
     SETTINGS_SATELLITES = "satellites"
     SETTINGS_SATELLITES_ADD_NEW = "satellitesAddNew"
@@ -890,7 +885,7 @@ class IndicatorLunar:
     SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 18
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
-    SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
+    SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER #TODO Need to get permission for this?
     SATELLITE_MENU_TEXT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + _( " now rising..." )
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
@@ -1322,20 +1317,6 @@ class IndicatorLunar:
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
             self.updateEclipseMenu( menuItem.get_submenu(), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
 
-            self.addOnClickHandlerToAllChildren( menuItem.get_submenu(), "moon" )
-
-#TODO This likely has to go!
-    def addOnClickHandlerToAllChildren( self, subMenu, name ):
-        for child in subMenu.get_children():
-            child.set_name( name )
-            child.connect( "activate", self.onChildClick )
-
-
-    def onChildClick( self, widget ):
-        url = "http://www.google.com/search?btnI=I%27m+Feeling+Lucky&ie=UTF-8&oe=UTF-8&q=" + widget.props.name + "%20wikipedia" 
-        if len( url ) > 0:
-            webbrowser.open( url )
-
 
     def updateSunMenu( self, menu ):
         key = ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
@@ -1544,7 +1525,6 @@ class IndicatorLunar:
                     menuItem.set_submenu( subMenu )
 
 
-#TODO Will this make the cut?
     def addOnCometHandler( self, subMenu, comet ):
         for child in subMenu.get_children():
             child.set_name( comet )
@@ -1552,7 +1532,7 @@ class IndicatorLunar:
 
 
     def onComet( self, widget ):
-        url = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+        url = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" #TODO Make this a constant?
 
         if "(" in widget.props.name:
             objectID = widget.props.name[ : widget.props.name.find( "(" ) ].strip()
@@ -1748,7 +1728,7 @@ class IndicatorLunar:
     def onSatellite( self, widget ):
         satelliteTLE = self.satelliteTLEData.get( tuple( widget.props.name.split( "-----" ) ) )
 
-        url = self.satelliteOnClickURL. \
+        url = IndicatorLunar.SATELLITE_ON_CLICK_URL. \
               replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteTLE.getName() ). \
               replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteTLE.getNumber() ). \
               replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, satelliteTLE.getInternationalDesignator() )
@@ -2641,33 +2621,6 @@ class IndicatorLunar:
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
         box.set_margin_top( 15 )
 
-        label = Gtk.Label( _( "Satellite 'on-click' URL" ) )
-        label.set_halign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
-
-        satelliteURLText = Gtk.Entry()
-        satelliteURLText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteOnClickURL ) )
-        satelliteURLText.set_hexpand( True )
-        satelliteURLText.set_tooltip_text( _(
-            "The URL used to lookup a satellite\n" + \
-            "(in the default browser) when any\n" + \
-            "of the satellite's child items are\n" + \
-            "selected from the menu.\n\n" + \
-            "If empty, no lookup will be done.\n\n" + \
-            "Available tags:\n\t" ) + \
-            IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION )
-
-        box.pack_start( satelliteURLText, True, True, 0 )
-
-        reset = Gtk.Button( _( "Reset" ) )
-        reset.connect( "clicked", self.onResetSatelliteOnClickURL, satelliteURLText )
-        reset.set_tooltip_text( _( "Reset the satellite look-up URL to factory default." ) )
-        box.pack_start( reset, False, False, 0 )
-
-#         grid.attach( box, 0, 11, 1, 1 )
-
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
         # Planets/Stars.
@@ -3223,7 +3176,6 @@ class IndicatorLunar:
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.hideSatelliteIfNoVisiblePass = hideSatelliteIfNoVisiblePassCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active()
-            self.satelliteOnClickURL = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteURLText.get_text().strip() )
 
             self.planets = [ ]
             for row in planetStore:
@@ -3343,12 +3295,6 @@ class IndicatorLunar:
 
 
     def onMoonSunToggled( self, widget, moonSunTag, astronomicalObjectType ): self.checkboxToggled( moonSunTag, astronomicalObjectType, widget.get_active() )
-
-
-#TODO May not be needed.
-    def onResetSatelliteOnClickURL( self, button, textEntry ):
-        translatedTags = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, IndicatorLunar.SATELLITE_ON_CLICK_URL )
-        textEntry.set_text( translatedTags )
 
 
     def onPlanetToggled( self, widget, row, dataStore ):
@@ -3683,7 +3629,6 @@ class IndicatorLunar:
 
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
         self.satelliteNotificationSummary = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT
-        self.satelliteOnClickURL = IndicatorLunar.SATELLITE_ON_CLICK_URL
         self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
         self.satellites = [ ]
         self.satellitesAddNew = False
@@ -3726,7 +3671,6 @@ class IndicatorLunar:
             self.planets = settings.get( IndicatorLunar.SETTINGS_PLANETS, self.planets )
             self.satelliteNotificationMessage = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
             self.satelliteNotificationSummary = settings.get( IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
-            self.satelliteOnClickURL = settings.get( IndicatorLunar.SETTINGS_SATELLITE_ON_CLICK_URL, self.satelliteOnClickURL )
             self.satelliteTLEURL = settings.get( IndicatorLunar.SETTINGS_SATELLITE_TLE_URL, self.satelliteTLEURL )
 
             self.satellites = settings.get( IndicatorLunar.SETTINGS_SATELLITES, self.satellites )
@@ -3780,7 +3724,6 @@ class IndicatorLunar:
                 IndicatorLunar.SETTINGS_PLANETS: self.planets,
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
                 IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,
-                IndicatorLunar.SETTINGS_SATELLITE_ON_CLICK_URL: self.satelliteOnClickURL,
                 IndicatorLunar.SETTINGS_SATELLITE_TLE_URL: self.satelliteTLEURL,
                 IndicatorLunar.SETTINGS_SATELLITES: satellites,
                 IndicatorLunar.SETTINGS_SATELLITES_ADD_NEW: self.satellitesAddNew,
