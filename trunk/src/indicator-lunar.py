@@ -34,9 +34,6 @@
 #  http://www.flaticon.com/search/satellite
 
 
-#TODO Generate a new pot file and send to Oleg.
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -837,7 +834,7 @@ class IndicatorLunar:
     COMET_OE_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
     COMET_OE_DOWNLOAD_PERIOD_HOURS = 30
 
-    COMET_ON_CLICK_URL = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" #TODO Need to get permission for this?
+    COMET_ON_CLICK_URL = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -872,7 +869,7 @@ class IndicatorLunar:
     SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 18
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
-    SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER #TODO Need to get permission for this?
+    SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
     SATELLITE_MENU_TEXT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + _( " now rising..." )
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
