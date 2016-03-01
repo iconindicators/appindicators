@@ -6,9 +6,9 @@ indicator-lunar (1.0.66-1) precise; urgency=low
   * Bug fix: "Orbital Element" now been renamed to "Comet".  Some user
     preferences may have to be reset!
   * Changed the default text for the summary/message for satellite
-    notification to now include the NORAD ID and International ID.
-  * Changed the satellite menu text to include the International ID.
-    The format is 'Satellite Name - NORAD ID - International ID'.
+    notification to now include the Number and International Designator.
+  * Changed the satellite menu text to include the International Designator.
+    The format is 'Satellite Name : Number : International Designator'.
   * Removed the user preference to change the satellite menu text.
   * Added latitude/longitude/elevation of location to the icon text tags.
   * Now able to hide/show the moon/sun.
