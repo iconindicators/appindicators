@@ -2720,7 +2720,7 @@ class IndicatorLunar:
         reset.set_tooltip_text( _( "Reset the satellite look-up URL to factory default." ) )
         box.pack_start( reset, False, False, 0 )
 
-        grid.attach( box, 0, 11, 1, 1 )
+#         grid.attach( box, 0, 11, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -3462,61 +3462,32 @@ class IndicatorLunar:
 
 
     def onFetchCometSatelliteData( self,
-                                    button,
-                                    entry,
-                                    grid, 
-                                    store, 
-                                    astronomicalObjectType, 
-                                    url, 
-                                    cacheBasename, 
-                                    cacheMaximumAgeHours, 
-                                    lastUpdate, 
-                                    downloadPeriodHours, 
-                                    summary, 
-                                    message, 
-                                    getDataFunction ):
-# TODO If the user has added/removed comets/satellites and then does a fetch, at what point, if at all, should the list of checked/unchecked comets/satellites be flushed?
-        
-        # Flush all comet/satellite data.
+                                   button, entry, grid, store, 
+                                   astronomicalObjectType, 
+                                   dataURL, 
+                                   cacheBasename, cacheMaximumAgeHours, lastUpdate, downloadPeriodHours, 
+                                   summary, message, 
+                                   getDataFunction ):
+        # Flush comet/satellite data.
         for key in list( self.data ): # Gets the keys and allows iteration with removal.
             if key[ 0 ] == astronomicalObjectType:
                 self.data.pop( key )
 
-#         print( "Added tags")
-#         for key in self.tagsAdded:
-#             if key[ 0 ] == astronomicalObjectType:
-#                 print( key )
+        for key in list( self.tagsAdded ):
+            if key[ 0 ] == astronomicalObjectType:
+                self.tagsAdded.pop( t, None )
 
-#         print( "Removed tags")
-#         for key in self.tagsRemoved:
-#             if key[ 0 ] == astronomicalObjectType:
-#                 print( key )
+        for key in list( self.tagsRemoved ):
+            if key[ 0 ] == astronomicalObjectType:
+                self.tagsRemoved.pop( t, None )
 
-#         t = ( astronomicalObjectType, bodyTag )
-#         for key in self.data.keys():
-#             if t == ( key[ 0 ], key[ 1 ] ): # Only compare the AstronomicalObjectType and body tag.
-#                 preExists = True
-#                 break
-# 
-#         if checked:
-#             if preExists:
-#                 self.tagsRemoved.pop( t, None )
-#             else:
-#                 self.tagsAdded[ t ] = None # The value is not actually used.
-#         else:
-#             if preExists:
-#                 self.tagsRemoved[ t ] = None # The value is not actually used.
-#             else:
-#                 self.tagsAdded.pop( t, None ) # It is possible tags for the checked item were not previously added because the object (comet/satellite) is not visible - so pass in None to safely pop.
-
-        
         if entry.get_text().strip() == "":
-            entry.set_text( url )
+            entry.set_text( dataURL )
 
         urlNew = entry.get_text().strip()
 
         # If the URL is the default, use the cache to avoid annoying the default data source.
-        if urlNew == url:
+        if urlNew == dataURL:
             dataNew, cacheDateTime = self.readFromCache( cacheBasename, datetime.datetime.now() - datetime.timedelta( hours = cacheMaximumAgeHours ) ) # Returned data is either None or non-empty.
             if dataNew is None:
                 # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
