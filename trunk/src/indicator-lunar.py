@@ -38,60 +38,6 @@
 #Ditto for the comet stuff?
 
 
-# (18:11:58) Now translating to English
-# (18:12:05) Bernmeister: Got your email.
-# (18:12:17) Oleg Moiseichuk: Good day.
-# (18:12:21) Bernmeister: Planets satellites: moons?
-# (18:12:28) Oleg Moiseichuk: Yep.
-# (18:13:00) Oleg Moiseichuk: They are all visible now.
-# (18:13:06) Bernmeister: Right. Generally they will always be Earth Visible. It's only when a moon is eclipsed by it's parent planet that is is not visible.
-# (18:13:15) Oleg Moiseichuk: Bad for testing purpose.
-# (18:13:41) Bernmeister: As for the untranslated tags...can you do a test now? I'll do it with you, starting with removing the .json file.
-# (18:13:43) Oleg Moiseichuk: Yesterday's evening was much better.
-# (18:13:55) Oleg Moiseichuk: Okay, one minute.
-# (18:15:09) Oleg Moiseichuk: I'm ready. I deleted my json and started fresh.
-# (18:15:54) Oleg Moiseichuk: Only [MOON PHASE] is shown in its translated form.
-# (18:16:57) Bernmeister: Shown where? Top/icon panel?
-# (18:17:04) Oleg Moiseichuk: Both.
-# (18:17:13) Bernmeister: Both what/where?
-# (18:17:20) Bernmeister: I ran the indicator and that's it.
-# (18:17:32) Bernmeister: I see Russian text (no tag) in the top/icon panel.
-# (18:18:03) Oleg Moiseichuk: On the Panel I see Waning Gibbous in Russian. Icon text shows [MOON PHASE] in Russian.
-# (18:18:52) Bernmeister: Icon text: what/where is this?
-# (18:19:09) Oleg Moiseichuk: 1st tab of Prefs.
-# (18:19:22) Bernmeister: OK - I thought you meant only top panel.
-# (18:19:39) Bernmeister: I am now running dialog prefs and see same as you.
-# (18:20:20) Oleg Moiseichuk: That's good. Now I go to the 2nd tab and disable Moon. Staying on that tab I press OK.
-# (18:20:39) Bernmeister: Done. The text from top panel is now gone.
-# (18:20:47) Bernmeister: (so just moon icon)
-# (18:21:20) Oleg Moiseichuk: Yep. But when I open Prefs now I see English tag [MOON PHASE] in the Icon text.
-# (18:21:52) Bernmeister: Bingo! Thanks...now that I can reproduce I can look into fixing it. Somehow I didn't catch this during testing today - sorry.
-# (18:21:53) Oleg Moiseichuk: It reverted to English somehow.
-# (18:22:30) Oleg Moiseichuk: If I go to 2nd once again and re-enable Moon, all reverts back.
-# (18:23:14) Bernmeister: Huh? If you enable the moon then OK or then click first tab?
-# (18:23:25) Bernmeister: I enable moon then click first tab and still broken.
-# (18:23:53) Oleg Moiseichuk: Go to 2nd tab, enable Moon, press OK, revisit Prefs. All seems normal.
-# (18:24:01) Bernmeister: Check.
-# (18:24:14) Bernmeister: Thanks - I'll have a look for a bit and then I have to head out.
-# (18:24:25) Oleg Moiseichuk: You are welcome.
-# (18:25:05) Oleg Moiseichuk: If you visit 1st tab _without_ pressing OK, it becomes even worse.
-# (18:27:10) Oleg Moiseichuk: It preserves translated tag but places it on the panel instead of the value and it cannot be removed from there even if I re-enable Moon. It can be fixed only by removing json file.
-# (18:30:11) Oleg Moiseichuk: Here's the sequence: Open Prefs, 2nd tab, disable Moon, switch to 1st tab (Icon text remains translated), press OK. Now Icon text is translated but the same text is placed on the panel. That's it.
-# (18:41:20) Bernmeister: Thanks - I have to head out in a little while. I'll save the conversation log and use it to reproduce.
-# (18:41:50) Oleg Moiseichuk: Okay.
-#TODO This issue occurs because a tag may be added to the indicator text,
-# but the underlying object no longer exists.
-# When the indicator text is saved to the properties file, it's is saved as the English tag.
-# When displayed to the user in the pref dialog, it is (or should be) converted to the local language tag.
-# The way the tag's are converted to local language relies upon the underlying object existing (and the tag is matched against the object).
-# If the tag exists but the object does not (is unchecked or no longer exists) the tag cannot be matched and so is not converted to local language.
-# So what to do?
-# If a tag is in the indicator text in the pref dialog and the user unchecks the underlying object,
-# should that tag be removed? 
-# If a tag exists when the indicator starts up, but the underlying object does not exist,
-# should the tag be stripped away?
-
-
 #TODO Click on the final submenu for a star and load the wikipedia page using the URL:
 # http://www.google.com/search?btnI=I%27m+Feeling+Lucky&ie=UTF-8&oe=UTF-8&q=schedar%20star%20wikipedia
 # which works for the star "schedar".
