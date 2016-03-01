@@ -34,21 +34,6 @@
 #  http://www.flaticon.com/search/satellite
 
 
-#TODO Click on the final submenu for a star and load the wikipedia page using the URL:
-# http://www.google.com/search?btnI=I%27m+Feeling+Lucky&ie=UTF-8&oe=UTF-8&q=schedar%20star%20wikipedia
-# which works for the star "schedar".
-# Go through list of stars from /home/bernard/Desktop/pyephem-3.7.6.0/ephem/stars.py and make sure each star loads the wikipedia page.
-# Load the relevant wikipedia page for each planet and moon, and the moon and sun?
-#Wikipedia does not always work via the Google search so...
-# Here's a database of planets and moons:
-#  http://www.windows2universe.org/our_solar_system/planets.html
-#  http://www.windows2universe.org/our_solar_system/moons_table.html
-#  
-#  Planet links are easily constructed:
-#  http://www.windows2universe.org/PlanetName/PlanetName.html
-#  The moons are also have the easy naming scheme.
-
-
 #TODO Generate a new pot file and send to Oleg.
 
 
