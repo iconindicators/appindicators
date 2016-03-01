@@ -2720,7 +2720,7 @@ class IndicatorLunar:
         reset.set_tooltip_text( _( "Reset the satellite look-up URL to factory default." ) )
         box.pack_start( reset, False, False, 0 )
 
-#         grid.attach( box, 0, 11, 1, 1 ) #TODO Eventually will go ... I think/hope.
+        grid.attach( box, 0, 11, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -3539,15 +3539,18 @@ class IndicatorLunar:
             self.satelliteTLEDataNew = dataNew
 
 
-#TODO When a comet is checked it is not added (or really, does not match in name between tagsAdded and self.data)...likely due to a case mismatch.
     def checkboxToggled( self, bodyTag, astronomicalObjectType, checked ):
+        # Maintain a record of objects which are checked and unchecked by the user.
+        # This allows the update of the table in the first tab to happen quickly, rather than doing a slow update on a per-check basis.
+        # Use hashtables (dicts) to maintain the record of checked and unchecked objects - no need to store a value, so None is used.
+        # Pass in None when doing a pop as it is possible was already checked.
         t = ( astronomicalObjectType, bodyTag )
         if checked:
             self.tagsRemoved.pop( t, None )
-            self.tagsAdded[ t ] = None # The value is not actually used.
+            self.tagsAdded[ t ] = None
         else:
-            self.tagsRemoved[ t ] = None # The value is not actually used.
-            self.tagsAdded.pop( t, None ) # It is possible tags for the checked item were not previously added because the object (comet/satellite) is not visible - so pass in None to safely pop.
+            self.tagsRemoved[ t ] = None
+            self.tagsAdded.pop( t, None )
 
 
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
@@ -3636,12 +3639,12 @@ class IndicatorLunar:
             for key in self.data.keys():
                 astronomicalObjectType = key[ 0 ]
                 bodyTag = key[ 1 ]
-                dataTag = key[ 2 ]
 
-                if ( astronomicalObjectType, bodyTag ) not in self.tagsRemoved:
+                if ( astronomicalObjectType, bodyTag ) not in self.tagsRemoved and \
+                   ( astronomicalObjectType, bodyTag ) not in self.tagsAdded:
                     self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
 
-            # Add tags for newly checked items (which don't exist in the current data).
+            # Add tags for newly checked items (duplicates have been avoided by the above code).
             for key in self.tagsAdded:
                 astronomicalObjectType = key[ 0 ]
                 bodyTag = key[ 1 ]
@@ -3663,7 +3666,6 @@ class IndicatorLunar:
                 elif astronomicalObjectType == AstronomicalObjectType.Sun:
                     tags = IndicatorLunar.DATA_TAGS_SUN
 
-#TODO Might need to check to see if the tag(s) is already present?
                 for tag in tags:
                     self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.DISPLAY_NEEDS_REFRESH, displayTagsStore )
 
