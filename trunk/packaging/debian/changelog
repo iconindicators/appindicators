@@ -10,6 +10,8 @@ indicator-lunar (1.0.66-1) precise; urgency=low
   * Changed the satellite menu text to include the International Designator.
     The format is 'Satellite Name : Number : International Designator'.
   * Removed the user preference to change the satellite menu text.
+  * Removed the user preference to change the satellite on-click URL.
+    Satellite (and comet) on-click URL is hard coded.
   * Added latitude/longitude/elevation of location to the icon text tags.
   * Now able to hide/show the moon/sun.
   * Use the process wrapper utilities rather than direct calls.
