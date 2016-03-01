@@ -967,8 +967,8 @@ class IndicatorLunar:
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LONGITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 1 ] ), 1 ) )
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_ELEVATION ) ] = str( _city_data.get( self.cityName )[ 2 ] )
 
-            ephemNow = self.updateAstronomicalInformation()
-
+            ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
+            self.updateAstronomicalInformation( ephemNow )
             GLib.idle_add( self.updateFrontend, ephemNow )
 
 
@@ -1865,15 +1865,13 @@ class IndicatorLunar:
     def toggleIconState( self ): IndicatorLunar.ICON_STATE = not IndicatorLunar.ICON_STATE
 
 
-    def updateAstronomicalInformation( self ):
-        ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
+    def updateAstronomicalInformation( self, ephemNow ):
         self.updateMoon( ephemNow )
         self.updateSun( ephemNow )
         self.updatePlanets( ephemNow )
         self.updateStars( ephemNow )
         self.updateComets( ephemNow, self.cometsMagnitude )
         self.updateSatellites( ephemNow, self.hideSatelliteIfNoVisiblePass )
-        return ephemNow
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
