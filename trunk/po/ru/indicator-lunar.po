@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-lunar 1.0.66\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2016-02-29 09:52+1100\n"
-"PO-Revision-Date: 2016-02-29 16:34+0300\n"
+"POT-Creation-Date: 2016-03-01 21:06+1100\n"
+"PO-Revision-Date: 2016-03-01 18:56+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -18,1664 +18,1664 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: indicator-lunar.py:133
+#: src/indicator-lunar.py:52
 msgid "You must also install python3-ephem!"
 msgstr "Вы также должны установить python3-ephem!"
 
-#: indicator-lunar.py:155
+#: src/indicator-lunar.py:74
 msgid ""
 "Displays lunar, solar, planetary, comet, star and satellite information."
 msgstr ""
 "Показывает сведения о Луне, Солнце, планетах, кометах, звёздах и спутниках "
 "Земли."
 
-#: indicator-lunar.py:156
+#: src/indicator-lunar.py:75
 msgid "Bright Limb from 'Astronomical Algorithms' by Jean Meeus."
 msgstr ""
 "Расчёт позиционного угла экватора интенсивности взят из\n"
 "\"Астрономических алгоритмов\" Жана Меёса."
 
-#: indicator-lunar.py:157
+#: src/indicator-lunar.py:76
 msgid ""
 "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa."
 "gov"
 msgstr ""
 "Сведения о затмениях: Фред Эспенак и Жан Меёс. http://eclipse.gsfc.nasa.gov"
 
-#: indicator-lunar.py:158
+#: src/indicator-lunar.py:77
 msgid "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem"
 msgstr ""
 "Расчёты выполняются благодаря использованию PyEphem/XEphem. http://"
 "rhodesmill.org/pyephem"
 
-#: indicator-lunar.py:159
+#: src/indicator-lunar.py:78
 msgid "Comet OE data by Minor Planet Center. http://www.minorplanetcenter.net"
 msgstr ""
 "Элементы орбит комет предоставлены Центром малых планет. http://www."
 "minorplanetcenter.net"
 
-#: indicator-lunar.py:160
+#: src/indicator-lunar.py:79
 msgid "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com"
 msgstr ""
 "Данные TLE для спутников предоставил д-р Т.С. Келсо. http://www.celestrak.com"
 
-#: indicator-lunar.py:161
+#: src/indicator-lunar.py:80
 msgid "Tropical Sign by Ignius Drake."
 msgstr "Расчёт знаков тропического зодиака предоставил Ignius Drake."
 
-#: indicator-lunar.py:167
+#: src/indicator-lunar.py:86
 msgid "(needs refresh)"
 msgstr "(необходимо обновить окно)"
 
-#: indicator-lunar.py:208
+#: src/indicator-lunar.py:126
 msgid "True"
 msgstr "да"
 
-#: indicator-lunar.py:209
+#: src/indicator-lunar.py:127
 msgid "False"
 msgstr "нет"
 
-#: indicator-lunar.py:396
+#: src/indicator-lunar.py:314
 msgid "ALTITUDE"
 msgstr "ВЫСОТА"
 
-#: indicator-lunar.py:397
+#: src/indicator-lunar.py:315
 msgid "AZIMUTH"
 msgstr "АЗИМУТ"
 
-#: indicator-lunar.py:398
+#: src/indicator-lunar.py:316
 msgid "BRIGHT LIMB"
 msgstr "УГОЛ ЭКВАТОРА ИНТЕНСИВНОСТИ"
 
-#: indicator-lunar.py:399
+#: src/indicator-lunar.py:317
 msgid "CONSTELLATION"
 msgstr "СОЗВЕЗДИЕ"
 
-#: indicator-lunar.py:400
+#: src/indicator-lunar.py:318
 msgid "DAWN"
 msgstr "РАССВЕТ"
 
-#: indicator-lunar.py:401
+#: src/indicator-lunar.py:319
 msgid "DECLINATION"
 msgstr "СКЛОНЕНИЕ"
 
-#: indicator-lunar.py:402
+#: src/indicator-lunar.py:320
 msgid "DISTANCE TO EARTH"
 msgstr "РАССТОЯНИЕ ДО ЗЕМЛИ"
 
-#: indicator-lunar.py:403
+#: src/indicator-lunar.py:321
 msgid "DISTANCE TO EARTH KM"
 msgstr "РАССТОЯНИЕ ДО ЗЕМЛИ КМ"
 
-#: indicator-lunar.py:404
+#: src/indicator-lunar.py:322
 msgid "DISTANCE TO SUN"
 msgstr "РАССТОЯНИЕ ДО СОЛНЦА"
 
-#: indicator-lunar.py:405
+#: src/indicator-lunar.py:323
 msgid "DUSK"
 msgstr "СУМЕРКИ"
 
-#: indicator-lunar.py:406
+#: src/indicator-lunar.py:324
 msgid "EARTH TILT"
 msgstr "НАКЛОН КОЛЕЦ К ЗЕМЛЕ"
 
-#: indicator-lunar.py:407
+#: src/indicator-lunar.py:325
 msgid "EARTH VISIBLE"
 msgstr "ВИДИМОСТЬ С ЗЕМЛИ"
 
-#: indicator-lunar.py:408
+#: src/indicator-lunar.py:326
 msgid "ECLIPSE DATE TIME"
 msgstr "ЗАТМЕНИЕ ДАТА ВРЕМЯ"
 
-#: indicator-lunar.py:409
+#: src/indicator-lunar.py:327
 msgid "ECLIPSE LATITUDE"
 msgstr "ЗАТМЕНИЕ ШИРОТА"
 
-#: indicator-lunar.py:410
+#: src/indicator-lunar.py:328
 msgid "ECLIPSE LONGITUDE"
 msgstr "ЗАТМЕНИЕ ДОЛГОТА"
 
-#: indicator-lunar.py:411
+#: src/indicator-lunar.py:329
 msgid "ECLIPSE TYPE"
 msgstr "ЗАТМЕНИЕ ТИП"
 
-#: indicator-lunar.py:412
+#: src/indicator-lunar.py:330
 msgid "ELEVATION"
 msgstr "ВЫСОТА"
 
-#: indicator-lunar.py:413
+#: src/indicator-lunar.py:331
 msgid "EQUINOX"
 msgstr "РАВНОДЕНСТВИЕ"
 
-#: indicator-lunar.py:414
+#: src/indicator-lunar.py:332
 msgid "FIRST QUARTER"
 msgstr "ПЕРВАЯ ЧЕТВЕРТЬ"
 
-#: indicator-lunar.py:415
+#: src/indicator-lunar.py:333
 msgid "FULL"
 msgstr "ПОЛНОЛУНИЕ"
 
-#: indicator-lunar.py:416
+#: src/indicator-lunar.py:334
 msgid "ILLUMINATION"
 msgstr "ОСВЕЩЁННОСТЬ ДИСКА"
 
-#: indicator-lunar.py:417
+#: src/indicator-lunar.py:335
 msgid "LATITUDE"
 msgstr "ШИРОТА"
 
-#: indicator-lunar.py:418
+#: src/indicator-lunar.py:336
 msgid "LONGITUDE"
 msgstr "ДОЛГОТА"
 
-#: indicator-lunar.py:419
+#: src/indicator-lunar.py:337
 msgid "MAGNITUDE"
 msgstr "ЗВЁЗДНАЯ ВЕЛИЧИНА"
 
-#: indicator-lunar.py:420
+#: src/indicator-lunar.py:338
 msgid "MESSAGE"
 msgstr "СООБЩЕНИЕ"
 
-#: indicator-lunar.py:421 indicator-lunar.py:928
+#: src/indicator-lunar.py:339 src/indicator-lunar.py:848
 msgid "NAME"
 msgstr "НАЗВАНИЕ"
 
-#: indicator-lunar.py:422
+#: src/indicator-lunar.py:340
 msgid "NEW"
 msgstr "НОВОЛУНИЕ"
 
-#: indicator-lunar.py:423
+#: src/indicator-lunar.py:341
 msgid "PHASE"
 msgstr "ФАЗА"
 
-#: indicator-lunar.py:424
+#: src/indicator-lunar.py:342
 msgid "RIGHT ASCENSION"
 msgstr "ПРЯМОЕ ВОСХОЖДЕНИЕ"
 
-#: indicator-lunar.py:425 indicator-lunar.py:931
+#: src/indicator-lunar.py:343 src/indicator-lunar.py:851
 msgid "RISE AZIMUTH"
 msgstr "АЗИМУТ ВОСХОДА"
 
-#: indicator-lunar.py:426 indicator-lunar.py:932
+#: src/indicator-lunar.py:344 src/indicator-lunar.py:852
 msgid "RISE TIME"
 msgstr "ВРЕМЯ ВОСХОДА"
 
-#: indicator-lunar.py:427 indicator-lunar.py:933
+#: src/indicator-lunar.py:345 src/indicator-lunar.py:853
 msgid "SET AZIMUTH"
 msgstr "АЗИМУТ ЗАХОДА"
 
-#: indicator-lunar.py:428 indicator-lunar.py:934
+#: src/indicator-lunar.py:346 src/indicator-lunar.py:854
 msgid "SET TIME"
 msgstr "ВРЕМЯ ЗАХОДА"
 
-#: indicator-lunar.py:429
+#: src/indicator-lunar.py:347
 msgid "SOLSTICE"
 msgstr "СОЛНЦЕСТОЯНИЕ"
 
-#: indicator-lunar.py:430
+#: src/indicator-lunar.py:348
 msgid "SUN TILT"
 msgstr "НАКЛОН КОЛЕЦ К СОЛНЦУ"
 
-#: indicator-lunar.py:431
+#: src/indicator-lunar.py:349
 msgid "THIRD QUARTER"
 msgstr "ПОСЛЕДНЯЯ ЧЕТВЕРТЬ"
 
-#: indicator-lunar.py:432
+#: src/indicator-lunar.py:350
 msgid "TROPICAL SIGN NAME"
 msgstr "ТРОПИЧЕСКИЙ ЗОДИАК ЗНАК"
 
-#: indicator-lunar.py:433
+#: src/indicator-lunar.py:351
 msgid "TROPICAL SIGN DEGREE"
 msgstr "ТРОПИЧЕСКИЙ ЗОДИАК ГРАДУСЫ"
 
-#: indicator-lunar.py:434
+#: src/indicator-lunar.py:352
 msgid "TROPICAL SIGN MINUTE"
 msgstr "ТРОПИЧЕСКИЙ ЗОДИАК МИНУТЫ"
 
-#: indicator-lunar.py:435 indicator-lunar.py:935
+#: src/indicator-lunar.py:353 src/indicator-lunar.py:855
 msgid "VISIBLE"
 msgstr "ВИДИМОСТЬ"
 
-#: indicator-lunar.py:436
+#: src/indicator-lunar.py:354
 msgid "X OFFSET"
 msgstr "СМЕЩЕНИЕ ПО ОСИ X"
 
-#: indicator-lunar.py:437
+#: src/indicator-lunar.py:355
 msgid "Y OFFSET"
 msgstr "СМЕЩЕНИЕ ПО ОСИ Y"
 
-#: indicator-lunar.py:438
+#: src/indicator-lunar.py:356
 msgid "Z OFFSET"
 msgstr "СМЕЩЕНИЕ ПО ОСИ Z"
 
-#: indicator-lunar.py:443
+#: src/indicator-lunar.py:361
 msgid "Andromeda"
 msgstr "Андромеда"
 
-#: indicator-lunar.py:444
+#: src/indicator-lunar.py:362
 msgid "Antlia"
 msgstr "Насос"
 
-#: indicator-lunar.py:445
+#: src/indicator-lunar.py:363
 msgid "Apus"
 msgstr "Райская Птица"
 
-#: indicator-lunar.py:446
+#: src/indicator-lunar.py:364
 msgid "Aquila"
 msgstr "Орёл"
 
-#: indicator-lunar.py:447 indicator-lunar.py:975
+#: src/indicator-lunar.py:365 src/indicator-lunar.py:895
 msgid "Aquarius"
 msgstr "Водолей"
 
-#: indicator-lunar.py:448
+#: src/indicator-lunar.py:366
 msgid "Ara"
 msgstr "Жертвенник"
 
-#: indicator-lunar.py:449 indicator-lunar.py:965
+#: src/indicator-lunar.py:367 src/indicator-lunar.py:885
 msgid "Aries"
 msgstr "Овен"
 
-#: indicator-lunar.py:450
+#: src/indicator-lunar.py:368
 msgid "Auriga"
 msgstr "Возничий"
 
-#: indicator-lunar.py:451
+#: src/indicator-lunar.py:369
 msgid "Bootes"
 msgstr "Волопас"
 
-#: indicator-lunar.py:452
+#: src/indicator-lunar.py:370
 msgid "Canis Major"
 msgstr "Большой Пёс"
 
-#: indicator-lunar.py:453
+#: src/indicator-lunar.py:371
 msgid "Canis Minor"
 msgstr "Малый Пёс"
 
-#: indicator-lunar.py:454
+#: src/indicator-lunar.py:372
 msgid "Canes Venatici"
 msgstr "Гончие Псы"
 
-#: indicator-lunar.py:455
+#: src/indicator-lunar.py:373
 msgid "Caelum"
 msgstr "Резец"
 
-#: indicator-lunar.py:456
+#: src/indicator-lunar.py:374
 msgid "Camelopardalis"
 msgstr "Жираф"
 
-#: indicator-lunar.py:457
+#: src/indicator-lunar.py:375
 msgid "Capricornus"
 msgstr "Козерог"
 
-#: indicator-lunar.py:458
+#: src/indicator-lunar.py:376
 msgid "Carina"
 msgstr "Киль"
 
-#: indicator-lunar.py:459
+#: src/indicator-lunar.py:377
 msgid "Cassiopeia"
 msgstr "Кассиопея"
 
-#: indicator-lunar.py:460
+#: src/indicator-lunar.py:378
 msgid "Centaurus"
 msgstr "Центавр"
 
-#: indicator-lunar.py:461
+#: src/indicator-lunar.py:379
 msgid "Cepheus"
 msgstr "Цефей"
 
-#: indicator-lunar.py:462
+#: src/indicator-lunar.py:380
 msgid "Cetus"
 msgstr "Кит"
 
-#: indicator-lunar.py:463
+#: src/indicator-lunar.py:381
 msgid "Chamaeleon"
 msgstr "Хамелеон"
 
-#: indicator-lunar.py:464
+#: src/indicator-lunar.py:382
 msgid "Circinus"
 msgstr "Циркуль"
 
-#: indicator-lunar.py:465 indicator-lunar.py:968
+#: src/indicator-lunar.py:383 src/indicator-lunar.py:888
 msgid "Cancer"
 msgstr "Рак"
 
-#: indicator-lunar.py:466
+#: src/indicator-lunar.py:384
 msgid "Columba"
 msgstr "Голубь"
 
-#: indicator-lunar.py:467
+#: src/indicator-lunar.py:385
 msgid "Coma Berenices"
 msgstr "Волосы Вероники"
 
-#: indicator-lunar.py:468
+#: src/indicator-lunar.py:386
 msgid "Corona Australis"
 msgstr "Южная Корона"
 
-#: indicator-lunar.py:469
+#: src/indicator-lunar.py:387
 msgid "Corona Borealis"
 msgstr "Северная Корона"
 
-#: indicator-lunar.py:470
+#: src/indicator-lunar.py:388
 msgid "Crater"
 msgstr "Чаша"
 
-#: indicator-lunar.py:471
+#: src/indicator-lunar.py:389
 msgid "Crux"
 msgstr "Южный Крест"
 
-#: indicator-lunar.py:472
+#: src/indicator-lunar.py:390
 msgid "Corvus"
 msgstr "Ворон"
 
-#: indicator-lunar.py:473
+#: src/indicator-lunar.py:391
 msgid "Cygnus"
 msgstr "Лебедь"
 
-#: indicator-lunar.py:474
+#: src/indicator-lunar.py:392
 msgid "Delphinus"
 msgstr "Дельфин"
 
-#: indicator-lunar.py:475
+#: src/indicator-lunar.py:393
 msgid "Dorado"
 msgstr "Золотая Рыба"
 
-#: indicator-lunar.py:476
+#: src/indicator-lunar.py:394
 msgid "Draco"
 msgstr "Дракон"
 
-#: indicator-lunar.py:477
+#: src/indicator-lunar.py:395
 msgid "Equuleus"
 msgstr "Малый Конь"
 
-#: indicator-lunar.py:478
+#: src/indicator-lunar.py:396
 msgid "Eridanus"
 msgstr "Эридан"
 
-#: indicator-lunar.py:479
+#: src/indicator-lunar.py:397
 msgid "Fornax"
 msgstr "Печь"
 
-#: indicator-lunar.py:480 indicator-lunar.py:967
+#: src/indicator-lunar.py:398 src/indicator-lunar.py:887
 msgid "Gemini"
 msgstr "Близнецы"
 
-#: indicator-lunar.py:481
+#: src/indicator-lunar.py:399
 msgid "Grus"
 msgstr "Журавль"
 
-#: indicator-lunar.py:482
+#: src/indicator-lunar.py:400
 msgid "Hercules"
 msgstr "Геркулес"
 
-#: indicator-lunar.py:483
+#: src/indicator-lunar.py:401
 msgid "Horologium"
 msgstr "Часы"
 
-#: indicator-lunar.py:484
+#: src/indicator-lunar.py:402
 msgid "Hydra"
 msgstr "Гидра"
 
-#: indicator-lunar.py:485
+#: src/indicator-lunar.py:403
 msgid "Hydrus"
 msgstr "Южная Гидра"
 
-#: indicator-lunar.py:486
+#: src/indicator-lunar.py:404
 msgid "Indus"
 msgstr "Индеец"
 
-#: indicator-lunar.py:487
+#: src/indicator-lunar.py:405
 msgid "Leo Minor"
 msgstr "Малый Лев"
 
-#: indicator-lunar.py:488
+#: src/indicator-lunar.py:406
 msgid "Lacerta"
 msgstr "Ящерица"
 
-#: indicator-lunar.py:489 indicator-lunar.py:969
+#: src/indicator-lunar.py:407 src/indicator-lunar.py:889
 msgid "Leo"
 msgstr "Лев"
 
-#: indicator-lunar.py:490
+#: src/indicator-lunar.py:408
 msgid "Lepus"
 msgstr "Заяц"
 
-#: indicator-lunar.py:491 indicator-lunar.py:971
+#: src/indicator-lunar.py:409 src/indicator-lunar.py:891
 msgid "Libra"
 msgstr "Весы"
 
-#: indicator-lunar.py:492
+#: src/indicator-lunar.py:410
 msgid "Lupus"
 msgstr "Волк"
 
-#: indicator-lunar.py:493
+#: src/indicator-lunar.py:411
 msgid "Lynx"
 msgstr "Рысь"
 
-#: indicator-lunar.py:494
+#: src/indicator-lunar.py:412
 msgid "Lyra"
 msgstr "Лира"
 
-#: indicator-lunar.py:495
+#: src/indicator-lunar.py:413
 msgid "Mensa"
 msgstr "Столовая Гора"
 
-#: indicator-lunar.py:496
+#: src/indicator-lunar.py:414
 msgid "Microscopium"
 msgstr "Микроскоп"
 
-#: indicator-lunar.py:497
+#: src/indicator-lunar.py:415
 msgid "Monoceros"
 msgstr "Единорог"
 
-#: indicator-lunar.py:498
+#: src/indicator-lunar.py:416
 msgid "Musca"
 msgstr "Муха"
 
-#: indicator-lunar.py:499
+#: src/indicator-lunar.py:417
 msgid "Norma"
 msgstr "Наугольник"
 
-#: indicator-lunar.py:500
+#: src/indicator-lunar.py:418
 msgid "Octans"
 msgstr "Октант"
 
-#: indicator-lunar.py:501
+#: src/indicator-lunar.py:419
 msgid "Ophiuchus"
 msgstr "Змееносец"
 
-#: indicator-lunar.py:502
+#: src/indicator-lunar.py:420
 msgid "Orion"
 msgstr "Орион"
 
-#: indicator-lunar.py:503
+#: src/indicator-lunar.py:421
 msgid "Pavo"
 msgstr "Павлин"
 
-#: indicator-lunar.py:504
+#: src/indicator-lunar.py:422
 msgid "Pegasus"
 msgstr "Пегас"
 
-#: indicator-lunar.py:505
+#: src/indicator-lunar.py:423
 msgid "Perseus"
 msgstr "Персей"
 
-#: indicator-lunar.py:506
+#: src/indicator-lunar.py:424
 msgid "Phoenix"
 msgstr "Феникс"
 
-#: indicator-lunar.py:507
+#: src/indicator-lunar.py:425
 msgid "Pictor"
 msgstr "Живописец"
 
-#: indicator-lunar.py:508
+#: src/indicator-lunar.py:426
 msgid "Piscis Austrinus"
 msgstr "Южная Рыба"
 
-#: indicator-lunar.py:509 indicator-lunar.py:976
+#: src/indicator-lunar.py:427 src/indicator-lunar.py:896
 msgid "Pisces"
 msgstr "Рыбы"
 
-#: indicator-lunar.py:510
+#: src/indicator-lunar.py:428
 msgid "Puppis"
 msgstr "Корма"
 
-#: indicator-lunar.py:511
+#: src/indicator-lunar.py:429
 msgid "Pyxis"
 msgstr "Компас"
 
-#: indicator-lunar.py:512
+#: src/indicator-lunar.py:430
 msgid "Reticulum"
 msgstr "Сетка"
 
-#: indicator-lunar.py:513
+#: src/indicator-lunar.py:431
 msgid "Sculptor"
 msgstr "Скульптор"
 
-#: indicator-lunar.py:514
+#: src/indicator-lunar.py:432
 msgid "Scorpius"
 msgstr "Скорпион"
 
-#: indicator-lunar.py:515
+#: src/indicator-lunar.py:433
 msgid "Scutum"
 msgstr "Щит"
 
-#: indicator-lunar.py:516
+#: src/indicator-lunar.py:434
 msgid "Serpens Caput"
 msgstr "Голова Змеи"
 
-#: indicator-lunar.py:517
+#: src/indicator-lunar.py:435
 msgid "Sextans"
 msgstr "Секстант"
 
-#: indicator-lunar.py:518
+#: src/indicator-lunar.py:436
 msgid "Sagitta"
 msgstr "Стрела"
 
-#: indicator-lunar.py:519 indicator-lunar.py:973
+#: src/indicator-lunar.py:437 src/indicator-lunar.py:893
 msgid "Sagittarius"
 msgstr "Стрелец"
 
-#: indicator-lunar.py:520 indicator-lunar.py:966
+#: src/indicator-lunar.py:438 src/indicator-lunar.py:886
 msgid "Taurus"
 msgstr "Телец"
 
-#: indicator-lunar.py:521
+#: src/indicator-lunar.py:439
 msgid "Telescopium"
 msgstr "Телескоп"
 
-#: indicator-lunar.py:522
+#: src/indicator-lunar.py:440
 msgid "Triangulum Australe"
 msgstr "Южный Треугольник"
 
-#: indicator-lunar.py:523
+#: src/indicator-lunar.py:441
 msgid "Triangulum"
 msgstr "Треугольник"
 
-#: indicator-lunar.py:524
+#: src/indicator-lunar.py:442
 msgid "Tucana"
 msgstr "Тукан"
 
-#: indicator-lunar.py:525
+#: src/indicator-lunar.py:443
 msgid "Ursa Major"
 msgstr "Большая Медведица"
 
-#: indicator-lunar.py:526
+#: src/indicator-lunar.py:444
 msgid "Ursa Minor"
 msgstr "Малая Медведица"
 
-#: indicator-lunar.py:527
+#: src/indicator-lunar.py:445
 msgid "Vela"
 msgstr "Паруса"
 
-#: indicator-lunar.py:528 indicator-lunar.py:970
+#: src/indicator-lunar.py:446 src/indicator-lunar.py:890
 msgid "Virgo"
 msgstr "Дева"
 
-#: indicator-lunar.py:529
+#: src/indicator-lunar.py:447
 msgid "Volans"
 msgstr "Летучая Рыба"
 
-#: indicator-lunar.py:530
+#: src/indicator-lunar.py:448
 msgid "Vulpecula"
 msgstr "Лисичка"
 
-#: indicator-lunar.py:531
+#: src/indicator-lunar.py:449
 msgid "Serpens Cauda"
 msgstr "Хвост Змеи"
 
-#: indicator-lunar.py:534
+#: src/indicator-lunar.py:452
 msgid "CITY"
 msgstr "ГОРОД"
 
-#: indicator-lunar.py:537
+#: src/indicator-lunar.py:455
 msgid "MOON"
 msgstr "ЛУНА"
 
-#: indicator-lunar.py:540
+#: src/indicator-lunar.py:458
 msgid "SUN"
 msgstr "СОЛНЦЕ"
 
-#: indicator-lunar.py:583
+#: src/indicator-lunar.py:501
 msgid "Mercury"
 msgstr "Меркурий"
 
-#: indicator-lunar.py:584
+#: src/indicator-lunar.py:502
 msgid "Venus"
 msgstr "Венера"
 
-#: indicator-lunar.py:585
+#: src/indicator-lunar.py:503
 msgid "Mars"
 msgstr "Марс"
 
-#: indicator-lunar.py:586
+#: src/indicator-lunar.py:504
 msgid "Jupiter"
 msgstr "Юпитер"
 
-#: indicator-lunar.py:587
+#: src/indicator-lunar.py:505
 msgid "Saturn"
 msgstr "Сатурн"
 
-#: indicator-lunar.py:588
+#: src/indicator-lunar.py:506
 msgid "Uranus"
 msgstr "Уран"
 
-#: indicator-lunar.py:589
+#: src/indicator-lunar.py:507
 msgid "Neptune"
 msgstr "Нептун"
 
-#: indicator-lunar.py:590
+#: src/indicator-lunar.py:508
 msgid "Pluto"
 msgstr "Плутон"
 
-#: indicator-lunar.py:592
+#: src/indicator-lunar.py:510
 msgid "Deimos"
 msgstr "Деймос"
 
-#: indicator-lunar.py:593
+#: src/indicator-lunar.py:511
 msgid "Phobos"
 msgstr "Фобос"
 
-#: indicator-lunar.py:595
+#: src/indicator-lunar.py:513
 msgid "Callisto"
 msgstr "Каллисто"
 
-#: indicator-lunar.py:596
+#: src/indicator-lunar.py:514
 msgid "Europa"
 msgstr "Европа"
 
-#: indicator-lunar.py:597
+#: src/indicator-lunar.py:515
 msgid "Ganymede"
 msgstr "Ганимед"
 
-#: indicator-lunar.py:598
+#: src/indicator-lunar.py:516
 msgid "Io"
 msgstr "Ио"
 
-#: indicator-lunar.py:600
+#: src/indicator-lunar.py:518
 msgid "Dione"
 msgstr "Диона"
 
-#: indicator-lunar.py:601
+#: src/indicator-lunar.py:519
 msgid "Enceladus"
 msgstr "Энцелад"
 
-#: indicator-lunar.py:602
+#: src/indicator-lunar.py:520
 msgid "Hyperion"
 msgstr "Гиперион"
 
-#: indicator-lunar.py:603
+#: src/indicator-lunar.py:521
 msgid "Iapetus"
 msgstr "Япет"
 
-#: indicator-lunar.py:604
+#: src/indicator-lunar.py:522
 msgid "Mimas"
 msgstr "Мимас"
 
-#: indicator-lunar.py:605
+#: src/indicator-lunar.py:523
 msgid "Rhea"
 msgstr "Рея"
 
-#: indicator-lunar.py:606
+#: src/indicator-lunar.py:524
 msgid "Tethys"
 msgstr "Тефия"
 
-#: indicator-lunar.py:607
+#: src/indicator-lunar.py:525
 msgid "Titan"
 msgstr "Титан"
 
-#: indicator-lunar.py:609
+#: src/indicator-lunar.py:527
 msgid "Ariel"
 msgstr "Ариэль"
 
-#: indicator-lunar.py:610
+#: src/indicator-lunar.py:528
 msgid "Miranda"
 msgstr "Миранда"
 
-#: indicator-lunar.py:611
+#: src/indicator-lunar.py:529
 msgid "Oberon"
 msgstr "Оберон"
 
-#: indicator-lunar.py:612
+#: src/indicator-lunar.py:530
 msgid "Titania"
 msgstr "Титания"
 
-#: indicator-lunar.py:613
+#: src/indicator-lunar.py:531
 msgid "Umbriel"
 msgstr "Умбриэль"
 
-#: indicator-lunar.py:616
+#: src/indicator-lunar.py:534
 msgid "MERCURY"
 msgstr "МЕРКУРИЙ"
 
-#: indicator-lunar.py:617
+#: src/indicator-lunar.py:535
 msgid "VENUS"
 msgstr "ВЕНЕРА"
 
-#: indicator-lunar.py:618
+#: src/indicator-lunar.py:536
 msgid "MARS"
 msgstr "МАРС"
 
-#: indicator-lunar.py:619
+#: src/indicator-lunar.py:537
 msgid "JUPITER"
 msgstr "ЮПИТЕР"
 
-#: indicator-lunar.py:620
+#: src/indicator-lunar.py:538
 msgid "SATURN"
 msgstr "САТУРН"
 
-#: indicator-lunar.py:621
+#: src/indicator-lunar.py:539
 msgid "URANUS"
 msgstr "УРАН"
 
-#: indicator-lunar.py:622
+#: src/indicator-lunar.py:540
 msgid "NEPTUNE"
 msgstr "НЕПТУН"
 
-#: indicator-lunar.py:623
+#: src/indicator-lunar.py:541
 msgid "PLUTO"
 msgstr "ПЛУТОН"
 
-#: indicator-lunar.py:625
+#: src/indicator-lunar.py:543
 msgid "DEIMOS"
 msgstr "ДЕЙМОС"
 
-#: indicator-lunar.py:626
+#: src/indicator-lunar.py:544
 msgid "PHOBOS"
 msgstr "ФОБОС"
 
-#: indicator-lunar.py:628
+#: src/indicator-lunar.py:546
 msgid "CALLISTO"
 msgstr "КАЛЛИСТО"
 
-#: indicator-lunar.py:629
+#: src/indicator-lunar.py:547
 msgid "EUROPA"
 msgstr "ЕВРОПА"
 
-#: indicator-lunar.py:630
+#: src/indicator-lunar.py:548
 msgid "GANYMEDE"
 msgstr "ГАНИМЕД"
 
-#: indicator-lunar.py:631
+#: src/indicator-lunar.py:549
 msgid "IO"
 msgstr "ИО"
 
-#: indicator-lunar.py:633
+#: src/indicator-lunar.py:551
 msgid "DIONE"
 msgstr "ДИОНА"
 
-#: indicator-lunar.py:634
+#: src/indicator-lunar.py:552
 msgid "ENCELADUS"
 msgstr "ЭНЦЕЛАД"
 
-#: indicator-lunar.py:635
+#: src/indicator-lunar.py:553
 msgid "HYPERION"
 msgstr "ГИПЕРИОН"
 
-#: indicator-lunar.py:636
+#: src/indicator-lunar.py:554
 msgid "IAPETUS"
 msgstr "ЯПЕТ"
 
-#: indicator-lunar.py:637
+#: src/indicator-lunar.py:555
 msgid "MIMAS"
 msgstr "МИМАС"
 
-#: indicator-lunar.py:638
+#: src/indicator-lunar.py:556
 msgid "RHEA"
 msgstr "РЕЯ"
 
-#: indicator-lunar.py:639
+#: src/indicator-lunar.py:557
 msgid "TETHYS"
 msgstr "ТЕФИЯ"
 
-#: indicator-lunar.py:640
+#: src/indicator-lunar.py:558
 msgid "TITAN"
 msgstr "ТИТАН"
 
-#: indicator-lunar.py:642
+#: src/indicator-lunar.py:560
 msgid "ARIEL"
 msgstr "АРИЭЛЬ"
 
-#: indicator-lunar.py:643
+#: src/indicator-lunar.py:561
 msgid "MIRANDA"
 msgstr "МИРАНДА"
 
-#: indicator-lunar.py:644
+#: src/indicator-lunar.py:562
 msgid "OBERON"
 msgstr "ОБЕРОН"
 
-#: indicator-lunar.py:645
+#: src/indicator-lunar.py:563
 msgid "TITANIA"
 msgstr "ТИТАНИЯ"
 
-#: indicator-lunar.py:646
+#: src/indicator-lunar.py:564
 msgid "UMBRIEL"
 msgstr "УМБРИЭЛЬ"
 
-#: indicator-lunar.py:651
+#: src/indicator-lunar.py:569
 msgid "Achernar"
 msgstr "Ахернар"
 
-#: indicator-lunar.py:652
+#: src/indicator-lunar.py:570
 msgid "Adara"
 msgstr "Адара"
 
-#: indicator-lunar.py:653
+#: src/indicator-lunar.py:571
 msgid "Agena"
 msgstr "Хадар"
 
-#: indicator-lunar.py:654
+#: src/indicator-lunar.py:572
 msgid "Albereo"
 msgstr "Альбирео"
 
-#: indicator-lunar.py:655
+#: src/indicator-lunar.py:573
 msgid "Alcaid"
 msgstr "Алькаид"
 
-#: indicator-lunar.py:656
+#: src/indicator-lunar.py:574
 msgid "Alcor"
 msgstr "Алькор"
 
-#: indicator-lunar.py:657
+#: src/indicator-lunar.py:575
 msgid "Alcyone"
 msgstr "Альциона"
 
-#: indicator-lunar.py:658
+#: src/indicator-lunar.py:576
 msgid "Aldebaran"
 msgstr "Альдебаран"
 
-#: indicator-lunar.py:659
+#: src/indicator-lunar.py:577
 msgid "Alderamin"
 msgstr "Альдерамин"
 
-#: indicator-lunar.py:660
+#: src/indicator-lunar.py:578
 msgid "Alfirk"
 msgstr "Альфирк"
 
-#: indicator-lunar.py:661
+#: src/indicator-lunar.py:579
 msgid "Algenib"
 msgstr "Альгениб"
 
-#: indicator-lunar.py:662
+#: src/indicator-lunar.py:580
 msgid "Algieba"
 msgstr "Альгиеба"
 
-#: indicator-lunar.py:663
+#: src/indicator-lunar.py:581
 msgid "Algol"
 msgstr "Алголь"
 
-#: indicator-lunar.py:664
+#: src/indicator-lunar.py:582
 msgid "Alhena"
 msgstr "Альхена"
 
-#: indicator-lunar.py:665
+#: src/indicator-lunar.py:583
 msgid "Alioth"
 msgstr "Алиот"
 
-#: indicator-lunar.py:666
+#: src/indicator-lunar.py:584
 msgid "Almach"
 msgstr "Аламак"
 
-#: indicator-lunar.py:667
+#: src/indicator-lunar.py:585
 msgid "Alnair"
 msgstr "Альнаир"
 
-#: indicator-lunar.py:668
+#: src/indicator-lunar.py:586
 msgid "Alnilam"
 msgstr "Альнилам"
 
-#: indicator-lunar.py:669
+#: src/indicator-lunar.py:587
 msgid "Alnitak"
 msgstr "Альнитак"
 
-#: indicator-lunar.py:670
+#: src/indicator-lunar.py:588
 msgid "Alphard"
 msgstr "Альфард"
 
-#: indicator-lunar.py:671
+#: src/indicator-lunar.py:589
 msgid "Alphecca"
 msgstr "Альфекка"
 
-#: indicator-lunar.py:672
+#: src/indicator-lunar.py:590
 msgid "Alshain"
 msgstr "Альшаин"
 
-#: indicator-lunar.py:673
+#: src/indicator-lunar.py:591
 msgid "Altair"
 msgstr "Альтаир"
 
-#: indicator-lunar.py:674
+#: src/indicator-lunar.py:592
 msgid "Antares"
 msgstr "Антарес"
 
-#: indicator-lunar.py:675
+#: src/indicator-lunar.py:593
 msgid "Arcturus"
 msgstr "Арктур"
 
-#: indicator-lunar.py:676
+#: src/indicator-lunar.py:594
 msgid "Arkab Posterior"
 msgstr "Аркаб Постериор"
 
-#: indicator-lunar.py:677
+#: src/indicator-lunar.py:595
 msgid "Arkab Prior"
 msgstr "Аркаб Приор"
 
-#: indicator-lunar.py:678
+#: src/indicator-lunar.py:596
 msgid "Arneb"
 msgstr "Арнеб"
 
-#: indicator-lunar.py:679
+#: src/indicator-lunar.py:597
 msgid "Atlas"
 msgstr "Атлас"
 
-#: indicator-lunar.py:680
+#: src/indicator-lunar.py:598
 msgid "Bellatrix"
 msgstr "Беллатрикс"
 
-#: indicator-lunar.py:681
+#: src/indicator-lunar.py:599
 msgid "Betelgeuse"
 msgstr "Бетельгейзе"
 
-#: indicator-lunar.py:682
+#: src/indicator-lunar.py:600
 msgid "Canopus"
 msgstr "Канопус"
 
-#: indicator-lunar.py:683
+#: src/indicator-lunar.py:601
 msgid "Capella"
 msgstr "Капелла"
 
-#: indicator-lunar.py:684
+#: src/indicator-lunar.py:602
 msgid "Caph"
 msgstr "Каф"
 
-#: indicator-lunar.py:685
+#: src/indicator-lunar.py:603
 msgid "Castor"
 msgstr "Кастор"
 
-#: indicator-lunar.py:686
+#: src/indicator-lunar.py:604
 msgid "Cebalrai"
 msgstr "Цельбальрай"
 
-#: indicator-lunar.py:687
+#: src/indicator-lunar.py:605
 msgid "Deneb"
 msgstr "Денеб"
 
-#: indicator-lunar.py:688
+#: src/indicator-lunar.py:606
 msgid "Denebola"
 msgstr "Денебола"
 
-#: indicator-lunar.py:689
+#: src/indicator-lunar.py:607
 msgid "Dubhe"
 msgstr "Дубхе"
 
-#: indicator-lunar.py:690
+#: src/indicator-lunar.py:608
 msgid "Electra"
 msgstr "Электра"
 
-#: indicator-lunar.py:691
+#: src/indicator-lunar.py:609
 msgid "Elnath"
 msgstr "Нат"
 
-#: indicator-lunar.py:692
+#: src/indicator-lunar.py:610
 msgid "Enif"
 msgstr "Эниф"
 
-#: indicator-lunar.py:693
+#: src/indicator-lunar.py:611
 msgid "Etamin"
 msgstr "Этамин"
 
-#: indicator-lunar.py:694
+#: src/indicator-lunar.py:612
 msgid "Fomalhaut"
 msgstr "Фомальгаут"
 
-#: indicator-lunar.py:695
+#: src/indicator-lunar.py:613
 msgid "Gienah Corvi"
 msgstr "Дженах Ворона"
 
-#: indicator-lunar.py:696
+#: src/indicator-lunar.py:614
 msgid "Hamal"
 msgstr "Хамаль"
 
-#: indicator-lunar.py:697
+#: src/indicator-lunar.py:615
 msgid "Izar"
 msgstr "Ицар"
 
-#: indicator-lunar.py:698
+#: src/indicator-lunar.py:616
 msgid "Kaus Australis"
 msgstr "Каус Аустралис"
 
-#: indicator-lunar.py:699
+#: src/indicator-lunar.py:617
 msgid "Kochab"
 msgstr "Кохаб"
 
-#: indicator-lunar.py:700
+#: src/indicator-lunar.py:618
 msgid "Maia"
 msgstr "Майя"
 
-#: indicator-lunar.py:701
+#: src/indicator-lunar.py:619
 msgid "Markab"
 msgstr "Маркаб"
 
-#: indicator-lunar.py:702
+#: src/indicator-lunar.py:620
 msgid "Megrez"
 msgstr "Мегрец"
 
-#: indicator-lunar.py:703
+#: src/indicator-lunar.py:621
 msgid "Menkalinan"
 msgstr "Менкалинан"
 
-#: indicator-lunar.py:704
+#: src/indicator-lunar.py:622
 msgid "Menkar"
 msgstr "Менкар"
 
-#: indicator-lunar.py:705
+#: src/indicator-lunar.py:623
 msgid "Merak"
 msgstr "Мерак"
 
-#: indicator-lunar.py:706
+#: src/indicator-lunar.py:624
 msgid "Merope"
 msgstr "Меропа"
 
-#: indicator-lunar.py:707
+#: src/indicator-lunar.py:625
 msgid "Mimosa"
 msgstr "Мимоза"
 
-#: indicator-lunar.py:708
+#: src/indicator-lunar.py:626
 msgid "Minkar"
 msgstr "Минкар"
 
-#: indicator-lunar.py:709
+#: src/indicator-lunar.py:627
 msgid "Mintaka"
 msgstr "Минтака"
 
-#: indicator-lunar.py:710
+#: src/indicator-lunar.py:628
 msgid "Mirach"
 msgstr "Мирах"
 
-#: indicator-lunar.py:711
+#: src/indicator-lunar.py:629
 msgid "Mirzam"
 msgstr "Мирцам"
 
-#: indicator-lunar.py:712
+#: src/indicator-lunar.py:630
 msgid "Mizar"
 msgstr "Мицар"
 
-#: indicator-lunar.py:713
+#: src/indicator-lunar.py:631
 msgid "Naos"
 msgstr "Наос"
 
-#: indicator-lunar.py:714
+#: src/indicator-lunar.py:632
 msgid "Nihal"
 msgstr "Нихал"
 
-#: indicator-lunar.py:715
+#: src/indicator-lunar.py:633
 msgid "Nunki"
 msgstr "Нунки"
 
-#: indicator-lunar.py:716
+#: src/indicator-lunar.py:634
 msgid "Peacock"
 msgstr "Пикок"
 
-#: indicator-lunar.py:717
+#: src/indicator-lunar.py:635
 msgid "Phecda"
 msgstr "Фекда"
 
-#: indicator-lunar.py:718
+#: src/indicator-lunar.py:636
 msgid "Polaris"
 msgstr "Полярная звезда"
 
-#: indicator-lunar.py:719
+#: src/indicator-lunar.py:637
 msgid "Pollux"
 msgstr "Поллукс"
 
-#: indicator-lunar.py:720
+#: src/indicator-lunar.py:638
 msgid "Procyon"
 msgstr "Процион"
 
-#: indicator-lunar.py:721
+#: src/indicator-lunar.py:639
 msgid "Rasalgethi"
 msgstr "Рас Альгети"
 
-#: indicator-lunar.py:722
+#: src/indicator-lunar.py:640
 msgid "Rasalhague"
 msgstr "Рас Альхаг"
 
-#: indicator-lunar.py:723
+#: src/indicator-lunar.py:641
 msgid "Regulus"
 msgstr "Регул"
 
-#: indicator-lunar.py:724
+#: src/indicator-lunar.py:642
 msgid "Rigel"
 msgstr "Ригель"
 
-#: indicator-lunar.py:725
+#: src/indicator-lunar.py:643
 msgid "Rukbat"
 msgstr "Рукбат"
 
-#: indicator-lunar.py:726
+#: src/indicator-lunar.py:644
 msgid "Sadalmelik"
 msgstr "Садальмелик"
 
-#: indicator-lunar.py:727
+#: src/indicator-lunar.py:645
 msgid "Sadr"
 msgstr "Садр"
 
-#: indicator-lunar.py:728
+#: src/indicator-lunar.py:646
 msgid "Saiph"
 msgstr "Саиф"
 
-#: indicator-lunar.py:729
+#: src/indicator-lunar.py:647
 msgid "Scheat"
 msgstr "Шеат"
 
-#: indicator-lunar.py:730
+#: src/indicator-lunar.py:648
 msgid "Schedar"
 msgstr "Шедар"
 
-#: indicator-lunar.py:731
+#: src/indicator-lunar.py:649
 msgid "Shaula"
 msgstr "Шаула"
 
-#: indicator-lunar.py:732
+#: src/indicator-lunar.py:650
 msgid "Sheliak"
 msgstr "Шелиак"
 
-#: indicator-lunar.py:733
+#: src/indicator-lunar.py:651
 msgid "Sirius"
 msgstr "Сириус"
 
-#: indicator-lunar.py:734
+#: src/indicator-lunar.py:652
 msgid "Sirrah"
 msgstr "Альферац"
 
-#: indicator-lunar.py:735
+#: src/indicator-lunar.py:653
 msgid "Spica"
 msgstr "Спика"
 
-#: indicator-lunar.py:736
+#: src/indicator-lunar.py:654
 msgid "Sulafat"
 msgstr "Сулафат"
 
-#: indicator-lunar.py:737
+#: src/indicator-lunar.py:655
 msgid "Tarazed"
 msgstr "Таразед"
 
-#: indicator-lunar.py:738
+#: src/indicator-lunar.py:656
 msgid "Taygeta"
 msgstr "Тайгета"
 
-#: indicator-lunar.py:739
+#: src/indicator-lunar.py:657
 msgid "Thuban"
 msgstr "Тубан"
 
-#: indicator-lunar.py:740
+#: src/indicator-lunar.py:658
 msgid "Unukalhai"
 msgstr "Унукалхай"
 
-#: indicator-lunar.py:741
+#: src/indicator-lunar.py:659
 msgid "Vega"
 msgstr "Вега"
 
-#: indicator-lunar.py:742
+#: src/indicator-lunar.py:660
 msgid "Vindemiatrix"
 msgstr "Виндемиатрикс"
 
-#: indicator-lunar.py:743
+#: src/indicator-lunar.py:661
 msgid "Wezen"
 msgstr "Везен"
 
-#: indicator-lunar.py:744
+#: src/indicator-lunar.py:662
 msgid "Zaurak"
 msgstr "Заурак"
 
-#: indicator-lunar.py:749
+#: src/indicator-lunar.py:667
 msgid "ACHERNAR"
 msgstr "АХЕРНАР"
 
-#: indicator-lunar.py:750
+#: src/indicator-lunar.py:668
 msgid "ADARA"
 msgstr "АДАРА"
 
-#: indicator-lunar.py:751
+#: src/indicator-lunar.py:669
 msgid "AGENA"
 msgstr "ХАДАР"
 
-#: indicator-lunar.py:752
+#: src/indicator-lunar.py:670
 msgid "ALBEREO"
 msgstr "АЛЬБИРЕО"
 
-#: indicator-lunar.py:753
+#: src/indicator-lunar.py:671
 msgid "ALCAID"
 msgstr "АЛЬКАИД"
 
-#: indicator-lunar.py:754
+#: src/indicator-lunar.py:672
 msgid "ALCOR"
 msgstr "АЛЬКОР"
 
-#: indicator-lunar.py:755
+#: src/indicator-lunar.py:673
 msgid "ALCYONE"
 msgstr "АЛЬЦИОНА"
 
-#: indicator-lunar.py:756
+#: src/indicator-lunar.py:674
 msgid "ALDEBARAN"
 msgstr "АЛЬДЕБАРАН"
 
-#: indicator-lunar.py:757
+#: src/indicator-lunar.py:675
 msgid "ALDERAMIN"
 msgstr "АЛЬДЕРАМИН"
 
-#: indicator-lunar.py:758
+#: src/indicator-lunar.py:676
 msgid "ALFIRK"
 msgstr "АЛЬФИРК"
 
-#: indicator-lunar.py:759
+#: src/indicator-lunar.py:677
 msgid "ALGENIB"
 msgstr "АЛЬГЕНИБ"
 
-#: indicator-lunar.py:760
+#: src/indicator-lunar.py:678
 msgid "ALGIEBA"
 msgstr "АЛЬГИЕБА"
 
-#: indicator-lunar.py:761
+#: src/indicator-lunar.py:679
 msgid "ALGOL"
 msgstr "АЛГОЛЬ"
 
-#: indicator-lunar.py:762
+#: src/indicator-lunar.py:680
 msgid "ALHENA"
 msgstr "АЛЬХЕНА"
 
-#: indicator-lunar.py:763
+#: src/indicator-lunar.py:681
 msgid "ALIOTH"
 msgstr "АЛИОТ"
 
-#: indicator-lunar.py:764
+#: src/indicator-lunar.py:682
 msgid "ALMACH"
 msgstr "АЛАМАК"
 
-#: indicator-lunar.py:765
+#: src/indicator-lunar.py:683
 msgid "ALNAIR"
 msgstr "АЛЬНАИР"
 
-#: indicator-lunar.py:766
+#: src/indicator-lunar.py:684
 msgid "ALNILAM"
 msgstr "АЛЬНИЛАМ"
 
-#: indicator-lunar.py:767
+#: src/indicator-lunar.py:685
 msgid "ALNITAK"
 msgstr "АЛЬНИТАК"
 
-#: indicator-lunar.py:768
+#: src/indicator-lunar.py:686
 msgid "ALPHARD"
 msgstr "АЛЬФАРД"
 
-#: indicator-lunar.py:769
+#: src/indicator-lunar.py:687
 msgid "ALPHECCA"
 msgstr "АЛЬФЕККА"
 
-#: indicator-lunar.py:770
+#: src/indicator-lunar.py:688
 msgid "ALSHAIN"
 msgstr "АЛЬШАИН"
 
-#: indicator-lunar.py:771
+#: src/indicator-lunar.py:689
 msgid "ALTAIR"
 msgstr "АЛЬТАИР"
 
-#: indicator-lunar.py:772
+#: src/indicator-lunar.py:690
 msgid "ANTARES"
 msgstr "АНТАРЕС"
 
-#: indicator-lunar.py:773
+#: src/indicator-lunar.py:691
 msgid "ARCTURUS"
 msgstr "АРКТУР"
 
-#: indicator-lunar.py:774
+#: src/indicator-lunar.py:692
 msgid "ARKAB POSTERIOR"
 msgstr "АРКАБ ПОСТЕРИОР"
 
-#: indicator-lunar.py:775
+#: src/indicator-lunar.py:693
 msgid "ARKAB PRIOR"
 msgstr "АРКАБ ПРИОР"
 
-#: indicator-lunar.py:776
+#: src/indicator-lunar.py:694
 msgid "ARNEB"
 msgstr "АРНЕБ"
 
-#: indicator-lunar.py:777
+#: src/indicator-lunar.py:695
 msgid "ATLAS"
 msgstr "АТЛАС"
 
-#: indicator-lunar.py:778
+#: src/indicator-lunar.py:696
 msgid "BELLATRIX"
 msgstr "БЕЛЛАТРИКС"
 
-#: indicator-lunar.py:779
+#: src/indicator-lunar.py:697
 msgid "BETELGEUSE"
 msgstr "БЕТЕЛЬГЕЙЗЕ"
 
-#: indicator-lunar.py:780
+#: src/indicator-lunar.py:698
 msgid "CANOPUS"
 msgstr "КАНОПУС"
 
-#: indicator-lunar.py:781
+#: src/indicator-lunar.py:699
 msgid "CAPELLA"
 msgstr "КАПЕЛЛА"
 
-#: indicator-lunar.py:782
+#: src/indicator-lunar.py:700
 msgid "CAPH"
 msgstr "КАФ"
 
-#: indicator-lunar.py:783
+#: src/indicator-lunar.py:701
 msgid "CASTOR"
 msgstr "КАСТОР"
 
-#: indicator-lunar.py:784
+#: src/indicator-lunar.py:702
 msgid "CEBALRAI"
 msgstr "ЦЕЛЬБАЛЬРАЙ"
 
-#: indicator-lunar.py:785
+#: src/indicator-lunar.py:703
 msgid "DENEB"
 msgstr "ДЕНЕБ"
 
-#: indicator-lunar.py:786
+#: src/indicator-lunar.py:704
 msgid "DENEBOLA"
 msgstr "ДЕНЕБОЛА"
 
-#: indicator-lunar.py:787
+#: src/indicator-lunar.py:705
 msgid "DUBHE"
 msgstr "ДУБХЕ"
 
-#: indicator-lunar.py:788
+#: src/indicator-lunar.py:706
 msgid "ELECTRA"
 msgstr "ЭЛЕКТРА"
 
-#: indicator-lunar.py:789
+#: src/indicator-lunar.py:707
 msgid "ELNATH"
 msgstr "НАТ"
 
-#: indicator-lunar.py:790
+#: src/indicator-lunar.py:708
 msgid "ENIF"
 msgstr "ЭНИФ"
 
-#: indicator-lunar.py:791
+#: src/indicator-lunar.py:709
 msgid "ETAMIN"
 msgstr "ЭТАМИН"
 
-#: indicator-lunar.py:792
+#: src/indicator-lunar.py:710
 msgid "FOMALHAUT"
 msgstr "ФОМАЛЬГАУТ"
 
-#: indicator-lunar.py:793
+#: src/indicator-lunar.py:711
 msgid "GIENAH CORVI"
 msgstr "ДЖЕНАХ ВОРОНА"
 
-#: indicator-lunar.py:794
+#: src/indicator-lunar.py:712
 msgid "HAMAL"
 msgstr "ХАМАЛЬ"
 
-#: indicator-lunar.py:795
+#: src/indicator-lunar.py:713
 msgid "IZAR"
 msgstr "ИЦАР"
 
-#: indicator-lunar.py:796
+#: src/indicator-lunar.py:714
 msgid "KAUS AUSTRALIS"
 msgstr "КАУС АУСТРАЛИС"
 
-#: indicator-lunar.py:797
+#: src/indicator-lunar.py:715
 msgid "KOCHAB"
 msgstr "КОХАБ"
 
-#: indicator-lunar.py:798
+#: src/indicator-lunar.py:716
 msgid "MAIA"
 msgstr "МАЙЯ"
 
-#: indicator-lunar.py:799
+#: src/indicator-lunar.py:717
 msgid "MARKAB"
 msgstr "МАРКАБ"
 
-#: indicator-lunar.py:800
+#: src/indicator-lunar.py:718
 msgid "MEGREZ"
 msgstr "МЕГРЕЦ"
 
-#: indicator-lunar.py:801
+#: src/indicator-lunar.py:719
 msgid "MENKALINAN"
 msgstr "МЕНКАЛИНАН"
 
-#: indicator-lunar.py:802
+#: src/indicator-lunar.py:720
 msgid "MENKAR"
 msgstr "МЕНКАР"
 
-#: indicator-lunar.py:803
+#: src/indicator-lunar.py:721
 msgid "MERAK"
 msgstr "МЕРАК"
 
-#: indicator-lunar.py:804
+#: src/indicator-lunar.py:722
 msgid "MEROPE"
 msgstr "МЕРОПА"
 
-#: indicator-lunar.py:805
+#: src/indicator-lunar.py:723
 msgid "MIMOSA"
 msgstr "МИМОЗА"
 
-#: indicator-lunar.py:806
+#: src/indicator-lunar.py:724
 msgid "MINKAR"
 msgstr "МИНКАР"
 
-#: indicator-lunar.py:807
+#: src/indicator-lunar.py:725
 msgid "MINTAKA"
 msgstr "МИНТАКА"
 
-#: indicator-lunar.py:808
+#: src/indicator-lunar.py:726
 msgid "MIRACH"
 msgstr "МИРАХ"
 
-#: indicator-lunar.py:809
+#: src/indicator-lunar.py:727
 msgid "MIRZAM"
 msgstr "МИРЦАМ"
 
-#: indicator-lunar.py:810
+#: src/indicator-lunar.py:728
 msgid "MIZAR"
 msgstr "МИЦАР"
 
-#: indicator-lunar.py:811
+#: src/indicator-lunar.py:729
 msgid "NAOS"
 msgstr "НАОС"
 
-#: indicator-lunar.py:812
+#: src/indicator-lunar.py:730
 msgid "NIHAL"
 msgstr "НИХАЛ"
 
-#: indicator-lunar.py:813
+#: src/indicator-lunar.py:731
 msgid "NUNKI"
 msgstr "НУНКИ"
 
-#: indicator-lunar.py:814
+#: src/indicator-lunar.py:732
 msgid "PEACOCK"
 msgstr "ПИКОК"
 
-#: indicator-lunar.py:815
+#: src/indicator-lunar.py:733
 msgid "PHECDA"
 msgstr "ФЕКДА"
 
-#: indicator-lunar.py:816
+#: src/indicator-lunar.py:734
 msgid "POLARIS"
 msgstr "ПОЛЯРНАЯ ЗВЕЗДА"
 
-#: indicator-lunar.py:817
+#: src/indicator-lunar.py:735
 msgid "POLLUX"
 msgstr "ПОЛЛУКС"
 
-#: indicator-lunar.py:818
+#: src/indicator-lunar.py:736
 msgid "PROCYON"
 msgstr "ПРОЦИОН"
 
-#: indicator-lunar.py:819
+#: src/indicator-lunar.py:737
 msgid "RASALGETHI"
 msgstr "РАС АЛЬГЕТИ"
 
-#: indicator-lunar.py:820
+#: src/indicator-lunar.py:738
 msgid "RASALHAGUE"
 msgstr "РАС АЛЬХАГ"
 
-#: indicator-lunar.py:821
+#: src/indicator-lunar.py:739
 msgid "REGULUS"
 msgstr "РЕГУЛ"
 
-#: indicator-lunar.py:822
+#: src/indicator-lunar.py:740
 msgid "RIGEL"
 msgstr "РИГЕЛЬ"
 
-#: indicator-lunar.py:823
+#: src/indicator-lunar.py:741
 msgid "RUKBAT"
 msgstr "РУКБАТ"
 
-#: indicator-lunar.py:824
+#: src/indicator-lunar.py:742
 msgid "SADALMELIK"
 msgstr "САДАЛЬМЕЛИК"
 
-#: indicator-lunar.py:825
+#: src/indicator-lunar.py:743
 msgid "SADR"
 msgstr "САДР"
 
-#: indicator-lunar.py:826
+#: src/indicator-lunar.py:744
 msgid "SAIPH"
 msgstr "САИФ"
 
-#: indicator-lunar.py:827
+#: src/indicator-lunar.py:745
 msgid "SCHEAT"
 msgstr "ШЕАТ"
 
-#: indicator-lunar.py:828
+#: src/indicator-lunar.py:746
 msgid "SCHEDAR"
 msgstr "ШЕДАР"
 
-#: indicator-lunar.py:829
+#: src/indicator-lunar.py:747
 msgid "SHAULA"
 msgstr "ШАУЛА"
 
-#: indicator-lunar.py:830
+#: src/indicator-lunar.py:748
 msgid "SHELIAK"
 msgstr "ШЕЛИАК"
 
-#: indicator-lunar.py:831
+#: src/indicator-lunar.py:749
 msgid "SIRIUS"
 msgstr "СИРИУС"
 
-#: indicator-lunar.py:832
+#: src/indicator-lunar.py:750
 msgid "SIRRAH"
 msgstr "АЛЬФЕРАЦ"
 
-#: indicator-lunar.py:833
+#: src/indicator-lunar.py:751
 msgid "SPICA"
 msgstr "СПИКА"
 
-#: indicator-lunar.py:834
+#: src/indicator-lunar.py:752
 msgid "SULAFAT"
 msgstr "СУЛАФАТ"
 
-#: indicator-lunar.py:835
+#: src/indicator-lunar.py:753
 msgid "TARAZED"
 msgstr "ТАРАЗЕД"
 
-#: indicator-lunar.py:836
+#: src/indicator-lunar.py:754
 msgid "TAYGETA"
 msgstr "ТАЙГЕТА"
 
-#: indicator-lunar.py:837
+#: src/indicator-lunar.py:755
 msgid "THUBAN"
 msgstr "ТУБАН"
 
-#: indicator-lunar.py:838
+#: src/indicator-lunar.py:756
 msgid "UNUKALHAI"
 msgstr "УНУКАЛХАЙ"
 
-#: indicator-lunar.py:839
+#: src/indicator-lunar.py:757
 msgid "VEGA"
 msgstr "ВЕГА"
 
-#: indicator-lunar.py:840
+#: src/indicator-lunar.py:758
 msgid "VINDEMIATRIX"
 msgstr "ВИНДЕМИАТРИКС"
 
-#: indicator-lunar.py:841
+#: src/indicator-lunar.py:759
 msgid "WEZEN"
 msgstr "ВЕЗЕН"
 
-#: indicator-lunar.py:842
+#: src/indicator-lunar.py:760
 msgid "ZAURAK"
 msgstr "ЗАУРАК"
 
-#: indicator-lunar.py:904
+#: src/indicator-lunar.py:822
 msgid "Full Moon"
 msgstr "Полнолуние"
 
-#: indicator-lunar.py:905
+#: src/indicator-lunar.py:823
 msgid "Waning Gibbous"
 msgstr "Убывающая луна"
 
-#: indicator-lunar.py:906
+#: src/indicator-lunar.py:824
 msgid "Third Quarter"
 msgstr "Последняя четверть"
 
-#: indicator-lunar.py:907
+#: src/indicator-lunar.py:825
 msgid "Waning Crescent"
 msgstr "Убывающий полумесяц"
 
-#: indicator-lunar.py:908
+#: src/indicator-lunar.py:826
 msgid "New Moon"
 msgstr "Новолуние"
 
-#: indicator-lunar.py:909
+#: src/indicator-lunar.py:827
 msgid "Waxing Crescent"
 msgstr "Растущий полумесяц"
 
-#: indicator-lunar.py:910
+#: src/indicator-lunar.py:828
 msgid "First Quarter"
 msgstr "Первая четверть"
 
-#: indicator-lunar.py:911
+#: src/indicator-lunar.py:829
 msgid "Waxing Gibbous"
 msgstr "Растущая луна"
 
-#: indicator-lunar.py:929
+#: src/indicator-lunar.py:849
 msgid "NUMBER"
 msgstr "НОМЕР"
 
-#: indicator-lunar.py:930
+#: src/indicator-lunar.py:850
 msgid "INTERNATIONAL DESIGNATOR"
 msgstr "МЕЖДУНАРОДНОЕ ОБОЗНАЧЕНИЕ"
 
-#: indicator-lunar.py:954
+#: src/indicator-lunar.py:874
 msgid " now rising..."
 msgstr " восходит"
 
-#: indicator-lunar.py:956
-msgid "NORAD ID: "
-msgstr "Идентификатор NORAD: "
+#: src/indicator-lunar.py:876
+msgid "Number: "
+msgstr "Номер: "
 
-#: indicator-lunar.py:957
-msgid "International ID: "
+#: src/indicator-lunar.py:877
+msgid "International Designator: "
 msgstr "Международное обозначение: "
 
-#: indicator-lunar.py:958
+#: src/indicator-lunar.py:878
 msgid "Rise Time: "
 msgstr "Время восхода: "
 
-#: indicator-lunar.py:959
+#: src/indicator-lunar.py:879
 msgid "Rise Azimuth: "
 msgstr "Азимут восхода: "
 
-#: indicator-lunar.py:960
+#: src/indicator-lunar.py:880
 msgid "Set Time: "
 msgstr "Время захода: "
 
-#: indicator-lunar.py:961
+#: src/indicator-lunar.py:881
 msgid "Set Azimuth: "
 msgstr "Азимут захода: "
 
-#: indicator-lunar.py:972
+#: src/indicator-lunar.py:892
 msgid "Scorpio"
 msgstr "Скорпион"
 
-#: indicator-lunar.py:974
+#: src/indicator-lunar.py:894
 msgid "Capricorn"
 msgstr "Козерог"
 
-#: indicator-lunar.py:978
+#: src/indicator-lunar.py:898
 msgid "                                          ...werewolves about ! ! !"
 msgstr "                                 ...кругом оборотни ! ! !"
 
-#: indicator-lunar.py:979
+#: src/indicator-lunar.py:899
 msgid "W  A  R  N  I  N  G"
 msgstr "Т  Р  Е  В  О  Г  А"
 
-#: indicator-lunar.py:983
+#: src/indicator-lunar.py:903
 msgid "Always Up!"
 msgstr "Никогда не заходит"
 
-#: indicator-lunar.py:984
+#: src/indicator-lunar.py:904
 msgid "Never Up!"
 msgstr "Никогда не восходит"
 
-#: indicator-lunar.py:985
+#: src/indicator-lunar.py:905
 msgid ""
 "Cannot access the data source\n"
 "<a href='{0}'>{0}</a>"
@@ -1683,11 +1683,11 @@ msgstr ""
 "Нет доступа к источнику данных\n"
 "<a href='{0}'>{0}</a>"
 
-#: indicator-lunar.py:986
+#: src/indicator-lunar.py:906
 msgid "No data!"
 msgstr "Отсутствуют данные!"
 
-#: indicator-lunar.py:987
+#: src/indicator-lunar.py:907
 msgid ""
 "No data found at\n"
 "<a href='{0}'>{0}</a>"
@@ -1695,308 +1695,311 @@ msgstr ""
 "Не найдены данные по адресу\n"
 "<a href='{0}'>{0}</a>"
 
-#: indicator-lunar.py:988
+#: src/indicator-lunar.py:908
 msgid "Satellite is circumpolar."
 msgstr "Спутник никогда не заходит."
 
-#: indicator-lunar.py:989
+#: src/indicator-lunar.py:909
 msgid "Satellite never rises."
 msgstr "Спутник никогда не восходит."
 
-#: indicator-lunar.py:990
+#: src/indicator-lunar.py:910
 msgid "No passes within the next two days."
 msgstr "Нет прохождений в ближайшие два дня."
 
-#: indicator-lunar.py:991
+#: src/indicator-lunar.py:911
 msgid "Unable to compute next pass!"
 msgstr "Невозможно вычислить следующее прохождение!"
 
-#: indicator-lunar.py:992
+#: src/indicator-lunar.py:912
 msgid "ValueError"
 msgstr "Ошибка вычисления"
 
-#: indicator-lunar.py:1124 indicator-lunar.py:1144
+#: src/indicator-lunar.py:1044 src/indicator-lunar.py:1067
 msgid "S"
 msgstr "Ю"
 
-#: indicator-lunar.py:1126 indicator-lunar.py:1146
+#: src/indicator-lunar.py:1046 src/indicator-lunar.py:1069
 msgid "N"
 msgstr "С"
 
-#: indicator-lunar.py:1132
+#: src/indicator-lunar.py:1052
 msgid "ua"
 msgstr "а.е."
 
-#: indicator-lunar.py:1135
+#: src/indicator-lunar.py:1055
 msgid "km"
 msgstr "км"
 
-#: indicator-lunar.py:1151
+#: src/indicator-lunar.py:1074
 msgid "E"
 msgstr "В"
 
-#: indicator-lunar.py:1153
+#: src/indicator-lunar.py:1076
 msgid "W"
 msgstr "З"
 
-#: indicator-lunar.py:1157
+#: src/indicator-lunar.py:1080
 msgid "Annular"
 msgstr "Кольцеобразное"
 
-#: indicator-lunar.py:1159
+#: src/indicator-lunar.py:1082
 msgid "Hybrid (Annular/Total)"
 msgstr "Полное кольцеобразное"
 
-#: indicator-lunar.py:1161
+#: src/indicator-lunar.py:1084
 msgid "Partial"
 msgstr "Частное"
 
-#: indicator-lunar.py:1163
+#: src/indicator-lunar.py:1086
 msgid "Penumbral"
 msgstr "Полутеневое"
 
-#: indicator-lunar.py:1165
+#: src/indicator-lunar.py:1088
 msgid "Total"
 msgstr "Полное"
 
-#: indicator-lunar.py:1168
+#: src/indicator-lunar.py:1091
 msgid "m"
 msgstr "м"
 
-#: indicator-lunar.py:1361 indicator-lunar.py:2557
+#: src/indicator-lunar.py:1278 src/indicator-lunar.py:2459
 msgid "Moon"
 msgstr "Луна"
 
-#: indicator-lunar.py:1365
+#: src/indicator-lunar.py:1282
 msgid "Phase: "
 msgstr "Фаза: "
 
-#: indicator-lunar.py:1366
+#: src/indicator-lunar.py:1283
 msgid "Next Phases"
 msgstr "Следующие фазы"
 
-#: indicator-lunar.py:1371
+#: src/indicator-lunar.py:1288
 msgid "First Quarter: "
 msgstr "Первая четверть: "
 
-#: indicator-lunar.py:1372
+#: src/indicator-lunar.py:1289
 msgid "Full: "
 msgstr "Полнолуние: "
 
-#: indicator-lunar.py:1373
+#: src/indicator-lunar.py:1290
 msgid "Third Quarter: "
 msgstr "Последняя четверть: "
 
-#: indicator-lunar.py:1374
+#: src/indicator-lunar.py:1291
 msgid "New: "
 msgstr "Новолуние: "
 
-#: indicator-lunar.py:1406 indicator-lunar.py:2563
+#: src/indicator-lunar.py:1309 src/indicator-lunar.py:2465
 msgid "Sun"
 msgstr "Солнце"
 
-#: indicator-lunar.py:1416 indicator-lunar.py:1420
+#: src/indicator-lunar.py:1319 src/indicator-lunar.py:1323
 msgid "Equinox: "
 msgstr "Равноденствие: "
 
-#: indicator-lunar.py:1417 indicator-lunar.py:1419
+#: src/indicator-lunar.py:1320 src/indicator-lunar.py:1322
 msgid "Solstice: "
 msgstr "Солнцестояние: "
 
-#: indicator-lunar.py:1428
+#: src/indicator-lunar.py:1331
 msgid "Eclipse"
 msgstr "Затмение"
 
-#: indicator-lunar.py:1429 indicator-lunar.py:1760 indicator-lunar.py:1764
+#: src/indicator-lunar.py:1332 src/indicator-lunar.py:1660
+#: src/indicator-lunar.py:1664
 msgid "Date/Time: "
 msgstr "Дата/Время: "
 
-#: indicator-lunar.py:1432
+#: src/indicator-lunar.py:1335
 msgid "Latitude/Longitude: "
 msgstr "Широта/Долгота: "
 
-#: indicator-lunar.py:1433
+#: src/indicator-lunar.py:1336
 msgid "Type: "
 msgstr "Тип: "
 
-#: indicator-lunar.py:1448 indicator-lunar.py:2579
+#: src/indicator-lunar.py:1351 src/indicator-lunar.py:2481
 msgid "Planets"
 msgstr "Планеты"
 
-#: indicator-lunar.py:1469
+#: src/indicator-lunar.py:1372
 msgid "Major Moons"
 msgstr "Основные спутники"
 
-#: indicator-lunar.py:1488
+#: src/indicator-lunar.py:1391
 msgid "Earth Visible: "
 msgstr "Видимость с Земли: "
 
-#: indicator-lunar.py:1491
+#: src/indicator-lunar.py:1394
 msgid "Offset from Planet (in planet radii)"
 msgstr "Смещение от планеты (в радиусах планеты)"
 
-#: indicator-lunar.py:1492
+#: src/indicator-lunar.py:1395
 msgid "X: "
 msgstr "X: "
 
-#: indicator-lunar.py:1493
+#: src/indicator-lunar.py:1396
 msgid "Y: "
 msgstr "Y: "
 
-#: indicator-lunar.py:1494
+#: src/indicator-lunar.py:1397
 msgid "Z: "
 msgstr "Z: "
 
-#: indicator-lunar.py:1510 indicator-lunar.py:2584
+#: src/indicator-lunar.py:1413 src/indicator-lunar.py:2486
 msgid "Stars"
 msgstr "Звёзды"
 
-#: indicator-lunar.py:1578 indicator-lunar.py:2589 indicator-lunar.py:2897
+#: src/indicator-lunar.py:1481 src/indicator-lunar.py:2491
+#: src/indicator-lunar.py:2770
 msgid "Comets"
 msgstr "Кометы"
 
-#: indicator-lunar.py:1632
+#: src/indicator-lunar.py:1532
 msgid "Illumination: "
 msgstr "Освещённость диска: "
 
-#: indicator-lunar.py:1635
+#: src/indicator-lunar.py:1535
 msgid "Constellation: "
 msgstr "Созвездие: "
 
-#: indicator-lunar.py:1637
+#: src/indicator-lunar.py:1537
 msgid "Magnitude: "
 msgstr "Звёздная величина: "
 
-#: indicator-lunar.py:1646
+#: src/indicator-lunar.py:1546
 msgid "Tropical Sign: "
 msgstr "Тропический зодиак: "
 
-#: indicator-lunar.py:1649 indicator-lunar.py:1655
+#: src/indicator-lunar.py:1549 src/indicator-lunar.py:1555
 msgid "Distance to Earth: "
 msgstr "Расстояние до Земли: "
 
-#: indicator-lunar.py:1660
+#: src/indicator-lunar.py:1560
 msgid "Distance to Sun: "
 msgstr "Расстояние до Солнца: "
 
-#: indicator-lunar.py:1664
+#: src/indicator-lunar.py:1564
 msgid "Bright Limb: "
 msgstr "Угол экватора интенсивности: "
 
-#: indicator-lunar.py:1668
+#: src/indicator-lunar.py:1568
 msgid "Earth Tilt: "
 msgstr "Наклон колец относительно Земли: "
 
-#: indicator-lunar.py:1669
+#: src/indicator-lunar.py:1569
 msgid "Sun Tilt: "
 msgstr "Наклон колец относительно Солнца: "
 
-#: indicator-lunar.py:1679
+#: src/indicator-lunar.py:1579
 msgid "Rise: "
 msgstr "Восход: "
 
-#: indicator-lunar.py:1680
+#: src/indicator-lunar.py:1580
 msgid "Set: "
 msgstr "Заход: "
 
-#: indicator-lunar.py:1684
+#: src/indicator-lunar.py:1584
 msgid "Dawn: "
 msgstr "Рассвет: "
 
-#: indicator-lunar.py:1685
+#: src/indicator-lunar.py:1585
 msgid "Dusk: "
 msgstr "Сумерки: "
 
-#: indicator-lunar.py:1697 indicator-lunar.py:1754 indicator-lunar.py:1761
-#: indicator-lunar.py:1765
+#: src/indicator-lunar.py:1597 src/indicator-lunar.py:1654
+#: src/indicator-lunar.py:1661 src/indicator-lunar.py:1665
 msgid "Azimuth: "
 msgstr "Азимут: "
 
-#: indicator-lunar.py:1698
+#: src/indicator-lunar.py:1598
 msgid "Altitude: "
 msgstr "Высота: "
 
-#: indicator-lunar.py:1700
+#: src/indicator-lunar.py:1600
 msgid "Right Ascension: "
 msgstr "Прямое восхождение: "
 
-#: indicator-lunar.py:1701 indicator-lunar.py:1755
+#: src/indicator-lunar.py:1601 src/indicator-lunar.py:1655
 msgid "Declination: "
 msgstr "Склонение: "
 
-#: indicator-lunar.py:1742 indicator-lunar.py:2594 indicator-lunar.py:3003
+#: src/indicator-lunar.py:1642 src/indicator-lunar.py:2496
+#: src/indicator-lunar.py:2876
 msgid "Satellites"
 msgstr "Спутники"
 
-#: indicator-lunar.py:1759
+#: src/indicator-lunar.py:1659
 msgid "Rise"
 msgstr "Восход"
 
-#: indicator-lunar.py:1763
+#: src/indicator-lunar.py:1663
 msgid "Set"
 msgstr "Заход"
 
-#: indicator-lunar.py:1768
+#: src/indicator-lunar.py:1668
 msgid "Visible: "
 msgstr "Видимость: "
 
-#: indicator-lunar.py:1836
+#: src/indicator-lunar.py:1736
 msgid "Error Retrieving Comet OE Data"
 msgstr "Ошибка получения данных о кометах"
 
-#: indicator-lunar.py:1837
+#: src/indicator-lunar.py:1737
 msgid "The comet OE data source could not be reached."
 msgstr "Источник данных о кометах недоступен."
 
-#: indicator-lunar.py:1840
+#: src/indicator-lunar.py:1740
 msgid "Empty Comet OE Data"
 msgstr "Данные о кометах пусты"
 
-#: indicator-lunar.py:1841
+#: src/indicator-lunar.py:1741
 msgid "The comet OE data retrieved was empty."
 msgstr "Полученный файл с данными о кометах пуст."
 
-#: indicator-lunar.py:1872
+#: src/indicator-lunar.py:1773
 msgid "Error Retrieving Satellite TLE Data"
 msgstr "Ошибка получения данных TLE для спутников"
 
-#: indicator-lunar.py:1873
+#: src/indicator-lunar.py:1774
 msgid "The satellite TLE data source could not be reached."
 msgstr "Источник данных TLE для спутников недоступен."
 
-#: indicator-lunar.py:1876
+#: src/indicator-lunar.py:1777
 msgid "Empty Satellite TLE Data"
 msgstr "Данные TLE для спутников пусты"
 
-#: indicator-lunar.py:1877
+#: src/indicator-lunar.py:1778
 msgid "The satellite TLE data retrieved was empty."
 msgstr "Полученный файл с данными TLE для спутников пуст."
 
-#: indicator-lunar.py:2414
+#: src/indicator-lunar.py:2316
 msgid "Credits"
 msgstr "Благодарность"
 
-#: indicator-lunar.py:2420
+#: src/indicator-lunar.py:2322
 msgid "translator-credits"
 msgstr "Олег Мойсейчук"
 
-#: indicator-lunar.py:2421
+#: src/indicator-lunar.py:2323
 msgid "View the"
 msgstr "Просмотреть"
 
-#: indicator-lunar.py:2422
+#: src/indicator-lunar.py:2324
 msgid "text file."
 msgstr "."
 
-#: indicator-lunar.py:2423
+#: src/indicator-lunar.py:2325
 msgid "changelog"
 msgstr "список изменений"
 
-#: indicator-lunar.py:2446
+#: src/indicator-lunar.py:2348
 msgid "Preferences unavailable..."
 msgstr "Параметры недоступны..."
 
-#: indicator-lunar.py:2447
+#: src/indicator-lunar.py:2349
 msgid ""
 "The lunar indicator is momentarily refreshing; preferences will be available "
 "shortly."
@@ -2004,11 +2007,11 @@ msgstr ""
 "Индикатор в данный момент обновляет информацию; параметры скоро станут "
 "доступны."
 
-#: indicator-lunar.py:2477
+#: src/indicator-lunar.py:2379
 msgid "Icon Text"
 msgstr "Текст возле значка"
 
-#: indicator-lunar.py:2482
+#: src/indicator-lunar.py:2384
 msgid ""
 "The text shown next to the indicator icon\n"
 "(or shown as a tooltip, where applicable).\n"
@@ -2024,15 +2027,15 @@ msgstr ""
 "(например, комета или спутник, удалённые из перечня),\n"
 "то соответствующие метки будут автоматически удалены."
 
-#: indicator-lunar.py:2520
+#: src/indicator-lunar.py:2422
 msgid "Tag"
 msgstr "Метка"
 
-#: indicator-lunar.py:2524
+#: src/indicator-lunar.py:2426
 msgid "Value"
 msgstr "Значение"
 
-#: indicator-lunar.py:2529
+#: src/indicator-lunar.py:2431
 msgid ""
 "Double click to add a tag\n"
 "to the indicator text."
@@ -2040,47 +2043,47 @@ msgstr ""
 "Двойной щелчок добавит элемент к тексту,\n"
 "отображаемому индикатором на панели."
 
-#: indicator-lunar.py:2539
+#: src/indicator-lunar.py:2441
 msgid "Icon"
 msgstr "Значок"
 
-#: indicator-lunar.py:2550
+#: src/indicator-lunar.py:2452
 msgid "Show"
 msgstr "Отображать"
 
-#: indicator-lunar.py:2559
+#: src/indicator-lunar.py:2461
 msgid "Show the moon."
 msgstr "Отображать Луну."
 
-#: indicator-lunar.py:2565
+#: src/indicator-lunar.py:2467
 msgid "Show the sun."
 msgstr "Отображать Солнце."
 
-#: indicator-lunar.py:2571
+#: src/indicator-lunar.py:2473
 msgid "Show as submenus"
 msgstr "Отображать в подменю"
 
-#: indicator-lunar.py:2581
+#: src/indicator-lunar.py:2483
 msgid "Show planets as submenus."
 msgstr "Отображать планеты в отдельном подменю."
 
-#: indicator-lunar.py:2585
+#: src/indicator-lunar.py:2487
 msgid "Show stars as submenus."
 msgstr "Отображать звёзды в отдельном подменю."
 
-#: indicator-lunar.py:2590
+#: src/indicator-lunar.py:2492
 msgid "Show comets as submenus."
 msgstr "Отображать кометы в отдельном подменю."
 
-#: indicator-lunar.py:2596
+#: src/indicator-lunar.py:2498
 msgid "Show satellites as submenus."
 msgstr "Отображать спутники в отдельном подменю."
 
-#: indicator-lunar.py:2601
+#: src/indicator-lunar.py:2503
 msgid "Hide bodies which are 'never up'"
 msgstr "Скрыть объекты, которые никогда не восходят"
 
-#: indicator-lunar.py:2605
+#: src/indicator-lunar.py:2507
 msgid ""
 "If checked, only planets, moon,\n"
 "sun, comets and stars which\n"
@@ -2103,15 +2106,15 @@ msgstr ""
 "избыток выводимой информации может\n"
 "повлиять на быстродействие индикатора."
 
-#: indicator-lunar.py:2616
+#: src/indicator-lunar.py:2518
 msgid "Group stars by constellation"
 msgstr "Группировать звёзды по созвездиям"
 
-#: indicator-lunar.py:2624
+#: src/indicator-lunar.py:2526
 msgid "Hide comets greater than magnitude"
 msgstr "Скрыть кометы со звёздной величиной более"
 
-#: indicator-lunar.py:2634
+#: src/indicator-lunar.py:2536
 msgid ""
 "Comets with a magnitude greater\n"
 "than that specified are hidden.\n"
@@ -2128,11 +2131,11 @@ msgstr ""
 "величины, то избыток выводимой информации\n"
 "может повлиять на быстродействие индикатора."
 
-#: indicator-lunar.py:2645
+#: src/indicator-lunar.py:2547
 msgid "Automatically add new comets"
 msgstr "Автоматически добавлять новые кометы"
 
-#: indicator-lunar.py:2649
+#: src/indicator-lunar.py:2551
 msgid ""
 "If checked, new comets in the\n"
 "downloaded data will be added\n"
@@ -2149,29 +2152,32 @@ msgstr ""
 "Кроме того, все отключенные на данный\n"
 "момент кометы будут включены."
 
-#: indicator-lunar.py:2659
+#: src/indicator-lunar.py:2561
 msgid "Sort satellites by rise date/time"
 msgstr "Сортировать спутники по моменту восхода"
 
-#: indicator-lunar.py:2663
+#: src/indicator-lunar.py:2565
+#, fuzzy
 msgid ""
 "By default, satellites are sorted\n"
-"alphabetically by menu text.\n"
+"alphabetically by Name, Number,\n"
+"then International Designator.\n"
 "\n"
 "If checked, satellites will be\n"
 "sorted by rise date/time."
 msgstr ""
-"По умолчанию спутники сортируются в\n"
-"меню по названию в алфавитном порядке.\n"
+"По умолчанию спутники сортируются в меню\n"
+"в алфавитном порядке по названию, номеру,\n"
+"а затем по международному обозначению.\n"
 "\n"
 "Если стоит отметка, спутники будут\n"
 "отсортированы по моменту восхода."
 
-#: indicator-lunar.py:2669
+#: src/indicator-lunar.py:2572
 msgid "Hide satellites which have no upcoming visible pass"
 msgstr "Скрыть невидимые прохождения искусственных спутников"
 
-#: indicator-lunar.py:2673
+#: src/indicator-lunar.py:2576
 msgid ""
 "If checked, only satellites with an\n"
 "upcoming visible pass are displayed.\n"
@@ -2197,11 +2203,11 @@ msgstr ""
 "избыток выводимой информации может\n"
 "повлиять на быстродействие индикатора."
 
-#: indicator-lunar.py:2685
+#: src/indicator-lunar.py:2588
 msgid "Automatically add new satellites"
 msgstr "Автоматически добавлять новые спутники"
 
-#: indicator-lunar.py:2689
+#: src/indicator-lunar.py:2592
 msgid ""
 "If checked, new satellites in the\n"
 "downloaded data will be added to\n"
@@ -2219,44 +2225,11 @@ msgstr ""
 "Кроме того, все отключенные на данный\n"
 "момент спутники будут включены."
 
-#: indicator-lunar.py:2700
-msgid "Satellite 'on-click' URL"
-msgstr "Ссылка для поиска спутника"
-
-#: indicator-lunar.py:2708
-msgid ""
-"The URL used to lookup a satellite\n"
-"(in the default browser) when any\n"
-"of the satellite's child items are\n"
-"selected from the menu.\n"
-"\n"
-"If empty, no lookup will be done.\n"
-"\n"
-"Available tags:\n"
-"\t"
-msgstr ""
-"Ссылка, используемая для поиска спутника\n"
-"(в обозревателе по умолчанию), открывается\n"
-"по щелчку на любой пункт подменю спутника.\n"
-"\n"
-"Если ссылка не задана, поиск не производится.\n"
-"\n"
-"Доступные метки:\n"
-"\t"
-
-#: indicator-lunar.py:2720
-msgid "Reset"
-msgstr "Сброс"
-
-#: indicator-lunar.py:2722
-msgid "Reset the satellite look-up URL to factory default."
-msgstr "Сбросить ссылку поиска спутника на начальную."
-
-#: indicator-lunar.py:2727
+#: src/indicator-lunar.py:2600
 msgid "Menu"
 msgstr "Меню"
 
-#: indicator-lunar.py:2739
+#: src/indicator-lunar.py:2612
 msgid ""
 "Check a planet (or dwarf planet)\n"
 "to display in the menu.\n"
@@ -2270,11 +2243,11 @@ msgstr ""
 "Щелчок по заголовку первого\n"
 "столбца включает все отметки."
 
-#: indicator-lunar.py:2751
+#: src/indicator-lunar.py:2624
 msgid "Planet"
 msgstr "Планета"
 
-#: indicator-lunar.py:2777
+#: src/indicator-lunar.py:2650
 msgid ""
 "Check a star to display in the menu.\n"
 "\n"
@@ -2286,19 +2259,19 @@ msgstr ""
 "Щелчок по заголовку первого столбца\n"
 "включает все отметки."
 
-#: indicator-lunar.py:2788
+#: src/indicator-lunar.py:2661
 msgid "Star"
 msgstr "Звезда"
 
-#: indicator-lunar.py:2792
+#: src/indicator-lunar.py:2665
 msgid "Constellation"
 msgstr "Созвездие"
 
-#: indicator-lunar.py:2802
+#: src/indicator-lunar.py:2675
 msgid "Planets / Stars"
 msgstr "Планеты / Звёзды"
 
-#: indicator-lunar.py:2815
+#: src/indicator-lunar.py:2688
 msgid ""
 "Check a comet to display\n"
 "in the menu.\n"
@@ -2312,15 +2285,15 @@ msgstr ""
 "Щелчок по заголовку первого столбца\n"
 "включает все отметки."
 
-#: indicator-lunar.py:2828
+#: src/indicator-lunar.py:2701 src/indicator-lunar.py:2795
 msgid "Name"
 msgstr "Название"
 
-#: indicator-lunar.py:2843
+#: src/indicator-lunar.py:2716
 msgid "Comet OE data"
 msgstr "Данные о кометах"
 
-#: indicator-lunar.py:2854
+#: src/indicator-lunar.py:2727
 msgid ""
 "The URL from which to source\n"
 "comet OE data. For a local\n"
@@ -2343,11 +2316,11 @@ msgstr ""
 "Для деактивации задайте фиктивный URL,\n"
 "например: 'http://'."
 
-#: indicator-lunar.py:2864 indicator-lunar.py:2967
+#: src/indicator-lunar.py:2737 src/indicator-lunar.py:2840
 msgid "Fetch"
 msgstr "Получить"
 
-#: indicator-lunar.py:2866
+#: src/indicator-lunar.py:2739
 msgid ""
 "Retrieve the comet OE data from\n"
 "the URL. If the URL is empty,\n"
@@ -2365,11 +2338,11 @@ msgstr ""
 "загрузка может блокироваться во избежание\n"
 "чрезмерного обращения к источнику данных."
 
-#: indicator-lunar.py:2883
+#: src/indicator-lunar.py:2756
 msgid "Comet data fetch aborted"
 msgstr "Получение данных о кометах прервано"
 
-#: indicator-lunar.py:2884 indicator-lunar.py:2989
+#: src/indicator-lunar.py:2757 src/indicator-lunar.py:2862
 msgid ""
 "To avoid taxing the data source, the download was aborted. The next time the "
 "download will occur will be at {0}."
@@ -2377,7 +2350,7 @@ msgstr ""
 "Чтобы избежать чрезмерного обращения к источнику данных, загрузка была "
 "прервана. Время следующей попытки загрузки: {0}."
 
-#: indicator-lunar.py:2910
+#: src/indicator-lunar.py:2783
 msgid ""
 "Check a satellite to display in\n"
 "the menu.\n"
@@ -2390,23 +2363,19 @@ msgstr ""
 "Щелчок по заголовку первого столбца\n"
 "включает все отметки."
 
-#: indicator-lunar.py:2922
-msgid "Satellite Name"
-msgstr "Название спутника"
-
-#: indicator-lunar.py:2926
+#: src/indicator-lunar.py:2799
 msgid "Number"
 msgstr "Номер"
 
-#: indicator-lunar.py:2930
+#: src/indicator-lunar.py:2803
 msgid "International Designator"
 msgstr "Международное обозначение"
 
-#: indicator-lunar.py:2946
+#: src/indicator-lunar.py:2819
 msgid "Satellite TLE data"
 msgstr "Данные TLE для спутников"
 
-#: indicator-lunar.py:2957
+#: src/indicator-lunar.py:2830
 msgid ""
 "The URL from which to source the\n"
 "satellite TLE data.\n"
@@ -2429,7 +2398,7 @@ msgstr ""
 "Для деактивации задайте фиктивный URL,\n"
 "например: 'http://'."
 
-#: indicator-lunar.py:2969
+#: src/indicator-lunar.py:2842
 msgid ""
 "Retrieve the satellite TLE data\n"
 "from the URL.\n"
@@ -2449,27 +2418,27 @@ msgstr ""
 "загрузка может блокироваться во избежание\n"
 "чрезмерного обращения к источнику данных."
 
-#: indicator-lunar.py:2988
+#: src/indicator-lunar.py:2861
 msgid "Satellite TLE data fetch aborted"
 msgstr "Получение данных TLE для спутников прервано"
 
-#: indicator-lunar.py:3006
+#: src/indicator-lunar.py:2879
 msgid "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD"
 msgstr "Справка по форматированию: https://wiki.ubuntu.com/NotifyOSD"
 
-#: indicator-lunar.py:3016
+#: src/indicator-lunar.py:2889
 msgid "Satellite rise"
 msgstr "Восход спутника"
 
-#: indicator-lunar.py:3018
+#: src/indicator-lunar.py:2891
 msgid "Screen notification when a satellite rises above the horizon."
 msgstr "Всплывающее сообщение при восходе спутника над горизонтом."
 
-#: indicator-lunar.py:3021 indicator-lunar.py:3118
+#: src/indicator-lunar.py:2894 src/indicator-lunar.py:2991
 msgid "Summary"
 msgstr "Заголовок"
 
-#: indicator-lunar.py:3031
+#: src/indicator-lunar.py:2904
 msgid ""
 "The summary for the satellite rise\n"
 "notification. Available tags:\n"
@@ -2479,11 +2448,11 @@ msgstr ""
 "Доступные метки:\n"
 "\t"
 
-#: indicator-lunar.py:3047 indicator-lunar.py:3132
+#: src/indicator-lunar.py:2920 src/indicator-lunar.py:3005
 msgid "Message"
 msgstr "Сообщение"
 
-#: indicator-lunar.py:3057
+#: src/indicator-lunar.py:2930
 msgid ""
 "The message for the satellite rise\n"
 "notification. Available tags:\n"
@@ -2493,11 +2462,11 @@ msgstr ""
 "Доступные метки:\n"
 "\t"
 
-#: indicator-lunar.py:3078 indicator-lunar.py:3152
+#: src/indicator-lunar.py:2951 src/indicator-lunar.py:3025
 msgid "Test"
 msgstr "Тест"
 
-#: indicator-lunar.py:3083
+#: src/indicator-lunar.py:2956
 msgid ""
 "Show the notification bubble.\n"
 "Tags will be substituted with\n"
@@ -2507,11 +2476,11 @@ msgstr ""
 "Вместо меток будет подставлен\n"
 "фиктивный текст."
 
-#: indicator-lunar.py:3093
+#: src/indicator-lunar.py:2966
 msgid "Werewolf warning"
 msgstr "Предостережение про оборотней"
 
-#: indicator-lunar.py:3096
+#: src/indicator-lunar.py:2969
 msgid ""
 "Screen notification (approximately hourly)\n"
 "at full moon (or leading up to)."
@@ -2519,11 +2488,11 @@ msgstr ""
 "Всплывающее сообщение (примерно ежечасное)\n"
 "при полнолунии (или приближении к нему)."
 
-#: indicator-lunar.py:3100
+#: src/indicator-lunar.py:2973
 msgid "Illumination"
 msgstr "Освещённость"
 
-#: indicator-lunar.py:3110
+#: src/indicator-lunar.py:2983
 msgid ""
 "The notification commences at the\n"
 "specified illumination (%),\n"
@@ -2533,7 +2502,7 @@ msgstr ""
 "заданной освещённости диска (%) с момента\n"
 "наступления новолуния (0%)."
 
-#: indicator-lunar.py:3126
+#: src/indicator-lunar.py:2999
 msgid ""
 "The summary for the werewolf notification.\n"
 "\n"
@@ -2541,7 +2510,7 @@ msgstr ""
 "Заголовок всплывающего сообщения про оборотней.\n"
 "\n"
 
-#: indicator-lunar.py:3141
+#: src/indicator-lunar.py:3014
 msgid ""
 "The message for the werewolf notification.\n"
 "\n"
@@ -2549,19 +2518,19 @@ msgstr ""
 "Текст всплывающего сообщения про оборотней.\n"
 "\n"
 
-#: indicator-lunar.py:3156
+#: src/indicator-lunar.py:3029
 msgid "Show the notification using the current settings."
 msgstr "Показать всплывающее сообщение, используя текущие настройки."
 
-#: indicator-lunar.py:3161
+#: src/indicator-lunar.py:3034
 msgid "Notifications"
 msgstr "Уведомления"
 
-#: indicator-lunar.py:3172
+#: src/indicator-lunar.py:3045
 msgid "City"
 msgstr "Город"
 
-#: indicator-lunar.py:3181
+#: src/indicator-lunar.py:3054
 msgid ""
 "Choose a city from the list.\n"
 "Or, add in your own city name."
@@ -2569,58 +2538,58 @@ msgstr ""
 "Выберите город из списка. Или\n"
 "добавьте желаемое название города."
 
-#: indicator-lunar.py:3188
+#: src/indicator-lunar.py:3061
 msgid "Latitude (DD)"
 msgstr "Широта (дес.град.)"
 
-#: indicator-lunar.py:3193
+#: src/indicator-lunar.py:3066
 msgid "Latitude of your location in decimal degrees."
 msgstr "Широта вашей местности в десятичных градусах."
 
-#: indicator-lunar.py:3196
+#: src/indicator-lunar.py:3069
 msgid "Longitude (DD)"
 msgstr "Долгота (дес.град.)"
 
-#: indicator-lunar.py:3201
+#: src/indicator-lunar.py:3074
 msgid "Longitude of your location in decimal degrees."
 msgstr "Долгота вашей местности в десятичных градусах."
 
-#: indicator-lunar.py:3204
+#: src/indicator-lunar.py:3077
 msgid "Elevation (m)"
 msgstr "Высота (м)"
 
-#: indicator-lunar.py:3209
+#: src/indicator-lunar.py:3082
 msgid "Height in metres above sea level."
 msgstr "Высота над уровнем моря в метрах."
 
-#: indicator-lunar.py:3215
+#: src/indicator-lunar.py:3088
 msgid "Autostart"
 msgstr "Автозапуск"
 
-#: indicator-lunar.py:3216
+#: src/indicator-lunar.py:3089
 msgid "Run the indicator automatically."
 msgstr "Запускать индикатор автоматически."
 
-#: indicator-lunar.py:3221
+#: src/indicator-lunar.py:3094
 msgid "General"
 msgstr "Общие"
 
-#: indicator-lunar.py:3223
+#: src/indicator-lunar.py:3096
 msgid "Preferences"
 msgstr "Параметры"
 
-#: indicator-lunar.py:3242
+#: src/indicator-lunar.py:3115
 msgid "City cannot be empty."
 msgstr "Город не может быть пустым."
 
-#: indicator-lunar.py:3249
+#: src/indicator-lunar.py:3122
 msgid "Latitude must be a number between 90 and -90 inclusive."
 msgstr "Широта должна быть числом от -90 до 90 включительно."
 
-#: indicator-lunar.py:3256
+#: src/indicator-lunar.py:3129
 msgid "Longitude must be a number between 180 and -180 inclusive."
 msgstr "Долгота должна быть числом от -180 до 180 включительно."
 
-#: indicator-lunar.py:3263
+#: src/indicator-lunar.py:3136
 msgid "Elevation must be a number between 0 and 10000 inclusive."
 msgstr "Высота должна быть числом от 0 до 10000 включительно."
