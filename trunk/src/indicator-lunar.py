@@ -34,6 +34,17 @@
 #  http://www.flaticon.com/search/satellite
 
 
+#TODO Noticed that the table in the first tab of the Preferences
+# shows items which should not be displayed if the corresponding
+# objects are hidden.
+# For example, if a satellite is hidden (no visible passes)
+# there is a message for the satellte in the table saying "no visible passes...".
+# If an object is meant to be hidden, should the object's data be removed from self.data?
+# This would ensure the table is clear and correct.
+# However, the problem remains that the message saying an object is hidden is needed by the menu builders.
+# So cannot remove all data...so then the table will show the message.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
