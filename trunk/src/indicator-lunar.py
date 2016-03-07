@@ -1284,8 +1284,8 @@ class IndicatorLunar:
 
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
+
 #TODO How to handle showing tags in the first tab of the Preferences dialog for an object which should be hidden?
-# 
 
 
     def updateMoonMenu( self, menu ):
@@ -1293,9 +1293,6 @@ class IndicatorLunar:
         abort = key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
                 self.hideBodyIfNeverUp
-
-        if abort:
-            self.data.pop( key + ( IndicatorLunar.DATA_MESSAGE, ), None )
 
         if not abort and self.showMoon:
             menuItem = Gtk.MenuItem( _( "Moon" ) )
