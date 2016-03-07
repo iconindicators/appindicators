@@ -34,23 +34,6 @@
 #  http://www.flaticon.com/search/satellite
 
 
-#TODO Noticed that the table in the first tab of the Preferences
-# shows items which should not be displayed if the corresponding
-# objects are hidden.
-# For example, if a satellite is hidden (no visible passes)
-# there is a message for the satellte in the table saying "no visible passes...".
-# If an object is meant to be hidden, should the object's data be removed from self.data?
-# This would ensure the table is clear and correct.
-# However, the problem remains that the message saying an object is hidden is needed by the menu builders.
-# So cannot remove all data...so then the table will show the message.
-
-
-#TODO In all the hiding of stuff, ensure that objects with IndicatorLunar.MESSAGE_DATA_NO_DATA and other messages are also hidden!
-
-
-#TODO Something might be screwy with the checkbox for hide body if never up and stars by constellation.  Seems checking one unchecks the other?
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -1285,9 +1268,6 @@ class IndicatorLunar:
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
 
-#TODO How to handle showing tags in the first tab of the Preferences dialog for an object which should be hidden?
-
-
     def updateMoonMenu( self, menu ):
         key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
         abort = key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
@@ -1892,7 +1872,6 @@ class IndicatorLunar:
         self.updateStars( ephemNow, hideBodyIfNeverUp )
         self.updateComets( ephemNow, hideBodyIfNeverUp, hideCometGreaterThanMagnitude )
         self.updateSatellites( ephemNow, hideSatelliteIfNoVisiblePass )
-        print( self.data ) #TODO Remove
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -2415,6 +2394,18 @@ class IndicatorLunar:
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
         for key in self.data.keys():
+            hideMessage = self.data[ key ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP or \
+                      self.data[ key ] == IndicatorLunar.MESSAGE_DATA_NO_DATA or \
+                      self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES or \
+                      self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
+                      self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
+                      self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
+
+            hideObject = self.hideBodyIfNeverUp or self.hideSatelliteIfNoVisiblePass
+
+            if hideMessage and hideObject:
+                continue
+
             self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
             tag = "[" + key[ 1 ] + " " + key[ 2 ] + "]"
             if tag in tags:
@@ -3492,6 +3483,18 @@ class IndicatorLunar:
 
             # Only add tags for data which has not been removed.
             for key in self.data.keys():
+                hideMessage = self.data[ key ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP or \
+                          self.data[ key ] == IndicatorLunar.MESSAGE_DATA_NO_DATA or \
+                          self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES or \
+                          self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
+                          self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
+                          self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
+
+                hideObject = self.hideBodyIfNeverUp or self.hideSatelliteIfNoVisiblePass
+
+                if hideMessage and hideObject:
+                    continue
+
                 astronomicalObjectType = key[ 0 ]
                 bodyTag = key[ 1 ]
 
