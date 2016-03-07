@@ -14,6 +14,9 @@ indicator-lunar (1.0.66-1) precise; urgency=low
     Satellite (and comet) on-click URL is hard coded.
   * Added latitude/longitude/elevation of location to the icon text tags.
   * Now able to hide/show the moon/sun.
+  * When computing moon/sun/planets/stars/comets, if the body is never up
+    and the user preference is to hide on never up, the remaining computations
+    for that body are not performed.
   * Use the process wrapper utilities rather than direct calls.
   * Removed expired eclipse information.
   * Changes to API for showing message dialogs.
