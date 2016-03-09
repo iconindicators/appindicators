@@ -7,13 +7,13 @@ indicator-lunar (1.0.66-1) precise; urgency=low
     preferences will likely need to be reset.
   * The default text for the summary/message for satellite notification now
     includes the Number and International Designator.
-  * The satellite menu text now includes the International Designator.
-    The format is 'Satellite Name : Number : International Designator'.
-  * Removed the user preferences to change the satellite menu text and to
-    change the satellite on-click URL.
-  * Added on-click look-up for comets.
+  * The satellite menu text has been hard-coded to the format
+    'Satellite Name : Number : International Designator'.
+  * Removed the user preferences to change the satellite menu text and the
+    satellite on-click URL (satellite on-click still remains).
+  * Added on-click URL look-up for comets.
   * Added latitude/longitude/elevation of location to the icon text tags.
-  * Now able to hide/show the moon/sun.
+  * Added the user preference to hide the moon/sun.
   * When computing moon/sun/planets/stars/comets, if the body is never up and
     the user preference is to hide on never up, the remaining computations for
     that body are not performed.
