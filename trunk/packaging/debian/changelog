@@ -3,20 +3,21 @@ indicator-lunar (1.0.66-1) precise; urgency=low
   * Bug fix: Tags in which the underlying object is unchecked or no longer
     exists (such as a comet/satellite) are stripped from the indicator text.
     Thanks to Oleg Moiseichuk for the regular expression code and testing!
-  * Bug fix: "Orbital Element" now been renamed to "Comet".  Some user
-    preferences will likely need to be reset.
+  * Bug fix: "Orbital Element" renamed to "Comet".  Some user preferences will
+    likely need to be reset.
   * The default text for the summary/message for satellite notification now
     includes the Number and International Designator.
   * The satellite menu text has been hard-coded to the format
-    'Satellite Name : Number : International Designator'.
-  * Removed the user preferences to change the satellite menu text and the
-    satellite on-click URL (satellite on-click still remains).
+    'Satellite Name : Number : International Designator'.  The corresponding
+    user preference has been removed.
+  * Removed the user preferences to specify the satellite on-click URL;
+    satellite on-click still remains.
   * Added on-click URL look-up for comets.
-  * Added latitude/longitude/elevation of location to the icon text tags.
-  * Added the user preference to hide the moon/sun.
+  * Added latitude/longitude/elevation of user's location to icon text tags.
+  * Added user preference to hide the moon/sun.
   * When computing moon/sun/planets/stars/comets, if the body is never up and
     the user preference is to hide on never up, the remaining computations for
-    that body are not performed.
+    that body are omitted.
   * Removed expired eclipse information.
   * Use the process wrapper utilities rather than direct calls.
   * Changes to API for showing message dialogs.
