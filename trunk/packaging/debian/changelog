@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.53-1) precise; urgency=low
+
+  * Added indicator-tide to the sample filter.
+  * Made the default PPA xenial.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 19 Apr 2016 13:48:07 +1000
+
+
 indicator-ppa-download-statistics (1.0.52-1) precise; urgency=low
 
   * Bug fix: When a filter was added which resulted in no published binaries,

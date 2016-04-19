@@ -48,7 +48,7 @@ import itertools, pythonutils, json, locale, logging, operator, os, re, shutil, 
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.52"
+    VERSION = "1.0.53"
     ICON = INDICATOR_NAME
     CHANGELOG = "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -926,9 +926,9 @@ class IndicatorPPADownloadStatistics:
 
     def initialiseDefaultSettings( self ):
         self.ppas = [ ]
-        self.ppas.append( PPA( "thebernmeister", "ppa", "trusty", "amd64" ) )
+        self.ppas.append( PPA( "thebernmeister", "ppa", "xenial", "amd64" ) )
         self.filters = { }
-        self.filters[ 'thebernmeister | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-virtual-box", "python3-ephem" ]
+        self.filters[ 'thebernmeister | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-tide", "indicator-virtual-box", "python3-ephem" ]
 
 
     def saveSettings( self ):
