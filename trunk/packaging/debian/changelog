@@ -1,5 +1,6 @@
 indicator-ppa-download-statistics (1.0.53-1) precise; urgency=low
 
+  * Added yakkety to list of series.
   * Added indicator-tide to the sample filter.
   * Made the default PPA xenial.
 
