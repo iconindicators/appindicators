@@ -288,10 +288,11 @@ class IndicatorScriptRunner:
         self.dialog.show_all()
 
         if self.dialog.run() == Gtk.ResponseType.OK:
-            self.scripts = backup
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             self.indicator.set_menu( self.buildMenu() )
+        else:
+            self.scripts = backup
 
         self.dialog.destroy()
         self.dialog = None
