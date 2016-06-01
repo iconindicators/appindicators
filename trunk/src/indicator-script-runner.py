@@ -241,7 +241,7 @@ class IndicatorScriptRunner:
 
         addButton = Gtk.Button( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new script." ) )
-        addButton.connect( "clicked", self.onScriptAdd, scriptNameComboBox )
+        addButton.connect( "clicked", self.onScriptAdd, scriptNameComboBox, scriptDescriptionTreeView )
 
         box.pack_start( addButton, True, True, 0 )
 
@@ -359,7 +359,8 @@ class IndicatorScriptRunner:
                         commandTextView.get_buffer().set_text( "" )
 
 
-    def onScriptAdd( self, button, scriptNameComboBox ): self.addEditScript( Info( "", "", "", "", False ) )
+    def onScriptAdd( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
+        self.addEditScript( Info( "", "", "", "", False ), scriptNameComboBox, scriptDescriptionTreeView )
 
 
 #TODO Handle when no scripts exist and edit is pressed...same as remove. 
@@ -369,12 +370,10 @@ class IndicatorScriptRunner:
         if treeiter != None:
             scriptDescription = model[ treeiter ][ 0 ]
             theScript = self.getScript( scriptName, scriptDescription )
-            self.addEditScript( theScript )
+            self.addEditScript( theScript, scriptNameComboBox, scriptDescriptionTreeView )
 
 
-#TODO At the end, call populateScriptNameCombo and select the script by name and description.
-#TODO Note the differences when checking for a duplicate between add and edit.
-    def addEditScript( self, script ):
+    def addEditScript( self, script, scriptNameComboBox, scriptDescriptionTreeView ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -440,13 +439,13 @@ class IndicatorScriptRunner:
         scrolledWindow.set_vexpand( True )
 
         box.pack_start( scrolledWindow, True, True, 0 )
-        grid.attach( box, 0, 3, 1, 15 ) #TODO Might need to make 20 rather than 15.
+        grid.attach( box, 0, 3, 1, 20 )
 
         terminalOpenCheckbox = Gtk.CheckButton( _( "Terminal Open" ) )
         terminalOpenCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) )
         terminalOpenCheckbox.set_active( script.isTerminalOpen() )
 
-        grid.attach( terminalOpenCheckbox, 0, 19, 1, 1 )
+        grid.attach( terminalOpenCheckbox, 0, 23, 1, 1 )
 
         title = _( "Edit Script" )
         if script.getName() == "":
@@ -471,30 +470,71 @@ class IndicatorScriptRunner:
                     scriptNameEntry.grab_focus()
                     continue
 
-                if commandTextView.get_buffer().get_text( commandTextView.get_buffer().get_start_iter(), commandTextView.get_buffer().get_end_iter(), True ).strip() == "":
+                if pythonutils.getTextViewText( commandTextView ).strip() == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script command cannot be empty." ), INDICATOR_NAME )
                     scriptNameEntry.grab_focus()
                     continue
 
-                if script.getName() == "":
-                    # Adding a new script - check for duplicate.
+                if script.getName() == "": # Adding a new script - check for duplicate.
                     if self.getScript( script.getName(), script.getDescription() ) is not None:
                         pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
                         scriptNameEntry.grab_focus()
                         continue
-                else:
-                    # Editing an existing script.
-                    print( "TODO" )
 
-                if script.getName() != "":
-                    print( "TODO" ) #TODO Find existing script and remove it.
+                else: # Editing an existing script.
+                    if scriptNameEntry.get_text().strip() == script.getName() and scriptDescriptionEntry.get_text().strip() == script.getDescription(): # Script name and description have not changed, so need nothing to do.
+                        break
 
+                    duplicate = False
+                    for scriptInList in self.scripts:
+                        if scriptNameEntry.get_text().strip() == scriptInList.getName() and scriptDescriptionEntry.get_text().strip() == scriptInList.getDescription():
+                            duplicate = True
+                            break
+
+                    if duplicate:
+                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
+                        scriptNameEntry.grab_focus()
+                        continue
+
+                    # Remove the existing script...a new script containing the edits will be added later.
+                    i = 0
+                    for scriptInList in self.scripts:
+                        if script.getName() == scriptInList.getName() and script.getDescription() == scriptInList.getDescription():
+                            break
+
+                        i += 1
+
+                    del self.scripts[ i ]
+
+                # Either the new script or the edit.
                 newScript = Info( scriptNameEntry.get_text(),
                                   scriptDescriptionEntry.get_text(), 
-                                  scriptDirectoryEntry.get_text(), commandTextView.get_buffer().get_text( commandTextView.get_buffer().get_start_iter(), commandTextView.get_buffer().get_end_iter(), True ),
+                                  scriptDirectoryEntry.get_text(),
+                                  pythonutils.getTextViewText( commandTextView ),
                                   terminalOpenCheckbox.get_active() )
 
                 self.scripts.append( newScript )
+
+                # Refresh the script name combo, select the script name and then the description.
+                self.populateScriptNameCombo( scriptNameComboBox )
+                iter = scriptNameComboBox.get_model().get_iter_first()
+                i = 0
+                while iter != None:
+                    if scriptNameComboBox.get_model().get_value( iter, 0 ) == newScript.getName():
+                        scriptNameComboBox.set_active( i )
+                        iter = scriptDescriptionTreeView.get_model().get_iter_first()
+                        i = 0
+                        while iter != None:
+                            if scriptDescriptionTreeView.get_model().get_value( iter, 0 ) == newScript.getDescription():
+                                scriptDescriptionTreeView.get_selection().select_path( i )
+                                scriptDescriptionTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( str( i ) ) )
+                                break
+
+                            iter = scriptDescriptionTreeView.get_model().iter_next( iter )
+                            i += 1
+
+                    iter = scriptNameComboBox.get_model().iter_next( iter )
+                    i += 1
 
             break
 
@@ -539,9 +579,6 @@ class IndicatorScriptRunner:
                 scripts = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPTS, [ ] )
                 for script in scripts:
                     self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
-
-#TODO This prompts for the password but seems to only do the autoclean...not the rest.
-                self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
 
             except Exception as e:
                 logging.exception( e )
