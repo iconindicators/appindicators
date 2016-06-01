@@ -18,9 +18,6 @@
 # Application indicator allowing a user to run a terminal command or script.
 
 
-# TODO Check for duplicate name/description when add/edit a script.
-
-
 # TODO Can't run multiple scripts simultaneously (irrespective of the value of terminalOpen).
 
 
