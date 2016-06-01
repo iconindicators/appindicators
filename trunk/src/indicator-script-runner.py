@@ -54,8 +54,8 @@ class IndicatorScriptRunner:
         self.loadSettings()
 
 #TODO Temporary testing of icon.
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, os.path.abspath( "/home/bernard/Programming/IndicatorScriptRunner/icons/ubuntu-mono-dark/" + IndicatorScriptRunner.ICON + ".svg" ), AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-#         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorScriptRunner.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+#         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, os.path.abspath( "/home/bernard/Programming/IndicatorScriptRunner/icons/ubuntu-mono-dark/" + IndicatorScriptRunner.ICON + ".svg" ), AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorScriptRunner.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( self.buildMenu() )
 
