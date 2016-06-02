@@ -94,7 +94,7 @@ class IndicatorScriptRunner:
     def onScript( self, widget, script ):
         wrapperScript = ""
         if script.isTerminalOpen():
-            wrapperScript = "/tmp/" + str( int ( time.time() ) )
+            wrapperScript = "/tmp/" + str( int( time.time() ) )
             if os.path.isfile( wrapperScript ):
                 os.remove( wrapperScript )
 
@@ -171,7 +171,6 @@ class IndicatorScriptRunner:
         scriptNameComboBox = Gtk.ComboBoxText()
         scriptNameComboBox.set_tooltip_text( _( "The name of a script object.\n\nMore than one script may\nshare the same name but\nhave a different description." ) )
         scriptNameComboBox.set_entry_text_column( 0 )
-        self.populateScriptNameCombo( scriptNameComboBox )
 
         box.pack_start( scriptNameComboBox, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
@@ -276,7 +275,7 @@ class IndicatorScriptRunner:
 
         scriptNameComboBox.connect( "changed", self.onScriptName, scriptDescriptionListStore, scriptDescriptionTreeView )
         scriptDescriptionTreeView.get_selection().connect( "changed", self.onScriptDescription, scriptNameComboBox, directoryEntry, commandTextView )
-        scriptNameComboBox.set_active( 0 ) # TODO Test this with NO scripts added.
+        self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, "", "" )
 
         self.dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -324,7 +323,7 @@ class IndicatorScriptRunner:
     def onScriptDescription( self, scriptDescriptionTreeSelection, scriptNameComboBox, directoryEntry, commandTextView ):
         scriptName = scriptNameComboBox.get_active_text()
         model, treeiter = scriptDescriptionTreeSelection.get_selected()
-        if treeiter != None:
+        if treeiter is not None:
             scriptDescription = model[ treeiter ][ 0 ]
             theScript = self.getScript( scriptName, scriptDescription )
             if theScript is not None:
@@ -334,10 +333,10 @@ class IndicatorScriptRunner:
 
     def onScriptRemove( self, button, scriptNameComboBox, scriptDescriptionTreeView, directoryEntry, commandTextView ):
         iter = scriptNameComboBox.get_active_iter()
-        if iter != None:
+        if iter is not None:
             scriptName = scriptNameComboBox.get_model()[ iter ][ 0 ]
             model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
-            if treeiter != None:
+            if treeiter is not None:
                 scriptDescription = model[ treeiter ][ 0 ]
                 theScript = self.getScript( scriptName, scriptDescription )
                 if pythonutils.showOKCancel( None, _( "Remove the selected script?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
@@ -349,8 +348,7 @@ class IndicatorScriptRunner:
                         i += 1
 
                     del self.scripts[ i ]
-                    self.populateScriptNameCombo( scriptNameComboBox )
-                    scriptNameComboBox.set_active( 0 )
+                    self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, scriptName, "" )
                     if len( self.scripts ) == 0:
                         directoryEntry.set_text( "" )
                         commandTextView.get_buffer().set_text( "" )
@@ -364,7 +362,7 @@ class IndicatorScriptRunner:
     def onScriptEdit( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
         scriptName = scriptNameComboBox.get_active_text() #TODO This is different to remove...check if this works on an empty list of scripts.
         model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
-        if treeiter != None:
+        if treeiter is not None:
             scriptDescription = model[ treeiter ][ 0 ]
             theScript = self.getScript( scriptName, scriptDescription )
             self.addEditScript( theScript, scriptNameComboBox, scriptDescriptionTreeView )
@@ -511,38 +509,48 @@ class IndicatorScriptRunner:
                                   terminalOpenCheckbox.get_active() )
 
                 self.scripts.append( newScript )
-
-                # Refresh the script name combo, select the script name and then the description.
-                self.populateScriptNameCombo( scriptNameComboBox )
-                iter = scriptNameComboBox.get_model().get_iter_first()
-                i = 0
-                while iter != None:
-                    if scriptNameComboBox.get_model().get_value( iter, 0 ) == newScript.getName():
-                        scriptNameComboBox.set_active( i )
-                        iter = scriptDescriptionTreeView.get_model().get_iter_first()
-                        i = 0
-                        while iter != None:
-                            if scriptDescriptionTreeView.get_model().get_value( iter, 0 ) == newScript.getDescription():
-                                scriptDescriptionTreeView.get_selection().select_path( i )
-                                scriptDescriptionTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( str( i ) ) )
-                                break
-
-                            iter = scriptDescriptionTreeView.get_model().iter_next( iter )
-                            i += 1
-
-                    iter = scriptNameComboBox.get_model().iter_next( iter )
-                    i += 1
-
+                self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, newScript.getName(), newScript.getDescription() )
             break
 
         dialog.destroy()
 
 
-    def populateScriptNameCombo( self, scriptNameComboBox ):
+#TODO Need to ensure that if "" is passed in for the name or description that we catch this at the end (or somewhere/somehow) and select the first name and/or desc.
+    def populateScriptNameCombo( self, scriptNameComboBox, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
         scriptNameComboBox.remove_all()
         scripts = self.getScriptsGroupedByName()
-        for scriptName in sorted( scripts, key = str.lower ):
-            scriptNameComboBox.append_text( scriptName )
+        for name in sorted( scripts, key = str.lower ):
+            scriptNameComboBox.append_text( name )
+
+        if scriptName == "":
+            scriptNameComboBox.set_active( 0 ) #TODO Test this works with no scripts.
+        else:
+            i = 0
+            iter = scriptNameComboBox.get_model().get_iter_first()
+            while iter is not None:
+                if scriptNameComboBox.get_model().get_value( iter, 0 ) == scriptName:
+                    scriptNameComboBox.set_active( i )
+                    break
+
+                iter = scriptNameComboBox.get_model().iter_next( iter )
+                i += 1
+
+            if iter is None: # Could not find the script name (happens when the last script of the given name is removed.)
+                scriptNameComboBox.set_active( 0 ) #TODO Test this works with no scripts.
+            else: # A script name was found (and selected).
+                if scriptDescription == "":
+                        scriptDescriptionTreeView.get_selection().select_path( 0 ) #TODO Test with no scripts.
+                else:
+                    i = 0
+                    iter = scriptDescriptionTreeView.get_model().get_iter_first()
+                    while iter is not None:
+                        if scriptDescriptionTreeView.get_model().get_value( iter, 0 ) == scriptDescription:
+                            scriptDescriptionTreeView.get_selection().select_path( i )
+                            scriptDescriptionTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( str( i ) ) )
+                            break
+     
+                        iter = scriptDescriptionTreeView.get_model().iter_next( iter )
+                        i += 1
 
 
     def getScript( self, scriptName, scriptDescription ):
@@ -589,6 +597,8 @@ class IndicatorScriptRunner:
 
 #TODO This prompts for the password but seems to only do the autoclean...not the rest.           
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
+
+#TODO Maybe a sample could use something like check if the internet is connected and show a notification (along with external IP).
 
 
     def saveSettings( self ):
