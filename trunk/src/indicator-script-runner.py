@@ -18,6 +18,11 @@
 # Application indicator allowing a user to run a terminal command or script.
 
 
+# https://developer.gnome.org/gnome-devel-demos
+# http://python-gtk-3-tutorial.readthedocs.io
+# http://lazka.github.io/pgi-docs
+
+
 # TODO Can't run multiple scripts simultaneously (irrespective of the value of terminalOpen).
 
 
@@ -359,6 +364,7 @@ class IndicatorScriptRunner:
 
 
 #TODO Handle when no scripts exist and edit is pressed...same as remove. 
+#TODO Tried to edit, changed the command, did not actually change!
     def onScriptEdit( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
         scriptName = scriptNameComboBox.get_active_text() #TODO This is different to remove...check if this works on an empty list of scripts.
         model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
@@ -599,6 +605,11 @@ class IndicatorScriptRunner:
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
 
 #TODO Maybe a sample could use something like check if the internet is connected and show a notification (along with external IP).
+#TODO How to work in the notify osd?  Ask Oleg.   
+# Need to include notifyosd in the deb file requirements!
+            self.scripts.append( Info( "Internet", "Up or down", "", "sh -c \"if wget -qO /dev/null google.com > /dev/null; then echo \"\u263a\"; else echo \"\u2639\"; fi\"", True ) )
+            self.scripts.append( Info( "Internet", "Public IP", "", "sh -c \"curl ipv4.icanhazip.com\"", True ) )
+#TODO Add these in via the prefs dialog and make sure they save out and then read in and then run!
 
 
     def saveSettings( self ):
