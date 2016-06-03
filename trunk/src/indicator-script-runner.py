@@ -504,10 +504,10 @@ class IndicatorScriptRunner:
                     del self.scripts[ i ]
 
                 # Either the new script or the edit.
-                newScript = Info( scriptNameEntry.get_text(),
-                                  scriptDescriptionEntry.get_text(), 
-                                  scriptDirectoryEntry.get_text(),
-                                  pythonutils.getTextViewText( commandTextView ),
+                newScript = Info( scriptNameEntry.get_text().strip(),
+                                  scriptDescriptionEntry.get_text().strip(), 
+                                  scriptDirectoryEntry.get_text().strip(),
+                                  pythonutils.getTextViewText( commandTextView ).strip(),
                                   terminalOpenCheckbox.get_active() )
 
                 self.scripts.append( newScript )
@@ -515,6 +515,16 @@ class IndicatorScriptRunner:
             break
 
         dialog.destroy()
+
+
+    def getScript( self, scriptName, scriptDescription ):
+        theScript = None
+        for script in self.scripts:
+            if script.getName() == scriptName and script.getDescription() == scriptDescription:
+                theScript = script
+                break
+
+        return theScript
 
 
     def populateScriptNameCombo( self, scriptNameComboBox, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
@@ -557,16 +567,6 @@ class IndicatorScriptRunner:
 
                         iter = scriptDescriptionTreeView.get_model().iter_next( iter )
                         i += 1
-
-
-    def getScript( self, scriptName, scriptDescription ):
-        theScript = None
-        for script in self.scripts:
-            if script.getName() == scriptName and script.getDescription() == scriptDescription:
-                theScript = script
-                break
-
-        return theScript
 
 
     def getScriptsGroupedByName( self ):
