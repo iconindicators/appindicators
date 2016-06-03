@@ -362,7 +362,6 @@ class IndicatorScriptRunner:
         self.addEditScript( Info( "", "", "", "", False ), scriptNameComboBox, scriptDescriptionTreeView )
 
 
-#TODO Handle when no scripts exist and edit is pressed...same as remove. 
 #TODO Tried to edit, changed the command, did not actually change!
     def onScriptEdit( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
         scriptName = scriptNameComboBox.get_active_text() #TODO This is different to remove...check if this works on an empty list of scripts.
