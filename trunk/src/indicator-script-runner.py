@@ -324,9 +324,6 @@ class IndicatorScriptRunner:
         scriptDescriptionTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
 
 
-#TODO
-# Select a script and then a description other than the first.
-# Select a different script - we get a selection event for the prior description.  WHy?
     def onScriptDescription( self, scriptDescriptionTreeSelection, scriptNameComboBox, directoryEntry, commandTextView ):
         scriptName = scriptNameComboBox.get_active_text()
         model, treeiter = scriptDescriptionTreeSelection.get_selected()
