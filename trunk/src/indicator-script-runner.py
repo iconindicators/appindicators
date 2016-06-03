@@ -90,6 +90,8 @@ class IndicatorScriptRunner:
 # http://askubuntu.com/questions/351097/passing-multiple-commands-to-gnome-terminal-from-a-script
 
 
+# https://www.linuxliteos.com/forums/tutorials/install-updates-how-to-keep-the-terminal-open/
+
 #TODO Need to test the whole shebang on Lubuntu/Xubuntu...
 #Might have to send ALT CTRL T which works on ALL Ubuntu versions...
 # http://stackoverflow.com/questions/5714072/simulate-keystroke-in-linux-with-python
@@ -521,7 +523,6 @@ class IndicatorScriptRunner:
         dialog.destroy()
 
 
-#TODO Need to ensure that if "" is passed in for the name or description that we catch this at the end (or somewhere/somehow) and select the first name and/or desc.
     def populateScriptNameCombo( self, scriptNameComboBox, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
         scriptNameComboBox.remove_all()
         scripts = self.getScriptsGroupedByName()
@@ -529,7 +530,9 @@ class IndicatorScriptRunner:
             scriptNameComboBox.append_text( name )
 
         if scriptName == "":
-            scriptNameComboBox.set_active( 0 ) #TODO Test this works with no scripts.
+            #TODO Test this works with no scripts.
+            #TODO Ensure that the first description is also selected.
+            scriptNameComboBox.set_active( 0 )
         else:
             i = 0
             iter = scriptNameComboBox.get_model().get_iter_first()
@@ -542,11 +545,14 @@ class IndicatorScriptRunner:
                 i += 1
 
             if iter is None: # Could not find the script name (happens when the last script of the given name is removed.)
-                scriptNameComboBox.set_active( 0 ) #TODO Test this works with no scripts.
-            else: # A script name was found (and selected).
+                #TODO Test this works with no scripts.
+                #TODO Ensure that the first description is also selected.
+                scriptNameComboBox.set_active( 0 )
+            else: # A script name was found and has been selected.
                 if scriptDescription == "":
-                        scriptDescriptionTreeView.get_selection().select_path( 0 ) #TODO Test with no scripts.
-                else:
+                    #TODO Test with no scripts.
+                    scriptDescriptionTreeView.get_selection().select_path( 0 )
+                else: # Select the description - the description must exist otherwise there is some coding error elsewhere.
                     i = 0
                     iter = scriptDescriptionTreeView.get_model().get_iter_first()
                     while iter is not None:
@@ -554,7 +560,7 @@ class IndicatorScriptRunner:
                             scriptDescriptionTreeView.get_selection().select_path( i )
                             scriptDescriptionTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( str( i ) ) )
                             break
-     
+
                         iter = scriptDescriptionTreeView.get_model().iter_next( iter )
                         i += 1
 
@@ -607,9 +613,16 @@ class IndicatorScriptRunner:
 #TODO Maybe a sample could use something like check if the internet is connected and show a notification (along with external IP).
 #TODO How to work in the notify osd?  Ask Oleg.   
 # Need to include notifyosd in the deb file requirements!
-            self.scripts.append( Info( "Internet", "Up or down", "", "sh -c \"if wget -qO /dev/null google.com > /dev/null; then echo \"\u263a\"; else echo \"\u2639\"; fi\"", True ) )
-            self.scripts.append( Info( "Internet", "Public IP", "", "sh -c \"curl ipv4.icanhazip.com\"", True ) )
+            self.scripts.append( Info( "Internet", "Up or down ORIG", "", "sh -c \"if wget -qO /dev/null google.com > /dev/null; then sh -c \\\"notify-send \\\"\u263a\\\"\\\"; else sh -c \\\"notify-send \\\"u2639\\\"\\\"; fi\"", False ) )
+            self.scripts.append( Info( "Internet", "Up or down", "", "sh -c \"if wget -qO /dev/null google.com > /dev/null; then sh -c \\\"notify-send 'aaaaa \u263a bbb'\\\"; else sh -c \\\"notify-send \\\"u2639\\\"\\\"; fi\"", False ) )
+
+            self.scripts.append( Info( "Internet", "Up or down NEW", "", "sh -c \"if wget -qO /dev/null google.com > /dev/null; then notify-send \\\'Internet is UP\\\'; else notify-send 'InternetisDOWN'; fi\"", False ) )
+
+            
+            self.scripts.append( Info( "Internet", "Public IP address", "", "sh -c \"notify-send \\\"External IP address: $(wget http://ipinfo.io/ip -qO -)\\\"\"", False ) )
 #TODO Add these in via the prefs dialog and make sure they save out and then read in and then run!
+
+
 
 
     def saveSettings( self ):
