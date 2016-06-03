@@ -89,39 +89,9 @@ class IndicatorScriptRunner:
         return menu
 
 
-#TODO http://stackoverflow.com/questions/3512055/avoid-gnome-terminal-close-after-script-execution
-# http://askubuntu.com/questions/484993/run-command-on-anothernew-terminal-window
-# http://stackoverflow.com/questions/11500649/new-terminal-with-multiple-commands-executed
-# http://askubuntu.com/questions/351097/passing-multiple-commands-to-gnome-terminal-from-a-script
-
-
-# https://www.linuxliteos.com/forums/tutorials/install-updates-how-to-keep-the-terminal-open/
-
-#TODO Need to test the whole shebang on Lubuntu/Xubuntu...
-#Might have to send ALT CTRL T which works on ALL Ubuntu versions...
-# http://stackoverflow.com/questions/5714072/simulate-keystroke-in-linux-with-python
-# http://askubuntu.com/questions/500972/why-does-man-x-terminal-emulator-return-the-output-of-man-gnome-terminal   
-# Xubuntu: x-terminal-emulator default has same arguments as GNOME.
-# Lubuntu: x-terminal-emulator default has same arguments as GNOME (but does not have the -x option).
+#TODO Test the whole shebang on Lubuntu/Xubuntu.
     def onScript( self, widget, script ):
-        wrapperScript = ""
-        if script.isTerminalOpen():
-            wrapperScript = "/tmp/" + str( int( time.time() ) )
-            if os.path.isfile( wrapperScript ):
-                os.remove( wrapperScript )
-
-#TODO Is this a security risk leaving the script there?
-            with open( wrapperScript, "w" ) as f:
-                f.write( "#!/bin/sh\n" )
-                f.write( "\"$@\"\n" )
-                f.write( "exec \"$SHELL\"\n" )
-
-#TODO Determine which of these permissions are needed or not when the indicator runs as per installed.
-            os.chmod( wrapperScript, os.stat( wrapperScript ).st_mode | stat.S_IXUSR )
-            os.chmod( wrapperScript, os.stat( wrapperScript ).st_mode | stat.S_IXGRP )
-            os.chmod( wrapperScript, os.stat( wrapperScript ).st_mode | stat.S_IXOTH )
-
-# oleg:  x-terminal-emulator -e ${SHELL}' -c here-goes-your-long-command-line-with-spaces-protected-with-backticks;'${SHELL}
+# TODO From oleg:  x-terminal-emulator -e ${SHELL}' -c here-goes-your-long-command-line-with-spaces-protected-with-backticks;'${SHELL}
         command = "x-terminal-emulator"
         if script.getDirectory() != "":
             command += " --working-directory=" + script.getDirectory()
@@ -131,16 +101,7 @@ class IndicatorScriptRunner:
         if script.isTerminalOpen():
             command += "${SHELL}"
 
-        print( command )
         pythonutils.processCall( command )
-
-#         terminalExecutable = "gnome-terminal"
-#         command = terminalExecutable
-#         if script.getDirectory() != "":
-#             command += " --working-directory=" + script.getDirectory()
-# 
-#         command += " -e '" + wrapperScript + " " + script.getCommand() + "'"
-#         pythonutils.processCall( command )
 
 
     def onAbout( self, widget ):
@@ -640,10 +601,7 @@ class IndicatorScriptRunner:
             self.scripts.append( Info( "Network", "Ping Google", "", "ping\ -c\ 5\ www.google.com", False ) )
             self.scripts.append( Info( "Network", "Public IP address", "", "\"notify-send \\\"External IP address: $(wget http://ipinfo.io/ip -qO -)\\\"\"", False ) )
             self.scripts.append( Info( "Network", "Up or down", "", "\"if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi\"", False ) )
-
-#TODO This prompts for the password but seems to only do the autoclean...not the rest.           
-            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
-
+            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "\"sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade\"", True ) )
 
 
     def saveSettings( self ):
