@@ -336,26 +336,24 @@ class IndicatorScriptRunner:
 
 
     def onScriptRemove( self, button, scriptNameComboBox, scriptDescriptionTreeView, directoryEntry, commandTextView ):
-        iter = scriptNameComboBox.get_active_iter()
-        if iter is not None:
-            scriptName = scriptNameComboBox.get_model()[ iter ][ 0 ]
-            model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
-            if treeiter is not None:
-                scriptDescription = model[ treeiter ][ 0 ]
-                theScript = self.getScript( scriptName, scriptDescription )
-                if pythonutils.showOKCancel( None, _( "Remove the selected script?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
-                    i = 0
-                    for script in self.scripts:
-                        if script.getName() == scriptName and script.getDescription() == scriptDescription:
-                            break
+        scriptName = scriptNameComboBox.get_active_text()
+        model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
+        if scriptName is not None and treeiter is not None:
+            scriptDescription = model[ treeiter ][ 0 ]
+            theScript = self.getScript( scriptName, scriptDescription )
+            if pythonutils.showOKCancel( None, _( "Remove the selected script?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+                i = 0
+                for script in self.scripts:
+                    if script.getName() == scriptName and script.getDescription() == scriptDescription:
+                        break
 
-                        i += 1
+                    i += 1
 
-                    del self.scripts[ i ]
-                    self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, scriptName, "" )
-                    if len( self.scripts ) == 0:
-                        directoryEntry.set_text( "" )
-                        commandTextView.get_buffer().set_text( "" )
+                del self.scripts[ i ]
+                self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, scriptName, "" )
+                if len( self.scripts ) == 0:
+                    directoryEntry.set_text( "" )
+                    commandTextView.get_buffer().set_text( "" )
 
 
     def onScriptAdd( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
@@ -364,9 +362,9 @@ class IndicatorScriptRunner:
 
 #TODO Tried to edit, changed the command, did not actually change!
     def onScriptEdit( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
-        scriptName = scriptNameComboBox.get_active_text() #TODO This is different to remove...check if this works on an empty list of scripts.
+        scriptName = scriptNameComboBox.get_active_text()
         model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
-        if treeiter is not None:
+        if scriptName is not None and treeiter is not None:
             scriptDescription = model[ treeiter ][ 0 ]
             theScript = self.getScript( scriptName, scriptDescription )
             self.addEditScript( theScript, scriptNameComboBox, scriptDescriptionTreeView )
@@ -598,6 +596,7 @@ class IndicatorScriptRunner:
                 logging.error( "Error reading settings: " + IndicatorScriptRunner.SETTINGS_FILE )
         else:
             self.scripts = [ ]
+#             if True: return #TODO Remove
             self.scripts.append( Info( "Ping", "Google", "", "ping -c 5 www.google.com", False ) )
             self.scripts.append( Info( "Ping", "Ubuntu", "", "ping -c 5 www.ubuntu.com", False ) )
             self.scripts.append( Info( "List Files", "Contents of /usr/bin", "/usr/bin", "ls", True ) )
