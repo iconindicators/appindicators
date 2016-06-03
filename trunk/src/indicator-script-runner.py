@@ -26,6 +26,11 @@
 # TODO Can't run multiple scripts simultaneously (irrespective of the value of terminalOpen).
 
 
+# TODO Need to include notifyosd in the deb file requirements!
+# sudo apt-get install notify-osd libnotify-bin
+
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -116,13 +121,26 @@ class IndicatorScriptRunner:
             os.chmod( wrapperScript, os.stat( wrapperScript ).st_mode | stat.S_IXGRP )
             os.chmod( wrapperScript, os.stat( wrapperScript ).st_mode | stat.S_IXOTH )
 
-        terminalExecutable = "gnome-terminal"
-        command = terminalExecutable
+# oleg:  x-terminal-emulator -e ${SHELL}' -c here-goes-your-long-command-line-with-spaces-protected-with-backticks;'${SHELL}
+        command = "x-terminal-emulator"
         if script.getDirectory() != "":
             command += " --working-directory=" + script.getDirectory()
 
-        command += " -e '" + wrapperScript + " " + script.getCommand() + "'"
+        command += " -e ${SHELL}' -c " + script.getCommand() + ";'"
+
+        if script.isTerminalOpen():
+            command += "${SHELL}"
+
+        print( command )
         pythonutils.processCall( command )
+
+#         terminalExecutable = "gnome-terminal"
+#         command = terminalExecutable
+#         if script.getDirectory() != "":
+#             command += " --working-directory=" + script.getDirectory()
+# 
+#         command += " -e '" + wrapperScript + " " + script.getCommand() + "'"
+#         pythonutils.processCall( command )
 
 
     def onAbout( self, widget ):
@@ -479,17 +497,37 @@ class IndicatorScriptRunner:
                         continue
 
                 else: # Editing an existing script.
-                    if scriptNameEntry.get_text().strip() == script.getName() and scriptDescriptionEntry.get_text().strip() == script.getDescription(): # Script name and description have not changed, so need nothing to do.
+                    if scriptNameEntry.get_text().strip() == script.getName() and \
+                       scriptDescriptionEntry.get_text().strip() == script.getDescription() and \
+                       scriptDirectoryEntry.get_text().strip() == script.getDirectory() and \
+                       pythonutils.getTextViewText( commandTextView ).strip() == script.getCommand() and \
+                       terminalOpenCheckbox.get_active() == script.isTerminalOpen(): # Script has not changed, so nothing to do.
                         break
 
+#TODO Below needs to be checked!
                     duplicate = False
-                    for scriptInList in self.scripts:
-                        if scriptNameEntry.get_text().strip() == scriptInList.getName() and scriptDescriptionEntry.get_text().strip() == scriptInList.getDescription():
-                            duplicate = True
-                            break
+                    if scriptNameEntry.get_text().strip() == script.getName() and scriptDescriptionEntry.get_text().strip() == script.getDescription():
+                        pass
+                    elif scriptNameEntry.get_text().strip() == script.getName(): # Description is different.
+                        #TODO What to do?
+                        # Look at scripts with same name - if a script with description is same as that in text entry, it's a duplicate.
+                        for scriptInList in self.scripts:
+                            if scriptNameEntry.get_text().strip() == scriptInList.getName() and scriptDescriptionEntry.get_text().strip() == scriptInList.getDescription():
+                                message = _( "A script of the same name and description already exists." )
+                                duplicate = True
+                                break
+                    elif scriptDescriptionEntry.get_text().strip() == script.getDescription():
+                        #TODO What to do?
+                        pass
+                    else: # Name and description are different.
+                        for scriptInList in self.scripts:
+                            if scriptNameEntry.get_text().strip() == scriptInList.getName() and scriptDescriptionEntry.get_text().strip() == scriptInList.getDescription():
+                                message = _( "A script of the same name and description already exists." )
+                                duplicate = True
+                                break
 
                     if duplicate:
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
+                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, message, INDICATOR_NAME )
                         scriptNameEntry.grab_focus()
                         continue
 
@@ -596,27 +634,15 @@ class IndicatorScriptRunner:
                 logging.error( "Error reading settings: " + IndicatorScriptRunner.SETTINGS_FILE )
         else:
             self.scripts = [ ]
-#             if True: return #TODO Remove
-            self.scripts.append( Info( "Ping", "Google", "", "ping -c 5 www.google.com", False ) )
-            self.scripts.append( Info( "Ping", "Ubuntu", "", "ping -c 5 www.ubuntu.com", False ) )
-            self.scripts.append( Info( "List Files", "Contents of /usr/bin", "/usr/bin", "ls", True ) )
-            self.scripts.append( Info( "List Files", "Contents of /bin", "/bin", "ls", True ) )
+#TODO Add these in via the prefs dialog and make sure they save out and then read in and then run!
+            self.scripts.append( Info( "List Files", "Contents of /usr/bin", "/usr/bin", "ls", True ) ) #TODO Come up with a better sample?  Want something that leaves the terminal open.
+            self.scripts.append( Info( "List Files", "Contents of /bin", "/bin", "ls", True ) ) #TODO Come up with a better sample?  Want something that leaves the terminal open.
+            self.scripts.append( Info( "Network", "Ping Google", "", "ping\ -c\ 5\ www.google.com", False ) )
+            self.scripts.append( Info( "Network", "Public IP address", "", "\"notify-send \\\"External IP address: $(wget http://ipinfo.io/ip -qO -)\\\"\"", False ) )
+            self.scripts.append( Info( "Network", "Up or down", "", "\"if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi\"", False ) )
 
 #TODO This prompts for the password but seems to only do the autoclean...not the rest.           
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
-
-#TODO Maybe a sample could use something like check if the internet is connected and show a notification (along with external IP).
-#TODO How to work in the notify osd?  Ask Oleg.   
-# Need to include notifyosd in the deb file requirements!
-            self.scripts.append( Info( "Internet", "Up or down ORIG", "", "sh -c \"if wget -qO /dev/null google.com > /dev/null; then sh -c \\\"notify-send \\\"\u263a\\\"\\\"; else sh -c \\\"notify-send \\\"u2639\\\"\\\"; fi\"", False ) )
-            self.scripts.append( Info( "Internet", "Up or down", "", "sh -c \"if wget -qO /dev/null google.com > /dev/null; then sh -c \\\"notify-send 'aaaaa \u263a bbb'\\\"; else sh -c \\\"notify-send \\\"u2639\\\"\\\"; fi\"", False ) )
-
-            self.scripts.append( Info( "Internet", "Up or down NEW", "", "sh -c \"if wget -qO /dev/null google.com > /dev/null; then notify-send \\\'Internet is UP\\\'; else notify-send 'InternetisDOWN'; fi\"", False ) )
-
-            
-            self.scripts.append( Info( "Internet", "Public IP address", "", "sh -c \"notify-send \\\"External IP address: $(wget http://ipinfo.io/ip -qO -)\\\"\"", False ) )
-#TODO Add these in via the prefs dialog and make sure they save out and then read in and then run!
-
 
 
 
