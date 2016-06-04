@@ -589,10 +589,10 @@ class IndicatorScriptRunner:
         else:
             self.scripts = [ ]
 #TODO Add these in via the prefs dialog and make sure they save out and then read in and then run!
-            self.scripts.append( Info( "List Files", "Contents of /usr/bin", "/usr/bin", "ls", True ) ) #TODO Come up with a better sample?  Want something that leaves the terminal open.
-            self.scripts.append( Info( "List Files", "Contents of /bin", "/bin", "ls", True ) ) #TODO Come up with a better sample?  Want something that leaves the terminal open.
+#TODO Come up other samples, in particular, something that leaves the terminal open.
+#TODO Need i18n or not (of script name, description and output text)?
             self.scripts.append( Info( "Network", "Ping Google", "", "ping\ -c\ 5\ www.google.com", False ) )
-            self.scripts.append( Info( "Network", "Public IP address", "", "\"notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"\"", False ) ) #TODO Need i18n or not?
+            self.scripts.append( Info( "Network", "Public IP address", "", "\"notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"\"", False ) )
             self.scripts.append( Info( "Network", "Up or down", "", "\"if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi\"", False ) )  #TODO Need i18n or not?
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "\"sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade\"", True ) )
 
