@@ -26,9 +26,6 @@
 # TODO Can't run multiple scripts simultaneously (test with both true and false values for terminalOpen).
 
 
-#TODO Have a duplicate script button?
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -223,13 +220,17 @@ class IndicatorScriptRunner:
         addButton = Gtk.Button( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new script." ) )
         addButton.connect( "clicked", self.onScriptAdd, scriptNameComboBox, scriptDescriptionTreeView )
-
         box.pack_start( addButton, True, True, 0 )
 
         editButton = Gtk.Button( _( "Edit" ) )
         editButton.set_tooltip_text( _( "Edit the current script." ) )
         editButton.connect( "clicked", self.onScriptEdit, scriptNameComboBox, scriptDescriptionTreeView )
         box.pack_start( editButton, True, True, 0 )
+
+        copyButton = Gtk.Button( _( "Copy" ) )
+        copyButton.set_tooltip_text( _( "Make a duplicate of the current script." ) )
+        copyButton.connect( "clicked", self.onScriptCopy, scriptNameComboBox, scriptDescriptionTreeView )
+        box.pack_start( copyButton, True, True, 0 )
 
         removeButton = Gtk.Button( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected script." ) )
@@ -311,6 +312,28 @@ class IndicatorScriptRunner:
             if theScript is not None:
                 directoryEntry.set_text( theScript.getDirectory() )
                 commandTextView.get_buffer().set_text( theScript.getCommand() )
+
+
+    def onScriptCopy( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
+        if True: return # TODO Implement!
+#         scriptName = scriptNameComboBox.get_active_text()
+#         model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
+#         if scriptName is not None and treeiter is not None:
+#             scriptDescription = model[ treeiter ][ 0 ]
+#             theScript = self.getScript( scriptName, scriptDescription )
+#             if pythonutils.showOKCancel( None, _( "Remove the selected script?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+#                 i = 0
+#                 for script in self.scripts:
+#                     if script.getName() == scriptName and script.getDescription() == scriptDescription:
+#                         break
+# 
+#                     i += 1
+# 
+#                 del self.scripts[ i ]
+#                 self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, scriptName, "" )
+#                 if len( self.scripts ) == 0:
+#                     directoryEntry.set_text( "" )
+#                     commandTextView.get_buffer().set_text( "" )
 
 
     def onScriptRemove( self, button, scriptNameComboBox, scriptDescriptionTreeView, directoryEntry, commandTextView ):
