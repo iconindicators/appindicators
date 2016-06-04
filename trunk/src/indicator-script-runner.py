@@ -334,7 +334,6 @@ class IndicatorScriptRunner:
         self.addEditScript( Info( "", "", "", "", False ), scriptNameComboBox, scriptDescriptionTreeView )
 
 
-#TODO Tried to edit, changed the command, did not actually change!
     def onScriptEdit( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
         scriptName = scriptNameComboBox.get_active_text()
         model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
@@ -461,7 +460,6 @@ class IndicatorScriptRunner:
                         pass # The name/description have not changed, but other parts have - so there is no chance of a clash.
 
                     else: # At this point either the script name or description has changed or both (and possibly the other script parameters). 
-#TODO Below needs to be checked!
                         print( "Script name and/or description have changed." ) #TODO Remove
                         duplicate = False
                         for scriptInList in self.scripts:
