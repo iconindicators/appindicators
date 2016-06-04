@@ -26,6 +26,12 @@
 # TODO Can't run multiple scripts simultaneously (test with both true and false values for terminalOpen).
 
 
+#TODO Add tooltips to explain stuff...
+
+
+#TODO apt-get update etc does not work any more!!!
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -338,6 +344,7 @@ class IndicatorScriptRunner:
         scriptNameEntry = Gtk.Entry()
         scriptNameEntry.set_tooltip_text( _( "The name of the script object." ) )
         scriptNameEntry.set_text( script.getName() )
+        scriptNameEntry.set_hexpand( True ) # Only need to set this once and all objects will expand.
         box.pack_start( scriptNameEntry, True, True, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )
