@@ -1,5 +1,6 @@
 indicator-script-runner (1.0.0-1) precise; urgency=low
 
   * Initial release.
+  * Many thanks to Oleg Moiseichuk for providing the magic to launch scripts!
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 May 2016 18:04:26 +1000
