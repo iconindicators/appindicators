@@ -123,6 +123,8 @@ class IndicatorScriptRunner:
 
 #TODO OPen preferences...was able to kick off a script whilst Prefs are open..that's bad!
 #Does this happen in other indicators (and is it of concern)?
+#Does it really matter if the about and preferences are launched simultaneously whilst a script is running?
+#Given that the self.scripts is altered by Prefs, best not to let user access scripts whilst prefs open...so yes, need to lock out scripts when prefs is open.
     def onPreferences( self, widget ):
         if self.dialog is not None:
             self.dialog.present()
