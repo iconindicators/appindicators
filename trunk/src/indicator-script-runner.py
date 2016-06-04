@@ -453,16 +453,16 @@ class IndicatorScriptRunner:
 
                 else: # Editing an existing script.
                     if script.isIdentical( Info( scriptNameEntry.get_text().strip(), scriptDescriptionEntry.get_text().strip(), scriptDirectoryEntry.get_text().strip(), pythonutils.getTextViewText( commandTextView ).strip(), terminalOpenCheckbox.get_active() ) ):
-                        print( "Identical" )
+                        print( "Identical" ) #TODO Remove
                         break # No change to the script, so exit.
 
                     elif scriptNameEntry.get_text().strip() == script.getName() and scriptDescriptionEntry.get_text().strip() == script.getDescription():
-                        print( "Name/description same, but other parts have changed." )
+                        print( "Name/description same, but other parts have changed." ) #TODO Remove
                         pass # The name/description have not changed, but other parts have - so there is no chance of a clash.
 
                     else: # At this point either the script name or description has changed or both (and possibly the other script parameters). 
 #TODO Below needs to be checked!
-                        print( "Script name and/or description have changed." )
+                        print( "Script name and/or description have changed." ) #TODO Remove
                         duplicate = False
                         for scriptInList in self.scripts:
                             if not scriptInList.isIdentical( script ):
