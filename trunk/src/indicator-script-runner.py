@@ -430,7 +430,6 @@ class IndicatorScriptRunner:
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
-
                 if scriptNameEntry.get_text().strip() == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script name cannot be empty." ), INDICATOR_NAME )
                     scriptNameEntry.grab_focus()
@@ -447,47 +446,36 @@ class IndicatorScriptRunner:
                     continue
 
                 if script.getName() == "": # Adding a new script - check for duplicate.
-                    if self.getScript( script.getName(), script.getDescription() ) is not None:
+                    if self.getScript( scriptNameEntry.get_text().strip(), scriptDescriptionEntry.get_text().strip() ) is not None:
                         pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
                         scriptNameEntry.grab_focus()
                         continue
 
                 else: # Editing an existing script.
-                    if scriptNameEntry.get_text().strip() == script.getName() and \
-                       scriptDescriptionEntry.get_text().strip() == script.getDescription() and \
-                       scriptDirectoryEntry.get_text().strip() == script.getDirectory() and \
-                       pythonutils.getTextViewText( commandTextView ).strip() == script.getCommand() and \
-                       terminalOpenCheckbox.get_active() == script.isTerminalOpen(): # Script has not changed, so nothing to do.
-                        break
+                    if script.isIdentical( Info( scriptNameEntry.get_text().strip(), scriptDescriptionEntry.get_text().strip(), scriptDirectoryEntry.get_text().strip(), pythonutils.getTextViewText( commandTextView ).strip(), terminalOpenCheckbox.get_active() ) ):
+                        print( "Identical" )
+                        break # No change to the script, so exit.
 
+                    elif scriptNameEntry.get_text().strip() == script.getName() and scriptDescriptionEntry.get_text().strip() == script.getDescription():
+                        print( "Name/description same, but other parts have changed." )
+                        pass # The name/description have not changed, but other parts have - so there is no chance of a clash.
+
+                    else: # At this point either the script name or description has changed or both (and possibly the other script parameters). 
 #TODO Below needs to be checked!
-                    duplicate = False
-                    if scriptNameEntry.get_text().strip() == script.getName() and scriptDescriptionEntry.get_text().strip() == script.getDescription():
-                        pass
-                    elif scriptNameEntry.get_text().strip() == script.getName(): # Description is different.
-                        #TODO What to do?
-                        # Look at scripts with same name - if a script with description is same as that in text entry, it's a duplicate.
+                        print( "Script name and/or description have changed." )
+                        duplicate = False
                         for scriptInList in self.scripts:
-                            if scriptNameEntry.get_text().strip() == scriptInList.getName() and scriptDescriptionEntry.get_text().strip() == scriptInList.getDescription():
-                                message = _( "A script of the same name and description already exists." )
-                                duplicate = True
-                                break
-                    elif scriptDescriptionEntry.get_text().strip() == script.getDescription():
-                        #TODO What to do?
-                        pass
-                    else: # Name and description are different.
-                        for scriptInList in self.scripts:
-                            if scriptNameEntry.get_text().strip() == scriptInList.getName() and scriptDescriptionEntry.get_text().strip() == scriptInList.getDescription():
-                                message = _( "A script of the same name and description already exists." )
-                                duplicate = True
-                                break
+                            if not scriptInList.isIdentical( script ):
+                                if scriptNameEntry.get_text().strip() == scriptInList.getName() and scriptDescriptionEntry.get_text().strip() == scriptInList.getDescription():
+                                    duplicate = True
+                                    break
 
-                    if duplicate:
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, message, INDICATOR_NAME )
-                        scriptNameEntry.grab_focus()
-                        continue
+                        if duplicate:
+                            pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
+                            scriptNameEntry.grab_focus()
+                            continue
 
-                    # Remove the existing script...a new script containing the edits will be added later.
+                    # Remove the existing script.
                     i = 0
                     for scriptInList in self.scripts:
                         if script.getName() == scriptInList.getName() and script.getDescription() == scriptInList.getDescription():
@@ -497,7 +485,7 @@ class IndicatorScriptRunner:
 
                     del self.scripts[ i ]
 
-                # Either the new script or the edit.
+                # The new script or the edit.
                 newScript = Info( scriptNameEntry.get_text().strip(),
                                   scriptDescriptionEntry.get_text().strip(), 
                                   scriptDirectoryEntry.get_text().strip(),

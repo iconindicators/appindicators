@@ -22,9 +22,9 @@ class Info:
 
     # Name of script.
     # Description of script.
-    # Working/starting directory - may be empty.
-    # The command or script with optional arguments.
-    # Boolean - True and the terminal used to run the script will be left open at the end.
+    # Working/starting directory - may be "".
+    # The command or script with arguments required.
+    # Boolean - If True, the terminal used to run the script will be left open at the end of script/command execution.
     def __init__( self, name, description, directory, command, terminalOpen ):
         self.name = name
         self.description = description
@@ -46,6 +46,14 @@ class Info:
 
 
     def isTerminalOpen( self ): return self.terminalOpen
+
+
+    def isIdentical( self, script ):
+        return self.name == script.getName() and \
+               self.description == script.getDescription() and \
+               self.directory == script.getDirectory() and \
+               self.command == script.getCommand() and \
+               self.terminalOpen == script.isTerminalOpen()
 
 
     def __str__( self ): return self.getName() + " | " + self.getDescription() + " | " + self.getDirectory() + " | " + self.getCommand() + " | " + str( self.isTerminalOpen() )
