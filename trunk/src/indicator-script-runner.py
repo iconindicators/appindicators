@@ -315,25 +315,80 @@ class IndicatorScriptRunner:
 
 
     def onScriptCopy( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
-        if True: return # TODO Implement!
-#         scriptName = scriptNameComboBox.get_active_text()
-#         model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
-#         if scriptName is not None and treeiter is not None:
-#             scriptDescription = model[ treeiter ][ 0 ]
-#             theScript = self.getScript( scriptName, scriptDescription )
-#             if pythonutils.showOKCancel( None, _( "Remove the selected script?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
-#                 i = 0
-#                 for script in self.scripts:
-#                     if script.getName() == scriptName and script.getDescription() == scriptDescription:
-#                         break
-# 
-#                     i += 1
-# 
-#                 del self.scripts[ i ]
-#                 self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, scriptName, "" )
-#                 if len( self.scripts ) == 0:
-#                     directoryEntry.set_text( "" )
-#                     commandTextView.get_buffer().set_text( "" )
+        scriptName = scriptNameComboBox.get_active_text()
+        model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
+        if scriptName is not None and treeiter is not None:
+            scriptDescription = model[ treeiter ][ 0 ]
+            script = self.getScript( scriptName, scriptDescription )
+            print( scriptName, scriptDescription ) #TODO Remove
+
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label( _( "Script Name" ) ), False, False, 0 )
+
+        scriptNameEntry = Gtk.Entry()
+        scriptNameEntry.set_tooltip_text( _( "The name of the script object." ) )
+        scriptNameEntry.set_text( script.getName() )
+        box.pack_start( scriptNameEntry, True, True, 0 )
+
+        grid.attach( box, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label( _( "Script Description" ) ), False, False, 0 )
+
+        scriptDescriptionEntry = Gtk.Entry()
+        scriptDescriptionEntry.set_tooltip_text( _( "The description of the script object." ) )
+        scriptDescriptionEntry.set_text( script.getDescription() )
+        box.pack_start( scriptDescriptionEntry, True, True, 0 )
+
+        grid.attach( box, 0, 1, 1, 1 )
+
+        dialog = Gtk.Dialog( _( "Copy Script" ), self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( grid, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorScriptRunner.ICON )
+
+        while True:
+            dialog.show_all()
+            if dialog.run() == Gtk.ResponseType.OK:
+                if scriptNameEntry.get_text().strip() == "":
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script name cannot be empty." ), INDICATOR_NAME )
+                    scriptNameEntry.grab_focus()
+                    continue
+
+                if scriptDescriptionEntry.get_text().strip() == "":
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script description cannot be empty." ), INDICATOR_NAME )
+                    scriptDescriptionEntry.grab_focus()
+                    continue
+
+                if scriptNameEntry.get_text().strip() == scriptName and scriptDescriptionEntry.get_text().strip() == scriptDescription:
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
+                    scriptNameEntry.grab_focus()
+                    continue
+
+                newScript = Info( scriptNameEntry.get_text().strip(),
+                                  scriptDescriptionEntry.get_text().strip(), 
+                                  script.getDirectory(),
+                                  script.getCommand(),
+                                  script.isTerminalOpen() )
+
+                self.scripts.append( newScript )
+                self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, newScript.getName(), newScript.getDescription() )
+
+            break
+
+        dialog.destroy()
 
 
     def onScriptRemove( self, button, scriptNameComboBox, scriptDescriptionTreeView, directoryEntry, commandTextView ):
@@ -463,12 +518,12 @@ class IndicatorScriptRunner:
 
                 if scriptDescriptionEntry.get_text().strip() == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script description cannot be empty." ), INDICATOR_NAME )
-                    scriptNameEntry.grab_focus()
+                    scriptDescriptionEntry.grab_focus()
                     continue
 
                 if pythonutils.getTextViewText( commandTextView ).strip() == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script command cannot be empty." ), INDICATOR_NAME )
-                    scriptNameEntry.grab_focus()
+                    commandTextView.grab_focus() #TODO Test this actually happens.
                     continue
 
                 if script.getName() == "": # Adding a new script - check for duplicate.
