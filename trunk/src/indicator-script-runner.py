@@ -26,6 +26,9 @@
 # TODO Can't run multiple scripts simultaneously (test with both true and false values for terminalOpen).
 
 
+#TODO Have a duplicate script button?
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -86,14 +89,26 @@ class IndicatorScriptRunner:
 
     def onScript( self, widget, script ):
         command = "x-terminal-emulator"
-        if script.getDirectory() != "":
-            command += " --working-directory=" + script.getDirectory()
+#         if script.getDirectory() != "":
+#             command += " --working-directory=" + script.getDirectory()
+# 
+#         command += " -e ${SHELL}' -c " + script.getCommand() + ";'"
+# 
+#         if script.isTerminalOpen():
+#             command += "${SHELL}"
 
-        command += " -e ${SHELL}' -c " + script.getCommand() + ";'"
+
+#TODO Test this with and without a directory...and include the sample scripts.
+        command += " -e ${SHELL}'"
+        if script.getDirectory() == "":
+            command += " -c " + script.getCommand() + ";'"
+        else:
+            command += " -c cd\ " + script.getDirectory() + ";\"" + script.getCommand() + "\";'"
 
         if script.isTerminalOpen():
             command += "${SHELL}"
 
+        print( command )
         pythonutils.processCall( command )
 
 
