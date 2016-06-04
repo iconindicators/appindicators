@@ -84,9 +84,7 @@ class IndicatorScriptRunner:
         return menu
 
 
-#TODO Test the whole shebang on Lubuntu/Xubuntu.
     def onScript( self, widget, script ):
-# TODO From oleg:  x-terminal-emulator -e ${SHELL}' -c here-goes-your-long-command-line-with-spaces-protected-with-backticks;'${SHELL}
         command = "x-terminal-emulator"
         if script.getDirectory() != "":
             command += " --working-directory=" + script.getDirectory()
