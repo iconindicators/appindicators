@@ -27,6 +27,7 @@
 
 
 #TODO Add tooltips to explain stuff...
+#...Maybe something on the command textview about having to put quotes around stuff or escape spaces, etc.
 
 
 #TODO apt-get update etc does not work any more!!!
