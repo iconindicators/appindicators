@@ -23,7 +23,7 @@
 # http://lazka.github.io/pgi-docs
 
 
-# TODO Can't run multiple scripts simultaneously (irrespective of the value of terminalOpen).
+# TODO Can't run multiple scripts simultaneously (test with both true and false values for terminalOpen).
 
 
 INDICATOR_NAME = "indicator-script-runner"
