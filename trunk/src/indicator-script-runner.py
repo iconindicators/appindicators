@@ -588,9 +588,9 @@ class IndicatorScriptRunner:
                 logging.error( "Error reading settings: " + IndicatorScriptRunner.SETTINGS_FILE )
         else:
             self.scripts = [ ]
-#TODO Add these in via the prefs dialog and make sure they save out and then read in and then run!
-#TODO Come up other samples, in particular, something that leaves the terminal open.
-#TODO Need i18n or not (of script name, description and output text)?
+#TODO Add/edit these in via the prefs dialog and make sure they save out and then read in and then run!
+#TODO Come up with other samples, in particular, something that leaves the terminal open.
+#TODO Need i18n or not (of script name, description and output text)?  Maybe not as the user can edit the script completely.
             self.scripts.append( Info( "Network", "Ping Google", "", "ping\ -c\ 5\ www.google.com", False ) )
             self.scripts.append( Info( "Network", "Public IP address", "", "\"notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"\"", False ) )
             self.scripts.append( Info( "Network", "Up or down", "", "\"if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi\"", False ) )  #TODO Need i18n or not?
