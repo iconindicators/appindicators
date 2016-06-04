@@ -88,27 +88,16 @@ class IndicatorScriptRunner:
 
 
     def onScript( self, widget, script ):
-        command = "x-terminal-emulator"
-#         if script.getDirectory() != "":
-#             command += " --working-directory=" + script.getDirectory()
-# 
-#         command += " -e ${SHELL}' -c " + script.getCommand() + ";'"
-# 
-#         if script.isTerminalOpen():
-#             command += "${SHELL}"
-
-
-#TODO Test this with and without a directory...and include the sample scripts.
-        command += " -e ${SHELL}'"
+        command = "x-terminal-emulator -e ${SHELL}'"
         if script.getDirectory() == "":
-            command += " -c " + script.getCommand() + ";'"
+            command += " -c cd\ .;\"" + script.getCommand() + "\";'"
         else:
             command += " -c cd\ " + script.getDirectory() + ";\"" + script.getCommand() + "\";'"
 
         if script.isTerminalOpen():
             command += "${SHELL}"
 
-        print( command )
+        print( command ) #TODO Remove
         pythonutils.processCall( command )
 
 
