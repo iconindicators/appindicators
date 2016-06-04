@@ -26,11 +26,6 @@
 # TODO Can't run multiple scripts simultaneously (irrespective of the value of terminalOpen).
 
 
-# TODO Need to include notifyosd in the deb file requirements!
-# sudo apt-get install notify-osd libnotify-bin
-
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -51,7 +46,7 @@ class IndicatorScriptRunner:
 
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
 
-    COMMENTS = _( "Run a terminal command or script from a GUI frontend." )
+    COMMENTS = _( "Run a terminal command or script from a GUI front-end." )
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_SCRIPTS = "scripts"
