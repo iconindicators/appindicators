@@ -30,6 +30,10 @@
 #...Maybe something on the command textview about having to put quotes around stuff or escape spaces, etc.
 
 
+#TODO Do a deb build (of all indicators) and look at the w/e from the Lintian output.
+
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
