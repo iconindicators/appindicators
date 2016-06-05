@@ -30,9 +30,6 @@
 #...Maybe something on the command textview about having to put quotes around stuff or escape spaces, etc.
 
 
-#TODO Add double click in preferences on description to edit.
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -171,6 +168,7 @@ class IndicatorScriptRunner:
         scriptDescriptionTreeView.set_hexpand( True )
         scriptDescriptionTreeView.set_vexpand( True )
         scriptDescriptionTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
+        scriptDescriptionTreeView.connect( "row-activated", self.onScriptDescriptionDoubleClick, scriptNameComboBox )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Script Description" ), Gtk.CellRendererText(), text = 0 )
         treeViewColumn.set_expand( True )
@@ -420,6 +418,10 @@ class IndicatorScriptRunner:
 
     def onScriptAdd( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
         self.addEditScript( Info( "", "", "", "", False ), scriptNameComboBox, scriptDescriptionTreeView )
+
+
+    def onScriptDescriptionDoubleClick( self, scriptDescriptionTreeView, scriptDescriptionTreePath, scriptDescriptionTreeViewColumn, scriptNameComboBox ):
+        self.onScriptEdit( None, scriptNameComboBox, scriptDescriptionTreeView )
 
 
     def onScriptEdit( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
