@@ -30,9 +30,6 @@
 #...Maybe something on the command textview about having to put quotes around stuff or escape spaces, etc.
 
 
-#TODO apt-get update etc does not work any more!!!
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -101,7 +98,6 @@ class IndicatorScriptRunner:
         if script.isTerminalOpen():
             command += "${SHELL}"
 
-        print( command ) #TODO Remove
         pythonutils.processCall( command )
 
 
@@ -327,7 +323,6 @@ class IndicatorScriptRunner:
         if scriptName is not None and treeiter is not None:
             scriptDescription = model[ treeiter ][ 0 ]
             script = self.getScript( scriptName, scriptDescription )
-            print( scriptName, scriptDescription ) #TODO Remove
 
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -542,15 +537,12 @@ class IndicatorScriptRunner:
 
                 else: # Editing an existing script.
                     if script.isIdentical( Info( scriptNameEntry.get_text().strip(), scriptDescriptionEntry.get_text().strip(), scriptDirectoryEntry.get_text().strip(), pythonutils.getTextViewText( commandTextView ).strip(), terminalOpenCheckbox.get_active() ) ):
-                        print( "Identical" ) #TODO Remove
                         break # No change to the script, so exit.
 
                     elif scriptNameEntry.get_text().strip() == script.getName() and scriptDescriptionEntry.get_text().strip() == script.getDescription():
-                        print( "Name/description same, but other parts have changed." ) #TODO Remove
                         pass # The name/description have not changed, but other parts have - so there is no chance of a clash.
 
                     else: # At this point either the script name or description has changed or both (and possibly the other script parameters). 
-                        print( "Script name and/or description have changed." ) #TODO Remove
                         duplicate = False
                         for scriptInList in self.scripts:
                             if not scriptInList.isIdentical( script ):
@@ -669,10 +661,10 @@ class IndicatorScriptRunner:
 #TODO Add/edit these in via the prefs dialog and make sure they save out and then read in and then run!
 #TODO Come up with other samples, in particular, something that leaves the terminal open.
 #TODO Need i18n or not (of script name, description and output text)?  Maybe not as the user can edit the script completely.
-            self.scripts.append( Info( "Network", "Ping Google", "", "ping\ -c\ 5\ www.google.com", False ) )
-            self.scripts.append( Info( "Network", "Public IP address", "", "\"notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"\"", False ) )
-            self.scripts.append( Info( "Network", "Up or down", "", "\"if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi\"", False ) )  #TODO Need i18n or not?
-            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "\"sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade\"", True ) )
+            self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 5 www.google.com", False ) )
+            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
+            self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )  #TODO Need i18n or not?
+            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
 
 
     def saveSettings( self ):
