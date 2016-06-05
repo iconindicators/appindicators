@@ -30,6 +30,9 @@
 #...Maybe something on the command textview about having to put quotes around stuff or escape spaces, etc.
 
 
+#TODO Add double click in preferences on description to edit.
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
