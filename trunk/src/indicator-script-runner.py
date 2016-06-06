@@ -23,11 +23,19 @@
 # http://lazka.github.io/pgi-docs
 
 
-# TODO Can't run multiple scripts simultaneously (test with both true and false values for terminalOpen).
+#TODO Can't run multiple scripts simultaneously (test with both true and false values for terminalOpen).
 
 
 #TODO Do a deb build (of all indicators) and look at the w/e from the Lintian output.
 
+
+#TODO Have an option to put script descriptions into submenus?
+
+
+#TODO OPen preferences...was able to kick off a script whilst Prefs are open..that's bad!
+#Does this happen in other indicators (and is it of concern)?
+#Does it really matter if the about and preferences are launched simultaneously whilst a script is running?
+#Given that the self.scripts is altered by Prefs, best not to let user access scripts whilst prefs open...so yes, need to lock out scripts when prefs is open.
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -70,7 +78,6 @@ class IndicatorScriptRunner:
     def main( self ): Gtk.main()
 
 
-#TODO Have an option to put script descriptions into submenus?
     def buildMenu( self ):
         scripts = self.getScriptsGroupedByName()
         menu = Gtk.Menu()
@@ -125,10 +132,6 @@ class IndicatorScriptRunner:
             self.dialog.present()
 
 
-#TODO OPen preferences...was able to kick off a script whilst Prefs are open..that's bad!
-#Does this happen in other indicators (and is it of concern)?
-#Does it really matter if the about and preferences are launched simultaneously whilst a script is running?
-#Given that the self.scripts is altered by Prefs, best not to let user access scripts whilst prefs open...so yes, need to lock out scripts when prefs is open.
     def onPreferences( self, widget ):
         if self.dialog is not None:
             self.dialog.present()
@@ -658,10 +661,6 @@ class IndicatorScriptRunner:
                 for script in scripts:
                     self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
 
-                self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 5 www.google.com", False ) )
-                self.scripts.append( Info( "Network", "Public IP address", "", "notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
-                self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )  #TODO Need i18n or not?
-                self.scripts.append( Info( "Update", "ORIG autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
             except Exception as e:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorScriptRunner.SETTINGS_FILE )
