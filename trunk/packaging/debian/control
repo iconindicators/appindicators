@@ -10,3 +10,5 @@ Package: indicator-fortune
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}, fortune-mod, gir1.2-appindicator3-0.1, python3-gi, python3-notify2
 Description: Application indicator which displays fortunes.
+ A user can add in any fortune file/directory and control the frequency
+ of the fortune display in the on-screen notification.
