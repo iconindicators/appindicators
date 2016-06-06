@@ -42,7 +42,7 @@ import datetime, gzip, json, logging, os, pythonutils, re, shutil, stardate, sys
 class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.31"
+    VERSION = "1.0.32"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"

@@ -1,3 +1,11 @@
+indicator-stardate (1.0.32-1) precise; urgency=low
+
+  * Fixed Lintian warnings - added extended description to control file and
+    copyright file now refers to common license file for GPL-3.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 6 Jun 2016 23:17:42 +1000
+
+
 indicator-stardate (1.0.31-1) precise; urgency=low
 
   * Bug fix: Omitted the '_' from 'translator-credits' in the About dialog.
