@@ -59,7 +59,7 @@ class AstronomicalObjectType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Sta
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.66"
+    VERSION = "1.0.67"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
