@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.54-1) precise; urgency=low
+
+  * Fixed Lintian warnings - added extended description to control file and
+    copyright file now refers to common license file for GPL-3.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 6 Jun 2016 22:23:27 +1000
+
+
 indicator-ppa-download-statistics (1.0.53-1) precise; urgency=low
 
   * Added yakkety to list of series.

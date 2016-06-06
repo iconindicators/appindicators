@@ -10,3 +10,5 @@ Package: indicator-ppa-download-statistics
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-gi, python3-notify2
 Description:  Application indicator which displays PPA download statistics.
+ A user can add any number of PPAs and the download counts will be retrieved.
+ If a PPA contains a lot of packages, the user can filter the results to suit.
