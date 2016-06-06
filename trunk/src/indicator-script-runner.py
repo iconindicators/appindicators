@@ -23,9 +23,6 @@
 # http://lazka.github.io/pgi-docs
 
 
-#TODO Test running scripts samples and mine on L|Xubuntu.
-
-
 #TODO Can't run multiple scripts simultaneously (test with both true and false values for terminalOpen).
 # IF we allow this to happen, the prefs needs to use the backup copy of the scripts to modify...that means passing in the scripts lists to all functions...big change!
 
