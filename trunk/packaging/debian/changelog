@@ -1,3 +1,11 @@
+indicator-tide (1.0.3-1) precise; urgency=low
+
+  * Fixed Lintian warnings - added extended description to control file and
+    copyright file now refers to common license file for GPL-3.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 6 Jun 2016 22:59:23 +1000
+
+
 indicator-tide (1.0.2-1) precise; urgency=low
 
   * Bug fix: Incorrectly handled Feb 29.

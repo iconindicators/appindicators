@@ -32,7 +32,7 @@ import datetime, gzip, json, locale, locations, logging, os, pythonutils, re, sh
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.2"
+    VERSION = "1.0.3"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
