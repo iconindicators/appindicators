@@ -27,9 +27,6 @@
 # IF we allow this to happen, the prefs needs to use the backup copy of the scripts to modify...that means passing in the scripts lists to all functions...big change!
 
 
-#TODO Have an option to put script descriptions into submenus?
-
-
 #TODO OPen preferences...was able to kick off a script whilst Prefs are open..that's bad!
 #Does this happen in other indicators (and is it of concern)?
 #Does it really matter if the about and preferences are launched simultaneously whilst a script is running?
@@ -60,6 +57,7 @@ class IndicatorScriptRunner:
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_SCRIPTS = "scripts"
+    SETTINGS_SHOW_SCRIPT_DESCRIPTIONS_AS_SUBMENUS = "showScriptDescriptionsAsSubmenus"
 
 
     def __init__( self ):
@@ -79,18 +77,30 @@ class IndicatorScriptRunner:
     def buildMenu( self ):
         scripts = self.getScriptsGroupedByName()
         menu = Gtk.Menu()
-        for scriptName in sorted( scripts.keys(), key = str.lower ):
-            menu.append( Gtk.MenuItem( scriptName + "..." ) )
-            scripts[ scriptName ].sort( key = lambda script: script.getDescription().lower() )
-            for script in scripts[ scriptName ]:
-                menuItem = Gtk.MenuItem( "        " + script.getDescription() )
-                menuItem.connect( "activate", self.onScript, script )
-                menu.append( menuItem )
+        if self.showScriptDescriptionsAsSubmenus:
+            for scriptName in sorted( scripts.keys(), key = str.lower ):
+                scriptNameMenuItem = Gtk.MenuItem( scriptName )
+                subMenu = Gtk.Menu()
+                scriptNameMenuItem.set_submenu( subMenu )
+                menu.append( scriptNameMenuItem )
+                self.addScriptsToMenu( scripts, scriptName, subMenu, "" )
+        else:
+            for scriptName in sorted( scripts.keys(), key = str.lower ):
+                menu.append( Gtk.MenuItem( scriptName + "..." ) )
+                self.addScriptsToMenu( scripts, scriptName, menu, "        " )
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( scripts ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
         return menu
+
+
+    def addScriptsToMenu( self, scripts, scriptName, menu, indent ):
+        scripts[ scriptName ].sort( key = lambda script: script.getDescription().lower() )
+        for script in scripts[ scriptName ]:
+            menuItem = Gtk.MenuItem( indent + script.getDescription() )
+            menuItem.connect( "activate", self.onScript, script )
+            menu.append( menuItem )
 
 
     def onScript( self, widget, script ):
@@ -256,11 +266,16 @@ class IndicatorScriptRunner:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
+        showScriptDescriptionsAsSubmenusCheckbox = Gtk.CheckButton( _( "Show script descriptions as submenus" ) )
+        showScriptDescriptionsAsSubmenusCheckbox.set_active( self.showScriptDescriptionsAsSubmenus )
+        showScriptDescriptionsAsSubmenusCheckbox.set_margin_top( 10 )
+        grid.attach( showScriptDescriptionsAsSubmenusCheckbox, 0, 0, 1, 1 )
+
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorScriptRunner.DESKTOP_FILE ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 0, 1, 1 )
+        grid.attach( autostartCheckbox, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
@@ -275,6 +290,7 @@ class IndicatorScriptRunner:
         self.dialog.show_all()
 
         if self.dialog.run() == Gtk.ResponseType.OK:
+            self.showScriptDescriptionsAsSubmenus = showScriptDescriptionsAsSubmenusCheckbox.get_active()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             self.indicator.set_menu( self.buildMenu() )
@@ -650,12 +666,14 @@ class IndicatorScriptRunner:
 
     def loadSettings( self ):
         self.scripts = [ ]
+        self.showScriptDescriptionsAsSubmenus = False
         if os.path.isfile( IndicatorScriptRunner.SETTINGS_FILE ):
             try:
                 with open( IndicatorScriptRunner.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
                 scripts = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPTS, [ ] )
+                self.showScriptDescriptionsAsSubmenus = settings.get( IndicatorScriptRunner.SETTINGS_SHOW_SCRIPT_DESCRIPTIONS_AS_SUBMENUS, self.showScriptDescriptionsAsSubmenus )
                 for script in scripts:
                     self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
 
@@ -678,7 +696,11 @@ class IndicatorScriptRunner:
             for script in self.scripts:
                 scripts.append( [ script.getName(), script.getDescription(), script.getDirectory(), script.getCommand(), script.isTerminalOpen() ] )
 
-            settings = { IndicatorScriptRunner.SETTINGS_SCRIPTS: scripts }
+            settings = {
+                IndicatorScriptRunner.SETTINGS_SCRIPTS: scripts,
+                IndicatorScriptRunner.SETTINGS_SHOW_SCRIPT_DESCRIPTIONS_AS_SUBMENUS: self.showScriptDescriptionsAsSubmenus
+            }
+
             with open( IndicatorScriptRunner.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 
