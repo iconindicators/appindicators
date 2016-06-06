@@ -1,14 +1,14 @@
-# Portable Object Template for indicator-virtual-box.
-# Copyright (C) 2015 Bernard Giannetti
-# This file is distributed under the same license as the indicator-virtual-box package.
-# Bernard Giannetti <thebernmeister@hotmail.com>, 2015.
+# Portable Object Template for indicator-script-runner.
+# Copyright (C) 2016 Bernard Giannetti
+# This file is distributed under the same license as the indicator-script-runner package.
+# Bernard Giannetti <thebernmeister@hotmail.com>, 2016.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-virtual-box 1.0.48\n"
+"Project-Id-Version: indicator-script-runner 1.0.0\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-05-22 18:05+1000\n"
+"POT-Creation-Date: 2016-06-06 22:02+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,156 +17,168 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicator-virtual-box.py:59
-msgid " Shows VirtualBox™ virtual machines and allows them to be started."
+#: indicator-script-runner.py:61
+msgid "Run a terminal command or script from a GUI front-end."
 msgstr ""
 
-#: indicator-virtual-box.py:95
-msgid "(no virtual machines exist)"
-msgstr ""
-
-#: indicator-virtual-box.py:123
-msgid "Launch VirtualBox Manager"
-msgstr ""
-
-#: indicator-virtual-box.py:128
-msgid "(VirtualBox is not installed)"
-msgstr ""
-
-msgid "Missing VM...\n\nName: {0}\nID: {1}"
-msgstr ""
-
-#: indicator-virtual-box.py:329
-msgid ""
-"The VM could not be found - either it has been renamed or deleted.  The list "
-"of VMs has been refreshed - please try again."
-msgstr ""
-
-#: indicator-virtual-box.py:344
-msgid ""
-"The VM is running but its window could not be found - perhaps it is running "
-"headless."
-msgstr ""
-
-#: indicator-virtual-box.py:349
-msgid ""
-"There is more than one VM with the same name - unfortunately your VM cannot "
-"be uniquely identified."
-msgstr ""
-
-#: indicator-virtual-box.py:359
-#, python-brace-format
-msgid "The VM '{0}' could not be started - check the log file: {1}"
-msgstr ""
-
-#: indicator-virtual-box.py:406
+#: indicator-script-runner.py:123
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-virtual-box.py:446
-msgid "Virtual Machine"
-msgstr ""
-
-#: indicator-virtual-box.py:447 indicator-virtual-box.py:515
-#: indicator-virtual-box.py:596
-msgid "Autostart"
-msgstr ""
-
-#: indicator-virtual-box.py:448 indicator-virtual-box.py:578
-msgid "Start Command"
-msgstr ""
-
-#: indicator-virtual-box.py:449
-msgid "Double click to edit a VM's properties."
-msgstr ""
-
-#: indicator-virtual-box.py:457
-msgid "Virtual Machines"
-msgstr ""
-
-#: indicator-virtual-box.py:472
-msgid "Show groups as submenus"
-msgstr ""
-
-#: indicator-virtual-box.py:474
-msgid ""
-"Groups can be shown with their VMs\n"
-"in submenus, or shown with their\n"
-"VMs as an indented list."
-msgstr ""
-
-#: indicator-virtual-box.py:479
-msgid "Sort VMs alphabetically"
-msgstr ""
-
-#: indicator-virtual-box.py:481
-msgid ""
-"VMs can be sorted alphabetically or\n"
-"as set in the VirtualBox Manager."
-msgstr ""
-
-#: indicator-virtual-box.py:491
-msgid "Refresh interval (minutes)"
-msgstr ""
-
-#: indicator-virtual-box.py:499
-msgid ""
-"How often the list of VMs and\n"
-"running status is updated."
-msgstr ""
-
-#: indicator-virtual-box.py:503
-msgid "Startup delay (seconds)"
-msgstr ""
-
-#: indicator-virtual-box.py:511
-msgid ""
-"Amount of time to wait from\n"
-"starting one VM to the next."
-msgstr ""
-
-#: indicator-virtual-box.py:516
-msgid "Run the indicator automatically."
-msgstr ""
-
-#: indicator-virtual-box.py:520
-msgid "General"
-msgstr ""
-
-#: indicator-virtual-box.py:522
-msgid "Preferences"
-msgstr ""
-
-#: indicator-virtual-box.py:589
-msgid ""
-"The terminal command to start the\n"
-"VM such as\n"
-"\t'VBoxManage startvm %VM%' or\n"
-"\t'VBoxHeadless --startvm %VM% --vrde off'"
-msgstr ""
-
-#: indicator-virtual-box.py:597
-msgid "Run the VM when the indicator starts."
-msgstr ""
-
-#: indicator-virtual-box.py:602
-msgid "VM Properties"
-msgstr ""
-
-#: indicator-virtual-box.py:614
-msgid "The start command cannot be empty."
-msgstr ""
-
-#: indicator-virtual-box.py:619
-msgid ""
-"The start command must contain %VM% which is substituted for the VM name/id."
-msgstr ""
-
+#: indicator-script-runner.py:124
 msgid "View the"
 msgstr ""
 
+#: indicator-script-runner.py:125
+msgid "text file."
+msgstr ""
+
+#: indicator-script-runner.py:126
 msgid "changelog"
 msgstr ""
 
-msgid "text file."
+#: indicator-script-runner.py:157 indicator-script-runner.py:342
+#: indicator-script-runner.py:451
+msgid "Script Name"
+msgstr ""
+
+#: indicator-script-runner.py:160
+msgid ""
+"The name of a script object.\n"
+"\n"
+"More than one script may\n"
+"share the same name but must\n"
+"have a different description."
+msgstr ""
+
+#: indicator-script-runner.py:170
+msgid ""
+"List of scripts with same name,\n"
+"but different descriptions."
+msgstr ""
+
+#: indicator-script-runner.py:176 indicator-script-runner.py:355
+#: indicator-script-runner.py:464
+msgid "Script Description"
+msgstr ""
+
+#: indicator-script-runner.py:180 indicator-script-runner.py:507
+msgid "Terminal Open"
+msgstr ""
+
+#: indicator-script-runner.py:193 indicator-script-runner.py:477
+msgid "Directory"
+msgstr ""
+
+#: indicator-script-runner.py:196 indicator-script-runner.py:480
+msgid ""
+"The directory from which the\n"
+"script/command is executed."
+msgstr ""
+
+#: indicator-script-runner.py:206 indicator-script-runner.py:490
+msgid "Command"
+msgstr ""
+
+#: indicator-script-runner.py:211 indicator-script-runner.py:495
+msgid ""
+"The terminal script/command,\n"
+"along with any arguments."
+msgstr ""
+
+#: indicator-script-runner.py:227
+msgid "Add"
+msgstr ""
+
+#: indicator-script-runner.py:228
+msgid "Add a new script."
+msgstr ""
+
+#: indicator-script-runner.py:232
+msgid "Edit"
+msgstr ""
+
+#: indicator-script-runner.py:233
+msgid "Edit the current script."
+msgstr ""
+
+#: indicator-script-runner.py:237
+msgid "Copy"
+msgstr ""
+
+#: indicator-script-runner.py:238
+msgid "Make a duplicate of the current script."
+msgstr ""
+
+#: indicator-script-runner.py:242
+msgid "Remove"
+msgstr ""
+
+#: indicator-script-runner.py:243
+msgid "Remove the selected script."
+msgstr ""
+
+#: indicator-script-runner.py:250
+msgid "Scripts"
+msgstr ""
+
+#: indicator-script-runner.py:261
+msgid "Autostart"
+msgstr ""
+
+#: indicator-script-runner.py:262
+msgid "Run the indicator automatically."
+msgstr ""
+
+#: indicator-script-runner.py:267
+msgid "General"
+msgstr ""
+
+#: indicator-script-runner.py:273
+msgid "Preferences"
+msgstr ""
+
+#: indicator-script-runner.py:345 indicator-script-runner.py:454
+msgid "The name of the script object."
+msgstr ""
+
+#: indicator-script-runner.py:358 indicator-script-runner.py:467
+msgid "The description of the script object."
+msgstr ""
+
+#: indicator-script-runner.py:364
+msgid "Copy Script"
+msgstr ""
+
+#: indicator-script-runner.py:373 indicator-script-runner.py:526
+msgid "The script name cannot be empty."
+msgstr ""
+
+#: indicator-script-runner.py:378 indicator-script-runner.py:531
+msgid "The script description cannot be empty."
+msgstr ""
+
+#: indicator-script-runner.py:383 indicator-script-runner.py:542
+#: indicator-script-runner.py:562
+msgid "A script of the same name and description already exists."
+msgstr ""
+
+#: indicator-script-runner.py:407
+msgid "Remove the selected script?"
+msgstr ""
+
+#: indicator-script-runner.py:508
+msgid "Leave the terminal open after the script completes."
+msgstr ""
+
+#: indicator-script-runner.py:513
+msgid "Edit Script"
+msgstr ""
+
+#: indicator-script-runner.py:515
+msgid "Add Script"
+msgstr ""
+
+#: indicator-script-runner.py:536
+msgid "The script command cannot be empty."
 msgstr ""
