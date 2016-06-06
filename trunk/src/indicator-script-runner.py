@@ -193,7 +193,7 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Directory" ) ), False, False, 0 )
 
         directoryEntry = Gtk.Entry()
-        directoryEntry.set_tooltip_text( _( "The directory from which the\nscript/command is executed.\n\n(may be empty)" ) )
+        directoryEntry.set_tooltip_text( _( "The directory from which the\nscript/command is executed." ) )
         directoryEntry.set_editable( False )
 
         box.pack_start( directoryEntry, True, True, 0 )
@@ -477,7 +477,7 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Directory" ) ), False, False, 0 )
 
         scriptDirectoryEntry = Gtk.Entry()
-        scriptDirectoryEntry.set_tooltip_text( _( "The directory from which the\nscript/command is executed.\n\n(may be empty)" ) )
+        scriptDirectoryEntry.set_tooltip_text( _( "The directory from which the\nscript/command is executed." ) )
         scriptDirectoryEntry.set_text( script.getDirectory() )
 
         box.pack_start( scriptDirectoryEntry, True, True, 0 )
