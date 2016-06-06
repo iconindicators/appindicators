@@ -27,9 +27,6 @@
 # IF we allow this to happen, the prefs needs to use the backup copy of the scripts to modify...that means passing in the scripts lists to all functions...big change!
 
 
-#TODO Do a deb build (of all indicators) and look at the w/e from the Lintian output.
-
-
 #TODO Have an option to put script descriptions into submenus?
 
 
