@@ -26,10 +26,6 @@
 # TODO Can't run multiple scripts simultaneously (test with both true and false values for terminalOpen).
 
 
-#TODO Add tooltips to explain stuff...
-#...Maybe something on the command textview about having to put quotes around stuff or escape spaces, etc.
-
-
 #TODO Do a deb build (of all indicators) and look at the w/e from the Lintian output.
 
 
@@ -158,7 +154,7 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Script Name" ) ), False, False, 0 )
 
         scriptNameComboBox = Gtk.ComboBoxText()
-        scriptNameComboBox.set_tooltip_text( _( "The name of a script object.\n\nMore than one script may\nshare the same name but\nhave a different description." ) )
+        scriptNameComboBox.set_tooltip_text( _( "The name of a script object.\n\nMore than one script may\nshare the same name but must\nhave a different description." ) )
         scriptNameComboBox.set_entry_text_column( 0 )
 
         box.pack_start( scriptNameComboBox, True, True, 0 )
@@ -194,7 +190,7 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Directory" ) ), False, False, 0 )
 
         directoryEntry = Gtk.Entry()
-        directoryEntry.set_tooltip_text( _( "The directory from which the\nscript/command is executed." ) )
+        directoryEntry.set_tooltip_text( _( "The directory from which the\nscript/command is executed.\n\n(may be empty)" ) )
         directoryEntry.set_editable( False )
 
         box.pack_start( directoryEntry, True, True, 0 )
@@ -478,7 +474,7 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Directory" ) ), False, False, 0 )
 
         scriptDirectoryEntry = Gtk.Entry()
-        scriptDirectoryEntry.set_tooltip_text( _( "The directory from which the\nscript/command is executed." ) )
+        scriptDirectoryEntry.set_tooltip_text( _( "The directory from which the\nscript/command is executed.\n\n(may be empty)" ) )
         scriptDirectoryEntry.set_text( script.getDirectory() )
 
         box.pack_start( scriptDirectoryEntry, True, True, 0 )
@@ -662,6 +658,10 @@ class IndicatorScriptRunner:
                 for script in scripts:
                     self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
 
+                self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 5 www.google.com", False ) )
+                self.scripts.append( Info( "Network", "Public IP address", "", "notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
+                self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )  #TODO Need i18n or not?
+                self.scripts.append( Info( "Update", "ORIG autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
             except Exception as e:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorScriptRunner.SETTINGS_FILE )
