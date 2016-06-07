@@ -23,15 +23,13 @@
 # http://lazka.github.io/pgi-docs
 
 
-#TODO Use a thread to kick off each script.
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
 
 from gi.repository import AppIndicator3, GLib, Gtk
 from script import Info
+from threading import Thread
 
 import copy, json, locale, logging, os, pythonutils, stat, threading, time
 
@@ -108,7 +106,7 @@ class IndicatorScriptRunner:
         if script.isTerminalOpen():
             command += "${SHELL}"
 
-        pythonutils.processCall( command )
+        Thread( target = pythonutils.processCall, args = ( command, ) ).start()
 
 
     def onAbout( self, widget ):
@@ -671,6 +669,9 @@ class IndicatorScriptRunner:
                 self.showScriptDescriptionsAsSubmenus = settings.get( IndicatorScriptRunner.SETTINGS_SHOW_SCRIPT_DESCRIPTIONS_AS_SUBMENUS, self.showScriptDescriptionsAsSubmenus )
                 for script in scripts:
                     self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
+                self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 5 www.google.com", False ) )
+                self.scripts.append( Info( "Network", "Public IP address", "", "notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
+                self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
 
             except Exception as e:
                 logging.exception( e )
