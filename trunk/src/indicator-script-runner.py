@@ -23,18 +23,7 @@
 # http://lazka.github.io/pgi-docs
 
 
-#TODO Can't run multiple scripts simultaneously (test with both true and false values for terminalOpen).
-# IF we allow this to happen, the prefs needs to use the backup copy of the scripts to modify...that means passing in the scripts lists to all functions...big change!
-
-
-#TODO OPen preferences...was able to kick off a script whilst Prefs are open..that's bad!
-#Does this happen in other indicators (and is it of concern)?
-#Does it really matter if the about and preferences are launched simultaneously whilst a script is running?
-#Given that the self.scripts is altered by Prefs, best not to let user access scripts whilst prefs open...so yes, need to lock out scripts when prefs is open.
-#Might be able to get around this...if we use threads to allow users to launch simultaneous scripts, will need to pass the self.scripts into functinos, rather than 
-# use the global.
-# This means that prefs could run despite a script already running.
-#Does it mean that the self.dialog stuff can be flicked?  Could that also be done for other indicators?
+#TODO Use a thread to kick off each script.
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -44,7 +33,7 @@ gettext.install( INDICATOR_NAME )
 from gi.repository import AppIndicator3, GLib, Gtk
 from script import Info
 
-import copy, json, locale, logging, os, pythonutils, stat, time
+import copy, json, locale, logging, os, pythonutils, stat, threading, time
 
 
 class IndicatorScriptRunner:
@@ -68,6 +57,8 @@ class IndicatorScriptRunner:
         filehandler = pythonutils.TruncatedFileHandler( IndicatorScriptRunner.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.dialog = None
+        GLib.threads_init()
+        self.lock = threading.Lock()
         self.loadSettings()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorScriptRunner.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
@@ -294,11 +285,13 @@ class IndicatorScriptRunner:
         self.dialog.show_all()
 
         if self.dialog.run() == Gtk.ResponseType.OK:
-            self.showScriptDescriptionsAsSubmenus = showScriptDescriptionsAsSubmenusCheckbox.get_active()
-            self.saveSettings()
-            pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            self.scripts = copyOfScripts
-            self.indicator.set_menu( self.buildMenu() )
+            with self.lock:
+                self.preferencesOpen = True
+                self.showScriptDescriptionsAsSubmenus = showScriptDescriptionsAsSubmenusCheckbox.get_active()
+                self.saveSettings()
+                pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+                self.scripts = copyOfScripts
+                self.indicator.set_menu( self.buildMenu() )
 
         self.dialog.destroy()
         self.dialog = None
