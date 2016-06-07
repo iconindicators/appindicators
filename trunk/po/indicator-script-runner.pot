@@ -37,8 +37,8 @@ msgstr ""
 msgid "changelog"
 msgstr ""
 
-#: indicator-script-runner.py:158 indicator-script-runner.py:350
-#: indicator-script-runner.py:459
+#: indicator-script-runner.py:158 indicator-script-runner.py:349
+#: indicator-script-runner.py:458
 msgid "Script Name"
 msgstr ""
 
@@ -57,30 +57,30 @@ msgid ""
 "but different descriptions."
 msgstr ""
 
-#: indicator-script-runner.py:177 indicator-script-runner.py:363
-#: indicator-script-runner.py:472
+#: indicator-script-runner.py:177 indicator-script-runner.py:362
+#: indicator-script-runner.py:471
 msgid "Script Description"
 msgstr ""
 
-#: indicator-script-runner.py:181 indicator-script-runner.py:515
+#: indicator-script-runner.py:181 indicator-script-runner.py:514
 msgid "Terminal Open"
 msgstr ""
 
-#: indicator-script-runner.py:194 indicator-script-runner.py:485
+#: indicator-script-runner.py:194 indicator-script-runner.py:484
 msgid "Directory"
 msgstr ""
 
-#: indicator-script-runner.py:197 indicator-script-runner.py:488
+#: indicator-script-runner.py:197 indicator-script-runner.py:487
 msgid ""
 "The directory from which the\n"
 "script/command is executed."
 msgstr ""
 
-#: indicator-script-runner.py:207 indicator-script-runner.py:498
+#: indicator-script-runner.py:207 indicator-script-runner.py:497
 msgid "Command"
 msgstr ""
 
-#: indicator-script-runner.py:212 indicator-script-runner.py:503
+#: indicator-script-runner.py:212 indicator-script-runner.py:502
 msgid ""
 "The terminal script/command,\n"
 "along with any arguments."
@@ -142,47 +142,47 @@ msgstr ""
 msgid "Preferences"
 msgstr ""
 
-#: indicator-script-runner.py:353 indicator-script-runner.py:462
+#: indicator-script-runner.py:352 indicator-script-runner.py:461
 msgid "The name of the script object."
 msgstr ""
 
-#: indicator-script-runner.py:366 indicator-script-runner.py:475
+#: indicator-script-runner.py:365 indicator-script-runner.py:474
 msgid "The description of the script object."
 msgstr ""
 
-#: indicator-script-runner.py:372
+#: indicator-script-runner.py:371
 msgid "Copy Script"
 msgstr ""
 
-#: indicator-script-runner.py:381 indicator-script-runner.py:534
+#: indicator-script-runner.py:380 indicator-script-runner.py:533
 msgid "The script name cannot be empty."
 msgstr ""
 
-#: indicator-script-runner.py:386 indicator-script-runner.py:539
+#: indicator-script-runner.py:385 indicator-script-runner.py:538
 msgid "The script description cannot be empty."
 msgstr ""
 
-#: indicator-script-runner.py:391 indicator-script-runner.py:550
-#: indicator-script-runner.py:570
+#: indicator-script-runner.py:390 indicator-script-runner.py:549
+#: indicator-script-runner.py:569
 msgid "A script of the same name and description already exists."
 msgstr ""
 
-#: indicator-script-runner.py:415
+#: indicator-script-runner.py:414
 msgid "Remove the selected script?"
 msgstr ""
 
-#: indicator-script-runner.py:516
+#: indicator-script-runner.py:515
 msgid "Leave the terminal open after the script completes."
 msgstr ""
 
-#: indicator-script-runner.py:521
+#: indicator-script-runner.py:520
 msgid "Edit Script"
 msgstr ""
 
-#: indicator-script-runner.py:523
+#: indicator-script-runner.py:522
 msgid "Add Script"
 msgstr ""
 
-#: indicator-script-runner.py:544
+#: indicator-script-runner.py:543
 msgid "The script command cannot be empty."
 msgstr ""
