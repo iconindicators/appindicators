@@ -286,9 +286,9 @@ class IndicatorScriptRunner:
             with self.lock:
                 self.preferencesOpen = True
                 self.showScriptDescriptionsAsSubmenus = showScriptDescriptionsAsSubmenusCheckbox.get_active()
+                self.scripts = copyOfScripts
                 self.saveSettings()
                 pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-                self.scripts = copyOfScripts
                 self.indicator.set_menu( self.buildMenu() )
 
         self.dialog.destroy()
@@ -663,9 +663,6 @@ class IndicatorScriptRunner:
                 self.showScriptDescriptionsAsSubmenus = settings.get( IndicatorScriptRunner.SETTINGS_SHOW_SCRIPT_DESCRIPTIONS_AS_SUBMENUS, self.showScriptDescriptionsAsSubmenus )
                 for script in scripts:
                     self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
-                self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 5 www.google.com", False ) )
-                self.scripts.append( Info( "Network", "Public IP address", "", "notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
-                self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
 
             except Exception as e:
                 logging.exception( e )
