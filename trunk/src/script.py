@@ -22,8 +22,8 @@ class Info:
 
     # Name of script.
     # Description of script.
-    # Working/starting directory - may be "".
-    # The command or script with arguments required.
+    # Working/starting directory (may be "").
+    # The command or script with any arguments as needed.
     # Boolean - If True, the terminal used to run the script will be left open at the end of script/command execution.
     def __init__( self, name, description, directory, command, terminalOpen ):
         self.name = name
