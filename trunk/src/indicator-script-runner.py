@@ -313,7 +313,6 @@ class IndicatorScriptRunner:
 
             scriptDescriptionListStore.append( [ scriptDescription, terminalOpen ] )
 
-        #TODO Test these work with no data in it.
         scriptDescriptionTreeView.get_selection().select_path( 0 )
         scriptDescriptionTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
 
@@ -542,7 +541,7 @@ class IndicatorScriptRunner:
 
                 if pythonutils.getTextViewText( commandTextView ).strip() == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script command cannot be empty." ), INDICATOR_NAME )
-                    commandTextView.grab_focus() #TODO Test this actually happens.
+                    commandTextView.grab_focus()
                     continue
 
                 if script.getName() == "": # Adding a new script - check for duplicate.
@@ -611,8 +610,6 @@ class IndicatorScriptRunner:
             scriptNameComboBox.append_text( name )
 
         if scriptName == "":
-            #TODO Test this works with no scripts.
-            #TODO Ensure that the first description is also selected.
             scriptNameComboBox.set_active( 0 )
         else:
             i = 0
@@ -626,12 +623,9 @@ class IndicatorScriptRunner:
                 i += 1
 
             if iter is None: # Could not find the script name (happens when the last script of the given name is removed.)
-                #TODO Test this works with no scripts.
-                #TODO Ensure that the first description is also selected.
                 scriptNameComboBox.set_active( 0 )
             else: # A script name was found and has been selected.
                 if scriptDescription == "":
-                    #TODO Test with no scripts.
                     scriptDescriptionTreeView.get_selection().select_path( 0 )
                 else: # Select the description - the description must exist otherwise there is some coding error elsewhere.
                     i = 0
@@ -678,8 +672,6 @@ class IndicatorScriptRunner:
                 logging.error( "Error reading settings: " + IndicatorScriptRunner.SETTINGS_FILE )
         else:
             self.scripts = [ ]
-#TODO Add/edit these in via the prefs dialog and make sure they save out and then read in and then run!
-#TODO Come up with other samples, in particular, something that leaves the terminal open.
             self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 5 www.google.com", False ) )
             self.scripts.append( Info( "Network", "Public IP address", "", "notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
             self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
