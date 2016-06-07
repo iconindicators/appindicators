@@ -34,6 +34,7 @@
 #Might be able to get around this...if we use threads to allow users to launch simultaneous scripts, will need to pass the self.scripts into functinos, rather than 
 # use the global.
 # This means that prefs could run despite a script already running.
+#Does it mean that the self.dialog stuff can be flicked?  Could that also be done for other indicators?
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -78,7 +79,7 @@ class IndicatorScriptRunner:
 
 
     def buildMenu( self ):
-        scripts = self.getScriptsGroupedByName()
+        scripts = self.getScriptsGroupedByName( self.scripts )
         menu = Gtk.Menu()
         if self.showScriptDescriptionsAsSubmenus:
             for scriptName in sorted( scripts.keys(), key = str.lower ):
@@ -148,7 +149,7 @@ class IndicatorScriptRunner:
             self.dialog.present()
             return
 
-        backup = copy.deepcopy( self.scripts )
+        copyOfScripts = copy.deepcopy( self.scripts )
         notebook = Gtk.Notebook()
 
         # User scripts.
@@ -182,7 +183,7 @@ class IndicatorScriptRunner:
         scriptDescriptionTreeView.set_hexpand( True )
         scriptDescriptionTreeView.set_vexpand( True )
         scriptDescriptionTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
-        scriptDescriptionTreeView.connect( "row-activated", self.onScriptDescriptionDoubleClick, scriptNameComboBox )
+        scriptDescriptionTreeView.connect( "row-activated", self.onScriptDescriptionDoubleClick, scriptNameComboBox, copyOfScripts )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Script Description" ), Gtk.CellRendererText(), text = 0 )
         treeViewColumn.set_expand( True )
@@ -237,22 +238,22 @@ class IndicatorScriptRunner:
 
         addButton = Gtk.Button( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new script." ) )
-        addButton.connect( "clicked", self.onScriptAdd, scriptNameComboBox, scriptDescriptionTreeView )
+        addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, scriptNameComboBox, scriptDescriptionTreeView )
         box.pack_start( addButton, True, True, 0 )
 
         editButton = Gtk.Button( _( "Edit" ) )
         editButton.set_tooltip_text( _( "Edit the current script." ) )
-        editButton.connect( "clicked", self.onScriptEdit, scriptNameComboBox, scriptDescriptionTreeView )
+        editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, scriptNameComboBox, scriptDescriptionTreeView )
         box.pack_start( editButton, True, True, 0 )
 
         copyButton = Gtk.Button( _( "Copy" ) )
         copyButton.set_tooltip_text( _( "Make a duplicate of the current script." ) )
-        copyButton.connect( "clicked", self.onScriptCopy, scriptNameComboBox, scriptDescriptionTreeView )
+        copyButton.connect( "clicked", self.onScriptCopy, copyOfScripts, scriptNameComboBox, scriptDescriptionTreeView )
         box.pack_start( copyButton, True, True, 0 )
 
         removeButton = Gtk.Button( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected script." ) )
-        removeButton.connect( "clicked", self.onScriptRemove, scriptNameComboBox, scriptDescriptionTreeView, directoryEntry, commandTextView )
+        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, scriptNameComboBox, scriptDescriptionTreeView, directoryEntry, commandTextView )
         box.pack_start( removeButton, True, True, 0 )
 
         box.set_halign( Gtk.Align.CENTER )
@@ -282,9 +283,9 @@ class IndicatorScriptRunner:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        scriptNameComboBox.connect( "changed", self.onScriptName, scriptDescriptionListStore, scriptDescriptionTreeView )
-        scriptDescriptionTreeView.get_selection().connect( "changed", self.onScriptDescription, scriptNameComboBox, directoryEntry, commandTextView )
-        self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, "", "" )
+        scriptNameComboBox.connect( "changed", self.onScriptName, copyOfScripts, scriptDescriptionListStore, scriptDescriptionTreeView )
+        scriptDescriptionTreeView.get_selection().connect( "changed", self.onScriptDescription, scriptNameComboBox, directoryEntry, commandTextView, copyOfScripts )
+        self.populateScriptNameCombo( copyOfScripts, scriptNameComboBox, scriptDescriptionTreeView, "", "" )
 
         self.dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -296,20 +297,19 @@ class IndicatorScriptRunner:
             self.showScriptDescriptionsAsSubmenus = showScriptDescriptionsAsSubmenusCheckbox.get_active()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+            self.scripts = copyOfScripts
             self.indicator.set_menu( self.buildMenu() )
-        else:
-            self.scripts = backup
 
         self.dialog.destroy()
         self.dialog = None
 
 
-    def onScriptName( self, scriptNameComboBox, scriptDescriptionListStore, scriptDescriptionTreeView ):
+    def onScriptName( self, scriptNameComboBox, scripts, scriptDescriptionListStore, scriptDescriptionTreeView ):
         scriptName = scriptNameComboBox.get_active_text()
         scriptDescriptionListStore.clear()
 
         scriptDescriptions = [ ]
-        for script in self.scripts:
+        for script in scripts:
             if script.getName() == scriptName:
                 scriptDescriptions.append( script.getDescription() )
 
@@ -317,7 +317,7 @@ class IndicatorScriptRunner:
 
         for scriptDescription in scriptDescriptions:
             terminalOpen = None
-            if self.getScript( scriptName, scriptDescription ).isTerminalOpen():
+            if self.getScript( scripts, scriptName, scriptDescription ).isTerminalOpen():
                 terminalOpen = Gtk.STOCK_APPLY
 
             scriptDescriptionListStore.append( [ scriptDescription, terminalOpen ] )
@@ -327,23 +327,23 @@ class IndicatorScriptRunner:
         scriptDescriptionTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
 
 
-    def onScriptDescription( self, scriptDescriptionTreeSelection, scriptNameComboBox, directoryEntry, commandTextView ):
+    def onScriptDescription( self, scriptDescriptionTreeSelection, scriptNameComboBox, directoryEntry, commandTextView, scripts ):
         scriptName = scriptNameComboBox.get_active_text()
         model, treeiter = scriptDescriptionTreeSelection.get_selected()
         if treeiter is not None:
             scriptDescription = model[ treeiter ][ 0 ]
-            theScript = self.getScript( scriptName, scriptDescription )
+            theScript = self.getScript( scripts, scriptName, scriptDescription )
             if theScript is not None:
                 directoryEntry.set_text( theScript.getDirectory() )
                 commandTextView.get_buffer().set_text( theScript.getCommand() )
 
 
-    def onScriptCopy( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
+    def onScriptCopy( self, button, scripts, scriptNameComboBox, scriptDescriptionTreeView ):
         scriptName = scriptNameComboBox.get_active_text()
         model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
         if scriptName is not None and treeiter is not None:
             scriptDescription = model[ treeiter ][ 0 ]
-            script = self.getScript( scriptName, scriptDescription )
+            script = self.getScript( scripts, scriptName, scriptDescription )
 
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -407,53 +407,53 @@ class IndicatorScriptRunner:
                                   script.getCommand(),
                                   script.isTerminalOpen() )
 
-                self.scripts.append( newScript )
-                self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, newScript.getName(), newScript.getDescription() )
+                scripts.append( newScript )
+                self.populateScriptNameCombo( scripts, scriptNameComboBox, scriptDescriptionTreeView, newScript.getName(), newScript.getDescription() )
 
             break
 
         dialog.destroy()
 
 
-    def onScriptRemove( self, button, scriptNameComboBox, scriptDescriptionTreeView, directoryEntry, commandTextView ):
+    def onScriptRemove( self, button, scripts, scriptNameComboBox, scriptDescriptionTreeView, directoryEntry, commandTextView ):
         scriptName = scriptNameComboBox.get_active_text()
         model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
         if scriptName is not None and treeiter is not None:
             scriptDescription = model[ treeiter ][ 0 ]
-            theScript = self.getScript( scriptName, scriptDescription )
+            theScript = self.getScript( scripts, scriptName, scriptDescription )
             if pythonutils.showOKCancel( None, _( "Remove the selected script?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
                 i = 0
-                for script in self.scripts:
+                for script in scripts:
                     if script.getName() == scriptName and script.getDescription() == scriptDescription:
                         break
 
                     i += 1
 
-                del self.scripts[ i ]
-                self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, scriptName, "" )
-                if len( self.scripts ) == 0:
+                del scripts[ i ]
+                self.populateScriptNameCombo( scripts, scriptNameComboBox, scriptDescriptionTreeView, scriptName, "" )
+                if len( scripts ) == 0:
                     directoryEntry.set_text( "" )
                     commandTextView.get_buffer().set_text( "" )
 
 
-    def onScriptAdd( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
-        self.addEditScript( Info( "", "", "", "", False ), scriptNameComboBox, scriptDescriptionTreeView )
+    def onScriptAdd( self, button, scripts, scriptNameComboBox, scriptDescriptionTreeView ):
+        self.addEditScript( Info( "", "", "", "", False ), scripts, scriptNameComboBox, scriptDescriptionTreeView )
 
 
-    def onScriptDescriptionDoubleClick( self, scriptDescriptionTreeView, scriptDescriptionTreePath, scriptDescriptionTreeViewColumn, scriptNameComboBox ):
-        self.onScriptEdit( None, scriptNameComboBox, scriptDescriptionTreeView )
+    def onScriptDescriptionDoubleClick( self, scriptDescriptionTreeView, scriptDescriptionTreePath, scriptDescriptionTreeViewColumn, scriptNameComboBox, scripts ):
+        self.onScriptEdit( None, scripts, scriptNameComboBox, scriptDescriptionTreeView )
 
 
-    def onScriptEdit( self, button, scriptNameComboBox, scriptDescriptionTreeView ):
+    def onScriptEdit( self, button, scripts, scriptNameComboBox, scriptDescriptionTreeView ):
         scriptName = scriptNameComboBox.get_active_text()
         model, treeiter = scriptDescriptionTreeView.get_selection().get_selected()
         if scriptName is not None and treeiter is not None:
             scriptDescription = model[ treeiter ][ 0 ]
-            theScript = self.getScript( scriptName, scriptDescription )
-            self.addEditScript( theScript, scriptNameComboBox, scriptDescriptionTreeView )
+            theScript = self.getScript( scripts, scriptName, scriptDescription )
+            self.addEditScript( theScript, scripts, scriptNameComboBox, scriptDescriptionTreeView )
 
 
-    def addEditScript( self, script, scriptNameComboBox, scriptDescriptionTreeView ):
+    def addEditScript( self, script, scripts, scriptNameComboBox, scriptDescriptionTreeView ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -555,7 +555,7 @@ class IndicatorScriptRunner:
                     continue
 
                 if script.getName() == "": # Adding a new script - check for duplicate.
-                    if self.getScript( scriptNameEntry.get_text().strip(), scriptDescriptionEntry.get_text().strip() ) is not None:
+                    if self.getScript( scripts, scriptNameEntry.get_text().strip(), scriptDescriptionEntry.get_text().strip() ) is not None:
                         pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
                         scriptNameEntry.grab_focus()
                         continue
@@ -569,7 +569,7 @@ class IndicatorScriptRunner:
 
                     else: # At this point either the script name or description has changed or both (and possibly the other script parameters). 
                         duplicate = False
-                        for scriptInList in self.scripts:
+                        for scriptInList in scripts:
                             if not scriptInList.isIdentical( script ):
                                 if scriptNameEntry.get_text().strip() == scriptInList.getName() and scriptDescriptionEntry.get_text().strip() == scriptInList.getDescription():
                                     duplicate = True
@@ -582,13 +582,13 @@ class IndicatorScriptRunner:
 
                     # Remove the existing script.
                     i = 0
-                    for scriptInList in self.scripts:
+                    for scriptInList in scripts:
                         if script.getName() == scriptInList.getName() and script.getDescription() == scriptInList.getDescription():
                             break
 
                         i += 1
 
-                    del self.scripts[ i ]
+                    del scripts[ i ]
 
                 # The new script or the edit.
                 newScript = Info( scriptNameEntry.get_text().strip(),
@@ -597,16 +597,16 @@ class IndicatorScriptRunner:
                                   pythonutils.getTextViewText( commandTextView ).strip(),
                                   terminalOpenCheckbox.get_active() )
 
-                self.scripts.append( newScript )
-                self.populateScriptNameCombo( scriptNameComboBox, scriptDescriptionTreeView, newScript.getName(), newScript.getDescription() )
+                scripts.append( newScript )
+                self.populateScriptNameCombo( scripts, scriptNameComboBox, scriptDescriptionTreeView, newScript.getName(), newScript.getDescription() )
             break
 
         dialog.destroy()
 
 
-    def getScript( self, scriptName, scriptDescription ):
+    def getScript( self, scripts, scriptName, scriptDescription ):
         theScript = None
-        for script in self.scripts:
+        for script in scripts:
             if script.getName() == scriptName and script.getDescription() == scriptDescription:
                 theScript = script
                 break
@@ -614,10 +614,9 @@ class IndicatorScriptRunner:
         return theScript
 
 
-    def populateScriptNameCombo( self, scriptNameComboBox, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
+    def populateScriptNameCombo( self, scripts, scriptNameComboBox, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
         scriptNameComboBox.remove_all()
-        scripts = self.getScriptsGroupedByName()
-        for name in sorted( scripts, key = str.lower ):
+        for name in sorted( self.getScriptsGroupedByName( scripts ), key = str.lower ):
             scriptNameComboBox.append_text( name )
 
         if scriptName == "":
@@ -656,15 +655,15 @@ class IndicatorScriptRunner:
                         i += 1
 
 
-    def getScriptsGroupedByName( self ):
-        scripts = { }
-        for script in self.scripts:
-            if script.getName() not in scripts:
-                scripts[ script.getName() ] = [ ]
+    def getScriptsGroupedByName( self, scripts ):
+        scriptsGroupedByName = { }
+        for script in scripts:
+            if script.getName() not in scriptsGroupedByName:
+                scriptsGroupedByName[ script.getName() ] = [ ]
 
-            scripts[ script.getName() ].append( script )
+            scriptsGroupedByName[ script.getName() ].append( script )
 
-        return scripts
+        return scriptsGroupedByName
 
 
     def loadSettings( self ):
