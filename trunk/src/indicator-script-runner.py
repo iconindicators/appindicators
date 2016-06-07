@@ -31,6 +31,9 @@
 #Does this happen in other indicators (and is it of concern)?
 #Does it really matter if the about and preferences are launched simultaneously whilst a script is running?
 #Given that the self.scripts is altered by Prefs, best not to let user access scripts whilst prefs open...so yes, need to lock out scripts when prefs is open.
+#Might be able to get around this...if we use threads to allow users to launch simultaneous scripts, will need to pass the self.scripts into functinos, rather than 
+# use the global.
+# This means that prefs could run despite a script already running.
 
 
 INDICATOR_NAME = "indicator-script-runner"
