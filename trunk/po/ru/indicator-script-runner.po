@@ -1,0 +1,200 @@
+# Russian translation for indicator-script-runner.
+# Copyright (C) 2016 Bernard Giannetti
+# This file is distributed under the same license as the indicator-script-runner package.
+# Bernard Giannetti <thebernmeister@hotmail.com>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: indicator-script-runner 1.0.0\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2016-06-06 22:02+1000\n"
+"PO-Revision-Date: 2016-06-10 16:59+0300\n"
+"Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: indicator-script-runner.py:47
+msgid "Run a terminal command or script from a GUI front-end."
+msgstr "Выполнить заданную в индикаторе команду или сценарий в терминале."
+
+#: indicator-script-runner.py:124
+msgid "translator-credits"
+msgstr "Олег Мойсейчук"
+
+#: indicator-script-runner.py:125
+msgid "View the"
+msgstr "Просмотреть"
+
+#: indicator-script-runner.py:126
+msgid "text file."
+msgstr "."
+
+#: indicator-script-runner.py:127
+msgid "changelog"
+msgstr "список изменений"
+
+#: indicator-script-runner.py:158 indicator-script-runner.py:349
+#: indicator-script-runner.py:458
+msgid "Script Name"
+msgstr "Группа команд"
+
+#: indicator-script-runner.py:161
+msgid ""
+"The name of a script object.\n"
+"\n"
+"More than one script may\n"
+"share the same name but must\n"
+"have a different description."
+msgstr ""
+"Название командной группы.\n"
+"\n"
+"Несколько команд могут входить\n"
+"в одну группу, но должны\n"
+"иметь разные названия."
+
+#: indicator-script-runner.py:171
+msgid ""
+"List of scripts with same name,\n"
+"but different descriptions."
+msgstr ""
+"Перечень команд из одной группы,\n"
+"но с разными названиями."
+
+#: indicator-script-runner.py:177 indicator-script-runner.py:362
+#: indicator-script-runner.py:471
+msgid "Script Description"
+msgstr "Название команды"
+
+#: indicator-script-runner.py:181 indicator-script-runner.py:514
+msgid "Terminal Open"
+msgstr "Не закрывать терминал"
+
+#: indicator-script-runner.py:194 indicator-script-runner.py:484
+msgid "Directory"
+msgstr "Папка"
+
+#: indicator-script-runner.py:197 indicator-script-runner.py:487
+msgid ""
+"The directory from which the\n"
+"script/command is executed."
+msgstr ""
+"Папка, из которой запускается\n"
+"сценарий/команда."
+
+#: indicator-script-runner.py:207 indicator-script-runner.py:497
+msgid "Command"
+msgstr "Команда"
+
+#: indicator-script-runner.py:212 indicator-script-runner.py:502
+msgid ""
+"The terminal script/command,\n"
+"along with any arguments."
+msgstr ""
+"Команда/сценарий с любыми аргументами\n"
+"для запуска в терминале."
+
+#: indicator-script-runner.py:228
+msgid "Add"
+msgstr "Добавить"
+
+#: indicator-script-runner.py:229
+msgid "Add a new script."
+msgstr "Добавить новую команду."
+
+#: indicator-script-runner.py:233
+msgid "Edit"
+msgstr "Редактировать"
+
+#: indicator-script-runner.py:234
+msgid "Edit the current script."
+msgstr "Редактировать выбранную команду."
+
+#: indicator-script-runner.py:238
+msgid "Copy"
+msgstr "Копировать"
+
+#: indicator-script-runner.py:239
+msgid "Make a duplicate of the current script."
+msgstr "Создать копию выбранной команды."
+
+#: indicator-script-runner.py:243
+msgid "Remove"
+msgstr "Удалить"
+
+#: indicator-script-runner.py:244
+msgid "Remove the selected script."
+msgstr "Удалить выбранную команду."
+
+#: indicator-script-runner.py:251
+msgid "Scripts"
+msgstr "Команды"
+
+#: indicator-script-runner.py:262
+msgid "Show script descriptions as submenus"
+msgstr "Отображать команды в виде подменю"
+
+#: indicator-script-runner.py:267
+msgid "Autostart"
+msgstr "Автозапуск"
+
+#: indicator-script-runner.py:268
+msgid "Run the indicator automatically."
+msgstr "Запускать индикатор автоматически."
+
+#: indicator-script-runner.py:273
+msgid "General"
+msgstr "Общие"
+
+#: indicator-script-runner.py:279
+msgid "Preferences"
+msgstr "Параметры"
+
+#: indicator-script-runner.py:352 indicator-script-runner.py:461
+msgid "The name of the script object."
+msgstr "Название командной группы."
+
+#: indicator-script-runner.py:365 indicator-script-runner.py:474
+msgid "The description of the script object."
+msgstr "Название команды в группе."
+
+#: indicator-script-runner.py:371
+msgid "Copy Script"
+msgstr "Копировать команду"
+
+#: indicator-script-runner.py:380 indicator-script-runner.py:533
+msgid "The script name cannot be empty."
+msgstr "Название группы команд не может быть пустым."
+
+#: indicator-script-runner.py:385 indicator-script-runner.py:538
+msgid "The script description cannot be empty."
+msgstr "Название команды не может быть пустым."
+
+#: indicator-script-runner.py:390 indicator-script-runner.py:549
+#: indicator-script-runner.py:569
+msgid "A script of the same name and description already exists."
+msgstr "Команда в такой группе и с таким названием уже существует."
+
+#: indicator-script-runner.py:414
+msgid "Remove the selected script?"
+msgstr "Удалить выбранную команду?"
+
+#: indicator-script-runner.py:515
+msgid "Leave the terminal open after the script completes."
+msgstr "Оставить терминал открытым после завершения команды."
+
+#: indicator-script-runner.py:520
+msgid "Edit Script"
+msgstr "Редактировать команду"
+
+#: indicator-script-runner.py:522
+msgid "Add Script"
+msgstr "Добавить команду"
+
+#: indicator-script-runner.py:543
+msgid "The script command cannot be empty."
+msgstr "Команда не может быть пустой."
