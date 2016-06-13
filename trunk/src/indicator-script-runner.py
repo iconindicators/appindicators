@@ -31,7 +31,7 @@ from gi.repository import AppIndicator3, GLib, Gtk
 from script import Info
 from threading import Thread
 
-import copy, json, locale, logging, os, pythonutils, stat, threading, time
+import copy, json, logging, os, pythonutils, threading, time
 
 
 class IndicatorScriptRunner:
@@ -61,7 +61,7 @@ class IndicatorScriptRunner:
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorScriptRunner.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-        self.indicator.set_menu( self.buildMenu() )
+        self.buildMenu()
 
 
     def main( self ): Gtk.main()
@@ -289,7 +289,7 @@ class IndicatorScriptRunner:
                 self.scripts = copyOfScripts
                 self.saveSettings()
                 pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-                self.indicator.set_menu( self.buildMenu() )
+                self.buildMenu()
 
         self.dialog.destroy()
         self.dialog = None
