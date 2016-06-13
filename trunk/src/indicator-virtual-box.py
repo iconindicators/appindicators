@@ -37,7 +37,7 @@ gettext.install( INDICATOR_NAME )
 from gi.repository import AppIndicator3, GLib, Gtk
 from threading import Thread
 
-import gzip, json, locale, logging, os, pythonutils, re, shutil, sys, time, virtualmachine
+import gzip, json, logging, os, pythonutils, re, shutil, sys, time, virtualmachine
 
 
 class IndicatorVirtualBox:
