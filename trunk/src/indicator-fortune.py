@@ -35,7 +35,7 @@ gettext.install( INDICATOR_NAME )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 
-import json, locale, logging, os, pythonutils, re, shutil
+import json, logging, os, pythonutils, re, shutil
 
 
 class IndicatorFortune:
