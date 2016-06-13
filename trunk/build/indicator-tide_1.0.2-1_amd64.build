@@ -1,0 +1,55 @@
+ dpkg-buildpackage -rfakeroot -D -us -uc -sa
+dpkg-buildpackage: source package indicator-tide
+dpkg-buildpackage: source version 1.0.2-1
+dpkg-buildpackage: source distribution precise
+dpkg-buildpackage: source changed by Bernard Giannetti <thebernmeister@hotmail.com>
+ dpkg-source --before-build indicator-tide-1.0.2
+dpkg-buildpackage: host architecture amd64
+ fakeroot debian/rules clean
+dh clean --with python3
+   dh_testdir
+   dh_auto_clean
+   dh_clean
+ dpkg-source -b indicator-tide-1.0.2
+dpkg-source: info: using source format `3.0 (quilt)'
+dpkg-source: info: building indicator-tide using existing ./indicator-tide_1.0.2.orig.tar.gz
+dpkg-source: info: building indicator-tide in indicator-tide_1.0.2-1.debian.tar.gz
+dpkg-source: info: building indicator-tide in indicator-tide_1.0.2-1.dsc
+ debian/rules build
+dh build --with python3
+   dh_testdir
+   dh_auto_configure
+   dh_auto_build
+   dh_auto_test
+ fakeroot debian/rules binary
+dh binary --with python3
+   dh_testroot
+   dh_prep
+   dh_auto_install
+   dh_install
+   dh_installdocs
+   dh_installchangelogs
+   dh_pysupport
+dh_pysupport: This program is deprecated, you should use dh_python2 instead. Migration guide: http://deb.li/dhs2p
+   dh_python3
+I: dh_python3 tools:100: replacing shebang in debian/indicator-tide/usr/share/indicator-tide/indicator-tide.py
+I: dh_python3 tools:100: replacing shebang in debian/indicator-tide/usr/share/indicator-tide/pythonutils.py
+I: dh_python3 tools:100: replacing shebang in debian/indicator-tide/usr/share/indicator-tide/tide.py
+   dh_icons
+   dh_perl
+   dh_link
+   dh_compress
+   dh_fixperms
+   dh_installdeb
+   dh_gencontrol
+dpkg-gencontrol: warning: package indicator-tide: unused substitution variable ${python:Depends}
+   dh_md5sums
+   dh_builddeb
+dpkg-deb: building package `indicator-tide' in `../indicator-tide_1.0.2-1_all.deb'.
+ dpkg-genchanges -sa >../indicator-tide_1.0.2-1_amd64.changes
+dpkg-genchanges: including full source code in upload
+ dpkg-source --after-build indicator-tide-1.0.2
+dpkg-buildpackage: full upload (original source is included)
+Now running lintian...
+E: indicator-tide: missing-dependency-on-python-support python-support (>= 0.90)
+Finished running lintian.
