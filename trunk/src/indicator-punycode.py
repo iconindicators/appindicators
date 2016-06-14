@@ -15,10 +15,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+# Convert domain names between Unicode and Punycode.
+# Allows the user to select, by either highlight or clipboard,
+# a domain name and convert between Unicode and Punycode.
+
+
 #TODO Testing...
 # www.Alliancefrançaise.nu
 # www.xn--alliancefranaise-npb.nu
-
+#
 # www.xn--bcher-kva.de
 # www.bücher.de
 #
