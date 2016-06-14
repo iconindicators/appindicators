@@ -26,24 +26,6 @@
 #TODO POT and RU PO.
 
 
-#TODO Testing...
-# www.Alliancefrançaise.nu
-# www.xn--alliancefranaise-npb.nu
-#
-# www.xn--bcher-kva.de
-# www.bücher.de
-#
-#Russian domain:			Punycode converted:
-#
-#президент.рф			xn--d1abbgf6aiiy.xn--p1ai
-#президент.из.рф			xn--d1abbgf6aiiy.xn--g1ab.xn--p1ai
-#president.рф			president.xn--p1ai
-#президент.from.рф		xn--d1abbgf6aiiy.from.xn--p1ai
-#президент.рф/test/test2/test3/	xn--d1abbgf6aiiy.xn--p1ai
-#https://президент.рф		https://xn--d1abbgf6aiiy.xn--p1ai
-#http://президент.рф/тест	http://xn--d1abbgf6aiiy.xn--p1ai
-
-
 INDICATOR_NAME = "indicator-punycode"
 import gettext
 gettext.install( INDICATOR_NAME )
