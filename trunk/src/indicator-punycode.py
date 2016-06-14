@@ -50,7 +50,7 @@ gettext.install( INDICATOR_NAME )
 
 from gi.repository import AppIndicator3, Gdk, Gtk, Notify
 
-import encodings.idna, json, logging, os, pythonutils
+import encodings.idna, json, logging, os, pythonutils, re
 
 
 class IndicatorPunycode:
@@ -127,9 +127,17 @@ class IndicatorPunycode:
 
             Notify.Notification.new( _( "Nothing to convert..." ), message, IndicatorPunycode.ICON ).show()
         else:
-#TODO Prior to converting, remove (and keep) any leading protocol and following trailing slash first,
-# then convert, then add back what was removed.
-# See email and original code for RE.
+            protocol = ""
+            result = re.split( r"(^.*//)", text )
+            if len( result ) == 3:
+                protocol = result[ 1 ]
+                text = result[ 2 ]
+
+            pathQuery = ""
+            result = re.split( r"(/.*$)", text )
+            if len( result ) == 3:
+                text = result[ 0 ]
+                pathQuery = result[ 1 ]
 
             try:
                 convertedText = ""
@@ -145,19 +153,19 @@ class IndicatorPunycode:
 
                     convertedText = convertedText[ : -1 ]
 
-                self.results.insert( 0, [ convertedText, text ] )
+                self.results.insert( 0, [ protocol + convertedText + pathQuery, protocol + text + pathQuery ] )
 
-                print( "Output:", convertedText ) #TODO Remove
+                print( "Output:", protocol + convertedText + pathQuery ) #TODO Remove
 
                 if len( self.results ) > self.resultHistoryLength:
                     self.results = self.results[ : self.resultHistoryLength ]
 
-                self.pasteToClipboard( None, convertedText )
+                self.pasteToClipboard( None, protocol + convertedText + pathQuery )
                 self.buildMenu()
 
             except Exception as e:
                 logging.exception( e )
-                logging.error( "Error converting '" + text + "'." )
+                logging.error( "Error converting '" + protocol + text + pathQuery + "'." )
                 Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), IndicatorPunycode.ICON ).show()
 
 
