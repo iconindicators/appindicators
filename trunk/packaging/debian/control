@@ -1,0 +1,14 @@
+Source: indicator-punycode
+Maintainer: Bernard Giannetti <thebernmeister@hotmail.com>
+Section: python
+Priority: optional
+Build-Depends: python3 (>= 3.2), debhelper (>= 7)
+Standards-Version: 3.9.5
+X-Python3-Version: >= 3.2
+
+Package: indicator-punycode
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-gi, python3-notify2
+Description: Convert domain names between Unicode and Punycode.
+ Allows the user to select, by either highlight or clipboard,
+ a domain name and convert between Unicode and Punycode.

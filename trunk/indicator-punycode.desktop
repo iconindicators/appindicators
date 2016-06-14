@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Punycode Indicator
+Comment=Convert domain names between Unicode and Punycode.
+Exec=/usr/share/indicator-punycode/indicator-punycode.py
+Terminal=false
+StartupNotify=true
+Type=Application
+Categories=Utility;
+Icon=indicator-punycode
+Name[en_AU]=indicator-punycode
