@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-script-runner 1.0.0\n"
+"Project-Id-Version: indicator-script-runner 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2016-06-06 22:02+1000\n"
 "PO-Revision-Date: 2016-06-10 16:59+0300\n"
