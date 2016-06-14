@@ -20,9 +20,6 @@
 # a domain name and convert between Unicode and Punycode.
 
 
-#TODO Hide the convert menu item if primary is selected?
-
-
 #TODO Icons.
 
 
@@ -122,7 +119,6 @@ class IndicatorPunycode:
         if self.inputClipboard:
             text = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
 
-        print( "Input:", text ) #TODO Remove
         if text is None:
             if self.inputClipboard:
                 message = _( "No text is in the clipboard." )
@@ -159,8 +155,6 @@ class IndicatorPunycode:
                     convertedText = convertedText[ : -1 ]
 
                 self.results.insert( 0, [ protocol + convertedText + pathQuery, protocol + text + pathQuery ] )
-
-                print( "Output:", protocol + convertedText + pathQuery ) #TODO Remove
 
                 if len( self.results ) > self.resultHistoryLength:
                     self.results = self.results[ : self.resultHistoryLength ]
