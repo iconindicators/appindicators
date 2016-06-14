@@ -23,7 +23,7 @@
 #TODO Icons.
 
 
-#TODO POT and RU PO.
+#TODO RU PO.
 
 
 INDICATOR_NAME = "indicator-punycode"
