@@ -13,8 +13,8 @@
    height="40.041901"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="indicator-virtual-box-lubuntu.svg">
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="indicator-virtual-box.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -24,11 +24,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="171.23899"
-     inkscape:cy="-136.08695"
+     inkscape:zoom="7.9195959"
+     inkscape:cx="7.4562549"
+     inkscape:cy="15.652989"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1056"
@@ -66,13 +66,13 @@
      style="display:inline"
      transform="translate(-365.70092,-242.28643)">
     <path
-       style="fill:#3c3c3c;fill-opacity:1;stroke:#3c3c3c;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+       style="fill:#5a5a5a;fill-opacity:1;stroke:#5a5a5a;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
        d="m 371.20092,247.78644 0,10.03839 5.05076,-0.0631 2.96733,9.02824 6.12405,-17.10946 2.90419,10.22779 3.53553,-10.35406 5.52427,15.34168 3.06203,-3e-5 0.0631,-17.10946 z"
        id="path3051-0"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccccccccc" />
     <path
-       style="fill:#3c3c3c;fill-opacity:1;stroke:#3c3c3c;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+       style="fill:#5a5a5a;fill-opacity:1;stroke:#5a5a5a;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
        d="m 371.26406,260.79215 0.12626,16.03618 28.85249,-0.0631 0.0947,-8.85462 -5.14547,-0.0474 -3.34613,-10.10152 -3.4724,10.10152 -3.03045,-10.03839 -5.99778,17.04633 -5.1139,-14.07901 z"
        id="path3053-2"
        inkscape:connector-curvature="0"
