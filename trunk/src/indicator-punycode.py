@@ -220,7 +220,7 @@ class IndicatorPunycode:
             "Input is taken from the\n" + \
             "currently highlighted/selected\n" + \
             "text after the user performs\n" + \
-            "a middle mouse click." ) )
+            "a middle mouse click on the icon." ) )
         inputPrimaryRadio.set_active( not self.inputClipboard )
         inputPrimaryRadio.set_margin_left( 15 )
         grid.attach( inputPrimaryRadio, 0, 2, 2, 1 )
