@@ -15,9 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Convert domain names between Unicode and Punycode.
+# Convert domain names between Unicode and ASCII.
 # Allows the user to select, by either highlight or clipboard,
-# a domain name and convert between Unicode and Punycode.
+# a domain name and convert between Unicode and ASCII.
 
 
 #TODO Icons.
@@ -45,7 +45,7 @@ class IndicatorPunycode:
 
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
 
-    COMMENTS = _( "Convert domain names between Unicode and Punycode." )
+    COMMENTS = _( "Convert domain names between Unicode and ASCII." )
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_DROP_PATH_QUERY = "dropPathQuery"
     SETTINGS_INPUT_CLIPBOARD = "inputClipboard"
@@ -57,7 +57,7 @@ class IndicatorPunycode:
         filehandler = pythonutils.TruncatedFileHandler( IndicatorPunycode.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.dialog = None
-        self.results =  [ ] # List of lists, each sublist contains [ unicode, punycode ].
+        self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
         self.loadSettings()
         Notify.init( INDICATOR_NAME )
 
@@ -81,11 +81,11 @@ class IndicatorPunycode:
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
 
-            menuItem = Gtk.MenuItem( indent + result [ 0 ] )
+            menuItem = Gtk.MenuItem( indent + "Unicode: " + result [ 0 ] )
             menuItem.connect( "activate", self.pasteToClipboard, result[ 0 ] )
             menu.append( menuItem )
 
-            menuItem = Gtk.MenuItem( indent + result [ 1 ] )
+            menuItem = Gtk.MenuItem( indent + "ASCII:   " + result [ 1 ] )
             menuItem.connect( "activate", self.pasteToClipboard, result[ 1 ] )
             menu.append( menuItem )
 
@@ -130,13 +130,13 @@ class IndicatorPunycode:
                         labels.append( ( encodings.idna.ToASCII( encodings.idna.nameprep( label ) ) ) )
 
                     convertedText = str( b'.'.join( labels ), "utf-8" )
+                    self.results.insert( 0, [ protocol + text + pathQuery, protocol + convertedText + pathQuery ] )
                 else:
                     for label in text.split( "." ):    
                         convertedText += encodings.idna.ToUnicode( encodings.idna.nameprep( label ) ) + "."
 
                     convertedText = convertedText[ : -1 ]
-
-                self.results.insert( 0, [ protocol + convertedText + pathQuery, protocol + text + pathQuery ] )
+                    self.results.insert( 0, [ protocol + convertedText + pathQuery, protocol + text + pathQuery ] )
 
                 if len( self.results ) > self.resultHistoryLength:
                     self.results = self.results[ : self.resultHistoryLength ]
