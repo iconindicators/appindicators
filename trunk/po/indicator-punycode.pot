@@ -84,7 +84,7 @@ msgid ""
 "Input is taken from the\n"
 "currently highlighted/selected\n"
 "text after the user performs\n"
-"a middle mouse click."
+"a middle mouse click on the icon."
 msgstr ""
 
 #: indicator-punycode.py:228
