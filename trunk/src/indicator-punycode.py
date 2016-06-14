@@ -20,6 +20,12 @@
 # a domain name and convert between Unicode and Punycode.
 
 
+#TODO Icons.
+
+
+#TODO POT and RU PO.
+
+
 #TODO Testing...
 # www.Alliancefrançaise.nu
 # www.xn--alliancefranaise-npb.nu
