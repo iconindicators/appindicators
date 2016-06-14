@@ -20,6 +20,9 @@
 # a domain name and convert between Unicode and Punycode.
 
 
+#TODO Hide the convert menu item if primary is selected?
+
+
 #TODO Icons.
 
 
@@ -65,6 +68,7 @@ class IndicatorPunycode:
 
     COMMENTS = _( "Convert domain names between Unicode and Punycode." )
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
+    SETTINGS_DROP_PATH_QUERY = "dropPathQuery"
     SETTINGS_INPUT_CLIPBOARD = "inputClipboard"
     SETTINGS_OUTPUT_BOTH = "outputBoth"
     SETTINGS_RESULT_HISTORY_LENGTH = "resultHistoryLength"
@@ -137,7 +141,8 @@ class IndicatorPunycode:
             result = re.split( r"(/.*$)", text )
             if len( result ) == 3:
                 text = result[ 0 ]
-                pathQuery = result[ 1 ]
+                if not self.dropPathQuery:
+                    pathQuery = result[ 1 ]
 
             try:
                 convertedText = ""
@@ -221,7 +226,7 @@ class IndicatorPunycode:
         grid.set_row_homogeneous( False )
         grid.set_column_homogeneous( False )
 
-        label = Gtk.Label( _( "Input" ) )
+        label = Gtk.Label( _( "Input source" ) )
         label.set_halign( Gtk.Align.START )
         label.set_margin_top( 10 )
         grid.attach( label, 0, 0, 2, 1 )
@@ -244,7 +249,7 @@ class IndicatorPunycode:
         inputPrimaryRadio.set_margin_left( 15 )
         grid.attach( inputPrimaryRadio, 0, 2, 2, 1 )
 
-        outputBothCheckbox = Gtk.CheckButton( _( "Output to Clipboard and Primary" ) )
+        outputBothCheckbox = Gtk.CheckButton( _( "Output to clipboard and primary" ) )
         outputBothCheckbox.set_tooltip_text( _(
             "If checked, the output text is sent\n" + \
             "to both the clipboard and primary.\n\n" + \
@@ -254,25 +259,36 @@ class IndicatorPunycode:
         outputBothCheckbox.set_margin_top( 10 )
         grid.attach( outputBothCheckbox, 0, 3, 2, 1 )
 
+        dropPathQueryCheckbox = Gtk.CheckButton( _( "Drop path/query in output" ) )
+        dropPathQueryCheckbox.set_tooltip_text( _(
+            "If checked, the output text will\n" + \
+            "not contain any path/query (if present)." ) )
+        dropPathQueryCheckbox.set_active( self.dropPathQuery )
+        dropPathQueryCheckbox.set_margin_top( 10 )
+        grid.attach( dropPathQueryCheckbox, 0, 4, 2, 1 )
+
         label = Gtk.Label( _( "Maximum results" ) )
         label.set_halign( Gtk.Align.START )
         label.set_margin_top( 10 )
-        grid.attach( label, 0, 4, 1, 1 )
+        grid.attach( label, 0, 5, 1, 1 )
 
         resultsAmountSpinner = Gtk.SpinButton()
         resultsAmountSpinner.set_adjustment( Gtk.Adjustment( self.resultHistoryLength, 0, 1000, 1, 1, 0 ) )
         resultsAmountSpinner.set_value( self.resultHistoryLength )
         resultsAmountSpinner.set_tooltip_text( _(
             "The number of most recent\n" + \
-            "results to show in the menu." ) )
+            "results to show in the menu.\n\n" + \
+            "Selecting a menu item which\n" + \
+            "contains a result will copy\n" + \
+            "the result to the output." ) )
         resultsAmountSpinner.set_margin_top( 10 )
-        grid.attach( resultsAmountSpinner, 1, 4, 1, 1 )
+        grid.attach( resultsAmountSpinner, 1, 5, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorPunycode.DESKTOP_FILE ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 5, 2, 1 )
+        grid.attach( autostartCheckbox, 0, 6, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
@@ -285,6 +301,7 @@ class IndicatorPunycode:
         if self.dialog.run() == Gtk.ResponseType.OK:
             self.inputClipboard = inputClipboardRadio.get_active()
             self.outputBoth = outputBothCheckbox.get_active()
+            self.dropPathQuery = dropPathQueryCheckbox.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorPunycode.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
@@ -295,6 +312,7 @@ class IndicatorPunycode:
 
 
     def loadSettings( self ):
+        self.dropPathQuery = False
         self.inputClipboard = False
         self.outputBoth = False
         self.resultHistoryLength = 3
@@ -303,6 +321,7 @@ class IndicatorPunycode:
                 with open( IndicatorPunycode.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
+                self.dropPathQuery = settings.get( IndicatorPunycode.SETTINGS_DROP_PATH_QUERY, self.dropPathQuery )
                 self.inputClipboard = settings.get( IndicatorPunycode.SETTINGS_INPUT_CLIPBOARD, self.inputClipboard )
                 self.outputBoth = settings.get( IndicatorPunycode.SETTINGS_OUTPUT_BOTH, self.outputBoth )
                 self.resultHistoryLength = settings.get( IndicatorPunycode.SETTINGS_RESULT_HISTORY_LENGTH, self.resultHistoryLength )
@@ -317,6 +336,7 @@ class IndicatorPunycode:
     def saveSettings( self ):
         try:
             settings = {
+                IndicatorPunycode.SETTINGS_DROP_PATH_QUERY: self.dropPathQuery,
                 IndicatorPunycode.SETTINGS_INPUT_CLIPBOARD: self.inputClipboard,
                 IndicatorPunycode.SETTINGS_OUTPUT_BOTH: self.outputBoth,
                 IndicatorPunycode.SETTINGS_RESULT_HISTORY_LENGTH: self.resultHistoryLength
