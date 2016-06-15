@@ -1,3 +1,10 @@
+indicator-punycode (1.0.1-1) precise; urgency=low
+
+  * Removed unecessary 'Name' translation from .desktop file.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 15 Jun 2016 14:34:58 +1000
+
+
 indicator-punycode (1.0.0-1) precise; urgency=low
 
   * Initial release - collaboration and inspiration from Oleg Moiseichuk.

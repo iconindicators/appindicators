@@ -20,12 +20,6 @@
 # a domain name and convert between Unicode and ASCII.
 
 
-#TODO Icons.
-
-
-#TODO RU PO.
-
-
 INDICATOR_NAME = "indicator-punycode"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -38,7 +32,7 @@ import encodings.idna, json, logging, os, pythonutils, re
 class IndicatorPunycode:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.0"
+    VERSION = "1.0.1"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
