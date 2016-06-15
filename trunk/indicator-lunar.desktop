@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Lunar Indicator
-Comment=Lunar indicator applet
+Comment=Displays lunar, solar, planetary, comet, star and satellite information.
 Exec=/usr/share/indicator-lunar/indicator-lunar.py
 Terminal=false
 StartupNotify=true
