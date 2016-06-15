@@ -124,13 +124,18 @@ class IndicatorPunycode:
                         labels.append( ( encodings.idna.ToASCII( encodings.idna.nameprep( label ) ) ) )
 
                     convertedText = str( b'.'.join( labels ), "utf-8" )
-                    self.results.insert( 0, [ protocol + text + pathQuery, protocol + convertedText + pathQuery ] )
+                    result = [ protocol + text + pathQuery, protocol + convertedText + pathQuery ]
                 else:
                     for label in text.split( "." ):    
                         convertedText += encodings.idna.ToUnicode( encodings.idna.nameprep( label ) ) + "."
 
                     convertedText = convertedText[ : -1 ]
-                    self.results.insert( 0, [ protocol + convertedText + pathQuery, protocol + text + pathQuery ] )
+                    result = [ protocol + convertedText + pathQuery, protocol + text + pathQuery ]
+
+                if result in self.results:
+                    self.results.remove( result )
+
+                self.results.insert( 0, result )
 
                 if len( self.results ) > self.resultHistoryLength:
                     self.results = self.results[ : self.resultHistoryLength ]
