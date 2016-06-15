@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Fortune Indicator
-Comment=Fortune indicator applet
+Comment=Calls the 'fortune' program displaying the result in the on-screen notification.
 Exec=/usr/share/indicator-fortune/indicator-fortune.py
 Terminal=false
 StartupNotify=true
