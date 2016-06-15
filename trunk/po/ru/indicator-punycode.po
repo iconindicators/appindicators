@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: indicator-punycode 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2016-06-14 20:28+1000\n"
-"PO-Revision-Date: 2016-06-14 17:24+0300\n"
+"PO-Revision-Date: 2016-06-15 12:39+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -18,59 +18,67 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: indicator-punycode.py:48
+#: indicator-punycode.py:42
 msgid "Convert domain names between Unicode and ASCII."
 msgstr "Преобразователь доменных имён, содержащих символы Уникода."
 
-#: indicator-punycode.py:75
+#: indicator-punycode.py:69
 msgid "Convert"
 msgstr "Преобразовать"
 
-#: indicator-punycode.py:106
+#: indicator-punycode.py:78
+msgid "Unicode:  "
+msgstr "Уникод:  "
+
+#: indicator-punycode.py:82
+msgid "ASCII:  "
+msgstr "ASCII:       "
+
+#: indicator-punycode.py:100
 msgid "No text is in the clipboard."
 msgstr "Буфер обмена пуст."
 
-#: indicator-punycode.py:108
+#: indicator-punycode.py:102
 msgid "No text is highlighted/selected."
 msgstr "Буфер выделения пуст."
 
-#: indicator-punycode.py:110
+#: indicator-punycode.py:104
 msgid "Nothing to convert..."
 msgstr "Преобразование невозможно..."
 
-#: indicator-punycode.py:150
+#: indicator-punycode.py:149
 msgid "Error converting..."
 msgstr "Ошибка преобразования..."
 
-#: indicator-punycode.py:150
+#: indicator-punycode.py:149
 msgid "See log for more details."
 msgstr "Подробности в журнале."
 
-#: indicator-punycode.py:176
+#: indicator-punycode.py:175
 msgid "translator-credits"
 msgstr "Олег Мойсейчук"
 
-#: indicator-punycode.py:177
+#: indicator-punycode.py:176
 msgid "View the"
 msgstr "Просмотреть"
 
-#: indicator-punycode.py:178
+#: indicator-punycode.py:177
 msgid "text file."
 msgstr "."
 
-#: indicator-punycode.py:179
+#: indicator-punycode.py:178
 msgid "changelog"
 msgstr "список изменений"
 
-#: indicator-punycode.py:205
+#: indicator-punycode.py:204
 msgid "Input source"
 msgstr "Источник данных"
 
-#: indicator-punycode.py:210
+#: indicator-punycode.py:209
 msgid "Clipboard"
 msgstr "Буфер обмена"
 
-#: indicator-punycode.py:212
+#: indicator-punycode.py:211
 msgid ""
 "Input is taken from the clipboard\n"
 "after a CTRL-X or CTRL-C (or eqivalent)."
@@ -78,11 +86,11 @@ msgstr ""
 "Данные вводятся при помощи Ctrl-C или\n"
 "пункта \"Копировать\" в контекстном меню."
 
-#: indicator-punycode.py:218
+#: indicator-punycode.py:217
 msgid "Primary"
 msgstr "Буфер выделения"
 
-#: indicator-punycode.py:220
+#: indicator-punycode.py:219
 msgid ""
 "Input is taken from the\n"
 "currently highlighted/selected\n"
@@ -93,11 +101,11 @@ msgstr ""
 "кнопки мыши на значок индикатора\n"
 "после выделения текста."
 
-#: indicator-punycode.py:228
+#: indicator-punycode.py:227
 msgid "Output to clipboard and primary"
 msgstr "Поместить результат в оба буфера"
 
-#: indicator-punycode.py:230
+#: indicator-punycode.py:229
 msgid ""
 "If checked, the output text is sent\n"
 "to both the clipboard and primary.\n"
@@ -111,11 +119,11 @@ msgstr ""
 "Иначе он помещается только в буфер,\n"
 "в котором содержались исходные данные."
 
-#: indicator-punycode.py:238
+#: indicator-punycode.py:237
 msgid "Drop path/query in output"
 msgstr "Отбросить символы за доменным именем"
 
-#: indicator-punycode.py:240
+#: indicator-punycode.py:239
 msgid ""
 "If checked, the output text will\n"
 "not contain any path/query (if present)."
@@ -123,11 +131,11 @@ msgstr ""
 "Если стоит отметка, все символы, следующие\n"
 "за доменным именем, будут отброшены."
 
-#: indicator-punycode.py:246
+#: indicator-punycode.py:245
 msgid "Maximum results"
 msgstr "Количество результатов"
 
-#: indicator-punycode.py:255
+#: indicator-punycode.py:254
 msgid ""
 "The number of most recent\n"
 "results to show in the menu.\n"
@@ -141,20 +149,20 @@ msgstr ""
 "\n"
 "Нажатие на пункт меню, который\n"
 "содержит результат, поместит\n"
-"результат в буфер обмена."
+"этот результат в буфер обмена."
 
-#: indicator-punycode.py:263
+#: indicator-punycode.py:262
 msgid "Autostart"
 msgstr "Автозапуск"
 
-#: indicator-punycode.py:264
+#: indicator-punycode.py:263
 msgid "Run the indicator automatically."
 msgstr "Запускать индикатор автоматически."
 
-#: indicator-punycode.py:269
+#: indicator-punycode.py:268
 msgid "General"
 msgstr "Общие"
 
-#: indicator-punycode.py:271
+#: indicator-punycode.py:270
 msgid "Preferences"
 msgstr "Параметры"
