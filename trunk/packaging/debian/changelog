@@ -1,5 +1,6 @@
 indicator-ppa-download-statistics (1.0.54-1) precise; urgency=low
 
+  * Added spacing to each download count menu item to increase readability.
   * Fixed Lintian warnings - added extended description to control file and
     copyright file now refers to common license file for GPL-3.
   * Updated comment of desktop file.

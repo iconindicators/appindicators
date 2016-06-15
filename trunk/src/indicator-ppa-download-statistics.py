@@ -154,9 +154,9 @@ class IndicatorPPADownloadStatistics:
     def createMenuItemForPublishedBinary( self, menu, ppa, publishedBinary ):
         label = IndicatorPPADownloadStatistics.INDENT + publishedBinary.getPackageName()
         if publishedBinary.getPackageVersion() is None:
-            label += ": " + str( publishedBinary.getDownloadCount() )
+            label += ":  " + str( publishedBinary.getDownloadCount() )
         else:
-            label += " (" + publishedBinary.getPackageVersion() + "): " + str( publishedBinary.getDownloadCount() )
+            label += "  (" + publishedBinary.getPackageVersion() + "):  " + str( publishedBinary.getDownloadCount() )
 
         menuItem = Gtk.MenuItem( label )
         menuItem.set_name( ppa.getKey() )
