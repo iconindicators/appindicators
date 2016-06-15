@@ -75,11 +75,11 @@ class IndicatorPunycode:
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
 
-            menuItem = Gtk.MenuItem( indent + "Unicode:  " + result [ 0 ] )
+            menuItem = Gtk.MenuItem( indent + _( "Unicode:  " ) + result [ 0 ] )
             menuItem.connect( "activate", self.pasteToClipboard, result[ 0 ] )
             menu.append( menuItem )
 
-            menuItem = Gtk.MenuItem( indent + "ASCII:  " + result [ 1 ] )
+            menuItem = Gtk.MenuItem( indent + _( "ASCII:  " ) + result [ 1 ] )
             menuItem.connect( "activate", self.pasteToClipboard, result[ 1 ] )
             menu.append( menuItem )
 

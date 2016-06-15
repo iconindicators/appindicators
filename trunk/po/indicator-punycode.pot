@@ -25,6 +25,14 @@ msgstr ""
 msgid "Convert"
 msgstr ""
 
+#: indicator-punycode.py:78
+msgid "Unicode:  "
+msgstr ""
+
+#: indicator-punycode.py:82
+msgid "ASCII:  "
+msgstr ""
+
 #: indicator-punycode.py:100
 msgid "No text is in the clipboard."
 msgstr ""
