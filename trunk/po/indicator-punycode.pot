@@ -17,69 +17,69 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicator-punycode.py:48
+#: indicator-punycode.py:42
 msgid "Convert domain names between Unicode and ASCII."
 msgstr ""
 
-#: indicator-punycode.py:75
+#: indicator-punycode.py:69
 msgid "Convert"
 msgstr ""
 
-#: indicator-punycode.py:106
+#: indicator-punycode.py:100
 msgid "No text is in the clipboard."
 msgstr ""
 
-#: indicator-punycode.py:108
+#: indicator-punycode.py:102
 msgid "No text is highlighted/selected."
 msgstr ""
 
-#: indicator-punycode.py:110
+#: indicator-punycode.py:104
 msgid "Nothing to convert..."
 msgstr ""
 
-#: indicator-punycode.py:150
+#: indicator-punycode.py:149
 msgid "Error converting..."
 msgstr ""
 
-#: indicator-punycode.py:150
+#: indicator-punycode.py:149
 msgid "See log for more details."
 msgstr ""
 
-#: indicator-punycode.py:176
+#: indicator-punycode.py:175
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-punycode.py:177
+#: indicator-punycode.py:176
 msgid "View the"
 msgstr ""
 
-#: indicator-punycode.py:178
+#: indicator-punycode.py:177
 msgid "text file."
 msgstr ""
 
-#: indicator-punycode.py:179
+#: indicator-punycode.py:178
 msgid "changelog"
 msgstr ""
 
-#: indicator-punycode.py:205
+#: indicator-punycode.py:204
 msgid "Input source"
 msgstr ""
 
-#: indicator-punycode.py:210
+#: indicator-punycode.py:209
 msgid "Clipboard"
 msgstr ""
 
-#: indicator-punycode.py:212
+#: indicator-punycode.py:211
 msgid ""
 "Input is taken from the clipboard\n"
 "after a CTRL-X or CTRL-C (or eqivalent)."
 msgstr ""
 
-#: indicator-punycode.py:218
+#: indicator-punycode.py:217
 msgid "Primary"
 msgstr ""
 
-#: indicator-punycode.py:220
+#: indicator-punycode.py:219
 msgid ""
 "Input is taken from the\n"
 "currently highlighted/selected\n"
@@ -87,11 +87,11 @@ msgid ""
 "a middle mouse click on the icon."
 msgstr ""
 
-#: indicator-punycode.py:228
+#: indicator-punycode.py:227
 msgid "Output to clipboard and primary"
 msgstr ""
 
-#: indicator-punycode.py:230
+#: indicator-punycode.py:229
 msgid ""
 "If checked, the output text is sent\n"
 "to both the clipboard and primary.\n"
@@ -100,21 +100,21 @@ msgid ""
 "only to the input source."
 msgstr ""
 
-#: indicator-punycode.py:238
+#: indicator-punycode.py:237
 msgid "Drop path/query in output"
 msgstr ""
 
-#: indicator-punycode.py:240
+#: indicator-punycode.py:239
 msgid ""
 "If checked, the output text will\n"
 "not contain any path/query (if present)."
 msgstr ""
 
-#: indicator-punycode.py:246
+#: indicator-punycode.py:245
 msgid "Maximum results"
 msgstr ""
 
-#: indicator-punycode.py:255
+#: indicator-punycode.py:254
 msgid ""
 "The number of most recent\n"
 "results to show in the menu.\n"
@@ -124,18 +124,18 @@ msgid ""
 "the result to the output."
 msgstr ""
 
-#: indicator-punycode.py:263
+#: indicator-punycode.py:262
 msgid "Autostart"
 msgstr ""
 
-#: indicator-punycode.py:264
+#: indicator-punycode.py:263
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-punycode.py:269
+#: indicator-punycode.py:268
 msgid "General"
 msgstr ""
 
-#: indicator-punycode.py:271
+#: indicator-punycode.py:270
 msgid "Preferences"
 msgstr ""
