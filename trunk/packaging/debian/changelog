@@ -8,7 +8,7 @@ indicator-script-runner (1.0.1-1) precise; urgency=low
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 14 Jun 2016 22:20:06 +1000
 
 
- indicator-script-runner (1.0.0-1) precise; urgency=low
+indicator-script-runner (1.0.0-1) precise; urgency=low
 
   * Initial release.
   * Many thanks to Oleg Moiseichuk for providing the magic to launch scripts!
