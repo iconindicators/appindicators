@@ -2,6 +2,7 @@ indicator-stardate (1.0.32-1) precise; urgency=low
 
   * Fixed Lintian warnings - added extended description to control file and
     copyright file now refers to common license file for GPL-3.
+  * Updated comment of desktop file.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 6 Jun 2016 23:17:42 +1000
 
