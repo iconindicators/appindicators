@@ -1,5 +1,7 @@
 indicator-script-runner (1.0.1-1) precise; urgency=low
 
+  * Bug fix: The sample script for 'update' incorrectly escaped the message in
+    notify-send.
   * Icon for lubuntu theme was incorrect colour.
   * Updated comment of desktop file.
 

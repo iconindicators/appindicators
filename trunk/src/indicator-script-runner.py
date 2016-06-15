@@ -672,7 +672,7 @@ class IndicatorScriptRunner:
             self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 5 www.google.com", False ) )
             self.scripts.append( Info( "Network", "Public IP address", "", "notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
             self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
-            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade && notify-send \"Update is finished!\"", True ) )
+            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade && notify-send \\\"Update is finished!\\\"", True ) )
 
 
     def saveSettings( self ):
