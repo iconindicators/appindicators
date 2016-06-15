@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=VirtualBox Indicator
-Comment=Application indicator to start/stop Virtual Box virtual machines.
+Comment=Easily start VirtualBox™ virtual machines.
 Exec=/usr/share/indicator-virtual-box/indicator-virtual-box.py
 Terminal=false
 StartupNotify=true

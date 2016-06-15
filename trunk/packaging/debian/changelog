@@ -4,6 +4,7 @@ indicator-virtual-box (1.0.49-1) precise; urgency=low
     copyright file now refers to common license file for GPL-3.
   * Cleaned up imports.
   * Icon for ubuntu-mono-dark theme was incorrect colour.
+  * Updated comment of desktop file.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 6 Jun 2016 23:05:46 +1000
 
