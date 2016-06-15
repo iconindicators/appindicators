@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Script Runner Indicator
-Comment=Run a terminal command or script from a GUI front-end.
+Comment=Run a terminal command or script from the indicator menu.
 Exec=/usr/share/indicator-script-runner/indicator-script-runner.py
 Terminal=false
 StartupNotify=true

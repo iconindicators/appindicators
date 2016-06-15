@@ -1,6 +1,7 @@
 indicator-script-runner (1.0.1-1) precise; urgency=low
 
   * Icon for lubuntu theme was incorrect colour.
+  * Updated comment of desktop file.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 14 Jun 2016 22:20:06 +1000
 
