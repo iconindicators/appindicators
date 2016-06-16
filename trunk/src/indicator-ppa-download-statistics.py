@@ -48,7 +48,7 @@ import itertools, pythonutils, json, locale, logging, operator, os, re, shutil, 
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.54"
+    VERSION = "1.0.55"
     ICON = INDICATOR_NAME
     CHANGELOG = "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -156,7 +156,7 @@ class IndicatorPPADownloadStatistics:
         if publishedBinary.getPackageVersion() is None:
             label += ":  " + str( publishedBinary.getDownloadCount() )
         else:
-            label += "  (" + publishedBinary.getPackageVersion() + "):  " + str( publishedBinary.getDownloadCount() )
+            label += " " + publishedBinary.getPackageVersion() + ":  " + str( publishedBinary.getDownloadCount() )
 
         menuItem = Gtk.MenuItem( label )
         menuItem.set_name( ppa.getKey() )
