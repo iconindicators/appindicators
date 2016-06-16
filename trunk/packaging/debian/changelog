@@ -2,7 +2,7 @@ indicator-lunar (1.0.67-1) precise; urgency=low
 
   * Fixed Lintian warnings - added extended description to control file and
     copyright file now refers to common license file for GPL-3.
-  * Icons for elementary and ubuntu-mono-dark theme were incorrect colours.
+  * Icons for elementary and ubuntu-mono-light theme were incorrect colours.
   * Updated comment of desktop file.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 6 Jun 2016 23:27:06 +1000
