@@ -43,7 +43,7 @@ import gzip, json, logging, os, pythonutils, re, shutil, sys, time, virtualmachi
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.49"
+    VERSION = "1.0.50"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"

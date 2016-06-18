@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-virtual-box 1.0.49\n"
+"Project-Id-Version: indicator-virtual-box 1.0.50\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2015-05-22 18:05+1000\n"
-"PO-Revision-Date: 2015-07-02 12:25+1000\n"
+"PO-Revision-Date: 2016-06-17 17:45+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: indicator-virtual-box.py:59
 msgid " Shows VirtualBox™ virtual machines and allows them to be started."
-msgstr "Показывает виртуальные машины VirtualBox и позволяет их запускать."
+msgstr "Показывает виртуальные машины VirtualBox™ и позволяет их запускать."
 
 #: indicator-virtual-box.py:95
 msgid "(no virtual machines exist)"
@@ -34,8 +34,16 @@ msgstr "Запустить Менеджер VirtualBox"
 msgid "(VirtualBox is not installed)"
 msgstr "(VirtualBox не установлен)"
 
-msgid "Missing VM...\n\nName: {0}\nID: {1}"
-msgstr "Пропавших без вести VM...\n\nИмя: {0}\nID: {1}"
+msgid ""
+"Missing VM...\n"
+"\n"
+"Name: {0}\n"
+"ID: {1}"
+msgstr ""
+"Отсутствует ВМ...\n"
+"\n"
+"Название: {0}\n"
+"ID: {1}"
 
 #: indicator-virtual-box.py:329
 msgid ""
@@ -58,7 +66,7 @@ msgid ""
 "There is more than one VM with the same name - unfortunately your VM cannot "
 "be uniquely identified."
 msgstr ""
-"Существует более одной ВМ с уникальным именем - к сожалению, ваша ВМ не "
+"Существует более одной ВМ с уникальным названием - к сожалению, ваша ВМ не "
 "может быть однозначно распознана."
 
 #: indicator-virtual-box.py:359
@@ -178,7 +186,8 @@ msgstr "Команда запуска не может быть пустой."
 msgid ""
 "The start command must contain %VM% which is substituted for the VM name/id."
 msgstr ""
-"Команда запуска должна содержать %VM%, этот параметр будет заменён именем ВМ."
+"Команда запуска должна содержать %VM%, этот параметр будет заменён названием "
+"или ID ВМ."
 
 msgid "View the"
 msgstr "Просмотреть"

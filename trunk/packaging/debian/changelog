@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.50-1) precise; urgency=low
+
+  * Updated ru translations - thanks to Oleg Moiseichuk for making these
+    corrections.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 18 Jun 2016 11:47:03 +1000
+
+
 indicator-virtual-box (1.0.49-1) precise; urgency=low
 
   * Fixed Lintian warnings - added extended description to control file and
