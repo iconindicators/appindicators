@@ -2,7 +2,7 @@ indicator-tide (1.0.3-1) precise; urgency=low
 
   * Fixed Lintian warnings - added extended description to control file and
     copyright file now refers to common license file for GPL-3.
-  * Icon for lubuntu theme was incorrect colour.
+  * Icon for ubuntu-mono-dark theme was incorrect colour.
   * Updated comment of desktop file.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 6 Jun 2016 22:59:23 +1000
