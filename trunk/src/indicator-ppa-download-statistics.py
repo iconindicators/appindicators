@@ -928,7 +928,16 @@ class IndicatorPPADownloadStatistics:
         self.ppas = [ ]
         self.ppas.append( PPA( "thebernmeister", "ppa", "xenial", "amd64" ) )
         self.filters = { }
-        self.filters[ 'thebernmeister | ppa' ] = [ "indicator-fortune", "indicator-lunar", "indicator-ppa-download-statistics", "indicator-stardate", "indicator-tide", "indicator-virtual-box", "python3-ephem" ]
+        self.filters[ 'thebernmeister | ppa' ] = [ 
+            "indicator-fortune",
+            "indicator-lunar",
+            "indicator-ppa-download-statistics",
+            "indicator-punycode",
+            "indicator-script-runner",
+            "indicator-stardate",
+            "indicator-tide",
+            "indicator-virtual-box",
+            "python3-ephem" ]
 
 
     def saveSettings( self ):

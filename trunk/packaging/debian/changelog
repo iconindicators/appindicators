@@ -1,6 +1,7 @@
 indicator-ppa-download-statistics (1.0.55-1) precise; urgency=low
 
-  * Added ...TODO... to list of series.
+  * Added indicator-punycode and indicator-script-runner to list of default
+    filters.
   * Removed parentheses from around version numbers to increase readability.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 6 Jun 2016 22:23:27 +1000    TODO Set date closer to release!
