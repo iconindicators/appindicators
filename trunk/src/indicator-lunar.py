@@ -59,7 +59,7 @@ class AstronomicalObjectType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Sta
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.67"
+    VERSION = "1.0.68"
     ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -2525,6 +2525,14 @@ class IndicatorLunar:
         groupStarsByConstellationCheckbox = Gtk.CheckButton( _( "Group stars by constellation" ) )
         groupStarsByConstellationCheckbox.set_margin_top( 15 )
         groupStarsByConstellationCheckbox.set_active( self.groupStarsByConstellation )
+        groupStarsByConstellationCheckbox.set_tooltip_text( _( 
+            "By default, stars are listed\n" + \
+            "alphabetically by name.\n\n" + \
+            "When checked, stars will be\n" + \
+            "grouped into their respective\n" + \
+            "constellations and listed\n" + \
+            "alphabetically by star name\n" + \
+            "within each group." ) )
         grid.attach( groupStarsByConstellationCheckbox, 0, 5, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
@@ -2569,11 +2577,11 @@ class IndicatorLunar:
         sortSatellitesByDateTimeCheckbox.set_margin_top( 15 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
         sortSatellitesByDateTimeCheckbox.set_tooltip_text( _(
-            "By default, satellites are sorted\n" + \
-            "alphabetically by Name, Number,\n" + \
-            "then International Designator.\n\n" + \
             "If checked, satellites will be\n" + \
-            "sorted by rise date/time." ) )
+            "sorted by rise date/time.\n\n" + \
+            "Otherwise, satellites are sorted\n" + \
+            "alphabetically by Name, Number\n" + \
+            "and then International Designator." ) )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 8, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( _( "Hide satellites which have no upcoming visible pass" ) )

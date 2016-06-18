@@ -1,3 +1,12 @@
+indicator-lunar (1.0.68-1) precise; urgency=low
+
+  * Fixed tooltip on sort satellite by date/time option to reflect the default
+    value. 
+  * Added tooltip to 'group stars by constellation' option.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 16 Jun 2016 23:58:17 +1000
+
+
 indicator-lunar (1.0.67-1) precise; urgency=low
 
   * Fixed Lintian warnings - added extended description to control file and
