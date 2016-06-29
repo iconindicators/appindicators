@@ -43,7 +43,7 @@ import gzip, json, logging, os, pythonutils, re, shutil, sys, time, virtualmachi
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.50"
+    VERSION = "1.0.51"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -57,7 +57,7 @@ class IndicatorVirtualBox:
 
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
 
-    COMMENTS = _( " Shows VirtualBox™ virtual machines and allows them to be started." )
+    COMMENTS = _( "Shows VirtualBox™ virtual machines and allows them to be started." )
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_DELAY_BETWEEN_AUTO_START = "delayBetweenAutoStartInSeconds"

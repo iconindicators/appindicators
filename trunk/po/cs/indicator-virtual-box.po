@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-virtual-box 1.0.50\n"
+"Project-Id-Version: indicator-virtual-box 1.0.51\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2015-05-22 18:05+1000\n"
-"PO-Revision-Date: 2015-07-02 12:25+1000\n"
+"PO-Revision-Date: 2016-06-30 19:23+1000\n"
 "Last-Translator: Filip Oščádal <filip@mxd.cz>\n"
 "Language-Team: Czech\n"
 "Language: cs\n"
@@ -18,8 +18,8 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: indicator-virtual-box.py:59
-msgid " Shows VirtualBox™ virtual machines and allows them to be started."
-msgstr " Zobrazuje virtuální stroje VirtualBox™ a umožňuje jejich start."
+msgid "Shows VirtualBox™ virtual machines and allows them to be started."
+msgstr "Zobrazuje virtuální stroje VirtualBox™ a umožňuje jejich start."
 
 #: indicator-virtual-box.py:95
 msgid "(no virtual machines exist)"
