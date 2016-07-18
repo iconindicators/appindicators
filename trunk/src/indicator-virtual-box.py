@@ -278,8 +278,6 @@ class IndicatorVirtualBox:
 
     def getVirtualMachinesFromConfigPrior4dot3( self ):
         virtualMachines = [ ]
-#TODO Instead of firstly grepping, first check if the file exists?    
-# Test what happens (the result in line) if the file does not exist.    
         line = pythonutils.processGet( "grep GUI/SelectorVMPositions " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_PRIOR )
         try:
             uuids = list( line.rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
