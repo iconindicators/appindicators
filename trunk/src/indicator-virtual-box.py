@@ -155,11 +155,11 @@ class IndicatorVirtualBox:
     def onVirtualMachine( self, widget ):
         virtualMachines = self.getVirtualMachines()
         virtualMachine = self.getVirtualMachine( widget.props.name, virtualMachines )
-        if virtualMachine is not None:
-            self.startVirtualMachine( virtualMachine, virtualMachines, 0 ) # Set a zero delay as this is not an autostart.
-        else:
+        if virtualMachine is None:
             GLib.timeout_add_seconds( 1, self.onRefresh, False )
             pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "Missing VM...\n\nName: {0}\nID: {1}" ).format( widget.props.label, widget.props.name ), INDICATOR_NAME )
+        else:
+            self.startVirtualMachine( virtualMachine, virtualMachines, 0 ) # Set a zero delay as this is not an autostart.
 
 
     def getVirtualMachine( self, uuid, virtualMachines ):
@@ -213,6 +213,23 @@ class IndicatorVirtualBox:
         return virtualMachines
 
 
+#TODO New function...if this makes the cut, then remove the isRunning stuff from the virtualmachine class.
+    def isRunning( self, virtualMachine ):
+        isRunning = False
+        result = pythonutils.processGet( "VBoxManage list runningvms" )
+        if result is not None:
+            for line in result.splitlines():
+                try:
+                    info = line[ 1 : -1 ].split( "\" {" )
+                    if virtualMachine.getUUID() == info[ 1 ]:
+                        isRunning = True
+                        break
+                except:
+                    pass # Sometimes VBoxManage emits a warning message along with the VM information.
+
+        return isRunning
+
+
     def autoStartVirtualMachines( self, virtualMachines ):
         for virtualMachine in virtualMachines:
             if self.isAutostart( virtualMachine.getUUID() ):
@@ -259,9 +276,10 @@ class IndicatorVirtualBox:
         return virtualMachines
 
 
-    # It is assumed that VBoxManage is installed!
     def getVirtualMachinesFromConfigPrior4dot3( self ):
         virtualMachines = [ ]
+#TODO Instead of firstly grepping, first check if the file exists?    
+# Test what happens (the result in line) if the file does not exist.    
         line = pythonutils.processGet( "grep GUI/SelectorVMPositions " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_PRIOR )
         try:
             uuids = list( line.rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
@@ -344,7 +362,7 @@ class IndicatorVirtualBox:
 
 
     def startVirtualMachine( self, virtualMachine, virtualMachines, delayInSeconds ):
-        if virtualMachine is None:
+        if virtualMachine is None: #TODO How/why can this occur?  Perhaps don't catch this - should be the caller's responsibility to pass in good data.
             pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." ), INDICATOR_NAME )
 
         elif virtualMachine.isRunning(): # Attempt to use the window manager to bring the VM window to the front.
