@@ -1,8 +1,7 @@
 indicator-virtual-box (1.0.51-1) precise; urgency=low
 
-  * Removed running status information from virtualmachine class.
-  * Running status for a VM is now obtained dynamically from VBoxManage on
-    request.
+  * Removed running status information from virtualmachine class - running
+    status for a VM now obtained on request from VBoxManage.
   * Removed extra spacing in comments for About dialog.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 30 Jun 2016 19:30:14 +1000
