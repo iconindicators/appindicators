@@ -88,6 +88,7 @@ class IndicatorVirtualBox:
             if len( virtualMachines ) == 0:
                 menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
             else:
+                runningVirtualMachines = self.getRunningVirtualMachines()
                 if self.showSubmenu == True:
                     stack = [ ]
                     currentMenu = menu
@@ -104,14 +105,14 @@ class IndicatorVirtualBox:
                             stack.append( currentMenu )
                             currentMenu = subMenu
                         else:
-                            currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, "" ) )
+                            currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, "", runningVirtualMachines ) )
                 else:
                     for virtualMachine in virtualMachines:
                         indent = "    " * virtualMachine.getIndent()
                         if virtualMachine.isGroup():
                             menu.append( Gtk.MenuItem( indent + self.getGroupName( virtualMachine ) ) )
                         else:
-                            menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent ) )
+                            menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, runningVirtualMachines ) )
 
             menu.append( Gtk.SeparatorMenuItem() )
             menuItem = Gtk.MenuItem( _( "Launch VirtualBox Manager" ) )
@@ -129,8 +130,8 @@ class IndicatorVirtualBox:
     def getGroupName( self, virtualMachine ): return virtualMachine.getName()[ virtualMachine.getName().rfind( "/" ) + 1 : ]
 
 
-    def createMenuItemForVirtualMachine( self, virtualMachine, indent ):
-        if virtualMachine.isRunning(): # No need to check if this is a group...groups never "run" and this function should only be called for a VM and never a group.
+    def createMenuItemForVirtualMachine( self, virtualMachine, indent, runningVirtualMachines ):
+        if virtualMachine.getUUID() in runningVirtualMachines: # No need to check if this is a group...groups never "run" and this function should only be called for a VM and never a group.
             menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
             menuItem.set_active( True )
         else:
@@ -158,7 +159,7 @@ class IndicatorVirtualBox:
             GLib.timeout_add_seconds( 1, self.onRefresh, False )
             pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "Missing VM...\n\nName: {0}\nID: {1}" ).format( widget.props.label, widget.props.name ), INDICATOR_NAME )
         else:
-            self.startVirtualMachine( virtualMachine, virtualMachines, 0 ) # Set a zero delay as this is not an autostart.
+            self.startVirtualMachine( virtualMachine, virtualMachines, self.getRunningVirtualMachines(), 0 ) # Set a zero delay as this is not an autostart.
 
 
     def getVirtualMachine( self, uuid, virtualMachines ):
@@ -173,19 +174,19 @@ class IndicatorVirtualBox:
         virtualMachines = [ ]
         if self.isVBoxManageInstalled():
             version = self.getVirtualBoxVersion()
-            virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage() # Contains no group information, nor sort order.
-            if version is not None and len( virtualMachinesFromVBoxManage ) > 0:
+            if version is not None:
                 if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
                     virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPrior4dot3()
                 else:
                     virtualMachinesFromConfig = self.getVirtualMachinesFromConfig4dot3()
-    
-                if len( virtualMachinesFromConfig ) == 0: # If the user did not modify the sort order of the VMs, there will be no list of VMs in the config file, so the result from VBoxManage.
+
+                virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage() # Contains no group information, nor sort order.
+                if len( virtualMachinesFromConfig ) == 0: # If the user did not modify VM sort order, there will be no list of VMs in the config file, so use the result from VBoxManage.
                     virtualMachinesFromConfig = virtualMachinesFromVBoxManage
-    
-                # Going forward, the virtual machine infos from the config is the definitive list of VMs (and groups if any).
+
+                # Going forward, the virtual machine infos from the config is the definitive list of VMs (and groups, if any).
                 virtualMachines = virtualMachinesFromConfig
-    
+
                 # The virtual machine infos from the config do not contain the names of virtual machines.
                 # Obtain the names from the virtual machine infos from VBoxManage.
                 for virtualmachineFromVBoxManage in virtualMachinesFromVBoxManage:
@@ -193,90 +194,32 @@ class IndicatorVirtualBox:
                         if virtualmachineFromVBoxManage.getUUID() == virtualMachine.getUUID():
                             virtualMachine.setName( virtualmachineFromVBoxManage.getName() )
                             break
-    
-                # Determine which VMs are running.
-                result = pythonutils.processGet( "VBoxManage list runningvms" ) # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
-                if result is not None:
-                    for line in result.splitlines():
-                        try:
-                            info = line[ 1 : -1 ].split( "\" {" )
-                            for virtualMachine in virtualMachines:
-                                if virtualMachine.getUUID() == info[ 1 ]:
-                                    virtualMachine.setRunning()
-                        except:
-                            pass # Sometimes VBoxManage emits a warning message along with the VM information.
-    
-                # Alphabetically sort...
+
+                # Alphabetically sort...or not.
                 if self.sortDefault == False and not self.groupsExist( virtualMachines ):
                     virtualMachines = sorted( virtualMachines, key = lambda virtualMachine: virtualMachine.name )
 
         return virtualMachines
 
 
-    def getVirtualMachinesOLD( self ):
-        virtualMachines = [ ]
-        version = self.getVirtualBoxVersion()
-        virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage() # Does not contain group information, nor sort order.
-        if self.isVBoxManageInstalled() and version is not None and len( virtualMachinesFromVBoxManage ) > 0:
-            if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
-                virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPrior4dot3()
-            else:
-                virtualMachinesFromConfig = self.getVirtualMachinesFromConfig4dot3()
-
-            if len( virtualMachinesFromConfig ) == 0: # If the user did not modify the sort order of the VMs, there will be no list of VMs in the config file, so the result from VBoxManage.
-                virtualMachinesFromConfig = virtualMachinesFromVBoxManage
-
-            # Going forward, the virtual machine infos from the config is the definitive list of VMs (and groups if any).
-            virtualMachines = virtualMachinesFromConfig
-
-            # The virtual machine infos from the config do not contain the names of virtual machines.
-            # Obtain the names from the virtual machine infos from VBoxManage.
-            for virtualmachineFromVBoxManage in virtualMachinesFromVBoxManage:
-                for virtualMachine in virtualMachines:
-                    if virtualmachineFromVBoxManage.getUUID() == virtualMachine.getUUID():
-                        virtualMachine.setName( virtualmachineFromVBoxManage.getName() )
-                        break
-
-            # Determine which VMs are running.
-            result = pythonutils.processGet( "VBoxManage list runningvms" ) # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
-            if result is not None:
-                for line in result.splitlines():
-                    try:
-                        info = line[ 1 : -1 ].split( "\" {" )
-                        for virtualMachine in virtualMachines:
-                            if virtualMachine.getUUID() == info[ 1 ]:
-                                virtualMachine.setRunning()
-                    except:
-                        pass # Sometimes VBoxManage emits a warning message along with the VM information.
-
-            # Alphabetically sort...
-            if self.sortDefault == False and not self.groupsExist( virtualMachines ):
-                virtualMachines = sorted( virtualMachines, key = lambda virtualMachine: virtualMachine.name )
-
-        return virtualMachines
-
-
-#TODO New function...if this makes the cut, then remove the isRunning stuff from the virtualmachine class.
-    def isRunning( self, virtualMachine ):
-        isRunning = False
+    def getRunningVirtualMachines( self ):
+        runningVirtualMachines = [ ]
         result = pythonutils.processGet( "VBoxManage list runningvms" )
         if result is not None:
             for line in result.splitlines():
                 try:
                     info = line[ 1 : -1 ].split( "\" {" )
-                    if virtualMachine.getUUID() == info[ 1 ]:
-                        isRunning = True
-                        break
+                    runningVirtualMachines.append( info[ 1 ] )
                 except:
                     pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
-        return isRunning
+        return runningVirtualMachines
 
 
     def autoStartVirtualMachines( self, virtualMachines ):
         for virtualMachine in virtualMachines:
             if self.isAutostart( virtualMachine.getUUID() ):
-                self.startVirtualMachine( virtualMachine, virtualMachines, self.delayBetweenAutoStartInSeconds )
+                self.startVirtualMachine( virtualMachine, virtualMachines, self.getRunningVirtualMachines(), self.delayBetweenAutoStartInSeconds )
 
 
     # Returns the version number as a string or None if no version could be determined.
@@ -403,11 +346,11 @@ class IndicatorVirtualBox:
         return False
 
 
-    def startVirtualMachine( self, virtualMachine, virtualMachines, delayInSeconds ):
-        if virtualMachine is None: #TODO How/why can this occur?  Perhaps don't catch this - should be the caller's responsibility to pass in good data.
+    def startVirtualMachine( self, virtualMachine, virtualMachines, runningVirtualMachines, delayInSeconds ):
+        if virtualMachine is None:
             pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." ), INDICATOR_NAME )
 
-        elif virtualMachine.isRunning(): # Attempt to use the window manager to bring the VM window to the front.
+        elif virtualMachine.getUUID() in runningVirtualMachines: # Use the window manager to bring the VM window to the front.
             if self.isVirtualMachineNameUnique( virtualMachine.getName(), virtualMachines ):
                 windowID = None
                 for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
@@ -427,7 +370,7 @@ class IndicatorVirtualBox:
             try:
                 startCommand = self.getStartCommand( virtualMachine.getUUID() ).replace( "%VM%", virtualMachine.getUUID() ) + " &"
                 pythonutils.processCall( startCommand )
-                GLib.timeout_add_seconds( 60, self.onRefresh, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
+                GLib.timeout_add_seconds( 10, self.onRefresh, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
                 if delayInSeconds > 0:
                     time.sleep( delayInSeconds )
 
@@ -609,7 +552,7 @@ class IndicatorVirtualBox:
 
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorVirtualBox.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.timeout_add_seconds( 5, self.onRefresh, False )
+            GLib.timeout_add_seconds( 1, self.onRefresh, False )
 
         self.dialog.destroy()
         self.dialog = None
@@ -617,10 +560,10 @@ class IndicatorVirtualBox:
 
     def updateVirtualMachinePreferences( self, store, treeiter ):
         while treeiter is not None:
-            isVM = store[ treeiter ][ 3 ] != "" # UUID is not empty, so this is a VM and not a group.
+            isVirtualMachine = store[ treeiter ][ 3 ] != "" # UUID is not empty, so this is a VM and not a group.
             isAutostart = store[ treeiter ][ 1 ] == "gtk-apply"
             isDefaultStartCommand = store[ treeiter ][ 2 ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
-            if ( isVM and isAutostart ) or ( isVM and not isDefaultStartCommand ): # Only record VMs with different settings to default.
+            if ( isVirtualMachine and isAutostart ) or ( isVirtualMachine and not isDefaultStartCommand ): # Only record VMs with different settings to default.
                 self.virtualMachinePreferences[ store[ treeiter ][ 3 ] ] = [ store[ treeiter ][ 1 ] == "gtk-apply", store[ treeiter ][ 2 ] ]
 
             if store.iter_has_child( treeiter ):
