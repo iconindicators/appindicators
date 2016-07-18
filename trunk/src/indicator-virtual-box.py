@@ -53,7 +53,6 @@ class IndicatorVirtualBox:
     VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
     VIRTUAL_BOX_CONFIGURATION_4_DOT_3_PRIOR = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
     VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION = "4.3" # Configuration file location and format changed at this version (https://www.virtualbox.org/manual/ch10.html#idp99351072).
-    VIRTUAL_BOX_CONFIGURATION_VERSION_BAD = "-1"
 
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
 
@@ -172,9 +171,53 @@ class IndicatorVirtualBox:
 
     def getVirtualMachines( self ):
         virtualMachines = [ ]
+        if self.isVBoxManageInstalled():
+            version = self.getVirtualBoxVersion()
+            virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage() # Contains no group information, nor sort order.
+            if version is not None and len( virtualMachinesFromVBoxManage ) > 0:
+                if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
+                    virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPrior4dot3()
+                else:
+                    virtualMachinesFromConfig = self.getVirtualMachinesFromConfig4dot3()
+    
+                if len( virtualMachinesFromConfig ) == 0: # If the user did not modify the sort order of the VMs, there will be no list of VMs in the config file, so the result from VBoxManage.
+                    virtualMachinesFromConfig = virtualMachinesFromVBoxManage
+    
+                # Going forward, the virtual machine infos from the config is the definitive list of VMs (and groups if any).
+                virtualMachines = virtualMachinesFromConfig
+    
+                # The virtual machine infos from the config do not contain the names of virtual machines.
+                # Obtain the names from the virtual machine infos from VBoxManage.
+                for virtualmachineFromVBoxManage in virtualMachinesFromVBoxManage:
+                    for virtualMachine in virtualMachines:
+                        if virtualmachineFromVBoxManage.getUUID() == virtualMachine.getUUID():
+                            virtualMachine.setName( virtualmachineFromVBoxManage.getName() )
+                            break
+    
+                # Determine which VMs are running.
+                result = pythonutils.processGet( "VBoxManage list runningvms" ) # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
+                if result is not None:
+                    for line in result.splitlines():
+                        try:
+                            info = line[ 1 : -1 ].split( "\" {" )
+                            for virtualMachine in virtualMachines:
+                                if virtualMachine.getUUID() == info[ 1 ]:
+                                    virtualMachine.setRunning()
+                        except:
+                            pass # Sometimes VBoxManage emits a warning message along with the VM information.
+    
+                # Alphabetically sort...
+                if self.sortDefault == False and not self.groupsExist( virtualMachines ):
+                    virtualMachines = sorted( virtualMachines, key = lambda virtualMachine: virtualMachine.name )
+
+        return virtualMachines
+
+
+    def getVirtualMachinesOLD( self ):
+        virtualMachines = [ ]
         version = self.getVirtualBoxVersion()
         virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage() # Does not contain group information, nor sort order.
-        if self.isVBoxManageInstalled() and version != IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_VERSION_BAD and len( virtualMachinesFromVBoxManage ) > 0:
+        if self.isVBoxManageInstalled() and version is not None and len( virtualMachinesFromVBoxManage ) > 0:
             if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
                 virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPrior4dot3()
             else:
@@ -236,12 +279,13 @@ class IndicatorVirtualBox:
                 self.startVirtualMachine( virtualMachine, virtualMachines, self.delayBetweenAutoStartInSeconds )
 
 
-    # Returns the version number as a string or IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_VERSION_BAD if no version could be obtained.
+    # Returns the version number as a string or None if no version could be determined.
     # Safe to call without checking if VBoxManage is installed.
     def getVirtualBoxVersion( self ):
-        version = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_VERSION_BAD
         result = pythonutils.processGet( "VBoxManage --version" )
-        if result is not None: # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
+        if result is None: # If a VM is corrupt/missing, VBoxManage may return a spurious (None) result.
+            version = None
+        else:
             for line in result.splitlines():
                 if len( line ) > 0 and line[ 0 ].isdigit(): # The result may include compile warnings in addition to the actual version number or even empty lines.
                     version = line
@@ -507,7 +551,7 @@ class IndicatorVirtualBox:
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
 
         version = self.getVirtualBoxVersion()
-        if self.isVBoxManageInstalled() and version != IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_VERSION_BAD:
+        if self.isVBoxManageInstalled() and version is not None:
             if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
                 grid.attach( sortAlphabeticallyCheckbox, 0, 0, 2, 1 )
             else:
