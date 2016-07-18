@@ -24,9 +24,9 @@ class Info:
     # True if a group; False is a VM.
     # UUID of VM.
     # Numeric amount to indent when groups are used. 
-    def __init__( self, name, group, uuid, indent ):
+    def __init__( self, name, isGroup, uuid, indent ):
         self.name = name
-        self.group = group
+        self.group = isGroup
         self.uuid = uuid
         self.indent = indent
         self.running = False
