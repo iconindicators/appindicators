@@ -47,12 +47,6 @@ class Info:
     def getIndent( self ): return self.indent
 
 
-    def setRunning( self ): self.running = True
-
-
-    def isRunning( self ): return self.running
-
-
     def __str__( self ): return self.getName() + " | " + str( self.isGroup() ) + " | " + self.getUUID() + " | " + str( self.getIndent() ) + " | " + str( self.isRunning() )
 
 
