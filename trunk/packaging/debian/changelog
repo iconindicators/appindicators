@@ -1,3 +1,11 @@
+indicator-tide (1.0.4-1) precise; urgency=low
+
+  * Updated build script to now take a single hicolor icon and create icons
+    for all supported themes.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 24 Jul 2016 13:04:17 +1000
+
+
 indicator-tide (1.0.3-1) precise; urgency=low
 
   * Fixed Lintian warnings - added extended description to control file and
