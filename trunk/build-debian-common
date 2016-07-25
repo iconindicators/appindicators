@@ -102,8 +102,6 @@ copyPOCreateMO()
 
 createOrigTarGz()
 {
-  # Create orig.tar.gz
-  cd build
   tar -czf "${NAME}_${VERSION}.orig.tar.gz" $NAME-$VERSION
   cd ..
 }
@@ -111,7 +109,6 @@ createOrigTarGz()
 
 copyDebian()
 {
-  # Debian files.
   rsync -ar --exclude=.svn packaging/debian build/$NAME-$VERSION
 }
 
@@ -157,8 +154,7 @@ buildDeb()
 
 cleanUp()
 {
-  # Clean up.
-  rm -rf $NAME-$VERSION #TODO Uncomment
+  rm -rf $NAME-$VERSION
   echo -e "\nTo upload to LaunchPad, change to the 'build' directory and run:\n"
   echo -e "    dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes\n"
 }
