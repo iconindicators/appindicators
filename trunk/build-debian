@@ -14,13 +14,5 @@ source=( $NAME".py" locationData.py locations.py tide.py )
 hicolorIcons=( $NAME".svg" ) # List of hicolor icons belonging to the indicator (contents of the icons directory).
 hicolorColours=( 0000aa ) # List of colours present across ALL the hicolor icons.
 
-. ./test-common
-copyTopLevelAndSource source
-copyHicolorCreateThemed hicolorIcons hicolorColours
-copyPOCreateMO
-createOrigTarGz
-copyDebian
-addIconsToDebianInstall hicolorIcons
-addMOToDebianInstall
-buildDeb
-cleanUp
+. ./build-debian-common
+doStandardBuild source hicolorIcons hicolorColours

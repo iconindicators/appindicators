@@ -13,6 +13,25 @@ themeColours=(    f4f4f4     5a5a5a          dfdbd2             3c3c3c       )
 
 # Arguments:
 #   Array of source files present in the src directory.
+#   Array of hicolor icons names present in the icons directory.
+#   Array of hicolor colours present across ALL hicolor icons.
+doStandardBuild()
+{
+  copyTopLevelAndSource $1
+  copyHicolorCreateThemed $2 $3
+  copyPOCreateMO
+  createOrigTarGz
+  copyDebian
+  addIconsToDebianInstall $2
+  addMOToDebianInstall
+  buildDeb
+  cleanUp
+}
+
+
+
+# Arguments:
+#   Array of source files present in the src directory.
 copyTopLevelAndSource()
 {
   local -n _source=$1
@@ -139,7 +158,7 @@ buildDeb()
 cleanUp()
 {
   # Clean up.
-  rm -rf $NAME-$VERSION
+  rm -rf $NAME-$VERSION #TODO Uncomment
   echo -e "\nTo upload to LaunchPad, change to the 'build' directory and run:\n"
   echo -e "    dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes\n"
 }
