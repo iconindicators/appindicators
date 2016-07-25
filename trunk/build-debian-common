@@ -29,7 +29,6 @@ doStandardBuild()
 }
 
 
-
 # Arguments:
 #   Array of source files present in the src directory.
 copyTopLevelAndSource()
@@ -102,6 +101,7 @@ copyPOCreateMO()
 
 createOrigTarGz()
 {
+  cd build
   tar -czf "${NAME}_${VERSION}.orig.tar.gz" $NAME-$VERSION
   cd ..
 }
