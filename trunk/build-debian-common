@@ -12,7 +12,7 @@ themeColours=(    f4f4f4     5a5a5a          dfdbd2             3c3c3c       )
 
 
 # Arguments:
-#   Array source files present in the src directory.
+#   Array of source files present in the src directory.
 copyTopLevelAndSource()
 {
   local -n _source=$1
