@@ -37,7 +37,7 @@ import copy, json, logging, os, pythonutils, threading, time
 class IndicatorScriptRunner:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.1"
+    VERSION = "1.0.2"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
