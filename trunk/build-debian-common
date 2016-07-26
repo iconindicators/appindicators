@@ -1,0 +1,160 @@
+#!/bin/bash
+#
+# Common code for the build-debian script for all indicators.
+
+
+PYTHON_UTILS=../PythonUtils/src/pythonutils.py
+
+
+# Supported themes and corresponding colours.
+themeNames=(   "elementary" "lubuntu" "ubuntu-mono-dark" "ubuntu-mono-light" )
+themeColours=(    f4f4f4     5a5a5a          dfdbd2             3c3c3c       )
+
+
+# Arguments:
+#   Array of source files present in the src directory.
+#   Array of hicolor icons names present in the icons directory.
+#   Array of hicolor colours present across ALL hicolor icons.
+doStandardBuild()
+{
+  copyTopLevelAndSource $1
+  copyHicolorCreateThemed $2 $3
+  copyPOCreateMO
+  createOrigTarGz
+  copyDebian
+  addIconsToDebianInstall $2
+  addMOToDebianInstall
+  buildDeb
+  cleanUp
+}
+
+
+# Arguments:
+#   Array of source files present in the src directory.
+copyTopLevelAndSource()
+{
+  local -n _source=$1
+
+  rm -rf build
+  if [ ! -f $PYTHON_UTILS ]
+  then
+      echo "$PYTHON_UTILS not found - ABORTING!" && exit 0
+  fi
+
+  mkdir -p build/$NAME-$VERSION
+
+  cp $NAME.desktop build/$NAME-$VERSION
+  cp build-debian build/$NAME-$VERSION
+  cp build-debian-common build/$NAME-$VERSION
+
+  mkdir -p build/$NAME-$VERSION/src
+  cp packaging/debian/changelog build/$NAME-$VERSION/src
+  cp $PYTHON_UTILS build/$NAME-$VERSION/src
+
+  for item in "${_source[@]}"; do
+    cp src/"$item" build/$NAME-$VERSION/src
+  done
+}
+
+
+# Arguments:
+#   Array of hicolor icons names present in the icons directory.
+#   Array of hicolor colours present across ALL hicolor icons.
+copyHicolorCreateThemed()
+{
+  local -n _hicolorIcons=$1
+  local -n _hicolorColours=$2
+
+  # Copy hicolor icon(s)...
+  mkdir -p build/$NAME-$VERSION/icons/hicolor
+  for (( i = 0; i < "${#_hicolorIcons[*]}"; i++ )); do
+    sourceIcon=icons/"${_hicolorIcons[ $i ]}"
+    cp $sourceIcon build/$NAME-$VERSION/icons/hicolor
+
+    # ...and create themed icons...
+    for (( j = 0; j < ${#themeNames[@]}; j++ )); do
+     destPath=build/$NAME-$VERSION/icons/${themeNames[ $j ]}
+     mkdir -p $destPath
+     cp $sourceIcon $destPath
+
+      # ...by substituting each hicolor colour(s) for the current theme colour.
+      for (( k = 0; k < "${#_hicolorColours[*]}"; k++ )); do
+        sed -i s/"${_hicolorColours[ $k ]}"/${themeColours[ $j ]}/g $destPath/"${_hicolorIcons[ $i ]}"
+      done
+    done
+  done
+}
+
+
+copyPOCreateMO()
+{
+  # Copy .po files.
+  rsync -ar --exclude=.svn --include=*.po po build/$NAME-$VERSION
+  cp po/LINGUAS po/POTFILES.in po/README build/$NAME-$VERSION/po
+
+  # Create .mo files.
+  for PO_FILE in $(find build/$NAME-$VERSION/po -type f -name '*.po') ; do
+    msgfmt $PO_FILE --output-file ${PO_FILE%\.po}.mo
+  done
+}
+
+
+createOrigTarGz()
+{
+  cd build
+  tar -czf "${NAME}_${VERSION}.orig.tar.gz" $NAME-$VERSION
+  cd ..
+}
+
+
+copyDebian()
+{
+  rsync -ar --exclude=.svn packaging/debian build/$NAME-$VERSION
+}
+
+
+# Arguments:
+#   Array of hicolor icons names present in the icons directory.
+addIconsToDebianInstall()
+{
+  # Update debian/install with icons.
+  local -n _hicolorIcons=$1
+
+  for (( i = 0; i < "${#_hicolorIcons[*]}"; i++ )); do
+    for (( j = 0; j < ${#themeNames[@]}; j++ )); do
+      line="icons/${themeNames[ $j ]}/${_hicolorIcons[ $i ]} usr/share/icons/${themeNames[ $j ]}/scalable/apps"
+      echo $line >> build/$NAME-$VERSION/debian/install
+    done
+  done
+}
+
+
+addMOToDebianInstall()
+{
+  # Update debian/install file with .mo
+  cd build/$NAME-$VERSION
+  for MO_FILE in $(find po -type f -name '*.mo') ; do
+    MO_PATH=${MO_FILE#po}
+    MO_CODE=${MO_PATH%$NAME.mo}
+    echo "$MO_FILE /usr/share/locale${MO_CODE}LC_MESSAGES" >> debian/install
+  done
+  cd ../..
+}
+
+
+buildDeb()
+{
+  # Build DEB source (or binary).
+  cd build/$NAME-$VERSION
+  debuild -S -sa         # Builds a DEB source file.
+  #debuild -sa -us -uc   # Builds a DEB binary file.
+  cd ..
+}
+
+
+cleanUp()
+{
+  rm -rf $NAME-$VERSION
+  echo -e "\nTo upload to LaunchPad, change to the 'build' directory and run:\n"
+  echo -e "    dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes\n"
+}

@@ -1,78 +1,18 @@
 #!/bin/bash
 #
 # Build the DEBIAN source files for upload to LaunchPad PPA.
-# Ensure the version number below matches that in src/indicator-virtual-box.py and packaging/debian/changelog.  
+#
+# Ensure the version number below also matches:
+#	src/indicator-tide.py
+#	packaging/debian/changelog.  
 
 
-NAME="indicator-virtual-box"
 VERSION="1.0.51"
-PYTHON_UTILS=../PythonUtils/src/pythonutils.py
+NAME="indicator-virtual-box"
 
+source=( $NAME".py" virtualmachine.py )
+hicolorIcons=( $NAME".svg" ) # List of hicolor icons belonging to the indicator (contents of the icons directory).
+hicolorColours=( 6999b9 ) # List of colours present across ALL the hicolor icons.
 
-# Initialisation.
-rm -rf build
-
-if [ ! -f $PYTHON_UTILS ];
-then
-    echo "$PYTHON_UTILS not found - ABORTING!" && exit 0
-fi
-
-
-# Copy top level files.
-mkdir -p build/$NAME-$VERSION
-cp $NAME.desktop build/$NAME-$VERSION
-cp build-debian build/$NAME-$VERSION
-
-
-# Python source and changelog.
-mkdir -p build/$NAME-$VERSION/src
-cp src/indicator-virtual-box.py src/virtualmachine.py $PYTHON_UTILS build/$NAME-$VERSION/src
-cp packaging/debian/changelog build/$NAME-$VERSION/src
-
-
-# Icons.
-rsync -ar --exclude=.svn --include=*.svg icons build/$NAME-$VERSION
-
-
-# Translations.
-rsync -ar --exclude=.svn --include=*.po po build/$NAME-$VERSION
-cp po/LINGUAS po/POTFILES.in po/README build/$NAME-$VERSION/po
-
-
-# Create .mo
-for PO_FILE in $(find build/$NAME-$VERSION/po -type f -name '*.po') ; do
-  msgfmt $PO_FILE --output-file ${PO_FILE%\.po}.mo
-done
-
-
-# Create orig.tar.gz
-cd build
-tar -czf "${NAME}_${VERSION}.orig.tar.gz" $NAME-$VERSION
-cd ..
-
-
-# Debian files.
-rsync -ar --exclude=.svn packaging/debian build/$NAME-$VERSION
-
-
-# Update debian/install file with .mo
-cd build/$NAME-$VERSION
-for MO_FILE in $(find po -type f -name '*.mo') ; do
-  MO_PATH=${MO_FILE#po}
-  MO_CODE=${MO_PATH%$NAME.mo}
-  echo "$MO_FILE /usr/share/locale${MO_CODE}LC_MESSAGES" >> debian/install
-done
-cd ../..
-
-
-# Build DEB source.
-cd build/$NAME-$VERSION
-debuild -S -sa         # Builds a DEB source file.
-#debuild -sa -us -uc   # Builds a DEB binary file.
-cd ..
-
-
-# Clean up.
-rm -rf $NAME-$VERSION
-echo "To upload to LaunchPad, change to the 'build' directory and run:"
-echo "    dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes"
+. ./build-debian-common
+doStandardBuild source hicolorIcons hicolorColours

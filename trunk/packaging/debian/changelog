@@ -7,6 +7,9 @@ indicator-virtual-box (1.0.51-1) precise; urgency=low
   * Changed the delay when clicking OK on the Preferences and updating the menu
     from 5s to 1s.
   * Removed extra spacing in comments for About dialog.
+  * Overhaul of build script: extracted common functions into a separate
+    script used by all indicators; only the hicolor icon is required and all
+    theme icons are created from the hicolor.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 30 Jun 2016 19:30:14 +1000
 
