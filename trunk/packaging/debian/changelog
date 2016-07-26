@@ -1,3 +1,12 @@
+indicator-stardate (1.0.33-1) precise; urgency=low
+
+  * Overhaul of build script: extracted common functions into a separate
+    script used by all indicators; only the hicolor icon is required and all
+    theme icons are created from the hicolor.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 24 Jul 2016 13:04:17 +1000
+
+
 indicator-stardate (1.0.32-1) precise; urgency=low
 
   * Fixed Lintian warnings - added extended description to control file and
