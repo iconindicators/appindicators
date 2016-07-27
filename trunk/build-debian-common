@@ -147,7 +147,7 @@ buildDeb()
   # Build DEB source (or binary).
   cd build/$NAME-$VERSION
   debuild -S -sa         # Builds a DEB source file.
-  #debuild -sa -us -uc   # Builds a DEB binary file.
+#  debuild -sa -us -uc   # Builds a DEB binary file.
   cd ..
 }
 
