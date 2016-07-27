@@ -3,7 +3,7 @@
 # Build the DEBIAN source files for upload to LaunchPad PPA.
 #
 # Ensure the version number below also matches:
-#	src/indicator-tide.py
+#	src/indicator-stardate.py
 #	packaging/debian/changelog.  
 
 
