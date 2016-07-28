@@ -32,7 +32,7 @@ import encodings.idna, json, logging, os, pythonutils, re
 class IndicatorPunycode:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.1"
+    VERSION = "1.0.2"
     ICON = INDICATOR_NAME
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
