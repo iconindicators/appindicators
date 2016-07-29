@@ -16,24 +16,3 @@ hicolorColours=( fff200 000000 ) # List of colours present across ALL the hicolo
 
 . ../PythonUtils/build-debian-common
 doStandardBuild source hicolorIcons hicolorColours
-
-
-# References for building a Debian package for PPA...
-# http://askubuntu.com/questions/27715/create-a-deb-package-from-scripts-or-binaries
-# http://askubuntu.com/questions/28562/how-do-i-create-a-ppa-for-a-working-program
-# http://askubuntu.com/questions/90764/how-do-i-create-a-deb-package-for-a-single-python-script
-# http://blog.garethj.com/2009/06/02/building-deb-packages-for-python-applications
-# http://developer.ubuntu.com/packaging/html/debian-dir-overview.html
-# http://help.launchpad.net/Packaging/PPA/Uploading
-# http://help.ubuntu.com/community/PythonRecipes/DebianPackage
-# http://savetheions.com/2010/01/20/packaging-python-applicationsmodules-for-debian
-# http://shallowsky.com/blog/programming/packaging-launchpad-ppas.html
-# http://ubuntulinuxtipstricks.blogspot.com.au/2010/08/is-packaging-new-software-hard.html
-# http://wiki.debian.org/Python/Packaging
-# http://wiki.ubuntu.com/MOTU/School/PackagingWithoutCompiling
-# http://wiki.ubuntu.com/PackagingGuide/HandsOn
-# http://wiki.ubuntu.com/PackagingGuide/Python
-# http://www.debian.org/doc/manuals/maint-guide
-# http://www.debian.org/doc/packaging-manuals/python-policy
-# http://www.debian-administration.org/articles/336
-# http://news.softpedia.com/news/How-to-Repack-Deb-Files-on-Debian-and-Ubuntu-404930.shtml
