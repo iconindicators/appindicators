@@ -14,8 +14,7 @@ source=( $NAME".py" )
 hicolorIcons=( $NAME".svg" ) # List of hicolor icons belonging to the indicator (contents of the icons directory).
 hicolorColours=( 78dc96 6496dc ) # List of colours present across ALL the hicolor icons.
 
-
-. ./build-debian-common
+. ../PythonUtils/build-debian-common
 copyTopLevelAndSource source
 copyHicolorCreateThemed hicolorIcons hicolorColours
 
