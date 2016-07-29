@@ -14,7 +14,7 @@ source=( $NAME".py" example.py stardate.py )
 hicolorIcons=( $NAME".svg" ) # List of hicolor icons belonging to the indicator (contents of the icons directory).
 hicolorColours=( fff200 000000 ) # List of colours present across ALL the hicolor icons.
 
-. ./build-debian-common
+. ../PythonUtils/build-debian-common
 doStandardBuild source hicolorIcons hicolorColours
 
 
