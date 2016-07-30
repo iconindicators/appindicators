@@ -67,27 +67,6 @@ def setAutoStart( desktopFile, isSet, logging, autoStartPath = os.getenv( "HOME"
             pass
 
 
-# Returns the colour (as #xxyyzz) for the current GTK icon theme.
-def getColourForIconTheme():
-    colour = "#fff200" # Use hicolor as a default
-    iconTheme = getIconTheme()
-    if iconTheme is not None:
-        if iconTheme == "elementary":
-            colour = "#f4f4f4"
-        elif iconTheme == "lubuntu":
-            colour = "#5a5a5a"
-        elif iconTheme == "ubuntu-mono-dark":
-            colour = "#dfdbd2"
-        elif iconTheme == "ubuntu-mono-light":
-            colour = "#3c3c3c"
-
-    return colour
-
-
-# Returns the name of the current GTK icon theme.
-def getIconTheme(): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
-
-
 # Shows a message dialog.
 #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
 def showMessage( parent, messageType, message, title ):
