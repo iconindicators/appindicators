@@ -36,6 +36,7 @@ copyTopLevelAndSource()
 {
   local -n _source=$1
 
+  rm -rf build
   mkdir -p build/$NAME-$VERSION
 
   cp $NAME.desktop build/$NAME-$VERSION
