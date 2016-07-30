@@ -1,3 +1,10 @@
+indicator-lunar (1.0.69-1) precise; urgency=low
+
+  * Overhaul of build script: extracted common functions into a separate
+    script used by all indicators; only the hicolor icon is required and all
+    theme icons are created from the hicolor.
+
+
 indicator-lunar (1.0.68-1) precise; urgency=low
 
   * Fixed tooltip on sort satellite by date/time option to reflect the default
