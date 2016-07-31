@@ -4,6 +4,8 @@ indicator-lunar (1.0.69-1) precise; urgency=low
     script used by all indicators; only the hicolor icon is required and all
     theme icons are created from the hicolor.
 
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 24 Jul 2016 13:04:17 +1000
+
 
 indicator-lunar (1.0.68-1) precise; urgency=low
 
