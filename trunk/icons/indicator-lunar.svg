@@ -8,7 +8,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
-   viewBox="0 0 25.037708 40.065919"
+   viewBox="0 0 40.07 40.07"
    id="svg3109"
    inkscape:version="0.48.4 r9939"
    width="100%"
@@ -40,9 +40,9 @@
      inkscape:window-height="1028"
      id="namedview3113"
      showgrid="true"
-     inkscape:zoom="2.36"
-     inkscape:cx="-16.27428"
-     inkscape:cy="5.2013506"
+     inkscape:zoom="13.350176"
+     inkscape:cx="11.798774"
+     inkscape:cy="14.012797"
      inkscape:window-x="450"
      inkscape:window-y="24"
      inkscape:window-maximized="0"
@@ -51,7 +51,8 @@
      fit-margin-top="5"
      fit-margin-bottom="5"
      fit-margin-left="5"
-     fit-margin-right="5">
+     fit-margin-right="5"
+     inkscape:showpageshadow="false">
     <inkscape:grid
        type="xygrid"
        id="grid3327"
@@ -63,7 +64,7 @@
        originy="-29.96704px" />
   </sodipodi:namedview>
   <path
-     d="M 20.037709,20.032959 V 4.9999995 a 15.03296,15.03296 0 1 0 0,30.0659185 7.5164801,15.03296 0 1 1 0,-30.0659185"
+     d="M 27.551355,20.03704 V 5.0040805 a 15.03296,15.03296 0 1 0 0,30.0659185 7.5164801,15.03296 0 1 1 0,-30.0659185"
      id="path3111"
      inkscape:connector-curvature="0"
      style="fill:#fff200" />

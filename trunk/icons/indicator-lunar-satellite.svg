@@ -10,8 +10,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
-   width="40.030678"
-   height="36.029232"
+   width="40.029999"
+   height="40.029999"
    id="svg2"
    inkscape:version="0.48.4 r9939"
    sodipodi:docname="indicator-lunar-satellite.svg">
@@ -38,11 +38,11 @@
      inkscape:window-width="960"
      inkscape:window-height="1028"
      id="namedview166"
-     showgrid="false"
-     inkscape:zoom="5.6568546"
-     inkscape:cx="19.780176"
-     inkscape:cy="-4.0575315"
-     inkscape:window-x="819"
+     showgrid="true"
+     inkscape:zoom="11.313709"
+     inkscape:cx="12.770986"
+     inkscape:cy="7.0878076"
+     inkscape:window-x="487"
      inkscape:window-y="24"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg2"
@@ -50,7 +50,16 @@
      fit-margin-left="5"
      fit-margin-right="5"
      fit-margin-bottom="5"
-     showborder="false" />
+     showborder="true"
+     inkscape:showpageshadow="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3009"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
   <defs
      id="defs4" />
   <g
@@ -58,13 +67,13 @@
      id="layer1"
      inkscape:label="Layer"
      style="display:inline"
-     transform="translate(-1048.4081,-704.30097)" />
+     transform="translate(-1048.4081,-700.3002)" />
   <g
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Layer#1"
      style="display:inline"
-     transform="translate(-1048.4081,-704.30097)" />
+     transform="translate(-1048.4081,-700.3002)" />
   <path
      style="fill:#fff200;fill-opacity:1;stroke:#dfdbd2;stroke-width:0.02316942;stroke-opacity:1"
      d=""
@@ -137,7 +146,7 @@
      inkscape:connector-curvature="0" />
   <g
      id="g3002"
-     transform="matrix(0.0659934,0,0,0.06299844,4.9092866,4.8359216)">
+     transform="matrix(0.0659934,0,0,0.06299844,4.9092866,6.7153716)">
     <path
        inkscape:connector-curvature="0"
        id="path3068"
