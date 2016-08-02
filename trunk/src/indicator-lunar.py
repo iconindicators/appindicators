@@ -1170,7 +1170,10 @@ class IndicatorLunar:
         moon = ephem.Moon( city )
         lunarIlluminationPercentage = int( round( moon.phase ) )
         brightLimbAngle = round( self.getZenithAngleOfBrightLimb( city, moon ), 1 )
-        self.createIcon( lunarIlluminationPercentage, float( brightLimbAngle ) )
+#TODO If the lunarIlluminationPercentage AND brightLimbAngle have not changed since the last run, then don't create the icon (and don't set it).
+# Requires caching these two values.
+#Perhaps test first how long it takes to create the icon...is it really a bottleneck compared say to the backend calculations? 
+        self.createIcon( lunarIlluminationPercentage, float( brightLimbAngle ), self.getIconFilename() )
         self.indicator.set_icon( self.getIconName() )
         return lunarIlluminationPercentage
 
@@ -1193,7 +1196,7 @@ class IndicatorLunar:
             if self.werewolfWarningSummary == "":
                 summary = " " # The notification summary text cannot be empty (at least on Unity).
 
-            Notify.Notification.new( summary, self.werewolfWarningMessage, self.getIconFile() ).show()
+            Notify.Notification.new( summary, self.werewolfWarningMessage, IndicatorLunar.SVG_FULL_MOON_FILE ).show()
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
@@ -1790,13 +1793,13 @@ class IndicatorLunar:
             self.addNewSatellites()
 
 
-    # Creates an SVG icon file representing the moon given the illumination and bright limb angle (relative to zenith).
+    # Creates an SVG icon file representing the moon given the illumination and bright limb angle.
     #
     #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
     #
-    #    brightLimbAngleInDegrees The angle of the (relative to zenith) bright limb ranging from 0 to 360 inclusive.
-    #                             If the bright limb is None, a full moon will be rendered and saved to a full moon file (for the notification).
-    def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees ):
+    #    brightLimbAngleInDegrees The angle of the bright limb, relative to zenith, ranging from 0 to 360 inclusive.
+    #                             Ignored if illuminationPercentage is 0 or 100.
+    def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees, svgFilename ):
         # Size of view box.
         width = 100
         height = 100
@@ -1834,27 +1837,21 @@ class IndicatorLunar:
 
         footer = '</svg>'
 
-        if brightLimbAngleInDegrees is None:
-            filename = IndicatorLunar.SVG_FULL_MOON_FILE
-        else:
-            filename = self.getIconFile()
-
         try:
-            with open( filename, "w" ) as f:
+            with open( svgFilename, "w" ) as f:
                 f.write( header + svg + footer )
                 f.close()
 
         except Exception as e:
             logging.exception( e )
-            logging.error( "Error writing SVG: " + filename )
+            logging.error( "Error writing: " + svgFilename )
 
 
-    def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
-
-#TODO Read the file each time...can this be cached and only obtained when the theme changes?
+#TODO Internally cache the colour and only fetch if the theme changes.
     def getThemeColour( self ):
         themeColour = "fff200" # Default hicolor.
-        iconFilenameForCurrentTheme = "/usr/share/icons/" + self.getThemeName() + "/scalable/apps/" + IndicatorLunar.ICON + ".svg"
+        themeName = Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
+        iconFilenameForCurrentTheme = "/usr/share/icons/" + themeName + "/scalable/apps/" + IndicatorLunar.ICON + ".svg"
         try:
             with open( iconFilenameForCurrentTheme, "r" ) as file:
                 data = file.read()
@@ -1863,6 +1860,7 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error reading SVG icon: " + iconFilenameForCurrentTheme )
+
         return themeColour
 
 
@@ -1876,7 +1874,7 @@ class IndicatorLunar:
         return iconName
 
 
-    def getIconFile( self ): return tempfile.gettempdir() + "/" + self.getIconName() + ".svg"
+    def getIconFilename( self ): return tempfile.gettempdir() + "/" + self.getIconName() + ".svg"
 
 
     # Hideous workaround because setting the icon with the same name does not change the icon any more...so alternate the name of the icon!
@@ -1884,8 +1882,6 @@ class IndicatorLunar:
     # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     # http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
     def toggleIconState( self ): IndicatorLunar.ICON_STATE = not IndicatorLunar.ICON_STATE
-#TODO Perhaps write a new icon file to /tmp with the name indicator-lunar-YYYYMMDD.svg
-#On startup of the indicator, clean out /tmp of these files.  Saves having to flip flop the name.
 
 
     def updateAstronomicalInformation( self, ephemNow, hideBodyIfNeverUp, hideCometGreaterThanMagnitude, hideSatelliteIfNoVisiblePass ):
@@ -3462,12 +3458,12 @@ class IndicatorLunar:
         message = pythonutils.getTextViewText( messageTextView )
 
         if isFullMoon:
-            self.createIcon( 100, None )
             svgFile = IndicatorLunar.SVG_FULL_MOON_FILE
+            self.createIcon( 100, None, svgFile )
         else:
             svgFile = IndicatorLunar.SVG_SATELLITE_ICON
             utcNow = str( datetime.datetime.utcnow() )
-            utcNowPlusTen = str( datetime.datetime.utcnow() + datetime.timedelta( minutes = 10 ) )
+            utcNowPlusTenMinutes = str( datetime.datetime.utcnow() + datetime.timedelta( minutes = 10 ) )
 
             # Mock data...
             summary = summary. \
@@ -3477,7 +3473,7 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123.45°" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321.54°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTen ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
 
             message = message. \
@@ -3487,7 +3483,7 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123.45°" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321.54°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTen ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
 
         if summary == "":
