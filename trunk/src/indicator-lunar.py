@@ -975,7 +975,7 @@ class IndicatorLunar:
     def updateFrontend( self, ephemNow ):
         self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
         self.updateMenu()
-        lunarIlluminationPercentage = self.updateIcon( ephemNow )
+        lunarIlluminationPercentage = self.updateIconAndLabel( ephemNow )
         self.notificationFullMoon( ephemNow, lunarIlluminationPercentage )
 
         if self.showSatelliteNotification:
@@ -1152,7 +1152,7 @@ class IndicatorLunar:
     def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
 
 
-    def updateIcon( self, ephemNow ):
+    def updateIconAndLabel( self, ephemNow ):
         parsedOutput = self.indicatorText
 
         # Substitute tags for values.
@@ -1801,21 +1801,25 @@ class IndicatorLunar:
         width = 100
         height = 100
 
+#TODO Scale the numbers to end up with 30 x 30, or put in a scale command at the end to scale by 66%.
+#Need a square border or not?  
+
         # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
         # A radius of 50 is too big and 25 is too small...so compute a radius half way between, based on the width/height of the viewing area.
         radius = float ( str( ( width / 2 ) - ( ( width / 2 ) - ( width / 4 ) ) / 2 ) )
 
+        colour = self.getThemeColour()
         if illuminationPercentage == 0 or illuminationPercentage == 100:
             svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
 
             if illuminationPercentage == 0: # New
-                svg = svgStart + '" fill="none" stroke="' + pythonutils.getColourForIconTheme() + '" stroke-width="2" />'
+                svg = svgStart + '" fill="none" stroke="#' + colour + '" stroke-width="2" />'
             else: # Full
-                svg = svgStart + '" fill="' + pythonutils.getColourForIconTheme() + '" />'
+                svg = svgStart + '" fill="#' + colour + '" />'
 
         else:
             svgStart = '<path d="M ' + str( width / 2 ) + ' ' + str( height / 2 ) + ' h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0'
-            svgEnd = ' transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="' + pythonutils.getColourForIconTheme() + '" />'
+            svgEnd = ' transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
 
             if illuminationPercentage == 50: # Quarter
                 svg = svgStart + '"' + svgEnd
@@ -1845,6 +1849,23 @@ class IndicatorLunar:
             logging.error( "Error writing SVG: " + filename )
 
 
+    def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
+
+#TODO Read the file each time...can this be cached and only obtained when the theme changes?
+    def getThemeColour( self ):
+        themeColour = "fff200" # Default hicolor.
+        iconFilenameForCurrentTheme = "/usr/share/icons/" + self.getThemeName() + "/scalable/apps/" + IndicatorLunar.ICON + ".svg"
+        try:
+            with open( iconFilenameForCurrentTheme, "r" ) as file:
+                data = file.read()
+                themeColour = data[ data.find( "style=\"fill:#" ) + 13 : data.find( "style=\"fill:#" ) + 19 ]
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error reading SVG icon: " + iconFilenameForCurrentTheme )
+        return themeColour
+
+
     def getIconName( self ):
         iconNameBase = "." + INDICATOR_NAME + "-illumination-icon"
         if IndicatorLunar.ICON_STATE:
@@ -1863,6 +1884,8 @@ class IndicatorLunar:
     # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     # http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
     def toggleIconState( self ): IndicatorLunar.ICON_STATE = not IndicatorLunar.ICON_STATE
+#TODO Perhaps write a new icon file to /tmp with the name indicator-lunar-YYYYMMDD.svg
+#On startup of the indicator, clean out /tmp of these files.  Saves having to flip flop the name.
 
 
     def updateAstronomicalInformation( self, ephemNow, hideBodyIfNeverUp, hideCometGreaterThanMagnitude, hideSatelliteIfNoVisiblePass ):
