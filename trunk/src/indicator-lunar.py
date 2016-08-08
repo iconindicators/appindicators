@@ -42,7 +42,7 @@ from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
 
-import calendar, copy, datetime, eclipse, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, sys, tempfile, threading, time, webbrowser
+import calendar, copy, datetime, eclipse, glob, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, sys, tempfile, threading, time, webbrowser
 
 try:
     import ephem
@@ -60,14 +60,15 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     VERSION = "1.0.69"
-    ICON_STATE = True # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     ICON = INDICATOR_NAME
+    ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
+    ICON_BASE_PATH = tempfile.gettempdir()
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     CACHE_PATH = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
     DESKTOP_FILE = INDICATOR_NAME + ".desktop"
-    SVG_FULL_MOON_FILE = tempfile.gettempdir() + "/" + "." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
+    SVG_FULL_MOON_FILE = ICON_BASE_PATH + "/." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
     URL_TIMEOUT_IN_SECONDS = 2
 
@@ -940,7 +941,7 @@ class IndicatorLunar:
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_icon_theme_path( tempfile.gettempdir() )
+        self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.loadSettings()
@@ -955,7 +956,6 @@ class IndicatorLunar:
 
     def updateBackend( self ):
         if self.lock.acquire( False ):
-            self.toggleIconState()
             self.updateCometOEData()
             self.updateSatelliteTLEData() 
 
@@ -1170,6 +1170,7 @@ class IndicatorLunar:
         key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
         lunarIlluminationPercentage = int( self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
         brightLimbAngle = float( self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] )
+        self.purgeIcons()
         self.createIcon( lunarIlluminationPercentage, brightLimbAngle, self.getIconFilename() )
         self.indicator.set_icon( self.getIconName() )
 
@@ -1860,24 +1861,21 @@ class IndicatorLunar:
         return themeColour
 
 
-    def getIconName( self ):
-        iconNameBase = "." + INDICATOR_NAME + "-illumination-icon"
-        if IndicatorLunar.ICON_STATE:
-            iconName = iconNameBase + "-1"
-        else:
-            iconName = iconNameBase + "-2"
-
-        return iconName
+    # Ideally would be able to create the icon with the same name each time, but overwrite the contents of the SVG file to match the moon's appearance.
+    # Due to a bug, the icon name must change between calls to setting the icon.
+    # So change the name each time - using the current date/time.
+    #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
+    #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
+    def getIconName( self ): return IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
 
 
-    def getIconFilename( self ): return tempfile.gettempdir() + "/" + self.getIconName() + ".svg"
+    def getIconFilename( self ): return IndicatorLunar.ICON_BASE_PATH + "/" + self.getIconName() + ".svg"
 
 
-    # Hideous workaround because setting the icon with the same name does not change the icon any more...so alternate the name of the icon!
-    #
-    # https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
-    # http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
-    def toggleIconState( self ): IndicatorLunar.ICON_STATE = not IndicatorLunar.ICON_STATE
+    def purgeIcons( self ):
+        oldIcons = glob.glob( IndicatorLunar.ICON_BASE_PATH + "/" + IndicatorLunar.ICON_BASE_NAME + "*" )
+        for oldIcon in oldIcons:
+            os.remove( oldIcon )
 
 
     def updateAstronomicalInformation( self, ephemNow, hideBodyIfNeverUp, hideCometGreaterThanMagnitude, hideSatelliteIfNoVisiblePass ):
