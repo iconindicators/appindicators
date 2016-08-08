@@ -1862,7 +1862,7 @@ class IndicatorLunar:
         return themeColour
 
 
-    # Ideally would be able to create the icon with the same name each time, but overwrite the contents of the SVG file to match the moon's appearance.
+    # Ideally should be able to create the icon with the same name each time.
     # Due to a bug, the icon name must change between calls to setting the icon.
     # So change the name each time - using the current date/time.
     #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
