@@ -1171,8 +1171,9 @@ class IndicatorLunar:
         lunarIlluminationPercentage = int( self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
         brightLimbAngle = float( self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] )
         self.purgeIcons()
-        self.createIcon( lunarIlluminationPercentage, brightLimbAngle, self.getIconFilename() )
-        self.indicator.set_icon( self.getIconName() )
+        iconName = self.getIconName()
+        self.createIcon( lunarIlluminationPercentage, brightLimbAngle, self.getIconFilename( iconName ) )
+        self.indicator.set_icon( iconName )
 
 
     def notificationFullMoon( self, ephemNow ):
@@ -1866,10 +1867,10 @@ class IndicatorLunar:
     # So change the name each time - using the current date/time.
     #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
-    def getIconName( self ): return IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
+    def getIconName( self ): return IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.now().strftime( "%y%m%d%H%M%S" ) )
 
 
-    def getIconFilename( self ): return IndicatorLunar.ICON_BASE_PATH + "/" + self.getIconName() + ".svg"
+    def getIconFilename( self, iconName ): return IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
 
 
     def purgeIcons( self ):
