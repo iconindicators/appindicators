@@ -975,8 +975,10 @@ class IndicatorLunar:
     def updateFrontend( self, ephemNow ):
         self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
         self.updateMenu()
-        lunarIlluminationPercentage = self.updateIconAndLabel( ephemNow )
-        self.notificationFullMoon( ephemNow, lunarIlluminationPercentage )
+        self.updateIconAndLabel( ephemNow )
+
+        if self.showWerewolfWarning:
+            self.notificationFullMoon( ephemNow )
 
         if self.showSatelliteNotification:
             self.notificationSatellite()
@@ -1163,22 +1165,17 @@ class IndicatorLunar:
         # If the underlying object has been unchecked or the object (satellite/comet) no longer exists,
         # a tag for this object will not be substituded; so remove.
         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput )
-
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
-        city = self.getCity( ephemNow )
-        moon = ephem.Moon( city )
-        lunarIlluminationPercentage = int( round( moon.phase ) )
-        brightLimbAngle = round( self.getZenithAngleOfBrightLimb( city, moon ), 1 )
-#TODO If the lunarIlluminationPercentage AND brightLimbAngle have not changed since the last run, then don't create the icon (and don't set it).
-# Requires caching these two values.
-#Perhaps test first how long it takes to create the icon...is it really a bottleneck compared say to the backend calculations? 
-        self.createIcon( lunarIlluminationPercentage, float( brightLimbAngle ), self.getIconFilename() )
+        key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+        lunarIlluminationPercentage = int( self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
+        brightLimbAngle = float( self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] )
+        self.createIcon( lunarIlluminationPercentage, brightLimbAngle, self.getIconFilename() )
         self.indicator.set_icon( self.getIconName() )
-        return lunarIlluminationPercentage
 
 
-    def notificationFullMoon( self, ephemNow, lunarIlluminationPercentage ):
+    def notificationFullMoon( self, ephemNow ):
+        lunarIlluminationPercentage = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG ) + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
@@ -1187,8 +1184,7 @@ class IndicatorLunar:
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-        if self.showWerewolfWarning and \
-           phaseIsBetweenNewAndFullInclusive and \
+        if phaseIsBetweenNewAndFullInclusive and \
            lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
            ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) < datetime.datetime.utcnow() ):
 
@@ -1849,7 +1845,7 @@ class IndicatorLunar:
 
 #TODO Internally cache the colour and only fetch if the theme changes.
     def getThemeColour( self ):
-        themeColour = "fff200" # Default hicolor.
+        themeColour = "fff200" # Default is hicolor.
         themeName = Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
         iconFilenameForCurrentTheme = "/usr/share/icons/" + themeName + "/scalable/apps/" + IndicatorLunar.ICON + ".svg"
         try:
