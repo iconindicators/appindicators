@@ -1867,7 +1867,7 @@ class IndicatorLunar:
     # So change the name each time - using the current date/time.
     #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
     #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
-    def getIconName( self ): return IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.now().strftime( "%y%m%d%H%M%S" ) )
+    def getIconName( self ): return IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
 
 
     def getIconFilename( self, iconName ): return IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
