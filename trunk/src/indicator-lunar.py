@@ -1158,9 +1158,8 @@ class IndicatorLunar:
 
 
     def updateIconAndLabel( self, ephemNow ):
-        parsedOutput = self.indicatorText
-
         # Substitute tags for values.
+        parsedOutput = self.indicatorText
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
