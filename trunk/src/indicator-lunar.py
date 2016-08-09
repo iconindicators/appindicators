@@ -925,6 +925,9 @@ class IndicatorLunar:
         self.toggleSatellitesTable = True
         self.toggleStarsTable = True
 
+        self.previousLunarIlluminationPercentage = ""
+        self.previousLunarBrightLimbAngle = ""
+
         if not os.path.exists( IndicatorLunar.CACHE_PATH ):
             os.makedirs( IndicatorLunar.CACHE_PATH )
 
@@ -1169,11 +1172,14 @@ class IndicatorLunar:
 
         key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
         lunarIlluminationPercentage = int( self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
-        brightLimbAngle = float( self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] )
-        self.purgeIcons()
-        iconName = self.getIconName()
-        self.createIcon( lunarIlluminationPercentage, brightLimbAngle, self.getIconFilename( iconName ) )
-        self.indicator.set_icon( iconName )
+        lunarBrightLimbAngle = int( round( float( self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] ) ) )
+        if lunarBrightLimbAngle != self.previousLunarBrightLimbAngle or lunarIlluminationPercentage != self.previousLunarIlluminationPercentage:
+            self.previousLunarBrightLimbAngle = lunarBrightLimbAngle
+            self.previousLunarIlluminationPercentage = lunarIlluminationPercentage
+            self.purgeIcons()
+            iconName = self.getIconName()
+            self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngle, self.getIconFilename( iconName ) )
+            self.indicator.set_icon( iconName )
 
 
     def notificationFullMoon( self, ephemNow ):
