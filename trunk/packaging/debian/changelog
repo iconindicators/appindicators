@@ -2,9 +2,9 @@ indicator-virtual-box (1.0.51-1) precise; urgency=low
 
   * Removed running status information from virtualmachine class - running
     status for a VM now obtained on request from VBoxManage.
-  * Changed the delay when (manually) starting a VM and updating the menu from
+  * Changed the delay from (manually) starting a VM to updating the menu from
     60s to 10s.
-  * Changed the delay when clicking OK on the Preferences and updating the menu
+  * Changed the delay from clicking OK on the Preferences to updating the menu
     from 5s to 1s.
   * Removed extra spacing in comments for About dialog.
   * Overhaul of build script: extracted common functions into a separate
