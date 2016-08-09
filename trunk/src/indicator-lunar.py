@@ -1804,6 +1804,9 @@ class IndicatorLunar:
 
 #TODO Scale the numbers to end up with 30 x 30, or put in a scale command at the end to scale by 66%.
 #Need a square border or not?  
+#Before making any changes, make sure how non-square icons behave (like the Stardate icon)...
+#...should enough buffer/spacing be given to force an icon to be square?
+#...how much border/spacing should be given?
 
         # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
         # A radius of 50 is too big and 25 is too small...so compute a radius half way between, based on the width/height of the viewing area.
@@ -1845,19 +1848,19 @@ class IndicatorLunar:
             logging.error( "Error writing: " + svgFilename )
 
 
-#TODO Internally cache the colour and only fetch if the theme changes.
+
     def getThemeColour( self ):
-        themeColour = "fff200" # Default is hicolor.
-        themeName = Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
-        iconFilenameForCurrentTheme = "/usr/share/icons/" + themeName + "/scalable/apps/" + IndicatorLunar.ICON + ".svg"
+        iconFilenameForCurrentTheme = "/usr/share/icons/" + Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" ) + "/scalable/apps/" + IndicatorLunar.ICON + ".svg"
         try:
             with open( iconFilenameForCurrentTheme, "r" ) as file:
                 data = file.read()
-                themeColour = data[ data.find( "style=\"fill:#" ) + 13 : data.find( "style=\"fill:#" ) + 19 ]
+                index = data.find( "style=\"fill:#" )
+                themeColour = data[ index + 13 : index + 19 ]
 
         except Exception as e:
             logging.exception( e )
             logging.error( "Error reading SVG icon: " + iconFilenameForCurrentTheme )
+            themeColour = "fff200" # Default to hicolor.
 
         return themeColour
 
