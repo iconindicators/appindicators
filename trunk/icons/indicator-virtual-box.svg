@@ -9,8 +9,8 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="40"
-   height="40"
+   width="22"
+   height="22"
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
@@ -24,24 +24,32 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.9195959"
-     inkscape:cx="59.397484"
-     inkscape:cy="31.213785"
+     inkscape:zoom="15.839192"
+     inkscape:cx="9.523662"
+     inkscape:cy="11.064682"
      inkscape:document-units="px"
      inkscape:current-layer="g2985"
-     showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1056"
-     inkscape:window-x="0"
+     showgrid="true"
+     inkscape:window-width="960"
+     inkscape:window-height="1028"
+     inkscape:window-x="960"
      inkscape:window-y="24"
-     inkscape:window-maximized="1"
-     showborder="false"
-     inkscape:showpageshadow="false"
+     inkscape:window-maximized="0"
+     showborder="true"
+     inkscape:showpageshadow="true"
      fit-margin-top="5"
      fit-margin-left="5"
      fit-margin-right="5"
      fit-margin-bottom="5"
-     borderlayer="false" />
+     borderlayer="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2987"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -59,18 +67,18 @@
      inkscape:groupmode="layer"
      id="layer1"
      style="display:inline"
-     transform="translate(-215.62499,-244.40626)" />
+     transform="translate(-215.62499,-262.40626)" />
   <g
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Layer1"
      style="display:inline"
-     transform="translate(-215.62499,-244.40626)">
+     transform="translate(-215.62499,-262.40626)">
     <g
        id="g2985">
       <g
          id="g2989"
-         transform="matrix(0.9923503,0,0,0.99873268,1.6877015,0.35410585)">
+         transform="matrix(0.59526377,0,0,0.59931041,86.38166,114.98736)">
         <path
            style="fill:#6999b9;fill-opacity:1;stroke:#6999b9;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
            d="m 221.12329,249.87343 0,10.03839 5.05076,-0.0631 2.96733,9.02824 6.12405,-17.10946 2.90419,10.22779 3.53553,-10.35406 5.52427,15.34168 3.06203,-3e-5 0.0631,-17.10946 z"
