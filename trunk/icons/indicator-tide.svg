@@ -8,7 +8,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
-   viewBox="0 0 40.006667 40.023454"
+   viewBox="0 0 22 22"
    id="svg3245"
    inkscape:version="0.48.4 r9939"
    width="100%"
@@ -37,36 +37,40 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="960"
-     inkscape:window-height="1028"
+     inkscape:window-width="1920"
+     inkscape:window-height="1056"
      id="namedview3249"
      showgrid="true"
-     inkscape:zoom="3.9544865"
-     inkscape:cx="29.988228"
-     inkscape:cy="-16.549157"
-     inkscape:window-x="492"
+     inkscape:zoom="22.369954"
+     inkscape:cx="10.470985"
+     inkscape:cy="9.2854517"
+     inkscape:window-x="0"
      inkscape:window-y="24"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg3245"
      fit-margin-top="5"
      fit-margin-left="5"
      fit-margin-right="5"
      fit-margin-bottom="5"
-     inkscape:showpageshadow="false"
-     showborder="true">
+     inkscape:showpageshadow="true"
+     showborder="true"
+     showguides="true"
+     units="px"
+     inkscape:snap-global="true"
+     borderlayer="false"
+     width="744.09px"
+     inkscape:snap-from-guide="true">
     <inkscape:grid
        type="xygrid"
-       id="grid3325"
+       id="grid3144"
        empspacing="5"
        visible="true"
        enabled="true"
-       snapvisiblegridlinesonly="true"
-       originx="-161.25776px"
-       originy="-168.41141px" />
+       snapvisiblegridlinesonly="true" />
   </sodipodi:namedview>
   <g
      id="g3290"
-     transform="matrix(0.49866533,0,0,0.53863607,1.6963656,-1.923304)">
+     transform="matrix(0.29881318,0,0,0.32275607,0.06920536,-2.1115224)">
     <path
        inkscape:connector-curvature="0"
        id="path4273"
