@@ -1803,20 +1803,9 @@ class IndicatorLunar:
     #    brightLimbAngleInDegrees The angle of the bright limb, relative to zenith, ranging from 0 to 360 inclusive.
     #                             Ignored if illuminationPercentage is 0 or 100.
     def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees, svgFilename ):
-        # Size of view box.
         width = 100
         height = 100
-
-#TODO Scale the numbers to end up with 30 x 30, or put in a scale command at the end to scale by 66%.
-#Need a square border or not?  
-#Before making any changes, make sure how non-square icons behave (like the Stardate icon)...
-#...should enough buffer/spacing be given to force an icon to be square?
-#...how much border/spacing should be given?
-
-        # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
-        # A radius of 50 is too big and 25 is too small...so compute a radius half way between, based on the width/height of the viewing area.
-        radius = float ( str( ( width / 2 ) - ( ( width / 2 ) - ( width / 4 ) ) / 2 ) )
-
+        radius = float( width / 2 ) * 0.85 # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
         colour = self.getThemeColour()
         if illuminationPercentage == 0 or illuminationPercentage == 100:
             svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
