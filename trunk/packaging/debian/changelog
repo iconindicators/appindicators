@@ -1,7 +1,7 @@
 indicator-lunar (1.0.69-1) precise; urgency=low
 
-  * Only updates the icon as needed (when the lunar illumination and bright
-    limb change values).
+  * Only updates the icon as needed (when the lunar illumination, bright
+    limb or theme name change values).
   * Overhaul of build script: extracted common functions into a separate
     script used by all indicators; only the hicolor icon is required and all
     theme icons are created from the hicolor.
