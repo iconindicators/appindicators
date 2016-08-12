@@ -927,6 +927,7 @@ class IndicatorLunar:
 
         self.previousLunarIlluminationPercentage = ""
         self.previousLunarBrightLimbAngle = ""
+        self.previousThemeName = ""
 
         if not os.path.exists( IndicatorLunar.CACHE_PATH ):
             os.makedirs( IndicatorLunar.CACHE_PATH )
@@ -1172,9 +1173,16 @@ class IndicatorLunar:
         key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
         lunarIlluminationPercentage = int( self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
         lunarBrightLimbAngle = int( round( float( self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] ) ) )
-        if lunarBrightLimbAngle != self.previousLunarBrightLimbAngle or lunarIlluminationPercentage != self.previousLunarIlluminationPercentage:
+        themeName = self.getThemeName()
+        noChange = \
+            lunarBrightLimbAngle == self.previousLunarBrightLimbAngle and \
+            lunarIlluminationPercentage == self.previousLunarIlluminationPercentage and \
+            themeName == self.previousThemeName
+
+        if not noChange:
             self.previousLunarBrightLimbAngle = lunarBrightLimbAngle
             self.previousLunarIlluminationPercentage = lunarIlluminationPercentage
+            self.previousThemeName = themeName
             self.purgeIcons()
             iconName = self.getIconName()
             self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngle, self.getIconFilename( iconName ) )
@@ -1843,8 +1851,11 @@ class IndicatorLunar:
 
 
 
+    def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
+
+
     def getThemeColour( self ):
-        iconFilenameForCurrentTheme = "/usr/share/icons/" + Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" ) + "/scalable/apps/" + IndicatorLunar.ICON + ".svg"
+        iconFilenameForCurrentTheme = "/usr/share/icons/" + self.getThemeName() + "/scalable/apps/" + IndicatorLunar.ICON + ".svg"
         try:
             with open( iconFilenameForCurrentTheme, "r" ) as file:
                 data = file.read()
