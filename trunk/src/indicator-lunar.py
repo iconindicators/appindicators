@@ -1813,7 +1813,7 @@ class IndicatorLunar:
     def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees, svgFilename ):
         width = 100
         height = 100
-        radius = float( width / 2 ) * 0.85 # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
+        radius = float( width / 2 ) * 0.8 # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
         colour = self.getThemeColour()
         if illuminationPercentage == 0 or illuminationPercentage == 100:
             svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
