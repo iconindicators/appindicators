@@ -8,8 +8,8 @@ PYTHON_UTILS=../PythonUtils
 
 
 # Supported themes and corresponding colours.
-themeNames=(   "elementary-xfce-darker" "Lubuntu" "lubuntu" "ubuntu-mono-dark" "ubuntu-mono-light" )
-themeColours=(            f2f2f2         5b5b5b    5b5b5b          dedad1             3e3e3e       )
+themeNames=(   "elementary-xfce-darker" "Lubuntu" "ubuntu-mono-dark" "ubuntu-mono-light" )
+themeColours=(            f2f2f2         5b5b5b          dedad1             3e3e3e       )
 
 
 # Arguments:
