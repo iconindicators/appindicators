@@ -34,6 +34,9 @@ INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
 
+import gi
+gi.require_version( "AppIndicator3", "0.1")
+
 from gi.repository import AppIndicator3, GLib, Gtk
 from threading import Thread
 
