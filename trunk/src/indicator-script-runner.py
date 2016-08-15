@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -26,6 +27,9 @@
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
+
+import gi
+gi.require_version( "AppIndicator3", "0.1")
 
 from gi.repository import AppIndicator3, GLib, Gtk
 from script import Info
