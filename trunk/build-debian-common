@@ -3,6 +3,13 @@
 # Common code for the build-debian script for all indicators.
 
 
+
+#
+####### TODO Make the build script work for building outside of this environment!!!
+#
+
+
+
 # Python Utils contains Python/build scripts common to all indicators.
 PYTHON_UTILS=../PythonUtils
 
