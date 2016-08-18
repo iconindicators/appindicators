@@ -2,6 +2,13 @@
 # -*- coding: utf-8 -*-
 
 
+#
+# TODO Full moon notification did not contain full moon icon.
+# This is the auto notification - NOT the test in preferences.
+#
+
+
+
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -1211,7 +1218,9 @@ class IndicatorLunar:
             if self.werewolfWarningSummary == "":
                 summary = " " # The notification summary text cannot be empty (at least on Unity).
 
+            self.createIcon( 100, None, IndicatorLunar.SVG_FULL_MOON_FILE )
             Notify.Notification.new( summary, self.werewolfWarningMessage, IndicatorLunar.SVG_FULL_MOON_FILE ).show()
+            os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
