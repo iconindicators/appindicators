@@ -2,13 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-#
-# TODO Full moon notification did not contain full moon icon.
-# This is the auto notification - NOT the test in preferences.
-#
-
-
-
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
