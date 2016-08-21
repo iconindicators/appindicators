@@ -38,8 +38,8 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "AppIndicator3", "0.1")
-gi.require_version( "Notify", "0.7")
+gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "Notify", "0.7" )
 
 from copy import deepcopy
 from gi.repository import AppIndicator3, Gio, GLib, Gtk, Notify
