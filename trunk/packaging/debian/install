@@ -1,4 +1,4 @@
-indicator-stardate.desktop usr/share/applications
+indicator-stardate.py.desktop usr/share/applications
 src/changelog usr/share/indicator-stardate
 src/example.py usr/share/indicator-stardate
 src/indicator-stardate.py usr/share/indicator-stardate
