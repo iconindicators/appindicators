@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Tide Indicator
-Comment=Displays tidal information.
-Exec=/usr/share/indicator-tide/indicator-tide.py
-Terminal=false
-StartupNotify=true
-Type=Application
-Categories=Utility;
-Icon=indicator-tide
