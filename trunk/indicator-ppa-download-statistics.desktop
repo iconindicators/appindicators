@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=PPA Download Statistics Indicator
-Comment=Display the download counts Launchpad PPAs.
-Exec=/usr/share/indicator-ppa-download-statistics/indicator-ppa-download-statistics.py
-Terminal=false
-StartupNotify=true
-Type=Application
-Categories=Utility;
-Icon=indicator-ppa-download-statistics
