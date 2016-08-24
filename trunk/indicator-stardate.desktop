@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Stardate Indicator
-Comment=Shows the current Star Trek™ stardate.
-Exec=/usr/share/indicator-stardate/indicator-stardate.py
-Terminal=false
-StartupNotify=true
-Type=Application
-Categories=Utility;
-Icon=indicator-stardate
