@@ -42,7 +42,7 @@ class IndicatorPunycode:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    DESKTOP_FILE = INDICATOR_NAME + ".desktop"
+    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
 
     COMMENTS = _( "Convert domain names between Unicode and ASCII." )
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
@@ -266,7 +266,7 @@ class IndicatorPunycode:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorPunycode.DESKTOP_FILE ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorPunycode.DESKTOP_FILE ), logging )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 6, 2, 1 )
 
