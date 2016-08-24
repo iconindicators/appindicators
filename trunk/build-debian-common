@@ -46,7 +46,7 @@ copyTopLevelAndSource()
   rm -rf build
   mkdir -p build/$NAME-$VERSION
 
-  cp $NAME.desktop build/$NAME-$VERSION
+  cp $NAME.py.desktop build/$NAME-$VERSION
   cp build-debian build/$NAME-$VERSION
   cp $PYTHON_UTILS/build-debian-common build/$NAME-$VERSION
 
