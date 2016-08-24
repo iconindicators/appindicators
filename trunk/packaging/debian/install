@@ -1,4 +1,4 @@
-indicator-tide.desktop usr/share/applications
+indicator-tide.py.desktop usr/share/applications
 src/changelog usr/share/indicator-tide
 src/indicator-tide.py usr/share/indicator-tide
 src/locationData.py usr/share/indicator-tide
