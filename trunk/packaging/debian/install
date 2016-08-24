@@ -1,4 +1,4 @@
-indicator-script-runner.desktop usr/share/applications
+indicator-script-runner.py.desktop usr/share/applications
 src/changelog usr/share/indicator-script-runner
 src/indicator-script-runner.py usr/share/indicator-script-runner
 src/script.py usr/share/indicator-script-runner

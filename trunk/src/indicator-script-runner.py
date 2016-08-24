@@ -46,7 +46,7 @@ class IndicatorScriptRunner:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    DESKTOP_FILE = INDICATOR_NAME + ".desktop"
+    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
 
     COMMENTS = _( "Run a terminal command or script from a GUI front-end." )
 
@@ -270,7 +270,7 @@ class IndicatorScriptRunner:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorScriptRunner.DESKTOP_FILE ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorScriptRunner.DESKTOP_FILE ), logging )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 1, 1, 1 )
 
