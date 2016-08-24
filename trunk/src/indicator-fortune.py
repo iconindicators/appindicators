@@ -51,7 +51,7 @@ class IndicatorFortune:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    DESKTOP_FILE = INDICATOR_NAME + ".desktop"
+    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
 
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
@@ -332,7 +332,7 @@ class IndicatorFortune:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorFortune.DESKTOP_FILE ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorFortune.DESKTOP_FILE ), logging )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 7, 2, 1 )
 

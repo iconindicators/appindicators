@@ -1,4 +1,4 @@
-indicator-fortune.desktop usr/share/applications
+indicator-fortune.py.desktop usr/share/applications
 src/changelog usr/share/indicator-fortune
 src/indicator-fortune.py usr/share/indicator-fortune
 src/pythonutils.py usr/share/indicator-fortune
