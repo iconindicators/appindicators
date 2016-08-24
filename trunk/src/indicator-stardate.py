@@ -50,7 +50,7 @@ class IndicatorStardate:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    DESKTOP_FILE = INDICATOR_NAME + ".desktop"
+    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
 
     COMMENTS = _( "Shows the current Star Trek™ stardate." )
     CREDITS = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ]
@@ -195,7 +195,7 @@ class IndicatorStardate:
         grid.attach( showInMenuCheckbox, 0, 3, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorStardate.DESKTOP_FILE ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorStardate.DESKTOP_FILE ), logging )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 4, 2, 1 )
