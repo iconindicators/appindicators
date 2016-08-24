@@ -1,5 +1,6 @@
 indicator-virtual-box (1.0.51-1) precise; urgency=low
 
+  * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
   * Removed running status information from virtualmachine class - running
     status for a VM now obtained on request from VBoxManage.
   * Changed the delay from (manually) starting a VM to updating the menu from

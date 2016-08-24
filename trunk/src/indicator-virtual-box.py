@@ -51,7 +51,7 @@ class IndicatorVirtualBox:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    DESKTOP_FILE = INDICATOR_NAME + ".desktop"
+    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
 
     VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
     VIRTUAL_BOX_CONFIGURATION_4_DOT_3_PRIOR = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
@@ -530,7 +530,7 @@ class IndicatorVirtualBox:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorVirtualBox.DESKTOP_FILE ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorVirtualBox.DESKTOP_FILE ), logging )
         grid.attach( autostartCheckbox, 0, 3, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
