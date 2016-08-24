@@ -23,6 +23,9 @@ from gi.repository import Gtk
 import logging.handlers, os, shutil, subprocess, sys
 
 
+AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+
+
 def processCall( command ):
     try:
         subprocess.call( command, shell = True )
@@ -43,15 +46,21 @@ def isNumber( numberAsString ):
     try:
         float( numberAsString )
         return True
-
     except ValueError:
         return False
 
 
-def isAutoStart( desktopFile, autoStartPath = os.getenv( "HOME" ) + "/.config/autostart/" ): return os.path.exists( autoStartPath + desktopFile )
+def isAutoStart( desktopFile, logging, autoStartPath = AUTOSTART_PATH ):
+    try:
+        return \
+            os.path.exists( autoStartPath + desktopFile ) and \
+            "X-GNOME-Autostart-enabled=true" in open( autoStartPath + desktopFile ).read()
+    except Exception as e:
+        logging.exception( e )
+        return False
 
 
-def setAutoStart( desktopFile, isSet, logging, autoStartPath = os.getenv( "HOME" ) + "/.config/autostart/", desktopPath = "/usr/share/applications/" ):
+def setAutoStart( desktopFile, isSet, logging, autoStartPath = AUTOSTART_PATH, desktopPath = "/usr/share/applications/" ):
     if not os.path.exists( autoStartPath ):
         os.makedirs( autoStartPath )
 
