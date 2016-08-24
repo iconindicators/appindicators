@@ -37,10 +37,11 @@ class IndicatorTide:
     AUTHOR = "Bernard Giannetti"
     VERSION = "1.0.4"
     ICON = INDICATOR_NAME
+    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
+
     EXPIRY = "2016-09-28" # The license for the UKHO data expires one year from 2015-09-28.
-    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     URL_TIMEOUT_IN_SECONDS = 10
 
     COMMENTS = _( "Displays tidal information.\n(this software will expire after {0})" ).format( EXPIRY )
@@ -289,7 +290,7 @@ class IndicatorTide:
         box.set_margin_top( 10 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorTide.DESKTOP_FILE ), logging )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorTide.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
 
         box.pack_start( autostartCheckbox, True, True, 1 )
