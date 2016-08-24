@@ -71,7 +71,7 @@ class IndicatorLunar:
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     CACHE_PATH = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
-    DESKTOP_FILE = INDICATOR_NAME + ".desktop"
+    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     SVG_FULL_MOON_FILE = ICON_BASE_PATH + "/." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
     URL_TIMEOUT_IN_SECONDS = 2
@@ -3130,7 +3130,7 @@ class IndicatorLunar:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorLunar.DESKTOP_FILE ) )
+        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorLunar.DESKTOP_FILE ), logging )
         autostartCheckbox.set_margin_top( 20 )
         grid.attach( autostartCheckbox, 0, 4, 2, 1 )
 
