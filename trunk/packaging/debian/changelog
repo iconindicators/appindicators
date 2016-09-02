@@ -1,6 +1,7 @@
 indicator-lunar (1.0.69-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
+  * Removed expired eclipse information.
   * The dynamically created icon is updated only as needed (when the lunar
     illumination, bright limb or theme change values).
   * Fixed PyGIWarnings on imports.
