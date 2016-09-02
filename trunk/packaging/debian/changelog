@@ -1,6 +1,7 @@
 indicator-ppa-download-statistics (1.0.56-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
+  * Added TODO to list of series.                                                      <------------------ TODO Add new version here!!!!!!!!!!
   * Added utf-8 encoding line.
   * Fixed PyGIWarnings on imports.
   * Overhaul of icons: only the hicolor icon is required and all theme icons
