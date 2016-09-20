@@ -453,7 +453,10 @@ class IndicatorFortune:
             "Ensure the fortune file/directory\n" + \
             "works by running it through 'fortune'\n" + \
             "in a terminal." ) )
-        if rowNumber is not None: # This is an edit.
+
+        if rowNumber is None: # This is an add.
+            enabledCheckbox.set_active( True )
+        else:
             enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabledCheckbox, 0, 2, 1, 1 )
