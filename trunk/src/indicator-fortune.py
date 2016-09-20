@@ -355,6 +355,7 @@ class IndicatorFortune:
             self.skipFortuneCharacterCount = spinnerCharacterCount.get_value_as_int()
             self.notificationSummary = notificationSummary.get_text()
 
+            self.update()
             GLib.source_remove( self.timeoutID )
             self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.update )
 
