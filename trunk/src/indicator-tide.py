@@ -54,6 +54,7 @@ class IndicatorTide:
     SETTINGS_MENU_ITEM_TIDE_FORMAT = "menuItemTideFormat"
     SETTINGS_PORT_ID = "portID"
     SETTINGS_SHOW_AS_SUBMENUS = "showAsSubmenus"
+    SETTINGS_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY = "showAsSubmenusExceptFirstDay"
 
     MENU_ITEM_DATE_DEFAULT_FORMAT = "%A, %d %B"
     MENU_ITEM_TIME_DEFAULT_FORMAT = "%I:%M %p"
@@ -85,31 +86,27 @@ class IndicatorTide:
         if tideReadings is None or len( tideReadings ) == 0:
             menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( locations.getPort( self.portID ).title() ) ) )
         else:
-            year = datetime.datetime.now().year
             previousMonth = -1
             previousDay = -1
-            previousPortName = ""
+            firstTideReading = True
             for tideReading in tideReadings:
-                if previousPortName != tideReading.getPortName():
-                    previousPortName = tideReading.getPortName()
+                if firstTideReading:
+                    firstMonth = tideReading.getMonth()
+                    firstDay = tideReading.getDay()
                     self.createMenuItem( menu, tideReading.getPortName(), tideReading.getURL() )
 
-                month = tideReading.getMonth()
-                day = tideReading.getDay()
-                hour = tideReading.getHour()
-                minute = tideReading.getMinute()
-                tideDateTime = datetime.datetime( year, month, day, hour, minute, 0 )
+                tideDateTime = datetime.datetime( datetime.datetime.now().year, tideReading.getMonth(), tideReading.getDay(), tideReading.getHour(), tideReading.getMinute(), 0 )
 
-                if not( previousMonth == month and previousDay == day ):
+                if not( tideReading.getMonth() == previousMonth and tideReading.getDay() == previousDay ):
                     menuItemText = indent + tideDateTime.strftime( self.menuItemDateFormat )
                     if self.showAsSubMenus:
-                        subMenu = Gtk.Menu()
-                        self.createMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
+                        if self.showAsSubMenusExceptFirstDay and firstMonth == tideReading.getMonth() and firstDay == tideReading.getDay():
+                            self.createMenuItem( menu, menuItemText, tideReading.getURL() )
+                        else:
+                            subMenu = Gtk.Menu()
+                            self.createMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
                     else:
                         self.createMenuItem( menu, menuItemText, tideReading.getURL() )
-
-                previousMonth = month
-                previousDay = day
 
                 menuItemText = tideDateTime.strftime( self.menuItemTideFormat )
 
@@ -121,9 +118,16 @@ class IndicatorTide:
                 menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tideReading.getLevelInMetres() ) + " m" )
 
                 if self.showAsSubMenus:
-                    self.createMenuItem( subMenu, menuItemText, tideReading.getURL() )
+                    if self.showAsSubMenusExceptFirstDay and firstMonth == tideReading.getMonth() and firstDay == tideReading.getDay():
+                        self.createMenuItem( menu, indent + indent + menuItemText, tideReading.getURL() )
+                    else:
+                        self.createMenuItem( subMenu, menuItemText, tideReading.getURL() )
                 else:
                     self.createMenuItem( menu, indent + indent + menuItemText, tideReading.getURL() )
+
+                firstTideReading = False
+                previousMonth = tideReading.getMonth()
+                previousDay = tideReading.getDay()
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
@@ -206,7 +210,7 @@ class IndicatorTide:
 
         grid.attach( box, 0, 0, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
+        box = Gtk.Box()
 
         ports = Gtk.ListStore( str ) # Port.
         ports.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
@@ -244,7 +248,7 @@ class IndicatorTide:
         box.pack_start( spinnerDaylightSavingsOffset, True, True, 1 )
         grid.attach( box, 0, 21, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
+        box = Gtk.Box()
         box.set_margin_top( 10 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show as submenus" ) )
@@ -253,6 +257,19 @@ class IndicatorTide:
 
         box.pack_start( showAsSubmenusCheckbox, True, True, 1 )
         grid.attach( box, 0, 22, 1, 1 )
+
+        box = Gtk.Box()
+
+        showAsSubmenusExceptFirstDayCheckbox = Gtk.CheckButton( _( "Except first day" ) )
+        showAsSubmenusExceptFirstDayCheckbox.set_sensitive( showAsSubmenusCheckbox.get_active() )
+        showAsSubmenusExceptFirstDayCheckbox.set_active( self.showAsSubMenusExceptFirstDay )
+        showAsSubmenusExceptFirstDayCheckbox.set_margin_left( 15 )
+        showAsSubmenusExceptFirstDayCheckbox.set_tooltip_text( _( "Show the first day's tide in full." ) )
+
+        box.pack_start( showAsSubmenusExceptFirstDayCheckbox, True, True, 1 )
+        grid.attach( box, 0, 23, 1, 1 )
+
+        showAsSubmenusCheckbox.connect( "toggled", self.onShowAsSubmenusCheckbox, showAsSubmenusExceptFirstDayCheckbox )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -267,7 +284,7 @@ class IndicatorTide:
 
         box.pack_start( dateFormat, True, True, 0 )
 
-        grid.attach( box, 0, 23, 1, 1 )
+        grid.attach( box, 0, 24, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -284,9 +301,9 @@ class IndicatorTide:
             "http://docs.python.org/3/library/datetime.html" ) )
         box.pack_start( tideFormat, True, True, 0 )
 
-        grid.attach( box, 0, 24, 1, 1 )
+        grid.attach( box, 0, 25, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
+        box = Gtk.Box()
         box.set_margin_top( 10 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
@@ -294,7 +311,7 @@ class IndicatorTide:
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
 
         box.pack_start( autostartCheckbox, True, True, 1 )
-        grid.attach( box, 0, 25, 1, 1 )
+        grid.attach( box, 0, 26, 1, 1 )
 
         self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( grid, True, True, 0 )
@@ -310,6 +327,7 @@ class IndicatorTide:
             self.portID = locations.getPortIDForCountryAndPort( country, port )
             self.daylightSavingsOffset = spinnerDaylightSavingsOffset.get_value_as_int()
             self.showAsSubMenus = showAsSubmenusCheckbox.get_active()
+            self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbox.get_active()
             self.menuItemDateFormat = dateFormat.get_text().strip()
             self.menuItemTideFormat = tideFormat.get_text().strip()
             self.saveSettings()
@@ -338,12 +356,17 @@ class IndicatorTide:
         portsTree.scroll_to_cell( Gtk.TreePath.new_from_string( portIndex ) )
 
 
+    def onShowAsSubmenusCheckbox( self, source, showAsSubmenusExceptFirstDayCheckbox ):
+        showAsSubmenusExceptFirstDayCheckbox.set_sensitive( source.get_active() )
+
+
     def loadSettings( self ):
         self.daylightSavingsOffset = "0"
         self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
         self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
         self.portID = None
         self.showAsSubMenus = False
+        self.showAsSubMenusExceptFirstDay = True
 
         if os.path.isfile( IndicatorTide.SETTINGS_FILE ):
             try:
@@ -355,6 +378,7 @@ class IndicatorTide:
                 self.menuItemTideFormat = settings.get( IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT, self.menuItemTideFormat )
                 self.portID = settings.get( IndicatorTide.SETTINGS_PORT_ID, self.portID )
                 self.showAsSubMenus = settings.get( IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS, self.showAsSubMenus )
+                self.showAsSubMenusExceptFirstDay = settings.get( IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, self.showAsSubMenusExceptFirstDay )
 
             except Exception as e:
                 logging.exception( e )
@@ -397,7 +421,8 @@ class IndicatorTide:
                 IndicatorTide.SETTINGS_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
                 IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
                 IndicatorTide.SETTINGS_PORT_ID: self.portID,
-                IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS: self.showAsSubMenus
+                IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS: self.showAsSubMenus,
+                IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY: self.showAsSubMenusExceptFirstDay
             }
 
             with open( IndicatorTide.SETTINGS_FILE, "w" ) as f:
