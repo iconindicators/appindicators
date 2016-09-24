@@ -433,6 +433,12 @@ class IndicatorTide:
             logging.error( "Error writing settings: " + IndicatorTide.SETTINGS_FILE )
 
 
+#TODO
+# Get the timezone from the computer (which reflects the current, possibly adjusted for Summer, timezone): date +%z
+# Get the timezone from the UKHO page (which is NEVER adjusted).
+# If the timezones match, burp if the DST offset != 0.
+# If the timezones do not match, burp if the UKHO timezone != computer timezone + DST offset.  Ensure it works for -ve timezones (such as South America).
+
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
         tidalReadings = [ ]
         defaultLocale = locale.getlocale( locale.LC_TIME )
