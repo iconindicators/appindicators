@@ -439,7 +439,81 @@ class IndicatorTide:
 # If the timezones match, burp if the DST offset != 0.
 # If the timezones do not match, burp if the UKHO timezone != computer timezone + DST offset.  Ensure it works for -ve timezones (such as South America).
 
+
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
+        tidalReadings = [ ]
+        defaultLocale = locale.getlocale( locale.LC_TIME )
+        locale.setlocale( locale.LC_ALL, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
+        today = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0, microsecond = 0 )
+        todayMonth = today.strftime( "%b" ).upper() # "SEP"
+
+#TODO Test for different ports.
+#TODO Test that data prior to today is skipped and data today onward is kept.
+#TODO Test for DEC/JAN and JAN/DEC.
+        portID = "6037" 
+
+        
+        if portID[ -1 ].isalpha():
+            portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
+        else:
+            portIDForURL = portID.rjust( 4, "0" )
+
+        url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + \
+               portIDForURL + "&PredictionLength=7&DaylightSavingOffset=" + \
+               str( daylightSavingOffset ) + \
+               "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+        try:
+            lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+            for index, line in enumerate( lines ):
+                if "class=\"PortName\"" in line:
+                    portName = line[ line.find( ">" ) + 1 : line.find( "</span>" ) ]
+
+                if "HWLWTableHeaderCell" in line:
+                    tideDate = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # "Sat 24 Sep"
+                    tideMonth = tideDate[ -3 : ].upper() # "SEP"
+                    tideYear = today.year
+                    if tideMonth == "JAN" and todayMonth == "DEC":
+                        tideYear = today.year + 1
+                    elif tideMonth == "DEC" and todayMonth == "JAN":
+                        tideYear = today.year - 1
+
+                    tideDate = datetime.datetime.strptime( tideDate + " " + str( tideYear ), "%a %d %b %Y" )
+                    if tideDate < today: # Only add data from today onward. 
+                        continue
+
+                    waterLevelTypes = [ ]
+                    line = lines[ index + 2 ]
+                    for item in line.split( "<th class=\"HWLWTableHWLWCellPrintFriendly\">" ):
+                        if len( item.strip() ) > 0:
+                            waterLevelTypes.append( item[ 0 : 1 ] )
+
+                    times = [ ]
+                    line = lines[ index + 4 ]
+                    for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\"> " ):
+                        if len( item.strip() ) > 0:
+                            times.append( item[ 0 : 5 ] )
+
+                    waterLevelsInMetres = [ ]
+                    line = lines[ index + 6 ]
+                    for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
+                        if len( item.strip() ) > 0:
+                            waterLevelsInMetres.append( item[ 0 : 3 ] )
+
+                    for index, item in enumerate( waterLevelTypes ):
+                        hourMinute = datetime.datetime.strptime( times[ index ], "%H:%M" )
+                        tidalReadings.append( tide.Reading( portName.title(), tideDate.month, tideDate.day, hourMinute.hour, hourMinute.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
+            tidalReadings = None
+
+        locale.setlocale( locale.LC_TIME, defaultLocale )
+        return tidalReadings
+
+
+    def getTidalDataFromUnitedKingdomHydrographicOfficeOLD( self, portID, daylightSavingOffset ):
         tidalReadings = [ ]
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_ALL, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
