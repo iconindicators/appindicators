@@ -35,13 +35,13 @@ import datetime, json, locale, locations, logging, os, pythonutils, tide, webbro
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.4"
+    VERSION = "1.0.5"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    EXPIRY = "2016-09-28" # The license for the UKHO data expires one year from 2015-09-28.
+    EXPIRY = "2016-09-28" # The license for the UKHO data expires one year from 2015-09-28.  #TODO Update with new license date.
     URL_TIMEOUT_IN_SECONDS = 10
 
     COMMENTS = _( "Displays tidal information.\n(this software will expire after {0})" ).format( EXPIRY )

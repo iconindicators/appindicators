@@ -7,7 +7,7 @@
 #	packaging/debian/changelog.  
 
 
-VERSION="1.0.4"
+VERSION="1.0.5"
 NAME="indicator-tide"
 
 source=( $NAME".py" locationData.py locations.py tide.py )

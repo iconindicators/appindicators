@@ -1,18 +1,24 @@
-indicator-tide (1.0.4-1) precise; urgency=low
+indicator-tide (1.0.5-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
   * Now displays the country next to the port city/town.
   * Shows a notification if the tidal information could not be obtained.
   * Added an option to show the first day's tidal information in full and
     subsequent days as submenus - useful for small screens.
-  * Renewed United Kingdom Hydrographic Office annual data access license.
   * Fixed PyGIWarnings on imports.
   * Overhaul of icons: only the hicolor icon is required and all theme icons
     are created from the hicolor via the build script.
   * Overhaul of build script: extracted common functions into a separate
     script used by all indicators.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 24 Jul 2016 13:04:17 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 25 Sep 2016 13:04:17 +1000
+
+
+indicator-tide (1.0.4-1) precise; urgency=low
+
+  * Renewed United Kingdom Hydrographic Office annual data access license.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 26 Sep 2016 18:46:15 +1000
 
 
 indicator-tide (1.0.3-1) precise; urgency=low
