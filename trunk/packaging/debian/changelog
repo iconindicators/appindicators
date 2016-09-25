@@ -2,6 +2,7 @@ indicator-tide (1.0.4-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
   * Now displays the country next to the port city/town.
+  * Shows a notification if the tidal information could not be obtained.
   * Added an option to show the first day's tidal information in full and
     subsequent days as submenus - useful for small screens.
   * Renewed United Kingdom Hydrographic Office annual data access license.
