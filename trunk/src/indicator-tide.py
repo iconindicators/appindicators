@@ -445,12 +445,6 @@ class IndicatorTide:
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_ALL, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
 
-#TODO Test for different ports.
-#TODO Test that data prior to today is skipped and data today onward is kept.
-#TODO Test for DEC/JAN and JAN/DEC.
-        portID = "6037" 
-#         portID = "9539"
-
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
         else:
