@@ -26,7 +26,7 @@ gettext.install( INDICATOR_NAME )
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 
-from gi.repository import AppIndicator3, GLib, Gtk
+from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
 
 import datetime, json, locale, locations, logging, os, pythonutils, tide, webbrowser
@@ -69,6 +69,7 @@ class IndicatorTide:
 
         self.dialog = None
         self.loadSettings()
+        Notify.init( INDICATOR_NAME )
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorTide.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
@@ -79,17 +80,17 @@ class IndicatorTide:
     def main( self ): Gtk.main()
 
 
-    def buildMenu( self, tideReadings ):
+    def buildMenu( self, tidalReadings ):
         indent = "    "
         menu = Gtk.Menu()
 
-        if tideReadings is None or len( tideReadings ) == 0:
-            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( locations.getPort( self.portID ).title() ) ) )
+        if tidalReadings is None or len( tidalReadings ) == 0:
+            menu.append( Gtk.MenuItem( self.getNoPortDataMessage() ) )
         else:
             previousMonth = -1
             previousDay = -1
             firstTideReading = True
-            for tideReading in tideReadings:
+            for tideReading in tidalReadings:
                 if firstTideReading:
                     firstMonth = tideReading.getMonth()
                     firstDay = tideReading.getDay()
@@ -145,9 +146,41 @@ class IndicatorTide:
         return menuItem
 
 
+#TODO
+# Get the timezone from the computer (which reflects the current, possibly adjusted for Summer, timezone): date +%z
+# -0400
+# +0200
+# +1000
+#
+# Get the timezone from the UKHO page (which is NEVER adjusted).
+# Port predictions (Standard Local Time) are equal to UTC
+# Port predictions (Standard Local Time) are +10 hours from UTC
+# Port predictions (Standard Local Time) are -5 hours from UTC
+# Port predictions (Standard Local Time) are +5 hours 30 mins from UTC
+#
+# If the timezones match, burp if the DST offset != 0.
+# If the timezones do not match, burp if the UKHO timezone + DST offset != computer timezone.  Ensure it works for -ve timezones (such as South America).
     def update( self ):
-        self.buildMenu( self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.daylightSavingsOffset ) )
+        tidalReadings, timeZoneFromUnitedKingdomHydrographicOffice = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.daylightSavingsOffset )
+        self.buildMenu( tidalReadings )
         self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
+
+        if tidalReadings is None or len( tideReadings ) == 0:
+            Notify.Notification.new( _( "Error" ), self.getNoPortDataMessage(), IndicatorTide.ICON ).show()
+        else:
+            timeZoneFromComputer = self.getTimeZoneFromComputer()
+
+            if timeZoneFromComputer == timeZoneFromUnitedKingdomHydrographicOffice and self.daylightSavingsOffset != 0:
+                message = _( "Your computer time zone '{0}' matches that from the UKHO. However, you have specified a non-zero DST offset {1}." ).format( timeZoneFromComputer, str (self.daylightSavingsOffset ) )
+                Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
+
+            if True: # TODO UKHO timezone + DST offset != computer timezone
+                x = float( timeZoneFromComputer )
+                y = float( timeZoneFromUnitedKingdomHydrographicOffice )
+                print( x, y, x / 100 )
+
+
+    def getNoPortDataMessage( self ): return _( "No port data available for {0}!" ).format( locations.getPort( self.portID ).title() )
 
 
     def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
@@ -433,17 +466,11 @@ class IndicatorTide:
             logging.error( "Error writing settings: " + IndicatorTide.SETTINGS_FILE )
 
 
-#TODO
-# Get the timezone from the computer (which reflects the current, possibly adjusted for Summer, timezone): date +%z
-# Get the timezone from the UKHO page (which is NEVER adjusted).
-# If the timezones match, burp if the DST offset != 0.
-# If the timezones do not match, burp if the UKHO timezone != computer timezone + DST offset.  Ensure it works for -ve timezones (such as South America).
-
-
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
-        tidalReadings = [ ]
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_ALL, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
+
+        portID = "6037" #TODO Remove
 
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
@@ -456,6 +483,7 @@ class IndicatorTide:
                "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
         try:
+            tidalReadings = [ ]
             today = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0, microsecond = 0 )
             todayMonth = today.strftime( "%b" ).upper() # "SEP"
             lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
@@ -463,6 +491,9 @@ class IndicatorTide:
                 if "class=\"PortName\"" in line:
                     portName = line[ line.find( ">" ) + 1 : line.find( "</span>" ) ]
                     country = line[ line.find( "class=\"CountryPredSummary\">" ) + len( "class=\"CountryPredSummary\">" ) : line.find( "</span></li>" ) ]
+
+                if "Port predictions (Standard Local Time) are" in line:
+                    timeZone = self.getTimeZoneFromUnitedKingdomHydrographicOffice( line )
 
                 if "HWLWTableHeaderCell" in line:
                     tideDate = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # "Sat 24 Sep"
@@ -503,9 +534,53 @@ class IndicatorTide:
             logging.exception( e )
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = None
+            timeZone = None
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
-        return tidalReadings
+        return tidalReadings, timeZone
+
+
+#TODO Finish and test and document!
+# 0616
+# Port predictions (Standard Local Time) are equal to UTC
+#
+# 6037
+# Port predictions (Standard Local Time) are +10 hours from UTC
+#
+# 9539
+# Port predictions (Standard Local Time) are -5 hours from UTC
+#
+# 4506
+# Port predictions (Standard Local Time) are +6 hours from UTC
+#
+# Port ID 4483
+# Port predictions (Standard Local Time) are +5 hours 30 mins from UTC
+    def getTimeZoneFromUnitedKingdomHydrographicOffice( self, line ):
+        timeZone = "+0000"
+        if "equal to UTC" not in line:
+            plusMinusIndex = max( line.find( "+" ), line.find( "-" ) )
+            hours = line[ plusMinusIndex : line.find( " hours" ) ]
+            if len( hours ) == 2:
+                hours = hours[ 0 ] + "0" + hours[ 1 ]
+
+            mins = "00"
+            if "mins" in line:
+                mins = line[ line.find( "hours " ) + 6 : line.find( " mins" ) ]
+                if len( mins ) == 1:
+                    mins = "0" + mins
+
+            timeZone = hours + mins
+
+        return timeZone
+
+
+    # Retrieves the current time zone from the computer, adjusted for daylight savings as required, in the format of +/-HHMM.
+    # For example:
+    #    Sydney (not in daylight savings), the result is +1000.
+    #    Sydney (in daylight savings), the result is +1100.
+    #    London (not in daylight savings), the result is +0000.
+    #    London (in daylight savings), the result is +0100.
+    def getTimeZoneFromComputer( self ): return pythonutils.processGet( "date +%z" ).strip()
 
 
 if __name__ == "__main__":
