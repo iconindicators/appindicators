@@ -11,7 +11,7 @@ indicator-tide (1.0.5-1) precise; urgency=low
   * Overhaul of build script: extracted common functions into a separate
     script used by all indicators.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 25 Sep 2016 13:04:17 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 27 Sep 2016 13:04:17 +1000
 
 
 indicator-tide (1.0.4-1) precise; urgency=low
