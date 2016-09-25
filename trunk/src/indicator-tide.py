@@ -29,7 +29,7 @@ gi.require_version( "AppIndicator3", "0.1" )
 from gi.repository import AppIndicator3, GLib, Gtk
 from urllib.request import urlopen
 
-import datetime, gzip, json, locale, locations, logging, os, pythonutils, re, shutil, subprocess, sys, tide, webbrowser
+import datetime, json, locale, locations, logging, os, pythonutils, tide, webbrowser
 
 
 class IndicatorTide:
