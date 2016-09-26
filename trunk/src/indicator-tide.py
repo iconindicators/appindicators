@@ -29,7 +29,7 @@ gi.require_version( "AppIndicator3", "0.1" )
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
 
-import datetime, json, locale, locations, logging, os, pythonutils, tide, webbrowser
+import datetime, json, locale, locations, logging, os, pythonutils, tide, time, webbrowser
 
 
 class IndicatorTide:
@@ -145,43 +145,22 @@ class IndicatorTide:
         return menuItem
 
 
-#TODO
-# Get the timezone from the computer (which reflects the current, possibly adjusted for Summer, timezone): date +%z
-# -0400
-# +0200
-# +1000
-#
-# Get the timezone from the UKHO page (which is NEVER adjusted).
-# Port predictions (Standard Local Time) are equal to UTC
-# Port predictions (Standard Local Time) are +10 hours from UTC
-# Port predictions (Standard Local Time) are -5 hours from UTC
-# Port predictions (Standard Local Time) are +5 hours 30 mins from UTC
-#
-# If the timezones match, burp if the DST offset != 0.
-# If the timezones do not match, burp if the UKHO timezone + DST offset != computer timezone.  Ensure it works for -ve timezones (such as South America).
     def update( self ):
-        tidalReadings, timeZoneFromUnitedKingdomHydrographicOffice = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.daylightSavingsOffset )
+        tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.daylightSavingsOffset )
         self.buildMenu( tidalReadings )
         self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
 
         if tidalReadings is None or len( tidalReadings ) == 0:
-            Notify.Notification.new(
-                _( "Error" ), 
-                _( "No port data available for {0}!" ).format( locations.getPort( self.portID ).title() ), 
-                IndicatorTide.ICON ).show()
-        else:
-            timeZoneFromComputer = self.getTimeZoneFromComputer()
+            message = _( "No port data available for {0}!" ).format( locations.getPort( self.portID ).title() )
+            Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
-            if timeZoneFromComputer == timeZoneFromUnitedKingdomHydrographicOffice and self.daylightSavingsOffset != 0:
-                message = _( "Your computer time zone '{0}' matches that from the UKHO. However, you have specified a non-zero DST offset {1}." ).format( timeZoneFromComputer, str ( self.daylightSavingsOffset ) )
-                Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
+        if time.localtime().tm_isdst == 1 and self.daylightSavingsOffset == 0:
+            message = _( "Your computer is in daylight savings, yet you have specified a zero DST offset." )
+            Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
 
-            if True: # TODO UKHO timezone + DST offset != computer timezone
-                # Not sure if this makes complete sense...
-                # If my computer time zone is Sydney but I want the port of Perth which is 3 hours behind, DST or not does NOT come into play.
-                x = float( timeZoneFromComputer )
-                y = float( timeZoneFromUnitedKingdomHydrographicOffice )
-                print( x, y, x / 100 )
+        if time.localtime().tm_isdst == 0 and self.daylightSavingsOffset > 0:
+            message = _( "Your computer is not in daylight savings, yet you have specified a DST offset of {0}." ).format( str ( self.daylightSavingsOffset ) )
+            Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
 
 
     def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
@@ -471,8 +450,6 @@ class IndicatorTide:
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_ALL, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
 
-        portID = "6037" #TODO Remove
-
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
         else:
@@ -492,9 +469,6 @@ class IndicatorTide:
                 if "class=\"PortName\"" in line:
                     portName = line[ line.find( ">" ) + 1 : line.find( "</span>" ) ]
                     country = line[ line.find( "class=\"CountryPredSummary\">" ) + len( "class=\"CountryPredSummary\">" ) : line.find( "</span></li>" ) ]
-
-                if "Port predictions (Standard Local Time) are" in line:
-                    timeZone = self.getTimeZoneFromUnitedKingdomHydrographicOffice( line )
 
                 if "HWLWTableHeaderCell" in line:
                     tideDate = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # "Sat 24 Sep"
@@ -535,46 +509,9 @@ class IndicatorTide:
             logging.exception( e )
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = None
-            timeZone = None
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
-        return tidalReadings, timeZone
-
-
-    # Extracts the time zone from the UKHO website for the specific port.
-    # The time zone is NOT adjusted for daylight savings and is in the format of +/-HHMM.
-    # Different ports will have different results:
-    #    0616: Port predictions (Standard Local Time) are equal to UTC
-    #    6037: Port predictions (Standard Local Time) are +10 hours from UTC
-    #    9539: Port predictions (Standard Local Time) are -5 hours from UTC
-    #    4506: Port predictions (Standard Local Time) are +6 hours from UTC
-    #    4483: Port predictions (Standard Local Time) are +5 hours 30 mins from UTC
-    def getTimeZoneFromUnitedKingdomHydrographicOffice( self, htmlContainingTimeZone ):
-        timeZone = "+0000"
-        if "equal to UTC" not in htmlContainingTimeZone:
-            plusMinusIndex = max( htmlContainingTimeZone.find( "+" ), htmlContainingTimeZone.find( "-" ) )
-            hours = htmlContainingTimeZone[ plusMinusIndex : htmlContainingTimeZone.find( " hours" ) ]
-            if len( hours ) == 2:
-                hours = hours[ 0 ] + "0" + hours[ 1 ]
-
-            mins = "00"
-            if "mins" in htmlContainingTimeZone:
-                mins = htmlContainingTimeZone[ htmlContainingTimeZone.find( "hours " ) + 6 : htmlContainingTimeZone.find( " mins" ) ]
-                if len( mins ) == 1:
-                    mins = "0" + mins
-
-            timeZone = hours + mins
-
-        return timeZone
-
-
-    # Retrieves the current time zone from the computer, adjusted for daylight savings as required, in the format of +/-HHMM.
-    # For example:
-    #    Sydney (not in daylight savings), the result is +1000.
-    #    Sydney (in daylight savings), the result is +1100.
-    #    London (not in daylight savings), the result is +0000.
-    #    London (in daylight savings), the result is +0100.
-    def getTimeZoneFromComputer( self ): return pythonutils.processGet( "date +%z" ).strip()
+        return tidalReadings
 
 
 if __name__ == "__main__": IndicatorTide().main()
