@@ -41,11 +41,10 @@ class IndicatorTide:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    EXPIRY = "2016-09-28" # The license for the UKHO data expires one year from 2015-09-28.  #TODO Update with new license date.
     URL_TIMEOUT_IN_SECONDS = 10
 
-    COMMENTS = _( "Displays tidal information.\n(this software will expire after {0})" ).format( EXPIRY )
-    CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tidal information reproduced by permission of the\nController of Her Majesty’s Stationery Office\nand the UK Hydrographic Office. http://www.ukho.gov.uk" )
+    COMMENTS = _( "Displays tidal information." )
+    CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tidal information reproduced by permission of the\nController of Her Majesty’s Stationery Office\nand the UK Hydrographic Office. http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" )
     CREDITS = [ CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
@@ -85,7 +84,7 @@ class IndicatorTide:
         menu = Gtk.Menu()
 
         if tidalReadings is None or len( tidalReadings ) == 0:
-            menu.append( Gtk.MenuItem( self.getNoPortDataMessage() ) )
+            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( locations.getPort( self.portID ).title() ) ) )
         else:
             previousMonth = -1
             previousDay = -1
@@ -165,22 +164,24 @@ class IndicatorTide:
         self.buildMenu( tidalReadings )
         self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
 
-        if tidalReadings is None or len( tideReadings ) == 0:
-            Notify.Notification.new( _( "Error" ), self.getNoPortDataMessage(), IndicatorTide.ICON ).show()
+        if tidalReadings is None or len( tidalReadings ) == 0:
+            Notify.Notification.new(
+                _( "Error" ), 
+                _( "No port data available for {0}!" ).format( locations.getPort( self.portID ).title() ), 
+                IndicatorTide.ICON ).show()
         else:
             timeZoneFromComputer = self.getTimeZoneFromComputer()
 
             if timeZoneFromComputer == timeZoneFromUnitedKingdomHydrographicOffice and self.daylightSavingsOffset != 0:
-                message = _( "Your computer time zone '{0}' matches that from the UKHO. However, you have specified a non-zero DST offset {1}." ).format( timeZoneFromComputer, str (self.daylightSavingsOffset ) )
+                message = _( "Your computer time zone '{0}' matches that from the UKHO. However, you have specified a non-zero DST offset {1}." ).format( timeZoneFromComputer, str ( self.daylightSavingsOffset ) )
                 Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
 
             if True: # TODO UKHO timezone + DST offset != computer timezone
+                # Not sure if this makes complete sense...
+                # If my computer time zone is Sydney but I want the port of Perth which is 3 hours behind, DST or not does NOT come into play.
                 x = float( timeZoneFromComputer )
                 y = float( timeZoneFromUnitedKingdomHydrographicOffice )
                 print( x, y, x / 100 )
-
-
-    def getNoPortDataMessage( self ): return _( "No port data available for {0}!" ).format( locations.getPort( self.portID ).title() )
 
 
     def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
@@ -540,32 +541,25 @@ class IndicatorTide:
         return tidalReadings, timeZone
 
 
-#TODO Finish and test and document!
-# 0616
-# Port predictions (Standard Local Time) are equal to UTC
-#
-# 6037
-# Port predictions (Standard Local Time) are +10 hours from UTC
-#
-# 9539
-# Port predictions (Standard Local Time) are -5 hours from UTC
-#
-# 4506
-# Port predictions (Standard Local Time) are +6 hours from UTC
-#
-# Port ID 4483
-# Port predictions (Standard Local Time) are +5 hours 30 mins from UTC
-    def getTimeZoneFromUnitedKingdomHydrographicOffice( self, line ):
+    # Extracts the time zone from the UKHO website for the specific port.
+    # The time zone is NOT adjusted for daylight savings and is in the format of +/-HHMM.
+    # Different ports will have different results:
+    #    0616: Port predictions (Standard Local Time) are equal to UTC
+    #    6037: Port predictions (Standard Local Time) are +10 hours from UTC
+    #    9539: Port predictions (Standard Local Time) are -5 hours from UTC
+    #    4506: Port predictions (Standard Local Time) are +6 hours from UTC
+    #    4483: Port predictions (Standard Local Time) are +5 hours 30 mins from UTC
+    def getTimeZoneFromUnitedKingdomHydrographicOffice( self, htmlContainingTimeZone ):
         timeZone = "+0000"
-        if "equal to UTC" not in line:
-            plusMinusIndex = max( line.find( "+" ), line.find( "-" ) )
-            hours = line[ plusMinusIndex : line.find( " hours" ) ]
+        if "equal to UTC" not in htmlContainingTimeZone:
+            plusMinusIndex = max( htmlContainingTimeZone.find( "+" ), htmlContainingTimeZone.find( "-" ) )
+            hours = htmlContainingTimeZone[ plusMinusIndex : htmlContainingTimeZone.find( " hours" ) ]
             if len( hours ) == 2:
                 hours = hours[ 0 ] + "0" + hours[ 1 ]
 
             mins = "00"
-            if "mins" in line:
-                mins = line[ line.find( "hours " ) + 6 : line.find( " mins" ) ]
+            if "mins" in htmlContainingTimeZone:
+                mins = htmlContainingTimeZone[ htmlContainingTimeZone.find( "hours " ) + 6 : htmlContainingTimeZone.find( " mins" ) ]
                 if len( mins ) == 1:
                     mins = "0" + mins
 
@@ -583,8 +577,4 @@ class IndicatorTide:
     def getTimeZoneFromComputer( self ): return pythonutils.processGet( "date +%z" ).strip()
 
 
-if __name__ == "__main__":
-    if datetime.datetime.now().strftime( "%Y-%m-%d" ) >= IndicatorTide.EXPIRY:
-        pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The tidal data license has expired!\n\nPlease download the latest version of this software." ), INDICATOR_NAME )
-    else:
-        IndicatorTide().main()
+if __name__ == "__main__": IndicatorTide().main()
