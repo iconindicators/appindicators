@@ -5,7 +5,7 @@ indicator-tide (1.0.5-1) precise; urgency=low
   * Shows a notification if the tidal information could not be obtained.
   * Added an option to show the first day's tidal information in full and
     subsequent days as submenus - useful for small screens.
-  * This program falls under the Open Government Licence and no longer
+  * This data used falls under the Open Government Licence and no longer
     requires annual renewal.
   * Fixed PyGIWarnings on imports.
   * Overhaul of icons: only the hicolor icon is required and all theme icons
