@@ -96,6 +96,9 @@ def getCountries():
     return countries
 
 
+def getFirstPortID(): return __ports[ 0 ][ __INDEX_PORT_ID ]
+
+
 # Indices for each port's data.
 __INDEX_PORT_ID = 0
 __INDEX_PORT_NAME = 1

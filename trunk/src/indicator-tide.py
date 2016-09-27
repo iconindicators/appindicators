@@ -408,7 +408,6 @@ class IndicatorTide:
 
         # Validate the port...
         if not ports.isValidPortID( self.portID ):
-            country = None
             try: # Set a geographically sensible default...
                 timezone = pythonutils.processGet( "cat /etc/timezone" )
                 country = timezone[ 0 : timezone.find( "/" ) ]
@@ -416,28 +415,23 @@ class IndicatorTide:
             except Exception as e:
                 logging.exception( e )
                 logging.error( "Error getting country/city from timezone." )
+                country = ""
 
             self.portID = ports.getPortIDForCountry( country )
-#TODO It is still possible no country exists (like Canada, or when the license expires)...so no country means no port ID...
-# ...so what to set then? 
-#Whatever id we choose make sure it exists even in the expired data!
-            self.portID = "537"           
+            if self.portID is None:
+                self.portID = ports.getFirstPortID()
 
-        # Ensure the daylight savings is numeric and sensible...
         try:
             if int( self.daylightSavingsOffset ) < 0:
                 self.daylightSavingsOffset = 0
         except ValueError:
             self.daylightSavingsOffset = 0 
 
-        # Ensure the daylight savings is numeric and sensible...
-        try:
-            bool( self.showAsSubMenus )
-        except ValueError:
-            self.showAsSubMenus = False
-
         if self.menuItemDateFormat is None:
-            self.menuItemDateFormat = ""
+            self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
+
+        if self.menuItemTideFormat is None:
+            self.menuItemTideFormat = MENU_ITEM_TIDE_DEFAULT_FORMAT
 
 
     def saveSettings( self ):
