@@ -17,6 +17,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import time
+
+
+def isExpired(): return getExpiry() < time.strftime( "%Y-%m-%d" )
+
+
+# Obtain the non-UK port expiry date in YYYY-MM-DD.
+def getExpiry(): return __UKHO_NON_UK_PORT_EXPIRY
+
+
 def isValidPortID( portID ):
     isValid = False
     for port in __ports:
@@ -92,14 +102,13 @@ __INDEX_PORT_NAME = 1
 __INDEX_PORT_COUNTRY = 2
 
 
-
 # © Crown Copyright and/or database rights.
 # No part of this material may sold, distributed nor copies made.
 # Reproduced by permission of the Controller of Her Majesty's Stationery Office and the UK Hydrographic Office.
 # www.ukho.gov.uk
 #
 # Port ID. port name, country.
-__UnitedKingdomHydrographicOffice_NonUnitedKingdomPorts = [
+__UKHO_NonUKPorts = [
     [ "5145A", "Kuala Belait", "Brunei" ],
     [ "4680", "Kuala Bernam", "Peninsular Malaysia West Coast" ],
     [ "5150", "Kuala Bintulu", "Sarawak" ],
@@ -1399,7 +1408,7 @@ __UnitedKingdomHydrographicOffice_NonUnitedKingdomPorts = [
 # www.nationalarchives.gov.uk/doc/open-government-licence
 #
 # Port ID. port name, country.
-__UnitedKingdomHydrographicOffice_UnitedKingdomPorts = [
+__UKHO_UKPorts = [
     [ "482A", "Aberdaron", "Wales" ],
     [ "244", "Aberdeen", "Scotland" ],
     [ "486", "Aberdovey", "Wales" ],
@@ -2020,7 +2029,10 @@ __UnitedKingdomHydrographicOffice_UnitedKingdomPorts = [
     [ "537", "Yelland Marsh", "England" ] ]
 
 
+__UKHO_NON_UK_PORT_EXPIRY = "2017-09-26" # The license for UKHO non-UK ports expires after this date.
+
+
 # Port data.
 #
 # Port ID. port name, country.
-__ports = __UnitedKingdomHydrographicOffice_NonUnitedKingdomPorts + __UnitedKingdomHydrographicOffice_UnitedKingdomPorts
+__ports = __UKHO_UKPorts if isExpired() else ( __UKHO_UKPorts + __UKHO_NonUKPorts )
