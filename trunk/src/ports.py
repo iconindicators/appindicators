@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 
-# This program is free software: you can redistribute it and/or modify
+# The program below (excluding the data) is free software:
+# you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -1358,6 +1360,8 @@ __UnitedKingdomHydrographicOffice_UnitedKingdomPorts = [
     [ "726", "Ballinskelligs Bay Castle", "Ireland" ] ]
 
 
+# © Crown Copyright and/or database rights.
+# No part of this material may sold, distributed nor copies made.
 # Reproduced by permission of the Controller of Her Majesty's Stationery Office and the UK Hydrographic Office.
 # www.ukho.gov.uk
 #
@@ -3014,40 +3018,8 @@ __INDEX_PORT_ID = 0
 __INDEX_PORT_NAME = 1
 __INDEX_PORT_COUNTRY = 2
 
-# Default Port ID.
-__DEFAULT_PORT_ID = "113"
-
 
 # Port data.
 #
 # Port ID. port name, country.
 __ports = __UnitedKingdomHydrographicOffice_NonUnitedKingdomPorts + __UnitedKingdomHydrographicOffice_UnitedKingdomPorts
-
-
-# print( "hello")
-# 
-# print( isValidPortID( "1234" ) )
-# print( isValidPortID( "2442" ) )
-# print( isValidPortID( "2446A" ) )
-# print( isValidPortID( "2001" ) )
-# print( isValidPortID( "2042A" ) )
-# 
-# print( getCountry( "1234" ) )
-# print( getCountry( "2442" ) )
-# print( getCountry( "2042A" ) )
-# 
-# print( getPortName( "1234" ) )
-# print( getPortName( "2442" ) )
-# print( getPortName( "2042A" ) )
-# 
-# print( getPortIDForCountry( "No Country" ) )
-# print( getPortIDForCountry( "Australia" ) )
-# print( getPortIDForCountry( "Wales" ) )
-# 
-# print( getCountries() )
-# 
-# print( getPortNamesForCountry( "No Country" ) )
-# print( getPortNamesForCountry( "Australia" ) )
-# 
-# print( getPortIDForCountryAndPortName( "Australia", "No Port" ) )
-# print( getPortIDForCountryAndPortName( "Australia", "Bampfield Head" ) )

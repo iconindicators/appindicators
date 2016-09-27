@@ -29,7 +29,7 @@ gi.require_version( "AppIndicator3", "0.1" )
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
 
-import datetime, json, locale, locations, logging, os, pythonutils, tide, time, webbrowser
+import datetime, json, locale, locations, logging, os, ports, pythonutils, tide, time, webbrowser
 
 
 class IndicatorTide:
@@ -90,7 +90,7 @@ class IndicatorTide:
         menu = Gtk.Menu()
 
         if tidalReadings is None or len( tidalReadings ) == 0:
-            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( locations.getPort( self.portID ).title() ) ) )
+            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ).title() ) ) )
         else:
             previousMonth = -1
             previousDay = -1
@@ -157,7 +157,7 @@ class IndicatorTide:
         self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
 
         if tidalReadings is None or len( tidalReadings ) == 0:
-            message = _( "No port data available for {0}!" ).format( locations.getPort( self.portID ).title() )
+            message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ).title() )
             Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
         if time.localtime().tm_isdst == 1 and self.daylightSavingsOffset == 0:
@@ -221,7 +221,7 @@ class IndicatorTide:
 
         countriesComboBox = Gtk.ComboBoxText()
         countriesComboBox.set_tooltip_text( _( "Choose your country." ) )
-        countries = sorted( locations.getCountries() )
+        countries = sorted( ports.getCountries() )
         for country in countries:
             countriesComboBox.append_text( country )
 
@@ -231,10 +231,10 @@ class IndicatorTide:
 
         box = Gtk.Box()
 
-        ports = Gtk.ListStore( str ) # Port.
-        ports.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+        portsList = Gtk.ListStore( str ) # Port.
+        portsList.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
-        portsTree = Gtk.TreeView( ports )
+        portsTree = Gtk.TreeView( portsList )
         portsTree.set_tooltip_text( _( "Choose your port." ) )
         portsTree.set_hexpand( True )
         portsTree.set_vexpand( True )
@@ -245,8 +245,8 @@ class IndicatorTide:
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( portsTree )
  
-        countriesComboBox.connect( "changed", self.onCountry, ports, portsTree )
-        countriesComboBox.set_active( countries.index( locations.getCountry( self.portID ) ) )
+        countriesComboBox.connect( "changed", self.onCountry, portsList, portsTree )
+        countriesComboBox.set_active( countries.index( ports.getCountry( self.portID ) ) )
 
         box.pack_start( scrolledWindow, True, True, 0 )
 
@@ -343,7 +343,7 @@ class IndicatorTide:
             country = countriesComboBox.get_active_text()
             model, treeiter = portsTree.get_selection().get_selected()
             port = model[ treeiter ][ 0 ]
-            self.portID = locations.getPortIDForCountryAndPort( country, port )
+            self.portID = ports.getPortIDForCountryAndPortName( country, port )
             self.daylightSavingsOffset = spinnerDaylightSavingsOffset.get_value_as_int()
             self.showAsSubMenus = showAsSubmenusCheckbox.get_active()
             self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbox.get_active()
@@ -363,13 +363,13 @@ class IndicatorTide:
     def onCountry( self, countriesComboBox, portsListStore, portsTree ):
         country = countriesComboBox.get_active_text()
         portsListStore.clear()
-        ports = sorted( locations.getPortsForCountry( country ) ) 
-        for port in ports:
+        portsList = sorted( ports.getPortNamesForCountry( country ) )
+        for port in portsList:
             portsListStore.append( [ port ] )
 
         portIndex = "0"
-        if locations.getCountry( self.portID ) == country:
-            portIndex = str( ports.index( locations.getPort( self.portID ) ) )
+        if ports.getCountry( self.portID ) == country:
+            portIndex = str( portsList.index( ports.getPortName( self.portID ) ) )
 
         portsTree.get_selection().select_path( portIndex )
         portsTree.scroll_to_cell( Gtk.TreePath.new_from_string( portIndex ) )
@@ -404,7 +404,7 @@ class IndicatorTide:
                 logging.error( "Error reading settings: " + IndicatorTide.SETTINGS_FILE )
 
         # Validate the port...
-        if not locations.isValidPortID( self.portID ):
+        if not ports.isValidPortID( self.portID ):
             country = None
             try: # Set a geographically sensible default...
                 timezone = pythonutils.processGet( "cat /etc/timezone" )
@@ -414,7 +414,7 @@ class IndicatorTide:
                 logging.exception( e )
                 logging.error( "Error getting country/city from timezone." )
 
-            self.portID = locations.getPortIDForCountry( country )
+            self.portID = ports.getPortIDForCountry( country )
 
         # Ensure the daylight savings is numeric and sensible...
         try:
