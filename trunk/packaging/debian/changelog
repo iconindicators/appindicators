@@ -2,15 +2,14 @@ indicator-tide (1.0.5-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
   * Updated UKHO port data to 2016/2017 listing.
-  * The UKHO port data has been segregated into two parts - that which does
-    not expire (essentially UK ports) and that which expires annually
-    (ports around the world and a few UK ports).
-    If the license date is exceeded, only the UK ports from the first part
-    will be available.
+  * The UKHO port data is split into two parts - UK ports, which does not
+    expire and non-UK ports for which data expires annually.
+    If the license date is exceeded, only the UK ports will be available.
   * Now displays the country next to the port city/town.
   * Shows a notification if the tidal information could not be obtained.
   * Added an option to show the first day's tidal information in full and
     subsequent days as submenus - useful for small screens.
+  * By default, tidal data is displayed as submenus, except for the first day.
   * Fixed PyGIWarnings on imports.
   * Overhaul of icons: only the hicolor icon is required and all theme icons
     are created from the hicolor via the build script.

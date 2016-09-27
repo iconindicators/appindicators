@@ -29,7 +29,7 @@ gi.require_version( "AppIndicator3", "0.1" )
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
 
-import datetime, json, locale, locations, logging, os, ports, pythonutils, tide, time, webbrowser
+import datetime, json, locale, logging, os, ports, pythonutils, tide, time, webbrowser
 
 
 class IndicatorTide:
@@ -41,16 +41,12 @@ class IndicatorTide:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    EXPIRY = "2016-09-28" # The license for the UKHO data expires one year from 2015-09-28.  #TODO Update with new license date.
     URL_TIMEOUT_IN_SECONDS = 10
 
-#TODO Work out what to say...is there different text/url for UK versus non UK ports?
-    COMMENTS = _( "Displays tidal information.\n(this software will expire after {0})" ).format( EXPIRY )
-    CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tidal information reproduced by permission of the\nController of Her Majesty’s Stationery Office\nand the UK Hydrographic Office. http://www.ukho.gov.uk" )
-    CREDITS = [ CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE ]
-    COMMENTS = _( "Displays tidal information." )
-    CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tidal information reproduced by permission of the\nController of Her Majesty’s Stationery Office\nand the UK Hydrographic Office. http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" )
-    CREDITS = [ CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE ]
+    COMMENTS = _( "Displays tidal information.\nNon-UK ports will be unavailable after {0}." ).format( ports.getExpiry() )
+    CREDIT_UKHO_UK_PORTS =     _( "Tidal information for UK ports licensed under the\nOpen Government Licence for Public Sector Information. http://www.nationalarchives.gov.uk/doc/open-government-licence" )
+    CREDIT_UKHO_UK_NON_PORTS = _( "Tidal information for non-UK ports reproduced by\npermission of the Controller of Her Majesty’s Stationery Office\nand the UK Hydrographic Office. http://www.ukho.gov.uk" )
+    CREDITS = [ CREDIT_UKHO_UK_PORTS, CREDIT_UKHO_UK_NON_PORTS ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_DAYLIGHT_SAVINGS_OFFSET = "daylightSavingsOffset"
@@ -78,7 +74,15 @@ class IndicatorTide:
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorTide.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
         self.update()
+
+        if ports.isExpired():
+            message = _(
+                "The license for non-UK ports has expired. " + 
+                "Until you upgrade to the latest version of the indicator, only UK ports will be available." )
+
+            Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
 
 
     def main( self ): Gtk.main()
@@ -89,7 +93,7 @@ class IndicatorTide:
         menu = Gtk.Menu()
 
         if tidalReadings is None or len( tidalReadings ) == 0:
-            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ).title() ) ) )
+            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
         else:
             previousMonth = -1
             previousDay = -1
@@ -156,17 +160,15 @@ class IndicatorTide:
         self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
 
         if tidalReadings is None or len( tidalReadings ) == 0:
-            message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ).title() )
+            message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
             Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
-#TODO Check if this makes sense.
         if time.localtime().tm_isdst == 1 and self.daylightSavingsOffset == 0:
-            message = _( "Your computer is in daylight savings, yet you have specified a zero DST offset." )
+            message = _( "Your computer is in daylight savings, yet your DST offset is zero." )
             Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
 
-#TODO Check if this makes sense.
         if time.localtime().tm_isdst == 0 and self.daylightSavingsOffset > 0:
-            message = _( "Your computer is not in daylight savings, yet you have specified a DST offset of {0}." ).format( str ( self.daylightSavingsOffset ) )
+            message = _( "Your DST offset is {0}, yet your computer is not in daylight savings." ).format( str ( self.daylightSavingsOffset ) )
             Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
 
 
@@ -385,7 +387,7 @@ class IndicatorTide:
         self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
         self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
         self.portID = None
-        self.showAsSubMenus = False
+        self.showAsSubMenus = True
         self.showAsSubMenusExceptFirstDay = True
 
         if os.path.isfile( IndicatorTide.SETTINGS_FILE ):
@@ -416,6 +418,10 @@ class IndicatorTide:
                 logging.error( "Error getting country/city from timezone." )
 
             self.portID = ports.getPortIDForCountry( country )
+#TODO It is still possible no country exists (like Canada, or when the license expires)...so no country means no port ID...
+# ...so what to set then? 
+#Whatever id we choose make sure it exists even in the expired data!
+            self.portID = "537"           
 
         # Ensure the daylight savings is numeric and sensible...
         try:
@@ -510,7 +516,7 @@ class IndicatorTide:
 
                     for index, item in enumerate( waterLevelTypes ):
                         tideTime = datetime.datetime.strptime( times[ index ], "%H:%M" )
-                        tidalReadings.append( tide.Reading( ( portName + ", " + country ).title(), tideDate.month, tideDate.day, tideTime.hour, tideTime.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
+                        tidalReadings.append( tide.Reading( ( portName + ", " + country ), tideDate.month, tideDate.day, tideTime.hour, tideTime.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
 
         except Exception as e:
             logging.exception( e )
@@ -521,9 +527,43 @@ class IndicatorTide:
         return tidalReadings
 
 
-#TODO Is it possible to disable only the non-UK data?
 if __name__ == "__main__":
-    if datetime.datetime.now().strftime( "%Y-%m-%d" ) >= IndicatorTide.EXPIRY:
-        pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The tidal data license has expired!\n\nPlease download the latest version of this software." ), INDICATOR_NAME )
-    else:
-        IndicatorTide().main()
+#TODO Maybe get rid of the DST offset and set it directly from the computer?
+    import calendar
+    t = time.localtime();
+    u = calendar.timegm( t ) - calendar.timegm( time.gmtime( time.mktime( t ) ) )
+    print( t )
+    print( u )
+    print( calendar.timegm( t ) )
+    print( calendar.timegm( time.gmtime( time.mktime( t ) ) ) )
+    print( time.timezone )
+    print( time.daylight )
+    print( time.altzone )
+    
+    millis = 1288483950000
+    ts = millis * 1e-3
+    # local time == (utc time + utc offset)
+    utc_offset = datetime.datetime.fromtimestamp(ts) - datetime.datetime.utcfromtimestamp(ts)
+    print( utc_offset )
+    
+    
+    import time
+
+    print( -time.timezone )
+    
+    print( time.localtime().tm_gmtoff )
+#     import pytz
+#     t = pytz.timezone()
+#     print( pytz.timezone().utcoffset( datetime.datetime.now() ) )
+#     print( pytz.timezone().utcoffset( datetime.datetime.now() ) )
+#     print( pytz.timezone().utcoffset( datetime.datetime.now() ) )
+#     print( pytz.timezone().utcoffset( datetime.datetime.now() ) )
+
+#     print( len( ports.getCountries() ) )
+
+#     x = 1/0
+#     print( time.localtime().tm_min )
+#     print( time.localtime() - time.gmtime() )
+#     print( time.localtime() - time.gmtime() )
+
+    IndicatorTide().main()
