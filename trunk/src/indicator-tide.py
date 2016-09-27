@@ -454,8 +454,8 @@ class IndicatorTide:
             lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for index, line in enumerate( lines ):
                 if "class=\"PortName\"" in line:
-                    portName = line[ line.find( ">" ) + 1 : line.find( "</span>" ) ]
-                    country = line[ line.find( "class=\"CountryPredSummary\">" ) + len( "class=\"CountryPredSummary\">" ) : line.find( "</span></li>" ) ]
+                    portName = line[ line.find( ">" ) + 1 : line.find( "</span>" ) ].title()
+                    country = line[ line.find( "class=\"CountryPredSummary\">" ) + len( "class=\"CountryPredSummary\">" ) : line.find( "</span></li>" ) ].title()
 
                 if "HWLWTableHeaderCell" in line:
                     tideDate = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # "Sat 24 Sep"
