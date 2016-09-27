@@ -49,7 +49,6 @@ class IndicatorTide:
     CREDITS = [ CREDIT_UKHO_UK_PORTS, CREDIT_UKHO_UK_NON_PORTS ]
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
-    SETTINGS_DAYLIGHT_SAVINGS_OFFSET = "daylightSavingsOffset"
     SETTINGS_MENU_ITEM_DATE_FORMAT = "menuItemDateFormat"
     SETTINGS_MENU_ITEM_TIDE_FORMAT = "menuItemTideFormat"
     SETTINGS_PORT_ID = "portID"
@@ -154,22 +153,29 @@ class IndicatorTide:
         return menuItem
 
 
+    # Determines if the computer is currently in daylight savings or not (for the given time zone)
+    # and if so, computer the offset amount in minutes.
+    # If the computer is not in daylight savings, the offset is zero.
+    # http://stackoverflow.com/questions/13464009/calculate-tm-isdst-from-date-and-timezone
+    def getDaylightSavingsOffsetInMinutes( self ):
+        offsetInMinutes = 0
+        isDST = time.daylight and time.localtime().tm_isdst > 0
+        if isDST:
+            utcOffsetInSecondsDST = - ( time.altzone if isDST else time.timezone )
+            utcOffsetInSeconds = - ( time.altzone if not isDST else time.timezone )
+            offsetInMinutes = int( ( utcOffsetInSecondsDST - utcOffsetInSeconds ) / 60 )
+
+        return offsetInMinutes
+
+
     def update( self ):
-        tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.daylightSavingsOffset )
+        tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.getDaylightSavingsOffsetInMinutes() )
         self.buildMenu( tidalReadings )
         self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
 
         if tidalReadings is None or len( tidalReadings ) == 0:
             message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
             Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
-
-        if time.localtime().tm_isdst == 1 and self.daylightSavingsOffset == 0:
-            message = _( "Your computer is in daylight savings, yet your DST offset is zero." )
-            Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
-
-        if time.localtime().tm_isdst == 0 and self.daylightSavingsOffset > 0:
-            message = _( "Your DST offset is {0}, yet your computer is not in daylight savings." ).format( str ( self.daylightSavingsOffset ) )
-            Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
 
 
     def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
@@ -255,21 +261,6 @@ class IndicatorTide:
 
         grid.attach( box, 0, 1, 1, 20 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label( _( "Daylight savings offset" ) ), False, False, 0 )
-
-        spinnerDaylightSavingsOffset = Gtk.SpinButton()
-        spinnerDaylightSavingsOffset.set_adjustment( Gtk.Adjustment( self.daylightSavingsOffset, 0, 180, 1, 10, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinnerDaylightSavingsOffset.set_value( self.daylightSavingsOffset ) # ...so need to force the initial value by explicitly setting it.
-        spinnerDaylightSavingsOffset.set_tooltip_text( _(
-            "If your timezone is currently in daylight savings,\n" + \
-            "specify the offset amount, in minutes." ) )
-
-        box.pack_start( spinnerDaylightSavingsOffset, True, True, 1 )
-        grid.attach( box, 0, 21, 1, 1 )
-
         box = Gtk.Box()
         box.set_margin_top( 10 )
 
@@ -278,7 +269,7 @@ class IndicatorTide:
         showAsSubmenusCheckbox.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
 
         box.pack_start( showAsSubmenusCheckbox, True, True, 1 )
-        grid.attach( box, 0, 22, 1, 1 )
+        grid.attach( box, 0, 21, 1, 1 )
 
         box = Gtk.Box()
 
@@ -289,7 +280,7 @@ class IndicatorTide:
         showAsSubmenusExceptFirstDayCheckbox.set_tooltip_text( _( "Show the first day's tide in full." ) )
 
         box.pack_start( showAsSubmenusExceptFirstDayCheckbox, True, True, 1 )
-        grid.attach( box, 0, 23, 1, 1 )
+        grid.attach( box, 0, 22, 1, 1 )
 
         showAsSubmenusCheckbox.connect( "toggled", self.onShowAsSubmenusCheckbox, showAsSubmenusExceptFirstDayCheckbox )
 
@@ -306,7 +297,7 @@ class IndicatorTide:
 
         box.pack_start( dateFormat, True, True, 0 )
 
-        grid.attach( box, 0, 24, 1, 1 )
+        grid.attach( box, 0, 23, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -323,7 +314,7 @@ class IndicatorTide:
             "http://docs.python.org/3/library/datetime.html" ) )
         box.pack_start( tideFormat, True, True, 0 )
 
-        grid.attach( box, 0, 25, 1, 1 )
+        grid.attach( box, 0, 24, 1, 1 )
 
         box = Gtk.Box()
         box.set_margin_top( 10 )
@@ -333,7 +324,7 @@ class IndicatorTide:
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
 
         box.pack_start( autostartCheckbox, True, True, 1 )
-        grid.attach( box, 0, 26, 1, 1 )
+        grid.attach( box, 0, 25, 1, 1 )
 
         self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         self.dialog.vbox.pack_start( grid, True, True, 0 )
@@ -347,7 +338,6 @@ class IndicatorTide:
             model, treeiter = portsTree.get_selection().get_selected()
             port = model[ treeiter ][ 0 ]
             self.portID = ports.getPortIDForCountryAndPortName( country, port )
-            self.daylightSavingsOffset = spinnerDaylightSavingsOffset.get_value_as_int()
             self.showAsSubMenus = showAsSubmenusCheckbox.get_active()
             self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbox.get_active()
             self.menuItemDateFormat = dateFormat.get_text().strip()
@@ -378,12 +368,10 @@ class IndicatorTide:
         portsTree.scroll_to_cell( Gtk.TreePath.new_from_string( portIndex ) )
 
 
-    def onShowAsSubmenusCheckbox( self, source, showAsSubmenusExceptFirstDayCheckbox ):
-        showAsSubmenusExceptFirstDayCheckbox.set_sensitive( source.get_active() )
+    def onShowAsSubmenusCheckbox( self, source, showAsSubmenusExceptFirstDayCheckbox ): showAsSubmenusExceptFirstDayCheckbox.set_sensitive( source.get_active() )
 
 
     def loadSettings( self ):
-        self.daylightSavingsOffset = 0
         self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
         self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
         self.portID = None
@@ -395,7 +383,6 @@ class IndicatorTide:
                 with open( IndicatorTide.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
-                self.daylightSavingsOffset = settings.get( IndicatorTide.SETTINGS_DAYLIGHT_SAVINGS_OFFSET, self.daylightSavingsOffset )
                 self.menuItemDateFormat = settings.get( IndicatorTide.SETTINGS_MENU_ITEM_DATE_FORMAT, self.menuItemDateFormat )
                 self.menuItemTideFormat = settings.get( IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT, self.menuItemTideFormat )
                 self.portID = settings.get( IndicatorTide.SETTINGS_PORT_ID, self.portID )
@@ -421,12 +408,6 @@ class IndicatorTide:
             if self.portID is None:
                 self.portID = ports.getFirstPortID()
 
-        try:
-            if int( self.daylightSavingsOffset ) < 0:
-                self.daylightSavingsOffset = 0
-        except ValueError:
-            self.daylightSavingsOffset = 0 
-
         if self.menuItemDateFormat is None:
             self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
 
@@ -437,7 +418,6 @@ class IndicatorTide:
     def saveSettings( self ):
         try:
             settings = {
-                IndicatorTide.SETTINGS_DAYLIGHT_SAVINGS_OFFSET: self.daylightSavingsOffset,
                 IndicatorTide.SETTINGS_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
                 IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
                 IndicatorTide.SETTINGS_PORT_ID: self.portID,
@@ -521,43 +501,4 @@ class IndicatorTide:
         return tidalReadings
 
 
-if __name__ == "__main__":
-#TODO Maybe get rid of the DST offset and set it directly from the computer?
-    import calendar
-    t = time.localtime();
-    u = calendar.timegm( t ) - calendar.timegm( time.gmtime( time.mktime( t ) ) )
-    print( t )
-    print( u )
-    print( calendar.timegm( t ) )
-    print( calendar.timegm( time.gmtime( time.mktime( t ) ) ) )
-    print( time.timezone )
-    print( time.daylight )
-    print( time.altzone )
-    
-    millis = 1288483950000
-    ts = millis * 1e-3
-    # local time == (utc time + utc offset)
-    utc_offset = datetime.datetime.fromtimestamp(ts) - datetime.datetime.utcfromtimestamp(ts)
-    print( utc_offset )
-    
-    
-    import time
-
-    print( -time.timezone )
-    
-    print( time.localtime().tm_gmtoff )
-#     import pytz
-#     t = pytz.timezone()
-#     print( pytz.timezone().utcoffset( datetime.datetime.now() ) )
-#     print( pytz.timezone().utcoffset( datetime.datetime.now() ) )
-#     print( pytz.timezone().utcoffset( datetime.datetime.now() ) )
-#     print( pytz.timezone().utcoffset( datetime.datetime.now() ) )
-
-#     print( len( ports.getCountries() ) )
-
-#     x = 1/0
-#     print( time.localtime().tm_min )
-#     print( time.localtime() - time.gmtime() )
-#     print( time.localtime() - time.gmtime() )
-
-    IndicatorTide().main()
+if __name__ == "__main__": IndicatorTide().main()
