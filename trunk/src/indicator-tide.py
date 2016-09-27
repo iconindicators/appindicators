@@ -48,7 +48,6 @@ class IndicatorTide:
     COMMENTS = _( "Displays tidal information.\n(this software will expire after {0})" ).format( EXPIRY )
     CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tidal information reproduced by permission of the\nController of Her Majesty’s Stationery Office\nand the UK Hydrographic Office. http://www.ukho.gov.uk" )
     CREDITS = [ CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE ]
-
     COMMENTS = _( "Displays tidal information." )
     CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE = _( "Tidal information reproduced by permission of the\nController of Her Majesty’s Stationery Office\nand the UK Hydrographic Office. http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" )
     CREDITS = [ CREDIT_UNITED_KINGDOM_HYDROGRAPHIC_OFFICE ]
@@ -160,10 +159,12 @@ class IndicatorTide:
             message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ).title() )
             Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
+#TODO Check if this makes sense.
         if time.localtime().tm_isdst == 1 and self.daylightSavingsOffset == 0:
             message = _( "Your computer is in daylight savings, yet you have specified a zero DST offset." )
             Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
 
+#TODO Check if this makes sense.
         if time.localtime().tm_isdst == 0 and self.daylightSavingsOffset > 0:
             message = _( "Your computer is not in daylight savings, yet you have specified a DST offset of {0}." ).format( str ( self.daylightSavingsOffset ) )
             Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
@@ -258,8 +259,8 @@ class IndicatorTide:
         box.pack_start( Gtk.Label( _( "Daylight savings offset" ) ), False, False, 0 )
 
         spinnerDaylightSavingsOffset = Gtk.SpinButton()
-        spinnerDaylightSavingsOffset.set_adjustment( Gtk.Adjustment( int( self.daylightSavingsOffset ), 0, 180, 1, 10, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinnerDaylightSavingsOffset.set_value( int( self.daylightSavingsOffset ) ) # ...so need to force the initial value by explicitly setting it.
+        spinnerDaylightSavingsOffset.set_adjustment( Gtk.Adjustment( self.daylightSavingsOffset, 0, 180, 1, 10, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerDaylightSavingsOffset.set_value( self.daylightSavingsOffset ) # ...so need to force the initial value by explicitly setting it.
         spinnerDaylightSavingsOffset.set_tooltip_text( _(
             "If your timezone is currently in daylight savings,\n" + \
             "specify the offset amount, in minutes." ) )
@@ -380,7 +381,7 @@ class IndicatorTide:
 
 
     def loadSettings( self ):
-        self.daylightSavingsOffset = "0"
+        self.daylightSavingsOffset = 0
         self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
         self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
         self.portID = None
@@ -419,9 +420,9 @@ class IndicatorTide:
         # Ensure the daylight savings is numeric and sensible...
         try:
             if int( self.daylightSavingsOffset ) < 0:
-                self.daylightSavingsOffset = "0" 
+                self.daylightSavingsOffset = 0
         except ValueError:
-            self.daylightSavingsOffset = "0" 
+            self.daylightSavingsOffset = 0 
 
         # Ensure the daylight savings is numeric and sensible...
         try:
@@ -520,6 +521,7 @@ class IndicatorTide:
         return tidalReadings
 
 
+#TODO Is it possible to disable only the non-UK data?
 if __name__ == "__main__":
     if datetime.datetime.now().strftime( "%Y-%m-%d" ) >= IndicatorTide.EXPIRY:
         pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The tidal data license has expired!\n\nPlease download the latest version of this software." ), INDICATOR_NAME )
