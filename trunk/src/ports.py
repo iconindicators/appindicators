@@ -86,6 +86,13 @@ def getCountries():
     return countries
 
 
+# Indices for each port's data.
+__INDEX_PORT_ID = 0
+__INDEX_PORT_NAME = 1
+__INDEX_PORT_COUNTRY = 2
+
+
+
 # © Crown Copyright and/or database rights.
 # No part of this material may sold, distributed nor copies made.
 # Reproduced by permission of the Controller of Her Majesty's Stationery Office and the UK Hydrographic Office.
@@ -2011,12 +2018,6 @@ __UnitedKingdomHydrographicOffice_UnitedKingdomPorts = [
     [ "443", "Wyre Lighthouse", "England" ],
     [ "45", "Yarmouth", "England" ],
     [ "537", "Yelland Marsh", "England" ] ]
-
-
-# Indices for each port's data.
-__INDEX_PORT_ID = 0
-__INDEX_PORT_NAME = 1
-__INDEX_PORT_COUNTRY = 2
 
 
 # Port data.
