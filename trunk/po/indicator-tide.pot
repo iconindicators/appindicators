@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-tide 1.0.4\n"
+"Project-Id-Version: indicator-tide 1.0.5\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2016-09-23 10:06+1000\n"
+"POT-Creation-Date: 2016-10-01 13:00+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,110 +17,121 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicator-tide.py:47
+#: indicator-tide.py:46
 #, python-brace-format
 msgid ""
 "Displays tidal information.\n"
-"(this software will expire after {0})"
+"Non-UK ports will be unavailable after {0}."
+msgstr ""
+
+#: indicator-tide.py:47
+msgid ""
+"Tidal information for UK ports licensed under the\n"
+"Open Government Licence for Public Sector Information. http://www."
+"nationalarchives.gov.uk/doc/open-government-licence"
 msgstr ""
 
 #: indicator-tide.py:48
 msgid ""
-"Tidal information reproduced by permission of the\n"
-"Controller of Her Majesty’s Stationery Office\n"
+"Tidal information for non-UK ports reproduced by\n"
+"permission of the Controller of Her Majesty’s Stationery Office\n"
 "and the UK Hydrographic Office. http://www.ukho.gov.uk"
 msgstr ""
 
-#: indicator-tide.py:87
+#: indicator-tide.py:81
+msgid ""
+"The license for non-UK ports has expired. Until you upgrade to the latest "
+"version of the indicator, only UK ports will be available."
+msgstr ""
+
+#: indicator-tide.py:84
+msgid "Warning"
+msgstr ""
+
+#: indicator-tide.py:95 indicator-tide.py:177
 #, python-brace-format
 msgid "No port data available for {0}!"
 msgstr ""
 
-#: indicator-tide.py:114
+#: indicator-tide.py:122
 msgid "H"
 msgstr ""
 
-#: indicator-tide.py:116
+#: indicator-tide.py:124
 msgid "L"
 msgstr ""
 
-#: indicator-tide.py:171
+#: indicator-tide.py:178
+msgid "Error"
+msgstr ""
+
+#: indicator-tide.py:199
 msgid "Credits"
 msgstr ""
 
-#: indicator-tide.py:177
+#: indicator-tide.py:205
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-tide.py:178
+#: indicator-tide.py:206
 msgid "View the"
 msgstr ""
 
-#: indicator-tide.py:179
+#: indicator-tide.py:207
 msgid "text file."
 msgstr ""
 
-#: indicator-tide.py:180
+#: indicator-tide.py:208
 msgid "changelog"
 msgstr ""
 
-#: indicator-tide.py:201
+#: indicator-tide.py:229
 msgid "Country"
 msgstr ""
 
-#: indicator-tide.py:204
+#: indicator-tide.py:232
 msgid "Choose your country."
 msgstr ""
 
-#: indicator-tide.py:219
+#: indicator-tide.py:247
 msgid "Choose your port."
 msgstr ""
 
-#: indicator-tide.py:222
+#: indicator-tide.py:250
 msgid "Port"
 msgstr ""
 
-#: indicator-tide.py:239
-msgid "Daylight savings offset"
-msgstr ""
-
-#: indicator-tide.py:245
-msgid ""
-"If your timezone is currently in daylight savings,\n"
-"specify the offset amount, in minutes."
-msgstr ""
-
-#: indicator-tide.py:254
+#: indicator-tide.py:267
 msgid "Show as submenus"
 msgstr ""
 
-#: indicator-tide.py:256
+#: indicator-tide.py:269
 msgid "Show each day's tides in a submenu."
 msgstr ""
 
-#: indicator-tide.py:263
+#: indicator-tide.py:276
 msgid "Except first day"
 msgstr ""
 
-#: indicator-tide.py:267
+#: indicator-tide.py:280
 msgid "Show the first day's tide in full."
 msgstr ""
 
-#: indicator-tide.py:277
+#: indicator-tide.py:290
 msgid "Date format"
 msgstr ""
 
-#: indicator-tide.py:282
+#: indicator-tide.py:295
 msgid ""
 "Formatting options are specified at\n"
 "http://docs.python.org/3/library/datetime.html"
 msgstr ""
 
-#: indicator-tide.py:292
+#: indicator-tide.py:305
 msgid "Tide format"
 msgstr ""
 
-#: indicator-tide.py:297
+#: indicator-tide.py:310
 msgid ""
 "Tide information is specified using:\n"
 "\n"
@@ -131,21 +142,14 @@ msgid ""
 "http://docs.python.org/3/library/datetime.html"
 msgstr ""
 
-#: indicator-tide.py:309
+#: indicator-tide.py:322
 msgid "Autostart"
 msgstr ""
 
-#: indicator-tide.py:311
+#: indicator-tide.py:324
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-tide.py:316
+#: indicator-tide.py:329
 msgid "Preferences"
-msgstr ""
-
-#: indicator-tide.py:509
-msgid ""
-"The tidal data license has expired!\n"
-"\n"
-"Please download the latest version of this software."
 msgstr ""

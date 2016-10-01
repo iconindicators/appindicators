@@ -478,9 +478,9 @@ class IndicatorTide:
 
                     times = [ ]
                     line = lines[ index + 4 ]
-                    for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\"> " ):
+                    for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
                         if len( item.strip() ) > 0:
-                            times.append( item[ 0 : 5 ] )
+                            times.append( item[ 0 : 6 ].strip() )
 
                     waterLevelsInMetres = [ ]
                     line = lines[ index + 6 ]
