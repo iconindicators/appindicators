@@ -2013,8 +2013,8 @@ msgstr ""
 
 #: indicator-lunar.py:2438
 msgid ""
-"Double click to add a tag\n"
-"to the indicator text."
+"Double click to add a\n"
+"tag to the icon text."
 msgstr ""
 
 #: indicator-lunar.py:2448

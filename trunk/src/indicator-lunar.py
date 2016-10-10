@@ -2463,8 +2463,8 @@ class IndicatorLunar:
         tree.append_column( treeViewColumn )
 
         tree.set_tooltip_text( _(
-            "Double click to add a tag\n" + \
-            "to the indicator text." ) )
+            "Double click to add a\n" + \
+            "tag to the icon text." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText )
 
