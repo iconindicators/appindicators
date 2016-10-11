@@ -37,7 +37,7 @@ gettext.install( INDICATOR_NAME )
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 
-from gi.repository import AppIndicator3, GLib, Gtk
+from gi.repository import AppIndicator3, Gdk, GLib, Gtk
 from threading import Thread
 
 import gzip, json, logging, os, pythonutils, re, shutil, sys, time, virtualmachine
@@ -75,17 +75,22 @@ class IndicatorVirtualBox:
         self.loadSettings()
         virtualMachines = self.getVirtualMachines()
         Thread( target = self.autoStartVirtualMachines, args = ( virtualMachines, ) ).start()
+
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorVirtualBox.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
-        self.buildMenu( virtualMachines )
-        self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh, True )
+
         self.scrollDirectionIsUp = True
         self.scrollUUID = None
 
+        self.buildMenu( virtualMachines )
+        self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh, True )
+
+
+    def main( self ): Gtk.main()
+
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        from gi.repository import Gdk #TODO Move up top
         runningVMs = self.getRunningVirtualMachines()
         if len( runningVMs ) > 0:
             if self.scrollUUID is None or self.scrollUUID not in runningVMs:
@@ -93,27 +98,35 @@ class IndicatorVirtualBox:
 
             if scrollDirection == Gdk.ScrollDirection.UP:
                 index = ( runningVMs.index( self.scrollUUID ) + 1 ) % len( runningVMs )
+                self.scrollUUID = runningVMs[ index ]
                 self.scrollDirectionIsUp = True
             else:
                 index = ( runningVMs.index( self.scrollUUID ) - 1 ) % len( runningVMs )
+                self.scrollUUID = runningVMs[ index ]
                 self.scrollDirectionIsUp = False
 
-            self.scrollUUID = runningVMs[ index ]
-            virtualMachineName = self.getVirtualMachineNameFromUUID( self.scrollUUID )
-            count = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
-            if count == "0":
-                print( "count = 0" )#TODO Show as notification instead...or just log to file?
+            self.bringWindowToFront( self.getVirtualMachineNameFromUUID( self.scrollUUID ) )
+
+
+    def bringWindowToFront( self, virtualMachineName ):
+        numberWindowsWithSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
+        if numberWindowsWithSameName == "0":
+            print( "numberWindowsWithSameName = 0" )#TODO Show as notification instead...or just log to file?
 #                 pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "The VM is running but its window could not be found - perhaps it is running headless." ), INDICATOR_NAME )
-            elif count == "1":
-                for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
-                    if virtualMachineName in line:
-                        windowID = line[ 0 : line.find( " " ) ]
-                        pythonutils.processCall( "wmctrl -i -a " + windowID )
-                        break
-            else:
-                #TODO Better message - really more than one window with same name.
+        elif numberWindowsWithSameName == "1":
+            for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
+                if virtualMachineName in line:
+                    windowID = line[ 0 : line.find( " " ) ]
+                    pythonutils.processCall( "wmctrl -i -a " + windowID )
+                    break
+        else:
+            #TODO Better message - really more than one window with same name.
 #                 pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified." ), INDICATOR_NAME )
-                print( "count > 1" )#TODO Show as notification instead...or just log to file?
+            print( "numberWindowsWithSameName > 1" )#TODO Show as notification instead...or just log to file?
+
+# pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." ), INDICATOR_NAME )
+# pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM '{0}' could not be started - check the log file: {1}" ).format( virtualMachine.getUUID(), IndicatorVirtualBox.LOG ), INDICATOR_NAME )
+
 
 
     def getVirtualMachineNameFromUUID( self, UUID ):
@@ -123,99 +136,6 @@ class IndicatorVirtualBox:
             name = result[ 1 : result.find( "\" {" ) ]
 
         return name
-
-
-    def onMouseWheelScrollOLD( self, indicator, delta, scrollDirection ):
-        result = pythonutils.processGet( "VBoxManage list runningvms" ) # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
-        if result is not None:
-            # Parse the result to generate a list of running VMs...
-            runningVMs = [ ]
-            for line in result.splitlines():
-                try:
-                    info = line[ 1 : -1 ].split( "\" {" )
-                    runningVMs.append( info[ 0 ] )
-                except:
-                    pass # Sometimes VBoxManage emits a warning message along with the VM information.
-
-            if len( runningVMs ) > 0:
-#                 print( "VBoxManage list runningvms:", runningVMs )
-                # Match up window IDs to running VMs.
-                # Not infallible as it is possible to have a non-VM window with the same name as a VM window.
-#                 runningVMs.sort() #TODO Does the sort need to be according to the user's choice (groups or whatever also taken into account)?
-                windowNamesAndIDs = [ ]
-                from gi.repository import Gtk, Wnck #TODO Move to top
-                screen = Wnck.Screen.get_default()
-                screen.force_update()
-                activeWindowID = None
-                for window in screen.get_windows():
-#                     print( window.get_name(), window.get_xid(), window.is_active() )
-                    if window.get_name().find( "Oracle" ) > 0 and window.get_name().find( "VirtualBox" ) > 0 and any( x in window.get_name() for x in runningVMs ):
-                        windowNamesAndIDs.append( [ window.get_name(), window.get_xid(), window ] )
-                        if window.is_active():
-                            activeWindowID = window.get_xid()
-
-#                 print( windowNamesAndIDs )
-#                 print( activeWindowID )
-
-                if scrollDirection == Gdk.ScrollDirection.UP:
-                    print( "up" )
-                    windowNamesAndIDs = sorted( windowNamesAndIDs, key = lambda x: ( x[ 0 ] ), reverse = True ) 
-                    print( windowNamesAndIDs )
-                    if activeWindowID is None:
-                        print( "not active")
-                        windowID = windowNamesAndIDs[ 0 ][ 1 ]
-                        windowNamesAndIDs[ 0 ][ 2 ].activate()
-                    else:
-                        print( "active")
-                elif scrollDirection == Gdk.ScrollDirection.DOWN:
-                    print( "down" )
-                    windowNamesAndIDs = sorted( windowNamesAndIDs, key = lambda x: ( x[ 0 ] ) ) 
-                    print( windowNamesAndIDs )
-                    if activeWindowID is None:
-                        print( "not active")
-                        windowID = windowNamesAndIDs[ 0 ][ 1 ]
-                        windowNamesAndIDs[ 0 ][ 2 ].activate()
-                    else:
-                        print( "active")
-                else:
-                    print( "NONE!!!!" )
-
-
-
-#             if len( runningVMs ) > 0:
-#                 # Match up window IDs to VMs to list of running VMs.
-#                 # Not infallible as it is possible to have a non-VM window with the same name as a VM window.
-#                 runningVMs.sort()
-#                 runningVMsAndWindowIDs = [ ]
-# 
-#                 for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
-#                     if line.find( "Oracle") > 0 or line.find( "VM" ) > 0 or line.find( "VirtualBox" ) > 0:
-#                         for vm in runningVMs:
-#                             if line.find( vm ) > 0:
-#                                 windowID = line[ 0 : line.find( " " ) ]
-#                                 runningVMsAndWindowIDs.append( [ vm, windowID ] )
-#                                 break
-# 
-#                 print( runningVMsAndWindowIDs )
-# 
-#                 activeWindowID = pythonutils.processGet( 'xprop -root -f _NET_ACTIVE_WINDOW 0x " \$0\\n" _NET_ACTIVE_WINDOW | awk "{print \$2}"' )
-#                 if activeWindowID is not None:
-#                     activeWindowID = activeWindowID.strip()
-#                     print( activeWindowID + "XXX" )
-# 
-#                     for vmName, windowID in runningVMsAndWindowIDs:
-#                         print( windowID, activeWindowID )
-#                         if windowID == activeWindowID:
-#                             print( "found", vmName )
-
-
-
-                window = None
-                screen = None
-                Wnck.shutdown()
-
-
-    def main( self ): Gtk.main()
 
 
     def buildMenu( self, virtualMachines ):
@@ -289,17 +209,16 @@ class IndicatorVirtualBox:
 
 
     def onVirtualMachine( self, widget ):
-        virtualMachines = self.getVirtualMachines()
-        virtualMachine = self.getVirtualMachine( widget.props.name, virtualMachines )
+        virtualMachine = self.getVirtualMachine( widget.props.name )
         if virtualMachine is None:
             GLib.timeout_add_seconds( 1, self.onRefresh, False )
             pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "Missing VM...\n\nName: {0}\nID: {1}" ).format( widget.props.label, widget.props.name ), INDICATOR_NAME )
         else:
-            self.startVirtualMachine( virtualMachine, virtualMachines, self.getRunningVirtualMachines(), 0 ) # Set a zero delay as this is not an autostart.
+            self.startVirtualMachine( virtualMachine, 0 ) # Set a zero delay as this is not an autostart.
 
 
-    def getVirtualMachine( self, uuid, virtualMachines ):
-        for virtualMachine in virtualMachines:
+    def getVirtualMachine( self, uuid ):
+        for virtualMachine in self.getVirtualMachines():
             if virtualMachine.getUUID() == uuid:
                 return virtualMachine
 
@@ -355,7 +274,7 @@ class IndicatorVirtualBox:
     def autoStartVirtualMachines( self, virtualMachines ):
         for virtualMachine in virtualMachines:
             if self.isAutostart( virtualMachine.getUUID() ):
-                self.startVirtualMachine( virtualMachine, virtualMachines, self.getRunningVirtualMachines(), self.delayBetweenAutoStartInSeconds )
+                self.startVirtualMachine( virtualMachine, self.delayBetweenAutoStartInSeconds )
 
 
     # Returns the version number as a string or None if no version could be determined.
@@ -482,27 +401,14 @@ class IndicatorVirtualBox:
         return False
 
 
-    def startVirtualMachine( self, virtualMachine, virtualMachines, runningVirtualMachines, delayInSeconds ):
+    def startVirtualMachine( self, virtualMachine, delayInSeconds ):
         if virtualMachine is None:
             pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." ), INDICATOR_NAME )
 
-        elif virtualMachine.getUUID() in runningVirtualMachines: # Use the window manager to bring the VM window to the front.
-            if self.isVirtualMachineNameUnique( virtualMachine.getName(), virtualMachines ):
-                windowID = None
-                for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
-                    if virtualMachine.getName() in line:
-                        windowID = line[ 0 : line.find( " " ) ]
-                        break
+        elif virtualMachine.getUUID() in self.getRunningVirtualMachines():
+            self.bringWindowToFront( virtualMachine.getName() )
 
-                if windowID is None:
-                    pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "The VM is running but its window could not be found - perhaps it is running headless." ), INDICATOR_NAME )
-                else:
-                    pythonutils.processCall( "wmctrl -i -a " + windowID )
-
-            else:
-                pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified." ), INDICATOR_NAME )
-
-        else: # Run the VM!
+        else:
             try:
                 startCommand = self.getStartCommand( virtualMachine.getUUID() ).replace( "%VM%", virtualMachine.getUUID() ) + " &"
                 pythonutils.processCall( startCommand )
