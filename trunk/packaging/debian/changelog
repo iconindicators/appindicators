@@ -1,12 +1,16 @@
 indicator-virtual-box (1.0.51-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
+  * Can use the mouse wheel to scroll through running VMs to successively
+    bring to front their respective window.
   * Removed running status information from virtualmachine class - running
     status for a VM now obtained from VBoxManage as required.
   * Changed the delay between (manually) starting a VM to updating the menu
     from 60s to 10s.
   * Changed the delay between clicking OK on the Preferences to updating the
     menu from 5s to 1s.
+  * When starting/selecting a VM, messages will appear in the OSD rather than
+    dialogs (and in the log, depending on the situation).
   * Removed extra spacing in comments of About dialog.
   * Fixed PyGIWarnings on imports.
   * Overhaul of icons: only the hicolor icon is required and all theme icons

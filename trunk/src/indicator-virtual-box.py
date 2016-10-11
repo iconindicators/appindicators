@@ -37,7 +37,7 @@ gettext.install( INDICATOR_NAME )
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 
-from gi.repository import AppIndicator3, Gdk, GLib, Gtk
+from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 from threading import Thread
 
 import gzip, json, logging, os, pythonutils, re, shutil, sys, time, virtualmachine
@@ -73,6 +73,7 @@ class IndicatorVirtualBox:
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.dialog = None
         self.loadSettings()
+        Notify.init( INDICATOR_NAME )
         virtualMachines = self.getVirtualMachines()
         Thread( target = self.autoStartVirtualMachines, args = ( virtualMachines, ) ).start()
 
@@ -109,24 +110,19 @@ class IndicatorVirtualBox:
 
 
     def bringWindowToFront( self, virtualMachineName ):
-        numberWindowsWithSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
-        if numberWindowsWithSameName == "0":
-            print( "numberWindowsWithSameName = 0" )#TODO Show as notification instead...or just log to file?
-#                 pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "The VM is running but its window could not be found - perhaps it is running headless." ), INDICATOR_NAME )
-        elif numberWindowsWithSameName == "1":
+        numberOfWindowsWithTheSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
+        if numberOfWindowsWithTheSameName == "0":
+            message = _( "The VM '{0}' is running but its window could not be found - perhaps it is running headless." ).format( widget.props.label )
+            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
+        elif numberOfWindowsWithTheSameName == "1":
             for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
                 if virtualMachineName in line:
                     windowID = line[ 0 : line.find( " " ) ]
                     pythonutils.processCall( "wmctrl -i -a " + windowID )
                     break
         else:
-            #TODO Better message - really more than one window with same name.
-#                 pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "There is more than one VM with the same name - unfortunately your VM cannot be uniquely identified." ), INDICATOR_NAME )
-            print( "numberWindowsWithSameName > 1" )#TODO Show as notification instead...or just log to file?
-
-# pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." ), INDICATOR_NAME )
-# pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM '{0}' could not be started - check the log file: {1}" ).format( virtualMachine.getUUID(), IndicatorVirtualBox.LOG ), INDICATOR_NAME )
-
+            message = _( "Unable to bring the VM '{0}' to front as there is more than one window with the same name." ).format( widget.props.label )
+            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
 
 
     def getVirtualMachineNameFromUUID( self, UUID ):
@@ -212,7 +208,9 @@ class IndicatorVirtualBox:
         virtualMachine = self.getVirtualMachine( widget.props.name )
         if virtualMachine is None:
             GLib.timeout_add_seconds( 1, self.onRefresh, False )
-            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "Missing VM...\n\nName: {0}\nID: {1}" ).format( widget.props.label, widget.props.name ), INDICATOR_NAME )
+            message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
+            Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+            logging.error( "Missing VM '{0}', UUID '{1}'.".format( widget.props.label, widget.props.name ) )
         else:
             self.startVirtualMachine( virtualMachine, 0 ) # Set a zero delay as this is not an autostart.
 
@@ -403,7 +401,8 @@ class IndicatorVirtualBox:
 
     def startVirtualMachine( self, virtualMachine, delayInSeconds ):
         if virtualMachine is None:
-            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM could not be found - either it has been renamed or deleted.  The list of VMs has been refreshed - please try again." ), INDICATOR_NAME )
+            message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
+            Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
 
         elif virtualMachine.getUUID() in self.getRunningVirtualMachines():
             self.bringWindowToFront( virtualMachine.getName() )
@@ -418,7 +417,8 @@ class IndicatorVirtualBox:
 
             except Exception as e:
                 logging.exception( e )
-                pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "The VM '{0}' could not be started - check the log file: {1}" ).format( virtualMachine.getUUID(), IndicatorVirtualBox.LOG ), INDICATOR_NAME )
+                message = _( "The VM '{0}' could not be started." ).format( virtualMachine.getUUID() )
+                Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
 
 
     # repeat: If True, will return True resulting in onRefresh being repeatedly called.  On False, onRefresh will no longer be called.
