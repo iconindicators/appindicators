@@ -9,8 +9,8 @@ indicator-virtual-box (1.0.51-1) precise; urgency=low
     from 60s to 10s.
   * Changed the delay between clicking OK on the Preferences to updating the
     menu from 5s to 1s.
-  * When starting/selecting a VM, messages will appear in the OSD rather than
-    dialogs (and in the log, depending on the situation).
+  * When starting/selecting a VM, if an error occurs, any message will appear
+    in the OSD (and possibly log) rather than in a dialog.
   * Removed extra spacing in comments of About dialog.
   * Fixed PyGIWarnings on imports.
   * Overhaul of icons: only the hicolor icon is required and all theme icons
