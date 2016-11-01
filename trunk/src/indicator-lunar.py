@@ -929,8 +929,8 @@ class IndicatorLunar:
         self.toggleSatellitesTable = True
         self.toggleStarsTable = True
 
-        self.previousLunarIlluminationPercentage = ""
-        self.previousLunarBrightLimbAngle = ""
+        self.previousLunarIlluminationPercentage = -1
+        self.previousLunarBrightLimbAngle = -1
         self.previousThemeName = ""
 
         if not os.path.exists( IndicatorLunar.CACHE_PATH ):
@@ -976,6 +976,8 @@ class IndicatorLunar:
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_ELEVATION ) ] = str( _city_data.get( self.cityName )[ 2 ] )
 
             ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
+            ephemNow = ephem.Date( "2016/11/14 13:52:00.0" ) # FULL
+            ephemNow = ephem.Date( "2016/10/30 17:38:00.0" ) # NEW
             self.updateAstronomicalInformation( ephemNow, self.hideBodyIfNeverUp, self.cometsMagnitude, self.hideSatelliteIfNoVisiblePass )
             GLib.idle_add( self.updateFrontend, ephemNow )
 
@@ -1023,7 +1025,7 @@ class IndicatorLunar:
            key[ 2 ] == IndicatorLunar.DATA_AZIMUTH or \
            key[ 2 ] == IndicatorLunar.DATA_RISE_AZIMUTH or \
            key[ 2 ] == IndicatorLunar.DATA_SET_AZIMUTH:
-            displayData = str( self.getDecimalDegrees( self.data[ key ], False, 2 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
+            displayData = str( self.getDecimalDegrees( self.data[ key ], False, 1 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
 
         elif key[ 2 ] == IndicatorLunar.DATA_BRIGHT_LIMB or \
              key[ 2 ] == IndicatorLunar.DATA_EARTH_TILT or \
@@ -1055,7 +1057,7 @@ class IndicatorLunar:
             else:
                 direction = _( "N" )
 
-            displayData = str( self.getDecimalDegrees( dec, False, 2 ) ) + "° " + direction + " (" + self.trimDecimal( self.data[ key ] ) + ")"
+            displayData = str( self.getDecimalDegrees( dec, False, 1 ) ) + "° " + direction + " (" + self.trimDecimal( self.data[ key ] ) + ")"
 
         elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH or \
              key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_SUN:
@@ -1120,7 +1122,7 @@ class IndicatorLunar:
             displayData = self.data[ key ]
 
         elif key[ 2 ] == IndicatorLunar.DATA_RIGHT_ASCENSION:
-            displayData = str( self.getDecimalDegrees( self.data[ key ], True, 2 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
+            displayData = str( self.getDecimalDegrees( self.data[ key ], True, 1 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
 
         elif key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_NAME:
             displayData = IndicatorLunar.TROPICAL_SIGN_TRANSLATIONS[ self.data[ key ] ] 
@@ -1174,9 +1176,8 @@ class IndicatorLunar:
         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput )
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
-        key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
-        lunarIlluminationPercentage = int( self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
-        lunarBrightLimbAngle = int( round( float( self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] ) ) )
+        lunarIlluminationPercentage = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG ) + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
+        lunarBrightLimbAngle = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG ) + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] )
         themeName = self.getThemeName()
         noChange = \
             lunarBrightLimbAngle == self.previousLunarBrightLimbAngle and \
@@ -1913,7 +1914,7 @@ class IndicatorLunar:
     def updateMoon( self, ephemNow, hideIfNeverUp ):
         if self.showMoon and \
            not self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp ):
-            lunarIlluminationPercentage = int( round( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
+            lunarIlluminationPercentage = int( ( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
             key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
             self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
             self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
@@ -1923,6 +1924,10 @@ class IndicatorLunar:
             self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
 
 
+    # Get the lunar phase for the given date/time and illumination percentage.
+    #
+    #    ephemNow Date/time.
+    #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
     def getLunarPhase( self, ephemNow, illuminationPercentage ):
         nextFullMoonDate = ephem.next_full_moon( ephemNow )
         nextNewMoonDate = ephem.next_new_moon( ephemNow )
@@ -2059,7 +2064,7 @@ class IndicatorLunar:
             body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
 
             if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
-                self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] = str( int( round( body.phase ) ) )
+                self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] = str( round( body.phase ) )
 
             self.data[ key + ( IndicatorLunar.DATA_CONSTELLATION, ) ] = ephem.constellation( body )[ 1 ]
             self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] = str( body.mag )
@@ -2085,7 +2090,7 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ] = str( round( body.sun_distance, 4 ) )
 
             if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
-                self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] = str( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), body ), 1 ) )
+                self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] = str( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), body ) ) )
 
             self.updateRightAscensionDeclinationAzimuthAltitude( body, astronomicalObjectType, dataTag )
 
