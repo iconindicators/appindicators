@@ -1023,7 +1023,7 @@ class IndicatorLunar:
            key[ 2 ] == IndicatorLunar.DATA_AZIMUTH or \
            key[ 2 ] == IndicatorLunar.DATA_RISE_AZIMUTH or \
            key[ 2 ] == IndicatorLunar.DATA_SET_AZIMUTH:
-            displayData = str( self.getDecimalDegrees( self.data[ key ], False, 1 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
+            displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
 
         elif key[ 2 ] == IndicatorLunar.DATA_BRIGHT_LIMB or \
              key[ 2 ] == IndicatorLunar.DATA_EARTH_TILT or \
@@ -1055,7 +1055,7 @@ class IndicatorLunar:
             else:
                 direction = _( "N" )
 
-            displayData = str( self.getDecimalDegrees( dec, False, 1 ) ) + "° " + direction + " (" + self.trimDecimal( self.data[ key ] ) + ")"
+            displayData = str( self.getDecimalDegrees( dec, False, 0 ) ) + "° " + direction + " (" + self.trimDecimal( self.data[ key ] ) + ")"
 
         elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH or \
              key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_SUN:
@@ -1120,7 +1120,7 @@ class IndicatorLunar:
             displayData = self.data[ key ]
 
         elif key[ 2 ] == IndicatorLunar.DATA_RIGHT_ASCENSION:
-            displayData = str( self.getDecimalDegrees( self.data[ key ], True, 1 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
+            displayData = str( self.getDecimalDegrees( self.data[ key ], True, 0 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
 
         elif key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_NAME:
             displayData = IndicatorLunar.TROPICAL_SIGN_TRANSLATIONS[ self.data[ key ] ] 
@@ -1156,7 +1156,12 @@ class IndicatorLunar:
             x = x * 15.0
 
         y = float( t[ 0 ] )
-        return round( math.copysign( x, y ), roundAmount )
+        if roundAmount == 0:
+            decimalDegrees = round( math.copysign( x, y ) )
+        else:
+            decimalDegrees = round( math.copysign( x, y ), roundAmount )
+
+        return decimalDegrees
 
 
     def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
