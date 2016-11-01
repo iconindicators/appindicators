@@ -37,7 +37,7 @@ gettext.install( INDICATOR_NAME )
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 
-from gi.repository import AppIndicator3, GLib, Gtk
+from gi.repository import AppIndicator3, Gdk, GLib, Gtk
 
 import datetime, gzip, json, logging, os, pythonutils, re, shutil, stardate, sys
 
@@ -71,7 +71,11 @@ class IndicatorStardate:
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorStardate.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+        self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
         self.indicator.set_menu( self.buildMenu() )
+
+        self.scrollDirectionIsUp = True
+        self.scrollIndex = 0
 
         self.stardate = stardate.Stardate()
         self.update()
@@ -84,6 +88,38 @@ class IndicatorStardate:
             period = 1
 
         GLib.timeout_add_seconds( period, self.update )
+
+
+    def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
+        numberOptions = 5
+        if scrollDirection == Gdk.ScrollDirection.UP:
+            self.scrollIndex = ( self.scrollIndex + 1 ) % numberOptions
+            self.scrollDirectionIsUp = True
+        else:
+            self.scrollIndex = ( self.scrollIndex - 1 ) % numberOptions
+            self.scrollDirectionIsUp = False
+
+        if self.scrollIndex == 0:
+            self.showClassic = False
+        elif self.scrollIndex == 1:
+            self.showClassic = True
+            self.showIssue = False
+            self.padInteger = False
+        elif self.scrollIndex == 2:
+            self.showClassic = True
+            self.showIssue = True
+            self.padInteger = False
+        elif self.scrollIndex == 3:
+            self.showClassic = True
+            self.showIssue = False
+            self.padInteger = True
+        else:
+            self.showClassic = True
+            self.showIssue = True
+            self.padInteger = True
+
+        self.update()
+        self.saveSettings()
 
 
     def buildMenu( self ):
