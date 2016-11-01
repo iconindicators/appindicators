@@ -1062,7 +1062,7 @@ class IndicatorLunar:
             displayData = self.data[ key ] + " " + _( "ua" )
 
         elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM:
-            displayData = self.data[ key ] + " " + _( "km" )
+            displayData = str( locale.format( "%d", int( self.data[ key ] ), grouping = True ) ) + " " + _( "km" )
 
         elif key[ 2 ] == IndicatorLunar.DATA_EARTH_VISIBLE or \
              key[ 2 ] == IndicatorLunar.DATA_VISIBLE:
@@ -2066,11 +2066,12 @@ class IndicatorLunar:
         if not neverUp:
             body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
 
-            if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
+            if astronomicalObjectType == AstronomicalObjectType.Moon or \
+               astronomicalObjectType == AstronomicalObjectType.Planet:
                 self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] = str( round( body.phase ) )
 
             self.data[ key + ( IndicatorLunar.DATA_CONSTELLATION, ) ] = ephem.constellation( body )[ 1 ]
-            self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] = str( body.mag )
+            self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] = str( round( body.mag, 1 ) )
 
             if astronomicalObjectType != AstronomicalObjectType.Comet:
                 tropicalSignName, tropicalSignDegree, tropicalSignMinute = self.getTropicalSign( body, ephemNow )
@@ -2079,20 +2080,20 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_TROPICAL_SIGN_MINUTE, ) ] = tropicalSignMinute
 
             if astronomicalObjectType == AstronomicalObjectType.Moon:
-                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ] = str( round( body.earth_distance * ephem.meters_per_au / 1000, 1 ) )
+                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ] = str( round( body.earth_distance * ephem.meters_per_au / 1000 ) )
+                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 5 ) )
+                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ] = str( round( body.sun_distance, 2 ) )
 
-            if astronomicalObjectType == AstronomicalObjectType.Moon or \
-               astronomicalObjectType == AstronomicalObjectType.Comet or \
-               astronomicalObjectType == AstronomicalObjectType.Planet or \
-               astronomicalObjectType == AstronomicalObjectType.Sun:
-                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 4 ) )
-
-            if astronomicalObjectType == AstronomicalObjectType.Moon or \
-               astronomicalObjectType == AstronomicalObjectType.Comet or \
+            if astronomicalObjectType == AstronomicalObjectType.Comet or \
                astronomicalObjectType == AstronomicalObjectType.Planet:
-                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ] = str( round( body.sun_distance, 4 ) )
+                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 1 ) )
+                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ] = str( round( body.sun_distance, 1 ) )
 
-            if astronomicalObjectType == AstronomicalObjectType.Moon or astronomicalObjectType == AstronomicalObjectType.Planet:
+            if astronomicalObjectType == AstronomicalObjectType.Sun:
+                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 2 ) )
+
+            if astronomicalObjectType == AstronomicalObjectType.Moon or \
+               astronomicalObjectType == AstronomicalObjectType.Planet:
                 self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] = str( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), body ) ) )
 
             self.updateRightAscensionDeclinationAzimuthAltitude( body, astronomicalObjectType, dataTag )

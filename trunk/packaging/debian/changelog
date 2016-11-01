@@ -4,6 +4,7 @@ indicator-lunar (1.0.69-1) precise; urgency=low
   * Removed expired eclipse information.
   * The dynamically created icon is updated only as needed
     (when the lunar illumination, bright limb or theme change values).
+  * Changes to formats/rounding of several attributes to improve readability.
   * Minor change to tool tip in the Preferences.
   * Fixed PyGIWarnings on imports.
   * Overhaul of icons: only the hicolor icon is required and all theme icons
