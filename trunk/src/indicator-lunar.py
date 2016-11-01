@@ -976,8 +976,6 @@ class IndicatorLunar:
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_ELEVATION ) ] = str( _city_data.get( self.cityName )[ 2 ] )
 
             ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
-            ephemNow = ephem.Date( "2016/11/14 13:52:00.0" ) # FULL
-            ephemNow = ephem.Date( "2016/10/30 17:38:00.0" ) # NEW
             self.updateAstronomicalInformation( ephemNow, self.hideBodyIfNeverUp, self.cometsMagnitude, self.hideSatelliteIfNoVisiblePass )
             GLib.idle_add( self.updateFrontend, ephemNow )
 
