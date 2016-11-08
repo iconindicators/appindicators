@@ -151,7 +151,7 @@ class IndicatorFortune:
 
                     try:
                         with open( IndicatorFortune.HISTORY_FILE, "a" ) as f:
-                            f.write( self.fortune + "\n" )
+                            f.write( self.fortune + "\n\n" )
 
                     except Exception as e:
                         logging.exception( e )
