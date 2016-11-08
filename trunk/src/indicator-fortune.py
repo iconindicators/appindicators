@@ -53,6 +53,7 @@ class IndicatorFortune:
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
+    HISTORY_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + "-history"
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
 
     COMMENTS = _( "Calls the 'fortune' program displaying the result in the on-screen notification." )
@@ -80,6 +81,8 @@ class IndicatorFortune:
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( self.buildMenu() )
+
+        os.remove( IndicatorFortune.HISTORY_FILE )
         self.update()
         self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.update )
 
@@ -145,6 +148,14 @@ class IndicatorFortune:
                     self.fortune = pythonutils.processGet( "fortune" + fortuneLocations )
                     if len( self.fortune ) > self.skipFortuneCharacterCount: # If the fortune exceeds the user-specified character limit, John West it...
                         continue
+
+                    try:
+                        with open( IndicatorFortune.HISTORY_FILE, "a" ) as f:
+                            f.write( self.fortune + "\n" )
+
+                    except Exception as e:
+                        logging.exception( e )
+                        logging.error( "Error writing fortune to history file: " + IndicatorFortune.HISTORY_FILE )
 
                     break
 
