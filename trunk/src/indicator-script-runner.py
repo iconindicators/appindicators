@@ -24,6 +24,22 @@
 # http://lazka.github.io/pgi-docs
 
 
+# TODO
+# Let the user define a default script.
+# When the user middle mouse clicks the icon,
+# the default script it executed.
+
+
+# TODO
+# Let the user check have either/both a OSD notification to show after task has finished and a ping sound to be played.
+# The relevant commands are
+# 
+#  && notify-send \"Update is finished!\"
+#  && paplay /usr/share/sounds/freedesktop/stereo/complete.oga
+# 
+# and should be configurable at a global level.
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -50,6 +66,8 @@ class IndicatorScriptRunner:
     COMMENTS = _( "Run a terminal command or script from a GUI front-end." )
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
+    SETTINGS_DEFAULT_SCRIPT_NAME = "defaultScriptName"
+    SETTINGS_DEFAULT_SCRIPT_DESCRIPTION = "defaultScriptDescription"
     SETTINGS_SCRIPTS = "scripts"
     SETTINGS_SHOW_SCRIPT_DESCRIPTIONS_AS_SUBMENUS = "showScriptDescriptionsAsSubmenus"
 
@@ -94,7 +112,14 @@ class IndicatorScriptRunner:
     def addScriptsToMenu( self, scripts, scriptName, menu, indent ):
         scripts[ scriptName ].sort( key = lambda script: script.getDescription().lower() )
         for script in scripts[ scriptName ]:
-            menuItem = Gtk.MenuItem( indent + script.getDescription() )
+            if scriptName == self.defaultScriptName and script.getDescription() == self.defaultScriptDescription:
+                #TODO NOt sure if we keep this...how to make the item obviously the default when shown in the menu?
+                menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + script.getDescription() )
+                menuItem.set_active( True )
+                self.indicator.set_secondary_activate_target( menuItem )
+            else:
+                menuItem = Gtk.MenuItem( indent + script.getDescription() )
+
             menuItem.connect( "activate", self.onScript, script )
             menu.append( menuItem )
 
@@ -141,6 +166,9 @@ class IndicatorScriptRunner:
             self.dialog.present()
             return
 
+        self.defaultScriptNameCurrent = self.defaultScriptName
+        self.defaultScriptDescriptionCurrent = self.defaultScriptDescription
+
         copyOfScripts = copy.deepcopy( self.scripts )
         notebook = Gtk.Notebook()
 
@@ -167,7 +195,7 @@ class IndicatorScriptRunner:
         box.pack_start( scriptNameComboBox, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
-        scriptDescriptionListStore = Gtk.ListStore( str, str ) # Script descriptions, tick icon (Gtk.STOCK_APPLY) or None for terminal open.
+        scriptDescriptionListStore = Gtk.ListStore( str, str, str ) # Script descriptions, tick icon (Gtk.STOCK_APPLY) or None for terminal open, tick icon (Gtk.STOCK_APPLY) or None for default script.
         scriptDescriptionListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         scriptDescriptionTreeView = Gtk.TreeView( scriptDescriptionListStore )
@@ -182,6 +210,10 @@ class IndicatorScriptRunner:
         scriptDescriptionTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Terminal Open" ), Gtk.CellRendererPixbuf(), stock_id = 1 )
+        treeViewColumn.set_expand( False )
+        scriptDescriptionTreeView.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Default Script" ), Gtk.CellRendererPixbuf(), stock_id = 2 )
         treeViewColumn.set_expand( False )
         scriptDescriptionTreeView.append_column( treeViewColumn )
 
@@ -290,6 +322,13 @@ class IndicatorScriptRunner:
                 self.preferencesOpen = True
                 self.showScriptDescriptionsAsSubmenus = showScriptDescriptionsAsSubmenusCheckbox.get_active()
                 self.scripts = copyOfScripts
+                if len( self.scripts ) == 0:
+                    self.defaultScriptName = ""
+                    self.defaultScriptDescription = ""
+                else:
+                    self.defaultScriptName = self.defaultScriptNameCurrent
+                    self.defaultScriptDescription = self.defaultScriptDescriptionCurrent
+
                 self.saveSettings()
                 pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
                 self.buildMenu()
@@ -314,7 +353,11 @@ class IndicatorScriptRunner:
             if self.getScript( scripts, scriptName, scriptDescription ).isTerminalOpen():
                 terminalOpen = Gtk.STOCK_APPLY
 
-            scriptDescriptionListStore.append( [ scriptDescription, terminalOpen ] )
+            defaultScript = None
+            if scriptName == self.defaultScriptNameCurrent and scriptDescription == self.defaultScriptDescriptionCurrent:
+                defaultScript = Gtk.STOCK_APPLY
+
+            scriptDescriptionListStore.append( [ scriptDescription, terminalOpen, defaultScript ] )
 
         scriptDescriptionTreeView.get_selection().select_path( 0 )
         scriptDescriptionTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
@@ -520,6 +563,13 @@ class IndicatorScriptRunner:
 
         grid.attach( terminalOpenCheckbox, 0, 23, 1, 1 )
 
+        defaultScriptCheckbox = Gtk.CheckButton( _( "Default" ) )
+        defaultScriptCheckbox.set_active( script.getName() == self.defaultScriptNameCurrent and script.getDescription() == self.defaultScriptDescriptionCurrent )
+        defaultScriptCheckbox.set_tooltip_text( _( "If checked, this script will be run\nafter a middle mouse click of the\nindicator icon.\n\nOnly one script can be the default!" ) )
+        defaultScriptCheckbox.set_margin_top( 10 )
+
+        grid.attach( defaultScriptCheckbox, 0, 24, 1, 1 )
+
         title = _( "Edit Script" )
         if script.getName() == "":
             title = _( "Add Script" )
@@ -555,7 +605,7 @@ class IndicatorScriptRunner:
 
                 else: # Editing an existing script.
                     if script.isIdentical( Info( scriptNameEntry.get_text().strip(), scriptDescriptionEntry.get_text().strip(), scriptDirectoryEntry.get_text().strip(), pythonutils.getTextViewText( commandTextView ).strip(), terminalOpenCheckbox.get_active() ) ):
-                        break # No change to the script, so exit.
+                        pass # No change to the script, so should exit, but continue to handle the default script checkbox.
 
                     elif scriptNameEntry.get_text().strip() == script.getName() and scriptDescriptionEntry.get_text().strip() == script.getDescription():
                         pass # The name/description have not changed, but other parts have - so there is no chance of a clash.
@@ -591,7 +641,17 @@ class IndicatorScriptRunner:
                                   terminalOpenCheckbox.get_active() )
 
                 scripts.append( newScript )
+
+                if defaultScriptCheckbox.get_active():
+                    self.defaultScriptNameCurrent = scriptNameEntry.get_text().strip()
+                    self.defaultScriptDescriptionCurrent = scriptDescriptionEntry.get_text().strip()
+                else:
+                    if self.defaultScriptNameCurrent == scriptNameEntry.get_text().strip() and self.defaultScriptDescriptionCurrent == scriptDescriptionEntry.get_text().strip():
+                        self.defaultScriptNameCurrent = ""
+                        self.defaultScriptDescriptionCurrent = ""
+
                 self.populateScriptNameCombo( scripts, scriptNameComboBox, scriptDescriptionTreeView, newScript.getName(), newScript.getDescription() )
+
             break
 
         dialog.destroy()
@@ -655,6 +715,8 @@ class IndicatorScriptRunner:
 
 
     def loadSettings( self ):
+        self.defaultScriptName = "LibreOffice"
+        self.defaultScriptDescription = "Portfolio"
         self.scripts = [ ]
         self.showScriptDescriptionsAsSubmenus = False
         if os.path.isfile( IndicatorScriptRunner.SETTINGS_FILE ):
@@ -662,6 +724,8 @@ class IndicatorScriptRunner:
                 with open( IndicatorScriptRunner.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
+                self.defaultScriptName = settings.get( IndicatorScriptRunner.SETTINGS_DEFAULT_SCRIPT_NAME, self.defaultScriptName )
+                self.defaultScriptDescription = settings.get( IndicatorScriptRunner.SETTINGS_DEFAULT_SCRIPT_DESCRIPTION, self.defaultScriptDescription )
                 scripts = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPTS, [ ] )
                 self.showScriptDescriptionsAsSubmenus = settings.get( IndicatorScriptRunner.SETTINGS_SHOW_SCRIPT_DESCRIPTIONS_AS_SUBMENUS, self.showScriptDescriptionsAsSubmenus )
                 for script in scripts:
@@ -685,6 +749,8 @@ class IndicatorScriptRunner:
                 scripts.append( [ script.getName(), script.getDescription(), script.getDirectory(), script.getCommand(), script.isTerminalOpen() ] )
 
             settings = {
+                IndicatorScriptRunner.SETTINGS_DEFAULT_SCRIPT_NAME: self.defaultScriptName,
+                IndicatorScriptRunner.SETTINGS_DEFAULT_SCRIPT_DESCRIPTION: self.defaultScriptDescription,
                 IndicatorScriptRunner.SETTINGS_SCRIPTS: scripts,
                 IndicatorScriptRunner.SETTINGS_SHOW_SCRIPT_DESCRIPTIONS_AS_SUBMENUS: self.showScriptDescriptionsAsSubmenus
             }
