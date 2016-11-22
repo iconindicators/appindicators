@@ -77,7 +77,8 @@ class IndicatorScriptRunner:
     SETTINGS_SCRIPTS = "scripts"
     SETTINGS_SHOW_SCRIPT_DESCRIPTIONS_AS_SUBMENUS = "showScriptDescriptionsAsSubmenus"
 
-    COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + _( "Summary" ) + "\\\" \\\"" + _( "Body!" ) + "\\\""  #TODO The text here only applies to the update script.
+    COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + "[SCRIPT_NAME]" + "\\\" \\\"" + _( "{0} has completed." ) + "\\\""
+    #TODO The text here only applies to the update script.
     #It is useless for anything else.  So either scrap it or make it use tags to refer to the script name/description.
     # Maybe let the user change the message summary/message; the actual command of notify-send should not be exposed?
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
@@ -146,39 +147,6 @@ class IndicatorScriptRunner:
 
 
     def onScript( self, widget, script ):
-#         command = "x-terminal-emulator -e ${SHELL}'"
-#         if script.getDirectory() == "":
-#             command += " -c cd\ .;\"" + script.getCommand() + "\";'"
-#         else:
-#             command += " -c cd\ " + script.getDirectory() + ";\"" + script.getCommand() + "\";'"
-# 
-#         if script.isTerminalOpen():
-#             command += "${SHELL}"
-
-
-#         if script.getDescription() == "ls":
-#             command = "x-terminal-emulator -e ${SHELL}'"
-#             notify = " && notify-send \\\"Update is finished!\\\""
-#             sound = " && paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
-#             if script.getDirectory() == "":
-#                 command += " -c cd\ .;\"" + script.getCommand() + " && " + IndicatorScriptRunner.COMMAND_NOTIFY + " && " + IndicatorScriptRunner.COMMAND_SOUND + "\";'"
-#             else:
-#                 command += " -c cd\ " + script.getDirectory() + ";\"" + script.getCommand() + " && " + IndicatorScriptRunner.COMMAND_NOTIFY + " && " + IndicatorScriptRunner.COMMAND_SOUND + "\";'"
-# 
-#             if script.isTerminalOpen():
-#                 command += "${SHELL}"
-# 
-#         else:
-#             command = "x-terminal-emulator -e ${SHELL}'"
-#             if script.getDirectory() == "":
-#                 command += " -c cd\ .;\"" + script.getCommand() + "\";'"
-#             else:
-#                 command += " -c cd\ " + script.getDirectory() + ";\"" + script.getCommand() + "\";'"
-# 
-#             if script.isTerminalOpen():
-#                 command += "${SHELL}"
-
-
         command = "x-terminal-emulator -e ${SHELL}'"
 
         if script.getDirectory() == "":
@@ -189,7 +157,7 @@ class IndicatorScriptRunner:
         command += script.getCommand()
 
         if script.getShowNotification():
-             command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY
+             command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.format( script.getDescription() ).replace( "[SCRIPT_NAME]", script.getName() )
 
         if script.getPlaySound():
              command += " && " + IndicatorScriptRunner.COMMAND_SOUND
@@ -876,4 +844,14 @@ class IndicatorScriptRunner:
             logging.error( "Error writing settings: " + IndicatorScriptRunner.SETTINGS_FILE )
 
 
-if __name__ == "__main__": IndicatorScriptRunner().main()
+if __name__ == "__main__": 
+    
+    command = "x-terminal-emulator -e ${SHELL}'"
+    command += " -c cd\ .;\""
+    command += "ls"
+    command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.format( "the script description" ).replace( "[SCRIPT_NAME]", "the script name" )
+    command += "\";'"
+    Thread( target = pythonutils.processCall, args = ( command, ) ).start()
+    print( command )
+    
+IndicatorScriptRunner().main()
