@@ -31,6 +31,8 @@ class Info:
         self.directory = directory
         self.command = command
         self.terminalOpen = terminalOpen
+        self.playSound = False
+        self.showNotification = False
 
 
     def getName( self ): return self.name
@@ -45,6 +47,18 @@ class Info:
     def getCommand( self ): return self.command
 
 
+    def getPlaySound( self ): return self.playSound
+
+
+    def setPlaySound( self, playSound ): self.playSound = playSound
+
+
+    def getShowNotification( self ): return self.showNotification
+
+
+    def setShowNotification( self, showNotification ): self.showNotification = showNotification
+
+
     def isTerminalOpen( self ): return self.terminalOpen
 
 
@@ -53,10 +67,19 @@ class Info:
                self.description == script.getDescription() and \
                self.directory == script.getDirectory() and \
                self.command == script.getCommand() and \
-               self.terminalOpen == script.isTerminalOpen()
+               self.terminalOpen == script.isTerminalOpen() and \
+               self.playSound == script.getPlaySound() and \
+               self.showNotification == script.getShowNotification()
 
 
-    def __str__( self ): return self.getName() + " | " + self.getDescription() + " | " + self.getDirectory() + " | " + self.getCommand() + " | " + str( self.isTerminalOpen() )
+    def __str__( self ):
+        return self.getName() + " | " + \
+               self.getDescription() + " | " + \
+               self.getDirectory() + " | " + \
+               self.getCommand() + " | " + \
+               str( self.isTerminalOpen() ) + " | " + \
+               str( self.getPlaySound() ) + " | " + \
+               str( self.getShowNotification() )
 
 
     def __repr__( self ): return self.__str__()
