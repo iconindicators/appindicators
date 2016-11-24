@@ -24,26 +24,6 @@
 # http://lazka.github.io/pgi-docs
 
 
-# TODO
-# Let the user define a default script.
-# When the user middle mouse clicks the icon,
-# the default script it executed.
-
-
-# TODO
-# Let the user check have either/both a OSD notification to show after task has finished and a ping sound to be played.
-# The relevant commands are
-# 
-#  && notify-send \"Update is finished!\"
-#  && paplay /usr/share/sounds/freedesktop/stereo/complete.oga
-# 
-# and should be configurable at a global level.
-#
-# If the user clears each one, reset to the default text.
-#
-# Have a test button for each?
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -55,7 +35,7 @@ from gi.repository import AppIndicator3, GLib, Gtk
 from script import Info
 from threading import Thread
 
-import copy, json, logging, os, pythonutils, threading, time
+import copy, json, logging, os, pythonutils, threading
 
 
 class IndicatorScriptRunner:
@@ -77,10 +57,10 @@ class IndicatorScriptRunner:
     SETTINGS_SCRIPTS = "scripts"
     SETTINGS_SHOW_SCRIPT_DESCRIPTIONS_AS_SUBMENUS = "showScriptDescriptionsAsSubmenus"
 
-    COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + "[SCRIPT_NAME]" + "\\\" \\\"" + _( "{0} has completed." ) + "\\\""
-    #TODO The text here only applies to the update script.
-    #It is useless for anything else.  So either scrap it or make it use tags to refer to the script name/description.
-    # Maybe let the user change the message summary/message; the actual command of notify-send should not be exposed?
+    COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
+#TODO Unable to put " or ' around the script name/description (although this works directly in a terminal).
+# Unable to use HTML for italic/bold.
+    COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "...\\\" \\\"" + _( "    ...{0} has completed." ) + "\\\""
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
 
@@ -105,6 +85,7 @@ class IndicatorScriptRunner:
         menu = Gtk.Menu()
         if self.showScriptDescriptionsAsSubmenus:
             for scriptName in sorted( scripts.keys(), key = str.lower ):
+
                 if scriptName == self.scriptNameDefault:
                 #TODO NOt sure if we keep this...how to make the item obviously the default when shown in the menu?
 #                     scriptNameMenuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + script.getDescription() )
@@ -112,7 +93,6 @@ class IndicatorScriptRunner:
                     scriptNameMenuItem.set_active( True )
                 else:
                     scriptNameMenuItem = Gtk.MenuItem( scriptName )
-
                 
 #                 scriptNameMenuItem = Gtk.MenuItem( scriptName )
                 subMenu = Gtk.Menu()
@@ -157,7 +137,7 @@ class IndicatorScriptRunner:
         command += script.getCommand()
 
         if script.getShowNotification():
-             command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.format( script.getDescription() ).replace( "[SCRIPT_NAME]", script.getName() )
+             command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.format( script.getDescription() ).replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
 
         if script.getPlaySound():
              command += " && " + IndicatorScriptRunner.COMMAND_SOUND
@@ -168,7 +148,6 @@ class IndicatorScriptRunner:
             command += "${SHELL}"
 
         Thread( target = pythonutils.processCall, args = ( command, ) ).start()
-        print( command )
 
 
     def onAbout( self, widget ):
@@ -308,12 +287,12 @@ class IndicatorScriptRunner:
         box.pack_start( addButton, True, True, 0 )
 
         editButton = Gtk.Button( _( "Edit" ) )
-        editButton.set_tooltip_text( _( "Edit the current script." ) )
+        editButton.set_tooltip_text( _( "Edit the selected script." ) )
         editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, scriptNameComboBox, scriptDescriptionTreeView )
         box.pack_start( editButton, True, True, 0 )
 
         copyButton = Gtk.Button( _( "Copy" ) )
-        copyButton.set_tooltip_text( _( "Make a duplicate of the current script." ) )
+        copyButton.set_tooltip_text( _( "Duplicate the selected script." ) )
         copyButton.connect( "clicked", self.onScriptCopy, copyOfScripts, scriptNameComboBox, scriptDescriptionTreeView )
         box.pack_start( copyButton, True, True, 0 )
 
@@ -337,6 +316,7 @@ class IndicatorScriptRunner:
         grid.set_margin_bottom( 10 )
 
         showScriptDescriptionsAsSubmenusCheckbox = Gtk.CheckButton( _( "Show script descriptions as submenus" ) )
+        showScriptDescriptionsAsSubmenusCheckbox.set_tooltip_text( _( "When checked, scripts with the same\nname are shown in subgroups.\n\nOtherwise, scripts appear in a single\nlist, grouped by name." ) )
         showScriptDescriptionsAsSubmenusCheckbox.set_active( self.showScriptDescriptionsAsSubmenus )
         showScriptDescriptionsAsSubmenusCheckbox.set_margin_top( 10 )
         grid.attach( showScriptDescriptionsAsSubmenusCheckbox, 0, 0, 1, 1 )
@@ -611,19 +591,19 @@ class IndicatorScriptRunner:
         grid.attach( box, 0, 3, 1, 20 )
 
         terminalCheckbox = Gtk.CheckButton( _( "Leave terminal open" ) )
-        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) )
+        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after\nthe script completes." ) )
         terminalCheckbox.set_active( script.isTerminalOpen() )
 
         grid.attach( terminalCheckbox, 0, 23, 1, 1 )
 
         soundCheckbox = Gtk.CheckButton( _( "Play sound" ) )
-        soundCheckbox.set_tooltip_text( _( "Play the general sound on script completion." ) )
+        soundCheckbox.set_tooltip_text( _( "Play a beep on script completion." ) )
         soundCheckbox.set_active( script.getPlaySound() )
 
         grid.attach( soundCheckbox, 0, 24, 1, 1 )
 
         notificationCheckbox = Gtk.CheckButton( _( "Show notification" ) )
-        notificationCheckbox.set_tooltip_text( _( "Show the general notification on script completion." ) )
+        notificationCheckbox.set_tooltip_text( _( "Show a notification on script completion." ) )
         notificationCheckbox.set_active( script.getShowNotification() )
 
         grid.attach( notificationCheckbox, 0, 25, 1, 1 )
@@ -811,12 +791,13 @@ class IndicatorScriptRunner:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorScriptRunner.SETTINGS_FILE )
         else:
+#TODO Make one of these the default script?
             self.scripts = [ ]
             self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 5 www.google.com", False ) )
-            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
-            self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
-            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade && notify-send \\\"Update is finished!\\\"", True ) )
-#TODO Test
+            self.scripts[ -1 ].setShowNotification( True )
+            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
+            self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
+            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
             self.scripts[ -1 ].setPlaySound( True )
             self.scripts[ -1 ].setShowNotification( True )
 
@@ -844,14 +825,4 @@ class IndicatorScriptRunner:
             logging.error( "Error writing settings: " + IndicatorScriptRunner.SETTINGS_FILE )
 
 
-if __name__ == "__main__": 
-    
-    command = "x-terminal-emulator -e ${SHELL}'"
-    command += " -c cd\ .;\""
-    command += "ls"
-    command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.format( "the script description" ).replace( "[SCRIPT_NAME]", "the script name" )
-    command += "\";'"
-    Thread( target = pythonutils.processCall, args = ( command, ) ).start()
-    print( command )
-    
-IndicatorScriptRunner().main()
+if __name__ == "__main__": IndicatorScriptRunner().main()
