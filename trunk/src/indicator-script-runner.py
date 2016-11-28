@@ -50,8 +50,6 @@ class IndicatorScriptRunner:
     COMMENTS = _( "Run a terminal command or script from a GUI front-end." )
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
-    SETTINGS_COMMAND_NOTIFY_DEFAULT = "commandNotifyDefault"
-    SETTINGS_COMMAND_SOUND_DEFAULT = "commandSoundDefault"
     SETTINGS_SCRIPT_NAME_DEFAULT = "scriptNameDefault"
     SETTINGS_SCRIPT_DESCRIPTION_DEFAULT = "scriptDescriptionDefault"
     SETTINGS_SCRIPTS = "scripts"
@@ -60,7 +58,8 @@ class IndicatorScriptRunner:
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
 #TODO Unable to put " or ' around the script name/description (although this works directly in a terminal).
 # Unable to use HTML for italic/bold.
-    COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "...\\\" \\\"" + _( "    ...{0} has completed." ) + "\\\""
+# Would be nice (more readable) if the script description was quoted.
+    COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "...\\\" \\\"" + _( "...{0} has completed." ) + "\\\""
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
 
@@ -85,16 +84,7 @@ class IndicatorScriptRunner:
         menu = Gtk.Menu()
         if self.showScriptDescriptionsAsSubmenus:
             for scriptName in sorted( scripts.keys(), key = str.lower ):
-
-                if scriptName == self.scriptNameDefault:
-                #TODO NOt sure if we keep this...how to make the item obviously the default when shown in the menu?
-#                     scriptNameMenuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + script.getDescription() )
-                    scriptNameMenuItem = Gtk.CheckMenuItem.new_with_label( scriptName )
-                    scriptNameMenuItem.set_active( True )
-                else:
-                    scriptNameMenuItem = Gtk.MenuItem( scriptName )
-                
-#                 scriptNameMenuItem = Gtk.MenuItem( scriptName )
+                scriptNameMenuItem = Gtk.MenuItem( scriptName )
                 subMenu = Gtk.Menu()
                 scriptNameMenuItem.set_submenu( subMenu )
                 menu.append( scriptNameMenuItem )
@@ -113,17 +103,11 @@ class IndicatorScriptRunner:
     def addScriptsToMenu( self, scripts, scriptName, menu, indent ):
         scripts[ scriptName ].sort( key = lambda script: script.getDescription().lower() )
         for script in scripts[ scriptName ]:
-            if scriptName == self.scriptNameDefault and script.getDescription() == self.scriptDescriptionDefault:
-                #TODO NOt sure if we keep this...how to make the item obviously the default when shown in the menu?
-#                 menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + script.getDescription() )
-                menuItem = Gtk.CheckMenuItem.new_with_label( indent + script.getDescription() )
-                menuItem.set_active( True )
-                self.indicator.set_secondary_activate_target( menuItem )
-            else:
-                menuItem = Gtk.MenuItem( indent + script.getDescription() )
-
+            menuItem = Gtk.MenuItem( indent + script.getDescription() )
             menuItem.connect( "activate", self.onScript, script )
             menu.append( menuItem )
+            if scriptName == self.scriptNameDefault and script.getDescription() == self.scriptDescriptionDefault:
+                self.indicator.set_secondary_activate_target( menuItem )
 
 
     def onScript( self, widget, script ):
@@ -202,7 +186,8 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Name" ) ), False, False, 0 )
 
         scriptNameComboBox = Gtk.ComboBoxText()
-        scriptNameComboBox.set_tooltip_text( _( "The name of a script object.\n\nMore than one script may\nshare the same name but must\nhave a different description." ) )
+#TODO Add a tooltip which says the first script will be selected if no default exists).
+        scriptNameComboBox.set_tooltip_text( _( "The name of a script object.\n\nScripts may share the same name,\nbut must have a different description." ) )
         scriptNameComboBox.set_entry_text_column( 0 )
 
         box.pack_start( scriptNameComboBox, True, True, 0 )
@@ -212,6 +197,7 @@ class IndicatorScriptRunner:
         scriptDescriptionListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         scriptDescriptionTreeView = Gtk.TreeView( scriptDescriptionListStore )
+#TODO Add a tooltip which says the first script will be selected if no default exists).
         scriptDescriptionTreeView.set_tooltip_text( _( "List of scripts with same name,\nbut different descriptions." ) )
         scriptDescriptionTreeView.set_hexpand( True )
         scriptDescriptionTreeView.set_vexpand( True )
@@ -426,7 +412,7 @@ class IndicatorScriptRunner:
 
         scriptNameEntry = Gtk.Entry()
         scriptNameEntry.set_tooltip_text( _( "The name of the script object." ) )
-        scriptNameEntry.set_text( script.getName() )
+        scriptNameEntry.set_text( script.getName() ) #TODO Remove all script and get a barf here.
         scriptNameEntry.set_hexpand( True ) # Only need to set this once and all objects will expand.
         box.pack_start( scriptNameEntry, True, True, 0 )
 
@@ -714,13 +700,18 @@ class IndicatorScriptRunner:
         return theScript
 
 
-    def populateScriptNameCombo( self, scripts, scriptNameComboBox, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
+    def populateScriptNameComboORIG( self, scripts, scriptNameComboBox, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
         scriptNameComboBox.remove_all()
         for name in sorted( self.getScriptsGroupedByName( scripts ), key = str.lower ):
             scriptNameComboBox.append_text( name )
 
         if scriptName == "":
-            scriptNameComboBox.set_active( 0 )
+            if self.scriptNameDefault == "" :
+                scriptNameComboBox.set_active( 0 )
+            else:
+                i = sorted( self.getScriptsGroupedByName( scripts ), key = str.lower ).index( self.scriptNameDefault )
+                scriptNameComboBox.set_active( i )
+#TODO Select the script description!
         else:
             i = 0
             iter = scriptNameComboBox.get_model().get_iter_first()
@@ -750,6 +741,40 @@ class IndicatorScriptRunner:
                         i += 1
 
 
+    def populateScriptNameCombo( self, scripts, scriptNameComboBox, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
+        scriptNameComboBox.remove_all()
+        for name in sorted( self.getScriptsGroupedByName( scripts ), key = str.lower ):
+            scriptNameComboBox.append_text( name )
+
+        if scriptName == "":
+            scriptName = self.scriptNameDefault
+            scriptDescription = self.scriptDescriptionDefault
+
+        try:
+            i = sorted( self.getScriptsGroupedByName( scripts ), key = str.lower ).index( scriptName )
+            scriptNameComboBox.set_active( i )
+            self.selectScriptDescription( scriptDescriptionTreeView, scriptDescription )
+        except ValueError: # Triggered when the last script (of a given name) is removed or when there is no default.
+            scriptNameComboBox.set_active( 0 )
+
+
+    def selectScriptDescription( self, scriptDescriptionTreeView, scriptDescription ): # Script description must be a valid value or "".
+#TODO Use an index type thing from above to select rather than the guff below?
+        if scriptDescription == "":
+            scriptDescriptionTreeView.get_selection().select_path( 0 )
+        else: # Select the description - the description must exist otherwise there is some coding error elsewhere.
+            i = 0
+            iter = scriptDescriptionTreeView.get_model().get_iter_first()
+            while iter is not None:
+                if scriptDescriptionTreeView.get_model().get_value( iter, 0 ) == scriptDescription:
+                    scriptDescriptionTreeView.get_selection().select_path( i )
+                    scriptDescriptionTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( str( i ) ) )
+                    break
+
+                iter = scriptDescriptionTreeView.get_model().iter_next( iter )
+                i += 1
+
+
     def getScriptsGroupedByName( self, scripts ):
         scriptsGroupedByName = { }
         for script in scripts:
@@ -762,8 +787,6 @@ class IndicatorScriptRunner:
 
 
     def loadSettings( self ):
-        self.commandNotifyDefault = IndicatorScriptRunner.COMMAND_NOTIFY
-        self.commandSoundDefault = IndicatorScriptRunner.COMMAND_SOUND
         self.scriptNameDefault = ""
         self.scriptDescriptionDefault = ""
         self.scripts = [ ]
@@ -773,8 +796,6 @@ class IndicatorScriptRunner:
                 with open( IndicatorScriptRunner.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
-                self.commandNotifyDefault = settings.get( IndicatorScriptRunner.SETTINGS_COMMAND_NOTIFY_DEFAULT, self.commandNotifyDefault )
-                self.commandSoundDefault = settings.get( IndicatorScriptRunner.SETTINGS_COMMAND_SOUND_DEFAULT, self.commandSoundDefault )
                 self.scriptNameDefault = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPT_NAME_DEFAULT, self.scriptNameDefault )
                 self.scriptDescriptionDefault = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPT_DESCRIPTION_DEFAULT, self.scriptDescriptionDefault )
                 scripts = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPTS, [ ] )
@@ -787,16 +808,20 @@ class IndicatorScriptRunner:
                         self.scripts[ -1 ].setPlaySound( script[ 5 ] )
                         self.scripts[ -1 ].setShowNotification( script[ 6 ] )
 
+                self.scripts.append( Info( "Update", "a", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", False ) )
+                self.scripts.append( Info( "Update", "b", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", False ) )
+                self.scripts.append( Info( "Update", "z", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", False ) )
+
             except Exception as e:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorScriptRunner.SETTINGS_FILE )
         else:
-#TODO Make one of these the default script?
             self.scripts = [ ]
             self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 5 www.google.com", False ) )
-            self.scripts[ -1 ].setShowNotification( True )
             self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
             self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
+            self.scriptNameDefault = self.scripts[ -1 ].getName()
+            self.scriptDescriptionDefault = self.scripts[ -1 ].getDescription()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
             self.scripts[ -1 ].setPlaySound( True )
             self.scripts[ -1 ].setShowNotification( True )
@@ -809,8 +834,6 @@ class IndicatorScriptRunner:
                 scripts.append( [ script.getName(), script.getDescription(), script.getDirectory(), script.getCommand(), script.isTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
 
             settings = {
-                IndicatorScriptRunner.SETTINGS_COMMAND_NOTIFY_DEFAULT: self.commandNotifyDefault,
-                IndicatorScriptRunner.SETTINGS_COMMAND_SOUND_DEFAULT: self.commandSoundDefault,
                 IndicatorScriptRunner.SETTINGS_SCRIPT_NAME_DEFAULT: self.scriptNameDefault,
                 IndicatorScriptRunner.SETTINGS_SCRIPT_DESCRIPTION_DEFAULT: self.scriptDescriptionDefault,
                 IndicatorScriptRunner.SETTINGS_SCRIPTS: scripts,
