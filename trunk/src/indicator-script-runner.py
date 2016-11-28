@@ -753,26 +753,30 @@ class IndicatorScriptRunner:
         try:
             i = sorted( self.getScriptsGroupedByName( scripts ), key = str.lower ).index( scriptName )
             scriptNameComboBox.set_active( i )
-            self.selectScriptDescription( scriptDescriptionTreeView, scriptDescription )
-        except ValueError: # Triggered when the last script (of a given name) is removed or when there is no default.
-            scriptNameComboBox.set_active( 0 )
+
+            scriptDescriptions = [ ]
+            for script in scripts:
+                if script.getName() == scriptName:
+                    scriptDescriptions.append( script.getDescription() )
+
+            scriptDescriptions = sorted( scriptDescriptions, key = str.lower )
+            scriptDescriptionTreeView.get_selection().select_path( scriptDescriptions.index( scriptDescription ) )
+
+        except ValueError: # Triggered when the last script (of a given name) is removed or when there is no default script.
+            scriptNameComboBox.set_active( 0 ) #TODO Test this...need to select an empty script description?  The first description should be selected by default.
 
 
-    def selectScriptDescription( self, scriptDescriptionTreeView, scriptDescription ): # Script description must be a valid value or "".
-#TODO Use an index type thing from above to select rather than the guff below?
+    def selectScriptDescription( self, scripts, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
         if scriptDescription == "":
             scriptDescriptionTreeView.get_selection().select_path( 0 )
-        else: # Select the description - the description must exist otherwise there is some coding error elsewhere.
-            i = 0
-            iter = scriptDescriptionTreeView.get_model().get_iter_first()
-            while iter is not None:
-                if scriptDescriptionTreeView.get_model().get_value( iter, 0 ) == scriptDescription:
-                    scriptDescriptionTreeView.get_selection().select_path( i )
-                    scriptDescriptionTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( str( i ) ) )
-                    break
+        else:
+            scriptDescriptions = [ ]
+            for script in scripts:
+                if script.getName() == scriptName:
+                    scriptDescriptions.append( script.getDescription() )
 
-                iter = scriptDescriptionTreeView.get_model().iter_next( iter )
-                i += 1
+            scriptDescriptions = sorted( scriptDescriptions, key = str.lower )
+            scriptDescriptionTreeView.get_selection().select_path( scriptDescriptions.index( scriptDescription ) )
 
 
     def getScriptsGroupedByName( self, scripts ):
