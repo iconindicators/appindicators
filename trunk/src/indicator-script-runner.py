@@ -741,7 +741,11 @@ class IndicatorScriptRunner:
 
 
 #TODO Rename script name to script group and script description to script name.
-#Need to keep the old settings for loading but also add new settings in loading.
+# 1) Rename text on labels/tooltips and so on.
+# 2) Rename GUI elements.
+# 3) What to do about load/save settings?  
+#    Maybe in the save, use the new settings (group/name).
+#    In the load, if name/description are found, load up and save as these are old settings.  Otherwise load up as normal.
     def loadSettings( self ):
         self.scriptNameDefault = ""
         self.scriptDescriptionDefault = ""
