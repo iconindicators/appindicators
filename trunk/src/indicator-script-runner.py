@@ -766,7 +766,7 @@ class IndicatorScriptRunner:
             scriptDescriptionTreeView.get_selection().select_path( scriptDescriptions.index( scriptDescription ) )
 
         except ValueError: # Triggered when the last script (of a given name) is removed or when there is no default script.
-            scriptNameComboBox.set_active( 0 ) #TODO Test this...need to select an empty script description?  The first description should be selected by default.
+            scriptNameComboBox.set_active( 0 )
 
 
     def getScriptsGroupedByName( self, scripts ):
@@ -780,6 +780,8 @@ class IndicatorScriptRunner:
         return scriptsGroupedByName
 
 
+#TODO Rename script name to script group and script description to script name.
+#Need to keep the old settings for loading but also add new settings in loading.
     def loadSettings( self ):
         self.scriptNameDefault = ""
         self.scriptDescriptionDefault = ""
