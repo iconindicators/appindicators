@@ -60,6 +60,8 @@ class IndicatorScriptRunner:
 # Unable to use HTML for italic/bold.
 # Would be nice (more readable) if the script description was quoted.
     COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "...\\\" \\\"" + _( "...{0} has completed." ) + "\\\""
+
+#TODO Before playing the audio, need to check if it exists?    
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
 
@@ -397,77 +399,77 @@ class IndicatorScriptRunner:
             scriptDescription = model[ treeiter ][ 0 ]
             script = self.getScript( scripts, scriptName, scriptDescription )
 
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+            grid = Gtk.Grid()
+            grid.set_column_spacing( 10 )
+            grid.set_row_spacing( 10 )
+            grid.set_margin_left( 10 )
+            grid.set_margin_right( 10 )
+            grid.set_margin_top( 10 )
+            grid.set_margin_bottom( 10 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
+            box = Gtk.Box( spacing = 6 )
+            box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Name" ) ), False, False, 0 )
+            box.pack_start( Gtk.Label( _( "Name" ) ), False, False, 0 )
 
-        scriptNameEntry = Gtk.Entry()
-        scriptNameEntry.set_tooltip_text( _( "The name of the script object." ) )
-        scriptNameEntry.set_text( script.getName() ) #TODO Remove all script and get a barf here.
-        scriptNameEntry.set_hexpand( True ) # Only need to set this once and all objects will expand.
-        box.pack_start( scriptNameEntry, True, True, 0 )
+            scriptNameEntry = Gtk.Entry()
+            scriptNameEntry.set_tooltip_text( _( "The name of the script object." ) )
+            scriptNameEntry.set_text( script.getName() )
+            scriptNameEntry.set_hexpand( True ) # Only need to set this once and all objects will expand.
+            box.pack_start( scriptNameEntry, True, True, 0 )
 
-        grid.attach( box, 0, 0, 1, 1 )
+            grid.attach( box, 0, 0, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
+            box = Gtk.Box( spacing = 6 )
+            box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Description" ) ), False, False, 0 )
+            box.pack_start( Gtk.Label( _( "Description" ) ), False, False, 0 )
 
-        scriptDescriptionEntry = Gtk.Entry()
-        scriptDescriptionEntry.set_tooltip_text( _( "The description of the script object." ) )
-        scriptDescriptionEntry.set_text( script.getDescription() )
-        box.pack_start( scriptDescriptionEntry, True, True, 0 )
+            scriptDescriptionEntry = Gtk.Entry()
+            scriptDescriptionEntry.set_tooltip_text( _( "The description of the script object." ) )
+            scriptDescriptionEntry.set_text( script.getDescription() )
+            box.pack_start( scriptDescriptionEntry, True, True, 0 )
 
-        grid.attach( box, 0, 1, 1, 1 )
+            grid.attach( box, 0, 1, 1, 1 )
 
-        dialog = Gtk.Dialog( _( "Copy Script" ), self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        dialog.vbox.pack_start( grid, True, True, 0 )
-        dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorScriptRunner.ICON )
+            dialog = Gtk.Dialog( _( "Copy Script" ), self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+            dialog.vbox.pack_start( grid, True, True, 0 )
+            dialog.set_border_width( 5 )
+            dialog.set_icon_name( IndicatorScriptRunner.ICON )
 
-        while True:
-            dialog.show_all()
-            if dialog.run() == Gtk.ResponseType.OK:
-                if scriptNameEntry.get_text().strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script name cannot be empty." ), INDICATOR_NAME )
-                    scriptNameEntry.grab_focus()
-                    continue
+            while True:
+                dialog.show_all()
+                if dialog.run() == Gtk.ResponseType.OK:
+                    if scriptNameEntry.get_text().strip() == "":
+                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script name cannot be empty." ), INDICATOR_NAME )
+                        scriptNameEntry.grab_focus()
+                        continue
 
-                if scriptDescriptionEntry.get_text().strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script description cannot be empty." ), INDICATOR_NAME )
-                    scriptDescriptionEntry.grab_focus()
-                    continue
+                    if scriptDescriptionEntry.get_text().strip() == "":
+                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script description cannot be empty." ), INDICATOR_NAME )
+                        scriptDescriptionEntry.grab_focus()
+                        continue
 
-                if scriptNameEntry.get_text().strip() == scriptName and scriptDescriptionEntry.get_text().strip() == scriptDescription:
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
-                    scriptNameEntry.grab_focus()
-                    continue
+                    if scriptNameEntry.get_text().strip() == scriptName and scriptDescriptionEntry.get_text().strip() == scriptDescription:
+                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
+                        scriptNameEntry.grab_focus()
+                        continue
 
-                newScript = Info( scriptNameEntry.get_text().strip(),
-                                  scriptDescriptionEntry.get_text().strip(), 
-                                  script.getDirectory(),
-                                  script.getCommand(),
-                                  script.isTerminalOpen() )
+                    newScript = Info( scriptNameEntry.get_text().strip(),
+                                      scriptDescriptionEntry.get_text().strip(), 
+                                      script.getDirectory(),
+                                      script.getCommand(),
+                                      script.isTerminalOpen() )
 
-                newScript.setPlaySound( script.getPlaySound() )
-                newScript.setShowNotification( script.getShowNotification() )
+                    newScript.setPlaySound( script.getPlaySound() )
+                    newScript.setShowNotification( script.getShowNotification() )
 
-                scripts.append( newScript )
-                self.populateScriptNameCombo( scripts, scriptNameComboBox, scriptDescriptionTreeView, newScript.getName(), newScript.getDescription() )
+                    scripts.append( newScript )
+                    self.populateScriptNameCombo( scripts, scriptNameComboBox, scriptDescriptionTreeView, newScript.getName(), newScript.getDescription() )
 
-            break
+                break
 
-        dialog.destroy()
+            dialog.destroy()
 
 
     def onScriptRemove( self, button, scripts, scriptNameComboBox, scriptDescriptionTreeView, directoryEntry, commandTextView ):
@@ -741,6 +743,7 @@ class IndicatorScriptRunner:
                         i += 1
 
 
+#TODO Test every call to this function.
     def populateScriptNameCombo( self, scripts, scriptNameComboBox, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
         scriptNameComboBox.remove_all()
         for name in sorted( self.getScriptsGroupedByName( scripts ), key = str.lower ):
@@ -764,19 +767,6 @@ class IndicatorScriptRunner:
 
         except ValueError: # Triggered when the last script (of a given name) is removed or when there is no default script.
             scriptNameComboBox.set_active( 0 ) #TODO Test this...need to select an empty script description?  The first description should be selected by default.
-
-
-    def selectScriptDescription( self, scripts, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
-        if scriptDescription == "":
-            scriptDescriptionTreeView.get_selection().select_path( 0 )
-        else:
-            scriptDescriptions = [ ]
-            for script in scripts:
-                if script.getName() == scriptName:
-                    scriptDescriptions.append( script.getDescription() )
-
-            scriptDescriptions = sorted( scriptDescriptions, key = str.lower )
-            scriptDescriptionTreeView.get_selection().select_path( scriptDescriptions.index( scriptDescription ) )
 
 
     def getScriptsGroupedByName( self, scripts ):
@@ -811,10 +801,6 @@ class IndicatorScriptRunner:
                     if len( script ) == 7:
                         self.scripts[ -1 ].setPlaySound( script[ 5 ] )
                         self.scripts[ -1 ].setShowNotification( script[ 6 ] )
-
-                self.scripts.append( Info( "Update", "a", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", False ) )
-                self.scripts.append( Info( "Update", "b", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", False ) )
-                self.scripts.append( Info( "Update", "z", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", False ) )
 
             except Exception as e:
                 logging.exception( e )
