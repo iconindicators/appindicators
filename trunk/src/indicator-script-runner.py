@@ -510,6 +510,8 @@ class IndicatorScriptRunner:
             self.addEditScript( theScript, scripts, scriptNameComboBox, scriptDescriptionTreeView )
 
 
+#TODO Given that script name will be script group...maybe let the user choose a group (if not the first script) from a combo.
+#How then to let the user also add a new group?
     def addEditScript( self, script, scripts, scriptNameComboBox, scriptDescriptionTreeView ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -702,48 +704,6 @@ class IndicatorScriptRunner:
         return theScript
 
 
-    def populateScriptNameComboORIG( self, scripts, scriptNameComboBox, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
-        scriptNameComboBox.remove_all()
-        for name in sorted( self.getScriptsGroupedByName( scripts ), key = str.lower ):
-            scriptNameComboBox.append_text( name )
-
-        if scriptName == "":
-            if self.scriptNameDefault == "" :
-                scriptNameComboBox.set_active( 0 )
-            else:
-                i = sorted( self.getScriptsGroupedByName( scripts ), key = str.lower ).index( self.scriptNameDefault )
-                scriptNameComboBox.set_active( i )
-#TODO Select the script description!
-        else:
-            i = 0
-            iter = scriptNameComboBox.get_model().get_iter_first()
-            while iter is not None:
-                if scriptNameComboBox.get_model().get_value( iter, 0 ) == scriptName:
-                    scriptNameComboBox.set_active( i )
-                    break
-
-                iter = scriptNameComboBox.get_model().iter_next( iter )
-                i += 1
-
-            if iter is None: # Could not find the script name (happens when the last script of the given name is removed.)
-                scriptNameComboBox.set_active( 0 )
-            else: # A script name was found and has been selected.
-                if scriptDescription == "":
-                    scriptDescriptionTreeView.get_selection().select_path( 0 )
-                else: # Select the description - the description must exist otherwise there is some coding error elsewhere.
-                    i = 0
-                    iter = scriptDescriptionTreeView.get_model().get_iter_first()
-                    while iter is not None:
-                        if scriptDescriptionTreeView.get_model().get_value( iter, 0 ) == scriptDescription:
-                            scriptDescriptionTreeView.get_selection().select_path( i )
-                            scriptDescriptionTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( str( i ) ) )
-                            break
-
-                        iter = scriptDescriptionTreeView.get_model().iter_next( iter )
-                        i += 1
-
-
-#TODO Test every call to this function.
     def populateScriptNameCombo( self, scripts, scriptNameComboBox, scriptDescriptionTreeView, scriptName, scriptDescription ): # Script name/description must be valid values or "".
         scriptNameComboBox.remove_all()
         for name in sorted( self.getScriptsGroupedByName( scripts ), key = str.lower ):
