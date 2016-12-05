@@ -85,16 +85,16 @@ class IndicatorScriptRunner:
         scripts = self.getScriptsByGroup( self.scripts )
         menu = Gtk.Menu()
         if self.showScriptsInSubmenus:
-            for scriptName in sorted( scripts.keys(), key = str.lower ):
-                scriptNameMenuItem = Gtk.MenuItem( scriptName )
+            for scriptGroup in sorted( scripts.keys(), key = str.lower ):
+                scriptNameMenuItem = Gtk.MenuItem( scriptGroup )
                 subMenu = Gtk.Menu()
                 scriptNameMenuItem.set_submenu( subMenu )
                 menu.append( scriptNameMenuItem )
-                self.addScriptsToMenu( scripts, scriptName, subMenu, "" )
+                self.addScriptsToMenu( scripts, scriptGroup, subMenu, "" )
         else:
-            for scriptName in sorted( scripts.keys(), key = str.lower ):
-                menu.append( Gtk.MenuItem( scriptName + "..." ) )
-                self.addScriptsToMenu( scripts, scriptName, menu, "        " )
+            for scriptGroup in sorted( scripts.keys(), key = str.lower ):
+                menu.append( Gtk.MenuItem( scriptGroup + "..." ) )
+                self.addScriptsToMenu( scripts, scriptGroup, menu, "        " )
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( scripts ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
@@ -102,13 +102,13 @@ class IndicatorScriptRunner:
         return menu
 
 
-    def addScriptsToMenu( self, scripts, scriptName, menu, indent ):
-        scripts[ scriptName ].sort( key = lambda script: script.getName().lower() )
-        for script in scripts[ scriptName ]:
+    def addScriptsToMenu( self, scriptsGroupedByName, scriptGroup, menu, indent ):
+        scriptsGroupedByName[ scriptGroup ].sort( key = lambda script: script.getName().lower() )
+        for script in scriptsGroupedByName[ scriptGroup ]:
             menuItem = Gtk.MenuItem( indent + script.getName() )
             menuItem.connect( "activate", self.onScript, script )
             menu.append( menuItem )
-            if scriptName == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
+            if scriptGroup == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
                 self.indicator.set_secondary_activate_target( menuItem )
 
 
@@ -315,7 +315,7 @@ class IndicatorScriptRunner:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        scriptGroupComboBox.connect( "changed", self.onScriptName, copyOfScripts, scriptNameListStore, scriptNameTreeView )
+        scriptGroupComboBox.connect( "changed", self.onScriptGroup, copyOfScripts, scriptNameListStore, scriptNameTreeView )
         scriptNameTreeView.get_selection().connect( "changed", self.onScriptName, scriptGroupComboBox, directoryEntry, commandTextView, copyOfScripts )
         self.populateScriptGroupCombo( copyOfScripts, scriptGroupComboBox, scriptNameTreeView, "", "" )
 
@@ -345,28 +345,28 @@ class IndicatorScriptRunner:
         self.dialog = None
 
 
-    def onScriptName( self, scriptGroupComboBox, scripts, scriptNameListStore, scriptNameTreeView ):
-        scriptName = scriptGroupComboBox.get_active_text()
+    def onScriptGroup( self, scriptGroupComboBox, scripts, scriptNameListStore, scriptNameTreeView ):
+        scriptGroup = scriptGroupComboBox.get_active_text()
         scriptNameListStore.clear()
 
         scriptNames = [ ]
         for script in scripts:
-            if script.getGroup() == scriptName:
+            if script.getGroup() == scriptGroup:
                 scriptNames.append( script.getName() )
 
         scriptNames = sorted( scriptNames, key = str.lower )
 
         for scriptName in scriptNames:
             terminalOpen = None
-            if self.getScript( scripts, scriptName, scriptName ).isTerminalOpen():
+            if self.getScript( scripts, scriptGroup, scriptName ).isTerminalOpen():
                 terminalOpen = Gtk.STOCK_APPLY
 
             playSound = None
-            if self.getScript( scripts, scriptName, scriptName ).getPlaySound():
+            if self.getScript( scripts, scriptGroup, scriptName ).getPlaySound():
                 playSound = Gtk.STOCK_APPLY
 
             showNotification = None
-            if self.getScript( scripts, scriptName, scriptName ).getShowNotification():
+            if self.getScript( scripts, scriptGroup, scriptName ).getShowNotification():
                 showNotification = Gtk.STOCK_APPLY
 
             defaultScript = None
@@ -508,8 +508,7 @@ class IndicatorScriptRunner:
             self.addEditScript( theScript, scripts, scriptGroupComboBox, scriptNameTreeView )
 
 
-#TODO Given that script name will be script group...maybe let the user choose a group (if not the first script) from a combo.
-#How then to let the user also add a new group?
+#TODO At some point there could be a script group orphaned...not sure how.  
     def addEditScript( self, script, scripts, scriptGroupComboBox, scriptNameTreeView ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -524,11 +523,18 @@ class IndicatorScriptRunner:
 
         box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
-        scriptGroupEntry = Gtk.Entry()
-        scriptGroupEntry.set_tooltip_text( _( "The group to which the script belongs." ) )
-        scriptGroupEntry.set_text( script.getGroup() )
+        scriptGroupCombo = Gtk.ComboBoxText.new_with_entry()
+        scriptGroupCombo.set_tooltip_text( _( "The group to which the script belongs.\n\nChoose an existing group or enter a\nnew one." ) )
+        groups = sorted( self.getScriptsByGroup( scripts ) )
+        for group in groups:
+            scriptGroupCombo.append_text( group )
 
-        box.pack_start( scriptGroupEntry, True, True, 0 )
+        if script.getGroup() == "": 
+            scriptGroupCombo.set_active( scriptGroupComboBox.get_active() )
+        else:
+            scriptGroupCombo.set_active( groups.index( script.getGroup() ) )
+
+        box.pack_start( scriptGroupCombo, True, True, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )
 
@@ -598,7 +604,7 @@ class IndicatorScriptRunner:
 
         defaultScriptCheckbox = Gtk.CheckButton( _( "Default script" ) )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
-        defaultScriptCheckbox.set_tooltip_text( _( "If checked, this script will be run\non a middle mouse click of the\nindicator icon.\n\nOnly one script can be the default!" ) )
+        defaultScriptCheckbox.set_tooltip_text( _( "If checked, this script will be run\non a middle mouse click of the\nindicator icon.\n\nOnly one script can be the default." ) )
 
         grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
 
@@ -614,9 +620,9 @@ class IndicatorScriptRunner:
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
-                if scriptGroupEntry.get_text().strip() == "":
+                if scriptGroupCombo.get_text().strip() == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The group cannot be empty." ), INDICATOR_NAME )
-                    scriptGroupEntry.grab_focus()
+                    scriptGroupCombo.grab_focus()
                     continue
 
                 if scriptNameEntry.get_text().strip() == "":
@@ -630,29 +636,29 @@ class IndicatorScriptRunner:
                     continue
 
                 if script.getGroup() == "": # Adding a new script - check for duplicate.
-                    if self.getScript( scripts, scriptGroupEntry.get_text().strip(), scriptNameEntry.get_text().strip() ) is not None:
+                    if self.getScript( scripts, scriptGroupCombo.get_text().strip(), scriptNameEntry.get_text().strip() ) is not None:
                         pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
-                        scriptGroupEntry.grab_focus()
+                        scriptGroupCombo.grab_focus()
                         continue
 
                 else: # Editing an existing script.
-                    if script.isIdentical( Info( scriptGroupEntry.get_text().strip(), scriptNameEntry.get_text().strip(), scriptDirectoryEntry.get_text().strip(), pythonutils.getTextViewText( commandTextView ).strip(), terminalCheckbox.get_active() ) ):
+                    if script.isIdentical( Info( scriptGroupCombo.get_text().strip(), scriptNameEntry.get_text().strip(), scriptDirectoryEntry.get_text().strip(), pythonutils.getTextViewText( commandTextView ).strip(), terminalCheckbox.get_active() ) ):
                         pass # No change to the script, so should exit, but continue to handle the default script checkbox.
 
-                    elif scriptGroupEntry.get_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
+                    elif scriptGroupCombo.get_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
                         pass # The group/name have not changed, but other parts have - so there is no chance of a clash.
 
                     else: # At this point either the script group or name has changed or both (and possibly the other script parameters). 
                         duplicate = False
                         for scriptInList in scripts:
                             if not scriptInList.isIdentical( script ):
-                                if scriptGroupEntry.get_text().strip() == scriptInList.getGroup() and scriptNameEntry.get_text().strip() == scriptInList.getName():
+                                if scriptGroupCombo.get_text().strip() == scriptInList.getGroup() and scriptNameEntry.get_text().strip() == scriptInList.getName():
                                     duplicate = True
                                     break
 
                         if duplicate:
                             pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
-                            scriptGroupEntry.grab_focus()
+                            scriptGroupCombo.grab_focus()
                             continue
 
                     # Remove the existing script.
@@ -666,7 +672,7 @@ class IndicatorScriptRunner:
                     del scripts[ i ]
 
                 # The new script or the edit.
-                newScript = Info( scriptGroupEntry.get_text().strip(),
+                newScript = Info( scriptGroupCombo.get_text().strip(),
                                   scriptNameEntry.get_text().strip(), 
                                   scriptDirectoryEntry.get_text().strip(),
                                   pythonutils.getTextViewText( commandTextView ).strip(),
@@ -678,10 +684,10 @@ class IndicatorScriptRunner:
                 scripts.append( newScript )
 
                 if defaultScriptCheckbox.get_active():
-                    self.defaultScriptGroupCurrent = scriptGroupEntry.get_text().strip()
+                    self.defaultScriptGroupCurrent = scriptGroupCombo.get_text().strip()
                     self.defaultScriptNameCurrent = scriptNameEntry.get_text().strip()
                 else:
-                    if self.defaultScriptGroupCurrent == scriptGroupEntry.get_text().strip() and self.defaultScriptNameCurrent == scriptNameEntry.get_text().strip():
+                    if self.defaultScriptGroupCurrent == scriptGroupCombo.get_text().strip() and self.defaultScriptNameCurrent == scriptNameEntry.get_text().strip():
                         self.defaultScriptGroupCurrent = ""
                         self.defaultScriptNameCurrent = ""
 
