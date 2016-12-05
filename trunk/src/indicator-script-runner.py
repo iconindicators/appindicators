@@ -185,11 +185,10 @@ class IndicatorScriptRunner:
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Name" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
         scriptNameComboBox = Gtk.ComboBoxText()
-#TODO Add a tooltip which says the first script will be selected if no default exists).
-        scriptNameComboBox.set_tooltip_text( _( "The name of a script object.\n\nScripts may share the same name,\nbut must have a different description." ) )
+        scriptNameComboBox.set_tooltip_text( _( "The group to which a script belongs.\n\nIf a default script has been nominated,\nthe group to which the script belongs\nwill be initially selected." ) )
         scriptNameComboBox.set_entry_text_column( 0 )
 
         box.pack_start( scriptNameComboBox, True, True, 0 )
@@ -200,13 +199,13 @@ class IndicatorScriptRunner:
 
         scriptDescriptionTreeView = Gtk.TreeView( scriptDescriptionListStore )
 #TODO Add a tooltip which says the first script will be selected if no default exists).
-        scriptDescriptionTreeView.set_tooltip_text( _( "List of scripts with same name,\nbut different descriptions." ) )
+        scriptDescriptionTreeView.set_tooltip_text( _( "List of scripts within the same group.\n\nIf a default script has been nominated,\nthat script will be initially selected." ) )
         scriptDescriptionTreeView.set_hexpand( True )
         scriptDescriptionTreeView.set_vexpand( True )
         scriptDescriptionTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         scriptDescriptionTreeView.connect( "row-activated", self.onScriptDescriptionDoubleClick, scriptNameComboBox, copyOfScripts )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Description" ), Gtk.CellRendererText(), text = 0 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 0 )
         treeViewColumn.set_expand( True )
         scriptDescriptionTreeView.append_column( treeViewColumn )
 
@@ -303,8 +302,9 @@ class IndicatorScriptRunner:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showScriptDescriptionsAsSubmenusCheckbox = Gtk.CheckButton( _( "Show script descriptions as submenus" ) )
-        showScriptDescriptionsAsSubmenusCheckbox.set_tooltip_text( _( "When checked, scripts with the same\nname are shown in subgroups.\n\nOtherwise, scripts appear in a single\nlist, grouped by name." ) )
+        showScriptDescriptionsAsSubmenusCheckbox = Gtk.CheckButton( _( "Show scripts in submenus" ) )
+#TODO Don't like last bit of tooltip.
+        showScriptDescriptionsAsSubmenusCheckbox.set_tooltip_text( _( "When checked, scripts with the same\ngroup are shown in submenus.\n\nOtherwise, scripts appear in a single\nlist, indented by group." ) )
         showScriptDescriptionsAsSubmenusCheckbox.set_active( self.showScriptDescriptionsAsSubmenus )
         showScriptDescriptionsAsSubmenusCheckbox.set_margin_top( 10 )
         grid.attach( showScriptDescriptionsAsSubmenusCheckbox, 0, 0, 1, 1 )
@@ -410,10 +410,10 @@ class IndicatorScriptRunner:
             box = Gtk.Box( spacing = 6 )
             box.set_margin_top( 10 )
 
-            box.pack_start( Gtk.Label( _( "Name" ) ), False, False, 0 )
+            box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
             scriptNameEntry = Gtk.Entry()
-            scriptNameEntry.set_tooltip_text( _( "The name of the script object." ) )
+            scriptNameEntry.set_tooltip_text( _( "The group to which the script belongs." ) )
             scriptNameEntry.set_text( script.getName() )
             scriptNameEntry.set_hexpand( True ) # Only need to set this once and all objects will expand.
             box.pack_start( scriptNameEntry, True, True, 0 )
@@ -423,10 +423,10 @@ class IndicatorScriptRunner:
             box = Gtk.Box( spacing = 6 )
             box.set_margin_top( 10 )
 
-            box.pack_start( Gtk.Label( _( "Description" ) ), False, False, 0 )
+            box.pack_start( Gtk.Label( _( "Name" ) ), False, False, 0 )
 
             scriptDescriptionEntry = Gtk.Entry()
-            scriptDescriptionEntry.set_tooltip_text( _( "The description of the script object." ) )
+            scriptDescriptionEntry.set_tooltip_text( _( "The name of the script." ) )
             scriptDescriptionEntry.set_text( script.getDescription() )
             box.pack_start( scriptDescriptionEntry, True, True, 0 )
 
@@ -441,17 +441,17 @@ class IndicatorScriptRunner:
                 dialog.show_all()
                 if dialog.run() == Gtk.ResponseType.OK:
                     if scriptNameEntry.get_text().strip() == "":
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script name cannot be empty." ), INDICATOR_NAME )
+                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script group cannot be empty." ), INDICATOR_NAME )
                         scriptNameEntry.grab_focus()
                         continue
 
                     if scriptDescriptionEntry.get_text().strip() == "":
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script description cannot be empty." ), INDICATOR_NAME )
+                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script name cannot be empty." ), INDICATOR_NAME )
                         scriptDescriptionEntry.grab_focus()
                         continue
 
                     if scriptNameEntry.get_text().strip() == scriptName and scriptDescriptionEntry.get_text().strip() == scriptDescription:
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
+                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
                         scriptNameEntry.grab_focus()
                         continue
 
@@ -524,10 +524,10 @@ class IndicatorScriptRunner:
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Name" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
         scriptNameEntry = Gtk.Entry()
-        scriptNameEntry.set_tooltip_text( _( "The name of the script object." ) )
+        scriptNameEntry.set_tooltip_text( _( "The group to which the script belongs." ) )
         scriptNameEntry.set_text( script.getName() )
 
         box.pack_start( scriptNameEntry, True, True, 0 )
@@ -537,10 +537,10 @@ class IndicatorScriptRunner:
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Description" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Name" ) ), False, False, 0 )
 
         scriptDescriptionEntry = Gtk.Entry()
-        scriptDescriptionEntry.set_tooltip_text( _( "The description of the script object." ) )
+        scriptDescriptionEntry.set_tooltip_text( _( "The name of the script." ) )
         scriptDescriptionEntry.set_text( script.getDescription() )
 
         box.pack_start( scriptDescriptionEntry, True, True, 0 )
@@ -568,7 +568,7 @@ class IndicatorScriptRunner:
         box.pack_start( label, False, False, 0 )
 
         commandTextView = Gtk.TextView()
-        commandTextView.set_tooltip_text( _( "The terminal script/command,\nalong with any arguments." ) )
+        commandTextView.set_tooltip_text( _( "The terminal script/command,\nincluding any arguments." ) )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
         commandTextView.get_buffer().set_text( script.getCommand() )
 
@@ -617,23 +617,23 @@ class IndicatorScriptRunner:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
                 if scriptNameEntry.get_text().strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script name cannot be empty." ), INDICATOR_NAME )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The group cannot be empty." ), INDICATOR_NAME )
                     scriptNameEntry.grab_focus()
                     continue
 
                 if scriptDescriptionEntry.get_text().strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script description cannot be empty." ), INDICATOR_NAME )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The name cannot be empty." ), INDICATOR_NAME )
                     scriptDescriptionEntry.grab_focus()
                     continue
 
                 if pythonutils.getTextViewText( commandTextView ).strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script command cannot be empty." ), INDICATOR_NAME )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The command cannot be empty." ), INDICATOR_NAME )
                     commandTextView.grab_focus()
                     continue
 
                 if script.getName() == "": # Adding a new script - check for duplicate.
                     if self.getScript( scripts, scriptNameEntry.get_text().strip(), scriptDescriptionEntry.get_text().strip() ) is not None:
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
+                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
                         scriptNameEntry.grab_focus()
                         continue
 
@@ -653,7 +653,7 @@ class IndicatorScriptRunner:
                                     break
 
                         if duplicate:
-                            pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same name and description already exists." ), INDICATOR_NAME )
+                            pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
                             scriptNameEntry.grab_focus()
                             continue
 
