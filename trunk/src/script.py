@@ -20,14 +20,14 @@
 
 class Info:
 
+    # Group to which a script belongs.
     # Name of script.
-    # Description of script.
     # Working/starting directory (may be "").
     # The command or script with any arguments as needed.
     # Boolean - If True, the terminal used to run the script will be left open at the end of script/command execution.
-    def __init__( self, name, description, directory, command, terminalOpen ):
+    def __init__( self, group, name, directory, command, terminalOpen ):
+        self.group = group
         self.name = name
-        self.description = description
         self.directory = directory
         self.command = command
         self.terminalOpen = terminalOpen
@@ -35,10 +35,10 @@ class Info:
         self.showNotification = False
 
 
+    def getGroup( self ): return self.group
+
+
     def getName( self ): return self.name
-
-
-    def getDescription( self ): return self.description
 
 
     def getDirectory( self ): return self.directory
@@ -63,8 +63,8 @@ class Info:
 
 
     def isIdentical( self, script ):
-        return self.name == script.getName() and \
-               self.description == script.getDescription() and \
+        return self.group == script.getGroup() and \
+               self.name == script.getName() and \
                self.directory == script.getDirectory() and \
                self.command == script.getCommand() and \
                self.terminalOpen == script.isTerminalOpen() and \
@@ -73,8 +73,8 @@ class Info:
 
 
     def __str__( self ):
-        return self.getName() + " | " + \
-               self.getDescription() + " | " + \
+        return self.getGroup() + " | " + \
+               self.getName() + " | " + \
                self.getDirectory() + " | " + \
                self.getCommand() + " | " + \
                str( self.isTerminalOpen() ) + " | " + \
