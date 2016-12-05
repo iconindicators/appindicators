@@ -1,6 +1,9 @@
 indicator-lunar (1.0.69-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
+  * The satellite notification has been simplified to such that only the
+    rise/set time is shown (rather than date and time) and the rise/set
+    azimuth has been rounded.
   * Removed expired eclipse information.
   * The dynamically created icon is updated only as needed
     (when the lunar illumination, bright limb or theme change values).

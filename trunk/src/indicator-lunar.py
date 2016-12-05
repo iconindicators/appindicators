@@ -85,6 +85,7 @@ class IndicatorLunar:
     ABOUT_CREDIT_TROPICAL_SIGN = _( "Tropical Sign by Ignius Drake." )
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
+    DATE_TIME_FORMAT_HHcolonMMcolonSS = "%H:%M:%S"
     DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT = "%Y-%m-%d %H:%M:%S.%f"
 
@@ -916,6 +917,9 @@ class IndicatorLunar:
     MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
+    # Used to tell the function which gets and formats data to format in a different manner for a different source.
+    SOURCE_SATELLITE_NOTIFICATION = 0
+
 
     def __init__( self ):
         self.dialog = None
@@ -1017,13 +1021,16 @@ class IndicatorLunar:
         menu.show_all()
 
 
-    def getDisplayData( self, key ):
+    def getDisplayData( self, key, source = None ):
         displayData = None
         if key[ 2 ] == IndicatorLunar.DATA_ALTITUDE or \
            key[ 2 ] == IndicatorLunar.DATA_AZIMUTH or \
            key[ 2 ] == IndicatorLunar.DATA_RISE_AZIMUTH or \
            key[ 2 ] == IndicatorLunar.DATA_SET_AZIMUTH:
-            displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
+            if source is None:
+                displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")"
+            elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
+                displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "°"
 
         elif key[ 2 ] == IndicatorLunar.DATA_BRIGHT_LIMB or \
              key[ 2 ] == IndicatorLunar.DATA_EARTH_TILT or \
@@ -1045,7 +1052,10 @@ class IndicatorLunar:
              key[ 2 ] == IndicatorLunar.DATA_SET_TIME or \
              key[ 2 ] == IndicatorLunar.DATA_SOLSTICE or \
              key[ 2 ] == IndicatorLunar.DATA_THIRD_QUARTER:
-            displayData = self.getLocalDateTime( self.data[ key ] )
+                if source is None:
+                    displayData = self.getLocalDateTime( self.data[ key ] )
+                elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
+                    displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
 
         elif key[ 2 ] == IndicatorLunar.DATA_DECLINATION:
             dec = self.data[ key ]
@@ -1140,12 +1150,16 @@ class IndicatorLunar:
 
 
     # Converts a UTC datetime string in the format 2015-05-11 22:51:42.429093 to local datetime string.
-    def getLocalDateTime( self, utcDateTimeString ):
+    def getLocalDateTime( self, utcDateTimeString, formatString = None ):
         utcDateTime = datetime.datetime.strptime( utcDateTimeString, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT )
         timestamp = calendar.timegm( utcDateTime.timetuple() )
         localDateTime = datetime.datetime.fromtimestamp( timestamp )
-        localDateTime.replace( microsecond = utcDateTime.microsecond )        
-        return str( localDateTime )
+        localDateTime.replace( microsecond = utcDateTime.microsecond )
+        localDateTimeString = str( localDateTime )
+        if formatString is not None and formatString == IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS:
+            localDateTimeString = localDateTime.strftime( IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
+
+        return localDateTimeString
 
 
     # Takes a string in the format of HH:MM:SS.S and converts to degrees (°) in decimal. 
@@ -1260,10 +1274,10 @@ class IndicatorLunar:
             self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] )
 
             # Parse the satellite summary/message to create the notification...
-            riseTime = self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ) )
-            riseAzimuth = self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) )
-            setTime = self.getDisplayData( key + ( IndicatorLunar.DATA_SET_TIME, ) )
-            setAzimuth = self.getDisplayData( key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) )
+            riseTime = self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            riseAzimuth = self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            setTime = self.getDisplayData( key + ( IndicatorLunar.DATA_SET_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            setAzimuth = self.getDisplayData( key + ( IndicatorLunar.DATA_SET_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
             tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
 
             summary = self.satelliteNotificationSummary. \
@@ -3488,20 +3502,20 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123.45°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321.54°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
 
             message = message. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123.45°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321.54°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
 
         if summary == "":
