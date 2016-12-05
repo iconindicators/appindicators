@@ -757,11 +757,12 @@ class IndicatorScriptRunner:
                 self.scriptGroupDefault = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPT_GROUP_DEFAULT, self.scriptGroupDefault )
                 self.scriptNameDefault = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPT_NAME_DEFAULT, self.scriptNameDefault )
                 self.showScriptsInSubmenus = settings.get( IndicatorScriptRunner.SETTINGS_SHOW_SCRIPTS_IN_SUBMENUS, self.showScriptsInSubmenus )
+
                 scripts = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPTS, [ ] )
-                defaultOK = False
+                defaultScriptFound = False
                 for script in scripts:
                     if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault:
-                        defaultOK = True
+                        defaultScriptFound = True
 
                     self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
 
@@ -770,7 +771,7 @@ class IndicatorScriptRunner:
                         self.scripts[ -1 ].setPlaySound( script[ 5 ] )
                         self.scripts[ -1 ].setShowNotification( script[ 6 ] )
 
-                if not defaultOK:
+                if not defaultScriptFound:
                     self.scriptGroupDefault = ""
                     self.scriptNameDefault = ""
 
