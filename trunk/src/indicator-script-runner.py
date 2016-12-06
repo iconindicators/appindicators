@@ -620,7 +620,7 @@ class IndicatorScriptRunner:
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
-                if scriptGroupCombo.get_text().strip() == "":
+                if scriptGroupCombo.get_active_text().strip() == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The group cannot be empty." ), INDICATOR_NAME )
                     scriptGroupCombo.grab_focus()
                     continue
@@ -636,23 +636,23 @@ class IndicatorScriptRunner:
                     continue
 
                 if script.getGroup() == "": # Adding a new script - check for duplicate.
-                    if self.getScript( scripts, scriptGroupCombo.get_text().strip(), scriptNameEntry.get_text().strip() ) is not None:
+                    if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ) is not None:
                         pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
                         scriptGroupCombo.grab_focus()
                         continue
 
                 else: # Editing an existing script.
-                    if script.isIdentical( Info( scriptGroupCombo.get_text().strip(), scriptNameEntry.get_text().strip(), scriptDirectoryEntry.get_text().strip(), pythonutils.getTextViewText( commandTextView ).strip(), terminalCheckbox.get_active() ) ):
+                    if script.isIdentical( Info( scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip(), scriptDirectoryEntry.get_text().strip(), pythonutils.getTextViewText( commandTextView ).strip(), terminalCheckbox.get_active() ) ):
                         pass # No change to the script, so should exit, but continue to handle the default script checkbox.
 
-                    elif scriptGroupCombo.get_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
+                    elif scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
                         pass # The group/name have not changed, but other parts have - so there is no chance of a clash.
 
                     else: # At this point either the script group or name has changed or both (and possibly the other script parameters). 
                         duplicate = False
                         for scriptInList in scripts:
                             if not scriptInList.isIdentical( script ):
-                                if scriptGroupCombo.get_text().strip() == scriptInList.getGroup() and scriptNameEntry.get_text().strip() == scriptInList.getName():
+                                if scriptGroupCombo.get_active_text().strip() == scriptInList.getGroup() and scriptNameEntry.get_text().strip() == scriptInList.getName():
                                     duplicate = True
                                     break
 
@@ -672,7 +672,7 @@ class IndicatorScriptRunner:
                     del scripts[ i ]
 
                 # The new script or the edit.
-                newScript = Info( scriptGroupCombo.get_text().strip(),
+                newScript = Info( scriptGroupCombo.get_active_text().strip(),
                                   scriptNameEntry.get_text().strip(), 
                                   scriptDirectoryEntry.get_text().strip(),
                                   pythonutils.getTextViewText( commandTextView ).strip(),
@@ -684,10 +684,10 @@ class IndicatorScriptRunner:
                 scripts.append( newScript )
 
                 if defaultScriptCheckbox.get_active():
-                    self.defaultScriptGroupCurrent = scriptGroupCombo.get_text().strip()
+                    self.defaultScriptGroupCurrent = scriptGroupCombo.get_active_text().strip()
                     self.defaultScriptNameCurrent = scriptNameEntry.get_text().strip()
                 else:
-                    if self.defaultScriptGroupCurrent == scriptGroupCombo.get_text().strip() and self.defaultScriptNameCurrent == scriptNameEntry.get_text().strip():
+                    if self.defaultScriptGroupCurrent == scriptGroupCombo.get_active_text().strip() and self.defaultScriptNameCurrent == scriptNameEntry.get_text().strip():
                         self.defaultScriptGroupCurrent = ""
                         self.defaultScriptNameCurrent = ""
 
