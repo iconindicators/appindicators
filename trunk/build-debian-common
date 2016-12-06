@@ -1,3 +1,5 @@
+#TODO Add a readme file to file build explaining orig/debian and how to debuild/upload.
+
 #!/bin/bash
 #
 # Common code for the build-debian script for all indicators.
@@ -142,8 +144,8 @@ buildDeb()
 {
   # Build DEB source (or binary).
   cd build/$NAME-$VERSION
-#  debuild -S -sa         # Builds a DEB source file.
-  debuild -sa -us -uc   # Builds a DEB binary file.
+  debuild -S -sa         # Builds a DEB source file.
+#  debuild -sa -us -uc   # Builds a DEB binary file.
   cd ..
 }
 
