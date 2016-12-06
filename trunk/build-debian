@@ -19,8 +19,8 @@ copyTopLevelAndSource source
 copyHicolorCreateThemed hicolorIcons hicolorColours
 
 # Specific code to handle opacity.
-sed -i 's/"opacity:0.2"/"opacity:0.15"/' build/$NAME-$VERSION/icons/elementary/indicator-punycode.svg
-sed -i 's/"opacity:0.2"/"opacity:0.3"/' build/$NAME-$VERSION/icons/lubuntu/indicator-punycode.svg
+sed -i 's/"opacity:0.2"/"opacity:0.15"/' build/$NAME-$VERSION/icons/elementary-xfce-darker/indicator-punycode.svg
+sed -i 's/"opacity:0.2"/"opacity:0.3"/' build/$NAME-$VERSION/icons/Lubuntu/indicator-punycode.svg
 sed -i 's/"opacity:0.2"/"opacity:0.3"/' build/$NAME-$VERSION/icons/ubuntu-mono-dark/indicator-punycode.svg
 sed -i 's/"opacity:0.2"/"opacity:0.3"/' build/$NAME-$VERSION/icons/ubuntu-mono-light/indicator-punycode.svg
 
