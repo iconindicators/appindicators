@@ -2,7 +2,7 @@ indicator-tide (1.0.5-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
   * Updated UKHO port data to 2016/2017 listing.
-  * The UKHO port data is split into two parts - UK ports, which does not
+    The UKHO port data is split into two parts - UK ports, which does not
     expire and non-UK ports for which data expires annually.
     If the license date is exceeded, only the UK ports will be available.
   * Now displays the country next to the port city/town.
@@ -11,8 +11,8 @@ indicator-tide (1.0.5-1) precise; urgency=low
     subsequent days as submenus - useful for small screens.
   * By default, tidal data is displayed as submenus, except for the first day.
   * The daylight savings offset is now automatically calculated (based on the
-    computer's time zone and DST tables).  The user preference has been
-    removed.
+    computer's time zone and DST tables).
+    The user preference has been removed.
   * Fixed PyGIWarnings on imports.
   * Overhaul of icons: only the hicolor icon is required and all theme icons
     are created from the hicolor via the build script.
