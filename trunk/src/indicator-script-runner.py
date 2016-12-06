@@ -370,7 +370,7 @@ class IndicatorScriptRunner:
                 showNotification = Gtk.STOCK_APPLY
 
             defaultScript = None
-            if scriptName == self.defaultScriptGroupCurrent and scriptName == self.defaultScriptNameCurrent:
+            if scriptGroup == self.defaultScriptGroupCurrent and scriptName == self.defaultScriptNameCurrent:
                 defaultScript = Gtk.STOCK_APPLY
 
             scriptNameListStore.append( [ scriptName, terminalOpen, playSound, showNotification, defaultScript ] )
