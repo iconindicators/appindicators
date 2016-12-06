@@ -3,13 +3,6 @@
 # Common code for the build-debian script for all indicators.
 
 
-
-#
-####### TODO Make the build script work for building outside of this environment!!!
-#
-
-
-
 # Python Utils contains Python/build scripts common to all indicators.
 PYTHON_UTILS=../PythonUtils
 
@@ -21,7 +14,7 @@ themeColours=(            f3f3f3         4c4c4c          dfdbd2             3c3c
 
 # Arguments:
 #   Array of source files present in the src directory.
-#   Array of hicolor icons names present in the icons directory.
+#   Array of hicolor icon names present in the icons directory.
 #   Array of hicolor colours present across ALL hicolor icons.
 doStandardBuild()
 {
@@ -47,8 +40,6 @@ copyTopLevelAndSource()
   mkdir -p build/$NAME-$VERSION
 
   cp $NAME.py.desktop build/$NAME-$VERSION
-  cp build-debian build/$NAME-$VERSION
-  cp $PYTHON_UTILS/build-debian-common build/$NAME-$VERSION
 
   mkdir -p build/$NAME-$VERSION/src
   cp packaging/debian/changelog build/$NAME-$VERSION/src
