@@ -55,14 +55,15 @@ class IndicatorScriptRunner:
     SETTINGS_SCRIPTS = "scripts"
     SETTINGS_SHOW_SCRIPTS_IN_SUBMENUS = "showScriptsInSubmenus"
 
-    COMMAND_NOTIFY_TAG_SCRIPT_GROUP = "[SCRIPT_GROUP]"
-#TODO Unable to put " or ' around the script name/description (although this works directly in a terminal).
+#     COMMAND_NOTIFY_TAG_SCRIPT_GROUP = "[SCRIPT_GROUP]"
+    COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
+#TODO Unable to put " or ' around the script group/name (although this works directly in a terminal).
 # Unable to use HTML for italic/bold.
-# Would be nice (more readable) if the script description was quoted.
-    COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + COMMAND_NOTIFY_TAG_SCRIPT_GROUP + "...\\\" \\\"" + _( "...{0} has completed." ) + "\\\""
-
-#TODO Before playing the audio, need to check if it exists?    
-    COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
+# Would be nice (more readable) if the script name was quoted.
+# Maybe now that we have group/name, perhaps just show the name in the summary and the body is just the general message?
+#     COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + COMMAND_NOTIFY_TAG_SCRIPT_GROUP + "...\\\" \\\"" + _( "...{0} has completed." ) + "\\\""
+    COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\\\" \\\"" + _( "...has completed." ) + "\\\""
+    COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga" # If this fails, it does not cause a crash.
 
 
     def __init__( self ):
@@ -123,7 +124,8 @@ class IndicatorScriptRunner:
         command += script.getCommand()
 
         if script.getShowNotification():
-             command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.format( script.getName() ).replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_GROUP, script.getGroup() )
+#             command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.format( script.getName() ).replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_GROUP, script.getGroup() )
+            command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
 
         if script.getPlaySound():
              command += " && " + IndicatorScriptRunner.COMMAND_SOUND
@@ -779,7 +781,7 @@ class IndicatorScriptRunner:
                 logging.error( "Error reading settings: " + IndicatorScriptRunner.SETTINGS_FILE )
         else:
             self.scripts = [ ]
-            self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 5 www.google.com", False ) )
+            self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 3 www.google.com", False ) )
             self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
             self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
