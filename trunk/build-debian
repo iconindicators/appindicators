@@ -7,12 +7,12 @@
 #	packaging/debian/changelog.  
 
 
-VERSION="1.0.5"
 NAME="indicator-tide"
+VERSION="1.0.5"
 
-source=( $NAME".py" locationData.py locations.py tide.py )
-hicolorIcons=( $NAME".svg" ) # List of hicolor icons belonging to the indicator (contents of the icons directory).
-hicolorColours=( 0000aa ) # List of colours present across ALL the hicolor icons.
+source=( $NAME".py" ports.py tide.py ) # List of source files.
+hicolorIcons=( $NAME".svg" ) # List of hicolor icons.
+hicolorColours=( 0000aa ) # List of colours in all the hicolor icons.
 
 . ../PythonUtils/build-debian-common
 doStandardBuild source hicolorIcons hicolorColours
