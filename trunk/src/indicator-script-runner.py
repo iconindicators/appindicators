@@ -38,6 +38,11 @@ from threading import Thread
 import copy, json, logging, os, pythonutils, threading
 
 
+#TODO On MythTV, takes two middle clicks to make the default script kick off.
+# Also need to ensure that the .desktop file is copied across...need to build a deb file and install properly!
+# Ensure that the autostart is checked.
+
+
 class IndicatorScriptRunner:
 
     AUTHOR = "Bernard Giannetti"
@@ -55,15 +60,9 @@ class IndicatorScriptRunner:
     SETTINGS_SCRIPTS = "scripts"
     SETTINGS_SHOW_SCRIPTS_IN_SUBMENUS = "showScriptsInSubmenus"
 
-#     COMMAND_NOTIFY_TAG_SCRIPT_GROUP = "[SCRIPT_GROUP]"
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
-#TODO Unable to put " or ' around the script group/name (although this works directly in a terminal).
-# Unable to use HTML for italic/bold.
-# Would be nice (more readable) if the script name was quoted.
-# Maybe now that we have group/name, perhaps just show the name in the summary and the body is just the general message?
-#     COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + COMMAND_NOTIFY_TAG_SCRIPT_GROUP + "...\\\" \\\"" + _( "...{0} has completed." ) + "\\\""
     COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\\\" \\\"" + _( "...has completed." ) + "\\\""
-    COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga" # If this fails, it does not cause a crash.
+    COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
 
     def __init__( self ):
@@ -124,11 +123,10 @@ class IndicatorScriptRunner:
         command += script.getCommand()
 
         if script.getShowNotification():
-#             command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.format( script.getName() ).replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_GROUP, script.getGroup() )
             command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
 
         if script.getPlaySound():
-             command += " && " + IndicatorScriptRunner.COMMAND_SOUND
+            command += " && " + IndicatorScriptRunner.COMMAND_SOUND
 
         command += "\";'"
 
