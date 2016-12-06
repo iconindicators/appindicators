@@ -2,8 +2,8 @@ indicator-fortune (1.0.24-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
   * When adding a new fortune, it is enabled by default.
-  * Writes all displayed fortunes to ~/.indicator-fortune-history and resets
-    the file each time the indicator is started.
+  * Displayed fortunes are now written to ~/.indicator-fortune-history.
+    Each time the indicator is started the file is reset.
   * Clicking OK in the Preferences initiates a new fortune.
   * Added utf-8 encoding line.
   * Fixed PyGIWarnings on imports.
