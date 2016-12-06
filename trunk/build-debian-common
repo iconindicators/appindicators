@@ -1,7 +1,9 @@
 #!/bin/bash
 #
 # Common code for the build-debian script for all indicators.
-
+#
+# Will need to install the packages:
+#   devscripts build-essential lintian
 
 # Python Utils contains Python/build scripts common to all indicators.
 PYTHON_UTILS=../PythonUtils
@@ -140,8 +142,8 @@ buildDeb()
 {
   # Build DEB source (or binary).
   cd build/$NAME-$VERSION
-  debuild -S -sa         # Builds a DEB source file.
-#  debuild -sa -us -uc   # Builds a DEB binary file.
+#  debuild -S -sa         # Builds a DEB source file.
+  debuild -sa -us -uc   # Builds a DEB binary file.
   cd ..
 }
 
@@ -173,3 +175,4 @@ cleanUp()
 # http://www.debian.org/doc/packaging-manuals/python-policy
 # http://www.debian-administration.org/articles/336
 # http://news.softpedia.com/news/How-to-Repack-Deb-Files-on-Debian-and-Ubuntu-404930.shtml
+# http://blog.packagecloud.io/debian/debuild/packaging/2015/06/08/buildling-deb-packages-with-debuild
