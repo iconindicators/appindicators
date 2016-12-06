@@ -508,7 +508,6 @@ class IndicatorScriptRunner:
             self.addEditScript( theScript, scripts, scriptGroupComboBox, scriptNameTreeView )
 
 
-#TODO At some point there could be a script group orphaned...not sure how.  
     def addEditScript( self, script, scripts, scriptGroupComboBox, scriptNameTreeView ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
