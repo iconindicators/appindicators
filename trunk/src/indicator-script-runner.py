@@ -41,6 +41,7 @@ import copy, json, logging, os, pythonutils, threading
 #TODO On MythTV, takes two middle clicks to make the default script kick off.
 # Also need to ensure that the .desktop file is copied across...need to build a deb file and install properly!
 # Ensure that the autostart is checked.
+#Depends: python3:any (>= 3.3.2-2~), gir1.2-appindicator3-0.1, libnotify-bin, python3-gi
 
 
 class IndicatorScriptRunner:
@@ -389,7 +390,6 @@ class IndicatorScriptRunner:
                 commandTextView.get_buffer().set_text( theScript.getCommand() )
 
 
-#TODO Test!
     def onScriptCopy( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeView.get_selection().get_selected()
@@ -484,15 +484,15 @@ class IndicatorScriptRunner:
                 i = 0
                 for script in scripts:
                     if script.getGroup() == scriptGroup and script.getName() == scriptName:
+                        del scripts[ i ]
+                        self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, "" )
+                        if len( scripts ) == 0:
+                            directoryEntry.set_text( "" )
+                            commandTextView.get_buffer().set_text( "" )
+
                         break
 
                     i += 1
-
-                del scripts[ i ]
-                self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, "" )
-                if len( scripts ) == 0:
-                    directoryEntry.set_text( "" )
-                    commandTextView.get_buffer().set_text( "" )
 
 
     def onScriptAdd( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
