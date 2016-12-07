@@ -327,7 +327,6 @@ class IndicatorScriptRunner:
 
         if self.dialog.run() == Gtk.ResponseType.OK:
             with self.lock:
-                self.preferencesOpen = True
                 self.showScriptsInSubmenus = showScriptsInSubmenusCheckbox.get_active()
                 self.scripts = copyOfScripts
                 if len( self.scripts ) == 0:
@@ -390,6 +389,7 @@ class IndicatorScriptRunner:
                 commandTextView.get_buffer().set_text( theScript.getCommand() )
 
 
+#TODO Test!
     def onScriptCopy( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeView.get_selection().get_selected()
@@ -410,11 +410,15 @@ class IndicatorScriptRunner:
 
             box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
-            scriptGroupEntry = Gtk.Entry()
-            scriptGroupEntry.set_tooltip_text( _( "The group to which the script belongs." ) )
-            scriptGroupEntry.set_text( script.getGroup() )
-            scriptGroupEntry.set_hexpand( True ) # Only need to set this once and all objects will expand.
-            box.pack_start( scriptGroupEntry, True, True, 0 )
+            scriptGroupCombo = Gtk.ComboBoxText.new_with_entry()
+            scriptGroupCombo.set_tooltip_text( _( "The group to which the script belongs.\n\nChoose an existing group or enter a\nnew one." ) )
+            scriptGroupCombo.set_hexpand( True ) # Only need to set this once and all objects will expand.
+            groups = sorted( self.getScriptsByGroup( scripts ) )
+            for group in groups:
+                scriptGroupCombo.append_text( group )
+
+            scriptGroupCombo.set_active( groups.index( script.getGroup() ) )
+            box.pack_start( scriptGroupCombo, True, True, 0 )
 
             grid.attach( box, 0, 0, 1, 1 )
 
@@ -438,22 +442,22 @@ class IndicatorScriptRunner:
             while True:
                 dialog.show_all()
                 if dialog.run() == Gtk.ResponseType.OK:
-                    if scriptGroupEntry.get_text().strip() == "":
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script group cannot be empty." ), INDICATOR_NAME )
-                        scriptGroupEntry.grab_focus()
+                    if scriptGroupCombo.get_active_text().strip() == "":
+                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The group cannot be empty." ), INDICATOR_NAME )
+                        scriptGroupCombo.grab_focus()
                         continue
 
                     if scriptNameEntry.get_text().strip() == "":
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The script name cannot be empty." ), INDICATOR_NAME )
+                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The name cannot be empty." ), INDICATOR_NAME )
                         scriptNameEntry.grab_focus()
                         continue
 
-                    if scriptGroupEntry.get_text().strip() == scriptGroup and scriptNameEntry.get_text().strip() == scriptName:
+                    if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ) is not None:
                         pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
-                        scriptGroupEntry.grab_focus()
+                        scriptGroupCombo.grab_focus()
                         continue
 
-                    newScript = Info( scriptGroupEntry.get_text().strip(),
+                    newScript = Info( scriptGroupCombo.get_active_text().strip(),
                                       scriptNameEntry.get_text().strip(), 
                                       script.getDirectory(),
                                       script.getCommand(),
