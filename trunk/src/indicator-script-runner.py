@@ -38,12 +38,6 @@ from threading import Thread
 import copy, json, logging, os, pythonutils, threading
 
 
-#TODO On MythTV, takes two middle clicks to make the default script kick off.
-# Also need to ensure that the .desktop file is copied across...need to build a deb file and install properly!
-# Ensure that the autostart is checked.
-#Depends: python3:any (>= 3.3.2-2~), gir1.2-appindicator3-0.1, libnotify-bin, python3-gi
-
-
 class IndicatorScriptRunner:
 
     AUTHOR = "Bernard Giannetti"
