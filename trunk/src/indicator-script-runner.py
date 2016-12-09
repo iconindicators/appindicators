@@ -569,7 +569,7 @@ class IndicatorScriptRunner:
         box.pack_start( label, False, False, 0 )
 
         commandTextView = Gtk.TextView()
-        commandTextView.set_tooltip_text( _( "The terminal script/command,\nalong any arguments." ) )
+        commandTextView.set_tooltip_text( _( "The terminal script/command,\nalong with any arguments." ) )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
         commandTextView.get_buffer().set_text( script.getCommand() )
 

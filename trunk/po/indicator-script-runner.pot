@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-script-runner 1.0.2\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2016-12-09 17:47+1100\n"
+"POT-Creation-Date: 2016-12-09 20:26+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -98,7 +98,7 @@ msgstr ""
 msgid "Command"
 msgstr ""
 
-#: indicator-script-runner.py:249
+#: indicator-script-runner.py:249 indicator-script-runner.py:572
 msgid ""
 "The terminal script/command,\n"
 "along with any arguments."
@@ -200,12 +200,6 @@ msgstr ""
 
 #: indicator-script-runner.py:477
 msgid "Remove the selected script?"
-msgstr ""
-
-#: indicator-script-runner.py:572
-msgid ""
-"The terminal script/command,\n"
-"along any arguments."
 msgstr ""
 
 #: indicator-script-runner.py:584
