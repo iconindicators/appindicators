@@ -6,7 +6,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-lunar 1.0.69\n"
+"Project-Id-Version: indicator-lunar 1.0.70\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2016-06-17 00:31+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"

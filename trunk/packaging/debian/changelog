@@ -1,3 +1,11 @@
+indicator-lunar (1.0.70-1) precise; urgency=low
+
+  * Bug fix: Mixing of round and int caused a mismatch between the moon's
+    phase and illumination.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 14 Dec 2016 11:51:53 +1000
+
+
 indicator-lunar (1.0.69-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.

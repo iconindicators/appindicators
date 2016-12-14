@@ -63,7 +63,7 @@ class AstronomicalObjectType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Sta
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.69"
+    VERSION = "1.0.70"
     ICON = INDICATOR_NAME
     ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
     ICON_BASE_PATH = tempfile.gettempdir()
@@ -1931,7 +1931,7 @@ class IndicatorLunar:
     def updateMoon( self, ephemNow, hideIfNeverUp ):
         if self.showMoon and \
            not self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp ):
-            lunarIlluminationPercentage = int( ( ephem.Moon( self.getCity( ephemNow ) ).phase ) )
+            lunarIlluminationPercentage = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG ) + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
             key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
             self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
             self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
