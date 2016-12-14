@@ -46,7 +46,7 @@ import json, logging, os, pythonutils, re, shutil
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.24"
+    VERSION = "1.0.25"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -82,7 +82,9 @@ class IndicatorFortune:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( self.buildMenu() )
 
-        os.remove( IndicatorFortune.HISTORY_FILE )
+        if os.path.isfile( IndicatorFortune.HISTORY_FILE ):
+            os.remove( IndicatorFortune.HISTORY_FILE )
+
         self.update()
         self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.update )
 
