@@ -180,7 +180,7 @@ indicator-stardate (1.0.12-1) precise; urgency=low
   * Updated labels/tooltips on Preferences.
   * Icons for Preferences/About now show for Lubuntu/Xubuntu.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 5 Mar 2013 01:07:41 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 15 Mar 2013 01:07:41 +1000
 
 
 indicator-stardate (1.0.11-1) precise; urgency=low
