@@ -46,7 +46,7 @@ import gzip, json, logging, os, pythonutils, re, shutil, sys, time, virtualmachi
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.51"
+    VERSION = "1.0.52"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -112,7 +112,7 @@ class IndicatorVirtualBox:
     def bringWindowToFront( self, virtualMachineName ):
         numberOfWindowsWithTheSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
         if numberOfWindowsWithTheSameName == "0":
-            message = _( "The VM '{0}' is running but its window could not be found - perhaps it is running headless." ).format( widget.props.label )
+            message = _( "The VM '{0}' is running but its window could not be found - perhaps it is running headless." ).format( virtualMachineName )
             Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
         elif numberOfWindowsWithTheSameName == "1":
             for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
@@ -121,7 +121,7 @@ class IndicatorVirtualBox:
                     pythonutils.processCall( "wmctrl -i -a " + windowID )
                     break
         else:
-            message = _( "Unable to bring the VM '{0}' to front as there is more than one window with the same name." ).format( widget.props.label )
+            message = _( "Unable to bring the VM '{0}' to front as there is more than one window with the same name." ).format( virtualMachineName )
             Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
 
 

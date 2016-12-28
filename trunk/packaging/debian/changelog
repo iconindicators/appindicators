@@ -1,3 +1,12 @@
+indicator-virtual-box (1.0.52-1) precise; urgency=low
+
+  * Bug fix: When choosing a VM from the menu which is already running,
+    attempting to bring the window to front would fail if the window name
+    could not be found or multiple names were found.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 28 Dec 2016 16:16:51 +1000
+
+
 indicator-virtual-box (1.0.51-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
