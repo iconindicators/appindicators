@@ -2077,7 +2077,7 @@ class IndicatorLunar:
     # Data tags such as RISE_TIME and/or MESSAGE will be added to the data dict.
     def updateCommon( self, body, astronomicalObjectType, dataTag, ephemNow, hideIfNeverUp ):
         key = ( astronomicalObjectType, dataTag )
-        neverUp = False
+        hidden = False
         try:
             city = self.getCity( ephemNow )
             rising = city.next_rising( body )
@@ -2089,11 +2089,12 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
 
         except ephem.NeverUpError:
-            self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
             if hideIfNeverUp:
-                neverUp = True
+                hidden = True
+            else:
+                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
-        if not neverUp:
+        if not hidden:
             body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
 
             if astronomicalObjectType == AstronomicalObjectType.Moon or \
@@ -2128,7 +2129,7 @@ class IndicatorLunar:
 
             self.updateRightAscensionDeclinationAzimuthAltitude( body, astronomicalObjectType, dataTag )
 
-        return neverUp
+        return hidden
 
 
     # Compute the right ascension, declination, azimuth and altitude for a body.
