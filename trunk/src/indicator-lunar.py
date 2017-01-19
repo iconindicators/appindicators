@@ -63,7 +63,7 @@ class AstronomicalObjectType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Sta
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.70"
+    VERSION = "1.0.71"
     ICON = INDICATOR_NAME
     ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
     ICON_BASE_PATH = tempfile.gettempdir()
@@ -1193,8 +1193,9 @@ class IndicatorLunar:
         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput )
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
-        lunarIlluminationPercentage = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG ) + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
-        lunarBrightLimbAngle = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG ) + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] )
+        moon = ephem.Moon( self.getCity( ephemNow ) )
+        lunarIlluminationPercentage = int( self.getPhase( moon ) )
+        lunarBrightLimbAngle = int( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), moon ) ) )
         themeName = self.getThemeName()
         noChange = \
             lunarBrightLimbAngle == self.previousLunarBrightLimbAngle and \
@@ -1212,7 +1213,7 @@ class IndicatorLunar:
 
 
     def notificationFullMoon( self, ephemNow ):
-        lunarIlluminationPercentage = int( self.data[ ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG ) + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
+        lunarIlluminationPercentage = int( self.getPhase( ephem.Moon( self.getCity( ephemNow ) ) ) )
         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
@@ -2099,7 +2100,7 @@ class IndicatorLunar:
 
             if astronomicalObjectType == AstronomicalObjectType.Moon or \
                astronomicalObjectType == AstronomicalObjectType.Planet:
-                self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] = str( round( body.phase ) )
+                self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] = str( self.getPhase( body ) )
 
             self.data[ key + ( IndicatorLunar.DATA_CONSTELLATION, ) ] = ephem.constellation( body )[ 1 ]
             self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] = str( round( body.mag, 1 ) )
@@ -2130,6 +2131,9 @@ class IndicatorLunar:
             self.updateRightAscensionDeclinationAzimuthAltitude( body, astronomicalObjectType, dataTag )
 
         return hidden
+
+
+    def getPhase( self, body ): return round( body.phase )
 
 
     # Compute the right ascension, declination, azimuth and altitude for a body.

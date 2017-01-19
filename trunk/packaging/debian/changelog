@@ -1,3 +1,11 @@
+indicator-lunar (1.0.71-1) precise; urgency=low
+
+  * Bug fix: If the moon was unchecked, the icon could not be created nor the
+    full moon notification be computed.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 20 Jan 2017 12:29:35: +1000
+
+
 indicator-lunar (1.0.70-1) precise; urgency=low
 
   * Bug fix: Mixing of round and int caused a mismatch between the moon's
