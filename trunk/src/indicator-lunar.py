@@ -2088,7 +2088,7 @@ class IndicatorLunar:
         except ephem.AlwaysUpError:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
 
-        except ephem.NeverUpError:
+        except ephem.NeverUpError: #TODO Test this clause now completely!
             if hideIfNeverUp:
                 hidden = True
             else:
