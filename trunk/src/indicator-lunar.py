@@ -2079,7 +2079,7 @@ class IndicatorLunar:
         except ephem.AlwaysUpError:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
 
-        except ephem.NeverUpError: #TODO Test this clause now completely!
+        except ephem.NeverUpError:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
         if not self.hideBody( astronomicalBodyType, dataTag, hideIfNeverUp ):
