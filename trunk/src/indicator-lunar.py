@@ -1308,12 +1308,8 @@ class IndicatorLunar:
 
 
     def updateMoonMenu( self, menu ):
-        key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
-        abort = key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
-                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
-                self.hideBodyIfNeverUp
-
-        if not abort and self.showMoon:
+        if self.showMoon and not self.hideBody( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, self.hideBodyIfNeverUp ):
+            key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
             menuItem = Gtk.MenuItem( _( "Moon" ) )
             menu.append( menuItem )
             self.updateCommonMenu( menuItem, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
@@ -1339,12 +1335,8 @@ class IndicatorLunar:
 
 
     def updateSunMenu( self, menu ):
-        key = ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
-        abort = key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
-                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
-                self.hideBodyIfNeverUp
-
-        if not abort and self.showSun:
+        if self.showSun and not self.hideBody( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, self.hideBodyIfNeverUp ):
+            key = ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
             menuItem = Gtk.MenuItem( _( "Sun" ) )
             menu.append( menuItem )
             self.updateCommonMenu( menuItem, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
@@ -1378,13 +1370,8 @@ class IndicatorLunar:
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planetName in self.planets:
-            key = ( AstronomicalObjectType.Planet, planetName.upper() )
-            if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
-               self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
-               self.hideBodyIfNeverUp:
-                continue
-
-            planets.append( planetName )
+            if not self.hideBody( AstronomicalObjectType.Planet, planetName.upper(), self.hideBodyIfNeverUp ):
+                planets.append( planetName )
 
         if len( planets ) > 0:
             menuItem = Gtk.MenuItem( _( "Planets" ) )
@@ -1930,16 +1917,17 @@ class IndicatorLunar:
     # http://www.geoastro.de/sundata/index.html
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     def updateMoon( self, ephemNow, hideIfNeverUp ):
-        if self.showMoon and \
-           not self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp ):
-            key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
-            lunarIlluminationPercentage = int( self.data[ key  + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
-            self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
-            self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
-            self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
-            self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
-            self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
-            self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+        if self.showMoon:
+            self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp )
+            if not self.hideBody( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, hideIfNeverUp ):
+                key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+                lunarIlluminationPercentage = int( self.data[ key  + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
+                self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
+                self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+                self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
+                self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+                self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
+                self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
 
 
     # Get the lunar phase for the given date/time and illumination percentage.
@@ -1989,7 +1977,8 @@ class IndicatorLunar:
         if self.showSun:
             city = self.getCity( ephemNow )
             sun = ephem.Sun( city )
-            if not self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, ephemNow, hideIfNeverUp ):
+            self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, ephemNow, hideIfNeverUp )
+            if not self.hideBody( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, hideIfNeverUp ):
                 key = ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
                 try:
                     # Dawn/Dusk.
@@ -2000,7 +1989,8 @@ class IndicatorLunar:
                     self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] = str( dawn.datetime() )
                     self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] = str( dusk.datetime() )
 
-                except ( ephem.AlwaysUpError, ephem.NeverUpError ): pass # No need to add a message here as update common would already have done so.
+                except ( ephem.AlwaysUpError, ephem.NeverUpError ):
+                    pass # No need to add a message here as update common would already have done so.
 
                 equinox = ephem.next_equinox( ephemNow )
                 solstice = ephem.next_solstice( ephemNow )
@@ -2032,7 +2022,8 @@ class IndicatorLunar:
         for planetName in self.planets:
             planet = getattr( ephem, planetName )() # Dynamically instantiate the planet object.
             planet.compute( self.getCity( ephemNow ) )
-            if not self.updateCommon( planet, AstronomicalObjectType.Planet, planetName.upper(), ephemNow, hideIfNeverUp ):
+            self.updateCommon( planet, AstronomicalObjectType.Planet, planetName.upper(), ephemNow, hideIfNeverUp )
+            if not self.hideBody( AstronomicalObjectType.Planet, planetName.upper(), hideIfNeverUp ):
                 if planetName == IndicatorLunar.PLANET_SATURN:
                     key = ( AstronomicalObjectType.Planet, planetName.upper() )
                     self.data[ key + ( IndicatorLunar.DATA_EARTH_TILT, ) ] = str( round( math.degrees( planet.earth_tilt ), 1 ) )
@@ -2078,7 +2069,6 @@ class IndicatorLunar:
     # Data tags such as RISE_TIME and/or MESSAGE will be added to the data dict.
     def updateCommon( self, body, astronomicalObjectType, dataTag, ephemNow, hideIfNeverUp ):
         key = ( astronomicalObjectType, dataTag )
-        hidden = False
         try:
             city = self.getCity( ephemNow )
             rising = city.next_rising( body )
@@ -2090,12 +2080,9 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
 
         except ephem.NeverUpError: #TODO Test this clause now completely!
-            if hideIfNeverUp:
-                hidden = True
-            else:
-                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
+            self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
-        if not hidden:
+        if not self.hideBody( astronomicalObjectType, dataTag, hideIfNeverUp ):
             body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
 
             if astronomicalObjectType == AstronomicalObjectType.Moon or \
@@ -2130,7 +2117,13 @@ class IndicatorLunar:
 
             self.updateRightAscensionDeclinationAzimuthAltitude( body, astronomicalObjectType, dataTag )
 
-        return hidden
+
+    def hideBody( self, astronomicalObjectType, dataTag, hideIfNeverUp ):
+        key = ( astronomicalObjectType, dataTag, IndicatorLunar.DATA_MESSAGE )
+        return \
+            key in self.data and \
+            self.data[ key ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
+            hideIfNeverUp
 
 
     def getPhase( self, body ): return round( body.phase )
