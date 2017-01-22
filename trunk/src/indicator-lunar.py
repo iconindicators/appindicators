@@ -57,7 +57,7 @@ except:
     sys.exit()
 
 
-class AstronomicalObjectType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star, Sun = range( 7 )
+class AstronomicalBodyType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star, Sun = range( 7 )
 
 
 class IndicatorLunar:
@@ -923,7 +923,7 @@ class IndicatorLunar:
 
     def __init__( self ):
         self.dialog = None
-        self.data = { } # Key is a tuple of AstronomicalObjectType, a data tag (upper case( and data tag (upper case).  Value is the data ready for display.
+        self.data = { } # Key is a tuple of AstronomicalBodyType, a data tag (upper case( and data tag (upper case).  Value is the data ready for display.
         self.cometOEData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
         self.satelliteNotifications = { }
         self.satelliteTLEData = { } # Key: ( satellite name upper cased, satellite number ) ; Value: satellite.TLE object.  Can be empty but never None.
@@ -1240,7 +1240,7 @@ class IndicatorLunar:
         # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
         satelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber, in self.satellites:
-            key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
+            key = ( AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
             if ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.data: # Assume all other information is present!
                satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
 
@@ -1251,7 +1251,7 @@ class IndicatorLunar:
 
         utcNow = str( datetime.datetime.utcnow() )
         for satelliteName, satelliteNumber, riseTime in satelliteNameNumberRiseTimes:
-            key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
+            key = ( AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
 
             if ( satelliteName, satelliteNumber ) in self.satelliteNotifications:
                 # There has been a previous notification for this satellite.
@@ -1308,11 +1308,11 @@ class IndicatorLunar:
 
 
     def updateMoonMenu( self, menu ):
-        if self.showMoon and not self.hideBody( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, self.hideBodyIfNeverUp ):
-            key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+        if self.showMoon and not self.hideBody( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, self.hideBodyIfNeverUp ):
+            key = ( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
             menuItem = Gtk.MenuItem( _( "Moon" ) )
             menu.append( menuItem )
-            self.updateCommonMenu( menuItem, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+            self.updateCommonMenu( menuItem, AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
             menuItem.get_submenu().append( Gtk.MenuItem( _( "Phase: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_PHASE, ) ) ) )
             menuItem.get_submenu().append( Gtk.MenuItem( _( "Next Phases" ) ) )
@@ -1331,15 +1331,15 @@ class IndicatorLunar:
                 self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, dateTime )
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-            self.updateEclipseMenu( menuItem.get_submenu(), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+            self.updateEclipseMenu( menuItem.get_submenu(), AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
 
 
     def updateSunMenu( self, menu ):
-        if self.showSun and not self.hideBody( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, self.hideBodyIfNeverUp ):
-            key = ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
+        if self.showSun and not self.hideBody( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG, self.hideBodyIfNeverUp ):
+            key = ( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
             menuItem = Gtk.MenuItem( _( "Sun" ) )
             menu.append( menuItem )
-            self.updateCommonMenu( menuItem, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
+            self.updateCommonMenu( menuItem, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
             # Solstice/Equinox.
@@ -1354,7 +1354,7 @@ class IndicatorLunar:
                 menuItem.get_submenu().append( Gtk.MenuItem( _( "Equinox: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_EQUINOX, ) ) ) )
 
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-            self.updateEclipseMenu( menuItem.get_submenu(), AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
+            self.updateEclipseMenu( menuItem.get_submenu(), AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
 
 
     def updateEclipseMenu( self, menu, astronomicalObjectType, dataTag ):
@@ -1370,7 +1370,7 @@ class IndicatorLunar:
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planetName in self.planets:
-            if not self.hideBody( AstronomicalObjectType.Planet, planetName.upper(), self.hideBodyIfNeverUp ):
+            if not self.hideBody( AstronomicalBodyType.Planet, planetName.upper(), self.hideBodyIfNeverUp ):
                 planets.append( planetName )
 
         if len( planets ) > 0:
@@ -1390,7 +1390,7 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.PLANET_AND_MOON_NAMES_TRANSLATIONS[ planetName ] )
                     menu.append( menuItem )
 
-                self.updateCommonMenu( menuItem, AstronomicalObjectType.Planet, dataTag )
+                self.updateCommonMenu( menuItem, AstronomicalBodyType.Planet, dataTag )
 
                 # Planetary moons.
                 if planetName in IndicatorLunar.PLANET_MOONS:
@@ -1411,23 +1411,23 @@ class IndicatorLunar:
 
             dataTag = moonName.upper()
             subMenu = Gtk.Menu()
-            self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, AstronomicalObjectType.PlanetaryMoon, dataTag )
+            self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, AstronomicalBodyType.PlanetaryMoon, dataTag )
             subMenu.append( Gtk.SeparatorMenuItem() )
 
-            subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + self.getDisplayData( ( AstronomicalObjectType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ) ) )
+            subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + self.getDisplayData( ( AstronomicalBodyType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ) ) )
             subMenu.append( Gtk.SeparatorMenuItem() )
 
             subMenu.append( Gtk.MenuItem( _( "Offset from Planet (in planet radii)" ) ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "X: " ) + self.getDisplayData( ( AstronomicalObjectType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_X_OFFSET ) ) ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Y: " ) + self.getDisplayData( ( AstronomicalObjectType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_Y_OFFSET ) ) ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Z: " ) + self.getDisplayData( ( AstronomicalObjectType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_Z_OFFSET ) ) ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "X: " ) + self.getDisplayData( ( AstronomicalBodyType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_X_OFFSET ) ) ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Y: " ) + self.getDisplayData( ( AstronomicalBodyType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_Y_OFFSET ) ) ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Z: " ) + self.getDisplayData( ( AstronomicalBodyType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_Z_OFFSET ) ) ) )
             moonMenuItem.set_submenu( subMenu )
 
 
     def updateStarsMenu( self, menu ):
         stars = [ ] # List of lists.  Each sublist contains the star name followed by the translated name.
         for starName in self.stars:
-            key = ( AstronomicalObjectType.Star, starName.upper() )
+            key = ( AstronomicalBodyType.Star, starName.upper() )
             if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
                self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
                self.hideBodyIfNeverUp:
@@ -1446,7 +1446,7 @@ class IndicatorLunar:
             if self.groupStarsByConstellation:
                 constellations = { }
                 for starName, starNameTranslated in stars:
-                    constellationTranslated = self.getDisplayData( ( AstronomicalObjectType.Star, starName.upper(), IndicatorLunar.DATA_CONSTELLATION ) )
+                    constellationTranslated = self.getDisplayData( ( AstronomicalBodyType.Star, starName.upper(), IndicatorLunar.DATA_CONSTELLATION ) )
                     if constellationTranslated not in constellations:
                         constellations[ constellationTranslated ] = [ ]
 
@@ -1472,7 +1472,7 @@ class IndicatorLunar:
                             menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.INDENT + starNameTranslated )
                             menu.append( menuItem )
   
-                        self.updateCommonMenu( menuItem, AstronomicalObjectType.Star, dataTag )
+                        self.updateCommonMenu( menuItem, AstronomicalBodyType.Star, dataTag )
             else:
                 stars = sorted( stars, key = lambda x: ( x[ 1 ] ) )
                 for starName, starNameTranslated in stars:
@@ -1484,13 +1484,13 @@ class IndicatorLunar:
                         menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starNameTranslated )
                         menu.append( menuItem )
 
-                    self.updateCommonMenu( menuItem, AstronomicalObjectType.Star, dataTag )
+                    self.updateCommonMenu( menuItem, AstronomicalBodyType.Star, dataTag )
 
 
     def updateCometsMenu( self, menu ):
         comets = [ ]
         for comet in self.comets:
-            key = ( AstronomicalObjectType.Comet, comet )
+            key = ( AstronomicalBodyType.Comet, comet )
             if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
                self.hideBodyIfNeverUp and \
                (
@@ -1524,11 +1524,11 @@ class IndicatorLunar:
                     menu.append( menuItem )
 
                 if key in self.cometOEData:
-                    self.updateCommonMenu( menuItem, AstronomicalObjectType.Comet, key )
+                    self.updateCommonMenu( menuItem, AstronomicalBodyType.Comet, key )
                     self.addOnCometHandler( menuItem.get_submenu(), key )
                 else: # Should only be a no data message...I hope!
                     subMenu = Gtk.Menu()
-                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( AstronomicalObjectType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ) ) )
+                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ) ) )
                     menuItem.set_submenu( subMenu )
 
 
@@ -1553,43 +1553,43 @@ class IndicatorLunar:
         key = ( astronomicalObjectType, dataTag )
         subMenu = Gtk.Menu()
 
-        if astronomicalObjectType == AstronomicalObjectType.Moon or \
-           astronomicalObjectType == AstronomicalObjectType.Planet:
+        if astronomicalObjectType == AstronomicalBodyType.Moon or \
+           astronomicalObjectType == AstronomicalBodyType.Planet:
             subMenu.append( Gtk.MenuItem( _( "Illumination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ILLUMINATION, ) ) ) )
 
-        if ( astronomicalObjectType == AstronomicalObjectType.Star and not self.groupStarsByConstellation ) or not astronomicalObjectType == AstronomicalObjectType.Star:
+        if ( astronomicalObjectType == AstronomicalBodyType.Star and not self.groupStarsByConstellation ) or not astronomicalObjectType == AstronomicalBodyType.Star:
             subMenu.append( Gtk.MenuItem( _( "Constellation: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_CONSTELLATION, ) ) ) )
 
         subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_MAGNITUDE, ) ) ) )
 
-        if astronomicalObjectType == AstronomicalObjectType.Moon or \
-           astronomicalObjectType == AstronomicalObjectType.Planet or \
-           astronomicalObjectType == AstronomicalObjectType.Star or \
-           astronomicalObjectType == AstronomicalObjectType.Sun:
+        if astronomicalObjectType == AstronomicalBodyType.Moon or \
+           astronomicalObjectType == AstronomicalBodyType.Planet or \
+           astronomicalObjectType == AstronomicalBodyType.Star or \
+           astronomicalObjectType == AstronomicalBodyType.Sun:
             tropicalSignName = self.getDisplayData( key + ( IndicatorLunar.DATA_TROPICAL_SIGN_NAME, ) ) 
             tropicalSignDegree = self.getDisplayData( key + ( IndicatorLunar.DATA_TROPICAL_SIGN_DEGREE, ) )
             tropicalSignMinute = self.getDisplayData( key + ( IndicatorLunar.DATA_TROPICAL_SIGN_MINUTE, ) )
             subMenu.append( Gtk.MenuItem( _( "Tropical Sign: " ) + tropicalSignName + " " + tropicalSignDegree + tropicalSignMinute ) )
 
-        if astronomicalObjectType == AstronomicalObjectType.Moon:
+        if astronomicalObjectType == AstronomicalBodyType.Moon:
             subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ) ) )
 
-        if astronomicalObjectType == AstronomicalObjectType.Moon or \
-           astronomicalObjectType == AstronomicalObjectType.Comet or \
-           astronomicalObjectType == AstronomicalObjectType.Planet or \
-           astronomicalObjectType == AstronomicalObjectType.Sun:
+        if astronomicalObjectType == AstronomicalBodyType.Moon or \
+           astronomicalObjectType == AstronomicalBodyType.Comet or \
+           astronomicalObjectType == AstronomicalBodyType.Planet or \
+           astronomicalObjectType == AstronomicalBodyType.Sun:
             subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ) ) )
 
-        if astronomicalObjectType == AstronomicalObjectType.Moon or \
-           astronomicalObjectType == AstronomicalObjectType.Comet or \
-           astronomicalObjectType == AstronomicalObjectType.Planet:
+        if astronomicalObjectType == AstronomicalBodyType.Moon or \
+           astronomicalObjectType == AstronomicalBodyType.Comet or \
+           astronomicalObjectType == AstronomicalBodyType.Planet:
             subMenu.append( Gtk.MenuItem( _( "Distance to Sun: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ) ) )
 
-        if astronomicalObjectType == AstronomicalObjectType.Moon or \
-           astronomicalObjectType == AstronomicalObjectType.Planet:
+        if astronomicalObjectType == AstronomicalBodyType.Moon or \
+           astronomicalObjectType == AstronomicalBodyType.Planet:
             subMenu.append( Gtk.MenuItem( _( "Bright Limb: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ) ) )
 
-        if astronomicalObjectType == AstronomicalObjectType.Planet and \
+        if astronomicalObjectType == AstronomicalBodyType.Planet and \
            dataTag == IndicatorLunar.PLANET_SATURN.upper():
             subMenu.append( Gtk.MenuItem( _( "Earth Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_EARTH_TILT, ) ) ) )
             subMenu.append( Gtk.MenuItem( _( "Sun Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SUN_TILT, ) ) ) )
@@ -1606,7 +1606,7 @@ class IndicatorLunar:
             data.append( [ key + ( IndicatorLunar.DATA_SET_TIME, ), _( "Set: " ), self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ] )
             self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
 
-            if astronomicalObjectType == AstronomicalObjectType.Sun:
+            if astronomicalObjectType == AstronomicalBodyType.Sun:
                 data.append( [ key + ( IndicatorLunar.DATA_DAWN, ), _( "Dawn: " ), self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] ] )
                 data.append( [ key + ( IndicatorLunar.DATA_DUSK, ), _( "Dusk: " ), self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ] )
                 self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ) )
@@ -1630,7 +1630,7 @@ class IndicatorLunar:
     def updateSatellitesMenu( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
-            key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
+            key = ( AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
             if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
                self.hideSatelliteIfNoVisiblePass and \
                (
@@ -1673,7 +1673,7 @@ class IndicatorLunar:
 
             now = str( datetime.datetime.utcnow() )
             for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
-                key = ( AstronomicalObjectType.Satellite, satelliteName + " " + satelliteNumber )
+                key = ( AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
                 subMenu = Gtk.Menu()
                 if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data:
                     if self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
@@ -1918,16 +1918,16 @@ class IndicatorLunar:
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     def updateMoon( self, ephemNow, hideIfNeverUp ):
         if self.showMoon:
-            self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp )
-            if not self.hideBody( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG, hideIfNeverUp ):
-                key = ( AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+            self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp )
+            if not self.hideBody( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, hideIfNeverUp ):
+                key = ( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
                 lunarIlluminationPercentage = int( self.data[ key  + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
                 self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
                 self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
                 self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
                 self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
                 self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
-                self.updateEclipse( ephemNow, AstronomicalObjectType.Moon, IndicatorLunar.MOON_TAG )
+                self.updateEclipse( ephemNow, AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
 
 
     # Get the lunar phase for the given date/time and illumination percentage.
@@ -1977,9 +1977,9 @@ class IndicatorLunar:
         if self.showSun:
             city = self.getCity( ephemNow )
             sun = ephem.Sun( city )
-            self.updateCommon( sun, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, ephemNow, hideIfNeverUp )
-            if not self.hideBody( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG, hideIfNeverUp ):
-                key = ( AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
+            self.updateCommon( sun, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG, ephemNow, hideIfNeverUp )
+            if not self.hideBody( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG, hideIfNeverUp ):
+                key = ( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
                 try:
                     # Dawn/Dusk.
                     city = self.getCity( ephemNow )
@@ -1997,7 +1997,7 @@ class IndicatorLunar:
                 self.data[ key + ( IndicatorLunar.DATA_EQUINOX, ) ] = str( equinox.datetime() )
                 self.data[ key + ( IndicatorLunar.DATA_SOLSTICE, ) ] = str( solstice.datetime() )
 
-                self.updateEclipse( ephemNow, AstronomicalObjectType.Sun, IndicatorLunar.SUN_TAG )
+                self.updateEclipse( ephemNow, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
 
 
     def updateEclipse( self, ephemNow, astronomicalObjectType, dataTag ):
@@ -2022,10 +2022,10 @@ class IndicatorLunar:
         for planetName in self.planets:
             planet = getattr( ephem, planetName )() # Dynamically instantiate the planet object.
             planet.compute( self.getCity( ephemNow ) )
-            self.updateCommon( planet, AstronomicalObjectType.Planet, planetName.upper(), ephemNow, hideIfNeverUp )
-            if not self.hideBody( AstronomicalObjectType.Planet, planetName.upper(), hideIfNeverUp ):
+            self.updateCommon( planet, AstronomicalBodyType.Planet, planetName.upper(), ephemNow, hideIfNeverUp )
+            if not self.hideBody( AstronomicalBodyType.Planet, planetName.upper(), hideIfNeverUp ):
                 if planetName == IndicatorLunar.PLANET_SATURN:
-                    key = ( AstronomicalObjectType.Planet, planetName.upper() )
+                    key = ( AstronomicalBodyType.Planet, planetName.upper() )
                     self.data[ key + ( IndicatorLunar.DATA_EARTH_TILT, ) ] = str( round( math.degrees( planet.earth_tilt ), 1 ) )
                     self.data[ key + ( IndicatorLunar.DATA_SUN_TILT, ) ] = str( round( math.degrees( planet.sun_tilt ), 1 ) )
 
@@ -2034,8 +2034,8 @@ class IndicatorLunar:
                     for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
                         moon = getattr( ephem, moonName )() # Dynamically instantiate the moon object.
                         moon.compute( city )
-                        self.updateRightAscensionDeclinationAzimuthAltitude( moon, AstronomicalObjectType.PlanetaryMoon, moonName.upper() )
-                        key = ( AstronomicalObjectType.PlanetaryMoon, moonName.upper() )
+                        self.updateRightAscensionDeclinationAzimuthAltitude( moon, AstronomicalBodyType.PlanetaryMoon, moonName.upper() )
+                        key = ( AstronomicalBodyType.PlanetaryMoon, moonName.upper() )
                         self.data[ key + ( IndicatorLunar.DATA_EARTH_VISIBLE, ) ] = str( bool( moon.earth_visible ) )
                         self.data[ key + ( IndicatorLunar.DATA_X_OFFSET, ) ] = str( round( moon.x, 1 ) )
                         self.data[ key + ( IndicatorLunar.DATA_Y_OFFSET, ) ] = str( round( moon.y, 1 ) )
@@ -2047,7 +2047,7 @@ class IndicatorLunar:
         for starName in self.stars:
             star = ephem.star( starName )
             star.compute( self.getCity( ephemNow ) )
-            self.updateCommon( star, AstronomicalObjectType.Star, star.name.upper(), ephemNow, hideIfNeverUp )
+            self.updateCommon( star, AstronomicalBodyType.Star, star.name.upper(), ephemNow, hideIfNeverUp )
 
 
     # Computes the rise/set and other information for comets.
@@ -2060,9 +2060,9 @@ class IndicatorLunar:
                 comet = ephem.readdb( self.cometOEData[ key ] )
                 comet.compute( self.getCity( ephemNow ) )
                 if float( comet.mag ) <= float( hideIfGreaterThanMagnitude ):
-                    self.updateCommon( comet, AstronomicalObjectType.Comet, key, ephemNow, hideIfNeverUp )
+                    self.updateCommon( comet, AstronomicalBodyType.Comet, key, ephemNow, hideIfNeverUp )
             else:
-                self.data[ ( AstronomicalObjectType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
+                self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
     # Calculates the common attributes such as rise/set, illumination, constellation, magnitude, tropical sign, distance, bright limb angle and RA/Dec/Az/Alt.
@@ -2085,34 +2085,34 @@ class IndicatorLunar:
         if not self.hideBody( astronomicalObjectType, dataTag, hideIfNeverUp ):
             body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
 
-            if astronomicalObjectType == AstronomicalObjectType.Moon or \
-               astronomicalObjectType == AstronomicalObjectType.Planet:
+            if astronomicalObjectType == AstronomicalBodyType.Moon or \
+               astronomicalObjectType == AstronomicalBodyType.Planet:
                 self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] = str( self.getPhase( body ) )
 
             self.data[ key + ( IndicatorLunar.DATA_CONSTELLATION, ) ] = ephem.constellation( body )[ 1 ]
             self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] = str( round( body.mag, 1 ) )
 
-            if astronomicalObjectType != AstronomicalObjectType.Comet:
+            if astronomicalObjectType != AstronomicalBodyType.Comet:
                 tropicalSignName, tropicalSignDegree, tropicalSignMinute = self.getTropicalSign( body, ephemNow )
                 self.data[ key + ( IndicatorLunar.DATA_TROPICAL_SIGN_NAME, ) ] = tropicalSignName
                 self.data[ key + ( IndicatorLunar.DATA_TROPICAL_SIGN_DEGREE, ) ] = tropicalSignDegree
                 self.data[ key + ( IndicatorLunar.DATA_TROPICAL_SIGN_MINUTE, ) ] = tropicalSignMinute
 
-            if astronomicalObjectType == AstronomicalObjectType.Moon:
+            if astronomicalObjectType == AstronomicalBodyType.Moon:
                 self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ] = str( round( body.earth_distance * ephem.meters_per_au / 1000 ) )
                 self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 5 ) )
                 self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ] = str( round( body.sun_distance, 2 ) )
 
-            if astronomicalObjectType == AstronomicalObjectType.Comet or \
-               astronomicalObjectType == AstronomicalObjectType.Planet:
+            if astronomicalObjectType == AstronomicalBodyType.Comet or \
+               astronomicalObjectType == AstronomicalBodyType.Planet:
                 self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 1 ) )
                 self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ] = str( round( body.sun_distance, 1 ) )
 
-            if astronomicalObjectType == AstronomicalObjectType.Sun:
+            if astronomicalObjectType == AstronomicalBodyType.Sun:
                 self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 2 ) )
 
-            if astronomicalObjectType == AstronomicalObjectType.Moon or \
-               astronomicalObjectType == AstronomicalObjectType.Planet:
+            if astronomicalObjectType == AstronomicalBodyType.Moon or \
+               astronomicalObjectType == AstronomicalBodyType.Planet:
                 self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] = str( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), body ) ) )
 
             self.updateRightAscensionDeclinationAzimuthAltitude( body, astronomicalObjectType, dataTag )
@@ -2223,11 +2223,11 @@ class IndicatorLunar:
             if key in self.satelliteTLEData:
                 self.calculateNextSatellitePass( ephemNow, key, self.satelliteTLEData[ key ], hideIfNoVisiblePass )
             else:
-                self.data[ ( AstronomicalObjectType.Satellite, " ".join( key ), IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
+                self.data[ ( AstronomicalBodyType.Satellite, " ".join( key ), IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
     def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE, hideOnNoVisiblePass ):
-        key = ( AstronomicalObjectType.Satellite, " ".join( key ) )
+        key = ( AstronomicalBodyType.Satellite, " ".join( key ) )
         currentDateTime = ephemNow
         endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 2 ) # Stop looking for passes 2 days from ephemNow.
         message = None
@@ -2515,13 +2515,13 @@ class IndicatorLunar:
         showMoonCheckbox = Gtk.CheckButton( _( "Moon" ) )
         showMoonCheckbox.set_active( self.showMoon )
         showMoonCheckbox.set_tooltip_text( _( "Show the moon." ) )
-        showMoonCheckbox.connect( "toggled", self.onMoonSunToggled, IndicatorLunar.MOON_TAG, AstronomicalObjectType.Moon )
+        showMoonCheckbox.connect( "toggled", self.onMoonSunToggled, IndicatorLunar.MOON_TAG, AstronomicalBodyType.Moon )
         box.pack_start( showMoonCheckbox, False, False, 0 )
 
         showSunCheckbox = Gtk.CheckButton( _( "Sun" ) )
         showSunCheckbox.set_active( self.showSun )
         showSunCheckbox.set_tooltip_text( _( "Show the sun." ) )
-        showSunCheckbox.connect( "toggled", self.onMoonSunToggled, IndicatorLunar.SUN_TAG, AstronomicalObjectType.Sun )
+        showSunCheckbox.connect( "toggled", self.onMoonSunToggled, IndicatorLunar.SUN_TAG, AstronomicalBodyType.Sun )
         box.pack_start( showSunCheckbox, False, False, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
@@ -2682,7 +2682,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore, None, displayTagsStore, AstronomicalObjectType.Planet )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore, None, displayTagsStore, AstronomicalBodyType.Planet )
         tree.append_column( treeViewColumn )
 
         tree.append_column( Gtk.TreeViewColumn( _( "Planet" ), Gtk.CellRendererText(), text = 2 ) )
@@ -2716,10 +2716,10 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, starStore, starStoreSort, AstronomicalObjectType.Star )
+        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, starStore, starStoreSort, AstronomicalBodyType.Star )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, starStoreSort, displayTagsStore, AstronomicalObjectType.Star )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, starStoreSort, displayTagsStore, AstronomicalBodyType.Star )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 )
@@ -2756,10 +2756,10 @@ class IndicatorLunar:
             "all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, cometStore, cometStoreSort, AstronomicalObjectType.Comet )
+        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, cometStore, cometStoreSort, AstronomicalBodyType.Comet )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore, cometStoreSort, displayTagsStore, AstronomicalObjectType.Comet )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore, cometStoreSort, displayTagsStore, AstronomicalBodyType.Comet )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2811,7 +2811,7 @@ class IndicatorLunar:
                        cometURLEntry,
                        cometGrid,
                        cometStore,
-                       AstronomicalObjectType.Comet,
+                       AstronomicalBodyType.Comet,
                        IndicatorLunar.COMET_OE_URL,
                        IndicatorLunar.COMET_OE_CACHE_BASENAME,
                        IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS,
@@ -2850,10 +2850,10 @@ class IndicatorLunar:
             "column toggles all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, satelliteStore, satelliteStoreSort, AstronomicalObjectType.Satellite )
+        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, satelliteStore, satelliteStoreSort, AstronomicalBodyType.Satellite )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, AstronomicalObjectType.Satellite )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, AstronomicalBodyType.Satellite )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2916,7 +2916,7 @@ class IndicatorLunar:
                        TLEURLEntry,
                        satelliteGrid,
                        satelliteStore,
-                       AstronomicalObjectType.Satellite,
+                       AstronomicalBodyType.Satellite,
                        IndicatorLunar.SATELLITE_TLE_URL,
                        IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME,
                        IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS,
@@ -3164,8 +3164,8 @@ class IndicatorLunar:
         self.dialog.show_all()
 
         # The visibility of some GUI objects must be determined AFTER the dialog is shown.
-        self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), AstronomicalObjectType.Comet )
-        self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), AstronomicalObjectType.Satellite )
+        self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), AstronomicalBodyType.Comet )
+        self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), AstronomicalBodyType.Satellite )
 
         # Last thing to do after everything else is built.
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
@@ -3292,7 +3292,7 @@ class IndicatorLunar:
 
         isCometOrSatellite = \
             astronomicalObjectType is not None and \
-            ( astronomicalObjectType == AstronomicalObjectType.Comet or astronomicalObjectType == AstronomicalObjectType.Satellite )
+            ( astronomicalObjectType == AstronomicalBodyType.Comet or astronomicalObjectType == AstronomicalBodyType.Satellite )
 
         if isCometOrSatellite:
             translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Don't translate the names of the comets/satellites.
@@ -3339,19 +3339,19 @@ class IndicatorLunar:
 
     def onPlanetToggled( self, widget, row, dataStore ):
         dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
-        self.checkboxToggled( dataStore[ row ][ 1 ].upper(), AstronomicalObjectType.Planet, dataStore[ row ][ 0 ] )
+        self.checkboxToggled( dataStore[ row ][ 1 ].upper(), AstronomicalBodyType.Planet, dataStore[ row ][ 0 ] )
         planetName = dataStore[ row ][ 1 ]
         if planetName in IndicatorLunar.PLANET_MOONS:
             for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
-                self.checkboxToggled( moonName.upper(), AstronomicalObjectType.PlanetaryMoon, dataStore[ row ][ 0 ] )
+                self.checkboxToggled( moonName.upper(), AstronomicalBodyType.PlanetaryMoon, dataStore[ row ][ 0 ] )
 
 
     def onCometStarSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalObjectType ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
-        if astronomicalObjectType == AstronomicalObjectType.Comet:
+        if astronomicalObjectType == AstronomicalBodyType.Comet:
             bodyTag = dataStore[ actualRow ][ 1 ].upper()
-        if astronomicalObjectType == AstronomicalObjectType.Satellite:
+        if astronomicalObjectType == AstronomicalBodyType.Satellite:
             bodyTag = dataStore[ actualRow ][ 1 ] + " " + dataStore[ actualRow ][ 2 ]
         else: # Assume star.
             bodyTag = dataStore[ actualRow ][ 1 ].upper()
@@ -3367,7 +3367,7 @@ class IndicatorLunar:
             message = IndicatorLunar.MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE.format( url )
         else:
             message = None
-            if astronomicalObjectType == AstronomicalObjectType.Satellite:
+            if astronomicalObjectType == AstronomicalBodyType.Satellite:
                 for key in data:
                     tle = data[ key ]
                     checked = ( tle.getName().upper(), tle.getNumber() ) in objects
@@ -3434,7 +3434,7 @@ class IndicatorLunar:
         self.updateCometSatellitePreferencesTab( grid, store, dataNew, [ ], urlNew, astronomicalObjectType )
 
         # Assign back to original objects...
-        if astronomicalObjectType == AstronomicalObjectType.Comet:
+        if astronomicalObjectType == AstronomicalBodyType.Comet:
             self.cometOEURLNew = urlNew
             self.cometOEDataNew = dataNew
         else: # Assume it's a satellite.
@@ -3457,20 +3457,20 @@ class IndicatorLunar:
 
 
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalObjectType ):
-        if astronomicalObjectType == AstronomicalObjectType.Planet:
+        if astronomicalObjectType == AstronomicalBodyType.Planet:
             toggle = self.togglePlanetsTable
             self.togglePlanetsTable = not self.togglePlanetsTable
             for row in range( len( dataStore ) ):
                 dataStore[ row ][ 0 ] = bool( not toggle )
                 self.onPlanetToggled( widget, row, dataStore )
 
-        elif astronomicalObjectType == AstronomicalObjectType.Comet or \
-             astronomicalObjectType == AstronomicalObjectType.Satellite or \
-             astronomicalObjectType == AstronomicalObjectType.Star:
-            if astronomicalObjectType == AstronomicalObjectType.Comet:
+        elif astronomicalObjectType == AstronomicalBodyType.Comet or \
+             astronomicalObjectType == AstronomicalBodyType.Satellite or \
+             astronomicalObjectType == AstronomicalBodyType.Star:
+            if astronomicalObjectType == AstronomicalBodyType.Comet:
                 toggle = self.toggleCometsTable
                 self.toggleCometsTable = not self.toggleCometsTable
-            elif astronomicalObjectType == AstronomicalObjectType.Satellite:
+            elif astronomicalObjectType == AstronomicalBodyType.Satellite:
                 toggle = self.toggleSatellitesTable
                 self.toggleSatellitesTable = not self.toggleSatellitesTable
             else:
@@ -3563,22 +3563,22 @@ class IndicatorLunar:
             for key in self.tagsAdded:
                 astronomicalObjectType = key[ 0 ]
                 bodyTag = key[ 1 ]
-                if astronomicalObjectType == AstronomicalObjectType.Comet:
+                if astronomicalObjectType == AstronomicalBodyType.Comet:
                     tags = IndicatorLunar.DATA_TAGS_COMET
-                elif astronomicalObjectType == AstronomicalObjectType.Moon:
+                elif astronomicalObjectType == AstronomicalBodyType.Moon:
                     tags = IndicatorLunar.DATA_TAGS_MOON
-                elif astronomicalObjectType == AstronomicalObjectType.Planet:
+                elif astronomicalObjectType == AstronomicalBodyType.Planet:
                     tags = IndicatorLunar.DATA_TAGS_PLANET
                     if bodyTag == IndicatorLunar.PLANET_SATURN.upper():
                         tags.append( IndicatorLunar.DATA_EARTH_TILT )
                         tags.append( IndicatorLunar.DATA_SUN_TILT )
-                elif astronomicalObjectType == AstronomicalObjectType.PlanetaryMoon:
+                elif astronomicalObjectType == AstronomicalBodyType.PlanetaryMoon:
                     tags = IndicatorLunar.DATA_TAGS_PLANETARY_MOON
-                elif astronomicalObjectType == AstronomicalObjectType.Satellite:
+                elif astronomicalObjectType == AstronomicalBodyType.Satellite:
                     tags = IndicatorLunar.DATA_TAGS_SATELLITE
-                elif astronomicalObjectType == AstronomicalObjectType.Star:
+                elif astronomicalObjectType == AstronomicalBodyType.Star:
                     tags = IndicatorLunar.DATA_TAGS_STAR
-                elif astronomicalObjectType == AstronomicalObjectType.Sun:
+                elif astronomicalObjectType == AstronomicalBodyType.Sun:
                     tags = IndicatorLunar.DATA_TAGS_SUN
 
                 for tag in tags:
