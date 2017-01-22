@@ -2427,7 +2427,7 @@ class IndicatorLunar:
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon\n" + \
             "(or shown as a tooltip, where applicable).\n\n" + \
-            "If an object is unchecked or no longer exists\n" + \
+            "If a body is unchecked or no longer exists\n" + \
             "(such as a comet/satellite not on the list),\n" + \
             "the tag will be automatically removed." ) )
         box.pack_start( indicatorText, True, True, 0 )
@@ -2450,9 +2450,9 @@ class IndicatorLunar:
                       self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
                       self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
 
-            hideObject = self.hideBodyIfNeverUp or self.hideSatelliteIfNoVisiblePass
+            hideBody = self.hideBodyIfNeverUp or self.hideSatelliteIfNoVisiblePass
 
-            if hideMessage and hideObject:
+            if hideMessage and hideBody:
                 continue
 
             self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
@@ -3359,7 +3359,7 @@ class IndicatorLunar:
         self.checkboxToggled( bodyTag, astronomicalBodyType, dataStore[ actualRow ][ 0 ] )
 
 
-    def updateCometSatellitePreferencesTab( self, grid, dataStore, data, objects, url, astronomicalBodyType ):
+    def updateCometSatellitePreferencesTab( self, grid, dataStore, data, bodies, url, astronomicalBodyType ):
         dataStore.clear()
         if data is None:
             message = IndicatorLunar.MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE.format( url )
@@ -3370,12 +3370,12 @@ class IndicatorLunar:
             if astronomicalBodyType == AstronomicalBodyType.Satellite:
                 for key in data:
                     tle = data[ key ]
-                    checked = ( tle.getName().upper(), tle.getNumber() ) in objects
+                    checked = ( tle.getName().upper(), tle.getNumber() ) in bodies
                     dataStore.append( [ checked, tle.getName(), tle.getNumber(), tle.getInternationalDesignator() ] )
             else:
                 for key in data:
                     oe = data[ key ]
-                    dataStore.append( [ key in objects, self.getCometDisplayName( oe ) ] )
+                    dataStore.append( [ key in bodies, self.getCometDisplayName( oe ) ] )
 
         # Hide/show the label and scrolled window as appropriate.
         # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
@@ -3433,7 +3433,7 @@ class IndicatorLunar:
 
         self.updateCometSatellitePreferencesTab( grid, store, dataNew, [ ], urlNew, astronomicalBodyType )
 
-        # Assign back to original objects...
+        # Assign back to original bodies...
         if astronomicalBodyType == AstronomicalBodyType.Comet:
             self.cometOEURLNew = urlNew
             self.cometOEDataNew = dataNew
@@ -3443,9 +3443,9 @@ class IndicatorLunar:
 
 
     def checkboxToggled( self, bodyTag, astronomicalBodyType, checked ):
-        # Maintain a record of objects which are checked and unchecked by the user.
+        # Maintain a record of bodies which are checked and unchecked by the user.
         # This allows the update of the table in the first tab to happen quickly, rather than doing a slow update on a per-check basis.
-        # Use hashtables (dicts) to maintain the record of checked and unchecked objects - no need to store a value, so None is used.
+        # Use hashtables (dicts) to maintain the record of checked and unchecked bodies - no need to store a value, so None is used.
         # Pass in None when doing a pop as it is possible was already checked.
         t = ( astronomicalBodyType, bodyTag )
         if checked:
@@ -3547,9 +3547,9 @@ class IndicatorLunar:
                           self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
                           self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
 
-                hideObject = self.hideBodyIfNeverUp or self.hideSatelliteIfNoVisiblePass
+                hideBody = self.hideBodyIfNeverUp or self.hideSatelliteIfNoVisiblePass
 
-                if hideMessage and hideObject:
+                if hideMessage and hideBody:
                     continue
 
                 astronomicalBodyType = key[ 0 ]
