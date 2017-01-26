@@ -29,27 +29,33 @@ from skyfield.api import load, Star
 
 planets = load( "de421.bsp" )
 earth = planets[ "earth" ]
+moon = planets[ "moon" ]
 mars = planets[ "mars" ]
 
 timeScale = load.timescale()
 now = timeScale.now()
-barycentric = mars.at( now )
 
-astrometric = earth.at( now ).observe( mars )
-apparent = earth.at( now ).observe( mars ).apparent()
+home = earth.topos( "33.8599722 S", "151.2111111 E" )
 
-boston = earth.topos( "42.3583 N", "71.0603 W" )
-astrometric = boston.at( now ).observe( mars )
-apparent = boston.at( now ).observe (mars ).apparent()
+apparent = home.at( now ).observe( mars ).apparent()
 
-barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
+alt, az, distance = apparent.altaz()
+print(alt.dstr())
+print(az.dstr())
+print(distance)
 
-astrometric = earth.at( now ).observe( barnard )
-apparent = earth.at( now ).observe( barnard ).apparent()
 
-astrometric = boston.at( now ).observe( barnard )
-apparent = boston.at( now ).observe( barnard ).apparent()
+# print( "Mars astrometric:", home.at( now ).observe( mars ) )
+# apparent = home.at( now ).observe (mars ).apparent()
+# 
+# 
+# 
+# 
+# barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
+# 
+# astrometric = earth.at( now ).observe( barnard )
+# apparent = earth.at( now ).observe( barnard ).apparent()
+# 
+# astrometric = home.at( now ).observe( barnard )
+# apparent = home.at( now ).observe( barnard ).apparent()
 
-t = timeScale.utc( 1980, 1, 1 )
-print( earth.at( t ).position.au )
-print( mars.at( t ).position.au )
