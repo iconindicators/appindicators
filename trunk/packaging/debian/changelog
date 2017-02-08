@@ -1,3 +1,14 @@
+indicator-lunar (1.0.72-1) precise; urgency=low
+
+  * Bug fix: Bad comet data was causing a core dump.
+    Ideally the underlying data would be screened for bad data, but the data
+    format is long and convoluted.  Instead, each comet is computed and if
+    certain attributes are NaN, namely earth_distance, phase, size and
+    sun_distance, the comet is deemed to have bad data.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 8 Feb 2017 23:42:18 +1000
+
+
 indicator-lunar (1.0.71-1) precise; urgency=low
 
   * Bug fix: If the moon was unchecked, the icon could not be created nor the

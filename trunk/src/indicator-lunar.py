@@ -63,7 +63,7 @@ class AstronomicalBodyType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star,
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.71"
+    VERSION = "1.0.72"
     ICON = INDICATOR_NAME
     ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
     ICON_BASE_PATH = tempfile.gettempdir()
@@ -908,6 +908,7 @@ class IndicatorLunar:
 
     MESSAGE_BODY_ALWAYS_UP = _( "Always Up!" )
     MESSAGE_BODY_NEVER_UP = _( "Never Up!" )
+    MESSAGE_DATA_BAD_DATA = _( "Bad data!" )
     MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE = _( "Cannot access the data source\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_DATA_NO_DATA = _( "No data!" )
     MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE = _( "No data found at\n<a href=\'{0}'>{0}</a>" )
@@ -1495,9 +1496,10 @@ class IndicatorLunar:
                self.hideBodyIfNeverUp and \
                (
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP or \
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_BAD_DATA or \
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA
                ):
-                continue
+                continue # Skip comets which are never up or have no data or have bad data AND the user wants to hide comets on such conditions.
 
             if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data or \
                key + ( IndicatorLunar.DATA_RISE_TIME, ) in self.data:
@@ -1523,13 +1525,17 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + displayName )
                     menu.append( menuItem )
 
-                if key in self.cometOEData:
-                    self.updateCommonMenu( menuItem, AstronomicalBodyType.Comet, key )
-                    self.addOnCometHandler( menuItem.get_submenu(), key )
-                else: # Should only be a no data message...I hope!
+                # Comet data may not exist or comet data exists but is bad.
+                cometDataIsMissingOrBad = ( key not in self.cometOEData ) or \
+                                          ( key in self.cometOEData and ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) in self.data )
+
+                if cometDataIsMissingOrBad:
                     subMenu = Gtk.Menu()
                     subMenu.append( Gtk.MenuItem( self.getDisplayData( ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ) ) )
                     menuItem.set_submenu( subMenu )
+                else:
+                    self.updateCommonMenu( menuItem, AstronomicalBodyType.Comet, key )
+                    self.addOnCometHandler( menuItem.get_submenu(), key )
 
 
     def addOnCometHandler( self, subMenu, comet ):
@@ -2059,8 +2065,11 @@ class IndicatorLunar:
             if key in self.cometOEData:
                 comet = ephem.readdb( self.cometOEData[ key ] )
                 comet.compute( self.getCity( ephemNow ) )
-                if float( comet.mag ) <= float( hideIfGreaterThanMagnitude ):
-                    self.updateCommon( comet, AstronomicalBodyType.Comet, key, ephemNow, hideIfNeverUp )
+                if math.isnan( comet.earth_distance ) or math.isnan( comet.phase ) or math.isnan( comet.size ) or math.isnan( comet.sun_distance ): # Have found tha data file may contain ***** in lieu of actual data!
+                    self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_BAD_DATA
+                else:
+                    if float( comet.mag ) <= float( hideIfGreaterThanMagnitude ):
+                        self.updateCommon( comet, AstronomicalBodyType.Comet, key, ephemNow, hideIfNeverUp )
             else:
                 self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
@@ -2444,6 +2453,7 @@ class IndicatorLunar:
         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
         for key in self.data.keys():
             hideMessage = self.data[ key ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP or \
+                      self.data[ key ] == IndicatorLunar.MESSAGE_DATA_BAD_DATA or \
                       self.data[ key ] == IndicatorLunar.MESSAGE_DATA_NO_DATA or \
                       self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES or \
                       self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
@@ -3541,6 +3551,7 @@ class IndicatorLunar:
             # Only add tags for data which has not been removed.
             for key in self.data.keys():
                 hideMessage = self.data[ key ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP or \
+                          self.data[ key ] == IndicatorLunar.MESSAGE_DATA_BAD_DATA or \
                           self.data[ key ] == IndicatorLunar.MESSAGE_DATA_NO_DATA or \
                           self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES or \
                           self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
