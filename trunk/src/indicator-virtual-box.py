@@ -36,6 +36,7 @@ gettext.install( INDICATOR_NAME )
 
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 from threading import Thread
@@ -46,7 +47,7 @@ import gzip, json, logging, os, pythonutils, re, shutil, sys, time, virtualmachi
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.52"
+    VERSION = "1.0.53"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
