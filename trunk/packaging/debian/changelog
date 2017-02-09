@@ -3,7 +3,7 @@ indicator-fortune (1.0.25-1) precise; urgency=low
   * Bug fix: Attempting to delete the history file if it did not exist caused
     a crash.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 14 Jul 2016 13:14:50 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 14 Dec 2016 13:14:50 +1000
 
 
 indicator-fortune (1.0.24-1) precise; urgency=low
