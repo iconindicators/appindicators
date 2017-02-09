@@ -1,3 +1,11 @@
+indicator-tide (1.0.7-1) precise; urgency=low
+
+  * Bug fix: Missing python3-notify2 from the debian/control file.
+    Also added a gi.require_version to the source.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 10 Feb 2016 9:28:41 +1000
+
+
 indicator-tide (1.0.6-1) precise; urgency=low
 
   * Bug fix: Corrected debian/install file to reflect changes to source files.

@@ -25,8 +25,9 @@ gettext.install( INDICATOR_NAME )
 
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "Notify", "0.7" )
 
-from gi.repository import AppIndicator3, GLib, Gtk, Notify
+from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 from urllib.request import urlopen
 
 import datetime, json, locale, logging, os, ports, pythonutils, tide, time, webbrowser
@@ -35,7 +36,7 @@ import datetime, json, locale, logging, os, ports, pythonutils, tide, time, webb
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.6"
+    VERSION = "1.0.7"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
