@@ -1,3 +1,15 @@
+indicator-ppa-download-statistics (1.0.57-1) precise; urgency=low
+
+  * The download notification is shown seldom, at most once every six hours,
+    and so the option to hide/show has been removed.
+    The notification will be shown when the download statistics differ between
+    updates.
+  * Clicking on any PPA item will open that item's PPA page in a web browser.
+    The option to turn off this feature has been removed.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 16 Feb 2017 16:05:16 +1000
+
+
 indicator-ppa-download-statistics (1.0.56-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.

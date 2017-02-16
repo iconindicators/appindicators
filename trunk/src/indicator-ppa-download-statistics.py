@@ -53,7 +53,7 @@ import itertools, pythonutils, json, locale, logging, operator, os, re, shutil, 
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.56"
+    VERSION = "1.0.57"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -68,12 +68,10 @@ class IndicatorPPADownloadStatistics:
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
-    SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER = "allowMenuItemsToLaunchBrowser"
     SETTINGS_COMBINE_PPAS = "combinePPAs"
     SETTINGS_FILTERS = "filters"
     SETTINGS_IGNORE_VERSION_ARCHITECTURE_SPECIFIC = "ignoreVersionArchitectureSpecific"
     SETTINGS_PPAS = "ppas"
-    SETTINGS_SHOW_NOTIFICATION_ON_UPDATE = "showNotificationOnUpdate"
     SETTINGS_SHOW_SUBMENU = "showSubmenu"
     SETTINGS_SORT_BY_DOWNLOAD = "sortByDownload"
     SETTINGS_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
@@ -259,21 +257,20 @@ class IndicatorPPADownloadStatistics:
 
 
     def onPPA( self, widget ):
-        if self.allowMenuItemsToLaunchBrowser == True:
-            firstPipe = str.find( widget.props.name, "|" )
-            ppaUser = widget.props.name[ 0 : firstPipe ].strip()
-            secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
-            if secondPipe == -1:
-                # This is a combined PPA...
-                ppaName = widget.props.name[ firstPipe + 1 : ].strip()
-                url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName
-            else:
-                ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
-                thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
-                series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
-                url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
+        firstPipe = str.find( widget.props.name, "|" )
+        ppaUser = widget.props.name[ 0 : firstPipe ].strip()
+        secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
+        if secondPipe == -1:
+            # This is a combined PPA...
+            ppaName = widget.props.name[ firstPipe + 1 : ].strip()
+            url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName
+        else:
+            ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
+            thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
+            series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
+            url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
 
-            webbrowser.open( url ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
+        webbrowser.open( url ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
 
 
     def onAbout( self, widget ):
@@ -500,30 +497,11 @@ class IndicatorPPADownloadStatistics:
 
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
-        showNotificationOnUpdateCheckbox = Gtk.CheckButton( _( "Notify on update" ) )
-        showNotificationOnUpdateCheckbox.set_tooltip_text( _(
-            "Show a screen notification\n" + \
-            "when the PPA download statistics\n" + \
-            "have been updated AND are\n" + \
-            "different to the last download." ) )
-        showNotificationOnUpdateCheckbox.set_active( self.showNotificationOnUpdate )
-        showNotificationOnUpdateCheckbox.set_margin_top( 10 )
-        grid.attach( showNotificationOnUpdateCheckbox, 0, 5, 2, 1 )
-
-        allowMenuItemsToLaunchBrowserCheckbox = Gtk.CheckButton( _( "Open PPA in browser" ) )
-        allowMenuItemsToLaunchBrowserCheckbox.set_tooltip_text( _(
-            "Clicking a PPA menu item loads\n" + \
-            "the PPA's page in the default\n" + \
-            "web browser." ) )
-        allowMenuItemsToLaunchBrowserCheckbox.set_active( self.allowMenuItemsToLaunchBrowser )
-        allowMenuItemsToLaunchBrowserCheckbox.set_margin_top( 10 )
-        grid.attach( allowMenuItemsToLaunchBrowserCheckbox, 0, 6, 2, 1 )
-
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorPPADownloadStatistics.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 7, 2, 1 )
+        grid.attach( autostartCheckbox, 0, 5, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
@@ -539,8 +517,6 @@ class IndicatorPPADownloadStatistics:
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
             self.sortByDownload = sortByDownloadCheckbox.get_active()
             self.sortByDownloadAmount = spinner.get_value_as_int()
-            self.showNotificationOnUpdate = showNotificationOnUpdateCheckbox.get_active()
-            self.allowMenuItemsToLaunchBrowser = allowMenuItemsToLaunchBrowserCheckbox.get_active()
 
             if self.ppasOrFiltersModified:
                 # Only save the PPAs/filters if modified - avoids a re-download.
@@ -886,13 +862,11 @@ class IndicatorPPADownloadStatistics:
 
 
     def loadSettings( self ):
-        self.allowMenuItemsToLaunchBrowser = True
         self.sortByDownload = False
         self.sortByDownloadAmount = 5
         self.combinePPAs = False
         self.ignoreVersionArchitectureSpecific = True
         self.showSubmenu = False
-        self.showNotificationOnUpdate = True
         self.filterAtDownload = True
 
         self.ppas = [ ]
@@ -909,11 +883,9 @@ class IndicatorPPADownloadStatistics:
 
                 self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
-                self.allowMenuItemsToLaunchBrowser = settings.get( IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER, self.allowMenuItemsToLaunchBrowser )
                 self.combinePPAs = settings.get( IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS, self.combinePPAs )
                 self.filters = settings.get( IndicatorPPADownloadStatistics.SETTINGS_FILTERS, { } )
                 self.ignoreVersionArchitectureSpecific = settings.get( IndicatorPPADownloadStatistics.SETTINGS_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, self.ignoreVersionArchitectureSpecific )
-                self.showNotificationOnUpdate = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SHOW_NOTIFICATION_ON_UPDATE, self.showNotificationOnUpdate )
                 self.showSubmenu = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
                 self.sortByDownload = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD, self.sortByDownload )
                 self.sortByDownloadAmount = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT, self.sortByDownloadAmount )
@@ -950,12 +922,10 @@ class IndicatorPPADownloadStatistics:
                 ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
             settings = {
-                IndicatorPPADownloadStatistics.SETTINGS_ALLOW_MENU_ITEMS_TO_LAUNCH_BROWSER: self.allowMenuItemsToLaunchBrowser,
                 IndicatorPPADownloadStatistics.SETTINGS_FILTERS: self.filters,
                 IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS: self.combinePPAs,
                 IndicatorPPADownloadStatistics.SETTINGS_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
                 IndicatorPPADownloadStatistics.SETTINGS_PPAS: ppas,
-                IndicatorPPADownloadStatistics.SETTINGS_SHOW_NOTIFICATION_ON_UPDATE: self.showNotificationOnUpdate,
                 IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
                 IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD: self.sortByDownload,
                 IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT: self.sortByDownloadAmount
@@ -1038,7 +1008,7 @@ class IndicatorPPADownloadStatistics:
 
             GLib.idle_add( self.buildMenu )
 
-            if self.showNotificationOnUpdate and not self.quitRequested and self.ppasPrevious != self.ppas:
+            if not self.quitRequested and self.ppasPrevious != self.ppas:
                 Notify.Notification.new( _( "Statistics downloaded!" ), "", IndicatorPPADownloadStatistics.ICON ).show()
 
             self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.

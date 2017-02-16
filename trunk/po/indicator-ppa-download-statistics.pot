@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-ppa-download-statistics 1.0.56\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-05-22 18:05+1000\n"
+"POT-Creation-Date: 2017-02-16 16:10+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,32 +17,44 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicator-ppa-download-statistics.py:61
+#: indicator-ppa-download-statistics.py:65
 msgid "Shows the total downloads of PPAs."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:77
+#: indicator-ppa-download-statistics.py:79
 msgid "(downloading data...)"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:78
+#: indicator-ppa-download-statistics.py:80
 msgid "(error retrieving PPA)"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:79
+#: indicator-ppa-download-statistics.py:81
 msgid "(multiple messages - uncombine PPAs)"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:80
+#: indicator-ppa-download-statistics.py:82
 msgid "(no published binaries)"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:81
+#: indicator-ppa-download-statistics.py:83
 msgid "(published binaries completely filtered)"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:290
+#: indicator-ppa-download-statistics.py:288
 msgid "translator-credits"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:289
+msgid "View the"
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:290
+msgid "text file."
+msgstr ""
+
+#: indicator-ppa-download-statistics.py:291
+msgid "changelog"
 msgstr ""
 
 #: indicator-ppa-download-statistics.py:302
@@ -54,22 +66,22 @@ msgid "Preferences are currently unavailable."
 msgstr ""
 
 #: indicator-ppa-download-statistics.py:333
-#: indicator-ppa-download-statistics.py:608
+#: indicator-ppa-download-statistics.py:587
 msgid "PPA User"
 msgstr ""
 
 #: indicator-ppa-download-statistics.py:334
-#: indicator-ppa-download-statistics.py:634
+#: indicator-ppa-download-statistics.py:613
 msgid "PPA Name"
 msgstr ""
 
 #: indicator-ppa-download-statistics.py:335
-#: indicator-ppa-download-statistics.py:658
+#: indicator-ppa-download-statistics.py:637
 msgid "Series"
 msgstr ""
 
 #: indicator-ppa-download-statistics.py:336
-#: indicator-ppa-download-statistics.py:673
+#: indicator-ppa-download-statistics.py:652
 msgid "Architecture"
 msgstr ""
 
@@ -210,97 +222,74 @@ msgid ""
 msgstr ""
 
 #: indicator-ppa-download-statistics.py:500
-msgid "Notify on update"
-msgstr ""
-
-#: indicator-ppa-download-statistics.py:502
-msgid ""
-"Show a screen notification\n"
-"when the PPA download statistics\n"
-"have been updated AND are\n"
-"different to the last download."
-msgstr ""
-
-#: indicator-ppa-download-statistics.py:510
-msgid "Open PPA in browser"
-msgstr ""
-
-#: indicator-ppa-download-statistics.py:512
-msgid ""
-"Clicking a PPA menu item loads\n"
-"the PPA's page in the default\n"
-"web browser."
-msgstr ""
-
-#: indicator-ppa-download-statistics.py:519
 msgid "Autostart"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:521
+#: indicator-ppa-download-statistics.py:502
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:525
+#: indicator-ppa-download-statistics.py:506
 msgid "General"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:527
+#: indicator-ppa-download-statistics.py:508
 msgid "Preferences"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:586
+#: indicator-ppa-download-statistics.py:565
 msgid "No PPA has been selected for removal."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:589
+#: indicator-ppa-download-statistics.py:568
 msgid "Remove the selected PPA?"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:688
+#: indicator-ppa-download-statistics.py:667
 msgid "Edit PPA"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:690
+#: indicator-ppa-download-statistics.py:669
 msgid "Add PPA"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:708
+#: indicator-ppa-download-statistics.py:687
 msgid "PPA user cannot be empty."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:713
+#: indicator-ppa-download-statistics.py:692
 msgid "PPA name cannot be empty."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:741
+#: indicator-ppa-download-statistics.py:720
 msgid "Duplicates disallowed - there is an identical PPA!"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:759
+#: indicator-ppa-download-statistics.py:738
 msgid "No filter has been selected for removal."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:762
+#: indicator-ppa-download-statistics.py:741
 msgid "Remove the selected filter?"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:769
+#: indicator-ppa-download-statistics.py:748
 msgid "Please add a PPA first!"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:779
+#: indicator-ppa-download-statistics.py:758
 msgid "Only one filter per PPA User/Name."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:796
+#: indicator-ppa-download-statistics.py:775
 msgid "PPA User/Name"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:827
+#: indicator-ppa-download-statistics.py:806
 msgid "Filter Text"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:833
+#: indicator-ppa-download-statistics.py:812
 msgid ""
 "Each line of text is a single\n"
 "filter which is compared against\n"
@@ -315,27 +304,18 @@ msgid ""
 "cards are not accepted!"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:853
+#: indicator-ppa-download-statistics.py:832
 msgid "Edit Filter"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:855
+#: indicator-ppa-download-statistics.py:834
 msgid "Add Filter"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:870
+#: indicator-ppa-download-statistics.py:849
 msgid "Please enter filter text!"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:1030
+#: indicator-ppa-download-statistics.py:1012
 msgid "Statistics downloaded!"
-msgstr ""
-
-msgid "View the"
-msgstr ""
-
-msgid "changelog"
-msgstr ""
-
-msgid "text file."
 msgstr ""
