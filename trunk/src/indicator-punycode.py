@@ -37,7 +37,7 @@ import encodings.idna, json, logging, os, pythonutils, re
 class IndicatorPunycode:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.2"
+    VERSION = "1.0.3"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -193,8 +193,6 @@ class IndicatorPunycode:
             self.dialog.present()
             return
 
-        notebook = Gtk.Notebook()
-
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -269,10 +267,8 @@ class IndicatorPunycode:
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 6, 2, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
-
         self.dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( notebook, True, True, 0 )
+        self.dialog.get_content_area().add( grid )
         self.dialog.set_border_width( 5 )
         self.dialog.set_icon_name( IndicatorPunycode.ICON )
         self.dialog.show_all()

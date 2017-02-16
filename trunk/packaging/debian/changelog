@@ -1,3 +1,10 @@
+indicator-punycode (1.0.3-1) precise; urgency=low
+
+  * Removed superfluous "General" tab from Preferences dialog.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 16 Feb 2017 13:24:54 +1000
+
+
 indicator-punycode (1.0.2-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
