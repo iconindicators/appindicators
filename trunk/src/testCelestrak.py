@@ -50,10 +50,12 @@ def getCountsOfObjectTypes( satelliteTLEData, satCat ):
         else:
             if satCat is None:
                 unknown.append( ( name, number ) )
+
             else:
                 payloadFlag = satCat[ number ][ 20 ]
                 if "*" in payloadFlag:
                     payload.append( ( name, number ) )
+
                 else:
                     unknown.append( ( name, number ) )
 
