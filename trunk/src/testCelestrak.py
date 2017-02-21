@@ -40,23 +40,22 @@ def getCountsOfObjectTypes( satelliteTLEData, satCat ):
     for name, number in satelliteTLEData:
         if "R/B" in name.upper():
             rocketBooster.append( ( name, number ) )
-            continue
 
-        if "DEB" in name.upper():
+        elif "DEB" in name.upper():
             debris.append( ( name, number ) )
-            continue
 
-        if "PLAT" in name.upper():
+        elif "PLAT" in name.upper():
             platform.append( ( name, number ) )
-            continue
 
-        if satCat is not None:
-            payloadFlag = satCat[ number ][ 20 ]
-            if "*" in payloadFlag:
-                payload.append( ( name, number ) )
-                continue
-
-        unknown.append( ( name, number ) )
+        else:
+            if satCat is None:
+                unknown.append( ( name, number ) )
+            else:
+                payloadFlag = satCat[ number ][ 20 ]
+                if "*" in payloadFlag:
+                    payload.append( ( name, number ) )
+                else:
+                    unknown.append( ( name, number ) )
 
     return ( rocketBooster, debris, platform, payload, unknown )
 
@@ -81,8 +80,7 @@ def getObjectsWhichAreNotDecayed( satCat ):
 
 
 def printObjectType( objectType, objectList ):
-#     print( "\t" + objectType + ":", len( objectList ), sorted( objectList ) )
-    print( "\t" + objectType + ":", len( objectList ) )
+    print( "\t" + objectType + ":", len( objectList ), sorted( objectList ) )
 
 
 satCat = getSatCat( "file:///home/bernard/Desktop/satcat.txt" )
