@@ -1,11 +1,11 @@
 indicator-ppa-download-statistics (1.0.57-1) precise; urgency=low
 
-  * The download notification is shown seldom, at most once every six hours,
-    and so the option to hide/show has been removed.
-    The notification will be shown when the download statistics differ between
-    updates.
-  * Clicking on any PPA item will open that item's PPA page in a web browser.
-    The option to turn off this feature has been removed.
+  * The download notification is shown at most once every six hours, hence
+    the option to hide/show has been removed.  The notification will be shown
+    (as usual) when the download statistics differ between updates.
+  * Clicking on any PPA item opens that item's PPA page in a web browser.  The
+    option to turn on/off this feature has been removed and the feature is
+    permanently enabled.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 16 Feb 2017 16:05:16 +1000
 
