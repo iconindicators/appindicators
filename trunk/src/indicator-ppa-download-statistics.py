@@ -59,7 +59,11 @@ class IndicatorPPADownloadStatistics:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    SERIES = [ "zesty", "yakkety", "xenial", "wily", "vivid", "utopic", "trusty", "saucy", "raring", "quantal", "precise", "oneiric", "natty", "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy", "gutsy", "feisty", "edgy", "dapper", "breezy", "hoary", "warty" ]
+    SERIES = [ "zesty", "yakkety", "xenial", "wily", "vivid", "utopic", "trusty", 
+              "saucy", "raring", "quantal", "precise", "oneiric", "natty",
+              "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy",
+              "gutsy", "feisty", "edgy", "dapper", "breezy", "hoary", "warty" ]
+
     ARCHITECTURES = [ "amd64", "i386" ]
 
     COMMENTS = _( "Shows the total downloads of PPAs." )
@@ -419,7 +423,7 @@ class IndicatorPPADownloadStatistics:
 
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show PPAs as submenus" ) )
         showAsSubmenusCheckbox.set_tooltip_text( _(
-            "The download statistics for each PPA\n" +\
+            "The download statistics for each PPA\n" + \
             "are shown in a separate submenu." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
