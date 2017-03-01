@@ -63,7 +63,7 @@ class AstronomicalBodyType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star,
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.72"
+    VERSION = "1.0.73"
     ICON = INDICATOR_NAME
     ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
     ICON_BASE_PATH = tempfile.gettempdir()
@@ -996,7 +996,7 @@ class IndicatorLunar:
         if self.showSatelliteNotification:
             self.notificationSatellite()
 
-        self.nextUpdate = datetime.datetime.strptime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT ) # Parse from string back into a datetime.
+        self.nextUpdate = self.toDateTime( self.nextUpdate ) # Parse from string back into a datetime.
         nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
 
         # Ensure the update period is positive, at most every minute and at least every hour.
@@ -1152,7 +1152,7 @@ class IndicatorLunar:
 
     # Converts a UTC datetime string in the format 2015-05-11 22:51:42.429093 to local datetime string.
     def getLocalDateTime( self, utcDateTimeString, formatString = None ):
-        utcDateTime = datetime.datetime.strptime( utcDateTimeString, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT )
+        utcDateTime = self.toDateTime( utcDateTimeString )
         timestamp = calendar.timegm( utcDateTime.timetuple() )
         localDateTime = datetime.datetime.fromtimestamp( timestamp )
         localDateTime.replace( microsecond = utcDateTime.microsecond )
@@ -1268,7 +1268,7 @@ class IndicatorLunar:
 
             # Ensure the current time is within the rise/set...
             # Subtract a minute from the rise time to force the notification to take place just prior to the satellite rise.
-            riseTimeMinusOneMinute = str( datetime.datetime.strptime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT ) - datetime.timedelta( minutes = 1 ) )
+            riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 ) )
             if utcNow < riseTimeMinusOneMinute or \
                utcNow > self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ]:
                 continue
@@ -1702,7 +1702,7 @@ class IndicatorLunar:
                     # Add the rise to the next update, ensuring it is not in the past.
                     # Subtract a minute from the rise time to spoof the next update to happen earlier.
                     # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
-                    riseTimeMinusOneMinute = str( datetime.datetime.strptime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT ) - datetime.timedelta( minutes = 1 ) )
+                    riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 ) )
                     if riseTimeMinusOneMinute > now:
                         self.nextUpdate = self.getSmallestDateTime( riseTimeMinusOneMinute, self.nextUpdate )
 
@@ -1720,6 +1720,18 @@ class IndicatorLunar:
                     menu.append( menuItem )
 
                 menuItem.set_submenu( subMenu )
+
+
+    # Have found (very seldom) that a date/time may be generated from the pyephem backend with the .%f component
+    # which may mean the value is zero but pyephem dropped it.
+    # However this means the format does not match and parsing into a DateTime object fails.
+    # So pre-check for .%f and if missing, add in ".0" to keep the parsing happy.
+    def toDateTime( self, dateTimeAsString ):
+        s = dateTimeAsString
+        if re.search( r"\.\d+$", s ) is None:
+            s += ".0"
+
+        return datetime.datetime.strptime( s, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT )
 
 
     # Compare two string dates in the format YYYY MM DD HH:MM:SS, returning the earliest.

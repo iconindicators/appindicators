@@ -1,5 +1,15 @@
 indicator-lunar (1.0.72-1) precise; urgency=low
 
+  * Bug fix: Date/Time objects returned from the pyephem backend may have a
+    zero component for milliseconds which is dropped.
+    When parsing from string to a Date/Time a format exception occurs.
+  * Removed expired eclipse information.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 1 Mar 2017 19:49:38 +1000
+
+
+indicator-lunar (1.0.72-1) precise; urgency=low
+
   * Bug fix: Bad comet data was causing a core dump.
     Ideally the underlying data would be screened for bad data, but the data
     format is long and convoluted.
