@@ -1,4 +1,4 @@
-indicator-lunar (1.0.72-1) precise; urgency=low
+indicator-lunar (1.0.73-1) precise; urgency=low
 
   * Bug fix: Date/Time objects returned from the pyephem backend may have a
     zero component for milliseconds which is dropped.
