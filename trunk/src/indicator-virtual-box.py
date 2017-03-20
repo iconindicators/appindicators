@@ -47,7 +47,7 @@ import gzip, json, logging, os, pythonutils, re, shutil, sys, time, virtualmachi
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.53"
+    VERSION = "1.0.54"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -489,7 +489,7 @@ class IndicatorVirtualBox:
 
             if virtualMachine.isGroup():
                 stack.append( parent )
-                parent = store.append( parent, [ virtualMachine.getName(), None, "", virtualMachine.getUUID() ] )
+                parent = store.append( parent, [ self.getGroupName( virtualMachine ), None, "", virtualMachine.getUUID() ] )
             else:
                 autoStart = None
                 if self.isAutostart( virtualMachine.getUUID() ):
