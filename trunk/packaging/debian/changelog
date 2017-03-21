@@ -11,7 +11,7 @@ indicator-virtual-box (1.0.53-1) precise; urgency=low
   * Bug fix: Missing python3-notify2 from the debian/control file.
     Also added a gi.require_version to the source.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 10 Feb 2016 9:11:53 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 10 Feb 2017 9:11:53 +1000
 
 
 indicator-virtual-box (1.0.52-1) precise; urgency=low
