@@ -68,14 +68,14 @@ earth = planets[ "earth" ]
 latitude, longitude = toLatitudeLongitude( latitudeDecimal, longitudeDecimal )
 print( latitude, longitude )
 
-home = earth.topos( latitude, longitude ) # TODO Elevation?
+observer = earth.topos( latitude, longitude ) # TODO Elevation?
 
 timeScale = load.timescale()
 print( now.datetime() )
 timeScaleNow = timeScale.utc( now.datetime().replace( tzinfo = pytz.UTC ) )
 
 mars = planets[ "mars" ]
-astrometric = home.at( timeScaleNow ).observe( mars )
+astrometric = observer.at( timeScaleNow ).observe( mars )
 alt, az, d = astrometric.apparent().altaz()
 ra, dec, d = astrometric.apparent().radec()
 print( ra, dec, az, alt )
