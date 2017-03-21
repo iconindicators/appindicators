@@ -25,37 +25,57 @@
 #     Satellite 
 
 
-from skyfield.api import load, Star
+import pytz, ephem
+from ephem.cities import _city_data
+from ephem.stars import stars
+
+
+cityName = "Sydney"
+latitudeDecimal = _city_data.get( cityName )[ 0 ]
+longitudeDecimal = _city_data.get( cityName )[ 1 ]
+elevation = _city_data.get( cityName )[ 2 ]
+print( latitudeDecimal, longitudeDecimal )
+
+now = ephem.now()
+print( now )
+
+observer = ephem.city( cityName )
+observer.date = now
+mars = ephem.Mars( observer )
+print( mars.ra, mars.dec, mars.az, mars.alt )
+
+observer = ephem.city( cityName )
+observer.date = now
+mars = ephem.Mars( observer )
+#print( observer.next_rising( mars ).datetime(), observer.next_setting( mars ).datetime() )
+
+
+print( "- - - - - - " )
+
+
+from skyfield.api import load
+
+
+def toLatitudeLongitude( latitudeDecimal, longitudeDecimal ):
+    return \
+        str( abs( float( latitudeDecimal ) ) ) + " S" if float( latitudeDecimal ) < 0 else str( float( latitudeDecimal ) ) + " N", \
+        str( abs( float( longitudeDecimal ) ) ) + " W" if float( longitudeDecimal ) < 0 else str( float( longitudeDecimal ) ) + " E"
+
 
 planets = load( "de421.bsp" )
 earth = planets[ "earth" ]
-moon = planets[ "moon" ]
-mars = planets[ "mars" ]
+
+latitude, longitude = toLatitudeLongitude( latitudeDecimal, longitudeDecimal )
+print( latitude, longitude )
+
+home = earth.topos( latitude, longitude ) # TODO Elevation?
 
 timeScale = load.timescale()
-now = timeScale.now()
+print( now.datetime() )
+timeScaleNow = timeScale.utc( now.datetime().replace( tzinfo = pytz.UTC ) )
 
-home = earth.topos( "33.8599722 S", "151.2111111 E" )
-
-apparent = home.at( now ).observe( mars ).apparent()
-
-alt, az, distance = apparent.altaz()
-print(alt.dstr())
-print(az.dstr())
-print(distance)
-
-
-# print( "Mars astrometric:", home.at( now ).observe( mars ) )
-# apparent = home.at( now ).observe (mars ).apparent()
-# 
-# 
-# 
-# 
-# barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
-# 
-# astrometric = earth.at( now ).observe( barnard )
-# apparent = earth.at( now ).observe( barnard ).apparent()
-# 
-# astrometric = home.at( now ).observe( barnard )
-# apparent = home.at( now ).observe( barnard ).apparent()
-
+mars = planets[ "mars" ]
+astrometric = home.at( timeScaleNow ).observe( mars )
+alt, az, d = astrometric.apparent().altaz()
+ra, dec, d = astrometric.apparent().radec()
+print( ra, dec, az, alt )
