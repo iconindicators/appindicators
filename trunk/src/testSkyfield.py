@@ -34,7 +34,7 @@ cityName = "Sydney"
 latitudeDecimal = _city_data.get( cityName )[ 0 ]
 longitudeDecimal = _city_data.get( cityName )[ 1 ]
 elevation = _city_data.get( cityName )[ 2 ]
-print( latitudeDecimal, longitudeDecimal )
+print( latitudeDecimal, longitudeDecimal, elevation )
 
 now = ephem.now()
 print( now )
@@ -68,7 +68,7 @@ earth = planets[ "earth" ]
 latitude, longitude = toLatitudeLongitude( latitudeDecimal, longitudeDecimal )
 print( latitude, longitude )
 
-observer = earth.topos( latitude, longitude ) # TODO Elevation?
+observer = earth.topos( latitude, longitude, elevation_m = elevation )
 
 timeScale = load.timescale()
 print( now.datetime() )
