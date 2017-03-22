@@ -19,9 +19,11 @@
 #     https://github.com/skyfielders/python-skyfield/issues/123
 #
 # Stars
+#     http://astronomy.stackexchange.com/questions/13488/where-can-i-find-visualize-planets-stars-moons-etc-positions
 #     http://astronomy.stackexchange.com/questions/14119/open-access-table-of-visible-stars-with-magnitude-coordinates-and-possibly-col
 #     http://astronomy.stackexchange.com/questions/11334/any-freely-available-large-stellar-spectra-catalog
-    
+#     http://simbad.u-strasbg.fr/simbad/sim-id?Ident=BD%2B043561a
+#     http://wwwadd.zah.uni-heidelberg.de/datenbanken/aricns/cnspages/4c01453.htm    
 
 # TODO Compute the following to the same level of detail as indicator-lunar:
 #     Moon
@@ -50,17 +52,20 @@ observer = ephem.city( cityName )
 observer.date = now
 mars = ephem.Mars( observer )
 print( mars.ra, mars.dec, mars.az, mars.alt )
+#print( observer.next_rising( mars ).datetime(), observer.next_setting( mars ).datetime() ) #TODO
 
 observer = ephem.city( cityName )
 observer.date = now
-mars = ephem.Mars( observer )
-#print( observer.next_rising( mars ).datetime(), observer.next_setting( mars ).datetime() )
+starName = "Cebalrai"
+star = ephem.star( starName )
+star.compute( observer )
+print( star.ra, star.dec, star.az, star.alt )
 
 
 print( "- - - - - - " )
 
 
-from skyfield.api import load
+from skyfield.api import load, Star
 
 
 def toLatitudeLongitude( latitudeDecimal, longitudeDecimal ):
@@ -87,3 +92,12 @@ astrometric = observer.at( timeScaleNow ).observe( mars )
 alt, az, d = astrometric.apparent().altaz()
 ra, dec, d = astrometric.apparent().radec()
 print( ra, dec, az, alt )
+
+
+barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
+ts = load.timescale()
+t = ts.now()
+astrometric = observer.at( timeScaleNow ).observe( barnard )
+ra, dec, distance = astrometric.apparent().radec()
+az, az, distance = astrometric.apparent().altaz()
+print(ra, dec, az, alt )
