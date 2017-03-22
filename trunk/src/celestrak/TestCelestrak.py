@@ -85,7 +85,7 @@ def printObjectType( objectType, objectList ):
     print( "\t" + objectType + ":", len( objectList ), sorted( objectList ) )
 
 
-satCat = getSatCat( "file:///home/bernard/Desktop/satcat.txt" )
+satCat = getSatCat( "file:./satcat.txt" )
 #satCat = getSatCat( "http://celestrak.com/pub/satcat.txt" )
 print( "Number of objects in the catalogue:", len( satCat ) )
 
