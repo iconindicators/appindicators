@@ -69,7 +69,8 @@ def toLatitudeLongitude( latitudeDecimal, longitudeDecimal ):
         str( abs( float( longitudeDecimal ) ) ) + " W" if float( longitudeDecimal ) < 0 else str( float( longitudeDecimal ) ) + " E"
 
 
-planets = load( "/home/bernard/Desktop/2017-2024.bsp" )
+planets = load( "2017-2024.bsp" )
+# planets = load( "de421.bsp" )
 earth = planets[ "earth" ]
 
 latitude, longitude = toLatitudeLongitude( latitudeDecimal, longitudeDecimal )
