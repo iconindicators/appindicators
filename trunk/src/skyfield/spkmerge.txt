@@ -1,0 +1,6 @@
+LEAPSECONDS_KERNEL = naif0010.tls
+SPK_KERNEL = 2017-2024.bsp
+   LOG_FILE = spkmerge.log
+   SOURCE_SPK_KERNEL = de421.bsp
+      BEGIN_TIME = 2017-01-01
+      END_TIME = 2025-01-01
