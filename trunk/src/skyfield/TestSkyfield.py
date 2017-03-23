@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 
-
 # Install (and upgrade to) latest skyfield: 
 #     sudo pip3 install --upgrade skyfield
+
 
 # https://github.com/skyfielders/python-skyfield
 # 
@@ -25,6 +25,7 @@
 #     http://simbad.u-strasbg.fr/simbad/sim-id?Ident=BD%2B043561a
 #     http://wwwadd.zah.uni-heidelberg.de/datenbanken/aricns/cnspages/4c01453.htm    
 
+
 # TODO Compute the following to the same level of detail as indicator-lunar:
 #     Moon
 #     Sun
@@ -34,70 +35,78 @@
 #     Satellite 
 
 
-import pytz, ephem
+import datetime, ephem, pytz
+
+import ephem
 from ephem.cities import _city_data
 from ephem.stars import stars
-
-
-cityName = "Sydney"
-latitudeDecimal = _city_data.get( cityName )[ 0 ]
-longitudeDecimal = _city_data.get( cityName )[ 1 ]
-elevation = _city_data.get( cityName )[ 2 ]
-print( latitudeDecimal, longitudeDecimal, elevation )
-
-now = ephem.now()
-print( now )
-
-observer = ephem.city( cityName )
-observer.date = now
-mars = ephem.Mars( observer )
-print( mars.ra, mars.dec, mars.az, mars.alt )
-#print( observer.next_rising( mars ).datetime(), observer.next_setting( mars ).datetime() ) #TODO
-
-observer = ephem.city( cityName )
-observer.date = now
-starName = "Cebalrai"
-star = ephem.star( starName )
-star.compute( observer )
-print( star.ra, star.dec, star.az, star.alt )
-
-
-print( "- - - - - - " )
-
 
 from skyfield.api import load, Star
 
 
-def toLatitudeLongitude( latitudeDecimal, longitudeDecimal ):
-    return \
-        str( abs( float( latitudeDecimal ) ) ) + " S" if float( latitudeDecimal ) < 0 else str( float( latitudeDecimal ) ) + " N", \
-        str( abs( float( longitudeDecimal ) ) ) + " W" if float( longitudeDecimal ) < 0 else str( float( longitudeDecimal ) ) + " E"
+def getPyephemObserver( dateTime, latitudeDecimal, longitudeDecimal, elevation ):
+    observer = ephem.Observer()
+    observer.lon = longitudeDecimal
+    observer.lat = latitudeDecimal
+    observer.elevation = elevation
+    observer.date = ephem.Date( dateTime )
+    return observer
 
 
-planets = load( "2017-2024.bsp" )
-# planets = load( "de421.bsp" )
-earth = planets[ "earth" ]
+def testPyephem( dateTime, latitudeDecimal, longitudeDecimal, elevation ):
+    print( dateTime )
 
-latitude, longitude = toLatitudeLongitude( latitudeDecimal, longitudeDecimal )
-print( latitude, longitude )
+#TODO Need to get a new observer after the risiing/setting computation and before the other calculations.  Perhaps log a bug or question at pyephem.    
+    observer = getPyephemObserver( dateTime, latitudeDecimal, longitudeDecimal, elevation )
+    saturn = ephem.Saturn( observer )
+    rising = observer.next_rising( saturn )
+    setting = observer.next_setting( saturn )
 
-observer = earth.topos( latitude, longitude, elevation_m = elevation )
-
-timeScale = load.timescale()
-print( now.datetime() )
-timeScaleNow = timeScale.utc( now.datetime().replace( tzinfo = pytz.UTC ) )
-
-mars = planets[ "mars" ]
-astrometric = observer.at( timeScaleNow ).observe( mars )
-alt, az, d = astrometric.apparent().altaz()
-ra, dec, d = astrometric.apparent().radec()
-print( ra, dec, az, alt )
+    saturn = ephem.Saturn( getPyephemObserver( dateTime, latitudeDecimal, longitudeDecimal, elevation ) )
+    print( saturn.ra, saturn.dec, saturn.az, saturn.alt, saturn.earth_distance, saturn.sun_distance, saturn.phase, ephem.constellation( saturn ), saturn.mag, rising, setting, sep = "\n" )
 
 
-barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
-ts = load.timescale()
-t = ts.now()
-astrometric = observer.at( timeScaleNow ).observe( barnard )
-ra, dec, distance = astrometric.apparent().radec()
-az, az, distance = astrometric.apparent().altaz()
-print(ra, dec, az, alt )
+def getSkyfieldObserver( latitudeDecimal, longitudeDecimal, elevation, earth ):
+    latitude = str( abs( float( latitudeDecimal ) ) ) + " S" if float( latitudeDecimal ) < 0 else str( float( latitudeDecimal ) ) + " N"
+    longitude = str( abs( float( longitudeDecimal ) ) ) + " W" if float( longitudeDecimal ) < 0 else str( float( longitudeDecimal ) ) + " E"
+    return earth.topos( latitude, longitude, elevation_m = elevation )
+
+
+def testSkyfield( dateTime, latitudeDecimal, longitudeDecimal, elevation ):
+    now = load.timescale().utc( dateTime.replace( tzinfo = pytz.UTC ) )
+    print( now.utc )
+
+    planets = load( "2017-2024.bsp" ) # TODO Is there a canned list of planets?
+    observer = getSkyfieldObserver( latitudeDecimal, longitudeDecimal, elevation, planets[ "earth" ] )
+    saturn = planets[ "saturn barycenter" ]
+    astrometric = observer.at( now ).observe( saturn ).apparent()
+    alt, az, d = astrometric.altaz()
+    ra, dec, d = astrometric.radec()
+    print( ra, dec, az, alt, d, "TODO: sun distance", "TODO: phase/illumination", "TODO: constellation", "TODO: magnitude", "TODO: rising", "TODO: setting", sep = "\n" )
+
+
+latitudeDecimal = "-33.8"
+longitudeDecimal = "151.2"
+elevation = 3.3
+now = datetime.datetime.utcnow()
+
+testPyephem( now, latitudeDecimal, longitudeDecimal, elevation )
+print( "-   -   -   -   -   -" )
+testSkyfield( now, latitudeDecimal, longitudeDecimal, elevation )
+
+
+# barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
+# ts = load.timescale()
+# t = ts.now()
+# astrometric = observer.at( timeScaleNow ).observe( barnard )
+# ra, dec, distance = astrometric.apparent().radec()
+# az, az, distance = astrometric.apparent().altaz()
+# print(ra, dec, az, alt )
+
+
+# observer = ephem.city( cityName )
+# observer.date = now
+# starName = "Cebalrai"
+# star = ephem.star( starName )
+# star.compute( observer )
+# print( star.ra, star.dec, star.az, star.alt )
