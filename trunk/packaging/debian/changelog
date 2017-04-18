@@ -120,7 +120,7 @@ indicator-lunar (1.0.64-1) precise; urgency=low
   * Removed DD:MM:SS from satellite notification as the notification looked
     too crowded/busy.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 4 Aug 2015 08:06:09 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 4 Aug 2015 8:06:09 +1000
 
 
 indicator-lunar (1.0.63-1) precise; urgency=low
@@ -234,7 +234,7 @@ indicator-lunar (1.0.57-1) precise; urgency=low
   * About dialog changed to accept translator information.
   * Overhaul of repository structure and build script.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 16 Feb 2015 08:46:02 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 16 Feb 2015 8:46:02 +1000
 
 
 indicator-lunar (1.0.56-1) precise; urgency=low
@@ -619,7 +619,7 @@ indicator-lunar (1.0.19-1) precise; urgency=low
     Lubuntu/Xubuntu.
   * Icons for Preferences/About now show for Lubuntu/Xubuntu.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 10 Apr 2013 11:17:21 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 10 Apr 2013 11:17:21 +1000
 
 
 indicator-lunar (1.0.18-1) precise; urgency=low
@@ -656,7 +656,7 @@ indicator-lunar (1.0.15-1) precise; urgency=low
   * The next phases of the moon were being dropped out before the phase
     actually arrived!
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 28 Nov 2012 8:51:47 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 28 Nov 2012 8:51:47 +1000
 
 
 indicator-lunar (1.0.14-1) precise; urgency=low
