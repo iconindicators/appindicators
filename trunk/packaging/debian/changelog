@@ -249,14 +249,14 @@ indicator-ppa-download-statistics (1.0.30-1) precise; urgency=low
   * Now uses icons for ubuntu-mono-dark and ubuntu-mono-light rather than text
     and hicolor icon.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 19 Feb 2014 09:37:24 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 19 Feb 2014 9:37:24 +1000
 
 
 indicator-ppa-download-statistics (1.0.29-1) precise; urgency=low
 
   * Created a new About dialog showing the changelog.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 17 Dec 2013 00:13:45 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 17 Dec 2013 0:13:45 +1000
 
 
 indicator-ppa-download-statistics (1.0.28-1) precise; urgency=low
@@ -314,7 +314,7 @@ indicator-ppa-download-statistics (1.0.23-1) precise; urgency=low
     consistent with other indicators.
   * Removed redundant onAutoStart function.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 4 May 2013 09:31:37 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 4 May 2013 9:31:37 +1000
 
 
 indicator-ppa-download-statistics (1.0.22-1) precise; urgency=low
@@ -328,7 +328,7 @@ indicator-ppa-download-statistics (1.0.21-1) precise; urgency=low
 
   * Icons for Preferences/About now show for Lubuntu/Xubuntu.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 10 Apr 2013 01:07:41 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 10 Apr 2013 1:07:41 +1000
 
 
 indicator-ppa-download-statistics (1.0.20-1) precise; urgency=low
@@ -528,4 +528,4 @@ indicator-ppa-download-statistics (1.0.0-1) precise; urgency=low
   * Initial release.  
   * Tested on Ubuntu and Lubuntu.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Jul 2012 09:19:54 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Jul 2012 9:19:54 +1000
