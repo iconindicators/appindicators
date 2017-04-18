@@ -47,7 +47,7 @@ import gzip, json, logging, os, pythonutils, re, shutil, sys, time, virtualmachi
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.54"
+    VERSION = "1.0.55"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -197,11 +197,25 @@ class IndicatorVirtualBox:
 
     # It is assumed that VirtualBox is installed!
     def onLaunchVirtualBoxManager( self, widget ):
-        result = pythonutils.processGet( 'wmctrl -l | grep "`hostname` Oracle VM VirtualBox"' )
-        if result is None:
-            pythonutils.processCall( "VirtualBox &" )
+        windowID = None
+        processes = pythonutils.processGet( "ps -ef | grep -i virtualbox" )
+        windows = pythonutils.processGet( "wmctrl -l -p" )
+        if processes is not None and windows is not None:
+            processIDs = [ ]
+            for line in processes.splitlines( True ):
+                processID = line.split()[ 1 ].strip()
+                processIDs.append( processID )
+
+            for line in windows.splitlines( True ):
+                line = line.split()
+                processID = line[ 2 ].strip()
+                if processID in processIDs:
+                    windowID = line[ 0 ].strip()
+                    break
+
+        if windowID is None:
+            pythonutils.processCall( "virtualbox &" )
         else:
-            windowID = result[ 0 : result.find( " " ) ]
             pythonutils.processCall( "wmctrl -i -a " + windowID )
 
 

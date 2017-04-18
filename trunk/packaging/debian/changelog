@@ -1,3 +1,12 @@
+indicator-virtual-box (1.0.55-1) precise; urgency=low
+
+  * Bug fix: Handle launching/toFront of the VirtualBox Manager better; toFront
+    only worked in English locales!  Latest VirtualBox also changed how it
+    appeared in the list of processes.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 18 Apr 2017 14:15:06 +1000
+
+
 indicator-virtual-box (1.0.54-1) precise; urgency=low
 
   * Bug fix: Group names in the Preferences dialog inadvertently contained
@@ -70,7 +79,7 @@ indicator-virtual-box (1.0.48-1) precise; urgency=low
   * Bug fix: Handle previously installed (older) versions of VirtualBox which
     have their config file in a different location.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 6 Feb 2015 12:12:13 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 6 Feb 2016 12:12:13 +1000
 
 
 indicator-virtual-box (1.0.47-1) precise; urgency=low
@@ -87,7 +96,7 @@ indicator-virtual-box (1.0.46-1) precise; urgency=low
   * Added Czech translation.  Thanks to Filip Oščádal.
   * Report to the user (rather than log) when a VM cannot be located.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 2 Jul 2015 12:30:09 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 2 Jul 2015 12:30:09 +1000
 
 
 indicator-virtual-box (1.0.45-1) precise; urgency=low
@@ -281,7 +290,7 @@ indicator-virtual-box (1.0.25-1) precise; urgency=low
 
   * Created a new About dialog showing the changelog.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 17 Dec 2013 00:22:56 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 17 Dec 2013 0:22:56 +1000
 
 
 indicator-virtual-box (1.0.24-1) precise; urgency=low
@@ -305,7 +314,7 @@ indicator-virtual-box (1.0.22-1) precise; urgency=low
 
   * Put the list of VMs in the Preferences into a scrolled window.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 17 Nov 2013 14:04:35 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 17 Nov 2013 14:04:35 +1000
 
 
 indicator-virtual-box (1.0.21-1) precise; urgency=low
@@ -314,7 +323,7 @@ indicator-virtual-box (1.0.21-1) precise; urgency=low
     are displayed.
   * Put in a delay between each VM starting up.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 13 Oct 2013 20:14:12 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 13 Oct 2013 20:14:12 +1000
 
 
 indicator-virtual-box (1.0.20-1) precise; urgency=low
@@ -323,7 +332,7 @@ indicator-virtual-box (1.0.20-1) precise; urgency=low
     appearing in the spinner field. Need to force the initial value by
     explicitly setting it.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 1 Oct 2013 11:32:20 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 1 Oct 2013 11:32:20 +1000
 
 
 indicator-virtual-box (1.0.19-1) precise; urgency=low
@@ -345,7 +354,7 @@ indicator-virtual-box (1.0.18-1) precise; urgency=low
   * Now logs to a file in the user's HOME directory.
   * Attempt to bring about/preferences to front.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 15 Apr 2013 10:38:13 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 15 Apr 2013 10:38:13 +1000
 
 
 indicator-virtual-box (1.0.17-1) precise; urgency=low
@@ -384,7 +393,7 @@ indicator-virtual-box (1.0.15-1) precise; urgency=low
     UI and as such the indicator displays the VM (from the group) alongside
     the other VMs.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 06 Nov 2012 18:45:52 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 6 Nov 2012 18:45:52 +1000
 
 
 indicator-virtual-box (1.0.14-1) precise; urgency=low
