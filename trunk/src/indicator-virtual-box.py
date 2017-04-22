@@ -198,23 +198,14 @@ class IndicatorVirtualBox:
     # It is assumed that VirtualBox is installed!
     def onLaunchVirtualBoxManager( self, widget ):
         windowID = None
-        processes = pythonutils.processGet( "ps -ef | grep [/]usr/lib/virtualbox/VirtualBox" ) # The [/] omits lines which don't have that which is the grep line.   Refer to http://stackoverflow.com/questions/9375711/more-elegant-ps-aux-grep-v-grep
-        if processes is not None:
-            for process in processes.splitlines():
-                if process.endswith( "/usr/lib/virtualbox/VirtualBox" ):
-                    processID = process.split()[ 1 ].strip() # Process ID of VirtualBox Manager.
+        processID = pythonutils.processGet( "ps -ef | awk '{ if( $NF == \"/usr/lib/virtualbox/VirtualBox\" ) print $2; }'" )
+        if( processID is not None and processID != "" ):
+            windowID = pythonutils.processGet( "wmctrl -lp | awk '{ if( $3 == " + processID.strip() + " ) print $1; }'" )
 
-                    windows = pythonutils.processGet( "wmctrl -lp" )
-                    if windows is not None:
-                        for window in windows.splitlines():
-                            if processID == window.split()[ 2 ].strip(): # Process ID of VirtualBox Manager found in list of windows.
-                                windowID = window.split()[ 0 ].strip() # Window ID of VirtualBox Manager.
-                                break
-
-        if windowID is None:
-            pythonutils.processCall( "virtualbox &" )
+        if windowID is None or windowID == "":
+            pythonutils.processCall( "/usr/lib/virtualbox/VirtualBox &" )
         else:
-            pythonutils.processCall( "wmctrl -i -a " + windowID )
+            pythonutils.processCall( "wmctrl -ia " + windowID.strip() )
 
 
     def onVirtualMachine( self, widget ):
