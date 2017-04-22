@@ -59,8 +59,8 @@ class IndicatorPPADownloadStatistics:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    SERIES = [ "zesty", "yakkety", "xenial", "wily", "vivid", "utopic", "trusty", 
-              "saucy", "raring", "quantal", "precise", "oneiric", "natty",
+    SERIES = [ "artful", "zesty", "yakkety", "xenial", "wily", "vivid", "utopic", 
+              "trusty", "saucy", "raring", "quantal", "precise", "oneiric", "natty",
               "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy",
               "gutsy", "feisty", "edgy", "dapper", "breezy", "hoary", "warty" ]
 
