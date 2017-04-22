@@ -1,8 +1,8 @@
 indicator-virtual-box (1.0.55-1) precise; urgency=low
 
-  * Bug fix: Handle launching/toFront of the VirtualBox Manager better; toFront
-    only worked in English locales!  Latest VirtualBox also changed how it
-    appeared in the list of processes.
+  * Bug fix: Bringing VirtualBox Manager to front only worked in English
+    locales.
+    Latest VirtualBox changed how it appeared in the list of processes.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 18 Apr 2017 14:15:06 +1000
 
