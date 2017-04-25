@@ -40,23 +40,22 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 
-import json, logging, os, pythonutils, re, shutil
+import json, logging, os, pythonutils
 
 
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.25"
+    VERSION = "1.0.26"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
+    COMMENTS = _( "Calls the 'fortune' program displaying the result in the on-screen notification." )
 
-    DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
+    DEFAULT_FORTUNE = "/usr/share/games/fortunes"
     HISTORY_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + "-history"
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
-
-    COMMENTS = _( "Calls the 'fortune' program displaying the result in the on-screen notification." )
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_FORTUNES = "fortunes"
@@ -74,41 +73,28 @@ class IndicatorFortune:
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.dialog = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
-        self.fortune = ""
+        self.fortune = "" # TODO Needed?
         self.loadSettings()
         Notify.init( INDICATOR_NAME )
-
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-        self.indicator.set_menu( self.buildMenu() )
 
         if os.path.isfile( IndicatorFortune.HISTORY_FILE ):
             os.remove( IndicatorFortune.HISTORY_FILE )
 
-        self.update()
-        self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.update )
+        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+        self.buildMenu()
+        self.showFortune( None, True )
+        self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.showFortune, None, True )
 
 
     def main( self ): Gtk.main()
-
-
-    def update( self ):
-        self.refreshFortune()
-
-        notificationSummary = self.notificationSummary
-        if notificationSummary == "":
-            notificationSummary = " " # Can't be empty text.
-
-        Notify.Notification.new( notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
-
-        return True
 
 
     def buildMenu( self ):
         menu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem( _( "New Fortune" ) )
-        menuItem.connect( "activate", self.onShowFortune, True )
+        menuItem.connect( "activate", self.showFortune, True )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
             self.indicator.set_secondary_activate_target( menuItem )
@@ -120,7 +106,7 @@ class IndicatorFortune:
             self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
-        menuItem.connect( "activate", self.onShowFortune, False )
+        menuItem.connect( "activate", self.showFortune, False )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
             self.indicator.set_secondary_activate_target( menuItem )
@@ -128,42 +114,10 @@ class IndicatorFortune:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-        return menu
 
 
-    def refreshFortune( self ):
-        if len( self.fortunes ) == 0:
-            self.fortune = _( "No fortunes defined!" )
-        else:
-            fortuneLocations = " "
-            for fortuneLocation in self.fortunes:
-                if fortuneLocation[ 1 ]:
-                    if( os.path.isdir( fortuneLocation[ 0 ] ) ):
-                        fortuneLocations += "'" + fortuneLocation[ 0 ].rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
-                    else:
-                        fortuneLocations += "'" + fortuneLocation[ 0 ].replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
-
-            if fortuneLocations == " ":
-                self.fortune = _( "No fortunes enabled!" )
-            else:
-                while True:
-                    self.fortune = pythonutils.processGet( "fortune" + fortuneLocations )
-                    if len( self.fortune ) > self.skipFortuneCharacterCount: # If the fortune exceeds the user-specified character limit, John West it...
-                        continue
-
-                    try:
-                        with open( IndicatorFortune.HISTORY_FILE, "a" ) as f:
-                            f.write( self.fortune + "\n\n" )
-
-                    except Exception as e:
-                        logging.exception( e )
-                        logging.error( "Error writing fortune to history file: " + IndicatorFortune.HISTORY_FILE )
-
-                    break
-
-
-    def onShowFortune( self, widget, showNew ):
-        if showNew:
+    def showFortune( self, widget, new ):
+        if new:
             self.refreshFortune()
 
         notificationSummary = self.notificationSummary
@@ -171,6 +125,36 @@ class IndicatorFortune:
             notificationSummary = " "
 
         Notify.Notification.new( notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
+
+        return True # Must return True so the timer continues.
+        
+
+    def refreshFortune( self ):
+        if len( self.fortunes ) == 0:
+            self.fortune = _( "No fortunes defined!" )
+        else:
+            locations = " "
+            for fortune in self.fortunes:
+                if os.path.isdir( fortune ):
+                    locations += "'" + fortune.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
+                elif os.path.isfile( fortune ):
+                    locations += "'" + fortune.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
+
+            if locations == " ":
+                self.fortune = _( "No fortunes enabled!" )
+            else:
+                while True:
+                    self.fortune = pythonutils.processGet( "fortune" + locations )
+                    if len( self.fortune ) <= self.skipFortuneCharacterCount: # If the fortune is within the character limit keep it...
+                        try:
+                            with open( IndicatorFortune.HISTORY_FILE, "a" ) as f:
+                                f.write( self.fortune + "\n\n" )
+
+                        except Exception as e:
+                            logging.exception( e )
+                            logging.error( "Error writing fortune to history file: " + IndicatorFortune.HISTORY_FILE )
+
+                        break
 
 
     def onCopyLastFortune( self, widget ): self.clipboard.set_text( self.fortune, -1 )
@@ -218,15 +202,20 @@ class IndicatorFortune:
         grid.set_row_homogeneous( False )
         grid.set_column_homogeneous( False )
 
-        store = Gtk.ListStore( str, str ) # Path to fortune file, tick icon (Gtk.STOCK_APPLY) or None.
-        store.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
-        for fortune in self.fortunes:
-            if fortune[ 1 ]:
-                store.append( [ fortune[ 0 ], Gtk.STOCK_APPLY ] )
-            else:
-                store.append( [ fortune[ 0 ], None ] )
+        store = Gtk.ListStore( str, str ) # Path to fortune; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
+        if IndicatorFortune.DEFAULT_FORTUNE not in self.fortunes: # Always include the default.
+            store.append( [ IndicatorFortune.DEFAULT_FORTUNE, None ] )
 
-        tree = Gtk.TreeView( store )
+        for fortune in self.fortunes:
+            if os.path.isfile( fortune ) or os.path.isdir( fortune ):
+                store.append( [ fortune, Gtk.STOCK_APPLY ] )
+            else:
+                store.append( [ fortune, Gtk.STOCK_DIALOG_ERROR ] )
+
+        storeSort = Gtk.TreeModelSort( model = store )
+        storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+
+        tree = Gtk.TreeView( storeSort )
         tree.expand_all()
         tree.set_hexpand( True )
         tree.set_vexpand( True )
@@ -368,28 +357,27 @@ class IndicatorFortune:
             self.skipFortuneCharacterCount = spinnerCharacterCount.get_value_as_int()
             self.notificationSummary = notificationSummary.get_text()
 
-            self.update()
-            GLib.source_remove( self.timeoutID )
-            self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.update )
-
             self.fortunes = [ ]
             treeiter = store.get_iter_first()
             while treeiter != None:
                 if store[ treeiter ][ 1 ] == Gtk.STOCK_APPLY:
-                    self.fortunes.append( [ store[ treeiter ][ 0 ], True ] )
-                else:
-                    self.fortunes.append( [ store[ treeiter ][ 0 ], False ] )
+                    self.fortunes.append( store[ treeiter ][ 0 ] )
 
                 treeiter = store.iter_next( treeiter )
 
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorFortune.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            self.indicator.set_menu( self.buildMenu() ) # Results in an assertion which turns out is caused by self.indicator.set_secondary_activate_target( menuItem ) which does not go away even if calling via GLib.idle_add.
+
+            GLib.timeout_add_seconds( 0, self.buildMenu )
+            GLib.timeout_add_seconds( 0, self.showFortune, None, True ) # Kick off a new fortune immediately.
+            GLib.source_remove( self.timeoutID )
+            self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.showFortune, None, True )
 
         self.dialog.destroy()
         self.dialog = None
 
 
+#TODO Check against calendar
     def onFortuneReset( self, button, tree ):
         if pythonutils.showOKCancel( None, _( "Reset fortunes to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
             model, treeiter = tree.get_selection().get_selected()
@@ -545,11 +533,8 @@ class IndicatorFortune:
                 with open( IndicatorFortune.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
-                self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes )
-                if self.fortunes == [ ]:
-                    self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
-
-                self.fortunes.sort( key = lambda x: x[ 0 ] )
+#TODO Handle reading old format...
+                self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes ).sort()
 
                 self.middleMouseClickOnIcon = settings.get( IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
                 self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )

@@ -1,3 +1,10 @@
+indicator-fortune (1.0.26-1) precise; urgency=low
+
+  * Bug fix: Reset in Preferences did not actually reset!
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 25 Apr 2017 16:40:46 +1000
+
+
 indicator-fortune (1.0.25-1) precise; urgency=low
 
   * Bug fix: Attempting to delete the history file if it did not exist caused
