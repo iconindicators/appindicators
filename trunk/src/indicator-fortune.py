@@ -30,6 +30,11 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
+#TODO Test what happens when refreshing the fortune with a...
+# file/directory that does not exist
+# file/directory that exists but does not contain fortunes.
+
+
 INDICATOR_NAME = "indicator-fortune"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -73,7 +78,6 @@ class IndicatorFortune:
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.dialog = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
-        self.fortune = "" # TODO Needed?
         self.loadSettings()
         Notify.init( INDICATOR_NAME )
 
@@ -206,6 +210,7 @@ class IndicatorFortune:
         if IndicatorFortune.DEFAULT_FORTUNE not in self.fortunes: # Always include the default.
             store.append( [ IndicatorFortune.DEFAULT_FORTUNE, None ] )
 
+#TODO Test with a bogus/bad fortune...
         for fortune in self.fortunes:
             if os.path.isfile( fortune ) or os.path.isdir( fortune ):
                 store.append( [ fortune, Gtk.STOCK_APPLY ] )
@@ -219,18 +224,24 @@ class IndicatorFortune:
         tree.expand_all()
         tree.set_hexpand( True )
         tree.set_vexpand( True )
-        tree.append_column( Gtk.TreeViewColumn( _( "Fortune File/Directory" ), Gtk.CellRendererText(), text = 0 ) )
-        tree.append_column( Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = 1 ) )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Fortune File/Directory" ), Gtk.CellRendererText(), text = 0 )
+        treeViewColumn.set_sort_column_id( 0 )
+        tree.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = 1 )
+        treeViewColumn.set_sort_column_id( 1 )
+        tree.append_column( treeViewColumn )
+
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onFortuneDoubleClick )
         tree.set_tooltip_text( _(
             "Double click to edit a fortune.\n\n" + \
-            "Basic English language fortunes\n" + \
-            "are installed by default.\n\n" + \
+            "English language fortunes are\n" + \
+            "installed by default.\n\n" + \
             "However, there may be be other\n" + \
             "fortune packages available,\n" + \
-            "in addition to fortunes in your\n" + \
-            "native language." ) )
+            "in your native language." ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -368,8 +379,8 @@ class IndicatorFortune:
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorFortune.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
 
+            self.showFortune( None, True ) # Kick off a new fortune immediately.  DO NOT RUN THROUGH A TIMER AS IT WILL LOOP INDEFINITELY!
             GLib.timeout_add_seconds( 0, self.buildMenu )
-            GLib.timeout_add_seconds( 0, self.showFortune, None, True ) # Kick off a new fortune immediately.
             GLib.source_remove( self.timeoutID )
             self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.showFortune, None, True )
 
@@ -377,27 +388,34 @@ class IndicatorFortune:
         self.dialog = None
 
 
-#TODO Check against calendar
-    def onFortuneReset( self, button, tree ):
+    def onFortuneReset( self, button, treeview ):
         if pythonutils.showOKCancel( None, _( "Reset fortunes to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
-            model, treeiter = tree.get_selection().get_selected()
-            model.clear()
-            model.append( [ IndicatorFortune.DEFAULT_FORTUNE[ 0 ], Gtk.STOCK_APPLY ]  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
+            listStore = treeview.get_model().get_model()
+            listStore.clear()
+            listStore.append( [ IndicatorFortune.DEFAULT_FORTUNE, Gtk.STOCK_APPLY ]  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
 
 
-    def onFortuneRemove( self, button, tree ):
-        model, treeiter = tree.get_selection().get_selected()
+    def onFortuneRemove( self, button, treeview ):
+        model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
             pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ), INDICATOR_NAME )
+        elif model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE:
+            pythonutils.showMessage( self.dialog, Gtk.MessageType.WARNING, _( "This is the default fortune\nand cannot be deleted." ), INDICATOR_NAME )
         elif pythonutils.showOKCancel( None, _( "Remove the selected fortune?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            model.remove( treeiter )
+            model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
-    def onFortuneAdd( self, button, tree ): self.onFortuneDoubleClick( tree, None, None )
+    def onFortuneAdd( self, button, treeview ): self.onFortuneDoubleClick( treeview, None, None )
 
 
-    def onFortuneDoubleClick( self, tree, rowNumber, treeViewColumn ):
-        model, treeiter = tree.get_selection().get_selected()
+#TODO Compare with calendar.
+    def onFortuneDoubleClick( self, treeview, rowNumber, treeViewColumn ):
+        model, treeiter = treeview.get_selection().get_selected()
+
+        if rowNumber is None: # This is an add.
+            isSystemFortune = False
+        else: # This is an edit.
+            isSystemFortune = model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE
 
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -413,19 +431,18 @@ class IndicatorFortune:
 
         fortuneFileDirectory = Gtk.Entry()
         fortuneFileDirectory.set_width_chars( 20 )
+        fortuneFileDirectory.set_editable( False )
 
-        if rowNumber is None: # This is an add.
-            fortuneFileDirectory.set_text( IndicatorFortune.DEFAULT_FORTUNE[ 0 ] )
-        else: # This is an edit.
+        if rowNumber is not None: # This is an edit.
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
+            fortuneFileDirectory.set_width_chars( len( fortuneFileDirectory.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
-        fortuneFileDirectory.set_width_chars( len( fortuneFileDirectory.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
         fortuneFileDirectory.set_tooltip_text( _(
-            "The full path to a fortune .dat file,\n" + \
-            "or a directory which contains fortune\n" + \
-            ".dat files.\n\n" + \
-            "Ensure the corresponding fortune text\n" + \
-            "file(s) is present!" ) )
+            "The path to a fortune .dat file,\n" + \
+            "or a directory which contains\n" + \
+            "fortune .dat files.\n\n" + \
+            "Ensure the corresponding\n" + \
+            "fortune text file(s) is present!" ) )
         fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
 
@@ -433,27 +450,43 @@ class IndicatorFortune:
         hbox.set_homogeneous( True )
 
         browseFileButton = Gtk.Button( _( "File" ) )
-        browseFileButton.set_tooltip_text( _(
-            "Choose a fortune .dat file.\n" + \
-            "Ensure the corresponding text\n" + \
-            "file is present!" ) )
+        browseFileButton.set_sensitive( not isSystemFortune )
+        if isSystemFortune:
+            browseFileButton.set_tooltip_text( _(
+                "This fortune is part of\n" + \
+                "your system and cannot be\n" + \
+                "modified." ) )
+        else:
+            browseFileButton.set_tooltip_text( _( 
+                "Choose a fortune .dat file.\n\n" + \
+                "Ensure the corresponding text\n" + \
+                "file is present!" ) )
+
         hbox.pack_start( browseFileButton, True, True, 0 )
 
         browseDirectoryButton = Gtk.Button( _( "Directory" ) )
-        browseDirectoryButton.set_tooltip_text( _(
-            "Choose a directory containing a\n" + \
-            "fortune .dat file(s).\n" + \
-            "Ensure the corresponding text\n" + \
-            "file(s) is present!" ) )
+        browseDirectoryButton.set_sensitive( not isSystemFortune )
+        if isSystemFortune:
+            browseFileButton.set_tooltip_text( _(
+                "This fortune is part of\n" + \
+                "your system and cannot be\n" + \
+                "modified." ) )
+        else:
+            browseFileButton.set_tooltip_text( _( 
+                "Choose a directory containing\n" + \
+                "a fortune .dat file(s).\n\n" + \
+                "Ensure the corresponding text\n" + \
+                "file is present!" ) )
+
         hbox.pack_start( browseDirectoryButton, True, True, 0 )
 
         hbox.set_halign( Gtk.Align.END )
-        grid.attach( hbox, 0, 1, 2, 1 )
+        grid.attach( hbox, 1, 1, 1, 1 )
 
         enabledCheckbox = Gtk.CheckButton( _( "Enabled" ) )
         enabledCheckbox.set_tooltip_text( _(
             "Ensure the fortune file/directory\n" + \
-            "works by running it through 'fortune'\n" + \
+            "works by running through 'fortune'\n" + \
             "in a terminal." ) )
 
         if rowNumber is None: # This is an add.
@@ -463,9 +496,10 @@ class IndicatorFortune:
 
         grid.attach( enabledCheckbox, 0, 2, 1, 1 )
 
-        title = _( "Fortune Properties" )
         if rowNumber is None:
             title = _( "Add Fortune" )
+        else:
+            title = _( "Fortune Properties" )
 
         dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
@@ -480,23 +514,20 @@ class IndicatorFortune:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
 
-                if fortuneFileDirectory.get_text().strip() == "":
+                if not isSystemFortune and fortuneFileDirectory.get_text().strip() == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path cannot be empty." ), INDICATOR_NAME )
                     fortuneFileDirectory.grab_focus()
                     continue
     
-                if not os.path.exists( fortuneFileDirectory.get_text().strip() ):
+                if not isSystemFortune and not os.path.exists( fortuneFileDirectory.get_text().strip() ):
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path does not exist." ), INDICATOR_NAME )
                     fortuneFileDirectory.grab_focus()
                     continue
 
                 if rowNumber is not None:
-                    model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
+                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value and append new value.  
     
-                if enabledCheckbox.get_active():
-                    model.append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY ] )
-                else:
-                    model.append( [ fortuneFileDirectory.get_text().strip(), None ] )
+                model.get_model().append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY if enabledCheckbox.get_active() else None ] )
 
             break
 
@@ -512,11 +543,18 @@ class IndicatorFortune:
             action = Gtk.FileChooserAction.SELECT_FOLDER
 
         dialog = Gtk.FileChooserDialog( title, addEditDialog, action, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
-        dialog.set_modal( True ) # TODO: This seems to have no effect - the underlying add/edit dialog is still clickable.
+        dialog.set_modal( True ) # In Ubuntu 14.04 the underlying add/edit dialog is still clickable, but behaves in Ubuntu 16.04/17.04.
         dialog.set_filename( fortuneFileDirectory.get_text() )
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            fortuneFileDirectory.set_text( dialog.get_filename() )
+        while( True ):
+            response = dialog.run()
+            if response == Gtk.ResponseType.OK:
+                if dialog.get_filename() == IndicatorFortune.DEFAULT_FORTUNE:
+                    pythonutils.showMessage( dialog, Gtk.MessageType.INFO, _( "The fortune is part of your system\nand is already included." ), INDICATOR_NAME )
+                else:
+                    fortuneFileDirectory.set_text( dialog.get_filename() )
+                    break
+            else:
+                break
 
         dialog.destroy()
 
@@ -533,8 +571,9 @@ class IndicatorFortune:
                 with open( IndicatorFortune.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
-#TODO Handle reading old format...
-                self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes ).sort()
+#TODO Handle reading old format...might have to sort after the data is sanitised.
+                self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes )
+                self.fortunes.sort()
 
                 self.middleMouseClickOnIcon = settings.get( IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
                 self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )
