@@ -49,6 +49,22 @@ from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 import json, logging, os, pythonutils
 
 
+class MenuItemManager:
+
+    def __init__( self ): self.menuItems = [ ]
+
+
+    def append( self, menuItem ): self.menuItems.append( menuItem )
+
+
+    def clearAll( self ): self.menuItems.clear()
+
+
+    def setSensitive( self, sensitive ):
+        for menuItem in self.menuItems:
+            menuItem.set_sensitive( sensitive )
+
+
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
@@ -76,6 +92,9 @@ class IndicatorFortune:
 
 
     def __init__( self ):
+
+        self.menuItemManager = MenuItemManager()
+
         filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.dialog = None
@@ -97,21 +116,25 @@ class IndicatorFortune:
 
 
     def buildMenu( self ):
+        self.menuItemManager.clearAll()
         menu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem( _( "New Fortune" ) )
+        self.menuItemManager.append( menuItem )
         menuItem.connect( "activate", self.showFortune, True )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
             self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Copy Last Fortune" ) )
+        self.menuItemManager.append( menuItem )
         menuItem.connect( "activate", self.onCopyLastFortune )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
             self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
+        self.menuItemManager.append( menuItem )
         menuItem.connect( "activate", self.showFortune, False )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
@@ -120,6 +143,7 @@ class IndicatorFortune:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
+        self.menu = menu
 
 
     def showFortune( self, widget, new ):
@@ -177,27 +201,32 @@ class IndicatorFortune:
 
 
     def onAbout( self, widget ):
-        if self.dialog is None:
-            self.dialog = pythonutils.createAboutDialog(
-                [ IndicatorFortune.AUTHOR ],
-                IndicatorFortune.COMMENTS, 
-                [ ],
-                "",
-                Gtk.License.GPL_3_0,
-                IndicatorFortune.ICON,
-                INDICATOR_NAME,
-                IndicatorFortune.WEBSITE,
-                IndicatorFortune.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ) )
+        for menuItem in self.menu.get_children():
+            menuItem.set_sensitive( False )
+        
+#         self.menu.set_sensitive( False )
+#         self.menuItemManager.setSensitive( False )
+        dialog = pythonutils.createAboutDialog(
+            [ IndicatorFortune.AUTHOR ],
+            IndicatorFortune.COMMENTS, 
+            [ ],
+            "",
+            Gtk.License.GPL_3_0,
+            IndicatorFortune.ICON,
+            INDICATOR_NAME,
+            IndicatorFortune.WEBSITE,
+            IndicatorFortune.VERSION,
+            _( "translator-credits" ),
+            _( "View the" ),
+            _( "text file." ),
+            _( "changelog" ) )
 
-            self.dialog.run()
-            self.dialog.destroy()
-            self.dialog = None
-        else:
-            self.dialog.present()
+        dialog.run()
+        dialog.destroy()
+#         self.menuItemManager.setSensitive( True )
+#         self.menu.set_sensitive( True )
+        for menuItem in self.menu.get_children():
+            menuItem.set_sensitive( True )
 
 
     def onPreferences( self, widget ):
