@@ -1,3 +1,10 @@
+indicator-stardate (1.0.34-1) precise; urgency=low
+
+  * Menu items are now disabled when About or Preferences is displayed.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 27 Apr 2017 23:19:28 +1000
+
+
 indicator-stardate (1.0.33-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.

@@ -38,19 +38,17 @@ import gi
 gi.require_version( "AppIndicator3", "0.1" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk
-
 import datetime, gzip, json, logging, os, pythonutils, re, shutil, stardate, sys
 
 
 class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.33"
+    VERSION = "1.0.34"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
-
     COMMENTS = _( "Shows the current Star Trek™ stardate." )
     CREDITS = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ]
 
@@ -65,7 +63,6 @@ class IndicatorStardate:
         filehandler = pythonutils.TruncatedFileHandler( IndicatorStardate.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
-        self.dialog = None
         self.stardateMenuItem = None
         self.loadSettings()
 
@@ -135,6 +132,7 @@ class IndicatorStardate:
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, False, self.onPreferences, self.onAbout, Gtk.main_quit )
         menu.show_all()
+        self.menu = menu
         return menu
 
 
@@ -153,33 +151,29 @@ class IndicatorStardate:
 
 
     def onAbout( self, widget ):
-        if self.dialog is None:
-            self.dialog = pythonutils.createAboutDialog(
-                [ IndicatorStardate.AUTHOR ],
-                IndicatorStardate.COMMENTS, 
-                IndicatorStardate.CREDITS,
-                _( "Credits" ),
-                Gtk.License.GPL_3_0,
-                IndicatorStardate.ICON,
-                INDICATOR_NAME,
-                IndicatorStardate.WEBSITE,
-                IndicatorStardate.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ) )
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        dialog = pythonutils.createAboutDialog(
+            [ IndicatorStardate.AUTHOR ],
+            IndicatorStardate.COMMENTS, 
+            IndicatorStardate.CREDITS,
+            _( "Credits" ),
+            Gtk.License.GPL_3_0,
+            IndicatorStardate.ICON,
+            INDICATOR_NAME,
+            IndicatorStardate.WEBSITE,
+            IndicatorStardate.VERSION,
+            _( "translator-credits" ),
+            _( "View the" ),
+            _( "text file." ),
+            _( "changelog" ) )
 
-            self.dialog.run()
-            self.dialog.destroy()
-            self.dialog = None
-        else:
-            self.dialog.present()
+        dialog.run()
+        dialog.destroy()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onPreferences( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
 
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -235,13 +229,13 @@ class IndicatorStardate:
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 4, 2, 1 )
 
-        self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( grid, True, True, 0 )
-        self.dialog.set_border_width( 5 )
-        self.dialog.set_icon_name( IndicatorStardate.ICON )
-        self.dialog.show_all()
+        dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( grid, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorStardate.ICON )
+        dialog.show_all()
 
-        response = self.dialog.run()
+        response = dialog.run()
         if response == Gtk.ResponseType.OK:
             self.padInteger = padIntegerCheckbox.get_active()
             self.showClassic = showClassicCheckbox.get_active()
@@ -252,8 +246,8 @@ class IndicatorStardate:
             self.indicator.set_menu( self.buildMenu() )
             self.update()
 
-        self.dialog.destroy()
-        self.dialog = None
+        dialog.destroy()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onShowClassicCheckbox( self, source, showIssueCheckbox, padIntegerCheckbox ):
