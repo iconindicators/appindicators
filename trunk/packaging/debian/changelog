@@ -6,6 +6,8 @@ indicator-fortune (1.0.26-1) precise; urgency=low
   * Changed default function of middle mouse button click from showing a new
     fortune to showing the current fortune.
   * Now handles bogus/missing fortune locations.
+  * When a dialog (Preferences or About) is displayed, the menu is disabled to
+    prevent spurious behaviour.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 25 Apr 2017 16:40:46 +1000
 

@@ -30,12 +30,6 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
-#TODO Test disabling the menu when a dialog (Preferences/About) is showing.
-#     http://zetcode.com/gui/pygtk/signals/
-#     http://stackoverflow.com/questions/1707188/how-to-disable-inactive-some-of-the-gtkmenu-items
-#     https://lazka.github.io/pgi-docs/GObject-2.0/classes/Object.html#GObject.Object.handler_block
-
-
 INDICATOR_NAME = "indicator-fortune"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -47,22 +41,6 @@ gi.require_version( "Notify", "0.7" )
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 
 import json, logging, os, pythonutils
-
-
-class MenuItemManager:
-
-    def __init__( self ): self.menuItems = [ ]
-
-
-    def append( self, menuItem ): self.menuItems.append( menuItem )
-
-
-    def clearAll( self ): self.menuItems.clear()
-
-
-    def setSensitive( self, sensitive ):
-        for menuItem in self.menuItems:
-            menuItem.set_sensitive( sensitive )
 
 
 class IndicatorFortune:
@@ -92,12 +70,8 @@ class IndicatorFortune:
 
 
     def __init__( self ):
-
-        self.menuItemManager = MenuItemManager()
-
         filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.dialog = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
         self.loadSettings()
         Notify.init( INDICATOR_NAME )
@@ -116,25 +90,21 @@ class IndicatorFortune:
 
 
     def buildMenu( self ):
-        self.menuItemManager.clearAll()
         menu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem( _( "New Fortune" ) )
-        self.menuItemManager.append( menuItem )
         menuItem.connect( "activate", self.showFortune, True )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
             self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Copy Last Fortune" ) )
-        self.menuItemManager.append( menuItem )
         menuItem.connect( "activate", self.onCopyLastFortune )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
             self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
-        self.menuItemManager.append( menuItem )
         menuItem.connect( "activate", self.showFortune, False )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
@@ -201,11 +171,7 @@ class IndicatorFortune:
 
 
     def onAbout( self, widget ):
-        for menuItem in self.menu.get_children():
-            menuItem.set_sensitive( False )
-        
-#         self.menu.set_sensitive( False )
-#         self.menuItemManager.setSensitive( False )
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
         dialog = pythonutils.createAboutDialog(
             [ IndicatorFortune.AUTHOR ],
             IndicatorFortune.COMMENTS, 
@@ -223,16 +189,11 @@ class IndicatorFortune:
 
         dialog.run()
         dialog.destroy()
-#         self.menuItemManager.setSensitive( True )
-#         self.menu.set_sensitive( True )
-        for menuItem in self.menu.get_children():
-            menuItem.set_sensitive( True )
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onPreferences( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
 
         notebook = Gtk.Notebook()
 
@@ -387,13 +348,13 @@ class IndicatorFortune:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        self.dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( notebook, True, True, 0 )
-        self.dialog.set_border_width( 5 )
-        self.dialog.set_icon_name( IndicatorFortune.ICON )
-        self.dialog.show_all()
+        dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( notebook, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorFortune.ICON )
+        dialog.show_all()
 
-        if self.dialog.run() == Gtk.ResponseType.OK:
+        if dialog.run() == Gtk.ResponseType.OK:
             if radioMiddleMouseClickNewFortune.get_active():
                 self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
             elif radioMiddleMouseClickCopyLastFortune.get_active():
@@ -421,8 +382,8 @@ class IndicatorFortune:
             self.buildMenu()
             self.showFortune( None, True )
 
-        self.dialog.destroy()
-        self.dialog = None
+        dialog.destroy()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onFortuneReset( self, button, treeview ):
@@ -435,9 +396,9 @@ class IndicatorFortune:
     def onFortuneRemove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ), INDICATOR_NAME )
+            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ), INDICATOR_NAME )
         elif model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.WARNING, _( "This is the default fortune\nand cannot be deleted." ), INDICATOR_NAME )
+            pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "This is the default fortune\nand cannot be deleted." ), INDICATOR_NAME )
         elif pythonutils.showOKCancel( None, _( "Remove the selected fortune?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
@@ -538,7 +499,7 @@ class IndicatorFortune:
         else:
             title = _( "Edit Fortune" )
 
-        dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorFortune.ICON )
