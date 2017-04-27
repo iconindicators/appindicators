@@ -39,7 +39,6 @@ gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
-
 import json, logging, os, pythonutils
 
 
@@ -81,7 +80,9 @@ class IndicatorFortune:
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
         self.buildMenu()
+
         self.timeoutID = None
         self.showFortune( None, True )
 
