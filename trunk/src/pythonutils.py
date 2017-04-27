@@ -76,6 +76,11 @@ def setAutoStart( desktopFile, isSet, logging, autoStartPath = AUTOSTART_PATH, d
             pass
 
 
+def setAllMenuItemsSensitive( menu, sensitive ):
+    for menuItem in menu.get_children():
+        menuItem.set_sensitive( sensitive )
+
+
 # Shows a message dialog.
 #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
 def showMessage( parent, messageType, message, title ):
