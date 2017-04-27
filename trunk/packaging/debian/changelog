@@ -8,6 +8,7 @@ indicator-fortune (1.0.26-1) precise; urgency=low
   * Now handles bogus/missing fortune locations.
   * When a dialog (Preferences or About) is displayed, the menu is disabled to
     prevent spurious behaviour.
+  * Menu items are now disabled when About or Preferences is displayed.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 25 Apr 2017 16:40:46 +1000
 
