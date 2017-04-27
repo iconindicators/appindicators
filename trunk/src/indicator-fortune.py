@@ -31,6 +31,9 @@
 
 
 #TODO Test disabling the menu when a dialog (Preferences/About) is showing.
+#     http://zetcode.com/gui/pygtk/signals/
+#     http://stackoverflow.com/questions/1707188/how-to-disable-inactive-some-of-the-gtkmenu-items
+#     https://lazka.github.io/pgi-docs/GObject-2.0/classes/Object.html#GObject.Object.handler_block
 
 
 INDICATOR_NAME = "indicator-fortune"
@@ -56,11 +59,10 @@ class IndicatorFortune:
     WEBSITE = "https://launchpad.net/~thebernmeister"
     COMMENTS = _( "Calls the 'fortune' program displaying the result in the on-screen notification." )
 
-    DEFAULT_FORTUNE = "/usr/share/games/fortunes"
+    DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
     HISTORY_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + "-history"
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
-    NOTIFICATION_WARNING_FLAG = "%%%%%" # Used to indicate the fortune notification summary should be emitted as a warning (rather than a regular fortune).
-
+    NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, the notification summary should be emitted as a warning (rather than a regular fortune).
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_FORTUNES = "fortunes"
@@ -145,11 +147,11 @@ class IndicatorFortune:
             self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No fortunes are enabled!" )
         else:
             locations = " "
-            for fortune in self.fortunes:
-                if os.path.isdir( fortune ):
-                    locations += "'" + fortune.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
-                elif os.path.isfile( fortune ):
-                    locations += "'" + fortune.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
+            for location, enabled in self.fortunes:
+                if os.path.isdir( location ):
+                    locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
+                elif os.path.isfile( location ):
+                    locations += "'" + location.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
 
             if locations == " ": # Despite one or more fortunes enabled, none seem to be valid paths/files...
                 self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No enabled fortunes have a valid location!" )
@@ -217,14 +219,11 @@ class IndicatorFortune:
         grid.set_column_homogeneous( False )
 
         store = Gtk.ListStore( str, str ) # Path to fortune; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
-        if IndicatorFortune.DEFAULT_FORTUNE not in self.fortunes: # Always include the default.
-            store.append( [ IndicatorFortune.DEFAULT_FORTUNE, None ] )
-
-        for fortune in self.fortunes:
-            if os.path.isfile( fortune ) or os.path.isdir( fortune ):
-                store.append( [ fortune, Gtk.STOCK_APPLY ] )
+        for location, enabled in self.fortunes:
+            if os.path.isfile( location ) or os.path.isdir( location ):
+                store.append( [ location, Gtk.STOCK_APPLY if enabled else None ] )
             else:
-                store.append( [ fortune, Gtk.STOCK_DIALOG_ERROR ] )
+                store.append( [ location, Gtk.STOCK_DIALOG_ERROR ] )
 
         storeSort = Gtk.TreeModelSort( model = store )
         storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
@@ -248,9 +247,9 @@ class IndicatorFortune:
             "Double click to edit a fortune.\n\n" + \
             "English language fortunes are\n" + \
             "installed by default.\n\n" + \
-            "However, there may be be other\n" + \
-            "fortune packages available in\n" + \
-            "your native language." ) )
+            "There may be be other fortune\n" + \
+            "packages available in your\n" + \
+            "native language." ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -381,7 +380,9 @@ class IndicatorFortune:
             treeiter = store.get_iter_first()
             while treeiter != None:
                 if store[ treeiter ][ 1 ] == Gtk.STOCK_APPLY:
-                    self.fortunes.append( store[ treeiter ][ 0 ] )
+                    self.fortunes.append( [ store[ treeiter ][ 0 ], True ] )
+                else:
+                    self.fortunes.append( [ store[ treeiter ][ 0 ], False ] )
 
                 treeiter = store.iter_next( treeiter )
 
@@ -408,7 +409,7 @@ class IndicatorFortune:
             pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ), INDICATOR_NAME )
         elif model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE:
             pythonutils.showMessage( self.dialog, Gtk.MessageType.WARNING, _( "This is the default fortune\nand cannot be deleted." ), INDICATOR_NAME )
-        elif pythonutils.showOKCancel( None, _( "Remove the selected fortune?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+        elif pythonutils.showOKCancel( None, _( "Remove the selected fortune?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
@@ -433,6 +434,7 @@ class IndicatorFortune:
         fortuneFileDirectory = Gtk.Entry()
         fortuneFileDirectory.set_width_chars( 20 )
         fortuneFileDirectory.set_editable( False )
+        fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
 
         if rowNumber is not None: # This is an edit.
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
@@ -440,11 +442,11 @@ class IndicatorFortune:
 
         fortuneFileDirectory.set_tooltip_text( _(
             "The path to a fortune .dat file,\n" + \
-            "or a directory which contains\n" + \
+            "or a directory containing\n" + \
             "fortune .dat files.\n\n" + \
             "Ensure the corresponding\n" + \
             "fortune text file(s) is present!" ) )
-        fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
+
         grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
 
         hbox = Gtk.Box( spacing = 6 )
@@ -512,7 +514,6 @@ class IndicatorFortune:
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorFortune.ICON )
 
-        # Need to set these here as the dialog had not been created at the point the buttons were defined.
         browseFileButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, True )
         browseDirectoryButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, False )
 
@@ -520,14 +521,14 @@ class IndicatorFortune:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
 
-                if fortuneFileDirectory.get_text().strip() == "":
+                if fortuneFileDirectory.get_text().strip() == "": # Will occur if the user does a browse, cancels the browse and hits okay.
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path cannot be empty." ), INDICATOR_NAME )
                     fortuneFileDirectory.grab_focus()
                     continue
 
                 if rowNumber is not None:
-                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value and append new value.  
-     
+                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value.
+
                 model.get_model().append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY if enabledCheckbox.get_active() else None ] )
 
             break
@@ -572,9 +573,9 @@ class IndicatorFortune:
                 with open( IndicatorFortune.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
-#TODO Handle reading old format...might have to sort after the data is sanitised.
-                self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes )
-                self.fortunes.sort()
+                self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes ) # At a minimum, will always contain the default fortune (may or may not be enabled).
+                if self.fortunes == [ ]: # Previous versions allowed the default fortune to be deleted so it is possible the fortunes list can be empty.
+                    self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
 
                 self.middleMouseClickOnIcon = settings.get( IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
                 self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )
