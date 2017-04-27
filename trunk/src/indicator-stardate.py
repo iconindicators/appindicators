@@ -64,6 +64,10 @@ class IndicatorStardate:
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
         self.stardateMenuItem = None
+        self.scrollDirectionIsUp = True
+        self.scrollIndex = 0
+        self.stardate = stardate.Stardate()
+
         self.loadSettings()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorStardate.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
@@ -71,10 +75,6 @@ class IndicatorStardate:
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
         self.indicator.set_menu( self.buildMenu() )
 
-        self.scrollDirectionIsUp = True
-        self.scrollIndex = 0
-
-        self.stardate = stardate.Stardate()
         self.update()
 
         # Use the stardate update period to set a refresh timer.
@@ -84,6 +84,8 @@ class IndicatorStardate:
         if period < 1:
             period = 1
 
+#TODO The update method should calculate when to do the next update and schedule the next call to itself. 
+#Also if we mouse scroll or change preferences, shouldn't the period be recalculated, given that the stardate type can be changed?
         GLib.timeout_add_seconds( period, self.update )
 
 
