@@ -30,9 +30,7 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
-#TODO Test what happens when refreshing the fortune with a...
-# file/directory that does not exist
-# file/directory that exists but does not contain fortunes.
+#TODO Test disabling the menu when a dialog (Preferences/About) is showing.
 
 
 INDICATOR_NAME = "indicator-fortune"
@@ -61,6 +59,8 @@ class IndicatorFortune:
     DEFAULT_FORTUNE = "/usr/share/games/fortunes"
     HISTORY_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + "-history"
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
+    NOTIFICATION_WARNING_FLAG = "%%%%%" # Used to indicate the fortune notification summary should be emitted as a warning (rather than a regular fortune).
+
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_FORTUNES = "fortunes"
@@ -87,8 +87,8 @@ class IndicatorFortune:
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.buildMenu()
+        self.timeoutID = None
         self.showFortune( None, True )
-        self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.showFortune, None, True )
 
 
     def main( self ): Gtk.main()
@@ -124,18 +124,25 @@ class IndicatorFortune:
         if new:
             self.refreshFortune()
 
-        notificationSummary = self.notificationSummary
-        if notificationSummary == "":
-            notificationSummary = " "
+        if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
+            notificationSummary = _( "WARNING. . ." )
+        else:
+            notificationSummary = self.notificationSummary
+            if notificationSummary == "":
+                notificationSummary = " "
 
-        Notify.Notification.new( notificationSummary, self.fortune, IndicatorFortune.ICON ).show()
+        Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
 
-        return True # Must return True so the timer continues.
-        
+        if new: # If the user is showing the previous fortune, keep the existing timer in place for the forthcoming fortune.
+            if self.timeoutID is not None:
+                GLib.source_remove( self.timeoutID )
+
+            self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.showFortune, None, True )
+
 
     def refreshFortune( self ):
         if len( self.fortunes ) == 0:
-            self.fortune = _( "No fortunes defined!" )
+            self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No fortunes are enabled!" )
         else:
             locations = " "
             for fortune in self.fortunes:
@@ -144,12 +151,15 @@ class IndicatorFortune:
                 elif os.path.isfile( fortune ):
                     locations += "'" + fortune.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
 
-            if locations == " ":
-                self.fortune = _( "No fortunes enabled!" )
+            if locations == " ": # Despite one or more fortunes enabled, none seem to be valid paths/files...
+                self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No enabled fortunes have a valid location!" )
             else:
                 while True:
                     self.fortune = pythonutils.processGet( "fortune" + locations )
-                    if len( self.fortune ) <= self.skipFortuneCharacterCount: # If the fortune is within the character limit keep it...
+                    if self.fortune is None: # Occurs when no fortune data is found...
+                        self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "Ensure enabled fortunes contain fortune data!" )
+                        break
+                    elif len( self.fortune ) <= self.skipFortuneCharacterCount: # If the fortune is within the character limit keep it...
                         try:
                             with open( IndicatorFortune.HISTORY_FILE, "a" ) as f:
                                 f.write( self.fortune + "\n\n" )
@@ -210,7 +220,6 @@ class IndicatorFortune:
         if IndicatorFortune.DEFAULT_FORTUNE not in self.fortunes: # Always include the default.
             store.append( [ IndicatorFortune.DEFAULT_FORTUNE, None ] )
 
-#TODO Test with a bogus/bad fortune...
         for fortune in self.fortunes:
             if os.path.isfile( fortune ) or os.path.isdir( fortune ):
                 store.append( [ fortune, Gtk.STOCK_APPLY ] )
@@ -240,8 +249,8 @@ class IndicatorFortune:
             "English language fortunes are\n" + \
             "installed by default.\n\n" + \
             "However, there may be be other\n" + \
-            "fortune packages available,\n" + \
-            "in your native language." ) )
+            "fortune packages available in\n" + \
+            "your native language." ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -379,10 +388,8 @@ class IndicatorFortune:
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorFortune.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
 
-            self.showFortune( None, True ) # Kick off a new fortune immediately.  DO NOT RUN THROUGH A TIMER AS IT WILL LOOP INDEFINITELY!
-            GLib.timeout_add_seconds( 0, self.buildMenu )
-            GLib.source_remove( self.timeoutID )
-            self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.showFortune, None, True )
+            self.buildMenu()
+            self.showFortune( None, True )
 
         self.dialog.destroy()
         self.dialog = None
@@ -408,14 +415,8 @@ class IndicatorFortune:
     def onFortuneAdd( self, button, treeview ): self.onFortuneDoubleClick( treeview, None, None )
 
 
-#TODO Compare with calendar.
     def onFortuneDoubleClick( self, treeview, rowNumber, treeViewColumn ):
         model, treeiter = treeview.get_selection().get_selected()
-
-        if rowNumber is None: # This is an add.
-            isSystemFortune = False
-        else: # This is an edit.
-            isSystemFortune = model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE
 
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -448,6 +449,11 @@ class IndicatorFortune:
 
         hbox = Gtk.Box( spacing = 6 )
         hbox.set_homogeneous( True )
+
+        if rowNumber is None: # This is an add.
+            isSystemFortune = False
+        else: # This is an edit.
+            isSystemFortune = model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE
 
         browseFileButton = Gtk.Button( _( "File" ) )
         browseFileButton.set_sensitive( not isSystemFortune )
@@ -499,7 +505,7 @@ class IndicatorFortune:
         if rowNumber is None:
             title = _( "Add Fortune" )
         else:
-            title = _( "Fortune Properties" )
+            title = _( "Edit Fortune" )
 
         dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
@@ -514,19 +520,14 @@ class IndicatorFortune:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
 
-                if not isSystemFortune and fortuneFileDirectory.get_text().strip() == "":
+                if fortuneFileDirectory.get_text().strip() == "":
                     pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path cannot be empty." ), INDICATOR_NAME )
-                    fortuneFileDirectory.grab_focus()
-                    continue
-    
-                if not isSystemFortune and not os.path.exists( fortuneFileDirectory.get_text().strip() ):
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path does not exist." ), INDICATOR_NAME )
                     fortuneFileDirectory.grab_focus()
                     continue
 
                 if rowNumber is not None:
                     model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value and append new value.  
-    
+     
                 model.get_model().append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY if enabledCheckbox.get_active() else None ] )
 
             break
@@ -543,12 +544,12 @@ class IndicatorFortune:
             action = Gtk.FileChooserAction.SELECT_FOLDER
 
         dialog = Gtk.FileChooserDialog( title, addEditDialog, action, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
-        dialog.set_modal( True ) # In Ubuntu 14.04 the underlying add/edit dialog is still clickable, but behaves in Ubuntu 16.04/17.04.
+        dialog.set_modal( True ) # On Ubuntu 14.04 the underlying add/edit dialog is still clickable, but behaves in Ubuntu 16.04/17.04.
         dialog.set_filename( fortuneFileDirectory.get_text() )
         while( True ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
-                if dialog.get_filename() == IndicatorFortune.DEFAULT_FORTUNE:
+                if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE ):
                     pythonutils.showMessage( dialog, Gtk.MessageType.INFO, _( "The fortune is part of your system\nand is already included." ), INDICATOR_NAME )
                 else:
                     fortuneFileDirectory.set_text( dialog.get_filename() )
@@ -561,7 +562,7 @@ class IndicatorFortune:
 
     def loadSettings( self ):
         self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
-        self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
+        self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
         self.notificationSummary = IndicatorFortune.NOTIFICATION_SUMMARY
         self.refreshIntervalInMinutes = 15
         self.skipFortuneCharacterCount = 360 # From experimentation, about 45 characters per line, but with word boundaries maintained, say 40 characters per line (with at most 9 lines).

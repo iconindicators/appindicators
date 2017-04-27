@@ -1,6 +1,11 @@
 indicator-fortune (1.0.26-1) precise; urgency=low
 
   * Bug fix: Reset in Preferences did not actually reset!
+  * Bug fix: Corrections and updates to tool tip text in the Preferences.
+  * Can now sort fortunes in the Preferences.
+  * Changed default function of middle mouse button click from showing a new
+    fortune to showing the current fortune.
+  * Now handles bogus/missing fortune locations.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 25 Apr 2017 16:40:46 +1000
 
