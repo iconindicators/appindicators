@@ -192,7 +192,7 @@ class Stardate( object ):
 
         self.stardateInteger = integer
         self.stardateFraction = fraction
-        self.__stardateToGregorian2009Revised()
+        self.__stardate2009RevisedToGregorian()
 
 
     # Returns the current Gregorian date/time in UTC.
@@ -340,7 +340,7 @@ class Stardate( object ):
 
 
     # Converts the current '2009 revised' stardate to the equivalent Gregorian date/time.
-    def __stardateToGregorian2009Revised( self ):
+    def __stardate2009RevisedToGregorian( self ):
         self.gregorianDateTime = datetime.date( self.stardateInteger, 1, 1 )
         self.gregorianDateTime += datetime.timedelta( days = self.stardateFraction )
 
