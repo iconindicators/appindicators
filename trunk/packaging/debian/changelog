@@ -1,5 +1,7 @@
 indicator-stardate (1.0.34-1) precise; urgency=low
 
+  * Removed the "show in menu" option as all supported platforms allow a label
+    next to the icon.
   * Menu items are now disabled when About or Preferences is displayed.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 27 Apr 2017 23:19:28 +1000
