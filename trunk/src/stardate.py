@@ -108,7 +108,7 @@ class Stardate( object ):
             if self.index == -1:
                 raise Exception( "Please set a valid gregorian date or stardate." )
 
-            return int( 1.0 / ( self.stardateRates[ self.index ] / 24.0 / 60.0 / 60.0 ) / 10.0 )
+            return int( ( 24.0 * 60.0 * 60.0 ) / ( self.stardateRates[ self.index ] * 10.0 ) )
 
         return ( 24 * 60 * 60 )
 
