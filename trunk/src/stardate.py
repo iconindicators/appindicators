@@ -170,7 +170,7 @@ class Stardate( object ):
         self.stardateIssue = issue
         self.stardateInteger = integer
         self.stardateFraction = fraction
-        self.__stardateToGregorianClassic()
+        self.__stardateClassicToGregorian()
 
 
     # Sets a '2009 revised' stardate for conversion to a Gregorian date/time.
@@ -253,7 +253,7 @@ class Stardate( object ):
 
 
     # Converts the current 'classic' stardate to the equivalent Gregorian date/time.
-    def __stardateToGregorianClassic( self ):
+    def __stardateClassicToGregorian( self ):
         fractionLength = len( str( self.stardateFraction ) )
         fractionDivisor = math.pow( 10.0, fractionLength )
         self.index = -1
