@@ -65,10 +65,221 @@
 import datetime, math
 
 
+# The Gregorian dates which reflect the start date for each rate in the 'classic' stardate era.
+# For example, an index of 3 (Gregorian date of 5/10/2283) corresponds to the rate of 0.5 stardate units per day.
+# The month is one-based (January = 1).
+gregorianDates = [
+    datetime.datetime( 2162, 1, 4, ),
+    datetime.datetime( 2162, 1, 4 ),
+    datetime.datetime( 2270, 1, 26 ),
+    datetime.datetime( 2283, 10, 5 ),
+    datetime.datetime( 2323, 1, 1 ) ]
+
+
+# Rates (in stardate units per day) for each 'classic' stardate era. 
+stardateRates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
+
+
+def getVersion(): return "Version 4.0 (2017-04-28)"
+
+
+# Convert a Gregorian datetime.datetime to a 'classic' stardate.
+#
+#  gregorianDateTime A Gregorian datetime.datetime in UTC to be converted to a stardate (1900 <= year <= 9500).
+#
+# Raises an exception if the Gregorian year is out the defined range.
+#
+# TODO Return?
+def getStardateClassic( gregorianDateTime ):
+    if ( gregorianDateTime.year < 1900 ) or ( gregorianDateTime.year > 9500 ): raise Exception( "Gregorian year out of range: 1900 <= year <= 9500." )
+
+    stardateIssues = [ -1, 0, 19, 19, 21 ]
+    stardateIntegers = [ 0, 0, 7340, 7840, 0 ]
+    stardateRange = [ 10000, 10000, 10000, 10000, 100000 ]
+    index = -1
+
+    # Determine into which era the given Gregorian date falls...
+    year = gregorianDateTime.year
+    month = gregorianDateTime.month # Month is one-based.
+    day = gregorianDateTime.day
+    if ( year < 2162 ) or ( year == 2162 and month == 1 and day < 4 ):
+        # Pre-stardate (pre 4/1/2162)...do the conversion here because a negative time is generated and throws out all other cases.          
+        index = 0
+        numberOfSeconds = ( gregorianDates[ index ] - gregorianDateTime ).total_seconds()
+        numberOfDays = numberOfSeconds / 60.0 / 60.0 / 24.0
+        rate = stardateRates[ index ]
+        units = numberOfDays * rate
+
+        stardateIssue = stardateIssues[ index ] - int( units / stardateRange[ index ] )
+
+        remainder = stardateRange[ index ] - ( units % stardateRange[ index ] )
+        stardateInteger = int( remainder )
+        stardateFraction = int( remainder * 10.0 ) - ( int( remainder ) * 10 )
+    else:
+        # Remainder of time periods can be treated equally...
+        if ( year == 2162 and month == 1 and day >= 4 ) or ( year == 2162 and month > 1 ) or ( year > 2162 and year < 2270 ) or ( year == 2270 and month == 1 and day < 26 ):
+            index = 1 # First period of stardates (4/1/2162 - 26/1/2270).
+        elif ( year == 2270 and month == 1 and day >= 26 ) or ( year == 2270 & month > 1 ) or ( year > 2270 and year < 2283 ) or ( year == 2283 and month < 10 ) or ( year == 2283 and month == 10 and day < 5 ):
+            index = 2 # Second period of stardates (26/1/2270 - 5/10/2283)
+        elif ( year == 2283 and month == 10 and day >= 5 ) or ( year == 2283 and month > 10 ) or ( year > 2283 and year < 2323 ):
+            index = 3 # Third period of stardates (5/10/2283 - 1/1/2323)
+        elif year >= 2323:
+            index = 4 # Fourth period of stardates (1/1/2323 - )
+        else:
+            raise Exception( "Invalid year/month/day: " + str( year ) + "/" + str( month ) + "/" + str( day ) )
+
+        # Now convert...
+        numberOfSeconds = ( gregorianDateTime - gregorianDates[ index ] ).total_seconds()
+        numberOfDays = numberOfSeconds / 60.0 / 60.0 / 24.0
+        rate = stardateRates[ index ]
+        units = numberOfDays * rate
+        stardateIssue = int( units / stardateRange[ index ] ) + stardateIssues[ index ]
+        remainder = units % stardateRange[ index ]
+        stardateInteger = int( remainder ) + stardateIntegers[ index ]
+        stardateFraction = int( remainder * 10.0 ) - ( int( remainder ) * 10 )
+
+    fractionalPeriod = int( ( 24.0 * 60.0 * 60.0 ) / ( stardateRates[ index ] * 10.0 ) )
+
+    return stardateIssue, stardateInteger, stardateFraction, fractionalPeriod
+
+
+# Convert a 'classic' stardate to a Gregorian datetime.datetime.
+#
+# Rules:
+#  issue <= 19: 0 <= integer <= 9999, fraction >= 0. 
+#  issue == 20: 0 <= integer < 5006, fraction >= 0. 
+#  issue >= 21: 0 <= integer <= 99999, fraction >= 0. 
+#
+#  issue The issue number for the stardate (can be negative).
+#  integer The integer part of a stardate.
+#  fraction The fractional part of a stardate.
+#
+# Raises an exception if the issue/integer/fraction are out of the defined ranges.
+def getGregorianFromStardateClassic( issue, integer, fraction ):
+    if issue <= 19 and ( integer < 0 or integer > 9999 ): raise Exception( "Integer out of range: 0 <= integer <= 9999" )
+
+    if issue == 20 and ( integer < 0 or integer >= 5006 ): raise Exception( "Integer out of range: 0 <= integer < 5006" )
+
+    if issue >= 21 and ( integer < 0 or integer > 99999 ): raise Exception( "Integer out of range: 0 <= integer <= 99999" )
+
+    if fraction < 0: raise Exception( "Fraction cannot be negative." )
+
+    fractionLength = len( str( fraction ) )
+    fractionDivisor = math.pow( 10.0, fractionLength )
+    index = -1
+    if issue < 0: # Pre-stardate (pre 4/1/2162).
+        index = 0
+        units = issue * 10000.0 + integer + fraction / fractionDivisor
+    elif issue >= 0 and issue < 19: # First period of stardates (4/1/2162 - 26/1/2270).
+        index = 1
+        units = issue * 1000.0 + integer + fraction / fractionDivisor
+    elif issue == 19 and integer < 7340: # First period of stardates (4/1/2162 - 26/1/2270).
+        index = 1
+        units = issue * 19.0 * 1000.0 + integer + fraction / fractionDivisor
+    elif issue == 19 and integer >= 7340 and integer < 7840: # Second period of stardates (26/1/2270 - 5/10/2283)
+        index = 2
+        units = integer + fraction / fractionDivisor - 7340
+    elif issue == 19 and integer >= 7840: # Third period of stardates (5/10/2283 - 1/1/2323)
+        index = 3
+        units = integer + fraction / fractionDivisor - 7840
+    elif issue == 20 and integer < 5006: # Third period of stardates (5/10/2283 - 1/1/2323)
+        index = 3
+        units = 1000.0 + integer + fraction / fractionDivisor
+    elif issue >= 21: # Fourth period of stardates (1/1/2323 - )
+        index = 4
+        units = ( issue - 21 ) * 10000.0 + integer + fraction / fractionDivisor
+    else:
+        raise Exception( "Illegal issue/integer: " + str( issue ) + "/" + str( integer ) )
+
+    rate = stardateRates[ index ]
+    days = units / rate
+    hours = ( days - int( days ) ) * 24.0
+    minutes = ( hours - int( hours ) ) * 60.0
+    seconds = ( minutes - int( minutes ) ) * 60.0
+
+    gregorianDateTime = datetime.datetime( gregorianDates[ index ].year, gregorianDates[ index ].month, gregorianDates[ index ].day )
+    gregorianDateTime += datetime.timedelta( int( days ), int( seconds ), 0, 0, int( minutes ), int( hours ) )
+    return gregorianDateTime
+
+
+# Convert a Gregorian datetime.datetime to a '2009 revised' stardate.
+#
+#  gregorianDateTime A Gregorian datetime.datetime in UTC to be converted to a '2009 revised' stardate (1900 <= year <= 9500).
+#
+# Raises an exception if the Gregorian year is out the defined range.
+#
+#TODO Return
+def getStardate2009Revised( gregorianDateTime ):
+    if ( gregorianDateTime.year < 1900 ) or ( gregorianDateTime.year > 9500 ): raise Exception( "Gregorian year out of range: 1900 <= year <= 9500." )
+
+    stardateInteger = gregorianDateTime.year
+    stardateFraction = ( datetime.date( gregorianDateTime.year, gregorianDateTime.month, gregorianDateTime.day ) - datetime.date( gregorianDateTime.year, 1, 1 ) ).days + 1
+    fractionalPeriod = 24 * 60 * 60
+
+    return stardateInteger, stardateFraction, fractionalPeriod
+
+
+
+# Convert a '2009 revised' stardate to a Gregorian datetime.datetime.
+#
+#  integer The integer part of a stardate (corresponds to a Gregorian year).
+#  fraction The fractional part of a stardate (0 <= fraction <= 365, or 366 if integer corresponds to a leap year).
+#
+# Raises an exception if the integer/fraction are out of the defined ranges.
+#TODO Return
+def getGregorianFromStardate2009Revised( integer, fraction ):
+    if fraction < 0: raise Exception( "Fraction cannot be negative." )
+
+    isLeapYear = ( integer % 4 == 0 and integer % 100 != 0 ) or integer % 400 == 0
+    if isLeapYear:
+        if fraction > 366: raise Exception( "Integer cannot exceed 366." )
+    else:
+        if fraction > 365: raise Exception( "Integer cannot exceed 365." )
+
+    gregorianDateTime = datetime.date( integer, 1, 1 )
+    gregorianDateTime += datetime.timedelta( days = fraction )
+    return gregorianDateTime
+
+
+#TODO One for classic and one for revised?  Is issue is None, then it's revised (otherwise classic) perhaps?
+# Returns the current value of the ('classic' or '2009 revised') stardate in string format.
+#
+#  showIssue    If True, the issue part of the 'classic' stardate will be included (ignored for '2009 revised').
+#  padInteger   If True, the integer part of the 'classic' stardate will be padded with zeros at the start (ignored for '2009 revised').
+def toStardateString( issue, integer, fraction, showIssue, padInteger ):
+    stringBuilder = ""
+    if issue is None:
+        stringBuilder = str( integer ) + "." + str( fraction )
+    else:
+        if showIssue:
+            stringBuilder = "[" + str( issue ) + "] "
+
+        if padInteger:
+            if issue < 21:
+                padding = len( "1000" ) - len( str( integer ) )
+            else:
+                padding = len( "10000" ) - len( str( integer ) )
+
+            integer = str( integer )
+            for i in range( padding ):
+                integer = "0" + integer
+
+            stringBuilder += str( integer )
+
+        else:
+            stringBuilder += str( integer )
+
+        stringBuilder += "." + str( fraction )
+
+    return stringBuilder
+
+
+
+#TODO Kill all below!
 class Stardate( object ):
 
     def __init__( self ):
-        self.API_VERSION = "Version 3.2 (2014-08-25)"
+        self.API_VERSION = "Version 4.0 (2017-04-28)"
 
         # Rates (in stardate units per day) for each 'classic' stardate era. 
         self.stardateRates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
