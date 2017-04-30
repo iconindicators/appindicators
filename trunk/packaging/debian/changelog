@@ -2,7 +2,13 @@ indicator-stardate (1.0.34-1) precise; urgency=low
 
   * Removed the "show in menu" option as all supported platforms allow a label
     next to the icon.
-  * Menu items are now disabled when About or Preferences is displayed.
+  * Tidied up tool tip text in Preferences.
+  * Menu items are now disabled when About/Preferences are displayed.
+  * Simplified the Stardate API to provide simple getters for conversion
+    between Gregorian datetime.datetime and 'classic stardate and '2009 revised'
+    stardates.
+  * Bug fix: Underlying Stardate API incorrectly converted from '2009 revised'
+    stardate to Gregorian datetime.datetime (was off by one day).
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 27 Apr 2017 23:19:28 +1000
 
@@ -245,7 +251,7 @@ indicator-stardate (1.0.6-1) precise; urgency=low
 indicator-stardate (1.0.5-1) precise; urgency=low
 
   * Now included example.py in the release to demonstrate the use of the
-    stardate API.
+    Stardate API.
   * Corrected the API version such that it matches the Java API version.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 11 Jul 2012 16:57:16 +1000
