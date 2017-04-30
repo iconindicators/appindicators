@@ -83,7 +83,7 @@ class IndicatorFortune:
 
         self.buildMenu()
 
-        self.timeoutID = None
+        self.timerID = None
         self.showFortune( None, True )
 
 
@@ -131,10 +131,10 @@ class IndicatorFortune:
         Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
 
         if new: # If the user is showing the previous fortune, keep the existing timer in place for the forthcoming fortune.
-            if self.timeoutID is not None:
-                GLib.source_remove( self.timeoutID )
+            if self.timerID is not None:
+                GLib.source_remove( self.timerID )
 
-            self.timeoutID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.showFortune, None, True )
+            self.timerID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.showFortune, None, True )
 
 
     def refreshFortune( self ):
