@@ -261,13 +261,13 @@ class IndicatorPunycode:
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 6, 2, 1 )
 
-        self.dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.get_content_area().add( grid )
-        self.dialog.set_border_width( 5 )
-        self.dialog.set_icon_name( IndicatorPunycode.ICON )
-        self.dialog.show_all()
+        dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.get_content_area().add( grid )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorPunycode.ICON )
+        dialog.show_all()
 
-        if self.dialog.run() == Gtk.ResponseType.OK:
+        if dialog.run() == Gtk.ResponseType.OK:
             self.inputClipboard = inputClipboardRadio.get_active()
             self.outputBoth = outputBothCheckbox.get_active()
             self.dropPathQuery = dropPathQueryCheckbox.get_active()
@@ -276,7 +276,7 @@ class IndicatorPunycode:
             pythonutils.setAutoStart( IndicatorPunycode.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             self.buildMenu()
 
-        self.dialog.destroy()
+        dialog.destroy()
         pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
