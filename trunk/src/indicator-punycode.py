@@ -41,8 +41,8 @@ class IndicatorPunycode:
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
-
     COMMENTS = _( "Convert domain names between Unicode and ASCII." )
+
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_DROP_PATH_QUERY = "dropPathQuery"
     SETTINGS_INPUT_CLIPBOARD = "inputClipboard"
