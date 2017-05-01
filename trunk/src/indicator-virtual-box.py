@@ -40,26 +40,24 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 from threading import Thread
-
-import gzip, json, logging, os, pythonutils, re, shutil, sys, time, virtualmachine
+import json, logging, os, pythonutils, time, virtualmachine
 
 
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.55"
+    VERSION = "1.0.56"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
+    COMMENTS = _( "Shows VirtualBox™ virtual machines and allows them to be started." )
 
     VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
     VIRTUAL_BOX_CONFIGURATION_4_DOT_3_PRIOR = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
     VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION = "4.3" # Configuration file location and format changed at this version (https://www.virtualbox.org/manual/ch10.html#idp99351072).
 
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
-
-    COMMENTS = _( "Shows VirtualBox™ virtual machines and allows them to be started." )
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_DELAY_BETWEEN_AUTO_START = "delayBetweenAutoStartInSeconds"
@@ -72,7 +70,6 @@ class IndicatorVirtualBox:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.dialog = None
         self.loadSettings()
         Notify.init( INDICATOR_NAME )
         virtualMachines = self.getVirtualMachines()
@@ -178,6 +175,7 @@ class IndicatorVirtualBox:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, False, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
+        self.menu = menu
 
 
     def getGroupName( self, virtualMachine ): return virtualMachine.getName()[ virtualMachine.getName().rfind( "/" ) + 1 : ]
@@ -451,33 +449,29 @@ class IndicatorVirtualBox:
 
 
     def onAbout( self, widget ):
-        if self.dialog is None:
-            self.dialog = pythonutils.createAboutDialog(
-                [ IndicatorVirtualBox.AUTHOR ],
-                IndicatorVirtualBox.COMMENTS, 
-                [ ],
-                "",
-                Gtk.License.GPL_3_0,
-                IndicatorVirtualBox.ICON,
-                INDICATOR_NAME,
-                IndicatorVirtualBox.WEBSITE,
-                IndicatorVirtualBox.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ) )
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        dialog = pythonutils.createAboutDialog(
+            [ IndicatorVirtualBox.AUTHOR ],
+            IndicatorVirtualBox.COMMENTS, 
+            [ ],
+            "",
+            Gtk.License.GPL_3_0,
+            IndicatorVirtualBox.ICON,
+            INDICATOR_NAME,
+            IndicatorVirtualBox.WEBSITE,
+            IndicatorVirtualBox.VERSION,
+            _( "translator-credits" ),
+            _( "View the" ),
+            _( "text file." ),
+            _( "changelog" ) )
 
-            self.dialog.run()
-            self.dialog.destroy()
-            self.dialog = None
-        else:
-            self.dialog.present()
+        dialog.run()
+        dialog.destroy()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onPreferences( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
 
         notebook = Gtk.Notebook()
 
@@ -601,7 +595,7 @@ class IndicatorVirtualBox:
             GLib.timeout_add_seconds( 1, self.onRefresh, False )
 
         self.dialog.destroy()
-        self.dialog = None
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def updateVirtualMachinePreferences( self, store, treeiter ):
@@ -726,15 +720,15 @@ class IndicatorVirtualBox:
 
 
     def saveSettings( self ):
-        try:
-            settings = {
-                IndicatorVirtualBox.SETTINGS_DELAY_BETWEEN_AUTO_START: self.delayBetweenAutoStartInSeconds,
-                IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
-                IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
-                IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault,
-                IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences
-            }
+        settings = {
+            IndicatorVirtualBox.SETTINGS_DELAY_BETWEEN_AUTO_START: self.delayBetweenAutoStartInSeconds,
+            IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
+            IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
+            IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault,
+            IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences
+        }
 
+        try:
             with open( IndicatorVirtualBox.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 
