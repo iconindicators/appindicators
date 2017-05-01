@@ -42,22 +42,22 @@ gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
 from copy import deepcopy
-from gi.repository import AppIndicator3, Gio, GLib, Gtk, Notify
+from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from ppa import PPA, PublishedBinary
 from threading import Thread
 from urllib.request import urlopen
-
-import itertools, pythonutils, json, locale, logging, operator, os, re, shutil, sys, threading, time, webbrowser
+import pythonutils, json, locale, logging, operator, os, threading, webbrowser
 
 
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.57"
+    VERSION = "1.0.58"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
+    COMMENTS = _( "Shows the total downloads of PPAs." )
 
     SERIES = [ "artful", "zesty", "yakkety", "xenial", "wily", "vivid", "utopic", 
               "trusty", "saucy", "raring", "quantal", "precise", "oneiric", "natty",
@@ -66,7 +66,6 @@ class IndicatorPPADownloadStatistics:
 
     ARCHITECTURES = [ "amd64", "i386" ]
 
-    COMMENTS = _( "Shows the total downloads of PPAs." )
     INDENT = "    "
     SVG_ICON = "." + INDICATOR_NAME + "-icon"
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
@@ -88,8 +87,6 @@ class IndicatorPPADownloadStatistics:
 
 
     def __init__( self ):
-        self.dialog = None
-
         GLib.threads_init()
         self.lock = threading.Lock()
         self.downloadInProgress = False
@@ -103,7 +100,6 @@ class IndicatorPPADownloadStatistics:
         self.loadSettings()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.buildMenu()
 
@@ -154,6 +150,7 @@ class IndicatorPPADownloadStatistics:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, self.quit )
         self.indicator.set_menu( menu )
         menu.show_all()
+        self.menu = menu
 
 
     def createMenuItemForPublishedBinary( self, menu, ppa, publishedBinary ):
@@ -278,27 +275,25 @@ class IndicatorPPADownloadStatistics:
 
 
     def onAbout( self, widget ):
-        if self.dialog is None:
-            self.dialog = pythonutils.createAboutDialog(
-                [ IndicatorPPADownloadStatistics.AUTHOR ],
-                IndicatorPPADownloadStatistics.COMMENTS, 
-                [ ],
-                "",
-                Gtk.License.GPL_3_0,
-                IndicatorPPADownloadStatistics.ICON,
-                INDICATOR_NAME,
-                IndicatorPPADownloadStatistics.WEBSITE,
-                IndicatorPPADownloadStatistics.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ) )
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        dialog = pythonutils.createAboutDialog(
+            [ IndicatorPPADownloadStatistics.AUTHOR ],
+            IndicatorPPADownloadStatistics.COMMENTS, 
+            [ ],
+            "",
+            Gtk.License.GPL_3_0,
+            IndicatorPPADownloadStatistics.ICON,
+            INDICATOR_NAME,
+            IndicatorPPADownloadStatistics.WEBSITE,
+            IndicatorPPADownloadStatistics.VERSION,
+            _( "translator-credits" ),
+            _( "View the" ),
+            _( "text file." ),
+            _( "changelog" ) )
 
-            self.dialog.run()
-            self.dialog.destroy()
-            self.dialog = None
-        else:
-            self.dialog.present()
+        dialog.run()
+        dialog.destroy()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onPreferences( self, widget ):
@@ -306,9 +301,7 @@ class IndicatorPPADownloadStatistics:
             Notify.Notification.new( _( "Downloading data..." ), _( "Preferences are currently unavailable." ), IndicatorPPADownloadStatistics.ICON ).show()
             return
 
-        if self.dialog is not None:
-            self.dialog.present()
-            return
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
 
         with self.lock:
             self.preferencesOpen = True
@@ -509,13 +502,13 @@ class IndicatorPPADownloadStatistics:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( notebook, True, True, 0 )
-        self.dialog.set_border_width( 5 )
-        self.dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
-        self.dialog.show_all()
+        dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( notebook, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
+        dialog.show_all()
 
-        if self.dialog.run() == Gtk.ResponseType.OK:
+        if dialog.run() == Gtk.ResponseType.OK:
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
@@ -549,11 +542,11 @@ class IndicatorPPADownloadStatistics:
                 with self.lock:
                     self.downloadInProgress = True # Although the download hasn't actually started, this ensures the preferences cannot be opened until the download completes.
 
-        self.dialog.destroy()
-        self.dialog = None
+        dialog.destroy()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
         with self.lock:
             self.preferencesOpen = False
-
+        
 
     def onCombinePPAsCheckbox( self, source, checkbox ): checkbox.set_sensitive( source.get_active() )
 
@@ -566,10 +559,10 @@ class IndicatorPPADownloadStatistics:
     def onPPARemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is None:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No PPA has been selected for removal." ), INDICATOR_NAME )
+            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "No PPA has been selected for removal." ), INDICATOR_NAME )
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            if pythonutils.showOKCancel( self.dialog, _( "Remove the selected PPA?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+            if pythonutils.showOKCancel( None, _( "Remove the selected PPA?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
                 self.ppasOrFiltersModified = True
 
@@ -672,7 +665,7 @@ class IndicatorPPADownloadStatistics:
         if rowNumber is None:
             title = _( "Add PPA" )
 
-        dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
@@ -739,17 +732,17 @@ class IndicatorPPADownloadStatistics:
     def onFilterRemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is None:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "No filter has been selected for removal." ), INDICATOR_NAME )
+            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "No filter has been selected for removal." ), INDICATOR_NAME )
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            if pythonutils.showOKCancel( self.dialog, _( "Remove the selected filter?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+            if pythonutils.showOKCancel( None, _( "Remove the selected filter?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
                 self.ppasOrFiltersModified = True
 
 
     def onFilterAdd( self, button, filterTree, ppaTree ):
         if len( ppaTree.get_model() ) == 0:
-            pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Please add a PPA first!" ), INDICATOR_NAME )
+            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "Please add a PPA first!" ), INDICATOR_NAME )
         else:
             # If the number of filters equals the number of PPA User/Names, cannot add a filter!
             ppaUsersNames = [ ]
@@ -759,7 +752,7 @@ class IndicatorPPADownloadStatistics:
                     ppaUsersNames.append( ppaUserName )
 
             if len( filterTree.get_model() ) == len( ppaUsersNames ):
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.INFO, _( "Only one filter per PPA User/Name." ), INDICATOR_NAME )
+                pythonutils.showMessage( None, Gtk.MessageType.INFO, _( "Only one filter per PPA User/Name." ), INDICATOR_NAME )
             else:
                 self.onFilterDoubleClick( filterTree, None, None, ppaTree )
 
@@ -837,7 +830,7 @@ class IndicatorPPADownloadStatistics:
         if rowNumber is None:
             title = _( "Add Filter" )
 
-        dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
@@ -920,21 +913,21 @@ class IndicatorPPADownloadStatistics:
 
 
     def saveSettings( self ):
+        ppas = [ ]
+        for ppa in self.ppas:
+            ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
+
+        settings = {
+            IndicatorPPADownloadStatistics.SETTINGS_FILTERS: self.filters,
+            IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS: self.combinePPAs,
+            IndicatorPPADownloadStatistics.SETTINGS_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
+            IndicatorPPADownloadStatistics.SETTINGS_PPAS: ppas,
+            IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
+            IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD: self.sortByDownload,
+            IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT: self.sortByDownloadAmount
+        }
+
         try:
-            ppas = [ ]
-            for ppa in self.ppas:
-                ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
-
-            settings = {
-                IndicatorPPADownloadStatistics.SETTINGS_FILTERS: self.filters,
-                IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS: self.combinePPAs,
-                IndicatorPPADownloadStatistics.SETTINGS_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
-                IndicatorPPADownloadStatistics.SETTINGS_PPAS: ppas,
-                IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
-                IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD: self.sortByDownload,
-                IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT: self.sortByDownloadAmount
-            }
-
             with open( IndicatorPPADownloadStatistics.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 

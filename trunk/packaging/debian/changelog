@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.58-1) precise; urgency=low
+
+  * Menu items are now disabled when About/Preferences are displayed.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 2 May 2017 10:19:37 +1000
+
+
 indicator-ppa-download-statistics (1.0.57-1) precise; urgency=low
 
   * Added artful to list of series.
