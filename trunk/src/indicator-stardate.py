@@ -62,9 +62,8 @@ class IndicatorStardate:
         filehandler = pythonutils.TruncatedFileHandler( IndicatorStardate.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
-        self.timerID = None
-        self.scrollDirectionIsUp = True
-        self.scrollIndex = 0
+        self.updateTimerID = None
+        self.saveSettingsTimerID = None
 
         self.loadSettings()
 
@@ -80,35 +79,44 @@ class IndicatorStardate:
 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        numberOptions = 5
-        if scrollDirection == Gdk.ScrollDirection.UP:
-            self.scrollIndex = ( self.scrollIndex + 1 ) % numberOptions
-            self.scrollDirectionIsUp = True
-        else:
-            self.scrollIndex = ( self.scrollIndex - 1 ) % numberOptions
-            self.scrollDirectionIsUp = False
+#         print( "BEFORE:", self.showClassic, self.showIssue, self.padInteger )
+        if self.showClassic:
 
-        if self.scrollIndex == 0:
-            self.showClassic = False
-        elif self.scrollIndex == 1:
-            self.showClassic = True
-            self.showIssue = False
-            self.padInteger = False
-        elif self.scrollIndex == 2:
-            self.showClassic = True
-            self.showIssue = True
-            self.padInteger = False
-        elif self.scrollIndex == 3:
-            self.showClassic = True
-            self.showIssue = False
-            self.padInteger = True
+            if self.showIssue and self.padInteger:
+                self.showIssue = True
+                self.padInteger = False
+                print( 1 )
+
+            elif self.showIssue and not self.padInteger:
+                self.showIssue = False
+                self.padInteger = True
+                print( 2 )
+
+            elif not self.showIssue and self.padInteger:
+                self.showIssue = False
+                self.padInteger = False
+                print( 3 )
+
+            else:
+                self.showIssue = True
+                self.padInteger = True
+                self.showClassic = False
+                print( 4 )
+
         else:
             self.showClassic = True
             self.showIssue = True
             self.padInteger = True
+            print( 5 )
+
+#         print( "AFTER:", self.showClassic, self.showIssue, self.padInteger )
 
         self.update()
-#         self.saveSettings() #TODO Put this into a timer that does the save in one minute...if a user is crazy scrolling, no point doing repetitive saves.
+
+#         if self.saveSettingsTimerID is not None:
+#             GLib.source_remove( self.saveSettingsTimerID )
+# 
+#         self.saveSettingsTimerID = GLib.timeout_add_seconds( 10, self.saveSettings ) # Defer the save to 10s in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
 
 
     def buildMenu( self ):
@@ -120,13 +128,33 @@ class IndicatorStardate:
 
 
     def update( self ):
+        # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
         if self.showClassic:
             stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
+#             paddingRequired = stardate.requiresPadding( stardateIssue, stardateInteger, stardateFraction )
+
+            # WHEN the stardate calculation is performed will NOT necessarily synchronise with WHEN the stardate actually changes.
+            # Therefore update at a faster rate, say at one tenth of the period, but at most once per minute.
+            numberOfSecondsToNextUpdate = int( fractionalPeriod / 10 )
+            if numberOfSecondsToNextUpdate < 60:
+                numberOfSecondsToNextUpdate = 60
+
         else:
+#             paddingRequired = False
             stardateIssue = None
             stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardate2009Revised( datetime.datetime.utcnow() )
 
+            # For '2009 revised' the rollover only happens at midnight...so use that for the timer!        
+            now = datetime.datetime.utcnow()
+            oneSecondAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
+            numberOfSecondsToNextUpdate = ( oneSecondAfterMidnight - now ).total_seconds()
+
         self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
+
+        if self.updateTimerID is not None:
+            GLib.source_remove( self.updateTimerID )
+
+        self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.update )
 
 
     def onAbout( self, widget ):
@@ -238,6 +266,7 @@ class IndicatorStardate:
 
 
     def saveSettings( self ):
+        self.saveSettingsTimerID = None # Need to reset the timer ID.
         try:
             settings = {
                 IndicatorStardate.SETTINGS_PAD_INTEGER: self.padInteger,
