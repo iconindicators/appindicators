@@ -79,44 +79,49 @@ class IndicatorStardate:
 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-#         print( "BEFORE:", self.showClassic, self.showIssue, self.padInteger )
+        # Based on the mouse wheel scroll event (irrespective of direction),
+        # cycle through the possible combinations of options for displayin the stardate.
+        # If showing a 'classic' stardate and padding is not require, ignore the padding option.
         if self.showClassic:
+            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
+            paddingRequired = stardate.requiresPadding( stardateIssue, stardateInteger )
+            if paddingRequired:
+                if self.showIssue and self.padInteger:
+                    self.showIssue = True
+                    self.padInteger = False
 
-            if self.showIssue and self.padInteger:
-                self.showIssue = True
-                self.padInteger = False
-                print( 1 )
+                elif self.showIssue and not self.padInteger:
+                    self.showIssue = False
+                    self.padInteger = True
 
-            elif self.showIssue and not self.padInteger:
-                self.showIssue = False
-                self.padInteger = True
-                print( 2 )
+                elif not self.showIssue and self.padInteger:
+                    self.showIssue = False
+                    self.padInteger = False
 
-            elif not self.showIssue and self.padInteger:
-                self.showIssue = False
-                self.padInteger = False
-                print( 3 )
+                else:
+                    self.showIssue = True
+                    self.padInteger = True
+                    self.showClassic = False # Shown all possible 'classic' options (when padding is required)...now move on to '2009 revised'.
 
             else:
-                self.showIssue = True
-                self.padInteger = True
-                self.showClassic = False
-                print( 4 )
+                if self.showIssue:
+                    self.showIssue = False
+
+                else:
+                    self.showIssue = True
+                    self.showClassic = False # Shown all possible 'classic' options (when padding is not required)...now move on to '2009 revised'.
 
         else:
-            self.showClassic = True
             self.showIssue = True
             self.padInteger = True
-            print( 5 )
-
-#         print( "AFTER:", self.showClassic, self.showIssue, self.padInteger )
+            self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
         self.update()
 
-#         if self.saveSettingsTimerID is not None:
-#             GLib.source_remove( self.saveSettingsTimerID )
-# 
-#         self.saveSettingsTimerID = GLib.timeout_add_seconds( 10, self.saveSettings ) # Defer the save to 10s in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
+        if self.saveSettingsTimerID is not None:
+            GLib.source_remove( self.saveSettingsTimerID )
+
+        self.saveSettingsTimerID = GLib.timeout_add_seconds( 10, self.saveSettings ) # Defer the save to 10s in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
 
 
     def buildMenu( self ):
@@ -131,7 +136,6 @@ class IndicatorStardate:
         # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
         if self.showClassic:
             stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
-#             paddingRequired = stardate.requiresPadding( stardateIssue, stardateInteger, stardateFraction )
 
             # WHEN the stardate calculation is performed will NOT necessarily synchronise with WHEN the stardate actually changes.
             # Therefore update at a faster rate, say at one tenth of the period, but at most once per minute.
@@ -140,7 +144,6 @@ class IndicatorStardate:
                 numberOfSecondsToNextUpdate = 60
 
         else:
-#             paddingRequired = False
             stardateIssue = None
             stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardate2009Revised( datetime.datetime.utcnow() )
 
@@ -267,12 +270,14 @@ class IndicatorStardate:
 
     def saveSettings( self ):
         self.saveSettingsTimerID = None # Need to reset the timer ID.
+
+        settings = {
+            IndicatorStardate.SETTINGS_PAD_INTEGER: self.padInteger,
+            IndicatorStardate.SETTINGS_SHOW_CLASSIC: self.showClassic,
+            IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showIssue
+        }
+
         try:
-            settings = {
-                IndicatorStardate.SETTINGS_PAD_INTEGER: self.padInteger,
-                IndicatorStardate.SETTINGS_SHOW_CLASSIC: self.showClassic,
-                IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showIssue
-            }
             with open( IndicatorStardate.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 
