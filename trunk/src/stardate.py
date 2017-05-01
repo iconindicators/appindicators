@@ -285,3 +285,25 @@ def toStardateString( stardateIssue, stardateInteger, stardateFraction, showIssu
         stringBuilder += "." + str( stardateFraction )
 
     return stringBuilder
+
+
+# Determines if a 'classic' stardate requires zero padding.
+#
+# A 'classic' stardate with issue < 21 will have up to four digits in the integer part.
+# However the integer part could be a single digit.
+# If the integer part has fewer than four digits, the stardate is deemed to
+# require padding.
+#
+# Similarly for a 'classic' stardate with issue >= 21, but there are five digits.
+#
+#  stardateIssue The stardate issue.
+#  stardateInteger The stardate integer.
+#
+# Returns Returns True if the integer part contains fewer digits than the maximum for the particular issue.
+def requiresPadding( stardateIssue, stardateInteger ):
+    if stardateIssue < 21:
+        paddingRequired = len( str( stardateInteger ) ) < 4
+    else:
+        paddingRequired = len( str( stardateInteger ) ) < 5
+
+    return paddingRequired
