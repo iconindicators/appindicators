@@ -34,19 +34,17 @@ gi.require_version( "AppIndicator3", "0.1" )
 from gi.repository import AppIndicator3, GLib, Gtk
 from script import Info
 from threading import Thread
-
 import copy, json, logging, os, pythonutils, threading
 
 
 class IndicatorScriptRunner:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.2"
+    VERSION = "1.0.3"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
-
     COMMENTS = _( "Run a terminal command or script from a GUI front-end." )
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
@@ -63,7 +61,6 @@ class IndicatorScriptRunner:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorScriptRunner.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.dialog = None
         GLib.threads_init()
         self.lock = threading.Lock()
         self.loadSettings()
@@ -94,7 +91,7 @@ class IndicatorScriptRunner:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( scripts ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-        return menu
+        self.menu = menu
 
 
     def addScriptsToMenu( self, scriptsGroupedByName, scriptGroup, menu, indent ):
@@ -132,33 +129,29 @@ class IndicatorScriptRunner:
 
 
     def onAbout( self, widget ):
-        if self.dialog is None:
-            self.dialog = pythonutils.createAboutDialog(
-                [ IndicatorScriptRunner.AUTHOR ],
-                IndicatorScriptRunner.COMMENTS, 
-                [ ],
-                "",
-                Gtk.License.GPL_3_0,
-                IndicatorScriptRunner.ICON,
-                INDICATOR_NAME,
-                IndicatorScriptRunner.WEBSITE,
-                IndicatorScriptRunner.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ) )
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        dialog = pythonutils.createAboutDialog(
+            [ IndicatorScriptRunner.AUTHOR ],
+            IndicatorScriptRunner.COMMENTS, 
+            [ ],
+            "",
+            Gtk.License.GPL_3_0,
+            IndicatorScriptRunner.ICON,
+            INDICATOR_NAME,
+            IndicatorScriptRunner.WEBSITE,
+            IndicatorScriptRunner.VERSION,
+            _( "translator-credits" ),
+            _( "View the" ),
+            _( "text file." ),
+            _( "changelog" ) )
 
-            self.dialog.run()
-            self.dialog.destroy()
-            self.dialog = None
-        else:
-            self.dialog.present()
+        dialog.run()
+        dialog.destroy()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onPreferences( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
 
         self.defaultScriptGroupCurrent = self.scriptGroupDefault
         self.defaultScriptNameCurrent = self.scriptNameDefault
@@ -314,13 +307,13 @@ class IndicatorScriptRunner:
         scriptNameTreeView.get_selection().connect( "changed", self.onScriptName, scriptGroupComboBox, directoryEntry, commandTextView, copyOfScripts )
         self.populateScriptGroupCombo( copyOfScripts, scriptGroupComboBox, scriptNameTreeView, "", "" )
 
-        self.dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( notebook, True, True, 0 )
-        self.dialog.set_border_width( 5 )
-        self.dialog.set_icon_name( IndicatorScriptRunner.ICON )
-        self.dialog.show_all()
+        dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( notebook, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorScriptRunner.ICON )
+        dialog.show_all()
 
-        if self.dialog.run() == Gtk.ResponseType.OK:
+        if dialog.run() == Gtk.ResponseType.OK:
             with self.lock:
                 self.showScriptsInSubmenus = showScriptsInSubmenusCheckbox.get_active()
                 self.scripts = copyOfScripts
@@ -335,8 +328,8 @@ class IndicatorScriptRunner:
                 pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
                 self.buildMenu()
 
-        self.dialog.destroy()
-        self.dialog = None
+        dialog.destroy()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onScriptGroup( self, scriptGroupComboBox, scripts, scriptNameListStore, scriptNameTreeView ):
@@ -428,7 +421,7 @@ class IndicatorScriptRunner:
 
             grid.attach( box, 0, 1, 1, 1 )
 
-            dialog = Gtk.Dialog( _( "Copy Script" ), self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+            dialog = Gtk.Dialog( _( "Copy Script" ), dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
             dialog.vbox.pack_start( grid, True, True, 0 )
             dialog.set_border_width( 5 )
             dialog.set_icon_name( IndicatorScriptRunner.ICON )
@@ -609,7 +602,7 @@ class IndicatorScriptRunner:
         if script.getGroup() == "":
             title = _( "Add Script" )
 
-        dialog = Gtk.Dialog( title, self.dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorScriptRunner.ICON )
@@ -788,18 +781,18 @@ class IndicatorScriptRunner:
 
 
     def saveSettings( self ):
+        scripts = [ ]
+        for script in self.scripts:
+            scripts.append( [ script.getGroup(), script.getName(), script.getDirectory(), script.getCommand(), script.isTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
+
+        settings = {
+            IndicatorScriptRunner.SETTINGS_SCRIPT_GROUP_DEFAULT: self.scriptGroupDefault,
+            IndicatorScriptRunner.SETTINGS_SCRIPT_NAME_DEFAULT: self.scriptNameDefault,
+            IndicatorScriptRunner.SETTINGS_SCRIPTS: scripts,
+            IndicatorScriptRunner.SETTINGS_SHOW_SCRIPTS_IN_SUBMENUS: self.showScriptsInSubmenus
+        }
+
         try:
-            scripts = [ ]
-            for script in self.scripts:
-                scripts.append( [ script.getGroup(), script.getName(), script.getDirectory(), script.getCommand(), script.isTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
-
-            settings = {
-                IndicatorScriptRunner.SETTINGS_SCRIPT_GROUP_DEFAULT: self.scriptGroupDefault,
-                IndicatorScriptRunner.SETTINGS_SCRIPT_NAME_DEFAULT: self.scriptNameDefault,
-                IndicatorScriptRunner.SETTINGS_SCRIPTS: scripts,
-                IndicatorScriptRunner.SETTINGS_SHOW_SCRIPTS_IN_SUBMENUS: self.showScriptsInSubmenus
-            }
-
             with open( IndicatorScriptRunner.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 

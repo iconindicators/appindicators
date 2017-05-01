@@ -1,3 +1,10 @@
+indicator-script-runner (1.0.3-1) precise; urgency=low
+
+  * Menu items are now disabled when About/Preferences are displayed.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 2 May 2017 10:54:26 +1000
+
+
 indicator-script-runner (1.0.2-1) precise; urgency=low
 
   * Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
