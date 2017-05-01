@@ -579,15 +579,15 @@ class IndicatorFortune:
 
 
     def saveSettings( self ):
-        try:
-            settings = {
-                IndicatorFortune.SETTINGS_FORTUNES: self.fortunes,
-                IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON: self.middleMouseClickOnIcon,
-                IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY: self.notificationSummary,
-                IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
-                IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
-            }
+        settings = {
+            IndicatorFortune.SETTINGS_FORTUNES: self.fortunes,
+            IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON: self.middleMouseClickOnIcon,
+            IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY: self.notificationSummary,
+            IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
+            IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
+        }
 
+        try:
             with open( IndicatorFortune.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 
