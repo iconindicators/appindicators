@@ -27,27 +27,25 @@ import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
+from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
-
 import datetime, json, locale, logging, os, ports, pythonutils, tide, time, webbrowser
 
 
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.7"
+    VERSION = "1.0.8"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
-
-    URL_TIMEOUT_IN_SECONDS = 10
-
     COMMENTS = _( "Displays tidal information.\nNon-UK ports will be unavailable after {0}." ).format( ports.getExpiry() )
     CREDIT_UKHO_UK_PORTS =     _( "Tidal information for UK ports licensed under the\nOpen Government Licence for Public Sector Information. http://www.nationalarchives.gov.uk/doc/open-government-licence" )
     CREDIT_UKHO_UK_NON_PORTS = _( "Tidal information for non-UK ports reproduced by\npermission of the Controller of Her Majesty’s Stationery Office\nand the UK Hydrographic Office. http://www.ukho.gov.uk" )
     CREDITS = [ CREDIT_UKHO_UK_PORTS, CREDIT_UKHO_UK_NON_PORTS ]
+
+    URL_TIMEOUT_IN_SECONDS = 10
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_MENU_ITEM_DATE_FORMAT = "menuItemDateFormat"
@@ -67,7 +65,6 @@ class IndicatorTide:
         filehandler = pythonutils.TruncatedFileHandler( IndicatorTide.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
-        self.dialog = None
         self.loadSettings()
         Notify.init( INDICATOR_NAME )
 
@@ -141,6 +138,7 @@ class IndicatorTide:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
+        self.menu = menu
 
 
     def createMenuItem( self, menu, menuItemText, url ):
@@ -192,33 +190,29 @@ class IndicatorTide:
 
 
     def onAbout( self, widget ):
-        if self.dialog is None:
-            self.dialog = pythonutils.createAboutDialog(
-                [ IndicatorTide.AUTHOR ],
-                IndicatorTide.COMMENTS, 
-                IndicatorTide.CREDITS,
-                _( "Credits" ),
-                Gtk.License.GPL_3_0,
-                IndicatorTide.ICON,
-                INDICATOR_NAME,
-                IndicatorTide.WEBSITE,
-                IndicatorTide.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ) )
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        dialog = pythonutils.createAboutDialog(
+            [ IndicatorTide.AUTHOR ],
+            IndicatorTide.COMMENTS, 
+            IndicatorTide.CREDITS,
+            _( "Credits" ),
+            Gtk.License.GPL_3_0,
+            IndicatorTide.ICON,
+            INDICATOR_NAME,
+            IndicatorTide.WEBSITE,
+            IndicatorTide.VERSION,
+            _( "translator-credits" ),
+            _( "View the" ),
+            _( "text file." ),
+            _( "changelog" ) )
 
-            self.dialog.run()
-            self.dialog.destroy()
-            self.dialog = None
-        else:
-            self.dialog.present()
+        dialog.run()
+        dialog.destroy()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onPreferences( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
 
         grid = Gtk.Grid()
         grid.set_row_spacing( 10 )
@@ -351,7 +345,7 @@ class IndicatorTide:
             self.update()
 
         self.dialog.destroy()
-        self.dialog = None
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onCountry( self, countriesComboBox, portsListStore, portsTree ):
@@ -417,15 +411,15 @@ class IndicatorTide:
 
 
     def saveSettings( self ):
-        try:
-            settings = {
-                IndicatorTide.SETTINGS_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
-                IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
-                IndicatorTide.SETTINGS_PORT_ID: self.portID,
-                IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS: self.showAsSubMenus,
-                IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY: self.showAsSubMenusExceptFirstDay
-            }
+        settings = {
+            IndicatorTide.SETTINGS_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
+            IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
+            IndicatorTide.SETTINGS_PORT_ID: self.portID,
+            IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS: self.showAsSubMenus,
+            IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY: self.showAsSubMenusExceptFirstDay
+        }
 
+        try:
             with open( IndicatorTide.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 

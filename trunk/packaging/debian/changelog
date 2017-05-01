@@ -1,3 +1,10 @@
+indicator-tide (1.0.8-1) precise; urgency=low
+
+  * Menu items are now disabled when About/Preferences are displayed.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 2 May 2017 10:35:15 +1000
+
+
 indicator-tide (1.0.7-1) precise; urgency=low
 
   * Bug fix: Missing python3-notify2 from the debian/control file.
