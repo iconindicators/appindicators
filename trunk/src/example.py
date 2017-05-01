@@ -18,25 +18,21 @@ import datetime, stardate
 
 
 # Exercise the Stardate API.
-currentStardate = stardate.Stardate()
-print( "Stardate API version: " + currentStardate.getVersion() )
+print( "Stardate API version: " + stardate.getVersion(), "\n" )
 
-now = datetime.datetime.now()
+utcNow = datetime.datetime.utcnow()
+print( "UTC now:", utcNow, "\n" )
 
-# Get the 'classic' stardate for the current date/time.
-currentStardate.setClassic( True )
-currentStardate.setGregorian( now )
-print( str( now ) + " = " + currentStardate.toStardateString( True, False ) + " 'classic'" )
+stardateClassic = stardate.getStardateClassic( utcNow )
+print( "'classic' Stardate (issue, integer, fraction, fractionalPeriod):", stardateClassic )
+print( "'classic' Stardate (as string):", stardate.toStardateString( stardateClassic[ 0 ], stardateClassic[ 1 ], stardateClassic[ 2 ], True, False ) )
 
-# Use the calculated 'classic' stardate to get the date/time (should be the same but rounding plays a part).
-currentStardate.setStardateClassic( currentStardate.getStardateIssue(), currentStardate.getStardateInteger(), currentStardate.getStardateFraction() )
-print( currentStardate.toStardateString( True, False ) + " 'classic' = " + currentStardate.toGregorianString() )
+# Use the calculated 'classic' Stardate to get the date/time (should be the same but rounding plays a part).
+print( "UTC now from 'classic' Stardate:", stardate.getGregorianFromStardateClassic( stardateClassic[ 0 ], stardateClassic[ 1 ], stardateClassic[ 2 ] ), "\n" )
 
-# Get the '2009 revised' stardate from the current date/time.
-currentStardate.setClassic( False ) 
-currentStardate.setGregorian( now )
-print( str( now ) + " = " + currentStardate.toStardateString( True, False ) + " '2009 revised'" )
+stardate2009Revised = stardate.getStardate2009Revised( utcNow )
+print( "'2009Revised' Stardate (integer, fraction, fractionalPeriod):", stardate2009Revised )
+print( "'2009Revised' Stardate (as string):", stardate.toStardateString( None, stardate2009Revised[ 0 ], stardate2009Revised[ 1 ], None, False ) )
 
-# Use the calculated '2009 revised' stardate to get the date/time (will always be midnight).
-currentStardate.setStardate2009Revised( currentStardate.getStardateInteger(), currentStardate.getStardateFraction() )
-print( currentStardate.toStardateString( True, False ) + " '2009 revised' = " + currentStardate.toGregorianString() )
+# Use the calculated '2009Revised' Stardate to get the date/time (should be the same but rounding plays a part).
+print( "UTC now from '2009Revised' Stardate:", stardate.getGregorianFromStardate2009Revised( stardate2009Revised[ 0 ], stardate2009Revised[ 1 ] ) )

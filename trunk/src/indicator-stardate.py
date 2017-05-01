@@ -56,37 +56,27 @@ class IndicatorStardate:
     SETTINGS_PAD_INTEGER = "padInteger"
     SETTINGS_SHOW_CLASSIC = "showClassic"
     SETTINGS_SHOW_ISSUE = "showIssue"
-    SETTINGS_SHOW_IN_MENU = "showInMenu"
 
 
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorStardate.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
-        self.stardateMenuItem = None
+        self.timerID = None
         self.scrollDirectionIsUp = True
         self.scrollIndex = 0
-        self.stardate = stardate.Stardate()
 
         self.loadSettings()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorStardate.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
-        self.indicator.set_menu( self.buildMenu() )
 
+        self.buildMenu()
         self.update()
 
-        # Use the stardate update period to set a refresh timer.
-        # The stardate calculation and WHEN the stardate changes are not synchronised,
-        # so update at ten times speed (but no less than once per second).
-        period = int( self.stardate.getStardateFractionalPeriod() / 10 ) 
-        if period < 1:
-            period = 1
 
-#TODO The update method should calculate when to do the next update and schedule the next call to itself. 
-#Also if we mouse scroll or change preferences, shouldn't the period be recalculated, given that the stardate type can be changed?
-        GLib.timeout_add_seconds( period, self.update )
+    def main( self ): Gtk.main()
 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
@@ -118,38 +108,25 @@ class IndicatorStardate:
             self.padInteger = True
 
         self.update()
-        self.saveSettings()
+#         self.saveSettings() #TODO Put this into a timer that does the save in one minute...if a user is crazy scrolling, no point doing repetitive saves.
 
 
     def buildMenu( self ):
         menu = Gtk.Menu()
-
-        if self.showInMenu:
-            image = Gtk.Image()
-            image.set_from_icon_name( IndicatorStardate.ICON, Gtk.IconSize.MENU )
-            self.stardateMenuItem = Gtk.ImageMenuItem()
-            self.stardateMenuItem.set_image( image )
-            menu.append( self.stardateMenuItem )
-            menu.append( Gtk.SeparatorMenuItem() )
-
         pythonutils.createPreferencesAboutQuitMenuItems( menu, False, self.onPreferences, self.onAbout, Gtk.main_quit )
         menu.show_all()
+        self.indicator.set_menu( menu )
         self.menu = menu
-        return menu
-
-
-    def main( self ): Gtk.main()
 
 
     def update( self ):
-        self.stardate.setClassic( self.showClassic )
-        self.stardate.setGregorian( datetime.datetime.utcnow() )
-        s = self.stardate.toStardateString( self.showIssue, self.padInteger )
-        self.indicator.set_label( s, "" )
-        if self.showInMenu:
-            self.stardateMenuItem.set_label( _( "Stardate: {0}" ).format( s ) )
+        if self.showClassic:
+            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
+        else:
+            stardateIssue = None
+            stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardate2009Revised( datetime.datetime.utcnow() )
 
-        return True # Needed so the timer continues!
+        self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
 
 
     def onAbout( self, widget ):
@@ -191,45 +168,31 @@ class IndicatorStardate:
             "Stardate 'classic' is based on\n\n" + \
             "\tSTARDATES IN STAR TREK FAQ V1.6\n\n" + \
             "by Andrew Main.\n\n" + \
-            "Otherwise the 2009 revision is used\n" + \
-            "(http://en.wikipedia.org/wiki/Stardate)." ) )
-        grid.attach( showClassicCheckbox, 0, 0, 2, 1 )
+            "Otherwise the 2009 revision is used:\n\n" + \
+            "\thttp://en.wikipedia.org/wiki/Stardate" ) )
+        grid.attach( showClassicCheckbox, 0, 0, 1, 1 )
 
         showIssueCheckbox = Gtk.CheckButton( _( "Show ISSUE" ) )
         showIssueCheckbox.set_active( self.showIssue )
         showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
         showIssueCheckbox.set_margin_left( 15 )
-        showIssueCheckbox.set_tooltip_text( _(
-            "Show the ISSUE of the stardate\n" + \
-            "(only applies to 'classic')." ) )
+        showIssueCheckbox.set_tooltip_text( _( "Show the ISSUE of the stardate." ) )
         grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
 
         padIntegerCheckbox = Gtk.CheckButton( _( "Pad INTEGER" ) )
         padIntegerCheckbox.set_active( self.padInteger )
         padIntegerCheckbox.set_sensitive( showClassicCheckbox.get_active() )
         padIntegerCheckbox.set_margin_left( 15 )
-        padIntegerCheckbox.set_tooltip_text( _(
-            "Pad the INTEGER part with leading\n" + \
-            "zeros (only applies to 'classic')." ) )
+        padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part with leading zeros." ) )
         grid.attach( padIntegerCheckbox, 0, 2, 1, 1 )
 
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
-
-        showInMenuCheckbox = Gtk.CheckButton( _( "Show in menu" ) )
-        showInMenuCheckbox.set_active( self.showInMenu )
-        showInMenuCheckbox.set_tooltip_text( _(
-            "Show the stardate in the menu.\n\n" + \
-            "Useful for desktop environments\n" + \
-            "which prohibit text labels adjacent\n" + \
-            "to the icon." ) )
-        showInMenuCheckbox.set_margin_top( 10 )
-        grid.attach( showInMenuCheckbox, 0, 3, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorStardate.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 4, 2, 1 )
+        grid.attach( autostartCheckbox, 0, 3, 1, 1 )
 
         dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
@@ -241,11 +204,9 @@ class IndicatorStardate:
         if response == Gtk.ResponseType.OK:
             self.padInteger = padIntegerCheckbox.get_active()
             self.showClassic = showClassicCheckbox.get_active()
-            self.showInMenu = showInMenuCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorStardate.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            self.indicator.set_menu( self.buildMenu() )
             self.update()
 
         dialog.destroy()
@@ -260,7 +221,6 @@ class IndicatorStardate:
     def loadSettings( self ):
         self.padInteger = True
         self.showClassic = True
-        self.showInMenu = False
         self.showIssue = True
 
         if os.path.isfile( IndicatorStardate.SETTINGS_FILE ):
@@ -270,7 +230,6 @@ class IndicatorStardate:
 
                 self.padInteger = settings.get( IndicatorStardate.SETTINGS_PAD_INTEGER, self.padInteger )
                 self.showClassic = settings.get( IndicatorStardate.SETTINGS_SHOW_CLASSIC, self.showClassic )
-                self.showInMenu = settings.get( IndicatorStardate.SETTINGS_SHOW_IN_MENU, self.showInMenu )
                 self.showIssue = settings.get( IndicatorStardate.SETTINGS_SHOW_ISSUE, self.showIssue )
 
             except Exception as e:
@@ -283,7 +242,6 @@ class IndicatorStardate:
             settings = {
                 IndicatorStardate.SETTINGS_PAD_INTEGER: self.padInteger,
                 IndicatorStardate.SETTINGS_SHOW_CLASSIC: self.showClassic,
-                IndicatorStardate.SETTINGS_SHOW_IN_MENU: self.showInMenu,
                 IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showIssue
             }
             with open( IndicatorStardate.SETTINGS_FILE, "w" ) as f:
