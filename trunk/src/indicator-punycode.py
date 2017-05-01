@@ -30,14 +30,13 @@ gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, Gdk, Gtk, Notify
-
 import encodings.idna, json, logging, os, pythonutils, re
 
 
 class IndicatorPunycode:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.3"
+    VERSION = "1.0.4"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -54,7 +53,6 @@ class IndicatorPunycode:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorPunycode.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.dialog = None
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
         self.loadSettings()
         Notify.init( INDICATOR_NAME )
@@ -90,6 +88,7 @@ class IndicatorPunycode:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
+        self.menu = menu
 
 
     def onConvert( self, widget ): Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( self.doConversion, None )
@@ -165,33 +164,29 @@ class IndicatorPunycode:
 
 
     def onAbout( self, widget ):
-        if self.dialog is None:
-            self.dialog = pythonutils.createAboutDialog(
-                [ IndicatorPunycode.AUTHOR ],
-                IndicatorPunycode.COMMENTS, 
-                [ ],
-                "",
-                Gtk.License.GPL_3_0,
-                IndicatorPunycode.ICON,
-                INDICATOR_NAME,
-                IndicatorPunycode.WEBSITE,
-                IndicatorPunycode.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ) )
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        dialog = pythonutils.createAboutDialog(
+            [ IndicatorPunycode.AUTHOR ],
+            IndicatorPunycode.COMMENTS, 
+            [ ],
+            "",
+            Gtk.License.GPL_3_0,
+            IndicatorPunycode.ICON,
+            INDICATOR_NAME,
+            IndicatorPunycode.WEBSITE,
+            IndicatorPunycode.VERSION,
+            _( "translator-credits" ),
+            _( "View the" ),
+            _( "text file." ),
+            _( "changelog" ) )
 
-            self.dialog.run()
-            self.dialog.destroy()
-            self.dialog = None
-        else:
-            self.dialog.present()
+        dialog.run()
+        dialog.destroy()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onPreferences( self, widget ):
-        if self.dialog is not None:
-            self.dialog.present()
-            return
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
 
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
@@ -205,7 +200,6 @@ class IndicatorPunycode:
 
         label = Gtk.Label( _( "Input source" ) )
         label.set_halign( Gtk.Align.START )
-        label.set_margin_top( 10 )
         grid.attach( label, 0, 0, 2, 1 )
 
         inputClipboardRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Clipboard" ) )
@@ -218,10 +212,10 @@ class IndicatorPunycode:
 
         inputPrimaryRadio = Gtk.RadioButton.new_with_label_from_widget( inputClipboardRadio, _( "Primary" ) )
         inputPrimaryRadio.set_tooltip_text( _(
-            "Input is taken from the\n" + \
-            "currently highlighted/selected\n" + \
-            "text after the user performs\n" + \
-            "a middle mouse click on the icon." ) )
+            "Input is taken from the currently\n" + \
+            "highlighted/selected text\n" + \
+            "after the user performs a\n" + \
+            "middle mouse click on the icon." ) )
         inputPrimaryRadio.set_active( not self.inputClipboard )
         inputPrimaryRadio.set_margin_left( 15 )
         grid.attach( inputPrimaryRadio, 0, 2, 2, 1 )
@@ -283,7 +277,7 @@ class IndicatorPunycode:
             self.buildMenu()
 
         self.dialog.destroy()
-        self.dialog = None
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def loadSettings( self ):
@@ -304,19 +298,17 @@ class IndicatorPunycode:
             except Exception as e:
                 logging.exception( e )
                 logging.error( "Error reading settings: " + IndicatorPunycode.SETTINGS_FILE )
-        else:
-            pass
 
 
     def saveSettings( self ):
-        try:
-            settings = {
-                IndicatorPunycode.SETTINGS_DROP_PATH_QUERY: self.dropPathQuery,
-                IndicatorPunycode.SETTINGS_INPUT_CLIPBOARD: self.inputClipboard,
-                IndicatorPunycode.SETTINGS_OUTPUT_BOTH: self.outputBoth,
-                IndicatorPunycode.SETTINGS_RESULT_HISTORY_LENGTH: self.resultHistoryLength
-            }
+        settings = {
+            IndicatorPunycode.SETTINGS_DROP_PATH_QUERY: self.dropPathQuery,
+            IndicatorPunycode.SETTINGS_INPUT_CLIPBOARD: self.inputClipboard,
+            IndicatorPunycode.SETTINGS_OUTPUT_BOTH: self.outputBoth,
+            IndicatorPunycode.SETTINGS_RESULT_HISTORY_LENGTH: self.resultHistoryLength
+        }
 
+        try:
             with open( IndicatorPunycode.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 
