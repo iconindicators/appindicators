@@ -34,6 +34,9 @@
 #  http://www.flaticon.com/search/satellite
 
 
+#TODO Sometimes when OK'ing the Preferences, an exception occurs when the autostart option is saved off.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
