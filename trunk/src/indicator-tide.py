@@ -321,13 +321,13 @@ class IndicatorTide:
         box.pack_start( autostartCheckbox, True, True, 1 )
         grid.attach( box, 0, 25, 1, 1 )
 
-        self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( grid, True, True, 0 )
-        self.dialog.set_border_width( 5 )
-        self.dialog.set_icon_name( IndicatorTide.ICON )
-        self.dialog.show_all()
+        dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( grid, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorTide.ICON )
+        dialog.show_all()
 
-        response = self.dialog.run()
+        response = dialog.run()
         if response == Gtk.ResponseType.OK:
             country = countriesComboBox.get_active_text()
             model, treeiter = portsTree.get_selection().get_selected()
@@ -344,7 +344,7 @@ class IndicatorTide:
             self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
             self.update()
 
-        self.dialog.destroy()
+        dialog.destroy()
         pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
