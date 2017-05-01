@@ -4,8 +4,8 @@ indicator-stardate (1.0.34-1) precise; urgency=low
     next to the icon.
   * Tidied up tool tip text in Preferences.
   * Menu items are now disabled when About/Preferences are displayed.
-  * Simplified the Stardate API to provide simple getters for conversion
-    between Gregorian datetime.datetime and 'classic stardate and '2009 revised'
+  * Simplified the Stardate API to provide getters for conversion between
+    Gregorian datetime.datetime and 'classic stardate and '2009 revised'
     stardates.
   * Bug fix: Underlying Stardate API incorrectly converted from '2009 revised'
     stardate to Gregorian datetime.datetime (was off by one day).
