@@ -572,13 +572,13 @@ class IndicatorVirtualBox:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( notebook, True, True, 0 )
-        self.dialog.set_border_width( 5 )
-        self.dialog.set_icon_name( IndicatorVirtualBox.ICON )
-        self.dialog.show_all()
+        dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( notebook, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorVirtualBox.ICON )
+        dialog.show_all()
 
-        if self.dialog.run() == Gtk.ResponseType.OK:
+        if dialog.run() == Gtk.ResponseType.OK:
             self.delayBetweenAutoStartInSeconds = spinnerDelay.get_value_as_int()
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.sortDefault = not sortAlphabeticallyCheckbox.get_active()
@@ -594,7 +594,7 @@ class IndicatorVirtualBox:
             pythonutils.setAutoStart( IndicatorVirtualBox.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.timeout_add_seconds( 1, self.onRefresh, False )
 
-        self.dialog.destroy()
+        dialog.destroy()
         pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
@@ -652,7 +652,7 @@ class IndicatorVirtualBox:
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
         # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
-        dialog = Gtk.Dialog( _( "VM Properties" ), self.dialog, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog = Gtk.Dialog( _( "VM Properties" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorVirtualBox.ICON )
