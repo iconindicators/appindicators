@@ -1,4 +1,4 @@
-indicator-stardate (1.0.34-1) precise; urgency=low
+indicator-stardate (1.0.34-1) trusty; urgency=low
 
   * Removed the "show in menu" option as all supported platforms allow a label
     next to the icon.
@@ -9,6 +9,7 @@ indicator-stardate (1.0.34-1) precise; urgency=low
     stardates.
   * Bug fix: Underlying Stardate API incorrectly converted from '2009 revised'
     stardate to Gregorian datetime.datetime (was off by one day).
+  * Update release to trusty as precise is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 27 Apr 2017 23:19:28 +1000
 

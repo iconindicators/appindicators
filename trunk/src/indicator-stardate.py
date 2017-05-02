@@ -38,7 +38,7 @@ import gi
 gi.require_version( "AppIndicator3", "0.1" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk
-import datetime, gzip, json, logging, os, pythonutils, re, shutil, stardate, sys
+import datetime, json, logging, os, pythonutils, stardate
 
 
 class IndicatorStardate:
