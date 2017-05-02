@@ -214,10 +214,18 @@ class IndicatorTide:
     def onPreferences( self, widget ):
         pythonutils.setAllMenuItemsSensitive( self.menu, False )
 
+        notebook = Gtk.Notebook()
+
+        # Port settings.
         grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
         grid.set_margin_left( 10 )
         grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
+        grid.set_row_homogeneous( False )
+        grid.set_column_homogeneous( False )
 
         box = Gtk.Box( spacing = 6 )
 
@@ -254,10 +262,20 @@ class IndicatorTide:
 
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        grid.attach( box, 0, 1, 1, 20 )
+        grid.attach( box, 0, 1, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( _( "Ports" ) ) )
+
+        # General settings.
+        grid = Gtk.Grid()
+        grid.set_column_spacing( 10 )
+        grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
 
         box = Gtk.Box()
-        box.set_margin_top( 10 )
 
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show as submenus" ) )
         showAsSubmenusCheckbox.set_active( self.showAsSubMenus )
@@ -321,8 +339,10 @@ class IndicatorTide:
         box.pack_start( autostartCheckbox, True, True, 1 )
         grid.attach( box, 0, 25, 1, 1 )
 
+        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
+
         dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        dialog.vbox.pack_start( grid, True, True, 0 )
+        dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorTide.ICON )
         dialog.show_all()
