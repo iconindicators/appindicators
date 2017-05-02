@@ -70,6 +70,9 @@ class IndicatorVirtualBox:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+        self.scrollDirectionIsUp = True
+        self.scrollUUID = None
+
         self.loadSettings()
         Notify.init( INDICATOR_NAME )
         virtualMachines = self.getVirtualMachines()
@@ -78,9 +81,6 @@ class IndicatorVirtualBox:
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorVirtualBox.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
-
-        self.scrollDirectionIsUp = True
-        self.scrollUUID = None
 
         self.buildMenu( virtualMachines )
         self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh, True )
