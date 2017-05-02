@@ -939,6 +939,8 @@ class IndicatorPPADownloadStatistics:
     def requestPPADownloadAndMenuRefresh( self, runAgain ):
         Thread( target = self.getPPADownloadStatistics ).start()
         return runAgain
+#TODO Can the scheduling of the next update happen here, rather than in the init?
+#Might have to take a parameter -IMMEDIATE or a TIME FROM NOW.
 
 
     # Get a list of the published binaries for each PPA.
