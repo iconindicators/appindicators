@@ -2403,6 +2403,8 @@ class IndicatorLunar:
         GLib.idle_add( self.onPreferencesInternal, widget )        
 
 
+#TODO Can we just turn off the Prefernces/About whilst an update is underway?
+# Look at PPA...the update is delayed if Prefs are open...do something similar here?
     def onPreferences( self, widget ):
         if self.dialog is None:
             # If the preferences were open and accessing the backend data (self.data) and an update occurs, that's not good.
@@ -2524,8 +2526,8 @@ class IndicatorLunar:
         grid.set_row_spacing( 10 )
         grid.set_margin_left( 10 )
         grid.set_margin_right( 10 )
-        grid.set_margin_top( 15 )
-        grid.set_margin_bottom( 15 )
+        grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
 
         label = Gtk.Label( _( "Show" ) )
         label.set_halign( Gtk.Align.START )
@@ -2550,7 +2552,7 @@ class IndicatorLunar:
 
         label = Gtk.Label( _( "Show as submenus" ) )
         label.set_halign( Gtk.Align.START )
-        label.set_margin_top( 15 )
+        label.set_margin_top( 10 )
         grid.attach( label, 0, 2, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 40 ) # Bug in Python - must specify the parameter names!
@@ -2579,7 +2581,7 @@ class IndicatorLunar:
         grid.attach( box, 0, 3, 1, 1 )
 
         hideBodyIfNeverUpCheckbox = Gtk.CheckButton( _( "Hide bodies which are 'never up'" ) )
-        hideBodyIfNeverUpCheckbox.set_margin_top( 15 )
+        hideBodyIfNeverUpCheckbox.set_margin_top( 10 )
         hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
         hideBodyIfNeverUpCheckbox.set_tooltip_text( _( 
             "If checked, only planets, moon,\n" + \
@@ -2594,7 +2596,7 @@ class IndicatorLunar:
         grid.attach( hideBodyIfNeverUpCheckbox, 0, 4, 1, 1 )
 
         groupStarsByConstellationCheckbox = Gtk.CheckButton( _( "Group stars by constellation" ) )
-        groupStarsByConstellationCheckbox.set_margin_top( 15 )
+        groupStarsByConstellationCheckbox.set_margin_top( 10 )
         groupStarsByConstellationCheckbox.set_active( self.groupStarsByConstellation )
         groupStarsByConstellationCheckbox.set_tooltip_text( _( 
             "By default, stars are listed\n" + \
@@ -2607,7 +2609,7 @@ class IndicatorLunar:
         grid.attach( groupStarsByConstellationCheckbox, 0, 5, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_top( 15 )
+        box.set_margin_top( 10 )
 
         label = Gtk.Label( _( "Hide comets greater than magnitude" ) )
         label.set_halign( Gtk.Align.START )
@@ -2631,7 +2633,7 @@ class IndicatorLunar:
         grid.attach( box, 0, 6, 1, 1 )
 
         cometsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new comets" ) )
-        cometsAddNewCheckbox.set_margin_top( 15 )
+        cometsAddNewCheckbox.set_margin_top( 10 )
         cometsAddNewCheckbox.set_active( self.cometsAddNew )
         cometsAddNewCheckbox.set_tooltip_text( _(
             "If checked, new comets in the\n" + \
@@ -2642,10 +2644,10 @@ class IndicatorLunar:
         grid.attach( cometsAddNewCheckbox, 0, 7, 1, 1 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_top( 15 )
+        box.set_margin_top( 10 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
-        sortSatellitesByDateTimeCheckbox.set_margin_top( 15 )
+        sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
         sortSatellitesByDateTimeCheckbox.set_tooltip_text( _(
             "If checked, satellites will be\n" + \
@@ -2656,7 +2658,7 @@ class IndicatorLunar:
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 8, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( _( "Hide satellites which have no upcoming visible pass" ) )
-        hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 15 )
+        hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 10 )
         hideSatelliteIfNoVisiblePassCheckbox.set_active( self.hideSatelliteIfNoVisiblePass )
         hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text( _( 
             "If checked, only satellites with an\n" + \
@@ -2672,7 +2674,7 @@ class IndicatorLunar:
         grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 9, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
-        satellitesAddNewCheckbox.set_margin_top( 15 )
+        satellitesAddNewCheckbox.set_margin_top( 10 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
         satellitesAddNewCheckbox.set_tooltip_text( _( 
             "If checked, new satellites in the\n" + \
@@ -3174,7 +3176,7 @@ class IndicatorLunar:
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorLunar.DESKTOP_FILE, logging ) )
-        autostartCheckbox.set_margin_top( 20 )
+        autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 4, 2, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
