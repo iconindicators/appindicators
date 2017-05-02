@@ -1,4 +1,4 @@
-indicator-fortune (1.0.26-1) precise; urgency=low
+indicator-fortune (1.0.26-1) trusty; urgency=low
 
   * Bug fix: Reset in Preferences did not actually reset!
   * Bug fix: Corrections and updates to tool tip text in the Preferences.
@@ -7,6 +7,7 @@ indicator-fortune (1.0.26-1) precise; urgency=low
     fortune to showing the current fortune.
   * Now handles bogus/missing fortune locations.
   * Menu items are now disabled when About/Preferences are displayed.
+  * Update release to trusty as precise is now end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 25 Apr 2017 16:40:46 +1000
 
