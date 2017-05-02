@@ -54,11 +54,13 @@ class IndicatorPunycode:
         filehandler = pythonutils.TruncatedFileHandler( IndicatorPunycode.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
+
         self.loadSettings()
         Notify.init( INDICATOR_NAME )
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPunycode.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
         self.buildMenu()
 
 
