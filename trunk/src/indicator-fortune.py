@@ -71,7 +71,9 @@ class IndicatorFortune:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+        self.timerID = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
+
         self.loadSettings()
         Notify.init( INDICATOR_NAME )
 
@@ -82,8 +84,6 @@ class IndicatorFortune:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.buildMenu()
-
-        self.timerID = None
         self.showFortune( None, True )
 
 
@@ -379,7 +379,6 @@ class IndicatorFortune:
 
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorFortune.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-
             self.buildMenu()
             self.showFortune( None, True )
 
