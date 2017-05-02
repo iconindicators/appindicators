@@ -87,27 +87,27 @@ class IndicatorPPADownloadStatistics:
 
 
     def __init__( self ):
-        GLib.threads_init()
-        self.lock = threading.Lock()
-        self.downloadInProgress = False
-        self.preferencesOpen = False
-        Notify.init( INDICATOR_NAME )
-        self.quitRequested = False
-
         filehandler = pythonutils.TruncatedFileHandler( IndicatorPPADownloadStatistics.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
 
+        self.downloadInProgress = False
+        self.preferencesOpen = False
+        self.quitRequested = False
+
+        GLib.threads_init()
+        self.lock = threading.Lock()
+        Notify.init( INDICATOR_NAME )
         self.loadSettings()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
         self.buildMenu()
-
-
-    def main( self ):
         self.requestPPADownloadAndMenuRefresh( False )
         GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every six hours.
-        Gtk.main()
+
+
+    def main( self ): Gtk.main()
 
 
     def buildMenu( self ):
