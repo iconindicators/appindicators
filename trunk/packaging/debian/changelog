@@ -1,5 +1,6 @@
 indicator-lunar (1.0.74-1) trusty; urgency=low
 
+  * Removed expired eclipse information.
   * Menu items are now disabled when About/Preferences are displayed.
   * Update release to trusty as precise is end of life.
 

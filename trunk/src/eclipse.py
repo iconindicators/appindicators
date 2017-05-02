@@ -74,7 +74,6 @@ def getEclipseForUTC( dateTimeUTC, isLunar ):
 # 
 #      Year   Month  Day   HH:MM:SS    DT   Type  Lat   Long
 __lunarEclipseData = [
-    [ "2017", "02", "11", "00:45:03", "70", "N", "13N", "8W" ],
     [ "2017", "08", "07", "18:21:38", "70", "P", "15S", "86E" ],
     [ "2018", "01", "31", "13:31:00", "71", "T", "17N", "161E" ],
     [ "2018", "07", "27", "20:22:54", "71", "T", "19S", "56E" ],
