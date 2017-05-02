@@ -61,12 +61,14 @@ class IndicatorScriptRunner:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorScriptRunner.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+
         GLib.threads_init()
         self.lock = threading.Lock()
         self.loadSettings()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorScriptRunner.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
         self.buildMenu()
 
 
@@ -171,7 +173,6 @@ class IndicatorScriptRunner:
         grid.set_column_homogeneous( False )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
@@ -292,7 +293,6 @@ class IndicatorScriptRunner:
         showScriptsInSubmenusCheckbox = Gtk.CheckButton( _( "Show scripts in submenus" ) )
         showScriptsInSubmenusCheckbox.set_tooltip_text( _( "When checked, scripts with the same\ngroup are shown in submenus.\n\nOtherwise, scripts appear in a list,\nindented by group." ) )
         showScriptsInSubmenusCheckbox.set_active( self.showScriptsInSubmenus )
-        showScriptsInSubmenusCheckbox.set_margin_top( 10 )
         grid.attach( showScriptsInSubmenusCheckbox, 0, 0, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
@@ -393,7 +393,6 @@ class IndicatorScriptRunner:
             grid.set_margin_bottom( 10 )
 
             box = Gtk.Box( spacing = 6 )
-            box.set_margin_top( 10 )
 
             box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
@@ -509,7 +508,6 @@ class IndicatorScriptRunner:
         grid.set_margin_bottom( 10 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
