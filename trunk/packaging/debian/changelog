@@ -3,7 +3,7 @@ indicator-punycode (1.0.4-1) trusty; urgency=low
   * Menu items are now disabled when About/Preferences are displayed.
   * Removed excessive spacing at top of Preferences.
   * Tidied up tooltips in the Preferences.
-  * Update release to trusty as precise is now end of life.
+  * Update release to trusty as precise is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 1 May 2017 23:02:15 +1000
 
