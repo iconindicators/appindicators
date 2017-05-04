@@ -42,6 +42,7 @@ import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
+#TODO Clean up.
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
@@ -2404,6 +2405,7 @@ class IndicatorLunar:
 
 #TODO Can we just turn off the Prefernces/About whilst an update is underway?
 # Look at PPA...the update is delayed if Prefs are open...do something similar here?
+#Also need to check if an update is underway and if so, alert the user (either use existing waitForUpdateToFinish or just tell user they can try later).
     def onPreferences( self, widget ):
         if self.dialog is None:
             # If the preferences were open and accessing the backend data (self.data) and an update occurs, that's not good.
