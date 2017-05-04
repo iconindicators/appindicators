@@ -45,7 +45,6 @@ gi.require_version( "Notify", "0.7" )
 from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
-
 import calendar, copy, datetime, eclipse, glob, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, sys, tempfile, threading, time, webbrowser
 
 try:
