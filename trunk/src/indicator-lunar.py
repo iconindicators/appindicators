@@ -923,7 +923,6 @@ class IndicatorLunar:
 
 
     def __init__( self ):
-        self.dialog = None
         self.data = { } # Key is a tuple of AstronomicalBodyType, a data tag (upper case( and data tag (upper case).  Value is the data ready for display.
         self.cometOEData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
         self.satelliteNotifications = { }
@@ -968,7 +967,7 @@ class IndicatorLunar:
 
 
     def updateBackend( self ):
-        if self.lock.acquire( False ):
+        if self.lock.acquire( blocking = False ):
             self.updateCometOEData()
             self.updateSatelliteTLEData() 
 
@@ -1020,6 +1019,7 @@ class IndicatorLunar:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
+        self.menu = menu
 
 
     def getDisplayData( self, key, source = None ):
@@ -2373,27 +2373,25 @@ class IndicatorLunar:
 
 
     def onAbout( self, widget ):
-        if self.dialog is None:
-            self.dialog = pythonutils.createAboutDialog(
-                [ IndicatorLunar.AUTHOR ],
-                IndicatorLunar.ABOUT_COMMENTS, 
-                IndicatorLunar.ABOUT_CREDITS,
-                _( "Credits" ),
-                Gtk.License.GPL_3_0,
-                IndicatorLunar.ICON,
-                INDICATOR_NAME,
-                IndicatorLunar.WEBSITE,
-                IndicatorLunar.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ) )
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        dialog = pythonutils.createAboutDialog(
+            [ IndicatorLunar.AUTHOR ],
+            IndicatorLunar.ABOUT_COMMENTS, 
+            IndicatorLunar.ABOUT_CREDITS,
+            _( "Credits" ),
+            Gtk.License.GPL_3_0,
+            IndicatorLunar.ICON,
+            INDICATOR_NAME,
+            IndicatorLunar.WEBSITE,
+            IndicatorLunar.VERSION,
+            _( "translator-credits" ),
+            _( "View the" ),
+            _( "text file." ),
+            _( "changelog" ) )
 
-            self.dialog.run()
-            self.dialog.destroy()
-            self.dialog = None
-        else:
-            self.dialog.present()
+        dialog.run()
+        dialog.destroy()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def waitForUpdateToFinish( self, widget ):
@@ -2406,22 +2404,21 @@ class IndicatorLunar:
 #TODO Can we just turn off the Prefernces/About whilst an update is underway?
 # Look at PPA...the update is delayed if Prefs are open...do something similar here?
 #Also need to check if an update is underway and if so, alert the user (either use existing waitForUpdateToFinish or just tell user they can try later).
+#May not need to worry about an update occurring whilst Pref/About open (or maybe just Pref) as Pref remove the timer ID.
     def onPreferences( self, widget ):
-        if self.dialog is None:
-            # If the preferences were open and accessing the backend data (self.data) and an update occurs, that's not good.
-            # So ensure that no update is occurring...if it is, wait for it to end.
-            if self.lock.acquire( blocking = False ):
-                self.onPreferencesInternal( widget )
-            else:
-                summary = _( "Preferences unavailable..." )
-                message = _( "The lunar indicator is momentarily refreshing; preferences will be available shortly." )
-                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-                Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start()
+        # If the preferences were open and accessing the backend data (self.data) and an update occurs, that's not good.
+        # So ensure that no update is occurring...if it is, wait for it to end.
+        if self.lock.acquire( blocking = False ):
+            self.onPreferencesInternal( widget )
         else:
-            self.dialog.present()
+            summary = _( "Preferences unavailable..." )
+            message = _( "The lunar indicator is momentarily refreshing; preferences will be available shortly." )
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start()
 
 
     def onPreferencesInternal( self, widget ):
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
         GLib.source_remove( self.eventSourceID ) # Ensure no update occurs whilst the preferences are open.
 
         TAB_ICON = 0
@@ -3182,11 +3179,11 @@ class IndicatorLunar:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        self.dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialog.vbox.pack_start( notebook, True, True, 0 )
-        self.dialog.set_border_width( 5 )
-        self.dialog.set_icon_name( IndicatorLunar.ICON )
-        self.dialog.show_all()
+        dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( notebook, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorLunar.ICON )
+        dialog.show_all()
 
         # The visibility of some GUI objects must be determined AFTER the dialog is shown.
         self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), AstronomicalBodyType.Comet )
@@ -3196,33 +3193,33 @@ class IndicatorLunar:
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
 
         while True:
-            if self.dialog.run() != Gtk.ResponseType.OK:
+            if dialog.run() != Gtk.ResponseType.OK:
                 break
 
             cityValue = city.get_active_text()
             if cityValue == "":
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ), INDICATOR_NAME )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
             if latitudeValue == "" or not pythonutils.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Latitude must be a number between 90 and -90 inclusive." ), INDICATOR_NAME )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Latitude must be a number between 90 and -90 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
             if longitudeValue == "" or not pythonutils.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Longitude must be a number between 180 and -180 inclusive." ), INDICATOR_NAME )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Longitude must be a number between 180 and -180 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
             if elevationValue == "" or not pythonutils.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
-                pythonutils.showMessage( self.dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number between 0 and 10000 inclusive." ), INDICATOR_NAME )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number between 0 and 10000 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 elevation.grab_focus()
                 continue
@@ -3305,9 +3302,8 @@ class IndicatorLunar:
             break
 
         self.lock.release()
-        self.update()
-        self.dialog.destroy()
-        self.dialog = None
+        self.update() #TODO Why do the update even when cancel?  If decide to only update on OK, need to call update after the lock is released.
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def appendToDisplayTagsStore( self, key, value, displayTagsStore ):
