@@ -39,7 +39,7 @@ gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
-import json, logging, os, pythonutils
+import json, logging, os, pythonutils, threading
 
 
 class IndicatorFortune:
@@ -71,6 +71,7 @@ class IndicatorFortune:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+        self.lock = threading.Lock()
         self.dialogAbout = None
         self.dialogPreferences = None
         self.timerID = None
@@ -132,7 +133,7 @@ class IndicatorFortune:
 
 #TODO Put back
 #         Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
-        print( self.fortune )
+        print( self.fortune ) #TODO Remove
 
         if new: # If the user is showing the previous fortune, keep the existing timer in place for the forthcoming fortune.
             if self.timerID is not None:
@@ -176,9 +177,31 @@ class IndicatorFortune:
 
 
     def onAbout( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
-        if self.dialogAbout is None:
-            self.dialogAbout = pythonutils.createAboutDialog(
+        if self.lock.acquire( blocking = False ):
+
+#         pythonutils.setAllMenuItemsSensitive( self.menu, False )
+#         if self.dialogAbout is None:
+#             self.dialogAbout = pythonutils.createAboutDialog(
+#                 [ IndicatorFortune.AUTHOR ],
+#                 IndicatorFortune.COMMENTS, 
+#                 [ ],
+#                 "",
+#                 Gtk.License.GPL_3_0,
+#                 IndicatorFortune.ICON,
+#                 INDICATOR_NAME,
+#                 IndicatorFortune.WEBSITE,
+#                 IndicatorFortune.VERSION,
+#                 _( "translator-credits" ),
+#                 _( "View the" ),
+#                 _( "text file." ),
+#                 _( "changelog" ) )
+# 
+#         self.dialogAbout.present()
+#         self.dialogAbout.run()
+#         self.dialogAbout.hide()
+#         pythonutils.setAllMenuItemsSensitive( self.menu, True )
+
+            dialogAbout = pythonutils.createAboutDialog(
                 [ IndicatorFortune.AUTHOR ],
                 IndicatorFortune.COMMENTS, 
                 [ ],
@@ -193,10 +216,15 @@ class IndicatorFortune:
                 _( "text file." ),
                 _( "changelog" ) )
 
-        self.dialogAbout.present()
-        self.dialogAbout.run()
-        self.dialogAbout.hide()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
+            dialogAbout.run()
+            dialogAbout.hide()
+
+            self.lock.release()
+        
+        else:
+            print( "About cannot lock" )
+#             time.sleep( 1 )
+
 
 #TODO
 # What are we trying to do here?
@@ -255,10 +283,12 @@ class IndicatorFortune:
 
 
     def onPreferences( self, widget ):
-        if self.dialogPreferences is None:
+        if self.lock.acquire( blocking = False ):
             self.onPreferencesInternal( widget )
+            print( "back in caller to preferences internal")
+            self.lock.release()
         else:
-            self.dialogPreferences.present()
+            print( "Prefs cannot lock" )
 
 
     def onPreferencesInternal( self, widget ):
