@@ -71,6 +71,8 @@ class IndicatorFortune:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+        self.dialogAbout = None
+        self.dialogPreferences = None
         self.timerID = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
@@ -128,7 +130,8 @@ class IndicatorFortune:
             if notificationSummary == "":
                 notificationSummary = " "
 
-        Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
+#TODO Put back
+#         Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
 
         if new: # If the user is showing the previous fortune, keep the existing timer in place for the forthcoming fortune.
             if self.timerID is not None:
@@ -172,25 +175,70 @@ class IndicatorFortune:
 
 
     def onAbout( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
-        dialog = pythonutils.createAboutDialog(
-            [ IndicatorFortune.AUTHOR ],
-            IndicatorFortune.COMMENTS, 
-            [ ],
-            "",
-            Gtk.License.GPL_3_0,
-            IndicatorFortune.ICON,
-            INDICATOR_NAME,
-            IndicatorFortune.WEBSITE,
-            IndicatorFortune.VERSION,
-            _( "translator-credits" ),
-            _( "View the" ),
-            _( "text file." ),
-            _( "changelog" ) )
+        if self.dialogAbout is None:
+            self.dialogAbout = pythonutils.createAboutDialog(
+                [ IndicatorFortune.AUTHOR ],
+                IndicatorFortune.COMMENTS, 
+                [ ],
+                "",
+                Gtk.License.GPL_3_0,
+                IndicatorFortune.ICON,
+                INDICATOR_NAME,
+                IndicatorFortune.WEBSITE,
+                IndicatorFortune.VERSION,
+                _( "translator-credits" ),
+                _( "View the" ),
+                _( "text file." ),
+                _( "changelog" ) )
 
-        dialog.run()
-        dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
+        self.dialogAbout.present()
+        self.dialogAbout.run()
+        self.dialogAbout.hide()
+
+#TODO
+# What are we trying to do here?
+# What is the problem, if any, to be solved?
+# Does it matter if the About and Preferences are shown simultaneously?
+#
+# If About/Preferences is already showing and the user selects again from the menu,
+# don't rebuild, but bring the respective window to front.
+# For this, need to keep a handle to each of About/Preferences.
+#
+# Could create the About dialog once and just run/present/hide each time.
+# Verify this works, by closing and escaping the About dialog,
+# ensuring it re-displays correctly.
+#
+# Probably should create the Preferences each time to ensure correct initialisation.
+#
+# Do the other menu items need to be disabled?
+# If Preferences are open but have not been saved,
+# the menu items will act on user settings currently saved,
+# not those that have not yet been saved.
+#
+# Maybe need to disable the menu items for virtual box and script runner.
+#
+# For lunar and ppa, whilst an update is occurring use a lock to block Preferences?
+# Also, use a lock to stop the update if the Preferences is opened?
+        
+        
+#         dialog = pythonutils.createAboutDialog(
+#             [ IndicatorFortune.AUTHOR ],
+#             IndicatorFortune.COMMENTS, 
+#             [ ],
+#             "",
+#             Gtk.License.GPL_3_0,
+#             IndicatorFortune.ICON,
+#             INDICATOR_NAME,
+#             IndicatorFortune.WEBSITE,
+#             IndicatorFortune.VERSION,
+#             _( "translator-credits" ),
+#             _( "View the" ),
+#             _( "text file." ),
+#             _( "changelog" ) )
+
+#         dialog.run()
+#         dialog.destroy()
+#         pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onPreferences( self, widget ):
