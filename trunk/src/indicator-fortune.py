@@ -132,6 +132,7 @@ class IndicatorFortune:
 
 #TODO Put back
 #         Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
+        print( self.fortune )
 
         if new: # If the user is showing the previous fortune, keep the existing timer in place for the forthcoming fortune.
             if self.timerID is not None:
@@ -175,6 +176,7 @@ class IndicatorFortune:
 
 
     def onAbout( self, widget ):
+        pythonutils.setAllMenuItemsSensitive( self.menu, False )
         if self.dialogAbout is None:
             self.dialogAbout = pythonutils.createAboutDialog(
                 [ IndicatorFortune.AUTHOR ],
@@ -194,6 +196,7 @@ class IndicatorFortune:
         self.dialogAbout.present()
         self.dialogAbout.run()
         self.dialogAbout.hide()
+        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 #TODO
 # What are we trying to do here?
@@ -219,7 +222,17 @@ class IndicatorFortune:
 #
 # For lunar and ppa, whilst an update is occurring use a lock to block Preferences?
 # Also, use a lock to stop the update if the Preferences is opened?
-        
+#
+# CANNOT have both About and Preferences running as each has a main loop which blocks the other!
+# This occurs when both dialogs are display and then lose focus or minimised.
+#
+# So, go back to a single dialog and block if not None.
+#
+# Maybe just use a lock...if the lock is available then can show the About dialog or Preferences dialog or do an update...
+# Each of these things must first attempt to grab the lock and if unable, either reschedule later (the update happens later)
+# or let the user know things are busy (About and Prefs can notify user).
+#
+
         
 #         dialog = pythonutils.createAboutDialog(
 #             [ IndicatorFortune.AUTHOR ],
@@ -242,8 +255,13 @@ class IndicatorFortune:
 
 
     def onPreferences( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        if self.dialogPreferences is None:
+            self.onPreferencesInternal( widget )
+        else:
+            self.dialogPreferences.present()
 
+
+    def onPreferencesInternal( self, widget ):
         notebook = Gtk.Notebook()
 
         # Fortune file settings.
@@ -397,13 +415,13 @@ class IndicatorFortune:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        dialog.vbox.pack_start( notebook, True, True, 0 )
-        dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorFortune.ICON )
-        dialog.show_all()
+        self.dialogPreferences = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        self.dialogPreferences.vbox.pack_start( notebook, True, True, 0 )
+        self.dialogPreferences.set_border_width( 5 )
+        self.dialogPreferences.set_icon_name( IndicatorFortune.ICON )
+        self.dialogPreferences.show_all()
 
-        if dialog.run() == Gtk.ResponseType.OK:
+        if self.dialogPreferences.run() == Gtk.ResponseType.OK:
             if radioMiddleMouseClickNewFortune.get_active():
                 self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
             elif radioMiddleMouseClickCopyLastFortune.get_active():
@@ -430,8 +448,8 @@ class IndicatorFortune:
             self.buildMenu()
             self.showFortune( None, True )
 
-        dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
+        self.dialogPreferences.destroy()
+        self.dialogPreferences = None
 
 
     def onFortuneReset( self, button, treeview ):
