@@ -24,13 +24,13 @@ def isExpired(): return getExpiry() < time.strftime( "%Y-%m-%d" )
 
 
 # Obtain the non-UK port expiry date in YYYY-MM-DD.
-def getExpiry(): return __UKHO_NON_UK_PORT_EXPIRY
+def getExpiry(): return _UKHO_NON_UK_PORT_EXPIRY
 
 
 def isValidPortID( portID ):
     isValid = False
-    for port in __ports:
-        if portID == port[ __INDEX_PORT_ID ]:
+    for port in _ports:
+        if portID == port[ _INDEX_PORT_ID ]:
             isValid = True
             break
 
@@ -39,9 +39,9 @@ def isValidPortID( portID ):
 
 def getCountry( portID ): 
     country = None
-    for port in __ports:
-        if portID == port[ __INDEX_PORT_ID ]:
-            country = port[ __INDEX_PORT_COUNTRY ]
+    for port in _ports:
+        if portID == port[ _INDEX_PORT_ID ]:
+            country = port[ _INDEX_PORT_COUNTRY ]
             break
 
     return country
@@ -49,9 +49,9 @@ def getCountry( portID ):
 
 def getPortName( portID ): 
     portName = None
-    for port in __ports:
-        if portID == port[ __INDEX_PORT_ID ]:
-            portName = port[ __INDEX_PORT_NAME ]
+    for port in _ports:
+        if portID == port[ _INDEX_PORT_ID ]:
+            portName = port[ _INDEX_PORT_NAME ]
             break
 
     return portName
@@ -60,9 +60,9 @@ def getPortName( portID ):
 # Returns the port ID for the first matching country.
 def getPortIDForCountry( country ):
     portID = None
-    for port in __ports:
-        if country == port[ __INDEX_PORT_COUNTRY ]:
-            portID = port[ __INDEX_PORT_ID ]
+    for port in _ports:
+        if country == port[ _INDEX_PORT_COUNTRY ]:
+            portID = port[ _INDEX_PORT_ID ]
             break
 
     return portID
@@ -70,9 +70,9 @@ def getPortIDForCountry( country ):
 
 def getPortIDForCountryAndPortName( country, portName ):
     portID = None
-    for port in __ports:
-        if country == port[ __INDEX_PORT_COUNTRY ] and portName == port[ __INDEX_PORT_NAME ]:
-            portID = port[ __INDEX_PORT_ID ]
+    for port in _ports:
+        if country == port[ _INDEX_PORT_COUNTRY ] and portName == port[ _INDEX_PORT_NAME ]:
+            portID = port[ _INDEX_PORT_ID ]
             break
 
     return portID
@@ -80,29 +80,29 @@ def getPortIDForCountryAndPortName( country, portName ):
 
 def getPortNamesForCountry( country ):
     portNames = [ ]
-    for port in __ports:
-        if port[ __INDEX_PORT_COUNTRY ] == country and port[ __INDEX_PORT_NAME ] not in portNames:
-            portNames.append( port[ __INDEX_PORT_NAME ] )
+    for port in _ports:
+        if port[ _INDEX_PORT_COUNTRY ] == country and port[ _INDEX_PORT_NAME ] not in portNames:
+            portNames.append( port[ _INDEX_PORT_NAME ] )
 
     return portNames
 
 
 def getCountries():
     countries = [ ]
-    for port in __ports:
-        if port[ __INDEX_PORT_COUNTRY ] not in countries:
-            countries.append( port[ __INDEX_PORT_COUNTRY ] )
+    for port in _ports:
+        if port[ _INDEX_PORT_COUNTRY ] not in countries:
+            countries.append( port[ _INDEX_PORT_COUNTRY ] )
 
     return countries
 
 
-def getFirstPortID(): return __ports[ 0 ][ __INDEX_PORT_ID ]
+def getFirstPortID(): return _ports[ 0 ][ _INDEX_PORT_ID ]
 
 
 # Indices for each port's data.
-__INDEX_PORT_ID = 0
-__INDEX_PORT_NAME = 1
-__INDEX_PORT_COUNTRY = 2
+_INDEX_PORT_ID = 0
+_INDEX_PORT_NAME = 1
+_INDEX_PORT_COUNTRY = 2
 
 
 # © Crown Copyright and/or database rights.
@@ -111,7 +111,7 @@ __INDEX_PORT_COUNTRY = 2
 # www.ukho.gov.uk
 #
 # Port ID. port name, country.
-__UKHO_NonUKPorts = [
+_UKHO_NonUKPorts = [
     [ "5145A", "Kuala Belait", "Brunei" ],
     [ "4680", "Kuala Bernam", "Peninsular Malaysia West Coast" ],
     [ "5150", "Kuala Bintulu", "Sarawak" ],
@@ -1411,7 +1411,7 @@ __UKHO_NonUKPorts = [
 # www.nationalarchives.gov.uk/doc/open-government-licence
 #
 # Port ID. port name, country.
-__UKHO_UKPorts = [
+_UKHO_UKPorts = [
     [ "482A", "Aberdaron", "Wales" ],
     [ "244", "Aberdeen", "Scotland" ],
     [ "486", "Aberdovey", "Wales" ],
@@ -2032,10 +2032,10 @@ __UKHO_UKPorts = [
     [ "537", "Yelland Marsh", "England" ] ]
 
 
-__UKHO_NON_UK_PORT_EXPIRY = "2017-09-26" # The license for UKHO non-UK ports expires after this date.
+_UKHO_NON_UK_PORT_EXPIRY = "2017-09-26" # The license for UKHO non-UK ports expires after this date.
 
 
 # Port data.
 #
 # Port ID. port name, country.
-__ports = __UKHO_UKPorts if isExpired() else ( __UKHO_UKPorts + __UKHO_NonUKPorts )
+_ports = _UKHO_UKPorts if isExpired() else ( _UKHO_UKPorts + _UKHO_NonUKPorts )
