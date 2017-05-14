@@ -19,6 +19,17 @@
 # Application indicator which displays tidal information.
 
 
+# References:
+#  http://developer.gnome.org/pygobject
+#  http://developer.gnome.org/gtk3
+#  http://python-gtk-3-tutorial.readthedocs.org
+#  http://wiki.gnome.org/Projects/PyGObject/Threading
+#  http://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
+#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -29,7 +40,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
-import datetime, json, locale, logging, os, ports, pythonutils, tide, time, webbrowser
+import datetime, json, locale, logging, os, ports, pythonutils, threading, tide, time, webbrowser
 
 
 class IndicatorTide:
@@ -64,6 +75,7 @@ class IndicatorTide:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorTide.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+        self.lock = threading.Lock()
 
         self.loadSettings()
         Notify.init( INDICATOR_NAME )
@@ -152,6 +164,19 @@ class IndicatorTide:
         return menuItem
 
 
+    def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
+
+
+    def update( self ):
+        tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.getDaylightSavingsOffsetInMinutes() )
+        self.buildMenu( tidalReadings )
+        self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
+
+        if tidalReadings is None or len( tidalReadings ) == 0:
+            message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
+            Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
+
+
     # Determines if the computer is currently in daylight savings or not (for the given time zone)
     # and if so, computer the offset amount in minutes.
     # If the computer is not in daylight savings, the offset is zero.
@@ -167,19 +192,6 @@ class IndicatorTide:
         return offsetInMinutes
 
 
-    def update( self ):
-        tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.getDaylightSavingsOffsetInMinutes() )
-        self.buildMenu( tidalReadings )
-        self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
-
-        if tidalReadings is None or len( tidalReadings ) == 0:
-            message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
-            Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
-
-
-    def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
-
-
     def getNextUpdateTimeInSeconds( self ):
         now = datetime.datetime.now()
         fiveMinutesAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 ) # Tidal information (appears to be) updated not long after local midnight.
@@ -190,30 +202,32 @@ class IndicatorTide:
 
 
     def onAbout( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
-        dialog = pythonutils.createAboutDialog(
-            [ IndicatorTide.AUTHOR ],
-            IndicatorTide.COMMENTS, 
-            IndicatorTide.CREDITS,
-            _( "Credits" ),
-            Gtk.License.GPL_3_0,
-            IndicatorTide.ICON,
-            INDICATOR_NAME,
-            IndicatorTide.WEBSITE,
-            IndicatorTide.VERSION,
-            _( "translator-credits" ),
-            _( "View the" ),
-            _( "text file." ),
-            _( "changelog" ) )
+        if self.lock.acquire( blocking = False ):
+            pythonutils.showAboutDialog(
+                [ IndicatorTide.AUTHOR ],
+                IndicatorTide.COMMENTS, 
+                IndicatorTide.CREDITS,
+                _( "Credits" ),
+                Gtk.License.GPL_3_0,
+                IndicatorTide.ICON,
+                INDICATOR_NAME,
+                IndicatorTide.WEBSITE,
+                IndicatorTide.VERSION,
+                _( "translator-credits" ),
+                _( "View the" ),
+                _( "text file." ),
+                _( "changelog" ) )
 
-        dialog.run()
-        dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
+            self.lock.release()
 
 
     def onPreferences( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        if self.lock.acquire( blocking = False ):
+            self.onPreferencesInternal( widget )
+            self.lock.release()
 
+
+    def onPreferencesInternal( self, widget ):
         notebook = Gtk.Notebook()
 
         # Port settings.
@@ -359,13 +373,10 @@ class IndicatorTide:
             self.menuItemTideFormat = tideFormat.get_text().strip()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorTide.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-
             GLib.source_remove( self.timeoutID )
-            self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
-            self.update()
+            GLib.idle_add( self.update )
 
         dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onCountry( self, countriesComboBox, portsListStore, portsTree ):

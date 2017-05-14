@@ -1,7 +1,6 @@
 indicator-tide (1.0.8-1) trusty; urgency=low
 
   * Split the Preferences over two tabs (ports and general).
-  * Menu items are now disabled when About/Preferences are displayed.
   * Update release to trusty as precise is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 2 May 2017 10:35:15 +1000
