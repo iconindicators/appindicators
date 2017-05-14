@@ -1,0 +1,30 @@
+# Portable Object Template for pythonutils.
+# Copyright (C) 2017 Bernard Giannetti
+# This file is distributed under the same license as the pythonutils package.
+# Bernard Giannetti <thebernmeister@hotmail.com>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: pythonutils 1.0.0\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2017-05-03 13:05+1000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: pythonutils.py:122
+msgid "Preferences"
+msgstr ""
+
+#: pythonutils.py:126
+msgid "About"
+msgstr ""
+
+#: pythonutils.py:130
+msgid "Quit"
+msgstr ""
