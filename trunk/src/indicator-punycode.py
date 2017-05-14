@@ -16,9 +16,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Convert domain names between Unicode and ASCII.
-# Allows the user to select, by either highlight or clipboard,
-# a domain name and convert between Unicode and ASCII.
+# Application indicator to let a user select a domain name, by either highlight or clipboard, and convert between Unicode and ASCII.
+
+
+# References:
+#  http://developer.gnome.org/pygobject
+#  http://developer.gnome.org/gtk3
+#  http://developer.gnome.org/gnome-devel-demos
+#  http://python-gtk-3-tutorial.readthedocs.org
+#  http://wiki.gnome.org/Projects/PyGObject/Threading
+#  http://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
+#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 
 
 INDICATOR_NAME = "indicator-punycode"
@@ -29,8 +39,8 @@ import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import AppIndicator3, Gdk, Gtk, Notify
-import encodings.idna, json, logging, os, pythonutils, re
+from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
+import encodings.idna, json, logging, os, pythonutils, re, threading
 
 
 class IndicatorPunycode:
@@ -53,6 +63,7 @@ class IndicatorPunycode:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorPunycode.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+        self.lock = threading.Lock()
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
 
         self.loadSettings()
@@ -145,8 +156,8 @@ class IndicatorPunycode:
                 if len( self.results ) > self.resultHistoryLength:
                     self.results = self.results[ : self.resultHistoryLength ]
 
-                self.pasteToClipboard( None, protocol + convertedText + pathQuery )
-                self.buildMenu()
+                GLib.idle_add( self.pasteToClipboard, None, protocol + convertedText + pathQuery )
+                Glib.idle_add( self.buildMenu )
 
             except Exception as e:
                 logging.exception( e )
@@ -166,30 +177,32 @@ class IndicatorPunycode:
 
 
     def onAbout( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
-        dialog = pythonutils.createAboutDialog(
-            [ IndicatorPunycode.AUTHOR ],
-            IndicatorPunycode.COMMENTS, 
-            [ ],
-            "",
-            Gtk.License.GPL_3_0,
-            IndicatorPunycode.ICON,
-            INDICATOR_NAME,
-            IndicatorPunycode.WEBSITE,
-            IndicatorPunycode.VERSION,
-            _( "translator-credits" ),
-            _( "View the" ),
-            _( "text file." ),
-            _( "changelog" ) )
+        if self.lock.acquire( blocking = False ):
+            pythonutils.showAboutDialog(
+                [ IndicatorPunycode.AUTHOR ],
+                IndicatorPunycode.COMMENTS, 
+                [ ],
+                "",
+                Gtk.License.GPL_3_0,
+                IndicatorPunycode.ICON,
+                INDICATOR_NAME,
+                IndicatorPunycode.WEBSITE,
+                IndicatorPunycode.VERSION,
+                _( "translator-credits" ),
+                _( "View the" ),
+                _( "text file." ),
+                _( "changelog" ) )
 
-        dialog.run()
-        dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
+            self.lock.release()
 
 
     def onPreferences( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        if self.lock.acquire( blocking = False ):
+            self.onPreferencesInternal( widget )
+            self.lock.release()
 
+
+    def onPreferencesInternal( self, widget ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -276,10 +289,9 @@ class IndicatorPunycode:
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorPunycode.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            self.buildMenu()
+            GLib.idle_add( self.buildMenu )
 
         dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def loadSettings( self ):
