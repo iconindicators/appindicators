@@ -62,7 +62,8 @@ class IndicatorStardate:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorStardate.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.lock = threading.Lock()
+        self.lockDialog = threading.Lock()
+        self.lockUpdate = threading.Lock()
         self.updateTimerID = None
         self.saveSettingsTimerID = None
 
@@ -73,56 +74,64 @@ class IndicatorStardate:
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
 
         self.buildMenu()
-        self.update()
+        self.update( False )
 
 
     def main( self ): Gtk.main()
 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        # Based on the mouse wheel scroll event (irrespective of direction),
-        # cycle through the possible combinations of options for display in the stardate.
-        # If showing a 'classic' stardate and padding is not require, ignore the padding option.
-        if self.showClassic:
-            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
-            paddingRequired = stardate.requiresPadding( stardateIssue, stardateInteger )
-            if paddingRequired:
-                if self.showIssue and self.padInteger:
-                    self.showIssue = True
-                    self.padInteger = False
-
-                elif self.showIssue and not self.padInteger:
-                    self.showIssue = False
-                    self.padInteger = True
-
-                elif not self.showIssue and self.padInteger:
-                    self.showIssue = False
-                    self.padInteger = False
-
+        print( "IN", threading.get_ident( ))
+        with threading.Lock():
+            print( "LOCKED", threading.get_ident( ))
+            # Based on the mouse wheel scroll event (irrespective of direction),
+            # cycle through the possible combinations of options for display in the stardate.
+            # If showing a 'classic' stardate and padding is not require, ignore the padding option.
+            if self.showClassic:
+                stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
+                paddingRequired = stardate.requiresPadding( stardateIssue, stardateInteger )
+                if paddingRequired:
+                    if self.showIssue and self.padInteger:
+                        self.showIssue = True
+                        self.padInteger = False
+    
+                    elif self.showIssue and not self.padInteger:
+                        self.showIssue = False
+                        self.padInteger = True
+    
+                    elif not self.showIssue and self.padInteger:
+                        self.showIssue = False
+                        self.padInteger = False
+    
+                    else:
+                        self.showIssue = True
+                        self.padInteger = True
+                        self.showClassic = False # Shown all possible 'classic' options (when padding is required)...now move on to '2009 revised'.
+    
                 else:
-                    self.showIssue = True
-                    self.padInteger = True
-                    self.showClassic = False # Shown all possible 'classic' options (when padding is required)...now move on to '2009 revised'.
-
+                    if self.showIssue:
+                        self.showIssue = False
+    
+                    else:
+                        self.showIssue = True
+                        self.showClassic = False # Shown all possible 'classic' options (when padding is not required)...now move on to '2009 revised'.
+    
             else:
-                if self.showIssue:
-                    self.showIssue = False
-
-                else:
-                    self.showIssue = True
-                    self.showClassic = False # Shown all possible 'classic' options (when padding is not required)...now move on to '2009 revised'.
-
-        else:
-            self.showIssue = True
-            self.padInteger = True
-            self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
-
-        GLib.idle_add( self.update )
-
-        if self.saveSettingsTimerID is not None:
-            GLib.source_remove( self.saveSettingsTimerID )
-
-        self.saveSettingsTimerID = GLib.timeout_add_seconds( 10, self.saveSettings ) # Defer the save to 10s in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
+                self.showIssue = True
+                self.padInteger = True
+                self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
+    
+            GLib.idle_add( self.update, True )
+    
+    #TODO Need a lock around this?
+    #Actually should perhaps have a lock around the whole function...?
+            if self.saveSettingsTimerID is not None:
+                GLib.source_remove( self.saveSettingsTimerID )
+    
+            self.saveSettingsTimerID = GLib.timeout_add_seconds( 1000, self.saveSettings ) # Defer the save to 10s in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
+            import time
+#             time.sleep( 2 )
+        print( "OUT", threading.get_ident( ))
 
 
     def buildMenu( self ):
@@ -133,40 +142,38 @@ class IndicatorStardate:
         self.menu = menu
 
 
-    def update( self ):
-        print( "Update - thread id:", threading.current_thread() )
-#         with threading.lock:
-#             GLib.source_remove( self.updateTimerID )
-        import datetime
-        print( "Update: ", str( datetime.datetime.now() ) )
+    def update( self, clearTimer ):
+        with self.lockUpdate:
+            if clearTimer:
+                GLib.source_remove( self.updateTimerID )
 
-        # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
-        if self.showClassic:
-            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
+            # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
+            if self.showClassic:
+                stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
 
-            # WHEN the stardate calculation is performed will NOT necessarily synchronise with WHEN the stardate actually changes.
-            # Therefore update at a faster rate, say at one tenth of the period, but at most once per minute.
-            numberOfSecondsToNextUpdate = int( fractionalPeriod / 10 )
-            if numberOfSecondsToNextUpdate < 60:
-                numberOfSecondsToNextUpdate = 60
+                # WHEN the stardate calculation is performed is NOT necessarily synchronised with WHEN the stardate actually changes.
+                # Therefore update at a faster rate, say at one tenth of the period, but at most once per minute.
+                numberOfSecondsToNextUpdate = int( fractionalPeriod / 10 )
+                if numberOfSecondsToNextUpdate < 60:
+                    numberOfSecondsToNextUpdate = 60
 
-        else:
-            stardateIssue = None
-            stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardate2009Revised( datetime.datetime.utcnow() )
+            else:
+                stardateIssue = None
+                stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardate2009Revised( datetime.datetime.utcnow() )
 
-            # For '2009 revised' the rollover only happens at midnight...so use that for the timer!        
-            now = datetime.datetime.utcnow()
-            oneSecondAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
-            numberOfSecondsToNextUpdate = ( oneSecondAfterMidnight - now ).total_seconds()
+                # For '2009 revised' the rollover only happens at midnight...so use that for the timer!        
+                now = datetime.datetime.utcnow()
+                oneSecondAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
+                numberOfSecondsToNextUpdate = ( oneSecondAfterMidnight - now ).total_seconds()
 
-        self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
+            self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
 
-        numberOfSecondsToNextUpdate = 4 #TODO Remove
-        self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.update )
+            numberOfSecondsToNextUpdate = 4 #TODO Remove
+            self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.update, False )
 
 
     def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
+        if self.lockDialog.acquire( blocking = False ):
             pythonutils.showAboutDialog(
                 [ IndicatorStardate.AUTHOR ],
                 IndicatorStardate.COMMENTS, 
@@ -182,23 +189,23 @@ class IndicatorStardate:
                 _( "text file." ),
                 _( "changelog" ) )
 
-            self.lock.release()
+            self.lockDialog.release()
         else:
             pass
-        #TODO If the lock is busy (and ditto for preferences) perhaps show a notification to the user? 
+        #TODO If the lockDialog is busy (and ditto for preferences) perhaps show a notification to the user? 
         # Can we show different notifications such as another dialog is currently open or an update/download is in progress?
-        # May need a dialog lock and an update/background lock...
+        # May need a dialog lockDialog and an update/background lockDialog...
         # ...if the about/preferences is open, the background update stuff should continue (and menu be responsive).
-        # If the preferences is saved and a timer needs to be replaced, use the background lock instead.
+        # If the preferences is saved and a timer needs to be replaced, use the background lockDialog instead.
 
 
     def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            self.onPreferencesInternal( widget )
-            self.lock.release()
+        if self.lockDialog.acquire( blocking = False ):
+            self._onPreferencesInternal( widget )
+            self.lockDialog.release()
 
 
-    def onPreferencesInternal( self, widget ):
+    def _onPreferencesInternal( self, widget ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -251,8 +258,7 @@ class IndicatorStardate:
             self.showIssue = showIssueCheckbox.get_active()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorStardate.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.idle_add( self.update )
-            print( "Preferences - thread id:", threading.current_thread() )
+            GLib.idle_add( self.update, True )
 
         dialog.destroy()
 
