@@ -19,9 +19,15 @@
 # Application indicator allowing a user to run a terminal command or script.
 
 
-# https://developer.gnome.org/gnome-devel-demos
-# http://python-gtk-3-tutorial.readthedocs.io
-# http://lazka.github.io/pgi-docs
+# References:
+#  http://developer.gnome.org/pygobject
+#  http://developer.gnome.org/gtk3
+#  http://python-gtk-3-tutorial.readthedocs.org
+#  http://wiki.gnome.org/Projects/PyGObject/Threading
+#  http://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
+#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
+#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -61,9 +67,8 @@ class IndicatorScriptRunner:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorScriptRunner.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-
-        GLib.threads_init()
         self.lock = threading.Lock()
+
         self.loadSettings()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorScriptRunner.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
@@ -131,30 +136,32 @@ class IndicatorScriptRunner:
 
 
     def onAbout( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
-        dialog = pythonutils.createAboutDialog(
-            [ IndicatorScriptRunner.AUTHOR ],
-            IndicatorScriptRunner.COMMENTS, 
-            [ ],
-            "",
-            Gtk.License.GPL_3_0,
-            IndicatorScriptRunner.ICON,
-            INDICATOR_NAME,
-            IndicatorScriptRunner.WEBSITE,
-            IndicatorScriptRunner.VERSION,
-            _( "translator-credits" ),
-            _( "View the" ),
-            _( "text file." ),
-            _( "changelog" ) )
+        if self.lock.acquire( blocking = False ):
+            pythonutils.showAboutDialog(
+                [ IndicatorScriptRunner.AUTHOR ],
+                IndicatorScriptRunner.COMMENTS, 
+                [ ],
+                "",
+                Gtk.License.GPL_3_0,
+                IndicatorScriptRunner.ICON,
+                INDICATOR_NAME,
+                IndicatorScriptRunner.WEBSITE,
+                IndicatorScriptRunner.VERSION,
+                _( "translator-credits" ),
+                _( "View the" ),
+                _( "text file." ),
+                _( "changelog" ) )
 
-        dialog.run()
-        dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
+            self.lock.release()
 
 
     def onPreferences( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        if self.lock.acquire( blocking = False ):
+            self.onPreferencesInternal( widget )
+            self.lock.release()
 
+
+    def onPreferencesInternal( self, widget ):
         self.defaultScriptGroupCurrent = self.scriptGroupDefault
         self.defaultScriptNameCurrent = self.scriptNameDefault
 
@@ -314,22 +321,20 @@ class IndicatorScriptRunner:
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
-            with self.lock:
-                self.showScriptsInSubmenus = showScriptsInSubmenusCheckbox.get_active()
-                self.scripts = copyOfScripts
-                if len( self.scripts ) == 0:
-                    self.scriptGroupDefault = ""
-                    self.scriptNameDefault = ""
-                else:
-                    self.scriptGroupDefault = self.defaultScriptGroupCurrent
-                    self.scriptNameDefault = self.defaultScriptNameCurrent
+            self.showScriptsInSubmenus = showScriptsInSubmenusCheckbox.get_active()
+            self.scripts = copyOfScripts
+            if len( self.scripts ) == 0:
+                self.scriptGroupDefault = ""
+                self.scriptNameDefault = ""
+            else:
+                self.scriptGroupDefault = self.defaultScriptGroupCurrent
+                self.scriptNameDefault = self.defaultScriptNameCurrent
 
-                self.saveSettings()
-                pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-                self.buildMenu()
+            self.saveSettings()
+            pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+            GLib.idle_add( self.buildMenu )
 
         dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onScriptGroup( self, scriptGroupComboBox, scripts, scriptNameListStore, scriptNameTreeView ):
