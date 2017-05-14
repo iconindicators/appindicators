@@ -296,6 +296,8 @@ class IndicatorPPADownloadStatistics:
         pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
+#TODO Add _onPreferencesInternal
+
     def onPreferences( self, widget ):
         if self.downloadInProgress:
             Notify.Notification.new( _( "Downloading data..." ), _( "Preferences are currently unavailable." ), IndicatorPPADownloadStatistics.ICON ).show()
