@@ -18,12 +18,17 @@
 # General utilities.
 
 
-from gi.repository import Gtk
+import gettext
+gettext.install( "pythonutils" )
 
+from gi.repository import Gtk
 import logging.handlers, os, shutil, subprocess, sys
 
 
 AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+
+
+def getVersion(): return "1.0.0"
 
 
 def processCall( command ):
@@ -76,11 +81,6 @@ def setAutoStart( desktopFile, isSet, logging, autoStartPath = AUTOSTART_PATH, d
             pass
 
 
-def setAllMenuItemsSensitive( menu, sensitive ):
-    for menuItem in menu.get_children():
-        menuItem.set_sensitive( sensitive )
-
-
 # Shows a message dialog.
 #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
 def showMessage( parent, messageType, message, title ):
@@ -119,20 +119,20 @@ def createPreferencesAboutQuitMenuItems( menu, prependSeparator, onPreferencesHa
     if prependSeparator:
         menu.append( Gtk.SeparatorMenuItem() )
 
-    menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_PREFERENCES, None )
+    menuItem = Gtk.MenuItem.new_with_label( _( "Preferences" ) )
     menuItem.connect( "activate", onPreferencesHandler )
     menu.append( menuItem )
 
-    menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_ABOUT, None )
+    menuItem = Gtk.MenuItem.new_with_label( _( "About" ) )
     menuItem.connect( "activate", onAboutHandler )
     menu.append( menuItem )
 
-    menuItem = Gtk.ImageMenuItem.new_from_stock( Gtk.STOCK_QUIT, None )
+    menuItem = Gtk.MenuItem.new_with_label( _( "Quit" ) )
     menuItem.connect( "activate", onQuitHandler )
     menu.append( menuItem )
 
 
-def createAboutDialog(
+def showAboutDialog(
         authors, # List of authors.
         comments, # Comments.
         creditsPeople, # List of credits.
@@ -185,7 +185,8 @@ def createAboutDialog(
             label.show()
             notebookOrStack.add( label )
 
-        return aboutDialog
+        aboutDialog.run()
+        aboutDialog.hide()
 
 
 # Log file handler.  Truncates the file when the file size limit is reached.

@@ -84,7 +84,11 @@ copyHicolorCreateThemed()
 
 copyPOCreateMO()
 {
-  # Copy .po files.
+  # Copy .po files from PythonUtils.
+  rsync -ar --exclude=.svn --include=*.po $PYTHON_UTILS/po build/$NAME-$VERSION
+  cp $PYTHON_UTILS/po/LINGUAS $PYTHON_UTILS/po/POTFILES.in $PYTHON_UTILS/po/README build/$NAME-$VERSION/po
+
+  # Copy .po files from Indicator (do this AFTER PythonUtils so the indicator's linguas/readme and similar are not overwritten).
   rsync -ar --exclude=.svn --include=*.po po build/$NAME-$VERSION
   cp po/LINGUAS po/POTFILES.in po/README build/$NAME-$VERSION/po
 
@@ -92,6 +96,9 @@ copyPOCreateMO()
   for PO_FILE in $(find build/$NAME-$VERSION/po -type f -name '*.po') ; do
     msgfmt $PO_FILE --output-file ${PO_FILE%\.po}.mo
   done
+
+  # Include PythonUtils in POTFILES.in
+  echo "src/pythonutils.py" >>build/$NAME-$VERSION/po/POTFILES.in
 }
 
 
@@ -128,11 +135,14 @@ addIconsToDebianInstall()
 addMOToDebianInstall()
 {
   # Update debian/install file with .mo
+  echo ""
   cd build/$NAME-$VERSION
   for MO_FILE in $(find po -type f -name '*.mo') ; do
-    MO_PATH=${MO_FILE#po}
-    MO_CODE=${MO_PATH%$NAME.mo}
-    echo "$MO_FILE /usr/share/locale${MO_CODE}LC_MESSAGES" >> debian/install
+    FIRST_SLASH=`expr index "$MO_FILE" /`
+	STRING_AFTER_FIRST_SLASH=${MO_FILE:FIRST_SLASH}
+    SECOND_SLASH=`expr index "$STRING_AFTER_FIRST_SLASH" /`
+    MO_CODE=${STRING_AFTER_FIRST_SLASH:0:SECOND_SLASH-1}
+    echo "$MO_FILE /usr/share/locale/${MO_CODE}/LC_MESSAGES" >> debian/install
   done
   cd ../..
 }
