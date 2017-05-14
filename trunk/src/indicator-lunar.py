@@ -2395,7 +2395,7 @@ class IndicatorLunar:
         while not self.lock.acquire( blocking = False ):
             time.sleep( 1 )
 
-        GLib.idle_add( self.onPreferencesInternal, widget )        
+        GLib.idle_add( self._onPreferencesInternal, widget )        
 
 
 #TODO Can we just turn off the Prefernces/About whilst an update is underway?
@@ -2429,7 +2429,7 @@ class IndicatorLunar:
         # If the preferences were open and accessing the backend data (self.data) and an update occurs, that's not good.
         # So ensure that no update is occurring...if it is, wait for it to end.
         if self.lock.acquire( blocking = False ):
-            self.onPreferencesInternal( widget )
+            self._onPreferencesInternal( widget )
         else:
             summary = _( "Preferences unavailable..." )
             message = _( "The lunar indicator is momentarily refreshing; preferences will be available shortly." )
@@ -2437,7 +2437,7 @@ class IndicatorLunar:
             Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start() #TODO What if the user selects Preferences several times...do we get several threads?
 
 
-    def onPreferencesInternal( self, widget ):
+    def _onPreferencesInternal( self, widget ):
         pythonutils.setAllMenuItemsSensitive( self.menu, False )
         GLib.source_remove( self.eventSourceID ) # Ensure no update occurs whilst the preferences are open.
 
