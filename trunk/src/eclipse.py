@@ -40,9 +40,9 @@ ECLIPSE_TYPE_TOTAL = "T"
 #    longitude (east is negative).
 def getEclipseForUTC( dateTimeUTC, isLunar ):
     if isLunar:
-        eclipseData = __lunarEclipseData
+        eclipseData = _lunarEclipseData
     else:
-        eclipseData = __solarEclipseData
+        eclipseData = _solarEclipseData
 
     eclipseInfo = None
     for eclipse in eclipseData:
@@ -73,7 +73,7 @@ def getEclipseForUTC( dateTimeUTC, isLunar ):
 # Date: 2011 May 23
 # 
 #      Year   Month  Day   HH:MM:SS    DT   Type  Lat   Long
-__lunarEclipseData = [
+_lunarEclipseData = [
     [ "2017", "08", "07", "18:21:38", "70", "P", "15S", "86E" ],
     [ "2018", "01", "31", "13:31:00", "71", "T", "17N", "161E" ],
     [ "2018", "07", "27", "20:22:54", "71", "T", "19S", "56E" ],
@@ -274,7 +274,7 @@ __lunarEclipseData = [
 # Date: 2008 10 07
 #
 #      Year   Month  Day   HH:MM:SS    DT   Type  Lat      Long
-__solarEclipseData = [
+_solarEclipseData = [
     [ "2017", "08", "21", "18:26:40", "70", "T", "37.0N", "87.7W" ],
     [ "2018", "02", "15", "20:52:33", "71", "P", "71.0S", "0.6E" ],
     [ "2018", "07", "13", "03:02:16", "71", "P", "67.9S", "127.4E" ],
