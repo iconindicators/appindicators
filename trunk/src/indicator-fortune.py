@@ -22,12 +22,13 @@
 # References:
 #  http://developer.gnome.org/pygobject
 #  http://developer.gnome.org/gtk3
+#  http://developer.gnome.org/gnome-devel-demos
 #  http://python-gtk-3-tutorial.readthedocs.org
-#  https://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/api/AppIndicator3_0.1/classes/Indicator.html
+#  http://wiki.gnome.org/Projects/PyGObject/Threading
+#  http://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 #  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
 INDICATOR_NAME = "indicator-fortune"
@@ -72,8 +73,6 @@ class IndicatorFortune:
         filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.lock = threading.Lock()
-        self.dialogAbout = None
-        self.dialogPreferences = None
         self.timerID = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
@@ -178,30 +177,7 @@ class IndicatorFortune:
 
     def onAbout( self, widget ):
         if self.lock.acquire( blocking = False ):
-
-#         pythonutils.setAllMenuItemsSensitive( self.menu, False )
-#         if self.dialogAbout is None:
-#             self.dialogAbout = pythonutils.createAboutDialog(
-#                 [ IndicatorFortune.AUTHOR ],
-#                 IndicatorFortune.COMMENTS, 
-#                 [ ],
-#                 "",
-#                 Gtk.License.GPL_3_0,
-#                 IndicatorFortune.ICON,
-#                 INDICATOR_NAME,
-#                 IndicatorFortune.WEBSITE,
-#                 IndicatorFortune.VERSION,
-#                 _( "translator-credits" ),
-#                 _( "View the" ),
-#                 _( "text file." ),
-#                 _( "changelog" ) )
-# 
-#         self.dialogAbout.present()
-#         self.dialogAbout.run()
-#         self.dialogAbout.hide()
-#         pythonutils.setAllMenuItemsSensitive( self.menu, True )
-
-            dialogAbout = pythonutils.createAboutDialog(
+            pythonutils.showAboutDialog(
                 [ IndicatorFortune.AUTHOR ],
                 IndicatorFortune.COMMENTS, 
                 [ ],
@@ -216,14 +192,7 @@ class IndicatorFortune:
                 _( "text file." ),
                 _( "changelog" ) )
 
-            dialogAbout.run()
-            dialogAbout.hide()
-
             self.lock.release()
-        
-        else:
-            print( "About cannot lock" )
-#             time.sleep( 1 )
 
 
 #TODO
@@ -262,33 +231,10 @@ class IndicatorFortune:
 #
 
         
-#         dialog = pythonutils.createAboutDialog(
-#             [ IndicatorFortune.AUTHOR ],
-#             IndicatorFortune.COMMENTS, 
-#             [ ],
-#             "",
-#             Gtk.License.GPL_3_0,
-#             IndicatorFortune.ICON,
-#             INDICATOR_NAME,
-#             IndicatorFortune.WEBSITE,
-#             IndicatorFortune.VERSION,
-#             _( "translator-credits" ),
-#             _( "View the" ),
-#             _( "text file." ),
-#             _( "changelog" ) )
-
-#         dialog.run()
-#         dialog.destroy()
-#         pythonutils.setAllMenuItemsSensitive( self.menu, True )
-
-
     def onPreferences( self, widget ):
         if self.lock.acquire( blocking = False ):
             self.onPreferencesInternal( widget )
-            print( "back in caller to preferences internal")
             self.lock.release()
-        else:
-            print( "Prefs cannot lock" )
 
 
     def onPreferencesInternal( self, widget ):
@@ -445,13 +391,13 @@ class IndicatorFortune:
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        self.dialogPreferences = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        self.dialogPreferences.vbox.pack_start( notebook, True, True, 0 )
-        self.dialogPreferences.set_border_width( 5 )
-        self.dialogPreferences.set_icon_name( IndicatorFortune.ICON )
-        self.dialogPreferences.show_all()
+        dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog.vbox.pack_start( notebook, True, True, 0 )
+        dialog.set_border_width( 5 )
+        dialog.set_icon_name( IndicatorFortune.ICON )
+        dialog.show_all()
 
-        if self.dialogPreferences.run() == Gtk.ResponseType.OK:
+        if dialog.run() == Gtk.ResponseType.OK:
             if radioMiddleMouseClickNewFortune.get_active():
                 self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
             elif radioMiddleMouseClickCopyLastFortune.get_active():
@@ -478,8 +424,7 @@ class IndicatorFortune:
             self.buildMenu()
             self.showFortune( None, True )
 
-        self.dialogPreferences.destroy()
-        self.dialogPreferences = None
+        dialog.destroy()
 
 
     def onFortuneReset( self, button, treeview ):
