@@ -1,6 +1,5 @@
 indicator-virtual-box (1.0.56-1) trusty; urgency=low
 
-  * Menu items are now disabled when About/Preferences are displayed.
   * Update release to trusty as precise is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 2 May 2017 9:57:08 +1000

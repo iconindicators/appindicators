@@ -22,12 +22,13 @@
 # References:
 #  http://developer.gnome.org/pygobject
 #  http://developer.gnome.org/gtk3
+#  http://developer.gnome.org/gnome-devel-demos
 #  http://python-gtk-3-tutorial.readthedocs.org
-#  https://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/api/AppIndicator3_0.1/classes/Indicator.html
+#  http://wiki.gnome.org/Projects/PyGObject/Threading
+#  http://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 #  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
 INDICATOR_NAME = "indicator-virtual-box"
@@ -40,7 +41,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 from threading import Thread
-import json, logging, os, pythonutils, time, virtualmachine
+import json, logging, os, pythonutils, threading, time, virtualmachine
 
 
 class IndicatorVirtualBox:
@@ -70,6 +71,7 @@ class IndicatorVirtualBox:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+        self.lock = threading.Lock()
         self.scrollDirectionIsUp = True
         self.scrollUUID = None
 
@@ -449,30 +451,32 @@ class IndicatorVirtualBox:
 
 
     def onAbout( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
-        dialog = pythonutils.createAboutDialog(
-            [ IndicatorVirtualBox.AUTHOR ],
-            IndicatorVirtualBox.COMMENTS, 
-            [ ],
-            "",
-            Gtk.License.GPL_3_0,
-            IndicatorVirtualBox.ICON,
-            INDICATOR_NAME,
-            IndicatorVirtualBox.WEBSITE,
-            IndicatorVirtualBox.VERSION,
-            _( "translator-credits" ),
-            _( "View the" ),
-            _( "text file." ),
-            _( "changelog" ) )
+        if self.lock.acquire( blocking = False ):
+            pythonutils.showAboutDialog(
+                [ IndicatorVirtualBox.AUTHOR ],
+                IndicatorVirtualBox.COMMENTS, 
+                [ ],
+                "",
+                Gtk.License.GPL_3_0,
+                IndicatorVirtualBox.ICON,
+                INDICATOR_NAME,
+                IndicatorVirtualBox.WEBSITE,
+                IndicatorVirtualBox.VERSION,
+                _( "translator-credits" ),
+                _( "View the" ),
+                _( "text file." ),
+                _( "changelog" ) )
 
-        dialog.run()
-        dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
+            self.lock.release()
 
 
     def onPreferences( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        if self.lock.acquire( blocking = False ):
+            self.onPreferencesInternal( widget )
+            self.lock.release()
 
+
+    def onPreferencesInternal( self, widget ):
         notebook = Gtk.Notebook()
 
         # List of VMs.
@@ -595,7 +599,6 @@ class IndicatorVirtualBox:
             GLib.timeout_add_seconds( 1, self.onRefresh, False )
 
         dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def updateVirtualMachinePreferences( self, store, treeiter ):
