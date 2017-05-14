@@ -233,11 +233,11 @@ class IndicatorFortune:
         
     def onPreferences( self, widget ):
         if self.lock.acquire( blocking = False ):
-            self.onPreferencesInternal( widget )
+            self._onPreferencesInternal( widget )
             self.lock.release()
 
 
-    def onPreferencesInternal( self, widget ):
+    def _onPreferencesInternal( self, widget ):
         notebook = Gtk.Notebook()
 
         # Fortune file settings.
