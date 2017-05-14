@@ -68,7 +68,7 @@ import datetime, math
 # The Gregorian dates which reflect the start date for each rate in the 'classic' stardate era.
 # For example, an index of 3 (Gregorian date of 5/10/2283) corresponds to the rate of 0.5 stardate units per day.
 # The month is one-based (January = 1).
-__gregorianDates = [
+_gregorianDates = [
     datetime.datetime( 2162, 1, 4, ),
     datetime.datetime( 2162, 1, 4 ),
     datetime.datetime( 2270, 1, 26 ),
@@ -77,7 +77,7 @@ __gregorianDates = [
 
 
 # Rates (in stardate units per day) for each 'classic' stardate era. 
-__stardateRates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
+_stardateRates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
 
 
 def getVersion(): return "Version 4.0 (2017-04-28)"
@@ -109,9 +109,9 @@ def getStardateClassic( gregorianDateTime ):
     if ( year < 2162 ) or ( year == 2162 and month == 1 and day < 4 ):
         # Pre-stardate (pre 4/1/2162)...do the conversion here because a negative time is generated and throws out all other cases.          
         index = 0
-        numberOfSeconds = ( __gregorianDates[ index ] - gregorianDateTime ).total_seconds()
+        numberOfSeconds = ( _gregorianDates[ index ] - gregorianDateTime ).total_seconds()
         numberOfDays = numberOfSeconds / 60.0 / 60.0 / 24.0
-        rate = __stardateRates[ index ]
+        rate = _stardateRates[ index ]
         units = numberOfDays * rate
 
         stardateIssue = stardateIssues[ index ] - int( units / stardateRange[ index ] )
@@ -133,16 +133,16 @@ def getStardateClassic( gregorianDateTime ):
             raise Exception( "Invalid year/month/day: " + str( year ) + "/" + str( month ) + "/" + str( day ) )
 
         # Now convert...
-        numberOfSeconds = ( gregorianDateTime - __gregorianDates[ index ] ).total_seconds()
+        numberOfSeconds = ( gregorianDateTime - _gregorianDates[ index ] ).total_seconds()
         numberOfDays = numberOfSeconds / 60.0 / 60.0 / 24.0
-        rate = __stardateRates[ index ]
+        rate = _stardateRates[ index ]
         units = numberOfDays * rate
         stardateIssue = int( units / stardateRange[ index ] ) + stardateIssues[ index ]
         remainder = units % stardateRange[ index ]
         stardateInteger = int( remainder ) + stardateIntegers[ index ]
         stardateFraction = int( remainder * 10.0 ) - ( int( remainder ) * 10 )
 
-    fractionalPeriod = int( ( 24.0 * 60.0 * 60.0 ) / ( __stardateRates[ index ] * 10.0 ) )
+    fractionalPeriod = int( ( 24.0 * 60.0 * 60.0 ) / ( _stardateRates[ index ] * 10.0 ) )
 
     return stardateIssue, stardateInteger, stardateFraction, fractionalPeriod
 
@@ -217,13 +217,13 @@ def getGregorianFromStardateClassic( stardateIssue, stardateInteger, stardateFra
     else:
         raise Exception( "Illegal issue/integer: " + str( stardateIssue ) + "/" + str( stardateInteger ) )
 
-    rate = __stardateRates[ index ]
+    rate = _stardateRates[ index ]
     days = units / rate
     hours = ( days - int( days ) ) * 24.0
     minutes = ( hours - int( hours ) ) * 60.0
     seconds = ( minutes - int( minutes ) ) * 60.0
 
-    gregorianDateTime = datetime.datetime( __gregorianDates[ index ].year, __gregorianDates[ index ].month, __gregorianDates[ index ].day )
+    gregorianDateTime = datetime.datetime( _gregorianDates[ index ].year, _gregorianDates[ index ].month, _gregorianDates[ index ].day )
     gregorianDateTime += datetime.timedelta( int( days ), int( seconds ), 0, 0, int( minutes ), int( hours ) )
     return gregorianDateTime
 
