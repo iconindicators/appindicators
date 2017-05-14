@@ -23,11 +23,11 @@
 #  http://developer.gnome.org/pygobject
 #  http://developer.gnome.org/gtk3
 #  http://python-gtk-3-tutorial.readthedocs.org
-#  https://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/api/AppIndicator3_0.1/classes/Indicator.html
+#  http://wiki.gnome.org/Projects/PyGObject/Threading
+#  http://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 #  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 #  http://launchpad.net/+apidoc
 #  http://help.launchpad.net/API/launchpadlib
 #  http://help.launchpad.net/API/Hacking
@@ -199,7 +199,7 @@ class IndicatorPPADownloadStatistics:
 
     def quit( self, widget ):
         if not self.quitRequested:
-            self.quitRequested = True
+            self.quitRequested = True  #TODO What is the logic here?
             Gtk.main_quit()
 
 
@@ -304,7 +304,7 @@ class IndicatorPPADownloadStatistics:
         pythonutils.setAllMenuItemsSensitive( self.menu, False )
 
         with self.lock:
-            self.preferencesOpen = True
+            self.preferencesOpen = True #TODO Maybe when an update occurs, disable the menu (except quit).  If a dialog (about/pref) is already open, delay the update?
 
         self.ppasOrFiltersModified = False
 
