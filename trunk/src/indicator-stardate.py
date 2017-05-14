@@ -22,12 +22,13 @@
 # References:
 #  http://developer.gnome.org/pygobject
 #  http://developer.gnome.org/gtk3
+#  http://developer.gnome.org/gnome-devel-demos
 #  http://python-gtk-3-tutorial.readthedocs.org
-#  https://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/api/AppIndicator3_0.1/classes/Indicator.html
+#  http://wiki.gnome.org/Projects/PyGObject/Threading
+#  http://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 #  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-14.04
 
 
 INDICATOR_NAME = "indicator-stardate"
@@ -38,7 +39,7 @@ import gi
 gi.require_version( "AppIndicator3", "0.1" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk
-import datetime, json, logging, os, pythonutils, stardate
+import datetime, json, logging, os, pythonutils, stardate, threading
 
 
 class IndicatorStardate:
@@ -61,7 +62,7 @@ class IndicatorStardate:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorStardate.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-
+        self.lock = threading.Lock()
         self.updateTimerID = None
         self.saveSettingsTimerID = None
 
@@ -116,7 +117,7 @@ class IndicatorStardate:
             self.padInteger = True
             self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
-        self.update()
+        GLib.idle_add( self.update )
 
         if self.saveSettingsTimerID is not None:
             GLib.source_remove( self.saveSettingsTimerID )
@@ -133,6 +134,12 @@ class IndicatorStardate:
 
 
     def update( self ):
+        print( "Update - thread id:", threading.current_thread() )
+#         with threading.lock:
+#             GLib.source_remove( self.updateTimerID )
+        import datetime
+        print( "Update: ", str( datetime.datetime.now() ) )
+
         # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
         if self.showClassic:
             stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
@@ -154,37 +161,44 @@ class IndicatorStardate:
 
         self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
 
-        if self.updateTimerID is not None:
-            GLib.source_remove( self.updateTimerID )
-
+        numberOfSecondsToNextUpdate = 4 #TODO Remove
         self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.update )
 
 
     def onAbout( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
-        dialog = pythonutils.createAboutDialog(
-            [ IndicatorStardate.AUTHOR ],
-            IndicatorStardate.COMMENTS, 
-            IndicatorStardate.CREDITS,
-            _( "Credits" ),
-            Gtk.License.GPL_3_0,
-            IndicatorStardate.ICON,
-            INDICATOR_NAME,
-            IndicatorStardate.WEBSITE,
-            IndicatorStardate.VERSION,
-            _( "translator-credits" ),
-            _( "View the" ),
-            _( "text file." ),
-            _( "changelog" ) )
+        if self.lock.acquire( blocking = False ):
+            pythonutils.showAboutDialog(
+                [ IndicatorStardate.AUTHOR ],
+                IndicatorStardate.COMMENTS, 
+                IndicatorStardate.CREDITS,
+                _( "Credits" ),
+                Gtk.License.GPL_3_0,
+                IndicatorStardate.ICON,
+                INDICATOR_NAME,
+                IndicatorStardate.WEBSITE,
+                IndicatorStardate.VERSION,
+                _( "translator-credits" ),
+                _( "View the" ),
+                _( "text file." ),
+                _( "changelog" ) )
 
-        dialog.run()
-        dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
+            self.lock.release()
+        else:
+            pass
+        #TODO If the lock is busy (and ditto for preferences) perhaps show a notification to the user? 
+        # Can we show different notifications such as another dialog is currently open or an update/download is in progress?
+        # May need a dialog lock and an update/background lock...
+        # ...if the about/preferences is open, the background update stuff should continue (and menu be responsive).
+        # If the preferences is saved and a timer needs to be replaced, use the background lock instead.
 
 
     def onPreferences( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
+        if self.lock.acquire( blocking = False ):
+            self.onPreferencesInternal( widget )
+            self.lock.release()
 
+
+    def onPreferencesInternal( self, widget ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -231,17 +245,16 @@ class IndicatorStardate:
         dialog.set_icon_name( IndicatorStardate.ICON )
         dialog.show_all()
 
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
+        if dialog.run() == Gtk.ResponseType.OK:
             self.padInteger = padIntegerCheckbox.get_active()
             self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorStardate.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            self.update()
+            GLib.idle_add( self.update )
+            print( "Preferences - thread id:", threading.current_thread() )
 
         dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def onShowClassicCheckbox( self, source, showIssueCheckbox, padIntegerCheckbox ):
