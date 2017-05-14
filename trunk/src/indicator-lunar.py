@@ -23,14 +23,11 @@
 #  http://developer.gnome.org/pygobject
 #  http://developer.gnome.org/gtk3
 #  http://python-gtk-3-tutorial.readthedocs.org
-#  https://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/api/AppIndicator3_0.1/classes/Indicator.html
+#  http://wiki.gnome.org/Projects/PyGObject/Threading
+#  http://wiki.ubuntu.com/NotifyOSD
+#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 #  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-14.04
-#  https://wiki.gnome.org/Projects/PyGObject/Threading
-#  https://wiki.gnome.org/Projects/PyGObject
-#  http://lazka.github.io/pgi-docs
 #  http://www.flaticon.com/search/satellite
 
 
@@ -2405,6 +2402,29 @@ class IndicatorLunar:
 # Look at PPA...the update is delayed if Prefs are open...do something similar here?
 #Also need to check if an update is underway and if so, alert the user (either use existing waitForUpdateToFinish or just tell user they can try later).
 #May not need to worry about an update occurring whilst Pref/About open (or maybe just Pref) as Pref remove the timer ID.
+#
+# What needs to happen...
+#    
+#    When Preferences is selected, if an update is underway, either 
+#        Notify the user the update is occurring and they can choose again in a minute, or
+#        Notify the user the update is occurring and we launch the Preferences when the update finishes.
+#
+#        When the Preferences is finally displayed, disable the menu and remove the timer for the next update (do this in a lock).
+#
+#        When the Preferences is closed, reenable the menu and kick off an update (regardless of OK or cancel).
+#    
+#    Ditto for About, including doing an update.
+#    
+#    
+#    
+# If an update is running, block Preferences (and About?)
+# If preferences is running, block an update from starting.
+# Should Quit always be available?  Update only takes seconds...if caught in a loop, then it's a programming error and the error needs to be fixed.
+#
+#    User selects About: grab lock
+
+
+
     def onPreferences( self, widget ):
         # If the preferences were open and accessing the backend data (self.data) and an update occurs, that's not good.
         # So ensure that no update is occurring...if it is, wait for it to end.
@@ -2414,7 +2434,7 @@ class IndicatorLunar:
             summary = _( "Preferences unavailable..." )
             message = _( "The lunar indicator is momentarily refreshing; preferences will be available shortly." )
             Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start()
+            Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start() #TODO What if the user selects Preferences several times...do we get several threads?
 
 
     def onPreferencesInternal( self, widget ):
