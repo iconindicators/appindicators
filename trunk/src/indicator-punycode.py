@@ -198,11 +198,11 @@ class IndicatorPunycode:
 
     def onPreferences( self, widget ):
         if self.lock.acquire( blocking = False ):
-            self.onPreferencesInternal( widget )
+            self._onPreferencesInternal( widget )
             self.lock.release()
 
 
-    def onPreferencesInternal( self, widget ):
+    def _onPreferencesInternal( self, widget ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
