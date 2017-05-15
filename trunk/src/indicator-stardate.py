@@ -38,7 +38,7 @@ gettext.install( INDICATOR_NAME )
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 
-from gi.repository import AppIndicator3, Gdk, GLib, Gtk
+from gi.repository import AppIndicator3, GLib, Gtk
 import datetime, json, logging, os, pythonutils, stardate, threading
 
 
@@ -62,8 +62,7 @@ class IndicatorStardate:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorStardate.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.lockDialog = threading.Lock()
-        self.lockUpdate = threading.Lock()
+        self.dialogLock = threading.Lock()
         self.updateTimerID = None
         self.saveSettingsTimerID = None
 
@@ -74,16 +73,14 @@ class IndicatorStardate:
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
 
         self.buildMenu()
-        self.update( False )
+        self.update( False ) # Initial call to update - there will be no timer so do not clear it.
 
 
     def main( self ): Gtk.main()
 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        print( "IN", threading.get_ident( ))
         with threading.Lock():
-            print( "LOCKED", threading.get_ident( ))
             # Based on the mouse wheel scroll event (irrespective of direction),
             # cycle through the possible combinations of options for display in the stardate.
             # If showing a 'classic' stardate and padding is not require, ignore the padding option.
@@ -94,44 +91,39 @@ class IndicatorStardate:
                     if self.showIssue and self.padInteger:
                         self.showIssue = True
                         self.padInteger = False
-    
+
                     elif self.showIssue and not self.padInteger:
                         self.showIssue = False
                         self.padInteger = True
-    
+
                     elif not self.showIssue and self.padInteger:
                         self.showIssue = False
                         self.padInteger = False
-    
+
                     else:
                         self.showIssue = True
                         self.padInteger = True
                         self.showClassic = False # Shown all possible 'classic' options (when padding is required)...now move on to '2009 revised'.
-    
+
                 else:
                     if self.showIssue:
                         self.showIssue = False
-    
+
                     else:
                         self.showIssue = True
                         self.showClassic = False # Shown all possible 'classic' options (when padding is not required)...now move on to '2009 revised'.
-    
+
             else:
                 self.showIssue = True
                 self.padInteger = True
                 self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
-    
+
             GLib.idle_add( self.update, True )
-    
-    #TODO Need a lock around this?
-    #Actually should perhaps have a lock around the whole function...?
+
             if self.saveSettingsTimerID is not None:
                 GLib.source_remove( self.saveSettingsTimerID )
-    
-            self.saveSettingsTimerID = GLib.timeout_add_seconds( 1000, self.saveSettings ) # Defer the save to 10s in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
-            import time
-#             time.sleep( 2 )
-        print( "OUT", threading.get_ident( ))
+
+            self.saveSettingsTimerID = GLib.timeout_add_seconds( 5, self.saveSettings ) # Defer the save to five seconds in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
 
 
     def buildMenu( self ):
@@ -142,8 +134,10 @@ class IndicatorStardate:
         self.menu = menu
 
 
+    # A schedule call to update will NOT want to clear the timer.
+    # An unscheduled call (from preferences or a mouse-wheel scroll) WILL want to clear the timer.
     def update( self, clearTimer ):
-        with self.lockUpdate:
+        with threading.Lock():
             if clearTimer:
                 GLib.source_remove( self.updateTimerID )
 
@@ -168,12 +162,11 @@ class IndicatorStardate:
 
             self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
 
-            numberOfSecondsToNextUpdate = 4 #TODO Remove
             self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.update, False )
 
 
     def onAbout( self, widget ):
-        if self.lockDialog.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
                 [ IndicatorStardate.AUTHOR ],
                 IndicatorStardate.COMMENTS, 
@@ -189,20 +182,13 @@ class IndicatorStardate:
                 _( "text file." ),
                 _( "changelog" ) )
 
-            self.lockDialog.release()
-        else:
-            pass
-        #TODO If the lockDialog is busy (and ditto for preferences) perhaps show a notification to the user? 
-        # Can we show different notifications such as another dialog is currently open or an update/download is in progress?
-        # May need a dialog lockDialog and an update/background lockDialog...
-        # ...if the about/preferences is open, the background update stuff should continue (and menu be responsive).
-        # If the preferences is saved and a timer needs to be replaced, use the background lockDialog instead.
+            self.dialogLock.release()
 
 
     def onPreferences( self, widget ):
-        if self.lockDialog.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             self._onPreferencesInternal( widget )
-            self.lockDialog.release()
+            self.dialogLock.release()
 
 
     def _onPreferencesInternal( self, widget ):
@@ -256,7 +242,7 @@ class IndicatorStardate:
             self.padInteger = padIntegerCheckbox.get_active()
             self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
-            self.saveSettings()
+            self.saveSettings() # A save timer could still be in force, but let it run as the same global values will just be re-saved.
             pythonutils.setAutoStart( IndicatorStardate.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.update, True )
 
@@ -288,7 +274,7 @@ class IndicatorStardate:
 
 
     def saveSettings( self ):
-        self.saveSettingsTimerID = None # Need to reset the timer ID.
+        self.saveSettingsTimerID = None # Reset the timer ID.
 
         settings = {
             IndicatorStardate.SETTINGS_PAD_INTEGER: self.padInteger,
