@@ -196,39 +196,14 @@ class IndicatorFortune:
 
 
 #TODO
-# What are we trying to do here?
-# What is the problem, if any, to be solved?
-# Does it matter if the About and Preferences are shown simultaneously?
+# Need to disable the menu items for virtual box and script runner when Preferences is shown?
 #
-# If About/Preferences is already showing and the user selects again from the menu,
-# don't rebuild, but bring the respective window to front.
-# For this, need to keep a handle to each of About/Preferences.
+# For lunar and ppa, whilst an update is occurring, need to block Preferences?
+# Use a lock to stop the update if the Preferences is opened?
 #
-# Could create the About dialog once and just run/present/hide each time.
-# Verify this works, by closing and escaping the About dialog,
-# ensuring it re-displays correctly.
-#
-# Probably should create the Preferences each time to ensure correct initialisation.
-#
-# Do the other menu items need to be disabled?
-# If Preferences are open but have not been saved,
-# the menu items will act on user settings currently saved,
-# not those that have not yet been saved.
-#
-# Maybe need to disable the menu items for virtual box and script runner.
-#
-# For lunar and ppa, whilst an update is occurring use a lock to block Preferences?
-# Also, use a lock to stop the update if the Preferences is opened?
-#
-# CANNOT have both About and Preferences running as each has a main loop which blocks the other!
-# This occurs when both dialogs are display and then lose focus or minimised.
-#
-# So, go back to a single dialog and block if not None.
-#
-# Maybe just use a lock...if the lock is available then can show the About dialog or Preferences dialog or do an update...
+# If the lock is available then can show the About dialog or Preferences dialog or do an update...
 # Each of these things must first attempt to grab the lock and if unable, either reschedule later (the update happens later)
 # or let the user know things are busy (About and Prefs can notify user).
-#
 
         
     def onPreferences( self, widget ):
