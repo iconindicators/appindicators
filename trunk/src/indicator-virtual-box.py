@@ -68,6 +68,18 @@ class IndicatorVirtualBox:
     SETTINGS_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
 
 
+#TODO
+# Need to disable the menu items for virtual box and script runner when Preferences is shown?
+#
+# For lunar and ppa, whilst an update is occurring, need to block Preferences?
+# Use a lock to stop the update if the Preferences is opened?
+#
+# If the lock is available then can show the About dialog or Preferences dialog or do an update...
+# Each of these things must first attempt to grab the lock and if unable, either reschedule later (the update happens later)
+# or let the user know things are busy (About and Prefs can notify user).
+
+
+
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
