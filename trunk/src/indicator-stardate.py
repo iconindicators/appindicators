@@ -131,7 +131,6 @@ class IndicatorStardate:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, False, self.onPreferences, self.onAbout, Gtk.main_quit )
         menu.show_all()
         self.indicator.set_menu( menu )
-        self.menu = menu
 
 
     # A schedule call to update will NOT want to clear the timer.
