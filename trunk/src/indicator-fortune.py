@@ -72,7 +72,7 @@ class IndicatorFortune:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.lock = threading.Lock()
+        self.dialogLock = threading.Lock()
         self.timerID = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
@@ -176,7 +176,7 @@ class IndicatorFortune:
 
 
     def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
                 [ IndicatorFortune.AUTHOR ],
                 IndicatorFortune.COMMENTS, 
@@ -192,7 +192,7 @@ class IndicatorFortune:
                 _( "text file." ),
                 _( "changelog" ) )
 
-            self.lock.release()
+            self.dialogLock.release()
 
 
 #TODO
@@ -207,9 +207,9 @@ class IndicatorFortune:
 
         
     def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             self._onPreferencesInternal( widget )
-            self.lock.release()
+            self.dialogLock.release()
 
 
     def _onPreferencesInternal( self, widget ):
