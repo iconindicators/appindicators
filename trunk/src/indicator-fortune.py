@@ -116,11 +116,10 @@ class IndicatorFortune:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-        self.menu = menu
 
 
-    def showFortune( self, widget, new ):
-        if new:
+    def showFortune( self, widget, newFortune ):
+        if newFortune:
             self.refreshFortune()
 
         if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
@@ -131,10 +130,10 @@ class IndicatorFortune:
                 notificationSummary = " "
 
 #TODO Put back
-#         Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
+#         Notify.Notification.newFortune( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
         print( self.fortune ) #TODO Remove
 
-        if new: # If the user is showing the previous fortune, keep the existing timer in place for the forthcoming fortune.
+        if newFortune: # If the user is showing the previous fortune, keep the existing timer in place for the forthcoming fortune.
             if self.timerID is not None:
                 GLib.source_remove( self.timerID )
 
