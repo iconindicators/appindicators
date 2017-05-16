@@ -2,7 +2,7 @@ indicator-stardate (1.0.34-1) trusty; urgency=low
 
   * Removed the "show in menu" option as all supported platforms allow a label
     next to the icon.
-  * Tidied up tool tip text in Preferences.
+  * Tidied up tool tip text in Preferences dialog.
   * Simplified the Stardate API to provide getters for conversion between
     Gregorian datetime.datetime and 'classic stardate and '2009 revised'
     stardates.
