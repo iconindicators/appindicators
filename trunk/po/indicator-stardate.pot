@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-stardate 1.0.34\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-05-15 13:05+1000\n"
+"POT-Creation-Date: 2017-05-16 21:45+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,31 +25,31 @@ msgstr ""
 msgid "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main."
 msgstr ""
 
-#: indicator-stardate.py:174
+#: indicator-stardate.py:173
 msgid "Credits"
 msgstr ""
 
-#: indicator-stardate.py:180
+#: indicator-stardate.py:179
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-stardate.py:181
+#: indicator-stardate.py:180
 msgid "View the"
 msgstr ""
 
-#: indicator-stardate.py:182
+#: indicator-stardate.py:181
 msgid "text file."
 msgstr ""
 
-#: indicator-stardate.py:183
+#: indicator-stardate.py:182
 msgid "changelog"
 msgstr ""
 
-#: indicator-stardate.py:203
+#: indicator-stardate.py:202
 msgid "Use 'classic' conversion"
 msgstr ""
 
-#: indicator-stardate.py:206
+#: indicator-stardate.py:205
 msgid ""
 "Stardate 'classic' is based on\n"
 "\n"
@@ -62,30 +62,30 @@ msgid ""
 "\thttp://en.wikipedia.org/wiki/Stardate"
 msgstr ""
 
-#: indicator-stardate.py:213
+#: indicator-stardate.py:212
 msgid "Show ISSUE"
 msgstr ""
 
-#: indicator-stardate.py:217
+#: indicator-stardate.py:216
 msgid "Show the ISSUE of the stardate."
 msgstr ""
 
-#: indicator-stardate.py:220
+#: indicator-stardate.py:219
 msgid "Pad INTEGER"
 msgstr ""
 
-#: indicator-stardate.py:224
+#: indicator-stardate.py:223
 msgid "Pad the INTEGER part with leading zeros."
 msgstr ""
 
-#: indicator-stardate.py:229
+#: indicator-stardate.py:228
 msgid "Autostart"
 msgstr ""
 
-#: indicator-stardate.py:231
+#: indicator-stardate.py:230
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-stardate.py:235
+#: indicator-stardate.py:234
 msgid "Preferences"
 msgstr ""
