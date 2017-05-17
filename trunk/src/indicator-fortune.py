@@ -76,8 +76,8 @@ class IndicatorFortune:
         self.timerID = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
-        self.loadSettings()
         Notify.init( INDICATOR_NAME )
+        self.loadSettings()
 
         if os.path.isfile( IndicatorFortune.HISTORY_FILE ):
             os.remove( IndicatorFortune.HISTORY_FILE )
@@ -86,7 +86,7 @@ class IndicatorFortune:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.buildMenu()
-        self.showFortune( None, True )
+        self.newFortune()
 
 
     def main( self ): Gtk.main()
@@ -96,7 +96,7 @@ class IndicatorFortune:
         menu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem( _( "New Fortune" ) )
-        menuItem.connect( "activate", self.showFortune, True )
+        menuItem.connect( "activate", lambda widget: self.newFortune() )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
             self.indicator.set_secondary_activate_target( menuItem )
@@ -108,7 +108,7 @@ class IndicatorFortune:
             self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
-        menuItem.connect( "activate", self.showFortune, False )
+        menuItem.connect( "activate", lambda widget: self.showFortune() )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
             self.indicator.set_secondary_activate_target( menuItem )
@@ -118,26 +118,29 @@ class IndicatorFortune:
         menu.show_all()
 
 
-    def showFortune( self, widget, newFortune ):
-        if newFortune:
+    def newFortune( self ):
+        with threading.Lock():
             self.refreshFortune()
-
-        if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
-            notificationSummary = _( "WARNING. . ." )
-        else:
-            notificationSummary = self.notificationSummary
-            if notificationSummary == "":
-                notificationSummary = " "
-
-#TODO Put back
-#         Notify.Notification.newFortune( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
-        print( self.fortune ) #TODO Remove
-
-        if newFortune: # If the user is showing the previous fortune, keep the existing timer in place for the forthcoming fortune.
-            if self.timerID is not None:
+            if self.timerID is not None: # When a new fortune is called via the timer, the timer does not need to be removed, but this is harmless and allows a new fortune to be called ah hoc by the user.
                 GLib.source_remove( self.timerID )
 
-            self.timerID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.showFortune, None, True )
+        self.showFortune()
+
+
+    def onCopyLastFortune( self, widget ): self.clipboard.set_text( self.fortune, -1 )
+
+
+    def showFortune( self ):
+        with threading.Lock():
+            if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
+                notificationSummary = _( "WARNING. . ." )
+            else:
+                notificationSummary = self.notificationSummary
+                if notificationSummary == "":
+                    notificationSummary = " "
+
+            Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
+            self.timerID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.newFortune )
 
 
     def refreshFortune( self ):
@@ -169,9 +172,6 @@ class IndicatorFortune:
                             logging.error( "Error writing fortune to history file: " + IndicatorFortune.HISTORY_FILE )
 
                         break
-
-
-    def onCopyLastFortune( self, widget ): self.clipboard.set_text( self.fortune, -1 )
 
 
     def onAbout( self, widget ):
@@ -395,8 +395,8 @@ class IndicatorFortune:
 
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorFortune.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            self.buildMenu()
-            self.showFortune( None, True )
+            GLib.idle_add( self.buildMenu )
+            GLib.idle_add( self.newFortune )
 
         dialog.destroy()
 
