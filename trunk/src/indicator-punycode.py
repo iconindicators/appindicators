@@ -77,8 +77,8 @@ class IndicatorPunycode:
         self.lock = threading.Lock()
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
 
-        self.loadSettings()
         Notify.init( INDICATOR_NAME )
+        self.loadSettings()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPunycode.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -112,7 +112,6 @@ class IndicatorPunycode:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-        self.menu = menu
 
 
     def onConvert( self, widget ): Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( self.doConversion, None )
