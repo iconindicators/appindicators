@@ -161,7 +161,6 @@ class IndicatorTide:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-        self.menu = menu
 
 
     def createMenuItem( self, menu, menuItemText, url ):
