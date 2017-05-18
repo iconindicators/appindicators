@@ -1,6 +1,6 @@
 indicator-tide (1.0.8-1) trusty; urgency=low
 
-  * Split the Preferences over two tabs (ports and general).
+  * Split the Preferences dialog over two tabs (ports and general).
   * About/Preferences dialogs now block each other - only show one at a time.
   * Update release to trusty as precise is end of life.
 
