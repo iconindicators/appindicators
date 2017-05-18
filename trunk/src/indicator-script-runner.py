@@ -109,7 +109,6 @@ class IndicatorScriptRunner:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( scripts ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-        self.menu = menu
 
 
     def addScriptsToMenu( self, scriptsGroupedByName, scriptGroup, menu, indent ):
