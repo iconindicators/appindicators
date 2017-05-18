@@ -73,7 +73,7 @@ class IndicatorStardate:
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
 
         self.buildMenu()
-        self.update( False ) # Initial call to update - there will be no timer so do not clear it.
+        self.scheduledUpdate()
 
 
     def main( self ): Gtk.main()
@@ -118,7 +118,7 @@ class IndicatorStardate:
                 self.padInteger = True
                 self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
-            GLib.idle_add( self.update, True )
+            GLib.idle_add( self.unscheduledUpdate )
 
             if self.saveSettingsTimerID is not None:
                 GLib.source_remove( self.saveSettingsTimerID )
@@ -133,35 +133,42 @@ class IndicatorStardate:
         self.indicator.set_menu( menu )
 
 
-    # A schedule call to update will NOT want to clear the timer.
-    # An unscheduled call (from preferences or a mouse-wheel scroll) WILL want to clear the timer.
-    def update( self, clearTimer ):
+    # Called ad hoc when an update needs to be forced - internally clears the existing timer.
+    def unscheduledUpdate( self ):
         with threading.Lock():
-            if clearTimer:
-                GLib.source_remove( self.updateTimerID )
+            GLib.source_remove( self.updateTimerID )
+            self._update()
 
-            # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
-            if self.showClassic:
-                stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
 
-                # WHEN the stardate calculation is performed is NOT necessarily synchronised with WHEN the stardate actually changes.
-                # Therefore update at a faster rate, say at one tenth of the period, but at most once per minute.
-                numberOfSecondsToNextUpdate = int( fractionalPeriod / 10 )
-                if numberOfSecondsToNextUpdate < 60:
-                    numberOfSecondsToNextUpdate = 60
+    # Called from a timer event only.
+    def scheduledUpdate( self ):
+        with threading.Lock():
+            self._update()
 
-            else:
-                stardateIssue = None
-                stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardate2009Revised( datetime.datetime.utcnow() )
 
-                # For '2009 revised' the rollover only happens at midnight...so use that for the timer!        
-                now = datetime.datetime.utcnow()
-                oneSecondAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
-                numberOfSecondsToNextUpdate = ( oneSecondAfterMidnight - now ).total_seconds()
+    def _update( self ):
+        # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
+        if self.showClassic:
+            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
 
-            self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
+            # WHEN the stardate calculation is performed is NOT necessarily synchronised with WHEN the stardate actually changes.
+            # Therefore update at a faster rate, say at one tenth of the period, but at most once per minute.
+            numberOfSecondsToNextUpdate = int( fractionalPeriod / 10 )
+            if numberOfSecondsToNextUpdate < 60:
+                numberOfSecondsToNextUpdate = 60
 
-            self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.update, False )
+        else:
+            stardateIssue = None
+            stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardate2009Revised( datetime.datetime.utcnow() )
+
+            # For '2009 revised' the rollover only happens at midnight...so use that for the timer!        
+            now = datetime.datetime.utcnow()
+            oneSecondAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
+            numberOfSecondsToNextUpdate = ( oneSecondAfterMidnight - now ).total_seconds()
+
+        self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
+
+        self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.scheduledUpdate )
 
 
     def onAbout( self, widget ):
@@ -243,7 +250,7 @@ class IndicatorStardate:
             self.showIssue = showIssueCheckbox.get_active()
             self.saveSettings() # A save timer could still be in force, but let it run as the same global values will just be re-saved.
             pythonutils.setAutoStart( IndicatorStardate.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.idle_add( self.update, True )
+            GLib.idle_add( self.unscheduledUpdate )
 
         dialog.destroy()
 
