@@ -268,8 +268,6 @@ class IndicatorTide:
 
         grid.attach( box, 0, 0, 1, 1 )
 
-        box = Gtk.Box()
-
         portsList = Gtk.ListStore( str ) # Port.
         portsList.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
@@ -283,13 +281,11 @@ class IndicatorTide:
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( portsTree )
- 
+
         countriesComboBox.connect( "changed", self.onCountry, portsList, portsTree )
         countriesComboBox.set_active( countries.index( ports.getCountry( self.portID ) ) )
 
-        box.pack_start( scrolledWindow, True, True, 0 )
-
-        grid.attach( box, 0, 1, 1, 1 )
+        grid.attach( scrolledWindow, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Ports" ) ) )
 
@@ -302,16 +298,11 @@ class IndicatorTide:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        box = Gtk.Box()
-
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show as submenus" ) )
         showAsSubmenusCheckbox.set_active( self.showAsSubMenus )
         showAsSubmenusCheckbox.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
 
-        box.pack_start( showAsSubmenusCheckbox, True, True, 1 )
-        grid.attach( box, 0, 21, 1, 1 )
-
-        box = Gtk.Box()
+        grid.attach( showAsSubmenusCheckbox, 0, 0, 1, 1 )
 
         showAsSubmenusExceptFirstDayCheckbox = Gtk.CheckButton( _( "Except first day" ) )
         showAsSubmenusExceptFirstDayCheckbox.set_sensitive( showAsSubmenusCheckbox.get_active() )
@@ -319,8 +310,7 @@ class IndicatorTide:
         showAsSubmenusExceptFirstDayCheckbox.set_margin_left( 15 )
         showAsSubmenusExceptFirstDayCheckbox.set_tooltip_text( _( "Show the first day's tide in full." ) )
 
-        box.pack_start( showAsSubmenusExceptFirstDayCheckbox, True, True, 1 )
-        grid.attach( box, 0, 22, 1, 1 )
+        grid.attach( showAsSubmenusExceptFirstDayCheckbox, 0, 1, 1, 1 )
 
         showAsSubmenusCheckbox.connect( "toggled", self.onShowAsSubmenusCheckbox, showAsSubmenusExceptFirstDayCheckbox )
 
@@ -337,7 +327,7 @@ class IndicatorTide:
 
         box.pack_start( dateFormat, True, True, 0 )
 
-        grid.attach( box, 0, 23, 1, 1 )
+        grid.attach( box, 0, 2, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -354,7 +344,7 @@ class IndicatorTide:
             "http://docs.python.org/3/library/datetime.html" ) )
         box.pack_start( tideFormat, True, True, 0 )
 
-        grid.attach( box, 0, 24, 1, 1 )
+        grid.attach( box, 0, 3, 1, 1 )
 
         box = Gtk.Box()
         box.set_margin_top( 10 )
@@ -364,7 +354,7 @@ class IndicatorTide:
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
 
         box.pack_start( autostartCheckbox, True, True, 1 )
-        grid.attach( box, 0, 25, 1, 1 )
+        grid.attach( box, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
