@@ -189,7 +189,6 @@ class IndicatorVirtualBox:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, False, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-        self.menu = menu
 
 
     def getGroupName( self, virtualMachine ): return virtualMachine.getName()[ virtualMachine.getName().rfind( "/" ) + 1 : ]
