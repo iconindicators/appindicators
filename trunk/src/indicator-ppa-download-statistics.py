@@ -161,7 +161,6 @@ class IndicatorPPADownloadStatistics:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, self.quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-        self.menu = menu
 
 
     def createMenuItemForPublishedBinary( self, menu, ppa, publishedBinary ):
@@ -286,7 +285,6 @@ class IndicatorPPADownloadStatistics:
 
 
     def onAbout( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
         dialog = pythonutils.createAboutDialog(
             [ IndicatorPPADownloadStatistics.AUTHOR ],
             IndicatorPPADownloadStatistics.COMMENTS, 
@@ -304,7 +302,6 @@ class IndicatorPPADownloadStatistics:
 
         dialog.run()
         dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
 #TODO Add _onPreferencesInternal
@@ -313,8 +310,6 @@ class IndicatorPPADownloadStatistics:
         if self.downloadInProgress:
             Notify.Notification.new( _( "Downloading data..." ), _( "Preferences are currently unavailable." ), IndicatorPPADownloadStatistics.ICON ).show()
             return
-
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
 
         with self.lock:
             self.preferencesOpen = True #TODO Maybe when an update occurs, disable the menu (except quit).  If a dialog (about/pref) is already open, delay the update?
@@ -556,7 +551,6 @@ class IndicatorPPADownloadStatistics:
                     self.downloadInProgress = True # Although the download hasn't actually started, this ensures the preferences cannot be opened until the download completes.
 
         dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
         with self.lock:
             self.preferencesOpen = False
         
