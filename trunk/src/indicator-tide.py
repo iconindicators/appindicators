@@ -22,6 +22,7 @@
 # References:
 #  http://developer.gnome.org/pygobject
 #  http://developer.gnome.org/gtk3
+#  http://developer.gnome.org/gnome-devel-demos
 #  http://python-gtk-3-tutorial.readthedocs.org
 #  http://wiki.gnome.org/Projects/PyGObject/Threading
 #  http://wiki.ubuntu.com/NotifyOSD
@@ -72,30 +73,19 @@ class IndicatorTide:
     MENU_ITEM_TIDE_DEFAULT_FORMAT = MENU_ITEM_TIME_DEFAULT_FORMAT + "    " + MENU_ITEM_TIDE_TYPE_TAG + "    " + MENU_ITEM_TIDE_LEVEL_TAG
 
 
-#TODO
-# Need to disable the menu items for virtual box and script runner when Preferences is shown?
-#
-# For lunar and ppa, whilst an update is occurring, need to block Preferences?
-# Use a lock to stop the update if the Preferences is opened?
-#
-# If the lock is available then can show the About dialog or Preferences dialog or do an update...
-# Each of these things must first attempt to grab the lock and if unable, either reschedule later (the update happens later)
-# or let the user know things are busy (About and Prefs can notify user).
-
-
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorTide.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.lock = threading.Lock()
+        self.dialogLock = threading.Lock()
 
-        self.loadSettings()
         Notify.init( INDICATOR_NAME )
+        self.loadSettings()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorTide.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
-        self.update()
+        self.scheduledUpdate()
 
         if ports.isExpired():
             message = _(
@@ -174,13 +164,26 @@ class IndicatorTide:
         return menuItem
 
 
-    def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
+    def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a dialogLock up!
 
 
-    def update( self ):
+    # Called ad hoc when an update needs to be forced - internally clears the existing timer.
+    def unscheduledUpdate( self ):
+        with threading.Lock():
+            GLib.source_remove( self.updateTimerID )
+            self._update()
+
+
+    # Called from a timer event only.
+    def scheduledUpdate( self ):
+        with threading.Lock():
+            self._update()
+
+
+    def _update( self ):
         tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.getDaylightSavingsOffsetInMinutes() )
         self.buildMenu( tidalReadings )
-        self.timeoutID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
+        self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.scheduledUpdate )
 
         if tidalReadings is None or len( tidalReadings ) == 0:
             message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
@@ -212,7 +215,7 @@ class IndicatorTide:
 
 
     def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
                 [ IndicatorTide.AUTHOR ],
                 IndicatorTide.COMMENTS, 
@@ -228,13 +231,13 @@ class IndicatorTide:
                 _( "text file." ),
                 _( "changelog" ) )
 
-            self.lock.release()
+            self.dialogLock.release()
 
 
     def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             self._onPreferencesInternal( widget )
-            self.lock.release()
+            self.dialogLock.release()
 
 
     def _onPreferencesInternal( self, widget ):
@@ -371,8 +374,7 @@ class IndicatorTide:
         dialog.set_icon_name( IndicatorTide.ICON )
         dialog.show_all()
 
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
+        if dialog.run() == Gtk.ResponseType.OK:
             country = countriesComboBox.get_active_text()
             model, treeiter = portsTree.get_selection().get_selected()
             port = model[ treeiter ][ 0 ]
@@ -383,8 +385,7 @@ class IndicatorTide:
             self.menuItemTideFormat = tideFormat.get_text().strip()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorTide.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.source_remove( self.timeoutID )
-            GLib.idle_add( self.update )
+            GLib.idle_add( self.unscheduledUpdate )
 
         dialog.destroy()
 
