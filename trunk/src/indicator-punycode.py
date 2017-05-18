@@ -47,10 +47,10 @@ import encodings.idna, json, logging, os, pythonutils, re, threading
 # Need to disable the menu items for virtual box and script runner when Preferences is shown?
 #
 # For lunar and ppa, whilst an update is occurring, need to block Preferences?
-# Use a lock to stop the update if the Preferences is opened?
+# Use a dialogLock to stop the update if the Preferences is opened?
 #
-# If the lock is available then can show the About dialog or Preferences dialog or do an update...
-# Each of these things must first attempt to grab the lock and if unable, either reschedule later (the update happens later)
+# If the dialogLock is available then can show the About dialog or Preferences dialog or do an update...
+# Each of these things must first attempt to grab the dialogLock and if unable, either reschedule later (the update happens later)
 # or let the user know things are busy (About and Prefs can notify user).
 
 
@@ -74,7 +74,7 @@ class IndicatorPunycode:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorPunycode.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.lock = threading.Lock()
+        self.dialogLock = threading.Lock()
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
 
         Notify.init( INDICATOR_NAME )
@@ -187,7 +187,7 @@ class IndicatorPunycode:
 
 
     def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
                 [ IndicatorPunycode.AUTHOR ],
                 IndicatorPunycode.COMMENTS, 
@@ -203,13 +203,13 @@ class IndicatorPunycode:
                 _( "text file." ),
                 _( "changelog" ) )
 
-            self.lock.release()
+            self.dialogLock.release()
 
 
     def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             self._onPreferencesInternal( widget )
-            self.lock.release()
+            self.dialogLock.release()
 
 
     def _onPreferencesInternal( self, widget ):
@@ -238,9 +238,9 @@ class IndicatorPunycode:
         inputPrimaryRadio = Gtk.RadioButton.new_with_label_from_widget( inputClipboardRadio, _( "Primary" ) )
         inputPrimaryRadio.set_tooltip_text( _(
             "Input is taken from the currently\n" + \
-            "highlighted/selected text\n" + \
-            "after the user performs a\n" + \
-            "middle mouse click on the icon." ) )
+            "highlighted/selected text after\n" + \
+            "the user performs a middle\n" + \
+            "mouse click on the icon." ) )
         inputPrimaryRadio.set_active( not self.inputClipboard )
         inputPrimaryRadio.set_margin_left( 15 )
         grid.attach( inputPrimaryRadio, 0, 2, 2, 1 )
@@ -257,8 +257,8 @@ class IndicatorPunycode:
 
         dropPathQueryCheckbox = Gtk.CheckButton( _( "Drop path/query in output" ) )
         dropPathQueryCheckbox.set_tooltip_text( _(
-            "If checked, the output text will\n" + \
-            "not contain any path/query (if present)." ) )
+            "If checked, the output text will not\n" + \
+            "contain any path/query (if present)." ) )
         dropPathQueryCheckbox.set_active( self.dropPathQuery )
         dropPathQueryCheckbox.set_margin_top( 10 )
         grid.attach( dropPathQueryCheckbox, 0, 4, 2, 1 )
