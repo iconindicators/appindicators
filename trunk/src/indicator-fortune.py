@@ -73,7 +73,7 @@ class IndicatorFortune:
         filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.dialogLock = threading.Lock()
-        self.timerID = None
+        self.updateTimerID = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
         Notify.init( INDICATOR_NAME )
@@ -121,8 +121,8 @@ class IndicatorFortune:
     def newFortune( self ):
         with threading.Lock():
             self.refreshFortune()
-            if self.timerID is not None: # When a new fortune is called via the timer, the timer does not need to be removed, but this is harmless and allows a new fortune to be called ah hoc by the user.
-                GLib.source_remove( self.timerID )
+            if self.updateTimerID is not None: # When a new fortune is called via the timer, the timer does not need to be removed, but this is harmless and allows a new fortune to be called ah hoc by the user.
+                GLib.source_remove( self.updateTimerID )
 
         self.showFortune()
 
@@ -140,7 +140,7 @@ class IndicatorFortune:
                     notificationSummary = " "
 
             Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
-            self.timerID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.newFortune )
+            self.updateTimerID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.newFortune )
 
 
     def refreshFortune( self ):
