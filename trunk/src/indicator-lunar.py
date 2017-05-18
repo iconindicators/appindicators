@@ -1027,7 +1027,6 @@ class IndicatorLunar:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-        self.menu = menu
 
 
     def getDisplayData( self, key, source = None ):
@@ -2381,7 +2380,6 @@ class IndicatorLunar:
 
 
     def onAbout( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
         dialog = pythonutils.createAboutDialog(
             [ IndicatorLunar.AUTHOR ],
             IndicatorLunar.ABOUT_COMMENTS, 
@@ -2399,7 +2397,6 @@ class IndicatorLunar:
 
         dialog.run()
         dialog.destroy()
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def waitForUpdateToFinish( self, widget ):
@@ -2449,7 +2446,6 @@ class IndicatorLunar:
 
 
     def _onPreferencesInternal( self, widget ):
-        pythonutils.setAllMenuItemsSensitive( self.menu, False )
         GLib.source_remove( self.eventSourceID ) # Ensure no update occurs whilst the preferences are open.
 
         TAB_ICON = 0
@@ -3334,7 +3330,6 @@ class IndicatorLunar:
 
         self.lock.release()
         self.update() #TODO Why do the update even when cancel?  If decide to only update on OK, need to call update after the lock is released.
-        pythonutils.setAllMenuItemsSensitive( self.menu, True )
 
 
     def appendToDisplayTagsStore( self, key, value, displayTagsStore ):
