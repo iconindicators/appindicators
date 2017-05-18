@@ -63,7 +63,6 @@ class IndicatorStardate:
         filehandler = pythonutils.TruncatedFileHandler( IndicatorStardate.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.dialogLock = threading.Lock()
-        self.updateTimerID = None
         self.saveSettingsTimerID = None
 
         self.loadSettings()
