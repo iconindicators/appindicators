@@ -293,11 +293,13 @@ class IndicatorFortune:
         spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60 * 24, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
         spinnerRefreshInterval.set_tooltip_text( _( "How often a fortune is displayed." ) )
+        spinnerRefreshInterval.set_hexpand( True )
         box.pack_start( spinnerRefreshInterval, True, True, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label( _( "Notification summary" ) ), False, False, 0 )
 
@@ -305,18 +307,19 @@ class IndicatorFortune:
         notificationSummary.set_text( self.notificationSummary )
         notificationSummary.set_tooltip_text( _( "The summary text for the notification." ) )
         notificationSummary.set_hexpand( True )
-        notificationSummary.set_margin_top( 10 )
         box.pack_start( notificationSummary, True, True, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label( _( "Message character limit" ) ), False, False, 0 )
 
         spinnerCharacterCount = Gtk.SpinButton()
         spinnerCharacterCount.set_adjustment( Gtk.Adjustment( self.skipFortuneCharacterCount, 1, 1000, 1, 50, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerCharacterCount.set_value( self.skipFortuneCharacterCount ) # ...so need to force the initial value by explicitly setting it.
+        spinnerCharacterCount.set_hexpand( True )
         spinnerCharacterCount.set_tooltip_text( _(
             "If the fortune exceeds the limit,\n" + \
             "a new fortune is created.\n\n" + \
@@ -424,14 +427,13 @@ class IndicatorFortune:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        label = Gtk.Label( _( "Fortune file/directory" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 0, 1, 1 )
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label( _( "Fortune file/directory" ) ), False, False, 0 )
 
         fortuneFileDirectory = Gtk.Entry()
-        fortuneFileDirectory.set_width_chars( 20 )
         fortuneFileDirectory.set_editable( False )
-        fortuneFileDirectory.set_hexpand( True ) # Only need to set this once and all objects will expand.
+        fortuneFileDirectory.set_hexpand( True )
 
         if rowNumber is not None: # This is an edit.
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
@@ -444,10 +446,12 @@ class IndicatorFortune:
             "Ensure the corresponding\n" + \
             "fortune text file(s) is present!" ) )
 
-        grid.attach( fortuneFileDirectory, 1, 0, 1, 1 )
+        box.pack_start( fortuneFileDirectory, True, True, 0 )
 
-        hbox = Gtk.Box( spacing = 6 )
-        hbox.set_homogeneous( True )
+        grid.attach( box, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_homogeneous( True )
 
         if rowNumber is None: # This is an add.
             isSystemFortune = False
@@ -467,7 +471,7 @@ class IndicatorFortune:
                 "Ensure the corresponding text\n" + \
                 "file is present!" ) )
 
-        hbox.pack_start( browseFileButton, True, True, 0 )
+        box.pack_start( browseFileButton, True, True, 0 )
 
         browseDirectoryButton = Gtk.Button( _( "Directory" ) )
         browseDirectoryButton.set_sensitive( not isSystemFortune )
@@ -483,10 +487,11 @@ class IndicatorFortune:
                 "Ensure the corresponding text\n" + \
                 "file is present!" ) )
 
-        hbox.pack_start( browseDirectoryButton, True, True, 0 )
+        box.pack_start( browseDirectoryButton, True, True, 0 )
 
-        hbox.set_halign( Gtk.Align.END )
-        grid.attach( hbox, 1, 1, 1, 1 )
+        box.set_halign( Gtk.Align.END )
+
+        grid.attach( box, 0, 1, 1, 1 )
 
         enabledCheckbox = Gtk.CheckButton( _( "Enabled" ) )
         enabledCheckbox.set_tooltip_text( _(
