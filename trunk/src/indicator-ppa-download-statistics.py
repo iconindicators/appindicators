@@ -918,6 +918,7 @@ class IndicatorPPADownloadStatistics:
             "indicator-virtual-box",
             "python3-ephem" ]
 
+#TODO Add final name of indicator-calendar
 
     def saveSettings( self ):
         ppas = [ ]
