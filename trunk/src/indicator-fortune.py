@@ -253,26 +253,26 @@ class IndicatorFortune:
 
         grid.attach( scrolledWindow, 0, 0, 1, 1 )
 
-        hbox = Gtk.Box( spacing = 6 )
-        hbox.set_homogeneous( True )
+        box = Gtk.Box( spacing = 6 )
+        box.set_homogeneous( True )
 
         addButton = Gtk.Button( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new fortune location." ) )
         addButton.connect( "clicked", self.onFortuneAdd, tree )
-        hbox.pack_start( addButton, True, True, 0 )
+        box.pack_start( addButton, True, True, 0 )
 
         removeButton = Gtk.Button( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected fortune location." ) )
         removeButton.connect( "clicked", self.onFortuneRemove, tree )
-        hbox.pack_start( removeButton, True, True, 0 )
+        box.pack_start( removeButton, True, True, 0 )
 
         resetButton = Gtk.Button( _( "Reset" ) )
         resetButton.set_tooltip_text( _( "Reset to factory default." ) )
         resetButton.connect( "clicked", self.onFortuneReset, tree )
-        hbox.pack_start( resetButton, True, True, 0 )
+        box.pack_start( resetButton, True, True, 0 )
 
-        hbox.set_halign( Gtk.Align.CENTER )
-        grid.attach( hbox, 0, 1, 1, 1 )
+        box.set_halign( Gtk.Align.CENTER )
+        grid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Fortunes" ) ) )
 
