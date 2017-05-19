@@ -225,7 +225,7 @@ class IndicatorPunycode:
 
         label = Gtk.Label( _( "Input source" ) )
         label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 0, 2, 1 )
+        grid.attach( label, 0, 0, 1, 1 )
 
         inputClipboardRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Clipboard" ) )
         inputClipboardRadio.set_tooltip_text( _(
@@ -233,7 +233,7 @@ class IndicatorPunycode:
             "after a CTRL-X or CTRL-C (or eqivalent)." ) )
         inputClipboardRadio.set_active( self.inputClipboard )
         inputClipboardRadio.set_margin_left( 15 )
-        grid.attach( inputClipboardRadio, 0, 1, 2, 1 )
+        grid.attach( inputClipboardRadio, 0, 1, 1, 1 )
 
         inputPrimaryRadio = Gtk.RadioButton.new_with_label_from_widget( inputClipboardRadio, _( "Primary" ) )
         inputPrimaryRadio.set_tooltip_text( _(
@@ -243,7 +243,7 @@ class IndicatorPunycode:
             "mouse click on the icon." ) )
         inputPrimaryRadio.set_active( not self.inputClipboard )
         inputPrimaryRadio.set_margin_left( 15 )
-        grid.attach( inputPrimaryRadio, 0, 2, 2, 1 )
+        grid.attach( inputPrimaryRadio, 0, 2, 1, 1 )
 
         outputBothCheckbox = Gtk.CheckButton( _( "Output to clipboard and primary" ) )
         outputBothCheckbox.set_tooltip_text( _(
@@ -253,7 +253,7 @@ class IndicatorPunycode:
             "only to the input source." ) )
         outputBothCheckbox.set_active( self.outputBoth )
         outputBothCheckbox.set_margin_top( 10 )
-        grid.attach( outputBothCheckbox, 0, 3, 2, 1 )
+        grid.attach( outputBothCheckbox, 0, 3, 1, 1 )
 
         dropPathQueryCheckbox = Gtk.CheckButton( _( "Drop path/query in output" ) )
         dropPathQueryCheckbox.set_tooltip_text( _(
@@ -261,12 +261,11 @@ class IndicatorPunycode:
             "contain any path/query (if present)." ) )
         dropPathQueryCheckbox.set_active( self.dropPathQuery )
         dropPathQueryCheckbox.set_margin_top( 10 )
-        grid.attach( dropPathQueryCheckbox, 0, 4, 2, 1 )
+        grid.attach( dropPathQueryCheckbox, 0, 4, 1, 1 )
 
-        label = Gtk.Label( _( "Maximum results" ) )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_top( 10 )
-        grid.attach( label, 0, 5, 1, 1 )
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label( _( "Maximum results" ) ), False, False, 0 )
 
         resultsAmountSpinner = Gtk.SpinButton()
         resultsAmountSpinner.set_adjustment( Gtk.Adjustment( self.resultHistoryLength, 0, 1000, 1, 1, 0 ) )
@@ -277,14 +276,15 @@ class IndicatorPunycode:
             "Selecting a menu item which\n" + \
             "contains a result will copy\n" + \
             "the result to the output." ) )
-        resultsAmountSpinner.set_margin_top( 10 )
-        grid.attach( resultsAmountSpinner, 1, 5, 1, 1 )
+        box.pack_start( resultsAmountSpinner, True, True, 0 )
+
+        grid.attach( box, 0, 5, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorPunycode.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 6, 2, 1 )
+        grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
         dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.get_content_area().add( grid )
