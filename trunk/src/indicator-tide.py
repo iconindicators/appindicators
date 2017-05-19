@@ -315,12 +315,12 @@ class IndicatorTide:
         showAsSubmenusCheckbox.connect( "toggled", self.onShowAsSubmenusCheckbox, showAsSubmenusExceptFirstDayCheckbox )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label( _( "Date format" ) ), False, False, 0 )
 
         dateFormat = Gtk.Entry()
         dateFormat.set_text( self.menuItemDateFormat )
+        dateFormat.set_hexpand( True )
         dateFormat.set_tooltip_text( _(
             "Formatting options are specified at\n" + \
             "http://docs.python.org/3/library/datetime.html" ) )
@@ -330,12 +330,12 @@ class IndicatorTide:
         grid.attach( box, 0, 2, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label( _( "Tide format" ) ), False, False, 0 )
 
         tideFormat = Gtk.Entry()
         tideFormat.set_text( self.menuItemTideFormat )
+        tideFormat.set_hexpand( True )
         tideFormat.set_tooltip_text( _(
             "Tide information is specified using:\n\n" + \
             "    [TYPE] - the tide is high or low.\n" + \
@@ -346,15 +346,10 @@ class IndicatorTide:
 
         grid.attach( box, 0, 3, 1, 1 )
 
-        box = Gtk.Box()
-        box.set_margin_top( 10 )
-
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorTide.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-
-        box.pack_start( autostartCheckbox, True, True, 1 )
-        grid.attach( box, 0, 4, 1, 1 )
+        grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
