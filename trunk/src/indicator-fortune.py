@@ -285,32 +285,34 @@ class IndicatorFortune:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        label = Gtk.Label( _( "Refresh interval (minutes)" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 0, 1, 1 )
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label( _( "Refresh interval (minutes)" ) ), False, False, 0 )
 
         spinnerRefreshInterval = Gtk.SpinButton()
         spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60 * 24, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
         spinnerRefreshInterval.set_tooltip_text( _( "How often a fortune is displayed." ) )
-        grid.attach( spinnerRefreshInterval, 1, 0, 1, 1 )
+        box.pack_start( spinnerRefreshInterval, True, True, 0 )
 
-        label = Gtk.Label( _( "Notification summary" ) )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_top( 10 )
-        grid.attach( label, 0, 1, 1, 1 )
+        grid.attach( box, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label( _( "Notification summary" ) ), False, False, 0 )
 
         notificationSummary = Gtk.Entry()
         notificationSummary.set_text( self.notificationSummary )
         notificationSummary.set_tooltip_text( _( "The summary text for the notification." ) )
         notificationSummary.set_hexpand( True )
         notificationSummary.set_margin_top( 10 )
-        grid.attach( notificationSummary, 1, 1, 1, 1 )
+        box.pack_start( notificationSummary, True, True, 0 )
 
-        label = Gtk.Label( _( "Message character limit" ) )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_top( 10 )
-        grid.attach( label, 0, 2, 1, 1 )
+        grid.attach( box, 0, 1, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label( _( "Message character limit" ) ), False, False, 0 )
 
         spinnerCharacterCount = Gtk.SpinButton()
         spinnerCharacterCount.set_adjustment( Gtk.Adjustment( self.skipFortuneCharacterCount, 1, 1000, 1, 50, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
@@ -322,35 +324,36 @@ class IndicatorFortune:
             "as many fortunes may be dropped,\n" + \
             "resulting in excessive calls to\n" + \
             "the 'fortune' program." ) )
-        spinnerCharacterCount.set_margin_top( 10 )
-        grid.attach( spinnerCharacterCount, 1, 2, 1, 1 )
+        box.pack_start( spinnerCharacterCount, True, True, 0 )
+
+        grid.attach( box, 0, 2, 1, 1 )
 
         label = Gtk.Label( _( "Middle mouse click of the icon" ) )
         label.set_tooltip_text( _( "Not supported on all versions/derivatives of Ubuntu!" ) )
         label.set_halign( Gtk.Align.START )
         label.set_margin_top( 10 )
-        grid.attach( label, 0, 3, 2, 1 )
+        grid.attach( label, 0, 3, 1, 1 )
 
         radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show a new fortune" ) )
         radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
         radioMiddleMouseClickNewFortune.set_margin_left( 15 )
-        grid.attach( radioMiddleMouseClickNewFortune, 0, 4, 2, 1 )
+        grid.attach( radioMiddleMouseClickNewFortune, 0, 4, 1, 1 )
 
         radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Copy current fortune to clipboard" ) )
         radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
         radioMiddleMouseClickCopyLastFortune.set_margin_left( 15 )
-        grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 5, 2, 1 )
+        grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 5, 1, 1 )
 
         radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Show current fortune" ) )
         radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
         radioMiddleMouseClickShowLastFortune.set_margin_left( 15 )
-        grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 2, 1 )
+        grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorFortune.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 7, 2, 1 )
+        grid.attach( autostartCheckbox, 0, 7, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
