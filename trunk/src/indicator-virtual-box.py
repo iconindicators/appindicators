@@ -68,27 +68,18 @@ class IndicatorVirtualBox:
     SETTINGS_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
 
 
-#TODO
-# Need to disable the menu items for virtual box and script runner when Preferences is shown?
-#
-# For lunar and ppa, whilst an update is occurring, need to block Preferences?
-# Use a lock to stop the update if the Preferences is opened?
-#
-# If the lock is available then can show the About dialog or Preferences dialog or do an update...
-# Each of these things must first attempt to grab the lock and if unable, either reschedule later (the update happens later)
-# or let the user know things are busy (About and Prefs can notify user).
-
+#TODO Need to disable the menu items when Preferences is shown?
 
 
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.lock = threading.Lock()
+        self.dialogLock = threading.Lock()
         self.scrollDirectionIsUp = True
         self.scrollUUID = None
 
-        self.loadSettings()
         Notify.init( INDICATOR_NAME )
+        self.loadSettings()
         virtualMachines = self.getVirtualMachines()
         Thread( target = self.autoStartVirtualMachines, args = ( virtualMachines, ) ).start()
 
@@ -101,49 +92,6 @@ class IndicatorVirtualBox:
 
 
     def main( self ): Gtk.main()
-
-
-    def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        runningVMs = self.getRunningVirtualMachines()
-        if len( runningVMs ) > 0:
-            if self.scrollUUID is None or self.scrollUUID not in runningVMs:
-                self.scrollUUID = runningVMs[ 0 ]
-
-            if scrollDirection == Gdk.ScrollDirection.UP:
-                index = ( runningVMs.index( self.scrollUUID ) + 1 ) % len( runningVMs )
-                self.scrollUUID = runningVMs[ index ]
-                self.scrollDirectionIsUp = True
-            else:
-                index = ( runningVMs.index( self.scrollUUID ) - 1 ) % len( runningVMs )
-                self.scrollUUID = runningVMs[ index ]
-                self.scrollDirectionIsUp = False
-
-            self.bringWindowToFront( self.getVirtualMachineNameFromUUID( self.scrollUUID ) )
-
-
-    def bringWindowToFront( self, virtualMachineName ):
-        numberOfWindowsWithTheSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
-        if numberOfWindowsWithTheSameName == "0":
-            message = _( "The VM '{0}' is running but its window could not be found - perhaps it is running headless." ).format( virtualMachineName )
-            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
-        elif numberOfWindowsWithTheSameName == "1":
-            for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
-                if virtualMachineName in line:
-                    windowID = line[ 0 : line.find( " " ) ]
-                    pythonutils.processCall( "wmctrl -i -a " + windowID )
-                    break
-        else:
-            message = _( "Unable to bring the VM '{0}' to front as there is more than one window with the same name." ).format( virtualMachineName )
-            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
-
-
-    def getVirtualMachineNameFromUUID( self, UUID ):
-        name = ""
-        result = pythonutils.processGet( "VBoxManage list runningvms | grep " + UUID )
-        if result is not None:
-            name = result[ 1 : result.find( "\" {" ) ]
-
-        return name
 
 
     def buildMenu( self, virtualMachines ):
@@ -189,6 +137,49 @@ class IndicatorVirtualBox:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, False, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
+
+
+    def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
+        runningVMs = self.getRunningVirtualMachines()
+        if len( runningVMs ) > 0:
+            if self.scrollUUID is None or self.scrollUUID not in runningVMs:
+                self.scrollUUID = runningVMs[ 0 ]
+
+            if scrollDirection == Gdk.ScrollDirection.UP:
+                index = ( runningVMs.index( self.scrollUUID ) + 1 ) % len( runningVMs )
+                self.scrollUUID = runningVMs[ index ]
+                self.scrollDirectionIsUp = True
+            else:
+                index = ( runningVMs.index( self.scrollUUID ) - 1 ) % len( runningVMs )
+                self.scrollUUID = runningVMs[ index ]
+                self.scrollDirectionIsUp = False
+
+            self.bringWindowToFront( self.getVirtualMachineNameFromUUID( self.scrollUUID ) )
+
+
+    def bringWindowToFront( self, virtualMachineName ):
+        numberOfWindowsWithTheSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
+        if numberOfWindowsWithTheSameName == "0":
+            message = _( "The VM '{0}' is running but its window could not be found - perhaps it is running headless." ).format( virtualMachineName )
+            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
+        elif numberOfWindowsWithTheSameName == "1":
+            for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
+                if virtualMachineName in line:
+                    windowID = line[ 0 : line.find( " " ) ]
+                    pythonutils.processCall( "wmctrl -i -a " + windowID )
+                    break
+        else:
+            message = _( "Unable to bring the VM '{0}' to front as there is more than one window with the same name." ).format( virtualMachineName )
+            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
+
+
+    def getVirtualMachineNameFromUUID( self, UUID ):
+        name = ""
+        result = pythonutils.processGet( "VBoxManage list runningvms | grep " + UUID )
+        if result is not None:
+            name = result[ 1 : result.find( "\" {" ) ]
+
+        return name
 
 
     def getGroupName( self, virtualMachine ): return virtualMachine.getName()[ virtualMachine.getName().rfind( "/" ) + 1 : ]
@@ -462,7 +453,7 @@ class IndicatorVirtualBox:
 
 
     def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
                 [ IndicatorVirtualBox.AUTHOR ],
                 IndicatorVirtualBox.COMMENTS, 
@@ -478,13 +469,13 @@ class IndicatorVirtualBox:
                 _( "text file." ),
                 _( "changelog" ) )
 
-            self.lock.release()
+            self.dialogLock.release()
 
 
     def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             self._onPreferencesInternal( widget )
-            self.lock.release()
+            self.dialogLock.release()
 
 
     def _onPreferencesInternal( self, widget ):
@@ -529,7 +520,7 @@ class IndicatorVirtualBox:
         # General settings.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 20 )
+        grid.set_row_spacing( 10 )
         grid.set_margin_left( 10 )
         grid.set_margin_right( 10 )
         grid.set_margin_top( 10 )        
@@ -548,6 +539,7 @@ class IndicatorVirtualBox:
             "as set in the VirtualBox Manager." ) )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
 
+#TODO Rewrite...only put in alpha sort for the right version and always put in groups exist but add a tooltip that it only applies if groups exist in VBOX manaager.
         version = self.getVirtualBoxVersion()
         if self.isVBoxManageInstalled() and version is not None:
             if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
