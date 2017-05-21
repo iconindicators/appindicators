@@ -2462,14 +2462,14 @@ class IndicatorLunar:
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
+        grid.set_margin_left( 10 )
+        grid.set_margin_right( 10 )
         grid.set_margin_top( 10 )
+        grid.set_margin_bottom( 10 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( 10 )
-        box.set_margin_right( 10 )
 
-        label = Gtk.Label( _( "Icon Text" ) )
-        box.pack_start( label, False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Icon Text" ) ), False, False, 0 )
 
         indicatorText = Gtk.Entry()
         indicatorText.set_tooltip_text( _(
@@ -2558,8 +2558,8 @@ class IndicatorLunar:
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
-        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 40 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_left( 20 )
+        box = Gtk.Box( spacing = 40 )
+        box.set_margin_left( 15 )
 
         showMoonCheckbox = Gtk.CheckButton( _( "Moon" ) )
         showMoonCheckbox.set_active( self.showMoon )
@@ -2580,8 +2580,8 @@ class IndicatorLunar:
         label.set_margin_top( 10 )
         grid.attach( label, 0, 2, 1, 1 )
 
-        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 40 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_left( 20 )
+        box = Gtk.Box( spacing = 40 )
+        box.set_margin_left( 15 )
 
         showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( _( "Planets" ) )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
@@ -2633,12 +2633,10 @@ class IndicatorLunar:
             "within each group." ) )
         grid.attach( groupStarsByConstellationCheckbox, 0, 5, 1, 1 )
 
-        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
+        box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        label = Gtk.Label( _( "Hide comets greater than magnitude" ) )
-        label.set_halign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Hide comets greater than magnitude" ) ), False, False, 0 )
 
         spinnerCometMagnitude = Gtk.SpinButton()
         spinnerCometMagnitude.set_numeric( True )
@@ -2653,7 +2651,7 @@ class IndicatorLunar:
             "displayed impacting the indicator's\n" + \
             "performance." ) )
 
-        box.pack_start( spinnerCometMagnitude, False, False, 0 )
+        box.pack_start( spinnerCometMagnitude, True, True, 0 )
 
         grid.attach( box, 0, 6, 1, 1 )
 
@@ -2667,9 +2665,6 @@ class IndicatorLunar:
             "In addition, any comets\n" + \
             "unchecked will become checked." ) )
         grid.attach( cometsAddNewCheckbox, 0, 7, 1, 1 )
-
-        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
-        box.set_margin_top( 10 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
@@ -2695,7 +2690,6 @@ class IndicatorLunar:
             "there may be a lot of information\n" + \
             "displayed impacting the indicator's\n" + \
             "performance." ) )
-
         grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 9, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
@@ -2713,7 +2707,7 @@ class IndicatorLunar:
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
         # Planets/Stars.
-        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 15 ) # Bug in Python - must specify the parameter names!
+        box = Gtk.Box( spacing = 20 )
 
         planetStore = Gtk.ListStore( bool, str, str ) # Show/hide, planet name (not displayed), translated planet name.
         for planetName in IndicatorLunar.PLANETS:
@@ -2789,12 +2783,20 @@ class IndicatorLunar:
 
         # Comets.
         cometGrid = Gtk.Grid()
+        cometGrid.set_column_spacing( 10 )
         cometGrid.set_row_spacing( 10 )
+        cometGrid.set_margin_left( 10 )
+        cometGrid.set_margin_right( 10 )
+        cometGrid.set_margin_top( 10 )
         cometGrid.set_margin_bottom( 10 )
 
         cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
         cometStoreSort = Gtk.TreeModelSort( model = cometStore )
         cometStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
+
+#TODO Go through tooltips...
+# Do comets still need OE in the wording?
+# Fix up spacing in all tooltips.
 
         tree = Gtk.TreeView( cometStoreSort )
         tree.set_tooltip_text( _(
@@ -2821,21 +2823,16 @@ class IndicatorLunar:
         scrolledWindow.add( tree )
         cometGrid.attach( scrolledWindow, 0, 0, 1, 1 )
 
-        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
+        box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
-        box.set_margin_left( 10 )
-        box.set_margin_right( 10 )
 
-        label = Gtk.Label( _( "Comet OE data" ) )
-        label.set_halign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Comet OE data" ) ), False, False, 0 )
 
         self.cometOEDataNew = None
         self.cometOEURLNew = None
 
         cometURLEntry = Gtk.Entry()
         cometURLEntry.set_text( self.cometOEURL )
-        cometURLEntry.set_hexpand( True )
         cometURLEntry.set_tooltip_text( _(
             "The URL from which to source\n" + \
             "comet OE data. For a local\n" + \
@@ -2873,18 +2870,15 @@ class IndicatorLunar:
 
         cometGrid.attach( box, 0, 1, 1, 1 )
 
-        label = Gtk.Label()
-        label.set_margin_left( 10 )
-        label.set_margin_right( 10 )
-        label.set_justify( Gtk.Justification.CENTER )
-        
-        cometGrid.attach( label, 0, 2, 1, 1 )
-
         notebook.append_page( cometGrid, Gtk.Label( _( "Comets" ) ) )
 
         # Satellites.
         satelliteGrid = Gtk.Grid()
+        satelliteGrid.set_column_spacing( 10 )
         satelliteGrid.set_row_spacing( 10 )
+        satelliteGrid.set_margin_left( 10 )
+        satelliteGrid.set_margin_right( 10 )
+        satelliteGrid.set_margin_top( 10 )
         satelliteGrid.set_margin_bottom( 10 )
 
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
@@ -2924,14 +2918,10 @@ class IndicatorLunar:
         scrolledWindow.add( tree )
         satelliteGrid.attach( scrolledWindow, 0, 0, 1, 1 )
 
-        box = Gtk.Box( orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 ) # Bug in Python - must specify the parameter names!
+        box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
-        box.set_margin_left( 10 )
-        box.set_margin_right( 10 )
 
-        label = Gtk.Label( _( "Satellite TLE data" ) )
-        label.set_halign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Satellite TLE data" ) ), False, False, 0 )
 
         self.satelliteTLEDataNew = None
         self.satelliteTLEURLNew = None
@@ -2979,13 +2969,6 @@ class IndicatorLunar:
 
         satelliteGrid.attach( box, 0, 1, 1, 1 )
 
-        label = Gtk.Label()
-        label.set_margin_left( 10 )
-        label.set_margin_right( 10 )
-        label.set_justify( Gtk.Justification.CENTER )
-        
-        satelliteGrid.attach( label, 0, 2, 1, 1 )
-
         notebook.append_page( satelliteGrid, Gtk.Label( _( "Satellites" ) ) )
 
         # OSD (satellite and full moon).
@@ -3002,13 +2985,14 @@ class IndicatorLunar:
         showSatelliteNotificationCheckbox = Gtk.CheckButton( _( "Satellite rise" ) )
         showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
         showSatelliteNotificationCheckbox.set_tooltip_text( _( "Screen notification when a satellite rises above the horizon." ) )
-        grid.attach( showSatelliteNotificationCheckbox, 0, 0, 2, 1 )
- 
+        grid.attach( showSatelliteNotificationCheckbox, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( 15 )
+
         label = Gtk.Label( _( "Summary" ) )
         label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_left( 25 )
-        grid.attach( label, 0, 1, 1, 1 )
+        box.pack_start( label, False, False, 0 )
 
         satelliteNotificationSummaryText = Gtk.Entry()
         satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
@@ -3026,16 +3010,19 @@ class IndicatorLunar:
             IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION + "\n\n" + \
             _( notifyOSDInformation ) )
 
-        grid.attach( satelliteNotificationSummaryText, 1, 1, 1, 1 )
+        box.pack_start( satelliteNotificationSummaryText, True, True, 0 )
+
+        grid.attach( box, 0, 1, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteNotificationSummaryText )
 
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( 15 )
+
         label = Gtk.Label( _( "Message" ) )
         label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_left( 25 )
         label.set_valign( Gtk.Align.START )
-        grid.attach( label, 0, 2, 1, 1 )
+        box.pack_start( label, False, False, 0 )
 
         satelliteNotificationMessageText = Gtk.TextView()
         satelliteNotificationMessageText.get_buffer().set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationMessage ) )
@@ -3057,7 +3044,9 @@ class IndicatorLunar:
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( satelliteNotificationMessageText )
-        grid.attach( scrolledWindow, 1, 2, 1, 1 )
+        box.pack_start( scrolledWindow, True, True, 0 )
+
+        grid.attach( box, 0, 2, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, scrolledWindow )
 
@@ -3069,25 +3058,24 @@ class IndicatorLunar:
             "Show the notification bubble.\n" + \
             "Tags will be substituted with\n" + \
             "mock text." ) )
-        grid.attach( test, 1, 3, 1, 1 )
+        grid.attach( test, 0, 3, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
-        separator = Gtk.Separator.new( Gtk.Orientation.HORIZONTAL )
-        grid.attach( separator, 0, 4, 2, 1 )
-
         showWerewolfWarningCheckbox = Gtk.CheckButton( _( "Werewolf warning" ) )
+        showWerewolfWarningCheckbox.set_margin_top( 10 )
         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
         showWerewolfWarningCheckbox.set_tooltip_text( _( 
             "Screen notification (approximately hourly)\n" + \
             "at full moon (or leading up to)." ) )
-        grid.attach( showWerewolfWarningCheckbox, 0, 5, 2, 1 )
+        grid.attach( showWerewolfWarningCheckbox, 0, 4, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( 15 )
 
         label = Gtk.Label( _( "Illumination" ) )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_left( 25 )
-        grid.attach( label, 0, 6, 1, 1 )
+        box.pack_start( label, False, False, 0 )
 
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 0, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
@@ -3097,30 +3085,36 @@ class IndicatorLunar:
             "specified illumination (%),\n" + \
             "starting after a new moon (0%)." ) )
         spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        grid.attach( spinner, 1, 6, 1, 1 )
+        box.pack_start( spinner, True, True, 0 )
+
+        grid.attach( box, 0, 5, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, spinner )
 
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( 15 )
+
         label = Gtk.Label( _( "Summary" ) )
-        label.set_margin_left( 25 )
-        label.set_halign( Gtk.Align.START )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        grid.attach( label, 0, 7, 1, 1 )
+        box.pack_start( label, False, False, 0 )
 
         werewolfNotificationSummaryText = Gtk.Entry()
         werewolfNotificationSummaryText.set_text( self.werewolfWarningSummary )
         werewolfNotificationSummaryText.set_tooltip_text( _( "The summary for the werewolf notification.\n\n" ) + notifyOSDInformation )
         werewolfNotificationSummaryText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        grid.attach( werewolfNotificationSummaryText, 1, 7, 1, 1 )
+        box.pack_start( werewolfNotificationSummaryText, True, True, 0 )
+
+        grid.attach( box, 0, 6, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationSummaryText )
 
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( 15 )
+
         label = Gtk.Label( _( "Message" ) )
-        label.set_margin_left( 25 )
-        label.set_halign( Gtk.Align.START )
         label.set_valign( Gtk.Align.START )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        grid.attach( label, 0, 8, 1, 1 )
+        box.pack_start( label, False, False, 0 )
 
         werewolfNotificationMessageText = Gtk.TextView()
         werewolfNotificationMessageText.get_buffer().set_text( self.werewolfWarningMessage )
@@ -3131,7 +3125,10 @@ class IndicatorLunar:
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( werewolfNotificationMessageText )
-        grid.attach( scrolledWindow, 1, 8, 1, 1 )
+
+        box.pack_start( scrolledWindow, True, True, 0 )
+
+        grid.attach( box, 0, 7, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationMessageText )
 
@@ -3140,7 +3137,7 @@ class IndicatorLunar:
         test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         test.connect( "clicked", self.onTestNotificationClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, True )
         test.set_tooltip_text( _( "Show the notification using the current settings." ) )
-        grid.attach( test, 1, 9, 1, 1 )
+        grid.attach( test, 0, 8, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
@@ -3155,10 +3152,9 @@ class IndicatorLunar:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        label = Gtk.Label( _( "City" ) )
-        label.set_halign( Gtk.Align.START )
+        box = Gtk.Box( spacing = 6 )
 
-        grid.attach( label, 0, 0, 1, 1 )
+        box.pack_start( Gtk.Label( _( "City" ) ), False, False, 0 )
 
         global _city_data
         cities = sorted( _city_data.keys(), key = locale.strxfrm )
@@ -3169,31 +3165,39 @@ class IndicatorLunar:
         for c in cities:
             city.append_text( c )
 
-        grid.attach( city, 1, 0, 1, 1 )
+        box.pack_start( city, True, True, 0 )
 
-        label = Gtk.Label( _( "Latitude (DD)" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 1, 1, 1 )
+        grid.attach( box, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label( _( "Latitude (DD)" ) ), False, False, 0 )
 
         latitude = Gtk.Entry()
         latitude.set_tooltip_text( _( "Latitude of your location in decimal degrees." ) )
-        grid.attach( latitude, 1, 1, 1, 1 )
+        box.pack_start( latitude, True, True, 0 )
 
-        label = Gtk.Label( _( "Longitude (DD)" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 2, 1, 1 )
+        grid.attach( box, 0, 1, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label( _( "Longitude (DD)" ) ), False, False, 0 )
 
         longitude = Gtk.Entry()
         longitude.set_tooltip_text( _( "Longitude of your location in decimal degrees." ) )
-        grid.attach( longitude, 1, 2, 1, 1 )
+        box.pack_start( longitude, True, True, 0 )
 
-        label = Gtk.Label( _( "Elevation (m)" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 3, 1, 1 )
+        grid.attach( box, 0, 2, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label( _( "Elevation (m)" ) ), False, False, 0 )
 
         elevation = Gtk.Entry()
         elevation.set_tooltip_text( _( "Height in metres above sea level." ) )
-        grid.attach( elevation, 1, 3, 1, 1 )
+        box.pack_start( elevation, True, True, 0 )
+
+        grid.attach( box, 0, 3, 1, 1 )
 
         city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
         city.set_active( cities.index( self.cityName ) )
@@ -3202,7 +3206,7 @@ class IndicatorLunar:
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorLunar.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 4, 2, 1 )
+        grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
