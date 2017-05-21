@@ -211,8 +211,6 @@ class IndicatorFortune:
         grid.set_margin_right( 10 )
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
-        grid.set_row_homogeneous( False )
-        grid.set_column_homogeneous( False )
 
         store = Gtk.ListStore( str, str ) # Path to fortune; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
         for location, enabled in self.fortunes:
