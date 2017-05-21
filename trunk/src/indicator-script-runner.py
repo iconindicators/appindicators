@@ -231,6 +231,7 @@ class IndicatorScriptRunner:
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( scriptNameTreeView )
+        scrolledWindow.set_margin_top( 10 )
 
         grid.attach( scrolledWindow, 0, 1, 1, 15 )
 
