@@ -539,18 +539,21 @@ class IndicatorVirtualBox:
             "as set in the VirtualBox Manager." ) )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
 
-#TODO Rewrite...only put in alpha sort for the right version and always put in groups exist but add a tooltip that it only applies if groups exist in VBOX manaager.
+        row = 0
         version = self.getVirtualBoxVersion()
         if self.isVBoxManageInstalled() and version is not None:
-            if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
-                grid.attach( sortAlphabeticallyCheckbox, 0, 0, 2, 1 )
+            if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION: #TODO Test by flipping sign
+                grid.attach( sortAlphabeticallyCheckbox, 0, row, 1, 1 )
+                row += 1
             else:
                 if self.groupsExist( virtualMachines ):
-                    grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
+                    grid.attach( showAsSubmenusCheckbox, 0, row, 1, 1 )
+                    row += 1
 
-        label = Gtk.Label( _( "Refresh interval (minutes)" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 1, 1, 1 )
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label( _( "Refresh interval (minutes)" ) ), False, False, 0 )
 
         spinnerRefreshInterval = Gtk.SpinButton()
         spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
@@ -558,11 +561,16 @@ class IndicatorVirtualBox:
         spinnerRefreshInterval.set_tooltip_text( _(
             "How often the list of VMs and\n" + \
             "running status is updated." ) )
-        grid.attach( spinnerRefreshInterval, 1, 1, 1, 1 )
 
-        label = Gtk.Label( _( "Startup delay (seconds)" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 2, 1, 1 )
+        box.pack_start( spinnerRefreshInterval, True, True, 0 )
+
+        grid.attach( box, 0, row, 1, 1 )
+        row += 1
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label( _( "Startup delay (seconds)" ) ), False, False, 0 )
 
         spinnerDelay = Gtk.SpinButton()
         spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
@@ -570,12 +578,17 @@ class IndicatorVirtualBox:
         spinnerDelay.set_tooltip_text( _(
             "Amount of time to wait from\n" + \
             "starting one VM to the next." ) )
-        grid.attach( spinnerDelay, 1, 2, 1, 1 )
+
+        box.pack_start( spinnerDelay, True, True, 0 )
+
+        grid.attach( box, 0, row, 1, 1 )
+        row += 1
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorVirtualBox.DESKTOP_FILE, logging ) )
-        grid.attach( autostartCheckbox, 0, 3, 2, 1 )
+        autostartCheckbox.set_margin_top( 10 )
+        grid.attach( autostartCheckbox, 0, row, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
