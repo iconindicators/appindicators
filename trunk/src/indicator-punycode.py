@@ -220,8 +220,6 @@ class IndicatorPunycode:
         grid.set_margin_right( 10 )
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
-        grid.set_row_homogeneous( False )
-        grid.set_column_homogeneous( False )
 
         label = Gtk.Label( _( "Input source" ) )
         label.set_halign( Gtk.Align.START )
@@ -264,6 +262,7 @@ class IndicatorPunycode:
         grid.attach( dropPathQueryCheckbox, 0, 4, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label( _( "Maximum results" ) ), False, False, 0 )
 
