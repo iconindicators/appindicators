@@ -315,6 +315,7 @@ class IndicatorTide:
         showAsSubmenusCheckbox.connect( "toggled", self.onShowAsSubmenusCheckbox, showAsSubmenusExceptFirstDayCheckbox )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label( _( "Date format" ) ), False, False, 0 )
 
@@ -330,6 +331,7 @@ class IndicatorTide:
         grid.attach( box, 0, 2, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label( _( "Tide format" ) ), False, False, 0 )
 
@@ -349,6 +351,7 @@ class IndicatorTide:
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorTide.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
+        autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
