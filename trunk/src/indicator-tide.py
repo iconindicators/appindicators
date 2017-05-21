@@ -251,8 +251,6 @@ class IndicatorTide:
         grid.set_margin_right( 10 )
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
-        grid.set_row_homogeneous( False )
-        grid.set_column_homogeneous( False )
 
         box = Gtk.Box( spacing = 6 )
 
