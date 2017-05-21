@@ -1,6 +1,7 @@
 indicator-script-runner (1.0.3-1) trusty; urgency=low
 
   * Bug fix: Updates we're being called twice!
+  * About/Preferences dialogs now block each other - only show one at a time.
   * Update release to trusty as precise is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 2 May 2017 10:54:26 +1000
