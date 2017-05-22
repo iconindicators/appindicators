@@ -529,7 +529,7 @@ class IndicatorVirtualBox:
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show groups as submenus" ) )
         showAsSubmenusCheckbox.set_tooltip_text( _(
             "If checked, groups are shown using submenus.\n\n" + \
-            "Otherwise, groups are shown as an indented list." ) )
+            "Otherwise groups are shown as an indented list." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
 
         sortAlphabeticallyCheckbox = Gtk.CheckButton( _( "Sort VMs alphabetically" ) )
