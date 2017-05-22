@@ -2474,9 +2474,9 @@ class IndicatorLunar:
         indicatorText = Gtk.Entry()
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon\n" + \
-            "(or shown as a tooltip, where applicable).\n\n" + \
+            "or tooltip, where applicable.\n\n" + \
             "If a body is unchecked or no longer exists\n" + \
-            "(such as a comet/satellite not on the list),\n" + \
+            "such as a comet/satellite not on the list,\n" + \
             "the tag will be automatically removed." ) )
         box.pack_start( indicatorText, True, True, 0 )
 
@@ -2532,9 +2532,7 @@ class IndicatorLunar:
         treeViewColumn.set_sort_column_id( COLUMN_VALUE )
         tree.append_column( treeViewColumn )
 
-        tree.set_tooltip_text( _(
-            "Double click to add a\n" + \
-            "tag to the icon text." ) )
+        tree.set_tooltip_text( _( "Double click to add a tag to the icon text." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText )
 
@@ -2619,12 +2617,8 @@ class IndicatorLunar:
         groupStarsByConstellationCheckbox.set_margin_top( 10 )
         groupStarsByConstellationCheckbox.set_active( self.groupStarsByConstellation )
         groupStarsByConstellationCheckbox.set_tooltip_text( _( 
-            "When checked, stars are grouped\n" + \
-            "by their respective constellations\n" + \
-            "and listed alphabetically by star\n" + \
-            "name within each group.\n\n" + \
-            "Otherwise, stars are listed\n" + \
-            "alphabetically by name." ) )
+            "If checked, stars are grouped by constellation.\n\n" + \
+            "Otherwise, stars are listed by name." ) )
         grid.attach( groupStarsByConstellationCheckbox, 0, 5, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -2649,20 +2643,19 @@ class IndicatorLunar:
         cometsAddNewCheckbox.set_margin_top( 10 )
         cometsAddNewCheckbox.set_active( self.cometsAddNew )
         cometsAddNewCheckbox.set_tooltip_text( _(
-            "If checked, all comets are\n" + \
-            "added to the list of checked\n" + \
-            "comets." ) )
+            "If checked, all comets are added\n" + \
+            "to the list of checked comets." ) )
         grid.attach( cometsAddNewCheckbox, 0, 7, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
         sortSatellitesByDateTimeCheckbox.set_tooltip_text( _(
-            "If checked, satellites are\n" + \
-            "sorted by rise date/time.\n\n" + \
+            "If checked, satellites are sorted\n" + \
+            "by rise date/time.\n\n" + \
             "Otherwise, satellites are sorted\n" + \
-            "alphabetically by Name, Number\n" + \
-            "and then International Designator." ) )
+            "by Name, Number and then\n" + \
+            "International Designator." ) )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 8, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( _( "Hide satellites which have no upcoming visible pass" ) )
@@ -2678,9 +2671,8 @@ class IndicatorLunar:
         satellitesAddNewCheckbox.set_margin_top( 10 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
         satellitesAddNewCheckbox.set_tooltip_text( _( 
-            "If checked all satellites are\n" + \
-            "added to the list of checked\n" + \
-            "satellites." ) )
+            "If checked all satellites are added\n" + \
+            "to the list of checked satellites." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 10, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
@@ -2695,10 +2687,9 @@ class IndicatorLunar:
         tree = Gtk.TreeView( planetStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.set_tooltip_text( _( 
-            "Check a planet to display\n" + \
-            "in the menu.\n\n" + \
-            "Clicking the first column\n" + \
-            "header toggles all checkboxes." ) )
+            "Check a planet to display in the menu.\n\n" + \
+            "Clicking the header of the first column\n" + \
+            "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore )
@@ -2733,10 +2724,9 @@ class IndicatorLunar:
         tree = Gtk.TreeView( starStoreSort )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.set_tooltip_text( _(
-            "Check a star to display\n" + \
-            "in the menu.\n\n" + \
-            "Clicking the first column\n" + \
-            "header toggles all checkboxes." ) )
+            "Check a star to display in the menu.\n\n" + \
+            "Clicking the header of the first column\n" + \
+            "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, starStore, starStoreSort, AstronomicalBodyType.Star )
@@ -2774,14 +2764,11 @@ class IndicatorLunar:
         cometStoreSort = Gtk.TreeModelSort( model = cometStore )
         cometStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
-#TODO Do comets still need OE in the wording?
-
         tree = Gtk.TreeView( cometStoreSort )
         tree.set_tooltip_text( _(
-            "Check a comet to display\n" + \
-            "in the menu.\n\n" + \
-            "Clicking the first column\n" + \
-            "header toggles all checkboxes." ) )
+            "Check a comet to display in the menu.\n\n" + \
+            "Clicking the header of the first column\n" + \
+            "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, cometStore, cometStoreSort, AstronomicalBodyType.Comet )
@@ -2812,21 +2799,21 @@ class IndicatorLunar:
         cometURLEntry.set_text( self.cometOEURL )
         cometURLEntry.set_tooltip_text( _(
             "The URL from which to source\n" + \
-            "comet OE data.\n" + \
-            "To specify a local file, use\n" + \
-            "'file:///' and the filename.\n\n" + \
-            "To disable, set a bogus URL\n" + \
-            "such as 'http://'." ) )
+            "comet OE data.\n\n" + \
+            "To specify a local file, use 'file:///'\n" + \
+            "and the filename.\n\n" + \
+            "Set a bogus URL such as 'http://'\n" + \
+            "to disable." ) )
         box.pack_start( cometURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
         fetch.set_tooltip_text( _(
-            "Retrieve the comet OE data.\n" + \
-            "If the URL is empty, the,\n" + \
-            "default URL will be used.\n\n" + \
-            "If using the default URL,\n" + \
-            "the download may be blocked\n" + \
-            "to avoid burdening the source." ) )
+            "Retrieve the comet OE data.\n\n" + \
+            "If the URL is empty, the default\n" + \
+            "URL will be used.\n\n" + \
+            "If using the default URL, the\n" + \
+            "download may be blocked to\n" + \
+            "avoid burdening the source." ) )
         fetch.connect( "clicked",
                        self.onFetchCometSatelliteData,
                        cometURLEntry,
@@ -2861,11 +2848,10 @@ class IndicatorLunar:
         satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView( satelliteStoreSort )
-        tree.set_tooltip_text( _( 
-            "Check a satellite to display\n" + \
-            "in the menu.\n\n" + \
-            "Clicking the first column\n" + \
-            "header toggles all checkboxes." ) )
+        tree.set_tooltip_text( _(
+            "Check a satellite to display in the menu.\n\n" + \
+            "Clicking the header of the first column\n" + \
+            "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, satelliteStore, satelliteStoreSort, AstronomicalBodyType.Satellite )
@@ -2905,26 +2891,22 @@ class IndicatorLunar:
         TLEURLEntry.set_text( self.satelliteTLEURL )
         TLEURLEntry.set_hexpand( True )
         TLEURLEntry.set_tooltip_text( _( 
-            "The URL from which to source the\n" + \
-            "satellite TLE data.\n" + \
-            "For a local file, use 'file:///'\n" + \
+            "The URL from which to source\n" + \
+            "satellite TLE data.\n\n" + \
+            "To specify a local file, use 'file:///'\n" + \
             "and the filename.\n\n" + \
-            "If you change the URL, you must\n" + \
-            "fetch the new data.\n\n" + \
-            "To disable, set a bogus URL such\n" + \
-            "as 'http://'" ) )
+            "Set a bogus URL such as 'http://'\n" + \
+            "to disable." ) )
         box.pack_start( TLEURLEntry, True, True, 0 )
 
         fetch = Gtk.Button( _( "Fetch" ) )
         fetch.set_tooltip_text( _(
-            "Retrieve the satellite TLE data\n" + \
-            "from the URL.\n" + \
+            "Retrieve the satellite TLE data.\n\n" + \
             "If the URL is empty, the default\n" + \
             "URL will be used.\n\n" + \
             "If using the default URL, the\n" + \
-            "download may be\n" + \
-            "blocked to avoid burdening the\n" + \
-            "data source." ) )
+            "download may be blocked to\n" + \
+            "avoid burdening the source." ) )
         fetch.connect( "clicked",
                        self.onFetchCometSatelliteData,
                        TLEURLEntry,
@@ -2973,8 +2955,8 @@ class IndicatorLunar:
         satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         satelliteNotificationSummaryText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationSummary ) )
         satelliteNotificationSummaryText.set_tooltip_text( _(
-            "The summary for the satellite rise\n" + \
-            "notification. Available tags:\n\t" ) + \
+            "The summary for the satellite rise notification.\n\n" + \
+            "Available tags:\n\t" ) + \
             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
@@ -3002,8 +2984,8 @@ class IndicatorLunar:
         satelliteNotificationMessageText = Gtk.TextView()
         satelliteNotificationMessageText.get_buffer().set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationMessage ) )
         satelliteNotificationMessageText.set_tooltip_text( _(
-            "The message for the satellite rise\n" + \
-            "notification. Available tags:\n\t" ) + \
+            "The message for the satellite rise notification.\n\n" + \
+            "Available tags:\n\t" ) + \
             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
@@ -3040,15 +3022,14 @@ class IndicatorLunar:
         showWerewolfWarningCheckbox = Gtk.CheckButton( _( "Werewolf warning" ) )
         showWerewolfWarningCheckbox.set_margin_top( 10 )
         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
-        showWerewolfWarningCheckbox.set_tooltip_text( _( 
-            "Screen notification (approximately hourly)\n" + \
-            "at full moon (or leading up to)." ) )
+        showWerewolfWarningCheckbox.set_tooltip_text( _(
+            "Hourly screen notification leading up to full moon." ) )
         grid.attach( showWerewolfWarningCheckbox, 0, 4, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( 15 )
 
-        label = Gtk.Label( _( "Illumination" ) )
+        label = Gtk.Label( _( "Illumination (%)" ) )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         box.pack_start( label, False, False, 0 )
 
@@ -3056,9 +3037,8 @@ class IndicatorLunar:
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 0, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.werewolfWarningStartIlluminationPercentage ) # ...so need to force the initial value by explicitly setting it.
         spinner.set_tooltip_text( _( 
-            "The notification commences at the\n" + \
-            "specified illumination (%),\n" + \
-            "starting after a new moon (0%)." ) )
+            "Notifications are shown from the specified\n" + \
+            "illumination, commencing after a new moon." ) )
         spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         box.pack_start( spinner, True, True, 0 )
 
@@ -3111,7 +3091,7 @@ class IndicatorLunar:
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         test.connect( "clicked", self.onTestNotificationClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, True )
-        test.set_tooltip_text( _( "Show the notification using the current settings." ) )
+        test.set_tooltip_text( _( "Show the notification using the current summary/message." ) )
         grid.attach( test, 0, 8, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
