@@ -205,13 +205,13 @@ class IndicatorStardate:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
-        showClassicCheckbox = Gtk.CheckButton( _( "Use 'classic' conversion" ) )
+        showClassicCheckbox = Gtk.CheckButton( _( "Show stardate 'classic'" ) )
         showClassicCheckbox.set_active( self.showClassic )
         showClassicCheckbox.set_tooltip_text( _(
-            "Stardate 'classic' is based on\n\n" + \
+            "If checked, show stardate 'classic' based on\n\n" + \
             "\tSTARDATES IN STAR TREK FAQ V1.6\n\n" + \
             "by Andrew Main.\n\n" + \
-            "Otherwise the 2009 revision is used:\n\n" + \
+            "Otherwise show stardate '2009 revised' based on\n\n" + \
             "\thttp://en.wikipedia.org/wiki/Stardate" ) )
         grid.attach( showClassicCheckbox, 0, 0, 1, 1 )
 
@@ -219,14 +219,14 @@ class IndicatorStardate:
         showIssueCheckbox.set_active( self.showIssue )
         showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
         showIssueCheckbox.set_margin_left( 15 )
-        showIssueCheckbox.set_tooltip_text( _( "Show the ISSUE of the stardate." ) )
+        showIssueCheckbox.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
         grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
 
         padIntegerCheckbox = Gtk.CheckButton( _( "Pad INTEGER" ) )
         padIntegerCheckbox.set_active( self.padInteger )
         padIntegerCheckbox.set_sensitive( showClassicCheckbox.get_active() )
         padIntegerCheckbox.set_margin_left( 15 )
-        padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part with leading zeros." ) )
+        padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
         grid.attach( padIntegerCheckbox, 0, 2, 1, 1 )
 
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
