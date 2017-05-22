@@ -120,7 +120,7 @@ class IndicatorFortune:
 
     def newFortune( self ):
         with threading.Lock():
-            self.refreshFortune()
+            self._refreshFortune()
             if self.updateTimerID is not None: # When a new fortune is called via the timer, the timer does not need to be removed, but this is harmless and allows a new fortune to be called ah hoc by the user.
                 GLib.source_remove( self.updateTimerID )
 
@@ -143,7 +143,7 @@ class IndicatorFortune:
             self.updateTimerID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.newFortune )
 
 
-    def refreshFortune( self ):
+    def _refreshFortune( self ):
         if len( self.fortunes ) == 0:
             self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No fortunes are enabled!" )
         else:
