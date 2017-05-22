@@ -10,6 +10,7 @@ from datetime import datetime
 
 
 changeLogs = [
+                "/home/bernard/Programming/IndicatorCalendar/packaging/debian/changelog",
                 "/home/bernard/Programming/IndicatorFortune/packaging/debian/changelog",
                 "/home/bernard/Programming/IndicatorLunar/packaging/debian/changelog",
                 "/home/bernard/Programming/IndicatorPPADownloadStatistics/packaging/debian/changelog",
