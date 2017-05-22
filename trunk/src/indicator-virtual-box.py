@@ -68,9 +68,6 @@ class IndicatorVirtualBox:
     SETTINGS_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
 
 
-#TODO Need to disable the menu items when Preferences is shown?
-
-
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
@@ -533,17 +530,17 @@ class IndicatorVirtualBox:
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
 
         sortAlphabeticallyCheckbox = Gtk.CheckButton( _( "Sort VMs alphabetically" ) )
-        sortAlphabeticallyCheckbox.set_tooltip_text( _( "VMs can be sorted alphabetically or as set in the VirtualBox Manager." ) )
+        sortAlphabeticallyCheckbox.set_tooltip_text( _( "If checked, VMs are sorted alphabetically.\n\nOtherwise VMs are sorted as set via VirtualBox Manager." ) )
         sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
 
         row = 0
         version = self.getVirtualBoxVersion()
         if self.isVBoxManageInstalled() and version is not None:
-            if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION: #TODO Test by flipping sign
+            if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
                 grid.attach( sortAlphabeticallyCheckbox, 0, row, 1, 1 )
                 row += 1
             else:
-                if not self.groupsExist( virtualMachines ):
+                if self.groupsExist( virtualMachines ):
                     grid.attach( showAsSubmenusCheckbox, 0, row, 1, 1 )
                     row += 1
 
@@ -605,7 +602,7 @@ class IndicatorVirtualBox:
 
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorVirtualBox.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.timeout_add_seconds( 1, self.onRefresh, False )
+            GLib.timeout_add_seconds( 1, self.onRefresh, False ) #TODO Use thread/lock stuff from stardate/fortune?
 
         dialog.destroy()
 
