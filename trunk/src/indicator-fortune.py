@@ -321,10 +321,10 @@ class IndicatorFortune:
         spinnerCharacterCount.set_tooltip_text( _(
             "If the fortune exceeds the limit,\n" + \
             "a new fortune is created.\n\n" + \
-            "Do not set too low (below 50)\n" + \
-            "as many fortunes may be dropped,\n" + \
-            "resulting in excessive calls to\n" + \
-            "the 'fortune' program." ) )
+            "Do not set too low (below 50) as\n" + \
+            "many fortunes may be dropped,\n" + \
+            "resulting in excessive calls to the\n" + \
+            "'fortune' program." ) )
         box.pack_start( spinnerCharacterCount, True, True, 0 )
 
         grid.attach( box, 0, 2, 1, 1 )
@@ -474,12 +474,12 @@ class IndicatorFortune:
         browseDirectoryButton = Gtk.Button( _( "Directory" ) )
         browseDirectoryButton.set_sensitive( not isSystemFortune )
         if isSystemFortune:
-            browseFileButton.set_tooltip_text( _(
+            browseDirectoryButton.set_tooltip_text( _(
                 "This fortune is part of\n" + \
                 "your system and cannot be\n" + \
                 "modified." ) )
         else:
-            browseFileButton.set_tooltip_text( _( 
+            browseDirectoryButton.set_tooltip_text( _( 
                 "Choose a directory containing\n" + \
                 "a fortune .dat file(s).\n\n" + \
                 "Ensure the corresponding text\n" + \
