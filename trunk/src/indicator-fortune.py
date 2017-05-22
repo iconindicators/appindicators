@@ -117,15 +117,6 @@ class IndicatorFortune:
             self.indicator.set_menu( menu )
             menu.show_all()
 
-#TODO...
-# Show new fortune
-#    Init - scheduled -                            refresh fortune, show fortune and set new timer
-#    Timer - scheduled -                           refresh fortune, show fortune and set new timer
-#    Menu - unscheduled -        remove old timer, refresh fortune, show fortune and set new timer
-#    Preferences - unscheduled - remove old timer, refresh fortune, show fortune and set new timer
-
-# Show existing fortune
-#    Menu - unscheduled -        remove old timer,                  show fortune and set new timer
 
     def showNewFortune( self, scheduled ):
         with threading.Lock():
@@ -153,31 +144,7 @@ class IndicatorFortune:
         Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
 
 
-
-
-#     def newFortune( self ):
-#         with threading.Lock():
-#             self._refreshFortune()
-#             if self.updateTimerID is not None: # When a new fortune is called via the timer, the timer does not need to be removed, but this is harmless and allows a new fortune to be called ah hoc by the user.
-#                 GLib.source_remove( self.updateTimerID )
-# 
-#         self._showFortune()
-
-
     def onCopyLastFortune( self, widget ): self.clipboard.set_text( self.fortune, -1 )
-
-
-#     def _showFortune( self ):
-#         with threading.Lock():
-#             if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
-#                 notificationSummary = _( "WARNING. . ." )
-#             else:
-#                 notificationSummary = self.notificationSummary
-#                 if notificationSummary == "":
-#                     notificationSummary = " "
-# 
-#             Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
-#             self.updateTimerID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.newFortune )
 
 
     def _refreshFortune( self ):
