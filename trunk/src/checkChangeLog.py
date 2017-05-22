@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 
 
+# Iterate through the changelogs specified below and report any bad dates of if dates are out of sequence. 
 
-# TODO Description
 
 from datetime import datetime
-
 
 
 changeLogs = [
