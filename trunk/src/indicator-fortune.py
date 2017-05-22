@@ -73,7 +73,6 @@ class IndicatorFortune:
         filehandler = pythonutils.TruncatedFileHandler( IndicatorFortune.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.dialogLock = threading.Lock()
-        self.updateTimerID = None
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
         Notify.init( INDICATOR_NAME )
@@ -86,61 +85,99 @@ class IndicatorFortune:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.buildMenu()
-        self.newFortune()
+        self.showNewFortune( True )
 
 
     def main( self ): Gtk.main()
 
 
     def buildMenu( self ):
-        menu = Gtk.Menu()
+        with threading.Lock(): # Locking is only required when called from Preferences; no harm/impact when called from initialisation.
+            menu = Gtk.Menu()
 
-        menuItem = Gtk.MenuItem( _( "New Fortune" ) )
-        menuItem.connect( "activate", lambda widget: self.newFortune() )
-        menu.append( menuItem )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
-            self.indicator.set_secondary_activate_target( menuItem )
+            menuItem = Gtk.MenuItem( _( "New Fortune" ) )
+            menuItem.connect( "activate", lambda widget: self.showNewFortune( False ) )
+            menu.append( menuItem )
+            if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
+                self.indicator.set_secondary_activate_target( menuItem )
 
-        menuItem = Gtk.MenuItem( _( "Copy Last Fortune" ) )
-        menuItem.connect( "activate", self.onCopyLastFortune )
-        menu.append( menuItem )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
-            self.indicator.set_secondary_activate_target( menuItem )
+            menuItem = Gtk.MenuItem( _( "Copy Last Fortune" ) )
+            menuItem.connect( "activate", self.onCopyLastFortune )
+            menu.append( menuItem )
+            if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
+                self.indicator.set_secondary_activate_target( menuItem )
 
-        menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
-        menuItem.connect( "activate", lambda widget: self.showFortune() )
-        menu.append( menuItem )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
-            self.indicator.set_secondary_activate_target( menuItem )
+            menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
+            menuItem.connect( "activate", lambda widget: self.showLastFortune() )
+            menu.append( menuItem )
+            if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
+                self.indicator.set_secondary_activate_target( menuItem )
 
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
-        self.indicator.set_menu( menu )
-        menu.show_all()
+            pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
+            self.indicator.set_menu( menu )
+            menu.show_all()
 
+#TODO...
+# Show new fortune
+#    Init - scheduled -                            refresh fortune, show fortune and set new timer
+#    Timer - scheduled -                           refresh fortune, show fortune and set new timer
+#    Menu - unscheduled -        remove old timer, refresh fortune, show fortune and set new timer
+#    Preferences - unscheduled - remove old timer, refresh fortune, show fortune and set new timer
 
-    def newFortune( self ):
+# Show existing fortune
+#    Menu - unscheduled -        remove old timer,                  show fortune and set new timer
+
+    def showNewFortune( self, scheduled ):
         with threading.Lock():
-            self._refreshFortune()
-            if self.updateTimerID is not None: # When a new fortune is called via the timer, the timer does not need to be removed, but this is harmless and allows a new fortune to be called ah hoc by the user.
+            if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
-        self.showFortune()
+            self._refreshFortune()
+            self._showFortune()
+            self.updateTimerID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.showNewFortune, True )
+
+
+    def showLastFortune( self ):
+        with threading.Lock():
+            self._showFortune()
+
+
+    def _showFortune( self ):
+        if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
+            notificationSummary = _( "WARNING. . ." )
+        else:
+            notificationSummary = self.notificationSummary
+            if notificationSummary == "":
+                notificationSummary = " "
+
+        Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
+
+
+
+
+#     def newFortune( self ):
+#         with threading.Lock():
+#             self._refreshFortune()
+#             if self.updateTimerID is not None: # When a new fortune is called via the timer, the timer does not need to be removed, but this is harmless and allows a new fortune to be called ah hoc by the user.
+#                 GLib.source_remove( self.updateTimerID )
+# 
+#         self._showFortune()
 
 
     def onCopyLastFortune( self, widget ): self.clipboard.set_text( self.fortune, -1 )
 
 
-    def showFortune( self ):
-        with threading.Lock():
-            if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
-                notificationSummary = _( "WARNING. . ." )
-            else:
-                notificationSummary = self.notificationSummary
-                if notificationSummary == "":
-                    notificationSummary = " "
-
-            Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
-            self.updateTimerID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.newFortune )
+#     def _showFortune( self ):
+#         with threading.Lock():
+#             if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
+#                 notificationSummary = _( "WARNING. . ." )
+#             else:
+#                 notificationSummary = self.notificationSummary
+#                 if notificationSummary == "":
+#                     notificationSummary = " "
+# 
+#             Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
+#             self.updateTimerID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.newFortune )
 
 
     def _refreshFortune( self ):
@@ -389,7 +426,7 @@ class IndicatorFortune:
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorFortune.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.buildMenu )
-            GLib.idle_add( self.newFortune )
+            GLib.idle_add( self.showNewFortune, False )
 
         dialog.destroy()
 
