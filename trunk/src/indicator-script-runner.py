@@ -192,7 +192,7 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
         scriptGroupComboBox = Gtk.ComboBoxText()
-        scriptGroupComboBox.set_tooltip_text( _( "The group to which a script belongs.\n\nIf a default script has been nominated,\nthe group to which the script belongs\nwill be initially selected." ) )
+        scriptGroupComboBox.set_tooltip_text( _( "The group to which a script belongs.\n\nIf a default script is specified,\nthe group to which the script belongs\nwill be initially selected." ) )
         scriptGroupComboBox.set_entry_text_column( 0 )
 
         box.pack_start( scriptGroupComboBox, True, True, 0 )
@@ -241,7 +241,7 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Directory" ) ), False, False, 0 )
 
         directoryEntry = Gtk.Entry()
-        directoryEntry.set_tooltip_text( _( "The directory from which the\nscript/command is executed." ) )
+        directoryEntry.set_tooltip_text( _( "The directory from which the script/command is executed." ) )
         directoryEntry.set_editable( False )
 
         box.pack_start( directoryEntry, True, True, 0 )
@@ -256,7 +256,7 @@ class IndicatorScriptRunner:
         box.pack_start( label, False, False, 0 )
 
         commandTextView = Gtk.TextView()
-        commandTextView.set_tooltip_text( _( "The terminal script/command,\nalong with any arguments." ) )
+        commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
         commandTextView.set_editable( False )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
 
@@ -307,7 +307,7 @@ class IndicatorScriptRunner:
         grid.set_margin_bottom( 10 )
 
         showScriptsInSubmenusCheckbox = Gtk.CheckButton( _( "Show scripts in submenus" ) )
-        showScriptsInSubmenusCheckbox.set_tooltip_text( _( "When checked, scripts with the same\ngroup are shown in submenus.\n\nOtherwise scripts appear in a list,\nindented by group." ) )
+        showScriptsInSubmenusCheckbox.set_tooltip_text( _( "If checked, scripts of the same group are shown in submenus.\n\nOtherwise scripts listed, indented by group." ) )
         showScriptsInSubmenusCheckbox.set_active( self.showScriptsInSubmenus )
         grid.attach( showScriptsInSubmenusCheckbox, 0, 0, 1, 1 )
 
@@ -411,7 +411,7 @@ class IndicatorScriptRunner:
             box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
             scriptGroupCombo = Gtk.ComboBoxText.new_with_entry()
-            scriptGroupCombo.set_tooltip_text( _( "The group to which the script belongs.\n\nChoose an existing group or enter a\nnew one." ) )
+            scriptGroupCombo.set_tooltip_text( _( "The group to which the script belongs.\n\nChoose an existing group or enter a new one." ) )
             scriptGroupCombo.set_hexpand( True ) # Only need to set this once and all objects will expand.
             groups = sorted( self.getScriptsByGroup( scripts ) )
             for group in groups:
@@ -434,7 +434,7 @@ class IndicatorScriptRunner:
 
             grid.attach( box, 0, 1, 1, 1 )
 
-            dialog = Gtk.Dialog( _( "Copy Script" ), dialog, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+            dialog = Gtk.Dialog( _( "Copy Script" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
             dialog.vbox.pack_start( grid, True, True, 0 )
             dialog.set_border_width( 5 )
             dialog.set_icon_name( IndicatorScriptRunner.ICON )
@@ -526,7 +526,7 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
         scriptGroupCombo = Gtk.ComboBoxText.new_with_entry()
-        scriptGroupCombo.set_tooltip_text( _( "The group to which the script belongs.\n\nChoose an existing group or enter a\nnew one." ) )
+        scriptGroupCombo.set_tooltip_text( _( "The group to which the script belongs.\n\nChoose an existing group or enter a new one." ) )
         groups = sorted( self.getScriptsByGroup( scripts ) )
         for group in groups:
             scriptGroupCombo.append_text( group )
@@ -559,7 +559,7 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Directory" ) ), False, False, 0 )
 
         scriptDirectoryEntry = Gtk.Entry()
-        scriptDirectoryEntry.set_tooltip_text( _( "The directory from which the\nscript/command is executed." ) )
+        scriptDirectoryEntry.set_tooltip_text( _( "The directory from which the script/command is executed." ) )
         scriptDirectoryEntry.set_text( script.getDirectory() )
 
         box.pack_start( scriptDirectoryEntry, True, True, 0 )
@@ -574,7 +574,7 @@ class IndicatorScriptRunner:
         box.pack_start( label, False, False, 0 )
 
         commandTextView = Gtk.TextView()
-        commandTextView.set_tooltip_text( _( "The terminal script/command,\nalong with any arguments." ) )
+        commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
         commandTextView.get_buffer().set_text( script.getCommand() )
 
@@ -587,7 +587,7 @@ class IndicatorScriptRunner:
         grid.attach( box, 0, 3, 1, 20 )
 
         terminalCheckbox = Gtk.CheckButton( _( "Leave terminal open" ) )
-        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after\nthe script completes." ) )
+        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) )
         terminalCheckbox.set_active( script.isTerminalOpen() )
 
         grid.attach( terminalCheckbox, 0, 23, 1, 1 )
@@ -606,7 +606,7 @@ class IndicatorScriptRunner:
 
         defaultScriptCheckbox = Gtk.CheckButton( _( "Default script" ) )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
-        defaultScriptCheckbox.set_tooltip_text( _( "If checked, this script will be run\non a middle mouse click of the\nindicator icon.\n\nOnly one script can be the default." ) )
+        defaultScriptCheckbox.set_tooltip_text( _( "If checked, this script will be run on a\nmiddle mouse click of the indicator icon.\n\nOnly one script can be the default." ) )
 
         grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
 
