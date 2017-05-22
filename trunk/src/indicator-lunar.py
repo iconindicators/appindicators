@@ -2610,7 +2610,7 @@ class IndicatorLunar:
             "If checked, planets, moon, sun\n" + \
             "comets and stars which rise/set\n" + \
             "or are 'always up' will be shown.\n\n" + \
-            "Otherwise, all bodies are shown." ) )
+            "Otherwise all bodies are shown." ) )
         grid.attach( hideBodyIfNeverUpCheckbox, 0, 4, 1, 1 )
 
         groupStarsByConstellationCheckbox = Gtk.CheckButton( _( "Group stars by constellation" ) )
@@ -2618,7 +2618,7 @@ class IndicatorLunar:
         groupStarsByConstellationCheckbox.set_active( self.groupStarsByConstellation )
         groupStarsByConstellationCheckbox.set_tooltip_text( _( 
             "If checked, stars are grouped by constellation.\n\n" + \
-            "Otherwise, stars are listed by name." ) )
+            "Otherwise stars are listed by name." ) )
         grid.attach( groupStarsByConstellationCheckbox, 0, 5, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -2653,7 +2653,7 @@ class IndicatorLunar:
         sortSatellitesByDateTimeCheckbox.set_tooltip_text( _(
             "If checked, satellites are sorted\n" + \
             "by rise date/time.\n\n" + \
-            "Otherwise, satellites are sorted\n" + \
+            "Otherwise satellites are sorted\n" + \
             "by Name, Number and then\n" + \
             "International Designator." ) )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 8, 1, 1 )
@@ -2664,7 +2664,7 @@ class IndicatorLunar:
         hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text( _( 
             "If checked, only satellites with an\n" + \
             "upcoming visible pass are displayed.\n\n" + \
-            "Otherwise, all passes are shown." ) )
+            "Otherwise all passes are shown." ) )
         grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 9, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
