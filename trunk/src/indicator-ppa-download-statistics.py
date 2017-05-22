@@ -348,21 +348,21 @@ class IndicatorPPADownloadStatistics:
         scrolledWindow.add( ppaTree )
         grid.attach( scrolledWindow, 0, 0, 1, 1 )
 
-        hbox = Gtk.Box( spacing = 6 )
-        hbox.set_homogeneous( True )
+        box = Gtk.Box( spacing = 6 )
+        box.set_homogeneous( True )
+        box.set_halign( Gtk.Align.CENTER )
 
         addButton = Gtk.Button( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new PPA." ) )
         addButton.connect( "clicked", self.onPPAAdd, ppaTree )
-        hbox.pack_start( addButton, True, True, 0 )
+        box.pack_start( addButton, True, True, 0 )
 
         removeButton = Gtk.Button( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected PPA." ) )
         removeButton.connect( "clicked", self.onPPARemove, ppaTree )
-        hbox.pack_start( removeButton, True, True, 0 )
+        box.pack_start( removeButton, True, True, 0 )
 
-        hbox.set_halign( Gtk.Align.CENTER )
-        grid.attach( hbox, 0, 1, 1, 1 )
+        grid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "PPAs" ) ) )
 
@@ -395,21 +395,21 @@ class IndicatorPPADownloadStatistics:
         scrolledWindow.add( filterTree )
         grid.attach( scrolledWindow, 0, 0, 1, 1 )
 
-        hbox = Gtk.Box( spacing = 6 )
-        hbox.set_homogeneous( True )
+        box = Gtk.Box( spacing = 6 )
+        box.set_homogeneous( True )
+        box.set_halign( Gtk.Align.CENTER )
 
         addButton = Gtk.Button( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new filter." ) )
         addButton.connect( "clicked", self.onFilterAdd, filterTree, ppaTree )
-        hbox.pack_start( addButton, True, True, 0 )
+        box.pack_start( addButton, True, True, 0 )
 
         removeButton = Gtk.Button( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected filter." ) )
         removeButton.connect( "clicked", self.onFilterRemove, filterTree )
-        hbox.pack_start( removeButton, True, True, 0 )
+        box.pack_start( removeButton, True, True, 0 )
 
-        hbox.set_halign( Gtk.Align.CENTER )
-        grid.attach( hbox, 0, 1, 1, 1 )
+        grid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Filters" ) ) )
 
@@ -427,7 +427,7 @@ class IndicatorPPADownloadStatistics:
             "The download statistics for each PPA\n" + \
             "are shown in a separate submenu." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
-        grid.attach( showAsSubmenusCheckbox, 0, 0, 2, 1 )
+        grid.attach( showAsSubmenusCheckbox, 0, 0, 1, 1 )
 
         combinePPAsCheckbox = Gtk.CheckButton( _( "Combine PPAs" ) )
         combinePPAsCheckbox.set_tooltip_text( _(
@@ -452,7 +452,7 @@ class IndicatorPPADownloadStatistics:
             "this category." ) )
         combinePPAsCheckbox.set_active( self.combinePPAs )
         combinePPAsCheckbox.set_margin_top( 10 )
-        grid.attach( combinePPAsCheckbox, 0, 1, 2, 1 )
+        grid.attach( combinePPAsCheckbox, 0, 1, 1, 1 )
 
         ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( _( "Ignore version for architecture specific" ) )
         ignoreVersionArchitectureSpecificCheckbox.set_margin_left( 15 )
@@ -475,7 +475,7 @@ class IndicatorPPADownloadStatistics:
             "instances of a published binary." ) )
         ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
-        grid.attach( ignoreVersionArchitectureSpecificCheckbox, 0, 2, 2, 1 )
+        grid.attach( ignoreVersionArchitectureSpecificCheckbox, 0, 2, 1, 1 )
 
         combinePPAsCheckbox.connect( "toggled", self.onCombinePPAsCheckbox, ignoreVersionArchitectureSpecificCheckbox )
 
@@ -483,12 +483,14 @@ class IndicatorPPADownloadStatistics:
         sortByDownloadCheckbox.set_tooltip_text( _( "Sort by download count within each PPA." ) )
         sortByDownloadCheckbox.set_active( self.sortByDownload )
         sortByDownloadCheckbox.set_margin_top( 10 )
-        grid.attach( sortByDownloadCheckbox, 0, 3, 2, 1 )
+        grid.attach( sortByDownloadCheckbox, 0, 3, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
 
         label = Gtk.Label( _( "  Clip amount" ) )
         label.set_sensitive( sortByDownloadCheckbox.get_active() )
         label.set_margin_left( 15 )
-        grid.attach( label, 0, 4, 1, 1 )
+        box.pack_start( label, False, False, 0 )
 
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
@@ -498,7 +500,9 @@ class IndicatorPPADownloadStatistics:
             "when sorting by download.\n\n" + \
             "A value of zero will not clip." ) )
         spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
-        grid.attach( spinner, 1, 4, 1, 1 )
+        box.pack_start( spinner, True, True, 0 )
+
+        grid.attach( box, 0, 4, 1, 1 )
 
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
@@ -506,7 +510,7 @@ class IndicatorPPADownloadStatistics:
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorPPADownloadStatistics.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 5, 2, 1 )
+        grid.attach( autostartCheckbox, 0, 5, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
