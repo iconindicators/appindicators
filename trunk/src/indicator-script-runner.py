@@ -307,7 +307,7 @@ class IndicatorScriptRunner:
         grid.set_margin_bottom( 10 )
 
         showScriptsInSubmenusCheckbox = Gtk.CheckButton( _( "Show scripts in submenus" ) )
-        showScriptsInSubmenusCheckbox.set_tooltip_text( _( "When checked, scripts with the same\ngroup are shown in submenus.\n\nOtherwise, scripts appear in a list,\nindented by group." ) )
+        showScriptsInSubmenusCheckbox.set_tooltip_text( _( "When checked, scripts with the same\ngroup are shown in submenus.\n\nOtherwise scripts appear in a list,\nindented by group." ) )
         showScriptsInSubmenusCheckbox.set_active( self.showScriptsInSubmenus )
         grid.attach( showScriptsInSubmenusCheckbox, 0, 0, 1, 1 )
 
