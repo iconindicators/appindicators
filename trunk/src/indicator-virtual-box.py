@@ -599,11 +599,9 @@ class IndicatorVirtualBox:
             self.delayBetweenAutoStartInSeconds = spinnerDelay.get_value_as_int()
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.sortDefault = not sortAlphabeticallyCheckbox.get_active()
-
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
-
-            self.virtualMachinePreferences.clear()#TODO Why do this?
-            self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )#TODO Why do this?
+            self.virtualMachinePreferences.clear()
+            self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
             pythonutils.setAutoStart( IndicatorVirtualBox.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             self.saveSettings()
             GLib.idle_add( self.update, False )
