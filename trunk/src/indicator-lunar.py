@@ -3232,6 +3232,8 @@ class IndicatorLunar:
             GLib.idle_add( self.update, False )
             break
 
+        dialog.destroy()
+
 
     def appendToDisplayTagsStore( self, key, value, displayTagsStore ):
         astronomicalBodyType = key[ 0 ]
