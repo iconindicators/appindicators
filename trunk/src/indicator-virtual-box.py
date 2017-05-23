@@ -119,21 +119,21 @@ class IndicatorVirtualBox:
                             currentMenu = stack.pop()
 
                         if virtualMachine.isGroup():
-                            menuItem = Gtk.MenuItem( self.getGroupName( virtualMachine ) )
+                            menuItem = Gtk.MenuItem( virtualMachine.getGroupName() )
                             currentMenu.append( menuItem )
                             subMenu = Gtk.Menu()
                             menuItem.set_submenu( subMenu )
                             stack.append( currentMenu )
                             currentMenu = subMenu
                         else:
-                            currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, "", runningVirtualMachines ) )
+                            currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, "", virtualMachine.getUUID() in runningVirtualMachines ) )
                 else:
                     for virtualMachine in virtualMachines:
                         indent = "    " * virtualMachine.getIndent()
                         if virtualMachine.isGroup():
-                            menu.append( Gtk.MenuItem( indent + self.getGroupName( virtualMachine ) ) )
+                            menu.append( Gtk.MenuItem( indent + virtualMachine.getGroupName() ) )
                         else:
-                            menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, runningVirtualMachines ) )
+                            menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, virtualMachine.getUUID() in runningVirtualMachines ) )
 
             menu.append( Gtk.SeparatorMenuItem() )
             menuItem = Gtk.MenuItem( _( "Launch VirtualBox Manager" ) )
@@ -148,8 +148,9 @@ class IndicatorVirtualBox:
         menu.show_all()
 
 
-    def createMenuItemForVirtualMachine( self, virtualMachine, indent, runningVirtualMachines ):
-        if virtualMachine.getUUID() in runningVirtualMachines: # No need to check if this is a group...groups never "run" and this function should only be called for a VM and never a group.
+#TODO When getting the VM name from the menu item, do a trim!
+    def createMenuItemForVirtualMachine( self, virtualMachine, indent, isRunning ):
+        if isRunning:
             menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
             menuItem.set_active( True )
         else:
@@ -161,14 +162,25 @@ class IndicatorVirtualBox:
 
 
     def onVirtualMachine( self, widget ):
-        virtualMachine = self.getVirtualMachine( widget.props.name )
-        if virtualMachine is None:
-            message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
-            Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
-            logging.error( "Missing VM '{0}', UUID '{1}'.".format( widget.props.label, widget.props.name ) )
-            GLib.idle_add( self.update, False )
-        else:
-            self.startVirtualMachine( virtualMachine, 0 ) # Set a zero delay as this is not an autostart.
+        uuid = widget.props.name
+        name = widget.props.label.strip() # If the VM is running it might have blanks before the name.
+        self.startVirtualMachine( uuid, name, 0 ) # Set a zero delay as this is not an autostart.
+
+#             message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
+#             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+#             logging.error( "Missing VM '{0}', UUID '{1}'.".format( widget.props.label, widget.props.name ) )
+#             GLib.idle_add( self.update, False )
+
+
+#     def onVirtualMachine( self, widget ):
+#         virtualMachine = self.getVirtualMachine( widget.props.name )
+#         if virtualMachine is None:
+#             message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
+#             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+#             logging.error( "Missing VM '{0}', UUID '{1}'.".format( widget.props.label, widget.props.name ) )
+#             GLib.idle_add( self.update, False )
+#         else:
+#             self.startVirtualMachine( virtualMachine, 0 ) # Set a zero delay as this is not an autostart.
 
 
     # It is assumed that VirtualBox is installed!
@@ -227,15 +239,12 @@ class IndicatorVirtualBox:
         return name
 
 
-    def getGroupName( self, virtualMachine ): return virtualMachine.getName()[ virtualMachine.getName().rfind( "/" ) + 1 : ]
-
-
-    def getVirtualMachine( self, uuid ):
-        for virtualMachine in self.getVirtualMachines():
-            if virtualMachine.getUUID() == uuid:
-                return virtualMachine
-
-        return None
+#     def getVirtualMachine( self, uuid ):
+#         for virtualMachine in self.getVirtualMachines():
+#             if virtualMachine.getUUID() == uuid:
+#                 return virtualMachine
+# 
+#         return None
 
 
     def getVirtualMachines( self ):
@@ -288,7 +297,14 @@ class IndicatorVirtualBox:
         virtualMachines = self.getVirtualMachines()
         for virtualMachine in virtualMachines:
             if self.isAutostart( virtualMachine.getUUID() ):
-                self.startVirtualMachine( virtualMachine, self.delayBetweenAutoStartInSeconds )
+                self.startVirtualMachine( virtualMachine.getUUID(), virtualMachine.getName(), self.delayBetweenAutoStartInSeconds )
+
+
+#     def autoStartVirtualMachines( self ):
+#         virtualMachines = self.getVirtualMachines()
+#         for virtualMachine in virtualMachines:
+#             if self.isAutostart( virtualMachine.getUUID() ):
+#                 self.startVirtualMachine( virtualMachine, self.delayBetweenAutoStartInSeconds )
 
 
     # Returns the version number as a string or None if no version could be determined.
@@ -415,8 +431,8 @@ class IndicatorVirtualBox:
         return False
 
 
-    def startVirtualMachine( self, virtualMachine, delayInSeconds ):
-        if virtualMachine is None:
+    def startVirtualMachine( self, uuid, name, delayInSeconds ):
+        if virtualMachine is None: #TODO Should we need to check for None (if so, then here or somewhere else)?
             message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
 
@@ -435,6 +451,28 @@ class IndicatorVirtualBox:
                 logging.exception( e )
                 message = _( "The VM '{0}' could not be started." ).format( virtualMachine.getUUID() )
                 Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+
+
+#     def startVirtualMachine( self, virtualMachine, delayInSeconds ):
+#         if virtualMachine is None: #TODO Should we need to check for None (if so, then here or somewhere else)?
+#             message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
+#             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+# 
+#         elif virtualMachine.getUUID() in self.getRunningVirtualMachines():
+#             self.bringWindowToFront( virtualMachine.getName() )
+# 
+#         else:
+#             try:
+#                 startCommand = self.getStartCommand( virtualMachine.getUUID() ).replace( "%VM%", virtualMachine.getUUID() ) + " &"
+#                 pythonutils.processCall( startCommand )
+#                 GLib.timeout_add_seconds( 10, self.update, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
+#                 if delayInSeconds > 0:
+#                     time.sleep( delayInSeconds )
+# 
+#             except Exception as e:
+#                 logging.exception( e )
+#                 message = _( "The VM '{0}' could not be started." ).format( virtualMachine.getUUID() )
+#                 Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
 
 
     def getStartCommand( self, uuid ):
@@ -496,7 +534,7 @@ class IndicatorVirtualBox:
 
             if virtualMachine.isGroup():
                 stack.append( parent )
-                parent = store.append( parent, [ self.getGroupName( virtualMachine ), None, "", virtualMachine.getUUID() ] )
+                parent = store.append( parent, [ virtualMachine.getGroupName(), None, "", virtualMachine.getUUID() ] )
             else:
                 autoStart = None
                 if self.isAutostart( virtualMachine.getUUID() ):
