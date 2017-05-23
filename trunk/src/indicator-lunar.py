@@ -936,11 +936,10 @@ class IndicatorLunar:
         if not os.path.exists( IndicatorLunar.CACHE_PATH ):
             os.makedirs( IndicatorLunar.CACHE_PATH )
 
-        self.dialogLock = threading.Lock()
-        self.lock = threading.Lock() #TODO Needed?
-
         filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+
+        self.dialogLock = threading.Lock()
         Notify.init( INDICATOR_NAME )
 
         # Initialise last update date/times to the past...
@@ -953,17 +952,18 @@ class IndicatorLunar:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.loadSettings()
-        self.update()
+        self.update( True )
 
 
     def main( self ): Gtk.main()
 
 
-    def update( self ): Thread( target = self.updateBackend ).start()
+    def update( self, scheduled ):
+        with threading.Lock():
+            if not scheduled:
+                GLib.source_remove( self.updateTimerID )
 
-
-    def updateBackend( self ):
-        if self.lock.acquire( blocking = False ):
+            # Update backend...
             self.updateCometOEData()
             self.updateSatelliteTLEData() 
 
@@ -977,31 +977,28 @@ class IndicatorLunar:
 
             ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
             self.updateAstronomicalInformation( ephemNow, self.hideBodyIfNeverUp, self.cometsMagnitude, self.hideSatelliteIfNoVisiblePass )
-            GLib.idle_add( self.updateFrontend, ephemNow )
 
+            # Update frontend...
+            self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
+            self.updateMenu()
+            self.updateIconAndLabel( ephemNow )
 
-    def updateFrontend( self, ephemNow ):
-        self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
-        self.updateMenu()
-        self.updateIconAndLabel( ephemNow )
+            if self.showWerewolfWarning:
+                self.notificationFullMoon( ephemNow )
 
-        if self.showWerewolfWarning:
-            self.notificationFullMoon( ephemNow )
+            if self.showSatelliteNotification:
+                self.notificationSatellite()
 
-        if self.showSatelliteNotification:
-            self.notificationSatellite()
+            self.nextUpdate = self.toDateTime( self.nextUpdate ) # Parse from string back into a datetime.
+            nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
 
-        self.nextUpdate = self.toDateTime( self.nextUpdate ) # Parse from string back into a datetime.
-        nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
+            # Ensure the update period is positive, at most every minute and at least every hour.
+            if nextUpdateInSeconds < 60:
+                nextUpdateInSeconds = 60
+            elif nextUpdateInSeconds > ( 60 * 60 ):
+                nextUpdateInSeconds = ( 60 * 60 )
 
-        # Ensure the update period is positive, at most every minute and at least every hour.
-        if nextUpdateInSeconds < 60:
-            nextUpdateInSeconds = 60
-        elif nextUpdateInSeconds > ( 60 * 60 ):
-            nextUpdateInSeconds = ( 60 * 60 )
-
-        self.eventSourceID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update )
-        self.lock.release()
+            self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update, True )
 
 
     def updateMenu( self ):
@@ -2389,40 +2386,15 @@ class IndicatorLunar:
 
     def onPreferences( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
-            self.onPreferencesInternal( widget )
+            self._onPreferences( widget )
             self.dialogLock.release()
 
 
-    def onPreferencesInternal( self, widget ):
-#TODO Now need to make a copy of the backend data?
-#Seems to be a problem below...but maybe it's not really a problem.
-        pass
+#TODO Need to make a copy of the backend data?
+#If need to make a copy, copy self.data and what about the list of sats/comets...will they change in the dialog if an update (refetch) occurs?
 
 
-
-#TODO Remove this...
-#Allow the prefs/about to launch, irrespective of an update occurring.
-    def waitForUpdateToFinish( self, widget ):
-        while not self.lock.acquire( blocking = False ):
-            time.sleep( 1 )
-
-        GLib.idle_add( self._onPreferencesInternal, widget )        
-
-
-    def onPreferences( self, widget ):
-        # If the preferences were open and accessing the backend data (self.data) and an update occurs, that's not good.
-        # So ensure that no update is occurring...if it is, wait for it to end.
-        if self.lock.acquire( blocking = False ):
-            self._onPreferencesInternal( widget )
-        else:
-            summary = _( "Preferences unavailable..." )
-            message = _( "The lunar indicator is momentarily refreshing; preferences will be available shortly." )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            Thread( target = self.waitForUpdateToFinish, args = ( widget, ) ).start() #TODO What if the user selects Preferences several times...do we get several threads?
-
-
-    def _onPreferencesInternal( self, widget ):
-        GLib.source_remove( self.eventSourceID ) # Ensure no update occurs whilst the preferences are open.
+    def _onPreferences( self, widget ):
 
         TAB_ICON = 0
         TAB_MENU = 1
@@ -3261,10 +3233,8 @@ class IndicatorLunar:
 
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorLunar.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+            GLib.idle_add( self.update, False )
             break
-
-        self.lock.release()
-        self.update() #TODO Why do the update even when cancel?  If decide to only update on OK, need to call update after the lock is released.
 
 
     def appendToDisplayTagsStore( self, key, value, displayTagsStore ):
