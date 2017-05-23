@@ -78,7 +78,7 @@ class IndicatorScriptRunner:
     def __init__( self ):
         filehandler = pythonutils.TruncatedFileHandler( IndicatorScriptRunner.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
-        self.lock = threading.Lock()
+        self.dialogLock = threading.Lock()
 
         self.loadSettings()
 
@@ -146,7 +146,7 @@ class IndicatorScriptRunner:
 
 
     def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
                 [ IndicatorScriptRunner.AUTHOR ],
                 IndicatorScriptRunner.COMMENTS, 
@@ -162,13 +162,13 @@ class IndicatorScriptRunner:
                 _( "text file." ),
                 _( "changelog" ) )
 
-            self.lock.release()
+            self.dialogLock.release()
 
 
     def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
+        if self.dialogLock.acquire( blocking = False ):
             self._onPreferencesInternal( widget )
-            self.lock.release()
+            self.dialogLock.release()
 
 
     def _onPreferencesInternal( self, widget ):
@@ -192,7 +192,7 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
         scriptGroupComboBox = Gtk.ComboBoxText()
-        scriptGroupComboBox.set_tooltip_text( _( "The group to which a script belongs.\n\nIf a default script is specified,\nthe group to which the script belongs\nwill be initially selected." ) )
+        scriptGroupComboBox.set_tooltip_text( _( "The group to which a script belongs.\n\nIf a default script is specified, the\ngroup to which the script belongs\nwill be initially selected." ) )
         scriptGroupComboBox.set_entry_text_column( 0 )
 
         box.pack_start( scriptGroupComboBox, True, True, 0 )
