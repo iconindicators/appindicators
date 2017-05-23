@@ -141,7 +141,7 @@ class IndicatorVirtualBox:
             menuItem = Gtk.MenuItem( _( "Launch VirtualBox Manager" ) )
             menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
             menu.append( menuItem )
-            
+
         else:
             menu.insert( Gtk.MenuItem( _( "(VirtualBox is not installed)" ) ), 0 )
 
@@ -163,25 +163,13 @@ class IndicatorVirtualBox:
         return menuItem
 
 
-    def onVirtualMachine( self, widget ):
-        uuid = widget.props.name
-        self.startVirtualMachine( uuid, 0 ) # Set a zero delay as this is not an autostart.
+#TODO Can this be put into a lamba?
+    def onVirtualMachine( self, widget ): self.startVirtualMachine( widget.props.name, 0 ) # Set a zero delay as this is not an autostart.
 
 #             message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
 #             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
 #             logging.error( "Missing VM '{0}', UUID '{1}'.".format( widget.props.label, widget.props.name ) )
 #             GLib.idle_add( self.update, False )
-
-
-#     def onVirtualMachine( self, widget ):
-#         virtualMachine = self.getVirtualMachine( widget.props.name )
-#         if virtualMachine is None:
-#             message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
-#             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
-#             logging.error( "Missing VM '{0}', UUID '{1}'.".format( widget.props.label, widget.props.name ) )
-#             GLib.idle_add( self.update, False )
-#         else:
-#             self.startVirtualMachine( virtualMachine, 0 ) # Set a zero delay as this is not an autostart.
 
 
     # It is assumed that VirtualBox is installed!
@@ -194,9 +182,10 @@ class IndicatorVirtualBox:
         if windowID is None or windowID == "":
             pythonutils.processCall( "/usr/lib/virtualbox/VirtualBox &" )
         else:
-            pythonutils.processCall( "wmctrl -ia " + windowID.strip() )
+            pythonutils.processCall( "wmctrl -ia " + windowID.strip() ) #TODO Check this works in non-English
 
 
+#TODO Double check this all makes sense and is efficient.
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
         runningVMs = self.getRunningVirtualMachines()
         if len( runningVMs ) > 0:
@@ -212,10 +201,11 @@ class IndicatorVirtualBox:
                 self.scrollUUID = runningVMs[ index ]
                 self.scrollDirectionIsUp = False
 
-            self.bringWindowToFront( self.getVirtualMachineNameFromUUID( self.scrollUUID ) )
+            self.bringWindowToFront( self.scrollUUID )
 
 
-    def bringWindowToFront( self, virtualMachineName ):
+    def bringWindowToFront( self, uuid ):
+        virtualMachineName = self.getVirtualMachinesByUUID()[ uuid ].getName()
         numberOfWindowsWithTheSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
         if numberOfWindowsWithTheSameName == "0":
             message = _( "The VM '{0}' is running but its window could not be found - perhaps it is running headless." ).format( virtualMachineName )
@@ -231,24 +221,6 @@ class IndicatorVirtualBox:
             Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
 
 
-    def getVirtualMachineNameFromUUID( self, UUID ):
-        name = ""
-        result = pythonutils.processGet( "VBoxManage list runningvms | grep " + UUID )
-        if result is not None:
-            name = result[ 1 : result.find( "\" {" ) ]
-
-        return name
-
-
-#     def getVirtualMachine( self, uuid ):
-#         for virtualMachine in self.getVirtualMachines():
-#             if virtualMachine.getUUID() == uuid:
-#                 return virtualMachine
-# 
-#         return None
-
-
-#TODO Rename to refreshVMs
     def refreshVirtualMachines( self ):
         self.virtualMachines = [ ]
         if self.isVBoxManageInstalled():
@@ -274,6 +246,8 @@ class IndicatorVirtualBox:
                             virtualMachine.setName( virtualmachineFromVBoxManage.getName() )
                             break
 
+#TODO Check the code/sense in the test
+#...also do this here?  Perhaps do it (say in build menu) where it is needed?
                 # Alphabetically sort...or not.
                 if self.sortDefault == False and not self.groupsExist( self.virtualMachines ):
                     self.virtualMachines = sorted( self.virtualMachines, key = lambda virtualMachine: virtualMachine.name )
@@ -301,17 +275,10 @@ class IndicatorVirtualBox:
 
 
     def autoStartVirtualMachines( self ):
-        virtualMachines = self.getVirtualMachines()
-        for virtualMachine in virtualMachines:
+        virtualMachines = self.getVirtualMachinesByUUID()
+        for virtualMachine in virtualMachines: # TODO Check this iterates over all
             if self.isAutostart( virtualMachine.getUUID() ):
-                self.startVirtualMachine( virtualMachine.getUUID(), virtualMachine.getName(), self.delayBetweenAutoStartInSeconds )
-
-
-#     def autoStartVirtualMachines( self ):
-#         virtualMachines = self.getVirtualMachines()
-#         for virtualMachine in virtualMachines:
-#             if self.isAutostart( virtualMachine.getUUID() ):
-#                 self.startVirtualMachine( virtualMachine, self.delayBetweenAutoStartInSeconds )
+                self.startVirtualMachine( virtualMachine.getUUID(), virtualMachine.getName(), self.delayBetweenAutoStartInSeconds ) #TODO Pass in startup command from prefs?
 
 
     # Returns the version number as a string or None if no version could be determined.
@@ -445,7 +412,7 @@ class IndicatorVirtualBox:
 
         virtualMachine = self.getVirtualMachinesByUUID()[ uuid ]
         if uuid in self.getRunningVirtualMachines():
-            self.bringWindowToFront( virtualMachine.getName() )
+            self.bringWindowToFront( virtualMachine.getName() ) #TODO Maybe make onVirtualMachine take a delay parameter and it either calls toFront or this start function.
 
         else:
             try:
