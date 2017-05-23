@@ -182,11 +182,11 @@ class IndicatorStardate:
 
     def onPreferences( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
-            self._onPreferencesInternal( widget )
+            self._onPreferences( widget )
             self.dialogLock.release()
 
 
-    def _onPreferencesInternal( self, widget ):
+    def _onPreferences( self, widget ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
