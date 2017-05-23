@@ -85,7 +85,7 @@ class IndicatorTide:
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
-        self.scheduledUpdate()
+        self.update( True )
 
         if ports.isExpired():
             message = _(
@@ -96,6 +96,20 @@ class IndicatorTide:
 
 
     def main( self ): Gtk.main()
+
+
+    def update( self, scheduled ):
+        with threading.Lock():
+            if not scheduled:
+                GLib.source_remove( self.updateTimerID )
+
+            tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.getDaylightSavingsOffsetInMinutes() )
+            self.buildMenu( tidalReadings )
+            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
+    
+            if tidalReadings is None or len( tidalReadings ) == 0:
+                message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
+                Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
 
     def buildMenu( self, tidalReadings ):
@@ -112,7 +126,7 @@ class IndicatorTide:
                 if firstTideReading:
                     firstMonth = tideReading.getMonth()
                     firstDay = tideReading.getDay()
-                    self.createMenuItem( menu, tideReading.getPortName(), tideReading.getURL() )
+                    menu.append( self.createMenuItem( tideReading.getPortName(), tideReading.getURL() ) )
 
                 tideDateTime = datetime.datetime( datetime.datetime.now().year, tideReading.getMonth(), tideReading.getDay(), tideReading.getHour(), tideReading.getMinute(), 0 )
 
@@ -120,12 +134,12 @@ class IndicatorTide:
                     menuItemText = indent + tideDateTime.strftime( self.menuItemDateFormat )
                     if self.showAsSubMenus:
                         if self.showAsSubMenusExceptFirstDay and firstMonth == tideReading.getMonth() and firstDay == tideReading.getDay():
-                            self.createMenuItem( menu, menuItemText, tideReading.getURL() )
+                            menu.append( self.createMenuItem( menuItemText, tideReading.getURL() ) )
                         else:
                             subMenu = Gtk.Menu()
-                            self.createMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
+                            menu.append( self.createMenuItem( menuItemText, None ).set_submenu( subMenu ) )
                     else:
-                        self.createMenuItem( menu, menuItemText, tideReading.getURL() )
+                        menu.append( self.createMenuItem( menuItemText, tideReading.getURL() ) )
 
                 menuItemText = tideDateTime.strftime( self.menuItemTideFormat )
 
@@ -138,11 +152,11 @@ class IndicatorTide:
 
                 if self.showAsSubMenus:
                     if self.showAsSubMenusExceptFirstDay and firstMonth == tideReading.getMonth() and firstDay == tideReading.getDay():
-                        self.createMenuItem( menu, indent + indent + menuItemText, tideReading.getURL() )
+                        menu.append( self.createMenuItem( indent + indent + menuItemText, tideReading.getURL() ) )
                     else:
-                        self.createMenuItem( subMenu, menuItemText, tideReading.getURL() )
+                        subMenu.append( self.createMenuItem( menuItemText, tideReading.getURL() ) )
                 else:
-                    self.createMenuItem( menu, indent + indent + menuItemText, tideReading.getURL() )
+                    menu.append( self.createMenuItem( indent + indent + menuItemText, tideReading.getURL() ) )
 
                 firstTideReading = False
                 previousMonth = tideReading.getMonth()
@@ -153,41 +167,13 @@ class IndicatorTide:
         menu.show_all()
 
 
-    def createMenuItem( self, menu, menuItemText, url ):
+    def createMenuItem( self, menuItemText, url ):
         menuItem = Gtk.MenuItem( menuItemText )
-
         if url is not None:
-            menuItem.connect( "activate", self.onTideMenuItem )
+            menuItem.connect( "activate", lambda widget: webbrowser.open( widget.props.name ) ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a dialog lock up!
             menuItem.set_name( url )
 
-        menu.append( menuItem )
         return menuItem
-
-
-    def onTideMenuItem( self, widget ): webbrowser.open( widget.props.name ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a dialogLock up!
-
-
-    # Called ad hoc when an update needs to be forced - internally clears the existing timer.
-    def unscheduledUpdate( self ):
-        with threading.Lock():
-            GLib.source_remove( self.updateTimerID )
-            self._update()
-
-
-    # Called from a timer event only.
-    def scheduledUpdate( self ):
-        with threading.Lock():
-            self._update()
-
-
-    def _update( self ):
-        tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.getDaylightSavingsOffsetInMinutes() )
-        self.buildMenu( tidalReadings )
-        self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.scheduledUpdate )
-
-        if tidalReadings is None or len( tidalReadings ) == 0:
-            message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
-            Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
 
     # Determines if the computer is currently in daylight savings or not (for the given time zone)
@@ -371,7 +357,7 @@ class IndicatorTide:
             self.menuItemTideFormat = tideFormat.get_text().strip()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorTide.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.idle_add( self.unscheduledUpdate )
+            GLib.idle_add( self.update, False )
 
         dialog.destroy()
 
