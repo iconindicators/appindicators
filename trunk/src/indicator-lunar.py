@@ -56,21 +56,10 @@ except:
 class AstronomicalBodyType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star, Sun = range( 7 )
 
 
-#TODO
-# Need to disable the menu items for virtual box and script runner when Preferences is shown?
-#
-# For lunar and ppa, whilst an update is occurring, need to block Preferences?
-# Use a lock to stop the update if the Preferences is opened?
-#
-# If the lock is available then can show the About dialog or Preferences dialog or do an update...
-# Each of these things must first attempt to grab the lock and if unable, either reschedule later (the update happens later)
-# or let the user know things are busy (About and Prefs can notify user).
-
-
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.73"
+    VERSION = "1.0.74"
     ICON = INDICATOR_NAME
     ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
     ICON_BASE_PATH = tempfile.gettempdir()
@@ -947,7 +936,8 @@ class IndicatorLunar:
         if not os.path.exists( IndicatorLunar.CACHE_PATH ):
             os.makedirs( IndicatorLunar.CACHE_PATH )
 
-        self.lock = threading.Lock()
+        self.dialogLock = threading.Lock()
+        self.lock = threading.Lock() #TODO Needed?
 
         filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
@@ -2378,57 +2368,45 @@ class IndicatorLunar:
 
 
     def onAbout( self, widget ):
-        dialog = pythonutils.createAboutDialog(
-            [ IndicatorLunar.AUTHOR ],
-            IndicatorLunar.ABOUT_COMMENTS, 
-            IndicatorLunar.ABOUT_CREDITS,
-            _( "Credits" ),
-            Gtk.License.GPL_3_0,
-            IndicatorLunar.ICON,
-            INDICATOR_NAME,
-            IndicatorLunar.WEBSITE,
-            IndicatorLunar.VERSION,
-            _( "translator-credits" ),
-            _( "View the" ),
-            _( "text file." ),
-            _( "changelog" ) )
+        if self.dialogLock.acquire( blocking = False ):
+            pythonutils.showAboutDialog(
+                [ IndicatorLunar.AUTHOR ],
+                IndicatorLunar.ABOUT_COMMENTS, 
+                IndicatorLunar.ABOUT_CREDITS,
+                _( "Credits" ),
+                Gtk.License.GPL_3_0,
+                IndicatorLunar.ICON,
+                INDICATOR_NAME,
+                IndicatorLunar.WEBSITE,
+                IndicatorLunar.VERSION,
+                _( "translator-credits" ),
+                _( "View the" ),
+                _( "text file." ),
+                _( "changelog" ) )
 
-        dialog.run()
-        dialog.destroy()
+            self.dialogLock.release()
 
 
+    def onPreferences( self, widget ):
+        if self.dialogLock.acquire( blocking = False ):
+            self.onPreferencesInternal( widget )
+            self.dialogLock.release()
+
+
+    def onPreferencesInternal( self, widget ):
+#TODO Now need to make a copy of the backend data?
+#Seems to be a problem below...but maybe it's not really a problem.
+        pass
+
+
+
+#TODO Remove this...
+#Allow the prefs/about to launch, irrespective of an update occurring.
     def waitForUpdateToFinish( self, widget ):
         while not self.lock.acquire( blocking = False ):
             time.sleep( 1 )
 
         GLib.idle_add( self._onPreferencesInternal, widget )        
-
-
-#TODO Can we just turn off the Prefernces/About whilst an update is underway?
-# Look at PPA...the update is delayed if Prefs are open...do something similar here?
-#Also need to check if an update is underway and if so, alert the user (either use existing waitForUpdateToFinish or just tell user they can try later).
-#May not need to worry about an update occurring whilst Pref/About open (or maybe just Pref) as Pref remove the timer ID.
-#
-# What needs to happen...
-#    
-#    When Preferences is selected, if an update is underway, either 
-#        Notify the user the update is occurring and they can choose again in a minute, or
-#        Notify the user the update is occurring and we launch the Preferences when the update finishes.
-#
-#        When the Preferences is finally displayed, disable the menu and remove the timer for the next update (do this in a lock).
-#
-#        When the Preferences is closed, reenable the menu and kick off an update (regardless of OK or cancel).
-#    
-#    Ditto for About, including doing an update.
-#    
-#    
-#    
-# If an update is running, block Preferences (and About?)
-# If preferences is running, block an update from starting.
-# Should Quit always be available?  Update only takes seconds...if caught in a loop, then it's a programming error and the error needs to be fixed.
-#
-#    User selects About: grab lock
-
 
 
     def onPreferences( self, widget ):
