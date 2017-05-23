@@ -475,11 +475,11 @@ class IndicatorVirtualBox:
 
     def onPreferences( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
-            self._onPreferencesInternal( widget )
+            self._onPreferences( widget )
             self.dialogLock.release()
 
 
-    def _onPreferencesInternal( self, widget ):
+    def _onPreferences( self, widget ):
         notebook = Gtk.Notebook()
 
         # List of VMs.
