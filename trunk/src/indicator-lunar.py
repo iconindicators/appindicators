@@ -40,7 +40,7 @@ gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
 #TODO Clean up.
-from gi.repository import AppIndicator3, GLib, GObject, Gtk, Notify
+from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
 import calendar, copy, datetime, eclipse, glob, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, sys, tempfile, threading, time, webbrowser
@@ -948,7 +948,6 @@ class IndicatorLunar:
         if not os.path.exists( IndicatorLunar.CACHE_PATH ):
             os.makedirs( IndicatorLunar.CACHE_PATH )
 
-        GObject.threads_init()
         self.lock = threading.Lock()
 
         filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
