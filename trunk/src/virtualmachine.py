@@ -29,7 +29,6 @@ class Info:
         self.group = isGroup
         self.uuid = uuid
         self.indent = indent
-        self.running = False
 
 
     def getName( self ): return self.name
@@ -47,7 +46,10 @@ class Info:
     def getIndent( self ): return self.indent
 
 
-    def __str__( self ): return self.getName() + " | " + str( self.isGroup() ) + " | " + self.getUUID() + " | " + str( self.getIndent() ) + " | " + str( self.isRunning() )
+    def getGroupName( self ): return self.name[ self.name.rfind( "/" ) + 1 : ] # Works for non-groups too, in case it's called!
+
+
+    def __str__( self ): return self.getName() + " | " + str( self.isGroup() ) + " | " + self.getUUID() + " | " + str( self.getIndent() )
 
 
     def __repr__( self ): return self.__str__()
