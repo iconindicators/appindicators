@@ -81,23 +81,31 @@ class IndicatorVirtualBox:
 
         Notify.init( INDICATOR_NAME )
         self.loadSettings()
-        virtualMachines = self.getVirtualMachines()
-        Thread( target = self.autoStartVirtualMachines, args = ( virtualMachines, ) ).start()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorVirtualBox.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
 
-        self.buildMenu( virtualMachines )
-        self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh, True )
+        self.update( True )
+        Thread( target = self.autoStartVirtualMachines ).start()
 
 
     def main( self ): Gtk.main()
 
 
-    def buildMenu( self, virtualMachines ):
+    def update( self, scheduled ):
+        with threading.Lock():
+            if not scheduled:
+                GLib.source_remove( self.updateTimerID )
+
+            self.buildMenu()
+            self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.update, True )
+
+
+    def buildMenu( self ):
         menu = Gtk.Menu()
         if self.isVBoxManageInstalled():
+            virtualMachines = self.getVirtualMachines()
             if len( virtualMachines ) == 0:
                 menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
             else:
@@ -138,6 +146,42 @@ class IndicatorVirtualBox:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, False, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
+
+
+    def createMenuItemForVirtualMachine( self, virtualMachine, indent, runningVirtualMachines ):
+        if virtualMachine.getUUID() in runningVirtualMachines: # No need to check if this is a group...groups never "run" and this function should only be called for a VM and never a group.
+            menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
+            menuItem.set_active( True )
+        else:
+            menuItem = Gtk.MenuItem( indent + virtualMachine.getName() )
+
+        menuItem.props.name = virtualMachine.getUUID()
+        menuItem.connect( "activate", self.onVirtualMachine )
+        return menuItem
+
+
+    # It is assumed that VirtualBox is installed!
+    def onLaunchVirtualBoxManager( self, widget ):
+        windowID = None
+        processID = pythonutils.processGet( "ps -ef | awk '{ if( $NF == \"/usr/lib/virtualbox/VirtualBox\" ) print $2; }'" )
+        if( processID is not None and processID != "" ):
+            windowID = pythonutils.processGet( "wmctrl -lp | awk '{ if( $3 == " + processID.strip() + " ) print $1; }'" )
+
+        if windowID is None or windowID == "":
+            pythonutils.processCall( "/usr/lib/virtualbox/VirtualBox &" )
+        else:
+            pythonutils.processCall( "wmctrl -ia " + windowID.strip() )
+
+
+    def onVirtualMachine( self, widget ):
+        virtualMachine = self.getVirtualMachine( widget.props.name )
+        if virtualMachine is None:
+            message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
+            Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+            logging.error( "Missing VM '{0}', UUID '{1}'.".format( widget.props.label, widget.props.name ) )
+            GLib.idle_add( self.update, False )
+        else:
+            self.startVirtualMachine( virtualMachine, 0 ) # Set a zero delay as this is not an autostart.
 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
@@ -184,42 +228,6 @@ class IndicatorVirtualBox:
 
 
     def getGroupName( self, virtualMachine ): return virtualMachine.getName()[ virtualMachine.getName().rfind( "/" ) + 1 : ]
-
-
-    def createMenuItemForVirtualMachine( self, virtualMachine, indent, runningVirtualMachines ):
-        if virtualMachine.getUUID() in runningVirtualMachines: # No need to check if this is a group...groups never "run" and this function should only be called for a VM and never a group.
-            menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
-            menuItem.set_active( True )
-        else:
-            menuItem = Gtk.MenuItem( indent + virtualMachine.getName() )
-
-        menuItem.props.name = virtualMachine.getUUID()
-        menuItem.connect( "activate", self.onVirtualMachine )
-        return menuItem
-
-
-    # It is assumed that VirtualBox is installed!
-    def onLaunchVirtualBoxManager( self, widget ):
-        windowID = None
-        processID = pythonutils.processGet( "ps -ef | awk '{ if( $NF == \"/usr/lib/virtualbox/VirtualBox\" ) print $2; }'" )
-        if( processID is not None and processID != "" ):
-            windowID = pythonutils.processGet( "wmctrl -lp | awk '{ if( $3 == " + processID.strip() + " ) print $1; }'" )
-
-        if windowID is None or windowID == "":
-            pythonutils.processCall( "/usr/lib/virtualbox/VirtualBox &" )
-        else:
-            pythonutils.processCall( "wmctrl -ia " + windowID.strip() )
-
-
-    def onVirtualMachine( self, widget ):
-        virtualMachine = self.getVirtualMachine( widget.props.name )
-        if virtualMachine is None:
-            GLib.timeout_add_seconds( 1, self.onRefresh, False )
-            message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
-            Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
-            logging.error( "Missing VM '{0}', UUID '{1}'.".format( widget.props.label, widget.props.name ) )
-        else:
-            self.startVirtualMachine( virtualMachine, 0 ) # Set a zero delay as this is not an autostart.
 
 
     def getVirtualMachine( self, uuid ):
@@ -276,7 +284,8 @@ class IndicatorVirtualBox:
         return runningVirtualMachines
 
 
-    def autoStartVirtualMachines( self, virtualMachines ):
+    def autoStartVirtualMachines( self ):
+        virtualMachines = self.getVirtualMachines()
         for virtualMachine in virtualMachines:
             if self.isAutostart( virtualMachine.getUUID() ):
                 self.startVirtualMachine( virtualMachine, self.delayBetweenAutoStartInSeconds )
@@ -418,7 +427,7 @@ class IndicatorVirtualBox:
             try:
                 startCommand = self.getStartCommand( virtualMachine.getUUID() ).replace( "%VM%", virtualMachine.getUUID() ) + " &"
                 pythonutils.processCall( startCommand )
-                GLib.timeout_add_seconds( 10, self.onRefresh, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
+                GLib.timeout_add_seconds( 10, self.update, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
                 if delayInSeconds > 0:
                     time.sleep( delayInSeconds )
 
@@ -426,12 +435,6 @@ class IndicatorVirtualBox:
                 logging.exception( e )
                 message = _( "The VM '{0}' could not be started." ).format( virtualMachine.getUUID() )
                 Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
-
-
-    # repeat: If True, will return True resulting in onRefresh being repeatedly called.  On False, onRefresh will no longer be called.
-    def onRefresh( self, repeat ):
-        GLib.idle_add( self.buildMenu, self.getVirtualMachines() )
-        return repeat # https://developer.gnome.org/pygobject/stable/glib-functions.html
 
 
     def getStartCommand( self, uuid ):
@@ -598,15 +601,12 @@ class IndicatorVirtualBox:
             self.sortDefault = not sortAlphabeticallyCheckbox.get_active()
 
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
-            GLib.source_remove( self.timeoutID )
-            self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.onRefresh, True )
 
-            self.virtualMachinePreferences.clear()
-            self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
-
-            self.saveSettings()
+            self.virtualMachinePreferences.clear()#TODO Why do this?
+            self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )#TODO Why do this?
             pythonutils.setAutoStart( IndicatorVirtualBox.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.timeout_add_seconds( 1, self.onRefresh, False ) #TODO Use thread/lock stuff from stardate/fortune?
+            self.saveSettings()
+            GLib.idle_add( self.update, False )
 
         dialog.destroy()
 
