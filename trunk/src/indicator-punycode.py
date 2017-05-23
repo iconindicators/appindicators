@@ -43,17 +43,6 @@ from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 import encodings.idna, json, logging, os, pythonutils, re, threading
 
 
-#TODO
-# Need to disable the menu items for virtual box and script runner when Preferences is shown?
-#
-# For lunar and ppa, whilst an update is occurring, need to block Preferences?
-# Use a dialogLock to stop the update if the Preferences is opened?
-#
-# If the dialogLock is available then can show the About dialog or Preferences dialog or do an update...
-# Each of these things must first attempt to grab the dialogLock and if unable, either reschedule later (the update happens later)
-# or let the user know things are busy (About and Prefs can notify user).
-
-
 class IndicatorPunycode:
 
     AUTHOR = "Bernard Giannetti"
@@ -208,11 +197,11 @@ class IndicatorPunycode:
 
     def onPreferences( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
-            self._onPreferencesInternal( widget )
+            self._onPreferences( widget )
             self.dialogLock.release()
 
 
-    def _onPreferencesInternal( self, widget ):
+    def _onPreferences( self, widget ):
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
