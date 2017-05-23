@@ -40,7 +40,6 @@ gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
-from threading import Thread
 from urllib.request import urlopen
 import calendar, datetime, eclipse, glob, json, locale, logging, math, os, pickle, pythonutils, re, satellite, sys, tempfile, threading, time, webbrowser
 
