@@ -48,6 +48,8 @@ from threading import Thread
 import json, logging, os, pythonutils, threading, time, virtualmachine
 
 
+#TODO Is there a problem in a VM existing but not present in the preferences...can this happen?
+
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
@@ -98,6 +100,7 @@ class IndicatorVirtualBox:
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
+            self.refreshVirtualMachines()
             self.buildMenu()
             self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.update, True )
 
@@ -105,16 +108,15 @@ class IndicatorVirtualBox:
     def buildMenu( self ):
         menu = Gtk.Menu()
         if self.isVBoxManageInstalled():
-            virtualMachines = self.getVirtualMachines()
-            if len( virtualMachines ) == 0:
+            if len( self.virtualMachines ) == 0: #TODO Check this works 
                 menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
             else:
                 runningVirtualMachines = self.getRunningVirtualMachines()
-                if self.showSubmenu == True:
+                if self.showSubmenu:
                     stack = [ ]
                     currentMenu = menu
-                    for i in range( len( virtualMachines ) ):
-                        virtualMachine = virtualMachines[ i ]
+                    for i in range( len( self.virtualMachines ) ): #TODO Can this be rewritten without the index i?
+                        virtualMachine = self.virtualMachines[ i ]
                         while virtualMachine.getIndent() < len( stack ):
                             currentMenu = stack.pop()
 
@@ -128,7 +130,7 @@ class IndicatorVirtualBox:
                         else:
                             currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, "", virtualMachine.getUUID() in runningVirtualMachines ) )
                 else:
-                    for virtualMachine in virtualMachines:
+                    for virtualMachine in self.virtualMachines:
                         indent = "    " * virtualMachine.getIndent()
                         if virtualMachine.isGroup():
                             menu.append( Gtk.MenuItem( indent + virtualMachine.getGroupName() ) )
@@ -163,8 +165,7 @@ class IndicatorVirtualBox:
 
     def onVirtualMachine( self, widget ):
         uuid = widget.props.name
-        name = widget.props.label.strip() # If the VM is running it might have blanks before the name.
-        self.startVirtualMachine( uuid, name, 0 ) # Set a zero delay as this is not an autostart.
+        self.startVirtualMachine( uuid, 0 ) # Set a zero delay as this is not an autostart.
 
 #             message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
 #             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
@@ -247,8 +248,9 @@ class IndicatorVirtualBox:
 #         return None
 
 
-    def getVirtualMachines( self ):
-        virtualMachines = [ ]
+#TODO Rename to refreshVMs
+    def refreshVirtualMachines( self ):
+        self.virtualMachines = [ ]
         if self.isVBoxManageInstalled():
             version = self.getVirtualBoxVersion()
             if version is not None:
@@ -262,20 +264,25 @@ class IndicatorVirtualBox:
                     virtualMachinesFromConfig = virtualMachinesFromVBoxManage
 
                 # Going forward, the virtual machine infos from the config is the definitive list of VMs (and groups, if any).
-                virtualMachines = virtualMachinesFromConfig
+                self.virtualMachines = virtualMachinesFromConfig
 
                 # The virtual machine infos from the config do not contain the names of virtual machines.
                 # Obtain the names from the virtual machine infos from VBoxManage.
                 for virtualmachineFromVBoxManage in virtualMachinesFromVBoxManage:
-                    for virtualMachine in virtualMachines:
+                    for virtualMachine in self.virtualMachines:
                         if virtualmachineFromVBoxManage.getUUID() == virtualMachine.getUUID():
                             virtualMachine.setName( virtualmachineFromVBoxManage.getName() )
                             break
 
                 # Alphabetically sort...or not.
-                if self.sortDefault == False and not self.groupsExist( virtualMachines ):
-                    virtualMachines = sorted( virtualMachines, key = lambda virtualMachine: virtualMachine.name )
+                if self.sortDefault == False and not self.groupsExist( self.virtualMachines ):
+                    self.virtualMachines = sorted( self.virtualMachines, key = lambda virtualMachine: virtualMachine.name )
 
+
+    def getVirtualMachinesByUUID( self ):
+        virtualMachines = { }
+        for virtualMachine in self.virtualMachines:
+            virtualMachines[ virtualMachine.getUUID() ] = virtualMachine
         return virtualMachines
 
 
@@ -431,12 +438,13 @@ class IndicatorVirtualBox:
         return False
 
 
-    def startVirtualMachine( self, uuid, name, delayInSeconds ):
-        if virtualMachine is None: #TODO Should we need to check for None (if so, then here or somewhere else)?
-            message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
-            Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+    def startVirtualMachine( self, uuid, delayInSeconds ):
+#         if virtualMachine is None: #TODO Should we need to check for None (if so, then here or somewhere else)?
+#             message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
+#             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
 
-        elif virtualMachine.getUUID() in self.getRunningVirtualMachines():
+        virtualMachine = self.getVirtualMachinesByUUID()[ uuid ]
+        if uuid in self.getRunningVirtualMachines():
             self.bringWindowToFront( virtualMachine.getName() )
 
         else:
