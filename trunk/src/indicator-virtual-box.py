@@ -160,6 +160,17 @@ class IndicatorVirtualBox:
         return menuItem
 
 
+    def onVirtualMachine( self, widget ):
+        virtualMachine = self.getVirtualMachine( widget.props.name )
+        if virtualMachine is None:
+            message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
+            Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+            logging.error( "Missing VM '{0}', UUID '{1}'.".format( widget.props.label, widget.props.name ) )
+            GLib.idle_add( self.update, False )
+        else:
+            self.startVirtualMachine( virtualMachine, 0 ) # Set a zero delay as this is not an autostart.
+
+
     # It is assumed that VirtualBox is installed!
     def onLaunchVirtualBoxManager( self, widget ):
         windowID = None
@@ -171,17 +182,6 @@ class IndicatorVirtualBox:
             pythonutils.processCall( "/usr/lib/virtualbox/VirtualBox &" )
         else:
             pythonutils.processCall( "wmctrl -ia " + windowID.strip() )
-
-
-    def onVirtualMachine( self, widget ):
-        virtualMachine = self.getVirtualMachine( widget.props.name )
-        if virtualMachine is None:
-            message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
-            Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
-            logging.error( "Missing VM '{0}', UUID '{1}'.".format( widget.props.label, widget.props.name ) )
-            GLib.idle_add( self.update, False )
-        else:
-            self.startVirtualMachine( virtualMachine, 0 ) # Set a zero delay as this is not an autostart.
 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
