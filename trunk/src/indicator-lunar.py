@@ -933,11 +933,11 @@ class IndicatorLunar:
         self.previousLunarBrightLimbAngle = -1
         self.previousThemeName = ""
 
-        if not os.path.exists( IndicatorLunar.CACHE_PATH ):
-            os.makedirs( IndicatorLunar.CACHE_PATH )
-
         filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+
+        if not os.path.exists( IndicatorLunar.CACHE_PATH ):
+            os.makedirs( IndicatorLunar.CACHE_PATH )
 
         self.dialogLock = threading.Lock()
         Notify.init( INDICATOR_NAME )
@@ -1012,166 +1012,6 @@ class IndicatorLunar:
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-
-
-    def getDisplayData( self, key, source = None ):
-        displayData = None
-        if key[ 2 ] == IndicatorLunar.DATA_ALTITUDE or \
-           key[ 2 ] == IndicatorLunar.DATA_AZIMUTH or \
-           key[ 2 ] == IndicatorLunar.DATA_RISE_AZIMUTH or \
-           key[ 2 ] == IndicatorLunar.DATA_SET_AZIMUTH:
-            if source is None:
-                displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")"
-            elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
-                displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "°"
-
-        elif key[ 2 ] == IndicatorLunar.DATA_BRIGHT_LIMB or \
-             key[ 2 ] == IndicatorLunar.DATA_EARTH_TILT or \
-             key[ 2 ] == IndicatorLunar.DATA_SUN_TILT or \
-             key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_DEGREE:
-            displayData = self.data[ key ] + "°"
-
-        elif key[ 2 ] == IndicatorLunar.DATA_CONSTELLATION:
-            displayData = IndicatorLunar.CONSTELLATIONS_TRANSLATIONS[ self.data[ key ] ]
-
-        elif key[ 2 ] == IndicatorLunar.DATA_DAWN or \
-             key[ 2 ] == IndicatorLunar.DATA_DUSK or \
-             key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_DATE_TIME or \
-             key[ 2 ] == IndicatorLunar.DATA_EQUINOX or \
-             key[ 2 ] == IndicatorLunar.DATA_FIRST_QUARTER or \
-             key[ 2 ] == IndicatorLunar.DATA_FULL or \
-             key[ 2 ] == IndicatorLunar.DATA_NEW or \
-             key[ 2 ] == IndicatorLunar.DATA_RISE_TIME or \
-             key[ 2 ] == IndicatorLunar.DATA_SET_TIME or \
-             key[ 2 ] == IndicatorLunar.DATA_SOLSTICE or \
-             key[ 2 ] == IndicatorLunar.DATA_THIRD_QUARTER:
-                if source is None:
-                    displayData = self.getLocalDateTime( self.data[ key ] )
-                elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
-                    displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_DECLINATION:
-            dec = self.data[ key ]
-            if self.getDecimalDegrees( self.data[ key ], False, 0 ) < 0.0:
-                dec = dec [ 1 : ]
-                direction = _( "S" )
-            else:
-                direction = _( "N" )
-
-            displayData = str( self.getDecimalDegrees( dec, False, 0 ) ) + "° " + direction + " (" + self.trimDecimal( self.data[ key ] ) + ")"
-
-        elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH or \
-             key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_SUN:
-            displayData = self.data[ key ] + " " + _( "ua" )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM:
-            displayData = str( locale.format( "%d", int( self.data[ key ] ), grouping = True ) ) + " " + _( "km" )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_EARTH_VISIBLE or \
-             key[ 2 ] == IndicatorLunar.DATA_VISIBLE:
-            if self.data[ key ] == IndicatorLunar.TRUE_TEXT:
-                displayData = IndicatorLunar.TRUE_TEXT_TRANSLATION
-            else:
-                displayData = IndicatorLunar.FALSE_TEXT_TRANSLATION
-
-        elif key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_LATITUDE:
-            latitude = self.data[ key ]
-            if latitude[ 0 ] == "-":
-                displayData = latitude[ 1 : ] + "° " + _( "S" )
-            else:
-                displayData = latitude + "° " +_( "N" )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_LONGITUDE:
-            longitude = self.data[ key ]
-            if longitude[ 0 ] == "-":
-                displayData = longitude[ 1 : ] + "° " + _( "E" )
-            else:
-                displayData = longitude + "° " +_( "W" )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_TYPE:
-            if self.data[ key ] == eclipse.ECLIPSE_TYPE_ANNULAR:
-                displayData = _( "Annular" )
-            elif self.data[ key ] == eclipse.ECLIPSE_TYPE_HYBRID:
-                displayData = _( "Hybrid (Annular/Total)" )
-            elif self.data[ key ] == eclipse.ECLIPSE_TYPE_PARTIAL:
-                displayData = _( "Partial" )
-            elif self.data[ key ] == eclipse.ECLIPSE_TYPE_PENUMBRAL:
-                displayData = _( "Penumbral" )
-            else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
-                displayData = _( "Total" )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_ELEVATION:
-            displayData = self.data[ key ] + " " + _( "m" )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_ILLUMINATION:
-            displayData = self.data[ key ] + "%"
-
-        elif key[ 2 ] == IndicatorLunar.DATA_LATITUDE or \
-             key[ 2 ] == IndicatorLunar.DATA_LONGITUDE:
-            displayData = self.data[ key ] + "°"
-
-        elif key[ 2 ] == IndicatorLunar.DATA_MAGNITUDE:
-            displayData = self.data[ key ]
-
-        elif key[ 2 ] == IndicatorLunar.DATA_MESSAGE:
-            displayData = self.data[ key ]
-
-        elif key[ 2 ] == IndicatorLunar.DATA_PHASE:
-            displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
-
-        elif key[ 2 ] == IndicatorLunar.DATA_NAME:
-            displayData = self.data[ key ]
-
-        elif key[ 2 ] == IndicatorLunar.DATA_RIGHT_ASCENSION:
-            displayData = str( self.getDecimalDegrees( self.data[ key ], True, 0 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
-
-        elif key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_NAME:
-            displayData = IndicatorLunar.TROPICAL_SIGN_TRANSLATIONS[ self.data[ key ] ] 
-
-        elif key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_MINUTE:
-            displayData = self.data[ key ] + "'"
-
-        elif key[ 2 ] == IndicatorLunar.DATA_X_OFFSET or \
-             key[ 2 ] == IndicatorLunar.DATA_Y_OFFSET or \
-             key[ 2 ] == IndicatorLunar.DATA_Z_OFFSET:
-            displayData = self.data[ key ]
-
-        if displayData is None:
-            logging.error( "Unknown/unhandled key: " + key )
-
-        return displayData # Returning None is not good but better to let it crash and find out about it than hide the problem.
-
-
-    # Converts a UTC datetime string in the format 2015-05-11 22:51:42.429093 to local datetime string.
-    def getLocalDateTime( self, utcDateTimeString, formatString = None ):
-        utcDateTime = self.toDateTime( utcDateTimeString )
-        timestamp = calendar.timegm( utcDateTime.timetuple() )
-        localDateTime = datetime.datetime.fromtimestamp( timestamp )
-        localDateTime.replace( microsecond = utcDateTime.microsecond )
-        localDateTimeString = str( localDateTime )
-        if formatString is not None and formatString == IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS:
-            localDateTimeString = localDateTime.strftime( IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
-
-        return localDateTimeString
-
-
-    # Takes a string in the format of HH:MM:SS.S and converts to degrees (°) in decimal. 
-    def getDecimalDegrees( self, stringInput, isHours, roundAmount ):
-        t = tuple( stringInput.split( ":" ) )
-        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
-        if isHours:
-            x = x * 15.0
-
-        y = float( t[ 0 ] )
-        if roundAmount == 0:
-            decimalDegrees = round( math.copysign( x, y ) )
-        else:
-            decimalDegrees = round( math.copysign( x, y ), roundAmount )
-
-        return decimalDegrees
-
-
-    def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
 
 
     def updateIconAndLabel( self, ephemNow ):
@@ -1714,6 +1554,184 @@ class IndicatorLunar:
                 menuItem.set_submenu( subMenu )
 
 
+    def addOnSatelliteHandler( self, subMenu, satelliteName, satelliteNumber ):
+        for child in subMenu.get_children():
+            child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
+            child.connect( "activate", self.onSatellite )
+
+
+    def onSatellite( self, widget ):
+        satelliteTLE = self.satelliteTLEData.get( tuple( widget.props.name.split( "-----" ) ) )
+
+        url = IndicatorLunar.SATELLITE_ON_CLICK_URL. \
+              replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteTLE.getName() ). \
+              replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteTLE.getNumber() ). \
+              replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, satelliteTLE.getInternationalDesignator() )
+
+        if len( url ) > 0:
+            webbrowser.open( url )
+
+
+    def getDisplayData( self, key, source = None ):
+        displayData = None
+        if key[ 2 ] == IndicatorLunar.DATA_ALTITUDE or \
+           key[ 2 ] == IndicatorLunar.DATA_AZIMUTH or \
+           key[ 2 ] == IndicatorLunar.DATA_RISE_AZIMUTH or \
+           key[ 2 ] == IndicatorLunar.DATA_SET_AZIMUTH:
+            if source is None:
+                displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")"
+            elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
+                displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "°"
+
+        elif key[ 2 ] == IndicatorLunar.DATA_BRIGHT_LIMB or \
+             key[ 2 ] == IndicatorLunar.DATA_EARTH_TILT or \
+             key[ 2 ] == IndicatorLunar.DATA_SUN_TILT or \
+             key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_DEGREE:
+            displayData = self.data[ key ] + "°"
+
+        elif key[ 2 ] == IndicatorLunar.DATA_CONSTELLATION:
+            displayData = IndicatorLunar.CONSTELLATIONS_TRANSLATIONS[ self.data[ key ] ]
+
+        elif key[ 2 ] == IndicatorLunar.DATA_DAWN or \
+             key[ 2 ] == IndicatorLunar.DATA_DUSK or \
+             key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_DATE_TIME or \
+             key[ 2 ] == IndicatorLunar.DATA_EQUINOX or \
+             key[ 2 ] == IndicatorLunar.DATA_FIRST_QUARTER or \
+             key[ 2 ] == IndicatorLunar.DATA_FULL or \
+             key[ 2 ] == IndicatorLunar.DATA_NEW or \
+             key[ 2 ] == IndicatorLunar.DATA_RISE_TIME or \
+             key[ 2 ] == IndicatorLunar.DATA_SET_TIME or \
+             key[ 2 ] == IndicatorLunar.DATA_SOLSTICE or \
+             key[ 2 ] == IndicatorLunar.DATA_THIRD_QUARTER:
+                if source is None:
+                    displayData = self.getLocalDateTime( self.data[ key ] )
+                elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
+                    displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
+
+        elif key[ 2 ] == IndicatorLunar.DATA_DECLINATION:
+            dec = self.data[ key ]
+            if self.getDecimalDegrees( self.data[ key ], False, 0 ) < 0.0:
+                dec = dec [ 1 : ]
+                direction = _( "S" )
+            else:
+                direction = _( "N" )
+
+            displayData = str( self.getDecimalDegrees( dec, False, 0 ) ) + "° " + direction + " (" + self.trimDecimal( self.data[ key ] ) + ")"
+
+        elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH or \
+             key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_SUN:
+            displayData = self.data[ key ] + " " + _( "ua" )
+
+        elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM:
+            displayData = str( locale.format( "%d", int( self.data[ key ] ), grouping = True ) ) + " " + _( "km" )
+
+        elif key[ 2 ] == IndicatorLunar.DATA_EARTH_VISIBLE or \
+             key[ 2 ] == IndicatorLunar.DATA_VISIBLE:
+            if self.data[ key ] == IndicatorLunar.TRUE_TEXT:
+                displayData = IndicatorLunar.TRUE_TEXT_TRANSLATION
+            else:
+                displayData = IndicatorLunar.FALSE_TEXT_TRANSLATION
+
+        elif key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_LATITUDE:
+            latitude = self.data[ key ]
+            if latitude[ 0 ] == "-":
+                displayData = latitude[ 1 : ] + "° " + _( "S" )
+            else:
+                displayData = latitude + "° " +_( "N" )
+
+        elif key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_LONGITUDE:
+            longitude = self.data[ key ]
+            if longitude[ 0 ] == "-":
+                displayData = longitude[ 1 : ] + "° " + _( "E" )
+            else:
+                displayData = longitude + "° " +_( "W" )
+
+        elif key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_TYPE:
+            if self.data[ key ] == eclipse.ECLIPSE_TYPE_ANNULAR:
+                displayData = _( "Annular" )
+            elif self.data[ key ] == eclipse.ECLIPSE_TYPE_HYBRID:
+                displayData = _( "Hybrid (Annular/Total)" )
+            elif self.data[ key ] == eclipse.ECLIPSE_TYPE_PARTIAL:
+                displayData = _( "Partial" )
+            elif self.data[ key ] == eclipse.ECLIPSE_TYPE_PENUMBRAL:
+                displayData = _( "Penumbral" )
+            else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
+                displayData = _( "Total" )
+
+        elif key[ 2 ] == IndicatorLunar.DATA_ELEVATION:
+            displayData = self.data[ key ] + " " + _( "m" )
+
+        elif key[ 2 ] == IndicatorLunar.DATA_ILLUMINATION:
+            displayData = self.data[ key ] + "%"
+
+        elif key[ 2 ] == IndicatorLunar.DATA_LATITUDE or \
+             key[ 2 ] == IndicatorLunar.DATA_LONGITUDE:
+            displayData = self.data[ key ] + "°"
+
+        elif key[ 2 ] == IndicatorLunar.DATA_MAGNITUDE:
+            displayData = self.data[ key ]
+
+        elif key[ 2 ] == IndicatorLunar.DATA_MESSAGE:
+            displayData = self.data[ key ]
+
+        elif key[ 2 ] == IndicatorLunar.DATA_PHASE:
+            displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
+
+        elif key[ 2 ] == IndicatorLunar.DATA_NAME:
+            displayData = self.data[ key ]
+
+        elif key[ 2 ] == IndicatorLunar.DATA_RIGHT_ASCENSION:
+            displayData = str( self.getDecimalDegrees( self.data[ key ], True, 0 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
+
+        elif key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_NAME:
+            displayData = IndicatorLunar.TROPICAL_SIGN_TRANSLATIONS[ self.data[ key ] ] 
+
+        elif key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_MINUTE:
+            displayData = self.data[ key ] + "'"
+
+        elif key[ 2 ] == IndicatorLunar.DATA_X_OFFSET or \
+             key[ 2 ] == IndicatorLunar.DATA_Y_OFFSET or \
+             key[ 2 ] == IndicatorLunar.DATA_Z_OFFSET:
+            displayData = self.data[ key ]
+
+        if displayData is None:
+            logging.error( "Unknown/unhandled key: " + key )
+
+        return displayData # Returning None is not good but better to let it crash and find out about it than hide the problem.
+
+
+    # Converts a UTC datetime string in the format 2015-05-11 22:51:42.429093 to local datetime string.
+    def getLocalDateTime( self, utcDateTimeString, formatString = None ):
+        utcDateTime = self.toDateTime( utcDateTimeString )
+        timestamp = calendar.timegm( utcDateTime.timetuple() )
+        localDateTime = datetime.datetime.fromtimestamp( timestamp )
+        localDateTime.replace( microsecond = utcDateTime.microsecond )
+        localDateTimeString = str( localDateTime )
+        if formatString is not None and formatString == IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS:
+            localDateTimeString = localDateTime.strftime( IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
+
+        return localDateTimeString
+
+
+    # Takes a string in the format of HH:MM:SS.S and converts to degrees (°) in decimal. 
+    def getDecimalDegrees( self, stringInput, isHours, roundAmount ):
+        t = tuple( stringInput.split( ":" ) )
+        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
+        if isHours:
+            x = x * 15.0
+
+        y = float( t[ 0 ] )
+        if roundAmount == 0:
+            decimalDegrees = round( math.copysign( x, y ) )
+        else:
+            decimalDegrees = round( math.copysign( x, y ), roundAmount )
+
+        return decimalDegrees
+
+
+    def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
+
+
     # Have found (very seldom) that a date/time may be generated from the pyephem backend with the .%f component
     # which may mean the value is zero but pyephem dropped it.
     # However this means the format does not match and parsing into a DateTime object fails.
@@ -1732,24 +1750,6 @@ class IndicatorLunar:
             return firstDateTimeAsString
 
         return secondDateTimeAsString
-
-
-    def addOnSatelliteHandler( self, subMenu, satelliteName, satelliteNumber ):
-        for child in subMenu.get_children():
-            child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
-            child.connect( "activate", self.onSatellite )
-
-
-    def onSatellite( self, widget ):
-        satelliteTLE = self.satelliteTLEData.get( tuple( widget.props.name.split( "-----" ) ) )
-
-        url = IndicatorLunar.SATELLITE_ON_CLICK_URL. \
-              replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteTLE.getName() ). \
-              replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteTLE.getNumber() ). \
-              replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, satelliteTLE.getInternationalDesignator() )
-
-        if len( url ) > 0:
-            webbrowser.open( url )
 
 
     def updateCometOEData( self ):
@@ -2388,10 +2388,6 @@ class IndicatorLunar:
         if self.dialogLock.acquire( blocking = False ):
             self._onPreferences( widget )
             self.dialogLock.release()
-
-
-#TODO Need to make a copy of the backend data?
-#If need to make a copy, copy self.data and what about the list of sats/comets...will they change in the dialog if an update (refetch) occurs?
 
 
     def _onPreferences( self, widget ):
@@ -3712,41 +3708,41 @@ class IndicatorLunar:
         else:
             satellites = self.satellites # Only write out the list of satellites if the user elects to not add new.
 
-        try:
-            settings = {
-                IndicatorLunar.SETTINGS_CITY_ELEVATION: _city_data.get( self.cityName )[ 2 ],
-                IndicatorLunar.SETTINGS_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
-                IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
-                IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
-                IndicatorLunar.SETTINGS_GROUP_STARS_BY_CONSTELLATION: self.groupStarsByConstellation,
-                IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
-                IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
-                IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
-                IndicatorLunar.SETTINGS_COMET_OE_URL: self.cometOEURL,
-                IndicatorLunar.SETTINGS_COMETS: comets,
-                IndicatorLunar.SETTINGS_COMETS_ADD_NEW: self.cometsAddNew,
-                IndicatorLunar.SETTINGS_COMETS_MAGNITUDE: self.cometsMagnitude,
-                IndicatorLunar.SETTINGS_PLANETS: self.planets,
-                IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
-                IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,
-                IndicatorLunar.SETTINGS_SATELLITE_TLE_URL: self.satelliteTLEURL,
-                IndicatorLunar.SETTINGS_SATELLITES: satellites,
-                IndicatorLunar.SETTINGS_SATELLITES_ADD_NEW: self.satellitesAddNew,
-                IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME: self.satellitesSortByDateTime,
-                IndicatorLunar.SETTINGS_SHOW_MOON: self.showMoon,
-                IndicatorLunar.SETTINGS_SHOW_COMETS_AS_SUBMENU: self.showCometsAsSubMenu,
-                IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
-                IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
-                IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU: self.showSatellitesAsSubMenu,
-                IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU: self.showStarsAsSubMenu,
-                IndicatorLunar.SETTINGS_SHOW_SUN: self.showSun,
-                IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
-                IndicatorLunar.SETTINGS_STARS: self.stars,
-                IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
-                IndicatorLunar.SETTINGS_WEREWOLF_WARNING_MESSAGE: self.werewolfWarningMessage,
-                IndicatorLunar.SETTINGS_WEREWOLF_WARNING_SUMMARY: self.werewolfWarningSummary
-            }
+        settings = {
+            IndicatorLunar.SETTINGS_CITY_ELEVATION: _city_data.get( self.cityName )[ 2 ],
+            IndicatorLunar.SETTINGS_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
+            IndicatorLunar.SETTINGS_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
+            IndicatorLunar.SETTINGS_CITY_NAME: self.cityName,
+            IndicatorLunar.SETTINGS_GROUP_STARS_BY_CONSTELLATION: self.groupStarsByConstellation,
+            IndicatorLunar.SETTINGS_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
+            IndicatorLunar.SETTINGS_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
+            IndicatorLunar.SETTINGS_INDICATOR_TEXT: self.indicatorText,
+            IndicatorLunar.SETTINGS_COMET_OE_URL: self.cometOEURL,
+            IndicatorLunar.SETTINGS_COMETS: comets,
+            IndicatorLunar.SETTINGS_COMETS_ADD_NEW: self.cometsAddNew,
+            IndicatorLunar.SETTINGS_COMETS_MAGNITUDE: self.cometsMagnitude,
+            IndicatorLunar.SETTINGS_PLANETS: self.planets,
+            IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
+            IndicatorLunar.SETTINGS_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,
+            IndicatorLunar.SETTINGS_SATELLITE_TLE_URL: self.satelliteTLEURL,
+            IndicatorLunar.SETTINGS_SATELLITES: satellites,
+            IndicatorLunar.SETTINGS_SATELLITES_ADD_NEW: self.satellitesAddNew,
+            IndicatorLunar.SETTINGS_SATELLITES_SORT_BY_DATE_TIME: self.satellitesSortByDateTime,
+            IndicatorLunar.SETTINGS_SHOW_MOON: self.showMoon,
+            IndicatorLunar.SETTINGS_SHOW_COMETS_AS_SUBMENU: self.showCometsAsSubMenu,
+            IndicatorLunar.SETTINGS_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
+            IndicatorLunar.SETTINGS_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
+            IndicatorLunar.SETTINGS_SHOW_SATELLITES_AS_SUBMENU: self.showSatellitesAsSubMenu,
+            IndicatorLunar.SETTINGS_SHOW_STARS_AS_SUBMENU: self.showStarsAsSubMenu,
+            IndicatorLunar.SETTINGS_SHOW_SUN: self.showSun,
+            IndicatorLunar.SETTINGS_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
+            IndicatorLunar.SETTINGS_STARS: self.stars,
+            IndicatorLunar.SETTINGS_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
+            IndicatorLunar.SETTINGS_WEREWOLF_WARNING_MESSAGE: self.werewolfWarningMessage,
+            IndicatorLunar.SETTINGS_WEREWOLF_WARNING_SUMMARY: self.werewolfWarningSummary
+        }
 
+        try:
             with open( IndicatorLunar.SETTINGS_FILE, "w" ) as f:
                 f.write( json.dumps( settings ) )
 
