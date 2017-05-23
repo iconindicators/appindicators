@@ -39,11 +39,10 @@ import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
-#TODO Clean up.
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from threading import Thread
 from urllib.request import urlopen
-import calendar, copy, datetime, eclipse, glob, json, locale, logging, math, os, pickle, pythonutils, re, satellite, shutil, sys, tempfile, threading, time, webbrowser
+import calendar, datetime, eclipse, glob, json, locale, logging, math, os, pickle, pythonutils, re, satellite, sys, tempfile, threading, time, webbrowser
 
 try:
     import ephem
