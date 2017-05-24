@@ -75,7 +75,7 @@ class IndicatorVirtualBox:
 
 
     def __init__( self ):
-        filehandler = pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG, "a", 10000, None, True )
+        filehandler = pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG, "a", 10000, None, True ) #TODO This does NOT match with what's defined...what does the True match with?  Can we pass in just the filename and perhaps size?
         logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
         self.dialogLock = threading.Lock()
         self.scrollDirectionIsUp = True
@@ -111,7 +111,7 @@ class IndicatorVirtualBox:
             if len( self.virtualMachines ) == 0: #TODO Check this works 
                 menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
             else:
-                runningVirtualMachines = self.getRunningVirtualMachines()
+                runningVirtualMachines = self.getRunningVirtualMachines() #TODO Get this here or get it in the update method each time (as per the list of VMs)?
                 if self.showSubmenu:
                     stack = [ ]
                     currentMenu = menu
@@ -130,7 +130,7 @@ class IndicatorVirtualBox:
                         else:
                             currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, "", virtualMachine.getUUID() in runningVirtualMachines ) )
                 else:
-                    for virtualMachine in self.virtualMachines:
+                    for virtualMachine in self.virtualMachines: #TODO Can we somehow use the dict instead without losing the order set by the user in VBoxManager?
                         indent = "    " * virtualMachine.getIndent()
                         if virtualMachine.isGroup():
                             menu.append( Gtk.MenuItem( indent + virtualMachine.getGroupName() ) )
@@ -159,12 +159,37 @@ class IndicatorVirtualBox:
             menuItem = Gtk.MenuItem( indent + virtualMachine.getName() )
 
         menuItem.props.name = virtualMachine.getUUID()
-        menuItem.connect( "activate", self.onVirtualMachine )
+        menuItem.connect( "activate", lambda widget: self._onVirtualMachine( widget.props.name ) ) #TODO Test this works!
         return menuItem
 
 
-#TODO Can this be put into a lamba?
-    def onVirtualMachine( self, widget ): self.startVirtualMachine( widget.props.name, 0 ) # Set a zero delay as this is not an autostart.
+    def autoStartVirtualMachines( self ):
+        for virtualMachine in self.virtualMachines: # TODO Check this iterates over all
+            if self.isAutostart( virtualMachine.getUUID() ):
+                self._onVirtualMachine( virtualMachine.getUUID() )
+                time.sleep( self.delayBetweenAutoStartInSeconds )
+#TODO When to refresh the menu?  Or just call update as unscheduled?
+
+
+    def _onVirtualMachine( self, uuid ):
+        if uuid in self.getRunningVirtualMachines():
+            print( "Bring to front:", uuid )
+            self.bringWindowToFront( self.getVirtualMachinesByUUID()[ uuid ].getName() )
+        else:
+            print( "Start up:", uuid )
+#             self.startVirtualMachine( uuid )
+
+#             self.refreshVirtualMachines() # Refresh in case the VM no longer exists.  #TODO Maybe ONLY refresh if the VM cannot be found (and rebuild menu and tell user).
+#             virtualMachinesByUUID = self.getVirtualMachinesByUUID()
+#             if uuid in virtualMachinesByUUID:
+#                 self.startVirtualMachine( uuid )
+#             else:
+#                 pass #TODO Handle...message?
+#         if virtualMachine is None: #TODO Should we need to check for None (if so, then here or somewhere else)?
+#             message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
+#             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+
+#         self.startVirtualMachine( widget.props.name, 0 ) # Set a zero delay as this is not an autostart.
 
 #             message = _( "Missing VM '{0}', UUID '{1}'." ).format( widget.props.label, widget.props.name )
 #             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
@@ -172,19 +197,80 @@ class IndicatorVirtualBox:
 #             GLib.idle_add( self.update, False )
 
 
-    # It is assumed that VirtualBox is installed!
-    def onLaunchVirtualBoxManager( self, widget ):
-        windowID = None
-        processID = pythonutils.processGet( "ps -ef | awk '{ if( $NF == \"/usr/lib/virtualbox/VirtualBox\" ) print $2; }'" )
-        if( processID is not None and processID != "" ):
-            windowID = pythonutils.processGet( "wmctrl -lp | awk '{ if( $3 == " + processID.strip() + " ) print $1; }'" )
-
-        if windowID is None or windowID == "":
-            pythonutils.processCall( "/usr/lib/virtualbox/VirtualBox &" )
+    def bringWindowToFront( self, virtualMachineName ):
+        numberOfWindowsWithTheSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
+        if numberOfWindowsWithTheSameName == "0":
+            message = _( "The VM '{0}' is running but its window could not be found - perhaps it is running headless." ).format( virtualMachineName )
+            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
+        elif numberOfWindowsWithTheSameName == "1":
+            for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
+                if virtualMachineName in line:
+                    windowID = line[ 0 : line.find( " " ) ]
+                    pythonutils.processCall( "wmctrl -i -a " + windowID )
+                    break
         else:
-            pythonutils.processCall( "wmctrl -ia " + windowID.strip() ) #TODO Check this works in non-English
+            message = _( "Unable to bring the VM '{0}' to front as there is more than one window with the same name." ).format( virtualMachineName )
+            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
 
 
+    def startVirtualMachine( self, uuid ):
+        try:
+            startCommand = self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &"
+            pythonutils.processCall( startCommand )
+#             GLib.timeout_add_seconds( 10, self.update, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
+
+        except Exception as e:
+            logging.exception( e )
+            message = _( "The VM '{0}' could not be started." ).format( uuid )
+            Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+
+
+    def startVirtualMachineOLD( self, uuid, delayInSeconds ):
+#         if virtualMachine is None: #TODO Should we need to check for None (if so, then here or somewhere else)?
+#             message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
+#             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+
+        virtualMachine = self.getVirtualMachinesByUUID()[ uuid ]
+        if uuid in self.getRunningVirtualMachines():
+            self.bringWindowToFront( virtualMachine.getName() ) #TODO Maybe make onVirtualMachine take a delay parameter and it either calls toFront or this start function.
+
+        else:
+            try:
+                startCommand = self.getStartCommand( virtualMachine.getUUID() ).replace( "%VM%", virtualMachine.getUUID() ) + " &"
+                pythonutils.processCall( startCommand )
+                GLib.timeout_add_seconds( 10, self.update, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
+                if delayInSeconds > 0:
+                    time.sleep( delayInSeconds )
+
+            except Exception as e:
+                logging.exception( e )
+                message = _( "The VM '{0}' could not be started." ).format( virtualMachine.getUUID() )
+                Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+
+
+#     def startVirtualMachine( self, virtualMachine, delayInSeconds ):
+#         if virtualMachine is None: #TODO Should we need to check for None (if so, then here or somewhere else)?
+#             message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
+#             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+# 
+#         elif virtualMachine.getUUID() in self.getRunningVirtualMachines():
+#             self.bringWindowToFront( virtualMachine.getName() )
+# 
+#         else:
+#             try:
+#                 startCommand = self.getStartCommand( virtualMachine.getUUID() ).replace( "%VM%", virtualMachine.getUUID() ) + " &"
+#                 pythonutils.processCall( startCommand )
+#                 GLib.timeout_add_seconds( 10, self.update, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
+#                 if delayInSeconds > 0:
+#                     time.sleep( delayInSeconds )
+# 
+#             except Exception as e:
+#                 logging.exception( e )
+#                 message = _( "The VM '{0}' could not be started." ).format( virtualMachine.getUUID() )
+#                 Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+
+
+    # It is assumed that VirtualBox is installed!
 #TODO Double check this all makes sense and is efficient.
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
         runningVMs = self.getRunningVirtualMachines()
@@ -204,21 +290,23 @@ class IndicatorVirtualBox:
             self.bringWindowToFront( self.scrollUUID )
 
 
-    def bringWindowToFront( self, uuid ):
-        virtualMachineName = self.getVirtualMachinesByUUID()[ uuid ].getName()
-        numberOfWindowsWithTheSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
-        if numberOfWindowsWithTheSameName == "0":
-            message = _( "The VM '{0}' is running but its window could not be found - perhaps it is running headless." ).format( virtualMachineName )
-            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
-        elif numberOfWindowsWithTheSameName == "1":
-            for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
-                if virtualMachineName in line:
-                    windowID = line[ 0 : line.find( " " ) ]
-                    pythonutils.processCall( "wmctrl -i -a " + windowID )
-                    break
+    def getVirtualMachinesByUUID( self ):
+        virtualMachines = { }
+        for virtualMachine in self.virtualMachines:
+            virtualMachines[ virtualMachine.getUUID() ] = virtualMachine
+        return virtualMachines
+
+
+    def onLaunchVirtualBoxManager( self, widget ):
+        windowID = None
+        processID = pythonutils.processGet( "ps -ef | awk '{ if( $NF == \"/usr/lib/virtualbox/VirtualBox\" ) print $2; }'" )
+        if( processID is not None and processID != "" ):
+            windowID = pythonutils.processGet( "wmctrl -lp | awk '{ if( $3 == " + processID.strip() + " ) print $1; }'" )
+
+        if windowID is None or windowID == "":
+            pythonutils.processCall( "/usr/lib/virtualbox/VirtualBox &" )
         else:
-            message = _( "Unable to bring the VM '{0}' to front as there is more than one window with the same name." ).format( virtualMachineName )
-            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
+            pythonutils.processCall( "wmctrl -ia " + windowID.strip() ) #TODO Check this works in non-English
 
 
     def refreshVirtualMachines( self ):
@@ -253,13 +341,6 @@ class IndicatorVirtualBox:
                     self.virtualMachines = sorted( self.virtualMachines, key = lambda virtualMachine: virtualMachine.name )
 
 
-    def getVirtualMachinesByUUID( self ):
-        virtualMachines = { }
-        for virtualMachine in self.virtualMachines:
-            virtualMachines[ virtualMachine.getUUID() ] = virtualMachine
-        return virtualMachines
-
-
     def getRunningVirtualMachines( self ):
         runningVirtualMachines = [ ]
         result = pythonutils.processGet( "VBoxManage list runningvms" )
@@ -272,13 +353,6 @@ class IndicatorVirtualBox:
                     pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
         return runningVirtualMachines
-
-
-    def autoStartVirtualMachines( self ):
-        virtualMachines = self.getVirtualMachinesByUUID()
-        for virtualMachine in virtualMachines: # TODO Check this iterates over all
-            if self.isAutostart( virtualMachine.getUUID() ):
-                self.startVirtualMachine( virtualMachine.getUUID(), virtualMachine.getName(), self.delayBetweenAutoStartInSeconds ) #TODO Pass in startup command from prefs?
 
 
     # Returns the version number as a string or None if no version could be determined.
@@ -405,51 +479,6 @@ class IndicatorVirtualBox:
         return False
 
 
-    def startVirtualMachine( self, uuid, delayInSeconds ):
-#         if virtualMachine is None: #TODO Should we need to check for None (if so, then here or somewhere else)?
-#             message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
-#             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
-
-        virtualMachine = self.getVirtualMachinesByUUID()[ uuid ]
-        if uuid in self.getRunningVirtualMachines():
-            self.bringWindowToFront( virtualMachine.getName() ) #TODO Maybe make onVirtualMachine take a delay parameter and it either calls toFront or this start function.
-
-        else:
-            try:
-                startCommand = self.getStartCommand( virtualMachine.getUUID() ).replace( "%VM%", virtualMachine.getUUID() ) + " &"
-                pythonutils.processCall( startCommand )
-                GLib.timeout_add_seconds( 10, self.update, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
-                if delayInSeconds > 0:
-                    time.sleep( delayInSeconds )
-
-            except Exception as e:
-                logging.exception( e )
-                message = _( "The VM '{0}' could not be started." ).format( virtualMachine.getUUID() )
-                Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
-
-
-#     def startVirtualMachine( self, virtualMachine, delayInSeconds ):
-#         if virtualMachine is None: #TODO Should we need to check for None (if so, then here or somewhere else)?
-#             message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
-#             Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
-# 
-#         elif virtualMachine.getUUID() in self.getRunningVirtualMachines():
-#             self.bringWindowToFront( virtualMachine.getName() )
-# 
-#         else:
-#             try:
-#                 startCommand = self.getStartCommand( virtualMachine.getUUID() ).replace( "%VM%", virtualMachine.getUUID() ) + " &"
-#                 pythonutils.processCall( startCommand )
-#                 GLib.timeout_add_seconds( 10, self.update, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
-#                 if delayInSeconds > 0:
-#                     time.sleep( delayInSeconds )
-# 
-#             except Exception as e:
-#                 logging.exception( e )
-#                 message = _( "The VM '{0}' could not be started." ).format( virtualMachine.getUUID() )
-#                 Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
-
-
     def getStartCommand( self, uuid ):
         if uuid in self.virtualMachinePreferences:
             return self.virtualMachinePreferences[ uuid ][ 1 ]
@@ -458,15 +487,6 @@ class IndicatorVirtualBox:
 
 
     def isAutostart( self, uuid ): return uuid in self.virtualMachinePreferences and self.virtualMachinePreferences[ uuid ][ 0 ]
-
-
-    def isVirtualMachineNameUnique( self, name, virtualMachines ):
-        count = 0
-        for virtualMachine in virtualMachines:
-            if virtualMachine.getName() == name:
-                count += 1
-
-        return count == 1
 
 
     def onAbout( self, widget ):
