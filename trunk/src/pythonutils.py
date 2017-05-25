@@ -22,7 +22,7 @@ import gettext
 gettext.install( "pythonutils" )
 
 from gi.repository import Gtk
-import logging, os, shutil, subprocess, sys
+import logging, logging.handlers, os, shutil, subprocess, sys
 
 
 AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
