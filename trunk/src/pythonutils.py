@@ -22,7 +22,7 @@ import gettext
 gettext.install( "pythonutils" )
 
 from gi.repository import Gtk
-import logging, logging.handlers, os, shutil, subprocess, sys
+import logging.handlers, os, shutil, subprocess, sys
 
 
 AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -196,7 +196,7 @@ def showAboutDialog(
 # http://stackoverflow.com/questions/24157278/limit-python-log-file
 # http://svn.python.org/view/python/trunk/Lib/logging/handlers.py?view=markup
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
-    def __init__( self, filename, maxBytes = 10000 ): super().__init__( filename, "a", maxBytes, 0, None, 0 )
+    def __init__( self, filename, maxBytes = 10000 ): super().__init__( filename, "a", maxBytes, 0, None, True )
 
 
     def doRollover( self ):
