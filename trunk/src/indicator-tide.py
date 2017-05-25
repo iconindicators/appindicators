@@ -125,7 +125,7 @@ class IndicatorTide:
                 if firstTideReading:
                     firstMonth = tideReading.getMonth()
                     firstDay = tideReading.getDay()
-                    menu.append( self.createMenuItem( tideReading.getPortName(), tideReading.getURL() ) )
+                    self.createAndAppendMenuItem( menu, tideReading.getPortName(), tideReading.getURL() )
 
                 tideDateTime = datetime.datetime( datetime.datetime.now().year, tideReading.getMonth(), tideReading.getDay(), tideReading.getHour(), tideReading.getMinute(), 0 )
 
@@ -133,12 +133,12 @@ class IndicatorTide:
                     menuItemText = indent + tideDateTime.strftime( self.menuItemDateFormat )
                     if self.showAsSubMenus:
                         if self.showAsSubMenusExceptFirstDay and firstMonth == tideReading.getMonth() and firstDay == tideReading.getDay():
-                            menu.append( self.createMenuItem( menuItemText, tideReading.getURL() ) )
+                            self.createAndAppendMenuItem( menu, menuItemText, tideReading.getURL() )
                         else:
                             subMenu = Gtk.Menu()
-                            menu.append( self.createMenuItem( menuItemText, None ).set_submenu( subMenu ) )
+                            self.createAndAppendMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
                     else:
-                        menu.append( self.createMenuItem( menuItemText, tideReading.getURL() ) )
+                        self.createAndAppendMenuItem( menu, menuItemText, tideReading.getURL() )
 
                 menuItemText = tideDateTime.strftime( self.menuItemTideFormat )
 
@@ -151,11 +151,11 @@ class IndicatorTide:
 
                 if self.showAsSubMenus:
                     if self.showAsSubMenusExceptFirstDay and firstMonth == tideReading.getMonth() and firstDay == tideReading.getDay():
-                        menu.append( self.createMenuItem( indent + indent + menuItemText, tideReading.getURL() ) )
+                        self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tideReading.getURL() )
                     else:
-                        subMenu.append( self.createMenuItem( menuItemText, tideReading.getURL() ) )
+                        self.createAndAppendMenuItem( subMenu, menuItemText, tideReading.getURL() )
                 else:
-                    menu.append( self.createMenuItem( indent + indent + menuItemText, tideReading.getURL() ) )
+                    self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tideReading.getURL() )
 
                 firstTideReading = False
                 previousMonth = tideReading.getMonth()
@@ -166,12 +166,14 @@ class IndicatorTide:
         menu.show_all()
 
 
-    def createMenuItem( self, menuItemText, url ):
+    def createAndAppendMenuItem( self, menu, menuItemText, url ):
         menuItem = Gtk.MenuItem( menuItemText )
+
         if url is not None:
             menuItem.connect( "activate", lambda widget: webbrowser.open( widget.props.name ) ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a dialog lock up!
             menuItem.set_name( url )
 
+        menu.append( menuItem )
         return menuItem
 
 
