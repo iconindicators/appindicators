@@ -438,11 +438,13 @@ class IndicatorVirtualBox:
         store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon (Gtk.STOCK_APPLY) or None for autostart of VM, VM start command, UUID.
         parent = None
         virtualMachines = self.getVirtualMachines()
+        groupsExist = False
         for virtualMachine in virtualMachines:
             while virtualMachine.getIndent() < len( stack ):
                 parent = stack.pop()
 
             if virtualMachine.isGroup():
+                groupsExist = True
                 stack.append( parent )
                 parent = store.append( parent, [ virtualMachine.getGroupName(), None, "", virtualMachine.getUUID() ] )
             else:
@@ -481,10 +483,13 @@ class IndicatorVirtualBox:
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show groups as submenus" ) )
         showAsSubmenusCheckbox.set_tooltip_text( _(
             "If checked, groups are shown using submenus.\n\n" + \
-            "Otherwise groups are shown as an indented list.\n\n" + \
-            "This option only applies if groups are present!" ) )
+            "Otherwise groups are shown as an indented list." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
-        grid.attach( showAsSubmenusCheckbox, 0, 0, 1, 1 )
+
+        row = 0
+        if groupsExist:
+            grid.attach( showAsSubmenusCheckbox, 0, row, 1, 1 )
+            row += 1
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -498,7 +503,8 @@ class IndicatorVirtualBox:
 
         box.pack_start( spinnerRefreshInterval, True, True, 0 )
 
-        grid.attach( box, 0, 1, 1, 1 )
+        grid.attach( box, 0, row, 1, 1 )
+        row += 1
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -512,13 +518,14 @@ class IndicatorVirtualBox:
 
         box.pack_start( spinnerDelay, True, True, 0 )
 
-        grid.attach( box, 0, 2, 1, 1 )
+        grid.attach( box, 0, row, 1, 1 )
+        row += 1
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorVirtualBox.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 3, 1, 1 )
+        grid.attach( autostartCheckbox, 0, row, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
