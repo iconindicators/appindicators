@@ -76,8 +76,7 @@ class IndicatorVirtualBox:
 
 
     def __init__( self ):
-        filehandler = pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG, "a", 10000, None, True ) #TODO This does NOT match with what's defined...what does the True match with?  Can we pass in just the filename and perhaps size?
-        logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+        logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG ) ] )
         self.dialogLock = threading.Lock()
         self.scrollDirectionIsUp = True
         self.scrollUUID = None
