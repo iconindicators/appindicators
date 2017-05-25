@@ -114,8 +114,7 @@ class IndicatorVirtualBox:
                 if self.showSubmenu:
                     stack = [ ]
                     currentMenu = menu
-                    for i in range( len( virtualMachines ) ): #TODO Can this be rewritten without the index i?
-                        virtualMachine = virtualMachines[ i ]
+                    for virtualMachine in virtualMachines:
                         while virtualMachine.getIndent() < len( stack ):
                             currentMenu = stack.pop()
 
