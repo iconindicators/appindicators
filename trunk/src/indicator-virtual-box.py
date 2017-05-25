@@ -31,8 +31,11 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 
 
-#TODO If/when Unity is no more, if the new framework (GNOME) provides an event when the icon is clicked,
-# capture that event and do a refresh of the menu.  Can then remove the refresh interval option.
+#TODO
+# If/when migrating to GNOME as a result of Unity's demise,
+# if the new indicator framework provides an event when the icon is clicked,
+# capture that event and do a refresh of the menu.
+# Then remove the refresh interval option.
 
 
 INDICATOR_NAME = "indicator-virtual-box"
@@ -47,8 +50,6 @@ from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 from threading import Thread
 import json, logging, os, pythonutils, threading, time, virtualmachine
 
-
-#TODO Is there a problem in a VM existing but not present in the preferences...can this happen?
 
 class IndicatorVirtualBox:
 
@@ -100,23 +101,23 @@ class IndicatorVirtualBox:
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
-            self.refreshVirtualMachines()
             self.buildMenu()
-            self.timeoutID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.update, True )
+            self.updateTimerID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.update, True )
 
 
     def buildMenu( self ):
         menu = Gtk.Menu()
         if self.isVBoxManageInstalled():
-            if len( self.virtualMachines ) == 0: #TODO Check this works 
+            virtualMachines = self.getVirtualMachines()
+            if len( virtualMachines ) == 0:
                 menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
             else:
-                runningVirtualMachines = self.getRunningVirtualMachines()
+                runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
                 if self.showSubmenu:
                     stack = [ ]
                     currentMenu = menu
-                    for i in range( len( self.virtualMachines ) ): #TODO Can this be rewritten without the index i?
-                        virtualMachine = self.virtualMachines[ i ]
+                    for i in range( len( virtualMachines ) ): #TODO Can this be rewritten without the index i?
+                        virtualMachine = virtualMachines[ i ]
                         while virtualMachine.getIndent() < len( stack ):
                             currentMenu = stack.pop()
 
@@ -128,14 +129,14 @@ class IndicatorVirtualBox:
                             stack.append( currentMenu )
                             currentMenu = subMenu
                         else:
-                            currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, "", virtualMachine.getUUID() in runningVirtualMachines ) )
+                            currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, "", virtualMachine.getUUID() in runningVMUUIDs ) )
                 else:
-                    for virtualMachine in self.virtualMachines:
+                    for virtualMachine in virtualMachines:
                         indent = "    " * virtualMachine.getIndent()
                         if virtualMachine.isGroup():
                             menu.append( Gtk.MenuItem( indent + virtualMachine.getGroupName() ) )
                         else:
-                            menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, virtualMachine.getUUID() in runningVirtualMachines ) )
+                            menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, virtualMachine.getUUID() in runningVMUUIDs ) )
 
             menu.append( Gtk.SeparatorMenuItem() )
             menuItem = Gtk.MenuItem( _( "Launch VirtualBox Manager" ) )
@@ -157,39 +158,32 @@ class IndicatorVirtualBox:
         else:
             menuItem = Gtk.MenuItem( indent + virtualMachine.getName() )
 
-        menuItem.connect( "activate", self.onVirtualMachine, virtualMachine.getUUID() )
+        menuItem.connect( "activate", self.startVirtualMachine, virtualMachine.getUUID() )
         return menuItem
 
 
     def autoStartVirtualMachines( self ):
-#TODO Could remove the global self.virtualMachines...
-# Need to get the list here (not a cost as it's done only once at startup).
-# Need to get the list in build menu (not a cost as menu should only be rebuilt periodically, or on demand).
-# Need to pass in the VM name into onVirtualMachine so bringToFront works.        
-        for virtualMachine in self.virtualMachines:
+        for virtualMachine in self.getVirtualMachines():
             if self.isAutostart( virtualMachine.getUUID() ):
-                self.onVirtualMachine( None, virtualMachine.getUUID() )
+                self.startVirtualMachine( None, virtualMachine.getUUID() )
                 time.sleep( self.delayBetweenAutoStartInSeconds )
-#TODO When to refresh the menu?  Or just call update as unscheduled?
 
 
-    def onVirtualMachine( self, widget, uuid ):
-        if uuid in self.getRunningVirtualMachines():
-            print( "Bring to front:", uuid )
-#             for virtualMachine in self.virtualMachines:
-#                 if virtualMachine.getUUID() == uuid:
-#                     self.bringWindowToFront( virtualMachine.getName() )
-#                     break
-
+    def startVirtualMachine( self, widget, uuid ):
+        delay = 0 # Time to delay before refreshing the menu.
+        runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
+        if uuid in runningVMUUIDs:
+            self.bringWindowToFront( runningVMNames[ runningVMUUIDs.index( uuid ) ] )
         else:
-            print( "Start up:", uuid )
             result = pythonutils.processGet( "VBoxManage list vms | grep " + uuid )
             if result is None or uuid not in result:
                 message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
                 Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
-#             else:
-#             self.startVirtualMachine( uuid ) #TODO Should this return false if the VM didn't exist or some other error/exception?
-# GLib.idle_add( self.update, False )
+            else:
+                pythonutils.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
+                delay = 10 # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
+
+        GLib.timeout_add_seconds( delay, self.update, False )
 
 
     def bringWindowToFront( self, virtualMachineName ):
@@ -197,6 +191,7 @@ class IndicatorVirtualBox:
         if numberOfWindowsWithTheSameName == "0":
             message = _( "Unable to find the window for the VM '{0}' - perhaps it is running as headless." ).format( virtualMachineName )
             Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
+
         elif numberOfWindowsWithTheSameName == "1":
             for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
                 if virtualMachineName in line:
@@ -208,37 +203,24 @@ class IndicatorVirtualBox:
             Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
 
 
-    def startVirtualMachine( self, uuid ):
-#TODO Need to wrap in try/catch?  Test using a bogus start command...see what happens.
-        try:
-            startCommand = self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" #TODO How to tell if the VM actually started?  If it doesn't start, need to tell user and do an unscheduled update, correct?  Or do an update regardless?
-            pythonutils.processCall( startCommand )
-#             GLib.timeout_add_seconds( 10, self.update, False ) # Delay the call to refresh (which builds the menu) because the VM will have been started in the background and VBoxManage will not have had time to update.
-
-        except Exception as e:
-            logging.exception( e )
-            message = _( "The VM '{0}' could not be started." ).format( uuid )
-            Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
-
-
     # It is assumed that VirtualBox is installed!
 #TODO Double check this all makes sense and is efficient.
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        runningVMs = self.getRunningVirtualMachines()
-        if len( runningVMs ) > 0:
-            if self.scrollUUID is None or self.scrollUUID not in runningVMs:
-                self.scrollUUID = runningVMs[ 0 ]
+        runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
+        if len( runningVMUUIDs ) > 0:
+            if self.scrollUUID is None or self.scrollUUID not in runningVMUUIDs:
+                self.scrollUUID = runningVMUUIDs[ 0 ]
 
             if scrollDirection == Gdk.ScrollDirection.UP:
-                index = ( runningVMs.index( self.scrollUUID ) + 1 ) % len( runningVMs )
-                self.scrollUUID = runningVMs[ index ]
+                index = ( runningVMUUIDs.index( self.scrollUUID ) + 1 ) % len( runningVMUUIDs )
+                self.scrollUUID = runningVMUUIDs[ index ]
                 self.scrollDirectionIsUp = True
             else:
-                index = ( runningVMs.index( self.scrollUUID ) - 1 ) % len( runningVMs )
-                self.scrollUUID = runningVMs[ index ]
+                index = ( runningVMUUIDs.index( self.scrollUUID ) - 1 ) % len( runningVMUUIDs )
+                self.scrollUUID = runningVMUUIDs[ index ]
                 self.scrollDirectionIsUp = False
 
-            self.bringWindowToFront( self.scrollUUID )
+            self.bringWindowToFront( runningVMNames[ runningVMUUIDs.index( self.scrollUUID ) ] )
 
 
     def onLaunchVirtualBoxManager( self, widget ):
@@ -253,8 +235,26 @@ class IndicatorVirtualBox:
             pythonutils.processCall( "wmctrl -ia " + windowID.strip() ) #TODO Check this works in non-English
 
 
-    def refreshVirtualMachines( self ):
-        self.virtualMachines = [ ]
+    # Returns a list of running VM names and list of corresponding running VM UUIDs.
+    def getRunningVirtualMachines( self ):
+        names = [ ]
+        uuids = [ ]
+        result = pythonutils.processGet( "VBoxManage list runningvms" )
+        if result is not None:
+            for line in result.splitlines():
+                try:
+                    info = line[ 1 : -1 ].split( "\" {" )
+                    names.append( info[ 0 ] )
+                    uuids.append( info[ 1 ] )
+                except:
+                    pass # Sometimes VBoxManage emits a warning message along with the VM information.
+
+        return names, uuids
+
+
+    # Returns a list of virtualmachine.Info objects reflecting VMs and groups as found via VBoxManage and configuration files.
+    def getVirtualMachines( self ):
+        virtualMachines = [ ]
         if self.isVBoxManageInstalled():
             version = self.getVirtualBoxVersion()
             if version is not None:
@@ -268,59 +268,22 @@ class IndicatorVirtualBox:
                     virtualMachinesFromConfig = virtualMachinesFromVBoxManage
 
                 # Going forward, the virtual machine infos from the config is the definitive list of VMs (and groups, if any).
-                self.virtualMachines = virtualMachinesFromConfig
+                virtualMachines = virtualMachinesFromConfig
 
                 # The virtual machine infos from the config do not contain the names of virtual machines.
                 # Obtain the names from the virtual machine infos from VBoxManage.
                 for virtualmachineFromVBoxManage in virtualMachinesFromVBoxManage:
-                    for virtualMachine in self.virtualMachines:
+                    for virtualMachine in virtualMachines:
                         if virtualmachineFromVBoxManage.getUUID() == virtualMachine.getUUID():
                             virtualMachine.setName( virtualmachineFromVBoxManage.getName() )
                             break
 
 #TODO Check the code/sense in the test
-#...also do this here?  Perhaps do it (say in build menu) where it is needed?
                 # Alphabetically sort...or not.
-                if self.sortDefault == False and not self.groupsExist( self.virtualMachines ):
-                    self.virtualMachines = sorted( self.virtualMachines, key = lambda virtualMachine: virtualMachine.name )
+                if self.sortDefault == False and not self.groupsExist( virtualMachines ):
+                    virtualMachines = sorted( virtualMachines, key = lambda virtualMachine: virtualMachine.name )
 
-
-    def getRunningVirtualMachines( self ):
-        runningVirtualMachines = [ ]
-        result = pythonutils.processGet( "VBoxManage list runningvms" )
-        if result is not None:
-            for line in result.splitlines():
-                try:
-                    info = line[ 1 : -1 ].split( "\" {" )
-                    runningVirtualMachines.append( info[ 1 ] )
-                except:
-                    pass # Sometimes VBoxManage emits a warning message along with the VM information.
-
-        return runningVirtualMachines
-
-
-    # Returns the version number as a string or None if no version could be determined.
-    # Safe to call without checking if VBoxManage is installed.
-    def getVirtualBoxVersion( self ):
-        result = pythonutils.processGet( "VBoxManage --version" )
-        if result is None: # If a VM is corrupt/missing, VBoxManage may return a spurious (None) result.
-            version = None
-        else:
-            for line in result.splitlines():
-                if len( line ) > 0 and line[ 0 ].isdigit(): # The result may include compile warnings in addition to the actual version number or even empty lines.
-                    version = line
-                    break
-
-        return version
-
-
-    def isVBoxManageInstalled( self ): 
-        isInstalled = False
-        result = pythonutils.processGet( "which VBoxManage" )
-        if result is not None:
-            isInstalled = result.find( "VBoxManage" ) > -1
-
-        return isInstalled
+        return virtualMachines
 
 
     # The returned list of virtualmachine.Info objects does not include any groups (if present) nor any order set by the user in the GUI.
@@ -413,6 +376,30 @@ class IndicatorVirtualBox:
             virtualMachines = [ ]
 
         return virtualMachines
+
+
+    # Returns the version number as a string or None if no version could be determined.
+    # Safe to call without checking if VBoxManage is installed.
+    def getVirtualBoxVersion( self ):
+        result = pythonutils.processGet( "VBoxManage --version" )
+        if result is None: # If a VM is corrupt/missing, VBoxManage may return a spurious (None) result.
+            version = None
+        else:
+            for line in result.splitlines():
+                if len( line ) > 0 and line[ 0 ].isdigit(): # The result may include compile warnings in addition to the actual version number or even empty lines.
+                    version = line
+                    break
+
+        return version
+
+
+    def isVBoxManageInstalled( self ): 
+        isInstalled = False
+        result = pythonutils.processGet( "which VBoxManage" )
+        if result is not None:
+            isInstalled = result.find( "VBoxManage" ) > -1
+
+        return isInstalled
 
 
     def groupsExist( self, virtualMachines ):
