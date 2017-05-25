@@ -71,7 +71,6 @@ class IndicatorVirtualBox:
     SETTINGS_DELAY_BETWEEN_AUTO_START = "delayBetweenAutoStartInSeconds"
     SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     SETTINGS_SHOW_SUBMENU = "showSubmenu"
-    SETTINGS_SORT_DEFAULT = "sortDefault"
     SETTINGS_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
 
 
@@ -275,11 +274,6 @@ class IndicatorVirtualBox:
                         if virtualmachineFromVBoxManage.getUUID() == virtualMachine.getUUID():
                             virtualMachine.setName( virtualmachineFromVBoxManage.getName() )
                             break
-
-#TODO Check the code/sense in the test
-                # Alphabetically sort...or not.
-                if self.sortDefault == False and not self.groupsExist( virtualMachines ):
-                    virtualMachines = sorted( virtualMachines, key = lambda virtualMachine: virtualMachine.name )
 
         return virtualMachines
 
@@ -498,17 +492,10 @@ class IndicatorVirtualBox:
             "Otherwise groups are shown as an indented list." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
 
-        sortAlphabeticallyCheckbox = Gtk.CheckButton( _( "Sort VMs alphabetically" ) )
-        sortAlphabeticallyCheckbox.set_tooltip_text( _( "If checked, VMs are sorted alphabetically.\n\nOtherwise VMs are sorted as set via VirtualBox Manager." ) )
-        sortAlphabeticallyCheckbox.set_active( not self.sortDefault )
-
         row = 0
         version = self.getVirtualBoxVersion()
         if self.isVBoxManageInstalled() and version is not None:
-            if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
-                grid.attach( sortAlphabeticallyCheckbox, 0, row, 1, 1 )
-                row += 1
-            else:
+            if version >= IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
                 if self.groupsExist( virtualMachines ):
                     grid.attach( showAsSubmenusCheckbox, 0, row, 1, 1 )
                     row += 1
@@ -560,7 +547,6 @@ class IndicatorVirtualBox:
         if dialog.run() == Gtk.ResponseType.OK:
             self.delayBetweenAutoStartInSeconds = spinnerDelay.get_value_as_int()
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
-            self.sortDefault = not sortAlphabeticallyCheckbox.get_active()
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.virtualMachinePreferences.clear()
             self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
@@ -672,7 +658,6 @@ class IndicatorVirtualBox:
         self.delayBetweenAutoStartInSeconds = 30
         self.refreshIntervalInMinutes = 15
         self.showSubmenu = False
-        self.sortDefault = True
         self.virtualMachinePreferences = { } # Store information about VMs (not groups). Key is VM UUID; value is [ autostart (bool), start command (str) ]
 
         if os.path.isfile( IndicatorVirtualBox.SETTINGS_FILE ):
@@ -683,7 +668,6 @@ class IndicatorVirtualBox:
                 self.delayBetweenAutoStartInSeconds = settings.get( IndicatorVirtualBox.SETTINGS_DELAY_BETWEEN_AUTO_START, self.delayBetweenAutoStartInSeconds )
                 self.refreshIntervalInMinutes = settings.get( IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
                 self.showSubmenu = settings.get( IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
-                self.sortDefault = settings.get( IndicatorVirtualBox.SETTINGS_SORT_DEFAULT, self.sortDefault )
                 self.virtualMachinePreferences = settings.get( IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES, self.virtualMachinePreferences )
 
             except Exception as e:
@@ -696,7 +680,6 @@ class IndicatorVirtualBox:
             IndicatorVirtualBox.SETTINGS_DELAY_BETWEEN_AUTO_START: self.delayBetweenAutoStartInSeconds,
             IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
             IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
-            IndicatorVirtualBox.SETTINGS_SORT_DEFAULT: self.sortDefault,
             IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences
         }
 
