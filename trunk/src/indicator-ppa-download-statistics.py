@@ -22,6 +22,7 @@
 # References:
 #  http://developer.gnome.org/pygobject
 #  http://developer.gnome.org/gtk3
+#  http://developer.gnome.org/gnome-devel-demos
 #  http://python-gtk-3-tutorial.readthedocs.org
 #  http://wiki.gnome.org/Projects/PyGObject/Threading
 #  http://wiki.ubuntu.com/NotifyOSD
