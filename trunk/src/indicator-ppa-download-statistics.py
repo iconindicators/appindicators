@@ -47,7 +47,7 @@ from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from ppa import PPA, PublishedBinary
 from threading import Thread
 from urllib.request import urlopen
-import pythonutils, json, locale, logging, operator, os, threading, webbrowser
+import json, locale, logging, operator, os, pythonutils, threading, webbrowser
 
 
 #TODO
