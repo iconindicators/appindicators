@@ -204,7 +204,6 @@ class IndicatorVirtualBox:
 
 
     # It is assumed that VirtualBox is installed!
-#TODO Double check this all makes sense and is efficient.
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
         runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
         if len( runningVMUUIDs ) > 0:
@@ -232,7 +231,7 @@ class IndicatorVirtualBox:
         if windowID is None or windowID == "":
             pythonutils.processCall( "/usr/lib/virtualbox/VirtualBox &" )
         else:
-            pythonutils.processCall( "wmctrl -ia " + windowID.strip() ) #TODO Check this works in non-English
+            pythonutils.processCall( "wmctrl -ia " + windowID.strip() )
 
 
     # Returns a list of running VM names and list of corresponding running VM UUIDs.
