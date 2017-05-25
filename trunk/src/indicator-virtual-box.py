@@ -62,7 +62,7 @@ class IndicatorVirtualBox:
     COMMENTS = _( "Shows VirtualBox™ virtual machines and allows them to be started." )
 
     VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
-    VIRTUAL_BOX_CONFIGURATION_4_DOT_3_PRIOR = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
+    VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
     VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION = "4.3" # Configuration file location and format changed at this version (https://www.virtualbox.org/manual/ch10.html#idp99351072).
 
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
@@ -256,9 +256,9 @@ class IndicatorVirtualBox:
             version = self.getVirtualBoxVersion()
             if version is not None:
                 if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
-                    virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPrior4dot3()
+                    virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPriorTo4dot3()
                 else:
-                    virtualMachinesFromConfig = self.getVirtualMachinesFromConfig4dot3()
+                    virtualMachinesFromConfig = self.getVirtualMachinesFromConfig4dot3OrGreater()
 
                 virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage() # Contains no group information, nor sort order.
                 if len( virtualMachinesFromConfig ) == 0: # If the user did not modify VM sort order, there will be no list of VMs in the config file, so use the result from VBoxManage.
@@ -295,9 +295,9 @@ class IndicatorVirtualBox:
         return virtualMachines
 
 
-    def getVirtualMachinesFromConfigPrior4dot3( self ):
+    def getVirtualMachinesFromConfigPriorTo4dot3( self ):
         virtualMachines = [ ]
-        line = pythonutils.processGet( "grep GUI/SelectorVMPositions " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_PRIOR )
+        line = pythonutils.processGet( "grep GUI/SelectorVMPositions " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 )
         try:
             uuids = list( line.rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
             for uuid in uuids:
@@ -310,14 +310,14 @@ class IndicatorVirtualBox:
         return virtualMachines
 
 
-    def getVirtualMachinesFromConfig4dot3( self ):
+    def getVirtualMachinesFromConfig4dot3OrGreater( self ):
         # The config file may exist in one of two places, particularly if the user has done an upgrade or uses an older version of Ubuntu.
-        # https://www.virtualbox.org/manual/ch10.html#idp46730491656240
+        # https://www.virtualbox.org/manual/ch10.html
         configFile = None
         if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER ):
             configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER
-        elif os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_PRIOR ):
-            configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_PRIOR
+        elif os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 ):
+            configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3
 
         virtualMachines = [ ]
         try:
