@@ -932,8 +932,7 @@ class IndicatorLunar:
         self.previousLunarBrightLimbAngle = -1
         self.previousThemeName = ""
 
-        filehandler = pythonutils.TruncatedFileHandler( IndicatorLunar.LOG, "a", 10000, None, True )
-        logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ filehandler ] )
+        logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorLunar.LOG ) ] )
 
         if not os.path.exists( IndicatorLunar.CACHE_PATH ):
             os.makedirs( IndicatorLunar.CACHE_PATH )
