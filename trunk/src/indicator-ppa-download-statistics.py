@@ -105,7 +105,6 @@ class IndicatorPPADownloadStatistics:
         self.preferencesOpen = False
         self.quitRequested = False
 
-        GLib.threads_init()
         self.lock = threading.Lock()
         Notify.init( INDICATOR_NAME )
         self.loadSettings()
