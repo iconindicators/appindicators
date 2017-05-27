@@ -215,8 +215,8 @@ class IndicatorPunycode:
 
         inputClipboardRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Clipboard" ) )
         inputClipboardRadio.set_tooltip_text( _(
-            "Input is taken from the clipboard\n" + \
-            "after a CTRL-X or CTRL-C (or eqivalent)." ) )
+            "Input is taken from the clipboard after\n" + \
+            "a CTRL-X or CTRL-C (or eqivalent)." ) )
         inputClipboardRadio.set_active( self.inputClipboard )
         inputClipboardRadio.set_margin_left( 15 )
         grid.attach( inputClipboardRadio, 0, 1, 1, 1 )
@@ -224,9 +224,8 @@ class IndicatorPunycode:
         inputPrimaryRadio = Gtk.RadioButton.new_with_label_from_widget( inputClipboardRadio, _( "Primary" ) )
         inputPrimaryRadio.set_tooltip_text( _(
             "Input is taken from the currently\n" + \
-            "highlighted/selected text after\n" + \
-            "the user performs a middle\n" + \
-            "mouse click on the icon." ) )
+            "selected text after a middle mouse\n" + \
+            "click of the indicator icon." ) )
         inputPrimaryRadio.set_active( not self.inputClipboard )
         inputPrimaryRadio.set_margin_left( 15 )
         grid.attach( inputPrimaryRadio, 0, 2, 1, 1 )
