@@ -1152,7 +1152,7 @@ class IndicatorPPADownloadStatistics:
             # The only status the PPA can be at this point is error retrieving ppa (set by get download count).
             if ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
                 ppa.setStatus( PPA.STATUS_OK )
-                if len( ppa.getPublishedBinaries() ) == 0:
+                if len( ppa.getPublishedBinaries() ) == 0: #TODO Is is possible for non filtered to hit this?
                     ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
 
         except Exception as e:
@@ -1161,12 +1161,12 @@ class IndicatorPPADownloadStatistics:
 
 
     def getDownloadCount( self, ppa, packageName, packageVersion, architectureSpecific, packageId ):
-        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
         with threading.Lock():
             status = ppa.getStatus() # If the status is set to error by another download (of this PPA), abort...
 
         if status != PPA.STATUS_ERROR_RETRIEVING_PPA:
             try:
+                url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
                 downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
                 if str( downloadCount ).isnumeric():
                     ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
