@@ -101,23 +101,59 @@ class IndicatorPPADownloadStatistics:
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorPPADownloadStatistics.LOG ) ] )
 
+        self.downloading = False
         self.downloadInProgress = False
-        self.preferencesOpen = False
+#         self.preferencesOpen = False
         self.quitRequested = False
 
-        self.lock = threading.Lock()
+        self.dialogLock = threading.Lock()
+        self.lock = threading.Lock() #TODO Needed by whom, if at all?
         Notify.init( INDICATOR_NAME )
         self.loadSettings()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
-        self.buildMenu()
-        self.requestPPADownloadAndMenuRefresh( False )
-        GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every six hours.
+#         self.buildMenu() # Menu will initially contain a download status message.
+        self.update( True )
+#         self.buildMenu()
+#         self.requestPPADownloadAndMenuRefresh( False )
+#         GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every six hours.
 
 
     def main( self ): Gtk.main()
+
+
+#TODO...
+#
+# Init - set PPA status to need download; build menu
+#      - kick off download; build menu after download
+#
+# Scheduled update - kick off download; build menu after download
+#
+# Preferences change - set PPA status to need download; build menu
+#                    - kick off download; build menu after download
+#
+# Saving preferences whilst a download is underway - cancel current download and kick off new one?
+# User quits while download is underway - monitor a flag and cancel download ASAP.
+
+
+    def update( self, scheduled ):
+        with threading.Lock():
+#             if not scheduled:
+#                 GLib.source_remove( self.updateTimerID )
+
+#TODO Cancel existing download if underway.            
+#TODO Perhaps here have a simple build Menu that just has the About/Pref/Quit and a message "downloading..."?
+            self.buildMenu() # Menu will initially contain a download status message as the PPA data should (must) be empty of statistics.  #TODO How to enforce this?
+            self.downloading = True
+            Thread( target = self.getPPADownloadStatistics ).start()
+
+#             self.requestPPADownloadAndMenuRefresh( False )
+#             GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every six hours.
+
+#             self.buildMenu()
+#             self.updateTimerID = GLib.timeout_add_seconds( self.fiveSecondsAfterMidnight(), self.update, True )
 
 
     def buildMenu( self ):
@@ -284,34 +320,38 @@ class IndicatorPPADownloadStatistics:
 
 
     def onAbout( self, widget ):
-        dialog = pythonutils.createAboutDialog(
-            [ IndicatorPPADownloadStatistics.AUTHOR ],
-            IndicatorPPADownloadStatistics.COMMENTS, 
-            [ ],
-            "",
-            Gtk.License.GPL_3_0,
-            IndicatorPPADownloadStatistics.ICON,
-            INDICATOR_NAME,
-            IndicatorPPADownloadStatistics.WEBSITE,
-            IndicatorPPADownloadStatistics.VERSION,
-            _( "translator-credits" ),
-            _( "View the" ),
-            _( "text file." ),
-            _( "changelog" ) )
+        if self.dialogLock.acquire( blocking = False ):
+            pythonutils.showAboutDialog(
+                [ IndicatorPPADownloadStatistics.AUTHOR ],
+                IndicatorPPADownloadStatistics.COMMENTS, 
+                [ ],
+                "",
+                Gtk.License.GPL_3_0,
+                IndicatorPPADownloadStatistics.ICON,
+                INDICATOR_NAME,
+                IndicatorPPADownloadStatistics.WEBSITE,
+                IndicatorPPADownloadStatistics.VERSION,
+                _( "translator-credits" ),
+                _( "View the" ),
+                _( "text file." ),
+                _( "changelog" ) )
 
-        dialog.run()
-        dialog.destroy()
+            self.dialogLock.release()
 
-
-#TODO Add _onPreferencesInternal
 
     def onPreferences( self, widget ):
-        if self.downloadInProgress:
-            Notify.Notification.new( _( "Downloading data..." ), _( "Preferences are currently unavailable." ), IndicatorPPADownloadStatistics.ICON ).show()
-            return
+        if self.dialogLock.acquire( blocking = False ):
+            self._onPreferences( widget )
+            self.dialogLock.release()
 
-        with self.lock:
-            self.preferencesOpen = True #TODO Maybe when an update occurs, disable the menu (except quit).  If a dialog (about/pref) is already open, delay the update?
+
+    def _onPreferences( self, widget ):
+#         if self.downloadInProgress:
+#             Notify.Notification.new( _( "Downloading data..." ), _( "Preferences are currently unavailable." ), IndicatorPPADownloadStatistics.ICON ).show()
+#             return
+# 
+#         with self.lock:
+#             self.preferencesOpen = True #TODO Maybe when an update occurs, disable the menu (except quit).  If a dialog (about/pref) is already open, delay the update?
 
         self.ppasOrFiltersModified = False
 
@@ -534,9 +574,9 @@ class IndicatorPPADownloadStatistics:
                 while treeiter != None:
                     self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
                     treeiter = ppaStore.iter_next( treeiter )
-    
+
                 self.ppas.sort( key = operator.methodcaller( "getKey" ) )
-    
+
                 self.filters = { }
                 treeiter = filterStore.get_iter_first()
                 while treeiter != None:
@@ -545,18 +585,19 @@ class IndicatorPPADownloadStatistics:
 
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorPPADownloadStatistics.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+            GLib.idle_add( self.update, False )
 
-            GLib.timeout_add_seconds( 1, self.buildMenu )
+#             GLib.timeout_add_seconds( 1, self.buildMenu )
 
-            if self.ppasOrFiltersModified:
-                GLib.timeout_add_seconds( 10, self.requestPPADownloadAndMenuRefresh, False ) # Hopefully 10 seconds is sufficient to rebuild the menu!
-                with self.lock:
-                    self.downloadInProgress = True # Although the download hasn't actually started, this ensures the preferences cannot be opened until the download completes.
+#             if self.ppasOrFiltersModified:
+#                 GLib.timeout_add_seconds( 10, self.requestPPADownloadAndMenuRefresh, False ) # Hopefully 10 seconds is sufficient to rebuild the menu!
+#                 with self.lock:
+#                     self.downloadInProgress = True # Although the download hasn't actually started, this ensures the preferences cannot be opened until the download completes.
 
         dialog.destroy()
-        with self.lock:
-            self.preferencesOpen = False
-        
+#         with self.lock:
+#             self.preferencesOpen = False
+
 
     def onCombinePPAsCheckbox( self, source, checkbox ): checkbox.set_sensitive( source.get_active() )
 
@@ -947,9 +988,9 @@ class IndicatorPPADownloadStatistics:
             logging.error( "Error writing settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
 
 
-    def requestPPADownloadAndMenuRefresh( self, runAgain ):
-        Thread( target = self.getPPADownloadStatistics ).start()
-        return runAgain
+#     def requestPPADownloadAndMenuRefresh( self, runAgain ):
+#         Thread( target = self.getPPADownloadStatistics ).start()
+#         return runAgain
 #TODO Can the scheduling of the next update happen here, rather than in the init?
 #Might have to take a parameter -IMMEDIATE or a TIME FROM NOW.
 
@@ -989,13 +1030,20 @@ class IndicatorPPADownloadStatistics:
     #    ,... 
     #}
     def getPPADownloadStatistics( self ):
-        if self.preferencesOpen:
-            GLib.timeout_add_seconds( 60, self.requestPPADownloadAndMenuRefresh, False ) # If the user has the preferences open and an automatic update has kicked off, reschedule the update.
-        else:
-            with self.lock:
-                self.downloadInProgress = True
+#         with self.lock:
+#             self.downloadInProgress = True
 
-            for ppa in self.ppas:
+        for ppa in self.ppas:
+            ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
+            key = ppa.getUser() + " | " + ppa.getName()
+            if key in self.filters:
+                self.getPublishedBinariesWithFilters( ppa )
+            else:
+                self.getPublishedBinariesNoFilters( ppa )
+
+        # Have a second attempt at failures...
+        for ppa in self.ppas:
+            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                 ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
                 key = ppa.getUser() + " | " + ppa.getName()
                 if key in self.filters:
@@ -1003,32 +1051,22 @@ class IndicatorPPADownloadStatistics:
                 else:
                     self.getPublishedBinariesNoFilters( ppa )
 
-            # Have a second attempt at failures...
-            for ppa in self.ppas:
-                if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
-                    ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
-                    key = ppa.getUser() + " | " + ppa.getName()
-                    if key in self.filters:
-                        self.getPublishedBinariesWithFilters( ppa )
-                    else:
-                        self.getPublishedBinariesNoFilters( ppa )
+        with self.lock:
+            self.downloadInProgress = False
 
-            with self.lock:
-                self.downloadInProgress = False
+        GLib.idle_add( self.buildMenu )
 
-            GLib.idle_add( self.buildMenu )
+        if not self.quitRequested and self.ppasPrevious != self.ppas:
+            Notify.Notification.new( _( "Statistics downloaded!" ), "", IndicatorPPADownloadStatistics.ICON ).show()
 
-            if not self.quitRequested and self.ppasPrevious != self.ppas:
-                Notify.Notification.new( _( "Statistics downloaded!" ), "", IndicatorPPADownloadStatistics.ICON ).show()
-
-            self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.
+        self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.
 
 
     def getPublishedBinariesNoFilters( self, ppa ):
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
-                  "?ws.op=getPublishedBinaries" + \
-                  "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
-                  "&status=Published"
+              "?ws.op=getPublishedBinaries" + \
+              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
+              "&status=Published"
 
         try:
             publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
@@ -1047,12 +1085,12 @@ class IndicatorPPADownloadStatistics:
         noPublishedBinaries = True
         for filter in self.filters.get( ppa.getUser() + " | " + ppa.getName() ):
             url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
-                      "?ws.op=getPublishedBinaries" + \
-                      "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
-                      "&status=Published" + \
-                      "&exact_match=false" + \
-                      "&ordered=false" + \
-                      "&binary_name=" + filter
+                  "?ws.op=getPublishedBinaries" + \
+                  "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
+                  "&status=Published" + \
+                  "&exact_match=false" + \
+                  "&ordered=false" + \
+                  "&binary_name=" + filter
 
             try:
                 publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
@@ -1076,7 +1114,7 @@ class IndicatorPPADownloadStatistics:
             index = 0
             resultPage = 1
             resultsPerUrl = 75
-            threads = []
+            threads = [ ]
             for i in range( numberOfPublishedBinaries ):
                 if self.quitRequested:
                     self.quit( None )
@@ -1091,12 +1129,12 @@ class IndicatorPPADownloadStatistics:
 
                 packageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
 
-                # Limit to 10 concurrent fetches of package download count...
-                if len( threads ) > 10:
+                # Limit the number of concurrent fetches...
+                if len( threads ) > 5:
                     for t in threads:
                         t.join()
 
-                    threads = []
+                    threads = [ ]
 
                 packageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
                 architectureSpecific = publishedBinaries[ "entries" ][ index ][ "architecture_specific" ]
@@ -1111,7 +1149,7 @@ class IndicatorPPADownloadStatistics:
             for t in threads:
                 t.join() # Wait for remaining threads...
 
-            # The only status the PPA can be at this point is needs download (the initial ppa status) or error retrieving ppa (set by get download count).
+            # The only status the PPA can be at this point is error retrieving ppa (set by get download count).
             if ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
                 ppa.setStatus( PPA.STATUS_OK )
                 if len( ppa.getPublishedBinaries() ) == 0:
@@ -1124,17 +1162,19 @@ class IndicatorPPADownloadStatistics:
 
     def getDownloadCount( self, ppa, packageName, packageVersion, architectureSpecific, packageId ):
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
-        try:
-            downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
-            with self.lock:
+        with threading.Lock():
+            status = ppa.getStatus() # If the status is set to error by another download (of this PPA), abort...
+
+        if status != PPA.STATUS_ERROR_RETRIEVING_PPA:
+            try:
+                downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
                 if str( downloadCount ).isnumeric():
                     ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
                 else:
                     ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-
-        except Exception as e:
-            logging.exception( e )
-            with self.lock:
+    
+            except Exception as e:
+                logging.exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
 
