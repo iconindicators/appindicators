@@ -143,10 +143,11 @@ class IndicatorFortune:
         else:
             locations = " "
             for location, enabled in self.fortunes:
-                if os.path.isdir( location ):
-                    locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
-                elif os.path.isfile( location ):
-                    locations += "'" + location.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
+                if enabled:
+                    if os.path.isdir( location ):
+                        locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
+                    elif os.path.isfile( location ):
+                        locations += "'" + location.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
 
             if locations == " ": # Despite one or more fortunes enabled, none seem to be valid paths/files...
                 self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No enabled fortunes have a valid location!" )
@@ -544,7 +545,7 @@ class IndicatorFortune:
         while( True ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
-                if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE ):
+                if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ 0 ] ):
                     pythonutils.showMessage( dialog, Gtk.MessageType.INFO, _( "The fortune is part of your system\nand is already included." ), INDICATOR_NAME )
                 else:
                     fortuneFileDirectory.set_text( dialog.get_filename() )
