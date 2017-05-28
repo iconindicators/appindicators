@@ -31,8 +31,7 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 
 
-#TODO
-# If/when migrating to GNOME as a result of Unity's demise,
+#TODO If/when migrating to GNOME as a result of Unity's demise,
 # if the new indicator framework provides an event when the icon is clicked,
 # capture that event and do a refresh of the menu.
 # Then remove the refresh interval option.
