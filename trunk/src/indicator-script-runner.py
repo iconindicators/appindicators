@@ -54,6 +54,7 @@ class IndicatorScriptRunner:
     COMMENTS = _( "Run a terminal command or script from a GUI front-end." )
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
+    SETTINGS_HIDE_GROUPS = "hideGroups"
     SETTINGS_SCRIPT_GROUP_DEFAULT = "scriptGroupDefault"
     SETTINGS_SCRIPT_NAME_DEFAULT = "scriptNameDefault"
     SETTINGS_SCRIPTS = "scripts"
@@ -80,37 +81,39 @@ class IndicatorScriptRunner:
 
 
     def buildMenu( self ):
-        scripts = self.getScriptsByGroup( self.scripts )
         menu = Gtk.Menu()
 
-        if len( scripts ) == 1: # When there is only one group, omit.
-            for scriptGroup in sorted( scripts.keys(), key = str.lower ):
-                self.addScriptsToMenu( scripts, scriptGroup, menu, "" )
-        else:
-            if self.showScriptsInSubmenus:
-                for scriptGroup in sorted( scripts.keys(), key = str.lower ):
-                    scriptNameMenuItem = Gtk.MenuItem( scriptGroup )
-                    subMenu = Gtk.Menu()
-                    scriptNameMenuItem.set_submenu( subMenu )
-                    menu.append( scriptNameMenuItem )
-                    self.addScriptsToMenu( scripts, scriptGroup, subMenu, "" )
-            else:
-                for scriptGroup in sorted( scripts.keys(), key = str.lower ):
-                    menu.append( Gtk.MenuItem( scriptGroup + "..." ) )
-                    self.addScriptsToMenu( scripts, scriptGroup, menu, "        " )
+        if self.showScriptsInSubmenus:
+            scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
+            for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
+                menuItem = Gtk.MenuItem( group )
+                menu.append( menuItem )
+                subMenu = Gtk.Menu()
+                menuItem.set_submenu( subMenu )
+                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, "" )
 
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, len( scripts ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
+        elif self.hideGroups:
+            for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
+                self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
+
+        else:
+            scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
+            for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
+                menu.append( Gtk.MenuItem( group + "..." ) )
+                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, "        " )
+
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, len( self.scripts ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
 
 
-    def addScriptsToMenu( self, scriptsGroupedByName, scriptGroup, menu, indent ):
-        scriptsGroupedByName[ scriptGroup ].sort( key = lambda script: script.getName().lower() )
-        for script in scriptsGroupedByName[ scriptGroup ]:
+    def addScriptsToMenu( self, scripts, group, menu, indent ):
+        scripts.sort( key = lambda script: script.getName().lower() )
+        for script in scripts:
             menuItem = Gtk.MenuItem( indent + script.getName() )
             menuItem.connect( "activate", self.onScript, script )
             menu.append( menuItem )
-            if scriptGroup == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
+            if group == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
                 self.indicator.set_secondary_activate_target( menuItem )
 
 
@@ -299,16 +302,30 @@ class IndicatorScriptRunner:
         grid.set_margin_top( 10 )
         grid.set_margin_bottom( 10 )
 
+        label = Gtk.Label( _( "Display" ) )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 1, 1 )
+
         showScriptsInSubmenusCheckbox = Gtk.CheckButton( _( "Show scripts in submenus" ) )
         showScriptsInSubmenusCheckbox.set_tooltip_text( _( "If checked, scripts of the same group are shown in submenus.\n\nOtherwise scripts listed, indented by group." ) )
         showScriptsInSubmenusCheckbox.set_active( self.showScriptsInSubmenus )
-        grid.attach( showScriptsInSubmenusCheckbox, 0, 0, 1, 1 )
+        showScriptsInSubmenusCheckbox.set_margin_left( 15 )
+        grid.attach( showScriptsInSubmenusCheckbox, 0, 1, 1, 1 )
+
+#TODO What happens if two scriptsGroupedByName have the same name?  
+#Grey out the option...or just alert the user when they click ok?
+#Or just warning user and/or have a tooltip....and then if there are two scripts with the same name (diff group), set hide groups to false.
+        hideGroupsCheckbox = Gtk.CheckButton( _( "Hide groups" ) )
+        hideGroupsCheckbox.set_tooltip_text( _( "If checked, only scripts names are displayed.\n\nOtherwise, script names are indented within each group." ) )
+        hideGroupsCheckbox.set_active( self.hideGroups )
+        hideGroupsCheckbox.set_margin_left( 15 )
+        grid.attach( hideGroupsCheckbox, 0, 2, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorScriptRunner.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 1, 1, 1 )
+        grid.attach( autostartCheckbox, 0, 3, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
@@ -744,11 +761,13 @@ class IndicatorScriptRunner:
         self.scriptNameDefault = ""
         self.scripts = [ ]
         self.showScriptsInSubmenus = False
+        self.hideGroups = False
         if os.path.isfile( IndicatorScriptRunner.SETTINGS_FILE ):
             try:
                 with open( IndicatorScriptRunner.SETTINGS_FILE, "r" ) as f:
                     settings = json.load( f )
 
+                self.hideGroups = settings.get( IndicatorScriptRunner.SETTINGS_HIDE_GROUPS, self.hideGroups )
                 self.scriptGroupDefault = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPT_GROUP_DEFAULT, self.scriptGroupDefault )
                 self.scriptNameDefault = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPT_NAME_DEFAULT, self.scriptNameDefault )
                 self.showScriptsInSubmenus = settings.get( IndicatorScriptRunner.SETTINGS_SHOW_SCRIPTS_IN_SUBMENUS, self.showScriptsInSubmenus )
@@ -791,6 +810,7 @@ class IndicatorScriptRunner:
             scripts.append( [ script.getGroup(), script.getName(), script.getDirectory(), script.getCommand(), script.isTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
 
         settings = {
+            IndicatorScriptRunner.SETTINGS_HIDE_GROUPS: self.hideGroups,
             IndicatorScriptRunner.SETTINGS_SCRIPT_GROUP_DEFAULT: self.scriptGroupDefault,
             IndicatorScriptRunner.SETTINGS_SCRIPT_NAME_DEFAULT: self.scriptNameDefault,
             IndicatorScriptRunner.SETTINGS_SCRIPTS: scripts,
