@@ -82,17 +82,22 @@ class IndicatorScriptRunner:
     def buildMenu( self ):
         scripts = self.getScriptsByGroup( self.scripts )
         menu = Gtk.Menu()
-        if self.showScriptsInSubmenus:
+
+        if len( scripts ) == 1: # When there is only one group, omit.
             for scriptGroup in sorted( scripts.keys(), key = str.lower ):
-                scriptNameMenuItem = Gtk.MenuItem( scriptGroup )
-                subMenu = Gtk.Menu()
-                scriptNameMenuItem.set_submenu( subMenu )
-                menu.append( scriptNameMenuItem )
-                self.addScriptsToMenu( scripts, scriptGroup, subMenu, "" )
+                self.addScriptsToMenu( scripts, scriptGroup, menu, "" )
         else:
-            for scriptGroup in sorted( scripts.keys(), key = str.lower ):
-                menu.append( Gtk.MenuItem( scriptGroup + "..." ) )
-                self.addScriptsToMenu( scripts, scriptGroup, menu, "        " )
+            if self.showScriptsInSubmenus:
+                for scriptGroup in sorted( scripts.keys(), key = str.lower ):
+                    scriptNameMenuItem = Gtk.MenuItem( scriptGroup )
+                    subMenu = Gtk.Menu()
+                    scriptNameMenuItem.set_submenu( subMenu )
+                    menu.append( scriptNameMenuItem )
+                    self.addScriptsToMenu( scripts, scriptGroup, subMenu, "" )
+            else:
+                for scriptGroup in sorted( scripts.keys(), key = str.lower ):
+                    menu.append( Gtk.MenuItem( scriptGroup + "..." ) )
+                    self.addScriptsToMenu( scripts, scriptGroup, menu, "        " )
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( scripts ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
