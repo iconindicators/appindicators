@@ -494,7 +494,7 @@ class IndicatorPPADownloadStatistics:
         grid.attach( combinePPAsCheckbox, 0, 1, 1, 1 )
 
         ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( _( "Ignore version for architecture specific" ) )
-        ignoreVersionArchitectureSpecificCheckbox.set_margin_left( pythonutils.WIDGET_INDENT_LEFT )
+        ignoreVersionArchitectureSpecificCheckbox.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
         ignoreVersionArchitectureSpecificCheckbox.set_tooltip_text( _(
             "Sometimes architecture specific\n" + \
             "packages with the same package\n" + \
@@ -528,7 +528,7 @@ class IndicatorPPADownloadStatistics:
 
         label = Gtk.Label( _( "  Clip amount" ) )
         label.set_sensitive( sortByDownloadCheckbox.get_active() )
-        label.set_margin_left( pythonutils.WIDGET_INDENT_LEFT )
+        label.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
         box.pack_start( label, False, False, 0 )
 
         spinner = Gtk.SpinButton()
