@@ -2499,7 +2499,7 @@ class IndicatorLunar:
         grid.attach( label, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 40 )
-        box.set_margin_left( pythonutils.WIDGET_INDENT_LEFT )
+        box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
 
         showMoonCheckbox = Gtk.CheckButton( _( "Moon" ) )
         showMoonCheckbox.set_active( self.showMoon )
@@ -2521,7 +2521,7 @@ class IndicatorLunar:
         grid.attach( label, 0, 2, 1, 1 )
 
         box = Gtk.Box( spacing = 40 )
-        box.set_margin_left( pythonutils.WIDGET_INDENT_LEFT )
+        box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
 
         showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( _( "Planets" ) )
         showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
@@ -2887,7 +2887,7 @@ class IndicatorLunar:
         grid.attach( showSatelliteNotificationCheckbox, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.TEXT_INDENT_LEFT )
+        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Summary" ) )
         label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
@@ -2916,7 +2916,7 @@ class IndicatorLunar:
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteNotificationSummaryText )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.TEXT_INDENT_LEFT )
+        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Message" ) )
         label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
@@ -2969,7 +2969,7 @@ class IndicatorLunar:
         grid.attach( showWerewolfWarningCheckbox, 0, 4, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.TEXT_INDENT_LEFT )
+        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Illumination (%)" ) )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
@@ -2989,7 +2989,7 @@ class IndicatorLunar:
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, spinner )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.TEXT_INDENT_LEFT )
+        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Summary" ) )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
@@ -3006,7 +3006,7 @@ class IndicatorLunar:
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationSummaryText )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.TEXT_INDENT_LEFT )
+        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Message" ) )
         label.set_valign( Gtk.Align.START )
