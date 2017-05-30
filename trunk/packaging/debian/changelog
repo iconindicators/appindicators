@@ -1,7 +1,7 @@
 indicator-script-runner (1.0.3-1) trusty; urgency=low
 
   * Bug fix: Updates we're being called twice!
-  * When there is only one group, omit from the menu.
+  * Added option to only show script names when scripts are shown grouped.
   * About/Preferences dialogs now block each other - only show one at a time.
   * Update release to trusty as precise is end of life.
 

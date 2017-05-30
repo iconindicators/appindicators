@@ -91,16 +91,16 @@ class IndicatorScriptRunner:
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
                 self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, "" )
-
-        elif self.hideGroups:
-            for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
-                self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
-
         else:
-            scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
-            for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
-                menu.append( Gtk.MenuItem( group + "..." ) )
-                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, "        " )
+            if self.hideGroups:
+                for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
+                    self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
+
+            else:
+                scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
+                for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
+                    menu.append( Gtk.MenuItem( group + "..." ) )
+                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, "        " )
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( self.scripts ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
@@ -306,26 +306,33 @@ class IndicatorScriptRunner:
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
-        showScriptsInSubmenusCheckbox = Gtk.CheckButton( _( "Show scripts in submenus" ) )
-        showScriptsInSubmenusCheckbox.set_tooltip_text( _( "If checked, scripts of the same group are shown in submenus.\n\nOtherwise scripts listed, indented by group." ) )
-        showScriptsInSubmenusCheckbox.set_active( self.showScriptsInSubmenus )
-        showScriptsInSubmenusCheckbox.set_margin_left( 15 )
-        grid.attach( showScriptsInSubmenusCheckbox, 0, 1, 1, 1 )
+        radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show scripts in submenus" ) )
+        radioShowScriptsSubmenu.set_tooltip_text( _( "Scripts of the same group are shown in submenus." ) )
+        radioShowScriptsSubmenu.set_active( self.showScriptsInSubmenus )
+        radioShowScriptsSubmenu.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        grid.attach( radioShowScriptsSubmenu, 0, 1, 1, 1 )
 
-#TODO What happens if two scriptsGroupedByName have the same name?  
-#Grey out the option...or just alert the user when they click ok?
-#Or just warning user and/or have a tooltip....and then if there are two scripts with the same name (diff group), set hide groups to false.
+        radioShowScriptsIndented = Gtk.RadioButton.new_with_label_from_widget( radioShowScriptsSubmenu, _( "Show scripts grouped" ) )
+        radioShowScriptsIndented.set_tooltip_text( _( "Scripts are shown within their respective group." ) )
+        radioShowScriptsIndented.set_active( not self.showScriptsInSubmenus )
+        radioShowScriptsIndented.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        grid.attach( radioShowScriptsIndented, 0, 2, 1, 1 )
+
         hideGroupsCheckbox = Gtk.CheckButton( _( "Hide groups" ) )
         hideGroupsCheckbox.set_tooltip_text( _( "If checked, only scripts names are displayed.\n\nOtherwise, script names are indented within each group." ) )
         hideGroupsCheckbox.set_active( self.hideGroups )
-        hideGroupsCheckbox.set_margin_left( 15 )
-        grid.attach( hideGroupsCheckbox, 0, 2, 1, 1 )
+        hideGroupsCheckbox.set_sensitive( not self.showScriptsInSubmenus )
+        hideGroupsCheckbox.set_margin_left( pythonutils.INDENT_WIDGET_LEFT * 2 )
+        grid.attach( hideGroupsCheckbox, 0, 3, 1, 1 )
+
+        radioShowScriptsSubmenu.connect( "toggled", self.onDisplayCheckboxes, radioShowScriptsSubmenu, hideGroupsCheckbox )
+        radioShowScriptsIndented.connect( "toggled", self.onDisplayCheckboxes, radioShowScriptsSubmenu, hideGroupsCheckbox )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorScriptRunner.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 3, 1, 1 )
+        grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
@@ -340,7 +347,8 @@ class IndicatorScriptRunner:
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
-            self.showScriptsInSubmenus = showScriptsInSubmenusCheckbox.get_active()
+            self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
+            self.hideGroups = hideGroupsCheckbox.get_active()
             self.scripts = copyOfScripts
             if len( self.scripts ) == 0:
                 self.scriptGroupDefault = ""
@@ -354,6 +362,10 @@ class IndicatorScriptRunner:
             GLib.idle_add( self.buildMenu )
 
         dialog.destroy()
+
+
+    def onDisplayCheckboxes( self, source, radioShowScriptsSubmenu, hideGroupsCheckbox ):
+        hideGroupsCheckbox.set_sensitive( not radioShowScriptsSubmenu.get_active() )
 
 
     def onScriptGroup( self, scriptGroupComboBox, scripts, scriptNameListStore, scriptNameTreeView ):
