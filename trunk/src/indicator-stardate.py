@@ -207,14 +207,14 @@ class IndicatorStardate:
         showIssueCheckbox = Gtk.CheckButton( _( "Show ISSUE" ) )
         showIssueCheckbox.set_active( self.showIssue )
         showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
-        showIssueCheckbox.set_margin_left( 20 )
+        showIssueCheckbox.set_margin_left( pythonutils.WIDGET_INDENT_LEFT )
         showIssueCheckbox.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
         grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
 
         padIntegerCheckbox = Gtk.CheckButton( _( "Pad INTEGER" ) )
         padIntegerCheckbox.set_active( self.padInteger )
         padIntegerCheckbox.set_sensitive( showClassicCheckbox.get_active() )
-        padIntegerCheckbox.set_margin_left( 20 )
+        padIntegerCheckbox.set_margin_left( pythonutils.WIDGET_INDENT_LEFT )
         padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
         grid.attach( padIntegerCheckbox, 0, 2, 1, 1 )
 
