@@ -27,6 +27,9 @@ import logging.handlers, os, shutil, subprocess, sys
 
 AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
 
+WIDGET_INDENT_LEFT = 20
+TEXT_INDENT_LEFT = 25
+
 LOGGING_BASIC_CONFIG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 LOGGING_BASIC_CONFIG_LEVEL = logging.DEBUG
 
