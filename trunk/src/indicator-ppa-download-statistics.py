@@ -1045,7 +1045,7 @@ class IndicatorPPADownloadStatistics:
 
         GLib.idle_add( self.buildMenu )
 
-        if not self.quitRequested and self.ppasPrevious != self.ppas:
+        if not self.quitRequested and self.ppasPrevious != self.ppas: #TODO Handle
             Notify.Notification.new( _( "Statistics downloaded!" ), "", IndicatorPPADownloadStatistics.ICON ).show()
 
         self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.
@@ -1085,8 +1085,9 @@ class IndicatorPPADownloadStatistics:
             ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
 
 
-    # Takes the published binary and extracts the information needed to get the download count (for each package).
-    # The results in a published binary are returned in lots of 75; for more than 75 published binaries, loop to get the remainder.
+    # Takes a published binary and extracts the information needed to get the download count (for each package).
+    # The results in a published binary are returned in lots of 75;
+    # for more than 75 published binaries, loop to get the remainder.
     def processPublishedBinaries( self, ppa, baseURL, publishedBinaries, numberOfPublishedBinaries ):
         try:
             index = 0
@@ -1094,7 +1095,7 @@ class IndicatorPPADownloadStatistics:
             resultsPerUrl = 75
             threads = [ ]
             for i in range( numberOfPublishedBinaries ):
-                if self.quitRequested:
+                if self.quitRequested: #TODO Handle
                     self.quit( None )
                     return
 
