@@ -1085,21 +1085,6 @@ class IndicatorPPADownloadStatistics:
             ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
 
 
-    def getPublishedBinariesURL( self, ppa, filter ):
-        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
-              "?ws.op=getPublishedBinaries" + \
-              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
-              "&status=Published"
-
-        if filter is not None:
-            url += "&status=Published" + \
-                    "&exact_match=false" + \
-                    "&ordered=false" + \
-                    "&binary_name=" + filter
-
-        return url
-
-
     # Takes the published binary and extracts the information needed to get the download count (for each package).
     # The results in a published binary are returned in lots of 75; for more than 75 published binaries, loop to get the remainder.
     def processPublishedBinaries( self, ppa, baseURL, publishedBinaries, numberOfPublishedBinaries ):
@@ -1159,7 +1144,7 @@ class IndicatorPPADownloadStatistics:
 
         if status != PPA.STATUS_ERROR_RETRIEVING_PPA:
             try:
-                url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
+                url = self.getPPABaseURL( ppa ) + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
                 downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
                 if str( downloadCount ).isnumeric():
                     ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
@@ -1169,6 +1154,24 @@ class IndicatorPPADownloadStatistics:
             except Exception as e:
                 logging.exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+
+
+    def getPublishedBinariesURL( self, ppa, filter ):
+        url = self.getPPABaseURL( ppa ) + \
+              "?ws.op=getPublishedBinaries" + \
+              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
+              "&status=Published"
+
+        if filter is not None:
+            url += "&status=Published" + \
+                    "&exact_match=false" + \
+                    "&ordered=false" + \
+                    "&binary_name=" + filter
+
+        return url
+
+
+    def getPPABaseURL( self, ppa ): return "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName()
 
 
 if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
