@@ -1052,12 +1052,8 @@ class IndicatorPPADownloadStatistics:
 
 
     def getPublishedBinariesNoFilters( self, ppa ):
-        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
-              "?ws.op=getPublishedBinaries" + \
-              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
-              "&status=Published"
-
         try:
+            url = self.getPublishedBinariesURL( ppa, None )
             publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
             numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
             if numberOfPublishedBinaries == 0:
@@ -1073,15 +1069,8 @@ class IndicatorPPADownloadStatistics:
     def getPublishedBinariesWithFilters( self, ppa ):
         noPublishedBinaries = True
         for filter in self.filters.get( ppa.getUser() + " | " + ppa.getName() ):
-            url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
-                  "?ws.op=getPublishedBinaries" + \
-                  "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
-                  "&status=Published" + \
-                  "&exact_match=false" + \
-                  "&ordered=false" + \
-                  "&binary_name=" + filter
-
             try:
+                url = self.getPublishedBinariesURL( ppa, filter )
                 publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
                 numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
                 if numberOfPublishedBinaries > 0: # Only fetch if there is data, that is, was not filtered.
@@ -1094,6 +1083,21 @@ class IndicatorPPADownloadStatistics:
 
         if noPublishedBinaries: # Will occur if all the data was filtered.
             ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+
+
+    def getPublishedBinariesURL( self, ppa, filter ):
+        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
+              "?ws.op=getPublishedBinaries" + \
+              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
+              "&status=Published"
+
+        if filter is not None:
+            url += "&status=Published" + \
+                    "&exact_match=false" + \
+                    "&ordered=false" + \
+                    "&binary_name=" + filter
+
+        return url
 
 
     # Takes the published binary and extracts the information needed to get the download count (for each package).
