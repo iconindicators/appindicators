@@ -984,6 +984,12 @@ class IndicatorPPADownloadStatistics:
 #Might have to take a parameter -IMMEDIATE or a TIME FROM NOW.
 
 
+#TODO In the update method up top, could call getPPADownloadStatistics in a thread (as currently done)
+# but then join on the thread to wait for it to finish and then build the menu.
+# This means the download functionality is separated from the menu stuff.
+# Make sure the code does not block (so whilst waiting for the join, can the user still operate the menu)...or should the menu be blocked?                
+
+
     # Get a list of the published binaries for each PPA.
     # From that extract the ID for each binary which is then used to get the download count for each binary.
     # The ID is the number at the end of self_link.
