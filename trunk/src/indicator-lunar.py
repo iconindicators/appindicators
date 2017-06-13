@@ -2549,10 +2549,11 @@ class IndicatorLunar:
         hideBodyIfNeverUpCheckbox.set_margin_top( 10 )
         hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
         hideBodyIfNeverUpCheckbox.set_tooltip_text( _( 
-            "If checked, planets, moon, sun\n" + \
-            "comets and stars which rise/set\n" + \
-            "or are 'always up' will be shown.\n\n" + \
-            "Otherwise all bodies are shown." ) )
+            "If checked, planets, moon, sun,\n" + \
+            "comets and stars which rise/set or\n" + \
+            "are 'always up' will only be shown.\n\n" + \
+            "Otherwise all bodies are shown.\n\n" + \
+            "Does not apply to satellites." ) )
         grid.attach( hideBodyIfNeverUpCheckbox, 0, 4, 1, 1 )
 
         groupStarsByConstellationCheckbox = Gtk.CheckButton( _( "Group stars by constellation" ) )
