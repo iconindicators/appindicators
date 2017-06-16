@@ -262,7 +262,7 @@ class IndicatorPunycode:
             "Selecting a menu item which\n" + \
             "contains a result will copy\n" + \
             "the result to the output." ) )
-        box.pack_start( resultsAmountSpinner, True, True, 0 )
+        box.pack_start( resultsAmountSpinner, False, False, 0 )
 
         grid.attach( box, 0, 5, 1, 1 )
 
