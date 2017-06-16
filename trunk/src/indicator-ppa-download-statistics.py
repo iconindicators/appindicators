@@ -528,7 +528,7 @@ class IndicatorPPADownloadStatistics:
             "when sorting by download.\n\n" + \
             "A value of zero will not clip." ) )
         spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
-        box.pack_start( spinner, True, True, 0 )
+        box.pack_start( spinner, False, False, 0 )
 
         grid.attach( box, 0, 4, 1, 1 )
 
