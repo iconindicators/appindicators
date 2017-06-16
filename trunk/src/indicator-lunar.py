@@ -2578,7 +2578,7 @@ class IndicatorLunar:
             "Comets with a magnitude greater\n" + \
             "than that specified are hidden." ) )
 
-        box.pack_start( spinnerCometMagnitude, True, True, 0 )
+        box.pack_start( spinnerCometMagnitude, False, False, 0 )
 
         grid.attach( box, 0, 6, 1, 1 )
 
@@ -2983,7 +2983,7 @@ class IndicatorLunar:
             "Notifications are shown from the specified\n" + \
             "illumination, commencing after a new moon." ) )
         spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        box.pack_start( spinner, True, True, 0 )
+        box.pack_start( spinner, False, False, 0 )
 
         grid.attach( box, 0, 5, 1, 1 )
 
@@ -3063,7 +3063,7 @@ class IndicatorLunar:
         for c in cities:
             city.append_text( c )
 
-        box.pack_start( city, True, True, 0 )
+        box.pack_start( city, False, False, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )
 
@@ -3073,7 +3073,7 @@ class IndicatorLunar:
 
         latitude = Gtk.Entry()
         latitude.set_tooltip_text( _( "Latitude of your location in decimal degrees." ) )
-        box.pack_start( latitude, True, True, 0 )
+        box.pack_start( latitude, False, False, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -3083,7 +3083,7 @@ class IndicatorLunar:
 
         longitude = Gtk.Entry()
         longitude.set_tooltip_text( _( "Longitude of your location in decimal degrees." ) )
-        box.pack_start( longitude, True, True, 0 )
+        box.pack_start( longitude, False, False, 0 )
 
         grid.attach( box, 0, 2, 1, 1 )
 
@@ -3093,7 +3093,7 @@ class IndicatorLunar:
 
         elevation = Gtk.Entry()
         elevation.set_tooltip_text( _( "Height in metres above sea level." ) )
-        box.pack_start( elevation, True, True, 0 )
+        box.pack_start( elevation, False, False, 0 )
 
         grid.attach( box, 0, 3, 1, 1 )
 
