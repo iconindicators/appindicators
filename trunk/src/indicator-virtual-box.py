@@ -499,7 +499,7 @@ class IndicatorVirtualBox:
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
         spinnerRefreshInterval.set_tooltip_text( _( "How often the list of VMs and running status are updated." ) )
 
-        box.pack_start( spinnerRefreshInterval, True, True, 0 )
+        box.pack_start( spinnerRefreshInterval, False, False, 0 )
 
         grid.attach( box, 0, row, 1, 1 )
         row += 1
@@ -514,7 +514,7 @@ class IndicatorVirtualBox:
         spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to force the initial value by explicitly setting it.
         spinnerDelay.set_tooltip_text( _( "Amount of time to wait from automatically starting one VM to the next." ) )
 
-        box.pack_start( spinnerDelay, True, True, 0 )
+        box.pack_start( spinnerDelay, False, False, 0 )
 
         grid.attach( box, 0, row, 1, 1 )
         row += 1
