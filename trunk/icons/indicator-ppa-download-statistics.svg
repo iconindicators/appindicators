@@ -1,66 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg:svg
+<svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="22"
+   id="svg3229"
    height="22"
-   id="svg3020"
-   version="1.1"
+   width="22"
+   version="1.0"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="indicator-ppa-download-statistics.svg">
-  <svg:defs
-     id="defs3022" />
+   sodipodi:docname="indicator-punycode.svg">
+  <defs
+     id="defs8" />
   <sodipodi:namedview
-     id="base"
      pagecolor="#ffffff"
      bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="32"
-     inkscape:cx="4.34095"
-     inkscape:cy="9.8369041"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:window-width="960"
+     inkscape:window-height="1028"
+     id="namedview6"
      showgrid="true"
-     inkscape:window-width="1920"
-     inkscape:window-height="1056"
-     inkscape:window-x="0"
+     inkscape:zoom="9.0237488"
+     inkscape:cx="21.503602"
+     inkscape:cy="6.8839278"
+     inkscape:window-x="960"
      inkscape:window-y="24"
-     inkscape:window-maximized="1"
-     showborder="true"
-     inkscape:showpageshadow="true"
-     fit-margin-top="0"
-     fit-margin-bottom="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     borderlayer="false"
-     showguides="false">
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg3229">
     <inkscape:grid
        type="xygrid"
-       id="grid3010"
-       empspacing="5"
-       visible="true"
-       enabled="true"
-       snapvisiblegridlinesonly="true" />
+       id="grid3819" />
   </sodipodi:namedview>
-  <svg:metadata
-     id="metadata3025">
-    <RDF>
-      <Work
-         about="">
-        <format>image/svg+xml</format>
-        <type
-           resource="http://purl.org/dc/dcmitype/StillImage" />
-        <title />
-      </Work>
-    </RDF>
+  <metadata
+     id="metadata9">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -70,35 +52,27 @@
         <dc:title />
       </cc:Work>
     </rdf:RDF>
-  </svg:metadata>
-  <svg:g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Layer"
-     transform="translate(138.6495,-34.593435)" />
-  <svg:g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(-12.84375,-315.21875)">
-    <svg:g
-       id="g2987"
-       transform="matrix(0.64257026,0,0,0.64257026,2.7755765,109.85135)">
-      <svg:path
-         d="m 19.220125,331.06097 0,5.46248 2.129576,0 c 0.788105,0 1.397352,-0.23694 1.827747,-0.71081 0.430379,-0.47386 0.645572,-1.14896 0.64558,-2.0253 -8e-6,-0.86983 -0.215201,-1.54169 -0.64558,-2.01556 -0.430395,-0.47386 -1.039642,-0.7108 -1.827747,-0.71081 l -2.129576,0 m -1.693601,-1.61635 3.823177,0 c 1.402943,2e-5 2.46214,0.37002 3.177597,1.11002 0.721028,0.73354 1.081547,1.81111 1.081557,3.2327 -10e-6,1.43459 -0.360529,2.51865 -1.081557,3.25217 -0.715457,0.73352 -1.774654,1.10029 -3.177597,1.10029 l -2.129576,0 0,5.84221 -1.693601,0 0,-14.53739"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#fff200;fill-opacity:1;stroke:#000000;stroke-width:0.46260789;stroke-miterlimit:1;stroke-opacity:1;font-family:Sans"
-         id="path3008"
-         inkscape:connector-curvature="0" />
-      <svg:path
-         d="m 30.082945,331.06097 0,5.46248 2.129576,0 c 0.788106,0 1.397353,-0.23694 1.827747,-0.71081 0.430379,-0.47386 0.645573,-1.14896 0.645581,-2.0253 -8e-6,-0.86983 -0.215202,-1.54169 -0.645581,-2.01556 -0.430394,-0.47386 -1.039641,-0.7108 -1.827747,-0.71081 l -2.129576,0 m -1.6936,-1.61635 3.823176,0 c 1.402943,2e-5 2.462141,0.37002 3.177597,1.11002 0.721028,0.73354 1.081547,1.81111 1.081557,3.2327 -10e-6,1.43459 -0.360529,2.51865 -1.081557,3.25217 -0.715456,0.73352 -1.774654,1.10029 -3.177597,1.10029 l -2.129576,0 0,5.84221 -1.6936,0 0,-14.53739"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#fff200;fill-opacity:1;stroke:#000000;stroke-width:0.46260789;stroke-miterlimit:1;stroke-opacity:1;font-family:Sans"
-         id="path3010"
-         inkscape:connector-curvature="0" />
-      <svg:path
-         d="m 42.454152,331.38229 -2.29726,7.23462 4.602904,0 -2.305644,-7.23462 m -0.955794,-1.93767 1.919972,0 4.770587,14.53739 -1.760673,0 -1.140246,-3.72928 -5.642539,0 -1.140245,3.72928 -1.785827,0 4.778971,-14.53739"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#fff200;fill-opacity:1;stroke:#000000;stroke-width:0.46260789;stroke-miterlimit:1;stroke-opacity:1;font-family:Sans"
-         id="path3012"
-         inkscape:connector-curvature="0" />
-    </svg:g>
-  </svg:g>
-</svg:svg>
+  </metadata>
+  <text
+     xml:space="preserve"
+     style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;opacity:0.2;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+     x="-0.21900554"
+     y="16.290073"
+     id="text3766-5"
+     sodipodi:linespacing="125%"><tspan
+       sodipodi:role="line"
+       id="tspan3768-7"
+       x="-0.21900554"
+       y="16.290073">PPA</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#6496dc;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+     x="-0.21900554"
+     y="15.299685"
+     id="text3766"
+     sodipodi:linespacing="125%"><tspan
+       sodipodi:role="line"
+       id="tspan3768"
+       x="-0.21900554"
+       y="15.299685">PPA</tspan></text>
+</svg>
