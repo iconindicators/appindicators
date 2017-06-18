@@ -39,7 +39,6 @@
 
 import datetime, ephem, pytz
 
-import ephem
 from ephem.cities import _city_data
 from ephem.stars import stars
 
