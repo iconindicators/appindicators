@@ -86,7 +86,8 @@ def getSkyfieldObserver( latitudeDMS, longitudeDMS, elevation, earth ):
 
 
 def testSkyfieldSaturn( utcNow, latitudeDMS, longitudeDMS, elevation ):
-    planets = load( "2017-2024.bsp" ) # TODO Is there a canned list of planets?
+# TODO Is there a canned list of planets?
+    planets = load( "2017-2024.bsp" )
     observer = getSkyfieldObserver( latitudeDMS, longitudeDMS, elevation, planets[ "earth" ] )
     saturn = planets[ "saturn barycenter" ]
     astrometric = observer.at( utcNow ).observe( saturn ).apparent()
