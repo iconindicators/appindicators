@@ -64,7 +64,6 @@ def getPyephemObserver( dateTime, latitudeDD, longitudeDD, elevation ):
 
 def testPyephemSaturn( utcNow, latitudeDD, longitudeDD, elevation ):
     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
-    print( observer )
     saturn = ephem.Saturn( observer )
 
     # Must grab the az/alt BEFORE rise/set is computed as the values get clobbered.
