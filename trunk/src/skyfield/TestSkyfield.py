@@ -2,6 +2,7 @@
 
 
 # Install (and upgrade to) latest skyfield: 
+#     sudo apt-get install python3-pip
 #     sudo pip3 install --upgrade skyfield
 
 
