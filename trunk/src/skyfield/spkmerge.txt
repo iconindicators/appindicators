@@ -1,4 +1,4 @@
-LEAPSECONDS_KERNEL = naif0010.tls
+LEAPSECONDS_KERNEL = naif0012.tls
 SPK_KERNEL = 2017-2024.bsp
    LOG_FILE = spkmerge.log
    SOURCE_SPK_KERNEL = de421.bsp
