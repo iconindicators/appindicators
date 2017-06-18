@@ -48,7 +48,9 @@ from skyfield.api import load, Star, Topos
 
 def printPairs( *pairs ):
     for i in range( 0, len( pairs ), 2 ):
-        print( pairs[ i ] + ": " + str( pairs[ i + 1 ] ) )
+        print( "\t" + pairs[ i ] + ": " + str( pairs[ i + 1 ] ) )
+
+    print()
 
 
 def getPyephemObserver( dateTime, latitudeDD, longitudeDD, elevation ):
@@ -72,7 +74,10 @@ def testPyephemSaturn( utcNow, latitudeDecimal, longitudeDecimal, elevation ):
 
 
 def testPyephem( utcNow, latitudeDD, longitudeDD, elevation ):
-    print( utcNow )
+    print( "=======" )
+    print( "PyEphem" )
+    print( "=======\n" )
+    print( utcNow, "\n" )
     testPyephemSaturn( utcNow, latitudeDD, longitudeDD, elevation )
 
 
@@ -93,7 +98,10 @@ def testSkyfieldSaturn( utcNow, latitudeDMS, longitudeDMS, elevation ):
 
 def testSkyfield( utcNow, latitudeDMS, longitudeDMS, elevation ):
     utcNowSkyfield = load.timescale().utc( utcNow.replace( tzinfo = pytz.UTC ) )
-    print( utcNowSkyfield.utc )
+    print( "========" )
+    print( "Skyfield" )
+    print( "========\n" )
+    print( utcNowSkyfield.utc, "\n" )
     testSkyfieldSaturn( utcNowSkyfield, latitudeDMS, longitudeDMS, elevation )
 
 
@@ -110,7 +118,7 @@ elevation = 3.3
 utcNow = datetime.datetime.utcnow()
 
 testPyephem( utcNow, latitudeDD, longitudeDD, elevation )
-print( "-   -   -   -   -   -" )
+
 latitudeDMS, longitudeDMS = getDMS( latitudeDD, longitudeDD )
 testSkyfield( utcNow, latitudeDMS, longitudeDMS, elevation )
 
