@@ -98,8 +98,11 @@ def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
 
 
 def testSkyfieldSaturn( utcNow, latitudeDD, longitudeDD, elevation ):
-# TODO Is there a canned list of planets?
     planets = load( "2017-2024.bsp" )
+
+# TODO Can this be used to get a list of planets?
+#     print( planets.names() )
+
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, planets[ "earth" ] )
     saturn = planets[ "saturn barycenter" ]
     astrometric = observer.at( utcNow ).observe( saturn ).apparent()
