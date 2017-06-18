@@ -31,7 +31,7 @@
 # TODO Compute the following to the same level of detail as indicator-lunar:
 #    Moon
 #    Sun
-#    Saturn
+#    Saturn + Moons
 #    Orion - Rigel
 #    Comet
 #    Satellite 
