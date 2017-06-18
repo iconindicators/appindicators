@@ -46,31 +46,45 @@ from ephem.stars import stars
 from skyfield.api import load, Star, Topos
 
 
-def printPairs( *pairs ):
+def printPairs( pairs ):
     for i in range( 0, len( pairs ), 2 ):
         print( "\t" + pairs[ i ] + ": " + str( pairs[ i + 1 ] ) )
 
     print()
 
 
+# Must get a new observer after a rising/setting computation and before a calculations for a new body.    
 def getPyephemObserver( dateTime, latitudeDD, longitudeDD, elevation ):
     observer = ephem.Observer()
-    observer.lon = longitudeDD
-    observer.lat = latitudeDD
+    observer.lat = str( latitudeDD )
+    observer.lon = str( longitudeDD )
     observer.elevation = elevation
     observer.date = ephem.Date( dateTime )
     return observer
 
 
-def testPyephemSaturn( utcNow, latitudeDecimal, longitudeDecimal, elevation ):
-#TODO Need to get a new observer after the rising/setting computation and before the other calculations.  Perhaps log a bug or question at pyephem.    
+def testPyephemSaturn( utcNow, latitudeDD, longitudeDD, elevation ):
     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
+    print( observer )
     saturn = ephem.Saturn( observer )
-    rising = observer.next_rising( saturn )
-    setting = observer.next_setting( saturn )
-    saturn = ephem.Saturn( getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation ) )
+
+    # Must grab the az/alt BEFORE rise/set is computed as the values get clobbered.
+    pairs = [ "AZ", saturn.az, "ALT", saturn.alt, "RA", saturn.ra, "DEC", saturn.dec, "ED", saturn.earth_distance, "SD", saturn.sun_distance, "PH", saturn.phase, "CON", ephem.constellation( saturn ), "MAG", saturn.mag ]
+
+    try:
+        rising = observer.next_rising( saturn )
+        setting = observer.next_setting( saturn )
+        pairs.extend( ( "RISE", rising, "SET", setting ) )
+
+    except ephem.AlwaysUpError:
+        pairs.extend( ( "RISE/SET", "Always Up" ) )
+
+    except ephem.NeverUpError:
+        pairs.extend( ( "RISE/SET", "Never Up" ) )
+
+    pairs.extend( ( "ET", saturn.earth_tilt, "ST", saturn.sun_tilt ) )
     print( "Saturn:" )
-    printPairs( "RA", saturn.ra, "DEC", saturn.dec, "AZ", saturn.az, "ALT", saturn.alt, "ED", saturn.earth_distance, "SD", saturn.sun_distance, "PH", saturn.phase, "CON", ephem.constellation( saturn ), "MAG", saturn.mag, "RISE", rising, "SET", setting )
+    printPairs( pairs )
 
 
 def testPyephem( utcNow, latitudeDD, longitudeDD, elevation ):
@@ -81,47 +95,39 @@ def testPyephem( utcNow, latitudeDD, longitudeDD, elevation ):
     testPyephemSaturn( utcNow, latitudeDD, longitudeDD, elevation )
 
 
-def getSkyfieldObserver( latitudeDMS, longitudeDMS, elevation, earth ):
-    return earth + Topos( latitudeDMS, longitudeDMS, elevation_m = elevation )
+def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
+    return earth + Topos( latitude_degrees = latitudeDD, longitude_degrees = longitudeDD, elevation_m = elevation )
 
 
-def testSkyfieldSaturn( utcNow, latitudeDMS, longitudeDMS, elevation ):
+def testSkyfieldSaturn( utcNow, latitudeDD, longitudeDD, elevation ):
 # TODO Is there a canned list of planets?
     planets = load( "2017-2024.bsp" )
-    observer = getSkyfieldObserver( latitudeDMS, longitudeDMS, elevation, planets[ "earth" ] )
+    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, planets[ "earth" ] )
     saturn = planets[ "saturn barycenter" ]
     astrometric = observer.at( utcNow ).observe( saturn ).apparent()
     alt, az, d = astrometric.altaz()
     ra, dec, d = astrometric.radec()
     print( "Saturn:" )
-    printPairs( "RA", ra, "DEC", dec, "AZ", az, "ALT", alt, "ED", d, "SD", "TODO", "PH", "TODO", "CON", "TODO", "MAG", "TODO", "RISE", "TODO", "SET", "TODO" )
+    printPairs( [ "AZ", az, "ALT", alt, "RA", ra, "DEC", dec, "ED", d, "SD", "TODO", "PH", "TODO", "CON", "TODO", "MAG", "TODO", "RISE", "TODO", "SET", "TODO", "ET", "TODO", "ST", "TODO" ] )
 
 
-def testSkyfield( utcNow, latitudeDMS, longitudeDMS, elevation ):
+def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     utcNowSkyfield = load.timescale().utc( utcNow.replace( tzinfo = pytz.UTC ) )
     print( "========" )
     print( "Skyfield" )
     print( "========\n" )
     print( utcNowSkyfield.utc, "\n" )
-    testSkyfieldSaturn( utcNowSkyfield, latitudeDMS, longitudeDMS, elevation )
+    testSkyfieldSaturn( utcNowSkyfield, latitudeDD, longitudeDD, elevation )
 
 
-def getDMS( latitudeDD, longitudeDD ):
-    latitudeDMS = str( abs( float( latitudeDD ) ) ) + " S" if float( latitudeDD ) < 0 else str( float( latitudeDD ) ) + " N"
-    longitudeDMS = str( abs( float( longitudeDD ) ) ) + " W" if float( longitudeDD ) < 0 else str( float( longitudeDD ) ) + " E"
-    return latitudeDMS, longitudeDMS
-
-
-latitudeDD = "-33.8"
-longitudeDD = "151.2"
-elevation = 3.3
+latitudeDD = -33.8
+longitudeDD = 151.2
+elevation = 100
 
 utcNow = datetime.datetime.utcnow()
-
+# testPyephem( utcNow, str( latitudeDD ), str( longitudeDD ), elevation )
 testPyephem( utcNow, latitudeDD, longitudeDD, elevation )
-
-latitudeDMS, longitudeDMS = getDMS( latitudeDD, longitudeDD )
-testSkyfield( utcNow, latitudeDMS, longitudeDMS, elevation )
+testSkyfield( utcNow, latitudeDD, longitudeDD, elevation )
 
 
 # barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
