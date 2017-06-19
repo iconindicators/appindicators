@@ -68,7 +68,7 @@ def testPyephemSaturn( utcNow, latitudeDD, longitudeDD, elevation ):
     saturn = ephem.Saturn( observer )
 
     # Must grab the az/alt BEFORE rise/set is computed as the values get clobbered.
-    pairs = [ "AZ", saturn.az, "ALT", saturn.alt, "RA", saturn.ra, "DEC", saturn.dec, "ED", saturn.earth_distance, "SD", saturn.sun_distance, "PH", saturn.phase, "CON", ephem.constellation( saturn ), "MAG", saturn.mag ]
+    pairs = [ "AZ", saturn.az, "ALT", saturn.alt, "RA", saturn.ra, "DEC", saturn.dec, "ED", saturn.earth_distance, "SD", saturn.sun_distance, "PH/IL", saturn.phase, "CON", ephem.constellation( saturn ), "MAG", saturn.mag ]
 
     try:
         rising = observer.next_rising( saturn )
@@ -110,7 +110,7 @@ def testSkyfieldSaturn( utcNow, latitudeDD, longitudeDD, elevation ):
     alt, az, d = astrometric.altaz()
     ra, dec, d = astrometric.radec()
     print( "Saturn:" )
-    printPairs( [ "AZ", az, "ALT", alt, "RA", ra, "DEC", dec, "ED", d, "SD", "TODO", "PH", "TODO", "CON", "TODO", "MAG", "TODO", "RISE", "TODO", "SET", "TODO", "ET", "TODO", "ST", "TODO" ] )
+    printPairs( [ "AZ", az, "ALT", alt, "RA", ra, "DEC", dec, "ED", d, "SD", "TODO", "PH/IL", "TODO", "CON", "TODO", "MAG", "TODO", "RISE", "TODO", "SET", "TODO", "ET", "TODO", "ST", "TODO" ] )
 
 
 def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
