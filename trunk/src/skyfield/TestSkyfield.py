@@ -22,6 +22,7 @@
 #    Download de421.bsp and run spkmerge as per the issue 123 to produce "2017-2024.bsp".
 #
 # Stars
+#    PyEphem only contains 94 stars.
 #    http://astronomy.stackexchange.com/questions/13488/where-can-i-find-visualize-planets-stars-moons-etc-positions
 #    http://astronomy.stackexchange.com/questions/14119/open-access-table-of-visible-stars-with-magnitude-coordinates-and-possibly-col
 #    http://astronomy.stackexchange.com/questions/11334/any-freely-available-large-stellar-spectra-catalog
