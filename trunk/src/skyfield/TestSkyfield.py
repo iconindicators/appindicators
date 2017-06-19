@@ -27,6 +27,12 @@
 #    http://astronomy.stackexchange.com/questions/11334/any-freely-available-large-stellar-spectra-catalog
 #    http://simbad.u-strasbg.fr/simbad/sim-id?Ident=BD%2B043561a
 #    http://wwwadd.zah.uni-heidelberg.de/datenbanken/aricns/cnspages/4c01453.htm    
+#
+# Other stuff...
+#     https://github.com/oefe/astronomy-notebooks
+#     https://github.com/skyfielders/python-skyfield/issues/35
+#     https://github.com/skyfielders/python-skyfield/blob/master/skyfield/starlib.py
+#     https://github.com/skyfielders/python-skyfield/blob/master/skyfield/data/hipparcos.py
 
 
 # TODO Compute the following to the same level of detail as indicator-lunar:
