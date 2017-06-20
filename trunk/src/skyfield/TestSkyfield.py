@@ -17,17 +17,18 @@
 # ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
 #
 # Planets
-#    https://github.com/skyfielders/python-skyfield/issues/123
-#    ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/de421.bsp
-#    Download de421.bsp and run spkmerge as per the issue 123 to produce "2017-2024.bsp".
+#     https://github.com/skyfielders/python-skyfield/issues/123
+#     ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/de421.bsp
+#     Download de421.bsp and run spkmerge as per the issue 123 to produce "2017-2024.bsp".
 #
 # Stars
-#    PyEphem only contains 94 stars.
-#    http://astronomy.stackexchange.com/questions/13488/where-can-i-find-visualize-planets-stars-moons-etc-positions
-#    http://astronomy.stackexchange.com/questions/14119/open-access-table-of-visible-stars-with-magnitude-coordinates-and-possibly-col
-#    http://astronomy.stackexchange.com/questions/11334/any-freely-available-large-stellar-spectra-catalog
-#    http://simbad.u-strasbg.fr/simbad/sim-id?Ident=BD%2B043561a
-#    http://wwwadd.zah.uni-heidelberg.de/datenbanken/aricns/cnspages/4c01453.htm    
+#     PyEphem only contains 94 stars.
+#     http://www.skyandtelescope.com/astronomy-resources/how-many-stars-night-sky-09172014/
+#     http://astronomy.stackexchange.com/questions/13488/where-can-i-find-visualize-planets-stars-moons-etc-positions
+#     http://astronomy.stackexchange.com/questions/14119/open-access-table-of-visible-stars-with-magnitude-coordinates-and-possibly-col
+#     http://astronomy.stackexchange.com/questions/11334/any-freely-available-large-stellar-spectra-catalog
+#     http://simbad.u-strasbg.fr/simbad/sim-id?Ident=BD%2B043561a
+#     http://wwwadd.zah.uni-heidelberg.de/datenbanken/aricns/cnspages/4c01453.htm    
 #
 # Other stuff...
 #     https://github.com/oefe/astronomy-notebooks
@@ -37,12 +38,12 @@
 
 
 # TODO Compute the following to the same level of detail as indicator-lunar:
-#    Moon
-#    Sun
-#    Saturn + Moons
-#    Orion - Rigel
-#    Comet
-#    Satellite 
+#     Moon
+#     Sun
+#     Saturn + Moons
+#     Orion - Rigel
+#     Comet
+#     Satellite 
 
 
 import datetime, ephem, pytz
