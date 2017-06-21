@@ -46,6 +46,29 @@
 #     Satellite 
 
 
+#TODO Divide up the attributes into those that are calculated and change over time and those that are not...
+#
+#     Attributes which change: 
+#         RA/DEC 
+#         ALT/AZ 
+#         Phase/Illumination 
+#         Distance to Earth/Sun 
+#         rise/set 
+#         moon phase and next phases 
+#         solstice/equinox 
+#         planetary moons RA/DEC/AZ/ALT/EarthVisible 
+#         Saturn earth/sun tilt
+#     
+#     Attributes which are static:
+#         Magnitude
+#
+#     Attributes which are calculated outside of engine:
+#         Bight Limb
+#         Tropical Sign
+#         Constellation (not applicable to all stars)
+#         moon/sun eclipse
+
+
 import datetime, ephem, pytz
 
 from ephem.cities import _city_data
