@@ -12,7 +12,7 @@ VERSION="1.0.34"
 
 source=( $NAME".py" example.py stardate.py ) # List of source files.
 hicolorIcons=( $NAME".svg" ) # List of hicolor icons.
-hicolorColours=( fff200 000000 ) # List of colours in all the hicolor icons.
+hicolorColours=( fff700 ) # List of colours in all the hicolor icons.
 
 . ../PythonUtils/build-debian-common
 doStandardBuild source hicolorIcons hicolorColours
