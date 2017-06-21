@@ -10,11 +10,11 @@ PYTHON_UTILS=../PythonUtils
 
 
 # Supported themes and corresponding colours.
-themeNames=(   "elementary-xfce-darker" "Lubuntu" "ubuntu-mono-dark" "ubuntu-mono-light" )
-themeColours=(            f3f3f3         4c4c4c          dfdbd2             3c3c3c       )
+themeNames=(   "Adwaita" "elementary-xfce-darker" "Lubuntu" "ubuntu-mono-dark" "ubuntu-mono-light" )
+themeColours=(  bebebe             f3f3f3          4c4c4c          dfdbd2             3c3c3c       )
 
 
-# Arguments:
+# Arguments: 
 #   Array of source files present in the src directory.
 #   Array of hicolor icon names present in the icons directory.
 #   Array of hicolor colours present across ALL hicolor icons.
@@ -152,8 +152,8 @@ buildDeb()
 {
   # Build DEB source (or binary).
   cd build/$NAME-$VERSION
-  debuild -S -sa         # Builds a DEB source file.
-#  debuild -sa -us -uc   # Builds a DEB binary file.
+#  debuild -S -sa         # Builds a DEB source file.
+  debuild -sa -us -uc   # Builds a DEB binary file.
   cd ..
 }
 
