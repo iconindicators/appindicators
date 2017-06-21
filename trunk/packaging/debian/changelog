@@ -6,6 +6,7 @@ indicator-fortune (1.0.26-1) trusty; urgency=low
   * Changed default function of middle mouse button click from showing a new
     fortune to showing the current fortune.
   * Handle bogus/missing fortune locations.
+  * Reduced icon to a single colour.
   * About/Preferences dialogs now block each other - only show one at a time.
   * Update release to trusty as precise is end of life.
 
