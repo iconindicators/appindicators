@@ -236,7 +236,7 @@ class IndicatorFortune:
             "Double click to edit a fortune.\n\n" + \
             "English language fortunes are\n" + \
             "installed by default.\n\n" + \
-            "There may be be other fortune\n" + \
+            "There may be other fortune\n" + \
             "packages available in your\n" + \
             "native language." ) )
 
@@ -323,7 +323,7 @@ class IndicatorFortune:
         grid.attach( box, 0, 2, 1, 1 )
 
         label = Gtk.Label( _( "Middle mouse click of the icon" ) )
-        label.set_tooltip_text( _( "Not supported on all versions/derivatives of Ubuntu!" ) )
+        label.set_tooltip_text( _( "Not supported on all versions/derivatives of Ubuntu." ) )
         label.set_halign( Gtk.Align.START )
         label.set_margin_top( 10 )
         grid.attach( label, 0, 3, 1, 1 )
@@ -399,7 +399,7 @@ class IndicatorFortune:
         if treeiter is None:
             pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ), INDICATOR_NAME )
         elif model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE:
-            pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "This is the default fortune\nand cannot be deleted." ), INDICATOR_NAME )
+            pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "This is the default fortune and cannot be deleted." ), INDICATOR_NAME )
         elif pythonutils.showOKCancel( None, _( "Remove the selected fortune?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
@@ -435,7 +435,7 @@ class IndicatorFortune:
             "or a directory containing\n" + \
             "fortune .dat files.\n\n" + \
             "Ensure the corresponding\n" + \
-            "fortune text file(s) is present!" ) )
+            "fortune text file(s) is present." ) )
 
         box.pack_start( fortuneFileDirectory, True, True, 0 )
 
@@ -460,7 +460,7 @@ class IndicatorFortune:
             browseFileButton.set_tooltip_text( _( 
                 "Choose a fortune .dat file.\n\n" + \
                 "Ensure the corresponding text\n" + \
-                "file is present!" ) )
+                "file is present." ) )
 
         box.pack_start( browseFileButton, True, True, 0 )
 
@@ -476,7 +476,7 @@ class IndicatorFortune:
                 "Choose a directory containing\n" + \
                 "a fortune .dat file(s).\n\n" + \
                 "Ensure the corresponding text\n" + \
-                "file is present!" ) )
+                "file is present." ) )
 
         box.pack_start( browseDirectoryButton, True, True, 0 )
 
@@ -544,7 +544,7 @@ class IndicatorFortune:
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ 0 ] ):
-                    pythonutils.showMessage( dialog, Gtk.MessageType.INFO, _( "The fortune is part of your system\nand is already included." ), INDICATOR_NAME )
+                    pythonutils.showMessage( dialog, Gtk.MessageType.INFO, _( "The fortune is part of your system and is already included." ), INDICATOR_NAME )
                 else:
                     fortuneFileDirectory.set_text( dialog.get_filename() )
                     break
