@@ -135,12 +135,12 @@ class IndicatorVirtualBox:
                             menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, virtualMachine.getUUID() in runningVMUUIDs ) )
 
             menu.append( Gtk.SeparatorMenuItem() )
-            menuItem = Gtk.MenuItem( _( "Launch VirtualBox Manager" ) )
+            menuItem = Gtk.MenuItem( _( "Launch VirtualBox™ Manager" ) )
             menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
             menu.append( menuItem )
 
         else:
-            menu.insert( Gtk.MenuItem( _( "(VirtualBox is not installed)" ) ), 0 )
+            menu.insert( Gtk.MenuItem( _( "(VirtualBox™ is not installed)" ) ), 0 )
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, False, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
@@ -173,7 +173,7 @@ class IndicatorVirtualBox:
         else:
             result = pythonutils.processGet( "VBoxManage list vms | grep " + uuid )
             if result is None or uuid not in result:
-                message = _( "The VM could not be found - perhaps it has been renamed or deleted.  The list of VMs has been refreshed - please try again." )
+                message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
                 Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
             else:
                 pythonutils.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
@@ -185,7 +185,7 @@ class IndicatorVirtualBox:
     def bringWindowToFront( self, virtualMachineName ):
         numberOfWindowsWithTheSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
         if numberOfWindowsWithTheSameName == "0":
-            message = _( "Unable to find the window for the VM '{0}' - perhaps it is running as headless." ).format( virtualMachineName )
+            message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtualMachineName )
             Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
 
         elif numberOfWindowsWithTheSameName == "1":
@@ -195,7 +195,7 @@ class IndicatorVirtualBox:
                     pythonutils.processCall( "wmctrl -i -a " + windowID )
                     break
         else:
-            message = _( "Unable to bring the VM '{0}' to front as there is more than one window of the same name." ).format( virtualMachineName )
+            message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window of the same name." ).format( virtualMachineName )
             Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
 
 
@@ -459,7 +459,7 @@ class IndicatorVirtualBox:
         tree.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = 0 ) )
         tree.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = 1 ) )
         tree.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = 2 ) )
-        tree.set_tooltip_text( _( "Double click to edit a VM's properties." ) )
+        tree.set_tooltip_text( _( "Double click to edit a virtual machine's properties." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onVirtualMachineDoubleClick )
 
@@ -497,7 +497,7 @@ class IndicatorVirtualBox:
         spinnerRefreshInterval = Gtk.SpinButton()
         spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
-        spinnerRefreshInterval.set_tooltip_text( _( "How often the list of VMs and running status are updated." ) )
+        spinnerRefreshInterval.set_tooltip_text( _( "How often the list of virtual machines and running status are updated." ) )
 
         box.pack_start( spinnerRefreshInterval, False, False, 0 )
 
@@ -512,7 +512,7 @@ class IndicatorVirtualBox:
         spinnerDelay = Gtk.SpinButton()
         spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to force the initial value by explicitly setting it.
-        spinnerDelay.set_tooltip_text( _( "Amount of time to wait from automatically starting one VM to the next." ) )
+        spinnerDelay.set_tooltip_text( _( "Amount of time to wait from automatically starting one virtual machine to the next." ) )
 
         box.pack_start( spinnerDelay, False, False, 0 )
 
@@ -587,19 +587,20 @@ class IndicatorVirtualBox:
             startCommand.set_width_chars( len( model[ treeiter ][ 2 ] ) * 5 / 4 ) # Sometimes the length is shorter than specified due to packing, so make it longer.
 
         startCommand.set_tooltip_text( _(
-            "The terminal command to start the VM such as\n" + \
-            "\t'VBoxManage startvm %VM%' or\n" + \
-            "\t'VBoxHeadless --startvm %VM% --vrde off'" ) )
+            "The terminal command to start the virtual machine such as\n\n" + \
+            "\tVBoxManage startvm %VM%\n" + \
+            "or\n" + \
+            "\tVBoxHeadless --startvm %VM% --vrde off" ) )
         startCommand.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( startCommand, 1, 0, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_tooltip_text( _( "Run the VM when the indicator starts." ) )
+        autostartCheckbox.set_tooltip_text( _( "Run the virtual machine when the indicator starts." ) )
         autostartCheckbox.set_active( model[ treeiter ][ 1 ] is not None and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
         # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
-        dialog = Gtk.Dialog( _( "VM Properties" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog = Gtk.Dialog( _( "Virtual Machine Properties" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
         dialog.set_icon_name( IndicatorVirtualBox.ICON )
@@ -616,7 +617,7 @@ class IndicatorVirtualBox:
                 continue
 
             if not "%VM%" in startCommand.get_text().strip():
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command must contain %VM% which is substituted for the VM name/id." ), INDICATOR_NAME )
+                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command must contain %VM% which is substituted for the virtual machine name/id." ), INDICATOR_NAME )
                 startCommand.grab_focus()
                 continue
 
