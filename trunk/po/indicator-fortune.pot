@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-fortune 1.0.26\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-06-22 14:54+1000\n"
+"POT-Creation-Date: 2017-06-23 10:59+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,7 +86,7 @@ msgid ""
 "English language fortunes are\n"
 "installed by default.\n"
 "\n"
-"There may be be other fortune\n"
+"There may be other fortune\n"
 "packages available in your\n"
 "native language."
 msgstr ""
@@ -155,7 +155,7 @@ msgid "Middle mouse click of the icon"
 msgstr ""
 
 #: indicator-fortune.py:326
-msgid "Not supported on all versions/derivatives of Ubuntu!"
+msgid "Not supported on all versions/derivatives of Ubuntu."
 msgstr ""
 
 #: indicator-fortune.py:331
@@ -195,9 +195,7 @@ msgid "No fortune has been selected for removal."
 msgstr ""
 
 #: indicator-fortune.py:402
-msgid ""
-"This is the default fortune\n"
-"and cannot be deleted."
+msgid "This is the default fortune and cannot be deleted."
 msgstr ""
 
 #: indicator-fortune.py:403
@@ -215,7 +213,7 @@ msgid ""
 "fortune .dat files.\n"
 "\n"
 "Ensure the corresponding\n"
-"fortune text file(s) is present!"
+"fortune text file(s) is present."
 msgstr ""
 
 #: indicator-fortune.py:452
@@ -234,7 +232,7 @@ msgid ""
 "Choose a fortune .dat file.\n"
 "\n"
 "Ensure the corresponding text\n"
-"file is present!"
+"file is present."
 msgstr ""
 
 #: indicator-fortune.py:467
@@ -247,7 +245,7 @@ msgid ""
 "a fortune .dat file(s).\n"
 "\n"
 "Ensure the corresponding text\n"
-"file is present!"
+"file is present."
 msgstr ""
 
 #: indicator-fortune.py:489
@@ -278,7 +276,5 @@ msgid "Choose a directory containing a fortune .dat file(s)"
 msgstr ""
 
 #: indicator-fortune.py:547
-msgid ""
-"The fortune is part of your system\n"
-"and is already included."
+msgid "The fortune is part of your system and is already included."
 msgstr ""
