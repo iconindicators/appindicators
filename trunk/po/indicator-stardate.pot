@@ -1,14 +1,14 @@
 # Portable Object Template for indicator-stardate.
-# Copyright (C) 2015 Bernard Giannetti
+# Copyright (C) 2015-2017 Bernard Giannetti
 # This file is distributed under the same license as the indicator-stardate package.
-# Bernard Giannetti <thebernmeister@hotmail.com>, 2015.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: indicator-stardate 1.0.34\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-05-16 21:45+1000\n"
+"POT-Creation-Date: 2017-06-23 16:04+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,67 +25,67 @@ msgstr ""
 msgid "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main."
 msgstr ""
 
-#: indicator-stardate.py:173
+#: indicator-stardate.py:168
 msgid "Credits"
 msgstr ""
 
-#: indicator-stardate.py:179
+#: indicator-stardate.py:174
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-stardate.py:180
+#: indicator-stardate.py:175
 msgid "View the"
 msgstr ""
 
-#: indicator-stardate.py:181
+#: indicator-stardate.py:176
 msgid "text file."
 msgstr ""
 
-#: indicator-stardate.py:182
+#: indicator-stardate.py:177
 msgid "changelog"
 msgstr ""
 
-#: indicator-stardate.py:202
-msgid "Use 'classic' conversion"
+#: indicator-stardate.py:197
+msgid "Show stardate 'classic'"
 msgstr ""
 
-#: indicator-stardate.py:205
+#: indicator-stardate.py:200
 msgid ""
-"Stardate 'classic' is based on\n"
+"If checked, show stardate 'classic' based on\n"
 "\n"
 "\tSTARDATES IN STAR TREK FAQ V1.6\n"
 "\n"
 "by Andrew Main.\n"
 "\n"
-"Otherwise the 2009 revision is used:\n"
+"Otherwise show stardate '2009 revised' based on\n"
 "\n"
 "\thttp://en.wikipedia.org/wiki/Stardate"
 msgstr ""
 
-#: indicator-stardate.py:212
+#: indicator-stardate.py:207
 msgid "Show ISSUE"
 msgstr ""
 
-#: indicator-stardate.py:216
-msgid "Show the ISSUE of the stardate."
+#: indicator-stardate.py:211
+msgid "Show the ISSUE of the stardate 'classic'."
 msgstr ""
 
-#: indicator-stardate.py:219
+#: indicator-stardate.py:214
 msgid "Pad INTEGER"
 msgstr ""
 
-#: indicator-stardate.py:223
-msgid "Pad the INTEGER part with leading zeros."
+#: indicator-stardate.py:218
+msgid "Pad the INTEGER part of the stardate 'classic' with leading zeros."
 msgstr ""
 
-#: indicator-stardate.py:228
+#: indicator-stardate.py:223
 msgid "Autostart"
 msgstr ""
 
-#: indicator-stardate.py:230
+#: indicator-stardate.py:225
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-stardate.py:234
+#: indicator-stardate.py:229
 msgid "Preferences"
 msgstr ""
