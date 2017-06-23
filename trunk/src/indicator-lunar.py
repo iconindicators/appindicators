@@ -2415,8 +2415,8 @@ class IndicatorLunar:
 
         indicatorText = Gtk.Entry()
         indicatorText.set_tooltip_text( _(
-            "The text shown next to the indicator icon\n" + \
-            "or tooltip, where applicable.\n\n" + \
+            "The text shown next to the indicator icon,\n" + \
+            "or tooltip where applicable.\n\n" + \
             "If a body is unchecked or no longer exists\n" + \
             "such as a comet/satellite not on the list,\n" + \
             "the tag will be automatically removed." ) )
