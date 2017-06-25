@@ -51,7 +51,7 @@ class IndicatorScriptRunner:
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
-    COMMENTS = _( "Run a terminal command or script from a GUI front-end." )
+    COMMENTS = _( "Run a terminal command or script from an indicator." )
 
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_HIDE_GROUPS = "hideGroups"
@@ -188,8 +188,12 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
         scriptGroupComboBox = Gtk.ComboBoxText()
-        scriptGroupComboBox.set_tooltip_text( _( "The group to which a script belongs.\n\nIf a default script is specified, the\ngroup to which the script belongs\nwill be initially selected." ) )
         scriptGroupComboBox.set_entry_text_column( 0 )
+        scriptGroupComboBox.set_tooltip_text( _(
+            "The group to which a script belongs.\n\n" + \
+            "If a default script is specified,\n" + \
+            "the group to which the script belongs\n" + \
+            "will be initially selected." ) )
 
         box.pack_start( scriptGroupComboBox, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
@@ -198,11 +202,14 @@ class IndicatorScriptRunner:
         scriptNameListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         scriptNameTreeView = Gtk.TreeView( scriptNameListStore )
-        scriptNameTreeView.set_tooltip_text( _( "List of scripts within the same group.\n\nIf a default script has been nominated,\nthat script will be initially selected." ) )
         scriptNameTreeView.set_hexpand( True )
         scriptNameTreeView.set_vexpand( True )
         scriptNameTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         scriptNameTreeView.connect( "row-activated", self.onScriptNameDoubleClick, scriptGroupComboBox, copyOfScripts )
+        scriptNameTreeView.set_tooltip_text( _(
+            "List of scripts within the same group.\n\n" + \
+            "If a default script has been nominated,\n" + \
+            "that script will be initially selected." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 0 )
         treeViewColumn.set_expand( True )
@@ -319,10 +326,13 @@ class IndicatorScriptRunner:
         grid.attach( radioShowScriptsIndented, 0, 2, 1, 1 )
 
         hideGroupsCheckbox = Gtk.CheckButton( _( "Hide groups" ) )
-        hideGroupsCheckbox.set_tooltip_text( _( "If checked, only scripts names are displayed.\n\nOtherwise, script names are indented within each group." ) )
         hideGroupsCheckbox.set_active( self.hideGroups )
         hideGroupsCheckbox.set_sensitive( not self.showScriptsInSubmenus )
         hideGroupsCheckbox.set_margin_left( pythonutils.INDENT_WIDGET_LEFT * 2 )
+        hideGroupsCheckbox.set_tooltip_text( _(
+            "If checked, only scripts names are displayed.\n\n" + \
+            "Otherwise, script names are indented within each group." ) )
+
         grid.attach( hideGroupsCheckbox, 0, 3, 1, 1 )
 
         radioShowScriptsSubmenu.connect( "toggled", self.onDisplayCheckboxes, radioShowScriptsSubmenu, hideGroupsCheckbox )
@@ -433,8 +443,11 @@ class IndicatorScriptRunner:
             box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
             scriptGroupCombo = Gtk.ComboBoxText.new_with_entry()
-            scriptGroupCombo.set_tooltip_text( _( "The group to which the script belongs.\n\nChoose an existing group or enter a new one." ) )
             scriptGroupCombo.set_hexpand( True ) # Only need to set this once and all objects will expand.
+            scriptGroupCombo.set_tooltip_text( _(
+                "The group to which the script belongs.\n\n" + \
+                "Choose an existing group or enter a new one." ) )
+
             groups = sorted( self.getScriptsByGroup( scripts ) )
             for group in groups:
                 scriptGroupCombo.append_text( group )
@@ -548,7 +561,10 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Group" ) ), False, False, 0 )
 
         scriptGroupCombo = Gtk.ComboBoxText.new_with_entry()
-        scriptGroupCombo.set_tooltip_text( _( "The group to which the script belongs.\n\nChoose an existing group or enter a new one." ) )
+        scriptGroupCombo.set_tooltip_text( _(
+            "The group to which the script belongs.\n\n" + \
+            "Choose an existing group or enter a new one." ) )
+
         groups = sorted( self.getScriptsByGroup( scripts ) )
         for group in groups:
             scriptGroupCombo.append_text( group )
@@ -581,8 +597,8 @@ class IndicatorScriptRunner:
         box.pack_start( Gtk.Label( _( "Directory" ) ), False, False, 0 )
 
         scriptDirectoryEntry = Gtk.Entry()
-        scriptDirectoryEntry.set_tooltip_text( _( "The directory from which the script/command is executed." ) )
         scriptDirectoryEntry.set_text( script.getDirectory() )
+        scriptDirectoryEntry.set_tooltip_text( _( "The directory from which the script/command is executed." ) )
 
         box.pack_start( scriptDirectoryEntry, True, True, 0 )
 
@@ -628,7 +644,10 @@ class IndicatorScriptRunner:
 
         defaultScriptCheckbox = Gtk.CheckButton( _( "Default script" ) )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
-        defaultScriptCheckbox.set_tooltip_text( _( "If checked, this script will be run on a\nmiddle mouse click of the indicator icon.\n\nOnly one script can be the default." ) )
+        defaultScriptCheckbox.set_tooltip_text( _(
+            "If checked, this script will be run on a\n" + \
+            "middle mouse click of the indicator icon.\n\n" + \
+            "Only one script can be the default." ) )
 
         grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
 
