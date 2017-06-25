@@ -1059,11 +1059,6 @@ class IndicatorPPADownloadStatistics:
 
     def getPublishedBinariesNoFilters( self, ppa ):
         try:
-#             url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
-#                   "?ws.op=getPublishedBinaries" + \
-#                   "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
-#                   "&status=Published"
-
             url = self.getLaunchPadURL( ppa, None, None )
             publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
             numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
@@ -1082,14 +1077,6 @@ class IndicatorPPADownloadStatistics:
         for filter in self.filters.get( ppa.getUser() + " | " + ppa.getName() ):
             try:
                 url = self.getLaunchPadURL( ppa, None, filter )
-#                 url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + \
-#                       "?ws.op=getPublishedBinaries" + \
-#                       "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
-#                       "&status=Published" + \
-#                       "&exact_match=false" + \
-#                       "&ordered=false" + \
-#                       "&binary_name=" + filter
-
                 publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
                 numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
                 if numberOfPublishedBinaries > 0: # Only fetch if there is data, that is, was not filtered.
@@ -1164,8 +1151,6 @@ class IndicatorPPADownloadStatistics:
 
         if status != PPA.STATUS_ERROR_RETRIEVING_PPA:
             try:
-#                 url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
-#                 downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
                 downloadCount = json.loads( urlopen( self.getLaunchPadURL( ppa, packageId, None ) ).read().decode( "utf8" ) )
                 if str( downloadCount ).isnumeric():
                     ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
@@ -1177,7 +1162,9 @@ class IndicatorPPADownloadStatistics:
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
 
-
+    # Either packageId or filter must be None.
+    # If packageId is None, filter must be a valid text string to filter OR set to None.
+    # If filter is None, packageId must be a valid text string for the package Id. 
     def getLaunchPadURL( self, ppa, packageId, filter ):
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName()
         if packageId is None:
