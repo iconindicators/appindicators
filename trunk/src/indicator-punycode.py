@@ -216,7 +216,7 @@ class IndicatorPunycode:
         inputClipboardRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Clipboard" ) )
         inputClipboardRadio.set_tooltip_text( _(
             "Input is taken from the clipboard after\n" + \
-            "a CTRL-X or CTRL-C (or eqivalent)." ) )
+            "a CTRL-X or CTRL-C (or equivalent)." ) )
         inputClipboardRadio.set_active( self.inputClipboard )
         inputClipboardRadio.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
         grid.attach( inputClipboardRadio, 0, 1, 1, 1 )
