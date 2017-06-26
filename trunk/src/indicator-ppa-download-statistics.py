@@ -1228,12 +1228,18 @@ class IndicatorPPADownloadStatistics:
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published"
 
+        url = "https://api.launchpad.net/1.0/~" + "thebernmeister" + "/+archive/" + "ppa" + "?ws.op=getPublishedBinaries" + \
+              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + "xenial" + "/" + "amd64" + "&status=Published"
+
         if filter is not None:
             url += "&exact_match=false" + "&ordered=false&binary_name=" + filter
 
         count = 0
+        pageNumber = 1
+        pageItems = 75
         numberOfPublishedBinaries = count + 1 # Set to a value greater than count to ensure the loop executes at least once. 
         while( count < numberOfPublishedBinaries ):
+#         while( ( pageNumber * pageItems ) < numberOfPublishedBinaries ):
             try:
                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( count ) ).read().decode( "utf8" ) )
                 print( url + "&ws.start=" + str( count ) )
@@ -1250,12 +1256,12 @@ class IndicatorPPADownloadStatistics:
                 continue
 
 #TODO Need to fix how the items per page are downloaded in terms of specifying the number of items in a given page taking into account the last page.
-            pageItems = 75
-            print( count % pageItems )
+            numberItems = pageItems
+            
+            
 
 #             with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
-#                 results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberOfPublishedBinaries ) }
-#                 results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( pageItems }
+#                 results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberItems }
 #                 for result in concurrent.futures.as_completed( results ):
 #                     i = results[ result ]
 #                     downloadCount = result.result()
@@ -1271,7 +1277,6 @@ class IndicatorPPADownloadStatistics:
 #                         executor.shutdown() #TODO Test!
                     
             count += 75 # The number of results per page.
-
 
 
     # Takes a published binary and extracts the information needed to get the download count (for each package).
