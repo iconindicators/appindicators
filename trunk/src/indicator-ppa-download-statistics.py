@@ -136,8 +136,8 @@ class IndicatorPPADownloadStatistics:
 #TODO Perhaps here have a simple build Menu that just has the About/Pref/Quit and a message "downloading..."?
             self.buildMenu() # Menu will initially contain a download status message as the PPA data should (must) be empty of statistics.  #TODO How to enforce this?
             self.downloading = True
-            Thread( target = self.getPPADownloadStatistics ).start()
-
+#             Thread( target = self.getPPADownloadStatistics ).start()
+            Thread( target = self.getPPADownloadStatisticsNEW ).start()
 #             self.requestPPADownloadAndMenuRefresh( False )
 #             GLib.timeout_add_seconds( 6 * 60 * 60, self.requestPPADownloadAndMenuRefresh, True ) # Auto update every six hours.
 
@@ -1162,6 +1162,160 @@ class IndicatorPPADownloadStatistics:
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
 
+    def getPPADownloadStatisticsNEW( self ):
+#         with self.lock:
+#             self.downloadInProgress = True
+
+        for ppa in self.ppas:
+            ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
+
+            filter = None
+            key = ppa.getUser() + " | " + ppa.getName()
+            if key in self.filters:
+                filter = self.filters.get( key )
+
+            self.getPublishedBinariesNEW( ppa, filter )
+
+        # Have a second attempt at failures...
+        for ppa in self.ppas:
+            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
+                key = ppa.getUser() + " | " + ppa.getName()
+                if key in self.filters:
+                    filter = self.filters.get( key )
+
+                self.getPublishedBinariesNEW( ppa, filter )
+
+        with self.lock:
+            self.downloadInProgress = False
+
+        GLib.idle_add( self.buildMenu )
+
+        if not self.quitRequested and self.ppasPrevious != self.ppas: #TODO Handle
+            Notify.Notification.new( _( "Statistics downloaded!" ), "", IndicatorPPADownloadStatistics.ICON ).show()
+
+        self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.
+
+
+    def getPublishedBinaries( self, ppa, filter ):
+        if filter is None:
+            baseURL = self.getLaunchPadURL( ppa, None, None )
+        else:
+            baseURL = self.getLaunchPadURL( ppa, None, filter )
+
+        count = 0
+        while( count < numberOfPublishedBinaries ):
+            try:
+                publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( count ) ).read().decode( "utf8" ) )
+                numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
+                if numberOfPublishedBinaries == 0:
+                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+                else:
+                    self.processPublishedBinariesNEW( ppa, publishedBinaries, numberOfPublishedBinaries )
+
+                count += 75 # The number of results per page.
+
+            except Exception as e:
+                logging.exception( e )
+                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                count = numberOfPublishedBinaries # Terminate the loop.
+
+
+    def getPublishedBinariesNEW( self, ppa, filter ):
+        import concurrent.futures #TODO Move to top
+        if filter is None:
+            baseURL = self.getLaunchPadURL( ppa, None, None )
+        else:
+            baseURL = self.getLaunchPadURL( ppa, None, filter )
+
+        count = 0
+        numberOfPublishedBinaries = count + 1 # Set to a value greater than count to ensure the loop executes at least once. 
+        while( count < numberOfPublishedBinaries ):
+            try:
+                publishedBinaries = json.loads( urlopen( baseURL + "&ws.start=" + str( count ) ).read().decode( "utf8" ) )
+            except Exception as e:
+                logging.exception( e )
+                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                count = numberOfPublishedBinaries
+                continue
+
+            numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
+            if numberOfPublishedBinaries == 0:
+                ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+                count = numberOfPublishedBinaries
+                continue
+
+            with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
+                results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberOfPublishedBinaries ) }
+                for result in concurrent.futures.as_completed( results ):
+                    i = results[ result ]
+                    downloadCount = result.result()
+                    if str( downloadCount ).isnumeric() and ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
+
+                        packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
+                        packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
+                        architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
+                        indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
+                        packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
+
+                        print( packageName, packageVersion, downloadCount )
+
+                        ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
+                    else:
+                        ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                        executor.shutdown() #TODO Test!
+                    
+            count += 75 # The number of results per page.
+
+
+
+    # Takes a published binary and extracts the information needed to get the download count (for each package).
+    # The results in a published binary are returned in lots of 75;
+    # for more than 75 published binaries, loop to get the remainder.
+    def processPublishedBinariesNEW( self, ppa, publishedBinaries, numberOfPublishedBinaries ):
+        import concurrent.futures.ThreadPoolExecutor
+        try:
+            resultIndexOnPage = 0
+            threads = [ ]
+            for resultCount in range( numberOfPublishedBinaries ):
+#                 if self.quitRequested: #TODO Handle
+#                     self.quit( None )
+#                     return
+
+                packageName = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "binary_package_name" ]
+
+                # Limit the number of concurrent fetches...
+                if len( threads ) > 5:
+                    for t in threads:
+                        t.join()
+
+                    threads = [ ]
+
+                packageVersion = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "binary_package_version" ]
+                architectureSpecific = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "architecture_specific" ]
+                indexLastSlash = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "self_link" ].rfind( "/" )
+                packageId = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "self_link" ][ indexLastSlash + 1 : ]
+
+                t = Thread( target = self.getDownloadCountNEW, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ) )
+                t.start()
+                threads.append( t )
+                resultIndexOnPage += 1
+
+            for t in threads:
+                t.join() # Wait for remaining threads...
+
+            # The only status the PPA can be at this point is error retrieving ppa (set by get download count).
+            if ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
+                ppa.setStatus( PPA.STATUS_OK )
+                if len( ppa.getPublishedBinaries() ) == 0: #TODO Is is possible for non filtered to hit this?
+                    ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+
+        except Exception as e:
+            logging.exception( e )
+            ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+
+
+
     # ppa: the current PPA.
     # One of packageId or filter must be None.
     # If packageId is None, filter must be a string OR None.
@@ -1182,6 +1336,22 @@ class IndicatorPPADownloadStatistics:
             url += "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
 
         return url
+
+
+def getDownloadCountNEW( ppa, publishedBinaries, index ):
+    indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
+    packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
+    result = PPA.STATUS_ERROR_RETRIEVING_PPA
+    try:
+        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
+        downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
+        if str( downloadCount ).isnumeric():
+            result = downloadCount
+
+    except Exception as e:
+        logging.exception( e )
+
+    return result
 
 
 if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
