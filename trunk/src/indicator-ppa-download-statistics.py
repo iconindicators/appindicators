@@ -1096,23 +1096,23 @@ class IndicatorPPADownloadStatistics:
     # for more than 75 published binaries, loop to get the remainder.
     def processPublishedBinaries( self, ppa, baseURL, publishedBinaries, numberOfPublishedBinaries ):
         try:
-            index = 0
+            resultIndexPerPage = 0
             resultPage = 1
             resultsPerUrl = 75
             threads = [ ]
-            for i in range( numberOfPublishedBinaries ):
+            for resultCount in range( numberOfPublishedBinaries ):
                 if self.quitRequested: #TODO Handle
                     self.quit( None )
                     return
 
-                if i == ( resultPage * resultsPerUrl ):
+                if resultCount == ( resultPage * resultsPerUrl ):
                     # Handle result pages after the first page.
                     url = baseURL + "&ws.start=" + str( resultPage * resultsPerUrl )
                     publishedBinaries = json.loads( urlopen( url ).read().decode( "utf8" ) )
                     resultPage += 1
-                    index = 0
+                    resultIndexPerPage = 0
 
-                packageName = publishedBinaries[ "entries" ][ index ][ "binary_package_name" ]
+                packageName = publishedBinaries[ "entries" ][ resultIndexPerPage ][ "binary_package_name" ]
 
                 # Limit the number of concurrent fetches...
                 if len( threads ) > 5:
@@ -1121,15 +1121,15 @@ class IndicatorPPADownloadStatistics:
 
                     threads = [ ]
 
-                packageVersion = publishedBinaries[ "entries" ][ index ][ "binary_package_version" ]
-                architectureSpecific = publishedBinaries[ "entries" ][ index ][ "architecture_specific" ]
-                indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
-                packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
+                packageVersion = publishedBinaries[ "entries" ][ resultIndexPerPage ][ "binary_package_version" ]
+                architectureSpecific = publishedBinaries[ "entries" ][ resultIndexPerPage ][ "architecture_specific" ]
+                indexLastSlash = publishedBinaries[ "entries" ][ resultIndexPerPage ][ "self_link" ].rfind( "/" )
+                packageId = publishedBinaries[ "entries" ][ resultIndexPerPage ][ "self_link" ][ indexLastSlash + 1 : ]
 
                 t = Thread( target = self.getDownloadCount, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ) )
                 t.start()
                 threads.append( t )
-                index += 1
+                resultIndexPerPage += 1
 
             for t in threads:
                 t.join() # Wait for remaining threads...
