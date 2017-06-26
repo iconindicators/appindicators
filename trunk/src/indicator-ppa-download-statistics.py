@@ -1224,16 +1224,18 @@ class IndicatorPPADownloadStatistics:
 #TODO Test with a PPA in excess of 75 results.
     def getPublishedBinariesNEW( self, ppa, filter ):
         import concurrent.futures #TODO Move to top
-        if filter is None:
-            baseURL = self.getLaunchPadURL( ppa, None, None )
-        else:
-            baseURL = self.getLaunchPadURL( ppa, None, filter )
+
+        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
+              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published"
+
+        if filter is not None:
+            url += "&exact_match=false" + "&ordered=false&binary_name=" + filter
 
         count = 0
         numberOfPublishedBinaries = count + 1 # Set to a value greater than count to ensure the loop executes at least once. 
         while( count < numberOfPublishedBinaries ):
             try:
-                publishedBinaries = json.loads( urlopen( baseURL + "&ws.start=" + str( count ) ).read().decode( "utf8" ) )
+                publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( count ) ).read().decode( "utf8" ) )
             except Exception as e:
                 logging.exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
@@ -1252,17 +1254,12 @@ class IndicatorPPADownloadStatistics:
                     i = results[ result ]
                     downloadCount = result.result()
                     if str( downloadCount ).isnumeric() and ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
+                        ppa.setStatus( PPA.STATUS_OK )
 
                         packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
                         packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
                         architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
-                        indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
-                        packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
-
-                        print( packageName, packageVersion, downloadCount )
-
                         ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
-                        ppa.setStatus( PPA.STATUS_OK )
                     else:
                         ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
                         executor.shutdown() #TODO Test!
