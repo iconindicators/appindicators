@@ -1186,8 +1186,8 @@ class IndicatorPPADownloadStatistics:
 
                 self.getPublishedBinariesNEW( ppa, filter )
 
-        with self.lock:
-            self.downloadInProgress = False
+#         with self.lock:
+#             self.downloadInProgress = False
 
         GLib.idle_add( self.buildMenu )
 
@@ -1221,6 +1221,7 @@ class IndicatorPPADownloadStatistics:
                 count = numberOfPublishedBinaries # Terminate the loop.
 
 
+#TODO Test with a PPA in excess of 75 results.
     def getPublishedBinariesNEW( self, ppa, filter ):
         import concurrent.futures #TODO Move to top
         if filter is None:
@@ -1261,6 +1262,7 @@ class IndicatorPPADownloadStatistics:
                         print( packageName, packageVersion, downloadCount )
 
                         ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
+                        ppa.setStatus( PPA.STATUS_OK )
                     else:
                         ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
                         executor.shutdown() #TODO Test!
