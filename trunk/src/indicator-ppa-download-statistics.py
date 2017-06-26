@@ -1162,9 +1162,10 @@ class IndicatorPPADownloadStatistics:
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
 
-    # Either packageId or filter must be None.
-    # If packageId is None, filter must be a valid text string to filter OR set to None.
-    # If filter is None, packageId must be a valid text string for the package Id. 
+    # ppa: the current PPA.
+    # One of packageId or filter must be None.
+    # If packageId is None, filter must be a string OR None.
+    # If filter is None, packageId must be a string.
     def getLaunchPadURL( self, ppa, packageId, filter ):
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName()
         if packageId is None:
@@ -1176,9 +1177,11 @@ class IndicatorPPADownloadStatistics:
                 url += "&exact_match=false" + \
                        "&ordered=false" + \
                        "&binary_name=" + filter
-        
+
         else:
             url += "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
+
+        return url
 
 
 if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
