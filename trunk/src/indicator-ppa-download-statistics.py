@@ -1236,6 +1236,7 @@ class IndicatorPPADownloadStatistics:
         while( count < numberOfPublishedBinaries ):
             try:
                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( count ) ).read().decode( "utf8" ) )
+                print( url + "&ws.start=" + str( count ) )
             except Exception as e:
                 logging.exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
@@ -1248,21 +1249,26 @@ class IndicatorPPADownloadStatistics:
                 count = numberOfPublishedBinaries
                 continue
 
-            with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
-                results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberOfPublishedBinaries ) }
-                for result in concurrent.futures.as_completed( results ):
-                    i = results[ result ]
-                    downloadCount = result.result()
-                    if str( downloadCount ).isnumeric() and ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
-                        ppa.setStatus( PPA.STATUS_OK )
+#TODO Need to fix how the items per page are downloaded in terms of specifying the number of items in a given page taking into account the last page.
+            pageItems = 75
+            print( count % pageItems )
 
-                        packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
-                        packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
-                        architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
-                        ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
-                    else:
-                        ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-                        executor.shutdown() #TODO Test!
+#             with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
+#                 results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberOfPublishedBinaries ) }
+#                 results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( pageItems }
+#                 for result in concurrent.futures.as_completed( results ):
+#                     i = results[ result ]
+#                     downloadCount = result.result()
+#                     if str( downloadCount ).isnumeric() and ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
+#                         ppa.setStatus( PPA.STATUS_OK )
+#  
+#                         packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
+#                         packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
+#                         architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
+#                         ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
+#                     else:
+#                         ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+#                         executor.shutdown() #TODO Test!
                     
             count += 75 # The number of results per page.
 
@@ -1338,16 +1344,17 @@ class IndicatorPPADownloadStatistics:
 
 
 def getDownloadCountNEW( ppa, publishedBinaries, index ):
-    indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
-    packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
-    result = PPA.STATUS_ERROR_RETRIEVING_PPA
     try:
+        indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
+        packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
+        result = PPA.STATUS_ERROR_RETRIEVING_PPA
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
         downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
         if str( downloadCount ).isnumeric():
             result = downloadCount
 
     except Exception as e:
+        print( "index:", index )
         logging.exception( e )
 
     return result
