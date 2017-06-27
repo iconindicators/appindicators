@@ -47,7 +47,7 @@ from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from ppa import PPA, PublishedBinary
 from threading import Thread
 from urllib.request import urlopen
-import json, locale, logging, operator, os, pythonutils, threading, webbrowser
+import concurrent.futures, json, locale, logging, operator, os, pythonutils, threading, webbrowser
 
 
 class IndicatorPPADownloadStatistics:
@@ -1221,11 +1221,15 @@ class IndicatorPPADownloadStatistics:
                 count = numberOfPublishedBinaries # Terminate the loop.
 
 
+    # Use a thread pool executer to get the download count within each published binary.
+    # References:
+    #    https://docs.python.org/3/library/concurrent.futures.html
+    #    https://pymotw.com/3/concurrent.futures
+    #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
+    def getPublishedBinariesNEW( self, ppa, filter ):
+
 #TODO Test with a PPA in excess of 75 results.
 # https://launchpad.net/~allanlesage/+archive/ubuntu/coverage-builder-01
-    def getPublishedBinariesNEW( self, ppa, filter ):
-        import concurrent.futures #TODO Move to top
-
         if ppa.getUser() == "allanlesage": return
 
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
@@ -1234,7 +1238,6 @@ class IndicatorPPADownloadStatistics:
         if filter is not None:
             url += "&exact_match=false" + "&ordered=false&binary_name=" + filter
 
-        counter = 0
         publishedBinariesPerPage = 75 # The number of results per page.
         publishedBinaryCounter = 0
         pageNumber = 1
@@ -1242,7 +1245,6 @@ class IndicatorPPADownloadStatistics:
         while( publishedBinaryCounter < totalPublishedBinaries ):
             try:
                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ) ).read().decode( "utf8" ) )
-#                 print( url + "&ws.start=" + str( publishedBinaryCounter ) )
             except Exception as e:
                 logging.exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
@@ -1250,7 +1252,6 @@ class IndicatorPPADownloadStatistics:
                 continue
 
             totalPublishedBinaries = publishedBinaries[ "total_size" ]
-            print( "total published binaries:", totalPublishedBinaries )
             if totalPublishedBinaries == 0:
                 ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
                 publishedBinaryCounter = totalPublishedBinaries
@@ -1260,21 +1261,17 @@ class IndicatorPPADownloadStatistics:
             if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
-            print( "Number of records to retrieve for this page:", numberPublishedBinariesCurrentPage )
-            counter += numberPublishedBinariesCurrentPage
-            
             numberWorkers = totalPublishedBinaries if totalPublishedBinaries <= 10 else 5
             with concurrent.futures.ThreadPoolExecutor( max_workers = numberWorkers ) as executor:
                 results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
                 for result in concurrent.futures.as_completed( results ):
-                    i = results[ result ]
+                    threadIndex = results[ result ]
                     downloadCount = result.result()
                     if str( downloadCount ).isnumeric() and ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
                         ppa.setStatus( PPA.STATUS_OK )
-   
-                        packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
-                        packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
-                        architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
+                        packageName = publishedBinaries[ "entries" ][ threadIndex ][ "binary_package_name" ]
+                        packageVersion = publishedBinaries[ "entries" ][ threadIndex ][ "binary_package_version" ]
+                        architectureSpecific = publishedBinaries[ "entries" ][ threadIndex ][ "architecture_specific" ]
                         ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
                     else:
                         ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
@@ -1283,7 +1280,6 @@ class IndicatorPPADownloadStatistics:
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
 
-        print( "TOTAL:", counter )
 
     # Takes a published binary and extracts the information needed to get the download publishedBinaryCounter (for each package).
     # The results in a published binary are returned in lots of 75;
@@ -1356,16 +1352,15 @@ class IndicatorPPADownloadStatistics:
 
 def getDownloadCountNEW( ppa, publishedBinaries, index ):
     try:
+        result = PPA.STATUS_ERROR_RETRIEVING_PPA
         indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
         packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
-        result = PPA.STATUS_ERROR_RETRIEVING_PPA
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
         downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
         if str( downloadCount ).isnumeric():
             result = downloadCount
 
     except Exception as e:
-        print( "index:", index )
         logging.exception( e )
 
     return result
