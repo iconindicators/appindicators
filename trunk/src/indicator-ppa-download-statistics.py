@@ -1222,64 +1222,68 @@ class IndicatorPPADownloadStatistics:
 
 
 #TODO Test with a PPA in excess of 75 results.
+# https://launchpad.net/~allanlesage/+archive/ubuntu/coverage-builder-01
     def getPublishedBinariesNEW( self, ppa, filter ):
         import concurrent.futures #TODO Move to top
+
+#         if ppa.getUser() == "kubuntu-ppa": return
 
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published"
 
-        url = "https://api.launchpad.net/1.0/~" + "thebernmeister" + "/+archive/" + "ppa" + "?ws.op=getPublishedBinaries" + \
-              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + "xenial" + "/" + "amd64" + "&status=Published"
-
         if filter is not None:
             url += "&exact_match=false" + "&ordered=false&binary_name=" + filter
 
-        count = 0
+        counter = 0
+        publishedBinariesPerPage = 75 # The number of results per page.
+        publishedBinaryCounter = 0
         pageNumber = 1
-        pageItems = 75
-        numberOfPublishedBinaries = count + 1 # Set to a value greater than count to ensure the loop executes at least once. 
-        while( count < numberOfPublishedBinaries ):
-#         while( ( pageNumber * pageItems ) < numberOfPublishedBinaries ):
+        totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once. 
+        while( publishedBinaryCounter < totalPublishedBinaries ):
             try:
-                publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( count ) ).read().decode( "utf8" ) )
-                print( url + "&ws.start=" + str( count ) )
+                publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ) ).read().decode( "utf8" ) )
+#                 print( url + "&ws.start=" + str( publishedBinaryCounter ) )
             except Exception as e:
                 logging.exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-                count = numberOfPublishedBinaries
+                publishedBinaryCounter = totalPublishedBinaries
                 continue
 
-            numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
-            if numberOfPublishedBinaries == 0:
+            totalPublishedBinaries = publishedBinaries[ "total_size" ]
+            print( "total published binaries:", totalPublishedBinaries )
+            if totalPublishedBinaries == 0:
                 ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
-                count = numberOfPublishedBinaries
+                publishedBinaryCounter = totalPublishedBinaries
                 continue
 
-#TODO Need to fix how the items per page are downloaded in terms of specifying the number of items in a given page taking into account the last page.
-            numberItems = pageItems
-            
-            
+            numberPublishedBinariesCurrentPage = publishedBinariesPerPage
+            if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
+                numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
-#             with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
-#                 results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberItems }
-#                 for result in concurrent.futures.as_completed( results ):
-#                     i = results[ result ]
-#                     downloadCount = result.result()
-#                     if str( downloadCount ).isnumeric() and ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
-#                         ppa.setStatus( PPA.STATUS_OK )
-#  
-#                         packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
-#                         packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
-#                         architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
-#                         ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
-#                     else:
-#                         ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-#                         executor.shutdown() #TODO Test!
-                    
-            count += 75 # The number of results per page.
+            print( "Number of records to retrieve for this page:", numberPublishedBinariesCurrentPage )
+            counter += numberPublishedBinariesCurrentPage
+            with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
+                results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
+                for result in concurrent.futures.as_completed( results ):
+                    i = results[ result ]
+                    downloadCount = result.result()
+                    if str( downloadCount ).isnumeric() and ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
+                        ppa.setStatus( PPA.STATUS_OK )
+   
+                        packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
+                        packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
+                        architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
+                        ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
+                    else:
+                        ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                        executor.shutdown() #TODO Test!
 
+            publishedBinaryCounter += publishedBinariesPerPage
+            pageNumber += 1
 
-    # Takes a published binary and extracts the information needed to get the download count (for each package).
+        print( "TOTAL:", counter )
+
+    # Takes a published binary and extracts the information needed to get the download publishedBinaryCounter (for each package).
     # The results in a published binary are returned in lots of 75;
     # for more than 75 published binaries, loop to get the remainder.
     def processPublishedBinariesNEW( self, ppa, publishedBinaries, numberOfPublishedBinaries ):
