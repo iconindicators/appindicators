@@ -1226,7 +1226,7 @@ class IndicatorPPADownloadStatistics:
     def getPublishedBinariesNEW( self, ppa, filter ):
         import concurrent.futures #TODO Move to top
 
-#         if ppa.getUser() == "kubuntu-ppa": return
+        if ppa.getUser() == "allanlesage": return
 
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published"
@@ -1262,7 +1262,9 @@ class IndicatorPPADownloadStatistics:
 
             print( "Number of records to retrieve for this page:", numberPublishedBinariesCurrentPage )
             counter += numberPublishedBinariesCurrentPage
-            with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
+            
+            numberWorkers = totalPublishedBinaries if totalPublishedBinaries <= 10 else 5
+            with concurrent.futures.ThreadPoolExecutor( max_workers = numberWorkers ) as executor:
                 results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
                 for result in concurrent.futures.as_completed( results ):
                     i = results[ result ]
