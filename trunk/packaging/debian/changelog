@@ -2,6 +2,7 @@ indicator-virtual-box (1.0.56-1) trusty; urgency=low
 
   * Support for VirtualBox 4.3/5.x or greater.
   * Removed the option to alphabetically sort.
+  * Removed outdated Czech translation.
   * About/Preferences dialogs now block each other - only show one at a time.
   * Update release to trusty as precise is end of life.
 
