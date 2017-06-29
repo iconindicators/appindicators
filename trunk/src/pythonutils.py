@@ -22,10 +22,12 @@ import gettext
 gettext.install( "pythonutils" )
 
 from gi.repository import Gtk
-import logging.handlers, os, shutil, subprocess, sys
+import datetime, logging.handlers, os, pickle, shutil, subprocess, sys
 
 
 AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+
+CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
 INDENT_WIDGET_LEFT = 20
 INDENT_TEXT_LEFT = 25
@@ -193,6 +195,77 @@ def showAboutDialog(
 
         aboutDialog.run()
         aboutDialog.hide()
+
+
+# Writes a dict as a binary file.
+#
+# data: The dict to write.
+# cachePath: File system path to the directory location of the cache.
+# baseName: Text used, along with a timestamp, to form the binary file name.
+#
+# For the application "fred" to write the dict objects "maryDict" and "janeDict":
+#
+#    writeToCache( maryDict, ~/.cache/fred/, mary, logging )
+#    writeToCache( janeDict, ~/.cache/fred/, jane, logging )
+#
+# resulting in binary files written (with timestamps):
+#
+#    ~/.cache/fred/mary-20170629174950
+#    ~/.cache/fred/jane-20170629174951
+def writeToCache( data, cachePath, baseName, logging ):
+    filename = cachePath + baseName + datetime.datetime.now().strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+    try:
+        with open( filename, "wb" ) as f:
+            pickle.dump( data, f )
+
+    except Exception as e:
+        logging.exception( e )
+        logging.error( "Error writing to cache: " + filename )
+
+
+# Reads the most recent file from the cache for the given base name.
+# Removes out of date cache files.
+#
+# Returns a tuple of the data (either None or a non-empty dict) and the corresponding date/time as string (either None or the date/time).
+def readFromCache( cachePath, baseName, cacheMaximumDateTime, logging ):
+    # Read all files in the cache and keep a list of those which match the base name.
+    # Any file matching the base name but is older than the cache maximum date/time id deleted.
+    cacheMaximumDateTimeString = cacheMaximumDateTime.strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+    files = [ ]
+    for file in os.listdir( cachePath ):
+        if file.startswith( baseName ):
+            fileDateTime = file[ file.index( baseName ) + len( baseName ) : ]
+            if fileDateTime < cacheMaximumDateTimeString:
+                os.remove( cachePath + file )
+            else:
+                files.append( file )
+
+    # Sort the matching files by date.  All file(s) will be newer than the cache maximum date/time.
+    files.sort()
+    data = None
+    dateTime = None
+    for file in reversed( files ): # Look at the most recent file first.
+        filename = cachePath + file
+        try:
+            with open( filename, "rb" ) as f:
+                data = pickle.load( f )
+
+            if data is not None and len( data ) > 0:
+                dateTime = file[ len( baseName ) : ]
+                break
+
+        except Exception as e:
+            data = None
+            dateTime = None
+            logging.exception( e )
+            logging.error( "Error reading from cache: " + filename )
+
+    # Only return None or non-empty.
+    if data is None or len( data ) == 0:
+        data = None
+        dateTime = None
+
+    return ( data, dateTime )
 
 
 # Log file handler.  Truncates the file when the file size limit is reached.
