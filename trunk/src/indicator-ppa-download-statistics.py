@@ -34,6 +34,10 @@
 #  http://help.launchpad.net/API/Hacking
 
 
+#TODO Current version 57 oot of the box does not find any downloads.
+# Removing the filter then works...is this a bug and does it still exist?
+
+
 INDICATOR_NAME = "indicator-ppa-download-statistics"
 import gettext
 gettext.install( INDICATOR_NAME )
