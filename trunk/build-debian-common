@@ -9,6 +9,10 @@
 PYTHON_UTILS=../PythonUtils
 
 
+#TODO Put in some flag to say we need pythonutils in the build...and then a check if the pot/po file is not present.
+
+
+
 # Supported themes and corresponding colours.
 themeNames=(   "Adwaita" "elementary-xfce-darker" "Lubuntu" "ubuntu-mono-dark" "ubuntu-mono-light" )
 themeColours=(  bebebe             f3f3f3          4c4c4c          dfdbd2             3c3c3c       )
