@@ -23,12 +23,15 @@ doStandardBuild()
   copyTopLevelAndSource $1
   copyHicolorCreateThemed $2 $3
   copyPOCreateMO
-#  createOrigTarGz
-#  copyDebian
-#  addIconsToDebianInstall $2
-#  addMOToDebianInstall
-#  buildDeb
-#  cleanUp
+  echo build/$NAME-$VERSION/po/$NAME.pot
+  echo build/$NAME-$VERSION/po/$NAME.mo
+  msgfmt build/$NAME-$VERSION/po/$NAME.pot --output-file build/$NAME-$VERSION/po/$NAME.mo
+  createOrigTarGz
+  copyDebian
+  addIconsToDebianInstall $2
+  addMOToDebianInstall
+  buildDeb
+  cleanUp
 }
 
 
@@ -104,26 +107,6 @@ copyPOCreateMO()
   for PO_FILE in $(find build/$NAME-$VERSION/po -type f -name '*.po') ; do
     msgfmt $PO_FILE --output-file ${PO_FILE%\.po}.mo
   done
-}
-
-
-copyPOCreateMO-ORIGINAL()
-{
-  # Copy .po files from PythonUtils.
-  rsync -ar --exclude=.svn --include=*.po $PYTHON_UTILS/po build/$NAME-$VERSION
-  cp $PYTHON_UTILS/po/LINGUAS $PYTHON_UTILS/po/POTFILES.in $PYTHON_UTILS/po/README build/$NAME-$VERSION/po
-
-  # Copy .po files from Indicator (do this AFTER PythonUtils so the indicator's linguas/readme and similar are not overwritten).
-  rsync -ar --exclude=.svn --include=*.po po build/$NAME-$VERSION
-  cp po/LINGUAS po/POTFILES.in po/README build/$NAME-$VERSION/po
-
-  # Create .mo files.
-  for PO_FILE in $(find build/$NAME-$VERSION/po -type f -name '*.po') ; do
-    msgfmt $PO_FILE --output-file ${PO_FILE%\.po}.mo
-  done
-
-  # Include PythonUtils in POTFILES.in
-  echo "src/pythonutils.py" >>build/$NAME-$VERSION/po/POTFILES.in
 }
 
 
