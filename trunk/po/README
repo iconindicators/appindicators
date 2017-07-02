@@ -1,75 +1,106 @@
-To prepare a single source .py file for translation
----------------------------------------------------
+To prepare a source .py file(s) for translation
+============================================
 
-Ensure the first lines of code in the source (before imports) is:
+Assume main project/file name is "MyProject".
 
-INDICATOR_NAME = "indicator-lunar"
-import gettext
-gettext.install( INDICATOR_NAME )
+Ensure the first lines of code in the source (before imports) contains the header:
 
+	import gettext
+	gettext.install( "MyProject" )
 
-Each simple/static string should be changed from:
+If there is more than one source file, omit the header above (the header must only appear once).
 
-"This is static text without variables"
+Each end-user string must be changed from:
+
+	"This is static text without variables"
 
 to:
 
-_( "This is static text without variables" )
+	_( "This is static text without variables" )
 
 as per http://www.gnu.org/software/gettext/manual/gettext.html#Sources
 
-
 If the About dialog from pythonutils is used, ensure that the 'translator' parameter is set to:
 
-_( "translator-credits" )
+	_( "translator-credits" )
 
-which will allow a translator to add their name(s) in the eventual PO translation file.  For example:
+to allow a translator to add their name(s) in the target PO translation file:
 
-msgid "translator-credits"
-msgstr "John Smith"
+	msgid "translator-credits"
+	msgstr "John Smith"
 
+Create the file POTFILES.in containing a list of source files which require translation.
 
-Create the PO Template
-----------------------
-
-In a terminal, generate the PO template file from the source file:
-
-xgettext inputSource.py
-
-This produces a file messages.po which should be renamed to inputSource.pot
-
-Edit inputSource.pot and modify/complete fields as per http://www.gnu.org/software/gettext/manual/gettext.html#Header-Entry.
-
-Place the inputSource.pot file in the directory po directory, located under the main project directory.
+Create the file LINGUAS and add each language/locale code, separated by whitespace, on a single line.
 
 
-Create a POTFILES.in and place in the po directory.  To this file list (one per line) each file to be translated.
-Initially there will be one entry only:
+Create the PO Template (POT) file
+=================================
 
-src/indicator-lunar.py
+In a terminal from the project home directory, generate the PO template file:
 
+	xgettext --files-from=po/POTFILES.in
 
-Create a LINGUAS file and place in the po directory. 
-As each PO file is created for a new language, add the language/locale code to that file on a single line, where each code separated by whitespace.
+This will create messages.po containing strings for all .py files.
+Move messages.po to the po directory and rename to MyProject.pot
+
+Open the file in an editor and modify the first three lines in the comment header. 
+
+Set Project-Id-Version and Report-Msgid-Bugs-To appropriate values.
+
+Ensure Content-Type contains charset=UTF-8 or use sed:
+
+	sed -i -e 's/charset=ASCII/charset=UTF-8/g' MyProject.pot
 
 
 Create a PO file for each new translation
------------------------------------------
+=========================================
 
 http://www.gnu.org/software/gettext/manual/gettext.html#Creating
 
-To create a translation file for new language (for example German, de), run from the terminal:
+To create for example the Russian (ru) translation file, run from the terminal in the po directory:
 
-msginit --locale=de --input=inputSource.pot‏
+	msginit --locale=ru --input=MyProject.pot --no-translator‏
 
-which creates the file de.po (same name as the language code).
+Move the output file, ru.po, to po/ru and rename from ru.po to MyProject.po
 
-Place de.po into a directory called de under the po directory.
+Open po/ru/MyProject.po in a text editor. 
 
-Rename the file from de.po to inputSource.po
+Replace the first line in the header
 
-Edit inputSource.po and ensure that PO-Revision-Date and Last-Translator are updated.
+	# SOME DESCRIPTIVE TITLE.
 
-For each msgid ensure the msgstr is filled out for the language.
+with
 
-The build-debian script at the main project directory will automatically build the .mo files and package them for distribution.
+	# Russian translation for MyProject.
+
+
+Replace fourth line in the header
+
+	# Automatically generated, ...
+
+with
+
+	# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+
+replacing each tag as appropriate.
+
+Replace 
+
+	"Last-Translator: Automatically generated\n"
+
+with translator name and email address.
+
+Replace
+
+	"Language-Team: none\n"
+
+with team name (typically the name of the language in English).
+
+For each msgid, replace with the appropriate translated text.
+
+
+
+						The build-debian script at the main project directory will automatically build the .mo files and package them for distribution.
+
+TODO: How does a translator take an existing PO file and merge/update?
