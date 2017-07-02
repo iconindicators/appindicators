@@ -39,18 +39,14 @@ Create the PO Template (POT) file
 
 In a terminal from the project home directory, generate the PO template file:
 
-	xgettext --files-from=po/POTFILES.in
+	xgettext --files-from=po/POTFILES.in --output=po/MyProject.pot
 
-This will create messages.po containing strings for all .py files.
-Move messages.po to the po directory and rename to MyProject.pot
-
-Open the file in an editor and modify the first three lines in the comment header. 
-
+Open MyProject.pot in a text editor.
+Edit the first three lines in the comment header.
 Set Project-Id-Version and Report-Msgid-Bugs-To appropriate values.
-
 Ensure Content-Type contains charset=UTF-8 or use sed:
 
-	sed -i -e 's/charset=ASCII/charset=UTF-8/g' MyProject.pot
+	sed -i -e 's/.*Content-Type.*/"Content-Type: text\/plain; charset=UTF-8\\n"/g' po/MyProject.pot
 
 
 Create a PO file for each new translation
