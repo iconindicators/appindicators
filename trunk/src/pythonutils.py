@@ -18,9 +18,6 @@
 # General utilities.
 
 
-import gettext
-gettext.install( "pythonutils" )
-
 from gi.repository import Gtk
 import datetime, logging.handlers, os, pickle, shutil, subprocess, sys
 
