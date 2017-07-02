@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pythonutils 1.0.0\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-06-23 09:37+1000\n"
+"POT-Creation-Date: 2017-07-02 13:21+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: pythonutils.py:128
+#: src/pythonutils.py:127
 msgid "Preferences"
 msgstr ""
 
-#: pythonutils.py:132
+#: src/pythonutils.py:131
 msgid "About"
 msgstr ""
 
-#: pythonutils.py:136
+#: src/pythonutils.py:135
 msgid "Quit"
 msgstr ""
