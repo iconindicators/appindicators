@@ -9,10 +9,6 @@
 PYTHON_UTILS=../PythonUtils
 
 
-#TODO Put in some flag to say we need pythonutils in the build...and then a check if the pot/po file is not present.
-
-
-
 # Supported themes and corresponding colours.
 themeNames=(   "Adwaita" "elementary-xfce-darker" "Lubuntu" "ubuntu-mono-dark" "ubuntu-mono-light" )
 themeColours=(  bebebe             f3f3f3          4c4c4c          dfdbd2             3c3c3c       )
@@ -89,35 +85,25 @@ copyHicolorCreateThemed()
 copyPOCreateMO()
 {
   # Copy entire po directory.
-#  rsync -ar --exclude=.svn $PYTHON_UTILS/po build/$NAME-$VERSION
   rsync -ar --exclude=.svn po build/$NAME-$VERSION
 
-  # Append translations from pythonutils to pot/po files.
+  # Append translations from pythonutils to POT.
   msgcat --use-first build/$NAME-$VERSION/po/$NAME.pot $PYTHON_UTILS/po/pythonutils.pot --output-file=build/$NAME-$VERSION/po/$NAME.pot
 
-#  string="31/2/3/4"
-#  array=(`echo $string | sed 's/\//\n/g'`)
-#  echo ${array[${#array[@]}-1]}
-
+  # Append translations from pythonutils to PO files.
   for PO_FILE in $(find build/$NAME-$VERSION/po -type f -name '*.po') ; do
-    echo $PO_FILE
 
     # Get the language code.  Split the PO_FILE into an array using / as the delimiter.
     array=(`echo $PO_FILE | sed 's/\//\n/g'`)
     languageCode=${array[${#array[@]}-2]}
-    #echo $languageCode
 
     msgcat --use-first $PO_FILE $PYTHON_UTILS/po/$languageCode/pythonutils.po --output-file=$PO_FILE
-#    msgfmt $PO_FILE --output-file ${PO_FILE%\.po}.mo
   done
 
   # Create .mo files.
-#  for PO_FILE in $(find build/$NAME-$VERSION/po -type f -name '*.po') ; do
-#    msgfmt $PO_FILE --output-file ${PO_FILE%\.po}.mo
-#  done
-
-  # Include PythonUtils in POTFILES.in
-#  echo "src/pythonutils.py" >>build/$NAME-$VERSION/po/POTFILES.in
+  for PO_FILE in $(find build/$NAME-$VERSION/po -type f -name '*.po') ; do
+    msgfmt $PO_FILE --output-file ${PO_FILE%\.po}.mo
+  done
 }
 
 
