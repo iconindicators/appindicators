@@ -96,6 +96,8 @@ For each msgid, replace with the appropriate translated text.
 
 
 
-						The build-debian script at the main project directory will automatically build the .mo files and package them for distribution.
+TODO: Need this line?
+	The build-debian script at the main project directory will automatically build the .mo files and package them for distribution.
 
-TODO: How does a translator take an existing PO file and merge/update?
+
+TODO: How does a translator take an existing PO file and merge/update changes from a new POT release?
