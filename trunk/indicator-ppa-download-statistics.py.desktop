@@ -1,8 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=PPA Download Statistics Indicator
-Comment=Display the download counts Launchpad PPAs.
 Icon=indicator-ppa-download-statistics
 Exec=/usr/share/indicator-ppa-download-statistics/indicator-ppa-download-statistics.py
-Categories=Utility;
+Categories=Utility
 X-GNOME-Autostart-enabled=true
