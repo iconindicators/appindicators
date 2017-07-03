@@ -1,7 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=Lunar Indicator
-Comment=Displays lunar, solar, planetary, comet, star and satellite information.
 Icon=indicator-lunar
 Exec=/usr/share/indicator-lunar/indicator-lunar.py
 Categories=Utility
