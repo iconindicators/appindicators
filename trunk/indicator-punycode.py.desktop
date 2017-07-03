@@ -1,8 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Punycode Indicator
-Comment=Convert domain names between Unicode and ASCII.
 Icon=indicator-punycode
 Exec=/usr/share/indicator-punycode/indicator-punycode.py
-Categories=Utility;
+Categories=Utility
 X-GNOME-Autostart-enabled=true
