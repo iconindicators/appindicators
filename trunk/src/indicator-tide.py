@@ -106,7 +106,7 @@ class IndicatorTide:
             self.buildMenu( tidalReadings )
             self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
     
-            if tidalReadings is None or len( tidalReadings ) == 0:
+            if len( tidalReadings ) == 0:
                 message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
                 Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
@@ -505,7 +505,7 @@ class IndicatorTide:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
-            tidalReadings = None
+            tidalReadings = [ ]
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
         return tidalReadings
