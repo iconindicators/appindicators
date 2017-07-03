@@ -1,7 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=Fortune Indicator
-Comment=Calls the 'fortune' program displaying the result in the on-screen notification.
 Icon=indicator-fortune
 Exec=/usr/share/indicator-fortune/indicator-fortune.py
 Categories=Utility;Amusement
