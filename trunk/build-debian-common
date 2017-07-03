@@ -23,9 +23,6 @@ doStandardBuild()
   copyTopLevelAndSource $1
   copyHicolorCreateThemed $2 $3
   copyPOCreateMO
-  echo build/$NAME-$VERSION/po/$NAME.pot
-  echo build/$NAME-$VERSION/po/$NAME.mo
-  msgfmt build/$NAME-$VERSION/po/$NAME.pot --output-file build/$NAME-$VERSION/po/$NAME.mo
   createOrigTarGz
   copyDebian
   addIconsToDebianInstall $2
