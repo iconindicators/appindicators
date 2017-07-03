@@ -87,6 +87,9 @@ copyPOCreateMO()
   # Copy entire po directory.
   rsync -ar --exclude=.svn po build/$NAME-$VERSION
 
+  # Copy README from pythonutils.
+  cp $PYTHON_UTILS/po/README build/$NAME-$VERSION/po
+
   # Append translations from pythonutils to POT.
   msgcat --use-first build/$NAME-$VERSION/po/$NAME.pot $PYTHON_UTILS/po/pythonutils.pot --output-file=build/$NAME-$VERSION/po/$NAME.pot
 
