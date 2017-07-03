@@ -1,8 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Tide Indicator
-Comment=Displays tidal information.
 Icon=indicator-tide
 Exec=/usr/share/indicator-tide/indicator-tide.py
-Categories=Utility;
+Categories=Utility
 X-GNOME-Autostart-enabled=true
