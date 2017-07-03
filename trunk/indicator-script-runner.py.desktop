@@ -1,8 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Script Runner Indicator
-Comment=Run a terminal command or script from the indicator menu.
 Icon=indicator-script-runner
 Exec=/usr/share/indicator-script-runner/indicator-script-runner.py
-Categories=Utility;
+Categories=Utility
 X-GNOME-Autostart-enabled=true
