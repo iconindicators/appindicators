@@ -194,13 +194,13 @@ def showAboutDialog(
         aboutDialog.hide()
 
 
-# Writes a dict as a binary file.
+# Writes an object as a binary file.
 #
-# data: The dict to write.
+# data: The object to write.
 # cachePath: File system path to the directory location of the cache.
 # baseName: Text used, along with a timestamp, to form the binary file name.
 #
-# For the application "fred" to write the dict objects "maryDict" and "janeDict":
+# For the application "fred" to write the objects "maryDict" and "janeDict":
 #
 #    writeToCache( maryDict, ~/.cache/fred/, mary, logging )
 #    writeToCache( janeDict, ~/.cache/fred/, jane, logging )
@@ -223,7 +223,13 @@ def writeToCache( data, cachePath, baseName, logging ):
 # Reads the most recent file from the cache for the given base name.
 # Removes out of date cache files.
 #
-# Returns a tuple of the data (either None or a non-empty dict) and the corresponding date/time as string (either None or the date/time).
+# cachePath: File system path to the directory location of the cache.
+# baseName: Text used, along with a timestamp, to form the binary file name.
+# cacheMaximumDateTime: If any file is older than the date/time,
+#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
+#                       the file will be discarded.  
+#
+# Returns a tuple of the data (either None or the object) and the corresponding date/time as string (either None or the date/time).
 def readFromCache( cachePath, baseName, cacheMaximumDateTime, logging ):
     # Read all files in the cache and keep a list of those which match the base name.
     # Any file matching the base name but is older than the cache maximum date/time id deleted.
