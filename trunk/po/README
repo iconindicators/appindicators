@@ -102,22 +102,14 @@ Updating POT and PO files
 
 If text has been added/edited/removed, simply create a new POT file as above.
 
-TODO: How does a translator take an existing PO file and merge/update changes from a new POT release?
+For a translator to update an existing PO file, take the newly generated POT file and
+from the terminal:
 
+    msgmerge MyProject.po MyProject.pot -o MyProject.po
 
+Which replaces the existing MyProject.po with a new/merged version.
 
-From Oleg:
-In order to do the updated translation every time I use the command:
-
-msgmerge indicator-fortune-old.po indicator-fortune.pot -o 
-indicator-fortune.po
-
-This command fills the translations for the strings which haven't 
-changed using the former translation file and adds the translations 
-which were changed slightly, marking them with the tag "fuzzy".
-I check the whole file, update "fuzzy" translations, create new 
-translations which weren't found in the former file and finally update 
-the header.
-
-Who will perform the merge of indicator-fortune.po and pythonutils.po 
-translations?
+Translations for the strings which haven't changed are copied across.
+Translations which have slightly changed are mark with the tag "fuzzy".
+Update "fuzzy" translations as appropriate.
+Update the header as appropriate.
