@@ -123,7 +123,7 @@ class IndicatorFortune:
 
             self._refreshFortune()
             self._showFortune()
-            self.updateTimerID = GLib.timeout_add_seconds( self.refreshIntervalInMinutes * 60, self.showNewFortune, True )
+            self.updateTimerID = GLib.timeout_add_seconds( int( self.refreshIntervalInMinutes ) * 60, self.showNewFortune, True )
 
 
     def _showFortune( self ):
