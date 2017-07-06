@@ -115,7 +115,7 @@ class IndicatorTide:
         indent = "    "
         menu = Gtk.Menu()
 
-        if tidalReadings is None or len( tidalReadings ) == 0:
+        if len( tidalReadings ) == 0:
             menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
         else:
             previousMonth = -1
@@ -447,6 +447,11 @@ class IndicatorTide:
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_ALL, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
 
+        cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
+        cacheDateBasename = "tidal-"
+        cachedAgeInHours = 24 * 8 # The UKHO shows tidal readings for today and the next week, so remove files older than that.
+        cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( cachedAgeInHours ) )
+
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
         else:
@@ -462,7 +467,7 @@ class IndicatorTide:
             today = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0, microsecond = 0 )
             todayMonth = today.strftime( "%b" ).upper() # "SEP"
             lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-            for index, line in enumerate( lines ):
+            for index, line in enumerate( lines ): # It is assumed the tidal data is presented in date/time order.
                 if "class=\"PortName\"" in line:
                     portName = line[ line.find( ">" ) + 1 : line.find( "</span>" ) ].title()
                     country = line[ line.find( "class=\"CountryPredSummary\">" ) + len( "class=\"CountryPredSummary\">" ) : line.find( "</span></li>" ) ].title()
@@ -500,7 +505,11 @@ class IndicatorTide:
 
                     for index, item in enumerate( waterLevelTypes ):
                         tideTime = datetime.datetime.strptime( times[ index ], "%H:%M" )
-                        tidalReadings.append( tide.Reading( ( portName + ", " + country ), tideDate.month, tideDate.day, tideTime.hour, tideTime.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
+                        tidalReadings.append( tide.Reading( ( portName + ", " + country ), tideDate.year, tideDate.month, tideDate.day, tideTime.hour, tideTime.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
+
+            if len( tidalReadings ) > 0: # Only write to the cache if there is data...
+                print( "Writing to cache" ) #TODO Remove
+                pythonutils.writeToCache( tidalReadings, cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
 
         except Exception as e:
             logging.exception( e )
@@ -508,6 +517,36 @@ class IndicatorTide:
             tidalReadings = [ ]
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
+
+        
+        
+        
+        for tidalReading in list( tidalReadings ): # Iterate over a copy of the list so that removal can take place (if required).
+            tideDate = datetime.datetime.strptime( str( tidalReading.getYear() ) + " " + str( tidalReading.getMonth() ) + " " + str( tidalReading.getDay() ), "%Y %m %d" )
+            print( tideDate, type( tideDate ) )
+            print( tidalReading.day, tidalReading.month, tidalReading.year )
+            print()
+ 
+        today = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0, microsecond = 0 )
+        print( today, type( today ) )
+        
+
+
+        
+        # If there is no data - no internet connection, website has no data or some other error - read from the cache.
+        if len( tidalReadings ) == 0:
+            tidalReadings, cacheDateTime = pythonutils.readFromCache( cachePath, cacheDateBasename, datetime.datetime.now() - datetime.timedelta( hours = ( cachedAgeInHours ) ), logging )
+            if tidalReadings is None:
+                tidalReadings = [ ]
+ 
+            elif len( tidalReadings ) > 0:
+                today = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0, microsecond = 0 )
+                for tidalReading in list( tidalReadings ): # Iterate over a copy of the list so that removal can take place (if required).
+                    tideDate = datetime.datetime.strptime( str( tidalReading.getYear() ) + " " + str( tidalReading.getMonth() ) + " " + str( tidalReading.getDay() ), "%Y %m %d" )
+#                     tidalReadings.remove( tide )
+
+            #TODO If empty/None to to []; otherwise, sort tidal readings by date/time; remove old tidal readings.  If empty after all of that, set to []
+
         return tidalReadings
 
 
