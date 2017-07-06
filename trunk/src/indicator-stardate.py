@@ -106,7 +106,7 @@ class IndicatorStardate:
                 # For '2009 revised' the rollover only happens at midnight...so use that for the timer!        
                 now = datetime.datetime.utcnow()
                 oneSecondAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
-                numberOfSecondsToNextUpdate = ( oneSecondAfterMidnight - now ).total_seconds()
+                numberOfSecondsToNextUpdate = int( ( oneSecondAfterMidnight - now ).total_seconds() )
 
             self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
             self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.update, True )
