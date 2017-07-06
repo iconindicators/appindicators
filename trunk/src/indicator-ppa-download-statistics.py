@@ -1265,7 +1265,7 @@ class IndicatorPPADownloadStatistics:
             if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
-            numberWorkers = totalPublishedBinaries if totalPublishedBinaries <= 10 else 5
+            numberWorkers = totalPublishedBinaries if totalPublishedBinaries <= 10 else 5 # If the total published binaries is less than or equal to ten, get them in one go, otherwise break into chunks of five.
             with concurrent.futures.ThreadPoolExecutor( max_workers = numberWorkers ) as executor:
                 results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
                 for result in concurrent.futures.as_completed( results ):
