@@ -199,6 +199,9 @@ def showAboutDialog(
 # data: The object to write.
 # cachePath: File system path to the directory location of the cache.
 # baseName: Text used, along with a timestamp, to form the binary file name.
+# cacheMaximumDateTime: If any file is older than the date/time,
+#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
+#                       the file will be discarded.  
 #
 # For the application "fred" to write the objects "maryDict" and "janeDict":
 #
@@ -209,7 +212,12 @@ def showAboutDialog(
 #
 #    ~/.cache/fred/mary-20170629174950
 #    ~/.cache/fred/jane-20170629174951
-def writeToCache( data, cachePath, baseName, logging ):
+def writeToCache( data, cachePath, baseName, cacheMaximumDateTime, logging ):
+    __createCache( cachePath )
+
+    # Read all files in the cache and keep a list of those which match the base name.
+    __clearCache( cachePath, baseName, cacheMaximumDateTime )
+
     filename = cachePath + baseName + datetime.datetime.now().strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
     try:
         with open( filename, "wb" ) as f:
@@ -231,19 +239,18 @@ def writeToCache( data, cachePath, baseName, logging ):
 #
 # Returns a tuple of the data (either None or the object) and the corresponding date/time as string (either None or the date/time).
 def readFromCache( cachePath, baseName, cacheMaximumDateTime, logging ):
+    __createCache( cachePath )
+    
     # Read all files in the cache and keep a list of those which match the base name.
-    # Any file matching the base name but is older than the cache maximum date/time id deleted.
-    cacheMaximumDateTimeString = cacheMaximumDateTime.strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+    __clearCache( cachePath, baseName, cacheMaximumDateTime )
+
+    # Any file matching the base name is kept.
     files = [ ]
     for file in os.listdir( cachePath ):
         if file.startswith( baseName ):
-            fileDateTime = file[ file.index( baseName ) + len( baseName ) : ]
-            if fileDateTime < cacheMaximumDateTimeString:
-                os.remove( cachePath + file )
-            else:
-                files.append( file )
+            files.append( file )
 
-    # Sort the matching files by date.  All file(s) will be newer than the cache maximum date/time.
+    # Sort the matching files by date - all file(s) will be newer than the cache maximum date/time.
     files.sort()
     data = None
     dateTime = None
@@ -269,6 +276,31 @@ def readFromCache( cachePath, baseName, cacheMaximumDateTime, logging ):
         dateTime = None
 
     return ( data, dateTime )
+
+
+# Removes out of date cache files.
+#
+# cachePath: File system path to the directory location of the cache.
+# baseName: Text used, along with a timestamp, to form the binary file name.
+# cacheMaximumDateTime: If any file is older than the date/time,
+#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
+#                       the file will be discarded.  
+def __clearCache( cachePath, baseName, cacheMaximumDateTime ):
+    # Read all files in the cache and any file matching the base name but older than the cache maximum date/time id deleted.
+    cacheMaximumDateTimeString = cacheMaximumDateTime.strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+    for file in os.listdir( cachePath ):
+        if file.startswith( baseName ):
+            fileDateTime = file[ file.index( baseName ) + len( baseName ) : ]
+            if fileDateTime < cacheMaximumDateTimeString:
+                os.remove( cachePath + file )
+
+
+# Creates the cache.
+#
+# cachePath: File system path to the directory location of the cache.
+def __createCache( cachePath ):
+    if not os.path.exists( cachePath ):
+        os.makedirs( cachePath )
 
 
 # Log file handler.  Truncates the file when the file size limit is reached.
