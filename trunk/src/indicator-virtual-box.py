@@ -99,7 +99,7 @@ class IndicatorVirtualBox:
                 GLib.source_remove( self.updateTimerID )
 
             self.buildMenu()
-            self.updateTimerID = GLib.timeout_add_seconds( 60 * self.refreshIntervalInMinutes, self.update, True )
+            self.updateTimerID = GLib.timeout_add_seconds( int( 60 * self.refreshIntervalInMinutes ), self.update, True )
 
 
     def buildMenu( self ):
