@@ -20,12 +20,13 @@ class Type: H, L = range( 2 )
 
 class Reading:
     # portName: name of the port/location.
-    # month, day, hour, minute: integer date/time components for when the tide type occurs.
+    # year, month, day, hour, minute: integer date/time components for when the tide type occurs.
     # levelInMetres: the level of the tide type (float, integer or string).
     # tideType: the type of the tide, either "H" or "L" string.
     # url: The URL used to source the tide information.
-    def __init__( self, portName, month, day, hour, minute, levelInMetres, tideType, url ):
+    def __init__( self, portName, year, month, day, hour, minute, levelInMetres, tideType, url ):
         self.portName = portName
+        self.year = year
         self.month = month
         self.day = day
         self.hour = hour
@@ -40,6 +41,9 @@ class Reading:
 
 
     def getPortName( self ): return self.portName
+
+
+    def getYear( self ): return self.year
 
 
     def getMonth( self ): return self.month
@@ -65,7 +69,11 @@ class Reading:
     def getURL( self ): return self.url
 
 
-    def __str__( self ): return self.portName + " | " + str( self.month ) + "-" + str( self.day ) + "-" + str( self.hour ) + "-" + str( self.minute ) + " | " + str( self.levelInMetres ) + " | " + str( self.tideType )
+    def __str__( self ):
+        return self.portName + " | " + \
+               str( self.year ) + "-" + str( self.month ) + "-" + str( self.day ) + "-" + str( self.hour ) + "-" + str( self.minute ) + " | " + \
+               str( self.levelInMetres ) + " | " + \
+               str( self.tideType )
 
 
     def __repr__( self ): return self.__str__()
