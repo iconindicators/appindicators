@@ -155,7 +155,7 @@ class IndicatorPunycode:
                     self.results = self.results[ : self.resultHistoryLength ]
 
                 GLib.idle_add( self.pasteToClipboard, None, protocol + convertedText + pathQuery )
-                Glib.idle_add( self.buildMenu )
+                GLib.idle_add( self.buildMenu )
 
             except Exception as e:
                 logging.exception( e )
