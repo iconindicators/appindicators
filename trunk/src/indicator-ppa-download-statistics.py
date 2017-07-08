@@ -34,8 +34,8 @@
 #  http://help.launchpad.net/API/Hacking
 
 
-#TODO Current version 57 oot of the box does not find any downloads.
-# Removing the filter then works...is this a bug and does it still exist?
+#TODO Current released version 57 with the sample filter in place DOES NOT find any downloads!
+# Removing the filter then works...is this a bug and does it still exist in the new code?
 
 
 INDICATOR_NAME = "indicator-ppa-download-statistics"
