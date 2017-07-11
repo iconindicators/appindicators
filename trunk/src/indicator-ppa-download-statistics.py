@@ -1168,6 +1168,30 @@ class IndicatorPPADownloadStatistics:
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
 
+    def getPublishedBinaries( self, ppa, filter ):
+        if filter is None:
+            baseURL = self.getLaunchPadURL( ppa, None, None )
+        else:
+            baseURL = self.getLaunchPadURL( ppa, None, filter )
+
+        count = 0
+        while( count < numberOfPublishedBinaries ):
+            try:
+                publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( count ) ).read().decode( "utf8" ) )
+                numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
+                if numberOfPublishedBinaries == 0:
+                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+                else:
+                    self.processPublishedBinariesNEW( ppa, publishedBinaries, numberOfPublishedBinaries )
+
+                count += 75 # The number of results per page.
+
+            except Exception as e:
+                logging.exception( e )
+                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                count = numberOfPublishedBinaries # Terminate the loop.
+
+
     def getPPADownloadStatisticsNEW( self ):
 #         with self.lock:
 #             self.downloadInProgress = True
@@ -1201,30 +1225,6 @@ class IndicatorPPADownloadStatistics:
             Notify.Notification.new( _( "Statistics downloaded!" ), "", IndicatorPPADownloadStatistics.ICON ).show()
 
         self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.
-
-
-    def getPublishedBinaries( self, ppa, filter ):
-        if filter is None:
-            baseURL = self.getLaunchPadURL( ppa, None, None )
-        else:
-            baseURL = self.getLaunchPadURL( ppa, None, filter )
-
-        count = 0
-        while( count < numberOfPublishedBinaries ):
-            try:
-                publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( count ) ).read().decode( "utf8" ) )
-                numberOfPublishedBinaries = publishedBinaries[ "total_size" ]
-                if numberOfPublishedBinaries == 0:
-                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
-                else:
-                    self.processPublishedBinariesNEW( ppa, publishedBinaries, numberOfPublishedBinaries )
-
-                count += 75 # The number of results per page.
-
-            except Exception as e:
-                logging.exception( e )
-                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-                count = numberOfPublishedBinaries # Terminate the loop.
 
 
     # Use a thread pool executer to get the download count within each published binary.
@@ -1372,4 +1372,37 @@ def getDownloadCountNEW( ppa, publishedBinaries, index ):
     return result
 
 
-if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
+#if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
+
+
+
+
+# https://stackapps.com/questions/2/api-hello-world-code
+
+import requests
+
+API_KEY     = "VN8jyf7k8STlkO3lx*iw6w(("
+
+BASEURL = "https://api.stackexchange.com/2.2/info" + "?key=" + API_KEY
+
+
+u = "https://api.stackexchange.com/2.2/info"
+params = {
+  "site" : "stackoverflow"
+  }
+
+
+BASEURL = "https://api.stackexchange.com/2.2/errors"
+params = { }
+
+
+BASEURL = "https://api.stackexchange.com/2.2//users/364002/inbox/unread?site=stackoverflow"
+params = { }
+
+
+
+
+
+r = requests.get( BASEURL + apiurl, params=params)
+
+print( r.json() )
