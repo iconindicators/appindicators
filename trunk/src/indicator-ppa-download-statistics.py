@@ -1372,7 +1372,15 @@ def getDownloadCountNEW( ppa, publishedBinaries, index ):
     return result
 
 
-#if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
+if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
+
+
+
+# URLS:
+# https://stackoverflow.com/questions/36343556/how-to-use-oauth2-to-access-stackexchange-api
+# https://security.stackexchange.com/questions/119225/oauth2-and-authentication
+# https://api.stackexchange.com/docs/authentication
+# https://api.stackexchange.com/docs/user-unread-inbox
 
 
 
