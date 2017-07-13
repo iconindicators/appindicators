@@ -112,6 +112,8 @@ class IndicatorTide:
                 Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
 
+
+#TODO day/month/time should be in local time of user, not the port local time...so convert the downloaded data to UTC and then convert to user local time zone?    
     def buildMenu( self, tidalReadings ):
         indent = "    "
         menu = Gtk.Menu()
