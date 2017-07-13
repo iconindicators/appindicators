@@ -446,7 +446,7 @@ class IndicatorTide:
 
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
         defaultLocale = locale.getlocale( locale.LC_TIME )
-        locale.setlocale( locale.LC_ALL, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
+        locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
 
         cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
         cacheDateBasename = "tidal-"
