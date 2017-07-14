@@ -112,8 +112,6 @@ class IndicatorTide:
                 Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
 
-
-#TODO day/month/time should be in local time of user, not the port local time...so convert the downloaded data to UTC and then convert to user local time zone?    
     def buildMenu( self, tidalReadings ):
         indent = "    "
         menu = Gtk.Menu()
@@ -454,6 +452,8 @@ class IndicatorTide:
         cacheDateBasename = "tidal-"
         cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( 24 * 8 ) ) # The UKHO shows tidal readings for today and the next week, so remove files older than that.
 
+#TODO Make sure port id 825A works with this code.        
+#TODO Make sure port id 73 works with this code.        
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
         else:
@@ -461,6 +461,44 @@ class IndicatorTide:
 
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
               "&PredictionLength=7&DaylightSavingOffset=" + str( daylightSavingOffset ) + "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+        url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1894A&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+        # Negative UTC offset
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2168&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Positive UTC offset
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4000&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # LW reading is negative
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1411&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW reading
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=3983&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1894A&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing HW and LW time
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2168&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=5088&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW and HW reading
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=0839&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW time
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1800&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1049&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4302&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1920&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW reading and LW time
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4000&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4060&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4157&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4324&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=3578&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW time and LW/HW reading
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4273&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
 
         try:
             tidalReadings = [ ]
@@ -503,8 +541,10 @@ class IndicatorTide:
                         if len( item.strip() ) > 0:
                             waterLevelsInMetres.append( item[ 0 : 3 ] )
 
+#TODO day/month/time should be in local time of user, not the port local time...so convert the downloaded data to UTC and then convert to user local time zone?    
                     for index, item in enumerate( waterLevelTypes ):
                         tideTime = datetime.datetime.strptime( times[ index ], "%H:%M" )
+# list: ['01:09', '&nbsp;', '14:48', '&nbsp;'] TODO Testing
                         tidalReadings.append( tide.Reading( ( portName + ", " + country ), tideDate.year, tideDate.month, tideDate.day, tideTime.hour, tideTime.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
 
             if len( tidalReadings ) > 0: # Only write to the cache if there is data...
