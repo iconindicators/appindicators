@@ -445,6 +445,147 @@ class IndicatorTide:
 
 
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
+#         defaultLocale = locale.getlocale( locale.LC_TIME )
+#         locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
+
+        cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
+        cacheDateBasename = "tidal-"
+        cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( 24 * 8 ) ) # The UKHO shows tidal readings for today and the next week, so remove files older than that.
+
+        if portID[ -1 ].isalpha():
+            portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
+        else:
+            portIDForURL = portID.rjust( 4, "0" )
+
+#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
+#               "&PredictionLength=7&DaylightSavingOffset=" + str( daylightSavingOffset ) + "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+        #TODO Sydney
+#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=6037&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+        # TODO Chille
+#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=9893&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+        # utc -3
+#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2168&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+        # utc +10
+#         url  = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=6037&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+        # utc = 0
+#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=0083&PredictionLength=7&DaylightSavingOffset=0&HeightUnits=0&GraphSize=7"
+
+
+        # utc + 3 30
+#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4302&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+        # If the data is stored in UTC, then do the conversion to local time in the menu build.  So this code is not needed here.
+        import time
+        ts = time.time()
+        localUTCOffset = int( ( datetime.datetime.fromtimestamp( ts ) - datetime.datetime.utcfromtimestamp( ts ) ).total_seconds() / 3600 )
+
+        try:
+            tidalReadings = [ ]
+
+
+            utcTodayMidnight = datetime.datetime.now( datetime.timezone.utc ).replace( hour = 0, minute = 0, second = 0, microsecond = 0 ) #TODO Should be UTC midnight.
+            utcTodayMonth = utcTodayMidnight.strftime( "%b" ).upper() # "SEP"
+
+            today = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0, microsecond = 0 ) #TODO Should be UTC midnight.
+            todayMonth = today.strftime( "%b" ).upper() # "SEP"
+
+            lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+            for index, line in enumerate( lines ): # It is assumed the tidal data is presented in date/time order.
+
+                if "class=\"PortName\"" in line:
+                    portName = line[ line.find( ">" ) + 1 : line.find( "</span>" ) ].title()
+                    country = line[ line.find( "class=\"CountryPredSummary\">" ) + len( "class=\"CountryPredSummary\">" ) : line.find( "</span></li>" ) ].title()
+
+                if "Port predictions" in line: # Tidal times are in the local time of the port - need to obtain the UTC offset for the port.
+                    if "equal to UTC" in line: # "Port predictions (Standard Local Time) are equal to UTC"
+                        utcOffset = "+0000"
+
+                    elif "hours from UTC" in line:
+                        utcOffset = line[ line.index( "are" ) + 4 : line.index( "hours" ) - 1 ]
+                        if len( utcOffset ) == 3: # "Port predictions (Standard Local Time) are +10 hours from UTC"
+                            utcOffset += "00"
+                        else:
+                            utcOffset = utcOffset[ 0 ] + "0" + utcOffset[ 1 ] + "00" # "Port predictions (Standard Local Time) are -3 hours from UTC"
+
+                    elif "mins from UTC" in line:
+                        hours = line[ line.index( "are" ) + 4 : line.index( "hours" ) - 1 ] 
+                        if len( hours ) == 2:
+                            hours = hours[ 0 ] + "0" + hours[ 1 ]
+
+                        minutes = line[ line.index( "hours" ) + 6 : line.index( "mins" ) - 1 ] 
+                        utcOffset = hours + minutes
+
+                if "HWLWTableHeaderCell" in line:
+                    tideDate = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # "Sat 24 Sep" in the timezone of the port.
+                    tideMonth = tideDate[ -3 : ].upper() # "SEP"
+                    tideYear = today.year
+                    if tideMonth == "JAN" and todayMonth == "DEC":
+                        tideYear = today.year + 1
+                    elif tideMonth == "DEC" and todayMonth == "JAN":
+                        tideYear = today.year - 1
+
+                    tideDate = datetime.datetime.strptime( tideDate + " " + str( tideYear ), "%a %d %b %Y" ) #TODO Needs to include the timezone offset and then convert to UTC timezone.
+                    if tideDate < today: # Only add data from today onward. 
+                        continue
+
+                    waterLevelTypes = [ ]
+                    line = lines[ index + 2 ]
+                    for item in line.split( "<th class=\"HWLWTableHWLWCellPrintFriendly\">" ):
+                        if len( item.strip() ) > 0:
+                            waterLevelTypes.append( item[ 0 : 1 ] )
+
+                    times = [ ]
+                    line = lines[ index + 4 ]
+                    for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
+                        if len( item.strip() ) > 0:
+                            times.append( item[ 0 : 6 ].strip() )
+
+                    waterLevelsInMetres = [ ]
+                    line = lines[ index + 6 ]
+                    for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
+                        if len( item.strip() ) > 0:
+                            waterLevelsInMetres.append( item[ 0 : 3 ] )
+
+#TODO day/month/time should be in local time of user, not the port local time...so convert the downloaded data to UTC and then convert to user local time zone?    
+#Store the data in UTC and the menu converts to local timezone?  Allows running (and storing) in one timezone and using the cached data in another timezone.
+                    for index, item in enumerate( waterLevelTypes ):
+                        tideTime = datetime.datetime.strptime( times[ index ], "%H:%M" )
+# list: ['01:09', '&nbsp;', '14:48', '&nbsp;'] TODO Testing
+                        tidalReadings.append( tide.Reading( ( portName + ", " + country ), tideDate.year, tideDate.month, tideDate.day, tideTime.hour, tideTime.minute, waterLevelsInMetres[ index ], waterLevelTypes[ index ], url ) )
+
+            if len( tidalReadings ) > 0: # Only write to the cache if there is data...
+                pythonutils.writeToCache( tidalReadings, cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
+            tidalReadings = [ ]
+
+#         locale.setlocale( locale.LC_TIME, defaultLocale )
+
+        # If there is no data - no internet connection, website has no data or some other error - read from the cache.
+        if len( tidalReadings ) == 0:
+#TODO Need to ensure the port ID for the cached data matches that currently set.
+#TODO Need to check if the cached data user's timezone matches the currently running timezone?
+            tidalReadings, cacheDateTime = pythonutils.readFromCache( cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
+            if tidalReadings is None:
+                tidalReadings = [ ]
+
+            elif len( tidalReadings ) > 0:
+                for tidalReading in list( tidalReadings ): # Iterate over a copy of the list so that removal (if required) can take place.
+                    tidalReadingDate = datetime.datetime.strptime( str( tidalReading.getYear() ) + " " + str( tidalReading.getMonth() ) + " " + str( tidalReading.getDay() ), "%Y %m %d" )
+                    if tidalReadingDate < today:
+                        tidalReadings.remove( tidalReading )
+
+        return tidalReadings
+
+
+    def getTidalDataFromUnitedKingdomHydrographicOfficeORIGINAL( self, portID, daylightSavingOffset ):
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object in a non-English locale.
 
@@ -452,8 +593,6 @@ class IndicatorTide:
         cacheDateBasename = "tidal-"
         cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( 24 * 8 ) ) # The UKHO shows tidal readings for today and the next week, so remove files older than that.
 
-#TODO Make sure port id 825A works with this code.        
-#TODO Make sure port id 73 works with this code.        
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
         else:
