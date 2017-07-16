@@ -475,9 +475,12 @@ class IndicatorTide:
         # utc = 0
 #         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=0083&PredictionLength=7&DaylightSavingOffset=0&HeightUnits=0&GraphSize=7"
 
-
         # utc + 3 30
 #         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4302&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+
+        
+        url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4273&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
         # If the data is stored in UTC, then do the conversion to local time in the menu build.  So this code is not needed here.
         import time
@@ -492,7 +495,7 @@ class IndicatorTide:
             utcTodayMonth = utcTodayMidnight.strftime( "%b" ).upper() # "SEP"
 
             today = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0, microsecond = 0 ) #TODO Should be UTC midnight.
-            todayMonth = today.strftime( "%b" ).upper() # "SEP"
+            todayMonth = today.strftime( "%b" ).upper() # "SEP" #TODO Why upper?
 
             lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for index, line in enumerate( lines ): # It is assumed the tidal data is presented in date/time order.
@@ -521,17 +524,22 @@ class IndicatorTide:
                         utcOffset = hours + minutes
 
                 if "HWLWTableHeaderCell" in line:
-                    tideDate = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # "Sat 24 Sep" in the timezone of the port.
-                    tideMonth = tideDate[ -3 : ].upper() # "SEP"
-                    tideYear = today.year
-                    if tideMonth == "JAN" and todayMonth == "DEC":
-                        tideYear = today.year + 1
-                    elif tideMonth == "DEC" and todayMonth == "JAN":
-                        tideYear = today.year - 1
+                    date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # "Sat 24 Sep" in the timezone of the port.
+                    weekDay = date[ 0 : 3 ] # "Sat"
+                    dayOfMonth = date[ 4 : 6 ] # "24"
+                    month = date[ -3 : ] # "Sep"
 
-                    tideDate = datetime.datetime.strptime( tideDate + " " + str( tideYear ), "%a %d %b %Y" ) #TODO Needs to include the timezone offset and then convert to UTC timezone.
-                    if tideDate < today: # Only add data from today onward. 
-                        continue
+#                     tideDate = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # "Sat 24 Sep" in the timezone of the port.
+#                     tideMonth = tideDate[ -3 : ].upper() # "SEP"
+#                     tideYear = today.year
+#                     if tideMonth == "JAN" and todayMonth == "DEC":
+#                         tideYear = today.year + 1
+#                     elif tideMonth == "DEC" and todayMonth == "JAN":
+#                         tideYear = today.year - 1
+
+#                     tideDate = datetime.datetime.strptime( tideDate + " " + str( tideYear ), "%a %d %b %Y" ) #TODO Needs to include the timezone offset and then convert to UTC timezone.
+#                     if tideDate < today: # Only add data from today onward. 
+#                         continue
 
                     waterLevelTypes = [ ]
                     line = lines[ index + 2 ]
@@ -543,13 +551,22 @@ class IndicatorTide:
                     line = lines[ index + 4 ]
                     for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
                         if len( item.strip() ) > 0:
-                            times.append( item[ 0 : 6 ].strip() )
+                            try:
+                                times.append( datetime.datetime.strptime( item[ 0 : 6 ].strip(), "%H:%M" ) )
+                            except ValueError:
+                                times.append( None ) #TODO How is None saved to the cache?
 
                     waterLevelsInMetres = [ ]
                     line = lines[ index + 6 ]
+                    import re #TODO Move to top if kept.
+                    pattern = re.compile( "[0-9]\.[0-9]" ) #TODO Move to outside loop if kept.
                     for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
                         if len( item.strip() ) > 0:
-                            waterLevelsInMetres.append( item[ 0 : 3 ] )
+                            level = item[ 0 : 3 ]
+                            if not pattern.match( level ):
+                                level = None #TODO How is None saved to the cache?
+
+                            waterLevelsInMetres.append( level )
 
 #TODO day/month/time should be in local time of user, not the port local time...so convert the downloaded data to UTC and then convert to user local time zone?    
 #Store the data in UTC and the menu converts to local timezone?  Allows running (and storing) in one timezone and using the cached data in another timezone.
