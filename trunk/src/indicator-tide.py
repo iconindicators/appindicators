@@ -112,6 +112,7 @@ class IndicatorTide:
                 Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
 
+#TODO From Oleg: What do you think whether it worth to add some switch like "Show local time of events | Show port local time of events"?
     def buildMenu( self, tidalReadings ):
         indent = "    "
         menu = Gtk.Menu()
@@ -123,10 +124,11 @@ class IndicatorTide:
             previousDay = -1
             firstTideReading = True
             for tidalReading in tidalReadings:
+#TODO The prev/first day/month might not work any more now that dates are in UTC but shown in local (sorted in UTC does not match up with showing in local).  Try Salamader Bay 6030
                 if firstTideReading:
                     firstMonth = tidalReading.getMonth()
                     firstDay = tidalReading.getDay()
-                    self.createAndAppendMenuItem( menu, tidalReading.getPortName(), tidalReading.getURL() )
+                    self.createAndAppendMenuItem( menu, tidalReading.getPortName(), tidalReading.getURL() ) #TODO Consider storing the port ID in the tide object rather than port name.
 
                 tideDateTime = datetime.datetime( datetime.datetime.now().year, tidalReading.getMonth(), tidalReading.getDay(), tidalReading.getHour(), tidalReading.getMinute(), 0, 0, datetime.timezone.utc ).astimezone()
 
@@ -483,8 +485,8 @@ class IndicatorTide:
         else:
             portIDForURL = portID.rjust( 4, "0" )
 
-#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
-#               "&PredictionLength=7&DaylightSavingOffset=" + str( daylightSavingOffset ) + "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+        url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
+              "&PredictionLength=7&DaylightSavingOffset=" + str( daylightSavingOffset ) + "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
         #TODO Sydney
 #         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=6037&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
@@ -507,7 +509,7 @@ class IndicatorTide:
 
         
 #         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4273&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
-        url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4615&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4615&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
 #TODO Needed?
         # If the data is stored in UTC, then do the conversion to local time in the menu build.  So this code is not needed here.
@@ -527,7 +529,9 @@ class IndicatorTide:
 
         try:
             tidalReadings = [ ]
-            levelPattern = re.compile( "[0-9]\.[0-9]" )
+            levelPositivePattern = re.compile( "^[0-9]\.[0-9]" )
+            levelNegativePattern = re.compile( "^-?[0-9]\.[0-9]" )
+            print( url )
             lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for index, line in enumerate( lines ): # It is assumed the tidal data is presented in date/time order.
 
@@ -557,12 +561,18 @@ class IndicatorTide:
                 if "PredictionSummary1_lblPredictionStart" in line:
                     startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time)
                     startYear = startDate[ 3 ] # 2017
-                    startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
+                    try:
+                        startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
+                    except Exception as e:
+                            print( e )
 
                 if "HWLWTableHeaderCell" in line:
                     date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # Mon 17 Jul (standard local time)
                     dayOfMonth = date[ 4 : 6 ] # 17
-                    month = str( datetime.datetime.strptime( date[ -3 : ], "%b" ).month ) # 7
+                    try:
+                        month = str( datetime.datetime.strptime( date[ -3 : ], "%b" ).month ) # 7
+                    except Exception as e:
+                            print( e )
                     year = startYear
                     if month < startMonth:
                         year = startYear + 1
@@ -594,11 +604,14 @@ class IndicatorTide:
                     line = lines[ index + 6 ]
                     for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
                         if len( item.strip() ) > 0:
-                            level = item[ 0 : 3 ]
-                            if not levelPattern.match( level ):
-                                level = None #TODO How is None saved to the cache?
+                            if levelPositivePattern.match( item ):
+                                levels.append( item[ 0 : 3 ] )
+                            elif levelNegativePattern.match( item ):
+                                levels.append( item[ 0 : 4 ] )
+                            else:
+                                levels.append( None ) #TODO How is None saved to the cache?
 
-                            levels.append( level )
+                    print( levels )
 
 #TODO day/month/time should be in local time of user, not the port local time...so convert the downloaded data to UTC and then convert to user local time zone?    
 #Store the data in UTC and the menu converts to local timezone?  Allows running (and storing) in one timezone and using the cached data in another timezone.
@@ -609,6 +622,8 @@ class IndicatorTide:
                             tidalReading = tide.Reading( ( portName + ", " + country ), dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, levels[ index ], types[ index ], url ) #TODO Url?
 
                         tidalReadings.append( tidalReading )
+                        
+                    print()
 
         except Exception as e:
             print( e ) #TODO Remove
