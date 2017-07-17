@@ -41,7 +41,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
-import datetime, json, locale, logging, os, ports, pythonutils, threading, tide, time, webbrowser
+import datetime, json, locale, logging, os, ports, pythonutils, re, threading, tide, time, webbrowser
 
 
 class IndicatorTide:
@@ -454,7 +454,10 @@ class IndicatorTide:
         daylightSavingOffset = None
 
         tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( portID, daylightSavingOffset )
-        
+ 
+#TODO Sort out if needed or not...
+#    check for old data?
+#    caching?
         if len( tidalReadings ) > 0: # Only write to the cache if there is data...
             pythonutils.writeToCache( tidalReadings, cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
         else:
@@ -506,23 +509,25 @@ class IndicatorTide:
 #         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4273&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4615&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
+#TODO Needed?
         # If the data is stored in UTC, then do the conversion to local time in the menu build.  So this code is not needed here.
-        import time
-        ts = time.time()
-        localUTCOffset = int( ( datetime.datetime.fromtimestamp( ts ) - datetime.datetime.utcfromtimestamp( ts ) ).total_seconds() / 3600 )
+#         import time
+#         ts = time.time()
+#         localUTCOffset = int( ( datetime.datetime.fromtimestamp( ts ) - datetime.datetime.utcfromtimestamp( ts ) ).total_seconds() / 3600 )
+
+#TODO Needed?
+#         utcTodayMidnight = datetime.datetime.now( datetime.timezone.utc ).replace( hour = 0, minute = 0, second = 0, microsecond = 0 ) #TODO Should be UTC midnight.
+#         utcTodayMonth = utcTodayMidnight.strftime( "%b" ).upper() # "SEP"
+#         today = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0, microsecond = 0 ) #TODO Should be UTC midnight.
+#         todayMonth = today.strftime( "%b" ).upper() # "SEP" #TODO Why upper?
+
+
+        defaultLocale = locale.getlocale( locale.LC_TIME )
+        locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object when in a non-English locale.
 
         try:
             tidalReadings = [ ]
-
-            utcTodayMidnight = datetime.datetime.now( datetime.timezone.utc ).replace( hour = 0, minute = 0, second = 0, microsecond = 0 ) #TODO Should be UTC midnight.
-            utcTodayMonth = utcTodayMidnight.strftime( "%b" ).upper() # "SEP"
-
-            today = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0, microsecond = 0 ) #TODO Should be UTC midnight.
-            todayMonth = today.strftime( "%b" ).upper() # "SEP" #TODO Why upper?
-
-            import re #TODO Move to top if kept.
             levelPattern = re.compile( "[0-9]\.[0-9]" )
-
             lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for index, line in enumerate( lines ): # It is assumed the tidal data is presented in date/time order.
 
@@ -610,6 +615,8 @@ class IndicatorTide:
             logging.exception( e )
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = [ ]
+
+        locale.setlocale( locale.LC_TIME, defaultLocale )
 
         return tidalReadings
 
