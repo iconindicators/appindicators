@@ -124,18 +124,17 @@ class IndicatorTide:
             previousDay = -1
             firstTideReading = True
             for tidalReading in tidalReadings:
-#TODO The prev/first day/month might not work any more now that dates are in UTC but shown in local (sorted in UTC does not match up with showing in local).  Try Salamader Bay 6030
+                tidalDateTime = tidalReading.getDateTimeUTC().astimezone() # Date time now in user local time zone.
+
                 if firstTideReading:
-                    firstMonth = tidalReading.getMonth()
-                    firstDay = tidalReading.getDay()
+                    firstMonth = tidalDateTime.month
+                    firstDay = tidalDateTime.day
                     self.createAndAppendMenuItem( menu, tidalReading.getPortName(), tidalReading.getURL() ) #TODO Consider storing the port ID in the tide object rather than port name.
 
-                tideDateTime = datetime.datetime( datetime.datetime.now().year, tidalReading.getMonth(), tidalReading.getDay(), tidalReading.getHour(), tidalReading.getMinute(), 0, 0, datetime.timezone.utc ).astimezone()
-
-                if not( tidalReading.getMonth() == previousMonth and tidalReading.getDay() == previousDay ):
-                    menuItemText = indent + tideDateTime.strftime( self.menuItemDateFormat )
+                if not( tidalDateTime.month == previousMonth and tidalDateTime.day == previousDay ):
+                    menuItemText = indent + tidalDateTime.strftime( self.menuItemDateFormat )
                     if self.showAsSubMenus:
-                        if self.showAsSubMenusExceptFirstDay and firstMonth == tidalReading.getMonth() and firstDay == tidalReading.getDay():
+                        if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTime.month and firstDay == tidalDateTime.day:
                             self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
                         else:
                             subMenu = Gtk.Menu()
@@ -143,7 +142,7 @@ class IndicatorTide:
                     else:
                         self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
 
-                menuItemText = tideDateTime.strftime( self.menuItemTideFormat )
+                menuItemText = tidalDateTime.strftime( self.menuItemTideFormat )
 
                 if tidalReading.getType() == tide.Type.H:
                     menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
@@ -153,7 +152,7 @@ class IndicatorTide:
                 menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tidalReading.getLevelInMetres() ) + " m" )
 
                 if self.showAsSubMenus:
-                    if self.showAsSubMenusExceptFirstDay and firstMonth == tidalReading.getMonth() and firstDay == tidalReading.getDay():
+                    if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTime.month and firstDay == tidalDateTime.day:
                         self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
                     else:
                         self.createAndAppendMenuItem( subMenu, menuItemText, tidalReading.getURL() )
@@ -161,8 +160,8 @@ class IndicatorTide:
                     self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
 
                 firstTideReading = False
-                previousMonth = tidalReading.getMonth()
-                previousDay = tidalReading.getDay()
+                previousMonth = tidalDateTime.month
+                previousDay = tidalDateTime.day
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
