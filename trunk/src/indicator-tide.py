@@ -63,6 +63,7 @@ class IndicatorTide:
     SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
     SETTINGS_MENU_ITEM_DATE_FORMAT = "menuItemDateFormat"
     SETTINGS_MENU_ITEM_TIDE_FORMAT = "menuItemTideFormat"
+    SETTINGS_MENU_ITEM_TIDE_FORMAT_SANS_TIME = "menuItemTideFormatSansTime"
     SETTINGS_PORT_ID = "portID"
     SETTINGS_SHOW_AS_SUBMENUS = "showAsSubmenus"
     SETTINGS_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY = "showAsSubmenusExceptFirstDay"
@@ -72,6 +73,7 @@ class IndicatorTide:
     MENU_ITEM_TIDE_LEVEL_TAG = "[LEVEL]" # The level of the tide in metres.
     MENU_ITEM_TIDE_TYPE_TAG = "[TYPE]" # The tide type, either high or low.
     MENU_ITEM_TIDE_DEFAULT_FORMAT = MENU_ITEM_TIME_DEFAULT_FORMAT + "    " + MENU_ITEM_TIDE_TYPE_TAG + "    " + MENU_ITEM_TIDE_LEVEL_TAG
+    MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME = "                         " + MENU_ITEM_TIDE_TYPE_TAG + "    " + MENU_ITEM_TIDE_LEVEL_TAG
 
 
     def __init__( self ):
@@ -148,7 +150,7 @@ class IndicatorTide:
 #                     menuItemText = tidalDateTimeUTC.astimezone().strftime( self.menuItemTideFormat ) # Date time now in user local time zone.
                     menuItemText = tidalDateTimeUTC.strftime( self.menuItemTideFormat ) # TODO Put back above
                 else:
-                    menuItemText = "" # There is no time component to the tidal information.
+                    menuItemText = self.menuItemTideFormatSansTime
 
                 if tidalReading.getType() == tide.Type.H:
                     menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
@@ -325,10 +327,16 @@ class IndicatorTide:
 
         grid.attach( box, 0, 2, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
+        label = Gtk.Label( _( "Tide format" ) )
+        label.set_margin_top( 10 )
+        label.set_halign( Gtk.Align.START )
 
-        box.pack_start( Gtk.Label( _( "Tide format" ) ), False, False, 0 )
+        grid.attach( label, 0, 3, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+
+        box.pack_start( Gtk.Label( _( "General" ) ), False, False, 0 )
 
         tideFormat = Gtk.Entry()
         tideFormat.set_text( self.menuItemTideFormat )
@@ -341,13 +349,31 @@ class IndicatorTide:
             "http://docs.python.org/3/library/datetime.html" ) )
         box.pack_start( tideFormat, True, True, 0 )
 
-        grid.attach( box, 0, 3, 1, 1 )
+        grid.attach( box, 0, 4, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+
+        box.pack_start( Gtk.Label( _( "In absentia" ) ), False, False, 0 )
+
+        tideFormatSansTime = Gtk.Entry()
+        tideFormatSansTime.set_text( self.menuItemTideFormatSansTime )
+        tideFormatSansTime.set_hexpand( True )
+        tideFormatSansTime.set_tooltip_text( _(
+            "Tide information is specified using:\n\n" + \
+            "    [TYPE] - the tide is high or low.\n" + \
+            "    [LEVEL] - the tide level, measured in metres.\n\n" + \
+            "This format is used when the tide reading\n" + \
+            "contains no time component." ) )
+        box.pack_start( tideFormatSansTime, True, True, 0 )
+
+        grid.attach( box, 0, 5, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorTide.DESKTOP_FILE, logging ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
-        grid.attach( autostartCheckbox, 0, 4, 1, 1 )
+        grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
@@ -364,8 +390,9 @@ class IndicatorTide:
             self.portID = ports.getPortIDForCountryAndPortName( country, port )
             self.showAsSubMenus = showAsSubmenusCheckbox.get_active()
             self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbox.get_active()
-            self.menuItemDateFormat = dateFormat.get_text().strip()
-            self.menuItemTideFormat = tideFormat.get_text().strip()
+            self.menuItemDateFormat = dateFormat.get_text()
+            self.menuItemTideFormat = tideFormat.get_text()
+            self.menuItemTideFormatSansTime = tideFormatSansTime.get_text()
             self.saveSettings()
             pythonutils.setAutoStart( IndicatorTide.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.update, False )
@@ -394,6 +421,7 @@ class IndicatorTide:
     def loadSettings( self ):
         self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
         self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
+        self.menuItemTideFormatSansTime = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME
         self.portID = None
         self.showAsSubMenus = True
         self.showAsSubMenusExceptFirstDay = True
@@ -405,6 +433,7 @@ class IndicatorTide:
 
                 self.menuItemDateFormat = settings.get( IndicatorTide.SETTINGS_MENU_ITEM_DATE_FORMAT, self.menuItemDateFormat )
                 self.menuItemTideFormat = settings.get( IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT, self.menuItemTideFormat )
+                self.menuItemTideFormatSansTime = settings.get( IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT_SANS_TIME, self.menuItemTideFormatSansTime )
                 self.portID = settings.get( IndicatorTide.SETTINGS_PORT_ID, self.portID )
                 self.showAsSubMenus = settings.get( IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS, self.showAsSubMenus )
                 self.showAsSubMenusExceptFirstDay = settings.get( IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, self.showAsSubMenusExceptFirstDay )
@@ -432,13 +461,17 @@ class IndicatorTide:
             self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
 
         if self.menuItemTideFormat is None:
-            self.menuItemTideFormat = MENU_ITEM_TIDE_DEFAULT_FORMAT
+            self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
+
+        if self.menuItemTideFormatSansTime is None:
+            self.menuItemTideFormatSansTime = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME
 
 
     def saveSettings( self ):
         settings = {
             IndicatorTide.SETTINGS_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
             IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
+            IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT_SANS_TIME: self.menuItemTideFormatSansTime,
             IndicatorTide.SETTINGS_PORT_ID: self.portID,
             IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS: self.showAsSubMenus,
             IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY: self.showAsSubMenusExceptFirstDay
@@ -570,7 +603,6 @@ class IndicatorTide:
             tidalReadings = [ ]
             levelPositivePattern = re.compile( "^[0-9]\.[0-9]" )
             levelNegativePattern = re.compile( "^-?[0-9]\.[0-9]" )
-            print( url )
             lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for index, line in enumerate( lines ): # It is assumed the tidal data is presented in date/time order.
 
@@ -661,7 +693,7 @@ class IndicatorTide:
                             tidalReadings.append( tide.Reading( portName, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, None, tideType, url ) )
 
                         elif levels[ index ] is not None: # Date/level but no time (add in None for time components and anyone using get time methods must handle).
-                            tidalReadings.append( tide.Reading( portName, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, None, None, levels[ index ], tideType, url ) )
+                            tidalReadings.append( tide.Reading( portName, int( year ), int( month ), int( dayOfMonth ), None, None, levels[ index ], tideType, url ) )
 
         except Exception as e:
             print( e ) #TODO Remove but somehow bubble a message back to the user...or is empty data good enough as a flag?
@@ -671,6 +703,7 @@ class IndicatorTide:
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
 
+        for t in tidalReadings: print( t )
         return tidalReadings
 
 
