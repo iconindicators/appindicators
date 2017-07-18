@@ -44,6 +44,9 @@ from urllib.request import urlopen
 import datetime, json, locale, logging, os, ports, pythonutils, re, threading, tide, time, webbrowser
 
 
+
+#TODO If caching is not used, remove from debian changelog!
+
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
