@@ -115,6 +115,8 @@ class IndicatorTide:
 
 
 #TODO From Oleg: What do you think whether it worth to add some switch like "Show local time of events | Show port local time of events"?
+#Potentially could have a three way switch: port local, user local, UTC.  
+# Why/how would anyone use/want other than local?
     def buildMenu( self, tidalReadings ):
         indent = "    "
         menu = Gtk.Menu()
@@ -126,7 +128,7 @@ class IndicatorTide:
             previousDay = -1
             firstTideReading = True
             for tidalReading in tidalReadings:
-                tidalDateTimeUTC = tidalReading.getDateTimeUTC().astimezone() # Date time now in user local time zone.
+                tidalDateTimeUTC = tidalReading.getDateTimeUTC().astimezone() # Date/time now in local time zone.
 
                 if firstTideReading:
                     firstMonth = tidalDateTimeUTC.month
@@ -135,7 +137,7 @@ class IndicatorTide:
                     firstTideReading = False
 
                 if not( tidalDateTimeUTC.month == previousMonth and tidalDateTimeUTC.day == previousDay ):
-                    menuItemText = indent + tidalDateTimeUTC.strftime( self.menuItemDateFormat ) # Date time now in user local time zone.
+                    menuItemText = indent + tidalDateTimeUTC.strftime( self.menuItemDateFormat )
 
                     if self.showAsSubMenus:
                         if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeUTC.month and firstDay == tidalDateTimeUTC.day:
@@ -318,8 +320,8 @@ class IndicatorTide:
         dateFormat.set_text( self.menuItemDateFormat )
         dateFormat.set_hexpand( True )
         dateFormat.set_tooltip_text( _(
-            "Formatting options are specified at\n" + \
-            "http://docs.python.org/3/library/datetime.html" ) )
+            "Formatting options for the date:\n\n" + \
+            "    http://docs.python.org/3/library/datetime.html" ) )
 
         box.pack_start( dateFormat, True, True, 0 )
 
@@ -343,8 +345,8 @@ class IndicatorTide:
             "Tide information is specified using:\n\n" + \
             "    [TYPE] - the tide is high or low.\n" + \
             "    [LEVEL] - the tide level, measured in metres.\n\n" + \
-            "Formatting options for the time are specified at\n" + \
-            "http://docs.python.org/3/library/datetime.html" ) )
+            "Formatting options for the time:\n\n" + \
+            "    http://docs.python.org/3/library/datetime.html" ) )
         box.pack_start( tideFormat, True, True, 0 )
 
         grid.attach( box, 0, 4, 1, 1 )
@@ -361,7 +363,7 @@ class IndicatorTide:
             "Tide information is specified using:\n\n" + \
             "    [TYPE] - the tide is high or low.\n" + \
             "    [LEVEL] - the tide level, measured in metres.\n\n" + \
-            "This format is used when the tide reading\n" + \
+            "This format is used when a tide reading\n" + \
             "contains no time component." ) )
         box.pack_start( tideFormatSansTime, True, True, 0 )
 
