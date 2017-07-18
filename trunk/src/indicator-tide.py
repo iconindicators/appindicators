@@ -127,7 +127,6 @@ class IndicatorTide:
             firstTideReading = True
             for tidalReading in tidalReadings:
                 tidalDateTimeUTC = tidalReading.getDateTimeUTC().astimezone() # Date time now in user local time zone.
-                print( "UTC out:", tidalDateTimeUTC, type( tidalDateTimeUTC ) )
 
                 if firstTideReading:
                     firstMonth = tidalDateTimeUTC.month
@@ -189,8 +188,7 @@ class IndicatorTide:
         return menuItem
 
 
-    # Determines if the computer is currently in daylight savings or not (for the given time zone)
-    # and if so, computer the offset amount in minutes.
+    # Computes the current daylight savings offset in minutes.
     # If the computer is not in daylight savings, the offset is zero.
     # http://stackoverflow.com/questions/13464009/calculate-tm-isdst-from-date-and-timezone
     def getDaylightSavingsOffsetInMinutes( self ):
@@ -597,10 +595,8 @@ class IndicatorTide:
                         if len( item.strip() ) > 0:
                             try:
                                 hourMinute = item.strip()[ 0 : 5 ]
-                                print( "Local:", year, month, dayOfMonth, hourMinute, utcOffset ) #TODO Remove
                                 dateTimeLocal = datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" )
                                 dateTimes.append( dateTimeLocal.astimezone( datetime.timezone.utc ) )
-                                print( "UTC:", dateTimes[ -1 ] )#TODO Remove
 
                             except ValueError:
                                 dateTimes.append( None ) #TODO How is None saved to the cache?
