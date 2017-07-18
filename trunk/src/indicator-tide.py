@@ -124,17 +124,19 @@ class IndicatorTide:
             previousDay = -1
             firstTideReading = True
             for tidalReading in tidalReadings:
-                tidalDateTime = tidalReading.getDateTimeUTC().astimezone() # Date time now in user local time zone.
+                tidalDateTimeUTC = tidalReading.getDateTimeUTC()
 
                 if firstTideReading:
-                    firstMonth = tidalDateTime.month
-                    firstDay = tidalDateTime.day
+                    firstMonth = tidalDateTimeUTC.month
+                    firstDay = tidalDateTimeUTC.day
                     self.createAndAppendMenuItem( menu, tidalReading.getPortName(), tidalReading.getURL() ) #TODO Consider storing the port ID in the tide object rather than port name.
+                    firstTideReading = False
 
-                if not( tidalDateTime.month == previousMonth and tidalDateTime.day == previousDay ):
-                    menuItemText = indent + tidalDateTime.strftime( self.menuItemDateFormat )
+                if not( tidalDateTimeUTC.month == previousMonth and tidalDateTimeUTC.day == previousDay ):
+                    menuItemText = indent + tidalDateTimeUTC.strftime( self.menuItemDateFormat ) # Date time now in user local time zone.
+
                     if self.showAsSubMenus:
-                        if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTime.month and firstDay == tidalDateTime.day:
+                        if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeUTC.month and firstDay == tidalDateTimeUTC.day:
                             self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
                         else:
                             subMenu = Gtk.Menu()
@@ -142,26 +144,32 @@ class IndicatorTide:
                     else:
                         self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
 
-                menuItemText = tidalDateTime.strftime( self.menuItemTideFormat )
+                if type( tidalDateTimeUTC ) is datetime.datetime:
+#                     menuItemText = tidalDateTimeUTC.astimezone().strftime( self.menuItemTideFormat ) # Date time now in user local time zone.
+                    menuItemText = tidalDateTimeUTC.strftime( self.menuItemTideFormat ) # TODO Put back above
+                else:
+                    menuItemText = "" # There is no time component to the tidal information.
 
                 if tidalReading.getType() == tide.Type.H:
                     menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
-                else:
+                else: # The type must be either H or L - cannot be None.
                     menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "L" ) )
 
-                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tidalReading.getLevelInMetres() ) + " m" )
+                if tidalReading.getLevelInMetres() is None:
+                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, "" )
+                else:
+                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tidalReading.getLevelInMetres() ) + " m" )
 
                 if self.showAsSubMenus:
-                    if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTime.month and firstDay == tidalDateTime.day:
+                    if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeUTC.month and firstDay == tidalDateTimeUTC.day:
                         self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
                     else:
                         self.createAndAppendMenuItem( subMenu, menuItemText, tidalReading.getURL() )
                 else:
                     self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
 
-                firstTideReading = False
-                previousMonth = tidalDateTime.month
-                previousDay = tidalDateTime.day
+                previousMonth = tidalDateTimeUTC.month
+                previousDay = tidalDateTimeUTC.day
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
@@ -506,9 +514,41 @@ class IndicatorTide:
 #         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4302&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
 
-        
+        # Negative UTC offset
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2168&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Positive UTC offset
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4000&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # LW reading is negative
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1411&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW reading
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=3983&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1894A&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing HW and LW time
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2168&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=5088&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW and HW reading
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=0839&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW time
+        url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1800&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1049&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4302&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1920&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW reading and LW time
+#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4000&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4060&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4157&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4324&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=3578&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW time and LW/HW reading
 #         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4273&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
-#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4615&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
 #TODO Needed?
         # If the data is stored in UTC, then do the conversion to local time in the menu build.  So this code is not needed here.
@@ -537,13 +577,14 @@ class IndicatorTide:
                 if "class=\"PortName\"" in line:
                     portName = line[ line.find( ">" ) + 1 : line.find( "</span>" ) ].title()
                     country = line[ line.find( "class=\"CountryPredSummary\">" ) + len( "class=\"CountryPredSummary\">" ) : line.find( "</span></li>" ) ].title()
+                    portName += ", " + country
 
                 if "Port predictions" in line: # Tidal dateTimes are in the local time of the port - need to obtain the UTC offset for the port in the format +HHMM or -HHMM.
                     if "equal to UTC" in line: # "Port predictions (Standard Local Time) are equal to UTC"
                         utcOffset = "+0000"
 
-                    elif "hours from UTC" in line:
-                        utcOffset = line[ line.index( "are" ) + 4 : line.index( "hours" ) - 1 ]
+                    elif "hour from UTC" in line or "hours from UTC" in line:
+                        utcOffset = line[ line.index( "are" ) + 4 : line.index( "hour" ) - 1 ]
                         if len( utcOffset ) == 3: # "Port predictions (Standard Local Time) are +10 hours from UTC"
                             utcOffset += "00"
                         else:
@@ -560,18 +601,12 @@ class IndicatorTide:
                 if "PredictionSummary1_lblPredictionStart" in line:
                     startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time)
                     startYear = startDate[ 3 ] # 2017
-                    try:
-                        startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
-                    except Exception as e:
-                            print( e )
+                    startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
 
                 if "HWLWTableHeaderCell" in line:
                     date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # Mon 17 Jul (standard local time)
                     dayOfMonth = date[ 4 : 6 ] # 17
-                    try:
-                        month = str( datetime.datetime.strptime( date[ -3 : ], "%b" ).month ) # 7
-                    except Exception as e:
-                            print( e )
+                    month = str( datetime.datetime.strptime( date[ -3 : ], "%b" ).month ) # 7
                     year = startYear
                     if month < startMonth:
                         year = startYear + 1
@@ -585,7 +620,12 @@ class IndicatorTide:
                     line = lines[ index + 2 ]
                     for item in line.split( "<th class=\"HWLWTableHWLWCellPrintFriendly\">" ):
                         if len( item.strip() ) > 0:
-                            types.append( item[ 0 ] ) # H or L
+                            if item[ 0 ] == "H":
+                                types.append( tide.Type.H )
+                            elif item[ 0 ] == "L":
+                                types.append( tide.Type.L )
+                            else:
+                                types.append( None ) # TODO Test this.
 
                     dateTimes = [ ]
                     line = lines[ index + 4 ]
@@ -594,7 +634,8 @@ class IndicatorTide:
                             try:
                                 hourMinute = item.strip()[ 0 : 5 ]
                                 dateTimeLocal = datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" )
-                                dateTimes.append( dateTimeLocal.astimezone( datetime.timezone.utc ) )
+#                                 dateTimes.append( dateTimeLocal.astimezone( datetime.timezone.utc ) )
+                                dateTimes.append( dateTimeLocal ) # TODO Put back above
 
                             except ValueError:
                                 dateTimes.append( None ) #TODO How is None saved to the cache?
@@ -604,28 +645,26 @@ class IndicatorTide:
                     for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
                         if len( item.strip() ) > 0:
                             if levelPositivePattern.match( item ):
-                                levels.append( item[ 0 : 3 ] )
+                                levels.append( float( item[ 0 : 3 ] ) )
                             elif levelNegativePattern.match( item ):
-                                levels.append( item[ 0 : 4 ] )
+                                levels.append( float( item[ 0 : 4 ] ) )
                             else:
                                 levels.append( None ) #TODO How is None saved to the cache?
 
-                    print( levels )
-
 #TODO day/month/time should be in local time of user, not the port local time...so convert the downloaded data to UTC and then convert to user local time zone?    
 #Store the data in UTC and the menu converts to local timezone?  Allows running (and storing) in one timezone and using the cached data in another timezone.
-                    for index, item in enumerate( types ):
-                        if dateTimes[ index ] is None:
-                            tidalReading = tide.Reading( ( portName + ", " + country ), None, None, None, None, None, levels[ index ], types[ index ], url ) #TODO Why include the url?
-                        else:
-                            tidalReading = tide.Reading( ( portName + ", " + country ), dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, levels[ index ], types[ index ], url ) #TODO Url?
+                    for index, tideType in enumerate( types ):
+                        if dateTimes[ index ] is not None and levels[ index ] is not None: # Date/time/level is present.
+                            tidalReadings.append( tide.Reading( portName, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, levels[ index ], tideType, url ) )
 
-                        tidalReadings.append( tidalReading )
-                        
-                    print()
+                        elif dateTimes[ index ] is not None: # Date/time but no level.
+                            tidalReadings.append( tide.Reading( portName, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, None, tideType, url ) )
+
+                        elif levels[ index ] is not None: # Date/level but no time (add in None for time components and anyone using get time methods must handle).
+                            tidalReadings.append( tide.Reading( portName, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, None, None, levels[ index ], tideType, url ) )
 
         except Exception as e:
-            print( e ) #TODO Remove
+            print( e ) #TODO Remove but somehow bubble a message back to the user...or is empty data good enough as a flag?
             logging.exception( e )
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = [ ]

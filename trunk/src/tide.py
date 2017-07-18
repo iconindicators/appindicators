@@ -15,14 +15,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import datetime
+
+
 class Type: H, L = range( 2 )
 
 
 class Reading:
     # portName: name of the port/location.
-    # year, month, day, hour, minute: integer date/time components for when the tide type occurs (string).
-    # levelInMetres: the level of the tide type (string).
-    # tideType: the type of the tide, either "H" or "L" string.
+    # year, month, day, hour, minute: numerical date/time components for when the tide type occurs (integer).
+    # levelInMetres: the (positive or negative) level of the tide in metres (float).
+    # tideType: the type of the tide.
     # url: The URL used to source the tide information.
     def __init__( self, portName, year, month, day, hour, minute, levelInMetres, tideType, url ):
         self.portName = portName
@@ -32,12 +35,8 @@ class Reading:
         self.hour = hour
         self.minute = minute
         self.levelInMetres = levelInMetres
+        self.tideType = tideType
         self.url = url
-
-        if tideType == "H":
-            self.tideType = Type.H
-        else:
-            self.tideType = Type.L
 
 
     def getPortName( self ): return self.portName
@@ -69,11 +68,16 @@ class Reading:
     def getURL( self ): return self.url
 
 
+    def getDateTimeUTC( self ):
+        try: return datetime.datetime( self.year, self.month, self.day, self.hour, self.minute, 0, 0, datetime.timezone.utc )
+        except TypeError: return datetime.date( self.year, self.month, self.day )
+
+
     def __str__( self ):
         return self.portName + " | " + \
-               self.year + "-" + self.month + "-" + self.day + "-" + self.hour + "-" + self.minute + " | " + \
-               self.levelInMetres + " | " + \
-               self.tideType
+                str( self.year ) + "-" + str( self.month ) + "-" + str( self.day ) + "-" + str( self.hour ) + "-" + str( self.minute ) + " | " + \
+                str( self.levelInMetres ) + " | " + \
+                ( "H" if self.tideType == Type.H else "L" )
 
 
     def __repr__( self ): return self.__str__()
