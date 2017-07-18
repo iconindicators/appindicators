@@ -527,19 +527,6 @@ class IndicatorTide:
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
               "&PredictionLength=7&DaylightSavingOffset=" + str( daylightSavingOffset ) + "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
-#TODO Needed?
-        # If the data is stored in UTC, then do the conversion to local time in the menu build.  So this code is not needed here.
-#         import time
-#         ts = time.time()
-#         localUTCOffset = int( ( datetime.datetime.fromtimestamp( ts ) - datetime.datetime.utcfromtimestamp( ts ) ).total_seconds() / 3600 )
-
-#TODO Needed?
-#         utcTodayMidnight = datetime.datetime.now( datetime.timezone.utc ).replace( hour = 0, minute = 0, second = 0, microsecond = 0 ) #TODO Should be UTC midnight.
-#         utcTodayMonth = utcTodayMidnight.strftime( "%b" ).upper() # "SEP"
-#         today = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0, microsecond = 0 ) #TODO Should be UTC midnight.
-#         todayMonth = today.strftime( "%b" ).upper() # "SEP" #TODO Why upper?
-
-
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object when in a non-English locale.
 
@@ -626,8 +613,7 @@ class IndicatorTide:
                             else:
                                 levels.append( None ) #TODO How is None saved to the cache?
 
-#TODO day/month/time should be in local time of user, not the port local time...so convert the downloaded data to UTC and then convert to user local time zone?    
-#Store the data in UTC and the menu converts to local timezone?  Allows running (and storing) in one timezone and using the cached data in another timezone.
+#TODO Noticed that data for Tuesday was split over Mon and Tues for Fort Denison.
                     for index, tideType in enumerate( types ):
                         if dateTimes[ index ] is not None and levels[ index ] is not None: # Date/time/level is present.
                             tidalReadings.append( tide.Reading( portName, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, levels[ index ], tideType, url ) )
