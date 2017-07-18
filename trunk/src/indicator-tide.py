@@ -147,8 +147,7 @@ class IndicatorTide:
                         self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
 
                 if type( tidalDateTimeUTC ) is datetime.datetime:
-#                     menuItemText = tidalDateTimeUTC.astimezone().strftime( self.menuItemTideFormat ) # Date time now in user local time zone.
-                    menuItemText = tidalDateTimeUTC.strftime( self.menuItemTideFormat ) # TODO Put back above
+                    menuItemText = tidalDateTimeUTC.astimezone().strftime( self.menuItemTideFormat ) # Date time now in user local time zone.
                 else:
                     menuItemText = self.menuItemTideFormatSansTime
 
@@ -611,8 +610,7 @@ class IndicatorTide:
                             try:
                                 hourMinute = item.strip()[ 0 : 5 ]
                                 dateTimeLocal = datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" )
-#                                 dateTimes.append( dateTimeLocal.astimezone( datetime.timezone.utc ) )
-                                dateTimes.append( dateTimeLocal ) # TODO Put back above
+                                dateTimes.append( dateTimeLocal.astimezone( datetime.timezone.utc ) )
 
                             except ValueError:
                                 dateTimes.append( None ) #TODO How is None saved to the cache?
