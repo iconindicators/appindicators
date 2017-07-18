@@ -126,7 +126,8 @@ class IndicatorTide:
             previousDay = -1
             firstTideReading = True
             for tidalReading in tidalReadings:
-                tidalDateTimeUTC = tidalReading.getDateTimeUTC()
+                tidalDateTimeUTC = tidalReading.getDateTimeUTC().astimezone() # Date time now in user local time zone.
+                print( "UTC out:", tidalDateTimeUTC, type( tidalDateTimeUTC ) )
 
                 if firstTideReading:
                     firstMonth = tidalDateTimeUTC.month
@@ -147,7 +148,7 @@ class IndicatorTide:
                         self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
 
                 if type( tidalDateTimeUTC ) is datetime.datetime:
-                    menuItemText = tidalDateTimeUTC.astimezone().strftime( self.menuItemTideFormat ) # Date time now in user local time zone.
+                    menuItemText = tidalDateTimeUTC.strftime( self.menuItemTideFormat )
                 else:
                     menuItemText = self.menuItemTideFormatSansTime
 
@@ -596,8 +597,10 @@ class IndicatorTide:
                         if len( item.strip() ) > 0:
                             try:
                                 hourMinute = item.strip()[ 0 : 5 ]
+                                print( "Local:", year, month, dayOfMonth, hourMinute, utcOffset ) #TODO Remove
                                 dateTimeLocal = datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" )
                                 dateTimes.append( dateTimeLocal.astimezone( datetime.timezone.utc ) )
+                                print( "UTC:", dateTimes[ -1 ] )#TODO Remove
 
                             except ValueError:
                                 dateTimes.append( None ) #TODO How is None saved to the cache?
