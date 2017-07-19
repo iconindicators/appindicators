@@ -193,6 +193,10 @@ class IndicatorTide:
         return menuItem
 
 
+#TODO Pretty sure this needs to return the DST offset for the PORT, not the USER.
+#The DST dropdown on the UKHO website does not work as expected - in Sydney getting Fort Denison data
+#(timezones are the same) the DST drop down does not affect the tidal times.
+#Is this because Fort Denison (the port, rather than the user) is not in DST?
     # Computes the current daylight savings offset in minutes.
     # If the computer is not in daylight savings, the offset is zero.
     # http://stackoverflow.com/questions/13464009/calculate-tm-isdst-from-date-and-timezone
