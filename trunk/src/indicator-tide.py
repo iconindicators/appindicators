@@ -460,6 +460,7 @@ class IndicatorTide:
             if self.portID is None:
                 self.portID = ports.getFirstPortID()
 
+#TODO How can these be None?
         if self.menuItemDateFormat is None:
             self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
 
