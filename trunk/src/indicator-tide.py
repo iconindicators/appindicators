@@ -612,7 +612,6 @@ class IndicatorTide:
                             else:
                                 levels.append( None ) #TODO How is None saved to the cache?
 
-#TODO Noticed that data for Tuesday was split over Mon and Tues for Fort Denison.
                     for index, tideType in enumerate( types ):
                         if dateTimes[ index ] is not None and levels[ index ] is not None: # Date/time/level is present.
                             tidalReadings.append( tide.Reading( portName, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, levels[ index ], tideType, url ) )
@@ -624,7 +623,6 @@ class IndicatorTide:
                             tidalReadings.append( tide.Reading( portName, int( year ), int( month ), int( dayOfMonth ), None, None, levels[ index ], tideType, url ) )
 
         except Exception as e:
-            print( e ) #TODO Remove but somehow bubble a message back to the user...or is empty data good enough as a flag?
             logging.exception( e )
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = [ ]
