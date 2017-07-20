@@ -137,7 +137,8 @@ class IndicatorTide:
                 if firstTideReading:
                     firstMonth = tidalDateTimeUTC.month
                     firstDay = tidalDateTimeUTC.day
-                    self.createAndAppendMenuItem( menu, tidalReading.getPortName(), tidalReading.getURL() ) #TODO Consider storing the port ID in the tide object rather than port name.
+                    menuItemText = _( "{0}, {1}" ).format( ports.getPortName( tidalReading.getPortID() ), ports.getCountry( tidalReading.getPortID() ) )
+                    self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
                     firstTideReading = False
 
                 if not( tidalDateTimeUTC.month == previousMonth and tidalDateTimeUTC.day == previousDay ):
@@ -615,13 +616,13 @@ class IndicatorTide:
 
                     for index, tideType in enumerate( types ):
                         if dateTimes[ index ] is not None and levels[ index ] is not None: # Date/time/level is present.
-                            tidalReadings.append( tide.Reading( portName, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, levels[ index ], tideType, url ) )
+                            tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, levels[ index ], tideType, url ) )
 
                         elif dateTimes[ index ] is not None: # Date/time but no level.
-                            tidalReadings.append( tide.Reading( portName, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, None, tideType, url ) )
+                            tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, None, tideType, url ) )
 
                         elif levels[ index ] is not None: # Date/level but no time (add in None for time components and anyone using get time methods must handle).
-                            tidalReadings.append( tide.Reading( portName, int( year ), int( month ), int( dayOfMonth ), None, None, levels[ index ], tideType, url ) )
+                            tidalReadings.append( tide.Reading( portID, int( year ), int( month ), int( dayOfMonth ), None, None, levels[ index ], tideType, url ) )
 
         except Exception as e:
             logging.exception( e )
