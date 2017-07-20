@@ -29,6 +29,7 @@
 #  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 #  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
+#  http://www.ukho.gov.uk/easytide
 
 
 INDICATOR_NAME = "indicator-tide"
