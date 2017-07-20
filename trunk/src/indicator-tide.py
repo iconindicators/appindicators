@@ -464,16 +464,6 @@ class IndicatorTide:
             if self.portID is None:
                 self.portID = ports.getFirstPortID()
 
-#TODO How can these be None?
-        if self.menuItemDateFormat is None:
-            self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
-
-        if self.menuItemTideFormat is None:
-            self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
-
-        if self.menuItemTideFormatSansTime is None:
-            self.menuItemTideFormatSansTime = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME
-
 
     def saveSettings( self ):
         settings = {
