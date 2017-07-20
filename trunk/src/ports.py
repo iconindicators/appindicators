@@ -23,7 +23,7 @@ import time
 def isExpired(): return getExpiry() < time.strftime( "%Y-%m-%d" )
 
 
-# Obtain the non-UK port expiry date in YYYY-MM-DD.
+# Obtain the non-UK port expiration date in YYYY-MM-DD.
 def getExpiry(): return _UKHO_NON_UK_PORT_EXPIRY
 
 
