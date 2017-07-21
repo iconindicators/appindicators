@@ -486,40 +486,12 @@ class IndicatorTide:
             logging.error( "Error writing settings: " + IndicatorTide.SETTINGS_FILE )
 
 
-#TODO Not sure if this will be used...
-    def getTidalData( self ):
-        cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
-        cacheDateBasename = "tidal-"
-        cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( 24 * 8 ) ) # The UKHO shows tidal readings for today and the next week, so remove files older than that.
-
-        portID = None
-        daylightSavingOffset = None
-
-        tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( portID, daylightSavingOffset )
- 
-#TODO Sort out if needed or not...
-#    check for old data?
-#    caching?
-        if len( tidalReadings ) > 0: # Only write to the cache if there is data...
-            pythonutils.writeToCache( tidalReadings, cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
-        else:
-            # If there is no data - no internet connection, website has no data or some other error - read from the cache.
-#TODO Need to ensure the port ID for the cached data matches that currently set.
-#TODO Need to check if the cached data user's timezone matches the currently running timezone?
-            tidalReadings, cacheDateTime = pythonutils.readFromCache( cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
-            if tidalReadings is None:
-                tidalReadings = [ ]
-
-            elif len( tidalReadings ) > 0:
-                for tidalReading in list( tidalReadings ): # Iterate over a copy of the list so that removal (if required) can take place.
-                    tidalReadingDate = datetime.datetime.strptime( str( tidalReading.getYear() ) + " " + str( tidalReading.getMonth() ) + " " + str( tidalReading.getDay() ), "%Y %m %d" )
-                    if tidalReadingDate < today:
-                        tidalReadings.remove( tidalReading )
-
-        return tidalReadings
-
-
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
+#TODO Needed for eventual cache.
+#         cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
+#         cacheDateBasename = "tidal-"
+#         cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( 24 * 8 ) ) # The UKHO shows tidal readings for today and the next week, so remove files older than that.
+
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
         else:
@@ -630,6 +602,27 @@ class IndicatorTide:
             tidalReadings = [ ]
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
+
+#TODO Needed for eventual cache.
+# Need to check scraped data to see if it is old.
+# After removing any old data, cache.
+# If no valid data, read from cache.  Ensure cached data is from same port as current.
+# Check that the timezone/location/whatever of the cached data matches current.
+# Remove old data from cached data.
+# Return data (good or empty).
+#         if len( tidalReadings ) > 0: # Only write to the cache if there is data...
+#             pythonutils.writeToCache( tidalReadings, cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
+#         else:
+#             # If there is no data - no internet connection, website has no data or some other error - read from the cache.
+#             tidalReadings, cacheDateTime = pythonutils.readFromCache( cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
+#             if tidalReadings is None:
+#                 tidalReadings = [ ]
+# 
+#             elif len( tidalReadings ) > 0:
+#                 for tidalReading in list( tidalReadings ): # Iterate over a copy of the list so that removal (if required) can take place.
+#                     tidalReadingDate = datetime.datetime.strptime( str( tidalReading.getYear() ) + " " + str( tidalReading.getMonth() ) + " " + str( tidalReading.getDay() ), "%Y %m %d" )
+#                     if tidalReadingDate < today:
+#                         tidalReadings.remove( tidalReading )
 
         return tidalReadings
 
