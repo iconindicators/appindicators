@@ -598,6 +598,11 @@ class IndicatorTide:
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
 
+        return self.washTidalDataThroughCache( tidalReadings )
+
+
+    def washTidalDataThroughCache( self, tidalReadings ):
+        return tidalReadings
 #TODO Needed for eventual cache.
 #         cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
 #         cacheDateBasename = "tidal-"
@@ -622,8 +627,6 @@ class IndicatorTide:
 #                     tidalReadingDate = datetime.datetime.strptime( str( tidalReading.getYear() ) + " " + str( tidalReading.getMonth() ) + " " + str( tidalReading.getDay() ), "%Y %m %d" )
 #                     if tidalReadingDate < today:
 #                         tidalReadings.remove( tidalReading )
-
-        return tidalReadings
 
 
 if __name__ == "__main__": IndicatorTide().main()
