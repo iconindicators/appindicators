@@ -487,11 +487,6 @@ class IndicatorTide:
 
 
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
-#TODO Needed for eventual cache.
-#         cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
-#         cacheDateBasename = "tidal-"
-#         cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( 24 * 8 ) ) # The UKHO shows tidal readings for today and the next week, so remove files older than that.
-
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
         else:
@@ -604,6 +599,10 @@ class IndicatorTide:
         locale.setlocale( locale.LC_TIME, defaultLocale )
 
 #TODO Needed for eventual cache.
+#         cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
+#         cacheDateBasename = "tidal-"
+#         cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( 24 * 8 ) ) # The UKHO shows tidal readings for today and the next week, so remove files older than that.
+#
 # Need to check scraped data to see if it is old.
 # After removing any old data, cache.
 # If no valid data, read from cache.  Ensure cached data is from same port as current.
