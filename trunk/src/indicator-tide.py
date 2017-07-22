@@ -503,14 +503,14 @@ class IndicatorTide:
             levelPositivePattern = re.compile( "^[0-9]\.[0-9]" )
             levelNegativePattern = re.compile( "^-?[0-9]\.[0-9]" )
             lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-            for index, line in enumerate( lines ): # It is assumed the tidal data is presented in date/time order.
+            for index, line in enumerate( lines ): # The tidal data is presented in date/time order.
 
                 if "class=\"PortName\"" in line:
                     portName = line[ line.find( ">" ) + 1 : line.find( "</span>" ) ].title()
                     country = line[ line.find( "class=\"CountryPredSummary\">" ) + len( "class=\"CountryPredSummary\">" ) : line.find( "</span></li>" ) ].title()
                     portName += ", " + country
 
-                if "Port predictions" in line: # Tidal dateTimes are in the local time of the port - need to obtain the UTC offset for the port in the format +HHMM or -HHMM.
+                if "Port predictions" in line: # Tidal dateTimes are in the standard local time of the port - need to obtain the UTC offset for the port in the format +HHMM or -HHMM.
                     if "equal to UTC" in line: # "Port predictions (Standard Local Time) are equal to UTC"
                         utcOffset = "+0000"
 
@@ -530,7 +530,7 @@ class IndicatorTide:
                         utcOffset = hours + minutes
 
                 if "PredictionSummary1_lblPredictionStart" in line:
-                    startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time)
+                    startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time of the port)
                     startYear = startDate[ 3 ] # 2017
                     startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
 
