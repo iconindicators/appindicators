@@ -528,11 +528,6 @@ class IndicatorTide:
                     if month < startMonth:
                         year = startYear + 1
 
-#TODO Check and/or remove data out of date here?  The website should be up to date.  A particular reading could be AFTER our current time...drop it?
-#                     tideDate = datetime.datetime.strptime( tideDate + " " + str( tideYear ), "%a %d %b %Y" ) #TODO Needs to include the timezone offset and then convert to UTC timezone.
-#                     if tideDate < today: # Only add data from today onward. 
-#                         continue
-
                     types = [ ]
                     line = lines[ index + 2 ]
                     for item in line.split( "<th class=\"HWLWTableHWLWCellPrintFriendly\">" ):
@@ -583,6 +578,16 @@ class IndicatorTide:
             tidalReadings = [ ]
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
+
+        # Remove data prior to today (user local time zone).
+#TODO...
+        todayMidnight = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0 )
+        print( todayMidnight )
+        print( todayMidnight.tzinfo is None )
+        print( todayMidnight.tzinfo.utcoffset( todayMidnight ) is None )
+#         for tidalReading in list( tidalReadings ):
+#             if tidalReading.getDateTimeUTC().astimezone() < todayMidnight:
+#                 tidalReadings.remove( tidalReading )
 
         return self.washTidalDataThroughCache( tidalReadings )
 
