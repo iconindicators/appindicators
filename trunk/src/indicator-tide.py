@@ -109,7 +109,7 @@ class IndicatorTide:
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
-            tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID, self.getDaylightSavingsOffsetInMinutes() )
+            tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )
             self.buildMenu( tidalReadings )
             self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
     
@@ -195,27 +195,13 @@ class IndicatorTide:
         return menuItem
 
 
-#TODO Pretty sure this needs to return the DST offset for the PORT, not the USER.
-#The DST dropdown on the UKHO website does not work as expected - in Sydney getting Fort Denison data
-#(timezones are the same) the DST drop down does not affect the tidal times.
-#Is this because Fort Denison (the port, rather than the user) is not in DST?
-    # Computes the current daylight savings offset in minutes.
-    # If the computer is not in daylight savings, the offset is zero.
-    # http://stackoverflow.com/questions/13464009/calculate-tm-isdst-from-date-and-timezone
-    def getDaylightSavingsOffsetInMinutes( self ):
-        offsetInMinutes = 0
-        isDST = time.daylight and time.localtime().tm_isdst > 0
-        if isDST:
-            utcOffsetInSecondsDST = - ( time.altzone if isDST else time.timezone )
-            utcOffsetInSeconds = - ( time.altzone if not isDST else time.timezone )
-            offsetInMinutes = int( ( utcOffsetInSecondsDST - utcOffsetInSeconds ) / 60 )
-
-        return offsetInMinutes
-
-
     def getNextUpdateTimeInSeconds( self ):
+#TODO...
+# No way of knowing when a port's data will be updated.
+# One way to calculate when to do an update is to ensure the user does not look at stale data
+# and the first day of data displayed matches their today.
         now = datetime.datetime.now()
-        fiveMinutesAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 ) # Tidal information (appears to be) updated not long after local midnight.
+        fiveMinutesAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
         numberOfSecondsUntilFiveMinutesAfterMidnight = ( fiveMinutesAfterMidnight - now ).total_seconds()
         numberOfSecondsInTwelveHours = 12 * 60 * 60 # Automatically update the tidal information at least every 12 hours.
 
@@ -486,14 +472,14 @@ class IndicatorTide:
             logging.error( "Error writing settings: " + IndicatorTide.SETTINGS_FILE )
 
 
-    def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID, daylightSavingOffset ):
+    def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID ):
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
         else:
             portIDForURL = portID.rjust( 4, "0" )
 
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
-              "&PredictionLength=7&DaylightSavingOffset=" + str( daylightSavingOffset ) + "&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+              "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object when in a non-English locale.
