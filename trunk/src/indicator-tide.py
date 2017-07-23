@@ -536,7 +536,7 @@ class IndicatorTide:
                             elif item[ 0 ] == "L":
                                 types.append( tide.Type.L )
                             else:
-                                types.append( None ) # TODO Test this.
+                                raise ValueError( "Unknown type '" + item[ 0 ] + "' at " + url ) # Should never happen
 
                     dateTimes = [ ]
                     line = lines[ index + 4 ]
