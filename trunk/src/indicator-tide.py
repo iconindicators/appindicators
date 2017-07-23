@@ -583,40 +583,12 @@ class IndicatorTide:
 
 
     def removeTidalReadingsPriorToToday( self, tidalReadings ):
-
-        # Remove data prior to today (user local time zone).
-#TODO...
-#         todayMidnight = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0 )
-#         print( todayMidnight )
-#         print( todayMidnight.tzinfo is None )
-#         print( todayMidnight.tzinfo.utcoffset( todayMidnight ) is None )
-
-#         utcNow = datetime.datetime.utcnow()
-#         print( utcNow )
-
+        todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
         for tidalReading in list( tidalReadings ):
-            print( tidalReading.getDateTimeUTC().astimezone() )
-#             if tidalReading.getDateTimeUTC().astimezone() < todayMidnight:
-#                 tidalReadings.remove( tidalReading )
+            if tidalReading.getDateTimeUTC().astimezone() < todayLocalMidnight:
+                tidalReadings.remove( tidalReading )
 
-        
-        todayMidnight = datetime.datetime.now().replace( hour = 0, minute = 0, second = 0 )
-        print( todayMidnight )
-
-        
-        utcNow = datetime.datetime.now( datetime.timezone.utc )
-        now = utcNow.astimezone()
-        
-        print( utcNow )
-        print( now )
-        print( now.replace( hour = 0, minute = 0, second = 0 ) )
-
-
-        todayMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
-
-        
         return tidalReadings
-
 
 
     def washTidalDataThroughCache( self, tidalReadings ):
