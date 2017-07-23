@@ -45,9 +45,6 @@ from urllib.request import urlopen
 import datetime, json, locale, logging, os, ports, pythonutils, re, threading, tide, time, webbrowser
 
 
-
-#TODO If caching is not used, remove from debian changelog!
-
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
@@ -118,9 +115,6 @@ class IndicatorTide:
                 Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
 
-#TODO From Oleg: What do you think whether it worth to add some switch like "Show local time of events | Show port local time of events"?
-#Potentially could have a three way switch: port local, user local, UTC.  
-# Why/how would anyone use/want other than local?
     def buildMenu( self, tidalReadings ):
         indent = "    "
         menu = Gtk.Menu()
