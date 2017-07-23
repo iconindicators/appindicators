@@ -536,7 +536,7 @@ class IndicatorTide:
                             elif item[ 0 ] == "L":
                                 types.append( tide.Type.L )
                             else:
-                                raise ValueError( "Unknown type '" + item[ 0 ] + "' at " + url ) # Should never happen
+                                raise ValueError( "Unknown type '" + item[ 0 ] + "' at " + url )
 
                     dateTimes = [ ]
                     line = lines[ index + 4 ]
@@ -548,7 +548,7 @@ class IndicatorTide:
                                 dateTimes.append( dateTimeLocal.astimezone( datetime.timezone.utc ) )
 
                             except ValueError:
-                                dateTimes.append( None ) #TODO How is None saved to the cache?
+                                dateTimes.append( None )
 
                     levels = [ ]
                     line = lines[ index + 6 ]
@@ -559,7 +559,7 @@ class IndicatorTide:
                             elif levelNegativePattern.match( item ):
                                 levels.append( float( item[ 0 : 4 ] ) )
                             else:
-                                levels.append( None ) #TODO How is None saved to the cache?
+                                levels.append( None )
 
                     for index, tideType in enumerate( types ):
                         if dateTimes[ index ] is not None and levels[ index ] is not None: # Date/time/level is present.
