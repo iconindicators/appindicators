@@ -590,32 +590,24 @@ class IndicatorTide:
         return tidalReadings
 
 
+    # Takes a list of tidal readings and...
+    # If there is data, write to the cache.  It is assumed that all the tidal data is date sorted and of today's date or newer.
+    # If there is no data, read from the cache (discarding data older than today).
     def washTidalDataThroughCache( self, tidalReadings ):
+        cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
+        cacheDateBasename = "tidal-"
+        cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( 24 * 8 ) ) # The UKHO shows tidal readings for one week from today.
+
+        if len( tidalReadings ) > 0:
+            pythonutils.writeToCache( tidalReadings, cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
+        else:
+            tidalReadings, cacheDateTime = pythonutils.readFromCache( cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
+            if tidalReadings is None or len( tidalReadings ) == 0:
+                tidalReadings = [ ]
+
+            tidalReadings = self.removeTidalReadingsPriorToToday( tidalReadings )
+
         return tidalReadings
-#TODO Needed for eventual cache.
-#         cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
-#         cacheDateBasename = "tidal-"
-#         cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( 24 * 8 ) ) # The UKHO shows tidal readings for today and the next week, so remove files older than that.
-#
-# Need to check scraped data to see if it is old.
-# After removing any old data, cache.
-# If no valid data, read from cache.  Ensure cached data is from same port as current.
-# Check that the timezone/location/whatever of the cached data matches current.
-# Remove old data from cached data.
-# Return data (good or empty).
-#         if len( tidalReadings ) > 0: # Only write to the cache if there is data...
-#             pythonutils.writeToCache( tidalReadings, cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
-#         else:
-#             # If there is no data - no internet connection, website has no data or some other error - read from the cache.
-#             tidalReadings, cacheDateTime = pythonutils.readFromCache( cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
-#             if tidalReadings is None:
-#                 tidalReadings = [ ]
-# 
-#             elif len( tidalReadings ) > 0:
-#                 for tidalReading in list( tidalReadings ): # Iterate over a copy of the list so that removal (if required) can take place.
-#                     tidalReadingDate = datetime.datetime.strptime( str( tidalReading.getYear() ) + " " + str( tidalReading.getMonth() ) + " " + str( tidalReading.getDay() ), "%Y %m %d" )
-#                     if tidalReadingDate < today:
-#                         tidalReadings.remove( tidalReading )
 
 
 if __name__ == "__main__": IndicatorTide().main()
