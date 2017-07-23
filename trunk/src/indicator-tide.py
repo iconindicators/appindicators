@@ -196,10 +196,9 @@ class IndicatorTide:
 
 
     def getNextUpdateTimeInSeconds( self ):
-#TODO...
-# No way of knowing when a port's data will be updated.
-# One way to calculate when to do an update is to ensure the user does not look at stale data
-# and the first day of data displayed matches their today.
+        # No way of knowing when a port's data will be updated.
+        # Simplest solution is ensure the user does not look at stale data.
+        # Doing an update just after (local) midnight will drop out any data prior to (local) today.
         now = datetime.datetime.now()
         fiveMinutesAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
         numberOfSecondsUntilFiveMinutesAfterMidnight = ( fiveMinutesAfterMidnight - now ).total_seconds()
