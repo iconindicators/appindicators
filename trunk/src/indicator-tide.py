@@ -122,6 +122,132 @@ class IndicatorTide:
         if len( tidalReadings ) == 0:
             menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
         else:
+            if self.showAsSubMenus:
+                pass
+            else:
+                self.buildMenuVanilla( menu, indent, tidalReadings )
+
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
+        self.indicator.set_menu( menu )
+        menu.show_all()
+
+
+    def buildMenuNEW( self, tidalReadings ):
+        indent = "    "
+        menu = Gtk.Menu()
+
+        if len( tidalReadings ) == 0:
+            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
+        else:
+            previousMonth = -1
+            previousDay = -1
+            firstTideReading = True
+            for tidalReading in tidalReadings:
+                
+                if type( tidalReading.getDateTimeUTC() ) is datetime.datetime:
+                    tidalDateTimeLocal = tidalReading.getDateTimeUTC().astimezone() # Date/time now in local time zone.
+                else:
+                    tidalDateTimeLocal = tidalReading.getDateTimeUTC() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
+
+                if firstTideReading:
+                    firstMonth = tidalDateTimeLocal.month
+                    firstDay = tidalDateTimeLocal.day
+                    menuItemText = _( "{0}, {1}" ).format( ports.getPortName( tidalReading.getPortID() ), ports.getCountry( tidalReading.getPortID() ) )
+                    self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
+                    firstTideReading = False
+
+                if not( tidalDateTimeLocal.month == previousMonth and tidalDateTimeLocal.day == previousDay ):
+                    if type( tidalDateTimeLocal ) is datetime.datetime:
+                        menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
+                    else:
+                        menuItemText = indent + self.menuItemTideFormatSansTime
+#                     menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
+
+                    if self.showAsSubMenus:
+                        if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
+                            self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
+                        else:
+                            subMenu = Gtk.Menu()
+                            self.createAndAppendMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
+                    else:
+                        self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
+
+                if type( tidalDateTimeLocal ) is datetime.datetime:
+                    menuItemText = tidalDateTimeLocal.strftime( self.menuItemTideFormat )
+                else:
+                    menuItemText = self.menuItemTideFormatSansTime
+
+                if tidalReading.getType() == tide.Type.H:
+                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
+                else: # The type must be either H or L - cannot be None.
+                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "L" ) )
+
+                if tidalReading.getLevelInMetres() is None:
+                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, "" )
+                else:
+                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tidalReading.getLevelInMetres() ) + " m" )
+
+                if self.showAsSubMenus:
+                    if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
+                        self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
+                    else:
+                        self.createAndAppendMenuItem( subMenu, menuItemText, tidalReading.getURL() )
+                else:
+                    self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
+
+                previousMonth = tidalDateTimeLocal.month
+                previousDay = tidalDateTimeLocal.day
+
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
+        self.indicator.set_menu( menu )
+        menu.show_all()
+
+
+    def buildMenuVanilla( self, menu, indent, tidalReadings ):
+        menuItemText = _( "{0}, {1}" ).format( ports.getPortName( tidalReadings[ 0 ].getPortID() ), ports.getCountry( tidalReadings[ 0 ].getPortID() ) )
+        self.createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
+
+        previousMonth = -1
+        previousDay = -1
+        for tidalReading in tidalReadings:
+
+            if type( tidalReading.getDateTimeUTC() ) is datetime.datetime:
+                tidalDateTimeLocal = tidalReading.getDateTimeUTC().astimezone() # Date/time now in local time zone.
+            else:
+                tidalDateTimeLocal = tidalReading.getDateTimeUTC() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
+
+            if not( tidalDateTimeLocal.month == previousMonth and tidalDateTimeLocal.day == previousDay ):
+                menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
+                self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
+
+            if type( tidalDateTimeLocal ) is datetime.datetime:
+                menuItemText = tidalDateTimeLocal.strftime( self.menuItemTideFormat )
+            else:
+                menuItemText = self.menuItemTideFormatSansTime
+
+            if tidalReading.getType() == tide.Type.H:
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
+            else: # The type must be either H or L - cannot be anything else.
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "L" ) )
+
+            if tidalReading.getLevelInMetres() is None:
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, "" )
+            else:
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tidalReading.getLevelInMetres() ) + " m" )
+
+            self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
+
+            previousMonth = tidalDateTimeLocal.month
+            previousDay = tidalDateTimeLocal.day
+
+
+    def buildMenuORIGINAL( self, tidalReadings ):
+        indent = "    "
+        menu = Gtk.Menu()
+
+        if len( tidalReadings ) == 0:
+            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
+        else:
             previousMonth = -1
             previousDay = -1
             firstTideReading = True
@@ -479,52 +605,23 @@ class IndicatorTide:
         else:
             portIDForURL = portID.rjust( 4, "0" )
 
-        portIDForURL ="1894A"
-
+        # Testing...
+        portIDForURL = "1800" # LW time missing.
+        portIDForURL = "1894A" # LW time missing.
+        portIDForURL = "1411" # LW reading is negative.
+        portIDForURL = "3983" # LW reading is missing.
+        portIDForURL = "1894A" # LW reading is missing.
+        portIDForURL = "2168" # HW/LW time missing.
+        portIDForURL = "5088" # HW/LW time missing.
+        portIDForURL = "0839" # HW/LW reading is missing.
+        portIDForURL = "4000" # LW time/reading is missing.
+        portIDForURL = "3578" # LW time/reading is missing.
+        portIDForURL = "4273" # HW/LW reading is missing; LW time is missing.
+        portIDForURL = "2168" # UTC offset negative.
+        portIDForURL = "4000" # UTC offset positive.
 
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
               "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
-
-#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1894A&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
-
-        # Negative UTC offset
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2168&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-
-        # Positive UTC offset
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4000&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-
-        # LW reading is negative
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1411&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-
-        # Missing LW reading
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=3983&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1894A&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-
-        # Missing HW and LW time
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2168&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=5088&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-
-        # Missing LW and HW reading
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=0839&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-
-        # Missing LW time
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1800&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1049&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4302&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1920&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-
-        # Missing LW reading and LW time
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4000&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4060&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4157&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4324&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=3578&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-
-        # Missing LW time and LW/HW reading
-#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4273&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-
-
-
 
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object when in a non-English locale.
@@ -631,7 +728,7 @@ class IndicatorTide:
         todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
         for tidalReading in list( tidalReadings ):
 
-            if type( tidalReading.getDateTimeUTC() ) == datetime.datetime:
+            if type( tidalReading.getDateTimeUTC() ) is datetime.datetime:
                 if tidalReading.getDateTimeUTC().astimezone() < todayLocalMidnight:
                     tidalReadings.remove( tidalReading )
 
