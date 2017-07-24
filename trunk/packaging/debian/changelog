@@ -4,7 +4,7 @@ indicator-tide (1.0.8-1) trusty; urgency=low
     missing, are now correctly handled.
   * Bug fix: Dates/times were displayed in port local date/time rather than
     user local date/time.
-  * Added a preference to handle when the time is absent from a reading.
+  * Added a preference to format the display when time is absent from a reading.........................
   * Tidal information is cached for use when offline.
   * Split the Preferences dialog over two tabs (ports and general).
   * About/Preferences dialogs now block each other - only show one at a time.
