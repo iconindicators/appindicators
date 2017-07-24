@@ -126,7 +126,11 @@ class IndicatorTide:
             previousDay = -1
             firstTideReading = True
             for tidalReading in tidalReadings:
-                tidalDateTimeLocal = tidalReading.getDateTimeUTC().astimezone() # Date/time now in local time zone.
+                
+                if type( tidalReading.getDateTimeUTC() ) == datetime.datetime:
+                    tidalDateTimeLocal = tidalReading.getDateTimeUTC().astimezone() # Date/time now in local time zone.
+                else:
+                    tidalDateTimeLocal = tidalReading.getDateTimeUTC() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
 
                 if firstTideReading:
                     firstMonth = tidalDateTimeLocal.month
@@ -136,7 +140,11 @@ class IndicatorTide:
                     firstTideReading = False
 
                 if not( tidalDateTimeLocal.month == previousMonth and tidalDateTimeLocal.day == previousDay ):
-                    menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
+                    if type( tidalDateTimeLocal ) is datetime.datetime:
+                        menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
+                    else:
+                        menuItemText = indent + self.menuItemTideFormatSansTime
+#                     menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
 
                     if self.showAsSubMenus:
                         if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
@@ -471,8 +479,52 @@ class IndicatorTide:
         else:
             portIDForURL = portID.rjust( 4, "0" )
 
+        portIDForURL ="1894A"
+
+
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
               "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1894A&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+
+        # Negative UTC offset
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2168&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Positive UTC offset
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4000&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # LW reading is negative
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1411&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW reading
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=3983&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1894A&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing HW and LW time
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2168&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=5088&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW and HW reading
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=0839&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW time
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1800&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1049&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4302&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=1920&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW reading and LW time
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4000&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4060&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4157&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4324&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=3578&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+        # Missing LW time and LW/HW reading
+#         url = http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=4273&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+
+
+
 
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object when in a non-English locale.
@@ -578,8 +630,14 @@ class IndicatorTide:
     def removeTidalReadingsPriorToToday( self, tidalReadings ):
         todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
         for tidalReading in list( tidalReadings ):
-            if tidalReading.getDateTimeUTC().astimezone() < todayLocalMidnight:
-                tidalReadings.remove( tidalReading )
+
+            if type( tidalReading.getDateTimeUTC() ) == datetime.datetime:
+                if tidalReading.getDateTimeUTC().astimezone() < todayLocalMidnight:
+                    tidalReadings.remove( tidalReading )
+
+            else:
+                if tidalReading.getDateTimeUTC() < todayLocalMidnight.date():
+                    tidalReadings.remove( tidalReading )
 
         return tidalReadings
 
