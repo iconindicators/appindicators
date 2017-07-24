@@ -513,15 +513,20 @@ class IndicatorTide:
         # TODO Testing...
 #         portIDForURL = "1800" # LW time missing.
 #         portIDForURL = "1894A" # LW time missing.
-#         portIDForURL = "1411" # LW reading is negative.
-#         portIDForURL = "3983" # LW reading is missing.
-#         portIDForURL = "1894A" # LW reading is missing.
+#         portIDForURL = "3983" # LW time is missing.
+#
 #         portIDForURL = "2168" # HW/LW time missing.
 #         portIDForURL = "5088" # HW/LW time missing.
+#
 #         portIDForURL = "0839" # HW/LW reading is missing.
+#
 #         portIDForURL = "4000" # LW time/reading is missing.
 #         portIDForURL = "3578" # LW time/reading is missing.
+#
 #         portIDForURL = "4273" # HW/LW reading is missing; LW time is missing.
+#
+#         portIDForURL = "1411" # LW reading is negative.
+#
 #         portIDForURL = "2168" # UTC offset negative.
 #         portIDForURL = "4000" # UTC offset positive.
 
@@ -535,6 +540,7 @@ class IndicatorTide:
             tidalReadings = [ ]
             levelPositivePattern = re.compile( "^[0-9]\.[0-9]" )
             levelNegativePattern = re.compile( "^-?[0-9]\.[0-9]" )
+            hourMinutePattern = re.compile( "^[0-9][0-9]:[0-9][0-9]" )
             lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for index, line in enumerate( lines ): # The tidal data is presented in date/time order.
 
@@ -590,13 +596,12 @@ class IndicatorTide:
                     line = lines[ index + 4 ]
                     for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
                         if len( item.strip() ) > 0:
-                            try:
-                                hourMinute = item.strip()[ 0 : 5 ]
-                                dateTimeLocal = datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" )
-                                dateTimes.append( dateTimeLocal.astimezone( datetime.timezone.utc ) )
+                            hourMinute = item.strip()[ 0 : 5 ]
+                            if not hourMinutePattern.match( hourMinute ):
+                                hourMinute = "00:00" # No time present so assume midnight.  #TODO What if the previous reading DID have a time component?  Ensure we are after this time!
 
-                            except ValueError:
-                                dateTimes.append( None )
+                            dateTimeLocal = datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" )
+                            dateTimes.append( dateTimeLocal.astimezone( datetime.timezone.utc ) )
 
                     levels = [ ]
                     line = lines[ index + 6 ]
