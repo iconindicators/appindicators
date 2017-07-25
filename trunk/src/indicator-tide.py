@@ -168,7 +168,7 @@ class IndicatorTide:
         previousDay = -1
         for tidalReading in tidalReadings:
 
-            if type( tidalReading.getDateTimeUTC() ) is datetime.datetime:
+            if isinstance( tidalReading.getDateTimeUTC(), datetime.datetime ):
                 tidalDateTimeLocal = tidalReading.getDateTimeUTC().astimezone() # Date/time now in local time zone.
             else:
                 tidalDateTimeLocal = tidalReading.getDateTimeUTC() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
@@ -177,7 +177,7 @@ class IndicatorTide:
                 menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
                 self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
 
-            if type( tidalDateTimeLocal ) is datetime.datetime:
+            if isinstance( tidalDateTimeLocal, datetime.datetime ):
                 menuItemText = tidalDateTimeLocal.strftime( self.menuItemTideFormat )
             else:
                 menuItemText = self.menuItemTideFormatSansTime
@@ -222,7 +222,7 @@ class IndicatorTide:
                     subMenu = Gtk.Menu()
                     self.createAndAppendMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
 
-            if type( tidalDateTimeLocal ) is datetime.datetime:
+            if isinstance( tidalDateTimeLocal, datetime.datetime ):
                 menuItemText = tidalDateTimeLocal.strftime( self.menuItemTideFormat )
             else:
                 menuItemText = self.menuItemTideFormatSansTime
@@ -573,11 +573,6 @@ class IndicatorTide:
             lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for index, line in enumerate( lines ): # The tidal data is presented in date/time order.
 
-                if "class=\"PortName\"" in line:
-                    portName = line[ line.find( ">" ) + 1 : line.find( "</span>" ) ].title()
-                    country = line[ line.find( "class=\"CountryPredSummary\">" ) + len( "class=\"CountryPredSummary\">" ) : line.find( "</span></li>" ) ].title()
-                    portName += ", " + country
-
                 if "Port predictions" in line: # Tidal dateTimes are in the standard local time of the port - need to obtain the UTC offset for the port in the format +HHMM or -HHMM.
                     if "equal to UTC" in line: # "Port predictions (Standard Local Time) are equal to UTC"
                         utcOffset = "+0000"
@@ -596,6 +591,9 @@ class IndicatorTide:
 
                         minutes = line[ line.index( "hours" ) + 6 : line.index( "mins" ) - 1 ] 
                         utcOffset = hours + minutes
+
+                    else:
+                        raise ValueError( "Unable to obtain UTC from '" + line + "' in " + url )
 
                 if "PredictionSummary1_lblPredictionStart" in line:
                     startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time of the port)
@@ -619,18 +617,17 @@ class IndicatorTide:
                             elif item[ 0 ] == "L":
                                 types.append( tide.Type.L )
                             else:
-                                raise ValueError( "Unknown type '" + item[ 0 ] + "' at " + url )
+                                raise ValueError( "Unknown type '" + item[ 0 ] + "' in " + url )
 
                     dateTimes = [ ]
                     line = lines[ index + 4 ]
                     for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
                         if len( item.strip() ) > 0:
                             hourMinute = item.strip()[ 0 : 5 ]
-                            if not hourMinutePattern.match( hourMinute ):
-                                hourMinute = "00:00" # No time present so assume midnight.  #TODO What if the previous reading DID have a time component?  Ensure we are after this time!
-
-                            dateTimeLocal = datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" )
-                            dateTimes.append( dateTimeLocal.astimezone( datetime.timezone.utc ) )
+                            if hourMinutePattern.match( hourMinute ):
+                                dateTimes.append( datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" ) )
+                            else:
+                                dateTimes.append( datetime.date( year, month, dayOfMonth ) )
 
                     levels = [ ]
                     line = lines[ index + 6 ]
@@ -644,14 +641,13 @@ class IndicatorTide:
                                 levels.append( None )
 
                     for index, tideType in enumerate( types ):
-                        if dateTimes[ index ] is not None and levels[ index ] is not None: # Date/time/level is present.
-                            tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, levels[ index ], tideType, url ) )
+                        if levels[ index ] is None and isinstance( dateTimes[ index ], datetime.date ): #TODO Test this with a port that has missing time and level.
+                            continue # Drop a tidal reading if missing both the time and level.
 
-                        elif dateTimes[ index ] is not None: # Date/time but no level.
-                            tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, None, tideType, url ) )
-
-                        elif levels[ index ] is not None: # Date/level but no time (add in None for time components and anyone using get time methods must handle).
-                            tidalReadings.append( tide.Reading( portID, int( year ), int( month ), int( dayOfMonth ), None, None, levels[ index ], tideType, url ) )
+                        if isinstance( dateTimes[ index ], datetime.datetime ):
+                            tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, dateTimes[ index ].tzname(), levels[ index ], tideType, url ) )
+                        else:
+                            tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, None, None, None, levels[ index ], tideType, url ) )
 
         except Exception as e:
             logging.exception( e )
