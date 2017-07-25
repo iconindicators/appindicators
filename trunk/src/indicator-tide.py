@@ -45,6 +45,35 @@ from urllib.request import urlopen
 import datetime, json, locale, logging, os, ports, pythonutils, re, threading, tide, time, webbrowser
 
 
+#TODO...
+# For most ports, each tidal reading contains date/type/time/level (Tue 25 Jul / HW / 05:38 / 0.4 m )
+# For these ports, convert the date/time from the port standard local time to (UTC and then to) user local time. 
+# Further, it seems every tidal reading will have at least the date and the type.
+# 
+# Some port tidal readings do not have a level (but still have date/time/type). 
+# In this case, the [LEVEL] tag is dropped out - is a separate user preference needed?
+# Date/time/level is shown as normal.
+# 
+# Some port tidal readings do not have the time and level.
+# In this case drop that specific tidal reading.
+# Assuming the remaining tidal readings have the date/time and optionally the level, proceed as above.
+# If all tidal readings have been dropped, there is no data to show and message the user.
+# 
+# Some port tidal reading do not have the time (date/type/level are present).
+# If all the port's tidal readings do not have the time, then display using just the date (as port standard local).
+# If there is a mix of tidal readings with date/time and some with only time, what to do?
+# Drop the time from date/time readings and show only date for all readings, or,
+# drop readings if they don't have a time (and keep the date/time readings).
+#
+# User preferences:
+#    A format to show the date (already present).
+#    A format to show each time/type/level (already present).
+#    A format to show each time/type (not present).
+#    When some readings contain date and some contain date/time, choose either
+#        a) drop the time from date/time readings and show all readings using only date, or
+#        b) drop readings that only have a date (missing time) and show only readings with a date/time.
+
+
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
