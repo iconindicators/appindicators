@@ -59,7 +59,7 @@ import datetime, json, locale, logging, os, ports, pythonutils, re, threading, t
 # Assuming the remaining tidal readings have the date/time and optionally the level, proceed as above.
 # If all tidal readings have been dropped, there is no data to show and message the user.
 # 
-# Some port tidal reading do not have the time (date/type/level are present).
+# Some port tidal readings do not have the time (date/type/level are present).
 # If all the port's tidal readings do not have the time, then display using just the date (as port standard local).
 # If there is a mix of tidal readings with date/time and some with only time, what to do?
 # Drop the time from date/time readings and show only date for all readings, or,
@@ -163,7 +163,63 @@ class IndicatorTide:
         menu.show_all()
 
 
+    # If all tidal readings are datetimes
+    #    Convert datetimes to user local
+    #
+    # Elif all tidal readings are dates
+    #    Display dates as is
+    #
+    # Else (mix of datetimes and dates)
+    #    If drop tidal readings containing dates
+    #        Drop tidal readings containing dates
+    #        Convert remaining datetimes to user local
+    #
+    #    Elif show only dates
+    #        Drop time from tidal readings containing datetimes
+    #        Display as dates
+    #
+    #    Else
+    #        Show datetimes and dates in port standard time.
+    def sanitiseTidalReadings( self, tidalReadings, dropTimeFromDateTime ):
+        allDates = True
+        allDateTimes = True
+        for tidalReading in tidalReadings:
+            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
+                allDates = False
+            else: # Must be datetime.date
+                allDateTimes = False
+
+        if not allDates and not allDateTimes: # A mix of datetime.datetime and datetime.date
+            if dropTimeFromDateTime: # Drop the time from tidal readings which contain datetime.datetime
+                
+#TODO
+                pass
+
+            else: # Drop tidal readings which contain datetime.date
+                for tidalReading in list( tidalReadings ):
+                    if isinstance( tidalReading.getDateTime(), datetime.date ):
+                        tidalReadings.remove( tidalReading )
+
+        return tidalReadings
+
+
     def buildMenuVanilla( self, menu, indent, tidalReadings ):
+
+        # If all tidal readings are datetimes
+        #    Convert datetimes to user local
+        #
+        # Elif all tidal readings are dates
+        #    Display dates as is
+        #
+        # Else (mix of datetimes and dates)
+        #    If drop tidal readings containing dates
+        #        Drop tidal readings containing dates
+        #        Convert remaining datetimes to user local
+        #
+        #    Else (show only dates)
+        #        Drop time from tidal readings containing datetimes
+        #        Display as dates
+
         previousMonth = -1
         previousDay = -1
         for tidalReading in tidalReadings:
@@ -255,6 +311,26 @@ class IndicatorTide:
             menuItem.set_name( url )
 
         return menuItem
+
+
+    def tidalReadingsContainDates( self, tidalReadings ):
+        containDates = False
+        for tidalReading in tidalReadings:
+            if isinstance( tidalReading.getDateTime(), datetime.date ):
+                containDates = True
+                break
+
+        return containDates
+
+
+    def tidalReadingsContainDateTimes( self, tidalReadings ):
+        containDateTimes = False
+        for tidalReading in tidalReadings:
+            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
+                containDateTimes = True
+                break
+
+        return containDateTimes
 
 
     def getNextUpdateTimeInSeconds( self ):
@@ -660,6 +736,12 @@ class IndicatorTide:
 
 
     def removeTidalReadingsPriorToToday( self, tidalReadings ):
+#TODO Not sure how this should now work given the use of either datetime or just dates.
+# Maybe only touch tidal readings containing datetime and leave those with date alone?
+#Perhaps for date only tidal readings, compare each date (which is in the port's local timezone)
+#to the current date of the port...does that make sense?
+        if True: return tidalReadings
+        
         todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
         for tidalReading in list( tidalReadings ):
 
