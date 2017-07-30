@@ -730,6 +730,8 @@ class IndicatorTide:
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = [ ]
 
+#         for t in tidalReadings: print( t )
+        
         locale.setlocale( locale.LC_TIME, defaultLocale )
 
         return self.washTidalDataThroughCache( self.removeTidalReadingsPriorToToday( tidalReadings ) )
