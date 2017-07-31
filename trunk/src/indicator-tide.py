@@ -638,6 +638,8 @@ class IndicatorTide:
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
               "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
+        print( "port id", portIDForURL )
+
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object when in a non-English locale.
 
@@ -671,11 +673,31 @@ class IndicatorTide:
                     else:
                         raise ValueError( "Unable to obtain UTC from '" + line + "' in " + url )
 
+                    from datetime import datetime, timedelta
+                    
+                    result = datetime.utcnow() + timedelta( minutes = int( utcOffset[ 0 ] + utcOffset[ 3 : 5 ] ), hours = int( utcOffset[ 0 ] + utcOffset[ 1 : 3 ] ) )
+                    print( "min", int( utcOffset[ 1 : 3 ] ) )
+                    print( "hours", int( utcOffset[ 3 : 5 ] ) )
+                    print( "utc offset", utcOffset )
+                    print( type( result) , result )
+                    print( "year", result.year )
+                    print( "year", ( datetime.utcnow() + timedelta( minutes = int( utcOffset[ 0 ] + utcOffset[ 3 : 5 ] ), hours = int( utcOffset[ 0 ] + utcOffset[ 1 : 3 ] ) ) ).year )
+                    return []
+                    
+
+
                 if "PredictionSummary1_lblPredictionStart" in line:
                     startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time of the port)
                     startYear = startDate[ 3 ] # 2017
                     startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
 
+#TODO The start date seems to be relative to GMT.
+# That means port data for Sydney (GMT +10) can have a start date of the previous day,
+# until GMT midnight comes around (when tidal readings are updated).
+# Only need the year from the start date...
+# ...or is there a way to get the year from the system date and ensure the year makes sense for the port in question?
+# Only need to worry about an incorrect year if Dec 31 or Jan 1...but how?
+# Maybe get current date/time for the UTC of the port and then get the year.
                 if "HWLWTableHeaderCell" in line:
                     date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # Mon 17 Jul (standard local time)
                     dayOfMonth = date[ 4 : 6 ] # 17
