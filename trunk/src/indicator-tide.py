@@ -673,23 +673,14 @@ class IndicatorTide:
                     else:
                         raise ValueError( "Unable to obtain UTC from '" + line + "' in " + url )
 
-                    from datetime import datetime, timedelta
-                    
-                    result = datetime.utcnow() + timedelta( minutes = int( utcOffset[ 0 ] + utcOffset[ 3 : 5 ] ), hours = int( utcOffset[ 0 ] + utcOffset[ 1 : 3 ] ) )
-                    print( "min", int( utcOffset[ 1 : 3 ] ) )
-                    print( "hours", int( utcOffset[ 3 : 5 ] ) )
-                    print( "utc offset", utcOffset )
-                    print( type( result) , result )
-                    print( "year", result.year )
-                    print( "year", ( datetime.utcnow() + timedelta( minutes = int( utcOffset[ 0 ] + utcOffset[ 3 : 5 ] ), hours = int( utcOffset[ 0 ] + utcOffset[ 1 : 3 ] ) ) ).year )
-                    return []
-                    
+                    # Obtain the year of the local port...
+                    # ...it is possible the year will change if the readings start in Dec and end in Jan (take into account as each reading is processed).
+                    year = ( datetime.datetime.utcnow() + datetime.timedelta( minutes = int( utcOffset[ 0 ] + utcOffset[ 3 : 5 ] ), hours = int( utcOffset[ 0 ] + utcOffset[ 1 : 3 ] ) ) ).year
 
-
-                if "PredictionSummary1_lblPredictionStart" in line:
-                    startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time of the port)
-                    startYear = startDate[ 3 ] # 2017
-                    startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
+#                 if "PredictionSummary1_lblPredictionStart" in line:
+#                     startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time of the port)
+#                     startYear = startDate[ 3 ] # 2017
+#                     startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
 
 #TODO The start date seems to be relative to GMT.
 # That means port data for Sydney (GMT +10) can have a start date of the previous day,
@@ -702,9 +693,9 @@ class IndicatorTide:
                     date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # Mon 17 Jul (standard local time)
                     dayOfMonth = date[ 4 : 6 ] # 17
                     month = str( datetime.datetime.strptime( date[ -3 : ], "%b" ).month ) # 7
-                    year = startYear
-                    if month < startMonth:
-                        year = startYear + 1
+#                     year = startYear
+#                     if month < startMonth:
+#                         year = startYear + 1
 
                     types = [ ]
                     line = lines[ index + 2 ]
