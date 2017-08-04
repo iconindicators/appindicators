@@ -733,6 +733,7 @@ class IndicatorTide:
                         if levels[ index ] is None and isinstance( dateTimes[ index ], datetime.date ): #TODO Test this with a port that has missing time and level.
                             continue # Drop a tidal reading if missing both the time and level.
 
+#TODO Add comment that cannot store as UTC becuase sometime only have the date, not date and time.
                         if isinstance( dateTimes[ index ], datetime.datetime ):
                             tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, dateTimes[ index ].tzname(), levels[ index ], tideType, url ) )
                         else:
