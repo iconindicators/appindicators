@@ -3,5 +3,5 @@ Type=Application
 Name=Tide Indicator
 Icon=indicator-tide
 Exec=/usr/share/indicator-tide/indicator-tide.py
-Categories=Utility
+Categories=Utility;
 X-GNOME-Autostart-enabled=true
