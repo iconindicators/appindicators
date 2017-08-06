@@ -45,6 +45,12 @@ from urllib.request import urlopen
 import datetime, json, locale, logging, os, ports, pythonutils, re, threading, tide, time, webbrowser
 
 
+# #TODO
+# Should indicator files go into .config?
+# The directory exists under Ubuntu GNOME and Ubuntu 14.04.
+# If so, apply to all indicators!
+
+
 #TODO...
 # For most ports, each tidal reading contains date/type/time/level (Tue 25 Jul / HW / 05:38 / 0.4 m )
 # For these ports, convert the date/time from the port standard local time to (UTC and then to) user local time. 
@@ -689,6 +695,15 @@ class IndicatorTide:
 # ...or is there a way to get the year from the system date and ensure the year makes sense for the port in question?
 # Only need to worry about an incorrect year if Dec 31 or Jan 1...but how?
 # Maybe get current date/time for the UTC of the port and then get the year.
+
+#TODO Sites for the port Bridgeport, Connecticut which is a day behind GMT and can be used to see what their data is and the date compared to UKHO.
+#     https://www.tides.info/?command=view&location=Bridgeport%20Harbor,%20Bridgeport,%20Connecticut
+#     http://ct.usharbors.com/monthly-tides/Connecticut-West/Bridgeport
+#     http://www.tides4fishing.com/us/connecticut/bridgeport#_tide_table
+#     http://tides.mobilegeographics.com/locations/731.html
+#     http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2772&PredictionLength=7
+
+
                 if "HWLWTableHeaderCell" in line:
                     date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # Mon 17 Jul (standard local time)
                     dayOfMonth = date[ 4 : 6 ] # 17
