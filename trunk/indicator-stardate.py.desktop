@@ -3,5 +3,5 @@ Type=Application
 Name=Stardate Indicator
 Icon=indicator-stardate
 Exec=/usr/share/indicator-stardate/indicator-stardate.py
-Categories=Utility;Amusement
+Categories=Utility;Amusement;
 X-GNOME-Autostart-enabled=true
