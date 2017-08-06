@@ -3,5 +3,5 @@ Type=Application
 Name=Punycode Indicator
 Icon=indicator-punycode
 Exec=/usr/share/indicator-punycode/indicator-punycode.py
-Categories=Utility
+Categories=Utility;
 X-GNOME-Autostart-enabled=true
