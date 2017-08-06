@@ -3,5 +3,5 @@ Type=Application
 Name=Lunar Indicator
 Icon=indicator-lunar
 Exec=/usr/share/indicator-lunar/indicator-lunar.py
-Categories=Utility
+Categories=Utility;
 X-GNOME-Autostart-enabled=true
