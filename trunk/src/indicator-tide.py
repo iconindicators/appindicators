@@ -681,12 +681,12 @@ class IndicatorTide:
 
                     # Obtain the year of the local port...
                     # ...it is possible the year will change if the readings start in Dec and end in Jan (take into account as each reading is processed).
-                    year = ( datetime.datetime.utcnow() + datetime.timedelta( minutes = int( utcOffset[ 0 ] + utcOffset[ 3 : 5 ] ), hours = int( utcOffset[ 0 ] + utcOffset[ 1 : 3 ] ) ) ).year
+#                     year = ( datetime.datetime.utcnow() + datetime.timedelta( minutes = int( utcOffset[ 0 ] + utcOffset[ 3 : 5 ] ), hours = int( utcOffset[ 0 ] + utcOffset[ 1 : 3 ] ) ) ).year
 
-#                 if "PredictionSummary1_lblPredictionStart" in line:
-#                     startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time of the port)
-#                     startYear = startDate[ 3 ] # 2017
-#                     startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
+                if "PredictionSummary1_lblPredictionStart" in line:
+                    startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time of the port)
+                    year = startDate[ 3 ] # 2017
+                    startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
 
 #TODO The start date seems to be relative to GMT.
 # That means port data for Sydney (GMT +10) can have a start date of the previous day,
@@ -713,8 +713,8 @@ class IndicatorTide:
                     dayOfMonth = date[ 4 : 6 ] # 17
                     month = str( datetime.datetime.strptime( date[ -3 : ], "%b" ).month ) # 7
 #                     year = startYear
-#                     if month < startMonth:
-#                         year = startYear + 1
+                    if month < startMonth: # Take into account tidal data containing both December and January.
+                        year = startYear + 1
 
                     types = [ ]
                     line = lines[ index + 2 ]
@@ -735,7 +735,7 @@ class IndicatorTide:
                             if hourMinutePattern.match( hourMinute ):
                                 dateTimes.append( datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" ) )
                             else:
-                                dateTimes.append( datetime.date( year, month, dayOfMonth ) )
+                                dateTimes.append( datetime.date( year, month, dayOfMonth ) ) # When no time is present, just add the date.
 
                     levels = [ ]
                     line = lines[ index + 6 ]
@@ -752,7 +752,8 @@ class IndicatorTide:
                         if levels[ index ] is None and isinstance( dateTimes[ index ], datetime.date ): #TODO Test this with a port that has missing time and level.
                             continue # Drop a tidal reading if missing both the time and level.
 
-#TODO Add comment that cannot store as UTC becuase sometime only have the date, not date and time.
+                        # As some ports only have the date component (no time is specified),
+                        # can only store date/time in the port local timezone rather than UTC.
                         if isinstance( dateTimes[ index ], datetime.datetime ):
                             tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, dateTimes[ index ].tzname(), levels[ index ], tideType, url ) )
                         else:
@@ -763,8 +764,8 @@ class IndicatorTide:
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = [ ]
 
-#         for t in tidalReadings: print( t )
-        
+        for t in tidalReadings: print( t )
+
         locale.setlocale( locale.LC_TIME, defaultLocale )
 
         return self.washTidalDataThroughCache( self.removeTidalReadingsPriorToToday( tidalReadings ) )
