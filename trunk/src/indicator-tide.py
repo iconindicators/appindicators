@@ -644,7 +644,7 @@ class IndicatorTide:
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
               "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
-        print( "port id", portIDForURL )
+        print( "port id", portIDForURL ) #TODO Remove
 
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object when in a non-English locale.
@@ -760,6 +760,7 @@ class IndicatorTide:
                             tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, None, None, None, levels[ index ], tideType, url ) )
 
         except Exception as e:
+            print( e ) #TODO Remove
             logging.exception( e )
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = [ ]
