@@ -702,6 +702,10 @@ class IndicatorTide:
 #     http://www.tides4fishing.com/us/connecticut/bridgeport#_tide_table
 #     http://tides.mobilegeographics.com/locations/731.html
 #     http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2772&PredictionLength=7
+#
+#     https://www.tides.info/?command=view&location=Honolulu,%20Honolulu%20Harbor,%20Oahu%20Island,%20Hawaii
+#     http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=6636&PredictionLength=7
+#     http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=6636&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
 
 
                 if "HWLWTableHeaderCell" in line:
