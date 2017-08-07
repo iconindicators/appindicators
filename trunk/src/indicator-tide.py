@@ -230,10 +230,10 @@ class IndicatorTide:
         previousDay = -1
         for tidalReading in tidalReadings:
 
-            if isinstance( tidalReading.getDateTimeUTC(), datetime.datetime ):
-                tidalDateTimeLocal = tidalReading.getDateTimeUTC().astimezone() # Date/time now in local time zone.
+            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
+                tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
             else:
-                tidalDateTimeLocal = tidalReading.getDateTimeUTC() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
+                tidalDateTimeLocal = tidalReading.getDateTime() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
 
             if not( tidalDateTimeLocal.month == previousMonth and tidalDateTimeLocal.day == previousDay ):
                 menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
@@ -266,10 +266,10 @@ class IndicatorTide:
         firstTidalReading = True
         for tidalReading in tidalReadings:
 
-            if type( tidalReading.getDateTimeUTC() ) == datetime.datetime:
-                tidalDateTimeLocal = tidalReading.getDateTimeUTC().astimezone() # Date/time now in local time zone.
+            if type( tidalReading.getDateTime() ) == datetime.datetime:
+                tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
             else:
-                tidalDateTimeLocal = tidalReading.getDateTimeUTC() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
+                tidalDateTimeLocal = tidalReading.getDateTime() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
 
             if firstTidalReading:
                 firstMonth = tidalDateTimeLocal.month
@@ -755,7 +755,7 @@ class IndicatorTide:
                         # As some ports only have the date component (no time is specified),
                         # can only store date/time in the port local timezone rather than UTC.
                         if isinstance( dateTimes[ index ], datetime.datetime ):
-                            tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, dateTimes[ index ].tzname(), levels[ index ], tideType, url ) )
+                            tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, dateTimes[ index ].tzname()[ 3 : 6 ] + dateTimes[ index ].tzname()[ 7 : ], levels[ index ], tideType, url ) )
                         else:
                             tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, None, None, None, levels[ index ], tideType, url ) )
 

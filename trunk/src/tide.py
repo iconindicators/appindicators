@@ -74,11 +74,20 @@ class Reading:
     def getURL( self ): return self.url
 
 
+    # Returns the date/time or date if time is unavailable in the port local timezone.
     def getDateTime( self ):
         if self.hour is None and self.minute is None and self.timezone is None:
             return datetime.date( self.year, self.month, self.day )
         else:
-            return datetime.datetime( self.year, self.month, self.day, self.hour, self.minute, 0, 0, self.timezone )
+            return \
+                datetime.datetime.strptime( \
+                    str( self.year ) + " " + 
+                    str( self.month ) +  " " + 
+                    str( self.day ) +  " " + 
+                    str( self.hour ) + " " + 
+                    str( self.minute ) + " " + 
+                    self.timezone,
+                    "%Y %m %d %H %M %z" )
 
 
     def __str__( self ):
