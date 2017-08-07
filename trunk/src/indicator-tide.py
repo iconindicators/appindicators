@@ -176,9 +176,9 @@ class IndicatorTide:
     #    Display dates as is
     #
     # Else (mix of datetimes and dates)
-    #    If drop tidal readings containing dates
-    #        Drop tidal readings containing dates
-    #        Convert remaining datetimes to user local
+    #    If drop tidal readings which are missing times
+    #        Drop a tidal reading if it only has a date
+    #        Convert a tidal reading's datetime to user local
     #
     #    Elif show only dates
     #        Drop time from tidal readings containing datetimes
@@ -210,22 +210,6 @@ class IndicatorTide:
 
 
     def buildMenuVanilla( self, menu, indent, tidalReadings ):
-
-        # If all tidal readings are datetimes
-        #    Convert datetimes to user local
-        #
-        # Elif all tidal readings are dates
-        #    Display dates as is
-        #
-        # Else (mix of datetimes and dates)
-        #    If drop tidal readings containing dates
-        #        Drop tidal readings containing dates
-        #        Convert remaining datetimes to user local
-        #
-        #    Else (show only dates)
-        #        Drop time from tidal readings containing datetimes
-        #        Display as dates
-
         previousMonth = -1
         previousDay = -1
         for tidalReading in tidalReadings:
@@ -236,8 +220,7 @@ class IndicatorTide:
                 tidalDateTimeLocal = tidalReading.getDateTime() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
 
             if not( tidalDateTimeLocal.month == previousMonth and tidalDateTimeLocal.day == previousDay ):
-                menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
-                self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
+                self.createAndAppendMenuItem( menu, indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat ), tidalReading.getURL() )
 
             if isinstance( tidalDateTimeLocal, datetime.datetime ):
                 menuItemText = tidalDateTimeLocal.strftime( self.menuItemTideFormat )
@@ -260,6 +243,7 @@ class IndicatorTide:
             previousDay = tidalDateTimeLocal.day
 
 
+#TODO Verify this works...and can it be merged with vanilla above?
     def buildMenuSubmenus( self, menu, indent, tidalReadings ):
         previousMonth = -1
         previousDay = -1
@@ -319,6 +303,7 @@ class IndicatorTide:
         return menuItem
 
 
+#TODO Needed?
     def tidalReadingsContainDates( self, tidalReadings ):
         containDates = False
         for tidalReading in tidalReadings:
@@ -329,6 +314,7 @@ class IndicatorTide:
         return containDates
 
 
+#TODO Needed?
     def tidalReadingsContainDateTimes( self, tidalReadings ):
         containDateTimes = False
         for tidalReading in tidalReadings:
@@ -339,6 +325,7 @@ class IndicatorTide:
         return containDateTimes
 
 
+#TODO UKHO updates at GMT midnight so update at that point...but also update at user midnight so old data is not showing.
     def getNextUpdateTimeInSeconds( self ):
         # No way of knowing when a port's data will be updated.
         # Simplest solution is ensure the user does not look at stale data.
