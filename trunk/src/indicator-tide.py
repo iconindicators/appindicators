@@ -173,46 +173,6 @@ class IndicatorTide:
         menu.show_all()
 
 
-    # If all tidal readings are datetimes
-    #    Convert datetimes to user local
-    #
-    # Elif all tidal readings are dates
-    #    Display dates as is
-    #
-    # Else (mix of datetimes and dates)
-    #    If drop tidal readings which are missing times
-    #        Drop a tidal reading if it only has a date
-    #        Convert a tidal reading's datetime to user local
-    #
-    #    Elif show only dates
-    #        Drop time from tidal readings containing datetimes
-    #        Display as dates
-    #
-    #    Else
-    #        Show datetimes and dates in port standard time.
-    def sanitiseTidalReadings( self, tidalReadings, dropTimeFromDateTime ):
-        allDates = True
-        allDateTimes = True
-        for tidalReading in tidalReadings:
-            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
-                allDates = False
-            else: # Must be datetime.date
-                allDateTimes = False
-
-        if not allDates and not allDateTimes: # A mix of datetime.datetime and datetime.date
-            if dropTimeFromDateTime: # Drop the time from tidal readings which contain datetime.datetime
-                
-#TODO
-                pass
-
-            else: # Drop tidal readings which contain datetime.date
-                for tidalReading in list( tidalReadings ):
-                    if isinstance( tidalReading.getDateTime(), datetime.date ):
-                        tidalReadings.remove( tidalReading )
-
-        return tidalReadings
-
-
     def buildMenuVanilla( self, menu, indent, tidalReadings ):
         previousMonth = -1
         previousDay = -1
@@ -305,6 +265,51 @@ class IndicatorTide:
             menuItem.set_name( url )
 
         return menuItem
+
+
+    # If all tidal readings are datetimes
+    #    pass (datetimes will be converted to user local)
+    #    If a level is missing, the level tag will be removed.
+    #
+    # Elif all tidal readings are dates
+    #    pass (display dates as is)
+    #    Need a format to show just type and level.
+    #    Levels cannot be missing as readings missing both level and time are dropped.
+    #
+    # Else (mix of datetimes and dates)
+    #    If drop date-only tidal readings
+    #        Drop a tidal reading if it only has a date (remaining readings contain datetimes)
+    #        If a level is missing from the remaining readings, the level tag will be removed.
+    #
+    #    Elif show only dates
+    #        Drop time from tidal readings containing datetimes
+    #        Drop readings that have no level (because readings now have no time)
+    #        Need a format to show just type and level.
+    #
+    #    Else
+    #        Show datetimes and dates in port standard time.
+    #        Need a format to show just type and level (used for readings with only a date).
+    def sanitiseTidalReadings( self, tidalReadings, dropTimeFromDateTime ):
+        allDates = True
+        allDateTimes = True
+        for tidalReading in tidalReadings:
+            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
+                allDates = False
+            else: # Must be datetime.date
+                allDateTimes = False
+
+        if not allDates and not allDateTimes: # A mix of datetime.datetime and datetime.date
+            if dropTimeFromDateTime: # Drop the time from tidal readings which contain datetime.datetime
+                
+#TODO
+                pass
+
+            else: # Drop tidal readings which contain datetime.date
+                for tidalReading in list( tidalReadings ):
+                    if isinstance( tidalReading.getDateTime(), datetime.date ):
+                        tidalReadings.remove( tidalReading )
+
+        return tidalReadings
 
 
 #TODO Needed?
