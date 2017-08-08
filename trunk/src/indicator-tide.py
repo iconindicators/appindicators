@@ -146,12 +146,83 @@ class IndicatorTide:
                 GLib.source_remove( self.updateTimerID )
 
             tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )
-            self.buildMenu( tidalReadings )
-            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
-    
+#TODO Call sanitise here...check length perhaps or sanitise can pass back some flag to indicate if/how the data has been modified...so can then notify the user. 
             if len( tidalReadings ) == 0:
                 message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
                 Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
+
+            self.buildMenu( tidalReadings )
+            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
+
+
+    # If all tidal readings are datetimes
+    #    pass (datetimes will be converted to user local)
+    #    If a level is missing, the level tag will be removed.
+    #
+    # Elif all tidal readings are dates
+    #    pass (display dates as is)
+    #    Need a format to show just type and level.
+    #    Levels cannot be missing as readings missing both level and time are dropped.
+    #
+    # Else (mix of datetimes and dates)
+    #    If drop date-only tidal readings
+    #        Drop a tidal reading if it only has a date (remaining readings contain datetimes)
+    #        If a level is missing from the remaining readings, the level tag will be removed.
+    #
+    #    Elif drop times from datetimes (show only dates)
+    #        Drop time from tidal readings containing datetimes
+    #        Drop readings that have no level (because readings now have no time)
+    #        Need a format to show just type and level.
+    #
+    #    Else
+    #        Show datetimes and dates in port standard time.
+    #        Need a format to show just type and level (used for readings with only a date).
+    def sanitiseTidalReadings( self, tidalReadings, dropTimeFromDateTime ):
+        allDates = True
+        allDateTimes = True
+        for tidalReading in tidalReadings:
+            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
+                allDates = False
+            else: # Must be datetime.date
+                allDateTimes = False
+
+        # If all tidal readings are datetime.datetime, each reading will be displayed in user local timezone.
+        # If all tidal readings are datetime.date, each reading will be displayed in port local timezone (as it was downloaded).
+        # If there is a mixture of datetime.datetime and datetime.date, adjust the tidal readings according to the user preferences...
+        if not allDates and not allDateTimes:
+            if dropTimeFromDateTime: # Drop the time from tidal readings which contain datetime.datetime
+
+#TODO
+                pass
+
+            else: # Drop tidal readings which contain datetime.date
+                for tidalReading in list( tidalReadings ):
+                    if isinstance( tidalReading.getDateTime(), datetime.date ):
+                        tidalReadings.remove( tidalReading )
+
+        return tidalReadings
+
+
+#TODO Needed?
+    def tidalReadingsContainDates( self, tidalReadings ):
+        containDates = False
+        for tidalReading in tidalReadings:
+            if isinstance( tidalReading.getDateTime(), datetime.date ):
+                containDates = True
+                break
+
+        return containDates
+
+
+#TODO Needed?
+    def tidalReadingsContainDateTimes( self, tidalReadings ):
+        containDateTimes = False
+        for tidalReading in tidalReadings:
+            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
+                containDateTimes = True
+                break
+
+        return containDateTimes
 
 
     def buildMenu( self, tidalReadings ):
@@ -161,7 +232,6 @@ class IndicatorTide:
         else:
             menuItemText = _( "{0}, {1}" ).format( ports.getPortName( tidalReadings[ 0 ].getPortID() ), ports.getCountry( tidalReadings[ 0 ].getPortID() ) )
             self.createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
-
             indent = "    "
             if self.showAsSubMenus:
                 self.buildMenuSubmenus( menu, indent, tidalReadings )
@@ -265,73 +335,6 @@ class IndicatorTide:
             menuItem.set_name( url )
 
         return menuItem
-
-
-    # If all tidal readings are datetimes
-    #    pass (datetimes will be converted to user local)
-    #    If a level is missing, the level tag will be removed.
-    #
-    # Elif all tidal readings are dates
-    #    pass (display dates as is)
-    #    Need a format to show just type and level.
-    #    Levels cannot be missing as readings missing both level and time are dropped.
-    #
-    # Else (mix of datetimes and dates)
-    #    If drop date-only tidal readings
-    #        Drop a tidal reading if it only has a date (remaining readings contain datetimes)
-    #        If a level is missing from the remaining readings, the level tag will be removed.
-    #
-    #    Elif show only dates
-    #        Drop time from tidal readings containing datetimes
-    #        Drop readings that have no level (because readings now have no time)
-    #        Need a format to show just type and level.
-    #
-    #    Else
-    #        Show datetimes and dates in port standard time.
-    #        Need a format to show just type and level (used for readings with only a date).
-    def sanitiseTidalReadings( self, tidalReadings, dropTimeFromDateTime ):
-        allDates = True
-        allDateTimes = True
-        for tidalReading in tidalReadings:
-            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
-                allDates = False
-            else: # Must be datetime.date
-                allDateTimes = False
-
-        if not allDates and not allDateTimes: # A mix of datetime.datetime and datetime.date
-            if dropTimeFromDateTime: # Drop the time from tidal readings which contain datetime.datetime
-                
-#TODO
-                pass
-
-            else: # Drop tidal readings which contain datetime.date
-                for tidalReading in list( tidalReadings ):
-                    if isinstance( tidalReading.getDateTime(), datetime.date ):
-                        tidalReadings.remove( tidalReading )
-
-        return tidalReadings
-
-
-#TODO Needed?
-    def tidalReadingsContainDates( self, tidalReadings ):
-        containDates = False
-        for tidalReading in tidalReadings:
-            if isinstance( tidalReading.getDateTime(), datetime.date ):
-                containDates = True
-                break
-
-        return containDates
-
-
-#TODO Needed?
-    def tidalReadingsContainDateTimes( self, tidalReadings ):
-        containDateTimes = False
-        for tidalReading in tidalReadings:
-            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
-                containDateTimes = True
-                break
-
-        return containDateTimes
 
 
 #TODO UKHO updates at GMT midnight so update at that point...but also update at user midnight so old data is not showing.
@@ -618,7 +621,7 @@ class IndicatorTide:
             portIDForURL = portID.rjust( 4, "0" )
 
         # TODO Testing...
-#         portIDForURL = "1800" # LW time missing.
+        portIDForURL = "1800" # LW time missing.
 #         portIDForURL = "1894A" # LW time missing.
 #         portIDForURL = "3983" # LW time is missing.
 #
@@ -731,7 +734,7 @@ class IndicatorTide:
                             if hourMinutePattern.match( hourMinute ):
                                 dateTimes.append( datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" ) )
                             else:
-                                dateTimes.append( datetime.date( year, month, dayOfMonth ) ) # When no time is present, just add the date.
+                                dateTimes.append( datetime.date( int( year ), int( month ), int( dayOfMonth ) ) ) # When no time is present, just add the date.
 
                     levels = [ ]
                     line = lines[ index + 6 ]
@@ -746,7 +749,7 @@ class IndicatorTide:
 
                     for index, tideType in enumerate( types ):
                         if levels[ index ] is None and isinstance( dateTimes[ index ], datetime.date ): #TODO Test this with a port that has missing time and level.
-                            continue # Drop a tidal reading if missing both the time and level.
+                            continue # Drop a tidal reading if missing both the time and level.   #TODO Add sample port IDs for which this would happen.
 
                         # As some ports only have the date component (no time is specified),
                         # can only store date/time in the port local timezone rather than UTC.
