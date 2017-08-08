@@ -54,35 +54,6 @@ import datetime, json, locale, logging, os, ports, pythonutils, re, threading, t
 # If so, apply to all indicators!
 
 
-#TODO...
-# For most ports, each tidal reading contains date/type/time/level (Tue 25 Jul / HW / 05:38 / 0.4 m )
-# For these ports, convert the date/time from the port standard local time to (UTC and then to) user local time. 
-# Further, it seems every tidal reading will have at least the date and the type.
-# 
-# Some port tidal readings do not have a level (but still have date/time/type). 
-# In this case, the [LEVEL] tag is dropped out - is a separate user preference needed?
-# Date/time/level is shown as normal.
-# 
-# Some port tidal readings do not have the time and level.
-# In this case drop that specific tidal reading.
-# Assuming the remaining tidal readings have the date/time and optionally the level, proceed as above.
-# If all tidal readings have been dropped, there is no data to show and message the user.
-# 
-# Some port tidal readings do not have the time (date/type/level are present).
-# If all the port's tidal readings do not have the time, then display using just the date (as port standard local).
-# If there is a mix of tidal readings with date/time and some with only time, what to do?
-# Drop the time from date/time readings and show only date for all readings, or,
-# drop readings if they don't have a time (and keep the date/time readings).
-#
-# User preferences:
-#    A format to show the date (already present).
-#    A format to show each time/type/level (already present).
-#    A format to show each time/type (not present).
-#    When some readings contain date and some contain date/time, choose either
-#        a) drop the time from date/time readings and show all readings using only date, or
-#        b) drop readings that only have a date (missing time) and show only readings with a date/time.
-
-
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
@@ -146,83 +117,12 @@ class IndicatorTide:
                 GLib.source_remove( self.updateTimerID )
 
             tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )
-#TODO Call sanitise here...check length perhaps or sanitise can pass back some flag to indicate if/how the data has been modified...so can then notify the user. 
             if len( tidalReadings ) == 0:
                 message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
                 Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
 
             self.buildMenu( tidalReadings )
             self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
-
-
-    # If all tidal readings are datetimes
-    #    pass (datetimes will be converted to user local)
-    #    If a level is missing, the level tag will be removed.
-    #
-    # Elif all tidal readings are dates
-    #    pass (display dates as is)
-    #    Need a format to show just type and level.
-    #    Levels cannot be missing as readings missing both level and time are dropped.
-    #
-    # Else (mix of datetimes and dates)
-    #    If drop date-only tidal readings
-    #        Drop a tidal reading if it only has a date (remaining readings contain datetimes)
-    #        If a level is missing from the remaining readings, the level tag will be removed.
-    #
-    #    Elif drop times from datetimes (show only dates)
-    #        Drop time from tidal readings containing datetimes
-    #        Drop readings that have no level (because readings now have no time)
-    #        Need a format to show just type and level.
-    #
-    #    Else
-    #        Show datetimes and dates in port standard time.
-    #        Need a format to show just type and level (used for readings with only a date).
-    def sanitiseTidalReadings( self, tidalReadings, dropTimeFromDateTime ):
-        allDates = True
-        allDateTimes = True
-        for tidalReading in tidalReadings:
-            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
-                allDates = False
-            else: # Must be datetime.date
-                allDateTimes = False
-
-        # If all tidal readings are datetime.datetime, each reading will be displayed in user local timezone.
-        # If all tidal readings are datetime.date, each reading will be displayed in port local timezone (as it was downloaded).
-        # If there is a mixture of datetime.datetime and datetime.date, adjust the tidal readings according to the user preferences...
-        if not allDates and not allDateTimes:
-            if dropTimeFromDateTime: # Drop the time from tidal readings which contain datetime.datetime
-
-#TODO
-                pass
-
-            else: # Drop tidal readings which contain datetime.date
-                for tidalReading in list( tidalReadings ):
-                    if isinstance( tidalReading.getDateTime(), datetime.date ):
-                        tidalReadings.remove( tidalReading )
-
-        return tidalReadings
-
-
-#TODO Needed?
-    def tidalReadingsContainDates( self, tidalReadings ):
-        containDates = False
-        for tidalReading in tidalReadings:
-            if isinstance( tidalReading.getDateTime(), datetime.date ):
-                containDates = True
-                break
-
-        return containDates
-
-
-#TODO Needed?
-    def tidalReadingsContainDateTimes( self, tidalReadings ):
-        containDateTimes = False
-        for tidalReading in tidalReadings:
-            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
-                containDateTimes = True
-                break
-
-        return containDateTimes
 
 
     def buildMenu( self, tidalReadings ):
@@ -247,14 +147,14 @@ class IndicatorTide:
         previousMonth = -1
         previousDay = -1
         for tidalReading in tidalReadings:
-
             if isinstance( tidalReading.getDateTime(), datetime.datetime ):
                 tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
             else:
                 tidalDateTimeLocal = tidalReading.getDateTime() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
 
             if not( tidalDateTimeLocal.month == previousMonth and tidalDateTimeLocal.day == previousDay ):
-                self.createAndAppendMenuItem( menu, indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat ), tidalReading.getURL() )
+                menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
+                self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
 
             if isinstance( tidalDateTimeLocal, datetime.datetime ):
                 menuItemText = tidalDateTimeLocal.strftime( self.menuItemTideFormat )
@@ -283,8 +183,7 @@ class IndicatorTide:
         previousDay = -1
         firstTidalReading = True
         for tidalReading in tidalReadings:
-
-            if type( tidalReading.getDateTime() ) == datetime.datetime:
+            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
                 tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
             else:
                 tidalDateTimeLocal = tidalReading.getDateTime() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
@@ -309,7 +208,7 @@ class IndicatorTide:
 
             if tidalReading.getType() == tide.Type.H:
                 menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
-            else: # The type must be either H or L - cannot be None.
+            else: # The type must be either H or L - cannot be anything else.
                 menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "L" ) )
 
             if tidalReading.getLevelInMetres() is None:
@@ -621,7 +520,7 @@ class IndicatorTide:
             portIDForURL = portID.rjust( 4, "0" )
 
         # TODO Testing...
-        portIDForURL = "1800" # LW time missing.
+#         portIDForURL = "1800" # LW time missing.
 #         portIDForURL = "1894A" # LW time missing.
 #         portIDForURL = "3983" # LW time is missing.
 #
@@ -678,41 +577,16 @@ class IndicatorTide:
                     else:
                         raise ValueError( "Unable to obtain UTC from '" + line + "' in " + url )
 
-                    # Obtain the year of the local port...
-                    # ...it is possible the year will change if the readings start in Dec and end in Jan (take into account as each reading is processed).
-#                     year = ( datetime.datetime.utcnow() + datetime.timedelta( minutes = int( utcOffset[ 0 ] + utcOffset[ 3 : 5 ] ), hours = int( utcOffset[ 0 ] + utcOffset[ 1 : 3 ] ) ) ).year
-
                 if "PredictionSummary1_lblPredictionStart" in line:
                     startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time of the port)
                     year = startDate[ 3 ] # 2017
                     startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
 
-#TODO The start date seems to be relative to GMT.
-# That means port data for Sydney (GMT +10) can have a start date of the previous day,
-# until GMT midnight comes around (when tidal readings are updated).
-# Only need the year from the start date...
-# ...or is there a way to get the year from the system date and ensure the year makes sense for the port in question?
-# Only need to worry about an incorrect year if Dec 31 or Jan 1...but how?
-# Maybe get current date/time for the UTC of the port and then get the year.
-
-#TODO Sites for the port Bridgeport, Connecticut which is a day behind GMT and can be used to see what their data is and the date compared to UKHO.
-#     https://www.tides.info/?command=view&location=Bridgeport%20Harbor,%20Bridgeport,%20Connecticut
-#     http://ct.usharbors.com/monthly-tides/Connecticut-West/Bridgeport
-#     http://www.tides4fishing.com/us/connecticut/bridgeport#_tide_table
-#     http://tides.mobilegeographics.com/locations/731.html
-#     http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=2772&PredictionLength=7
-#
-#     https://www.tides.info/?command=view&location=Honolulu,%20Honolulu%20Harbor,%20Oahu%20Island,%20Hawaii
-#     http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=6636&PredictionLength=7
-#     http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=6636&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
-
-
                 if "HWLWTableHeaderCell" in line:
                     date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # Mon 17 Jul (standard local time)
                     dayOfMonth = date[ 4 : 6 ] # 17
                     month = str( datetime.datetime.strptime( date[ -3 : ], "%b" ).month ) # 7
-#                     year = startYear
-                    if month < startMonth: # Take into account tidal data containing both December and January.
+                    if month < startMonth: # Take into account tidal data changing from December to January.
                         year = startYear + 1
 
                     types = [ ]
@@ -764,7 +638,7 @@ class IndicatorTide:
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = [ ]
 
-        for t in tidalReadings: print( t )
+        for t in tidalReadings: print( t ) # TODO Testing
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
 
@@ -781,7 +655,7 @@ class IndicatorTide:
         todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
         for tidalReading in list( tidalReadings ):
 
-            if type( tidalReading.getDateTimeUTC() ) is datetime.datetime:
+            if type( tidalReading.getDateTimeUTC() ) is datetime.datetime:  #TODO Use isinstance
                 if tidalReading.getDateTimeUTC().astimezone() < todayLocalMidnight:
                     tidalReadings.remove( tidalReading )
 
