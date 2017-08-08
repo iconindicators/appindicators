@@ -90,8 +90,9 @@ class IndicatorTide:
     WEBSITE = "https://launchpad.net/~thebernmeister"
     COMMENTS = _( "Displays tidal information.\nNon-UK ports will be unavailable after {0}." ).format( ports.getExpiry() )
 
-    CREDIT_UKHO_UK_PORTS = _( "Tidal information for UK ports licensed under the\nOpen Government Licence for Public Sector Information. http://www.nationalarchives.gov.uk/doc/open-government-licence" )
-    CREDIT_UKHO_UK_NON_PORTS = _( "Tidal information for non-UK ports reproduced by\npermission of the Controller of Her Majesty’s Stationery Office\nand the UK Hydrographic Office. http://www.ukho.gov.uk" )
+#TODO This should not be translated...check with Oleg.
+    CREDIT_UKHO_UK_PORTS = _( "Tidal information for UK ports licensed under the Open\nGovernment Licence for Public Sector Information. http://www.nationalarchives.gov.uk/doc/open-government-licence" )
+    CREDIT_UKHO_UK_NON_PORTS = _( "Tidal information for non-UK ports reproduced by\npermission of the Controller of Her Majesty’s Stationery\nOffice and the UK Hydrographic Office. http://www.ukho.gov.uk" )
     CREDITS = [ CREDIT_UKHO_UK_PORTS, CREDIT_UKHO_UK_NON_PORTS ]
 
     URL_TIMEOUT_IN_SECONDS = 10
@@ -141,7 +142,8 @@ class IndicatorTide:
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
-            tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )
+#             tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID ) #TODO Remove
+            tidalReadings = []
             self.buildMenu( tidalReadings )
             self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
     
