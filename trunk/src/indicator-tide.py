@@ -45,6 +45,9 @@ from urllib.request import urlopen
 import datetime, json, locale, logging, os, ports, pythonutils, re, threading, tide, time, webbrowser
 
 
+#TODO Renew license!
+
+
 # #TODO
 # Should indicator files go into .config?
 # The directory exists under Ubuntu GNOME and Ubuntu 14.04.
@@ -142,8 +145,7 @@ class IndicatorTide:
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
-#             tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID ) #TODO Remove
-            tidalReadings = []
+            tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )
             self.buildMenu( tidalReadings )
             self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
     
