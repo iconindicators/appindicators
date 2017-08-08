@@ -1,11 +1,13 @@
 indicator-tide (1.0.8-1) trusty; urgency=low
 
-  * Bug fix: Tidal information in which the time or level (or both) are
-    missing, are now correctly handled.
-  * Bug fix: Dates/times were displayed in port local date/time rather than
+  * Bug fix: Correctly handle tidal information in which the time or level or
+    both are absent.
+  * Bug fix: Dates/times were displayed in port local date/time rather than in
     user local date/time.
+  * Changed the format of the tide type, time and level to have the type first
+    (rather than time first) to match the data source.
   * Added a preference to format the display when time is absent from a reading.........................
-  * Tidal information is cached for use when offline.
+  * Tidal information is cached for use when offline.   ........................Is this still valid?
   * Split the Preferences dialog over two tabs (ports and general).
   * About/Preferences dialogs now block each other - only show one at a time.
   * Update release to trusty as precise is end of life.
