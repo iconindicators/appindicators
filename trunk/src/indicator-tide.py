@@ -132,46 +132,11 @@ class IndicatorTide:
         else:
             menuItemText = _( "{0}, {1}" ).format( ports.getPortName( tidalReadings[ 0 ].getPortID() ), ports.getCountry( tidalReadings[ 0 ].getPortID() ) )
             self.createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
-            indent = "    "
-            self._buildMenu( menu, indent, tidalReadings )
+            self._buildMenu( menu, "    ", tidalReadings )
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-
-
-    def buildMenuVanilla( self, menu, indent, tidalReadings ):
-        previousMonth = -1
-        previousDay = -1
-        for tidalReading in tidalReadings:
-            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
-                tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
-            else:
-                tidalDateTimeLocal = tidalReading.getDateTime() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
-
-            if not( tidalDateTimeLocal.month == previousMonth and tidalDateTimeLocal.day == previousDay ):
-                menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
-                self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
-
-            if isinstance( tidalDateTimeLocal, datetime.datetime ):
-                menuItemText = tidalDateTimeLocal.strftime( self.menuItemTideFormat )
-            else:
-                menuItemText = self.menuItemTideFormatSansTime
-
-            if tidalReading.getType() == tide.Type.H:
-                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
-            else: # The type must be either H or L - cannot be anything else.
-                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "L" ) )
-
-            if tidalReading.getLevelInMetres() is None:
-                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, "" )
-            else:
-                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tidalReading.getLevelInMetres() ) + " m" )
-
-            self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
-
-            previousMonth = tidalDateTimeLocal.month
-            previousDay = tidalDateTimeLocal.day
 
 
 #TODO Verify subMenus work.
@@ -223,54 +188,6 @@ class IndicatorTide:
                     self.createAndAppendMenuItem( subMenu, menuItemText, tidalReading.getURL() )
             else:
                 self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
-
-            previousMonth = tidalDateTimeLocal.month
-            previousDay = tidalDateTimeLocal.day
-
-
-#TODO Verify this works...and can it be merged with vanilla above?
-    def buildMenuSubmenus( self, menu, indent, tidalReadings ):
-        previousMonth = -1
-        previousDay = -1
-        firstTidalReading = True
-        for tidalReading in tidalReadings:
-            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
-                tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
-            else:
-                tidalDateTimeLocal = tidalReading.getDateTime() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
-
-            if firstTidalReading:
-                firstMonth = tidalDateTimeLocal.month
-                firstDay = tidalDateTimeLocal.day
-                firstTidalReading = False
-
-            if not( tidalDateTimeLocal.month == previousMonth and tidalDateTimeLocal.day == previousDay ):
-                menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
-                if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
-                    self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
-                else:
-                    subMenu = Gtk.Menu()
-                    self.createAndAppendMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
-
-            if isinstance( tidalDateTimeLocal, datetime.datetime ):
-                menuItemText = tidalDateTimeLocal.strftime( self.menuItemTideFormat )
-            else:
-                menuItemText = self.menuItemTideFormatSansTime
-
-            if tidalReading.getType() == tide.Type.H:
-                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
-            else: # The type must be either H or L - cannot be anything else.
-                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "L" ) )
-
-            if tidalReading.getLevelInMetres() is None:
-                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, "" )
-            else:
-                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tidalReading.getLevelInMetres() ) + " m" )
-
-            if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
-                self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
-            else:
-                self.createAndAppendMenuItem( subMenu, menuItemText, tidalReading.getURL() )
 
             previousMonth = tidalDateTimeLocal.month
             previousDay = tidalDateTimeLocal.day
