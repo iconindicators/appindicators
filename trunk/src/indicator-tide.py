@@ -593,7 +593,10 @@ class IndicatorTide:
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = [ ]
 
-        for t in tidalReadings: print( t ) # TODO Testing
+#TODO Test all ports from above:
+#     Check subMenus and not subMenus option.
+#     Verify dates/times
+        for t in tidalReadings: print( t ) # TODO Ensure raw data is correctly scraped.
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
 
