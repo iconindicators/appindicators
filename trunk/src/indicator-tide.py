@@ -139,7 +139,6 @@ class IndicatorTide:
         menu.show_all()
 
 
-#TODO Verify subMenus work.
     def _buildMenu( self, menu, indent, tidalReadings ):
         previousMonth = -1
         previousDay = -1
@@ -497,8 +496,6 @@ class IndicatorTide:
         #    UTC offset negative: 2168
         #    UTC offset positive: 4000
 
-
-        portIDForURL = "4000"
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
               "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
