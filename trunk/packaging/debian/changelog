@@ -1,5 +1,6 @@
 indicator-lunar (1.0.74-1) trusty; urgency=low
 
+  * Corrected warnings in .desktop file.
   * Removed expired eclipse information.
   * About/Preferences dialogs now block each other - only show one at a time.
   * Update release to trusty as precise is end of life.
