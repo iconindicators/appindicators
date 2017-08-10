@@ -610,12 +610,12 @@ class IndicatorTide:
         todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
         for tidalReading in list( tidalReadings ):
 
-            if type( tidalReading.getDateTimeUTC() ) is datetime.datetime:  #TODO Use isinstance
-                if tidalReading.getDateTimeUTC().astimezone() < todayLocalMidnight:
+            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
+                if tidalReading.getDateTime().astimezone() < todayLocalMidnight:
                     tidalReadings.remove( tidalReading )
 
             else:
-                if tidalReading.getDateTimeUTC() < todayLocalMidnight.date():
+                if tidalReading.getDateTime() < todayLocalMidnight.date():
                     tidalReadings.remove( tidalReading )
 
         return tidalReadings
