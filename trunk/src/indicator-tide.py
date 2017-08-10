@@ -487,30 +487,18 @@ class IndicatorTide:
         else:
             portIDForURL = portID.rjust( 4, "0" )
 
-        # TODO Testing...
-#         portIDForURL = "1800" # LW time missing.
-#         portIDForURL = "1894A" # LW time missing.
-#         portIDForURL = "3983" # LW time is missing.
-#
-#         portIDForURL = "2168" # HW/LW time missing.
-#         portIDForURL = "5088" # HW/LW time missing.
-#
-#         portIDForURL = "0839" # HW/LW reading is missing.
-#
-#         portIDForURL = "4000" # LW time/reading is missing.
-#         portIDForURL = "3578" # LW time/reading is missing.
-#
-#         portIDForURL = "4273" # HW/LW reading is missing; LW time is missing.
-#
-#         portIDForURL = "1411" # LW reading is negative.
-#
-#         portIDForURL = "2168" # UTC offset negative.
-#         portIDForURL = "4000" # UTC offset positive.
+        # Port IDs for testing...
+        #    LW time missing: 1800, 1894A, 3983
+        #    HW/LW time missing: 2168, 5088
+        #    HW/LW reading is missing: 0839
+        #    LW time/reading is missing: 4000, 3578
+        #    HW/LW reading is missing; LW time is missing: 4273
+        #    LW reading is negative: 1411
+        #    UTC offset negative: 2168
+        #    UTC offset positive: 4000
 
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
               "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
-
-        print( "port id", portIDForURL ) #TODO Remove
 
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object when in a non-English locale.
