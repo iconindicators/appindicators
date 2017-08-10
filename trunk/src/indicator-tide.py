@@ -203,17 +203,18 @@ class IndicatorTide:
         return menuItem
 
 
-#TODO UKHO updates at GMT midnight so update at that point...but also update at user midnight so old data is not showing.
     def getNextUpdateTimeInSeconds( self ):
-        # No way of knowing when a port's data will be updated.
-        # Simplest solution is ensure the user does not look at stale data.
-        # Doing an update just after (local) midnight will drop out any data prior to (local) today.
-        now = datetime.datetime.now()
-        fiveMinutesAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
-        numberOfSecondsUntilFiveMinutesAfterMidnight = ( fiveMinutesAfterMidnight - now ).total_seconds()
-        numberOfSecondsInTwelveHours = 12 * 60 * 60 # Automatically update the tidal information at least every 12 hours.
+        # UKHO appears to update port data at GMT midnight.
+        # Do an update shortly after GMT midnight but also shortly after local midnight to drop stale data.
+        utcnow = datetime.datetime.utcnow()
+        fiveMinutesAfterUTCMidnight = ( utcnow + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
+        numberOfSecondsUntilFiveMinutesAfterUTCMidnight = ( fiveMinutesAfterUTCMidnight - utcnow ).total_seconds()
 
-        return int( min( numberOfSecondsInTwelveHours, numberOfSecondsUntilFiveMinutesAfterMidnight ) )
+        now = datetime.datetime.now()
+        fiveMinutesAfterLocalMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
+        numberOfSecondsUntilFiveMinutesAfterLocalMidnight = ( fiveMinutesAfterLocalMidnight - now ).total_seconds()
+
+        return int( min( numberOfSecondsUntilFiveMinutesAfterUTCMidnight, numberOfSecondsUntilFiveMinutesAfterLocalMidnight ) )
 
 
     def onAbout( self, widget ):
