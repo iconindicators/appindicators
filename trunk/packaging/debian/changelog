@@ -1,5 +1,6 @@
 indicator-ppa-download-statistics (1.0.58-1) trusty; urgency=low
 
+  * Corrected warnings in .desktop file.
   * About/Preferences dialogs now block each other - only show one at a time.
   * Added a drop shadow to the icon.
   * Update release to trusty as precise is end of life.
