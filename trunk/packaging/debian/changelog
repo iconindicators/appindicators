@@ -1,5 +1,6 @@
 indicator-punycode (1.0.4-1) trusty; urgency=low
 
+  * Corrected warnings in .desktop file.
   * Tidied up tooltips in the Preferences dialog.
   * About/Preferences dialogs now block each other - only show one at a time.
   * Update release to trusty as precise is end of life.
