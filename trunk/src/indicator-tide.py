@@ -358,7 +358,7 @@ class IndicatorTide:
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
 
-        box.pack_start( Gtk.Label( _( "In absentia" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Missing time" ) ), False, False, 0 )
 
         tideFormatSansTime = Gtk.Entry()
         tideFormatSansTime.set_text( self.menuItemTideFormatSansTime )
