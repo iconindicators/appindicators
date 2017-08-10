@@ -147,7 +147,7 @@ class IndicatorTide:
             if isinstance( tidalReading.getDateTime(), datetime.datetime ):
                 tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
             else:
-                tidalDateTimeLocal = tidalReading.getDateTime() # There is no time component.  #TODO Test port 1894A which hits this problem - make sure the days/dates match up and are make sense. 
+                tidalDateTimeLocal = tidalReading.getDateTime() # There is no time component.
 
             if self.showAsSubMenus and firstTidalReading:
                 firstMonth = tidalDateTimeLocal.month
