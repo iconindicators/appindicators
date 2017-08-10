@@ -497,6 +497,8 @@ class IndicatorTide:
         #    UTC offset negative: 2168
         #    UTC offset positive: 4000
 
+
+        portIDForURL = "4000"
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
               "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
@@ -578,8 +580,8 @@ class IndicatorTide:
                                 levels.append( None )
 
                     for index, tideType in enumerate( types ):
-                        if levels[ index ] is None and isinstance( dateTimes[ index ], datetime.date ): #TODO Test this with a port that has missing time and level.
-                            continue # Drop a tidal reading if missing both the time and level.   #TODO Add sample port IDs for which this would happen.
+                        if levels[ index ] is None and isinstance( dateTimes[ index ], datetime.date ):
+                            continue # Drop a tidal reading if missing both the time and level.
 
                         # As some ports only have the date component (no time is specified),
                         # can only store date/time in the port local timezone rather than UTC.
@@ -589,7 +591,6 @@ class IndicatorTide:
                             tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, None, None, None, levels[ index ], tideType, url ) )
 
         except Exception as e:
-            print( e ) #TODO Remove
             logging.exception( e )
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = [ ]
