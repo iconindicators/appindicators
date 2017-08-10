@@ -1,6 +1,7 @@
 indicator-fortune (1.0.26-1) trusty; urgency=low
 
   * Bug fix: Reset in Preferences did not actually reset!
+  * Corrected warnings in .desktop file.
   * Corrections and updates to the tool tip text in the Preferences dialog.
   * Can now sort fortunes in the Preferences.
   * Changed default function of middle mouse button click from showing a new
