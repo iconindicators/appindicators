@@ -58,7 +58,8 @@ class IndicatorFortune:
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
     NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, the notification summary should be emitted as a warning (rather than a regular fortune).
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
+    SETTINGS_DIR = INDICATOR_NAME
+    SETTINGS_FILE = INDICATOR_NAME + ".json" #TODO This should be final...but check!
     SETTINGS_FORTUNES = "fortunes"
     SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
     SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW = 1
@@ -555,6 +556,8 @@ class IndicatorFortune:
 
 
     def loadSettings( self ):
+        self.saveSettings()
+        if True: return #TODO Remove
         self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
         self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
         self.notificationSummary = IndicatorFortune.NOTIFICATION_SUMMARY
@@ -589,13 +592,7 @@ class IndicatorFortune:
             IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
         }
 
-        try:
-            with open( IndicatorFortune.SETTINGS_FILE, "w" ) as f:
-                f.write( json.dumps( settings ) )
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing settings: " + IndicatorFortune.SETTINGS_FILE )
+        pythonutils.saveSettings( settings, IndicatorFortune.SETTINGS_DIR, IndicatorFortune.SETTINGS_FILE, logging )
 
 
 if __name__ == "__main__": IndicatorFortune().main()
