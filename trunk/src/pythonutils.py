@@ -200,12 +200,12 @@ def showAboutDialog(
 #TOOD Add comment header.
 def loadSettings( settingsRelativeDirectory, settingsFile, logging ):
     settingsDirectory = getSettingsDirectory( settingsRelativeDirectory )
-    settings = None
+    settings = [ ]
     if os.path.isfile( settingsDirectory + "/" + settingsFile ):
         try:
             with open( settingsDirectory + "/" + settingsFile, "r" ) as f:
                 settings = json.load( f )
-
+#TODO Test with missing file...and bad file...what is settings?  None or empty or what?
         except Exception as e:
             logging.exception( e )
             logging.error( "Error reading settings: " + settingsDirectory + "/" + settingsFile )
