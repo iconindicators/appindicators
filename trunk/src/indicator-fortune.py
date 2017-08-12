@@ -59,7 +59,7 @@ class IndicatorFortune:
     NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, the notification summary should be emitted as a warning (rather than a regular fortune).
 
     SETTINGS_DIR = INDICATOR_NAME
-    SETTINGS_FILE = INDICATOR_NAME + ".json" #TODO This should be final...but check!
+    SETTINGS_FILE = INDICATOR_NAME + ".json" #TODO This should be final...but check! Can these two be combined?
     SETTINGS_FORTUNES = "fortunes"
     SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
     SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW = 1
@@ -76,6 +76,7 @@ class IndicatorFortune:
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
         Notify.init( INDICATOR_NAME )
+        pythonutils.migrateSettings( IndicatorFortune.SETTINGS_DIR, IndicatorFortune.SETTINGS_FILE ) # Migrate old user settings to new location.
         self.loadSettings()
 
         if os.path.isfile( IndicatorFortune.HISTORY_FILE ):
@@ -556,31 +557,22 @@ class IndicatorFortune:
 
 
     def loadSettings( self ):
-        self.saveSettings()
-        if True: return #TODO Remove
         self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
         self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
         self.notificationSummary = IndicatorFortune.NOTIFICATION_SUMMARY
         self.refreshIntervalInMinutes = 15
         self.skipFortuneCharacterCount = 360 # From experimentation, about 45 characters per line, but with word boundaries maintained, say 40 characters per line (with at most 9 lines).
 
-        if os.path.isfile( IndicatorFortune.SETTINGS_FILE ):
-            try:
-                with open( IndicatorFortune.SETTINGS_FILE, "r" ) as f:
-                    settings = json.load( f )
+        settings = pythonutils.loadSettings( IndicatorFortune.SETTINGS_DIR, IndicatorFortune.SETTINGS_FILE, logging )
+        if settings is not None:
+            self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes ) # At a minimum, will always contain the default fortune (may or may not be enabled).
+            if self.fortunes == [ ]: # Previous versions allowed the default fortune to be deleted so it is possible the fortunes list can be empty.
+                self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
 
-                self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes ) # At a minimum, will always contain the default fortune (may or may not be enabled).
-                if self.fortunes == [ ]: # Previous versions allowed the default fortune to be deleted so it is possible the fortunes list can be empty.
-                    self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
-
-                self.middleMouseClickOnIcon = settings.get( IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
-                self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )
-                self.refreshIntervalInMinutes = settings.get( IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
-                self.skipFortuneCharacterCount = settings.get( IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT, self.skipFortuneCharacterCount )
-
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Error reading settings: " + IndicatorFortune.SETTINGS_FILE )
+            self.middleMouseClickOnIcon = settings.get( IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
+            self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )
+            self.refreshIntervalInMinutes = settings.get( IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
+            self.skipFortuneCharacterCount = settings.get( IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT, self.skipFortuneCharacterCount )
 
 
     def saveSettings( self ):
