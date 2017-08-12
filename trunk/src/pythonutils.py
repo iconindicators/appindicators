@@ -197,19 +197,30 @@ def showAboutDialog(
         aboutDialog.hide()
 
 
+#TOOD Add comment header.
+def loadSettings( settingsRelativeDirectory, settingsFile, logging ):
+    settingsDirectory = getSettingsDirectory( settingsRelativeDirectory )
+    settings = None
+    if os.path.isfile( settingsDirectory + "/" + settingsFile ):
+        try:
+            with open( settingsDirectory + "/" + settingsFile, "r" ) as f:
+                settings = json.load( f )
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error reading settings: " + settingsDirectory + "/" + settingsFile )
+
+    return settings
+
+
+# Write a dict of settings to JSON text file.
+#
+# settings: dict of key/value pairs.
+# settingsRelativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# settingsFile: The file name.
+# logging: Used to log.
 def saveSettings( settings, settingsRelativeDirectory, settingsFile, logging ):
-    if CONFIG_HOME_ENVIRONMENT in os.environ:
-        settingsDirectory = os.environ[ CONFIG_HOME_ENVIRONMENT ] + "/"
-    else:
-        settingsDirectory = os.path.expanduser( "~" ) + "/" + CONFIG_HOME_DEFAULT + "/"
-
-    if settingsRelativeDirectory is not None and len( settingsRelativeDirectory ) > 0:
-        settingsDirectory += settingsRelativeDirectory + "/"
-
-    print( settingsDirectory )
-    if not os.path.isdir( settingsDirectory ):
-        print( os.mkdir( settingsDirectory ) )
-
+    settingsDirectory = getSettingsDirectory( settingsRelativeDirectory )
     success = True
     try:
         with open( settingsDirectory + "/" + settingsFile, "w" ) as f:
@@ -221,6 +232,41 @@ def saveSettings( settings, settingsRelativeDirectory, settingsFile, logging ):
         success = False
 
     return success
+
+
+# Move the settings file from user home (original and incorrect location) to new location.
+#
+# settingsRelativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# settingsFile: The file name.
+def migrateSettings( settingsRelativeDirectory, settingsFile ):
+    oldSettings = os.path.expanduser( "~" ) + "/." + settingsFile
+    if os.path.isfile( oldSettings ):
+        os.rename( oldSettings, getSettingsDirectory( settingsRelativeDirectory ) + "/" + settingsFile )
+
+
+# Return the full path of the settings directory and if necessary, create it.
+#
+# settingsRelativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
+#
+# The environment variable XDG_CONFIG_HOME is used to generate the base directory.
+# If no variable is present, "~/.config" is used.
+# The full path will be either
+#    XDG_CONFIG_HOME/settingsRelativeDirectory
+# or
+#    ~/.config/settingsRelativeDirectory
+def getSettingsDirectory( settingsRelativeDirectory ):
+    if CONFIG_HOME_ENVIRONMENT in os.environ:
+        settingsDirectory = os.environ[ CONFIG_HOME_ENVIRONMENT ] + "/"
+    else:
+        settingsDirectory = os.path.expanduser( "~" ) + "/" + CONFIG_HOME_DEFAULT + "/"
+
+    if settingsRelativeDirectory is not None and len( settingsRelativeDirectory ) > 0:
+        settingsDirectory += settingsRelativeDirectory + "/"
+
+    if not os.path.isdir( settingsDirectory ):
+        os.mkdir( settingsDirectory )
+
+    return settingsDirectory
 
 
 # Writes an object as a binary file.
