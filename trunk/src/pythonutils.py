@@ -19,12 +19,15 @@
 
 
 from gi.repository import Gtk
-import datetime, logging.handlers, os, pickle, shutil, subprocess, sys
+import datetime, json, logging.handlers, os, pickle, shutil, subprocess, sys
 
 
 AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
 
 CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+
+CONFIG_HOME_DEFAULT = ".config"
+CONFIG_HOME_ENVIRONMENT = "XDG_CONFIG_HOME"
 
 INDENT_WIDGET_LEFT = 20
 INDENT_TEXT_LEFT = 25
@@ -192,6 +195,32 @@ def showAboutDialog(
 
         aboutDialog.run()
         aboutDialog.hide()
+
+
+def saveSettings( settings, settingsRelativeDirectory, settingsFile, logging ):
+    if CONFIG_HOME_ENVIRONMENT in os.environ:
+        settingsDirectory = os.environ[ CONFIG_HOME_ENVIRONMENT ] + "/"
+    else:
+        settingsDirectory = os.path.expanduser( "~" ) + "/" + CONFIG_HOME_DEFAULT + "/"
+
+    if settingsRelativeDirectory is not None and len( settingsRelativeDirectory ) > 0:
+        settingsDirectory += settingsRelativeDirectory + "/"
+
+    print( settingsDirectory )
+    if not os.path.isdir( settingsDirectory ):
+        print( os.mkdir( settingsDirectory ) )
+
+    success = True
+    try:
+        with open( settingsDirectory + "/" + settingsFile, "w" ) as f:
+            f.write( json.dumps( settings ) )
+ 
+    except Exception as e:
+        logging.exception( e )
+        logging.error( "Error writing settings: " + settingsDirectory + "/" + settingsFile )
+        success = False
+
+    return success
 
 
 # Writes an object as a binary file.
