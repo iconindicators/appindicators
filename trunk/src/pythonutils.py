@@ -26,6 +26,8 @@ AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
 
 CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
+CONFIG_CACHE_DEFAULT = ".cache"
+CONFIG_CACHE_ENVIRONMENT = "XDG_CACHE_HOME"
 CONFIG_HOME_DEFAULT = ".config"
 CONFIG_HOME_ENVIRONMENT = "XDG_CONFIG_HOME"
 
@@ -269,6 +271,31 @@ def getSettingsDirectory( settingsRelativeDirectory ):
     return settingsDirectory
 
 
+# Return the full path of the cache directory and if necessary, create it.
+#
+# cacheRelativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
+#
+# The environment variable XDG_CACHE_HOME is used to generate the base directory.
+# If no variable is present, "~/.cache" is used.
+# The full path will be either
+#    XDG_CONFIG_HOME/cacheRelativeDirectory
+# or
+#    ~/.cache/cacheRelativeDirectory
+def getCacheDirectory( cacheRelativeDirectory ):
+    if CONFIG_CACHE_ENVIRONMENT in os.environ:
+        cacheDirectory = os.environ[ CONFIG_CACHE_ENVIRONMENT ] + "/"
+    else:
+        cacheDirectory = os.path.expanduser( "~" ) + "/" + CONFIG_CACHE_DEFAULT + "/"
+
+    if cacheRelativeDirectory is not None and len( cacheRelativeDirectory ) > 0:
+        cacheDirectory += cacheRelativeDirectory + "/"
+
+    if not os.path.isdir( cacheDirectory ):
+        os.mkdir( cacheDirectory )
+
+    return cacheDirectory
+
+
 # Writes an object as a binary file.
 #
 # data: The object to write.
@@ -288,6 +315,7 @@ def getSettingsDirectory( settingsRelativeDirectory ):
 #    ~/.cache/fred/mary-20170629174950
 #    ~/.cache/fred/jane-20170629174951
 def writeToCache( data, cachePath, baseName, cacheMaximumDateTime, logging ):
+#TODO Use the getCacheDirectoyr funcion above.    
     __createCache( cachePath )
 
     # Read all files in the cache and keep a list of those which match the base name.
