@@ -54,12 +54,10 @@ class IndicatorFortune:
     COMMENTS = _( "Calls the 'fortune' program displaying the result in the on-screen notification." )
 
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
-    HISTORY_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + "-history"
+    HISTORY_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + "-history" #TODO Save to cache directory.
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
     NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, the notification summary should be emitted as a warning (rather than a regular fortune).
 
-    SETTINGS_DIR = INDICATOR_NAME
-    SETTINGS_FILE = INDICATOR_NAME + ".json" #TODO This should be final...but check! Can these two be combined?
     SETTINGS_FORTUNES = "fortunes"
     SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
     SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW = 1
@@ -76,7 +74,7 @@ class IndicatorFortune:
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
         Notify.init( INDICATOR_NAME )
-        pythonutils.migrateSettings( IndicatorFortune.SETTINGS_DIR, IndicatorFortune.SETTINGS_FILE ) # Migrate old user settings to new location.
+        pythonutils.migrateSettings( IndicatorFortune.INDICATOR_NAME, IndicatorFortune.INDICATOR_NAME ) # Migrate old user settings to new location.
         self.loadSettings()
 
         if os.path.isfile( IndicatorFortune.HISTORY_FILE ):
