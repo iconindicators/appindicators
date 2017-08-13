@@ -74,7 +74,7 @@ class IndicatorFortune:
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
         Notify.init( INDICATOR_NAME )
-        pythonutils.migrateSettings( IndicatorFortune.INDICATOR_NAME, IndicatorFortune.INDICATOR_NAME ) # Migrate old user settings to new location.
+        pythonutils.migrateSettings( INDICATOR_NAME, INDICATOR_NAME ) # Migrate old user settings to new location.
         self.loadSettings()
 
         if os.path.isfile( IndicatorFortune.HISTORY_FILE ):
@@ -561,7 +561,7 @@ class IndicatorFortune:
         self.refreshIntervalInMinutes = 15
         self.skipFortuneCharacterCount = 360 # From experimentation, about 45 characters per line, but with word boundaries maintained, say 40 characters per line (with at most 9 lines).
 
-        settings = pythonutils.loadSettings( IndicatorFortune.SETTINGS_DIR, IndicatorFortune.SETTINGS_FILE, logging )
+        settings = pythonutils.loadSettings( INDICATOR_NAME, INDICATOR_NAME, logging )
         if settings is not None:
             self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes ) # At a minimum, will always contain the default fortune (may or may not be enabled).
             if self.fortunes == [ ]: # Previous versions allowed the default fortune to be deleted so it is possible the fortunes list can be empty.
@@ -582,7 +582,7 @@ class IndicatorFortune:
             IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
         }
 
-        pythonutils.saveSettings( settings, IndicatorFortune.SETTINGS_DIR, IndicatorFortune.SETTINGS_FILE, logging )
+        pythonutils.saveSettings( settings, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
 if __name__ == "__main__": IndicatorFortune().main()
