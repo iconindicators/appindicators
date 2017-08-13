@@ -27,9 +27,10 @@ AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
 CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
 CONFIG_CACHE_DEFAULT = ".cache"
-CONFIG_CACHE_ENVIRONMENT = "XDG_CACHE_HOME"
 CONFIG_HOME_DEFAULT = ".config"
-CONFIG_HOME_ENVIRONMENT = "XDG_CONFIG_HOME"
+
+ENVIRONMENT_CACHE_HOME = "XDG_CACHE_HOME"
+ENVIRONMENT_CONFIG_HOME = "XDG_CONFIG_HOME"
 
 INDENT_WIDGET_LEFT = 20
 INDENT_TEXT_LEFT = 25
@@ -201,7 +202,7 @@ def showAboutDialog(
 
 #TOOD Add comment header.
 def loadSettings( settingsRelativeDirectory, settingsFile, logging ):
-    settingsDirectory = getSettingsDirectory( settingsRelativeDirectory )
+    settingsDirectory = getConfigDirectory( settingsRelativeDirectory )
     settings = [ ]
     if os.path.isfile( settingsDirectory + "/" + settingsFile ):
         try:
@@ -222,7 +223,7 @@ def loadSettings( settingsRelativeDirectory, settingsFile, logging ):
 # settingsFile: The file name.
 # logging: Used to log.
 def saveSettings( settings, settingsRelativeDirectory, settingsFile, logging ):
-    settingsDirectory = getSettingsDirectory( settingsRelativeDirectory )
+    settingsDirectory = getConfigDirectory( settingsRelativeDirectory )
     success = True
     try:
         with open( settingsDirectory + "/" + settingsFile, "w" ) as f:
@@ -236,64 +237,59 @@ def saveSettings( settings, settingsRelativeDirectory, settingsFile, logging ):
     return success
 
 
-# Move the settings file from user home (original and incorrect location) to new location.
+# Move the settings file from user home (original and incorrect location)
+# to new location ONLY if the new location does not contain a settings file.
 #
 # settingsRelativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
 # settingsFile: The file name.
 def migrateSettings( settingsRelativeDirectory, settingsFile ):
-    oldSettings = os.path.expanduser( "~" ) + "/." + settingsFile
-    if os.path.isfile( oldSettings ):
-        os.rename( oldSettings, getSettingsDirectory( settingsRelativeDirectory ) + "/" + settingsFile )
+    newSettings = getConfigDirectory( settingsRelativeDirectory ) + "/" + settingsFile + ".json"
+    oldSettings = os.path.expanduser( "~" ) + "/." + settingsFile + ".json"
+    old = os.path.isfile( oldSettings )
+    new = os.path.isfile( newSettings )
+    if os.path.isfile( oldSettings ) and not os.path.isfile( newSettings ):
+        os.rename( oldSettings, getConfigDirectory( settingsRelativeDirectory ) + "/" + settingsFile + ".json" )
 
 
-# Return the full path of the settings directory and if necessary, create it.
+
+# Obtain (and create if necessary) a directory for use as XDG cache.
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 #
-# settingsRelativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# relativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
+def getConfigDirectory( relativeDirectory ): return _getDirectory( relativeDirectory, ENVIRONMENT_CONFIG_HOME, CONFIG_HOME_DEFAULT )
+
+
+# Obtain (and create if necessary) a directory for use as XDG config.
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 #
-# The environment variable XDG_CONFIG_HOME is used to generate the base directory.
-# If no variable is present, "~/.config" is used.
-# The full path will be either
-#    XDG_CONFIG_HOME/settingsRelativeDirectory
+# relativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
+def getCacheDirectory( relativeDirectory ): return _getDirectory( relativeDirectory, ENVIRONMENT_CACHE_HOME, CONFIG_CACHE_DEFAULT )
+
+
+# Obtain (and create if necessary) a directory for use as XDG config, cache or similar.
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+#
+# relativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# environmentHome: The XDG environment variable used to obtain the base directory.
+# defaultHome: The directory used when no value for the environment variable is located.
+#
+# The full directory path will be either
+#    ${environmentHome}/relativeDirectory
 # or
-#    ~/.config/settingsRelativeDirectory
-def getSettingsDirectory( settingsRelativeDirectory ):
-    if CONFIG_HOME_ENVIRONMENT in os.environ:
-        settingsDirectory = os.environ[ CONFIG_HOME_ENVIRONMENT ] + "/"
+#    ~/.${defaultHome}/relativeDirectory
+def _getDirectory( relativeDirectory, environmentHome, defaultHome ):
+    if environmentHome in os.environ:
+        directory = os.environ[ environmentHome ]
     else:
-        settingsDirectory = os.path.expanduser( "~" ) + "/" + CONFIG_HOME_DEFAULT + "/"
+        directory = os.path.expanduser( "~" ) + "/" + defaultHome
 
-    if settingsRelativeDirectory is not None and len( settingsRelativeDirectory ) > 0:
-        settingsDirectory += settingsRelativeDirectory + "/"
+    if relativeDirectory is not None and len( relativeDirectory ) > 0:
+        directory += "/" + relativeDirectory
 
-    if not os.path.isdir( settingsDirectory ):
-        os.mkdir( settingsDirectory )
+    if not os.path.isdir( directory ):
+        os.mkdir( directory )
 
-    return settingsDirectory
-
-
-# Return the full path of the cache directory and if necessary, create it.
-#
-# cacheRelativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
-#
-# The environment variable XDG_CACHE_HOME is used to generate the base directory.
-# If no variable is present, "~/.cache" is used.
-# The full path will be either
-#    XDG_CONFIG_HOME/cacheRelativeDirectory
-# or
-#    ~/.cache/cacheRelativeDirectory
-def getCacheDirectory( cacheRelativeDirectory ):
-    if CONFIG_CACHE_ENVIRONMENT in os.environ:
-        cacheDirectory = os.environ[ CONFIG_CACHE_ENVIRONMENT ] + "/"
-    else:
-        cacheDirectory = os.path.expanduser( "~" ) + "/" + CONFIG_CACHE_DEFAULT + "/"
-
-    if cacheRelativeDirectory is not None and len( cacheRelativeDirectory ) > 0:
-        cacheDirectory += cacheRelativeDirectory + "/"
-
-    if not os.path.isdir( cacheDirectory ):
-        os.mkdir( cacheDirectory )
-
-    return cacheDirectory
+    return directory
 
 
 # Writes an object as a binary file.
