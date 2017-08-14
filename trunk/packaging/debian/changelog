@@ -4,9 +4,6 @@ indicator-tide (1.0.8-1) trusty; urgency=low
     both are absent.
   * Bug fix: Dates/times were displayed in port local date/time rather than in
     user local date/time.
-  * User settings are now stored in the directory specified by the environment
-    variable XDG_CONFIG_HOME or, if not present, $HOME/.config (and existing
-    user settings stored in $HOME are migrated to the new location).
   * Corrected warnings in .desktop file.
   * Changed the format of the tide type, time and level to have the type first
     (rather than time first) to match the data source.
