@@ -210,7 +210,7 @@ def showAboutDialog(
 #
 # Returns a dict of key/value pairs (empty when no file is present or an error occurs).
 def loadSettings( applicationBaseDirectory, settingsBaseFile, logging ):
-    theSettingsFile = getSettingsFile( applicationBaseDirectory, settingsBaseFile )
+    theSettingsFile = _createUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + settingsBaseFile + JSON_EXTENSION
     settings = { }
     if os.path.isfile( theSettingsFile ):
         try:
@@ -230,7 +230,7 @@ def loadSettings( applicationBaseDirectory, settingsBaseFile, logging ):
 # settingsBaseFile: The file name (without extension).
 # logging: Used to log.
 def saveSettings( settings, applicationBaseDirectory, settingsBaseFile, logging ):
-    theSettingsFile = getSettingsFile( applicationBaseDirectory, settingsBaseFile )
+    theSettingsFile = _createUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + settingsBaseFile + JSON_EXTENSION
     success = True
     try:
         with open( theSettingsFile, "w" ) as f:
@@ -251,33 +251,78 @@ def saveSettings( settings, applicationBaseDirectory, settingsBaseFile, logging 
 # settingsBaseFile: The file name (without extension).
 def migrateSettings( applicationBaseDirectory, settingsBaseFile ):
     oldSettings = os.path.expanduser( "~" ) + "/." + settingsBaseFile + JSON_EXTENSION
-    newSettings = getSettingsFile( applicationBaseDirectory, settingsBaseFile )
+    newSettings = _createUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + settingsBaseFile + JSON_EXTENSION
     if os.path.isfile( oldSettings ) and not os.path.isfile( newSettings ):
         os.rename( oldSettings, newSettings )
 
 
-# Create the user directory, if necessary, and return the full path of the user directory to the JSON text file.
+#TODO Fix header
+# Read a dict of settings from a JSON text file.
 #
-# applicationBaseDirectory: The directory name used to specify the application.
+# applicationBaseDirectory: The directory path used as the final part of the overall path.
 # settingsBaseFile: The file name (without extension).
-def getSettingsFile( applicationBaseDirectory, settingsBaseFile ):
-    return createUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + settingsBaseFile + JSON_EXTENSION
-
-
-
-#TODO Can this and the function below be subsumed into the callers above?
-# Obtain (and create if necessary) a directory for use as XDG cache.
-# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+# logging: Used to log.
 #
-# relativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
-#def getConfigDirectory( relativeDirectory ): return createUserDirectory( relativeDirectory, XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG )
+# Returns a dict of key/value pairs (empty when no file is present or an error occurs).
+def readCacheText( applicationBaseDirectory, fileName, logging ):
+    cacheFile = _createUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
+    text = ""
+    if os.path.isfile( cacheFile ):
+        try:
+            with open( cacheFile, "r" ) as f:
+                text = f.read()
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error reading from cache: " + cacheFile )
+
+    return text
 
 
-# Obtain (and create if necessary) a directory for use as XDG config.
-# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+#TODO Fix header.
+# Writes text to a file in the cache.
 #
-# relativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
-#def getCacheDirectory( relativeDirectory ): return createUserDirectory( relativeDirectory, XDG_KEY_CACHE, USER_DIRECTORY_CACHE )
+# data: The object to write.
+# cachePath: File system path to the directory location of the cache.
+# baseName: Text used, along with a timestamp, to form the binary file name.
+# cacheMaximumDateTime: If any file is older than the date/time,
+#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
+#                       the file will be discarded.  
+#
+# For the application "fred" to write the objects "maryDict" and "janeDict":
+#
+#    writeToCache( maryDict, ~/.cache/fred/, mary, logging )
+#    writeToCache( janeDict, ~/.cache/fred/, jane, logging )
+#
+# resulting in binary files written (with timestamps):
+#
+#    ~/.cache/fred/mary-20170629174950
+#    ~/.cache/fred/jane-20170629174951
+def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
+    success = True
+    cacheFile = _createUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
+    try:
+        with open( cacheFile, "w" ) as f:
+            f.write( text )
+
+    except Exception as e:
+        logging.exception( e )
+        logging.error( "Error writing to cache: " + cacheFile )
+        success = False
+
+    return success
+
+
+#TODO Fix header.
+# Removes files from the cache.
+#
+# applicationBaseDirectory: File system path to the directory location of the cache.
+# baseName: Text used, along with a timestamp, to form the binary file name.
+def removeFromCache( applicationBaseDirectory, baseName ):
+    # Read all files in the cache; any file starting with the base name is deleted.
+    cacheDirectory = _createUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
+    for file in os.listdir( cacheDirectory ):
+        if file.startswith( baseName ): #TODO Add if baseName is None or file.startswith.... so when None, ALL files are removed and baseName = None is a default arg.
+            os.remove( cacheDirectory + "/" + file )
 
 
 # Obtain (and create if necessary) a directory for use as config, cache or similar for an application.
@@ -291,7 +336,7 @@ def getSettingsFile( applicationBaseDirectory, settingsBaseFile ):
 #    ${XDGKey}/applicationBaseDirectory
 # or
 #    ~/.userBaseDirectory/applicationBaseDirectory
-def createUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
+def _createUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
     if XDGKey in os.environ:
         directory = os.environ[ XDGKey ] + "/" + applicationBaseDirectory
     else:
