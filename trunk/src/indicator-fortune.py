@@ -77,6 +77,7 @@ class IndicatorFortune:
         pythonutils.migrateSettings( INDICATOR_NAME, INDICATOR_NAME ) # Migrate old user settings to new location.
         self.loadSettings()
 
+        #TODO Use pythonutils somehow...
         if os.path.isfile( IndicatorFortune.HISTORY_FILE ):
             os.remove( IndicatorFortune.HISTORY_FILE )
 
@@ -562,15 +563,15 @@ class IndicatorFortune:
         self.skipFortuneCharacterCount = 360 # From experimentation, about 45 characters per line, but with word boundaries maintained, say 40 characters per line (with at most 9 lines).
 
         settings = pythonutils.loadSettings( INDICATOR_NAME, INDICATOR_NAME, logging )
-        if settings is not None:
-            self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes ) # At a minimum, will always contain the default fortune (may or may not be enabled).
-            if self.fortunes == [ ]: # Previous versions allowed the default fortune to be deleted so it is possible the fortunes list can be empty.
-                self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
 
-            self.middleMouseClickOnIcon = settings.get( IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
-            self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )
-            self.refreshIntervalInMinutes = settings.get( IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
-            self.skipFortuneCharacterCount = settings.get( IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT, self.skipFortuneCharacterCount )
+        self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes ) # At a minimum, will always contain the default fortune (may or may not be enabled).
+        if self.fortunes == [ ]: # Previous versions allowed the default fortune to be deleted so it is possible the fortunes list can be empty.
+            self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
+
+        self.middleMouseClickOnIcon = settings.get( IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
+        self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )
+        self.refreshIntervalInMinutes = settings.get( IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
+        self.skipFortuneCharacterCount = settings.get( IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT, self.skipFortuneCharacterCount )
 
 
     def saveSettings( self ):
