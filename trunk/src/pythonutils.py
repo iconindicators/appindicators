@@ -26,9 +26,6 @@ AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
 
 CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
-BASE_DIRECTORY_CACHE = ".cache"
-BASE_DIRECTORY_CONFIG = ".config"
-
 INDENT_WIDGET_LEFT = 20
 INDENT_TEXT_LEFT = 25
 
@@ -36,6 +33,9 @@ JSON_EXTENSION = ".json"
 
 LOGGING_BASIC_CONFIG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 LOGGING_BASIC_CONFIG_LEVEL = logging.DEBUG
+
+USER_DIRECTORY_CACHE = ".cache"
+USER_DIRECTORY_CONFIG = ".config"
 
 XDG_KEY_CACHE = "XDG_CACHE_HOME"
 XDG_KEY_CONFIG = "XDG_CONFIG_HOME"
@@ -204,13 +204,13 @@ def showAboutDialog(
 
 # Read a dict of settings from a JSON text file.
 #
-# settingsBaseDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# applicationBaseDirectory: The directory path used as the final part of the overall path.
 # settingsBaseFile: The file name (without extension).
 # logging: Used to log.
 #
 # Returns a dict of key/value pairs (empty when no file is present or an error occurs).
-def loadSettings( settingsBaseDirectory, settingsBaseFile, logging ):
-    theSettingsFile = getSettingsFile( settingsBaseDirectory, settingsBaseFile )
+def loadSettings( applicationBaseDirectory, settingsBaseFile, logging ):
+    theSettingsFile = getSettingsFile( applicationBaseDirectory, settingsBaseFile )
     settings = { }
     if os.path.isfile( theSettingsFile ):
         try:
@@ -226,11 +226,11 @@ def loadSettings( settingsBaseDirectory, settingsBaseFile, logging ):
 # Write a dict of settings to a JSON text file.
 #
 # settings: dict of key/value pairs.
-# settingsBaseDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# applicationBaseDirectory: The directory path used as the final part of the overall path.
 # settingsBaseFile: The file name (without extension).
 # logging: Used to log.
-def saveSettings( settings, settingsBaseDirectory, settingsBaseFile, logging ):
-    theSettingsFile = getSettingsFile( settingsBaseDirectory, settingsBaseFile )
+def saveSettings( settings, applicationBaseDirectory, settingsBaseFile, logging ):
+    theSettingsFile = getSettingsFile( applicationBaseDirectory, settingsBaseFile )
     success = True
     try:
         with open( theSettingsFile, "w" ) as f:
@@ -247,21 +247,22 @@ def saveSettings( settings, settingsBaseDirectory, settingsBaseFile, logging ):
 # Move the settings file from user home (original and incorrect location)
 # to new location ONLY if the new location does not contain a settings file.
 #
-# settingsBaseDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# applicationBaseDirectory: The directory path used as the final part of the overall path.
 # settingsBaseFile: The file name (without extension).
-def migrateSettings( settingsBaseDirectory, settingsBaseFile ):
+def migrateSettings( applicationBaseDirectory, settingsBaseFile ):
     oldSettings = os.path.expanduser( "~" ) + "/." + settingsBaseFile + JSON_EXTENSION
-    newSettings = getSettingsFile( settingsBaseDirectory, settingsBaseFile )
+    newSettings = getSettingsFile( applicationBaseDirectory, settingsBaseFile )
     if os.path.isfile( oldSettings ) and not os.path.isfile( newSettings ):
         os.rename( oldSettings, newSettings )
 
 
 # Create the user directory, if necessary, and return the full path of the user directory to the JSON text file.
 #
-# settingsBaseDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# applicationBaseDirectory: The directory name used to specify the application.
 # settingsBaseFile: The file name (without extension).
-def getSettingsFile( settingsBaseDirectory, settingsBaseFile ):
-    return createUserDirectory( settingsBaseDirectory, XDG_KEY_CONFIG, BASE_DIRECTORY_CONFIG ) + "/" + settingsBaseFile + JSON_EXTENSION
+def getSettingsFile( applicationBaseDirectory, settingsBaseFile ):
+    return createUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + settingsBaseFile + JSON_EXTENSION
+
 
 
 #TODO Can this and the function below be subsumed into the callers above?
@@ -269,35 +270,32 @@ def getSettingsFile( settingsBaseDirectory, settingsBaseFile ):
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 #
 # relativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
-#def getConfigDirectory( relativeDirectory ): return createUserDirectory( relativeDirectory, XDG_KEY_CONFIG, BASE_DIRECTORY_CONFIG )
+#def getConfigDirectory( relativeDirectory ): return createUserDirectory( relativeDirectory, XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG )
 
 
 # Obtain (and create if necessary) a directory for use as XDG config.
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 #
 # relativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
-#def getCacheDirectory( relativeDirectory ): return createUserDirectory( relativeDirectory, XDG_KEY_CACHE, BASE_DIRECTORY_CACHE )
+#def getCacheDirectory( relativeDirectory ): return createUserDirectory( relativeDirectory, XDG_KEY_CACHE, USER_DIRECTORY_CACHE )
 
 
-# Obtain (and create if necessary) a directory for use as XDG config, cache or similar.
-# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+# Obtain (and create if necessary) a directory for use as config, cache or similar for an application.
 #
-# relativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
-# environmentHome: The XDG environment variable used to obtain the base directory.
-# defaultHome: The directory used when no value for the environment variable is located.
+# XDGKey: The XDG environment variable used to obtain the base directory of the config/cache.
+#         https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+# userBaseDirectory: The directory name used to hold the config/cache (used when the XDGKey is not present in the environment).
+# applicationBaseDirectory: The directory name at the end of the final user directory to specify the application.
 #
 # The full directory path will be either
-#    ${environmentHome}/relativeDirectory
+#    ${XDGKey}/applicationBaseDirectory
 # or
-#    ~/.${defaultHome}/relativeDirectory
-def createUserDirectory( relativeDirectory, environmentHome, defaultHome ): #TODO Maybe call this createUserDirectory or createUserDirectory
-    if environmentHome in os.environ:
-        directory = os.environ[ environmentHome ]
+#    ~/.userBaseDirectory/applicationBaseDirectory
+def createUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
+    if XDGKey in os.environ:
+        directory = os.environ[ XDGKey ] + "/" + applicationBaseDirectory
     else:
-        directory = os.path.expanduser( "~" ) + "/" + defaultHome
-
-    if relativeDirectory is not None and len( relativeDirectory ) > 0:
-        directory += "/" + relativeDirectory
+        directory = os.path.expanduser( "~" ) + "/" + userBaseDirectory + "/" + applicationBaseDirectory
 
     if not os.path.isdir( directory ):
         os.mkdir( directory )
