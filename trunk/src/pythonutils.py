@@ -26,17 +26,19 @@ AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
 
 CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
-CONFIG_CACHE_DEFAULT = ".cache"
-CONFIG_HOME_DEFAULT = ".config"
-
-ENVIRONMENT_CACHE_HOME = "XDG_CACHE_HOME"
-ENVIRONMENT_CONFIG_HOME = "XDG_CONFIG_HOME"
+BASE_DIRECTORY_CACHE = ".cache"
+BASE_DIRECTORY_CONFIG = ".config"
 
 INDENT_WIDGET_LEFT = 20
 INDENT_TEXT_LEFT = 25
 
+JSON_EXTENSION = ".json"
+
 LOGGING_BASIC_CONFIG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 LOGGING_BASIC_CONFIG_LEVEL = logging.DEBUG
+
+XDG_KEY_CACHE = "XDG_CACHE_HOME"
+XDG_KEY_CONFIG = "XDG_CONFIG_HOME"
 
 
 def getVersion(): return "1.0.0"
@@ -200,38 +202,43 @@ def showAboutDialog(
         aboutDialog.hide()
 
 
-#TOOD Add comment header.
-def loadSettings( settingsRelativeDirectory, settingsFile, logging ):
-    settingsDirectory = getConfigDirectory( settingsRelativeDirectory )
-    settings = [ ]
-    if os.path.isfile( settingsDirectory + "/" + settingsFile ):
+# Read a dict of settings from a JSON text file.
+#
+# settingsBaseDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# settingsBaseFile: The file name (without extension).
+# logging: Used to log.
+#
+# Returns a dict of key/value pairs (empty when no file is present or an error occurs).
+def loadSettings( settingsBaseDirectory, settingsBaseFile, logging ):
+    theSettingsFile = getSettingsFile( settingsBaseDirectory, settingsBaseFile )
+    settings = { }
+    if os.path.isfile( theSettingsFile ):
         try:
-            with open( settingsDirectory + "/" + settingsFile, "r" ) as f:
+            with open( theSettingsFile ) as f:
                 settings = json.load( f )
-#TODO Test with missing file...and bad file...what is settings?  None or empty or what?
         except Exception as e:
             logging.exception( e )
-            logging.error( "Error reading settings: " + settingsDirectory + "/" + settingsFile )
+            logging.error( "Error reading settings: " + theSettingsFile )
 
     return settings
 
 
-# Write a dict of settings to JSON text file.
+# Write a dict of settings to a JSON text file.
 #
 # settings: dict of key/value pairs.
-# settingsRelativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
-# settingsFile: The file name.
+# settingsBaseDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# settingsBaseFile: The file name (without extension).
 # logging: Used to log.
-def saveSettings( settings, settingsRelativeDirectory, settingsFile, logging ):
-    settingsDirectory = getConfigDirectory( settingsRelativeDirectory )
+def saveSettings( settings, settingsBaseDirectory, settingsBaseFile, logging ):
+    theSettingsFile = getSettingsFile( settingsBaseDirectory, settingsBaseFile )
     success = True
     try:
-        with open( settingsDirectory + "/" + settingsFile, "w" ) as f:
+        with open( theSettingsFile, "w" ) as f:
             f.write( json.dumps( settings ) )
  
     except Exception as e:
         logging.exception( e )
-        logging.error( "Error writing settings: " + settingsDirectory + "/" + settingsFile )
+        logging.error( "Error writing settings: " + theSettingsFile )
         success = False
 
     return success
@@ -240,30 +247,36 @@ def saveSettings( settings, settingsRelativeDirectory, settingsFile, logging ):
 # Move the settings file from user home (original and incorrect location)
 # to new location ONLY if the new location does not contain a settings file.
 #
-# settingsRelativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
-# settingsFile: The file name.
-def migrateSettings( settingsRelativeDirectory, settingsFile ):
-    newSettings = getConfigDirectory( settingsRelativeDirectory ) + "/" + settingsFile + ".json"
-    oldSettings = os.path.expanduser( "~" ) + "/." + settingsFile + ".json"
-    old = os.path.isfile( oldSettings )
-    new = os.path.isfile( newSettings )
+# settingsBaseDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# settingsBaseFile: The file name (without extension).
+def migrateSettings( settingsBaseDirectory, settingsBaseFile ):
+    oldSettings = os.path.expanduser( "~" ) + "/." + settingsBaseFile + JSON_EXTENSION
+    newSettings = getSettingsFile( settingsBaseDirectory, settingsBaseFile )
     if os.path.isfile( oldSettings ) and not os.path.isfile( newSettings ):
-        os.rename( oldSettings, getConfigDirectory( settingsRelativeDirectory ) + "/" + settingsFile + ".json" )
+        os.rename( oldSettings, newSettings )
 
 
+# Create the user directory, if necessary, and return the full path of the user directory to the JSON text file.
+#
+# settingsBaseDirectory: The directory path used as the final part of the overall path (can be "" or None).
+# settingsBaseFile: The file name (without extension).
+def getSettingsFile( settingsBaseDirectory, settingsBaseFile ):
+    return createUserDirectory( settingsBaseDirectory, XDG_KEY_CONFIG, BASE_DIRECTORY_CONFIG ) + "/" + settingsBaseFile + JSON_EXTENSION
 
+
+#TODO Can this and the function below be subsumed into the callers above?
 # Obtain (and create if necessary) a directory for use as XDG cache.
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 #
 # relativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
-def getConfigDirectory( relativeDirectory ): return _getDirectory( relativeDirectory, ENVIRONMENT_CONFIG_HOME, CONFIG_HOME_DEFAULT )
+#def getConfigDirectory( relativeDirectory ): return createUserDirectory( relativeDirectory, XDG_KEY_CONFIG, BASE_DIRECTORY_CONFIG )
 
 
 # Obtain (and create if necessary) a directory for use as XDG config.
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 #
 # relativeDirectory: The directory path used as the final part of the overall path (can be "" or None).
-def getCacheDirectory( relativeDirectory ): return _getDirectory( relativeDirectory, ENVIRONMENT_CACHE_HOME, CONFIG_CACHE_DEFAULT )
+#def getCacheDirectory( relativeDirectory ): return createUserDirectory( relativeDirectory, XDG_KEY_CACHE, BASE_DIRECTORY_CACHE )
 
 
 # Obtain (and create if necessary) a directory for use as XDG config, cache or similar.
@@ -277,7 +290,7 @@ def getCacheDirectory( relativeDirectory ): return _getDirectory( relativeDirect
 #    ${environmentHome}/relativeDirectory
 # or
 #    ~/.${defaultHome}/relativeDirectory
-def _getDirectory( relativeDirectory, environmentHome, defaultHome ):
+def createUserDirectory( relativeDirectory, environmentHome, defaultHome ): #TODO Maybe call this createUserDirectory or createUserDirectory
     if environmentHome in os.environ:
         directory = os.environ[ environmentHome ]
     else:
