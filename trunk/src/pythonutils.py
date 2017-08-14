@@ -321,7 +321,9 @@ def removeFromCache( applicationBaseDirectory, baseName ):
     # Read all files in the cache; any file starting with the base name is deleted.
     cacheDirectory = _createUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     for file in os.listdir( cacheDirectory ):
-        if file.startswith( baseName ): #TODO Add if baseName is None or file.startswith.... so when None, ALL files are removed and baseName = None is a default arg.
+        if file.startswith( baseName ): #TODO Add if baseName is None or file.startswith.... 
+            #so when None, ALL files are removed and baseName = None is a default arg.
+            #Also, use startsWith or contains or just a straight compare (so delete at most one file)?
             os.remove( cacheDirectory + "/" + file )
 
 
@@ -367,7 +369,6 @@ def _createUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
 #    ~/.cache/fred/mary-20170629174950
 #    ~/.cache/fred/jane-20170629174951
 def writeToCache( data, cachePath, baseName, cacheMaximumDateTime, logging ):
-#TODO Use the getCacheDirectoyr funcion above.    
     __createCache( cachePath )
 
     # Read all files in the cache and keep a list of those which match the base name.
@@ -381,6 +382,55 @@ def writeToCache( data, cachePath, baseName, cacheMaximumDateTime, logging ):
     except Exception as e:
         logging.exception( e )
         logging.error( "Error writing to cache: " + filename )
+
+
+# Reads the most recent file from the cache for the given base name.
+# Removes out of date cache files.
+#
+# cachePath: File system path to the directory location of the cache.
+# baseName: Text used, along with a timestamp, to form the binary file name.
+# cacheMaximumDateTime: If any file is older than the date/time,
+#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
+#                       the file will be discarded.  
+#
+# Returns a tuple of the data (either None or the object) and the corresponding date/time as string (either None or the date/time).
+def readCacheObject( applicationBaseDirectory, baseName, cacheMaximumDateTime, logging ):
+    cacheDirectory = _createUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
+
+#     __clearCache( cachePath, baseName, cacheMaximumDateTime )
+
+    # Read all files in the cache and note those which match the base name.
+    files = [ ]
+    for file in os.listdir( cacheDirectory ):
+        if file.startswith( baseName ):
+            files.append( file )
+
+    # Sort the matching files by date - all file(s) will be newer than the cache maximum date/time.
+    files.sort()
+    data = None
+    dateTime = None
+    for file in reversed( files ): # Look at the most recent file first.
+        filename = cacheDirectory + "/" + file
+        try:
+            with open( filename, "rb" ) as f:
+                data = pickle.load( f )
+
+            if data is not None and len( data ) > 0:
+                dateTime = file[ len( baseName ) : ]
+                break
+
+        except Exception as e:
+            data = None
+            dateTime = None
+            logging.exception( e )
+            logging.error( "Error reading from cache: " + filename )
+
+    # Only return None or non-empty.
+    if data is None or len( data ) == 0: #TODO Return None or [] instead?  Is it possible to end up with None?
+        data = None
+        dateTime = None
+
+    return ( data, dateTime )
 
 
 # Reads the most recent file from the cache for the given base name.
@@ -440,7 +490,7 @@ def readFromCache( cachePath, baseName, cacheMaximumDateTime, logging ):
 # cacheMaximumDateTime: If any file is older than the date/time,
 #                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
 #                       the file will be discarded.  
-def __clearCache( cachePath, baseName, cacheMaximumDateTime ):
+def __clearCache( cachePath, baseName, cacheMaximumDateTime ):#TODO Need a new version that doesn't take the cache path and call it removeFromCache (if possible).
     # Read all files in the cache and any file matching the base name but older than the cache maximum date/time id deleted.
     cacheMaximumDateTimeString = cacheMaximumDateTime.strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
     for file in os.listdir( cachePath ):
