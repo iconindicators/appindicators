@@ -54,7 +54,8 @@ class IndicatorFortune:
     COMMENTS = _( "Calls the 'fortune' program displaying the result in the on-screen notification." )
 
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
-    HISTORY_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + "-history" #TODO Save to cache directory.
+    HISTORY_FILE = "fortune-history"
+
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
     NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, the notification summary should be emitted as a warning (rather than a regular fortune).
 
@@ -75,11 +76,8 @@ class IndicatorFortune:
 
         Notify.init( INDICATOR_NAME )
         pythonutils.migrateSettings( INDICATOR_NAME, INDICATOR_NAME ) # Migrate old user settings to new location.
+        pythonutils.removeFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
         self.loadSettings()
-
-        #TODO Use pythonutils somehow...
-        if os.path.isfile( IndicatorFortune.HISTORY_FILE ):
-            os.remove( IndicatorFortune.HISTORY_FILE )
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -147,6 +145,7 @@ class IndicatorFortune:
                 if enabled:
                     if os.path.isdir( location ):
                         locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
+
                     elif os.path.isfile( location ):
                         locations += "'" + location.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
 
@@ -158,15 +157,10 @@ class IndicatorFortune:
                     if self.fortune is None: # Occurs when no fortune data is found...
                         self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "Ensure enabled fortunes contain fortune data!" )
                         break
+
                     elif len( self.fortune ) <= self.skipFortuneCharacterCount: # If the fortune is within the character limit keep it...
-                        try:
-                            with open( IndicatorFortune.HISTORY_FILE, "a" ) as f:
-                                f.write( self.fortune + "\n\n" )
-
-                        except Exception as e:
-                            logging.exception( e )
-                            logging.error( "Error writing fortune to history file: " + IndicatorFortune.HISTORY_FILE )
-
+                        history = pythonutils.readCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE, logging ) + self.fortune + "\n\n"
+                        pythonutils.writeCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE, history, logging )
                         break
 
 
