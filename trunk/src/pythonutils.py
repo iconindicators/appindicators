@@ -202,70 +202,78 @@ def showAboutDialog(
         aboutDialog.hide()
 
 
-# Read a dict of settings from a JSON text file.
+# Read a dict of configuration from a JSON text file.
 #
 # applicationBaseDirectory: The directory path used as the final part of the overall path.
-# settingsBaseFile: The file name (without extension).
+# configBaseFile: The file name (without extension).
 # logging: Used to log.
 #
 # Returns a dict of key/value pairs (empty when no file is present or an error occurs).
-def loadSettings( applicationBaseDirectory, settingsBaseFile, logging ):
-    theSettingsFile = _createUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + settingsBaseFile + JSON_EXTENSION
-    settings = { }
-    if os.path.isfile( theSettingsFile ):
+def loadConfig( applicationBaseDirectory, configBaseFile, logging ):
+    configFile = _getConfigFile( applicationBaseDirectory, configBaseFile )
+    config = { }
+    if os.path.isfile( configFile ):
         try:
-            with open( theSettingsFile ) as f:
-                settings = json.load( f )
+            with open( configFile ) as f:
+                config = json.load( f )
         except Exception as e:
             logging.exception( e )
-            logging.error( "Error reading settings: " + theSettingsFile )
+            logging.error( "Error reading configuration: " + configFile )
 
-    return settings
+    return config
 
 
-# Write a dict of settings to a JSON text file.
+# Write a dict of user configuration to a JSON text file.
 #
-# settings: dict of key/value pairs.
+# config: dict of key/value pairs.
 # applicationBaseDirectory: The directory path used as the final part of the overall path.
-# settingsBaseFile: The file name (without extension).
+# configBaseFile: The file name (without extension).
 # logging: Used to log.
-def saveSettings( settings, applicationBaseDirectory, settingsBaseFile, logging ):
-    theSettingsFile = _createUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + settingsBaseFile + JSON_EXTENSION
+def saveConfig( config, applicationBaseDirectory, configBaseFile, logging ):
+    configFile = _getConfigFile( applicationBaseDirectory, configBaseFile )
     success = True
     try:
-        with open( theSettingsFile, "w" ) as f:
-            f.write( json.dumps( settings ) )
+        with open( configFile, "w" ) as f:
+            f.write( json.dumps( config ) )
  
     except Exception as e:
         logging.exception( e )
-        logging.error( "Error writing settings: " + theSettingsFile )
+        logging.error( "Error writing configuration: " + configFile )
         success = False
 
     return success
 
 
-# Move the settings file from user home (original and incorrect location)
-# to new location ONLY if the new location does not contain a settings file.
+# Move the configuration file from user home (original and incorrect location)
+# to new location ONLY if the new location does not contain a configuration file.
 #
 # applicationBaseDirectory: The directory path used as the final part of the overall path.
-# settingsBaseFile: The file name (without extension).
-def migrateSettings( applicationBaseDirectory, settingsBaseFile ):
-    oldSettings = os.path.expanduser( "~" ) + "/." + settingsBaseFile + JSON_EXTENSION
-    newSettings = _createUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + settingsBaseFile + JSON_EXTENSION
-    if os.path.isfile( oldSettings ) and not os.path.isfile( newSettings ):
-        os.rename( oldSettings, newSettings )
+# configBaseFile: The file name (without extension).
+def migrateConfig( applicationBaseDirectory, configBaseFile ):
+    oldConfigFile = os.path.expanduser( "~" ) + "/." + configBaseFile + JSON_EXTENSION
+    newConfigFile = _getConfigFile( applicationBaseDirectory, configBaseFile )
+    if os.path.isfile( oldConfigFile ) and not os.path.isfile( newConfigFile ):
+        os.rename( oldConfigFile, newConfigFile )
+
+
+# Obtain the user configuration JSON file, creating if necessary the underlying directory.
+#
+# applicationBaseDirectory: The directory path used as the final part of the overall path.
+# configBaseFile: The file name (without extension).
+def _getConfigFile( applicationBaseDirectory, configBaseFile ):
+    return _getUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + configBaseFile + JSON_EXTENSION
 
 
 #TODO Fix header
-# Read a dict of settings from a JSON text file.
+# Read a dict of ?????/ from a JSON text file.
 #
 # applicationBaseDirectory: The directory path used as the final part of the overall path.
-# settingsBaseFile: The file name (without extension).
+# configBaseFile: The file name (without extension).
 # logging: Used to log.
 #
 # Returns a dict of key/value pairs (empty when no file is present or an error occurs).
 def readCacheText( applicationBaseDirectory, fileName, logging ):
-    cacheFile = _createUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
+    cacheFile = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
     text = ""
     if os.path.isfile( cacheFile ):
         try:
@@ -299,7 +307,7 @@ def readCacheText( applicationBaseDirectory, fileName, logging ):
 #    ~/.cache/fred/jane-20170629174951
 def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
     success = True
-    cacheFile = _createUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
+    cacheFile = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
     try:
         with open( cacheFile, "w" ) as f:
             f.write( text )
@@ -319,7 +327,7 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
 # baseName: Text used, along with a timestamp, to form the binary file name.
 def removeFromCache( applicationBaseDirectory, baseName ):
     # Read all files in the cache; any file starting with the base name is deleted.
-    cacheDirectory = _createUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
+    cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     for file in os.listdir( cacheDirectory ):
         if file.startswith( baseName ): #TODO Add if baseName is None or file.startswith.... 
             #so when None, ALL files are removed and baseName = None is a default arg.
@@ -338,7 +346,7 @@ def removeFromCache( applicationBaseDirectory, baseName ):
 #    ${XDGKey}/applicationBaseDirectory
 # or
 #    ~/.userBaseDirectory/applicationBaseDirectory
-def _createUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
+def _getUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
     if XDGKey in os.environ:
         directory = os.environ[ XDGKey ] + "/" + applicationBaseDirectory
     else:
@@ -395,7 +403,7 @@ def writeToCache( data, cachePath, baseName, cacheMaximumDateTime, logging ):
 #
 # Returns a tuple of the data (either None or the object) and the corresponding date/time as string (either None or the date/time).
 def readCacheObject( applicationBaseDirectory, baseName, cacheMaximumDateTime, logging ):
-    cacheDirectory = _createUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
+    cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
 
 #     __clearCache( cachePath, baseName, cacheMaximumDateTime )
 
