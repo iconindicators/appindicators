@@ -59,14 +59,14 @@ class IndicatorFortune:
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
     NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, the notification summary should be emitted as a warning (rather than a regular fortune).
 
-    SETTINGS_FORTUNES = "fortunes"
-    SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
-    SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW = 1
-    SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST = 2
-    SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST = 3
-    SETTINGS_NOTIFICATION_SUMMARY = "notificationSummary"
-    SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
-    SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
+    CONFIG_FORTUNES = "fortunes"
+    CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
+    CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW = 1
+    CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST = 2
+    CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST = 3
+    CONFIG_NOTIFICATION_SUMMARY = "notificationSummary"
+    CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
+    CONFIG_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
 
     def __init__( self ):
@@ -75,9 +75,9 @@ class IndicatorFortune:
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
         Notify.init( INDICATOR_NAME )
-        pythonutils.migrateSettings( INDICATOR_NAME, INDICATOR_NAME ) # Migrate old user settings to new location.
+        pythonutils.migrateConfig( INDICATOR_NAME, INDICATOR_NAME ) # Migrate old user configuration to new location.
         pythonutils.removeFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
-        self.loadSettings()
+        self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -95,19 +95,19 @@ class IndicatorFortune:
         menuItem = Gtk.MenuItem( _( "New Fortune" ) )
         menuItem.connect( "activate", lambda widget: self.showNewFortune( False ) )
         menu.append( menuItem )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
+        if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
             self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Copy Last Fortune" ) )
         menuItem.connect( "activate", lambda widget: self.clipboard.set_text( self.fortune, -1 ) )
         menu.append( menuItem )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
+        if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
             self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
         menuItem.connect( "activate", lambda widget: self._showFortune() )
         menu.append( menuItem )
-        if self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
+        if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
             self.indicator.set_secondary_activate_target( menuItem )
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
@@ -193,7 +193,7 @@ class IndicatorFortune:
     def _onPreferences( self, widget ):
         notebook = Gtk.Notebook()
 
-        # Fortune file settings.
+        # Fortune file.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -264,7 +264,7 @@ class IndicatorFortune:
 
         notebook.append_page( grid, Gtk.Label( _( "Fortunes" ) ) )
 
-        # General settings.
+        # General.
         grid = Gtk.Grid()
         grid.set_column_spacing( 10 )
         grid.set_row_spacing( 10 )
@@ -324,17 +324,17 @@ class IndicatorFortune:
         grid.attach( label, 0, 3, 1, 1 )
 
         radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show a new fortune" ) )
-        radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
+        radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
         radioMiddleMouseClickNewFortune.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickNewFortune, 0, 4, 1, 1 )
 
         radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Copy current fortune to clipboard" ) )
-        radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
+        radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
         radioMiddleMouseClickCopyLastFortune.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 5, 1, 1 )
 
         radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Show current fortune" ) )
-        radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
+        radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
         radioMiddleMouseClickShowLastFortune.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 1, 1 )
 
@@ -354,11 +354,11 @@ class IndicatorFortune:
 
         if dialog.run() == Gtk.ResponseType.OK:
             if radioMiddleMouseClickNewFortune.get_active():
-                self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
+                self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
             elif radioMiddleMouseClickCopyLastFortune.get_active():
-                self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST
+                self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST
             else:
-                self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
+                self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
 
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.skipFortuneCharacterCount = spinnerCharacterCount.get_value_as_int()
@@ -374,7 +374,7 @@ class IndicatorFortune:
 
                 treeiter = store.iter_next( treeiter )
 
-            self.saveSettings()
+            self.saveConfig()
             pythonutils.setAutoStart( IndicatorFortune.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.buildMenu )
             GLib.idle_add( self.showNewFortune, False )
@@ -549,35 +549,35 @@ class IndicatorFortune:
         dialog.destroy()
 
 
-    def loadSettings( self ):
+    def loadConfig( self ):
         self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
-        self.middleMouseClickOnIcon = IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
+        self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
         self.notificationSummary = IndicatorFortune.NOTIFICATION_SUMMARY
         self.refreshIntervalInMinutes = 15
         self.skipFortuneCharacterCount = 360 # From experimentation, about 45 characters per line, but with word boundaries maintained, say 40 characters per line (with at most 9 lines).
 
-        settings = pythonutils.loadSettings( INDICATOR_NAME, INDICATOR_NAME, logging )
+        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-        self.fortunes = settings.get( IndicatorFortune.SETTINGS_FORTUNES, self.fortunes ) # At a minimum, will always contain the default fortune (may or may not be enabled).
+        self.fortunes = config.get( IndicatorFortune.CONFIG_FORTUNES, self.fortunes ) # At a minimum, will always contain the default fortune (may or may not be enabled).
         if self.fortunes == [ ]: # Previous versions allowed the default fortune to be deleted so it is possible the fortunes list can be empty.
             self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
 
-        self.middleMouseClickOnIcon = settings.get( IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
-        self.notificationSummary = settings.get( IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY, self.notificationSummary )
-        self.refreshIntervalInMinutes = settings.get( IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
-        self.skipFortuneCharacterCount = settings.get( IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT, self.skipFortuneCharacterCount )
+        self.middleMouseClickOnIcon = config.get( IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
+        self.notificationSummary = config.get( IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY, self.notificationSummary )
+        self.refreshIntervalInMinutes = config.get( IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
+        self.skipFortuneCharacterCount = config.get( IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT, self.skipFortuneCharacterCount )
 
 
-    def saveSettings( self ):
-        settings = {
-            IndicatorFortune.SETTINGS_FORTUNES: self.fortunes,
-            IndicatorFortune.SETTINGS_MIDDLE_MOUSE_CLICK_ON_ICON: self.middleMouseClickOnIcon,
-            IndicatorFortune.SETTINGS_NOTIFICATION_SUMMARY: self.notificationSummary,
-            IndicatorFortune.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
-            IndicatorFortune.SETTINGS_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
+    def saveConfig( self ):
+        config = {
+            IndicatorFortune.CONFIG_FORTUNES: self.fortunes,
+            IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON: self.middleMouseClickOnIcon,
+            IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY: self.notificationSummary,
+            IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
+            IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
         }
 
-        pythonutils.saveSettings( settings, INDICATOR_NAME, INDICATOR_NAME, logging )
+        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
 if __name__ == "__main__": IndicatorFortune().main()
