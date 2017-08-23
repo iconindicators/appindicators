@@ -322,17 +322,14 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
 
 
 #TODO Fix header.
-# Removes files from the cache.
+# Remove a file from the cache.
 #
 # applicationBaseDirectory: File system path to the directory location of the cache.
-# baseName: Text used, along with a timestamp, to form the binary file name.
-def removeFromCache( applicationBaseDirectory, baseName ):
-    # Read all files in the cache; any file starting with the base name is deleted.
+# fileName: Text used, along with a timestamp, to form the binary file name.
+def removeFromCache( applicationBaseDirectory, fileName ):
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     for file in os.listdir( cacheDirectory ):
-        if file.startswith( baseName ): #TODO Add if baseName is None or file.startswith.... 
-            #so when None, ALL files are removed and baseName = None is a default arg.
-            #Also, use startsWith or contains or just a straight compare (so delete at most one file)?
+        if file == fileName:
             os.remove( cacheDirectory + "/" + file )
 
 
