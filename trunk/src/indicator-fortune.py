@@ -75,7 +75,7 @@ class IndicatorFortune:
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
         Notify.init( INDICATOR_NAME )
-        pythonutils.migrateConfig( INDICATOR_NAME, INDICATOR_NAME ) # Migrate old user configuration to new location.
+        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
         pythonutils.removeFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
         self.loadConfig()
 
