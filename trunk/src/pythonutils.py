@@ -403,6 +403,7 @@ def writeToCache( data, cachePath, baseName, cacheMaximumDateTime, logging ):
 def readCacheObject( applicationBaseDirectory, baseName, cacheMaximumDateTime, logging ):
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
 
+#TODO Need a new clear cache...maybe take a None value as a default to clear the whole cache?
 #     __clearCache( cachePath, baseName, cacheMaximumDateTime )
 
     # Read all files in the cache and note those which match the base name.
