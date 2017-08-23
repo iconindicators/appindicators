@@ -247,11 +247,12 @@ def saveConfig( config, applicationBaseDirectory, configBaseFile, logging ):
 # Move the configuration file from user home (original and incorrect location)
 # to new location ONLY if the new location does not contain a configuration file.
 #
-# applicationBaseDirectory: The directory path used as the final part of the overall path.
-# configBaseFile: The file name (without extension).
-def migrateConfig( applicationBaseDirectory, configBaseFile ):
-    oldConfigFile = os.path.expanduser( "~" ) + "/." + configBaseFile + JSON_EXTENSION
-    newConfigFile = _getConfigFile( applicationBaseDirectory, configBaseFile )
+# name The application name, which was used as the base name of the configuration file
+# in the user's home directory, and will now be used as the base directory name in the
+# new configuration location in addition to the base name of the configuration file.
+def migrateConfig( applicationName ):
+    oldConfigFile = os.path.expanduser( "~" ) + "/." + applicationName + JSON_EXTENSION
+    newConfigFile = _getConfigFile( applicationName, applicationName )
     if os.path.isfile( oldConfigFile ) and not os.path.isfile( newConfigFile ):
         os.rename( oldConfigFile, newConfigFile )
 
