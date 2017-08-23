@@ -40,7 +40,7 @@ gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
-import json, logging, os, pythonutils, threading
+import logging, os, pythonutils, threading
 
 
 class IndicatorFortune:
