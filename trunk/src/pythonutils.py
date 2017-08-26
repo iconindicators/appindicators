@@ -326,11 +326,32 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
 #
 # applicationBaseDirectory: File system path to the directory location of the cache.
 # fileName: Text used, along with a timestamp, to form the binary file name.
-def removeFromCache( applicationBaseDirectory, fileName ):
+def removeFileFromCache( applicationBaseDirectory, fileName ):
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     for file in os.listdir( cacheDirectory ):
         if file == fileName:
             os.remove( cacheDirectory + "/" + file )
+
+
+
+
+#TODO Fix header
+#TODO Ensure this works using new directory system.
+# Removes out of date cache files.
+#
+# cachePath: File system path to the directory location of the cache.
+# baseName: Text used, along with a timestamp, to form the binary file name.
+# cacheMaximumDateTime: If any file is older than the date/time,
+#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
+#                       the file will be discarded.  
+def removeFilesFromCache( applicationBaseDirectory, baseName, cacheMaximumDateTime ):
+    # Read all files in the cache and any file matching the base name but older than the cache maximum date/time id deleted.
+    cacheMaximumDateTimeString = cacheMaximumDateTime.strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+    for file in os.listdir( cachePath ):
+        if file.startswith( baseName ):
+            fileDateTime = file[ file.index( baseName ) + len( baseName ) : ]
+            if fileDateTime < cacheMaximumDateTimeString:
+                os.remove( cachePath + file )
 
 
 # Obtain (and create if not present) the directory for application config, cache or similar.
