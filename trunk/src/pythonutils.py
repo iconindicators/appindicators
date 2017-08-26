@@ -333,7 +333,7 @@ def removeFromCache( applicationBaseDirectory, fileName ):
             os.remove( cacheDirectory + "/" + file )
 
 
-# Obtain (and create if necessary) a directory for use as config, cache or similar for an application.
+# Obtain (and create if not present) the directory for application config, cache or similar.
 #
 # XDGKey: The XDG environment variable used to obtain the base directory of the config/cache.
 #         https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
