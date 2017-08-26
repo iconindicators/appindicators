@@ -331,7 +331,7 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
 #                       the file will be discarded.  
 #
 # Returns a tuple of the data (either None or the object) and the corresponding date/time as string (either None or the date/time).
-def readCacheBinary( applicationBaseDirectory, baseName, cacheMaximumDateTime, logging ):
+def readCacheBinary( applicationBaseDirectory, baseName, logging ):
 
 #TODO Verify this function works!
     
@@ -390,7 +390,7 @@ def readCacheBinary( applicationBaseDirectory, baseName, cacheMaximumDateTime, l
 #
 #    ~/.cache/fred/mary-20170629174950
 #    ~/.cache/fred/jane-20170629174951
-def writeCacheBinary( binaryData, applicationBaseDirectory, baseName, cacheMaximumDateTime, logging ):
+def writeCacheBinary( binaryData, applicationBaseDirectory, baseName, logging ):
 #TODO Verify this function works!
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     filename = cacheDirectory + "/" + baseName + datetime.datetime.now().strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
