@@ -76,7 +76,7 @@ class IndicatorFortune:
 
         Notify.init( INDICATOR_NAME )
         pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
-        pythonutils.removeFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
+        pythonutils.removeFileFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
         self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
