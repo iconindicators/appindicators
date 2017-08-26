@@ -372,6 +372,38 @@ def readCacheBinary( applicationBaseDirectory, baseName, cacheMaximumDateTime, l
 
 
 #TODO Fix header.
+# Writes an object as a binary file.
+#
+# data: The object to write.
+# cachePath: File system path to the directory location of the cache.
+# baseName: Text used, along with a timestamp, to form the binary file name.
+# cacheMaximumDateTime: If any file is older than the date/time,
+#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
+#                       the file will be discarded.  
+#
+# For the application "fred" to write the objects "maryDict" and "janeDict":
+#
+#    writeToCache( maryDict, ~/.cache/fred/, mary, logging )
+#    writeToCache( janeDict, ~/.cache/fred/, jane, logging )
+#
+# resulting in binary files written (with timestamps):
+#
+#    ~/.cache/fred/mary-20170629174950
+#    ~/.cache/fred/jane-20170629174951
+def writeCacheBinary( binaryData, applicationBaseDirectory, baseName, cacheMaximumDateTime, logging ):
+#TODO Verify this function works!
+    cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
+    filename = cacheDirectory + "/" + baseName + datetime.datetime.now().strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+    try:
+        with open( filename, "wb" ) as f:
+            pickle.dump( binaryData, f )
+
+    except Exception as e:
+        logging.exception( e )
+        logging.error( "Error writing to cache: " + filename )
+
+
+#TODO Fix header.
 # Remove a file from the cache.
 #
 # applicationBaseDirectory: File system path to the directory location of the cache.
