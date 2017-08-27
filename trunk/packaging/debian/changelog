@@ -4,6 +4,9 @@ indicator-virtual-box (1.0.56-1) trusty; urgency=low
   * Removed the option to alphabetically sort.
   * Removed outdated Czech translation.
   * About/Preferences dialogs now block each other - only show one at a time.
+  * User settings now stored in the directory specified by the environment
+    variable XDG_CONFIG_HOME, or, if not present, $HOME/.config
+    (existing user settings stored in $HOME are migrated to the new location).
   * Update release to trusty as precise is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 2 May 2017 9:57:08 +1000

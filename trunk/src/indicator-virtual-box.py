@@ -66,11 +66,10 @@ class IndicatorVirtualBox:
 
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
-    SETTINGS_DELAY_BETWEEN_AUTO_START = "delayBetweenAutoStartInSeconds"
-    SETTINGS_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
-    SETTINGS_SHOW_SUBMENU = "showSubmenu"
-    SETTINGS_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
+    CONFIG_DELAY_BETWEEN_AUTO_START = "delayBetweenAutoStartInSeconds"
+    CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
+    CONFIG_SHOW_SUBMENU = "showSubmenu"
+    CONFIG_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
 
 
     def __init__( self ):
@@ -80,7 +79,8 @@ class IndicatorVirtualBox:
         self.scrollUUID = None
 
         Notify.init( INDICATOR_NAME )
-        self.loadSettings()
+        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
+        self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorVirtualBox.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -540,7 +540,7 @@ class IndicatorVirtualBox:
             self.virtualMachinePreferences.clear()
             self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
             pythonutils.setAutoStart( IndicatorVirtualBox.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            self.saveSettings()
+            self.saveConfig()
             GLib.idle_add( self.update, False )
 
         dialog.destroy()
@@ -644,42 +644,29 @@ class IndicatorVirtualBox:
         dialog.destroy()
 
 
-    def loadSettings( self ):
+    def loadConfig( self ):
         self.delayBetweenAutoStartInSeconds = 10
         self.refreshIntervalInMinutes = 15
         self.showSubmenu = False
         self.virtualMachinePreferences = { } # Store information about VMs (not groups). Key is VM UUID; value is [ autostart (bool), start command (str) ]
 
-        if os.path.isfile( IndicatorVirtualBox.SETTINGS_FILE ):
-            try:
-                with open( IndicatorVirtualBox.SETTINGS_FILE, "r" ) as f:
-                    settings = json.load( f )
+        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-                self.delayBetweenAutoStartInSeconds = settings.get( IndicatorVirtualBox.SETTINGS_DELAY_BETWEEN_AUTO_START, self.delayBetweenAutoStartInSeconds )
-                self.refreshIntervalInMinutes = settings.get( IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
-                self.showSubmenu = settings.get( IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
-                self.virtualMachinePreferences = settings.get( IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES, self.virtualMachinePreferences )
-
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Error reading settings: " + IndicatorVirtualBox.SETTINGS_FILE )
+        self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START, self.delayBetweenAutoStartInSeconds )
+        self.refreshIntervalInMinutes = config.get( IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
+        self.showSubmenu = config.get( IndicatorVirtualBox.CONFIG_SHOW_SUBMENU, self.showSubmenu )
+        self.virtualMachinePreferences = config.get( IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES, self.virtualMachinePreferences )
 
 
-    def saveSettings( self ):
-        settings = {
-            IndicatorVirtualBox.SETTINGS_DELAY_BETWEEN_AUTO_START: self.delayBetweenAutoStartInSeconds,
-            IndicatorVirtualBox.SETTINGS_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
-            IndicatorVirtualBox.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
-            IndicatorVirtualBox.SETTINGS_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences
+    def saveConfig( self ):
+        config = {
+            IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START: self.delayBetweenAutoStartInSeconds,
+            IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
+            IndicatorVirtualBox.CONFIG_SHOW_SUBMENU: self.showSubmenu,
+            IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences
         }
 
-        try:
-            with open( IndicatorVirtualBox.SETTINGS_FILE, "w" ) as f:
-                f.write( json.dumps( settings ) )
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing settings: " + IndicatorVirtualBox.SETTINGS_FILE )
+        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
 if __name__ == "__main__": IndicatorVirtualBox().main()
