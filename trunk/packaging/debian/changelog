@@ -11,6 +11,9 @@ indicator-tide (1.0.8-1) trusty; urgency=low
   * Tidal information is cached for use when offline.   ........................Is this still valid?
   * Split the Preferences dialog over two tabs (ports and general).
   * About/Preferences dialogs now block each other - only show one at a time.
+  * User settings now stored in the directory specified by the environment
+    variable XDG_CONFIG_HOME, or, if not present, $HOME/.config
+    (existing user settings stored in $HOME are migrated to the new location).
   * Update release to trusty as precise is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 2 May 2017 10:35:15 +1000

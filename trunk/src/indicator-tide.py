@@ -71,13 +71,12 @@ class IndicatorTide:
 
     URL_TIMEOUT_IN_SECONDS = 10
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
-    SETTINGS_MENU_ITEM_DATE_FORMAT = "menuItemDateFormat"
-    SETTINGS_MENU_ITEM_TIDE_FORMAT = "menuItemTideFormat"
-    SETTINGS_MENU_ITEM_TIDE_FORMAT_SANS_TIME = "menuItemTideFormatSansTime"
-    SETTINGS_PORT_ID = "portID"
-    SETTINGS_SHOW_AS_SUBMENUS = "showAsSubmenus"
-    SETTINGS_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY = "showAsSubmenusExceptFirstDay"
+    CONFIG_MENU_ITEM_DATE_FORMAT = "menuItemDateFormat"
+    CONFIG_MENU_ITEM_TIDE_FORMAT = "menuItemTideFormat"
+    CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME = "menuItemTideFormatSansTime"
+    CONFIG_PORT_ID = "portID"
+    CONFIG_SHOW_AS_SUBMENUS = "showAsSubmenus"
+    CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY = "showAsSubmenusExceptFirstDay"
 
     MENU_ITEM_DATE_DEFAULT_FORMAT = "%A, %d %B"
     MENU_ITEM_TIME_DEFAULT_FORMAT = "%I:%M %p"
@@ -92,7 +91,8 @@ class IndicatorTide:
         self.dialogLock = threading.Lock()
 
         Notify.init( INDICATOR_NAME )
-        self.loadSettings()
+        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
+        self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorTide.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
@@ -397,7 +397,7 @@ class IndicatorTide:
             self.menuItemDateFormat = dateFormat.get_text()
             self.menuItemTideFormat = tideFormat.get_text()
             self.menuItemTideFormatSansTime = tideFormatSansTime.get_text()
-            self.saveSettings()
+            self.saveConfig()
             pythonutils.setAutoStart( IndicatorTide.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.update, False )
 
@@ -422,7 +422,7 @@ class IndicatorTide:
     def onShowAsSubmenusCheckbox( self, source, showAsSubmenusExceptFirstDayCheckbox ): showAsSubmenusExceptFirstDayCheckbox.set_sensitive( source.get_active() )
 
 
-    def loadSettings( self ):
+    def loadConfig( self ):
         self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
         self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
         self.menuItemTideFormatSansTime = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME
@@ -430,21 +430,14 @@ class IndicatorTide:
         self.showAsSubMenus = True
         self.showAsSubMenusExceptFirstDay = True
 
-        if os.path.isfile( IndicatorTide.SETTINGS_FILE ):
-            try:
-                with open( IndicatorTide.SETTINGS_FILE, "r" ) as f:
-                    settings = json.load( f )
+        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-                self.menuItemDateFormat = settings.get( IndicatorTide.SETTINGS_MENU_ITEM_DATE_FORMAT, self.menuItemDateFormat )
-                self.menuItemTideFormat = settings.get( IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT, self.menuItemTideFormat )
-                self.menuItemTideFormatSansTime = settings.get( IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT_SANS_TIME, self.menuItemTideFormatSansTime )
-                self.portID = settings.get( IndicatorTide.SETTINGS_PORT_ID, self.portID )
-                self.showAsSubMenus = settings.get( IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS, self.showAsSubMenus )
-                self.showAsSubMenusExceptFirstDay = settings.get( IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, self.showAsSubMenusExceptFirstDay )
-
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Error reading settings: " + IndicatorTide.SETTINGS_FILE )
+        self.menuItemDateFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT, self.menuItemDateFormat )
+        self.menuItemTideFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT, self.menuItemTideFormat )
+        self.menuItemTideFormatSansTime = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME, self.menuItemTideFormatSansTime )
+        self.portID = config.get( IndicatorTide.CONFIG_PORT_ID, self.portID )
+        self.showAsSubMenus = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS, self.showAsSubMenus )
+        self.showAsSubMenusExceptFirstDay = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, self.showAsSubMenusExceptFirstDay )
 
         # Validate the port...
         if not ports.isValidPortID( self.portID ):
@@ -462,23 +455,17 @@ class IndicatorTide:
                 self.portID = ports.getFirstPortID()
 
 
-    def saveSettings( self ):
-        settings = {
-            IndicatorTide.SETTINGS_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
-            IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
-            IndicatorTide.SETTINGS_MENU_ITEM_TIDE_FORMAT_SANS_TIME: self.menuItemTideFormatSansTime,
-            IndicatorTide.SETTINGS_PORT_ID: self.portID,
-            IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS: self.showAsSubMenus,
-            IndicatorTide.SETTINGS_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY: self.showAsSubMenusExceptFirstDay
+    def saveConfig( self ):
+        config = {
+            IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
+            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
+            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME: self.menuItemTideFormatSansTime,
+            IndicatorTide.CONFIG_PORT_ID: self.portID,
+            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS: self.showAsSubMenus,
+            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY: self.showAsSubMenusExceptFirstDay
         }
 
-        try:
-            with open( IndicatorTide.SETTINGS_FILE, "w" ) as f:
-                f.write( json.dumps( settings ) )
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing settings: " + IndicatorTide.SETTINGS_FILE )
+        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID ):
