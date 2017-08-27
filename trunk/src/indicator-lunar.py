@@ -1757,7 +1757,8 @@ class IndicatorLunar:
         # before the download period has expired.
         # The cache attempts to avoid the download source blocking a user
         # as a ressult of too many downloads in a given period.
-        self.cometOEData, cacheDateTime = pythonutils.readFromCache( IndicatorLunar.CACHE_PATH, IndicatorLunar.COMET_OE_CACHE_BASENAME, self.getCacheMaximumDateTime( IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS ), logging ) # Returned data is either None or non-empty.
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, self.getCacheMaximumDateTime( IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS ) )
+        self.cometOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
         if self.cometOEData is None:
             # Cache returned no result so download from the source.
             self.cometOEData = self.getCometOEData( self.cometOEURL )
@@ -1771,7 +1772,7 @@ class IndicatorLunar:
                 message = _( "The comet OE data retrieved was empty." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             else:
-                pythonutils.writeToCache( self.cometOEData, IndicatorLunar.CACHE_PATH, IndicatorLunar.COMET_OE_CACHE_BASENAME, self.getCacheMaximumDateTime( IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS ), logging )
+                pythonutils.writeCacheBinary( self.cometOEData, INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging )
 
             # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
             self.lastUpdateCometOE = datetime.datetime.utcnow()
@@ -1794,7 +1795,8 @@ class IndicatorLunar:
         # before the download period has expired.
         # The cache attempts to avoid the download source blocking a user
         # as a ressult of too many downloads in a given period.
-        self.satelliteTLEData, cacheDateTime = pythonutils.readFromCache( IndicatorLunar.CACHE_PATH, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, self.getCacheMaximumDateTime( IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ), logging ) # Returned data is either None or non-empty.
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, self.getCacheMaximumDateTime( IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) )
+        self.satelliteTLEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
         if self.satelliteTLEData is None:
             # Cache returned no result so download from the source.
             self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
@@ -1808,7 +1810,7 @@ class IndicatorLunar:
                 message = _( "The satellite TLE data retrieved was empty." )
                 Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
             else:
-                pythonutils.writeToCache( self.satelliteTLEData, IndicatorLunar.CACHE_PATH, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, self.getCacheMaximumDateTime( IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ), logging )
+                pythonutils.writeCacheBinary( self.satelliteTLEData, INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging )
 
             # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
             self.lastUpdateSatelliteTLE = datetime.datetime.utcnow()
@@ -3181,7 +3183,7 @@ class IndicatorLunar:
                 else:
                     self.cometOEData = self.cometOEDataNew # The retrieved data is good (but still could be empty).
 
-                pythonutils.writeToCache( self.cometOEData, IndicatorLunar.CACHE_PATH, IndicatorLunar.COMET_OE_CACHE_BASENAME, self.getCacheMaximumDateTime( IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS ), logging )
+                pythonutils.writeCacheBinary( self.cometOEData, INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging )
                 self.lastUpdateCometOE = datetime.datetime.utcnow()
 
             self.comets = [ ]
@@ -3199,7 +3201,7 @@ class IndicatorLunar:
                 else:
                     self.satelliteTLEData = self.satelliteTLEDataNew # The retrieved data is good (but still could be empty).
 
-                pythonutils.writeToCache( self.satelliteTLEData, IndicatorLunar.CACHE_PATH, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, self.getCacheMaximumDateTime( IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ), logging )
+                pythonutils.writeCacheBinary( self.satelliteTLEData, INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging )
                 self.lastUpdateSatelliteTLE = datetime.datetime.utcnow()
 
             self.satellites = [ ]
@@ -3365,7 +3367,8 @@ class IndicatorLunar:
 
         # If the URL is the default, use the cache to avoid annoying the default data source.
         if urlNew == dataURL:
-            dataNew, cacheDateTime = pythonutils.readFromCache( IndicatorLunar.CACHE_PATH, cacheBasename, self.getCacheMaximumDateTime( cacheMaximumAgeHours ), logging ) # Returned data is either None or non-empty.
+            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBasename, self.getCacheMaximumDateTime( cacheMaximumAgeHours ) )
+            dataNew, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBasename, logging ) # Returned data is either None or non-empty.
             if dataNew is None:
                 # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
                 if datetime.datetime.utcnow() < ( lastUpdate + datetime.timedelta( hours = downloadPeriodHours ) ):
