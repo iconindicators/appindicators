@@ -159,8 +159,11 @@ class IndicatorFortune:
                         break
 
                     elif len( self.fortune ) <= self.skipFortuneCharacterCount: # If the fortune is within the character limit keep it...
-                        history = pythonutils.readCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE, logging ) + self.fortune + "\n\n"
-                        pythonutils.writeCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE, history, logging )
+                        history = pythonutils.readCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE, logging )
+                        if history is None:
+                            history = ""
+
+                        pythonutils.writeCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n", logging )
                         break
 
 
