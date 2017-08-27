@@ -53,10 +53,9 @@ class IndicatorStardate:
     COMMENTS = _( "Shows the current Star Trek™ stardate." )
     CREDITS = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ]
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
-    SETTINGS_PAD_INTEGER = "padInteger"
-    SETTINGS_SHOW_CLASSIC = "showClassic"
-    SETTINGS_SHOW_ISSUE = "showIssue"
+    CONFIG_PAD_INTEGER = "padInteger"
+    CONFIG_SHOW_CLASSIC = "showClassic"
+    CONFIG_SHOW_ISSUE = "showIssue"
 
 
     def __init__( self ):
@@ -64,7 +63,8 @@ class IndicatorStardate:
         self.dialogLock = threading.Lock()
         self.saveSettingsTimerID = None
 
-        self.loadSettings()
+        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
+        self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorStardate.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -156,7 +156,7 @@ class IndicatorStardate:
             if self.saveSettingsTimerID is not None:
                 GLib.source_remove( self.saveSettingsTimerID )
 
-            self.saveSettingsTimerID = GLib.timeout_add_seconds( 5, self.saveSettings ) # Defer the save to five seconds in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
+            self.saveSettingsTimerID = GLib.timeout_add_seconds( 5, self.saveConfig ) # Defer the save to five seconds in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
 
 
     def onAbout( self, widget ):
@@ -236,7 +236,7 @@ class IndicatorStardate:
             self.padInteger = padIntegerCheckbox.get_active()
             self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
-            self.saveSettings() # A save timer could still be in force, but let it run as the same global values will just be re-saved.
+            self.saveConfig() # A save timer could still be in force, but let it run as the same global values will just be re-saved.
             pythonutils.setAutoStart( IndicatorStardate.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.update, False )
 
@@ -248,41 +248,28 @@ class IndicatorStardate:
         showIssueCheckbox.set_sensitive( source.get_active() )
 
 
-    def loadSettings( self ):
+    def loadConfig( self ):
         self.padInteger = True
         self.showClassic = True
         self.showIssue = True
 
-        if os.path.isfile( IndicatorStardate.SETTINGS_FILE ):
-            try:
-                with open( IndicatorStardate.SETTINGS_FILE, "r" ) as f:
-                    settings = json.load( f )
+        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-                self.padInteger = settings.get( IndicatorStardate.SETTINGS_PAD_INTEGER, self.padInteger )
-                self.showClassic = settings.get( IndicatorStardate.SETTINGS_SHOW_CLASSIC, self.showClassic )
-                self.showIssue = settings.get( IndicatorStardate.SETTINGS_SHOW_ISSUE, self.showIssue )
-
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Error reading settings: " + IndicatorStardate.SETTINGS_FILE )
+        self.padInteger = config.get( IndicatorStardate.CONFIG_PAD_INTEGER, self.padInteger )
+        self.showClassic = config.get( IndicatorStardate.CONFIG_SHOW_CLASSIC, self.showClassic )
+        self.showIssue = config.get( IndicatorStardate.CONFIG_SHOW_ISSUE, self.showIssue )
 
 
-    def saveSettings( self ):
+    def saveConfig( self ):
         self.saveSettingsTimerID = None # Reset the timer ID.
 
-        settings = {
-            IndicatorStardate.SETTINGS_PAD_INTEGER: self.padInteger,
-            IndicatorStardate.SETTINGS_SHOW_CLASSIC: self.showClassic,
-            IndicatorStardate.SETTINGS_SHOW_ISSUE: self.showIssue
+        config = {
+            IndicatorStardate.CONFIG_PAD_INTEGER: self.padInteger,
+            IndicatorStardate.CONFIG_SHOW_CLASSIC: self.showClassic,
+            IndicatorStardate.CONFIG_SHOW_ISSUE: self.showIssue
         }
 
-        try:
-            with open( IndicatorStardate.SETTINGS_FILE, "w" ) as f:
-                f.write( json.dumps( settings ) )
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing settings: " + IndicatorStardate.SETTINGS_FILE )
+        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
 if __name__ == "__main__": IndicatorStardate().main()
