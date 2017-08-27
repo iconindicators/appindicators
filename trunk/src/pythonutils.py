@@ -275,14 +275,18 @@ def _getConfigFile( applicationBaseDirectory, configBaseFile ):
 # Returns a dict of key/value pairs (empty when no file is present or an error occurs).
 def readCacheText( applicationBaseDirectory, fileName, logging ):
     cacheFile = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
-    text = ""
+    text = None
     if os.path.isfile( cacheFile ):
         try:
             with open( cacheFile, "r" ) as f:
                 text = f.read()
         except Exception as e:
+            text = None
             logging.exception( e )
             logging.error( "Error reading from cache: " + cacheFile )
+
+    if text is None or len( text ) == 0: # Return either None or non-empty text.
+        text = None
 
     return text
 
@@ -364,7 +368,7 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
             logging.error( "Error reading from cache: " + filename )
 
     # Only return None or non-empty.
-    if data is None or len( data ) == 0: #TODO Return None or [] instead?  Is it possible to end up with None?
+    if data is None or len( data ) == 0: # Return None or a non-empty object.
         data = None
         dateTime = None
 
@@ -392,6 +396,7 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
 #    ~/.cache/fred/jane-20170629174951
 def writeCacheBinary( binaryData, applicationBaseDirectory, baseName, logging ):
 #TODO Verify this function works!
+    success = True
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     filename = cacheDirectory + "/" + baseName + datetime.datetime.now().strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
     try:
@@ -401,6 +406,9 @@ def writeCacheBinary( binaryData, applicationBaseDirectory, baseName, logging ):
     except Exception as e:
         logging.exception( e )
         logging.error( "Error writing to cache: " + filename )
+        success = False
+
+    return success
 
 
 #TODO Fix header.
@@ -458,6 +466,7 @@ def _getUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
     return directory
 
 
+#TODO Remove once writeCacheBinary is verified.
 # Writes an object as a binary file.
 #
 # data: The object to write.
@@ -492,6 +501,7 @@ def writeToCache( data, cachePath, baseName, cacheMaximumDateTime, logging ):
         logging.error( "Error writing to cache: " + filename )
 
 
+#TODO Remove once readCacheBinary is verified.
 # Reads the most recent file from the cache for the given base name.
 # Removes out of date cache files.
 #
@@ -542,6 +552,7 @@ def readFromCache( cachePath, baseName, cacheMaximumDateTime, logging ):
     return ( data, dateTime )
 
 
+#TODO Remove once writeCacheBinary and readCacheBinary are verified.
 # Removes out of date cache files.
 #
 # cachePath: File system path to the directory location of the cache.
@@ -559,6 +570,7 @@ def __clearCache( cachePath, baseName, cacheMaximumDateTime ):#TODO Need a new v
                 os.remove( cachePath + file )
 
 
+#TODO Remove once writeCacheBinary and readCacheBinary are verified.
 # Creates the cache.
 #
 # cachePath: File system path to the directory location of the cache.
