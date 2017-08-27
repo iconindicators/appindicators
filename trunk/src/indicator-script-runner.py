@@ -53,12 +53,11 @@ class IndicatorScriptRunner:
     WEBSITE = "https://launchpad.net/~thebernmeister"
     COMMENTS = _( "Run a terminal command or script from an indicator." )
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
-    SETTINGS_HIDE_GROUPS = "hideGroups"
-    SETTINGS_SCRIPT_GROUP_DEFAULT = "scriptGroupDefault"
-    SETTINGS_SCRIPT_NAME_DEFAULT = "scriptNameDefault"
-    SETTINGS_SCRIPTS = "scripts"
-    SETTINGS_SHOW_SCRIPTS_IN_SUBMENUS = "showScriptsInSubmenus"
+    CONFIG_HIDE_GROUPS = "hideGroups"
+    CONFIG_SCRIPT_GROUP_DEFAULT = "scriptGroupDefault"
+    CONFIG_SCRIPT_NAME_DEFAULT = "scriptNameDefault"
+    CONFIG_SCRIPTS = "scripts"
+    CONFIG_SHOW_SCRIPTS_IN_SUBMENUS = "showScriptsInSubmenus"
 
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
     COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\\\" \\\"" + _( "...has completed." ) + "\\\""
@@ -69,7 +68,8 @@ class IndicatorScriptRunner:
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorScriptRunner.LOG ) ] )
         self.dialogLock = threading.Lock()
 
-        self.loadSettings()
+        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
+        self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorScriptRunner.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -367,7 +367,7 @@ class IndicatorScriptRunner:
                 self.scriptGroupDefault = self.defaultScriptGroupCurrent
                 self.scriptNameDefault = self.defaultScriptNameCurrent
 
-            self.saveSettings()
+            self.saveConfig()
             pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.buildMenu )
 
@@ -787,42 +787,37 @@ class IndicatorScriptRunner:
         return scriptsGroupedByName
 
 
-    def loadSettings( self ):
+    def loadConfig( self ):
         self.scriptGroupDefault = ""
         self.scriptNameDefault = ""
         self.scripts = [ ]
         self.showScriptsInSubmenus = False
         self.hideGroups = False
-        if os.path.isfile( IndicatorScriptRunner.SETTINGS_FILE ):
-            try:
-                with open( IndicatorScriptRunner.SETTINGS_FILE, "r" ) as f:
-                    settings = json.load( f )
 
-                self.hideGroups = settings.get( IndicatorScriptRunner.SETTINGS_HIDE_GROUPS, self.hideGroups )
-                self.scriptGroupDefault = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPT_GROUP_DEFAULT, self.scriptGroupDefault )
-                self.scriptNameDefault = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPT_NAME_DEFAULT, self.scriptNameDefault )
-                self.showScriptsInSubmenus = settings.get( IndicatorScriptRunner.SETTINGS_SHOW_SCRIPTS_IN_SUBMENUS, self.showScriptsInSubmenus )
+        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
+        if len( config ) > 0:
+            self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, self.hideGroups )
+            self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, self.scriptGroupDefault )
+            self.scriptNameDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT, self.scriptNameDefault )
+            self.showScriptsInSubmenus = config.get( IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, self.showScriptsInSubmenus )
 
-                scripts = settings.get( IndicatorScriptRunner.SETTINGS_SCRIPTS, [ ] )
-                defaultScriptFound = False
-                for script in scripts:
-                    if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault:
-                        defaultScriptFound = True
+            scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
+            defaultScriptFound = False
+            for script in scripts:
+                if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault:
+                    defaultScriptFound = True
 
-                    self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
+                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
 
-                    # Handle additions to scripts: show notification and play sound.
-                    if len( script ) == 7:
-                        self.scripts[ -1 ].setPlaySound( script[ 5 ] )
-                        self.scripts[ -1 ].setShowNotification( script[ 6 ] )
+                # Handle additions to scripts: show notification and play sound.
+                if len( script ) == 7:
+                    self.scripts[ -1 ].setPlaySound( script[ 5 ] )
+                    self.scripts[ -1 ].setShowNotification( script[ 6 ] )
 
-                if not defaultScriptFound:
-                    self.scriptGroupDefault = ""
-                    self.scriptNameDefault = ""
+            if not defaultScriptFound:
+                self.scriptGroupDefault = ""
+                self.scriptNameDefault = ""
 
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Error reading settings: " + IndicatorScriptRunner.SETTINGS_FILE )
         else:
             self.scripts = [ ]
             self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 3 www.google.com", False ) )
@@ -835,26 +830,20 @@ class IndicatorScriptRunner:
             self.scripts[ -1 ].setShowNotification( True )
 
 
-    def saveSettings( self ):
+    def saveConfig( self ):
         scripts = [ ]
         for script in self.scripts:
             scripts.append( [ script.getGroup(), script.getName(), script.getDirectory(), script.getCommand(), script.isTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
 
-        settings = {
-            IndicatorScriptRunner.SETTINGS_HIDE_GROUPS: self.hideGroups,
-            IndicatorScriptRunner.SETTINGS_SCRIPT_GROUP_DEFAULT: self.scriptGroupDefault,
-            IndicatorScriptRunner.SETTINGS_SCRIPT_NAME_DEFAULT: self.scriptNameDefault,
-            IndicatorScriptRunner.SETTINGS_SCRIPTS: scripts,
-            IndicatorScriptRunner.SETTINGS_SHOW_SCRIPTS_IN_SUBMENUS: self.showScriptsInSubmenus
+        config = {
+            IndicatorScriptRunner.CONFIG_HIDE_GROUPS: self.hideGroups,
+            IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT: self.scriptGroupDefault,
+            IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT: self.scriptNameDefault,
+            IndicatorScriptRunner.CONFIG_SCRIPTS: scripts,
+            IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS: self.showScriptsInSubmenus
         }
 
-        try:
-            with open( IndicatorScriptRunner.SETTINGS_FILE, "w" ) as f:
-                f.write( json.dumps( settings ) )
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing settings: " + IndicatorScriptRunner.SETTINGS_FILE )
+        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
 if __name__ == "__main__": IndicatorScriptRunner().main()
