@@ -53,11 +53,10 @@ class IndicatorPunycode:
     WEBSITE = "https://launchpad.net/~thebernmeister"
     COMMENTS = _( "Convert domain names between Unicode and ASCII." )
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
-    SETTINGS_DROP_PATH_QUERY = "dropPathQuery"
-    SETTINGS_INPUT_CLIPBOARD = "inputClipboard"
-    SETTINGS_OUTPUT_BOTH = "outputBoth"
-    SETTINGS_RESULT_HISTORY_LENGTH = "resultHistoryLength"
+    CONFIG_DROP_PATH_QUERY = "dropPathQuery"
+    CONFIG_INPUT_CLIPBOARD = "inputClipboard"
+    CONFIG_OUTPUT_BOTH = "outputBoth"
+    CONFIG_RESULT_HISTORY_LENGTH = "resultHistoryLength"
 
 
     def __init__( self ):
@@ -66,7 +65,7 @@ class IndicatorPunycode:
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
 
         Notify.init( INDICATOR_NAME )
-        self.loadSettings()
+        self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPunycode.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -283,48 +282,36 @@ class IndicatorPunycode:
             self.outputBoth = outputBothCheckbox.get_active()
             self.dropPathQuery = dropPathQueryCheckbox.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
-            self.saveSettings()
+            self.saveConfig()
             pythonutils.setAutoStart( IndicatorPunycode.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.buildMenu )
 
         dialog.destroy()
 
 
-    def loadSettings( self ):
+    def loadConfig( self ):
         self.dropPathQuery = False
         self.inputClipboard = False
         self.outputBoth = False
         self.resultHistoryLength = 3
-        if os.path.isfile( IndicatorPunycode.SETTINGS_FILE ):
-            try:
-                with open( IndicatorPunycode.SETTINGS_FILE, "r" ) as f:
-                    settings = json.load( f )
 
-                self.dropPathQuery = settings.get( IndicatorPunycode.SETTINGS_DROP_PATH_QUERY, self.dropPathQuery )
-                self.inputClipboard = settings.get( IndicatorPunycode.SETTINGS_INPUT_CLIPBOARD, self.inputClipboard )
-                self.outputBoth = settings.get( IndicatorPunycode.SETTINGS_OUTPUT_BOTH, self.outputBoth )
-                self.resultHistoryLength = settings.get( IndicatorPunycode.SETTINGS_RESULT_HISTORY_LENGTH, self.resultHistoryLength )
+        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Error reading settings: " + IndicatorPunycode.SETTINGS_FILE )
+        self.dropPathQuery = config.get( IndicatorPunycode.CONFIG_DROP_PATH_QUERY, self.dropPathQuery )
+        self.inputClipboard = config.get( IndicatorPunycode.CONFIG_INPUT_CLIPBOARD, self.inputClipboard )
+        self.outputBoth = config.get( IndicatorPunycode.CONFIG_OUTPUT_BOTH, self.outputBoth )
+        self.resultHistoryLength = config.get( IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH, self.resultHistoryLength )
 
 
-    def saveSettings( self ):
-        settings = {
-            IndicatorPunycode.SETTINGS_DROP_PATH_QUERY: self.dropPathQuery,
-            IndicatorPunycode.SETTINGS_INPUT_CLIPBOARD: self.inputClipboard,
-            IndicatorPunycode.SETTINGS_OUTPUT_BOTH: self.outputBoth,
-            IndicatorPunycode.SETTINGS_RESULT_HISTORY_LENGTH: self.resultHistoryLength
+    def saveConfig( self ):
+        config = {
+            IndicatorPunycode.CONFIG_DROP_PATH_QUERY: self.dropPathQuery,
+            IndicatorPunycode.CONFIG_INPUT_CLIPBOARD: self.inputClipboard,
+            IndicatorPunycode.CONFIG_OUTPUT_BOTH: self.outputBoth,
+            IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH: self.resultHistoryLength
         }
 
-        try:
-            with open( IndicatorPunycode.SETTINGS_FILE, "w" ) as f:
-                f.write( json.dumps( settings ) )
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing settings: " + IndicatorPunycode.SETTINGS_FILE )
+        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
 if __name__ == "__main__": IndicatorPunycode().main()
