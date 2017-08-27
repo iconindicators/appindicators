@@ -944,7 +944,8 @@ class IndicatorLunar:
         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
-        self.loadSettings()
+        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
+        self.loadConfig()
         self.update( True )
 
 
@@ -3221,7 +3222,7 @@ class IndicatorLunar:
             self.cityName = cityValue
             _city_data[ self.cityName ] = ( str( latitudeValue ), str( longitudeValue ), float( elevationValue ) )
 
-            self.saveSettings()
+            self.saveConfig()
             pythonutils.setAutoStart( IndicatorLunar.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.update, False )
             break
@@ -3622,7 +3623,7 @@ class IndicatorLunar:
     def getCacheMaximumDateTime( self, cacheMaximumAgeHours ): return datetime.datetime.now() - datetime.timedelta( hours = cacheMaximumAgeHours )
 
 
-    def loadSettings( self ):
+    def loadConfig( self ):
         self.getDefaultCity()
 
         self.groupStarsByConstellation = False
@@ -3664,45 +3665,45 @@ class IndicatorLunar:
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
         global _city_data
-        cityElevation = settings.get( IndicatorLunar.CONFIG_CITY_ELEVATION, _city_data.get( self.cityName )[ 2 ] )
-        cityLatitude = settings.get( IndicatorLunar.CONFIG_CITY_LATITUDE, _city_data.get( self.cityName )[ 0 ] )
-        cityLongitude = settings.get( IndicatorLunar.CONFIG_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
-        self.cityName = settings.get( IndicatorLunar.CONFIG_CITY_NAME, self.cityName )
+        cityElevation = config.get( IndicatorLunar.CONFIG_CITY_ELEVATION, _city_data.get( self.cityName )[ 2 ] )
+        cityLatitude = config.get( IndicatorLunar.CONFIG_CITY_LATITUDE, _city_data.get( self.cityName )[ 0 ] )
+        cityLongitude = config.get( IndicatorLunar.CONFIG_CITY_LONGITUDE, _city_data.get( self.cityName )[ 1 ] )
+        self.cityName = config.get( IndicatorLunar.CONFIG_CITY_NAME, self.cityName )
         _city_data[ self.cityName ] = ( str( cityLatitude ), str( cityLongitude ), float( cityElevation ) ) # Insert/overwrite the cityName and information into the cities.
 
-        self.groupStarsByConstellation = settings.get( IndicatorLunar.CONFIG_GROUP_STARS_BY_CONSTELLATION, self.groupStarsByConstellation )
-        self.hideBodyIfNeverUp = settings.get( IndicatorLunar.CONFIG_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
-        self.hideSatelliteIfNoVisiblePass = settings.get( IndicatorLunar.CONFIG_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
-        self.indicatorText = settings.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, self.indicatorText )
-        self.cometOEURL = settings.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL )
-        self.comets = settings.get( IndicatorLunar.CONFIG_COMETS, self.comets )
-        self.cometsAddNew = settings.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, self.cometsAddNew )
-        self.cometsMagnitude = settings.get( IndicatorLunar.CONFIG_COMETS_MAGNITUDE, self.cometsMagnitude )
-        self.planets = settings.get( IndicatorLunar.CONFIG_PLANETS, self.planets )
-        self.satelliteNotificationMessage = settings.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
-        self.satelliteNotificationSummary = settings.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
-        self.satelliteTLEURL = settings.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL )
+        self.groupStarsByConstellation = config.get( IndicatorLunar.CONFIG_GROUP_STARS_BY_CONSTELLATION, self.groupStarsByConstellation )
+        self.hideBodyIfNeverUp = config.get( IndicatorLunar.CONFIG_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
+        self.hideSatelliteIfNoVisiblePass = config.get( IndicatorLunar.CONFIG_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
+        self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, self.indicatorText )
+        self.cometOEURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL )
+        self.comets = config.get( IndicatorLunar.CONFIG_COMETS, self.comets )
+        self.cometsAddNew = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, self.cometsAddNew )
+        self.cometsMagnitude = config.get( IndicatorLunar.CONFIG_COMETS_MAGNITUDE, self.cometsMagnitude )
+        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, self.planets )
+        self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
+        self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
+        self.satelliteTLEURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL )
 
-        self.satellites = settings.get( IndicatorLunar.CONFIG_SATELLITES, self.satellites )
+        self.satellites = config.get( IndicatorLunar.CONFIG_SATELLITES, self.satellites )
         self.satellites = [ tuple( l ) for l in self.satellites ] # Converts from a list of lists to a list of tuples...go figure!
 
-        self.satellitesAddNew = settings.get( IndicatorLunar.CONFIG_SATELLITES_ADD_NEW, self.satellitesAddNew )
-        self.satellitesSortByDateTime = settings.get( IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME, self.satellitesSortByDateTime )
-        self.showMoon = settings.get( IndicatorLunar.CONFIG_SHOW_MOON, self.showMoon )
-        self.showCometsAsSubMenu = settings.get( IndicatorLunar.CONFIG_SHOW_COMETS_AS_SUBMENU, self.showCometsAsSubMenu )
-        self.showPlanetsAsSubMenu = settings.get( IndicatorLunar.CONFIG_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
-        self.showSatelliteNotification = settings.get( IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
-        self.showSatellitesAsSubMenu = settings.get( IndicatorLunar.CONFIG_SHOW_SATELLITES_AS_SUBMENU, self.showSatellitesAsSubMenu )
-        self.showStarsAsSubMenu = settings.get( IndicatorLunar.CONFIG_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
-        self.showSun = settings.get( IndicatorLunar.CONFIG_SHOW_SUN, self.showSun )
-        self.showWerewolfWarning = settings.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
-        self.stars = settings.get( IndicatorLunar.CONFIG_STARS, self.stars )
-        self.werewolfWarningStartIlluminationPercentage = settings.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
-        self.werewolfWarningMessage = settings.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, self.werewolfWarningMessage )
-        self.werewolfWarningSummary = settings.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, self.werewolfWarningSummary )
+        self.satellitesAddNew = config.get( IndicatorLunar.CONFIG_SATELLITES_ADD_NEW, self.satellitesAddNew )
+        self.satellitesSortByDateTime = config.get( IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME, self.satellitesSortByDateTime )
+        self.showMoon = config.get( IndicatorLunar.CONFIG_SHOW_MOON, self.showMoon )
+        self.showCometsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_COMETS_AS_SUBMENU, self.showCometsAsSubMenu )
+        self.showPlanetsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
+        self.showSatelliteNotification = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
+        self.showSatellitesAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITES_AS_SUBMENU, self.showSatellitesAsSubMenu )
+        self.showStarsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
+        self.showSun = config.get( IndicatorLunar.CONFIG_SHOW_SUN, self.showSun )
+        self.showWerewolfWarning = config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
+        self.stars = config.get( IndicatorLunar.CONFIG_STARS, self.stars )
+        self.werewolfWarningStartIlluminationPercentage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
+        self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, self.werewolfWarningMessage )
+        self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, self.werewolfWarningSummary )
 
 
-    def saveSettings( self ):
+    def saveConfig( self ):
         if self.cometsAddNew:
             comets = [ ] 
         else:
@@ -3713,7 +3714,7 @@ class IndicatorLunar:
         else:
             satellites = self.satellites # Only write out the list of satellites if the user elects to not add new.
 
-        settings = {
+        config = {
             IndicatorLunar.CONFIG_CITY_ELEVATION: _city_data.get( self.cityName )[ 2 ],
             IndicatorLunar.CONFIG_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
             IndicatorLunar.CONFIG_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
