@@ -48,12 +48,6 @@ import datetime, json, locale, logging, os, ports, pythonutils, re, threading, t
 #TODO Renew license!
 
 
-# #TODO
-# Should indicator files go into .config?
-# The directory exists under Ubuntu GNOME and Ubuntu 14.04.
-# If so, apply to all indicators!
-
-
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
@@ -367,8 +361,8 @@ class IndicatorTide:
             "Tide information is specified using:\n\n" + \
             "    [TYPE] - the tide is high or low.\n" + \
             "    [LEVEL] - the tide level, measured in metres.\n\n" + \
-            "This format is used when a tide reading\n" + \
-            "contains no time component." ) )
+            "This format is used when there is no time\n" + \
+            "component in a tide reading" ) )
         box.pack_start( tideFormatSansTime, True, True, 0 )
 
         grid.attach( box, 0, 5, 1, 1 )
@@ -569,7 +563,7 @@ class IndicatorTide:
                             continue # Drop a tidal reading if missing both the time and level.
 
                         # As some ports only have the date component (no time is specified),
-                        # can only store date/time in the port local timezone rather than UTC.
+                        # can only store date/time in the port local timezone (rather than say, UTC).
                         if isinstance( dateTimes[ index ], datetime.datetime ):
                             tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, dateTimes[ index ].tzname()[ 3 : 6 ] + dateTimes[ index ].tzname()[ 7 : ], levels[ index ], tideType, url ) )
                         else:
@@ -615,6 +609,8 @@ class IndicatorTide:
     # If there is data, write to the cache.  It is assumed that all the tidal data is date sorted and of today's date or newer.
     # If there is no data, read from the cache (discarding data older than today).
     def washTidalDataThroughCache( self, tidalReadings ):
+        if True: return tidalReadings
+
         cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
         cacheDateBasename = "tidal-"
         cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( 24 * 8 ) ) # The UKHO shows tidal readings for one week from today.
