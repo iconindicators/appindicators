@@ -61,7 +61,7 @@ class IndicatorStardate:
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorStardate.LOG ) ] )
         self.dialogLock = threading.Lock()
-        self.saveSettingsTimerID = None
+        self.saveConfigTimerID = None
 
         pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
         self.loadConfig()
@@ -153,10 +153,10 @@ class IndicatorStardate:
 
             GLib.idle_add( self.update, False )
 
-            if self.saveSettingsTimerID is not None:
-                GLib.source_remove( self.saveSettingsTimerID )
+            if self.saveConfigTimerID is not None:
+                GLib.source_remove( self.saveConfigTimerID )
 
-            self.saveSettingsTimerID = GLib.timeout_add_seconds( 5, self.saveConfig ) # Defer the save to five seconds in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
+            self.saveConfigTimerID = GLib.timeout_add_seconds( 5, self.saveConfig ) # Defer the save to five seconds in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
 
 
     def onAbout( self, widget ):
@@ -261,7 +261,7 @@ class IndicatorStardate:
 
 
     def saveConfig( self ):
-        self.saveSettingsTimerID = None # Reset the timer ID.
+        self.saveConfigTimerID = None # Reset the timer ID.
 
         config = {
             IndicatorStardate.CONFIG_PAD_INTEGER: self.padInteger,
