@@ -336,12 +336,8 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
 #
 # Returns a tuple of the data (either None or the object) and the corresponding date/time as string (either None or the date/time).
 def readCacheBinary( applicationBaseDirectory, baseName, logging ):
-
-#TODO Verify this function works!
-    
-    cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
-
     # Read all files in the cache and note those which match the base name.
+    cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     files = [ ]
     for file in os.listdir( cacheDirectory ):
         if file.startswith( baseName ):
@@ -395,7 +391,6 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
 #    ~/.cache/fred/mary-20170629174950
 #    ~/.cache/fred/jane-20170629174951
 def writeCacheBinary( binaryData, applicationBaseDirectory, baseName, logging ):
-#TODO Verify this function works!
     success = True
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     filename = cacheDirectory + "/" + baseName + datetime.datetime.now().strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
@@ -464,119 +459,6 @@ def _getUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
         os.mkdir( directory )
 
     return directory
-
-
-#TODO Remove once writeCacheBinary is verified.
-# Writes an object as a binary file.
-#
-# data: The object to write.
-# cachePath: File system path to the directory location of the cache.
-# baseName: Text used, along with a timestamp, to form the binary file name.
-# cacheMaximumDateTime: If any file is older than the date/time,
-#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
-#                       the file will be discarded.  
-#
-# For the application "fred" to write the objects "maryDict" and "janeDict":
-#
-#    writeToCache( maryDict, ~/.cache/fred/, mary, logging )
-#    writeToCache( janeDict, ~/.cache/fred/, jane, logging )
-#
-# resulting in binary files written (with timestamps):
-#
-#    ~/.cache/fred/mary-20170629174950
-#    ~/.cache/fred/jane-20170629174951
-def writeToCache( data, cachePath, baseName, cacheMaximumDateTime, logging ):
-    __createCache( cachePath )
-
-    # Read all files in the cache and keep a list of those which match the base name.
-    __clearCache( cachePath, baseName, cacheMaximumDateTime )
-
-    filename = cachePath + baseName + datetime.datetime.now().strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-    try:
-        with open( filename, "wb" ) as f:
-            pickle.dump( data, f )
-
-    except Exception as e:
-        logging.exception( e )
-        logging.error( "Error writing to cache: " + filename )
-
-
-#TODO Remove once readCacheBinary is verified.
-# Reads the most recent file from the cache for the given base name.
-# Removes out of date cache files.
-#
-# cachePath: File system path to the directory location of the cache.
-# baseName: Text used, along with a timestamp, to form the binary file name.
-# cacheMaximumDateTime: If any file is older than the date/time,
-#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
-#                       the file will be discarded.  
-#
-# Returns a tuple of the data (either None or the object) and the corresponding date/time as string (either None or the date/time).
-def readFromCache( cachePath, baseName, cacheMaximumDateTime, logging ):
-    __createCache( cachePath )
-    
-    # Read all files in the cache and keep a list of those which match the base name.
-    __clearCache( cachePath, baseName, cacheMaximumDateTime )
-
-    # Any file matching the base name is kept.
-    files = [ ]
-    for file in os.listdir( cachePath ):
-        if file.startswith( baseName ):
-            files.append( file )
-
-    # Sort the matching files by date - all file(s) will be newer than the cache maximum date/time.
-    files.sort()
-    data = None
-    dateTime = None
-    for file in reversed( files ): # Look at the most recent file first.
-        filename = cachePath + file
-        try:
-            with open( filename, "rb" ) as f:
-                data = pickle.load( f )
-
-            if data is not None and len( data ) > 0:
-                dateTime = file[ len( baseName ) : ]
-                break
-
-        except Exception as e:
-            data = None
-            dateTime = None
-            logging.exception( e )
-            logging.error( "Error reading from cache: " + filename )
-
-    # Only return None or non-empty.
-    if data is None or len( data ) == 0:
-        data = None
-        dateTime = None
-
-    return ( data, dateTime )
-
-
-#TODO Remove once writeCacheBinary and readCacheBinary are verified.
-# Removes out of date cache files.
-#
-# cachePath: File system path to the directory location of the cache.
-# baseName: Text used, along with a timestamp, to form the binary file name.
-# cacheMaximumDateTime: If any file is older than the date/time,
-#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
-#                       the file will be discarded.  
-def __clearCache( cachePath, baseName, cacheMaximumDateTime ):#TODO Need a new version that doesn't take the cache path and call it removeFromCache (if possible).
-    # Read all files in the cache and any file matching the base name but older than the cache maximum date/time id deleted.
-    cacheMaximumDateTimeString = cacheMaximumDateTime.strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-    for file in os.listdir( cachePath ):
-        if file.startswith( baseName ):
-            fileDateTime = file[ file.index( baseName ) + len( baseName ) : ]
-            if fileDateTime < cacheMaximumDateTimeString:
-                os.remove( cachePath + file )
-
-
-#TODO Remove once writeCacheBinary and readCacheBinary are verified.
-# Creates the cache.
-#
-# cachePath: File system path to the directory location of the cache.
-def __createCache( cachePath ):
-    if not os.path.exists( cachePath ):
-        os.makedirs( cachePath )
 
 
 # Log file handler.  Truncates the file when the file size limit is reached.
