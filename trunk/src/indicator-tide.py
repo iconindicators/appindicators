@@ -133,6 +133,11 @@ class IndicatorTide:
         menu.show_all()
 
 
+#TODO When a mix of reading occur with date/time and date only, the date/time will be adjusted in user local time 
+#(and might jump to the next day) being out of order with the adjacent date only reading.
+# What to do?
+
+
     def _buildMenu( self, menu, indent, tidalReadings ):
         previousMonth = -1
         previousDay = -1
@@ -468,6 +473,7 @@ class IndicatorTide:
         else:
             portIDForURL = portID.rjust( 4, "0" )
 
+        portIDForURL = "1800" #TODO Remove
         # Port IDs for testing...
         #    LW time missing: 1800, 1894A, 3983
         #    HW/LW time missing: 2168, 5088
@@ -589,6 +595,8 @@ class IndicatorTide:
 # Maybe only touch tidal readings containing datetime and leave those with date alone?
 #Perhaps for date only tidal readings, compare each date (which is in the port's local timezone)
 #to the current date of the port...does that make sense?
+#
+#Maybe just reject any reading with a date before today (today local date).
         if True: return tidalReadings
         
         todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
