@@ -136,6 +136,12 @@ class IndicatorTide:
 #TODO When a mix of reading occur with date/time and date only, the date/time will be adjusted in user local time 
 #(and might jump to the next day) being out of order with the adjacent date only reading.
 # What to do?
+#
+#If all readings have a date and time, convert to user local.
+#
+#If all readings only have a date, do no conversion but show a notification saying dates are relative to the port's UTC offset.
+#
+#If the readings are mixed...
 
 
     def _buildMenu( self, menu, indent, tidalReadings ):
