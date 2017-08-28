@@ -7,7 +7,7 @@ indicator-tide (1.0.8-1) trusty; urgency=low
   * Corrected warnings in .desktop file.
   * Changed the format of the tide type, time and level to have the type first
     (rather than time first) to match the data source.
-  * Added a preference to format the display when time is absent from a reading.........................
+  * Added a preference to format the display when time is absent from a reading.
   * Tidal information is cached for use when offline.   ........................Is this still valid?
   * Split the Preferences dialog over two tabs (ports and general).
   * About/Preferences dialogs now block each other - only show one at a time.
