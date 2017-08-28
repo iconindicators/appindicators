@@ -112,11 +112,16 @@ class IndicatorTide:
 
             tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )
             if len( tidalReadings ) == 0:
+                summary = _( "Error" )
                 message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
-                Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
             else:
+#TODO Rephrase the summary/message...                
+                summary = _( "Port data for {0}..." ).format( ports.getPortName( self.portID ) )
+                message = _( "...are in port local date/time." )
                 if self.tidalReadingsAreAllDateTimes( tidalReadings ):
-                    pass #TODO Show notification 
+                    message = _( "...are in user local date/time." )
+
+            Notify.Notification.new( summary, message, IndicatorTide.ICON ).show()
 
             self.buildMenu( tidalReadings )
             self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
