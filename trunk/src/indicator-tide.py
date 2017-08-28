@@ -114,6 +114,9 @@ class IndicatorTide:
             if len( tidalReadings ) == 0:
                 message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
                 Notify.Notification.new( _( "Error" ), message, IndicatorTide.ICON ).show()
+            else:
+                if self.tidalReadingsAreAllDateTimes( tidalReadings ):
+                    pass #TODO Show notification 
 
             self.buildMenu( tidalReadings )
             self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
@@ -133,26 +136,16 @@ class IndicatorTide:
         menu.show_all()
 
 
-#TODO When a mix of reading occur with date/time and date only, the date/time will be adjusted in user local time 
-#(and might jump to the next day) being out of order with the adjacent date only reading.
-# What to do?
-#
-#If all readings have a date and time, convert to user local.
-#
-#If all readings only have a date, do no conversion but show a notification saying dates are relative to the port's UTC offset.
-#
-#If the readings are mixed...
-
-
     def _buildMenu( self, menu, indent, tidalReadings ):
+        allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
         previousMonth = -1
         previousDay = -1
         firstTidalReading = True # Used for subMenu build.
         for tidalReading in tidalReadings:
-            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
+            if allDateTimes:
                 tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
             else:
-                tidalDateTimeLocal = tidalReading.getDateTime() # There is no time component.
+                tidalDateTimeLocal = tidalReading.getDateTime() # There may or may not be a time component; the result will be in port local.
 
             if self.showAsSubMenus and firstTidalReading:
                 firstMonth = tidalDateTimeLocal.month
@@ -208,6 +201,17 @@ class IndicatorTide:
         return menuItem
 
 
+    def tidalReadingsAreAllDateTimes( self, tidalReadings ):
+        allDateTimes = True
+        for tidalReading in tidalReadings:
+            if not isinstance( tidalReading.getDateTime(), datetime.datetime ):
+                allDateTimes = False
+                break
+
+        return allDateTimes
+
+
+#TODO Make sure this works for when all readings are date/times or mixed or just times.
     def getNextUpdateTimeInSeconds( self ):
         # UKHO appears to update port data at GMT midnight.
         # Do an update shortly after GMT midnight but also shortly after local midnight to drop stale data.
@@ -479,7 +483,6 @@ class IndicatorTide:
         else:
             portIDForURL = portID.rjust( 4, "0" )
 
-        portIDForURL = "1800" #TODO Remove
         # Port IDs for testing...
         #    LW time missing: 1800, 1894A, 3983
         #    HW/LW time missing: 2168, 5088
@@ -585,11 +588,6 @@ class IndicatorTide:
             logging.exception( e )
             logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = [ ]
-
-#TODO Test all ports from above:
-#     Check subMenus and not subMenus option.
-#     Verify dates/times
-        for t in tidalReadings: print( t ) # TODO Ensure raw data is correctly scraped.
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
 
