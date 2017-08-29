@@ -204,7 +204,7 @@ def showAboutDialog(
 
 # Read a dict of configuration from a JSON text file.
 #
-# applicationBaseDirectory: The directory path used as the final part of the overall path.
+# applicationBaseDirectory: The directory used as the final part of the overall path.
 # configBaseFile: The file name (without extension).
 # logging: A valid logger, used on error.
 #
@@ -226,7 +226,7 @@ def loadConfig( applicationBaseDirectory, configBaseFile, logging ):
 # Write a dict of user configuration to a JSON text file.
 #
 # config: dict of key/value pairs.
-# applicationBaseDirectory: The directory path used as the final part of the overall path.
+# applicationBaseDirectory: The directory used as the final part of the overall path.
 # configBaseFile: The file name (without extension).
 # logging: A valid logger, used on error.
 def saveConfig( config, applicationBaseDirectory, configBaseFile, logging ):
@@ -266,14 +266,13 @@ def _getConfigFile( applicationBaseDirectory, configBaseFile ):
     return _getUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + configBaseFile + JSON_EXTENSION
 
 
-#TODO Fix header
-# Read a dict of ?????/ from a JSON text file.
+# Read a text file from the cache.
 #
-# applicationBaseDirectory: The directory path used as the final part of the overall path.
-# configBaseFile: The file name (without extension).
-# logging: Used to log.
+# applicationBaseDirectory: The directory used as the final part of the overall path.
+# fileName: The file name of the text file.
+# logging: A valid logger, used on error.
 #
-# Returns a dict of key/value pairs (empty when no file is present or an error occurs).
+# Returns the text contents or None on error.
 def readCacheText( applicationBaseDirectory, fileName, logging ):
     cacheFile = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
     text = None
@@ -292,25 +291,12 @@ def readCacheText( applicationBaseDirectory, fileName, logging ):
     return text
 
 
-#TODO Fix header.
-# Writes text to a file in the cache.
+# Write a text file to the cache.
 #
-# data: The object to write.
-# cachePath: File system path to the directory location of the cache.
-# baseName: Text used, along with a timestamp, to form the binary file name.
-# cacheMaximumDateTime: If any file is older than the date/time,
-#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
-#                       the file will be discarded.  
-#
-# For the application "fred" to write the objects "maryDict" and "janeDict":
-#
-#    writeToCache( maryDict, ~/.cache/fred/, mary, logging )
-#    writeToCache( janeDict, ~/.cache/fred/, jane, logging )
-#
-# resulting in binary files written (with timestamps):
-#
-#    ~/.cache/fred/mary-20170629174950
-#    ~/.cache/fred/jane-20170629174951
+# applicationBaseDirectory: The directory used as the final part of the overall path.
+# fileName: The file name of the text file.
+# text: The text to write.
+# logging: A valid logger, used on error.
 def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
     success = True
     cacheFile = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
@@ -325,6 +311,14 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
 
     return success
 
+
+# Read the most recent binary object from the cache.
+#
+# applicationBaseDirectory: The directory used as the final part of the overall path.
+# baseName: The file name of the text file.
+# logging: A valid logger, used on error.
+#
+# Returns the binary object or None on error.
 
 #TODO Fix header.
 # Reads the most recent file from the cache for the given base name.
