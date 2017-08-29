@@ -206,7 +206,7 @@ def showAboutDialog(
 #
 # applicationBaseDirectory: The directory path used as the final part of the overall path.
 # configBaseFile: The file name (without extension).
-# logging: Used to log.
+# logging: A valid logger, used on error.
 #
 # Returns a dict of key/value pairs (empty when no file is present or an error occurs).
 def loadConfig( applicationBaseDirectory, configBaseFile, logging ):
@@ -228,7 +228,7 @@ def loadConfig( applicationBaseDirectory, configBaseFile, logging ):
 # config: dict of key/value pairs.
 # applicationBaseDirectory: The directory path used as the final part of the overall path.
 # configBaseFile: The file name (without extension).
-# logging: Used to log.
+# logging: A valid logger, used on error.
 def saveConfig( config, applicationBaseDirectory, configBaseFile, logging ):
     configFile = _getConfigFile( applicationBaseDirectory, configBaseFile )
     success = True
@@ -244,12 +244,12 @@ def saveConfig( config, applicationBaseDirectory, configBaseFile, logging ):
     return success
 
 
-# Move the configuration file from user home (original and incorrect location)
+# Move the JSON configuration file from user home (original and incorrect location)
 # to new location ONLY if the new location does not contain a configuration file.
 #
-# name The application name, which was used as the base name of the configuration file
-# in the user's home directory, and will now be used as the base directory name in the
-# new configuration location in addition to the base name of the configuration file.
+# applicationName The application name, used as the base name of the configuration file
+#                 in the user's home directory and the base directory name in the new
+#                 configuration location (and the base name of the configuration file).
 def migrateConfig( applicationName ):
     oldConfigFile = os.path.expanduser( "~" ) + "/." + applicationName + JSON_EXTENSION
     newConfigFile = _getConfigFile( applicationName, applicationName )
@@ -257,7 +257,8 @@ def migrateConfig( applicationName ):
         os.rename( oldConfigFile, newConfigFile )
 
 
-# Obtain the user configuration JSON file, creating if necessary the underlying directory.
+# Obtain the path to the user configuration JSON file,
+# creating if necessary the underlying path.
 #
 # applicationBaseDirectory: The directory path used as the final part of the overall path.
 # configBaseFile: The file name (without extension).
