@@ -439,11 +439,12 @@ def removeOldFilesFromCache( applicationBaseDirectory, baseName, cacheMaximumDat
                 os.remove( cacheDirectory + "/" + file )
 
 
-# Obtain (and create if not present) the directory for application config, cache or similar.
+# Obtain (and create if not present) the directory for configuration, cache or similar.
 #
-# XDGKey: The XDG environment variable used to obtain the base directory of the config/cache.
+# XDGKey: The XDG environment variable used to obtain the base directory of the configuration/cache.
 #         https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-# userBaseDirectory: The directory name used to hold the config/cache (used when the XDGKey is not present in the environment).
+# userBaseDirectory: The directory name used to hold the configuration/cache
+#                    (used when the XDGKey is not present in the environment).
 # applicationBaseDirectory: The directory name at the end of the final user directory to specify the application.
 #
 # The full directory path will be either
