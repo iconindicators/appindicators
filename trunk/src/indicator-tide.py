@@ -58,7 +58,10 @@ class IndicatorTide:
     WEBSITE = "https://launchpad.net/~thebernmeister"
     COMMENTS = _( "Displays tidal information.\nNon-UK ports will be unavailable after {0}." ).format( ports.getExpiry() )
 
-#TODO This should not be translated...check with Oleg.
+#TODO Should this be translated?
+# The text comes from the UKHO.
+# The GPL text is in English.
+# ...check with Oleg.
     CREDIT_UKHO_UK_PORTS = _( "Tidal information for UK ports licensed under the Open\nGovernment Licence for Public Sector Information. http://www.nationalarchives.gov.uk/doc/open-government-licence" )
     CREDIT_UKHO_UK_NON_PORTS = _( "Tidal information for non-UK ports reproduced by\npermission of the Controller of Her Majesty’s Stationery\nOffice and the UK Hydrographic Office. http://www.ukho.gov.uk" )
     CREDITS = [ CREDIT_UKHO_UK_PORTS, CREDIT_UKHO_UK_NON_PORTS ]
@@ -113,13 +116,12 @@ class IndicatorTide:
             tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )
             if len( tidalReadings ) == 0:
                 summary = _( "Error" )
-                message = _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) )
+                message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
             else:
-#TODO Rephrase the summary/message...                
-                summary = _( "Port data for {0}..." ).format( ports.getPortName( self.portID ) )
-                message = _( "...are in port local date/time." )
+                summary = _( "Tidal data available" )
+                message = _( "Tidal data for {0} is shown in port local date/time." ).format( ports.getPortName( self.portID ) )
                 if self.tidalReadingsAreAllDateTimes( tidalReadings ):
-                    message = _( "...are in user local date/time." )
+                    message = _( "Tidal data for {0} is shown in user local date/time." ).format( ports.getPortName( self.portID ) )
 
             Notify.Notification.new( summary, message, IndicatorTide.ICON ).show()
 
@@ -130,7 +132,7 @@ class IndicatorTide:
     def buildMenu( self, tidalReadings ):
         menu = Gtk.Menu()
         if len( tidalReadings ) == 0:
-            menu.append( Gtk.MenuItem( _( "No port data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
+            menu.append( Gtk.MenuItem( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
         else:
             menuItemText = _( "{0}, {1}" ).format( ports.getPortName( tidalReadings[ 0 ].getPortID() ), ports.getCountry( tidalReadings[ 0 ].getPortID() ) )
             self.createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
