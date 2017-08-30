@@ -601,28 +601,21 @@ class IndicatorTide:
         return self.washTidalDataThroughCache( self.removeTidalReadingsPriorToToday( tidalReadings ) )
 
 
+    # If all the tidal readings comprise date and time, 
+    # then it's possible to convert each reading to user local and
+    # remove a reading if is prior to (user local) today.
     def removeTidalReadingsPriorToToday( self, tidalReadings ):
-#TODO Not sure how this should now work given the use of either datetime or just dates.
-# Maybe only touch tidal readings containing datetime and leave those with date alone?
-#Perhaps for date only tidal readings, compare each date (which is in the port's local timezone)
-#to the current date of the port...does that make sense?
-#
-#Maybe just reject any reading with a date before today (today local date).
-        if True: return tidalReadings
-        
-        todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
-        for tidalReading in list( tidalReadings ):
-
-            if isinstance( tidalReading.getDateTime(), datetime.datetime ):
+        if self.tidalReadingsAreAllDateTimes( tidalReadings ):
+            todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
+            for tidalReading in list( tidalReadings ):
                 if tidalReading.getDateTime().astimezone() < todayLocalMidnight:
-                    tidalReadings.remove( tidalReading )
-
-            else:
-                if tidalReading.getDateTime() < todayLocalMidnight.date():
                     tidalReadings.remove( tidalReading )
 
         return tidalReadings
 
+#TODO Add comment to changelog about which data is removed and why?
+
+#TODO Figure out if caching is feasible.
 
     # Takes a list of tidal readings and...
     # If there is data, write to the cache.  It is assumed that all the tidal data is date sorted and of today's date or newer.
