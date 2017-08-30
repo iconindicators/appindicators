@@ -75,14 +75,13 @@ class IndicatorPPADownloadStatistics:
     SVG_ICON = "." + INDICATOR_NAME + "-icon"
     SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
 
-    SETTINGS_FILE = os.getenv( "HOME" ) + "/." + INDICATOR_NAME + ".json"
-    SETTINGS_COMBINE_PPAS = "combinePPAs"
-    SETTINGS_FILTERS = "filters"
-    SETTINGS_IGNORE_VERSION_ARCHITECTURE_SPECIFIC = "ignoreVersionArchitectureSpecific"
-    SETTINGS_PPAS = "ppas"
-    SETTINGS_SHOW_SUBMENU = "showSubmenu"
-    SETTINGS_SORT_BY_DOWNLOAD = "sortByDownload"
-    SETTINGS_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
+    CONFIG_COMBINE_PPAS = "combinePPAs"
+    CONFIG_FILTERS = "filters"
+    CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC = "ignoreVersionArchitectureSpecific"
+    CONFIG_PPAS = "ppas"
+    CONFIG_SHOW_SUBMENU = "showSubmenu"
+    CONFIG_SORT_BY_DOWNLOAD = "sortByDownload"
+    CONFIG_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
 
     MESSAGE_DOWNLOADING_DATA = _( "(downloading data...)" )
     MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
@@ -102,7 +101,8 @@ class IndicatorPPADownloadStatistics:
         self.dialogLock = threading.Lock()
         self.lock = threading.Lock() #TODO Needed by whom, if at all?
         Notify.init( INDICATOR_NAME )
-        self.loadSettings()
+        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
+        self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -578,7 +578,7 @@ class IndicatorPPADownloadStatistics:
                     self.filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
                     treeiter = filterStore.iter_next( treeiter )
 
-            self.saveSettings()
+            self.saveConfig()
             pythonutils.setAutoStart( IndicatorPPADownloadStatistics.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.update, False )
 
@@ -904,7 +904,7 @@ class IndicatorPPADownloadStatistics:
         dialog.destroy()
 
 
-    def loadSettings( self ):
+    def loadConfig( self ):
         self.sortByDownload = False
         self.sortByDownloadAmount = 5
         self.combinePPAs = False
@@ -914,73 +914,53 @@ class IndicatorPPADownloadStatistics:
 
         self.ppas = [ ]
         self.ppasPrevious = [ ] # Used to hold the most recent download for comparison.
-
-        if os.path.isfile( IndicatorPPADownloadStatistics.SETTINGS_FILE ):
-            try:
-                with open( IndicatorPPADownloadStatistics.SETTINGS_FILE, "r" ) as f:
-                    settings = json.load( f )
-
-                ppas = settings.get( IndicatorPPADownloadStatistics.SETTINGS_PPAS, [ ] )
-                for ppa in ppas:
-                    self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
-
-                self.ppas.sort( key = operator.methodcaller( "getKey" ) )
-
-                self.combinePPAs = settings.get( IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS, self.combinePPAs )
-                self.filters = settings.get( IndicatorPPADownloadStatistics.SETTINGS_FILTERS, { } )
-                self.ignoreVersionArchitectureSpecific = settings.get( IndicatorPPADownloadStatistics.SETTINGS_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, self.ignoreVersionArchitectureSpecific )
-                self.showSubmenu = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU, self.showSubmenu )
-                self.sortByDownload = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD, self.sortByDownload )
-                self.sortByDownloadAmount = settings.get( IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT, self.sortByDownloadAmount )
-
-            except Exception as e:
-                logging.exception( e )
-                logging.error( "Error reading settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
-                self.initialiseDefaultSettings()
-
-        else:
-            self.initialiseDefaultSettings() # No properties file exists, so populate with a sample PPA to give the user an idea of the format.
-
-
-    def initialiseDefaultSettings( self ):
-        self.ppas = [ ]
-        self.ppas.append( PPA( "thebernmeister", "ppa", "xenial", "amd64" ) )
         self.filters = { }
-        self.filters[ 'thebernmeister | ppa' ] = [ 
-            "indicator-fortune",
-            "indicator-lunar",
-            "indicator-ppa-download-statistics",
-            "indicator-punycode",
-            "indicator-script-runner",
-            "indicator-stardate",
-            "indicator-tide",
-            "indicator-virtual-box",
-            "python3-ephem" ]
 
+        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
+        if len( config ) == 0:
+            self.ppas.append( PPA( "thebernmeister", "ppa", "xenial", "amd64" ) )
+            self.filters[ 'thebernmeister | ppa' ] = [ 
+                "indicator-fortune",
+                "indicator-lunar",
+                "indicator-ppa-download-statistics",
+                "indicator-punycode",
+                "indicator-script-runner",
+                "indicator-stardate",
+                "indicator-tide",
+                "indicator-virtual-box",
+                "python3-ephem" ]
 #TODO Add final name of indicator-calendar
+        else:
+            ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
+            for ppa in ppas:
+                self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
+    
+            self.ppas.sort( key = operator.methodcaller( "getKey" ) )
+    
+            self.combinePPAs = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, self.combinePPAs )
+            self.filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, { } )
+            self.ignoreVersionArchitectureSpecific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, self.ignoreVersionArchitectureSpecific )
+            self.showSubmenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, self.showSubmenu )
+            self.sortByDownload = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, self.sortByDownload )
+            self.sortByDownloadAmount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, self.sortByDownloadAmount )
 
-    def saveSettings( self ):
+
+    def saveConfig( self ):
         ppas = [ ]
         for ppa in self.ppas:
             ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
-        settings = {
-            IndicatorPPADownloadStatistics.SETTINGS_FILTERS: self.filters,
-            IndicatorPPADownloadStatistics.SETTINGS_COMBINE_PPAS: self.combinePPAs,
-            IndicatorPPADownloadStatistics.SETTINGS_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
-            IndicatorPPADownloadStatistics.SETTINGS_PPAS: ppas,
-            IndicatorPPADownloadStatistics.SETTINGS_SHOW_SUBMENU: self.showSubmenu,
-            IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD: self.sortByDownload,
-            IndicatorPPADownloadStatistics.SETTINGS_SORT_BY_DOWNLOAD_AMOUNT: self.sortByDownloadAmount
+        config = {
+            IndicatorPPADownloadStatistics.CONFIG_FILTERS: self.filters,
+            IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS: self.combinePPAs,
+            IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
+            IndicatorPPADownloadStatistics.CONFIG_PPAS: ppas,
+            IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU: self.showSubmenu,
+            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD: self.sortByDownload,
+            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT: self.sortByDownloadAmount
         }
 
-        try:
-            with open( IndicatorPPADownloadStatistics.SETTINGS_FILE, "w" ) as f:
-                f.write( json.dumps( settings ) )
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing settings: " + IndicatorPPADownloadStatistics.SETTINGS_FILE )
+        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
 #     def requestPPADownloadAndMenuRefresh( self, runAgain ):
