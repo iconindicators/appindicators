@@ -257,8 +257,7 @@ def migrateConfig( applicationName ):
         os.rename( oldConfigFile, newConfigFile )
 
 
-# Obtain the path to the user configuration JSON file,
-# creating if necessary the underlying path.
+# Obtain the path to the user configuration JSON file, creating if necessary the underlying path.
 #
 # applicationBaseDirectory: The directory path used as the final part of the overall path.
 # configBaseFile: The file name (without extension).
@@ -315,23 +314,22 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
 # Read the most recent binary object from the cache.
 #
 # applicationBaseDirectory: The directory used as the final part of the overall path.
-# baseName: The file name of the text file.
+# baseName: The text used to form the file name, typically the name of the calling application.
 # logging: A valid logger, used on error.
 #
-# Returns the binary object or None on error.
-
-#TODO Fix header.
-# Reads the most recent file from the cache for the given base name.
+# All files in cache directory are filtered based on the pattern
+#     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+# or
+#     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
 #
-# cachePath: File system path to the directory location of the cache.
-# baseName: Text used, along with a timestamp, to form the binary file name.
-# cacheMaximumDateTime: If any file is older than the date/time,
-#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
-#                       the file will be discarded.  
+# For example, for an application 'apple', the first file will pass through, whilst the second is filtered out
+#    ~/.cache/fred/apple-20170629174950
+#    ~/.cache/fred/orange-20170629174951
 #
-# Returns a tuple of the data (either None or the object) and the corresponding date/time as string (either None or the date/time).
+# Files which pass the filter are sorted by date/time and the most recent file is read.
+#
+# Returns a tuple of the binary object and the (string) date/time, or a tuple of (None, None) on error.
 def readCacheBinary( applicationBaseDirectory, baseName, logging ):
-    # Read all files in the cache and note those which match the base name.
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     files = [ ]
     for file in os.listdir( cacheDirectory ):
@@ -366,25 +364,19 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
     return ( data, dateTime )
 
 
-#TODO Fix header.
 # Writes an object as a binary file.
 #
-# data: The object to write.
-# cachePath: File system path to the directory location of the cache.
-# baseName: Text used, along with a timestamp, to form the binary file name.
-# cacheMaximumDateTime: If any file is older than the date/time,
-#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
-#                       the file will be discarded.  
+# binaryData: The object to write.
+# applicationBaseDirectory: The directory used as the final part of the overall path.
+# baseName: The text used to form the file name, typically the name of the calling application.
+# logging: A valid logger, used on error.
 #
-# For the application "fred" to write the objects "maryDict" and "janeDict":
+# The object will be written to the cache directory using the pattern
+#     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+# or
+#     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
 #
-#    writeToCache( maryDict, ~/.cache/fred/, mary, logging )
-#    writeToCache( janeDict, ~/.cache/fred/, jane, logging )
-#
-# resulting in binary files written (with timestamps):
-#
-#    ~/.cache/fred/mary-20170629174950
-#    ~/.cache/fred/jane-20170629174951
+# Returns True on success; False otherwise.
 def writeCacheBinary( binaryData, applicationBaseDirectory, baseName, logging ):
     success = True
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
@@ -401,11 +393,15 @@ def writeCacheBinary( binaryData, applicationBaseDirectory, baseName, logging ):
     return success
 
 
-#TODO Fix header.
 # Remove a file from the cache.
 #
-# applicationBaseDirectory: File system path to the directory location of the cache.
-# fileName: Text used, along with a timestamp, to form the binary file name.
+# applicationBaseDirectory: The directory used as the final part of the overall path.
+# fileName: The file to remove.
+#
+# The file removed will be either
+#     ${XDGKey}/applicationBaseDirectory/fileName
+# or
+#     ~/.cache/applicationBaseDirectory/fileName
 def removeFileFromCache( applicationBaseDirectory, fileName ):
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     for file in os.listdir( cacheDirectory ):
@@ -413,16 +409,17 @@ def removeFileFromCache( applicationBaseDirectory, fileName ):
             os.remove( cacheDirectory + "/" + file )
 
 
-#TODO Fix header.
-#TODO Add comment on the file name format: baseNamecacheMaximumDateTime ...might need a hypen in between...which means callers need to drop their hyphen.  Maybe!
-#TODO Ensure this works using new directory system.
 # Removes out of date cache files.
 #
-# cachePath: File system path to the directory location of the cache.
-# baseName: Text used, along with a timestamp, to form the binary file name.
-# cacheMaximumDateTime: If any file is older than the date/time,
-#                       in format CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS, 
-#                       the file will be discarded.  
+# applicationBaseDirectory: The directory used as the final part of the overall path.
+# baseName: The text used to form the file name, typically the name of the calling application.
+# cacheMaximumDateTime: A date/time string in the format of CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS.
+#
+# Any file in the cache directory matching the pattern
+#     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+# or
+#     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+# and is older than the cache maximum date/time is discarded.
 def removeOldFilesFromCache( applicationBaseDirectory, baseName, cacheMaximumDateTime ):
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     cacheMaximumDateTimeString = cacheMaximumDateTime.strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
