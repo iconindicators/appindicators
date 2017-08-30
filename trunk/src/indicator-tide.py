@@ -218,6 +218,7 @@ class IndicatorTide:
         return allDateTimes
 
 
+#TODO Make sure this works for when all readings are date/times or mixed or just times.
     def getNextUpdateTimeInSeconds( self ):
         # UKHO appears to update port data at GMT midnight.
         # Do an update shortly after GMT midnight but also shortly after local midnight to drop stale data.
