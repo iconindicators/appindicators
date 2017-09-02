@@ -126,7 +126,7 @@ class IndicatorTide:
             Notify.Notification.new( summary, message, IndicatorTide.ICON ).show()
 
             self.buildMenu( tidalReadings )
-            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
+            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds( tidalReadings ), self.update, True )
 
 
     def buildMenu( self, tidalReadings ):
@@ -218,19 +218,24 @@ class IndicatorTide:
         return allDateTimes
 
 
-#TODO Make sure this works for when all readings are date/times or mixed or just times.
-    def getNextUpdateTimeInSeconds( self ):
-        # UKHO appears to update port data at GMT midnight.
-        # Do an update shortly after GMT midnight but also shortly after local midnight to drop stale data.
+    def getNextUpdateTimeInSeconds( self, tidalReadings ):
+        # UKHO appears to update port data at GMT midnight (so update shortly after GMT midnight).
         utcnow = datetime.datetime.utcnow()
         fiveMinutesAfterUTCMidnight = ( utcnow + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
         numberOfSecondsUntilFiveMinutesAfterUTCMidnight = ( fiveMinutesAfterUTCMidnight - utcnow ).total_seconds()
 
+        # Remove stale data (data from days prior to user local today); can only compute that for ports with date/time.
         now = datetime.datetime.now()
         fiveMinutesAfterLocalMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
         numberOfSecondsUntilFiveMinutesAfterLocalMidnight = ( fiveMinutesAfterLocalMidnight - now ).total_seconds()
 
-        return int( min( numberOfSecondsUntilFiveMinutesAfterUTCMidnight, numberOfSecondsUntilFiveMinutesAfterLocalMidnight ) )
+        if self.tidalReadingsAreAllDateTimes( tidalReadings ):
+            nextUpdateTimeInSeconds = int( min( numberOfSecondsUntilFiveMinutesAfterUTCMidnight, numberOfSecondsUntilFiveMinutesAfterLocalMidnight ) )
+        else:
+            nextUpdateTimeInSeconds = numberOfSecondsUntilFiveMinutesAfterUTCMidnight
+
+            
+        return nextUpdateTimeInSeconds
 
 
     def onAbout( self, widget ):
