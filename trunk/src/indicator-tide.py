@@ -234,7 +234,6 @@ class IndicatorTide:
         else:
             nextUpdateTimeInSeconds = numberOfSecondsUntilFiveMinutesAfterUTCMidnight
 
-            
         return nextUpdateTimeInSeconds
 
 
