@@ -118,10 +118,10 @@ class IndicatorTide:
                 summary = _( "Error" )
                 message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
             else:
-                summary = _( "Tidal data available" )
-                message = _( "Tidal data for {0} is shown in port local date/time." ).format( ports.getPortName( self.portID ) )
+                summary = _( "Tidal data ready" )
+                message = _( "Tidal data is presented in the time zone of {0}." ).format( ports.getPortName( self.portID ) )
                 if self.tidalReadingsAreAllDateTimes( tidalReadings ):
-                    message = _( "Tidal data for {0} is shown in user local date/time." ).format( ports.getPortName( self.portID ) )
+                    message = _( "Tidal data is presented in your local time zone." )
 
             Notify.Notification.new( summary, message, IndicatorTide.ICON ).show()
 
