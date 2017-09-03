@@ -124,9 +124,9 @@ class IndicatorTide:
             else:
                 summary = _( "Tidal data ready" )
                 if self.cachedDataInUse:
-                    summary = _( "Cached tidal data in use" )
+                    summary = _( "Cached tidal data ready" )
 
-                message = _( "Tidal data is presented in the time zone of {0}." ).format( ports.getPortName( self.portID ) )
+                message = _( "Tidal data is presented in the time zone of the port." )
                 if self.tidalReadingsAreAllDateTimes( tidalReadings ):
                     message = _( "Tidal data is presented in your local time zone." )
 
@@ -626,9 +626,8 @@ class IndicatorTide:
         return tidalReadings
 
 
-#TODO Is there a way to remove data which is not all date/time?
-    # If all tidal readings comprise both a date and time, 
-    # first convert each reading to user local, then remove a reading if is prior to (user local) today.
+    # If all tidal readings comprise both a date and time, convert each reading to user local and then remove a reading if prior to user local today.
+    # Otherwise, tidal reading contain a mix of date and date/time or are date only: compare each reading to UTC midnight date only and remove if older. 
     def removeTidalReadingsPriorToToday( self, tidalReadings ):
         if self.tidalReadingsAreAllDateTimes( tidalReadings ):
             todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
@@ -636,12 +635,15 @@ class IndicatorTide:
                 if tidalReading.getDateTime().astimezone() < todayLocalMidnight:
                     tidalReadings.remove( tidalReading )
         else:
-            utcMidnight = datetime.datetime.utcnow().replace( hour = 0, minute = 0, second = 0 )
+            utcMidnightDate = datetime.datetime.utcnow().replace( hour = 0, minute = 0, second = 0 ).date()
             for tidalReading in list( tidalReadings ):
                 if isinstance( tidalReading.getDateTime(), datetime.datetime ):
-#                 if tidalReading.getDateTime() < utcMidnight:
-#                     tidalReadings.remove( tidalReading )
-                pass
+                    theDate = tidalReading.getDateTime().date()
+                else:
+                    theDate = tidalReading.getDateTime()
+
+                if theDate < utcMidnightDate:
+                    tidalReadings.remove( tidalReading )
 
         return tidalReadings
 
