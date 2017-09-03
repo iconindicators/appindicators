@@ -98,6 +98,7 @@ class IndicatorTide:
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
+        self.cachedDataInUse = False
         self.update( True )
 
         if ports.isExpired():
@@ -122,6 +123,9 @@ class IndicatorTide:
                 message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
             else:
                 summary = _( "Tidal data ready" )
+                if self.cachedDataInUse:
+                    summary = _( "Cached tidal data in use" )
+
                 message = _( "Tidal data is presented in the time zone of {0}." ).format( ports.getPortName( self.portID ) )
                 if self.tidalReadingsAreAllDateTimes( tidalReadings ):
                     message = _( "Tidal data is presented in your local time zone." )
@@ -613,9 +617,11 @@ class IndicatorTide:
         if len( tidalReadings ) > 0:
             pythonutils.writeCacheBinary( tidalReadings, INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, logging )
         else:
+            self.cachedDataInUse = True
             tidalReadings, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, logging )
             if tidalReadings is None: # No data read or empty data read.
                 tidalReadings = [ ]
+                self.cachedDataInUse = False
 
         return tidalReadings
 
