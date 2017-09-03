@@ -1,6 +1,6 @@
 indicator-tide (1.0.8-1) trusty; urgency=low
 
-  * Bug fix: Tidal readings are now displayed based on their composition:
+  * Bug fix: Tidal readings are now displayed based on the date/time:
       If all of a port's readings contain both date and time, each reading is
       converted to user local date/time.
       If at least one of a port's readings is missing the time, all of the
