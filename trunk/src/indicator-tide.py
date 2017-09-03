@@ -635,6 +635,13 @@ class IndicatorTide:
             for tidalReading in list( tidalReadings ):
                 if tidalReading.getDateTime().astimezone() < todayLocalMidnight:
                     tidalReadings.remove( tidalReading )
+        else:
+            utcMidnight = datetime.datetime.utcnow().replace( hour = 0, minute = 0, second = 0 )
+            for tidalReading in list( tidalReadings ):
+                if isinstance( tidalReading.getDateTime(), datetime.datetime ):
+#                 if tidalReading.getDateTime() < utcMidnight:
+#                     tidalReadings.remove( tidalReading )
+                pass
 
         return tidalReadings
 
