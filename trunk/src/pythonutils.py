@@ -413,16 +413,17 @@ def removeFileFromCache( applicationBaseDirectory, fileName ):
 #
 # applicationBaseDirectory: The directory used as the final part of the overall path.
 # baseName: The text used to form the file name, typically the name of the calling application.
-# cacheMaximumDateTime: A date/time string in the format of CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS.
+# cacheMaximumAgeInHours: Anything older than the maximum age (hours) is deleted.
 #
 # Any file in the cache directory matching the pattern
 #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
 # or
 #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-# and is older than the cache maximum date/time is discarded.
-def removeOldFilesFromCache( applicationBaseDirectory, baseName, cacheMaximumDateTime ):
+# and is older than the cache maximum age is discarded.
+def removeOldFilesFromCache( applicationBaseDirectory, baseName, cacheMaximumAgeInHours ):
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
-    cacheMaximumDateTimeString = cacheMaximumDateTime.strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+    cacheMaximumAgeDateTime = datetime.datetime.now() - datetime.timedelta( hours = cacheMaximumAgeInHours )
+    cacheMaximumDateTimeString = cacheMaximumAgeDateTime.strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
     for file in os.listdir( cacheDirectory ):
         if file.startswith( baseName ):
             fileDateTime = file[ len( baseName ) : ]
