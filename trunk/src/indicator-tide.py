@@ -82,6 +82,9 @@ class IndicatorTide:
     MENU_ITEM_TIDE_DEFAULT_FORMAT = MENU_ITEM_TIDE_TYPE_TAG + "    " + MENU_ITEM_TIME_DEFAULT_FORMAT + "    " + MENU_ITEM_TIDE_LEVEL_TAG
     MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME = MENU_ITEM_TIDE_TYPE_TAG + "    " + MENU_ITEM_TIDE_LEVEL_TAG
 
+    CACHE_BASENAME = "tidal-"
+    CACHE_MAXIMUM_AGE_HOURS = 24
+
 
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorTide.LOG ) ] )
@@ -599,7 +602,22 @@ class IndicatorTide:
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
 
-        return self.washTidalDataThroughCache( self.removeTidalReadingsPriorToToday( tidalReadings ) )
+        return self.removeTidalReadingsPriorToToday( self.washTidalDataThroughCache( tidalReadings ) )
+
+
+    # Takes a list of tidal readings and...
+    # If there is data, write to the cache.  It is assumed that all the tidal data is date sorted and of today's date or newer.
+    # If there is no data, read from the cache (discarding data older than today).
+    def washTidalDataThroughCache( self, tidalReadings ):
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
+        if len( tidalReadings ) > 0:
+            pythonutils.writeCacheBinary( tidalReadings, INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, logging )
+        else:
+            tidalReadings, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, logging )
+            if tidalReadings is None: # No data read or empty data read.
+                tidalReadings = [ ]
+
+        return tidalReadings
 
 
     # If all tidal readings comprise both a date and time, 
@@ -610,31 +628,6 @@ class IndicatorTide:
             for tidalReading in list( tidalReadings ):
                 if tidalReading.getDateTime().astimezone() < todayLocalMidnight:
                     tidalReadings.remove( tidalReading )
-
-        return tidalReadings
-
-#TODO Add comment to changelog about which data is removed and why?
-
-#TODO Figure out if caching is feasible.
-
-    # Takes a list of tidal readings and...
-    # If there is data, write to the cache.  It is assumed that all the tidal data is date sorted and of today's date or newer.
-    # If there is no data, read from the cache (discarding data older than today).
-    def washTidalDataThroughCache( self, tidalReadings ):
-        if True: return tidalReadings
-
-        cachePath = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
-        cacheDateBasename = "tidal-"
-        cacheMaximumDateTime = datetime.datetime.now() - datetime.timedelta( hours = ( 24 * 8 ) ) # The UKHO shows tidal readings for one week from today.
-
-        if len( tidalReadings ) > 0:
-            pythonutils.writeToCache( tidalReadings, cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
-        else:
-            tidalReadings, cacheDateTime = pythonutils.readFromCache( cachePath, cacheDateBasename, cacheMaximumDateTime, logging )
-            if tidalReadings is None or len( tidalReadings ) == 0:
-                tidalReadings = [ ]
-
-            tidalReadings = self.removeTidalReadingsPriorToToday( tidalReadings )
 
         return tidalReadings
 
