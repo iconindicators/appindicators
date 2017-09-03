@@ -48,10 +48,6 @@ import datetime, json, locale, logging, os, ports, pythonutils, re, threading, t
 #TODO Renew license!
 
 
-#TODO Perhaps have options:
-#    Convert to local time zone - only happens if all readings are date/time.
-#    User specifies...
-
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
