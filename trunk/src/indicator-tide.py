@@ -48,6 +48,10 @@ import datetime, json, locale, logging, os, ports, pythonutils, re, threading, t
 #TODO Renew license!
 
 
+#TODO Perhaps have options:
+#    Convert to local time zone - only happens if all readings are date/time.
+#    User specifies...
+
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
@@ -626,6 +630,7 @@ class IndicatorTide:
         return tidalReadings
 
 
+#TODO Is there a way to remove data which is not all date/time?
     # If all tidal readings comprise both a date and time, 
     # first convert each reading to user local, then remove a reading if is prior to (user local) today.
     def removeTidalReadingsPriorToToday( self, tidalReadings ):
