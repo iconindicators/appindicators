@@ -602,9 +602,8 @@ class IndicatorTide:
         return self.washTidalDataThroughCache( self.removeTidalReadingsPriorToToday( tidalReadings ) )
 
 
-    # If all the tidal readings comprise date and time, 
-    # then it's possible to convert each reading to user local and
-    # remove a reading if is prior to (user local) today.
+    # If all tidal readings comprise both a date and time, 
+    # first convert each reading to user local, then remove a reading if is prior to (user local) today.
     def removeTidalReadingsPriorToToday( self, tidalReadings ):
         if self.tidalReadingsAreAllDateTimes( tidalReadings ):
             todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
