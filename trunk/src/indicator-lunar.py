@@ -66,7 +66,6 @@ class IndicatorLunar:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    CACHE_PATH = os.getenv( "HOME" ) + "/.cache/" + INDICATOR_NAME + "/"
     SVG_FULL_MOON_FILE = ICON_BASE_PATH + "/." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
     URL_TIMEOUT_IN_SECONDS = 2
@@ -1757,7 +1756,7 @@ class IndicatorLunar:
         # before the download period has expired.
         # The cache attempts to avoid the download source blocking a user
         # as a ressult of too many downloads in a given period.
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, self.getCacheMaximumDateTime( IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS ) )
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
         self.cometOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
         if self.cometOEData is None:
             # Cache returned no result so download from the source.
@@ -1795,7 +1794,7 @@ class IndicatorLunar:
         # before the download period has expired.
         # The cache attempts to avoid the download source blocking a user
         # as a ressult of too many downloads in a given period.
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, self.getCacheMaximumDateTime( IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS ) )
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
         self.satelliteTLEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
         if self.satelliteTLEData is None:
             # Cache returned no result so download from the source.
@@ -3367,7 +3366,7 @@ class IndicatorLunar:
 
         # If the URL is the default, use the cache to avoid annoying the default data source.
         if urlNew == dataURL:
-            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBasename, self.getCacheMaximumDateTime( cacheMaximumAgeHours ) )
+            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBasename, cacheMaximumAgeHours )
             dataNew, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBasename, logging ) # Returned data is either None or non-empty.
             if dataNew is None:
                 # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
@@ -3621,9 +3620,6 @@ class IndicatorLunar:
             logging.exception( e )
             logging.error( "Error getting default city." )
             self.cityName = sorted( _city_data.keys(), key = locale.strxfrm )[ 0 ]
-
-
-    def getCacheMaximumDateTime( self, cacheMaximumAgeHours ): return datetime.datetime.now() - datetime.timedelta( hours = cacheMaximumAgeHours )
 
 
     def loadConfig( self ):
