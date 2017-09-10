@@ -935,9 +935,9 @@ class IndicatorPPADownloadStatistics:
             ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
             for ppa in ppas:
                 self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
-    
+
             self.ppas.sort( key = operator.methodcaller( "getKey" ) )
-    
+
             self.combinePPAs = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, self.combinePPAs )
             self.filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, { } )
             self.ignoreVersionArchitectureSpecific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, self.ignoreVersionArchitectureSpecific )
