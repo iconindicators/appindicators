@@ -1023,11 +1023,9 @@ class IndicatorPPADownloadStatistics:
             else:
                 self.getPublishedBinariesNoFilters( ppa )
 
-        # Have a second attempt at failures...
-        for ppa in self.ppas:
+            # Try again on failure...
             if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                 ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
-                key = ppa.getUser() + " | " + ppa.getName()
                 if key in self.filters:
                     self.getPublishedBinariesWithFilters( ppa )
                 else:
