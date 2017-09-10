@@ -64,10 +64,12 @@ class IndicatorPPADownloadStatistics:
     WEBSITE = "https://launchpad.net/~thebernmeister"
     COMMENTS = _( "Shows the total downloads of PPAs." )
 
-    SERIES = [ "artful", "zesty", "yakkety", "xenial", "wily", "vivid", "utopic", 
-              "trusty", "saucy", "raring", "quantal", "precise", "oneiric", "natty",
-              "maverick", "lucid", "karmic", "jaunty", "intrepid", "hardy",
-              "gutsy", "feisty", "edgy", "dapper", "breezy", "hoary", "warty" ]
+    SERIES = [ "artful", "zesty",
+              "yakkety", "xenial", "wily", "vivid", "utopic",
+              "trusty", "saucy", "raring", "quantal", "precise",
+              "oneiric", "natty", "maverick", "lucid", "karmic",
+              "jaunty", "intrepid", "hardy", "gutsy", "feisty",
+              "edgy", "dapper", "breezy", "hoary", "warty" ]
 
     ARCHITECTURES = [ "amd64", "i386" ]
 
