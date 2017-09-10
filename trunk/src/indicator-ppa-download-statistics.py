@@ -1291,7 +1291,7 @@ class IndicatorPPADownloadStatistics:
         if filter is not None:
             url += "&exact_match=false" + "&ordered=false&binary_name=" + filter
 
-        publishedBinariesPerPage = 75 # The number of results per page.
+        publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
         publishedBinaryCounter = 0
         pageNumber = 1
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once. 
