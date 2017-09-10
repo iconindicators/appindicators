@@ -1057,6 +1057,7 @@ class IndicatorPPADownloadStatistics:
             ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
 
+#TODO Verify this function after no filters and entire sequence checks out.
     def getPublishedBinariesWithFilters( self, ppa ):
         noPublishedBinaries = True
         for filter in self.filters.get( ppa.getUser() + " | " + ppa.getName() ):
