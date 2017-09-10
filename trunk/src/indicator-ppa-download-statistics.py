@@ -1173,6 +1173,52 @@ class IndicatorPPADownloadStatistics:
                 count = numberOfPublishedBinaries # Terminate the loop.
 
 
+    # Takes a published binary and extracts the information needed to get the download publishedBinaryCounter (for each package).
+    # The results in a published binary are returned in lots of 75;
+    # for more than 75 published binaries, loop to get the remainder.
+    def processPublishedBinariesNEW( self, ppa, publishedBinaries, numberOfPublishedBinaries ):
+        import concurrent.futures.ThreadPoolExecutor
+        try:
+            resultIndexOnPage = 0
+            threads = [ ]
+            for resultCount in range( numberOfPublishedBinaries ):
+#                 if self.quitRequested: #TODO Handle
+#                     self.quit( None )
+#                     return
+
+                packageName = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "binary_package_name" ]
+
+                # Limit the number of concurrent fetches...
+                if len( threads ) > 5:
+                    for t in threads:
+                        t.join()
+
+                    threads = [ ]
+
+                packageVersion = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "binary_package_version" ]
+                architectureSpecific = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "architecture_specific" ]
+                indexLastSlash = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "self_link" ].rfind( "/" )
+                packageId = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "self_link" ][ indexLastSlash + 1 : ]
+
+                t = Thread( target = self.getDownloadCountNEW, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ) )
+                t.start()
+                threads.append( t )
+                resultIndexOnPage += 1
+
+            for t in threads:
+                t.join() # Wait for remaining threads...
+
+            # The only status the PPA can be at this point is error retrieving ppa (set by get download count).
+            if ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
+                ppa.setStatus( PPA.STATUS_OK )
+                if len( ppa.getPublishedBinaries() ) == 0: #TODO Is is possible for non filtered to hit this?
+                    ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+
+        except Exception as e:
+            logging.exception( e )
+            ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+
+
     def getPPADownloadStatisticsNEW( self ):
 #         with self.lock:
 #             self.downloadInProgress = True
@@ -1187,11 +1233,9 @@ class IndicatorPPADownloadStatistics:
 
             self.getPublishedBinariesNEW( ppa, filter )
 
-        # Have a second attempt at failures...
-        for ppa in self.ppas:
+            # Have a second attempt at failures...
             if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                 ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
-                key = ppa.getUser() + " | " + ppa.getName()
                 if key in self.filters:
                     filter = self.filters.get( key )
 
@@ -1266,52 +1310,6 @@ class IndicatorPPADownloadStatistics:
 
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
-
-
-    # Takes a published binary and extracts the information needed to get the download publishedBinaryCounter (for each package).
-    # The results in a published binary are returned in lots of 75;
-    # for more than 75 published binaries, loop to get the remainder.
-    def processPublishedBinariesNEW( self, ppa, publishedBinaries, numberOfPublishedBinaries ):
-        import concurrent.futures.ThreadPoolExecutor
-        try:
-            resultIndexOnPage = 0
-            threads = [ ]
-            for resultCount in range( numberOfPublishedBinaries ):
-#                 if self.quitRequested: #TODO Handle
-#                     self.quit( None )
-#                     return
-
-                packageName = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "binary_package_name" ]
-
-                # Limit the number of concurrent fetches...
-                if len( threads ) > 5:
-                    for t in threads:
-                        t.join()
-
-                    threads = [ ]
-
-                packageVersion = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "binary_package_version" ]
-                architectureSpecific = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "architecture_specific" ]
-                indexLastSlash = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "self_link" ].rfind( "/" )
-                packageId = publishedBinaries[ "entries" ][ resultIndexOnPage ][ "self_link" ][ indexLastSlash + 1 : ]
-
-                t = Thread( target = self.getDownloadCountNEW, args = ( ppa, packageName, packageVersion, architectureSpecific, packageId ) )
-                t.start()
-                threads.append( t )
-                resultIndexOnPage += 1
-
-            for t in threads:
-                t.join() # Wait for remaining threads...
-
-            # The only status the PPA can be at this point is error retrieving ppa (set by get download count).
-            if ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
-                ppa.setStatus( PPA.STATUS_OK )
-                if len( ppa.getPublishedBinaries() ) == 0: #TODO Is is possible for non filtered to hit this?
-                    ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
-
-        except Exception as e:
-            logging.exception( e )
-            ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
 
 
