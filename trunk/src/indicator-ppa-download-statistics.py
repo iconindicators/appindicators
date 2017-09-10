@@ -1291,10 +1291,10 @@ class IndicatorPPADownloadStatistics:
         if filter is not None:
             url += "&exact_match=false" + "&ordered=false&binary_name=" + filter
 
+        pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
         publishedBinaryCounter = 0
-        pageNumber = 1
-        totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once. 
+        totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
         while( publishedBinaryCounter < totalPublishedBinaries ):
             try:
                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ) ).read().decode( "utf8" ) )
