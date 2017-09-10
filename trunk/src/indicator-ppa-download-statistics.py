@@ -1173,6 +1173,28 @@ class IndicatorPPADownloadStatistics:
                 count = numberOfPublishedBinaries # Terminate the loop.
 
 
+    # ppa: the current PPA.
+    # One of packageId or filter must be None.
+    # If packageId is None, filter must be a string OR None.
+    # If filter is None, packageId must be a string.
+    def getLaunchPadURL( self, ppa, packageId, filter ):
+        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName()
+        if packageId is None:
+            url += "?ws.op=getPublishedBinaries" + \
+                   "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
+                   "&status=Published"
+
+            if filter is not None:
+                url += "&exact_match=false" + \
+                       "&ordered=false" + \
+                       "&binary_name=" + filter
+
+        else:
+            url += "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
+
+        return url
+
+
     # Takes a published binary and extracts the information needed to get the download publishedBinaryCounter (for each package).
     # The results in a published binary are returned in lots of 75;
     # for more than 75 published binaries, loop to get the remainder.
@@ -1310,29 +1332,6 @@ class IndicatorPPADownloadStatistics:
 
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
-
-
-
-    # ppa: the current PPA.
-    # One of packageId or filter must be None.
-    # If packageId is None, filter must be a string OR None.
-    # If filter is None, packageId must be a string.
-    def getLaunchPadURL( self, ppa, packageId, filter ):
-        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName()
-        if packageId is None:
-            url += "?ws.op=getPublishedBinaries" + \
-                   "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + \
-                   "&status=Published"
-
-            if filter is not None:
-                url += "&exact_match=false" + \
-                       "&ordered=false" + \
-                       "&binary_name=" + filter
-
-        else:
-            url += "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
-
-        return url
 
 
 def getDownloadCountNEW( ppa, publishedBinaries, index ):
