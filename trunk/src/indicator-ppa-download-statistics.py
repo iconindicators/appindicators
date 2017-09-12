@@ -1247,6 +1247,17 @@ class IndicatorPPADownloadStatistics:
 #         with self.lock:
 #             self.downloadInProgress = True
 
+        #TODO Testing...remove
+        self.filters[ 'thebernmeister | ppa' ] = [ 
+            "indicator-fortune",
+            "indicator-lunar",
+            "indicator-ppa-download-statistics",
+            "indicator-punycode",
+            "indicator-script-runner",
+            "indicator-stardate",
+            "indicator-tide",
+            "indicator-virtual-box" ]
+
         for ppa in self.ppas:
             ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
 
@@ -1294,9 +1305,9 @@ class IndicatorPPADownloadStatistics:
 
 #TODO Test filtering!
 #         if filter is not None:
-#             url += "&exact_match=false" + "&ordered=false&binary_name=" + filter
+#             url += "&exact_match=false&ordered=false&binary_name=" + filter
 
-#         if ppa.getUser() == "nilarimogard": return
+        if ppa.getUser() == "nilarimogard": return
 
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
@@ -1304,7 +1315,7 @@ class IndicatorPPADownloadStatistics:
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
         while( publishedBinaryCounter < totalPublishedBinaries ):
             try:
-                print( url + "&ws.start=" + str( publishedBinaryCounter ) )
+#                 print( url + "&ws.start=" + str( publishedBinaryCounter ) )
                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ) ).read().decode( "utf8" ) )
             except Exception as e:
                 logging.exception( e )
@@ -1323,23 +1334,16 @@ class IndicatorPPADownloadStatistics:
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
             with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor: # Limit to 5 concurrent requests to not burden LaunchPad.
-                results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
+                results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i, executor ): i for i in range( numberPublishedBinariesCurrentPage ) }
                 for result in concurrent.futures.as_completed( results ):
-                    threadIndex = results[ result ]
-                    downloadCount = result.result()
-                    if downloadCount is None:
-                        ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-                        executor.shutdown() #TODO Test!
-                    else:
-#                         print( "getPublisedBinaries", threadIndex, downloadCount )
-                        ppa.setStatus( PPA.STATUS_OK )
-                        packageName = publishedBinaries[ "entries" ][ threadIndex ][ "binary_package_name" ]
-                        packageVersion = publishedBinaries[ "entries" ][ threadIndex ][ "binary_package_version" ]
-                        architectureSpecific = publishedBinaries[ "entries" ][ threadIndex ][ "architecture_specific" ]
-                        ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
+                    pass
 
+#TODO If status is error, then set loop variable to exit loop, else do as below.
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
+
+        if ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
+            ppa.setStatus( PPA.STATUS_OK )
 
 
 # https://api.launchpad.net/1.0/~nilarimogard/+archive/webupd8?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/trusty/amd64&status=Published&ws.start=0
@@ -1349,21 +1353,272 @@ class IndicatorPPADownloadStatistics:
 # https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/xenial/amd64&status=Published&ws.start=0
 
 
-def getDownloadCountNEW( ppa, publishedBinaries, index ):
+def getDownloadCountNEW( ppa, publishedBinaries, i, executor ):
+    fail = True
+    indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
+    packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
+    url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
     try:
-        indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
-        packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
-        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
         downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
-        if not str( downloadCount ).isnumeric():
-            downloadCount = None
+        if str( downloadCount ).isnumeric():
+            packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
+            packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
+            architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
+            ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
+            fail = False
+            print( packageName, packageVersion, downloadCount, architectureSpecific )
 
     except Exception as e:
         logging.exception( e )
-        downloadCount = None
+
+    if fail:
+        ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+        executor.shutdown() #TODO Test!
 
 #     print( "getDownloadCount", index, downloadCount )
-    return downloadCount
 
 
 if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
+
+
+# audacious 3.9-3~webupd8~trusty1 1023 True
+# asunder 2.8-1~webupd8~trusty 14672 True
+# albert 0.11.1-1~webupd8~trusty0 518 True
+# ap-hotspot 0.3-1~webupd8~4 55622 False
+# actionaz 3.8.0-1~webupd8~trusty 1709 True
+# audacious-dbg 3.7.2-1~webupd8~trusty0 156 True
+# audacious-dev 3.9-3~webupd8~trusty1 15 True
+# audacious-plugins-data 3.9-3~webupd8~trusty1 2339 False
+# audacious-plugins 3.9-3~webupd8~trusty1 1040 True
+# audacious-plugins-dbg 3.9-3~webupd8~trusty1 11 True
+# avant-window-navigator 0.4.2~1+gitb8c2248-ubuntu1~trusty1 373 True
+# avant-window-navigator-data 0.4.2~1+gitb8c2248-ubuntu1~trusty1 487 False
+# awn-applet-awn-notification-daemon 0.4.1~1+git1081e3f-ubuntu2~trusty 151 True
+# awn-applet-animal-farm 0.4.1~1+git1081e3f-ubuntu2~trusty 184 False
+# awn-applet-awn-system-monitor 0.4.1~1+git1081e3f-ubuntu2~trusty 143 True
+# awn-applet-battery-applet 0.4.1~1+git1081e3f-ubuntu2~trusty 194 False
+# awn-applet-awnterm 0.4.1~1+git1081e3f-ubuntu2~trusty 143 True
+# awn-applet-calendar 0.4.1~1+git1081e3f-ubuntu2~trusty 191 False
+# awn-applet-cairo-main-menu 0.4.1~1+git1081e3f-ubuntu2~trusty 155 True
+# awn-applet-cairo-clock 0.4.1~1+git1081e3f-ubuntu2~trusty 191 False
+# awn-applet-common-folder 0.4.1~1+git1081e3f-ubuntu2~trusty 178 False
+# awn-applet-cpufreq 0.4.1~1+git1081e3f-ubuntu2~trusty 201 False
+# awn-applet-dialect 0.4.1~1+git1081e3f-ubuntu2~trusty 183 False
+# awn-applet-comics 0.4.1~1+git1081e3f-ubuntu2~trusty 183 False
+# awn-applet-digital-clock 0.4.1~1+git1081e3f-ubuntu2~trusty 149 True
+# awn-applet-dockbarx 0.92-1~webupd8~trusty4 628 False
+# awn-applet-file-browser-launcher 0.4.1~1+git1081e3f-ubuntu2~trusty 191 False
+# awn-applet-garbage 0.4.1~1+git1081e3f-ubuntu2~trusty 149 True
+# awn-applet-hardware-sensors 0.4.1~1+git1081e3f-ubuntu2~trusty 189 False
+# awn-applet-feeds 0.4.1~1+git1081e3f-ubuntu2~trusty 184 False
+# awn-applet-indicator 0.4.1~1+git1081e3f-ubuntu2~trusty 154 True
+# awn-applet-mail 0.4.1~1+git1081e3f-ubuntu2~trusty 179 False
+# awn-applet-media-player 0.4.1~1+git1081e3f-ubuntu2~trusty 186 False
+# awn-applet-media-icon-applet 0.4.1~1+git1081e3f-ubuntu2~trusty 193 False
+# awn-applet-media-control 0.4.1~1+git1081e3f-ubuntu2~trusty 188 False
+# awn-applet-notification-area 0.4.1~1+git1081e3f-ubuntu2~trusty 150 True
+# awn-applet-pandora 0.4.1~1+git1081e3f-ubuntu2~trusty 191 False
+# awn-applet-quit-applet 0.4.1~1+git1081e3f-ubuntu2~trusty 189 False
+# awn-applet-radio 0.10-1~webupd8~natty 4631 False
+# awn-applet-places 0.4.1~1+git1081e3f-ubuntu2~trusty 146 True
+# awn-applet-related 0.4.1~1+git1081e3f-ubuntu2~trusty 151 True
+# awn-applet-shinyswitcher 0.4.1~1+git1081e3f-ubuntu2~trusty 155 True
+# awn-applet-showdesktop 0.4.1~1+git1081e3f-ubuntu2~trusty 144 True
+# awn-applet-stack 0.4.1~1+git1081e3f-ubuntu2~trusty 184 False
+# awn-applet-slickswitcher 0.4.1~1+git1081e3f-ubuntu2~trusty 192 False
+# awn-applet-sysmon 0.4.1~1+git1081e3f-ubuntu2~trusty 153 True
+# awn-applet-thinkhdaps 0.4.1~1+git1081e3f-ubuntu2~trusty 181 False
+# awn-applet-todo 0.4.1~1+git1081e3f-ubuntu2~trusty 176 False
+# awn-applet-volume-control 0.4.1~1+git1081e3f-ubuntu2~trusty 193 False
+# awn-applet-tomboy-applet 0.4.1~1+git1081e3f-ubuntu2~trusty 187 False
+# awn-applet-weather 0.4.1~1+git1081e3f-ubuntu2~trusty 192 False
+# awn-applet-webapplet 0.4.1~1+git1081e3f-ubuntu2~trusty 145 True
+# awn-applet-wm 0.8-0~webupd8~natty 5357 False
+# awn-applets-all 0.4.1~1+git1081e3f-ubuntu2~trusty 183 False
+# awn-applets-common 0.4.1~1+git1081e3f-ubuntu2~trusty 277 False
+# awn-applets-dbg 0.4.1~1+git1081e3f-ubuntu2~trusty 50 True
+# awn-settings 0.4.2~1+gitb8c2248-ubuntu1~trusty1 433 False
+# browser-plugin-freshplayer-nacl 0.3.6-1~webupd8~trusty6 178 True
+# caffeine-plus 2.7.4+git20150326-1~webupd8~trusty1 13033 False
+# browser-plugin-freshplayer-libpdf 0.3.6-1~webupd8~trusty6 513 True
+# browser-plugin-freshplayer-pepperflash 0.3.6-1~webupd8~trusty6 10070 True
+# calise 0.4.0-1~webupd8~raring 1459 True
+# cardapio 0.9.202-0recipe887+1~custom~webupd8~trusty2 12064 False
+# cardapio-awn 0.9.202-0recipe887+1~custom~webupd8~trusty2 683 False
+# cardapio-docky 0.9.202-0recipe887+1~custom~webupd8~trusty2 4406 False
+# cardapio-cinnamon 0.9.202-0recipe887+1~custom~webupd8~trusty2 1143 False
+# cardapio-gnomepanel 0.9.202-0recipe887+1~custom~webupd8~trusty2 4804 False
+# dockbarx 0.92-1~webupd8~trusty4 1172 False
+# curseradio 0.2+git20150716-1~webupd8~trusty1 107 False
+# cardapio-matepanel 0.9.202-0recipe887+1~custom~webupd8~trusty2 785 False
+# cardapio-gnomeshell 0.9.202-0recipe887+1~custom~webupd8~trusty2 799 False
+# dockbarx-applet-all 0.92-1~webupd8~trusty4 104 False
+# dockbarx-applet-appindicator 0.92-1~webupd8~trusty4 476 False
+# dockbarx-applet-battery-status 0.92-1~webupd8~trusty4 487 False
+# dockbarx-applet-cardapio 0.92-1~webupd8~trusty4 439 False
+# dockbarx-applet-hello-world 0.92-1~webupd8~trusty4 459 False
+# dockbarx-applet-volume-control 0.92-1~webupd8~trusty4 486 False
+# dockbarx-applet-clock 0.92-1~webupd8~trusty4 485 False
+# dockbarx-common 0.92-1~webupd8~trusty4 1218 False
+# dockbarx-applet-namebar 0.92-1~webupd8~trusty4 479 False
+# dockbarx-dockx 0.92-1~webupd8~trusty4 1207 False
+# emerald 0.9.5-0~webupd8~trusty2 10307 True
+# dropbox-share 0.6-1~webupd8~0 2176 False
+# dockbarx-themes-extra 2.1-1~2 16772 False
+# dropbox-index 0.6-1~webupd8~0 2703 False
+# encryptcli 0.3.2.5-1~webupd8~trusty0 134 True
+# encryptpad 0.3.2.5-1~webupd8~trusty0 131 True
+# exaile 3.4.5-1~webupd8~trusty0 7799 False
+# exaile-plugin-contextinfo 3.4.5-1~webupd8~trusty0 4033 False
+# exaile-plugin-ipod 3.4.5-1~webupd8~trusty0 3649 False
+# exaile-plugin-moodbar 3.4.5-1~webupd8~trusty0 3446 False
+# flashplugin-fullscreenhack 0.1-1~webupd8~trusty 2848 True
+# freshplayerplugin 0.3.6-1~webupd8~trusty6 14118 False
+# gloobus-sushi 0.4.5-ubuntu11~ppa335-14.04+1 3019 False
+# gnome-subtitles 1.3-1~webupd8~trusty 16341 True
+# gnome-window-applets 0.3-1~webupd8~trusty 1074 True
+# gnomepanel-applet-dockbarx 0.92-1~webupd8~trusty4 46 False
+# grive 0.5.1-1+git20170322~webupd8~trusty0 3745 True
+# gloobus-preview 0.4.5-ubuntu11~ppa335-14.04+1 7476 True
+# gtk3-nocsd 3-1~webupd8~trusty5 245 False
+# guake 0.8.5-1~webupd8~trusty0 5614 True
+# indicator-netspeed 0+git20140722-0~webupd8~trusty0 15320 True
+# ipad-charge 1.1+git20161017-1~webupd8~trusty1 419 True
+# indicator-xkbmod 0.1-1+git20150223~webupd8~trusty2 339 True
+# kkedit 0.4.1-1~webupd8~trusty0 126 True
+# launcher-list-indicator 0.1+git20161029-0~webupd8~0 408 False
+# lcurse 0.2+git20170502-0~webupd8~0 321 False
+# launchpad-getkeys 0.3.3-1~webupd8~2 68502 False
+# lgogdownloader 2.26-1~webupd8~trusty0 393 True
+# libaudclient2 3.4.3-1~webupd8~trusty 1227 True
+# libaudcore1 3.4.3-1~webupd8~trusty 776 True
+# libaudcore2 3.5.2-1~webupd8~trusty0 16012 True
+# libaudcore3 3.7.2-2-1~webupd8~trusty1 12318 True
+# libaudcore4 3.9-1~webupd8~trusty0 1418 True
+# libaudcore5 3.9-3~webupd8~trusty1 1041 True
+# libaudgui3 3.7.2-2-1~webupd8~trusty1 12159 True
+# libaudgui5 3.9-3~webupd8~trusty1 1041 True
+# libaudqt0 3.7.2-2-1~webupd8~trusty1 12014 True
+# libaudqt2 3.9-3~webupd8~trusty1 1041 True
+# libaudqt1 3.9-1~webupd8~trusty0 1414 True
+# libaudgui4 3.9-1~webupd8~trusty0 1418 True
+# libaudtag2 3.7.2-2-1~webupd8~trusty1 12157 True
+# libaudtag3 3.9-3~webupd8~trusty1 1042 True
+# libawn-doc 0.4.2~1+gitb8c2248-ubuntu1~trusty1 53 False
+# libawn-dev 0.4.2~1+gitb8c2248-ubuntu1~trusty1 46 True
+# libawn1 0.4.2~1+gitb8c2248-ubuntu1~trusty1 432 True
+# libawn1-dbg 0.4.2~1+gitb8c2248-ubuntu1~trusty1 45 True
+# libdesktop-agnostic-bin 0.3.94~1+git4d9b6fd-ubuntu0~trusty 364 True
+# libdesktop-agnostic-cfg-keyfile 0.3.94~1+git4d9b6fd-ubuntu0~trusty 726 True
+# libdesktop-agnostic-data 0.3.94~1+git4d9b6fd-ubuntu0~trusty 1224 True
+# libdesktop-agnostic-cfg-gconf 0.3.94~1+git4d9b6fd-ubuntu0~trusty 876 True
+# libdesktop-agnostic-dev 0.3.94~1+git4d9b6fd-ubuntu0~trusty 55 True
+# libdesktop-agnostic-doc 0.3.94~1+git4d9b6fd-ubuntu0~trusty 48 False
+# libdesktop-agnostic-fdo-gio 0.3.94~1+git4d9b6fd-ubuntu0~trusty 149 True
+# libdesktop-agnostic-fdo-glib 0.3.94~1+git4d9b6fd-ubuntu0~trusty 265 True
+# libdesktop-agnostic-vfs-gio 0.3.94~1+git4d9b6fd-ubuntu0~trusty 1059 True
+# libdesktop-agnostic0-dbg 0.3.94~1+git4d9b6fd-ubuntu0~trusty 58 True
+# libdesktop-agnostic0 0.3.94~1+git4d9b6fd-ubuntu0~trusty 1236 True
+# libemeraldengine-dev 0.9.5-0~webupd8~trusty2 381 True
+# libgtk3-nocsd0 3-1~webupd8~trusty5 247 True
+# libemeraldengine0 0.9.5-0~webupd8~trusty2 9833 True
+# libguess-dev 1.2.1-0~webupd8~trusty 862 True
+# libguess1 1.2.1-0~webupd8~trusty 58872 True
+# libmowgli-2-0 2.0.0-1~webupd8~trusty 60155 True
+# libmowgli-2-dev 2.0.0-1~webupd8~trusty 403 True
+# libmowgli-2-0-dbg 2.0.0-1~webupd8~trusty 245 True
+# libvdpau-va-gl1 0.4.2-1~webupd8~trusty0 1520 True
+# maim 3.4.47-1~webupd8~trusty0 124 True
+# mate-multiload-ng-applet 1.5.2-1~webupd8~trusty0 51 True
+# mcomix 1.2.1-1~webupd8~trusty1 1502 False
+# minitube 2.2-1~webupd8~trusty 15241 True
+# multiload-ng-common 1.5.2-1~webupd8~trusty0 187 False
+# multiload-ng-standalone 1.5.2-1~webupd8~trusty0 44 True
+# multiload-ng-systray 1.5.2-1~webupd8~trusty0 51 True
+# multiload-ng-indicator 1.5.2-1~webupd8~trusty0 62 True
+# musique 1.3-1~webupd8~trusty 4449 True
+# nautilus-columns 0.3.3-1~webupd8~1 3804 False
+# nautilus-hide 0.2.1-1~webupd8~trusty 125 False
+# ncmpcpp 0.7.7-1~webupd8~trusty 191 True
+# nemo-gloobus-sushi 0.1~webupd8+2 3355 False
+# nvidia-power-indicator 1.0.0-1~webupd8~1 1363 False
+# notifyosdconfig 0.3+22+201404260950~ubuntu14.04.1 1234 True
+# penguin-subtitle-player 1.0.1-1~webupd8~trusty0 72 True
+# pidgin-hangouts 1.0+hg20170628-1~webupd8~trusty0 122 False
+# pidgin-indicator 1.0-1~webupd8~trusty0 2229 True
+# pidgin-skypeweb 1.4.0+git20170806-1~webupd8~trusty0 117 False
+# prime-indicator 0.1-1+git20150211~webupd8~1 28589 False
+# prime-indicator-plus 1.0.3-1~webupd8~2 3347 False
+# puddletag 1.2.0-2~webupd8~trusty0 1099 False
+# pulseaudio-equalizer 2.7.0.2-4~webupd8~1 65035 False
+# purple-funyahoo-plusplus 0.1+git20170706-1~webupd8~trusty0 20 True
+# purple-skypeweb 1.4.0+git20170806-1~webupd8~trusty0 95 True
+# purple-hangouts 1.0+hg20170628-1~webupd8~trusty0 109 True
+# python-awn 0.4.2~1+gitb8c2248-ubuntu1~trusty1 378 True
+# python-awn-extras 0.4.1~1+git1081e3f-ubuntu2~trusty 193 True
+# python-backports-shutil-get-terminal-size 1.0.0-3~webupd8~trusty1 313 False
+# python-backports-shutil-which 3.5.1-1~webupd8~trusty1 322 False
+# python-cryptodomex 3.4.3-1~webupd8~trusty8 344 True
+# python-cryptodomex-dbg 3.4.3-1~webupd8~trusty8 49 True
+# python-desktop-agnostic 0.3.94~1+git4d9b6fd-ubuntu0~trusty 464 True
+# python-ephem 3.7.3.4-1~webupd8~raring 1699 True
+# python-iso-639 0.4.5-1~webupd8~trusty3 362 False
+# python-iso3166 0.8-1~webupd8~trusty 362 False
+# python-streamlink 0.7.0-1~webupd8~trusty0 145 False
+# python-streamlink-doc 0.7.0-1~webupd8~trusty0 14 False
+# python3-cryptodomex-dbg 3.4.3-1~webupd8~trusty8 44 True
+# python3-cryptodomex 3.4.3-1~webupd8~trusty8 70 True
+# python3-iso-639 0.4.5-1~webupd8~trusty3 53 False
+# python3-iso3166 0.8-1~webupd8~trusty 54 False
+# qgifer 0.2.3-rc2-1~trusty2+1~webupd8~trusty1 976 True
+# python3-streamlink 0.7.0-1~webupd8~trusty0 20 False
+# qrazercfg 0.39-1~webupd8~trusty0 90 True
+# qrazercfg-applet 0.39-1~webupd8~trusty0 66 True
+# qt5ct 0.20-1~webupd8~trusty2 325 True
+# radiotray-lite 0.2.18-1~webupd8~trusty0 41 True
+# razercfg 0.39-1~webupd8~trusty0 96 True
+# rclone-browser 1.2-1~webupd8~trusty0 136 True
+# rosa-media-player 1.6.9-1~webupd8~trusty2 1309 True
+# screenkey 0.9-1~webupd8~trusty1 480 False
+# stream2chromecast 0+git20170109-0~webupd8~0 1378 False
+# slop 4.2.20-1~webupd8~trusty1 695 True
+# steam-skin-manager 4.2+1-1~webupd8~trusty 2588 True
+# snappy 1.0-1~webupd8~trusty 1536 True
+# streamlink 0.7.0-1~webupd8~trusty0 144 False
+# syncthing-gtk 0.9.2.5-1~webupd8~trusty0 669 False
+# syncwall 2.0.0-2~webupd8~trusty2 4193 True
+# telegram-purple 1.3.1-1~webupd8~trusty0 566 True
+# syspeek 0.3+bzr26-1~webupd8~trusty0 7561 False
+# textadept-default-cli 9.3-1~webupd8~0 153 False
+# textadept 9.3-1~webupd8~0 361 False
+# todo-indicator 0.5.0-1+git20170309~webupd8~0 790 False
+# transmageddon 1.0-1~webupd8~trusty 19220 False
+# twitch-indicator 0.26-1~webupd8~0 492 False
+# unity-reboot 0.2.1-2~webupd8~0 2319 False
+# unity-dropbox-share 0.6-1~webupd8~0 1393 False
+# viberwrapper-indicator 0.1.1~git20150611~webupd8~0 13085 True
+# wimlib-dev 1.8.0-1~webupd8~trusty 204 True
+# wimlib-doc 1.7.0-1~webupd8~trusty 194 False
+# wimlib-doc 1.8.0-1~webupd8~trusty 747 False
+# wimlib9 1.7.0-1~webupd8~trusty 773 True
+# wimlib15 1.8.0-1~webupd8~trusty 1897 True
+# woeusb 2.1.3-1~webupd8~trusty 1898 True
+# wimtools 1.8.0-1~webupd8~trusty 1932 True
+# winusb 2.1.3-1~webupd8~trusty 1904 False
+# update-java 0.5.2-2~webupd8 88806 False
+# xfce4-dockbarx-plugin 0.4.1-1~webupd8~trusty2 996 True
+# xfce4-multiload-ng-plugin 1.5.2-1~webupd8~trusty0 86 True
+# xournal 4.8.really0.4.8-0~webupd8~trusty1 33143 True
+# yarock 1.1.6-1~webupd8~trusty2 272 True
+# yad 0.39.0-1~webupd8~trusty0 3155 True
+# youtube-dlg 0.3.8-1~webupd8~trusty0 14930 False
+# youtube-viewer 3.2.7-1~webupd8~trusty0 500 False
+# youtube-dl 1:2017.09.02-1~webupd8~trusty0 1667 False
+# indicator-script-runner 1.0.2-1 56 False
+# indicator-punycode 1.0.3-1 4 False
+# indicator-fortune 1.0.25-1 26 False
+# indicator-ppa-download-statistics 1.0.57-1 7 False
+# indicator-stardate 1.0.33-1 64 False
+# indicator-lunar 1.0.73-1 195 False
+# indicator-tide 1.0.7-1 9 False
+# indicator-virtual-box 1.0.55-1 470 False
