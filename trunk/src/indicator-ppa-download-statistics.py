@@ -1323,15 +1323,15 @@ class IndicatorPPADownloadStatistics:
                 for result in concurrent.futures.as_completed( results ):
                     threadIndex = results[ result ]
                     downloadCount = result.result()
-                    if str( downloadCount ).isnumeric() and ppa.getStatus() != PPA.STATUS_ERROR_RETRIEVING_PPA:
+                    if downloadCount is None:
+                        ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                        executor.shutdown() #TODO Test!
+                    else:
                         ppa.setStatus( PPA.STATUS_OK )
                         packageName = publishedBinaries[ "entries" ][ threadIndex ][ "binary_package_name" ]
                         packageVersion = publishedBinaries[ "entries" ][ threadIndex ][ "binary_package_version" ]
                         architectureSpecific = publishedBinaries[ "entries" ][ threadIndex ][ "architecture_specific" ]
                         ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
-                    else:
-                        ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-                        executor.shutdown() #TODO Test!
 
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
@@ -1339,18 +1339,18 @@ class IndicatorPPADownloadStatistics:
 
 def getDownloadCountNEW( ppa, publishedBinaries, index ):
     try:
-        result = PPA.STATUS_ERROR_RETRIEVING_PPA
         indexLastSlash = publishedBinaries[ "entries" ][ index ][ "self_link" ].rfind( "/" )
         packageId = publishedBinaries[ "entries" ][ index ][ "self_link" ][ indexLastSlash + 1 : ]
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
         downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
-        if str( downloadCount ).isnumeric():
-            result = downloadCount
+        if not str( downloadCount ).isnumeric():
+            downloadCount = None
 
     except Exception as e:
         logging.exception( e )
+        downloadCount = None
 
-    return result
+    return downloadCount
 
 
 if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
