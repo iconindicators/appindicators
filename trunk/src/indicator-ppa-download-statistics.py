@@ -563,6 +563,8 @@ class IndicatorPPADownloadStatistics:
             self.sortByDownload = sortByDownloadCheckbox.get_active()
             self.sortByDownloadAmount = spinner.get_value_as_int()
 
+#TODO Check indenting...
+# Seems that adding a PPA and clicking OK doesn't actually save!
             if self.ppasOrFiltersModified:
                 # Only save the PPAs/filters if modified - avoids a re-download.
                 # On a PPA remove, a re-download really doesn't need to occur...but it's a PITA to sort that one out!
@@ -1281,6 +1283,8 @@ class IndicatorPPADownloadStatistics:
     #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
     def getPublishedBinariesNEW( self, ppa, filter ):
 
+#TODO Test with at least two PPAs.
+
 #TODO Test with a PPA in excess of 75 results...
 # https://launchpad.net/~nilarimogard/+archive/ubuntu/webupd8?field.series_filter=xenial
 # https://launchpad.net/~nilarimogard/+archive/ubuntu/webupd8?field.series_filter=trusty
@@ -1289,8 +1293,8 @@ class IndicatorPPADownloadStatistics:
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published"
 
 #TODO Test filtering!
-        if filter is not None:
-            url += "&exact_match=false" + "&ordered=false&binary_name=" + filter
+#         if filter is not None:
+#             url += "&exact_match=false" + "&ordered=false&binary_name=" + filter
 
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
