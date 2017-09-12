@@ -1281,9 +1281,9 @@ class IndicatorPPADownloadStatistics:
     #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
     def getPublishedBinariesNEW( self, ppa, filter ):
 
-#TODO Test with a PPA in excess of 75 results.
-# https://launchpad.net/~allanlesage/+archive/ubuntu/coverage-builder-01
-        if ppa.getUser() == "allanlesage": return
+#TODO Test with a PPA in excess of 75 results...
+# https://launchpad.net/~nilarimogard/+archive/ubuntu/webupd8?field.series_filter=xenial
+# https://launchpad.net/~nilarimogard/+archive/ubuntu/webupd8?field.series_filter=trusty
 
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published"
