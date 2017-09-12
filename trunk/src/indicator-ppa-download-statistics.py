@@ -1288,6 +1288,7 @@ class IndicatorPPADownloadStatistics:
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published"
 
+#TODO Test filtering!
         if filter is not None:
             url += "&exact_match=false" + "&ordered=false&binary_name=" + filter
 
