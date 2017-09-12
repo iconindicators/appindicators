@@ -36,6 +36,7 @@
 
 #TODO Current released version 57 with the sample filter in place DOES NOT find any downloads!
 # Removing the filter then works...is this a bug and does it still exist in the new code?
+# Check by removing .json file.
 
 
 INDICATOR_NAME = "indicator-ppa-download-statistics"
@@ -1286,11 +1287,6 @@ class IndicatorPPADownloadStatistics:
     #    https://pymotw.com/3/concurrent.futures
     #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
     def getPublishedBinariesNEW( self, ppa, filter ):
-
-#TODO Test with a PPA in excess of 75 results...
-# https://launchpad.net/~nilarimogard/+archive/ubuntu/webupd8?field.series_filter=xenial
-# https://launchpad.net/~nilarimogard/+archive/ubuntu/webupd8?field.series_filter=trusty
-
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
               "&exact_match=false&ordered=false&binary_name=" + filter
@@ -1303,7 +1299,6 @@ class IndicatorPPADownloadStatistics:
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
         while( publishedBinaryCounter < totalPublishedBinaries ):
             try:
-#                 print( url + "&ws.start=" + str( publishedBinaryCounter ) )
                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ) ).read().decode( "utf8" ) )
             except Exception as e:
                 logging.exception( e )
@@ -1334,13 +1329,6 @@ class IndicatorPPADownloadStatistics:
             ppa.setStatus( PPA.STATUS_OK )
 
 
-# https://api.launchpad.net/1.0/~nilarimogard/+archive/webupd8?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/trusty/amd64&status=Published&ws.start=0
-# https://api.launchpad.net/1.0/~nilarimogard/+archive/webupd8?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/trusty/amd64&status=Published&ws.start=75
-# https://api.launchpad.net/1.0/~nilarimogard/+archive/webupd8?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/trusty/amd64&status=Published&ws.start=150
-# https://api.launchpad.net/1.0/~nilarimogard/+archive/webupd8?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/trusty/amd64&status=Published&ws.start=225
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/xenial/amd64&status=Published&ws.start=0
-
-
 def getDownloadCountNEW( ppa, publishedBinaries, i, executor ):
     fail = True
     indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
@@ -1354,7 +1342,6 @@ def getDownloadCountNEW( ppa, publishedBinaries, i, executor ):
             architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
             ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
             fail = False
-            print( packageName, packageVersion, downloadCount, architectureSpecific ) #TODO Remove
 
     except Exception as e:
         logging.exception( e )
@@ -1362,8 +1349,6 @@ def getDownloadCountNEW( ppa, publishedBinaries, i, executor ):
     if fail:
         ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
         executor.shutdown() #TODO Test!
-
-#     print( "getDownloadCount", index, downloadCount ) #TODO Remove
 
 
 if __name__ == "__main__": IndicatorPPADownloadStatistics().main()
