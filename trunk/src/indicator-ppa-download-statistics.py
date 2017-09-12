@@ -1311,12 +1311,14 @@ class IndicatorPPADownloadStatistics:
                 publishedBinaryCounter = totalPublishedBinaries
                 continue
 
+#TODO Figure out what this is doing!
             numberPublishedBinariesCurrentPage = publishedBinariesPerPage
             if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
-            numberWorkers = totalPublishedBinaries if totalPublishedBinaries <= 10 else 5 # If the total published binaries is less than or equal to ten, get them in one go, otherwise break into chunks of five.
-            with concurrent.futures.ThreadPoolExecutor( max_workers = numberWorkers ) as executor:
+
+#TODO Document this section!
+            with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor: # Limit to 5 concurrent requests to not burden LaunchPad.
                 results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
                 for result in concurrent.futures.as_completed( results ):
                     threadIndex = results[ result ]
