@@ -1296,12 +1296,15 @@ class IndicatorPPADownloadStatistics:
 #         if filter is not None:
 #             url += "&exact_match=false" + "&ordered=false&binary_name=" + filter
 
+#         if ppa.getUser() == "nilarimogard": return
+
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
         publishedBinaryCounter = 0
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
         while( publishedBinaryCounter < totalPublishedBinaries ):
             try:
+                print( url + "&ws.start=" + str( publishedBinaryCounter ) )
                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ) ).read().decode( "utf8" ) )
             except Exception as e:
                 logging.exception( e )
@@ -1328,6 +1331,7 @@ class IndicatorPPADownloadStatistics:
                         ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
                         executor.shutdown() #TODO Test!
                     else:
+#                         print( "getPublisedBinaries", threadIndex, downloadCount )
                         ppa.setStatus( PPA.STATUS_OK )
                         packageName = publishedBinaries[ "entries" ][ threadIndex ][ "binary_package_name" ]
                         packageVersion = publishedBinaries[ "entries" ][ threadIndex ][ "binary_package_version" ]
@@ -1336,6 +1340,13 @@ class IndicatorPPADownloadStatistics:
 
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
+
+
+# https://api.launchpad.net/1.0/~nilarimogard/+archive/webupd8?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/trusty/amd64&status=Published&ws.start=0
+# https://api.launchpad.net/1.0/~nilarimogard/+archive/webupd8?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/trusty/amd64&status=Published&ws.start=75
+# https://api.launchpad.net/1.0/~nilarimogard/+archive/webupd8?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/trusty/amd64&status=Published&ws.start=150
+# https://api.launchpad.net/1.0/~nilarimogard/+archive/webupd8?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/trusty/amd64&status=Published&ws.start=225
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/xenial/amd64&status=Published&ws.start=0
 
 
 def getDownloadCountNEW( ppa, publishedBinaries, index ):
@@ -1351,6 +1362,7 @@ def getDownloadCountNEW( ppa, publishedBinaries, index ):
         logging.exception( e )
         downloadCount = None
 
+#     print( "getDownloadCount", index, downloadCount )
     return downloadCount
 
 
