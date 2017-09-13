@@ -911,7 +911,7 @@ class IndicatorPPADownloadStatistics:
 
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
         if len( config ) == 0:
-            self.ppas.append( PPA( "thebernmeister", "ppa", "xenial", "amd64" ) )
+            self.ppas.append( PPA( "thebernmeister", "ppa", "artful", "amd64" ) )
             self.filters[ 'thebernmeister | ppa' ] = [ 
                 "indicator-fortune",
                 "indicator-lunar",
