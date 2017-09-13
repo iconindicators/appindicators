@@ -40,6 +40,8 @@ class PPA( object ):
         self.series = series
         self.architecture = architecture
 
+        self.counter = 0
+
 
     def getStatus( self ): return self.status
 

@@ -1281,11 +1281,20 @@ class IndicatorPPADownloadStatistics:
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
               "&exact_match=false&ordered=false&binary_name=" + filter
 
+#         if ppa.getUser() == "nilarimogard": return
+        print( ppa.getUser() )
+
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
         publishedBinaryCounter = 0
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
-        while( publishedBinaryCounter < totalPublishedBinaries ):
+        loop = 0
+        ppa.counter = 0
+        while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD ): # If 
+            print( "counter", ppa.counter )
+            ppa.counter = 0
+            print( "loop = ", loop )
+            loop += 1
             try:
                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ) ).read().decode( "utf8" ) )
             except Exception as e:
@@ -1303,6 +1312,7 @@ class IndicatorPPADownloadStatistics:
             if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
+            print( totalPublishedBinaries )
             maxWorkers = 10 if totalPublishedBinaries < 10 else 5 # If the total is fewer than 10, grab all in one batch, otherwise limit to 5 concurrent requests.
             with concurrent.futures.ThreadPoolExecutor( max_workers = maxWorkers ) as executor:
                 results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i, executor ): i for i in range( numberPublishedBinariesCurrentPage ) }
@@ -1316,9 +1326,14 @@ class IndicatorPPADownloadStatistics:
         if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # If the initial status is still present then all is good.
             ppa.setStatus( PPA.STATUS_OK )
 
+        print( "counter", ppa.counter )
+
 
 def getDownloadCountNEW( ppa, publishedBinaries, i, executor ):
+    if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+        return
     try:
+        ppa.counter += 1
         indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
         packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
@@ -1331,10 +1346,12 @@ def getDownloadCountNEW( ppa, publishedBinaries, i, executor ):
             ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
 
         else:
+            print( "Non numeric:", url )
             ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
             executor.shutdown() #TODO Test!
 
     except Exception as e:
+        print( "Exception:", url )
         logging.exception( e )
         ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
         executor.shutdown() #TODO Test!
