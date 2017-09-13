@@ -1281,8 +1281,6 @@ class IndicatorPPADownloadStatistics:
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
               "&exact_match=false&ordered=false&binary_name=" + filter
 
-        if ppa.getUser() == "nilarimogard": return #TODO Testing
-
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
         publishedBinaryCounter = 0
