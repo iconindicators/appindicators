@@ -37,10 +37,8 @@
 #TODO Current released version 57 with the sample filter in place DOES NOT find any downloads!
 # Removing the filter then works...is this a bug and does it still exist in the new code?
 # Check by removing .json file.
-
-
-
-
+#
+# Try no filters, filters that will match and also not match, other variations?
 
 
 INDICATOR_NAME = "indicator-ppa-download-statistics"
@@ -67,7 +65,7 @@ class IndicatorPPADownloadStatistics:
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
-    COMMENTS = _( "Shows the total downloads of PPAs." )
+    COMMENTS = _( "Diaplay the total downloads of PPAs." )
 
     SERIES = [ "artful", "zesty",
               "yakkety", "xenial", "wily", "vivid", "utopic",
@@ -242,12 +240,13 @@ class IndicatorPPADownloadStatistics:
         for ppa in ppas:
             key = ppa.getUser() + " | " + ppa.getName()
             if key in combinedPPAs:
-                if ppa.getStatus() == PPA.STATUS_OK and combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
+                if ppa.getStatus() == combinedPPAs[ key ].getStatus():
                     combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() )
                 elif combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
                     combinedPPAs[ key ].setStatus( ppa.getStatus() ) # The current PPA has an error, so that becomes the new status.
-                elif combinedPPAs[ key ].getStatus() != ppa.getStatus():
+                else:
                     combinedPPAs[ key ].setStatus( PPA.STATUS_MULTIPLE_ERRORS ) # The combined PPA and the current PPA have different errors, so set a combined error.
+
             else:
                 # No previous match for this PPA.
                 ppa.nullifyArchitectureSeries()
@@ -303,7 +302,7 @@ class IndicatorPPADownloadStatistics:
             series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
             url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
 
-        webbrowser.open( url ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a lock up!
+        webbrowser.open( url ) # This returns a boolean indicating success or failure; showing the user a message on a false return value causes a lock up!
 
 
     def onAbout( self, widget ):
