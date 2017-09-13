@@ -70,8 +70,6 @@ class IndicatorPPADownloadStatistics:
     ARCHITECTURES = [ "amd64", "i386" ]
 
     INDENT = "    "
-    SVG_ICON = "." + INDICATOR_NAME + "-icon"
-    SVG_FILE = os.getenv( "HOME" ) + "/" + SVG_ICON + ".svg"
 
     CONFIG_COMBINE_PPAS = "combinePPAs"
     CONFIG_FILTERS = "filters"
