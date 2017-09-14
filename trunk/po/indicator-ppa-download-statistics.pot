@@ -1,14 +1,14 @@
 # Portable Object Template for indicator-ppa-download-statistics.
-# Copyright (C) 2015 Bernard Giannetti
+# Copyright (C) 2015-2017 Bernard Giannetti
 # This file is distributed under the same license as the indicator-ppa-download-statistics package.
-# Bernard Giannetti <thebernmeister@hotmail.com>, 2015.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: indicator-ppa-download-statistics 1.0.58\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-02-16 16:10+1100\n"
+"POT-Creation-Date: 2017-09-14 14:48+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,139 +17,131 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicator-ppa-download-statistics.py:65
-msgid "Shows the total downloads of PPAs."
+#: src/indicator-ppa-download-statistics.py:61
+msgid "Display the total downloads of PPAs."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:79
+#: src/indicator-ppa-download-statistics.py:82
 msgid "(downloading data...)"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:80
+#: src/indicator-ppa-download-statistics.py:83
 msgid "(error retrieving PPA)"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:81
+#: src/indicator-ppa-download-statistics.py:84
 msgid "(multiple messages - uncombine PPAs)"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:82
+#: src/indicator-ppa-download-statistics.py:85
 msgid "(no published binaries)"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:83
+#: src/indicator-ppa-download-statistics.py:86
 msgid "(published binaries completely filtered)"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:288
+#: src/indicator-ppa-download-statistics.py:266
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:289
+#: src/indicator-ppa-download-statistics.py:267
 msgid "View the"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:290
+#: src/indicator-ppa-download-statistics.py:268
 msgid "text file."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:291
+#: src/indicator-ppa-download-statistics.py:269
 msgid "changelog"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:302
-msgid "Downloading data..."
-msgstr ""
-
-#: indicator-ppa-download-statistics.py:302
-msgid "Preferences are currently unavailable."
-msgstr ""
-
-#: indicator-ppa-download-statistics.py:333
-#: indicator-ppa-download-statistics.py:587
+#: src/indicator-ppa-download-statistics.py:302
+#: src/indicator-ppa-download-statistics.py:551
 msgid "PPA User"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:334
-#: indicator-ppa-download-statistics.py:613
+#: src/indicator-ppa-download-statistics.py:303
+#: src/indicator-ppa-download-statistics.py:577
 msgid "PPA Name"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:335
-#: indicator-ppa-download-statistics.py:637
+#: src/indicator-ppa-download-statistics.py:304
+#: src/indicator-ppa-download-statistics.py:601
 msgid "Series"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:336
-#: indicator-ppa-download-statistics.py:652
+#: src/indicator-ppa-download-statistics.py:305
+#: src/indicator-ppa-download-statistics.py:616
 msgid "Architecture"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:337
+#: src/indicator-ppa-download-statistics.py:306
 msgid "Double click to edit a PPA."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:349
-#: indicator-ppa-download-statistics.py:396
+#: src/indicator-ppa-download-statistics.py:319
+#: src/indicator-ppa-download-statistics.py:366
 msgid "Add"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:350
+#: src/indicator-ppa-download-statistics.py:320
 msgid "Add a new PPA."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:354
-#: indicator-ppa-download-statistics.py:401
+#: src/indicator-ppa-download-statistics.py:324
+#: src/indicator-ppa-download-statistics.py:371
 msgid "Remove"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:355
+#: src/indicator-ppa-download-statistics.py:325
 msgid "Remove the selected PPA."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:362
+#: src/indicator-ppa-download-statistics.py:331
 msgid "PPAs"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:382
+#: src/indicator-ppa-download-statistics.py:351
 msgid "PPA"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:383
+#: src/indicator-ppa-download-statistics.py:352
 msgid "Filter"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:384
+#: src/indicator-ppa-download-statistics.py:353
 msgid "Double click to edit a filter."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:397
+#: src/indicator-ppa-download-statistics.py:367
 msgid "Add a new filter."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:402
+#: src/indicator-ppa-download-statistics.py:372
 msgid "Remove the selected filter."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:409
+#: src/indicator-ppa-download-statistics.py:378
 msgid "Filters"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:420
+#: src/indicator-ppa-download-statistics.py:389
 msgid "Show PPAs as submenus"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:422
+#: src/indicator-ppa-download-statistics.py:391
 msgid ""
 "The download statistics for each PPA\n"
 "are shown in a separate submenu."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:427
+#: src/indicator-ppa-download-statistics.py:396
 msgid "Combine PPAs"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:429
+#: src/indicator-ppa-download-statistics.py:398
 msgid ""
 "Combine the statistics of binary\n"
 "packages when the PPA user/name\n"
@@ -174,11 +166,11 @@ msgid ""
 "this category."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:452
+#: src/indicator-ppa-download-statistics.py:421
 msgid "Ignore version for architecture specific"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:455
+#: src/indicator-ppa-download-statistics.py:424
 msgid ""
 "Sometimes architecture specific\n"
 "packages with the same package\n"
@@ -201,19 +193,19 @@ msgid ""
 "instances of a published binary."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:477
+#: src/indicator-ppa-download-statistics.py:446
 msgid "Sort by download"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:478
+#: src/indicator-ppa-download-statistics.py:447
 msgid "Sort by download count within each PPA."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:483
+#: src/indicator-ppa-download-statistics.py:454
 msgid "  Clip amount"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:492
+#: src/indicator-ppa-download-statistics.py:463
 msgid ""
 "Limit the number of entries\n"
 "when sorting by download.\n"
@@ -221,75 +213,75 @@ msgid ""
 "A value of zero will not clip."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:500
+#: src/indicator-ppa-download-statistics.py:473
 msgid "Autostart"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:502
+#: src/indicator-ppa-download-statistics.py:475
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:506
+#: src/indicator-ppa-download-statistics.py:479
 msgid "General"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:508
+#: src/indicator-ppa-download-statistics.py:481
 msgid "Preferences"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:565
+#: src/indicator-ppa-download-statistics.py:529
 msgid "No PPA has been selected for removal."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:568
+#: src/indicator-ppa-download-statistics.py:532
 msgid "Remove the selected PPA?"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:667
+#: src/indicator-ppa-download-statistics.py:631
 msgid "Edit PPA"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:669
+#: src/indicator-ppa-download-statistics.py:633
 msgid "Add PPA"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:687
+#: src/indicator-ppa-download-statistics.py:651
 msgid "PPA user cannot be empty."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:692
+#: src/indicator-ppa-download-statistics.py:656
 msgid "PPA name cannot be empty."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:720
+#: src/indicator-ppa-download-statistics.py:684
 msgid "Duplicates disallowed - there is an identical PPA!"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:738
+#: src/indicator-ppa-download-statistics.py:702
 msgid "No filter has been selected for removal."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:741
+#: src/indicator-ppa-download-statistics.py:705
 msgid "Remove the selected filter?"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:748
+#: src/indicator-ppa-download-statistics.py:712
 msgid "Please add a PPA first!"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:758
+#: src/indicator-ppa-download-statistics.py:722
 msgid "Only one filter per PPA User/Name."
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:775
+#: src/indicator-ppa-download-statistics.py:739
 msgid "PPA User/Name"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:806
+#: src/indicator-ppa-download-statistics.py:770
 msgid "Filter Text"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:812
+#: src/indicator-ppa-download-statistics.py:776
 msgid ""
 "Each line of text is a single\n"
 "filter which is compared against\n"
@@ -304,18 +296,18 @@ msgid ""
 "cards are not accepted!"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:832
+#: src/indicator-ppa-download-statistics.py:796
 msgid "Edit Filter"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:834
+#: src/indicator-ppa-download-statistics.py:798
 msgid "Add Filter"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:849
+#: src/indicator-ppa-download-statistics.py:813
 msgid "Please enter filter text!"
 msgstr ""
 
-#: indicator-ppa-download-statistics.py:1012
+#: src/indicator-ppa-download-statistics.py:942
 msgid "Statistics downloaded!"
 msgstr ""
