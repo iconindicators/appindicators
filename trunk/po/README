@@ -43,7 +43,7 @@ Create the PO Template (POT) file
 
 Run a terminal and create the PO template file:
 
-	xgettext --files-from=po/POTFILES.in --output=po/MyProject.pot
+	xgettext --files-from=po/POTFILES.in --directory=src --output=po/MyProject.pot
 
 Open MyProject.pot in a text editor.
 Edit the first three lines in the comment header as appropriate.
