@@ -104,7 +104,7 @@ class IndicatorPPADownloadStatistics:
 
     def update( self ):
         self.buildMenu()
-        Thread( target = self.getPPADownloadStatisticsNEW ).start()
+        Thread( target = self.getPPADownloadStatistics ).start()
         GLib.timeout_add_seconds( 6 * 60 * 60, self.update ) # Auto update every six hours.
 
 
@@ -917,7 +917,7 @@ class IndicatorPPADownloadStatistics:
     #    {
     #    ,... 
     #}
-    def getPPADownloadStatisticsNEW( self ):
+    def getPPADownloadStatistics( self ):
         for ppa in self.ppas:
             filters = [ "" ] # To match all published binary names an empty string can be used.
             key = ppa.getUser() + " | " + ppa.getName()
@@ -926,7 +926,7 @@ class IndicatorPPADownloadStatistics:
 
             ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
             for filter in filters:
-                self.getPublishedBinariesNEW( ppa, filter )
+                self.getPublishedBinaries( ppa, filter )
                 if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                     break # No point continuing...
 
@@ -944,12 +944,12 @@ class IndicatorPPADownloadStatistics:
         self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.
 
 
-    # Use a thread pool executer to get the download count within each published binary.
+    # Use a thread pool executer to get the download counts for each published binary.
     # References:
     #    https://docs.python.org/3/library/concurrent.futures.html
     #    https://pymotw.com/3/concurrent.futures
     #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
-    def getPublishedBinariesNEW( self, ppa, filter ):
+    def getPublishedBinaries( self, ppa, filter ):
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
               "&exact_match=false&ordered=false&binary_name=" + filter
@@ -978,7 +978,7 @@ class IndicatorPPADownloadStatistics:
 
             maxWorkers = 10 if totalPublishedBinaries < 10 else 5 # If the total is fewer than 10, grab all in one batch, otherwise limit to 5 concurrent requests.
             with concurrent.futures.ThreadPoolExecutor( max_workers = maxWorkers ) as executor:
-                results = { executor.submit( getDownloadCountNEW, ppa, publishedBinaries, i, executor ): i for i in range( numberPublishedBinariesCurrentPage ) }
+                results = { executor.submit( getDownloadCount, ppa, publishedBinaries, i, executor ): i for i in range( numberPublishedBinariesCurrentPage ) }
                 for result in concurrent.futures.as_completed( results ):
                     pass
 
@@ -989,7 +989,7 @@ class IndicatorPPADownloadStatistics:
             ppa.setStatus( PPA.STATUS_OK )
 
 
-def getDownloadCountNEW( ppa, publishedBinaries, i, executor ):
+def getDownloadCount( ppa, publishedBinaries, i, executor ):
     if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # Use the status to cancel downloads if an error occurred.
         try:
             indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
