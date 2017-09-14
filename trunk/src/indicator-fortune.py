@@ -51,7 +51,7 @@ class IndicatorFortune:
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
-    COMMENTS = _( "Calls the 'fortune' program, displaying the result in the on-screen notification." )
+    COMMENTS = _( "Calls the 'fortune' program displaying the result in the on-screen notification." )
 
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
     HISTORY_FILE = "fortune-history"
