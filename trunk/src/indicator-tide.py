@@ -45,7 +45,7 @@ from urllib.request import urlopen
 import datetime, json, locale, logging, os, ports, pythonutils, re, threading, tide, time, webbrowser
 
 
-#TODO Renew license!
+#TODO Update ports.
 
 
 class IndicatorTide:
@@ -62,9 +62,9 @@ class IndicatorTide:
 # The text comes from the UKHO.
 # The GPL text is in English.
 # ...check with Oleg.
-    CREDIT_UKHO_UK_PORTS = _( "Tidal information for UK ports licensed under the Open\nGovernment Licence for Public Sector Information. http://www.nationalarchives.gov.uk/doc/open-government-licence" )
-    CREDIT_UKHO_UK_NON_PORTS = _( "Tidal information for non-UK ports reproduced by\npermission of the Controller of Her Majesty’s Stationery\nOffice and the UK Hydrographic Office. http://www.ukho.gov.uk" )
-    CREDITS = [ CREDIT_UKHO_UK_PORTS, CREDIT_UKHO_UK_NON_PORTS ]
+    CREDIT_UKHO_COPYRIGHT = _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. http://www.GOV.uk/UKHO" )
+    CREDIT_UKHO_ON_CLICK = _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." )
+    CREDITS = [ CREDIT_UKHO_COPYRIGHT, CREDIT_UKHO_ON_CLICK ]
 
     URL_TIMEOUT_IN_SECONDS = 10
 
