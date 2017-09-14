@@ -58,7 +58,7 @@ class IndicatorPPADownloadStatistics:
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
-    COMMENTS = _( "Diaplay the total downloads of PPAs." )
+    COMMENTS = _( "Display the total downloads of PPAs." )
 
     SERIES = [ "artful", "zesty",
               "yakkety", "xenial", "wily", "vivid", "utopic",
