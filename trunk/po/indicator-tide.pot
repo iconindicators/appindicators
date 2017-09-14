@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-tide 1.0.8\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-06-25 14:47+1000\n"
+"POT-Creation-Date: 2017-09-14 15:03+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,147 +17,185 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicator-tide.py:55
+#: src/indicator-tide.py:59
 #, python-brace-format
 msgid ""
 "Displays tidal information.\n"
 "Non-UK ports will be unavailable after {0}."
 msgstr ""
 
-#: indicator-tide.py:56
+#: src/indicator-tide.py:65
 msgid ""
-"Tidal information for UK ports licensed under the\n"
-"Open Government Licence for Public Sector Information. http://www."
+"Tidal information for UK ports licensed under the Open\n"
+"Government Licence for Public Sector Information. http://www."
 "nationalarchives.gov.uk/doc/open-government-licence"
 msgstr ""
 
-#: indicator-tide.py:57
+#: src/indicator-tide.py:66
 msgid ""
 "Tidal information for non-UK ports reproduced by\n"
-"permission of the Controller of Her Majesty’s Stationery Office\n"
-"and the UK Hydrographic Office. http://www.ukho.gov.uk"
+"permission of the Controller of Her Majesty’s Stationery\n"
+"Office and the UK Hydrographic Office. http://www.ukho.gov.uk"
 msgstr ""
 
-#: indicator-tide.py:91
+#: src/indicator-tide.py:106
 msgid ""
 "The license for non-UK ports has expired. Until you upgrade to the latest "
 "version of the indicator, only UK ports will be available."
 msgstr ""
 
-#: indicator-tide.py:94
+#: src/indicator-tide.py:109
 msgid "Warning"
 msgstr ""
 
-#: indicator-tide.py:110 indicator-tide.py:119
-#, python-brace-format
-msgid "No port data available for {0}!"
-msgstr ""
-
-#: indicator-tide.py:111
+#: src/indicator-tide.py:122
 msgid "Error"
 msgstr ""
 
-#: indicator-tide.py:146
+#: src/indicator-tide.py:123 src/indicator-tide.py:142
+#, python-brace-format
+msgid "No tidal data available for {0}!"
+msgstr ""
+
+#: src/indicator-tide.py:125
+msgid "Tidal data ready"
+msgstr ""
+
+#: src/indicator-tide.py:127
+msgid "Cached tidal data ready"
+msgstr ""
+
+#: src/indicator-tide.py:129
+msgid "Tidal data is presented in the time zone of the port."
+msgstr ""
+
+#: src/indicator-tide.py:131
+msgid "Tidal data is presented in your local time zone."
+msgstr ""
+
+#: src/indicator-tide.py:144
+#, python-brace-format
+msgid "{0}, {1}"
+msgstr ""
+
+#: src/indicator-tide.py:179
 msgid "H"
 msgstr ""
 
-#: indicator-tide.py:148
+#: src/indicator-tide.py:181
 msgid "L"
 msgstr ""
 
-#: indicator-tide.py:210
+#: src/indicator-tide.py:250
 msgid "Credits"
 msgstr ""
 
-#: indicator-tide.py:216
+#: src/indicator-tide.py:256
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-tide.py:217
+#: src/indicator-tide.py:257
 msgid "View the"
 msgstr ""
 
-#: indicator-tide.py:218
+#: src/indicator-tide.py:258
 msgid "text file."
 msgstr ""
 
-#: indicator-tide.py:219
+#: src/indicator-tide.py:259
 msgid "changelog"
 msgstr ""
 
-#: indicator-tide.py:244
+#: src/indicator-tide.py:284
 msgid "Country"
 msgstr ""
 
-#: indicator-tide.py:247
+#: src/indicator-tide.py:287
 msgid "Choose your country."
 msgstr ""
 
-#: indicator-tide.py:260
+#: src/indicator-tide.py:300
 msgid "Choose your port."
 msgstr ""
 
-#: indicator-tide.py:263
+#: src/indicator-tide.py:303
 msgid "Port"
 msgstr ""
 
-#: indicator-tide.py:275
+#: src/indicator-tide.py:315
 msgid "Ports"
 msgstr ""
 
-#: indicator-tide.py:286
+#: src/indicator-tide.py:326
 msgid "Show as submenus"
 msgstr ""
 
-#: indicator-tide.py:288
+#: src/indicator-tide.py:328
 msgid "Show each day's tides in a submenu."
 msgstr ""
 
-#: indicator-tide.py:292
+#: src/indicator-tide.py:332
 msgid "Except first day"
 msgstr ""
 
-#: indicator-tide.py:296
+#: src/indicator-tide.py:336
 msgid "Show the first day's tide in full."
 msgstr ""
 
-#: indicator-tide.py:305
+#: src/indicator-tide.py:345
 msgid "Date format"
 msgstr ""
 
-#: indicator-tide.py:311
+#: src/indicator-tide.py:351
 msgid ""
-"Formatting options are specified at\n"
-"http://docs.python.org/3/library/datetime.html"
+"Formatting options for the date:\n"
+"\n"
+"    http://docs.python.org/3/library/datetime.html"
 msgstr ""
 
-#: indicator-tide.py:321
+#: src/indicator-tide.py:358
 msgid "Tide format"
 msgstr ""
 
-#: indicator-tide.py:327
+#: src/indicator-tide.py:367 src/indicator-tide.py:406
+msgid "General"
+msgstr ""
+
+#: src/indicator-tide.py:373
 msgid ""
 "Tide information is specified using:\n"
 "\n"
 "    [TYPE] - the tide is high or low.\n"
 "    [LEVEL] - the tide level, measured in metres.\n"
 "\n"
-"Formatting options for the time are specified at\n"
-"http://docs.python.org/3/library/datetime.html"
+"Formatting options for the time:\n"
+"\n"
+"    http://docs.python.org/3/library/datetime.html"
 msgstr ""
 
-#: indicator-tide.py:336
+#: src/indicator-tide.py:385
+msgid "Missing time"
+msgstr ""
+
+#: src/indicator-tide.py:391
+msgid ""
+"Tide information is specified using:\n"
+"\n"
+"    [TYPE] - the tide is high or low.\n"
+"    [LEVEL] - the tide level, measured in metres.\n"
+"\n"
+"This format is used when there is no time\n"
+"component in a tide reading"
+msgstr ""
+
+#: src/indicator-tide.py:400
 msgid "Autostart"
 msgstr ""
 
-#: indicator-tide.py:338
+#: src/indicator-tide.py:402
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-tide.py:342
-msgid "General"
-msgstr ""
-
-#: indicator-tide.py:344
+#: src/indicator-tide.py:408
 msgid "Preferences"
 msgstr ""
