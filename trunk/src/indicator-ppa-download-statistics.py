@@ -317,6 +317,10 @@ class IndicatorPPADownloadStatistics:
 
 
     def onPreferences( self, widget ):
+#         if self.downloadInProgress:
+#             Notify.Notification.new( _( "Downloading data..." ), _( "Preferences are currently unavailable." ), IndicatorPPADownloadStatistics.ICON ).show()
+#             return
+# 
         if self.dialogLock.acquire( blocking = False ):
             self._onPreferences( widget )
             self.dialogLock.release()
