@@ -1,5 +1,7 @@
 indicator-ppa-download-statistics (1.0.58-1) trusty; urgency=low
 
+  * Bug fix: When multiple filters were in use, if one filter resulted in no
+    matches, all other filters became redundant.
   * Corrected warnings in .desktop file.
   * About/Preferences dialogs now block each other - only show one at a time.
   * Added a drop shadow to the icon.
