@@ -2,16 +2,15 @@
 # -*- coding: utf-8 -*-
 
 
-# Open each of
+# Open the UKHO ports file
 #
-#     2016_predictions_non-commercial_granted.xls
-#     2016_predictions_non-commercial_granted_non UK ports.xls
+#     Worldwide Granted Ports.xls
 #
 # in LibreOffice Calc and Save As 'Text CSV' using TAB as the field delimiter and no text delimiter.
 #
 # Note that openpyxl would not work as it gave some Unicode error, so must convert to CSV and read that instead.
 #
-# Read in each CSV and produce output of the form:
+# Amend the column numbers to match the port ID, port name and country and then call process to produce output of the form:
 #     [ "1822", "Alger (Algiers)", "Algeria" ],
 #     [ "1820", "Arzew", "Algeria" ],
 #     ...
@@ -25,11 +24,9 @@ def process( fileName ):
                continue
 
            line = line.strip().split( "\t" )
-           line = "[ \"" + line[ 0 ] + line[ 1 ] + "\", \"" + line[ 2 ] + "\", \"" + line[ 8 ] + "\" ],"
+           line = "[ \"" + line[ 0 ] + line[ 1 ] + "\", \"" + line[ 2 ] + "\", \"" + line[ 10 ] + "\" ],"
            line = line.replace( "ST.", "St." ).title()
            print( line )
 
 
-process( "2016_predictions_non-commercial_granted_non UK ports.csv" )
-print( "" )
-process( "2016_predictions_non-commercial_granted.csv" )
+process( "Worldwide Granted Ports.csv" )
