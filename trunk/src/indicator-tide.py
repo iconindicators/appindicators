@@ -56,7 +56,7 @@ class IndicatorTide:
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
-    COMMENTS = _( "Displays tidal information.\nNon-UK ports will be unavailable after {0}." ).format( ports.getExpiry() )
+    COMMENTS = _( "Displays tidal information.\nPort data will expire after {0}." ).format( ports.getExpiry() )
 
 #TODO Should this be translated?
 # The text comes from the UKHO.
