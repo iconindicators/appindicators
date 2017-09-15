@@ -45,9 +45,6 @@ from urllib.request import urlopen
 import datetime, json, locale, logging, os, ports, pythonutils, re, threading, tide, time, webbrowser
 
 
-#TODO Update ports.
-
-
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
