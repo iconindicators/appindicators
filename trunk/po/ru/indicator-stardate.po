@@ -1,14 +1,14 @@
 # Russian translation for indicator-stardate.
-# Copyright (C) 2015 Bernard Giannetti
+# Copyright (C) 2015-2017 Bernard Giannetti
 # This file is distributed under the same license as the indicator-stardate package.
-# Bernard Giannetti <thebernmeister@hotmail.com>, 2015.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2017.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: indicator-stardate 1.0.34\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2015-05-22 18:05+1000\n"
-"PO-Revision-Date: 2015-05-22 18:06+0300\n"
+"POT-Creation-Date: 2017-09-15 07:59+1000\n"
+"PO-Revision-Date: 2017-07-06 16:52+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -18,109 +18,81 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: indicator-stardate.py:54
+#: indicator-stardate.py:53
 msgid "Shows the current Star Trek™ stardate."
 msgstr "Показывает текущую звёздную дату \"Звёздного пути\"."
 
-#: indicator-stardate.py:55
+#: indicator-stardate.py:54
 msgid "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main."
 msgstr "Основано на \"STARDATES IN STAR TREK FAQ V1.6\", автор Andrew Main."
 
-#: indicator-stardate.py:125
-msgid "Stardate: {0}"
-msgstr "Звёздная дата: {0}"
-
-#: indicator-stardate.py:142
+#: indicator-stardate.py:168
 msgid "Credits"
 msgstr "Благодарность"
 
-#: indicator-stardate.py:145
+#: indicator-stardate.py:174
 msgid "translator-credits"
 msgstr "Олег Мойсейчук"
 
-#: indicator-stardate.py:168
-msgid "Use 'classic' conversion"
-msgstr "\"Классическое\" преобразование дат"
+#: indicator-stardate.py:175
+msgid "View the"
+msgstr "Просмотреть"
 
-#: indicator-stardate.py:171
+#: indicator-stardate.py:176
+msgid "text file."
+msgstr "."
+
+#: indicator-stardate.py:177
+msgid "changelog"
+msgstr "список изменений"
+
+#: indicator-stardate.py:197
+msgid "Show stardate 'classic'"
+msgstr "Показывать \"классическую\" звёздную дату"
+
+#: indicator-stardate.py:200
 msgid ""
-"Stardate 'classic' is based on\n"
+"If checked, show stardate 'classic' based on\n"
 "\n"
 "\tSTARDATES IN STAR TREK FAQ V1.6\n"
 "\n"
 "by Andrew Main.\n"
 "\n"
-"Otherwise the 2009 revision is used\n"
-"(http://en.wikipedia.org/wiki/Stardate)."
+"Otherwise show stardate '2009 revised' based on\n"
+"\n"
+"\thttp://en.wikipedia.org/wiki/Stardate"
 msgstr ""
-"\"Классические\" звёздные даты основаны на\n"
+"Если стоит отметка, показываются \"классические\"\n"
+"звёздные даты, основанные на\n"
+"\"STARDATES IN STAR TREK FAQ V1.6\", автор Andrew Main.\n"
 "\n"
-"\t\"STARDATES IN STAR TREK FAQ V1.6\"\n"
-"\n"
-"автор Andrew Main.\n"
-"\n"
-"Иначе использется ревизия 2009 года\n"
-"(http://en.wikipedia.org/wiki/Stardate)."
+"Иначе показываются звёздные даты \"ревизии 2009 года\"\n"
+"http://en.wikipedia.org/wiki/Stardate"
 
-#: indicator-stardate.py:178
+#: indicator-stardate.py:207
 msgid "Show ISSUE"
-msgstr "Показывать \"выпуск\""
+msgstr "Показывать ВЫПУСК"
 
-#: indicator-stardate.py:183
-msgid ""
-"Show the ISSUE of the stardate\n"
-"(only applies to 'classic')."
-msgstr ""
-"Показывать \"выпуск\" звёздной даты\n"
-"(касается только \"классической\" системы)."
+#: indicator-stardate.py:211
+msgid "Show the ISSUE of the stardate 'classic'."
+msgstr "Показывать ВЫПУСК \"классической\" звёздной даты."
 
-#: indicator-stardate.py:187
+#: indicator-stardate.py:214
 msgid "Pad INTEGER"
 msgstr "Выравнивать целую часть"
 
-#: indicator-stardate.py:192
-msgid ""
-"Pad the INTEGER part with leading\n"
-"zeros (only applies to 'classic')."
-msgstr ""
-"Дополнять нулями целую часть звёздной даты\n"
-"(касается только \"классической\" системы)."
+#: indicator-stardate.py:218
+msgid "Pad the INTEGER part of the stardate 'classic' with leading zeros."
+msgstr "Дополнять нулями целую часть \"классической\" звёздной даты."
 
-#: indicator-stardate.py:198
-msgid "Show in menu"
-msgstr "Показывать в меню"
-
-#: indicator-stardate.py:201
-msgid ""
-"Show the stardate in the menu.\n"
-"\n"
-"Useful for desktop environments\n"
-"which prohibit text labels adjacent\n"
-"to the icon."
-msgstr ""
-"Показывать звёздную дату в меню.\n"
-"\n"
-"Полезно для сред рабочего стола,\n"
-"которые запрещают показ текста\n"
-"рядом со значком."
-
-#: indicator-stardate.py:208
+#: indicator-stardate.py:223
 msgid "Autostart"
 msgstr "Автозапуск"
 
-#: indicator-stardate.py:210
+#: indicator-stardate.py:225
 msgid "Run the indicator automatically."
 msgstr "Запускать индикатор автоматически."
 
-#: indicator-stardate.py:214
+#: indicator-stardate.py:229
 msgid "Preferences"
 msgstr "Параметры"
-
-msgid "View the"
-msgstr "Просмотреть"
-
-msgid "changelog"
-msgstr "список изменений"
-
-msgid "text file."
-msgstr "."
