@@ -4,7 +4,7 @@
 
 # Open the UKHO ports file
 #
-#     Worldwide Granted Ports.xls
+#     2017_predictions_non-commercial_granted (2016.11.15).xls
 #
 # in LibreOffice Calc and Save As 'Text CSV' using TAB as the field delimiter and no text delimiter.
 #
@@ -24,9 +24,9 @@ def process( fileName ):
                continue
 
            line = line.strip().split( "\t" )
-           line = "[ \"" + line[ 0 ] + line[ 1 ] + "\", \"" + line[ 2 ] + "\", \"" + line[ 10 ] + "\" ],"
+           line = "[ \"" + line[ 0 ] + line[ 1 ] + "\", \"" + line[ 2 ] + "\", \"" + line[ 8 ] + "\" ],"
            line = line.replace( "ST.", "St." ).title()
            print( line )
 
 
-process( "Worldwide Granted Ports.csv" )
+process( "2017_predictions_non-commercial_granted (2016.11.15).csv" )
