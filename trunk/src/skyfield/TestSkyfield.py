@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# Use
+#    https://ssd.jpl.nasa.gov/horizons.cgi
+# to verify results.
+
 
 # Install (and upgrade to) latest skyfield: 
 #     sudo apt-get install python3-pip
