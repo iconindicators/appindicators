@@ -55,10 +55,6 @@ class IndicatorTide:
     WEBSITE = "https://launchpad.net/~thebernmeister"
     COMMENTS = _( "Displays tidal information.\nPort data is licensed will expire after {0}." ).format( ports.getExpiry() )
 
-#TODO Should this be translated?
-# The text comes from the UKHO.
-# The GPL text is in English.
-# ...check with Oleg.
     CREDIT_UKHO_COPYRIGHT = _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. http://www.GOV.uk/UKHO" )
     CREDIT_UKHO_ON_CLICK = _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." )
     CREDITS = [ CREDIT_UKHO_COPYRIGHT, CREDIT_UKHO_ON_CLICK ]
@@ -147,7 +143,7 @@ class IndicatorTide:
             firstTidalReading = True # Used for subMenu build.
             for tidalReading in tidalReadings:
                 if allDateTimes:
-                    tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
+                    tidalDateTimeLocal = tidalReading.getDateTime().astimezone( tz = None ) # Date/time now in local time zone.
                 else:
                     tidalDateTimeLocal = tidalReading.getDateTime() # There may or may not be a time component; the result will be in port local.
 
@@ -627,9 +623,9 @@ class IndicatorTide:
     # Otherwise, tidal reading contain a mix of date and date/time or are date only: compare each reading to UTC midnight date only and remove if older. 
     def removeTidalReadingsPriorToToday( self, tidalReadings ):
         if self.tidalReadingsAreAllDateTimes( tidalReadings ):
-            todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
+            todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone( tz = None ).replace( hour = 0, minute = 0, second = 0 )
             for tidalReading in list( tidalReadings ):
-                if tidalReading.getDateTime().astimezone() < todayLocalMidnight:
+                if tidalReading.getDateTime().astimezone( tz = None ) < todayLocalMidnight:
                     tidalReadings.remove( tidalReading )
         else:
             utcMidnightDate = datetime.datetime.utcnow().replace( hour = 0, minute = 0, second = 0 ).date()
