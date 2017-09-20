@@ -143,7 +143,7 @@ class IndicatorTide:
             firstTidalReading = True # Used for subMenu build.
             for tidalReading in tidalReadings:
                 if allDateTimes:
-                    tidalDateTimeLocal = tidalReading.getDateTime().astimezone( tz = None ) # Date/time now in local time zone.
+                    tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
                 else:
                     tidalDateTimeLocal = tidalReading.getDateTime() # There may or may not be a time component; the result will be in port local.
 
@@ -357,7 +357,7 @@ class IndicatorTide:
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
 
-        box.pack_start( Gtk.Label( _( "General" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Default" ) ), False, False, 0 )
 
         tideFormat = Gtk.Entry()
         tideFormat.set_text( self.menuItemTideFormat )
@@ -623,9 +623,9 @@ class IndicatorTide:
     # Otherwise, tidal reading contain a mix of date and date/time or are date only: compare each reading to UTC midnight date only and remove if older. 
     def removeTidalReadingsPriorToToday( self, tidalReadings ):
         if self.tidalReadingsAreAllDateTimes( tidalReadings ):
-            todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone( tz = None ).replace( hour = 0, minute = 0, second = 0 )
+            todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
             for tidalReading in list( tidalReadings ):
-                if tidalReading.getDateTime().astimezone( tz = None ) < todayLocalMidnight:
+                if tidalReading.getDateTime().astimezone() < todayLocalMidnight:
                     tidalReadings.remove( tidalReading )
         else:
             utcMidnightDate = datetime.datetime.utcnow().replace( hour = 0, minute = 0, second = 0 ).date()

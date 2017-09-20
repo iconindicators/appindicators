@@ -157,8 +157,8 @@ msgstr ""
 msgid "Tide format"
 msgstr ""
 
-#: indicator-tide.py:360 indicator-tide.py:399
-msgid "General"
+#: indicator-tide.py:360
+msgid "Default"
 msgstr ""
 
 #: indicator-tide.py:366
@@ -194,6 +194,10 @@ msgstr ""
 
 #: indicator-tide.py:395
 msgid "Run the indicator automatically."
+msgstr ""
+
+#: indicator-tide.py:399
+msgid "General"
 msgstr ""
 
 #: indicator-tide.py:401
