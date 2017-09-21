@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-tide 1.0.8\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-06-25 14:47+1000\n"
-"PO-Revision-Date: 2017-07-11 16:12+0300\n"
+"POT-Creation-Date: 2017-09-18 20:52+1000\n"
+"PO-Revision-Date: 2017-09-21 10:46+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -18,35 +18,34 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: indicator-tide.py:55
-msgid ""
-"Displays tidal information.\n"
-"Non-UK ports will be unavailable after {0}."
-msgstr ""
-"Показывает сведения о приливах.\n"
-"Порты за пределами Великобритании станут недоступны после {0}."
-
 #: indicator-tide.py:56
 msgid ""
-"Tidal information for UK ports licensed under the\n"
-"Open Government Licence for Public Sector Information. http://www."
-"nationalarchives.gov.uk/doc/open-government-licence"
+"Displays tidal information.\n"
+"Port data is licensed will expire after {0}."
 msgstr ""
-"Информация о приливах для портов Великобритании используется\n"
-"согласно Открытой государственной лицензии.\n"
-"http://www.nationalarchives.gov.uk/doc/open-government-licence"
+"Показывает сведения о приливах.\n"
+"Лицензия на данные о портах истекает с {0}."
 
-#: indicator-tide.py:57
+#: indicator-tide.py:58
 msgid ""
-"Tidal information for non-UK ports reproduced by\n"
-"permission of the Controller of Her Majesty’s Stationery Office\n"
-"and the UK Hydrographic Office. http://www.ukho.gov.uk"
+"© Crown Copyright and/or database rights.\n"
+"Reproduced by permission of the\n"
+"Controller of Her Majesty’s Stationery Office and the\n"
+"UK Hydrographic Office. http://www.GOV.uk/UKHO"
 msgstr ""
-"Информация о приливах для портов за пределами Великобритании\n"
-"воспроизведена с разрешения Управляющего Издательства Её Величества\n"
-"и Гидрографической службы Великобритании. http://www.ukho.gov.uk"
+"© Авторское право Великобритании и/или права на базу данных.\n"
+"Воспроизводится с разрешения Управляющего Издательства Её Величества\n"
+"и Гидрографической службы Великобритании. http://www.GOV.uk/UKHO"
 
-#: indicator-tide.py:91
+#: indicator-tide.py:59
+msgid ""
+"Click on any menu item to display the ‘Admiralty EasyTide’\n"
+"port page to verify the results produced."
+msgstr ""
+"Щёлкните по любому пункту меню, чтобы отобразить страницу\n"
+"‘Admiralty EasyTide’ для проверки выдаваемых результатов."
+
+#: indicator-tide.py:99
 msgid ""
 "The license for non-UK ports has expired. Until you upgrade to the latest "
 "version of the indicator, only UK ports will be available."
@@ -54,128 +53,178 @@ msgstr ""
 "Лицензия для портов за пределами Великобритании истекла. Пока вы не обновите "
 "индикатор, будут доступны только порты Великобритании."
 
-#: indicator-tide.py:94
+#: indicator-tide.py:102
 msgid "Warning"
 msgstr "Предупреждение"
 
-#: indicator-tide.py:110 indicator-tide.py:119
-msgid "No port data available for {0}!"
-msgstr "Данные для порта {0} недоступны!"
-
-#: indicator-tide.py:111
+#: indicator-tide.py:115
 msgid "Error"
 msgstr "Ошибка"
 
-#: indicator-tide.py:146
+#: indicator-tide.py:116 indicator-tide.py:135
+msgid "No tidal data available for {0}!"
+msgstr "Данные о приливах для {0} недоступны!"
+
+#: indicator-tide.py:118
+msgid "Tidal data ready"
+msgstr "Данные о приливах получены"
+
+#: indicator-tide.py:120
+msgid "Cached tidal data ready"
+msgstr "Данные о приливах получены из кэша"
+
+#: indicator-tide.py:122
+msgid "Tidal data is presented in the time zone of the port."
+msgstr "Данные о приливах соответствуют часовому поясу порта."
+
+#: indicator-tide.py:124
+msgid "Tidal data is presented in your local time zone."
+msgstr "Данные о приливах соответствуют местному времени."
+
+#: indicator-tide.py:137
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
+
+#: indicator-tide.py:172
 msgid "H"
 msgstr "П"
 
-#: indicator-tide.py:148
+#: indicator-tide.py:174
 msgid "L"
 msgstr "О"
 
-#: indicator-tide.py:210
+#: indicator-tide.py:243
 msgid "Credits"
 msgstr "Благодарность"
 
-#: indicator-tide.py:216
+#: indicator-tide.py:249
 msgid "translator-credits"
 msgstr "Олег Мойсейчук"
 
-#: indicator-tide.py:217
+#: indicator-tide.py:250
 msgid "View the"
 msgstr "Просмотреть"
 
-#: indicator-tide.py:218
+#: indicator-tide.py:251
 msgid "text file."
 msgstr "."
 
-#: indicator-tide.py:219
+#: indicator-tide.py:252
 msgid "changelog"
 msgstr "список изменений"
 
-#: indicator-tide.py:244
+#: indicator-tide.py:277
 msgid "Country"
 msgstr "Страна"
 
-#: indicator-tide.py:247
+#: indicator-tide.py:280
 msgid "Choose your country."
 msgstr "Выберите вашу страну."
 
-#: indicator-tide.py:260
+#: indicator-tide.py:293
 msgid "Choose your port."
 msgstr "Выберите ваш порт."
 
-#: indicator-tide.py:263
+#: indicator-tide.py:296
 msgid "Port"
 msgstr "Порт"
 
-#: indicator-tide.py:275
+#: indicator-tide.py:308
 msgid "Ports"
 msgstr "Порты"
 
-#: indicator-tide.py:286
+#: indicator-tide.py:319
 msgid "Show as submenus"
-msgstr "Отображать в подменю"
+msgstr "Отображать подменю"
 
-#: indicator-tide.py:288
+#: indicator-tide.py:321
 msgid "Show each day's tides in a submenu."
-msgstr "Отображать приливы каждого дня в подменю."
+msgstr "Отображать приливы каждого дня в виде подменю."
 
-#: indicator-tide.py:292
+#: indicator-tide.py:325
 msgid "Except first day"
 msgstr "Кроме первого дня"
 
-#: indicator-tide.py:296
+#: indicator-tide.py:329
 msgid "Show the first day's tide in full."
 msgstr "Отображать приливы первого дня полностью."
 
-#: indicator-tide.py:305
+#: indicator-tide.py:338
 msgid "Date format"
 msgstr "Формат даты"
 
-#: indicator-tide.py:311
+#: indicator-tide.py:344
 msgid ""
-"Formatting options are specified at\n"
-"http://docs.python.org/3/library/datetime.html"
+"Formatting options for the date:\n"
+"\n"
+"    http://docs.python.org/3/library/datetime.html"
 msgstr ""
-"Варианты формата времени описаны на странице\n"
-"http://docs.python.org/3/library/datetime.html"
+"Варианты формата даты:\n"
+"\n"
+"    http://docs.python.org/3/library/datetime.html"
 
-#: indicator-tide.py:321
+#: indicator-tide.py:351
 msgid "Tide format"
-msgstr "Формат данных"
+msgstr "Формат приливных данных"
 
-#: indicator-tide.py:327
+#: indicator-tide.py:360
+msgid "Default"
+msgstr "Формат по умолчанию"
+
+#: indicator-tide.py:366
 msgid ""
 "Tide information is specified using:\n"
 "\n"
 "    [TYPE] - the tide is high or low.\n"
 "    [LEVEL] - the tide level, measured in metres.\n"
 "\n"
-"Formatting options for the time are specified at\n"
-"http://docs.python.org/3/library/datetime.html"
+"Formatting options for the time:\n"
+"\n"
+"    http://docs.python.org/3/library/datetime.html"
 msgstr ""
 "Информация о приливах задаётся с помощью меток:\n"
 "\n"
 "    [TYPE] - тип (прилив или отлив).\n"
 "    [LEVEL] - уровень поверхности воды в метрах.\n"
 "\n"
-"Варианты формата времени описаны на странице\n"
-"http://docs.python.org/3/library/datetime.html"
+"Варианты формата времени:\n"
+"\n"
+"    http://docs.python.org/3/library/datetime.html"
 
-#: indicator-tide.py:336
+#: indicator-tide.py:378
+msgid "Missing time"
+msgstr "Формат данных без времени"
+
+#: indicator-tide.py:384
+msgid ""
+"Tide information is specified using:\n"
+"\n"
+"    [TYPE] - the tide is high or low.\n"
+"    [LEVEL] - the tide level, measured in metres.\n"
+"\n"
+"This format is used when there is no time\n"
+"component in a tide reading"
+msgstr ""
+"Информация о приливах задаётся с помощью меток:\n"
+"\n"
+"    [TYPE] - тип (прилив или отлив).\n"
+"    [LEVEL] - уровень поверхности воды в метрах.\n"
+"\n"
+"Этот формат используется в том случае, если в данных\n"
+"о приливах отсутствует компонент времени."
+
+#: indicator-tide.py:393
 msgid "Autostart"
 msgstr "Автозапуск"
 
-#: indicator-tide.py:338
+#: indicator-tide.py:395
 msgid "Run the indicator automatically."
 msgstr "Запускать индикатор автоматически."
 
-#: indicator-tide.py:342
+#: indicator-tide.py:399
 msgid "General"
 msgstr "Общие"
 
-#: indicator-tide.py:344
+#: indicator-tide.py:401
 msgid "Preferences"
 msgstr "Параметры"
