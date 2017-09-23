@@ -216,6 +216,7 @@ def loadConfig( applicationBaseDirectory, configBaseFile, logging ):
         try:
             with open( configFile ) as f:
                 config = json.load( f )
+
         except Exception as e:
             logging.exception( e )
             logging.error( "Error reading configuration: " + configFile )
@@ -263,6 +264,14 @@ def migrateConfig( applicationName ):
 # configBaseFile: The file name (without extension).
 def _getConfigFile( applicationBaseDirectory, configBaseFile ):
     return _getUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + configBaseFile + JSON_EXTENSION
+
+
+# Obtain the full path to a cache file, creating if necessary the underlying path.
+#
+# applicationBaseDirectory: The directory path used as the final part of the overall path.
+# filename: The file name.
+def getCachePathname( applicationBaseDirectory, filename ):
+    return _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + filename
 
 
 # Read a text file from the cache.
