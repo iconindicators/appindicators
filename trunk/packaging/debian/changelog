@@ -1,3 +1,11 @@
+indicator-tide (1.0.9-1) trusty; urgency=low
+
+  * Bug fix: Handle year changeover when tidal data contains both December and
+    January.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 25 Sep 2017 15:43:02 +1000
+
+
 indicator-tide (1.0.8-1) trusty; urgency=low
 
   * Bug fix: Tidal readings are now displayed based on the date/time:

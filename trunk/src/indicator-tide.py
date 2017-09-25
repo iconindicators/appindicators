@@ -48,7 +48,7 @@ import datetime, json, locale, logging, os, ports, pythonutils, re, threading, t
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.8"
+    VERSION = "1.0.9"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -540,14 +540,14 @@ class IndicatorTide:
                 if "PredictionSummary1_lblPredictionStart" in line:
                     startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time of the port)
                     year = startDate[ 3 ] # 2017
-                    startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
+                    startMonth = str( datetime.datetime.strptime( "March", "%B" ).month ) # 7
 
                 if "HWLWTableHeaderCell" in line:
                     date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # Mon 17 Jul (standard local time)
                     dayOfMonth = date[ 4 : 6 ] # 17
                     month = str( datetime.datetime.strptime( date[ -3 : ], "%b" ).month ) # 7
-                    if month < startMonth: # Take into account tidal data changing from December to January.   #TODO Check for string/int mismatch
-                        year = startYear + 1
+                    if month == "1" and startMonth == "12": # Account for the year change when rolling from December to January.
+                        year = str( int( year ) + 1 )
 
                     types = [ ]
                     line = lines[ index + 2 ]
