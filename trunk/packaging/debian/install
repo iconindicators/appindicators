@@ -1,0 +1,6 @@
+indicator-on-this-day.py.desktop usr/share/applications
+src/changelog usr/share/indicator-on-this-day
+src/indicator-on-this-day.py usr/share/indicator-on-this-day
+src/event.py usr/share/indicator-on-this-day
+src/pythonutils.py usr/share/indicator-on-this-day
+icons/hicolor/indicator-on-this-day.svg usr/share/icons/hicolor/scalable/apps
