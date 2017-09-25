@@ -31,13 +31,6 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 
 
-#TODO Once the name is settled...
-#    Rename all files
-#    Add to repository
-#    Add to AskUbuntu
-#    Add to indicator-ppa-download-statistics
-
-
 INDICATOR_NAME = "indicator-on-this-day"
 import gettext
 gettext.install( INDICATOR_NAME )
