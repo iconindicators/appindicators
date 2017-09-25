@@ -17,176 +17,184 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicator-on-this-day.py:71
+#: indicator-on-this-day.py:56
 msgid "Calls the 'calendar' program and displays events in the menu."
 msgstr ""
 
-#: indicator-on-this-day.py:78
+#: indicator-on-this-day.py:63
 msgid "EVENT"
 msgstr ""
 
-#: indicator-on-this-day.py:121
+#: indicator-on-this-day.py:106
 msgid "On this day..."
 msgstr ""
 
-#: indicator-on-this-day.py:207
+#: indicator-on-this-day.py:192
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-on-this-day.py:208
+#: indicator-on-this-day.py:193
 msgid "View the"
 msgstr ""
 
-#: indicator-on-this-day.py:209
+#: indicator-on-this-day.py:194
 msgid "text file."
 msgstr ""
 
-#: indicator-on-this-day.py:210
+#: indicator-on-this-day.py:195
 msgid "changelog"
 msgstr ""
 
-#: indicator-on-this-day.py:252
+#: indicator-on-this-day.py:237
 msgid "Calendar"
 msgstr ""
 
-#: indicator-on-this-day.py:256 indicator-on-this-day.py:488
+#: indicator-on-this-day.py:241 indicator-on-this-day.py:473
 msgid "Enabled"
 msgstr ""
 
-#: indicator-on-this-day.py:262
+#: indicator-on-this-day.py:247
 msgid "Double click to edit a calendar."
 msgstr ""
 
-#: indicator-on-this-day.py:273
+#: indicator-on-this-day.py:258
 msgid "Add"
 msgstr ""
 
-#: indicator-on-this-day.py:274
+#: indicator-on-this-day.py:259
 msgid "Add a new calendar."
 msgstr ""
 
-#: indicator-on-this-day.py:278
+#: indicator-on-this-day.py:263
 msgid "Remove"
 msgstr ""
 
-#: indicator-on-this-day.py:279
+#: indicator-on-this-day.py:264
 msgid "Remove the selected calendar."
 msgstr ""
 
-#: indicator-on-this-day.py:283
+#: indicator-on-this-day.py:268
 msgid "Reset"
 msgstr ""
 
-#: indicator-on-this-day.py:284
+#: indicator-on-this-day.py:269
 msgid "Reset to factory default."
 msgstr ""
 
-#: indicator-on-this-day.py:291
+#: indicator-on-this-day.py:276
 msgid "Calendars"
 msgstr ""
 
-#: indicator-on-this-day.py:304
+#: indicator-on-this-day.py:289
 msgid "Days"
 msgstr ""
 
-#: indicator-on-this-day.py:309
+#: indicator-on-this-day.py:294
 msgid "The number of days to show from today, from 1 to 366 inclusive."
 msgstr ""
 
-#: indicator-on-this-day.py:315
+#: indicator-on-this-day.py:300
 msgid "On event click"
 msgstr ""
 
-#: indicator-on-this-day.py:320
+#: indicator-on-this-day.py:305
 msgid "Copy event to clipboard"
 msgstr ""
 
-#: indicator-on-this-day.py:321
+#: indicator-on-this-day.py:306
 msgid "Copy the event text and date to the clipboard."
 msgstr ""
 
-#: indicator-on-this-day.py:326
+#: indicator-on-this-day.py:311
 msgid "Search event on the internet"
 msgstr ""
 
-#: indicator-on-this-day.py:327
+#: indicator-on-this-day.py:312
 msgid "Open the default web browser and search for the event."
 msgstr ""
 
-#: indicator-on-this-day.py:336
+#: indicator-on-this-day.py:321
 msgid "URL"
 msgstr ""
 
-#: indicator-on-this-day.py:342
+#: indicator-on-this-day.py:327
+#, python-brace-format
 msgid ""
 "The URL to search for the event.\n"
 "\n"
-"Use "
+"Use {0} in the URL to specify the\n"
+"position of the event text/date.\n"
+"\n"
+"If the URL is empty and 'search' is selected,\n"
+"the search will effectively be ignored.\n"
+"\n"
+"If the URL is empty and 'copy' is selected,\n"
+"the URL is reset back to factory default."
 msgstr ""
 
-#: indicator-on-this-day.py:358
+#: indicator-on-this-day.py:343
 msgid "Notify"
 msgstr ""
 
-#: indicator-on-this-day.py:360
+#: indicator-on-this-day.py:345
 msgid ""
 "On startup or when saving preferences,\n"
 "show a notification for each of today's events."
 msgstr ""
 
-#: indicator-on-this-day.py:366
+#: indicator-on-this-day.py:351
 msgid "Autostart"
 msgstr ""
 
-#: indicator-on-this-day.py:367
+#: indicator-on-this-day.py:352
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-on-this-day.py:372
+#: indicator-on-this-day.py:357
 msgid "General"
 msgstr ""
 
-#: indicator-on-this-day.py:374
+#: indicator-on-this-day.py:359
 msgid "Preferences"
 msgstr ""
 
-#: indicator-on-this-day.py:419
+#: indicator-on-this-day.py:404
 msgid "Reset calendars to factory default?"
 msgstr ""
 
-#: indicator-on-this-day.py:432
+#: indicator-on-this-day.py:417
 msgid "No calendar has been selected."
 msgstr ""
 
-#: indicator-on-this-day.py:434
+#: indicator-on-this-day.py:419
 msgid ""
 "This calendar is part of your system\n"
 "and cannot be removed."
 msgstr ""
 
-#: indicator-on-this-day.py:435
+#: indicator-on-this-day.py:420
 msgid "Remove the selected calendar?"
 msgstr ""
 
-#: indicator-on-this-day.py:460
+#: indicator-on-this-day.py:445
 msgid "Calendar file"
 msgstr ""
 
-#: indicator-on-this-day.py:469
+#: indicator-on-this-day.py:454
 msgid "The path to a calendar file."
 msgstr ""
 
-#: indicator-on-this-day.py:472
+#: indicator-on-this-day.py:457
 msgid "Browse"
 msgstr ""
 
-#: indicator-on-this-day.py:476
+#: indicator-on-this-day.py:461
 msgid ""
 "This calendar is part of your\n"
 "system and cannot be modified."
 msgstr ""
 
-#: indicator-on-this-day.py:480
+#: indicator-on-this-day.py:465
 msgid ""
 "Choose a calendar file.\n"
 "\n"
@@ -195,27 +203,27 @@ msgid ""
 "'calendar' in a terminal."
 msgstr ""
 
-#: indicator-on-this-day.py:497
+#: indicator-on-this-day.py:482
 msgid "Add Calendar"
 msgstr ""
 
-#: indicator-on-this-day.py:499
+#: indicator-on-this-day.py:484
 msgid "Edit Calendar"
 msgstr ""
 
-#: indicator-on-this-day.py:514
+#: indicator-on-this-day.py:499
 msgid "The calendar path cannot be empty."
 msgstr ""
 
-#: indicator-on-this-day.py:519
+#: indicator-on-this-day.py:504
 msgid "The calendar path does not exist."
 msgstr ""
 
-#: indicator-on-this-day.py:535
+#: indicator-on-this-day.py:520
 msgid "Choose a calendar file"
 msgstr ""
 
-#: indicator-on-this-day.py:542
+#: indicator-on-this-day.py:527
 msgid ""
 "The calendar is part of your system\n"
 "and is already included."

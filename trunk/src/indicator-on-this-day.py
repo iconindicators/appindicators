@@ -325,12 +325,12 @@ class IndicatorOnThisDay:
         searchEngineEntry = Gtk.Entry()
         searchEngineEntry.set_tooltip_text( _( 
             "The URL to search for the event.\n\n" + \
-            "Use " + IndicatorOnThisDay.TAG_EVENT + " in the URL to specify the\n" + \
+            "Use {0} in the URL to specify the\n" + \
             "position of the event text/date.\n\n" + \
             "If the URL is empty and 'search' is selected,\n" + \
             "the search will effectively be ignored.\n\n" + \
             "If the URL is empty and 'copy' is selected,\n" + \
-            "the URL is reset back to factory default." ) )
+            "the URL is reset back to factory default." ).format( IndicatorOnThisDay.TAG_EVENT ) )
         searchEngineEntry.set_text( self.searchURL )
         searchEngineEntry.set_sensitive( not self.copyToClipboard )
         box.pack_start( searchEngineEntry, True, True, 0 )
