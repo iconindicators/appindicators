@@ -843,13 +843,14 @@ class IndicatorPPADownloadStatistics:
             self.filters[ 'thebernmeister | ppa' ] = [ 
                 "indicator-fortune",
                 "indicator-lunar",
+                "indicator-on-this-day",
                 "indicator-ppa-download-statistics",
                 "indicator-punycode",
                 "indicator-script-runner",
                 "indicator-stardate",
                 "indicator-tide",
                 "indicator-virtual-box" ]
-#TODO Add final name of indicator-calendar
+
         else:
             ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
             for ppa in ppas:
