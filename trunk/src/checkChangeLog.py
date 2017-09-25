@@ -8,20 +8,23 @@
 from datetime import datetime
 
 
+basePath = "/home/bernard/Programming/"
+changeLogPath = "/packaging/debian/changelog"
 changeLogs = [
-                "/home/bernard/Programming/IndicatorCalendar/packaging/debian/changelog",
-                "/home/bernard/Programming/IndicatorFortune/packaging/debian/changelog",
-                "/home/bernard/Programming/IndicatorLunar/packaging/debian/changelog",
-                "/home/bernard/Programming/IndicatorPPADownloadStatistics/packaging/debian/changelog",
-                "/home/bernard/Programming/IndicatorPunycode/packaging/debian/changelog",
-                "/home/bernard/Programming/IndicatorScriptRunner/packaging/debian/changelog",
-                "/home/bernard/Programming/IndicatorStardate/packaging/debian/changelog",
-                "/home/bernard/Programming/IndicatorTide/packaging/debian/changelog",
-                "/home/bernard/Programming/IndicatorVirtualBox/packaging/debian/changelog"
+                "IndicatorFortune",
+                "IndicatorLunar",
+                "IndicatorOnThisDay",
+                "IndicatorPPADownloadStatistics",
+                "IndicatorPunycode",
+                "IndicatorScriptRunner",
+                "IndicatorStardate",
+                "IndicatorTide",
+                "IndicatorVirtualBox"
               ]
 
 dateTimeFormat = "%a, %d %b %Y %H:%M:%S %z"
 for changeLog in changeLogs:
+    changeLog = basePath + changeLog + changeLogPath
     print( changeLog )
     dates = [ ]
     with open( changeLog ) as f:
