@@ -546,7 +546,7 @@ class IndicatorTide:
                     date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # Mon 17 Jul (standard local time)
                     dayOfMonth = date[ 4 : 6 ] # 17
                     month = str( datetime.datetime.strptime( date[ -3 : ], "%b" ).month ) # 7
-                    if month < startMonth: # Take into account tidal data changing from December to January.
+                    if month < startMonth: # Take into account tidal data changing from December to January.   #TODO Check for string/int mismatch
                         year = startYear + 1
 
                     types = [ ]
@@ -625,7 +625,7 @@ class IndicatorTide:
         if self.tidalReadingsAreAllDateTimes( tidalReadings ):
             todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
             for tidalReading in list( tidalReadings ):
-                if tidalReading.getDateTime().astimezone() < todayLocalMidnight:
+                if tidalReading.getDateTime().astimezone() < todayLocalMidnight: #TODO Check for string/int mismatch
                     tidalReadings.remove( tidalReading )
         else:
             utcMidnightDate = datetime.datetime.utcnow().replace( hour = 0, minute = 0, second = 0 ).date()
@@ -635,7 +635,7 @@ class IndicatorTide:
                 else:
                     theDate = tidalReading.getDateTime()
 
-                if theDate < utcMidnightDate:
+                if theDate < utcMidnightDate: #TODO Check for string/int mismatch
                     tidalReadings.remove( tidalReading )
 
         return tidalReadings
