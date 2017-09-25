@@ -625,7 +625,7 @@ class IndicatorTide:
         if self.tidalReadingsAreAllDateTimes( tidalReadings ):
             todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
             for tidalReading in list( tidalReadings ):
-                if tidalReading.getDateTime().astimezone() < todayLocalMidnight: #TODO Check for string/int mismatch
+                if tidalReading.getDateTime().astimezone() < todayLocalMidnight:
                     tidalReadings.remove( tidalReading )
         else:
             utcMidnightDate = datetime.datetime.utcnow().replace( hour = 0, minute = 0, second = 0 ).date()
@@ -635,7 +635,7 @@ class IndicatorTide:
                 else:
                     theDate = tidalReading.getDateTime()
 
-                if theDate < utcMidnightDate: #TODO Check for string/int mismatch
+                if theDate < utcMidnightDate:
                     tidalReadings.remove( tidalReading )
 
         return tidalReadings
