@@ -47,7 +47,7 @@ import json, logging, os, pythonutils, threading, time, virtualmachine
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.56"
+    VERSION = "1.0.57"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -312,52 +312,53 @@ class IndicatorVirtualBox:
             configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3
 
         virtualMachines = [ ]
-        try:
-            with open( configFile, "r" ) as f:
-                content = f.readlines()
+        if configFile is not None:
+            try:
+                with open( configFile, "r" ) as f:
+                    content = f.readlines()
 
-            # Parse all group definition tags extracting each group name and contents (which may be group names and/or VMs).
-            groupDefinitions = { }
-            for line in content:
-                if "\"GUI/GroupDefinitions/" in line:
-                    parts = line.split( "\"" )
-                    groupDefinitions[ parts[ 1 ] ] = parts[ 3 ]
+                # Parse all group definition tags extracting each group name and contents (which may be group names and/or VMs).
+                groupDefinitions = { }
+                for line in content:
+                    if "\"GUI/GroupDefinitions/" in line:
+                        parts = line.split( "\"" )
+                        groupDefinitions[ parts[ 1 ] ] = parts[ 3 ]
 
-            # Process the top level tag first...
-            i = 0
-            key = "GUI/GroupDefinitions/"
-            if len( groupDefinitions ) > 0 and key in groupDefinitions: 
-                values = groupDefinitions[ key ].split( "," )
-                for value in values:
-                    if value.startswith( "go=" ):
-                        virtualMachines.insert( i, virtualmachine.Info( key + value.replace( "go=", "" ), True, "", 0 ) )
-                    else:
-                        virtualMachines.insert( i, virtualmachine.Info( "", False, value.replace( "m=", "" ), 0 ) )
+                # Process the top level tag first...
+                i = 0
+                key = "GUI/GroupDefinitions/"
+                if len( groupDefinitions ) > 0 and key in groupDefinitions: 
+                    values = groupDefinitions[ key ].split( "," )
+                    for value in values:
+                        if value.startswith( "go=" ):
+                            virtualMachines.insert( i, virtualmachine.Info( key + value.replace( "go=", "" ), True, "", 0 ) )
+                        else:
+                            virtualMachines.insert( i, virtualmachine.Info( "", False, value.replace( "m=", "" ), 0 ) )
+    
+                        i += 1
+
+                # Now have a list of virtual machine infos containing top level groups and/or VMs.
+                # Process the list and where a group is found, add in its children (groups and/or VMs).
+                i = 0
+                while i < len( virtualMachines ):
+                    if virtualMachines[ i ].isGroup():
+                        indent = virtualMachines[ i ].getIndent() + 1
+                        key = virtualMachines[ i ].getName()
+                        values = groupDefinitions[ key ].split( "," )
+                        j = i + 1
+                        for value in values:
+                            if value.startswith( "go=" ):
+                                virtualMachines.insert( j, virtualmachine.Info( key + "/" + value.replace( "go=", "" ), True, "", indent ) )
+                            else:
+                                virtualMachines.insert( j, virtualmachine.Info( "", False, value.replace( "m=", "" ), indent ) )
+
+                            j += 1
 
                     i += 1
 
-            # Now have a list of virtual machine infos containing top level groups and/or VMs.
-            # Process the list and where a group is found, add in its children (groups and/or VMs).
-            i = 0
-            while i < len( virtualMachines ):
-                if virtualMachines[ i ].isGroup():
-                    indent = virtualMachines[ i ].getIndent() + 1
-                    key = virtualMachines[ i ].getName()
-                    values = groupDefinitions[ key ].split( "," )
-                    j = i + 1
-                    for value in values:
-                        if value.startswith( "go=" ):
-                            virtualMachines.insert( j, virtualmachine.Info( key + "/" + value.replace( "go=", "" ), True, "", indent ) )
-                        else:
-                            virtualMachines.insert( j, virtualmachine.Info( "", False, value.replace( "m=", "" ), indent ) )
-
-                        j += 1
-
-                i += 1
-
-        except Exception as e:
-            logging.exception( e )
-            virtualMachines = [ ]
+            except Exception as e:
+                logging.exception( e )
+                virtualMachines = [ ]
 
         return virtualMachines
 

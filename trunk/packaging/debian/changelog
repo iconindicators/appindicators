@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.57-1) trusty; urgency=low
+
+  * Bug fix: An exception occurred when no VirtualBox config file was present.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 30 Sep 2017 16:21:23 +1000
+
+
 indicator-virtual-box (1.0.56-1) trusty; urgency=low
 
   * Support for VirtualBox 4.3/5.x or greater.
