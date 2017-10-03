@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.59-1) trusty; urgency=low
+
+  * Bug fix: Downloading within a PPA ended prematurely.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 3 Oct 2017 20:16:25 +1000
+
+
 indicator-ppa-download-statistics (1.0.58-1) trusty; urgency=low
 
   * Bug fix: When multiple filters were in use, if one filter resulted in no

@@ -53,7 +53,7 @@ import concurrent.futures, json, locale, logging, operator, os, pythonutils, thr
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.58"
+    VERSION = "1.0.59"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -839,7 +839,7 @@ class IndicatorPPADownloadStatistics:
 
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
         if len( config ) == 0:
-            self.ppas.append( PPA( "thebernmeister", "ppa", "artful", "amd64" ) )
+            self.ppas.append( PPA( "thebernmeister", "ppa", "xenial", "amd64" ) )
             self.filters[ 'thebernmeister | ppa' ] = [ 
                 "indicator-fortune",
                 "indicator-lunar",
@@ -931,11 +931,14 @@ class IndicatorPPADownloadStatistics:
                 if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                     break # No point continuing...
 
-            if ppa.getStatus() == PPA.STATUS_OK and len( ppa.getPublishedBinaries() ) == 0: # No error but check for no results...
-                if filters[ 0 ] == "": # No filtering was used for this PPA.
-                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+            if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # No error occurred, so set the final status...
+                if len( ppa.getPublishedBinaries() ) == 0:
+                    if filters[ 0 ] == "": # No filtering was used for this PPA.
+                        ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+                    else:
+                        ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
                 else:
-                    ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+                    ppa.setStatus( PPA.STATUS_OK )
 
         GLib.idle_add( self.buildMenu )
 
@@ -985,9 +988,6 @@ class IndicatorPPADownloadStatistics:
 
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
-
-        if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # If the initial status is still present then all is good.
-            ppa.setStatus( PPA.STATUS_OK )
 
 
 def getDownloadCount( ppa, publishedBinaries, i, executor ):
