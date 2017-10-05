@@ -28,7 +28,7 @@ doStandardBuild()
   addIconsToDebianInstall $2
   addMOToDebianInstall
   buildDeb
-  cleanUp
+#  cleanUp
 }
 
 
@@ -56,28 +56,6 @@ copyTopLevelAndSource()
 # Arguments:
 #   Array of hicolor icons names present in the icons directory.
 #   Array of hicolor colours present across ALL hicolor icons.
-
-
-https://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
-https://developer.gnome.org/icon-theme-spec/
-
-14.04:
-
-/usr/share/icons/hicolor/scalable/apps
-/usr/share/icons/ubuntu-mono-dark/apps/22 
-/usr/share/icons/ubuntu-mono-light/apps/22
-
-
-16.04/17.10:
-
-/usr/share/icons/Adwaita/scalable/apps
-/usr/share/icons/hicolor/scalable/apps
-/usr/share/icons/ubuntu-mono-dark/apps/22
-/usr/share/icons/ubuntu-mono-light/apps/22
-
-Copy to 16/22/24/48
-
-
 copyHicolorCreateThemed()
 {
   local -n _hicolorIcons=$1
@@ -160,6 +138,27 @@ addIconsToDebianInstall()
     done
   done
 }
+
+#https://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
+#https://developer.gnome.org/icon-theme-spec/
+#
+#14.04:
+#
+#/usr/share/icons/hicolor/scalable/apps
+#/usr/share/icons/ubuntu-mono-dark/apps/22 
+#/usr/share/icons/ubuntu-mono-light/apps/22
+#
+#
+#16.04/17.10:
+#
+#/usr/share/icons/Adwaita/scalable/apps
+#/usr/share/icons/hicolor/scalable/apps
+#/usr/share/icons/ubuntu-mono-dark/apps/22
+#/usr/share/icons/ubuntu-mono-light/apps/22
+#
+#Copy to 16/22/24/48
+
+
 
 
 addMOToDebianInstall()
