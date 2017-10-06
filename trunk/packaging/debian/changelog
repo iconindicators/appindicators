@@ -1,6 +1,9 @@
 indicator-virtual-box (1.0.57-1) trusty; urgency=low
 
   * Bug fix: An exception occurred when no VirtualBox config file was present.
+  * Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
+    ubuntu-mono-light would not load due to directories not present in the
+    underlying index.theme file.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 30 Sep 2017 16:21:23 +1000
 
