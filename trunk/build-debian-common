@@ -28,7 +28,7 @@ doStandardBuild()
   addIconsToDebianInstall $2
   addMOToDebianInstall
   buildDeb
-#  cleanUp
+  cleanUp
 }
 
 
@@ -126,6 +126,26 @@ copyDebian()
 
 # Arguments:
 #   Array of hicolor icons names present in the icons directory.
+#
+# Between Ubuntu 12.04 and 16.04, a change occurred in how icons are located.
+# Unsure if it is a bug in earlier versions that was fixed in later versions,
+# or a bug was introduced in later versions.
+#
+# In 12.04/14.04, SVG icons were loaded, regardless if the directories
+# in which they were located were listed or not in the index.theme file.
+# In 16.04 and later, the SVG icons are not located.
+#
+# Ideally, each icon theme would be specifically handled so that icons
+# are placed in directories which exist for that theme.
+#
+# For example, hicolor/Adwaita does not have an apps/22, apps/24, ...
+# and so on but does have scalable/apps directory.  Therefore, icons would
+# be placed only into scalable/apps.
+# For ubuntu-mono-dark/ubuntu-mono-light, the reverse is true.
+#
+# However, to keep functionality simple/generic and not have specific code
+# for each icon theme, place icons in multiple directories to ensure that
+# for a given icon theme, at least one of the directories exists in the index.theme file.
 addIconsToDebianInstall()
 {
   # Update debian/install with icons.
@@ -133,32 +153,25 @@ addIconsToDebianInstall()
 
   for (( i = 0; i < "${#_hicolorIcons[*]}"; i++ )); do
     for (( j = 0; j < ${#themeNames[@]}; j++ )); do
+
       line="icons/${themeNames[ $j ]}/${_hicolorIcons[ $i ]} usr/share/icons/${themeNames[ $j ]}/scalable/apps"
       echo $line >> build/$NAME-$VERSION/debian/install
+
+      line="icons/${themeNames[ $j ]}/${_hicolorIcons[ $i ]} usr/share/icons/${themeNames[ $j ]}/apps/16"
+      echo $line >> build/$NAME-$VERSION/debian/install
+
+      line="icons/${themeNames[ $j ]}/${_hicolorIcons[ $i ]} usr/share/icons/${themeNames[ $j ]}/apps/22"
+      echo $line >> build/$NAME-$VERSION/debian/install
+
+      line="icons/${themeNames[ $j ]}/${_hicolorIcons[ $i ]} usr/share/icons/${themeNames[ $j ]}/apps/24"
+      echo $line >> build/$NAME-$VERSION/debian/install
+
+      line="icons/${themeNames[ $j ]}/${_hicolorIcons[ $i ]} usr/share/icons/${themeNames[ $j ]}/apps/48"
+      echo $line >> build/$NAME-$VERSION/debian/install
+
     done
   done
 }
-
-#https://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
-#https://developer.gnome.org/icon-theme-spec/
-#
-#14.04:
-#
-#/usr/share/icons/hicolor/scalable/apps
-#/usr/share/icons/ubuntu-mono-dark/apps/22 
-#/usr/share/icons/ubuntu-mono-light/apps/22
-#
-#
-#16.04/17.10:
-#
-#/usr/share/icons/Adwaita/scalable/apps
-#/usr/share/icons/hicolor/scalable/apps
-#/usr/share/icons/ubuntu-mono-dark/apps/22
-#/usr/share/icons/ubuntu-mono-light/apps/22
-#
-#Copy to 16/22/24/48
-
-
 
 
 addMOToDebianInstall()
@@ -215,3 +228,5 @@ cleanUp()
 # http://www.debian-administration.org/articles/336
 # http://news.softpedia.com/news/How-to-Repack-Deb-Files-on-Debian-and-Ubuntu-404930.shtml
 # http://blog.packagecloud.io/debian/debuild/packaging/2015/06/08/buildling-deb-packages-with-debuild
+# https://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
+# https://developer.gnome.org/icon-theme-spec/
