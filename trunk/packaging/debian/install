@@ -5,4 +5,12 @@ src/eclipse.py usr/share/indicator-lunar
 src/satellite.py usr/share/indicator-lunar
 src/pythonutils.py usr/share/indicator-lunar
 icons/hicolor/indicator-lunar.svg usr/share/icons/hicolor/scalable/apps
+icons/hicolor/indicator-lunar.svg usr/share/icons/hicolor/apps/16
+icons/hicolor/indicator-lunar.svg usr/share/icons/hicolor/apps/22
+icons/hicolor/indicator-lunar.svg usr/share/icons/hicolor/apps/24
+icons/hicolor/indicator-lunar.svg usr/share/icons/hicolor/apps/48
 icons/hicolor/indicator-lunar-satellite.svg usr/share/icons/hicolor/scalable/apps
+icons/hicolor/indicator-lunar-satellite.svg usr/share/icons/hicolor/apps/16
+icons/hicolor/indicator-lunar-satellite.svg usr/share/icons/hicolor/apps/22
+icons/hicolor/indicator-lunar-satellite.svg usr/share/icons/hicolor/apps/24
+icons/hicolor/indicator-lunar-satellite.svg usr/share/icons/hicolor/apps/48
