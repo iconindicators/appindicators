@@ -5,3 +5,7 @@ src/ports.py usr/share/indicator-tide
 src/tide.py usr/share/indicator-tide
 src/pythonutils.py usr/share/indicator-tide
 icons/hicolor/indicator-tide.svg usr/share/icons/hicolor/scalable/apps
+icons/hicolor/indicator-tide.svg usr/share/icons/hicolor/apps/16
+icons/hicolor/indicator-tide.svg usr/share/icons/hicolor/apps/22
+icons/hicolor/indicator-tide.svg usr/share/icons/hicolor/apps/24
+icons/hicolor/indicator-tide.svg usr/share/icons/hicolor/apps/48

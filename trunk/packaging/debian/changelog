@@ -1,3 +1,12 @@
+indicator-tide (1.0.10-1) trusty; urgency=low
+
+  * Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
+    ubuntu-mono-light would not load due to directories not present in the
+    underlying index.theme file.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 6 Oct 2017 12:37:10 +1000
+
+
 indicator-tide (1.0.9-1) trusty; urgency=low
 
   * Bug fix: Handle year changeover when tidal data contains both December and
