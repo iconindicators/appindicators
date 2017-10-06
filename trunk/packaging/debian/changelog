@@ -1,3 +1,12 @@
+indicator-fortune (1.0.27-1) trusty; urgency=low
+
+  * Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
+    ubuntu-mono-light would not load due to directories not present in the
+    underlying index.theme file.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 6 Oct 2017 11:52:57 +1000
+
+
 indicator-fortune (1.0.26-1) trusty; urgency=low
 
   * Bug fix: Reset in Preferences did not actually reset!
