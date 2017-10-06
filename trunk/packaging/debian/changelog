@@ -4,7 +4,7 @@ indicator-on-this-day (1.0.1-1) trusty; urgency=low
     ubuntu-mono-light would not load due to directories not present in the
     underlying index.theme file.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 6 Sep 2017 12:06:52 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 6 Oct 2017 12:06:52 +1000
 
 
 indicator-on-this-day (1.0.0-1) trusty; urgency=low
