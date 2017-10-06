@@ -1,3 +1,12 @@
+indicator-script-runner (1.0.4-1) trusty; urgency=low
+
+  * Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
+    ubuntu-mono-light would not load due to directories not present in the
+    underlying index.theme file.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 6 Oct 2017 12:19:16 +1000
+
+
 indicator-script-runner (1.0.3-1) trusty; urgency=low
 
   * Bug fix: Updates we're being called twice!
