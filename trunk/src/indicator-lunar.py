@@ -1867,7 +1867,6 @@ class IndicatorLunar:
             logging.error( "Error writing: " + svgFilename )
 
 
-
     def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
