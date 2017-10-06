@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-punycode 1.0.4\n"
+"Project-Id-Version: indicator-punycode 1.0.5\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2017-06-25 14:33+1000\n"
 "PO-Revision-Date: 2017-07-07 15:38+0300\n"
