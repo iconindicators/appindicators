@@ -5,3 +5,7 @@ src/indicator-stardate.py usr/share/indicator-stardate
 src/stardate.py usr/share/indicator-stardate
 src/pythonutils.py usr/share/indicator-stardate
 icons/hicolor/indicator-stardate.svg usr/share/icons/hicolor/scalable/apps
+icons/hicolor/indicator-stardate.svg usr/share/icons/hicolor/apps/16
+icons/hicolor/indicator-stardate.svg usr/share/icons/hicolor/apps/22
+icons/hicolor/indicator-stardate.svg usr/share/icons/hicolor/apps/24
+icons/hicolor/indicator-stardate.svg usr/share/icons/hicolor/apps/48

@@ -1,3 +1,12 @@
+indicator-stardate (1.0.35-1) trusty; urgency=low
+
+  * Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
+    ubuntu-mono-light would not load due to directories not present in the
+    underlying index.theme file.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 6 Oct 2017 12:23:22 +1000
+
+
 indicator-stardate (1.0.34-1) trusty; urgency=low
 
   * Bug fix: Underlying Stardate API incorrectly converted from '2009 revised'
