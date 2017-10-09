@@ -101,6 +101,7 @@ class IndicatorLunar:
     CONFIG_PLANETS = "planets"
     CONFIG_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
     CONFIG_SATELLITE_NOTIFICATION_SUMMARY = "satelliteNotificationSummary"
+    CONFIG_SATELLITE_NOTIFICATION_TIME_FORMAT = "satelliteNotificationTimeFormat"
     CONFIG_SATELLITE_TLE_URL = "satelliteTLEURL"
     CONFIG_SATELLITES = "satellites"
     CONFIG_SATELLITES_ADD_NEW = "satellitesAddNew"
@@ -910,7 +911,7 @@ class IndicatorLunar:
     MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
-    # Used to tell the function which gets and formats data to format in a different manner for a different source.
+    # Data is displayed using a default format, but when an alternate format is required, specify using a source below.
     SOURCE_SATELLITE_NOTIFICATION = 0
 
 
@@ -1130,7 +1131,8 @@ class IndicatorLunar:
                       replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
                       replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, self.getDisplayData( key + ( IndicatorLunar.DATA_VISIBLE, ) ) )
 
-            Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+#             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+#TODO Uncomment
 
 
     def updateMoonMenu( self, menu ):
@@ -1599,7 +1601,7 @@ class IndicatorLunar:
                 if source is None:
                     displayData = self.getLocalDateTime( self.data[ key ] )
                 elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
-                    displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
+                    displayData = self.getLocalDateTime( self.data[ key ], self.satelliteNotificationTimeFormat )
 
         elif key[ 2 ] == IndicatorLunar.DATA_DECLINATION:
             dec = self.data[ key ]
@@ -1700,8 +1702,8 @@ class IndicatorLunar:
         localDateTime = datetime.datetime.fromtimestamp( timestamp )
         localDateTime.replace( microsecond = utcDateTime.microsecond )
         localDateTimeString = str( localDateTime )
-        if formatString is not None and formatString == IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS:
-            localDateTimeString = localDateTime.strftime( IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
+        if formatString is not None:
+            localDateTimeString = localDateTime.strftime( formatString )
 
         return localDateTimeString
 
@@ -1725,8 +1727,8 @@ class IndicatorLunar:
     def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
 
 
-    # Have found (very seldom) that a date/time may be generated from the pyephem backend with the .%f component
-    # which may mean the value is zero but pyephem dropped it.
+    # Have found (very seldom) that a date/time may be generated from the pyephem backend
+    # with the .%f component which may mean the value is zero but pyephem dropped it.
     # However this means the format does not match and parsing into a DateTime object fails.
     # So pre-check for .%f and if missing, add in ".0" to keep the parsing happy.
     def toDateTime( self, dateTimeAsString ):
@@ -3457,9 +3459,9 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, self.satelliteNotificationTimeFormat ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, self.satelliteNotificationTimeFormat ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
 
             message = message. \
@@ -3467,9 +3469,9 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, self.satelliteNotificationTimeFormat ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, self.satelliteNotificationTimeFormat ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
 
         if summary == "":
@@ -3640,6 +3642,7 @@ class IndicatorLunar:
 
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
         self.satelliteNotificationSummary = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT
+        self.satelliteNotificationTimeFormat = IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS
         self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
         self.satellites = [ ]
         self.satellitesAddNew = False
@@ -3680,6 +3683,7 @@ class IndicatorLunar:
         self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, self.planets )
         self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
         self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
+        self.satelliteNotificationTimeFormat = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_TIME_FORMAT, self.satelliteNotificationTimeFormat )
         self.satelliteTLEURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL )
 
         self.satellites = config.get( IndicatorLunar.CONFIG_SATELLITES, self.satellites )
@@ -3728,6 +3732,7 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_PLANETS: self.planets,
             IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
             IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,
+            IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_TIME_FORMAT: self.satelliteNotificationTimeFormat,
             IndicatorLunar.CONFIG_SATELLITE_TLE_URL: self.satelliteTLEURL,
             IndicatorLunar.CONFIG_SATELLITES: satellites,
             IndicatorLunar.CONFIG_SATELLITES_ADD_NEW: self.satellitesAddNew,
