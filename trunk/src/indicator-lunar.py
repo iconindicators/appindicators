@@ -1133,8 +1133,7 @@ class IndicatorLunar:
                       replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
                       replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, self.getDisplayData( key + ( IndicatorLunar.DATA_VISIBLE, ) ) )
 
-#             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
-#TODO Uncomment
+            Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
 
     def updateMoonMenu( self, menu ):
@@ -2563,6 +2562,19 @@ class IndicatorLunar:
         grid.attach( groupStarsByConstellationCheckbox, 0, 5, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.pack_start( Gtk.Label( _( "Date/time format" ) ), False, False, 0 )
+
+        dateTimeFormatEntry = Gtk.Entry()
+        dateTimeFormatEntry.set_text( self.dateTimeFormat )
+        dateTimeFormatEntry.set_hexpand( True )
+        dateTimeFormatEntry.set_tooltip_text( _( 
+            "Specify the format of attributes containing a date/time.\n\n" + \
+            "Refer to http://docs.python.org/3/library/datetime.html" ) )
+        box.pack_start( dateTimeFormatEntry, True, True, 0 )
+
+        grid.attach( box, 0, 6, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label( _( "Hide comets greater than magnitude" ) ), False, False, 0 )
@@ -2578,7 +2590,7 @@ class IndicatorLunar:
 
         box.pack_start( spinnerCometMagnitude, False, False, 0 )
 
-        grid.attach( box, 0, 6, 1, 1 )
+        grid.attach( box, 0, 7, 1, 1 )
 
         cometsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new comets" ) )
         cometsAddNewCheckbox.set_margin_top( 10 )
@@ -2586,7 +2598,7 @@ class IndicatorLunar:
         cometsAddNewCheckbox.set_tooltip_text( _(
             "If checked, all comets are added\n" + \
             "to the list of checked comets." ) )
-        grid.attach( cometsAddNewCheckbox, 0, 7, 1, 1 )
+        grid.attach( cometsAddNewCheckbox, 0, 8, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
@@ -2597,7 +2609,7 @@ class IndicatorLunar:
             "Otherwise satellites are sorted\n" + \
             "by Name, Number and then\n" + \
             "International Designator." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 8, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 9, 1, 1 )
 
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( _( "Hide satellites which have no upcoming visible pass" ) )
         hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 10 )
@@ -2606,7 +2618,7 @@ class IndicatorLunar:
             "If checked, only satellites with an\n" + \
             "upcoming visible pass are displayed.\n\n" + \
             "Otherwise all passes are shown." ) )
-        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 9, 1, 1 )
+        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 10, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
@@ -2614,7 +2626,7 @@ class IndicatorLunar:
         satellitesAddNewCheckbox.set_tooltip_text( _( 
             "If checked all satellites are added\n" + \
             "to the list of checked satellites." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 10, 1, 1 )
+        grid.attach( satellitesAddNewCheckbox, 0, 11, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -2948,15 +2960,32 @@ class IndicatorLunar:
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, scrolledWindow )
 
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+
+        label = Gtk.Label( _( "Time format" ) )
+        label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
+        box.pack_start( label, False, False, 0 )
+
+        satelliteNotificationTimeFormatEntry = Gtk.Entry()
+        satelliteNotificationTimeFormatEntry.set_text( self.satelliteNotificationTimeFormat )
+        satelliteNotificationTimeFormatEntry.set_hexpand( True )
+        satelliteNotificationTimeFormatEntry.set_tooltip_text( _( 
+            "Specify the format of the rise/set time.\n\n" + \
+            "Refer to http://docs.python.org/3/library/datetime.html" ) )
+        box.pack_start( satelliteNotificationTimeFormatEntry, True, True, 0 )
+
+        grid.attach( box, 0, 3, 1, 1 )
+
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        test.connect( "clicked", self.onTestNotificationClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, False )
+        test.connect( "clicked", self.onTestNotificationClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, satelliteNotificationTimeFormatEntry, False )
         test.set_tooltip_text( _(
             "Show the notification bubble.\n" + \
             "Tags will be substituted with\n" + \
             "mock text." ) )
-        grid.attach( test, 0, 3, 1, 1 )
+        grid.attach( test, 0, 4, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
@@ -2965,7 +2994,7 @@ class IndicatorLunar:
         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
         showWerewolfWarningCheckbox.set_tooltip_text( _(
             "Hourly screen notification leading up to full moon." ) )
-        grid.attach( showWerewolfWarningCheckbox, 0, 4, 1, 1 )
+        grid.attach( showWerewolfWarningCheckbox, 0, 5, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
@@ -2983,7 +3012,7 @@ class IndicatorLunar:
         spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         box.pack_start( spinner, False, False, 0 )
 
-        grid.attach( box, 0, 5, 1, 1 )
+        grid.attach( box, 0, 6, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, spinner )
 
@@ -3000,7 +3029,7 @@ class IndicatorLunar:
         werewolfNotificationSummaryText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         box.pack_start( werewolfNotificationSummaryText, True, True, 0 )
 
-        grid.attach( box, 0, 6, 1, 1 )
+        grid.attach( box, 0, 7, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationSummaryText )
 
@@ -3024,16 +3053,16 @@ class IndicatorLunar:
 
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        grid.attach( box, 0, 7, 1, 1 )
+        grid.attach( box, 0, 8, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationMessageText )
 
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        test.connect( "clicked", self.onTestNotificationClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, True )
+        test.connect( "clicked", self.onTestNotificationClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, None, True )
         test.set_tooltip_text( _( "Show the notification using the current summary/message." ) )
-        grid.attach( test, 0, 8, 1, 1 )
+        grid.attach( test, 0, 9, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
@@ -3152,6 +3181,8 @@ class IndicatorLunar:
                 continue
 
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text().strip() )
+            self.dateTimeFormat = dateTimeFormatEntry.get_text().strip()
+            self.satelliteNotificationTimeFormat = satelliteNotificationTimeFormatEntry.get_text().strip()
             self.showMoon = showMoonCheckbox.get_active()
             self.showSun = showSunCheckbox.get_active()
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
@@ -3441,7 +3472,7 @@ class IndicatorLunar:
                 self.onCometStarSatelliteToggled( widget, row, dataStore, sortStore, astronomicalBodyType )
 
 
-    def onTestNotificationClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
+    def onTestNotificationClicked( self, button, summaryEntry, messageTextView, satelliteNotificationTimeFormatEntry, isFullMoon ):
         summary = summaryEntry.get_text()
         message = pythonutils.getTextViewText( messageTextView )
 
@@ -3459,9 +3490,9 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, self.satelliteNotificationTimeFormat ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, satelliteNotificationTimeFormatEntry.get_text().strip() ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, self.satelliteNotificationTimeFormat ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, satelliteNotificationTimeFormatEntry.get_text().strip() ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
 
             message = message. \
@@ -3469,9 +3500,9 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, self.satelliteNotificationTimeFormat ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, satelliteNotificationTimeFormatEntry.get_text().strip() ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, self.satelliteNotificationTimeFormat ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, satelliteNotificationTimeFormatEntry.get_text().strip() ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
 
         if summary == "":

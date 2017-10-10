@@ -3,6 +3,7 @@ indicator-lunar (1.0.75-1) trusty; urgency=low
   * Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
     ubuntu-mono-light would not load due to directories not present in the
     underlying index.theme file.
+  * Added options to specify the date/time format for attributes.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 6 Oct 2017 12:43:15 +1000
 
