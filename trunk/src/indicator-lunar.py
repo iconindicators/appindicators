@@ -81,6 +81,7 @@ class IndicatorLunar:
 
     DATE_TIME_FORMAT_HHcolonMMcolonSS = "%H:%M:%S"
     DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT = "%Y-%m-%d %H:%M:%S.%f"
 
     DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
@@ -95,6 +96,7 @@ class IndicatorLunar:
     CONFIG_COMETS_ADD_NEW = "cometsAddNew"
     CONFIG_COMETS_MAGNITUDE = "cometsMagnitude"
     CONFIG_HIDE_BODY_IF_NEVER_UP = "hideBodyIfNeverUp"
+    CONFIG_DATE_TIME_FORMAT = "dateTimeFormat"
     CONFIG_INDICATOR_TEXT = "indicatorText"
     CONFIG_GROUP_STARS_BY_CONSTELLATION = "groupStarsByConstellation"
     CONFIG_HIDE_SATELLITE_IF_NO_VISIBLE_PASS = "hideSatelliteIfNoVisiblePass"
@@ -1599,7 +1601,7 @@ class IndicatorLunar:
              key[ 2 ] == IndicatorLunar.DATA_SOLSTICE or \
              key[ 2 ] == IndicatorLunar.DATA_THIRD_QUARTER:
                 if source is None:
-                    displayData = self.getLocalDateTime( self.data[ key ] )
+                    displayData = self.getLocalDateTime( self.data[ key ], self.dateTimeFormat )
                 elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
                     displayData = self.getLocalDateTime( self.data[ key ], self.satelliteNotificationTimeFormat )
 
@@ -1695,15 +1697,13 @@ class IndicatorLunar:
         return displayData # Returning None is not good but better to let it crash and find out about it than hide the problem.
 
 
-    # Converts a UTC datetime string in the format 2015-05-11 22:51:42.429093 to local datetime string.
-    def getLocalDateTime( self, utcDateTimeString, formatString = None ):
+    # Converts a UTC datetime string in the format given to local datetime string.
+    def getLocalDateTime( self, utcDateTimeString, formatString ):
         utcDateTime = self.toDateTime( utcDateTimeString )
         timestamp = calendar.timegm( utcDateTime.timetuple() )
         localDateTime = datetime.datetime.fromtimestamp( timestamp )
         localDateTime.replace( microsecond = utcDateTime.microsecond )
-        localDateTimeString = str( localDateTime )
-        if formatString is not None:
-            localDateTimeString = localDateTime.strftime( formatString )
+        localDateTimeString = localDateTime.strftime( formatString )
 
         return localDateTimeString
 
@@ -1727,11 +1727,11 @@ class IndicatorLunar:
     def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
 
 
-    # Have found (very seldom) that a date/time may be generated from the pyephem backend
-    # with the .%f component which may mean the value is zero but pyephem dropped it.
-    # However this means the format does not match and parsing into a DateTime object fails.
-    # So pre-check for .%f and if missing, add in ".0" to keep the parsing happy.
     def toDateTime( self, dateTimeAsString ):
+        # Have found (very seldom) that a date/time may be generated from the pyephem backend
+        # with the .%f component which may mean the value is zero but pyephem dropped it.
+        # However this means the format does not match and parsing into a DateTime object fails.
+        # So pre-check for .%f and if missing, add in ".0" to keep the parsing happy.
         s = dateTimeAsString
         if re.search( r"\.\d+$", s ) is None:
             s += ".0"
@@ -3626,6 +3626,7 @@ class IndicatorLunar:
     def loadConfig( self ):
         self.getDefaultCity()
 
+        self.dateTimeFormat = IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS
         self.groupStarsByConstellation = False
         self.hideBodyIfNeverUp = True
         self.hideSatelliteIfNoVisiblePass = True
@@ -3672,6 +3673,7 @@ class IndicatorLunar:
         self.cityName = config.get( IndicatorLunar.CONFIG_CITY_NAME, self.cityName )
         _city_data[ self.cityName ] = ( str( cityLatitude ), str( cityLongitude ), float( cityElevation ) ) # Insert/overwrite the cityName and information into the cities.
 
+        self.dateTimeFormat = config.get( IndicatorLunar.CONFIG_DATE_TIME_FORMAT, self.dateTimeFormat )
         self.groupStarsByConstellation = config.get( IndicatorLunar.CONFIG_GROUP_STARS_BY_CONSTELLATION, self.groupStarsByConstellation )
         self.hideBodyIfNeverUp = config.get( IndicatorLunar.CONFIG_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
         self.hideSatelliteIfNoVisiblePass = config.get( IndicatorLunar.CONFIG_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
@@ -3721,6 +3723,7 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_CITY_LATITUDE: _city_data.get( self.cityName )[ 0 ],
             IndicatorLunar.CONFIG_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
             IndicatorLunar.CONFIG_CITY_NAME: self.cityName,
+            IndicatorLunar.CONFIG_DATE_TIME_FORMAT: self.dateTimeFormat,
             IndicatorLunar.CONFIG_GROUP_STARS_BY_CONSTELLATION: self.groupStarsByConstellation,
             IndicatorLunar.CONFIG_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
             IndicatorLunar.CONFIG_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
