@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pythonutils 1.0.0\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-07-02 13:21+1000\n"
-"PO-Revision-Date: 2017-07-04 16:41+0300\n"
+"POT-Creation-Date: 2017-09-14 20:12+1000\n"
+"PO-Revision-Date: 2017-09-14 18:41+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -18,14 +18,14 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: pythonutils.py:127
+#: pythonutils.py:135
 msgid "Preferences"
 msgstr "Параметры"
 
-#: pythonutils.py:131
+#: pythonutils.py:139
 msgid "About"
 msgstr "О программе"
 
-#: pythonutils.py:135
+#: pythonutils.py:143
 msgid "Quit"
 msgstr "Выход"
