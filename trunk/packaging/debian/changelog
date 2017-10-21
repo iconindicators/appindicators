@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.60-1) trusty; urgency=low
+
+  * Added Czech translation.  Thanks to Pavel Rehak.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 21 Oct 2017 19:54:16 +1000
+
+
 indicator-ppa-download-statistics (1.0.59-1) trusty; urgency=low
 
   * Bug fix: Downloading within a PPA ended prematurely.
@@ -127,8 +134,8 @@ indicator-ppa-download-statistics (1.0.47-1) precise; urgency=low
 indicator-ppa-download-statistics (1.0.46-1) precise; urgency=low
 
   * Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental
-    in this miracle! 
-  * Added Russian translation.  Thanks to Oleg Moiseichuk. 
+    in this miracle!
+  * Added Russian translation.  Thanks to Oleg Moiseichuk.
   * About dialog changed to accept translator information.
   * Overhaul of repository structure and build script.
 
