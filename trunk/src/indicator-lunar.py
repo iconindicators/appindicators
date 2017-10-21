@@ -58,7 +58,7 @@ class AstronomicalBodyType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star,
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.75"
+    VERSION = "1.0.76"
     ICON = INDICATOR_NAME
     ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
     ICON_BASE_PATH = tempfile.gettempdir()
@@ -3180,7 +3180,7 @@ class IndicatorLunar:
                 elevation.grab_focus()
                 continue
 
-            self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text().strip() )
+            self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.dateTimeFormat = dateTimeFormatEntry.get_text().strip()
             self.satelliteNotificationTimeFormat = satelliteNotificationTimeFormatEntry.get_text().strip()
             self.showMoon = showMoonCheckbox.get_active()
