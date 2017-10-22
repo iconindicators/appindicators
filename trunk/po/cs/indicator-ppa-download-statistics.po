@@ -15,7 +15,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.7.1\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: indicator-ppa-download-statistics.py:61
@@ -312,11 +311,3 @@ msgstr "Zadejte prosím text filtru!"
 #: indicator-ppa-download-statistics.py:942
 msgid "Statistics downloaded!"
 msgstr "Statistiky staženy!"
-
-#: pythonutils.py:139
-msgid "About"
-msgstr "O aplikaci"
-
-#: pythonutils.py:143
-msgid "Quit"
-msgstr "Ukončit"
