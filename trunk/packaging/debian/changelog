@@ -1,3 +1,10 @@
+indicator-tide (1.0.11-1) trusty; urgency=low
+
+  * Updated Russian translation.  Thanks to Oleg Moiseichuk.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Oct 2017 23:57:24 +1000
+
+
 indicator-tide (1.0.10-1) trusty; urgency=low
 
   * Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
