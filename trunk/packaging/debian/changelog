@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.58-1) trusty; urgency=low
+
+  * Updated Russian translation.  Thanks to Oleg Moiseichuk.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Oct 2017 23:53:26 +1000
+
+
 indicator-virtual-box (1.0.57-1) trusty; urgency=low
 
   * Bug fix: An exception occurred when no VirtualBox config file was present.
