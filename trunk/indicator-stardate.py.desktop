@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Stardate Indicator
+Name[ru]=Индикатор звёздной даты
 Icon=indicator-stardate
 Exec=/usr/share/indicator-stardate/indicator-stardate.py
 Categories=Utility;Amusement;
