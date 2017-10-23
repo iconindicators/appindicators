@@ -5,3 +5,4 @@ Icon=indicator-ppa-download-statistics
 Exec=/usr/share/indicator-ppa-download-statistics/indicator-ppa-download-statistics.py
 Categories=Utility;
 X-GNOME-Autostart-enabled=true
+Name[cs]=PPA indikátor statisktik stahování
