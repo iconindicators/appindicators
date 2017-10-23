@@ -1,6 +1,7 @@
 indicator-ppa-download-statistics (1.0.60-1) trusty; urgency=low
 
   * Added Czech translation.  Thanks to Pavel Rehak.
+  * Updated Russian translation.  Thanks to Oleg Moiseichuk.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 21 Oct 2017 19:54:16 +1000
 
