@@ -60,7 +60,7 @@ class IndicatorPPADownloadStatistics:
     WEBSITE = "https://launchpad.net/~thebernmeister"
     COMMENTS = _( "Display the total downloads of PPAs." )
 
-    SERIES = [ "artful", "zesty",
+    SERIES = [ "bionic", "artful", "zesty",
               "yakkety", "xenial", "wily", "vivid", "utopic",
               "trusty", "saucy", "raring", "quantal", "precise",
               "oneiric", "natty", "maverick", "lucid", "karmic",

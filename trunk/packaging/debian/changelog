@@ -1,5 +1,6 @@
 indicator-ppa-download-statistics (1.0.60-1) trusty; urgency=low
 
+  * Added bionic to the list of series.
   * Added Czech translation.  Thanks to Pavel Rehak.
   * Updated Russian translation.  Thanks to Oleg Moiseichuk.
 
