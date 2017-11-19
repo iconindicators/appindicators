@@ -53,7 +53,7 @@ import concurrent.futures, json, locale, logging, operator, os, pythonutils, thr
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.60"
+    VERSION = "1.0.61"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -982,9 +982,7 @@ class IndicatorPPADownloadStatistics:
 
             maxWorkers = 10 if totalPublishedBinaries < 10 else 5 # If the total is fewer than 10, grab all in one batch, otherwise limit to 5 concurrent requests.
             with concurrent.futures.ThreadPoolExecutor( max_workers = maxWorkers ) as executor:
-                results = { executor.submit( getDownloadCount, ppa, publishedBinaries, i, executor ): i for i in range( numberPublishedBinariesCurrentPage ) }
-                for result in concurrent.futures.as_completed( results ):
-                    pass
+                { executor.submit( getDownloadCount, ppa, publishedBinaries, i, executor ): i for i in range( numberPublishedBinariesCurrentPage ) }
 
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
