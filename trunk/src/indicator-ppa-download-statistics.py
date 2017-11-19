@@ -982,13 +982,13 @@ class IndicatorPPADownloadStatistics:
 
             maxWorkers = 10 if totalPublishedBinaries < 10 else 5 # If the total is fewer than 10, grab all in one batch, otherwise limit to 5 concurrent requests.
             with concurrent.futures.ThreadPoolExecutor( max_workers = maxWorkers ) as executor:
-                { executor.submit( getDownloadCount, ppa, publishedBinaries, i, executor ): i for i in range( numberPublishedBinariesCurrentPage ) }
+                { executor.submit( getDownloadCount, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
 
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
 
 
-def getDownloadCount( ppa, publishedBinaries, i, executor ):
+def getDownloadCount( ppa, publishedBinaries, i ):
     if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # Use the status to cancel downloads if an error occurred.
         try:
             indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
