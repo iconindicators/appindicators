@@ -46,7 +46,7 @@ import copy, json, logging, os, pythonutils, threading
 class IndicatorScriptRunner:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.4"
+    VERSION = "1.0.5"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -448,7 +448,7 @@ class IndicatorScriptRunner:
                 "The group to which the script belongs.\n\n" + \
                 "Choose an existing group or enter a new one." ) )
 
-            groups = sorted( self.getScriptsByGroup( scripts ) )
+            groups = sorted( self.getScriptsByGroup( scripts ).keys(), key = str.lower )
             for group in groups:
                 scriptGroupCombo.append_text( group )
 
@@ -565,7 +565,7 @@ class IndicatorScriptRunner:
             "The group to which the script belongs.\n\n" + \
             "Choose an existing group or enter a new one." ) )
 
-        groups = sorted( self.getScriptsByGroup( scripts ) )
+        groups = sorted( self.getScriptsByGroup( scripts ).keys(), key = str.lower )
         for group in groups:
             scriptGroupCombo.append_text( group )
 

@@ -1,3 +1,12 @@
+indicator-script-runner (1.0.5-1) trusty; urgency=low
+
+  * Bug fix: Script group names were not being sorted case insensitively,
+    resulting in incorrect script group indexes being selected in the
+    Preferences.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 20 Jan 2018 18:04:22 +1000
+
+
 indicator-script-runner (1.0.4-1) trusty; urgency=low
 
   * Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
