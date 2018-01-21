@@ -348,7 +348,7 @@ class IndicatorScriptRunner:
 
         scriptGroupComboBox.connect( "changed", self.onScriptGroup, copyOfScripts, scriptNameListStore, scriptNameTreeView )
         scriptNameTreeView.get_selection().connect( "changed", self.onScriptName, scriptGroupComboBox, directoryEntry, commandTextView, copyOfScripts )
-        self.populateScriptGroupCombo( copyOfScripts, scriptGroupComboBox, scriptNameTreeView, "", "" )
+        self.populateScriptGroupCombo( copyOfScripts, scriptGroupComboBox, scriptNameTreeView, None, None )
 
         dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -379,6 +379,7 @@ class IndicatorScriptRunner:
 
 
     def onScriptGroup( self, scriptGroupComboBox, scripts, scriptNameListStore, scriptNameTreeView ):
+        print( "onScriptGroup")#TODO Remove
         scriptGroup = scriptGroupComboBox.get_active_text()
         scriptNameListStore.clear()
 
@@ -520,7 +521,7 @@ class IndicatorScriptRunner:
                 for script in scripts:
                     if script.getGroup() == scriptGroup and script.getName() == scriptName:
                         del scripts[ i ]
-                        self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, "" )
+                        self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, "" ) #TODO Fix!
                         if len( scripts ) == 0:
                             directoryEntry.set_text( "" )
                             commandTextView.get_buffer().set_text( "" )
@@ -751,29 +752,31 @@ class IndicatorScriptRunner:
         return theScript
 
 
-    def populateScriptGroupCombo( self, scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, scriptName ): # Script group/name must be valid values or "".
+# Script group/name must be valid values or "".
+    def populateScriptGroupCombo( self, scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, scriptName ): 
+        print( "populateScriptGroupCombo")#TODO Remove
         scriptGroupComboBox.remove_all()
-        for name in sorted( self.getScriptsByGroup( scripts ), key = str.lower ):
-            scriptGroupComboBox.append_text( name )
+        groups = sorted( self.getScriptsByGroup( scripts ), key = str.lower )
+        for group in groups:
+            scriptGroupComboBox.append_text( group )
 
-        if scriptGroup == "":
-            scriptGroup = self.scriptGroupDefault
-            scriptName = self.scriptNameDefault
-
-        try:
-            i = sorted( self.getScriptsByGroup( scripts ), key = str.lower ).index( scriptGroup )
-            scriptGroupComboBox.set_active( i )
-
-            scriptNames = [ ]
-            for script in scripts:
-                if script.getGroup() == scriptGroup:
-                    scriptNames.append( script.getName() )
-
-            scriptNames = sorted( scriptNames, key = str.lower )
-            scriptNameTreeView.get_selection().select_path( scriptNames.index( scriptName ) )
-
-        except ValueError: # Triggered when the last script (of a given group) is removed or when there is no default script.
+        if scriptGroup is None:
             scriptGroupComboBox.set_active( 0 )
+            scriptNameTreeView.get_selection().select_path( 0 ) #TODO Test with deleting all scripts in a group.
+        else:
+            groups = sorted( self.getScriptsByGroup( scripts ), key = str.lower )
+            scriptGroupComboBox.set_active( groups.index( scriptGroup ) )
+
+            if scriptName is None:
+                scriptNameTreeView.get_selection().select_path( 0 )
+            else:
+                scriptNames = [ ]
+                for script in scripts:
+                    if script.getGroup() == scriptGroup:
+                        scriptNames.append( script.getName() )
+
+                scriptNames = sorted( scriptNames, key = str.lower )
+                scriptNameTreeView.get_selection().select_path( scriptNames.index( scriptName ) )
 
 
     def getScriptsByGroup( self, scripts ):
