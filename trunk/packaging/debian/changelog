@@ -1,3 +1,12 @@
+indicator-script-runner (1.0.6-1) trusty; urgency=low
+
+  * When a script was removed, the next script selected would be from the
+    first script of the first group, rather than the first script of the same
+    group, causing confusion when deleting multiple scripts.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 22 Jan 2018 14:47:10 +1000
+
+
 indicator-script-runner (1.0.5-1) trusty; urgency=low
 
   * Bug fix: Script group names were not being sorted case insensitively,

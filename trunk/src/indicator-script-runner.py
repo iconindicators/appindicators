@@ -46,7 +46,7 @@ import copy, json, logging, os, pythonutils, threading
 class IndicatorScriptRunner:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.5"
+    VERSION = "1.0.6"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -379,7 +379,6 @@ class IndicatorScriptRunner:
 
 
     def onScriptGroup( self, scriptGroupComboBox, scripts, scriptNameListStore, scriptNameTreeView ):
-        print( "onScriptGroup")#TODO Remove
         scriptGroup = scriptGroupComboBox.get_active_text()
         scriptNameListStore.clear()
 
@@ -521,7 +520,10 @@ class IndicatorScriptRunner:
                 for script in scripts:
                     if script.getGroup() == scriptGroup and script.getName() == scriptName:
                         del scripts[ i ]
-                        self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, "" ) #TODO Fix!
+                        if scriptGroup not in self.getScriptsByGroup( scripts ):
+                            scriptGroup = None
+
+                        self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, None )
                         if len( scripts ) == 0:
                             directoryEntry.set_text( "" )
                             commandTextView.get_buffer().set_text( "" )
@@ -752,31 +754,32 @@ class IndicatorScriptRunner:
         return theScript
 
 
-# Script group/name must be valid values or "".
+    # Script group/name must be valid OR group is None (name is ignored) OR group is valid and name is None.
     def populateScriptGroupCombo( self, scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, scriptName ): 
-        print( "populateScriptGroupCombo")#TODO Remove
         scriptGroupComboBox.remove_all()
         groups = sorted( self.getScriptsByGroup( scripts ), key = str.lower )
         for group in groups:
             scriptGroupComboBox.append_text( group )
 
         if scriptGroup is None:
-            scriptGroupComboBox.set_active( 0 )
-            scriptNameTreeView.get_selection().select_path( 0 ) #TODO Test with deleting all scripts in a group.
+            groupIndex = 0
+            scriptIndex = 0
         else:
-            groups = sorted( self.getScriptsByGroup( scripts ), key = str.lower )
-            scriptGroupComboBox.set_active( groups.index( scriptGroup ) )
-
             if scriptName is None:
-                scriptNameTreeView.get_selection().select_path( 0 )
+                groupIndex = groups.index( scriptGroup )
+                scriptIndex = 0
             else:
+                groupIndex = groups.index( scriptGroup )
                 scriptNames = [ ]
                 for script in scripts:
                     if script.getGroup() == scriptGroup:
                         scriptNames.append( script.getName() )
 
                 scriptNames = sorted( scriptNames, key = str.lower )
-                scriptNameTreeView.get_selection().select_path( scriptNames.index( scriptName ) )
+                scriptIndex = scriptNames.index( scriptName )
+
+        scriptGroupComboBox.set_active( groupIndex )
+        scriptNameTreeView.get_selection().select_path( scriptIndex )
 
 
     def getScriptsByGroup( self, scripts ):
@@ -823,14 +826,14 @@ class IndicatorScriptRunner:
 
         else:
             self.scripts = [ ]
-            self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 3 www.google.com", False ) )
-            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
-            self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
-            self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
-            self.scriptNameDefault = self.scripts[ -1 ].getName()
-            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
-            self.scripts[ -1 ].setPlaySound( True )
-            self.scripts[ -1 ].setShowNotification( True )
+#             self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 3 www.google.com", False ) )
+#             self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
+#             self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
+#             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
+#             self.scriptNameDefault = self.scripts[ -1 ].getName()
+#             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
+#             self.scripts[ -1 ].setPlaySound( True )
+#             self.scripts[ -1 ].setShowNotification( True )
 
 
     def saveConfig( self ):
