@@ -1,6 +1,7 @@
 indicator-lunar (1.0.77-1) trusty; urgency=low
 
   * Removed old eclipse information.
+  * Removed user config migration code.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 18 Feb 2018 10:06:38 +1000
 
