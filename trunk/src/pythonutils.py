@@ -245,19 +245,6 @@ def saveConfig( config, applicationBaseDirectory, configBaseFile, logging ):
     return success
 
 
-# Move the JSON configuration file from user home (original and incorrect location)
-# to new location ONLY if the new location does not contain a configuration file.
-#
-# applicationName The application name, used as the base name of the configuration file
-#                 in the user's home directory and the base directory name in the new
-#                 configuration location (and the base name of the configuration file).
-def migrateConfig( applicationName ):
-    oldConfigFile = os.path.expanduser( "~" ) + "/." + applicationName + JSON_EXTENSION
-    newConfigFile = _getConfigFile( applicationName, applicationName )
-    if os.path.isfile( oldConfigFile ) and not os.path.isfile( newConfigFile ):
-        os.rename( oldConfigFile, newConfigFile )
-
-
 # Obtain the path to the user configuration JSON file, creating if necessary the underlying path.
 #
 # applicationBaseDirectory: The directory path used as the final part of the overall path.
