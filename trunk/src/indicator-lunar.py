@@ -1755,7 +1755,7 @@ class IndicatorLunar:
         # The cache becomes useful only when the indicator is restarted
         # before the download period has expired.
         # The cache attempts to avoid the download source blocking a user
-        # as a ressult of too many downloads in a given period.
+        # as a result of too many downloads in a given period.
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
         self.cometOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
         if self.cometOEData is None:
@@ -1793,7 +1793,7 @@ class IndicatorLunar:
         # The cache becomes useful only when the indicator is restarted
         # before the download period has expired.
         # The cache attempts to avoid the download source blocking a user
-        # as a ressult of too many downloads in a given period.
+        # as a result of too many downloads in a given period.
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
         self.satelliteTLEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
         if self.satelliteTLEData is None:
