@@ -1807,6 +1807,83 @@ class IndicatorLunar:
 
 
     def updateSatelliteTLEData( self ):
+        if datetime.datetime.utcnow() > ( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
+
+            # The download period has two purposes: to prevent over-taxing the download source (and avoid being blocked)
+            # and only download as often as necessary (and no more).
+            #
+            # The cache age is used to ensure that data retrieved from the cache is not stale (and therefore valid).
+            #
+            # The download period and cache age are set to the same value.
+            # When a update needs to be done (download period is exceeded), the cache age has also expired, 
+            # requiring a download, rendering the cache out of date.
+            #
+            # The cache has two uses: prevent downloading when the indicator is restarted (and before the download period has expired);
+            # allow the use of data when offline.
+            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
+            self.satelliteTLEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
+            if self.satelliteTLEData is None:
+                self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
+
+                if self.satelliteTLEData is None:
+                    self.satelliteTLEData = { }
+                    summary = _( "Error Retrieving Satellite TLE Data" )
+                    message = _( "The satellite TLE data source could not be reached." )
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+                elif len( self.satelliteTLEData ) == 0:
+                    summary = _( "Empty Satellite TLE Data" )
+                    message = _( "The satellite TLE data retrieved was empty." )
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+                else:
+                    pythonutils.writeCacheBinary( self.satelliteTLEData, INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging )
+
+                # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
+                self.lastUpdateSatelliteTLE = datetime.datetime.utcnow()
+
+            else:
+                # Set the next update to occur when the cache is due to expire.
+                self.lastUpdateSatelliteTLE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
+
+            if self.satellitesAddNew:
+                self.addNewSatellites()
+
+        # The download period and cache age are the same, which means
+        # when a update needs to be done, the cache age has also expired,
+        # requiring a download, rendering the cache pointless.
+        # The cache becomes useful only when the indicator is restarted
+        # before the download period has expired.
+        # The cache attempts to avoid the download source blocking a user
+        # as a result of too many downloads in a given period.
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
+        self.satelliteTLEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
+        if self.satelliteTLEData is None:
+            # Cache returned no result so download from the source.
+            self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
+            if self.satelliteTLEData is None:
+                self.satelliteTLEData = { }
+                summary = _( "Error Retrieving Satellite TLE Data" )
+                message = _( "The satellite TLE data source could not be reached." )
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            elif len( self.satelliteTLEData ) == 0:
+                summary = _( "Empty Satellite TLE Data" )
+                message = _( "The satellite TLE data retrieved was empty." )
+                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+            else:
+                pythonutils.writeCacheBinary( self.satelliteTLEData, INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging )
+
+            # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
+            self.lastUpdateSatelliteTLE = datetime.datetime.utcnow()
+        else:
+            # Set the next update to occur when the cache is due to expire.
+            self.lastUpdateSatelliteTLE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
+
+        if self.satellitesAddNew:
+            self.addNewSatellites()
+
+
+    def updateSatelliteTLEDataORIGINAL( self ):
         if datetime.datetime.utcnow() < ( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
             return
 
@@ -3616,24 +3693,26 @@ class IndicatorLunar:
     # Key: comet name, upper cased ; Value: entire comet string.
     # On error, returns None.
     def getCometOEData( self, url ):
-        try:
-            # Comets are read from a URL which assumes the XEphem format.
-            # For example
-            #
-            #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
-            #
-            # from which the first field (up to the first ',') is the name.
-            cometOEData = { }
-            data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-            for i in range( 0, len( data ) ):
-                if not data[ i ].startswith( "#" ):
-                    cometName = data[ i ][ 0 : data[ i ].index( "," ) ] 
-                    cometOEData[ cometName.upper() ] = data[ i ]
+        cometOEData = None # Indicates error.
+        if pythonutils.isConnectedToInternet():
+            try:
+                # Comets are read from a URL which assumes the XEphem format.
+                # For example
+                #
+                #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
+                #
+                # from which the first field (up to the first ',') is the name.
+                cometOEData = { }
+                data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+                for i in range( 0, len( data ) ):
+                    if not data[ i ].startswith( "#" ):
+                        cometName = data[ i ][ 0 : data[ i ].index( "," ) ] 
+                        cometOEData[ cometName.upper() ] = data[ i ]
 
-        except Exception as e:
-            cometOEData = None # Indicates error.
-            logging.exception( e )
-            logging.error( "Error retrieving comet OE data from " + str( url ) )
+            except Exception as e:
+                cometOEData = None
+                logging.exception( e )
+                logging.error( "Error retrieving comet OE data from " + str( url ) )
 
         return cometOEData
 
@@ -3642,17 +3721,19 @@ class IndicatorLunar:
     # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
     # On error, returns None.
     def getSatelliteTLEData( self, url ):
-        try:
-            satelliteTLEData = { }
-            data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-            for i in range( 0, len( data ), 3 ):
-                tle = satellite.TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
-                satelliteTLEData[ ( tle.getName().upper(), tle.getNumber() ) ] = tle
-
-        except Exception as e:
-            satelliteTLEData = None # Indicates error.
-            logging.exception( e )
-            logging.error( "Error retrieving satellite TLE data from " + str( url ) )
+        satelliteTLEData = None # Indicates error.
+        if pythonutils.isConnectedToInternet():
+            try:
+                satelliteTLEData = { }
+                data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+                for i in range( 0, len( data ), 3 ):
+                    tle = satellite.TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
+                    satelliteTLEData[ ( tle.getName().upper(), tle.getNumber() ) ] = tle
+    
+            except Exception as e:
+                satelliteTLEData = None
+                logging.exception( e )
+                logging.error( "Error retrieving satellite TLE data from " + str( url ) )
 
         return satelliteTLEData
 
