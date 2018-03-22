@@ -19,7 +19,7 @@
 
 
 from gi.repository import Gtk
-import datetime, json, logging.handlers, os, pickle, shutil, subprocess, sys
+import datetime, json, logging.handlers, os, pickle, shutil, socket, subprocess, sys
 
 
 AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -449,6 +449,18 @@ def _getUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
         os.mkdir( directory )
 
     return directory
+
+
+def isConnectedToInternet():
+    connected = False
+    try:
+        socket.create_connection( ( socket.gethostbyname( "www.google.com" ), 80 ), 2 ).close()
+        connected = True
+    except socket.error:
+        print( "not connected" )
+        pass
+
+    return connected
 
 
 # Log file handler.  Truncates the file when the file size limit is reached.
