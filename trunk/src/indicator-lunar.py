@@ -867,7 +867,7 @@ class IndicatorLunar:
 
     SATELLITE_TLE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS = 18
-    SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 18  #TODO Name change?  TLE data lifespan?
+    SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 18  #TODO Name change?  TLE data lifespan?  Ditto for comet.  Maybe combine MAX AGE and DOWNLOAD PERIOD?
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
     SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
@@ -1782,8 +1782,8 @@ class IndicatorLunar:
         if self.cometsAddNew:
             self.addNewComets()
 
-
-    def updateSatelliteTLEData( self ):
+#TODO
+    def updateSatelliteTLEDataPossiblyNEW( self ):
         if datetime.datetime.utcnow() > ( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
 
             self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
@@ -1799,7 +1799,6 @@ class IndicatorLunar:
 #                 # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
 #                 self.lastUpdateSatelliteTLE = datetime.datetime.utcnow()
 
-
             else:
                 pythonutils.writeCacheBinary( self.satelliteTLEData, INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging )
                 self.lastUpdateSatelliteTLE = datetime.datetime.utcnow() + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS )
@@ -1807,7 +1806,7 @@ class IndicatorLunar:
                     self.addNewSatellites()
 
 
-    def updateSatelliteTLEDataORIGINAL( self ):
+    def updateSatelliteTLEData( self ):
         if datetime.datetime.utcnow() < ( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
             return
 
@@ -3811,17 +3810,4 @@ class IndicatorLunar:
         pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
-if __name__ == "__main__": 
-    
-    #TODO See if I can make a test to see if the is internet connection BEFORE downlaodn.
-    import socket
-    print( '1' )
-    try:
-        print('2')
-        socket.create_connection(('8.8.8.8',80)).close()
-        print( 'connected to google' )
-    except socket.error as msg:
-        print( 'there is no connection' )
-        
-    print('z')
-#     IndicatorLunar().main()
+if __name__ == "__main__": IndicatorLunar().main()
