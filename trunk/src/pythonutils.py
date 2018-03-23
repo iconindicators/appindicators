@@ -451,13 +451,14 @@ def _getUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
     return directory
 
 
+# Opens a socket to www.google.com and if successful,
+# we are connected to the internet and returns True (False otherwise).
 def isConnectedToInternet():
     connected = False
     try:
         socket.create_connection( ( socket.gethostbyname( "www.google.com" ), 80 ), 2 ).close()
         connected = True
     except socket.error:
-        print( "not connected" )
         pass
 
     return connected
