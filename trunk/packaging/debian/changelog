@@ -1,5 +1,8 @@
 indicator-lunar (1.0.77-1) trusty; urgency=low
 
+  * Now checks for an internet connection before downloading TLE/OE data.
+    This stops the log file cluttering up with failed connection messages.
+  * Reduced the download period for TLE/OE data.
   * Removed old eclipse information.
   * Removed user config migration code.
 
