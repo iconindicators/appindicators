@@ -2,6 +2,7 @@ indicator-tide (1.0.11-1) trusty; urgency=low
 
   * Updated Russian translation.  Thanks to Oleg Moiseichuk.
   * Now checks for an internet connection before downloading tidal data.
+    This stops the log file cluttering up with failed connection messages.
   * Removed user config migration code.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Oct 2017 23:57:24 +1000
