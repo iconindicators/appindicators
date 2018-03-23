@@ -84,7 +84,6 @@ class IndicatorTide:
         self.dialogLock = threading.Lock()
 
         Notify.init( INDICATOR_NAME )
-        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
         self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorTide.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
@@ -486,6 +485,14 @@ class IndicatorTide:
 
 
     def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID ):
+        tidalReadings = [ ]
+        if pythonutils.isConnectedToInternet():
+            tidalReadings = self._getTidalDataFromUnitedKingdomHydrographicOffice( portID )
+
+        return self.removeTidalReadingsPriorToToday( self.washTidalDataThroughCache( tidalReadings ) )
+
+
+    def _getTidalDataFromUnitedKingdomHydrographicOffice( self, portID ):
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
         else:
@@ -599,7 +606,7 @@ class IndicatorTide:
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
 
-        return self.removeTidalReadingsPriorToToday( self.washTidalDataThroughCache( tidalReadings ) )
+        return tidalReadings
 
 
     # Takes a list of tidal readings and...
