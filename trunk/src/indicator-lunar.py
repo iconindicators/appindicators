@@ -830,10 +830,19 @@ class IndicatorLunar:
         LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" )
     }
 
+    # The download period serves two purposes:
+    #    Prevent over-taxing the download source (which may result in being blocked).
+    #    Download as often as necessary for accuracy.
+    #
+    # The cache age ensures the data retrieved from the cache is not stale.
+    #
+    # The cache has two uses:
+    #    Act as a source when restarting the indicator.
+    #    Act as a source when offline.
     COMET_OE_CACHE_BASENAME = "comet-oe-"
     COMET_OE_CACHE_MAXIMUM_AGE_HOURS = 30
     COMET_OE_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
-    COMET_OE_DOWNLOAD_PERIOD_HOURS = 30
+    COMET_OE_DOWNLOAD_PERIOD_HOURS = 24
 
     COMET_ON_CLICK_URL = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
@@ -865,9 +874,18 @@ class IndicatorLunar:
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_VISIBLE.strip( "[]" ), SATELLITE_TAG_VISIBLE_TRANSLATION.strip( "[]" ) ] )
 
+    # The download period serves two purposes:
+    #    Prevent over-taxing the download source (which may result in being blocked).
+    #    Download as often as necessary for accuracy.
+    #
+    # The cache age ensures the data retrieved from the cache is not stale.
+    #
+    # The cache has two uses:
+    #    Act as a source when restarting the indicator.
+    #    Act as a source when offline.
     SATELLITE_TLE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS = 18
-    SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 18  #TODO Name change?  TLE data lifespan?  Ditto for comet.  Maybe combine MAX AGE and DOWNLOAD PERIOD?
+    SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 12
     SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
 
     SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
@@ -1745,61 +1763,42 @@ class IndicatorLunar:
         return secondDateTimeAsString
 
 
-#TODO Update to look like the TLE function below...
     def updateCometOEData( self ):
-        if datetime.datetime.utcnow() < ( self.lastUpdateCometOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) ):
-            return
-
-        # The download period and cache age are the same, which means
-        # when a update needs to be done, the cache age has also expired,
-        # requiring a download, rendering the cache pointless.
-        # The cache becomes useful only when the indicator is restarted
-        # before the download period has expired.
-        # The cache attempts to avoid the download source blocking a user
-        # as a result of too many downloads in a given period.
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
-        self.cometOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
-        if self.cometOEData is None:
-            # Cache returned no result so download from the source.
-            self.cometOEData = self.getCometOEData( self.cometOEURL )
+        if datetime.datetime.utcnow() > ( self.lastUpdateCometOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) ):
+            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
+            self.cometOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
             if self.cometOEData is None:
-                self.cometOEData = { }
-                summary = _( "Error Retrieving Comet OE Data" )
-                message = _( "The comet OE data source could not be reached." )
-                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-            elif len( self.cometOEData ) == 0:
-                summary = _( "Empty Comet OE Data" )
-                message = _( "The comet OE data retrieved was empty." )
-                Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+                self.cometOEData = self.getCometOEData( self.cometOEURL )
+
+                if self.cometOEData is None:
+                    self.cometOEData = { }
+                    summary = _( "Error Retrieving Comet OE Data" )
+                    message = _( "The comet OE data source could not be reached." )
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+                elif len( self.cometOEData ) == 0:
+                    summary = _( "Empty Comet OE Data" )
+                    message = _( "The comet OE data retrieved was empty." )
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+                else:
+                    pythonutils.writeCacheBinary( self.cometOEData, INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging )
+    
+                # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
+                self.lastUpdateCometOE = datetime.datetime.utcnow()
+
             else:
-                pythonutils.writeCacheBinary( self.cometOEData, INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging )
-
-            # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
-            self.lastUpdateCometOE = datetime.datetime.utcnow()
-        else:
-            # Set the next update to occur when the cache is due to expire.
-            self.lastUpdateCometOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
-
-        if self.cometsAddNew:
-            self.addNewComets()
+                # Set the next update to occur when the cache is due to expire.
+                self.lastUpdateCometOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
+    
+            if self.cometsAddNew:
+                self.addNewComets()
 
 
     def updateSatelliteTLEData( self ):
         if datetime.datetime.utcnow() > ( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
-
-            # The download period has two purposes: to prevent over-taxing the download source (and avoid being blocked)
-            # and only download as often as necessary (and no more).
-            #
-            # The cache age is used to ensure that data retrieved from the cache is not stale (and therefore valid).
-            #
-            # The download period and cache age are set to the same value.
-            # When a update needs to be done (download period is exceeded), the cache age has also expired, 
-            # requiring a download, rendering the cache out of date.
-            #
-            # The cache has two uses: prevent downloading when the indicator is restarted (and before the download period has expired);
-            # allow the use of data when offline.
             pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
-            self.satelliteTLEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
+            self.satelliteTLEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging )
             if self.satelliteTLEData is None:
                 self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
 
