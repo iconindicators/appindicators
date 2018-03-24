@@ -90,7 +90,6 @@ class IndicatorPPADownloadStatistics:
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorPPADownloadStatistics.LOG ) ] )
         self.dialogLock = threading.Lock()
         Notify.init( INDICATOR_NAME )
-        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
         self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
