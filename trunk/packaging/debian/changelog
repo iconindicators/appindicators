@@ -1,6 +1,9 @@
 indicator-ppa-download-statistics (1.0.61-1) trusty; urgency=low
 
   * Removed redundant check for results in the thread pool executer.
+  * Now checks for an internet connection before downloading PPA data.
+    This stops the log file cluttering up with failed connection messages.
+  * Removed user config migration code.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 19 Nov 2017 12:14:52 +1000
 
