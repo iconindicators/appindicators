@@ -1,3 +1,10 @@
+indicator-punycode (1.0.6-1) trusty; urgency=low
+
+  * Removed user config migration code.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 27 Mar 2018 14:55:58 +1000
+
+
 indicator-punycode (1.0.5-1) trusty; urgency=low
 
   * Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and

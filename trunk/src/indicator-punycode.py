@@ -46,7 +46,7 @@ import encodings.idna, json, logging, os, pythonutils, re, threading
 class IndicatorPunycode:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.5"
+    VERSION = "1.0.6"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -65,7 +65,6 @@ class IndicatorPunycode:
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
 
         Notify.init( INDICATOR_NAME )
-        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
         self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPunycode.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
