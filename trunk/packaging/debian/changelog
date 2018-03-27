@@ -1,3 +1,10 @@
+indicator-script-runner (1.0.7-1) trusty; urgency=low
+
+  * Removed user config migration code.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 27 Mar 2018 14:56:03 +1000
+
+
 indicator-script-runner (1.0.6-1) trusty; urgency=low
 
   * When a script was removed, the next script selected would be from the

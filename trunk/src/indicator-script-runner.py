@@ -46,7 +46,7 @@ import copy, json, logging, os, pythonutils, threading
 class IndicatorScriptRunner:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.6"
+    VERSION = "1.0.7"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -68,7 +68,6 @@ class IndicatorScriptRunner:
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorScriptRunner.LOG ) ] )
         self.dialogLock = threading.Lock()
 
-        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
         self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorScriptRunner.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
