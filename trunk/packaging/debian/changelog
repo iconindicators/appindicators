@@ -1,6 +1,7 @@
 indicator-stardate (1.0.36-1) trusty; urgency=low
 
   * Updated Russian translation.  Thanks to Oleg Moiseichuk.
+  * Removed user config migration code.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Oct 2017 23:52:15 +1000
 

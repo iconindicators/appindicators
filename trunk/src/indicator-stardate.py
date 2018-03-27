@@ -63,7 +63,6 @@ class IndicatorStardate:
         self.dialogLock = threading.Lock()
         self.saveConfigTimerID = None
 
-        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
         self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorStardate.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
