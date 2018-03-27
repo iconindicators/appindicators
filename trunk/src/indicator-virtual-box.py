@@ -73,7 +73,6 @@ class IndicatorVirtualBox:
         self.scrollUUID = None
 
         Notify.init( INDICATOR_NAME )
-        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
         self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorVirtualBox.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )

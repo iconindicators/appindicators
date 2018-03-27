@@ -1,6 +1,7 @@
 indicator-virtual-box (1.0.58-1) trusty; urgency=low
 
   * Updated Russian translation.  Thanks to Oleg Moiseichuk.
+  * Removed user config migration code.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Oct 2017 23:53:26 +1000
 
