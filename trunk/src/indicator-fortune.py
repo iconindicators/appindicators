@@ -46,7 +46,7 @@ import logging, os, pythonutils, threading
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.27"
+    VERSION = "1.0.28"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -75,7 +75,6 @@ class IndicatorFortune:
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
         Notify.init( INDICATOR_NAME )
-        pythonutils.migrateConfig( INDICATOR_NAME ) # Migrate old user configuration to new location.
         pythonutils.removeFileFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
         self.loadConfig()
 
