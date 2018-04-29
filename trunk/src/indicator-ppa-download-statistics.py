@@ -103,7 +103,15 @@ class IndicatorPPADownloadStatistics:
 
     def update( self ):
         self.buildMenu()
-        Thread( target = self.getPPADownloadStatistics ).start()
+
+        if pythonutils.isConnectedToInternet():
+            Thread( target = self.getPPADownloadStatistics ).start()
+        else:
+            for ppa in self.ppas:
+                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+
+            self.buildMenu()
+
         GLib.timeout_add_seconds( 6 * 60 * 60, self.update ) # Auto update every six hours.
 
 
