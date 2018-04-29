@@ -1,3 +1,14 @@
+TODO Update licese in September
+
+
+indicator-tide (1.0.12-1) trusty; urgency=low
+
+  * No longer allows the [TYPE] and [LEVEL] tags to be translated.
+  * Annual renewal of UKHO licence.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 29 Apr 2018 17:34:51 +1000
+
+
 indicator-tide (1.0.11-1) trusty; urgency=low
 
   * Updated Russian translation.  Thanks to Oleg Moiseichuk.

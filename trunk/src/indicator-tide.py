@@ -48,7 +48,7 @@ import datetime, json, locale, logging, os, ports, pythonutils, re, threading, t
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.11"
+    VERSION = "1.0.12"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -363,10 +363,10 @@ class IndicatorTide:
         tideFormat.set_hexpand( True )
         tideFormat.set_tooltip_text( _(
             "Tide information is specified using:\n\n" + \
-            "    [TYPE] - the tide is high or low.\n" + \
-            "    [LEVEL] - the tide level, measured in metres.\n\n" + \
+            "    {0} - the tide is high or low.\n" + \
+            "    {1} - the tide level, measured in metres.\n\n" + \
             "Formatting options for the time:\n\n" + \
-            "    http://docs.python.org/3/library/datetime.html" ) )
+            "    http://docs.python.org/3/library/datetime.html" ).format( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG ) )
         box.pack_start( tideFormat, True, True, 0 )
 
         grid.attach( box, 0, 4, 1, 1 )
@@ -381,10 +381,10 @@ class IndicatorTide:
         tideFormatSansTime.set_hexpand( True )
         tideFormatSansTime.set_tooltip_text( _(
             "Tide information is specified using:\n\n" + \
-            "    [TYPE] - the tide is high or low.\n" + \
-            "    [LEVEL] - the tide level, measured in metres.\n\n" + \
+            "    {0} - the tide is high or low.\n" + \
+            "    {1} - the tide level, measured in metres.\n\n" + \
             "This format is used when there is no time\n" + \
-            "component in a tide reading" ) )
+            "component in a tide reading" ).format( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG ) )
         box.pack_start( tideFormatSansTime, True, True, 0 )
 
         grid.attach( box, 0, 5, 1, 1 )

@@ -1,12 +1,12 @@
 # Portable Object Template for indicator-tide.
-# Copyright (C) 2015-2017 Bernard Giannetti
+# Copyright (C) 2015-2018 Bernard Giannetti
 # This file is distributed under the same license as the indicator-tide package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-tide 1.0.11\n"
+"Project-Id-Version: indicator-tide 1.0.12\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2017-09-18 20:52+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -165,8 +165,8 @@ msgstr ""
 msgid ""
 "Tide information is specified using:\n"
 "\n"
-"    [TYPE] - the tide is high or low.\n"
-"    [LEVEL] - the tide level, measured in metres.\n"
+"    {0} - the tide is high or low.\n"
+"    {1} - the tide level, measured in metres.\n"
 "\n"
 "Formatting options for the time:\n"
 "\n"
@@ -181,8 +181,8 @@ msgstr ""
 msgid ""
 "Tide information is specified using:\n"
 "\n"
-"    [TYPE] - the tide is high or low.\n"
-"    [LEVEL] - the tide level, measured in metres.\n"
+"    {0} - the tide is high or low.\n"
+"    {1} - the tide level, measured in metres.\n"
 "\n"
 "This format is used when there is no time\n"
 "component in a tide reading"
