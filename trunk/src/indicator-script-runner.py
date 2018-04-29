@@ -825,14 +825,14 @@ class IndicatorScriptRunner:
 
         else:
             self.scripts = [ ]
-#             self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 3 www.google.com", False ) )
-#             self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
-#             self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
-#             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
-#             self.scriptNameDefault = self.scripts[ -1 ].getName()
-#             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
-#             self.scripts[ -1 ].setPlaySound( True )
-#             self.scripts[ -1 ].setShowNotification( True )
+            self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 3 www.google.com", False ) )
+            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
+            self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
+            self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
+            self.scriptNameDefault = self.scripts[ -1 ].getName()
+            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
+            self.scripts[ -1 ].setPlaySound( True )
+            self.scripts[ -1 ].setShowNotification( True )
 
 
     def saveConfig( self ):
