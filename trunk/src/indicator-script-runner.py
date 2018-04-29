@@ -116,6 +116,11 @@ class IndicatorScriptRunner:
                 self.indicator.set_secondary_activate_target( menuItem )
 
 
+#TODO Ubuntu 18.04 barfs...seems the arguments to gnome-terminal have changed...
+# https://ubuntuforums.org/showthread.php?t=2385156
+# https://askubuntu.com/questions/968032/option-e-is-deprecated-and-might-be-removed-in-a-later-version-of-gnome-termi
+# https://stackoverflow.com/questions/48627989/open-a-terminal-via-gnome-terminal-then-execute-command-error-failed-to-exec
+
     def onScript( self, widget, script ):
         command = "x-terminal-emulator -e ${SHELL}'"
 
