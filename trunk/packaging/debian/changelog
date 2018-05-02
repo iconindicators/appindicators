@@ -1,6 +1,3 @@
-TODO Update licese in September
-
-
 indicator-tide (1.0.12-1) trusty; urgency=low
 
   * Bug fix: the [TYPE] and [LEVEL] tags could potentially be translated.
