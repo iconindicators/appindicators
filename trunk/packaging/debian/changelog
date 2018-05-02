@@ -1,6 +1,6 @@
 indicator-ppa-download-statistics (1.0.61-1) trusty; urgency=low
 
-  * Added TODO to the list of series.
+  * Added cosmic to the list of series.
   * Removed redundant check for results in the thread pool executer.
   * Now checks for an internet connection before downloading PPA data.
     This stops the log file cluttering up with failed connection messages.
