@@ -53,15 +53,15 @@ import concurrent.futures, json, locale, logging, operator, os, pythonutils, thr
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.61"
+    VERSION = "1.0.62"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
     COMMENTS = _( "Display the total downloads of PPAs." )
 
-    SERIES = [ "cosmic", "bionic", "artful", "zesty", "yakkety",
-               "xenial", "wily", "vivid", "utopic", "utopic",
+    SERIES = [ "cosmic", "bionic", "artful", "zesty",
+               "yakkety", "xenial", "wily", "vivid", "utopic",
                "trusty", "saucy", "raring", "quantal", "precise",
                "oneiric", "natty", "maverick", "lucid", "karmic",
                "jaunty", "intrepid", "hardy", "gutsy", "feisty",
