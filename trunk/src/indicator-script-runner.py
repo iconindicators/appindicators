@@ -142,7 +142,8 @@ class IndicatorScriptRunner:
         if script.isTerminalOpen():
             command += "${SHELL}"
 
-        Thread( target = pythonutils.processCall, args = ( command, ) ).start()
+        print( command )
+#         Thread( target = pythonutils.processCall, args = ( command, ) ).start()
 
 
     def onAbout( self, widget ):
