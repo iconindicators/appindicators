@@ -60,7 +60,7 @@ class IndicatorScriptRunner:
     CONFIG_SHOW_SCRIPTS_IN_SUBMENUS = "showScriptsInSubmenus"
 
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
-    COMMAND_NOTIFY = "notify-send -i " + ICON + " \\\"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\\\" \\\"" + _( "...has completed." ) + "\\\""
+    COMMAND_NOTIFY = "notify-send -i " + ICON + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + _( "...has completed." ) + "\""
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
 
@@ -123,28 +123,25 @@ class IndicatorScriptRunner:
 # https://askubuntu.com/questions/1033121/trouble-with-spaces-in-the-terminal-on-ubuntu-18-04-and-or-terminal-command-e
 
     def onScript( self, widget, script ):
-        command = "x-terminal-emulator -e ${SHELL}'"
+        command = "gnome-terminal -- /bin/bash -c '"
 
-        if script.getDirectory() == "":
-            command += " -c cd\ .;\""
-        else:
-            command += " -c cd\ " + script.getDirectory() + ";\""
+        if script.getDirectory() != "":
+            command += "cd " + script.getDirectory() + "; "
 
         command += script.getCommand()
 
         if script.getShowNotification():
-            command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
+            command += "; " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
 
         if script.getPlaySound():
-            command += " && " + IndicatorScriptRunner.COMMAND_SOUND
-
-        command += "\";'"
+            command += "; " + IndicatorScriptRunner.COMMAND_SOUND
 
         if script.isTerminalOpen():
-            command += "${SHELL}"
+            command += "; /bin/bash"
 
+        command += "'"
         print( command )
-#         Thread( target = pythonutils.processCall, args = ( command, ) ).start()
+        Thread( target = pythonutils.processCall, args = ( command, ) ).start()
 
 
     def onAbout( self, widget ):
@@ -833,8 +830,8 @@ class IndicatorScriptRunner:
         else:
             self.scripts = [ ]
             self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 3 www.google.com", False ) )
-            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Public IP address: $(wget http://ipinfo.io/ip -qO -)\\\"", False ) )
-            self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + IndicatorScriptRunner.ICON + " \\\"Internet is UP\\\"; else notify-send \\\"Internet is DOWN\\\"; fi", False ) )
+            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + IndicatorScriptRunner.ICON + " \"Public IP address: $(wget http://ipinfo.io/ip -qO -)\"", False ) )
+            self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + IndicatorScriptRunner.ICON + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False ) )
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )

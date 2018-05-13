@@ -1,5 +1,9 @@
 indicator-script-runner (1.0.7-1) trusty; urgency=low
 
+  * Handle the deprecation of the -e option in gnome-terminal and simplify.
+    Consequently, gnome-terminal is used (rather than x-terminal-emulator),
+    /bin/bash is used (rather than $SHELL) and any text (used for example in
+    the notifications) may need to be checked for correct escape characters.
   * Removed user config migration code.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 27 Mar 2018 14:56:03 +1000
