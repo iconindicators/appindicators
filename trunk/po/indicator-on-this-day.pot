@@ -1,12 +1,12 @@
 # Portable Object Template for indicator-on-this-day.
-# Copyright (C) 2017 Bernard Giannetti
+# Copyright (C) 2017-2018 Bernard Giannetti
 # This file is distributed under the same license as the indicator-on-this-day package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-on-this-day 1.0.1\n"
+"Project-Id-Version: indicator-on-this-day 1.0.2\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2017-09-23 17:43+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"

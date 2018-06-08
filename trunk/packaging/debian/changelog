@@ -1,3 +1,10 @@
+indicator-on-this-day (1.0.2-1) trusty; urgency=low
+
+  * Removed duplicate calendar entries from the result set.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 8 Jun 2018 15:29:08 +1000
+
+
 indicator-on-this-day (1.0.1-1) trusty; urgency=low
 
   * Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and

@@ -48,7 +48,7 @@ import fnmatch, logging, os, pythonutils, threading, webbrowser
 class IndicatorOnThisDay:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.1"
+    VERSION = "1.0.2"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -174,7 +174,13 @@ class IndicatorOnThisDay:
         if len( events ) > len( sortedEvents ):
             sortedEvents += sorted( events[ i : ], key = lambda event: event.getDescription() )
 
-        return sortedEvents
+        # Remove duplicate events.
+        sortedEventsWithoutDuplicates = [ ]
+        for event in sortedEvents:
+            if event not in sortedEventsWithoutDuplicates:
+                sortedEventsWithoutDuplicates.append( event )
+
+        return sortedEventsWithoutDuplicates
 
 
     def onAbout( self, widget ):
