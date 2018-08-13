@@ -107,6 +107,46 @@ class IndicatorOnThisDay:
 
 
     def buildMenu( self, events ):
+
+        window = Gtk.Window()
+        screen = window.get_screen()
+        print( "width = " + str(screen.get_width()) + ", height = " + str(screen.get_height()) )        
+        
+        menuItemMaximum = 37 #TODO Needs to be a user preference.
+        print( screen.get_height() / menuItemMaximum )
+        menuItemMaximum = screen.get_height() / 25
+        menuItemCount = 3 # Initial value takes into account About, Preferences and Quit.
+        menu = Gtk.Menu()
+        lastDate = ""
+        for event in events:
+            if event.getDate() != lastDate:
+                if ( menuItemCount + 2 ) <= menuItemMaximum: # Ensure there is room for the date menu item and an event menu item.
+                    menu.append( Gtk.MenuItem( event.getDate() ) )
+                    lastDate = event.getDate()
+                    menuItemCount += 1
+                else:
+                    break # Don't add the menu item for the new date and don't add a subsequent event.
+
+            menuItem = Gtk.MenuItem( "    " + event.getDescription() )
+            menuItem.props.name = event.getDate() # Allows the month/day to be passed to the copy/search functions below.
+            menu.append( menuItem )
+            menuItemCount += 1
+
+            if self.copyToClipboard:
+                menuItem.connect( "activate", lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( widget.props.name + " " + widget.props.label.strip(), -1 ) )
+
+            elif len( self.searchURL ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified. 
+                menuItem.connect( "activate", lambda widget: webbrowser.open( self.searchURL.replace( IndicatorOnThisDay.TAG_EVENT, ( widget.props.name + " " + widget.props.label ).replace( " ", "+" ) ) ) )
+
+            if menuItemCount == menuItemMaximum:
+                break
+
+        pythonutils.createPreferencesAboutQuitMenuItems( menu, len( events ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
+        menu.show_all()
+        self.indicator.set_menu( menu )
+
+
+    def buildMenuORIGINAL( self, events ):
         menu = Gtk.Menu()
         lastDate = ""
         for event in events:
