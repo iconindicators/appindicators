@@ -107,15 +107,16 @@ class IndicatorOnThisDay:
 
 
     def buildMenu( self, events ):
+        print( "Screen height = " + str( Gtk.Window().get_screen().get_height() ) )        
 
-        window = Gtk.Window()
-        screen = window.get_screen()
-        print( "width = " + str(screen.get_width()) + ", height = " + str(screen.get_height()) )        
-        
-        menuItemMaximum = 37 #TODO Needs to be a user preference.
-        print( screen.get_height() / menuItemMaximum )
-        menuItemMaximum = screen.get_height() / 25
-        menuItemCount = 3 # Initial value takes into account About, Preferences and Quit.
+#TODO Allow the user to set a value for menuItemMaximum.
+        # By experiment, it was found for a height of 900 and knowing that 37 menu items will fit
+        # (before a scroll bar is imposed), 900 / 37 = 25 which is used as a divisor for the initial guess.
+#         menuItemMaximum = 37 #TODO Needs to be a user preference.
+#         print( Gtk.Window().get_screen().get_height() / menuItemMaximum )
+        menuItemMaximum = Gtk.Window().get_screen().get_height() / 25 - 3 # Less three to account for About, Preferences and Quit.
+
+        menuItemCount = 0
         menu = Gtk.Menu()
         lastDate = ""
         for event in events:
