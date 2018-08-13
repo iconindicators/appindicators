@@ -48,7 +48,7 @@ import fnmatch, logging, os, pythonutils, threading, webbrowser
 class IndicatorOnThisDay:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.2"
+    VERSION = "1.0.3"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -65,7 +65,7 @@ class IndicatorOnThisDay:
 
     CONFIG_CALENDARS = "calendars"
     CONFIG_COPY_TO_CLIPBOARD = "copyToClipboard"
-    CONFIG_DAYS = "days"
+    CONFIG_LINES = "lines"
     CONFIG_NOTIFY = "notify"
     CONFIG_SEARCH_URL = "searchURL"
 
@@ -107,15 +107,7 @@ class IndicatorOnThisDay:
 
 
     def buildMenu( self, events ):
-        print( "Screen height = " + str( Gtk.Window().get_screen().get_height() ) )        
-
-#TODO Allow the user to set a value for menuItemMaximum.
-        # By experiment, it was found for a height of 900 and knowing that 37 menu items will fit
-        # (before a scroll bar is imposed), 900 / 37 = 25 which is used as a divisor for the initial guess.
-#         menuItemMaximum = 37 #TODO Needs to be a user preference.
-#         print( Gtk.Window().get_screen().get_height() / menuItemMaximum )
-        menuItemMaximum = Gtk.Window().get_screen().get_height() / 25 - 3 # Less three to account for About, Preferences and Quit.
-
+        menuItemMaximum = self.lines - 3 # Less three to account for About, Preferences and Quit.
         menuItemCount = 0
         menu = Gtk.Menu()
         lastDate = ""
@@ -147,29 +139,6 @@ class IndicatorOnThisDay:
         self.indicator.set_menu( menu )
 
 
-    def buildMenuORIGINAL( self, events ):
-        menu = Gtk.Menu()
-        lastDate = ""
-        for event in events:
-            if event.getDate() != lastDate:
-                menu.append( Gtk.MenuItem( event.getDate() ) )
-                lastDate = event.getDate()
-
-            menuItem = Gtk.MenuItem( "    " + event.getDescription() )
-            menuItem.props.name = event.getDate() # Allows the month/day to be passed to the copy/search functions below.
-            menu.append( menuItem )
-
-            if self.copyToClipboard:
-                menuItem.connect( "activate", lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( widget.props.name + " " + widget.props.label.strip(), -1 ) )
-
-            elif len( self.searchURL ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified. 
-                menuItem.connect( "activate", lambda widget: webbrowser.open( self.searchURL.replace( IndicatorOnThisDay.TAG_EVENT, ( widget.props.name + " " + widget.props.label ).replace( " ", "+" ) ) ) )
-
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, len( events ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
-        menu.show_all()
-        self.indicator.set_menu( menu )
-
-
     def getEvents( self ):
         # Write the path of each calendar file to a temporary file - allows for one call to calendar.
         content = ""
@@ -181,7 +150,7 @@ class IndicatorOnThisDay:
 
         # Run the calendar command and parse the results, one event per line, sometimes...
         events = [ ]
-        command = "calendar -f " + IndicatorOnThisDay.CACHE_CALENDAR_FULL_PATH + " -A " + str( self.days - 1 )
+        command = "calendar -f " + IndicatorOnThisDay.CACHE_CALENDAR_FULL_PATH + " -A 366"
         for line in pythonutils.processGet( command ).splitlines():
             if( line is None or len( line.strip() ) == 0 ):
                 continue # Ubuntu 17.04 inserts an empty line between events.
@@ -333,12 +302,12 @@ class IndicatorOnThisDay:
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Days" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Lines" ) ), False, False, 0 )
 
         spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment( self.days, 1, 366, 1, 10, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinner.set_value( self.days ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( _( "The number of days to show from today, from 1 to 366 inclusive." ) )
+        spinner.set_adjustment( Gtk.Adjustment( self.lines, 1, 1000, 1, 10, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinner.set_value( self.lines ) # ...so need to force the initial value by explicitly setting it.
+        spinner.set_tooltip_text( _( "The number of menu items available for display." ) )
 
         box.pack_start( spinner, False, False, 0 )
 
@@ -411,7 +380,7 @@ class IndicatorOnThisDay:
 
         if dialog.run() == Gtk.ResponseType.OK:
 
-            self.days = spinner.get_value_as_int()
+            self.lines = spinner.get_value_as_int()
 
             self.calendars = [ ]
             treeiter = store.get_iter_first()
@@ -582,9 +551,14 @@ class IndicatorOnThisDay:
 
 
     def loadConfig( self ):
-        self.days = 5 # Between 1 and 366 inclusive.
         self.calendars = [ IndicatorOnThisDay.DEFAULT_CALENDAR ]
         self.copyToClipboard = True
+
+        # By experiment, a height of 900 (pixels) will fit 37 menu items before a scroll bar is imposed by GTK.
+        # To arrive at a reasonable initial guess for a given screen height, compute a divisor and use that.
+        # So the divisor is 900 / 37 = 25.
+        self.lines = Gtk.Window().get_screen().get_height() / 25
+
         self.notify = True
         self.searchURL = IndicatorOnThisDay.SEARCH_URL_DEFAULT
 
@@ -592,7 +566,7 @@ class IndicatorOnThisDay:
 
         self.calendars = config.get( IndicatorOnThisDay.CONFIG_CALENDARS, self.calendars )
         self.copyToClipboard = config.get( IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD, self.copyToClipboard )
-        self.days = config.get( IndicatorOnThisDay.CONFIG_DAYS, self.days )
+        self.lines = config.get( IndicatorOnThisDay.CONFIG_LINES, self.lines )
         self.notify = config.get( IndicatorOnThisDay.CONFIG_NOTIFY, self.notify )
         self.searchURL = config.get( IndicatorOnThisDay.CONFIG_SEARCH_URL, self.searchURL )
 
@@ -601,7 +575,7 @@ class IndicatorOnThisDay:
         config = {
             IndicatorOnThisDay.CONFIG_CALENDARS: self.calendars,
             IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD: self.copyToClipboard,
-            IndicatorOnThisDay.CONFIG_DAYS: self.days,
+            IndicatorOnThisDay.CONFIG_LINES: self.lines,
             IndicatorOnThisDay.CONFIG_NOTIFY: self.notify,
             IndicatorOnThisDay.CONFIG_SEARCH_URL: self.searchURL,
         }
