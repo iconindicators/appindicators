@@ -1371,6 +1371,10 @@ class IndicatorLunar:
                     menu.append( menuItem )
 
                 # Comet data may not exist or comet data exists but is bad.
+#TODO Testing                        
+                missing = ( key not in self.cometOEData )
+                bad = ( key in self.cometOEData and ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) in self.data )
+
                 cometDataIsMissingOrBad = ( key not in self.cometOEData ) or \
                                           ( key in self.cometOEData and ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) in self.data )
 
@@ -2076,6 +2080,16 @@ class IndicatorLunar:
                         self.updateCommon( comet, AstronomicalBodyType.Comet, key, ephemNow, hideIfNeverUp )
             else:
                 self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
+
+#TODO Testing       
+        for k in self.data:
+            if k[ 1 ] == 'C/2016 M1 (PANSTARRS)':
+                print( self.data[ k ] )
+                
+        print()                
+        for k in self.data:
+            if k[ 1 ] == '78P/GEHRELS':
+                print( self.data[ k ] )
 
 
     # Calculates the common attributes such as rise/set, illumination, constellation, magnitude, tropical sign, distance, bright limb angle and RA/Dec/Az/Alt.
@@ -3718,7 +3732,16 @@ class IndicatorLunar:
         self.hideBodyIfNeverUp = config.get( IndicatorLunar.CONFIG_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
         self.hideSatelliteIfNoVisiblePass = config.get( IndicatorLunar.CONFIG_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
         self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, self.indicatorText )
-        self.cometOEURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL )
+
+        # The Minor Planet Center changed the URL protocol to be https (rather than http).
+        # The URLs for OE and TLE are now set to use https.
+        # Therefore some users may still have the default URLs in their preferences and if so, convert from http to https.
+        originalURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL ).startswith( "http://" ) and \
+                      config.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL ).endswith( IndicatorLunar.COMET_OE_URL[ 5 : ] )
+
+        if not originalURL:
+            self.cometOEURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL )
+
         self.comets = config.get( IndicatorLunar.CONFIG_COMETS, self.comets )
         self.cometsAddNew = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, self.cometsAddNew )
         self.cometsMagnitude = config.get( IndicatorLunar.CONFIG_COMETS_MAGNITUDE, self.cometsMagnitude )
@@ -3726,7 +3749,13 @@ class IndicatorLunar:
         self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
         self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
         self.satelliteNotificationTimeFormat = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_TIME_FORMAT, self.satelliteNotificationTimeFormat )
-        self.satelliteTLEURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL )
+
+        # See comment above for OE URL as to why this code is necessary...
+        originalURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL ).startswith( "http://" ) and \
+                      config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL ).endswith( IndicatorLunar.SATELLITE_TLE_URL[ 5 : ] )
+
+        if not originalURL:
+            self.satelliteTLEURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL )
 
         self.satellites = config.get( IndicatorLunar.CONFIG_SATELLITES, self.satellites )
         self.satellites = [ tuple( l ) for l in self.satellites ] # Converts from a list of lists to a list of tuples...go figure!
