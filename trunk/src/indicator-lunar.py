@@ -1453,6 +1453,8 @@ class IndicatorLunar:
         self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, astronomicalBodyType, dataTag )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
+        # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
+        # Therefore only check for the presence of these two messages.
         if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data:
             subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ) )
         else:
@@ -1471,6 +1473,8 @@ class IndicatorLunar:
                 subMenu.append( Gtk.MenuItem( text + self.getDisplayData( key ) ) )
 
         menuItem.set_submenu( subMenu )
+
+#TODO Also consider if bad/no data for comets, need to add to the tool tip that the comet will be hidden?
 
 
     def updateRightAscensionDeclinationAzimuthAltitudeMenu( self, menu, astronomicalBodyType, dataTag ):
