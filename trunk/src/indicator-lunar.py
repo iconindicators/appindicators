@@ -58,7 +58,7 @@ class AstronomicalBodyType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star,
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.77"
+    VERSION = "1.0.78"
     ICON = INDICATOR_NAME
     ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
     ICON_BASE_PATH = tempfile.gettempdir()
@@ -841,10 +841,10 @@ class IndicatorLunar:
     #    Act as a source when offline.
     COMET_OE_CACHE_BASENAME = "comet-oe-"
     COMET_OE_CACHE_MAXIMUM_AGE_HOURS = 30
-    COMET_OE_URL = "http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
+    COMET_OE_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
     COMET_OE_DOWNLOAD_PERIOD_HOURS = 24
 
-    COMET_ON_CLICK_URL = "http://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+    COMET_ON_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -886,9 +886,9 @@ class IndicatorLunar:
     SATELLITE_TLE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS = 18
     SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 12
-    SATELLITE_TLE_URL = "http://celestrak.com/NORAD/elements/visual.txt"
+    SATELLITE_TLE_URL = "https://celestrak.com/NORAD/elements/visual.txt"
 
-    SATELLITE_ON_CLICK_URL = "http://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
+    SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
     SATELLITE_MENU_TEXT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + _( " now rising..." )
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
