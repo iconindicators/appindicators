@@ -1,3 +1,12 @@
+indicator-lunar (1.0.78-1) trusty; urgency=low
+
+  * The comet data source no longer accepts http and so changed to https
+    (along with all other URLs).
+  * Removed old eclipse information.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 4 Sep 2018 17:16:51 +1000
+
+
 indicator-lunar (1.0.77-1) trusty; urgency=low
 
   * Now checks for an internet connection before downloading TLE/OE data.
