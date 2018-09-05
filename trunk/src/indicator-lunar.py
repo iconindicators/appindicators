@@ -58,7 +58,7 @@ class AstronomicalBodyType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star,
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.78"
+    VERSION = "1.0.79"
     ICON = INDICATOR_NAME
     ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
     ICON_BASE_PATH = tempfile.gettempdir()
@@ -1371,14 +1371,17 @@ class IndicatorLunar:
                     menu.append( menuItem )
 
                 # Comet data may not exist or comet data exists but is bad.
-#TODO Testing                        
-                missing = ( key not in self.cometOEData )
-                bad = ( key in self.cometOEData and ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) in self.data )
+                missing = ( key not in self.cometOEData ) # This scenario should be covered by the 'no data' clause below...but just in case catch it here!
 
-                cometDataIsMissingOrBad = ( key not in self.cometOEData ) or \
-                                          ( key in self.cometOEData and ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) in self.data )
+                badData = ( key in self.cometOEData and \
+                          ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) in self.data ) and \
+                          self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_DATA_BAD_DATA
 
-                if cometDataIsMissingOrBad:
+                noData = ( key in self.cometOEData and \
+                         ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) in self.data ) and \
+                          self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA
+
+                if missing or badData or noData:
                     subMenu = Gtk.Menu()
                     subMenu.append( Gtk.MenuItem( self.getDisplayData( ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ) ) )
                     menuItem.set_submenu( subMenu )
@@ -1456,7 +1459,11 @@ class IndicatorLunar:
         # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
         # Therefore only check for the presence of these two messages.
         if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data:
-            subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ) )
+            # This function only handles the messages of 'always up' and 'never up'.
+            # Other messages are handled by the specific functions (comet, satellite).
+            if self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_ALWAYS_UP or \
+               self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP:
+                subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ) )
         else:
             data = [ ]
             data.append( [ key + ( IndicatorLunar.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
@@ -1473,8 +1480,6 @@ class IndicatorLunar:
                 subMenu.append( Gtk.MenuItem( text + self.getDisplayData( key ) ) )
 
         menuItem.set_submenu( subMenu )
-
-#TODO Also consider if bad/no data for comets, need to add to the tool tip that the comet will be hidden?
 
 
     def updateRightAscensionDeclinationAzimuthAltitudeMenu( self, menu, astronomicalBodyType, dataTag ):
@@ -2084,16 +2089,6 @@ class IndicatorLunar:
                         self.updateCommon( comet, AstronomicalBodyType.Comet, key, ephemNow, hideIfNeverUp )
             else:
                 self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
-
-#TODO Testing       
-        for k in self.data:
-            if k[ 1 ] == 'C/2016 M1 (PANSTARRS)':
-                print( self.data[ k ] )
-                
-        print()                
-        for k in self.data:
-            if k[ 1 ] == '78P/GEHRELS':
-                print( self.data[ k ] )
 
 
     # Calculates the common attributes such as rise/set, illumination, constellation, magnitude, tropical sign, distance, bright limb angle and RA/Dec/Az/Alt.
