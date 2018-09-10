@@ -4,7 +4,7 @@
 
 # Open the UKHO ports file
 #
-#     2017_predictions_non-commercial_granted (2016.11.15).xls
+#     2018 Current Tidal Prediction Ports.xlsx
 #
 # in LibreOffice Calc and Save As 'Text CSV' using TAB as the field delimiter and no text delimiter.
 #
@@ -17,16 +17,13 @@
 
 
 def process( fileName ):
-    print( fileName )
     with open( fileName ) as f:
        for line in f:
-           if line.startswith( "PortNo" ):
-               continue
-
-           line = line.strip().split( "\t" )
-           line = "[ \"" + line[ 0 ] + line[ 1 ] + "\", \"" + line[ 2 ] + "\", \"" + line[ 8 ] + "\" ],"
-           line = line.replace( "ST.", "St." ).title()
-           print( line )
+           if not line.startswith( "PortNo" ):
+               line = line.strip().split( "\t" )
+               line = "[ \"" + line[ 0 ] + line[ 1 ] + "\", \"" + line[ 2 ] + "\", \"" + line[ 8 ] + "\" ],"
+               line = line.title().replace( "St. ", "St." ).replace( "St.", "St. " ).replace( "'S", "'s" )
+               print( line )
 
 
-process( "2017_predictions_non-commercial_granted (2016.11.15).csv" )
+process( "Current Tidal Prediction Ports.csv" )
