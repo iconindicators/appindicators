@@ -1,7 +1,6 @@
 indicator-tide (1.0.13-1) trusty; urgency=low
 
   * Annual renewal of UKHO licence.
-  * Port listings have been updated - some additions, some deletions.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 14 Aug 2018 22:09:37 +1000
 
