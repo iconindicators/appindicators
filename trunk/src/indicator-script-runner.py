@@ -117,7 +117,36 @@ class IndicatorScriptRunner:
 
 
     def onScript( self, widget, script ):
+
+
+        command = "x-terminal-emulator -e ${SHELL}'"
+
+        if script.getDirectory() == "":
+            command += " -c cd\ .;\""
+        else:
+            command += " -c cd\ " + script.getDirectory() + ";\""
+
+        command += script.getCommand()
+
+        if script.getShowNotification():
+            command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
+
+        if script.getPlaySound():
+            command += " && " + IndicatorScriptRunner.COMMAND_SOUND
+
+        command += "\";'"
+
+        if script.isTerminalOpen():
+            command += "${SHELL}"
+
+
+xfce4-terminal -e or -x 
+https://bugs.launchpad.net/ubuntu/+source/gnome-terminal/+bug/1726380
+https://docs.xfce.org/apps/terminal/command-line
+
+        # gnome-terminal
         command = "gnome-terminal -- /bin/bash -c '"
+        command = "/usr/bin/gnome-terminal -- /bin/bash -c '"
 
         if script.getDirectory() != "":
             command += "cd " + script.getDirectory() + "; "
