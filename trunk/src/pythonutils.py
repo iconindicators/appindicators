@@ -34,6 +34,10 @@ JSON_EXTENSION = ".json"
 LOGGING_BASIC_CONFIG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 LOGGING_BASIC_CONFIG_LEVEL = logging.DEBUG
 
+TERMINAL_GNOME = "gnome-terminal"
+TERMINAL_LXDE = "lxterminal"
+TERMINAL_XFCE = "xfce4-terminal"
+
 USER_DIRECTORY_CACHE = ".cache"
 USER_DIRECTORY_CONFIG = ".config"
 
@@ -66,6 +70,35 @@ def isNumber( numberAsString ):
         return True
     except ValueError:
         return False
+
+
+# Return the full path and name of the executable for the current terminal; None on failure.
+def getTerminal():
+    terminal = processGet( "which " + TERMINAL_GNOME )
+    if terminal is None:
+        terminal = processGet( "which " + TERMINAL_LXDE )
+
+        if terminal is None:
+            terminal = processGet( "which " + TERMINAL_XFCE )
+
+    if terminal is not None:
+        terminal = terminal.strip()
+
+    if terminal == "":
+        terminal = None
+
+    return terminal
+
+
+def getTerminalExecutionFlag( terminal ): 
+    executionFlag = None
+    if terminal is not None:
+        if terminal.endswith( TERMINAL_GNOME ):
+            executionFlag = "--"
+        elif terminal.endswith( TERMINAL_LXDE ) or terminal.endswith( TERMINAL_XFCE ):
+            executionFlag = "-x"
+
+    return executionFlag
 
 
 def isAutoStart( desktopFile, logging, autoStartPath = AUTOSTART_PATH ):
