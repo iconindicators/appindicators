@@ -46,7 +46,7 @@ import copy, json, logging, os, pythonutils, threading
 class IndicatorScriptRunner:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.7"
+    VERSION = "1.0.8"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -117,40 +117,10 @@ class IndicatorScriptRunner:
 
 
     def onScript( self, widget, script ):
-
         terminal = pythonutils.getTerminal()
-        print( terminal )
         terminalExecutionFlag = pythonutils.getTerminalExecutionFlag( terminal )
-        print( terminalExecutionFlag )
-#         if True: return
-
-
-#TODO Wrap this in a try/catch...see if the currently released version will show/catch the error when running on Xubuntu 16.04.
-
-#         command = terminal + " " + terminalExecutionFlag + " ${SHELL}'"
-
-#         if script.getDirectory() == "":
-#             command += " -c cd\ .;\""
-#         else: 
-#             command += " -c cd\ " + script.getDirectory() + ";\""
-# 
-#         command += script.getCommand()
-# 
-#         if script.getShowNotification():
-#             command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
-# 
-#         if script.getPlaySound():
-#             command += " && " + IndicatorScriptRunner.COMMAND_SOUND
-# 
-#         command += "\";'"
-# 
-#         if script.isTerminalOpen():
-#             command += "${SHELL}"
-
 
         command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
-#         command = "gnome-terminal -- /bin/bash -c '"
-#         command = "/usr/bin/gnome-terminal -- /bin/bash -c '"
 
         if script.getDirectory() != "":
             command += "cd " + script.getDirectory() + "; "
@@ -165,7 +135,6 @@ class IndicatorScriptRunner:
 
         if script.isTerminalOpen():
             command += "; ${SHELL}"
-#             command += "; /bin/bash"
 
         command += "'"
         Thread( target = pythonutils.processCall, args = ( command, ) ).start()
