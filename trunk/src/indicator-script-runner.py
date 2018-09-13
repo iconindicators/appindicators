@@ -118,35 +118,39 @@ class IndicatorScriptRunner:
 
     def onScript( self, widget, script ):
 
-
-        command = "x-terminal-emulator -e ${SHELL}'"
-
-        if script.getDirectory() == "":
-            command += " -c cd\ .;\""
-        else:
-            command += " -c cd\ " + script.getDirectory() + ";\""
-
-        command += script.getCommand()
-
-        if script.getShowNotification():
-            command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
-
-        if script.getPlaySound():
-            command += " && " + IndicatorScriptRunner.COMMAND_SOUND
-
-        command += "\";'"
-
-        if script.isTerminalOpen():
-            command += "${SHELL}"
+        terminal = pythonutils.getTerminal()
+        print( terminal )
+        terminalExecutionFlag = pythonutils.getTerminalExecutionFlag( terminal )
+        print( terminalExecutionFlag )
+#         if True: return
 
 
-xfce4-terminal -e or -x 
-https://bugs.launchpad.net/ubuntu/+source/gnome-terminal/+bug/1726380
-https://docs.xfce.org/apps/terminal/command-line
+#TODO Wrap this in a try/catch...see if the currently released version will show/catch the error when running on Xubuntu 16.04.
 
-        # gnome-terminal
-        command = "gnome-terminal -- /bin/bash -c '"
-        command = "/usr/bin/gnome-terminal -- /bin/bash -c '"
+#         command = terminal + " " + terminalExecutionFlag + " ${SHELL}'"
+
+#         if script.getDirectory() == "":
+#             command += " -c cd\ .;\""
+#         else: 
+#             command += " -c cd\ " + script.getDirectory() + ";\""
+# 
+#         command += script.getCommand()
+# 
+#         if script.getShowNotification():
+#             command += " && " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
+# 
+#         if script.getPlaySound():
+#             command += " && " + IndicatorScriptRunner.COMMAND_SOUND
+# 
+#         command += "\";'"
+# 
+#         if script.isTerminalOpen():
+#             command += "${SHELL}"
+
+
+        command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
+#         command = "gnome-terminal -- /bin/bash -c '"
+#         command = "/usr/bin/gnome-terminal -- /bin/bash -c '"
 
         if script.getDirectory() != "":
             command += "cd " + script.getDirectory() + "; "
@@ -160,7 +164,8 @@ https://docs.xfce.org/apps/terminal/command-line
             command += "; " + IndicatorScriptRunner.COMMAND_SOUND
 
         if script.isTerminalOpen():
-            command += "; /bin/bash"
+            command += "; ${SHELL}"
+#             command += "; /bin/bash"
 
         command += "'"
         Thread( target = pythonutils.processCall, args = ( command, ) ).start()
