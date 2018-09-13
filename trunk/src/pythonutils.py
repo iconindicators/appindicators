@@ -96,7 +96,9 @@ def getTerminalExecutionFlag( terminal ):
     if terminal is not None:
         if terminal.endswith( TERMINAL_GNOME ):
             executionFlag = "--"
-        elif terminal.endswith( TERMINAL_LXDE ) or terminal.endswith( TERMINAL_XFCE ):
+        elif terminal.endswith( TERMINAL_LXDE ):
+            executionFlag = "-e"
+        elif terminal.endswith( TERMINAL_XFCE ):
             executionFlag = "-x"
 
     return executionFlag
