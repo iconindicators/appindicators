@@ -90,6 +90,7 @@ def getTerminal():
     return terminal
 
 
+# Return the execution flag for the given terminal; None on failure. 
 def getTerminalExecutionFlag( terminal ): 
     executionFlag = None
     if terminal is not None:
