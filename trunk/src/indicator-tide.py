@@ -48,12 +48,12 @@ import datetime, json, locale, logging, os, ports, pythonutils, re, threading, t
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.13"
+    VERSION = "1.0.14"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
-    COMMENTS = _( "Displays tidal information.\nPort data is licensed will expire after {0}." ).format( ports.getExpiry() )
+    COMMENTS = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() )
 
     CREDIT_UKHO_COPYRIGHT = _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. http://www.GOV.uk/UKHO" )
     CREDIT_UKHO_ON_CLICK = _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." )

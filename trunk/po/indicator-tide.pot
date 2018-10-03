@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-tide 1.0.13\n"
+"Project-Id-Version: indicator-tide 1.0.14\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-09-18 20:52+1000\n"
+"POT-Creation-Date: 2018-10-03 18:24+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "Displays tidal information.\n"
-"Port data is licensed will expire after {0}."
+"Port data is licensed and will expire after {0}."
 msgstr ""
 
 #: indicator-tide.py:58
@@ -38,130 +38,131 @@ msgid ""
 "port page to verify the results produced."
 msgstr ""
 
-#: indicator-tide.py:99
+#: indicator-tide.py:98
 msgid ""
 "The license for non-UK ports has expired. Until you upgrade to the latest "
 "version of the indicator, only UK ports will be available."
 msgstr ""
 
-#: indicator-tide.py:102
+#: indicator-tide.py:101
 msgid "Warning"
 msgstr ""
 
-#: indicator-tide.py:115
+#: indicator-tide.py:114
 msgid "Error"
 msgstr ""
 
-#: indicator-tide.py:116 indicator-tide.py:135
+#: indicator-tide.py:115 indicator-tide.py:134
 #, python-brace-format
 msgid "No tidal data available for {0}!"
 msgstr ""
 
-#: indicator-tide.py:118
+#: indicator-tide.py:117
 msgid "Tidal data ready"
 msgstr ""
 
-#: indicator-tide.py:120
+#: indicator-tide.py:119
 msgid "Cached tidal data ready"
 msgstr ""
 
-#: indicator-tide.py:122
+#: indicator-tide.py:121
 msgid "Tidal data is presented in the time zone of the port."
 msgstr ""
 
-#: indicator-tide.py:124
+#: indicator-tide.py:123
 msgid "Tidal data is presented in your local time zone."
 msgstr ""
 
-#: indicator-tide.py:137
+#: indicator-tide.py:136
 #, python-brace-format
 msgid "{0}, {1}"
 msgstr ""
 
-#: indicator-tide.py:172
+#: indicator-tide.py:171
 msgid "H"
 msgstr ""
 
-#: indicator-tide.py:174
+#: indicator-tide.py:173
 msgid "L"
 msgstr ""
 
-#: indicator-tide.py:243
+#: indicator-tide.py:242
 msgid "Credits"
 msgstr ""
 
-#: indicator-tide.py:249
+#: indicator-tide.py:248
 msgid "translator-credits"
 msgstr ""
 
-#: indicator-tide.py:250
+#: indicator-tide.py:249
 msgid "View the"
 msgstr ""
 
-#: indicator-tide.py:251
+#: indicator-tide.py:250
 msgid "text file."
 msgstr ""
 
-#: indicator-tide.py:252
+#: indicator-tide.py:251
 msgid "changelog"
 msgstr ""
 
-#: indicator-tide.py:277
+#: indicator-tide.py:276
 msgid "Country"
 msgstr ""
 
-#: indicator-tide.py:280
+#: indicator-tide.py:279
 msgid "Choose your country."
 msgstr ""
 
-#: indicator-tide.py:293
+#: indicator-tide.py:292
 msgid "Choose your port."
 msgstr ""
 
-#: indicator-tide.py:296
+#: indicator-tide.py:295
 msgid "Port"
 msgstr ""
 
-#: indicator-tide.py:308
+#: indicator-tide.py:307
 msgid "Ports"
 msgstr ""
 
-#: indicator-tide.py:319
+#: indicator-tide.py:318
 msgid "Show as submenus"
 msgstr ""
 
-#: indicator-tide.py:321
+#: indicator-tide.py:320
 msgid "Show each day's tides in a submenu."
 msgstr ""
 
-#: indicator-tide.py:325
+#: indicator-tide.py:324
 msgid "Except first day"
 msgstr ""
 
-#: indicator-tide.py:329
+#: indicator-tide.py:328
 msgid "Show the first day's tide in full."
 msgstr ""
 
-#: indicator-tide.py:338
+#: indicator-tide.py:337
 msgid "Date format"
 msgstr ""
 
-#: indicator-tide.py:344
+#: indicator-tide.py:343
 msgid ""
 "Formatting options for the date:\n"
 "\n"
 "    http://docs.python.org/3/library/datetime.html"
 msgstr ""
 
-#: indicator-tide.py:351
+#: indicator-tide.py:350
 msgid "Tide format"
 msgstr ""
 
-#: indicator-tide.py:360
+#: indicator-tide.py:359
 msgid "Default"
 msgstr ""
 
-#: indicator-tide.py:366
+#: indicator-tide.py:365
+#, python-brace-format
 msgid ""
 "Tide information is specified using:\n"
 "\n"
@@ -173,11 +174,12 @@ msgid ""
 "    http://docs.python.org/3/library/datetime.html"
 msgstr ""
 
-#: indicator-tide.py:378
+#: indicator-tide.py:377
 msgid "Missing time"
 msgstr ""
 
-#: indicator-tide.py:384
+#: indicator-tide.py:383
+#, python-brace-format
 msgid ""
 "Tide information is specified using:\n"
 "\n"
@@ -188,18 +190,18 @@ msgid ""
 "component in a tide reading"
 msgstr ""
 
-#: indicator-tide.py:393
+#: indicator-tide.py:392
 msgid "Autostart"
 msgstr ""
 
-#: indicator-tide.py:395
+#: indicator-tide.py:394
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-tide.py:399
+#: indicator-tide.py:398
 msgid "General"
 msgstr ""
 
-#: indicator-tide.py:401
+#: indicator-tide.py:400
 msgid "Preferences"
 msgstr ""

@@ -1,3 +1,10 @@
+indicator-tide (1.0.14-1) trusty; urgency=low
+
+  * Fixed incorrect grammar in About dialog.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 3 Oct 2018 18:21:17 +1000
+
+
 indicator-tide (1.0.13-1) trusty; urgency=low
 
   * Annual renewal of UKHO licence.
