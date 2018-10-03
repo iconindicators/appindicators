@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-tide 1.0.13\n"
+"Project-Id-Version: indicator-tide 1.0.14\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-09-18 20:52+1000\n"
-"PO-Revision-Date: 2017-09-21 10:46+0300\n"
+"POT-Creation-Date: 2018-10-03 18:24+1000\n"
+"PO-Revision-Date: 2018-10-03 15:00+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: indicator-tide.py:56
 msgid ""
 "Displays tidal information.\n"
-"Port data is licensed will expire after {0}."
+"Port data is licensed and will expire after {0}."
 msgstr ""
 "Показывает сведения о приливах.\n"
 "Лицензия на данные о портах истекает с {0}."
@@ -172,6 +172,7 @@ msgid "Default"
 msgstr "Формат по умолчанию"
 
 #: indicator-tide.py:366
+#, python-brace-format
 msgid ""
 "Tide information is specified using:\n"
 "\n"
@@ -196,6 +197,7 @@ msgid "Missing time"
 msgstr "Формат данных без времени"
 
 #: indicator-tide.py:384
+#, python-brace-format
 msgid ""
 "Tide information is specified using:\n"
 "\n"
