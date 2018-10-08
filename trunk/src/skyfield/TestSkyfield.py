@@ -141,12 +141,13 @@ def testSkyfieldSaturn( utcNow, latitudeDD, longitudeDD, elevation ):
 
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, planets[ "earth" ] )
     saturn = planets[ "saturn barycenter" ]
-    astrometric = observer.at( utcNow ).observe( saturn ).apparent()
-    alt, az, earthDistance = astrometric.altaz()
-    ra, dec, earthDistance = astrometric.radec()
+    apparent = observer.at( utcNow ).observe( saturn ).apparent()
+    alt, az, earthDistance = apparent.altaz()
+    ra, dec, earthDistance = apparent.radec()
     ra, dec, sunDistance = planets[ "sun" ].at( utcNow ).observe( planets[ "saturn barycenter" ] ).radec()
     print( "Saturn:" )
-    printPairs( [ "AZ", az, "ALT", alt, "RA", ra, "DEC", dec, "ED", earthDistance, "SD", sunDistance, "PH/IL", "TODO", "CON", "TODO", "MAG", "TODO", "RISE", "TODO", "SET", "TODO", "ET", "TODO", "ST", "TODO" ] )
+    printPairs( [ "AZ", az.dms(), "ALT", alt.dms(), "RA", ra.hms(), "DEC", dec.dms(), "ED", earthDistance, "SD", sunDistance, "PH/IL", "TODO", "CON", "TODO", "MAG", "TODO", "RISE", "TODO", "SET", "TODO", "ET", "TODO", "ST", "TODO" ] )
+    print( "TODO: Alt/Az/Ra/Dec for Saturn are out slightly in the minutes/seconds." )
 
 
 def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
