@@ -1,6 +1,6 @@
 indicator-ppa-download-statistics (1.0.62-1) trusty; urgency=low
 
-  * Added "TODO Whatever comes after cosmic" to the list of series.
+  * Added disco to the list of series.
   * Changed default series from xenial to bionic.
   * Bug fix: Removed duplicate 'utopic' from list of series.
 
