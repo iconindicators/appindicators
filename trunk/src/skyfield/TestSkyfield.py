@@ -13,10 +13,7 @@
 # https://github.com/skyfielders/python-skyfield
 # 
 # http://rhodesmill.org/skyfield/
-# http://rhodesmill.org/skyfield/toc.html
-# http://rhodesmill.org/skyfield/planets.html
-# http://rhodesmill.org/skyfield/api.html
-# 
+#
 # ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
 # ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
 #
@@ -50,8 +47,6 @@
 #     Satellite 
 
 
-#TODO Divide up the attributes into those that are calculated and change over time and those that are not...
-#
 #     Attributes which change: 
 #         RA/DEC 
 #         ALT/AZ 
@@ -63,11 +58,11 @@
 #         planetary moons RA/DEC/AZ/ALT/EarthVisible 
 #         Saturn earth/sun tilt
 #     
-#     Attributes which are static:
+#     Attributes which are relatively static:
 #         Magnitude
 #
 #     Attributes which are calculated outside of engine:
-#         Bight Limb
+#         Bright Limb
 #         Tropical Sign
 #         Constellation (not applicable to all stars)
 #         moon/sun eclipse
@@ -134,14 +129,24 @@ def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
     return earth + Topos( latitude_degrees = latitudeDD, longitude_degrees = longitudeDD, elevation_m = elevation )
 
 
-def testSkyfieldSaturn( utcNow, planets, latitudeDD, longitudeDD, elevation ):
-    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, planets[ "earth" ] )
-    saturn = planets[ "saturn barycenter" ]
+#TODO For Saturn, return the earth/sun tilts.
+def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
+    apparent = observer.at( utcNow ).observe( planet ).apparent()
+    alt, az, earthDistance = apparent.altaz()
+    ra, dec, sunDistance = ephemeris[ "sun" ].at( utcNow ).observe( planet ).radec()
+    ra, dec, earthDistance = apparent.radec()
+    illumination = almanac.fraction_illuminated( ephemeris, planet, utcNow ) * 100
+    return az.dms(), alt.dms(), ra.hms(), dec.dms(), earthDistance, sunDistance, illumination, "CON: TODO", "MAG: TODO https://github.com/skyfielders/python-skyfield/issues/210", "RISE: TODO", "SET: TODO"
+
+
+def testSkyfieldSaturn( utcNow, ephemeris, latitudeDD, longitudeDD, elevation ):
+    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ "earth" ] )
+    saturn = ephemeris[ "saturn barycenter" ]
     apparent = observer.at( utcNow ).observe( saturn ).apparent()
     alt, az, earthDistance = apparent.altaz()
-    ra, dec, sunDistance = planets[ "sun" ].at( utcNow ).observe( planets[ "saturn barycenter" ] ).radec()
+    ra, dec, sunDistance = ephemeris[ "sun" ].at( utcNow ).observe( ephemeris[ "saturn barycenter" ] ).radec()
     ra, dec, earthDistance = apparent.radec()
-    illumination = almanac.fraction_illuminated( planets, "saturn barycenter", utcNow ) * 100
+    illumination = almanac.fraction_illuminated( ephemeris, "saturn barycenter", utcNow ) * 100
 
     print( "Saturn:" )
     printPairs( [ "AZ", az.dms(), "ALT", alt.dms(), "RA", ra.hms(), "DEC", dec.dms(), "ED", earthDistance, "SD", sunDistance, "PH/IL", illumination, "CON", "TODO", "MAG", "TODO https://github.com/skyfielders/python-skyfield/issues/210", "RISE", "TODO", "SET", "TODO", "ET", "TODO", "ST", "TODO" ] )
@@ -155,11 +160,23 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     print( "========\n" )
     print( utcNowSkyfield.utc, "\n" )
 
-    planets = load( "2017-2024.bsp" )
-# TODO Can this be used to get a list of planets?
-#     print( planets.names() )
+#TODO This ephemeris contains only planets...what about stars and planetary moons?
+    ephemeris = load( "2017-2024.bsp" )
 
-    testSkyfieldSaturn( utcNowSkyfield, planets, latitudeDD, longitudeDD, elevation )
+# TODO Can this be used to get a list of planets?
+#     print( ephemeris.names() )
+
+    testSkyfieldSaturn( utcNowSkyfield, ephemeris, latitudeDD, longitudeDD, elevation )
+#     print( ephemeris[ "saturn barycenter" ].target_name )
+
+    for planet in ephemeris.names():
+        print( planet )
+#         thing = ephemeris[ planet ]
+#         print( thing.target, thing.target_name )
+
+
+    print( ephemeris)
+#     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ "earth" ] ), ephemeris[ "saturn barycenter" ] ) )
 
 
 latitudeDD = -33.8
