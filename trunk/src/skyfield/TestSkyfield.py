@@ -78,6 +78,7 @@ import datetime, ephem, pytz
 from ephem.cities import _city_data
 from ephem.stars import stars
 
+from skyfield import almanac
 from skyfield.api import load, Star, Topos
 
 
@@ -133,30 +134,32 @@ def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
     return earth + Topos( latitude_degrees = latitudeDD, longitude_degrees = longitudeDD, elevation_m = elevation )
 
 
-def testSkyfieldSaturn( utcNow, latitudeDD, longitudeDD, elevation ):
-    planets = load( "2017-2024.bsp" )
-
-# TODO Can this be used to get a list of planets?
-#     print( planets.names() )
-
+def testSkyfieldSaturn( utcNow, planets, latitudeDD, longitudeDD, elevation ):
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, planets[ "earth" ] )
     saturn = planets[ "saturn barycenter" ]
     apparent = observer.at( utcNow ).observe( saturn ).apparent()
     alt, az, earthDistance = apparent.altaz()
-    ra, dec, earthDistance = apparent.radec()
     ra, dec, sunDistance = planets[ "sun" ].at( utcNow ).observe( planets[ "saturn barycenter" ] ).radec()
+    ra, dec, earthDistance = apparent.radec()
+    illumination = almanac.fraction_illuminated( planets, "saturn barycenter", utcNow ) * 100
+
     print( "Saturn:" )
-    printPairs( [ "AZ", az.dms(), "ALT", alt.dms(), "RA", ra.hms(), "DEC", dec.dms(), "ED", earthDistance, "SD", sunDistance, "PH/IL", "TODO", "CON", "TODO", "MAG", "TODO", "RISE", "TODO", "SET", "TODO", "ET", "TODO", "ST", "TODO" ] )
-    print( "TODO: Alt/Az/Ra/Dec for Saturn are out slightly in the minutes/seconds." )
+    printPairs( [ "AZ", az.dms(), "ALT", alt.dms(), "RA", ra.hms(), "DEC", dec.dms(), "ED", earthDistance, "SD", sunDistance, "PH/IL", illumination, "CON", "TODO", "MAG", "TODO https://github.com/skyfielders/python-skyfield/issues/210", "RISE", "TODO", "SET", "TODO", "ET", "TODO", "ST", "TODO" ] )
 
 
 def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     utcNowSkyfield = load.timescale().utc( utcNow.replace( tzinfo = pytz.UTC ) )
+
     print( "========" )
     print( "Skyfield" )
     print( "========\n" )
     print( utcNowSkyfield.utc, "\n" )
-    testSkyfieldSaturn( utcNowSkyfield, latitudeDD, longitudeDD, elevation )
+
+    planets = load( "2017-2024.bsp" )
+# TODO Can this be used to get a list of planets?
+#     print( planets.names() )
+
+    testSkyfieldSaturn( utcNowSkyfield, planets, latitudeDD, longitudeDD, elevation )
 
 
 latitudeDD = -33.8
