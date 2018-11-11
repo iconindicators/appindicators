@@ -47,7 +47,7 @@
 #     Satellite 
 
 
-#     Attributes which change: 
+#     Attributes calulated/provided by pyephem: 
 #         RA/DEC 
 #         ALT/AZ 
 #         Phase/Illumination 
@@ -57,11 +57,9 @@
 #         solstice/equinox 
 #         planetary moons RA/DEC/AZ/ALT/EarthVisible 
 #         Saturn earth/sun tilt
-#     
-#     Attributes which are relatively static:
 #         Magnitude
 #
-#     Attributes which are calculated outside of engine:
+#     Attributes which are calculated independently of pyephem:
 #         Bright Limb
 #         Tropical Sign
 #         Constellation (not applicable to all stars)
@@ -110,7 +108,7 @@ def testPyephemPlanet( observer, planet ):
         pairs.extend( ( "RISE/SET", "Never Up" ) )
 
 #TODO Needs to be a special case.
-    pairs.extend( ( "ET", planet.earth_tilt, "ST", planet.sun_tilt ) )
+#     pairs.extend( ( "ET", planet.earth_tilt, "ST", planet.sun_tilt ) )
 
     print( "Saturn:" )
     printPairs( pairs )
@@ -120,6 +118,7 @@ def testPyephem( utcNow, latitudeDD, longitudeDD, elevation ):
     print( "=======" )
     print( "PyEphem" )
     print( "=======\n" )
+
     print( utcNow, "\n" )
 
     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
@@ -132,7 +131,7 @@ def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
 
 #TODO Add rise/set.
 #TODO For Saturn, return the earth/sun tilts.
-#TODO Add planetery moons with AZ/ATL/RA/DEC, earth visible, offset from planet.
+#TODO Add planetary moons with AZ/ATL/RA/DEC, earth visible, offset from planet.
 def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
     thePlanet = ephemeris[ planet ]
     apparent = observer.at( utcNow ).observe( thePlanet ).apparent()
