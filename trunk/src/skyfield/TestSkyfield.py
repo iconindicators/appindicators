@@ -94,16 +94,13 @@ def getPyephemObserver( dateTime, latitudeDD, longitudeDD, elevation ):
     return observer
 
 
-def testPyephemSaturn( utcNow, latitudeDD, longitudeDD, elevation ):
-    observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
-    saturn = ephem.Saturn( observer )
-
+def testPyephemPlanet( observer, planet ):
     # Must grab the az/alt BEFORE rise/set is computed as the values get clobbered.
-    pairs = [ "AZ", saturn.az, "ALT", saturn.alt, "RA", saturn.ra, "DEC", saturn.dec, "ED", saturn.earth_distance, "SD", saturn.sun_distance, "PH/IL", saturn.phase, "CON", ephem.constellation( saturn ), "MAG", saturn.mag ]
+    pairs = [ "AZ", planet.az, "ALT", planet.alt, "RA", planet.ra, "DEC", planet.dec, "ED", planet.earth_distance, "SD", planet.sun_distance, "PH/IL", planet.phase, "CON", ephem.constellation( planet ), "MAG", planet.mag ]
 
     try:
-        rising = observer.next_rising( saturn )
-        setting = observer.next_setting( saturn )
+        rising = observer.next_rising( planet )
+        setting = observer.next_setting( planet )
         pairs.extend( ( "RISE", rising, "SET", setting ) )
 
     except ephem.AlwaysUpError:
@@ -112,7 +109,9 @@ def testPyephemSaturn( utcNow, latitudeDD, longitudeDD, elevation ):
     except ephem.NeverUpError:
         pairs.extend( ( "RISE/SET", "Never Up" ) )
 
-    pairs.extend( ( "ET", saturn.earth_tilt, "ST", saturn.sun_tilt ) )
+#TODO Needs to be a special case.
+    pairs.extend( ( "ET", planet.earth_tilt, "ST", planet.sun_tilt ) )
+
     print( "Saturn:" )
     printPairs( pairs )
 
@@ -122,7 +121,9 @@ def testPyephem( utcNow, latitudeDD, longitudeDD, elevation ):
     print( "PyEphem" )
     print( "=======\n" )
     print( utcNow, "\n" )
-    testPyephemSaturn( utcNow, latitudeDD, longitudeDD, elevation )
+
+    observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
+    testPyephemPlanet( observer, ephem.Saturn( observer ) )
 
 
 def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
@@ -142,33 +143,18 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
     return az.dms(), alt.dms(), ra.hms(), dec.dms(), earthDistance, sunDistance, illumination, "CON: TODO", "MAG: TODO https://github.com/skyfielders/python-skyfield/issues/210", "RISE: TODO", "SET: TODO"
 
 
-def testSkyfieldSaturn( utcNow, ephemeris, latitudeDD, longitudeDD, elevation ):
-    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ "earth" ] )
-    saturn = ephemeris[ "saturn barycenter" ]
-    apparent = observer.at( utcNow ).observe( saturn ).apparent()
-    alt, az, earthDistance = apparent.altaz()
-    ra, dec, sunDistance = ephemeris[ "sun" ].at( utcNow ).observe( ephemeris[ "saturn barycenter" ] ).radec()
-    ra, dec, earthDistance = apparent.radec()
-    illumination = almanac.fraction_illuminated( ephemeris, "saturn barycenter", utcNow ) * 100
-
-    print( "Saturn:" )
-    printPairs( [ "AZ", az.dms(), "ALT", alt.dms(), "RA", ra.hms(), "DEC", dec.dms(), "ED", earthDistance, "SD", sunDistance, "PH/IL", illumination, "CON", "TODO", "MAG", "TODO https://github.com/skyfielders/python-skyfield/issues/210", "RISE", "TODO", "SET", "TODO", "ET", "TODO", "ST", "TODO" ] )
-
-
 def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
-    utcNowSkyfield = load.timescale().utc( utcNow.replace( tzinfo = pytz.UTC ) )
-
     print( "========" )
     print( "Skyfield" )
     print( "========\n" )
+
+    utcNowSkyfield = load.timescale().utc( utcNow.replace( tzinfo = pytz.UTC ) )
     print( utcNowSkyfield.utc, "\n" )
 
 #TODO This ephemeris contains only planets...what about stars and planetary moons?
     ephemeris = load( "2017-2024.bsp" )
 
-    testSkyfieldSaturn( utcNowSkyfield, ephemeris, latitudeDD, longitudeDD, elevation )
 #     print( ephemeris[ "saturn barycenter" ].target_name )
-
 #     for planet in ephemeris.names():
 #         print( planet )
 #         thing = ephemeris[ planet ]
@@ -191,7 +177,6 @@ longitudeDD = 151.2
 elevation = 100
 
 utcNow = datetime.datetime.utcnow()
-# testPyephem( utcNow, str( latitudeDD ), str( longitudeDD ), elevation )
 testPyephem( utcNow, latitudeDD, longitudeDD, elevation )
 testSkyfield( utcNow, latitudeDD, longitudeDD, elevation )
 
