@@ -30,6 +30,7 @@
 #     http://astronomy.stackexchange.com/questions/11334/any-freely-available-large-stellar-spectra-catalog
 #     http://simbad.u-strasbg.fr/simbad/sim-id?Ident=BD%2B043561a
 #     http://wwwadd.zah.uni-heidelberg.de/datenbanken/aricns/cnspages/4c01453.htm
+#     https://en.wikipedia.org/wiki/Lists_of_stars
 #     sudo pip3 install --upgrade pandas
 #
 # Other stuff...
