@@ -92,7 +92,32 @@ TROPICAL_SIGNS = [ "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra
 
 
 # Code courtesy of Ignius Drake.
-def getTropicalSign( body, ephemNow ):
+def getTropicalSign( body, ephemNow, now ):
+    ( year, month, day ) = ephemNow.triple()
+
+    timeDelta = datetime.timedelta( days = now.day, hours = now.hour, minutes = now.minute, seconds = now.second, microseconds = now.microsecond )
+    dayWithFractionalHourMinuteSecond = timeDelta.total_seconds() / datetime.timedelta( days = 1 ).total_seconds()
+
+    epochAdjustedNew = float( now.year ) + float( now.month ) / 12.0 + float( dayWithFractionalHourMinuteSecond ) / 365.242
+    epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
+    ephemNowDate = str( ephemNow ).split( " " )
+
+    bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
+    bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
+    planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
+
+    if float( planetCoordinates[ 2 ] ) > 30:
+        planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
+
+    tropicalSignDegree = int( planetCoordinates[ 0 ] ) % 30
+    tropicalSignMinute = str( planetCoordinates[ 1 ] )
+    tropicalSignIndex = int( planetCoordinates[ 0 ] ) / 30
+    tropicalSignName = TROPICAL_SIGNS[ int( tropicalSignIndex ) ]
+
+    return ( tropicalSignName, str( tropicalSignDegree ), tropicalSignMinute )
+
+
+def getTropicalSignORIGINAL( body, ephemNow ):
     ( year, month, day ) = ephemNow.triple()
     epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
     ephemNowDate = str( ephemNow ).split( " " )
@@ -187,6 +212,10 @@ def testPyephem( utcNow, latitudeDD, longitudeDD, elevation ):
     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
     print( testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
 
+    observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
+    tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSign( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
+    print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
+
 #     with load.open( hipparcos.URL ) as f:
 #         stars = hipparcos.load_dataframe( f )
 
@@ -256,6 +285,10 @@ SKYFIELD_PLANET_SUN = "sun"
 latitudeDD = -33.8
 longitudeDD = 151.2
 elevation = 100
+
+#TODO Migh need to install pytz
+# https://rhodesmill.org/skyfield/time.html
+#to localise the date/time.
 
 utcNow = datetime.datetime.utcnow()
 testPyephem( utcNow, latitudeDD, longitudeDD, elevation )
