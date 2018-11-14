@@ -73,7 +73,7 @@ import datetime, ephem, math, pytz
 from ephem.cities import _city_data
 from ephem.stars import stars
 
-from skyfield import almanac
+from skyfield import almanac, positionlib
 from skyfield.api import load, Star, Topos
 from skyfield.data import hipparcos
 
@@ -93,18 +93,28 @@ TROPICAL_SIGNS = [ "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra
 
 # Code courtesy of Ignius Drake.
 def getTropicalSign( body, ephemNow, now ):
+
     ( year, month, day ) = ephemNow.triple()
-
     timeDelta = datetime.timedelta( days = now.day, hours = now.hour, minutes = now.minute, seconds = now.second, microseconds = now.microsecond )
-    dayWithFractionalHourMinuteSecond = timeDelta.total_seconds() / datetime.timedelta( days = 1 ).total_seconds()
+    yearWithFractionalDateTime = timeDelta.total_seconds() / datetime.timedelta( days = 1 ).total_seconds()
 
-    epochAdjustedNew = float( now.year ) + float( now.month ) / 12.0 + float( dayWithFractionalHourMinuteSecond ) / 365.242
+    epochAdjustedNew = float( now.year ) + float( now.month ) / 12.0 + float( yearWithFractionalDateTime ) / 365.242
+
+    x = load.timescale().utc( now.year, month = now.month, day = yearWithFractionalDateTime )
+
     epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
     ephemNowDate = str( ephemNow ).split( " " )
 
     bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
     bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
     planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
+
+    ephemeris = load( "2017-2024.bsp" )
+    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    thePlanet = ephemeris[ SKYFIELD_PLANET_SATURN ]
+    timescale = load.timescale()
+    y = observer.at( timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) ).observe( thePlanet ).apparent().ecliptic_latlon( epoch = x )
+
 
     if float( planetCoordinates[ 2 ] ) > 30:
         planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
@@ -255,7 +265,8 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     print( "========" )
     print()
 
-    utcNowSkyfield = load.timescale().utc( utcNow.replace( tzinfo = pytz.UTC ) )
+    timescale = load.timescale()
+    utcNowSkyfield = timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
     print( utcNowSkyfield.utc )
 
 #TODO This ephemeris contains only planets...what about stars and planetary moons?
