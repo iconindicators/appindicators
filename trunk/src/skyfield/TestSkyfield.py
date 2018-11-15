@@ -165,38 +165,52 @@ def getTropicalSignORIGINAL( body, ephemNow ):
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
     #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-    def getZenithAngleOfBrightLimb( self, city, body ):
-        sun = ephem.Sun( city )
+def getZenithAngleOfBrightLimb( self, city, body ):
+    sun = ephem.Sun( city )
 
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-        y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
-        x = math.cos( body.dec ) * math.sin( sun.dec ) - math.sin( body.dec ) * math.cos( sun.dec ) * math.cos( sun.ra - body.ra )
-        positionAngleOfBrightLimb = math.atan2( y, x )
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+    y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
+    x = math.cos( body.dec ) * math.sin( sun.dec ) - math.sin( body.dec ) * math.cos( sun.dec ) * math.cos( sun.ra - body.ra )
+    positionAngleOfBrightLimb = math.atan2( y, x )
 
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-        hourAngle = city.sidereal_time() - body.ra
-        y = math.sin( hourAngle )
-        x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
-        parallacticAngle = math.atan2( y, x )
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
+    hourAngle = city.sidereal_time() - body.ra
+    y = math.sin( hourAngle )
+    x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+    parallacticAngle = math.atan2( y, x )
 
-        return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+    return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
-    def getZenithAngleOfBrightLimbNEW( self, city, body, sunRA, sunDec, bodyRA, bodyDec, observerSiderealTime ):
-        sun = ephem.Sun( city )
+def getZenithAngleOfBrightLimbNEW( city, body, sunRA, sunDec, bodyRA, bodyDec, observerLatitude, observerSiderealTime ):
+    sun = ephem.Sun( city )
 
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-        y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
-        x = math.cos( body.dec ) * math.sin( sun.dec ) - math.sin( body.dec ) * math.cos( sun.dec ) * math.cos( sun.ra - body.ra )
-        positionAngleOfBrightLimb = math.atan2( y, x )
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+    y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
+    x = math.cos( body.dec ) * math.sin( sun.dec ) - math.sin( body.dec ) * math.cos( sun.dec ) * math.cos( sun.ra - body.ra )
+    positionAngleOfBrightLimb = math.atan2( y, x )
 
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-        hourAngle = city.sidereal_time() - body.ra
-        y = math.sin( hourAngle )
-        x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
-        parallacticAngle = math.atan2( y, x )
+    yNEW = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
+    xNEW = math.cos( bodyDec ) * math.sin( sunDec ) - math.sin( bodyDec ) * math.cos( sunDec ) * math.cos( sunRA - bodyRA )
+    positionAngleOfBrightLimbNEW = math.atan2( yNEW, xNEW )
 
-        return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
+    citySiderealTime = city.sidereal_time()
+    c = math.radians( citySiderealTime )
+    bodyRAinRadians = math.radians( body.ra )
+    hourAngle = citySiderealTime - body.ra
+    y = math.sin( hourAngle )
+    x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+    parallacticAngle = math.atan2( y, x )
+
+    hourAngleNEW = observerSiderealTime - bodyRA
+    yNEW = math.sin( hourAngleNEW )
+    xNEW = math.tan( observerLatitude ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngleNEW )
+    parallacticAngleNEW = math.atan2( yNEW, xNEW )
+
+    orig = math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+    new = math.degrees( ( positionAngleOfBrightLimbNEW - parallacticAngleNEW ) % ( 2.0 * math.pi ) )
+    return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
 def testPyephemPlanet( observer, planet ):
@@ -239,9 +253,35 @@ def testPyephem( utcNow, latitudeDD, longitudeDD, elevation ):
     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
     print( testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
 
+#     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
+#     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSign( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
+#     print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
+
     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
-    tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSign( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
-    print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
+    city = ephem.city( "Sydney" )
+    city.date = utcNow
+#     sun = ephem.Sun( observer )
+    saturn = ephem.Saturn( observer )
+
+    
+    ephemeris = load( "2017-2024.bsp" )
+    sun = ephemeris[ SKYFIELD_PLANET_SUN ]
+
+    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    timescale = load.timescale()
+    utcNowSkyfield = timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
+    apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
+    alt, az, earthDistance = apparent.altaz()
+    sunRA, sunDEC, earthDistance = apparent.radec()
+    
+    thePlanet = ephemeris[ SKYFIELD_PLANET_SATURN ]
+    apparent = observer.at( utcNowSkyfield ).observe( thePlanet ).apparent()
+    ra, dec, earthDistance = apparent.radec()
+
+    observerSiderealTime = utcNowSkyfield.gmst
+    bl = getZenithAngleOfBrightLimbNEW( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDD ), observerSiderealTime )
+    print()
+
 
 #     with load.open( hipparcos.URL ) as f:
 #         stars = hipparcos.load_dataframe( f )
