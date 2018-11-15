@@ -182,6 +182,23 @@ def getTropicalSignORIGINAL( body, ephemNow ):
         return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
+    def getZenithAngleOfBrightLimbNEW( self, city, body, sunRA, sunDec, bodyRA, bodyDec, observerSiderealTime ):
+        sun = ephem.Sun( city )
+
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+        y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
+        x = math.cos( body.dec ) * math.sin( sun.dec ) - math.sin( body.dec ) * math.cos( sun.dec ) * math.cos( sun.ra - body.ra )
+        positionAngleOfBrightLimb = math.atan2( y, x )
+
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
+        hourAngle = city.sidereal_time() - body.ra
+        y = math.sin( hourAngle )
+        x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+        parallacticAngle = math.atan2( y, x )
+
+        return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+
+
 def testPyephemPlanet( observer, planet ):
     # Must grab the az/alt BEFORE rise/set is computed as the values get clobbered.
     planet.compute( observer )
