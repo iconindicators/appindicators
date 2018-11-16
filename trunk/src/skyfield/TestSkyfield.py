@@ -8,7 +8,7 @@
 # Install (and upgrade to) latest skyfield: 
 #     sudo apt-get install python3-pip
 #     sudo pip3 install --upgrade skyfield
-
+#     sudo pip install --upgrade pytz
 
 # https://github.com/skyfielders/python-skyfield
 # 
@@ -244,6 +244,53 @@ def testPyephem( utcNow, latitudeDD, longitudeDD, elevation ):
     print( "PyEphem" )
     print( "=======" )
     print()
+
+    madrid = ephem.city('Madrid')
+    madrid.date = '1978/10/3 11:32'
+    print( "Madrid", madrid.sidereal_time())
+
+
+    madrid = ephem.city('Sydney')
+    madrid.date = '1978/10/3 11:32'
+    print( "Sydney", madrid.sidereal_time())
+
+
+    ts = load.timescale()
+    t = ts.utc(1978, 10, 3,11,32, 0)
+    st = t.gmst
+    print( st )
+
+    print( load.timescale().now().gmst )
+
+    sss = ts.utc( utcNow.replace( tzinfo = pytz.UTC ) )
+#     sss = ts.utc( datetime.datetime.utcnow() )
+    print( sss.gmst )
+
+    import sys
+    sys.exit()
+
+    ephemeris = load( "2017-2024.bsp" )
+    sun = ephemeris[ SKYFIELD_PLANET_SUN ]
+
+    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    timescale = load.timescale()
+    utcNowSkyfield = timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
+    apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
+    alt, az, earthDistance = apparent.altaz()
+    sunRA, sunDEC, earthDistance = apparent.radec()
+    
+    thePlanet = ephemeris[ SKYFIELD_PLANET_SATURN ]
+    apparent = observer.at( utcNowSkyfield ).observe( thePlanet ).apparent()
+    ra, dec, earthDistance = apparent.radec()
+
+    observerSiderealTime = utcNowSkyfield.gmst
+
+
+
+
+
+
+
 
     print( utcNow )
 
