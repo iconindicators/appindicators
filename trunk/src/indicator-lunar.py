@@ -988,12 +988,22 @@ class IndicatorLunar:
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LONGITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 1 ] ), 1 ) )
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_ELEVATION ) ] = str( _city_data.get( self.cityName )[ 2 ] )
 
-            ephemNow = ephem.now() # UTC, used in all calculations.  When it comes time to display, conversion to local time takes place.
-#TODO Not sure if it is valid to use UTC to calculate lots of stuff, then adjust the results based on the current timezone.
-# Using UTC to calculate rise/set and then adjust the result later to the current timezone is probably okay. 
-# Using UTC to calculate the bright limb is okay ONLY if the the current timezone is UTC because sidereal time is used and is timezone based.
-# Need to determine what calculations are safe to be adjusted after the fact and which are not.
-# For example, calculate rise/set for sun/moon/mars for UTC and then adjust to timezone COMPARED against calculating for the timezone directly.
+            # UTC, used in all calculations which is required by pyephem.
+            # When it comes time to display, conversion to local time takes place.
+            ephemNow = ephem.now()
+
+#TODO Need to check all results are accurate...
+# I suspect all results of a date/time nature are accureate.
+# Others should also be accurate.
+# However check bright limb...suspect it is incorrect because the sidereal time is in UTC not local.
+#
+# http://www.ga.gov.au/bin/geodesy/run/sunmoonposn
+# https://www.suncalc.org/#/-33.7939,151.1906,16/2018.11.17/17:10/1/0
+#
+# Moon Bright Limb
+# https://www.calsky.com/cs.cgi?cha=6&sec=1
+# https://futureboy.us/fsp/moon.fsp
+
             self.updateAstronomicalInformation( ephemNow, self.hideBodyIfNeverUp, self.cometsMagnitude, self.hideSatelliteIfNoVisiblePass )
 
             # Update frontend...
