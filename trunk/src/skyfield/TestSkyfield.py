@@ -68,6 +68,10 @@
 #         moon/sun eclipse
 
 
+
+# https://stackoverflow.com/questions/28867022/python-convert-au-to-km
+
+
 import datetime, ephem, math, pytz
 
 from ephem.cities import _city_data
