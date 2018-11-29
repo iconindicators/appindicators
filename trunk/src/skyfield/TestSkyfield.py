@@ -370,6 +370,10 @@ def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
     return earth + Topos( latitude_degrees = latitudeDD, longitude_degrees = longitudeDD, elevation_m = elevation )
 
 
+def getSkyfieldTopos( latitudeDD, longitudeDD, elevation):
+    return Topos( latitude_degrees = latitudeDD, longitude_degrees = longitudeDD, elevation_m = elevation )
+
+
 #TODO Add rise/set.
 #TODO For Saturn, return the earth/sun tilts.
 #TODO Add planetary moons with AZ/ATL/RA/DEC, earth visible, offset from planet.
@@ -399,11 +403,23 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
     return result
 
 
-def testSkyfieldSun( timeScale, utcNow, ephemeris, observer ):
+def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
     apparent = observer.at( utcNow ).observe( sun ).apparent()
     alt, az, earthDistance = apparent.altaz()
     ra, dec, earthDistance = apparent.radec()
+
+    t0 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
+    t1 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day + 1 )
+    t, y = almanac.find_discrete( t0, t1, almanac.sunrise_sunset( ephemeris, topos ) )
+    if y[ 0 ]:
+        rise = t[ 0 ].utc_iso()
+        set = t[ 1 ].utc_iso()
+    else:
+        rise = t[ 1 ].utc_iso()
+        set = t[ 0 ].utc_iso()
+
+#TODO Rise/set does not match pyephem!
 
     t0 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
     t1 = timeScale.utc( utcNow.utc_datetime().year + 1, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
@@ -426,8 +442,8 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer ):
         "Right Ascension: " + str( ra.hms() ), \
         "Declination: " + str( dec.dms() ), \
         "Dawn: TODO", \
-        "Rise: TODO", \
-        "Set: TODO", \
+        "Rise: " + str( rise ), \
+        "Set: " + str( set ), \
         "Dusk: TODO", \
         "Solstice: " + solstice, \
         "Equinox: " + equinox, \
@@ -454,7 +470,8 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
 #         print( thing.target, thing.target_name )
 
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-    print( testSkyfieldSun( timeScale, utcNowSkyfield, ephemeris, observer ) )
+    topos = getSkyfieldTopos( latitudeDD, longitudeDD, elevation )
+    print( testSkyfieldSun( timeScale, utcNowSkyfield, ephemeris, observer, topos ) )
 
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
