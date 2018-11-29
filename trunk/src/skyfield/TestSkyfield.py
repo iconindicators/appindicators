@@ -239,8 +239,25 @@ def testPyephemPlanet( observer, planet ):
     return result
 
 
-def testPyephemSun( observer, sun ):
-    return str( sun.az ), str( sun.alt ), str( sun.ra ), str( sun.dec ), sun.earth_distance, ephem.constellation( sun ), sun.mag, observer.next_rising( sun ).datetime(), observer.next_setting( sun ).datetime()
+def testPyephemSun( observer ):
+    sun = ephem.Sun( observer )
+
+    return \
+        "Constellation: " + str( ephem.constellation( sun ) ), \
+        "Magnitude: " + str( sun.mag ), \
+        "Tropical Sign: TODO", \
+        "Distance to Earth: " + str( sun.earth_distance ), \
+        "Azimuth: " + str( sun.az ), \
+        "Altitude: " + str( sun.alt ), \
+        "Right Ascension: " + str( sun.ra ), \
+        "Declination: " + str( sun.dec ), \
+        "Dawn: TODO", \
+        "Rise: " + str( observer.next_rising( sun ).datetime() ), \
+        "Set: " + str( observer.next_setting( sun ).datetime() ), \
+        "Dusk: TODO", \
+        "Solstice: TODO", \
+        "Equinox: TODO", \
+        "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
 
 
 def testPyephem( now, latitudeDD, longitudeDD, elevation ):
@@ -297,10 +314,10 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 
 
     observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
-    print( testPyephemSun( observer, ephem.Sun( observer ) ) )
+    print( testPyephemSun( observer ) )
 
-    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
-    print( testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
+#     observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
+#     print( testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
 
 #     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
 #     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSign( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
@@ -362,7 +379,23 @@ def testSkyfieldSun( utcNow, ephemeris, observer ):
     apparent = observer.at( utcNow ).observe( sun ).apparent()
     alt, az, earthDistance = apparent.altaz()
     ra, dec, earthDistance = apparent.radec()
-    return az.dms(), alt.dms(), ra.hms(), dec.dms(), earthDistance, "CON: TODO", "MAG: TODO https://github.com/skyfielders/python-skyfield/issues/210", "RISE: TODO", "SET: TODO"
+
+    return \
+        "Constellation: TODO", \
+        "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
+        "Tropical Sign: TODO", \
+        "Distance to Earth: " + str( earthDistance ), \
+        "Azimuth: " + str( az.dms() ), \
+        "Altitude: " + str( alt.dms() ), \
+        "Right Ascension: " + str( ra.hms() ), \
+        "Declination: " + str( dec.dms() ), \
+        "Dawn: TODO", \
+        "Rise: TODO", \
+        "Set: TODO", \
+        "Dusk: TODO", \
+        "Solstice: TODO", \
+        "Equinox: TODO", \
+        "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
 
 
 def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
@@ -373,7 +406,7 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
 
     timescale = load.timescale()
     utcNowSkyfield = timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
-    print( utcNowSkyfield.utc )
+#     print( utcNowSkyfield.utc )
 
 #TODO This ephemeris contains only planets...what about stars and planetary moons?
     ephemeris = load( "2017-2024.bsp" )
@@ -387,8 +420,8 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     print( testSkyfieldSun( utcNowSkyfield, ephemeris, observer ) )
 
-    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-    print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
+#     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+#     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
 
 
 # def getPlanetFromEphemeris( ephemeris ):
@@ -415,7 +448,7 @@ print( now )
 testPyephem( now, latitudeDD, longitudeDD, elevation )
 print()
 print()
-# testSkyfield( utcNow, latitudeDD, longitudeDD, elevation )
+testSkyfield( now, latitudeDD, longitudeDD, elevation )
 
 
 # barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
