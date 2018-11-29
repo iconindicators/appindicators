@@ -70,7 +70,7 @@
 
 
 # https://stackoverflow.com/questions/28867022/python-convert-au-to-km
-
+# https://stackoverflow.com/questions/53011697/difference-in-sun-earth-distance-with-computedate-and-computeobserver
 
 import datetime, ephem, math, pytz
 
@@ -80,6 +80,7 @@ from ephem.stars import stars
 from skyfield import almanac, positionlib
 from skyfield.api import load, Star, Topos
 from skyfield.data import hipparcos
+from posix import times
 
 
 # Must get a new observer after a rising/setting computation and before a calculations for a new body.    
@@ -255,6 +256,8 @@ def testPyephemPlanet( observer, planet ):
 def testPyephemSun( now, observer ):
     sun = ephem.Sun( observer )
 
+    print( "Rise: " + str( observer.next_rising( sun ).datetime() ) )
+    print( "Set: " + str( observer.next_setting( sun ).datetime() ) )
     return \
         "Constellation: " + str( ephem.constellation( sun ) ), \
         "Magnitude: " + str( sun.mag ), \
@@ -423,6 +426,9 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
         rise = t[ 1 ].utc_iso( ' ' )
         set = t[ 0 ].utc_iso( ' ' )
 
+    print( "Rise: " + rise )
+    print( "Set: " + set )
+
 #TODO Rise/set does not match pyephem!
 
     t0 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
@@ -479,6 +485,29 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
 
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
+
+
+#     print()
+#     timeScale = load.timescale()
+#     bluffton = Topos('40.8939 N', '83.8917 W')
+#     
+#     t0 = timeScale.utc(2018, 9, 12, 4)
+#     t1 = timeScale.utc(2018, 9, 13, 4)
+#     t, y = almanac.find_discrete(t0, t1, almanac.sunrise_sunset(ephemeris, bluffton))
+#     
+#     print(t.utc_iso())
+#     print(y)
+#     print()
+# 
+#     bluffton = Topos('40.8939 N', '83.8917 W')
+#     
+#     t0 = timeScale.utc(2018, 9, 12)
+#     t1 = timeScale.utc(2018, 9, 13)
+#     t, y = almanac.find_discrete(t0, t1, almanac.sunrise_sunset(ephemeris, bluffton))
+#     
+#     print(t.utc_iso())
+#     print(y)
+
 
 
 # def getPlanetFromEphemeris( ephemeris ):
