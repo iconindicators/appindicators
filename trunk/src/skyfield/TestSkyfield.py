@@ -370,7 +370,7 @@ def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
     return earth + Topos( latitude_degrees = latitudeDD, longitude_degrees = longitudeDD, elevation_m = elevation )
 
 
-def getSkyfieldTopos( latitudeDD, longitudeDD, elevation):
+def getSkyfieldTopos( latitudeDD, longitudeDD, elevation ):
     return Topos( latitude_degrees = latitudeDD, longitude_degrees = longitudeDD, elevation_m = elevation )
 
 
@@ -412,12 +412,16 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
     t0 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
     t1 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day + 1 )
     t, y = almanac.find_discrete( t0, t1, almanac.sunrise_sunset( ephemeris, topos ) )
+
+    print(t.utc_iso())
+    print(y)
+
     if y[ 0 ]:
-        rise = t[ 0 ].utc_iso()
-        set = t[ 1 ].utc_iso()
+        rise = t[ 0 ].utc_iso( ' ' )
+        set = t[ 1 ].utc_iso( ' ' )
     else:
-        rise = t[ 1 ].utc_iso()
-        set = t[ 0 ].utc_iso()
+        rise = t[ 1 ].utc_iso( ' ' )
+        set = t[ 0 ].utc_iso( ' ' )
 
 #TODO Rise/set does not match pyephem!
 
