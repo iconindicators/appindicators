@@ -252,7 +252,7 @@ def testPyephemPlanet( observer, planet ):
     return result
 
 
-def testPyephemSun( observer ):
+def testPyephemSun( now, observer ):
     sun = ephem.Sun( observer )
 
     return \
@@ -268,8 +268,8 @@ def testPyephemSun( observer ):
         "Rise: " + str( observer.next_rising( sun ).datetime() ), \
         "Set: " + str( observer.next_setting( sun ).datetime() ), \
         "Dusk: TODO", \
-        "Solstice: TODO", \
-        "Equinox: TODO", \
+        "Solstice: " + str( ephem.next_solstice( now ) ), \
+        "Equinox: " + str( ephem.next_equinox( now ) ), \
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
 
 
@@ -323,7 +323,7 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 
 
     observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
-    print( testPyephemSun( observer ) )
+    print( testPyephemSun( now, observer ) )
 
     observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
     print( testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
@@ -399,11 +399,22 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
     return result
 
 
-def testSkyfieldSun( utcNow, ephemeris, observer ):
+def testSkyfieldSun( timeScale, utcNow, ephemeris, observer ):
     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
     apparent = observer.at( utcNow ).observe( sun ).apparent()
     alt, az, earthDistance = apparent.altaz()
     ra, dec, earthDistance = apparent.radec()
+
+    t0 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
+    t1 = timeScale.utc( utcNow.utc_datetime().year + 1, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
+    t, y = almanac.find_discrete( t0, t1, almanac.seasons( ephemeris ) )
+
+    if "Equinox" in almanac.SEASON_EVENTS[ y[ 0 ] ]:
+        equinox = t[ 0 ].utc_iso(' ' )
+        solstice = t[ 1 ].utc_iso(' ' )
+    else:
+        solstice = t[ 0 ].utc_iso(' ' )
+        equinox = t[ 1 ].utc_iso(' ' )
 
     return \
         "Constellation: TODO", \
@@ -418,8 +429,8 @@ def testSkyfieldSun( utcNow, ephemeris, observer ):
         "Rise: TODO", \
         "Set: TODO", \
         "Dusk: TODO", \
-        "Solstice: TODO", \
-        "Equinox: TODO", \
+        "Solstice: " + solstice, \
+        "Equinox: " + equinox, \
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
 
 
@@ -429,8 +440,8 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     print( "========" )
     print()
 
-    timescale = load.timescale()
-    utcNowSkyfield = timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
+    timeScale = load.timescale()
+    utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
 #     print( utcNowSkyfield.utc )
 
 #TODO This ephemeris contains only planets...what about stars and planetary moons?
@@ -443,7 +454,7 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
 #         print( thing.target, thing.target_name )
 
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-    print( testSkyfieldSun( utcNowSkyfield, ephemeris, observer ) )
+    print( testSkyfieldSun( timeScale, utcNowSkyfield, ephemeris, observer ) )
 
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
