@@ -218,23 +218,36 @@ def getZenithAngleOfBrightLimbNEW( city, body, sunRA, sunDec, bodyRA, bodyDec, o
 
 
 def testPyephemPlanet( observer, planet ):
-    # Must grab the az/alt BEFORE rise/set is computed as the values get clobbered.
     planet.compute( observer )
-    result = str( planet.az ), str( planet.alt ), str( planet.ra ), str( planet.dec ), planet.earth_distance, planet.sun_distance, planet.phase, ephem.constellation( planet ), planet.mag
+
+    # Must retrieve the az/alt/ra/dec BEFORE rise/set is computed as the values get clobbered.
+    result = \
+        "Illumination: " + str( planet.phase ), \
+        "Constellation: " + str( ephem.constellation( planet ) ), \
+        "Magnitude: " + str( planet.mag ), \
+        "Tropical Sign: TODO", \
+        "Distance to Earth: " + str( planet.earth_distance ), \
+        "Distance to Sun: " + str( planet.sun_distance ), \
+        "Bright Limb: " + str( "TODO" ), \
+        "Azimuth: " + str( planet.az ), \
+        "Altitude: " + str( planet.alt ), \
+        "Right Ascension: " + str( planet.ra ), \
+        "Declination: " + str( planet.dec )
 
     try:
-        rising =  str( observer.next_rising( planet ) )
-        setting = str( observer.next_setting( planet ) )
-        result += rising, setting
+        result += \
+            "Rise: " + str( observer.next_rising( planet ) ), \
+            "Set: " + str( observer.next_setting( planet ) )
 
     except ephem.AlwaysUpError:
-        result += "Always Up"
+        result += "Rise/Set: Always Up"
 
     except ephem.NeverUpError:
-        result += "Never Up"
+        result += "Rise/Set: Never Up"
 
-    if planet.name == "Saturn":
-        result += str( planet.earth_tilt ), str( planet.sun_tilt )
+#TODO
+#     if planet.name == "Saturn":
+#         result += str( planet.earth_tilt ), str( planet.sun_tilt )
 
     return result
 
@@ -299,7 +312,7 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 #     apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
 #     alt, az, earthDistance = apparent.altaz()
 #     sunRA, sunDEC, earthDistance = apparent.radec()
-    
+
 #     thePlanet = ephemeris[ SKYFIELD_PLANET_SATURN ]
 #     apparent = observer.at( utcNowSkyfield ).observe( thePlanet ).apparent()
 #     ra, dec, earthDistance = apparent.radec()
@@ -309,15 +322,11 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 
 
 
-
-
-
-
     observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
     print( testPyephemSun( observer ) )
 
-#     observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
-#     print( testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
+    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
+    print( testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
 
 #     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
 #     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSign( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
@@ -371,7 +380,23 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
     ra, dec, sunDistance = ephemeris[ SKYFIELD_PLANET_SUN ].at( utcNow ).observe( thePlanet ).radec()
     ra, dec, earthDistance = apparent.radec()
     illumination = almanac.fraction_illuminated( ephemeris, planet, utcNow ) * 100
-    return az.dms(), alt.dms(), ra.hms(), dec.dms(), earthDistance, sunDistance, illumination, "CON: TODO", "MAG: TODO https://github.com/skyfielders/python-skyfield/issues/210", "RISE: TODO", "SET: TODO"
+
+    result = \
+        "Illumination: " + str( illumination ), \
+        "Constellation: " + str( "TODO" ), \
+        "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
+        "Tropical Sign: TODO", \
+        "Distance to Earth: " + str( earthDistance ), \
+        "Distance to Sun: " + str( sunDistance ), \
+        "Bright Limb: " + str( "TODO" ), \
+        "Azimuth: " + str( az.dms() ), \
+        "Altitude: " + str( alt.dms() ), \
+        "Right Ascension: " + str( ra.hms() ), \
+        "Declination: " + str( dec.dms() ), \
+        "Rise: TODO", \
+        "Set: TODO"
+
+    return result
 
 
 def testSkyfieldSun( utcNow, ephemeris, observer ):
@@ -420,8 +445,8 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     print( testSkyfieldSun( utcNowSkyfield, ephemeris, observer ) )
 
-#     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-#     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
+    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
 
 
 # def getPlanetFromEphemeris( ephemeris ):
