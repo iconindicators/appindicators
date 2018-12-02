@@ -324,6 +324,8 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 
 
 
+#TODO There is a difference between Az/ALT for the sun between the two systems...
+#...yet skyfield agrees with the indicator!
 
     observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
     print( testPyephemSun( now, observer ) )
@@ -416,8 +418,8 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
     t1 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day + 1 )
     t, y = almanac.find_discrete( t0, t1, almanac.sunrise_sunset( ephemeris, topos ) )
 
-    print(t.utc_iso())
-    print(y)
+#     print(t.utc_iso())
+#     print(y)
 
     if y[ 0 ]:
         rise = t[ 0 ].utc_iso( ' ' )
@@ -430,6 +432,7 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
     print( "Set: " + set )
 
 #TODO Rise/set does not match pyephem!
+# Results match when local time and GMT are on the same day...so try very early in morning or immediately after midnight to verify.
 
     t0 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
     t1 = timeScale.utc( utcNow.utc_datetime().year + 1, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
