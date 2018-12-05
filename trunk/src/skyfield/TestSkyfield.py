@@ -254,11 +254,9 @@ def testPyephemPlanet( observer, planet ):
 
 
 def testPyephemSun( now, observer ):
+    # Must retrieve the az/alt/ra/dec BEFORE rise/set is computed as the values get clobbered.
     sun = ephem.Sun( observer )
-
-    print( "Rise: " + str( observer.next_rising( sun ).datetime() ) )
-    print( "Set: " + str( observer.next_setting( sun ).datetime() ) )
-    return \
+    result = \
         "Constellation: " + str( ephem.constellation( sun ) ), \
         "Magnitude: " + str( sun.mag ), \
         "Tropical Sign: TODO", \
@@ -273,7 +271,11 @@ def testPyephemSun( now, observer ):
         "Dusk: TODO", \
         "Solstice: " + str( ephem.next_solstice( now ) ), \
         "Equinox: " + str( ephem.next_equinox( now ) ), \
-        "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
+        "Eclipse Date/Time, Latitude/Longitude, Type: TODO";
+
+    print( "Rise: " + str( observer.next_rising( sun ).datetime() ) )
+    print( "Set: " + str( observer.next_setting( sun ).datetime() ) )
+    return result
 
 
 def testPyephem( now, latitudeDD, longitudeDD, elevation ):
@@ -431,7 +433,7 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
     print( "Rise: " + rise )
     print( "Set: " + set )
 
-#TODO Rise/set does not match pyephem!
+#TODO Rise/set do not always match between pyephem and skyfield!
 # Results match when local time and GMT are on the same day...so try very early in morning or immediately after midnight to verify.
 
     t0 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
