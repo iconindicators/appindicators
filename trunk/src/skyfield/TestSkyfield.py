@@ -9,6 +9,7 @@
 #     sudo apt-get install python3-pip
 #     sudo pip3 install --upgrade skyfield
 #     sudo pip install --upgrade pytz
+#     sudo pip3 install --upgrade pandas
 
 # https://github.com/skyfielders/python-skyfield
 # 
@@ -265,12 +266,12 @@ def testPyephemSun( now, observer ):
         "Altitude: " + str( sun.alt ), \
         "Right Ascension: " + str( sun.ra ), \
         "Declination: " + str( sun.dec );
-        
+
     solstice = str( ephem.next_solstice( now ) )
     equinox = str( ephem.next_equinox( now ) )
 
     rise = str( observer.next_rising( sun ).datetime() )
-    set = str( observer.next_setting( sun ).datetime() )
+    sunset = str( observer.next_setting( sun ).datetime() )
 
     observer.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
     sun = ephem.Sun( observer )
@@ -280,15 +281,15 @@ def testPyephemSun( now, observer ):
     result += \
         "Dawn: " + dawn, \
         "Rise: " + rise, \
-        "Set: " + set, \
+        "Set: " + sunset, \
         "Dusk: " + dusk, \
-        "Solstice: " + str( ephem.next_solstice( now ) ), \
-        "Equinox: " + str( ephem.next_equinox( now ) ), \
+        "Solstice: " + solstice, \
+        "Equinox: " + equinox, \
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO";
 
     print( "Dawn: " + dawn )
     print( "Rise: " + rise )
-    print( "Set: " + set )
+    print( "Set: " + sunset )
     print( "Dusk: " + dusk )
 
     return result
@@ -381,12 +382,17 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 #     print()
 
 
-#     with load.open( hipparcos.URL ) as f:
-#         stars = hipparcos.load_dataframe( f )
+#TODO First time star catalog is loaded, takes a lot of time, but subsequent loads are quick.
+# So the data must be cached...where?  Raise an issue with Skyfield.
+    with load.open( hipparcos.URL ) as f:
+        stars = hipparcos.load_dataframe( f )
 
-#     stars = stars[ stars[ "magnitude" ] <= 2 ]
-#     stars = stars[ stars[ "magnitude" ] <= 4.3 ]
-#     print( "After filtering, there are {} stars".format( len( stars ) ) )
+    stars = stars[ stars[ "magnitude" ] <= 2.5 ]
+    print( "After filtering, there are {} stars".format( len( stars ) ) )
+#Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
+    print( stars.dtypes )
+    print( stars.head(1))
+
 
 
 def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
@@ -407,7 +413,7 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
     ra, dec, sunDistance = ephemeris[ SKYFIELD_PLANET_SUN ].at( utcNow ).observe( thePlanet ).radec()
     ra, dec, earthDistance = apparent.radec()
     illumination = almanac.fraction_illuminated( ephemeris, planet, utcNow ) * 100
-
+    
     result = \
         "Illumination: " + str( illumination ), \
         "Constellation: " + str( "TODO" ), \
@@ -543,9 +549,9 @@ latitudeDD = -33.8
 longitudeDD = 151.2
 elevation = 100
 
-#TODO Migh need to install pytz
+#TODO Might need to install pytz to localise the date/time.
 # https://rhodesmill.org/skyfield/time.html
-#to localise the date/time.
+
 
 # indicator-lunar revision 755 changed from local date/time to UTC for calculations (I think).
 
