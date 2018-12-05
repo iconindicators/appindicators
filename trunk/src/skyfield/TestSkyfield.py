@@ -264,17 +264,33 @@ def testPyephemSun( now, observer ):
         "Azimuth: " + str( sun.az ), \
         "Altitude: " + str( sun.alt ), \
         "Right Ascension: " + str( sun.ra ), \
-        "Declination: " + str( sun.dec ), \
-        "Dawn: TODO", \
-        "Rise: " + str( observer.next_rising( sun ).datetime() ), \
-        "Set: " + str( observer.next_setting( sun ).datetime() ), \
-        "Dusk: TODO", \
+        "Declination: " + str( sun.dec );
+        
+    solstice = str( ephem.next_solstice( now ) )
+    equinox = str( ephem.next_equinox( now ) )
+
+    rise = str( observer.next_rising( sun ).datetime() )
+    set = str( observer.next_setting( sun ).datetime() )
+
+    observer.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
+    sun = ephem.Sun( observer )
+    dawn = str( observer.next_rising( sun, use_center = True ).datetime() )
+    dusk = str( observer.next_setting( sun, use_center = True ).datetime() )
+
+    result += \
+        "Dawn: " + dawn, \
+        "Rise: " + rise, \
+        "Set: " + set, \
+        "Dusk: " + dusk, \
         "Solstice: " + str( ephem.next_solstice( now ) ), \
         "Equinox: " + str( ephem.next_equinox( now ) ), \
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO";
 
-    print( "Rise: " + str( observer.next_rising( sun ).datetime() ) )
-    print( "Set: " + str( observer.next_setting( sun ).datetime() ) )
+    print( "Dawn: " + dawn )
+    print( "Rise: " + rise )
+    print( "Set: " + set )
+    print( "Dusk: " + dusk )
+
     return result
 
 
