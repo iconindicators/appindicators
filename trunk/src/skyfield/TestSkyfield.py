@@ -384,15 +384,35 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 
 #TODO First time star catalog is loaded, takes a lot of time, but subsequent loads are quick.
 # So the data must be cached...where?  Raise an issue with Skyfield.
-    with load.open( hipparcos.URL ) as f:
-        stars = hipparcos.load_dataframe( f )
+# Seems the load line below pulls the data from ftp://cdsarc.u-strasbg.fr/cats/I/239/hip_main.dat.gz
+# New question: if we can pre-load the data file that is good.
+# So can we pre-filter the data and only keep that as a file, rather than the whole thing?
+#     with load.open( hipparcos.URL ) as f:
+#         stars = hipparcos.load_dataframe( f )
 
-    stars = stars[ stars[ "magnitude" ] <= 2.5 ]
-    print( "After filtering, there are {} stars".format( len( stars ) ) )
+#     stars = stars[ stars[ "magnitude" ] <= 2.5 ]
+#     print( "After filtering, there are {} stars".format( len( stars ) ) )
 #Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
-    print( stars.dtypes )
-    print( stars.head(1))
+#     print( stars.dtypes )
+#     print( stars.head(1))
 
+
+    from pandas import read_fwf
+    with load.open( hipparcos.URL ) as f:
+        df = read_fwf( f, delimiter = '|', compression = "gzip" )
+
+    for index, series in df.iterrows() :
+        print("XXXXXXXXXXXXXXX")
+        print( index )
+        print("XXXXXXXXXXXXXXX")
+        print( series )
+        print("XXXXXXXXXXXXXXX")
+        print( type( series ) )
+        print("XXXXXXXXXXXXXXX")
+#         print( index, row )
+#         print( type(index))
+#         print( type(row))
+        break
 
 
 def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
@@ -579,3 +599,100 @@ testSkyfield( now, latitudeDD, longitudeDD, elevation )
 # star = ephem.star( starName )
 # star.compute( observer )
 # print( star.ra, star.dec, star.az, star.alt )
+
+
+# List of stars from PyEphem
+# Achernar
+# Adara
+# Agena
+# Albereo
+# Alcaid
+# Alcor
+# Alcyone
+# Aldebaran
+# Alderamin
+# Alfirk
+# Algenib
+# Algieba
+# Algol
+# Alhena
+# Alioth
+# Almach
+# Alnair
+# Alnilam
+# Alnitak
+# Alphard
+# Alphecca
+# Alshain
+# Altair
+# Antares
+# Arcturus
+# Arkab Posterior
+# Arkab Prior
+# Arneb
+# Atlas
+# Bellatrix
+# Betelgeuse
+# Canopus
+# Capella
+# Caph
+# Castor
+# Cebalrai
+# Deneb
+# Denebola
+# Dubhe
+# Electra
+# Elnath
+# Enif
+# Etamin
+# Fomalhaut
+# Gienah Corvi
+# Hamal
+# Izar
+# Kaus Australis
+# Kochab
+# Maia
+# Markab
+# Megrez
+# Menkalinan
+# Menkar
+# Merak
+# Merope
+# Mimosa
+# Minkar
+# Mintaka
+# Mirach
+# Mirzam
+# Mizar
+# Naos
+# Nihal
+# Nunki
+# Peacock
+# Phecda
+# Polaris
+# Pollux
+# Procyon
+# Rasalgethi
+# Rasalhague
+# Regulus
+# Rigel
+# Rukbat
+# Sadalmelik
+# Sadr
+# Saiph
+# Scheat
+# Schedar
+# Shaula
+# Sheliak
+# Sirius
+# Sirrah
+# Spica
+# Sulafat
+# Tarazed
+# Taygeta
+# Thuban
+# Unukalhai
+# Vega
+# Vindemiatrix
+# Wezen
+# Zaurak
