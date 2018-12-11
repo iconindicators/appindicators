@@ -81,7 +81,6 @@ from ephem.stars import stars
 from skyfield import almanac, positionlib
 from skyfield.api import load, Star, Topos
 from skyfield.data import hipparcos
-from posix import times
 
 
 # Must get a new observer after a rising/setting computation and before a calculations for a new body.    
@@ -390,29 +389,28 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 #     with load.open( hipparcos.URL ) as f:
 #         stars = hipparcos.load_dataframe( f )
 
-#     stars = stars[ stars[ "magnitude" ] <= 2.5 ]
-#     print( "After filtering, there are {} stars".format( len( stars ) ) )
+    with load.open( "hip_main.2.5.dat.gz" ) as f:
+        stars = hipparcos.load_dataframe( f )
+
+    stars = stars[ stars[ "magnitude" ] <= 1.5 ]
+    print( "After filtering, there are {} stars".format( len( stars ) ) )
 #Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
-#     print( stars.dtypes )
-#     print( stars.head(1))
 
 
-    from pandas import read_fwf
-    with load.open( hipparcos.URL ) as f:
-        df = read_fwf( f, delimiter = '|', compression = "gzip" )
 
-    for index, series in df.iterrows() :
-        print("XXXXXXXXXXXXXXX")
-        print( index )
-        print("XXXXXXXXXXXXXXX")
-        print( series )
-        print("XXXXXXXXXXXXXXX")
-        print( type( series ) )
-        print("XXXXXXXXXXXXXXX")
-#         print( index, row )
-#         print( type(index))
-#         print( type(row))
-        break
+#     filterStarsByMagnitudeFromHipparcos( "hip_main.dat.gz", "hip_main.2.5.dat.gz", 2.5 )
+
+
+import gzip
+def filterStarsByMagnitudeFromHipparcos( hipparcosInputGzipFile, hipparcosOutputGzipFile, magnitude ):
+    try:
+        with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
+            for line in inFile:
+                if len( line.decode()[ 41 : 46 ].strip() ) > 0 and float( line.decode()[ 41 : 46 ] ) <= float( magnitude ):
+                    outFile.write( line )
+
+    except Exception as e:
+        print( e )
 
 
 def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
