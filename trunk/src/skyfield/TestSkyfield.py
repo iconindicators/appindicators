@@ -466,12 +466,15 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
     return result
 
 
+# https://www.cosmos.esa.int/web/hipparcos/search-facility
+# https://www.cosmos.esa.int/web/hipparcos/common-star-names
 #TODO Add rise/set.
+#TODO Add alt, az.  Can these be obtained from ra/dec?
 def testSkyfieldStar( utcNow, ephemeris, observer, star ):
-    apparent = observer.at( utcNow ).observe( star ).apparent()
-    alt, az, earthDistance = apparent.altaz()
+    astrometric = observer.at( utcNow ).observe( star )
+#     alt, az, earthDistance = astrometric.altaz()
     ra, dec, sunDistance = ephemeris[ SKYFIELD_PLANET_SUN ].at( utcNow ).observe( star ).radec()
-    ra, dec, earthDistance = apparent.radec()
+    ra, dec, earthDistance = astrometric.radec()
     
     result = \
         "Constellation: " + str( "TODO" ), \
@@ -480,8 +483,6 @@ def testSkyfieldStar( utcNow, ephemeris, observer, star ):
         "Distance to Earth: " + str( earthDistance ), \
         "Distance to Sun: " + str( sunDistance ), \
         "Bright Limb: " + str( "TODO" ), \
-        "Azimuth: " + str( az.dms() ), \
-        "Altitude: " + str( alt.dms() ), \
         "Right Ascension: " + str( ra.hms() ), \
         "Declination: " + str( dec.dms() ), \
         "Rise: TODO", \
@@ -569,7 +570,6 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     print( testSkyfieldSun( timeScale, utcNowSkyfield, ephemeris, observer, topos ) )
 
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-    topos = getSkyfieldTopos( latitudeDD, longitudeDD, elevation )
     with load.open( "hip_main.2.5.dat.gz" ) as f:
         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
 
