@@ -470,10 +470,9 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
 # https://www.cosmos.esa.int/web/hipparcos/common-star-names
 #TODO Add rise/set.
 #TODO Add alt, az.  Can these be obtained from ra/dec?
-def testSkyfieldStar( utcNow, ephemeris, observer, star ):
+def testSkyfieldStar( utcNow, observer, star ):
     astrometric = observer.at( utcNow ).observe( star )
 #     alt, az, earthDistance = astrometric.altaz()
-    ra, dec, sunDistance = ephemeris[ SKYFIELD_PLANET_SUN ].at( utcNow ).observe( star ).radec()
     ra, dec, earthDistance = astrometric.radec()
     
     result = \
@@ -481,7 +480,6 @@ def testSkyfieldStar( utcNow, ephemeris, observer, star ):
         "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
         "Tropical Sign: TODO", \
         "Distance to Earth: " + str( earthDistance ), \
-        "Distance to Sun: " + str( sunDistance ), \
         "Bright Limb: " + str( "TODO" ), \
         "Right Ascension: " + str( ra.hms() ), \
         "Declination: " + str( dec.dms() ), \
@@ -573,11 +571,17 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     with load.open( "hip_main.2.5.dat.gz" ) as f:
         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
 
-    print( testSkyfieldStar( utcNowSkyfield, ephemeris, observer, star ) )
+    print( testSkyfieldStar( utcNowSkyfield, observer, star ) )
+
+#     barnard = Star(ra_hours=(17, 57, 48.49803),
+#                dec_degrees=(4, 41, 36.2072),
+#                ra_mas_per_year=-798.71,
+#                dec_mas_per_year=+10337.77,
+#                parallax_mas=545.4,
+#                radial_km_per_s=-110.6)
 
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
-
 
 
 #TODO First time star catalog is loaded, takes a lot of time, but subsequent loads are quick.
