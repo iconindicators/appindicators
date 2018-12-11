@@ -253,6 +253,38 @@ def testPyephemPlanet( observer, planet ):
     return result
 
 
+def testPyephemStar( observer, star ):
+    star.compute( observer )
+
+    # Must retrieve the az/alt/ra/dec BEFORE rise/set is computed as the values get clobbered.
+    result = \
+        "Constellation: " + str( ephem.constellation( star ) ), \
+        "Magnitude: " + str( star.mag ), \
+        "Tropical Sign: TODO", \
+        "Bright Limb: " + str( "TODO" ), \
+        "Azimuth: " + str( star.az ), \
+        "Altitude: " + str( star.alt ), \
+        "Right Ascension: " + str( star.ra ), \
+        "Declination: " + str( star.dec )
+
+    try:
+        result += \
+            "Rise: " + str( observer.next_rising( star ) ), \
+            "Set: " + str( observer.next_setting( star ) )
+
+    except ephem.AlwaysUpError:
+        result += "Rise/Set: Always Up"
+
+    except ephem.NeverUpError:
+        result += "Rise/Set: Never Up"
+
+#TODO
+#     if planet.name == "Saturn":
+#         result += str( planet.earth_tilt ), str( planet.sun_tilt )
+
+    return result
+
+
 def testPyephemSun( now, observer ):
     # Must retrieve the az/alt/ra/dec BEFORE rise/set is computed as the values get clobbered.
     sun = ephem.Sun( observer )
@@ -351,6 +383,9 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
     observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
     print( testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
 
+    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
+    print( testPyephemStar( observer, ephem.star( "Almach" ) ) )
+
 #     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
 #     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSign( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
 #     print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
@@ -380,25 +415,6 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 #     bl = getZenithAngleOfBrightLimbNEW( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDD ), observerSiderealTime )
 #     print()
 
-
-#TODO First time star catalog is loaded, takes a lot of time, but subsequent loads are quick.
-# So the data must be cached...where?  Raise an issue with Skyfield.
-# Seems the load line below pulls the data from ftp://cdsarc.u-strasbg.fr/cats/I/239/hip_main.dat.gz
-# New question: if we can pre-load the data file that is good.
-# So can we pre-filter the data and only keep that as a file, rather than the whole thing?
-#     with load.open( hipparcos.URL ) as f:
-#         stars = hipparcos.load_dataframe( f )
-
-    with load.open( "hip_main.2.5.dat.gz" ) as f:
-        stars = hipparcos.load_dataframe( f )
-
-    stars = stars[ stars[ "magnitude" ] <= 1.5 ]
-    print( "After filtering, there are {} stars".format( len( stars ) ) )
-#Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
-
-
-
-#     filterStarsByMagnitudeFromHipparcos( "hip_main.dat.gz", "hip_main.2.5.dat.gz", 2.5 )
 
 
 import gzip
@@ -434,6 +450,30 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
     
     result = \
         "Illumination: " + str( illumination ), \
+        "Constellation: " + str( "TODO" ), \
+        "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
+        "Tropical Sign: TODO", \
+        "Distance to Earth: " + str( earthDistance ), \
+        "Distance to Sun: " + str( sunDistance ), \
+        "Bright Limb: " + str( "TODO" ), \
+        "Azimuth: " + str( az.dms() ), \
+        "Altitude: " + str( alt.dms() ), \
+        "Right Ascension: " + str( ra.hms() ), \
+        "Declination: " + str( dec.dms() ), \
+        "Rise: TODO", \
+        "Set: TODO"
+
+    return result
+
+
+#TODO Add rise/set.
+def testSkyfieldStar( utcNow, ephemeris, observer, star ):
+    apparent = observer.at( utcNow ).observe( star ).apparent()
+    alt, az, earthDistance = apparent.altaz()
+    ra, dec, sunDistance = ephemeris[ SKYFIELD_PLANET_SUN ].at( utcNow ).observe( star ).radec()
+    ra, dec, earthDistance = apparent.radec()
+    
+    result = \
         "Constellation: " + str( "TODO" ), \
         "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
         "Tropical Sign: TODO", \
@@ -529,7 +569,36 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     print( testSkyfieldSun( timeScale, utcNowSkyfield, ephemeris, observer, topos ) )
 
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    topos = getSkyfieldTopos( latitudeDD, longitudeDD, elevation )
+    with load.open( "hip_main.2.5.dat.gz" ) as f:
+        star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
+
+    print( testSkyfieldStar( utcNowSkyfield, ephemeris, observer, star ) )
+
+    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
+
+
+
+#TODO First time star catalog is loaded, takes a lot of time, but subsequent loads are quick.
+# So the data must be cached...where?  Raise an issue with Skyfield.
+# Seems the load line below pulls the data from ftp://cdsarc.u-strasbg.fr/cats/I/239/hip_main.dat.gz
+# New question: if we can pre-load the data file that is good.
+# So can we pre-filter the data and only keep that as a file, rather than the whole thing?
+#     with load.open( hipparcos.URL ) as f:
+#         stars = hipparcos.load_dataframe( f )
+
+#     with load.open( "hip_main.2.5.dat.gz" ) as f:
+#         stars = hipparcos.load_dataframe( f )
+
+#     stars = stars[ stars[ "magnitude" ] <= 1.5 ]
+#     print( "After filtering, there are {} stars".format( len( stars ) ) )
+#Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
+
+
+
+#     filterStarsByMagnitudeFromHipparcos( "hip_main.dat.gz", "hip_main.2.5.dat.gz", 2.5 )
+
 
 
 #     print()
