@@ -83,6 +83,110 @@ from skyfield.api import load, Star, Topos
 from skyfield.data import hipparcos
 
 
+
+
+# https://www.cosmos.esa.int/web/hipparcos/common-star-names
+STARS = [ [ "Acamar", 13847 ], \
+          [ "Achernar", 7588 ], \
+          [ "Acrux", 60718 ], \
+          [ "Adhara", 33579 ], \
+          [ "Agena", 68702 ], \
+          [ "Albireo", 95947 ], \
+          [ "Alcor", 65477 ], \
+          [ "Alcyone", 17702 ], \
+          [ "Aldebaran", 21421 ], \
+          [ "Alderamin", 105199 ], \
+          [ "Algenib", 1067 ], \
+          [ "Algieba", 50583 ], \
+          [ "Algol", 14576 ], \
+          [ "Alhena", 31681 ], \
+          [ "Alioth", 62956 ], \
+          [ "Alkaid", 67301 ], \
+          [ "Almaak", 9640 ], \
+          [ "Alnair", 109268 ], \
+          [ "Alnath", 25428 ], \
+          [ "Alnilam", 26311 ], \
+          [ "Alnitak", 26727 ], \
+          [ "Alphard", 46390 ], \
+          [ "Alphekka", 76267 ], \
+          [ "Alpheratz", 677 ], \
+          [ "Alshain", 98036 ], \
+          [ "Altair", 97649 ], \
+          [ "Ankaa", 2081 ], \
+          [ "Antares", 80763 ], \
+          [ "Arcturus", 69673 ], \
+          [ "Arneb", 25985 ], \
+          [ "Babcock's star", 112247 ], \
+          [ "Barnard's star", 87937 ], \
+          [ "Bellatrix", 25336 ], \
+          [ "Betelgeuse", 27989 ], \
+          [ "Campbell's star", 96295 ], \
+          [ "Canopus", 30438 ], \
+          [ "Capella", 24608 ], \
+          [ "Caph", 746 ], \
+          [ "Castor", 36850 ], \
+          [ "Cor Caroli", 63125 ], \
+          [ "Cyg X-1", 98298 ], \
+          [ "Deneb", 102098 ], \
+          [ "Denebola", 57632 ], \
+          [ "Diphda", 3419 ], \
+          [ "Dubhe", 54061 ], \
+          [ "Enif", 107315 ], \
+          [ "Etamin", 87833 ], \
+          [ "Fomalhaut", 113368 ], \
+          [ "Groombridge 1830", 57939 ], \
+          [ "Hadar", 68702 ], \
+          [ "Hamal", 9884 ], \
+          [ "Izar", 72105 ], \
+          [ "Kapteyn's star", 24186 ], \
+          [ "Kaus Australis", 90185 ], \
+          [ "Kocab", 72607 ], \
+          [ "Kruger 60", 110893 ], \
+          [ "Luyten's star", 36208 ], \
+          [ "Markab", 113963 ], \
+          [ "Megrez", 59774 ], \
+          [ "Menkar", 14135 ], \
+          [ "Merak", 53910 ], \
+          [ "Mintaka", 25930 ], \
+          [ "Mira", 10826 ], \
+          [ "Mirach", 5447 ], \
+          [ "Mirphak", 15863 ], \
+          [ "Mizar", 65378 ], \
+          [ "Nihal", 25606 ], \
+          [ "Nunki", 92855 ], \
+          [ "Phad", 58001 ], \
+          [ "Pleione", 17851 ], \
+          [ "Polaris", 11767 ], \
+          [ "Pollux", 37826 ], \
+          [ "Procyon", 37279 ], \
+          [ "Proxima", 70890 ], \
+          [ "Rasalgethi", 84345 ], \
+          [ "Rasalhague", 86032 ], \
+          [ "Red Rectangle", 30089 ], \
+          [ "Regulus", 49669 ], \
+          [ "Rigel", 24436 ], \
+          [ "Rigil Kent", 71683 ], \
+          [ "Sadalmelik", 109074 ], \
+          [ "Saiph", 27366 ], \
+          [ "Scheat", 113881 ], \
+          [ "Shaula", 85927 ], \
+          [ "Shedir", 3179 ], \
+          [ "Sheliak", 92420 ], \
+          [ "Sirius", 32349 ], \
+          [ "Spica", 65474 ], \
+          [ "Tarazed", 97278 ], \
+          [ "Thuban", 68756 ], \
+          [ "Unukalhai", 77070 ], \
+          [ "Van Maanen 2", 3829 ], \
+          [ "Vega", 91262 ], \
+          [ "Vindemiatrix", 63608 ], \
+          [ "Zaurak", 18543 ], \
+          [ "3C 273", 60936 ], \
+
+
+
+
+
 # Must get a new observer after a rising/setting computation and before a calculations for a new body.    
 def getPyephemObserver( now, latitudeDD, longitudeDD, elevation ):
     observer = ephem.Observer()
@@ -567,11 +671,11 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     topos = getSkyfieldTopos( latitudeDD, longitudeDD, elevation )
     print( testSkyfieldSun( timeScale, utcNowSkyfield, ephemeris, observer, topos ) )
 
-    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-    with load.open( "hip_main.2.5.dat.gz" ) as f:
-        star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
-
-    print( testSkyfieldStar( utcNowSkyfield, observer, star ) )
+#     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+#     with load.open( "hip_main.2.5.dat.gz" ) as f:
+#         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
+# 
+#     print( testSkyfieldStar( utcNowSkyfield, observer, star ) )
 
 #     barnard = Star(ra_hours=(17, 57, 48.49803),
 #                dec_degrees=(4, 41, 36.2072),
@@ -584,6 +688,9 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
 
 
+    filterStarsByMagnitudeFromHipparcos( "hip_main.dat.gz", "hip_main.2.5.dat.gz", 3 )
+
+
 #TODO First time star catalog is loaded, takes a lot of time, but subsequent loads are quick.
 # So the data must be cached...where?  Raise an issue with Skyfield.
 # Seems the load line below pulls the data from ftp://cdsarc.u-strasbg.fr/cats/I/239/hip_main.dat.gz
@@ -592,16 +699,15 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
 #     with load.open( hipparcos.URL ) as f:
 #         stars = hipparcos.load_dataframe( f )
 
-#     with load.open( "hip_main.2.5.dat.gz" ) as f:
-#         stars = hipparcos.load_dataframe( f )
+    with load.open( "hip_main.2.5.dat.gz" ) as f:
+        stars = hipparcos.load_dataframe( f )
 
-#     stars = stars[ stars[ "magnitude" ] <= 1.5 ]
-#     print( "After filtering, there are {} stars".format( len( stars ) ) )
+    stars = stars[ stars[ "magnitude" ] <= 10 ]
+    print( "After filtering, there are {} stars".format( len( stars ) ) )
 #Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
 
 
 
-#     filterStarsByMagnitudeFromHipparcos( "hip_main.dat.gz", "hip_main.2.5.dat.gz", 2.5 )
 
 
 
