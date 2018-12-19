@@ -38,6 +38,8 @@ TERMINAL_GNOME = "gnome-terminal"
 TERMINAL_LXDE = "lxterminal"
 TERMINAL_XFCE = "xfce4-terminal"
 
+URL_TIMEOUT_IN_SECONDS = 10
+
 USER_DIRECTORY_CACHE = ".cache"
 USER_DIRECTORY_CONFIG = ".config"
 
@@ -492,7 +494,7 @@ def _getUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
 def isConnectedToInternet():
     connected = False
     try:
-        socket.create_connection( ( socket.gethostbyname( "www.google.com" ), 80 ), 2 ).close()
+        socket.create_connection( ( socket.gethostbyname( "www.google.com" ), 80 ), timeout = URL_TIMEOUT_IN_SECONDS ).close()
         connected = True
     except socket.error:
         pass
