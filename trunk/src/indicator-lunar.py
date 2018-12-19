@@ -3637,10 +3637,15 @@ class IndicatorLunar:
                 # from which the first field (up to the first ',') is the name.
                 cometOEData = { }
                 data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+#                 data = urlopen( "file:///home/bernard/Desktop/Soft03Cmt.txt", timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
                 for i in range( 0, len( data ) ):
                     if not data[ i ].startswith( "#" ):
-                        cometName = data[ i ][ 0 : data[ i ].index( "," ) ] 
-                        cometOEData[ cometName.upper() ] = data[ i ]
+                        cometName = data[ i ][ 0 : data[ i ].index( "," ) ]
+                        cometName = re.sub( "\s\s+", "", cometName ) # Found that the comet name can have multiple whitespace, so remove.
+                        cometData = data[ i ][ data[ i ].index( "," ) : ]
+                        cometOEData[ cometName.upper() ] = cometName + cometData
+#                         print( data[ i ] )
+#                         print( cometOEData[ cometName.upper() ] )
 
             except Exception as e:
                 cometOEData = None
