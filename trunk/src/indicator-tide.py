@@ -59,8 +59,6 @@ class IndicatorTide:
     CREDIT_UKHO_ON_CLICK = _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." )
     CREDITS = [ CREDIT_UKHO_COPYRIGHT, CREDIT_UKHO_ON_CLICK ]
 
-    URL_TIMEOUT_IN_SECONDS = 10
-
     CONFIG_MENU_ITEM_DATE_FORMAT = "menuItemDateFormat"
     CONFIG_MENU_ITEM_TIDE_FORMAT = "menuItemTideFormat"
     CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME = "menuItemTideFormatSansTime"
@@ -519,7 +517,7 @@ class IndicatorTide:
             levelPositivePattern = re.compile( "^[0-9]\.[0-9]" )
             levelNegativePattern = re.compile( "^-?[0-9]\.[0-9]" )
             hourMinutePattern = re.compile( "^[0-9][0-9]:[0-9][0-9]" )
-            lines = urlopen( url, timeout = IndicatorTide.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+            lines = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for index, line in enumerate( lines ): # The tidal data is presented in date/time order.
 
                 if "Port predictions" in line: # Tidal dateTimes are in the standard local time of the port - need to obtain the UTC offset for the port in the format +HHMM or -HHMM.
