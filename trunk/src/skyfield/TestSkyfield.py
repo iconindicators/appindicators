@@ -181,7 +181,7 @@ STARS = [ [ "Acamar", 13847 ], \
           [ "Vega", 91262 ], \
           [ "Vindemiatrix", 63608 ], \
           [ "Zaurak", 18543 ], \
-          [ "3C 273", 60936 ], \
+          [ "3C 273", 60936 ] ]
 
 
 
@@ -274,7 +274,7 @@ def getTropicalSignORIGINAL( body, ephemNow ):
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
     #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-    def getZenithAngleOfBrightLimb( self, city, body ):
+    def getZenithAngleOfBrightLimb( city, body ):
         sun = ephem.Sun( city )
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
@@ -305,6 +305,10 @@ def getZenithAngleOfBrightLimbNEW( city, body, sunRA, sunDec, bodyRA, bodyDec, o
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
     hourAngle = city.sidereal_time() - body.ra
+    print( city.sidereal_time() )
+    citySiderealTime = city.sidereal_time()
+    bodyra = body.ra
+
     y = math.sin( hourAngle )
     x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
     parallacticAngle = math.atan2( y, x )
@@ -495,24 +499,30 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
     city = ephem.city( "Sydney" )
     city.date = now
     sun = ephem.Sun( observer )
+    saturn = ephem.Saturn( observer )
 
-#     ephemeris = load( "2017-2024.bsp" )
-#     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
+    ephemeris = load( "2017-2024.bsp" )
+    sun = ephemeris[ SKYFIELD_PLANET_SUN ]
 
-#     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-#     timescale = load.timescale()
-#     utcNowSkyfield = timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
-#     apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
-#     alt, az, earthDistance = apparent.altaz()
-#     sunRA, sunDEC, earthDistance = apparent.radec()
-    
-#     thePlanet = ephemeris[ SKYFIELD_PLANET_SATURN ]
-#     apparent = observer.at( utcNowSkyfield ).observe( thePlanet ).apparent()
-#     ra, dec, earthDistance = apparent.radec()
-
+    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     timescale = load.timescale()
     utcNowSkyfield = timescale.utc( now.replace( tzinfo = pytz.UTC ) )
+    apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
+    sunRA, sunDEC, earthDistance = apparent.radec()
+
+    apparent = observer.at( utcNowSkyfield ).observe( ephemeris[ SKYFIELD_PLANET_SATURN ] ).apparent()
+    ra, dec, earthDistance = apparent.radec()
+
     observerSiderealTime = utcNowSkyfield.gmst
+    print( city.sidereal_time() )
+    print( observerSiderealTime )
+
+    print( timescale.utc( now.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
+    print( timescale.utc( now.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gast )
+    
+
+
+    if True: return
     bl = getZenithAngleOfBrightLimbNEW( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDD ), observerSiderealTime )
 #     print()
 
