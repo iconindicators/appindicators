@@ -1,7 +1,10 @@
 indicator-lunar (1.0.80-1) trusty; urgency=low
 
+  * Found that comet names from the Minor Planet Center may have multiple
+    whitespace, so remove it.
   * Now uses a global URL timeout when attempting downloads.
   * Removed old eclipse information.  <------------TODO -------------------------------- TODO ------------------------------TODO
+  * TODO TODO TODO Check TODO for Bright Limb...verify the code is correct when using UTC in the bright limb code (maybe it should be local time)?
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 19 Dec 2018 15:57:35 +1000
 
