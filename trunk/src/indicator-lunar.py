@@ -58,7 +58,7 @@ class AstronomicalBodyType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star,
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.79"
+    VERSION = "1.0.80"
     ICON = INDICATOR_NAME
     ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
     ICON_BASE_PATH = tempfile.gettempdir()
@@ -68,7 +68,6 @@ class IndicatorLunar:
 
     SVG_FULL_MOON_FILE = ICON_BASE_PATH + "/." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
-    URL_TIMEOUT_IN_SECONDS = 2
 
     ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, comet, star and satellite information." )
     ABOUT_CREDIT_BRIGHT_LIMB = _( "Bright Limb from 'Astronomical Algorithms' by Jean Meeus." )
@@ -3637,7 +3636,7 @@ class IndicatorLunar:
                 #
                 # from which the first field (up to the first ',') is the name.
                 cometOEData = { }
-                data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+                data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
                 for i in range( 0, len( data ) ):
                     if not data[ i ].startswith( "#" ):
                         cometName = data[ i ][ 0 : data[ i ].index( "," ) ] 
@@ -3659,7 +3658,7 @@ class IndicatorLunar:
         if pythonutils.isConnectedToInternet():
             try:
                 satelliteTLEData = { }
-                data = urlopen( url, timeout = IndicatorLunar.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+                data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
                 for i in range( 0, len( data ), 3 ):
                     tle = satellite.TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
                     satelliteTLEData[ ( tle.getName().upper(), tle.getNumber() ) ] = tle

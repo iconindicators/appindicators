@@ -1,3 +1,11 @@
+indicator-lunar (1.0.80-1) trusty; urgency=low
+
+  * Now uses a global URL timeout when attempting downloads.
+  * Removed old eclipse information.  <------------TODO -------------------------------- TODO ------------------------------TODO
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 19 Dec 2018 15:57:35 +1000
+
+
 indicator-lunar (1.0.79-1) trusty; urgency=low
 
   * Bug fix: When a comet was 'always up' or 'never up', only that information
