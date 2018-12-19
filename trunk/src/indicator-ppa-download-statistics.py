@@ -53,7 +53,7 @@ import concurrent.futures, json, locale, logging, operator, os, pythonutils, thr
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.62"
+    VERSION = "1.0.63"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -971,7 +971,7 @@ class IndicatorPPADownloadStatistics:
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
         while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
-                publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ) ).read().decode( "utf8" ) )
+                publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
             except Exception as e:
                 logging.exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
@@ -1002,7 +1002,7 @@ def getDownloadCount( ppa, publishedBinaries, i ):
             packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
             url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
 
-            downloadCount = json.loads( urlopen( url ).read().decode( "utf8" ) )
+            downloadCount = json.loads( urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
             if str( downloadCount ).isnumeric():
                 packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
                 packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]

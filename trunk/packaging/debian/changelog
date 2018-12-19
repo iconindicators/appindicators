@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.63-1) trusty; urgency=low
+
+  * Added TODO to the list of series.     TODO <----------------------------------------------------------------TODO TODO TODO
+  * Added a URL timeout when attempting downloads.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 19 Dec 2018 15:48:59 +1000
+
+
 indicator-ppa-download-statistics (1.0.62-1) trusty; urgency=low
 
   * Added disco to the list of series.
