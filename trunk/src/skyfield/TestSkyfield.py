@@ -513,6 +513,8 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
     apparent = observer.at( utcNowSkyfield ).observe( ephemeris[ SKYFIELD_PLANET_SATURN ] ).apparent()
     ra, dec, earthDistance = apparent.radec()
 
+# https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
+# http://neoprogrammics.com/sidereal_time_calculator/index.php
     observerSiderealTime = utcNowSkyfield.gmst
     print( city.sidereal_time() )
     print( observerSiderealTime )
