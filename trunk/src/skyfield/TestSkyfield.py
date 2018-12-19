@@ -274,40 +274,37 @@ def getTropicalSignORIGINAL( body, ephemNow ):
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
     #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-def getZenithAngleOfBrightLimb( self, city, body ):
-    sun = ephem.Sun( city )
+    def getZenithAngleOfBrightLimb( self, city, body ):
+        sun = ephem.Sun( city )
 
-    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-    y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
-    x = math.cos( body.dec ) * math.sin( sun.dec ) - math.sin( body.dec ) * math.cos( sun.dec ) * math.cos( sun.ra - body.ra )
-    positionAngleOfBrightLimb = math.atan2( y, x )
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
+        y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
+        x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
+        positionAngleOfBrightLimb = math.atan2( y, x )
 
-    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-    hourAngle = city.sidereal_time() - body.ra
-    y = math.sin( hourAngle )
-    x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
-    parallacticAngle = math.atan2( y, x )
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+        hourAngle = city.sidereal_time() - body.ra
+        y = math.sin( hourAngle )
+        x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+        parallacticAngle = math.atan2( y, x )
 
-    return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+        return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
 def getZenithAngleOfBrightLimbNEW( city, body, sunRA, sunDec, bodyRA, bodyDec, observerLatitude, observerSiderealTime ):
     sun = ephem.Sun( city )
 
-    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
     y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
-    x = math.cos( body.dec ) * math.sin( sun.dec ) - math.sin( body.dec ) * math.cos( sun.dec ) * math.cos( sun.ra - body.ra )
+    x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
     positionAngleOfBrightLimb = math.atan2( y, x )
 
     yNEW = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
-    xNEW = math.cos( bodyDec ) * math.sin( sunDec ) - math.sin( bodyDec ) * math.cos( sunDec ) * math.cos( sunRA - bodyRA )
+    xNEW = math.sin( sunDec ) * math.cos( bodyDec ) - math.cos( sunDec ) * math.sin( bodyDec ) * math.cos( sunRA - bodyRA )
     positionAngleOfBrightLimbNEW = math.atan2( yNEW, xNEW )
 
-    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-    citySiderealTime = city.sidereal_time()
-    c = math.radians( citySiderealTime )
-    bodyRAinRadians = math.radians( body.ra )
-    hourAngle = citySiderealTime - body.ra
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+    hourAngle = city.sidereal_time() - body.ra
     y = math.sin( hourAngle )
     x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
     parallacticAngle = math.atan2( y, x )
@@ -465,7 +462,7 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 
 #     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
 #     timescale = load.timescale()
-#     utcNowSkyfield = timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
+#     utcNowSkyfield = timescale.utc( now.replace( tzinfo = pytz.UTC ) )
 #     apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
 #     alt, az, earthDistance = apparent.altaz()
 #     sunRA, sunDEC, earthDistance = apparent.radec()
@@ -494,13 +491,11 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 #     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSign( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
 #     print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
 
-#     observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
-#     city = ephem.city( "Sydney" )
-#     city.date = now
-#     sun = ephem.Sun( observer )
-#     saturn = ephem.Saturn( observer )
+    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
+    city = ephem.city( "Sydney" )
+    city.date = now
+    sun = ephem.Sun( observer )
 
-    
 #     ephemeris = load( "2017-2024.bsp" )
 #     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
 
@@ -515,8 +510,10 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 #     apparent = observer.at( utcNowSkyfield ).observe( thePlanet ).apparent()
 #     ra, dec, earthDistance = apparent.radec()
 
-#     observerSiderealTime = utcNowSkyfield.gmst
-#     bl = getZenithAngleOfBrightLimbNEW( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDD ), observerSiderealTime )
+    timescale = load.timescale()
+    utcNowSkyfield = timescale.utc( now.replace( tzinfo = pytz.UTC ) )
+    observerSiderealTime = utcNowSkyfield.gmst
+    bl = getZenithAngleOfBrightLimbNEW( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDD ), observerSiderealTime )
 #     print()
 
 
