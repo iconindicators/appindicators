@@ -520,6 +520,7 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 # http://neoprogrammics.com/sidereal_time_calculator/index.php   <------ does not match the other sites.
     observerSiderealTime = utcNowSkyfield.gmst
     print( city.sidereal_time() )
+    print( '%.6f' % city.sidereal_time() )
     print( observerSiderealTime )
 
     print( timescale.utc( now.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
