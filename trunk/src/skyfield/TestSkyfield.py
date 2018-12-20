@@ -514,7 +514,10 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
     ra, dec, earthDistance = apparent.radec()
 
 # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-# http://neoprogrammics.com/sidereal_time_calculator/index.php
+# http://astro.subhashbose.com/siderealtime/
+# http://www.wwu.edu/skywise/skymobile/skywatch.html
+# http://www.jgiesen.de/astro/astroJS/siderealClock/
+# http://neoprogrammics.com/sidereal_time_calculator/index.php   <------ does not match the other sites.
     observerSiderealTime = utcNowSkyfield.gmst
     print( city.sidereal_time() )
     print( observerSiderealTime )
