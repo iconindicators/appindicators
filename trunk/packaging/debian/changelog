@@ -1,7 +1,7 @@
 indicator-lunar (1.0.80-1) trusty; urgency=low
 
   * Remove extraneous whitespace from comet names.
-  * Now uses a global URL timeout when attempting downloads.
+  * Now uses a global URL timeout when downloading.
   * Removed old eclipse information.
   * TODO TODO TODO Check TODO for Bright Limb...verify the code is correct when using UTC in the bright limb code (maybe it should be local time)?
 
