@@ -200,7 +200,28 @@ def getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees,
 TROPICAL_SIGNS = [ "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces" ]
 
 
-def getTropicalSign( body, utcNow ):
+def getTropicalSignPyEphem( body, utcNow ):
+    ephemNowUTC = ephem.Date( utcNow )
+    ( year, month, day ) = ephemNowUTC.triple()
+    epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
+    ephemNowDate = str( ephemNowUTC ).split( " " )
+
+    bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
+    bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
+    planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
+
+    if float( planetCoordinates[ 2 ] ) > 30:
+        planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
+
+    tropicalSignDegree = int( planetCoordinates[ 0 ] ) % 30
+    tropicalSignMinute = str( planetCoordinates[ 1 ] )
+    tropicalSignIndex = int( planetCoordinates[ 0 ] ) / 30
+    tropicalSignName = TROPICAL_SIGNS[ int( tropicalSignIndex ) ]
+
+    return ( tropicalSignName, str( tropicalSignDegree ), tropicalSignMinute )
+
+
+def getTropicalSignSkyfield( body, utcNow ):
     ephemNowUTC = ephem.Date( utcNow )
     ( year, month, day ) = ephemNowUTC.triple()
     epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
@@ -352,7 +373,7 @@ def testPyephemPlanet( observer, planet ):
         "Illumination: " + str( planet.phase ), \
         "Constellation: " + str( ephem.constellation( planet ) ), \
         "Magnitude: " + str( planet.mag ), \
-        "Tropical Sign: " + str( getTropicalSign( planet, utcNow ) ), \
+        "Tropical Sign: " + str( getTropicalSignPyEphem( planet, utcNow ) ), \
         "Distance to Earth: " + str( planet.earth_distance ), \
         "Distance to Sun: " + str( planet.sun_distance ), \
         "Bright Limb: " + str( "TODO" ), \
@@ -386,7 +407,7 @@ def testPyephemStar( observer, star ):
     result = \
         "Constellation: " + str( ephem.constellation( star ) ), \
         "Magnitude: " + str( star.mag ), \
-        "Tropical Sign: " + str( getTropicalSign( star, utcNow ) ), \
+        "Tropical Sign: " + str( getTropicalSignPyEphem( star, utcNow ) ), \
         "Bright Limb: " + str( "TODO" ), \
         "Azimuth: " + str( star.az ), \
         "Altitude: " + str( star.alt ), \
@@ -418,7 +439,7 @@ def testPyephemSun( utcNow, observer ):
     result = \
         "Constellation: " + str( ephem.constellation( sun ) ), \
         "Magnitude: " + str( sun.mag ), \
-        "Tropical Sign: " + str( getTropicalSign( sun, utcNow ) ), \
+        "Tropical Sign: " + str( getTropicalSignPyEphem( sun, utcNow ) ), \
         "Distance to Earth: " + str( sun.earth_distance ), \
         "Azimuth: " + str( sun.az ), \
         "Altitude: " + str( sun.alt ), \
@@ -538,7 +559,7 @@ def testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevat
     print( "Almach (star):", testPyephemStar( observer, ephem.star( "Almach" ) ) )
 
 #     observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
-#     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSign( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
+#     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSignPyEphem( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
 #     print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
 
 
