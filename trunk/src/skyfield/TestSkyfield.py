@@ -431,69 +431,47 @@ def testPyephemSun( now, observer ):
     return result
 
 
-def testPyephem( now, latitudeDD, longitudeDD, elevation ):
-    print( "=======" )
-    print( "PyEphem" )
-    print( "=======" )
-    print()
-
-#     madrid = ephem.city('Madrid')
-#     madrid.date = '1978/10/3 11:32'
-#     print( "Madrid", madrid.sidereal_time())
+def testSiderealTime():
+    madrid = ephem.city('Madrid')
+    madrid.date = '1978/10/3 11:32'
+    print( "Madrid", madrid.sidereal_time())
 
 
-#     madrid = ephem.city('Sydney')
-#     madrid.date = '1978/10/3 11:32'
-#     print( "Sydney", madrid.sidereal_time())
+    madrid = ephem.city('Sydney')
+    madrid.date = '1978/10/3 11:32'
+    print( "Sydney", madrid.sidereal_time())
 
 
-#     ts = load.timescale()
-#     t = ts.utc(1978, 10, 3,11,32, 0)
-#     st = t.gmst
-#     print( st )
+    ts = load.timescale()
+    t = ts.utc(1978, 10, 3,11,32, 0)
+    st = t.gmst
+    print( st )
 
-#     print( load.timescale().now().gmst )
+    print( load.timescale().now().gmst )
 
-#     sss = ts.utc( utcNow.replace( tzinfo = pytz.UTC ) )
-#     sss = ts.utc( datetime.datetime.utcnow() )
-#     print( sss.gmst )
+    sss = ts.utc( utcNow.replace( tzinfo = pytz.UTC ) )
+    sss = ts.utc( datetime.datetime.utcnow() )
+    print( sss.gmst )
 
-#     import sys
-#     sys.exit()
+    import sys
+    sys.exit()
 
-#     ephemeris = load( "2017-2024.bsp" )
-#     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
+    ephemeris = load( "2017-2024.bsp" )
+    sun = ephemeris[ SKYFIELD_PLANET_SUN ]
 
-#     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-#     timescale = load.timescale()
-#     utcNowSkyfield = timescale.utc( now.replace( tzinfo = pytz.UTC ) )
-#     apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
-#     alt, az, earthDistance = apparent.altaz()
-#     sunRA, sunDEC, earthDistance = apparent.radec()
+    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    timescale = load.timescale()
+    utcNowSkyfield = timescale.utc( now.replace( tzinfo = pytz.UTC ) )
+    apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
+    alt, az, earthDistance = apparent.altaz()
+    sunRA, sunDEC, earthDistance = apparent.radec()
 
-#     thePlanet = ephemeris[ SKYFIELD_PLANET_SATURN ]
-#     apparent = observer.at( utcNowSkyfield ).observe( thePlanet ).apparent()
-#     ra, dec, earthDistance = apparent.radec()
+    thePlanet = ephemeris[ SKYFIELD_PLANET_SATURN ]
+    apparent = observer.at( utcNowSkyfield ).observe( thePlanet ).apparent()
+    ra, dec, earthDistance = apparent.radec()
 
-#     observerSiderealTime = utcNowSkyfield.gmst
+    observerSiderealTime = utcNowSkyfield.gmst
 
-
-
-#TODO There is a difference between Az/ALT for the sun between the two systems...
-#...yet skyfield agrees with the indicator!
-
-    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
-    print( testPyephemSun( now, observer ) )
-
-    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
-    print( testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
-
-    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
-    print( testPyephemStar( observer, ephem.star( "Almach" ) ) )
-
-#     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
-#     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSign( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
-#     print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
 
     observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
     city = ephem.city( "Sydney" )
@@ -525,21 +503,36 @@ def testPyephem( now, latitudeDD, longitudeDD, elevation ):
 
     print( timescale.utc( now.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
     print( timescale.utc( now.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gast )
-    
 
 
-    if True: return
-    bl = getZenithAngleOfBrightLimbNEW( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDD ), observerSiderealTime )
-#     print()
+def testPyephem( now, latitudeDD, longitudeDD, elevation ):
+    print( "=======" )
+    print( "PyEphem" )
+    print( "=======" )
+    print()
+
+    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
+    print( testPyephemSun( now, observer ) )
+
+    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
+    print( testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
+
+    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
+    print( testPyephemStar( observer, ephem.star( "Almach" ) ) )
+
+#     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
+#     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSign( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
+#     print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
+
 
 
 
 import gzip
-def filterStarsByMagnitudeFromHipparcos( hipparcosInputGzipFile, hipparcosOutputGzipFile, magnitude ):
+def filterStarsByMagnitudeFromHipparcos( hipparcosInputGzipFile, hipparcosOutputGzipFile, maximumMagnitude ):
     try:
         with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
             for line in inFile:
-                if len( line.decode()[ 41 : 46 ].strip() ) > 0 and float( line.decode()[ 41 : 46 ] ) <= float( magnitude ):
+                if len( line.decode()[ 41 : 46 ].strip() ) > 0 and float( line.decode()[ 41 : 46 ] ) <= float( maximumMagnitude ):
                     outFile.write( line )
 
     except Exception as e:
@@ -606,6 +599,8 @@ def testSkyfieldStar( utcNow, observer, star ):
     return result
 
 
+#TODO There is a difference between Az/ALT for the sun between the two systems...
+#...yet skyfield agrees with the indicator!
 def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
     apparent = observer.at( utcNow ).observe( sun ).apparent()
@@ -680,9 +675,11 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
 #         thing = ephemeris[ planet ]
 #         print( thing.target, thing.target_name )
 
+
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     topos = getSkyfieldTopos( latitudeDD, longitudeDD, elevation )
     print( testSkyfieldSun( timeScale, utcNowSkyfield, ephemeris, observer, topos ) )
+
 
 #     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
 #     with load.open( "hip_main.2.5.dat.gz" ) as f:
@@ -690,12 +687,14 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
 # 
 #     print( testSkyfieldStar( utcNowSkyfield, observer, star ) )
 
+
 #     barnard = Star(ra_hours=(17, 57, 48.49803),
 #                dec_degrees=(4, 41, 36.2072),
 #                ra_mas_per_year=-798.71,
 #                dec_mas_per_year=+10337.77,
 #                parallax_mas=545.4,
 #                radial_km_per_s=-110.6)
+
 
     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
@@ -772,6 +771,9 @@ testPyephem( now, latitudeDD, longitudeDD, elevation )
 print()
 print()
 testSkyfield( now, latitudeDD, longitudeDD, elevation )
+
+
+# bl = getZenithAngleOfBrightLimbNEW( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDD ), observerSiderealTime )
 
 
 # barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
