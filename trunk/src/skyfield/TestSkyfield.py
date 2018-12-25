@@ -278,26 +278,6 @@ def getTropicalSignTest( body, ephemNow, utcNow ):
     return ( tropicalSignName, str( tropicalSignDegree ), tropicalSignMinute )
 
 
-def getTropicalSignORIGINAL( body, ephemNow ):
-    ( year, month, day ) = ephemNow.triple()
-    epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
-    ephemNowDate = str( ephemNow ).split( " " )
-
-    bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
-    bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
-    planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
-
-    if float( planetCoordinates[ 2 ] ) > 30:
-        planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
-
-    tropicalSignDegree = int( planetCoordinates[ 0 ] ) % 30
-    tropicalSignMinute = str( planetCoordinates[ 1 ] )
-    tropicalSignIndex = int( planetCoordinates[ 0 ] ) / 30
-    tropicalSignName = TROPICAL_SIGNS[ int( tropicalSignIndex ) ]
-
-    return ( tropicalSignName, str( tropicalSignDegree ), tropicalSignMinute )
-
-
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body.
     # Measured in degrees counter clockwise from a positive y axis.
     #
