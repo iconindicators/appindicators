@@ -187,29 +187,50 @@ STARS = [ [ "Acamar", 13847 ], \
 
 
 
-# Must get a new observer after a rising/setting computation and before a calculations for a new body.    
-def getPyephemObserver( now, latitudeDD, longitudeDD, elevation ):
+# Must get a new observer after a rising/setting computation and before calculations for a new body.    
+def getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres ):
     observer = ephem.Observer()
-    observer.lat = str( latitudeDD )
-    observer.lon = str( longitudeDD )
-    observer.elevation = elevation
-    observer.date = ephem.Date( now )
+    observer.lat = str( latitudeDecimalDegrees )
+    observer.lon = str( longitudeDecimalDegrees )
+    observer.elevation = elevationMetres
+    observer.date = ephem.Date( utcNow )
     return observer
 
 
 TROPICAL_SIGNS = [ "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces" ]
 
 
+def getTropicalSign( body, utcNow ):
+    ephemNowUTC = ephem.Date( utcNow )
+    ( year, month, day ) = ephemNowUTC.triple()
+    epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
+    ephemNowDate = str( ephemNowUTC ).split( " " )
+
+    bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
+    bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
+    planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
+
+    if float( planetCoordinates[ 2 ] ) > 30:
+        planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
+
+    tropicalSignDegree = int( planetCoordinates[ 0 ] ) % 30
+    tropicalSignMinute = str( planetCoordinates[ 1 ] )
+    tropicalSignIndex = int( planetCoordinates[ 0 ] ) / 30
+    tropicalSignName = TROPICAL_SIGNS[ int( tropicalSignIndex ) ]
+
+    return ( tropicalSignName, str( tropicalSignDegree ), tropicalSignMinute )
+
+
 # Code courtesy of Ignius Drake.
-def getTropicalSign( body, ephemNow, now ):
+def getTropicalSignTest( body, ephemNow, utcNow ):
 
     ( year, month, day ) = ephemNow.triple()
-    timeDelta = datetime.timedelta( days = now.day, hours = now.hour, minutes = now.minute, seconds = now.second, microseconds = now.microsecond )
+    timeDelta = datetime.timedelta( days = utcNow.day, hours = utcNow.hour, minutes = utcNow.minute, seconds = utcNow.second, microseconds = utcNow.microsecond )
     yearWithFractionalDateTime = timeDelta.total_seconds() / datetime.timedelta( days = 1 ).total_seconds()
 
-    epochAdjustedNew = float( now.year ) + float( now.month ) / 12.0 + float( yearWithFractionalDateTime ) / 365.242
+    epochAdjustedNew = float( utcNow.year ) + float( utcNow.month ) / 12.0 + float( yearWithFractionalDateTime ) / 365.242
 
-    x = load.timescale().utc( now.year, month = now.month, day = yearWithFractionalDateTime )
+    x = load.timescale().utc( utcNow.year, month = utcNow.month, day = yearWithFractionalDateTime )
 
     epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
     ephemNowDate = str( ephemNow ).split( " " )
@@ -219,7 +240,7 @@ def getTropicalSign( body, ephemNow, now ):
     planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
 
     ephemeris = load( "2017-2024.bsp" )
-    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     thePlanet = ephemeris[ SKYFIELD_PLANET_SATURN ]
     timescale = load.timescale()
     y = observer.at( timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) ).observe( thePlanet ).apparent().ecliptic_latlon( epoch = x )
@@ -331,7 +352,7 @@ def testPyephemPlanet( observer, planet ):
         "Illumination: " + str( planet.phase ), \
         "Constellation: " + str( ephem.constellation( planet ) ), \
         "Magnitude: " + str( planet.mag ), \
-        "Tropical Sign: TODO", \
+        "Tropical Sign: " + str( getTropicalSign( planet, utcNow ) ), \
         "Distance to Earth: " + str( planet.earth_distance ), \
         "Distance to Sun: " + str( planet.sun_distance ), \
         "Bright Limb: " + str( "TODO" ), \
@@ -365,7 +386,7 @@ def testPyephemStar( observer, star ):
     result = \
         "Constellation: " + str( ephem.constellation( star ) ), \
         "Magnitude: " + str( star.mag ), \
-        "Tropical Sign: TODO", \
+        "Tropical Sign: " + str( getTropicalSign( star, utcNow ) ), \
         "Bright Limb: " + str( "TODO" ), \
         "Azimuth: " + str( star.az ), \
         "Altitude: " + str( star.alt ), \
@@ -390,21 +411,22 @@ def testPyephemStar( observer, star ):
     return result
 
 
-def testPyephemSun( now, observer ):
+def testPyephemSun( utcNow, observer ):
     # Must retrieve the az/alt/ra/dec BEFORE rise/set is computed as the values get clobbered.
     sun = ephem.Sun( observer )
+
     result = \
         "Constellation: " + str( ephem.constellation( sun ) ), \
         "Magnitude: " + str( sun.mag ), \
-        "Tropical Sign: TODO", \
+        "Tropical Sign: " + str( getTropicalSign( sun, utcNow ) ), \
         "Distance to Earth: " + str( sun.earth_distance ), \
         "Azimuth: " + str( sun.az ), \
         "Altitude: " + str( sun.alt ), \
         "Right Ascension: " + str( sun.ra ), \
         "Declination: " + str( sun.dec );
 
-    solstice = str( ephem.next_solstice( now ) )
-    equinox = str( ephem.next_equinox( now ) )
+    solstice = str( ephem.next_solstice( utcNow ) )
+    equinox = str( ephem.next_equinox( utcNow ) )
 
     rise = str( observer.next_rising( sun ).datetime() )
     sunset = str( observer.next_setting( sun ).datetime() )
@@ -422,11 +444,6 @@ def testPyephemSun( now, observer ):
         "Solstice: " + solstice, \
         "Equinox: " + equinox, \
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO";
-
-    print( "Dawn: " + dawn )
-    print( "Rise: " + rise )
-    print( "Set: " + sunset )
-    print( "Dusk: " + dusk )
 
     return result
 
@@ -459,9 +476,9 @@ def testSiderealTime():
     ephemeris = load( "2017-2024.bsp" )
     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
 
-    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     timescale = load.timescale()
-    utcNowSkyfield = timescale.utc( now.replace( tzinfo = pytz.UTC ) )
+    utcNowSkyfield = timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
     apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
     alt, az, earthDistance = apparent.altaz()
     sunRA, sunDEC, earthDistance = apparent.radec()
@@ -473,18 +490,18 @@ def testSiderealTime():
     observerSiderealTime = utcNowSkyfield.gmst
 
 
-    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
+    observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
     city = ephem.city( "Sydney" )
-    city.date = now
+    city.date = utcNow
     sun = ephem.Sun( observer )
     saturn = ephem.Saturn( observer )
 
     ephemeris = load( "2017-2024.bsp" )
     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
 
-    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     timescale = load.timescale()
-    utcNowSkyfield = timescale.utc( now.replace( tzinfo = pytz.UTC ) )
+    utcNowSkyfield = timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
     apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
     sunRA, sunDEC, earthDistance = apparent.radec()
 
@@ -501,29 +518,28 @@ def testSiderealTime():
     print( '%.6f' % city.sidereal_time() )
     print( observerSiderealTime )
 
-    print( timescale.utc( now.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
-    print( timescale.utc( now.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gast )
+    print( timescale.utc( utcNow.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
+    print( timescale.utc( utcNow.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gast )
 
 
-def testPyephem( now, latitudeDD, longitudeDD, elevation ):
+def testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres ):
     print( "=======" )
     print( "PyEphem" )
     print( "=======" )
     print()
 
-    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
-    print( testPyephemSun( now, observer ) )
+    observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
+    print( "Sun:", testPyephemSun( utcNow, observer ) )
 
-    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
-    print( testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
+    observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
+    print( "Saturn:", testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
 
-    observer = getPyephemObserver( now, latitudeDD, longitudeDD, elevation )
-    print( testPyephemStar( observer, ephem.star( "Almach" ) ) )
+    observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
+    print( "Almach (star):", testPyephemStar( observer, ephem.star( "Almach" ) ) )
 
-#     observer = getPyephemObserver( utcNow, latitudeDD, longitudeDD, elevation )
+#     observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
 #     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSign( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
 #     print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
-
 
 
 
@@ -539,12 +555,12 @@ def filterStarsByMagnitudeFromHipparcos( hipparcosInputGzipFile, hipparcosOutput
         print( e )
 
 
-def getSkyfieldObserver( latitudeDD, longitudeDD, elevation, earth ):
-    return earth + Topos( latitude_degrees = latitudeDD, longitude_degrees = longitudeDD, elevation_m = elevation )
+def getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, earth ):
+    return earth + Topos( latitude_degrees = latitudeDecimalDegrees, longitude_degrees = longitudeDecimalDegrees, elevation_m = elevationMetres )
 
 
-def getSkyfieldTopos( latitudeDD, longitudeDD, elevation ):
-    return Topos( latitude_degrees = latitudeDD, longitude_degrees = longitudeDD, elevation_m = elevation )
+def getSkyfieldTopos( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres ):
+    return Topos( latitude_degrees = latitudeDecimalDegrees, longitude_degrees = longitudeDecimalDegrees, elevation_m = elevationMetres )
 
 
 #TODO Add rise/set.
@@ -656,7 +672,7 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
 
 
-def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
+def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres ):
     print( "========" )
     print( "Skyfield" )
     print( "========" )
@@ -676,12 +692,12 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
 #         print( thing.target, thing.target_name )
 
 
-    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-    topos = getSkyfieldTopos( latitudeDD, longitudeDD, elevation )
+    observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    topos = getSkyfieldTopos( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
     print( testSkyfieldSun( timeScale, utcNowSkyfield, ephemeris, observer, topos ) )
 
 
-#     observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+#     observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
 #     with load.open( "hip_main.2.5.dat.gz" ) as f:
 #         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
 # 
@@ -696,7 +712,7 @@ def testSkyfield( utcNow, latitudeDD, longitudeDD, elevation ):
 #                radial_km_per_s=-110.6)
 
 
-    observer = getSkyfieldObserver( latitudeDD, longitudeDD, elevation, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
 
 
@@ -754,9 +770,9 @@ SKYFIELD_PLANET_EARTH = "earth"
 SKYFIELD_PLANET_SATURN = "saturn barycenter"
 SKYFIELD_PLANET_SUN = "sun"
 
-latitudeDD = -33.8
-longitudeDD = 151.2
-elevation = 100
+latitudeDecimalDegrees = -33.8
+longitudeDecimalDegrees = 151.2
+elevationMetres = 100
 
 #TODO Might need to install pytz to localise the date/time.
 # https://rhodesmill.org/skyfield/time.html
@@ -764,21 +780,22 @@ elevation = 100
 
 # indicator-lunar revision 755 changed from local date/time to UTC for calculations (I think).
 
-now = datetime.datetime.utcnow()
-print( now )
-
-testPyephem( now, latitudeDD, longitudeDD, elevation )
+utcNow = datetime.datetime.utcnow()
+print( utcNow )
 print()
-print()
-testSkyfield( now, latitudeDD, longitudeDD, elevation )
+
+testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
+# print()
+# print()
+# testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
 
 
-# bl = getZenithAngleOfBrightLimbNEW( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDD ), observerSiderealTime )
+# bl = getZenithAngleOfBrightLimbNEW( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDecimalDegrees ), observerSiderealTime )
 
 
 # barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
 # ts = load.timescale()
-# t = ts.now()
+# t = ts.utcNow()
 # astrometric = observer.at( timeScaleNow ).observe( barnard )
 # ra, dec, distance = astrometric.apparent().radec()
 # az, az, distance = astrometric.apparent().altaz()
@@ -786,7 +803,7 @@ testSkyfield( now, latitudeDD, longitudeDD, elevation )
 
 
 # observer = ephem.city( cityName )
-# observer.date = now
+# observer.date = utcNow
 # starName = "Cebalrai"
 # star = ephem.star( starName )
 # star.compute( observer )
