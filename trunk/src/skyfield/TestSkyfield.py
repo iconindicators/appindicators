@@ -69,7 +69,6 @@
 #         moon/sun eclipse
 
 
-
 # https://stackoverflow.com/questions/28867022/python-convert-au-to-km
 # https://stackoverflow.com/questions/53011697/difference-in-sun-earth-distance-with-computedate-and-computeobserver
 
@@ -81,8 +80,6 @@ from ephem.stars import stars
 from skyfield import almanac, positionlib
 from skyfield.api import load, Star, Topos
 from skyfield.data import hipparcos
-
-
 
 
 # https://www.cosmos.esa.int/web/hipparcos/common-star-names
@@ -184,9 +181,6 @@ STARS = [ [ "Acamar", 13847 ], \
           [ "3C 273", 60936 ] ]
 
 
-
-
-
 # Must get a new observer after a rising/setting computation and before calculations for a new body.    
 def getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres ):
     observer = ephem.Observer()
@@ -197,120 +191,39 @@ def getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees,
     return observer
 
 
-TROPICAL_SIGNS = [ "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces" ]
+# Compute the bright limb angle (relative to zenith) between the sun and a planetary body.
+# Measured in degrees counter clockwise from a positive y axis.
+#
+# References:
+#  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
+#  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
+#  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
+#  http://www.geoastro.de/SME/
+#  http://futureboy.us/fsp/moon.fsp
+#  http://www.timeanddate.com/moon/australia/sydney
+#
+# Other references...
+#  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
+#  https://sites.google.com/site/astronomicalalgorithms
+#  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
+#  https://github.com/brandon-rhodes/pyephem/issues/24
+#  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
+#  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
+def getZenithAngleOfBrightLimb( city, body ):
+    sun = ephem.Sun( city )
 
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
+    y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
+    x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
+    positionAngleOfBrightLimb = math.atan2( y, x )
 
-def getTropicalSignPyEphem( body, utcNow ):
-    ephemNowUTC = ephem.Date( utcNow )
-    ( year, month, day ) = ephemNowUTC.triple()
-    epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
-    ephemNowDate = str( ephemNowUTC ).split( " " )
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+    hourAngle = city.sidereal_time() - body.ra
+    y = math.sin( hourAngle )
+    x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+    parallacticAngle = math.atan2( y, x )
 
-    bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
-    bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
-    planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
-
-    if float( planetCoordinates[ 2 ] ) > 30:
-        planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
-
-    tropicalSignDegree = int( planetCoordinates[ 0 ] ) % 30
-    tropicalSignMinute = str( planetCoordinates[ 1 ] )
-    tropicalSignIndex = int( planetCoordinates[ 0 ] ) / 30
-    tropicalSignName = TROPICAL_SIGNS[ int( tropicalSignIndex ) ]
-
-    return ( tropicalSignName, str( tropicalSignDegree ), tropicalSignMinute )
-
-
-def getTropicalSignSkyfield( body, utcNow ):
-    ephemNowUTC = ephem.Date( utcNow )
-    ( year, month, day ) = ephemNowUTC.triple()
-    epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
-    ephemNowDate = str( ephemNowUTC ).split( " " )
-
-    bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
-    bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
-    planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
-
-    if float( planetCoordinates[ 2 ] ) > 30:
-        planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
-
-    tropicalSignDegree = int( planetCoordinates[ 0 ] ) % 30
-    tropicalSignMinute = str( planetCoordinates[ 1 ] )
-    tropicalSignIndex = int( planetCoordinates[ 0 ] ) / 30
-    tropicalSignName = TROPICAL_SIGNS[ int( tropicalSignIndex ) ]
-
-    return ( tropicalSignName, str( tropicalSignDegree ), tropicalSignMinute )
-
-
-# Code courtesy of Ignius Drake.
-def getTropicalSignTest( body, ephemNow, utcNow ):
-
-    ( year, month, day ) = ephemNow.triple()
-    timeDelta = datetime.timedelta( days = utcNow.day, hours = utcNow.hour, minutes = utcNow.minute, seconds = utcNow.second, microseconds = utcNow.microsecond )
-    yearWithFractionalDateTime = timeDelta.total_seconds() / datetime.timedelta( days = 1 ).total_seconds()
-
-    epochAdjustedNew = float( utcNow.year ) + float( utcNow.month ) / 12.0 + float( yearWithFractionalDateTime ) / 365.242
-
-    x = load.timescale().utc( utcNow.year, month = utcNow.month, day = yearWithFractionalDateTime )
-
-    epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
-    ephemNowDate = str( ephemNow ).split( " " )
-
-    bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
-    bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
-    planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
-
-    ephemeris = load( "2017-2024.bsp" )
-    observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-    thePlanet = ephemeris[ SKYFIELD_PLANET_SATURN ]
-    timescale = load.timescale()
-    y = observer.at( timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) ).observe( thePlanet ).apparent().ecliptic_latlon( epoch = x )
-
-
-    if float( planetCoordinates[ 2 ] ) > 30:
-        planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
-
-    tropicalSignDegree = int( planetCoordinates[ 0 ] ) % 30
-    tropicalSignMinute = str( planetCoordinates[ 1 ] )
-    tropicalSignIndex = int( planetCoordinates[ 0 ] ) / 30
-    tropicalSignName = TROPICAL_SIGNS[ int( tropicalSignIndex ) ]
-
-    return ( tropicalSignName, str( tropicalSignDegree ), tropicalSignMinute )
-
-
-    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body.
-    # Measured in degrees counter clockwise from a positive y axis.
-    #
-    # References:
-    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
-    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
-    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
-    #  http://www.geoastro.de/SME/
-    #  http://futureboy.us/fsp/moon.fsp
-    #  http://www.timeanddate.com/moon/australia/sydney
-    #
-    # Other references...
-    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
-    #  https://sites.google.com/site/astronomicalalgorithms
-    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
-    #  https://github.com/brandon-rhodes/pyephem/issues/24
-    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
-    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-    def getZenithAngleOfBrightLimb( city, body ):
-        sun = ephem.Sun( city )
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-        y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
-        x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
-        positionAngleOfBrightLimb = math.atan2( y, x )
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-        hourAngle = city.sidereal_time() - body.ra
-        y = math.sin( hourAngle )
-        x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
-        parallacticAngle = math.atan2( y, x )
-
-        return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+    return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
 def getZenithAngleOfBrightLimbNEW( city, body, sunRA, sunDec, bodyRA, bodyDec, observerLatitude, observerSiderealTime ):
