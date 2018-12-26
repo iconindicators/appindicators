@@ -2226,8 +2226,12 @@ class IndicatorLunar:
         x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
         positionAngleOfBrightLimb = math.atan2( y, x )
 
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+        # https://community.dur.ac.uk/john.lucey/users/lst.html
+        # http://www.wwu.edu/skywise/skymobile/skywatch.html
+        # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
         hourAngle = city.sidereal_time() - body.ra
+
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
         y = math.sin( hourAngle )
         x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
         parallacticAngle = math.atan2( y, x )
