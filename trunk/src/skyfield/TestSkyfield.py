@@ -209,7 +209,7 @@ def getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees,
 #  https://github.com/brandon-rhodes/pyephem/issues/24
 #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
 #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-def getZenithAngleOfBrightLimb( city, body ):
+def getZenithAngleOfBrightLimbPyEphem( city, body ):
     sun = ephem.Sun( city )
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
@@ -226,7 +226,7 @@ def getZenithAngleOfBrightLimb( city, body ):
     return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
-def getZenithAngleOfBrightLimbNEW( city, body, sunRA, sunDec, bodyRA, bodyDec, observerLatitude, observerSiderealTime ):
+def getZenithAngleOfBrightLimbSkyfield( city, body, sunRA, sunDec, bodyRA, bodyDec, observerLatitude, observerSiderealTime ):
     sun = ephem.Sun( city )
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
@@ -266,7 +266,7 @@ def testPyephemPlanet( observer, planet ):
         "Illumination: " + str( planet.phase ), \
         "Constellation: " + str( ephem.constellation( planet ) ), \
         "Magnitude: " + str( planet.mag ), \
-        "Tropical Sign: " + str( getTropicalSignPyEphem( planet, utcNow ) ), \
+        "Tropical Sign: TODO", \
         "Distance to Earth: " + str( planet.earth_distance ), \
         "Distance to Sun: " + str( planet.sun_distance ), \
         "Bright Limb: " + str( "TODO" ), \
@@ -300,7 +300,7 @@ def testPyephemStar( observer, star ):
     result = \
         "Constellation: " + str( ephem.constellation( star ) ), \
         "Magnitude: " + str( star.mag ), \
-        "Tropical Sign: " + str( getTropicalSignPyEphem( star, utcNow ) ), \
+        "Tropical Sign: TODO", \
         "Bright Limb: " + str( "TODO" ), \
         "Azimuth: " + str( star.az ), \
         "Altitude: " + str( star.alt ), \
@@ -332,7 +332,7 @@ def testPyephemSun( utcNow, observer ):
     result = \
         "Constellation: " + str( ephem.constellation( sun ) ), \
         "Magnitude: " + str( sun.mag ), \
-        "Tropical Sign: " + str( getTropicalSignPyEphem( sun, utcNow ) ), \
+        "Tropical Sign: TODO", \
         "Distance to Earth: " + str( sun.earth_distance ), \
         "Azimuth: " + str( sun.az ), \
         "Altitude: " + str( sun.alt ), \
@@ -357,6 +357,32 @@ def testPyephemSun( utcNow, observer ):
         "Dusk: " + dusk, \
         "Solstice: " + solstice, \
         "Equinox: " + equinox, \
+        "Eclipse Date/Time, Latitude/Longitude, Type: TODO";
+
+    return result
+
+
+def testPyephemMoon( utcNow, observer ):
+    # Must retrieve the az/alt/ra/dec BEFORE rise/set is computed as the values get clobbered.
+    moon = ephem.Moon( observer )
+
+    result = \
+        "Constellation: " + str( ephem.constellation( moon ) ), \
+        "Magnitude: " + str( moon.mag ), \
+        "Tropical Sign: TODO", \
+        "Distance to Earth: " + str( moon.earth_distance ), \
+        "Azimuth: " + str( moon.az ), \
+        "Altitude: " + str( moon.alt ), \
+        "Right Ascension: " + str( moon.ra ), \
+        "Declination: " + str( moon.dec );
+
+    rise = str( observer.next_rising( moon ).datetime() )
+    sunset = str( observer.next_setting( moon ).datetime() )
+
+
+    result += \
+        "Rise: " + rise, \
+        "Set: " + sunset, \
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO";
 
     return result
@@ -450,6 +476,9 @@ def testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevat
 
     observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
     print( "Almach (star):", testPyephemStar( observer, ephem.star( "Almach" ) ) )
+
+    observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
+    print( "Moon:", testPyephemMoon( utcNow, observer ) )
 
 #     observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
 #     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSignPyEphem( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
@@ -704,7 +733,7 @@ testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationM
 # testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
 
 
-# bl = getZenithAngleOfBrightLimbNEW( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDecimalDegrees ), observerSiderealTime )
+# bl = getZenithAngleOfBrightLimbSkyfield( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDecimalDegrees ), observerSiderealTime )
 
 
 # barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
