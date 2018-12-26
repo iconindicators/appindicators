@@ -991,18 +991,6 @@ class IndicatorLunar:
             # When it comes time to display, conversion to local time takes place.
             ephemNow = ephem.now()
 
-#TODO Need to check all results are accurate...
-# I suspect all results of a date/time nature are accureate.
-# Others should also be accurate.
-# However check bright limb...suspect it is incorrect because the sidereal time is in UTC not local.
-#
-# http://www.ga.gov.au/bin/geodesy/run/sunmoonposn
-# https://www.suncalc.org/#/-33.7939,151.1906,16/2018.11.17/17:10/1/0
-#
-# Moon Bright Limb
-# https://www.calsky.com/cs.cgi?cha=6&sec=1
-# https://futureboy.us/fsp/moon.fsp
-
             self.updateAstronomicalInformation( ephemNow, self.hideBodyIfNeverUp, self.cometsMagnitude, self.hideSatelliteIfNoVisiblePass )
 
             # Update frontend...
@@ -2218,6 +2206,10 @@ class IndicatorLunar:
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
     #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
+
+#TODO Verify this URL is valid...
+# https://www.calsky.com/cs.cgi?cha=6&sec=1
+
     def getZenithAngleOfBrightLimb( self, city, body ):
         sun = ephem.Sun( city )
 
