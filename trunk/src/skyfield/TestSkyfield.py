@@ -239,7 +239,19 @@ def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, 
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
 
 #TODO Is this screwing up the timescale?
-    print( "Local sidereal time:", timeScale.utc( utcNow.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
+#     print( "Local sidereal time:", timeScale.utc( utcNow.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
+
+
+
+    print( "Timescale now gmst", load.timescale().now().gmst )
+    timeScale = load.timescale()
+#     utcNowSkyfield = timeScale.utc( load.timescale().now().replace( tzinfo = pytz.UTC ) )
+#     print( "Timescale now tzinfo utc gmst", utcNowSkyfield.gmst )
+    
+    
+    sss = timeScale.utc( datetime.datetime.utcnow() )
+    print( "Timescale datetime utc now gmst", sss.gmst )
+
 
 #     hourAngle = city.sidereal_time() - bodyRA
 #     y = math.sin( hourAngle )
