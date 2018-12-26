@@ -228,36 +228,33 @@ def getZenithAngleOfBrightLimbPyEphem( city, body ):
     return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
-def getZenithAngleOfBrightLimbSkyfield( city, body, sunRA, sunDec, bodyRA, bodyDec, observerLatitude, observerSiderealTime ):
-    sun = ephem.Sun( city )
+def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, bodyRA, bodyDec, ):
+    sunRA, sunDec, earthDistance = observer.at( utcNow ).observe( ephemeris[ SKYFIELD_PLANET_SUN ] ).apparent().radec()
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-    y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
-    x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
+    y = math.cos( sunDec.radians ) * math.sin( sunRA.radians - bodyRA.radians )
+    x = math.sin( sunDec.radians ) * math.cos( bodyDec.radians ) - math.cos( sunDec.radians ) * math.sin( bodyDec.radians ) * math.cos( sunRA.radians - bodyRA.radians )
     positionAngleOfBrightLimb = math.atan2( y, x )
 
-    yNEW = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
-    xNEW = math.sin( sunDec ) * math.cos( bodyDec ) - math.cos( sunDec ) * math.sin( bodyDec ) * math.cos( sunRA - bodyRA )
-    positionAngleOfBrightLimbNEW = math.atan2( yNEW, xNEW )
-
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-    hourAngle = city.sidereal_time() - body.ra
-    print( city.sidereal_time() )
-    citySiderealTime = city.sidereal_time()
-    bodyra = body.ra
 
-    y = math.sin( hourAngle )
-    x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
-    parallacticAngle = math.atan2( y, x )
+#TODO Is this screwing up the timescale?
+    print( "Local sidereal time:", timeScale.utc( utcNow.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
 
-    hourAngleNEW = observerSiderealTime - bodyRA
-    yNEW = math.sin( hourAngleNEW )
-    xNEW = math.tan( observerLatitude ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngleNEW )
-    parallacticAngleNEW = math.atan2( yNEW, xNEW )
+#     hourAngle = city.sidereal_time() - bodyRA
+#     y = math.sin( hourAngle )
+#     x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+#     parallacticAngle = math.atan2( y, x )
 
-    orig = math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
-    new = math.degrees( ( positionAngleOfBrightLimbNEW - parallacticAngleNEW ) % ( 2.0 * math.pi ) )
-    return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+#     hourAngleNEW = observerSiderealTime - bodyRA
+#     yNEW = math.sin( hourAngleNEW )
+#     xNEW = math.tan( observerLatitude ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngleNEW )
+#     parallacticAngleNEW = math.atan2( yNEW, xNEW )
+
+#     orig = math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+#     new = math.degrees( ( positionAngleOfBrightLimbNEW - parallacticAngleNEW ) % ( 2.0 * math.pi ) )
+#     return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+    return ""
 
 
 def testPyephemPlanet( observer, planet ):
@@ -619,6 +616,28 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
 
 
+def testSkyfieldMoon( timeScale, utcNow, ephemeris, observer, topos ):
+    moon = ephemeris[ SKYFIELD_PLANET_MOON ]
+    apparent = observer.at( utcNow ).observe( moon ).apparent()
+    alt, az, earthDistance = apparent.altaz()
+    ra, dec, earthDistance = apparent.radec()
+
+    zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, ra, dec ) )
+
+    return \
+        "Constellation: TODO", \
+        "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
+        "Tropical Sign: TODO", \
+        "Distance to Earth: " + str( earthDistance ), \
+        "Azimuth: " + str( az.dms() ), \
+        "Altitude: " + str( alt.dms() ), \
+        "Right Ascension: " + str( ra.hms() ), \
+        "Declination: " + str( dec.dms() ), \
+        "Rise: TODO", \
+        "Set: TODO", \
+        "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
+
+
 def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres ):
     print( "========" )
     print( "Skyfield" )
@@ -642,6 +661,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     topos = getSkyfieldTopos( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
     print( testSkyfieldSun( timeScale, utcNowSkyfield, ephemeris, observer, topos ) )
+    print( testSkyfieldMoon( timeScale, utcNowSkyfield, ephemeris, observer, topos ) )
 
 
 #     observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
@@ -714,6 +734,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
         
 
 SKYFIELD_PLANET_EARTH = "earth"
+SKYFIELD_PLANET_MOON = "moon"
 SKYFIELD_PLANET_SATURN = "saturn barycenter"
 SKYFIELD_PLANET_SUN = "sun"
 
@@ -732,9 +753,9 @@ print( utcNow )
 print()
 
 testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
-# print()
-# print()
-# testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
+print()
+print()
+testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
 
 
 # bl = getZenithAngleOfBrightLimbSkyfield( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDecimalDegrees ), observerSiderealTime )
