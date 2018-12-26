@@ -2198,6 +2198,7 @@ class IndicatorLunar:
     #  http://www.geoastro.de/SME/
     #  http://futureboy.us/fsp/moon.fsp
     #  http://www.timeanddate.com/moon/australia/sydney
+    #  https://www.calsky.com/cs.cgi?cha=6&sec=1
     #
     # Other references...
     #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
@@ -2206,10 +2207,6 @@ class IndicatorLunar:
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
     #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-
-#TODO Verify this URL is valid...
-# https://www.calsky.com/cs.cgi?cha=6&sec=1
-
     def getZenithAngleOfBrightLimb( self, city, body ):
         sun = ephem.Sun( city )
 
