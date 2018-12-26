@@ -218,6 +218,8 @@ def getZenithAngleOfBrightLimbPyEphem( city, body ):
     positionAngleOfBrightLimb = math.atan2( y, x )
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+#TODO The city at this point has UTC as the time, but I think needs to change to be local time for the sidereal calculation.
+    print( "Local sidereal time:", city.sidereal_time() )
     hourAngle = city.sidereal_time() - body.ra
     y = math.sin( hourAngle )
     x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
@@ -379,11 +381,13 @@ def testPyephemMoon( utcNow, observer ):
     rise = str( observer.next_rising( moon ).datetime() )
     sunset = str( observer.next_setting( moon ).datetime() )
 
+    zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbPyEphem( observer, moon ) )
 
     result += \
         "Rise: " + rise, \
         "Set: " + sunset, \
-        "Eclipse Date/Time, Latitude/Longitude, Type: TODO";
+        "Eclipse Date/Time, Latitude/Longitude, Type: TODO", \
+        "Zenith Angle of Bright Limb: " + zenithAngleOfBrightLimb;
 
     return result
 
