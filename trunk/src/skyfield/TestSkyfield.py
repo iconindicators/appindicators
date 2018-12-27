@@ -220,7 +220,9 @@ def getZenithAngleOfBrightLimbPyEphem( city, body ):
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
 #TODO The city at this point has UTC as the time, but I think needs to change to be local time for the sidereal calculation.
     print( "Local sidereal time:", city.sidereal_time() )
+    print( "bodyRA", body.ra )
     hourAngle = city.sidereal_time() - body.ra
+    print( "hour angle", hourAngle )
     y = math.sin( hourAngle )
     x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
     parallacticAngle = math.atan2( y, x )
@@ -244,19 +246,53 @@ def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, 
 
 # https://rhodesmill.org/skyfield/time.html
 # https://rhodesmill.org/skyfield/api-time.html#skyfield.timelib.Timescale.now
-    print( "GMT: ", load.timescale().now().utc ) # Print GMT (UTC) date/time.
-    print( "GMT: ", load.timescale().now().utc_iso() ) # Print GMT (UTC) date/time.
-    print( "GMT: ", load.timescale().now().utc_jpl() ) # Print GMT (UTC) date/time.
+#     print( "GMT: ", load.timescale().now().utc ) # Print GMT (UTC) date/time.
+#     print( "GMT: ", load.timescale().now().utc_iso() ) # Print GMT (UTC) date/time.
+#     print( "GMT: ", load.timescale().now().utc_jpl() ) # Print GMT (UTC) date/time.
+
+#     print( "GMST", load.timescale().now().gmst )
+    print( "GMST", utcNow.gmst )
 
 
-    print( "Timescale now gmst", load.timescale().now().gmst )
-    timeScale = load.timescale()
+    from datetime import datetime, timezone
+
+    utc_dt = datetime.now( timezone.utc ) # UTC time
+    dt = utc_dt.astimezone() # local time
+    print( utc_dt )
+    print( dt )
+
+    zzz = timeScale.utc( dt )
+    print( zzz )
+    print( zzz.gmst )
+
+    from skyfield.units import Angle
+    longitude = None
+    for positive in observer.positives:
+        print( type( positive ) )
+        if type( positive ).__name__ == "Topos":
+            longitude = positive.longitude
+            break
+
+    import numpy
+    print( utcNow.gmst, type( utcNow.gmst ) )
+    print( longitude, type( longitude ) ) 
+    print( bodyRA, type( bodyRA ) )
+    hourAngle = numpy.radians( utcNow.gmst ) - longitude.radians - bodyRA.radians
+    print( "hour angle", hourAngle )
+
+#     from time import gmtime, strftime
+#     print(strftime("%z", gmtime()))
+#     import time; print( time.tzname )
+#     print( time.tzname[time.daylight] )
+#     print( time.localtime().tm_isdst )
+#     print( datetime.datetime.now(datetime.timezone.utc).astimezone().tzname() )
+#     print( pytz.all_timezones )
 #     utcNowSkyfield = timeScale.utc( load.timescale().now().replace( tzinfo = pytz.UTC ) )
 #     print( "Timescale now tzinfo utc gmst", utcNowSkyfield.gmst )
     
     
-    sss = timeScale.utc( datetime.datetime.utcnow() )
-    print( "Timescale datetime utc now gmst", sss.gmst )
+#     sss = timeScale.utc( datetime.datetime.utcnow() )
+#     print( "Timescale datetime utc now gmst", sss.gmst )
 
 
 #     hourAngle = city.sidereal_time() - bodyRA
