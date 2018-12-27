@@ -242,6 +242,12 @@ def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, 
 #     print( "Local sidereal time:", timeScale.utc( utcNow.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
 
 
+# https://rhodesmill.org/skyfield/time.html
+# https://rhodesmill.org/skyfield/api-time.html#skyfield.timelib.Timescale.now
+    print( "GMT: ", load.timescale().now().utc ) # Print GMT (UTC) date/time.
+    print( "GMT: ", load.timescale().now().utc_iso() ) # Print GMT (UTC) date/time.
+    print( "GMT: ", load.timescale().now().utc_jpl() ) # Print GMT (UTC) date/time.
+
 
     print( "Timescale now gmst", load.timescale().now().gmst )
     timeScale = load.timescale()
