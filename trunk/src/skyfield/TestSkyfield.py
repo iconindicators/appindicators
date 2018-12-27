@@ -244,39 +244,32 @@ def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, 
 #     print( "Local sidereal time:", timeScale.utc( utcNow.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
 
 
-# https://rhodesmill.org/skyfield/time.html
-# https://rhodesmill.org/skyfield/api-time.html#skyfield.timelib.Timescale.now
-#     print( "GMT: ", load.timescale().now().utc ) # Print GMT (UTC) date/time.
-#     print( "GMT: ", load.timescale().now().utc_iso() ) # Print GMT (UTC) date/time.
-#     print( "GMT: ", load.timescale().now().utc_jpl() ) # Print GMT (UTC) date/time.
-
 #     print( "GMST", load.timescale().now().gmst )
     print( "GMST", utcNow.gmst )
 
+#     from datetime import datetime, timezone
+# 
+#     utc_dt = datetime.now( timezone.utc ) # UTC time
+#     dt = utc_dt.astimezone() # local time
+#     print( utc_dt )
+#     print( dt )
 
-    from datetime import datetime, timezone
-
-    utc_dt = datetime.now( timezone.utc ) # UTC time
-    dt = utc_dt.astimezone() # local time
-    print( utc_dt )
-    print( dt )
-
-    zzz = timeScale.utc( dt )
-    print( zzz )
-    print( zzz.gmst )
+#     zzz = timeScale.utc( dt )
+#     print( zzz )
+#     print( zzz.gmst )
 
     from skyfield.units import Angle
     longitude = None
     for positive in observer.positives:
-        print( type( positive ) )
         if type( positive ).__name__ == "Topos":
             longitude = positive.longitude
             break
 
     import numpy
-    print( utcNow.gmst, type( utcNow.gmst ) )
-    print( longitude, type( longitude ) ) 
-    print( bodyRA, type( bodyRA ) )
+    print( "GMST", utcNow.gmst, type( utcNow.gmst ) )
+    print( "Longitude", longitude, type( longitude ) ) 
+    print( "Longitude radians", longitude.radians ) 
+    print( "bodyRA", bodyRA, type( bodyRA ) )
     hourAngle = numpy.radians( utcNow.gmst ) - longitude.radians - bodyRA.radians
     print( "hour angle", hourAngle )
 
