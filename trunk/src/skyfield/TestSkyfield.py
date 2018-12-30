@@ -20,7 +20,7 @@
 #
 # Planets
 #     https://github.com/skyfielders/python-skyfield/issues/123
-#     ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/de421.bsp
+#     ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/de421.bsp   <------------Use 430 as more accurate  https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
 #     Download de421.bsp and run spkmerge as per the issue 123 to produce "2017-2024.bsp".
 #
 # Stars
@@ -247,16 +247,16 @@ def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, 
 #     print( "GMST", load.timescale().now().gmst )
     print( "GMST", utcNow.gmst )
 
-#     from datetime import datetime, timezone
-# 
-#     utc_dt = datetime.now( timezone.utc ) # UTC time
-#     dt = utc_dt.astimezone() # local time
-#     print( utc_dt )
-#     print( dt )
+#     https://stackoverflow.com/questions/25837452/python-get-current-time-in-right-timezone
+    from datetime import datetime, timezone, timedelta
+    utc_dt = datetime.now( timezone.utc ) # UTC time
+    dt = utc_dt.astimezone() # local time
+    print( "UTC with timezone information:", utc_dt )
+    print( "Local time with timezone information:", dt )
 
-#     zzz = timeScale.utc( dt )
-#     print( zzz )
-#     print( zzz.gmst )
+    zzz = timeScale.utc( dt )
+    print( "UTC from time object:", zzz )
+    print( "GMST:", zzz.gmst )
 
     from skyfield.units import Angle
     longitude = None
@@ -267,11 +267,25 @@ def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, 
 
     import numpy
     print( "GMST", utcNow.gmst, type( utcNow.gmst ) )
+    print( "GMST (hours)", utcNow.gmst, type( utcNow.gmst ) )
+    print( "GMST radians", numpy.radians( utcNow.gmst ), type( numpy.radians( utcNow.gmst ) ) )
+    print( "GMST angle", Angle( hours = utcNow.gmst ), Angle( hours = utcNow.gmst ) )
     print( "Longitude", longitude, type( longitude ) ) 
-    print( "Longitude radians", longitude.radians ) 
+    print( "Longitude radians", longitude.radians, type( longitude.radians ) ) 
+    print( "Longitude degrees", longitude.degrees, type( longitude.degrees ) ) 
     print( "bodyRA", bodyRA, type( bodyRA ) )
+    print( "bodyRA radians", bodyRA.radians, type( bodyRA.radians ) )
+    print( "bodyRA hours", bodyRA._hours, type( bodyRA._hours) )
     hourAngle = numpy.radians( utcNow.gmst ) - longitude.radians - bodyRA.radians
     print( "hour angle", hourAngle )
+    hourAngle = utcNow.gmst - longitude._degrees - bodyRA._hours
+    print( "hour angle", hourAngle )
+#     hourAngle = Angle( hours = utcNow.gmst ) - longitude - bodyRA
+#     print( "hour angle", hourAngle )
+
+    import time
+    print( "Local time zone:", time.strftime( "%z" ) )
+    print( "Local time zone:", timezone( timedelta( seconds =- time.timezone ) ) )
 
 #     from time import gmtime, strftime
 #     print(strftime("%z", gmtime()))
@@ -321,6 +335,7 @@ def testPyephemPlanet( observer, planet ):
         "Right Ascension: " + str( planet.ra ), \
         "Declination: " + str( planet.dec )
 
+    # Must be the last thing calculated!
     try:
         result += \
             "Rise: " + str( observer.next_rising( planet ) ), \
@@ -353,6 +368,7 @@ def testPyephemStar( observer, star ):
         "Right Ascension: " + str( star.ra ), \
         "Declination: " + str( star.dec )
 
+    # Must be the last thing calculated!
     try:
         result += \
             "Rise: " + str( observer.next_rising( star ) ), \
@@ -388,6 +404,7 @@ def testPyephemSun( utcNow, observer ):
     solstice = str( ephem.next_solstice( utcNow ) )
     equinox = str( ephem.next_equinox( utcNow ) )
 
+    # Must be the last thing calculated!
     rise = str( observer.next_rising( sun ).datetime() )
     sunset = str( observer.next_setting( sun ).datetime() )
 
@@ -422,10 +439,11 @@ def testPyephemMoon( utcNow, observer ):
         "Right Ascension: " + str( moon.ra ), \
         "Declination: " + str( moon.dec );
 
+    zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbPyEphem( observer, moon ) )
+
+    # Must be the last thing calculated!
     rise = str( observer.next_rising( moon ).datetime() )
     sunset = str( observer.next_setting( moon ).datetime() )
-
-    zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbPyEphem( observer, moon ) )
 
     result += \
         "Rise: " + rise, \
