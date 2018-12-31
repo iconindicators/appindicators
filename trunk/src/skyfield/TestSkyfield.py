@@ -278,7 +278,7 @@ def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, 
     print( "bodyRA hours", bodyRA._hours, type( bodyRA._hours) )
     hourAngle = numpy.radians( utcNow.gmst ) - longitude.radians - bodyRA.radians
     print( "hour angle", hourAngle )
-    hourAngle = utcNow.gmst - ( 1.0 * longitude._degrees ) - bodyRA._hours
+    hourAngle = utcNow.gmst - ( - 1.0 * 24 * longitude._degrees / 360 ) - bodyRA._hours
     print( "hour angle", numpy.radians( hourAngle ) )
 #     hourAngle = Angle( hours = utcNow.gmst ) - longitude - bodyRA
 #     print( "hour angle", hourAngle )
