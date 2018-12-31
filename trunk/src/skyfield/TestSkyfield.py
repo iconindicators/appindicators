@@ -219,8 +219,8 @@ def getZenithAngleOfBrightLimbPyEphem( city, body ):
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
 #TODO The city at this point has UTC as the time, but I think needs to change to be local time for the sidereal calculation.
-    print( "Local sidereal time:", city.sidereal_time() )
-    print( "bodyRA", body.ra )
+    print( "Local sidereal time (hms):", city.sidereal_time() )
+    print( "bodyRA (hms)", body.ra )
     hourAngle = city.sidereal_time() - body.ra
     print( "hour angle", hourAngle )
     y = math.sin( hourAngle )
@@ -278,8 +278,8 @@ def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, 
     print( "bodyRA hours", bodyRA._hours, type( bodyRA._hours) )
     hourAngle = numpy.radians( utcNow.gmst ) - longitude.radians - bodyRA.radians
     print( "hour angle", hourAngle )
-    hourAngle = utcNow.gmst - longitude._degrees - bodyRA._hours
-    print( "hour angle", hourAngle )
+    hourAngle = utcNow.gmst - ( 1.0 * longitude._degrees ) - bodyRA._hours
+    print( "hour angle", numpy.radians( hourAngle ) )
 #     hourAngle = Angle( hours = utcNow.gmst ) - longitude - bodyRA
 #     print( "hour angle", hourAngle )
 
