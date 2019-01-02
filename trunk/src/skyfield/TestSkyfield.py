@@ -227,6 +227,17 @@ def getZenithAngleOfBrightLimbPyEphem( city, body ):
     x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
     parallacticAngle = math.atan2( y, x )
 
+    print()
+
+    o = ephem.Observer()
+    print( "GMT sidereal time:", o.sidereal_time(), type( o.sidereal_time() ) )
+    print( "longitude", city.lon, type( city.lon ) )
+    print( "longitude (hms)", city.lon * 24.0 / 360.0, type( city.lon * 24.0 / 360.0 ) )
+    print( "longitude ", ephem.degrees( str( city.lon * 24.0 / 360.0 ) ), type( ephem.degrees( str( city.lon * 24.0 / 360.0 )) ) )
+    print( "bodyRA", body.ra, type( body.ra ) )
+    hourAngle = o.sidereal_time() - ( ephem.degrees( str( city.lon * 24.0 / 360.0 ) ) ) - body.ra
+    print( "hour angle", hourAngle )
+
     return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
@@ -245,18 +256,18 @@ def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, 
 
 
 #     print( "GMST", load.timescale().now().gmst )
-    print( "GMST", utcNow.gmst )
+#     print( "GMST", utcNow.gmst )
 
 #     https://stackoverflow.com/questions/25837452/python-get-current-time-in-right-timezone
     from datetime import datetime, timezone, timedelta
     utc_dt = datetime.now( timezone.utc ) # UTC time
     dt = utc_dt.astimezone() # local time
-    print( "UTC with timezone information:", utc_dt )
-    print( "Local time with timezone information:", dt )
+#     print( "UTC with timezone information:", utc_dt )
+#     print( "Local time with timezone information:", dt )
 
     zzz = timeScale.utc( dt )
-    print( "UTC from time object:", zzz )
-    print( "GMST:", zzz.gmst )
+#     print( "UTC from time object:", zzz )
+#     print( "GMST:", zzz.gmst )
 
     from skyfield.units import Angle
     longitude = None
@@ -266,20 +277,22 @@ def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, 
             break
 
     import numpy
-    print( "GMST", utcNow.gmst, type( utcNow.gmst ) )
+#     print( "GMST", utcNow.gmst, type( utcNow.gmst ) )
     print( "GMST (hours)", utcNow.gmst, type( utcNow.gmst ) )
-    print( "GMST radians", numpy.radians( utcNow.gmst ), type( numpy.radians( utcNow.gmst ) ) )
-    print( "GMST angle", Angle( hours = utcNow.gmst ), Angle( hours = utcNow.gmst ) )
+#     print( "GMST radians", numpy.radians( utcNow.gmst ), type( numpy.radians( utcNow.gmst ) ) )
+#     print( "GMST angle", Angle( hours = utcNow.gmst ), Angle( hours = utcNow.gmst ) )
     print( "Longitude", longitude, type( longitude ) ) 
-    print( "Longitude radians", longitude.radians, type( longitude.radians ) ) 
-    print( "Longitude degrees", longitude.degrees, type( longitude.degrees ) ) 
+    print( "Longitude (degrees)", longitude._degrees, type( longitude ) ) 
+    print( "Longitude as time", longitude._degrees * 24.0 / 360.0 )
+#     print( "Longitude radians", longitude.radians, type( longitude.radians ) ) 
+#     print( "Longitude degrees", longitude.degrees, type( longitude.degrees ) ) 
     print( "bodyRA", bodyRA, type( bodyRA ) )
-    print( "bodyRA radians", bodyRA.radians, type( bodyRA.radians ) )
+#     print( "bodyRA radians", bodyRA.radians, type( bodyRA.radians ) )
     print( "bodyRA hours", bodyRA._hours, type( bodyRA._hours) )
-    hourAngle = numpy.radians( utcNow.gmst ) - longitude.radians - bodyRA.radians
+#     hourAngle = numpy.radians( utcNow.gmst ) - longitude.radians - bodyRA.radians
+#     print( "hour angle", numpy.radians( hourAngle ) )
+    hourAngle = utcNow.gmst - ( - 24.0 * longitude._degrees / 360.0 ) - bodyRA._hours
     print( "hour angle", hourAngle )
-    hourAngle = utcNow.gmst - ( - 1.0 * 24 * longitude._degrees / 360 ) - bodyRA._hours
-    print( "hour angle", numpy.radians( hourAngle ) )
 #     hourAngle = Angle( hours = utcNow.gmst ) - longitude - bodyRA
 #     print( "hour angle", hourAngle )
 
