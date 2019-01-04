@@ -20,7 +20,7 @@
 #
 # Planets
 #     https://github.com/skyfielders/python-skyfield/issues/123
-#     ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/de421.bsp   <------------Use 430 as more accurate  https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
+#     ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/de421.bsp   <------------Use 430 or later as more accurate  https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
 #     Download de421.bsp and run spkmerge as per the issue 123 to produce "2017-2024.bsp".
 #
 # Stars
@@ -492,7 +492,7 @@ def testSiderealTime():
     import sys
     sys.exit()
 
-    ephemeris = load( "2017-2024.bsp" )
+    ephemeris = load( "2019-2023-planets.bsp" )
     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
 
     observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
@@ -515,7 +515,7 @@ def testSiderealTime():
     sun = ephem.Sun( observer )
     saturn = ephem.Saturn( observer )
 
-    ephemeris = load( "2017-2024.bsp" )
+    ephemeris = load( "2019-2023-planets.bsp" )
     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
 
     observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
@@ -727,7 +727,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 #     print( utcNowSkyfield.utc )
 
 #TODO This ephemeris contains only planets...what about stars and planetary moons?
-    ephemeris = load( "2017-2024.bsp" )
+    ephemeris = load( "2019-2023-planets.bsp" )
 
 #     print( ephemeris[ "saturn barycenter" ].target_name )
 #     for planet in ephemeris.names():
