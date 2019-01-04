@@ -2,5 +2,5 @@ LEAPSECONDS_KERNEL = naif0012.tls
 SPK_KERNEL = 2019-2023-planets.bsp
    LOG_FILE = spkmerge.log
    SOURCE_SPK_KERNEL = de438.bsp
-      BEGIN_TIME = 2018-01-01
+      BEGIN_TIME = 2019-01-01
       END_TIME = 2024-01-01
