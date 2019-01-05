@@ -761,7 +761,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
 
 
-    filterStarsByMagnitudeFromHipparcos( "hip_main.dat.gz", "hip_main.2.5.dat.gz", 3 )
+#     filterStarsByMagnitudeFromHipparcos( "hip_main.dat.gz", "hip_main.2.5.dat.gz", 2.5 )
 
 
 #TODO First time star catalog is loaded, takes a lot of time, but subsequent loads are quick.
@@ -772,14 +772,27 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 #     with load.open( hipparcos.URL ) as f:
 #         stars = hipparcos.load_dataframe( f )
 
-    with load.open( "hip_main.2.5.dat.gz" ) as f:
-        stars = hipparcos.load_dataframe( f )
-
-    stars = stars[ stars[ "magnitude" ] <= 10 ]
-    print( "After filtering, there are {} stars".format( len( stars ) ) )
+#     with load.open( "hip_main.2.5.dat.gz" ) as f:
+#         stars = hipparcos.load_dataframe( f )
+# 
+#     stars = stars[ stars[ "magnitude" ] <= 10 ]
+#     print( "After filtering, there are {} stars".format( len( stars ) ) )
 #Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
 
 
+def compareStars():
+
+    with load.open( "hip_main.2.5.dat.gz" ) as f:
+        stars = hipparcos.load_dataframe( f )
+
+    print( stars.size )
+    print( stars.columns )
+    print( stars.index )
+#     for star in stars.items():
+#         print( star )
+    
+#     print( stars[ "magnitude" ] )
+#Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
 
 
 
@@ -835,6 +848,8 @@ print()
 print()
 testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
 
+
+compareStars()
 
 # bl = getZenithAngleOfBrightLimbSkyfield( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDecimalDegrees ), observerSiderealTime )
 
