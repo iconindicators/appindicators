@@ -785,15 +785,69 @@ def compareStars():
     with load.open( "hip_main.2.5.dat.gz" ) as f:
         stars = hipparcos.load_dataframe( f )
 
-    print( stars.size )
-    print( stars.columns )
-    print( stars.index )
+#     print( stars.size )
+#     print()
+#     print( stars.columns )
+#     print()
+#     print( stars.index )
+#     print()
+#     print( stars.dtypes )
+#     print()
+#     print( stars.axes )
+#     print()
+#     print( stars.ndim )
+#     print()
+#     print( stars.shape )
+#     print()
+#     print( stars.values )
+#     print()
+
 #     for star in stars.items():
 #         print( star )
     
 #     print( stars[ "magnitude" ] )
 #Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
 
+
+        print( "Stars in hipparcos but not in common name:" )
+        for hipparcosIdentifier, row in stars.iterrows():
+            if not any( hipparcosIdentifier in x for x in STARS ):
+                print( hipparcosIdentifier )
+# 4427
+# 28360
+# 30324
+# 34444
+# 35904
+# 39429
+# 39953
+# 41037
+# 42913
+# 44816
+# 45238
+# 45556
+# 45941
+# 61084
+# 61932
+# 62434
+# 66657
+# 68933
+# 71352
+# 71681
+# 71860
+# 78401
+# 82273
+# 82396
+# 84012
+# 86228
+# 86670
+# 100453
+# 100751
+# 102488
+# 112122
+
+#TODO Can we find common names for the HIP numbers above?
+
+#TODO Is it worth removing the stars above from the dataset?
 
 
 
