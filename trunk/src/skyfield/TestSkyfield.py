@@ -849,6 +849,11 @@ def compareStars():
 
 #TODO Is it worth removing the stars above from the dataset?
 
+#TODO This list https://en.wikipedia.org/wiki/List_of_proper_names_of_stars
+# does not have the HIP number, so difficult to automate a lookup.
+# https://www.obliquity.com/skyeye/misc/name.html
+
+#TODO Perhaps iterate over the original data frame and create a new data frame comprising only stars matching the main STARS list.
 
 
 #     print()
