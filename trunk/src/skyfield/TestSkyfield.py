@@ -808,11 +808,20 @@ def compareStars():
 #     print( stars[ "magnitude" ] )
 #Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
 
+#         print( "Stars in hipparcos but not in common name:" )
 
-        print( "Stars in hipparcos but not in common name:" )
-        for hipparcosIdentifier, row in stars.iterrows():
-            if not any( hipparcosIdentifier in x for x in STARS ):
-                print( hipparcosIdentifier )
+    starsCommon = [ ]
+    for hipparcosIdentifier, row in stars.iterrows():
+        if any( hipparcosIdentifier in x for x in STARS ):
+            starsCommon.append( row )
+#             print( hipparcosIdentifier )
+
+    from pandas import concat, DataFrame
+    newStars = DataFrame().reindex_like( stars )
+    zz = concat( [ starsCommon, newStars ] )
+    print( len( STARS ), zz.size )
+
+
 # 4427
 # 28360
 # 30324
@@ -854,6 +863,7 @@ def compareStars():
 # https://www.obliquity.com/skyeye/misc/name.html
 
 #TODO Perhaps iterate over the original data frame and create a new data frame comprising only stars matching the main STARS list.
+
 
 
 #     print()
