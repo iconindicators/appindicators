@@ -80,6 +80,7 @@ from ephem.stars import stars
 from skyfield import almanac, positionlib
 from skyfield.api import load, Star, Topos
 from skyfield.data import hipparcos
+from pandas.core.frame import DataFrame
 
 
 # https://www.cosmos.esa.int/web/hipparcos/common-star-names
@@ -577,6 +578,18 @@ def filterStarsByMagnitudeFromHipparcos( hipparcosInputGzipFile, hipparcosOutput
         print( e )
 
 
+def filterStarsByHipparcosIdentifierFromHipparcos( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
+    try:
+        with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
+            for line in inFile:
+                hip = int( line.decode()[ 2 : 14 ].strip() )
+                if hip in hipparcosIdentifiers:
+                    outFile.write( line )
+
+    except Exception as e:
+        print( e )
+
+
 def getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, earth ):
     return earth + Topos( latitude_degrees = latitudeDecimalDegrees, longitude_degrees = longitudeDecimalDegrees, elevation_m = elevationMetres )
 
@@ -762,6 +775,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 
 
 #     filterStarsByMagnitudeFromHipparcos( "hip_main.dat.gz", "hip_main.2.5.dat.gz", 2.5 )
+    filterStarsByHipparcosIdentifierFromHipparcos( "hip_main.dat.gz", "hip_common_name_stars.dat.gz", [ i[ 1 ] for i in STARS ] )
 
 
 #TODO First time star catalog is loaded, takes a lot of time, but subsequent loads are quick.
@@ -782,7 +796,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 
 def compareStars():
 
-    with load.open( "hip_main.2.5.dat.gz" ) as f:
+    with load.open( "hip_main.dat.gz" ) as f:
         stars = hipparcos.load_dataframe( f )
 
 #     print( stars.size )
@@ -809,17 +823,36 @@ def compareStars():
 #Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
 
 #         print( "Stars in hipparcos but not in common name:" )
+    commonStars = [ ]
+    for starHip in STARS:
+        try:
+            theStar = Star.from_dataframe( stars.loc[ starHip[ 1 ] ] )
+            name = starHip[ 0 ]
+            hip = starHip[ 1 ]
+#             print( "Found:", name, hip )
+            commonStars.append( stars.loc[ starHip[ 1 ] ] )
+        except:
+#             print( starHip )
+            pass
 
-    starsCommon = [ ]
-    for hipparcosIdentifier, row in stars.iterrows():
-        if any( hipparcosIdentifier in x for x in STARS ):
-            starsCommon.append( row )
+    print( len( commonStars ) )
+    zzz = DataFrame( commonStars )
+    theStar = Star.from_dataframe( zzz.loc[ 87937 ] )
+    print( theStar )
+
+#     starsCommon = [ ]
+#     for hipparcosIdentifier, row in stars.iterrows():
+#         if any( hipparcosIdentifier in x for x in STARS ):
+#             starsCommon.append( row )
 #             print( hipparcosIdentifier )
 
-    from pandas import concat, DataFrame
-    newStars = DataFrame().reindex_like( stars )
-    zz = concat( [ starsCommon, newStars ] )
-    print( len( STARS ), zz.size )
+#     from pandas import concat, DataFrame
+#     newStars = DataFrame().reindex_like( stars )
+#     zz = concat( [ starsCommon, newStars ] )
+#     print( len( STARS ), zz.size )
+
+#TODO Perhaps instead of figuring out which stars exist in the HIP database versus those from PyEphem,
+# just take the list of visible stars and only grab those from HIP (assuming they all exist in HIP).
 
 
 # 4427
