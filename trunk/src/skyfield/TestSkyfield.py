@@ -566,8 +566,7 @@ def testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevat
 #     print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
 
 
-
-def filterStarsByHipparcosIdentifierFromHipparcos( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
+def filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
     try:
         with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
             for line in inFile:
@@ -576,7 +575,7 @@ def filterStarsByHipparcosIdentifierFromHipparcos( hipparcosInputGzipFile, hippa
                     outFile.write( line )
 
     except Exception as e:
-        print( e )
+        print( e ) #TODO Handle betterer.
 
 
 def getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, earth ):
@@ -597,7 +596,7 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
     ra, dec, sunDistance = ephemeris[ SKYFIELD_PLANET_SUN ].at( utcNow ).observe( thePlanet ).radec()
     ra, dec, earthDistance = apparent.radec()
     illumination = almanac.fraction_illuminated( ephemeris, planet, utcNow ) * 100
-    
+
     result = \
         "Illumination: " + str( illumination ), \
         "Constellation: " + str( "TODO" ), \
@@ -629,7 +628,7 @@ def testSkyfieldStar( utcNow, observer, star ):
         "Constellation: " + str( "TODO" ), \
         "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
         "Tropical Sign: TODO", \
-        "Distance to Earth: " + str( earthDistance ), \
+        "Distance to Earth: " + str( earthDistance ) + " (may not be worth it as additional computation is needed for this to be accurate)", \
         "Bright Limb: " + str( "TODO" ), \
         "Right Ascension: " + str( ra.hms() ), \
         "Declination: " + str( dec.dms() ), \
@@ -655,14 +654,14 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
 #     print(y)
 
     if y[ 0 ]:
-        rise = t[ 0 ].utc_iso( ' ' )
-        set = t[ 1 ].utc_iso( ' ' )
+        riseDateTime = t[ 0 ].utc_iso( ' ' )
+        setDateTime = t[ 1 ].utc_iso( ' ' )
     else:
-        rise = t[ 1 ].utc_iso( ' ' )
-        set = t[ 0 ].utc_iso( ' ' )
+        riseDateTime = t[ 1 ].utc_iso( ' ' )
+        setDateTime = t[ 0 ].utc_iso( ' ' )
 
-    print( "Rise: " + rise )
-    print( "Set: " + set )
+    print( "Rise: " + riseDateTime )
+    print( "Set: " + setDateTime )
 
 #TODO Rise/set do not always match between pyephem and skyfield!
 # Results match when local time and GMT are on the same day...so try very early in morning or immediately after midnight to verify.
@@ -688,8 +687,8 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
         "Right Ascension: " + str( ra.hms() ), \
         "Declination: " + str( dec.dms() ), \
         "Dawn: TODO", \
-        "Rise: " + str( rise ), \
-        "Set: " + str( set ), \
+        "Rise: " + str( riseDateTime ), \
+        "Set: " + str( setDateTime ), \
         "Dusk: TODO", \
         "Solstice: " + solstice, \
         "Equinox: " + equinox, \
@@ -702,7 +701,7 @@ def testSkyfieldMoon( timeScale, utcNow, ephemeris, observer, topos ):
     alt, az, earthDistance = apparent.altaz()
     ra, dec, earthDistance = apparent.radec()
 
-    zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, ra, dec ) )
+#     zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, ra, dec ) )
 
     return \
         "Constellation: TODO", \
@@ -728,7 +727,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
 #     print( utcNowSkyfield.utc )
 
-#TODO This ephemeris contains only planets...what about stars and planetary moons?
+#TODO This ephemeris contains only planets...what about planetary moons?
     ephemeris = load( SKYFIELD_EPHEMERIS_PLANETS )
 
 #     print( ephemeris[ "saturn barycenter" ].target_name )
@@ -751,19 +750,11 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 #     print( testSkyfieldStar( utcNowSkyfield, observer, star ) )
 
 
-#     barnard = Star(ra_hours=(17, 57, 48.49803),
-#                dec_degrees=(4, 41, 36.2072),
-#                ra_mas_per_year=-798.71,
-#                dec_mas_per_year=+10337.77,
-#                parallax_mas=545.4,
-#                radial_km_per_s=-110.6)
-
-
     observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
 
 
-#     filterStarsByHipparcosIdentifierFromHipparcos( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS ] )
+#     filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS ] )
 
     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
         stars = hipparcos.load_dataframe( f )
@@ -780,8 +771,6 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 # skyfield might support somehow star names out of the box...
 # ...so that means taking the data, selecting only stars of magnitude 2.5 or so and keep those.
 # See revision 999 for code to filter stars by magnitude.
-
-
 
 
 #     print()
@@ -804,7 +793,6 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 #     
 #     print(t.utc_iso())
 #     print(y)
-
 
 
 # def getPlanetFromEphemeris( ephemeris ):
