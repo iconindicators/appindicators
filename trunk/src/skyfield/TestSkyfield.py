@@ -72,7 +72,7 @@
 # https://stackoverflow.com/questions/28867022/python-convert-au-to-km
 # https://stackoverflow.com/questions/53011697/difference-in-sun-earth-distance-with-computedate-and-computeobserver
 
-import datetime, ephem, math, pytz
+import datetime, ephem, gzip, math, pytz
 
 from ephem.cities import _city_data
 from ephem.stars import stars
@@ -566,18 +566,6 @@ def testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevat
 
 
 
-import gzip
-def filterStarsByMagnitudeFromHipparcos( hipparcosInputGzipFile, hipparcosOutputGzipFile, maximumMagnitude ):
-    try:
-        with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
-            for line in inFile:
-                if len( line.decode()[ 41 : 46 ].strip() ) > 0 and float( line.decode()[ 41 : 46 ] ) <= float( maximumMagnitude ):
-                    outFile.write( line )
-
-    except Exception as e:
-        print( e )
-
-
 def filterStarsByHipparcosIdentifierFromHipparcos( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
     try:
         with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
@@ -774,128 +762,19 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
 
 
-#     filterStarsByMagnitudeFromHipparcos( "hip_main.dat.gz", "hip_main.2.5.dat.gz", 2.5 )
-    filterStarsByHipparcosIdentifierFromHipparcos( "hip_main.dat.gz", "hip_common_name_stars.dat.gz", [ i[ 1 ] for i in STARS ] )
+#     filterStarsByHipparcosIdentifierFromHipparcos( "hip_main.dat.gz", "hip_common_name_stars.dat.gz", [ i[ 1 ] for i in STARS ] )
 
-
-#TODO First time star catalog is loaded, takes a lot of time, but subsequent loads are quick.
-# So the data must be cached...where?  Raise an issue with Skyfield.
-# Seems the load line below pulls the data from ftp://cdsarc.u-strasbg.fr/cats/I/239/hip_main.dat.gz
-# New question: if we can pre-load the data file that is good.
-# So can we pre-filter the data and only keep that as a file, rather than the whole thing?
-#     with load.open( hipparcos.URL ) as f:
-#         stars = hipparcos.load_dataframe( f )
-
-#     with load.open( "hip_main.2.5.dat.gz" ) as f:
-#         stars = hipparcos.load_dataframe( f )
-# 
-#     stars = stars[ stars[ "magnitude" ] <= 10 ]
-#     print( "After filtering, there are {} stars".format( len( stars ) ) )
-#Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
-
-
-def compareStars():
-
-    with load.open( "hip_main.dat.gz" ) as f:
+    with load.open( "hip_common_name_stars.dat.gz" ) as f:
         stars = hipparcos.load_dataframe( f )
-
-#     print( stars.size )
-#     print()
-#     print( stars.columns )
-#     print()
-#     print( stars.index )
-#     print()
-#     print( stars.dtypes )
-#     print()
-#     print( stars.axes )
-#     print()
-#     print( stars.ndim )
-#     print()
-#     print( stars.shape )
-#     print()
-#     print( stars.values )
-#     print()
-
-#     for star in stars.items():
-#         print( star )
     
-#     print( stars[ "magnitude" ] )
-#Results in 93 stars; same number as PyEphem (not sure how though as PyEphem has stars with magnitude greater than 2.5).
-
-#         print( "Stars in hipparcos but not in common name:" )
-    commonStars = [ ]
-    for starHip in STARS:
-        try:
-            theStar = Star.from_dataframe( stars.loc[ starHip[ 1 ] ] )
-            name = starHip[ 0 ]
-            hip = starHip[ 1 ]
-#             print( "Found:", name, hip )
-            commonStars.append( stars.loc[ starHip[ 1 ] ] )
-        except:
-#             print( starHip )
-            pass
-
-    print( len( commonStars ) )
-    zzz = DataFrame( commonStars )
-    theStar = Star.from_dataframe( zzz.loc[ 87937 ] )
-    print( theStar )
-
-#     starsCommon = [ ]
-#     for hipparcosIdentifier, row in stars.iterrows():
-#         if any( hipparcosIdentifier in x for x in STARS ):
-#             starsCommon.append( row )
-#             print( hipparcosIdentifier )
-
-#     from pandas import concat, DataFrame
-#     newStars = DataFrame().reindex_like( stars )
-#     zz = concat( [ starsCommon, newStars ] )
-#     print( len( STARS ), zz.size )
-
-#TODO Perhaps instead of figuring out which stars exist in the HIP database versus those from PyEphem,
-# just take the list of visible stars and only grab those from HIP (assuming they all exist in HIP).
-
-
-# 4427
-# 28360
-# 30324
-# 34444
-# 35904
-# 39429
-# 39953
-# 41037
-# 42913
-# 44816
-# 45238
-# 45556
-# 45941
-# 61084
-# 61932
-# 62434
-# 66657
-# 68933
-# 71352
-# 71681
-# 71860
-# 78401
-# 82273
-# 82396
-# 84012
-# 86228
-# 86670
-# 100453
-# 100751
-# 102488
-# 112122
-
-#TODO Can we find common names for the HIP numbers above?
-
-#TODO Is it worth removing the stars above from the dataset?
-
+    for nameHipparcosIdentifier in STARS:
+        print( Star.from_dataframe( stars.loc[ nameHipparcosIdentifier[ 1 ] ] ) )
 #TODO This list https://en.wikipedia.org/wiki/List_of_proper_names_of_stars
 # does not have the HIP number, so difficult to automate a lookup.
 # https://www.obliquity.com/skyeye/misc/name.html
 
-#TODO Perhaps iterate over the original data frame and create a new data frame comprising only stars matching the main STARS list.
+
+
 
 
 
@@ -951,8 +830,6 @@ print()
 testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
 
 
-compareStars()
-
 # bl = getZenithAngleOfBrightLimbSkyfield( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDecimalDegrees ), observerSiderealTime )
 
 
@@ -972,99 +849,3 @@ compareStars()
 # star.compute( observer )
 # print( star.ra, star.dec, star.az, star.alt )
 
-
-# List of stars from PyEphem
-# Achernar
-# Adara
-# Agena
-# Albereo
-# Alcaid
-# Alcor
-# Alcyone
-# Aldebaran
-# Alderamin
-# Alfirk
-# Algenib
-# Algieba
-# Algol
-# Alhena
-# Alioth
-# Almach
-# Alnair
-# Alnilam
-# Alnitak
-# Alphard
-# Alphecca
-# Alshain
-# Altair
-# Antares
-# Arcturus
-# Arkab Posterior
-# Arkab Prior
-# Arneb
-# Atlas
-# Bellatrix
-# Betelgeuse
-# Canopus
-# Capella
-# Caph
-# Castor
-# Cebalrai
-# Deneb
-# Denebola
-# Dubhe
-# Electra
-# Elnath
-# Enif
-# Etamin
-# Fomalhaut
-# Gienah Corvi
-# Hamal
-# Izar
-# Kaus Australis
-# Kochab
-# Maia
-# Markab
-# Megrez
-# Menkalinan
-# Menkar
-# Merak
-# Merope
-# Mimosa
-# Minkar
-# Mintaka
-# Mirach
-# Mirzam
-# Mizar
-# Naos
-# Nihal
-# Nunki
-# Peacock
-# Phecda
-# Polaris
-# Pollux
-# Procyon
-# Rasalgethi
-# Rasalhague
-# Regulus
-# Rigel
-# Rukbat
-# Sadalmelik
-# Sadr
-# Saiph
-# Scheat
-# Schedar
-# Shaula
-# Sheliak
-# Sirius
-# Sirrah
-# Spica
-# Sulafat
-# Tarazed
-# Taygeta
-# Thuban
-# Unukalhai
-# Vega
-# Vindemiatrix
-# Wezen
-# Zaurak
