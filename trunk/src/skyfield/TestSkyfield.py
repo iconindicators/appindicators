@@ -773,7 +773,10 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 # does not have the HIP number, so difficult to automate a lookup.
 # https://www.obliquity.com/skyeye/misc/name.html
 
-
+#TODO According to 
+# https://github.com/skyfielders/python-skyfield/issues/39
+# skyfield might support somehow star names out of the box...
+# ...so that means taking the data, selecting only stars of magnitude 2.5 or so and keep those.
 
 
 
