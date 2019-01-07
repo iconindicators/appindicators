@@ -777,6 +777,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 # https://github.com/skyfielders/python-skyfield/issues/39
 # skyfield might support somehow star names out of the box...
 # ...so that means taking the data, selecting only stars of magnitude 2.5 or so and keep those.
+# See revision 999 for code to filter stars by magnitude.
 
 
 
