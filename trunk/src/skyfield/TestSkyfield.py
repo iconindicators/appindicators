@@ -744,7 +744,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 
 
 #     observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-#     with load.open( "hip_main.2.5.dat.gz" ) as f:
+#     with load.open( "hip_common_name_stars.dat.gz" ) as f:
 #         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
 # 
 #     print( testSkyfieldStar( utcNowSkyfield, observer, star ) )
@@ -775,6 +775,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 
 #TODO According to 
 # https://github.com/skyfielders/python-skyfield/issues/39
+# https://github.com/skyfielders/python-skyfield/pull/40
 # skyfield might support somehow star names out of the box...
 # ...so that means taking the data, selecting only stars of magnitude 2.5 or so and keep those.
 # See revision 999 for code to filter stars by magnitude.
