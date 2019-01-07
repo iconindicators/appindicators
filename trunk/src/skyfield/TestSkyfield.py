@@ -20,8 +20,9 @@
 #
 # Planets
 #     https://github.com/skyfielders/python-skyfield/issues/123
-#     ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/de421.bsp   <------------Use 430 or later as more accurate  https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
-#     Download de421.bsp and run spkmerge as per the issue 123 to produce "2017-2024.bsp".
+#     https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
+#     ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/de430.bsp  
+#     Download de438.bsp and run spkmerge as per the issue 123 to produce a subset bsp.
 #
 # Stars
 #     PyEphem only contains 94 stars.
@@ -493,7 +494,7 @@ def testSiderealTime():
     import sys
     sys.exit()
 
-    ephemeris = load( "2019-2023-planets.bsp" )
+    ephemeris = load( SKYFIELD_EPHEMERIS_PLANETS )
     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
 
     observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
@@ -516,7 +517,7 @@ def testSiderealTime():
     sun = ephem.Sun( observer )
     saturn = ephem.Saturn( observer )
 
-    ephemeris = load( "2019-2023-planets.bsp" )
+    ephemeris = load( SKYFIELD_EPHEMERIS_PLANETS )
     sun = ephemeris[ SKYFIELD_PLANET_SUN ]
 
     observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
@@ -728,7 +729,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 #     print( utcNowSkyfield.utc )
 
 #TODO This ephemeris contains only planets...what about stars and planetary moons?
-    ephemeris = load( "2019-2023-planets.bsp" )
+    ephemeris = load( SKYFIELD_EPHEMERIS_PLANETS )
 
 #     print( ephemeris[ "saturn barycenter" ].target_name )
 #     for planet in ephemeris.names():
@@ -744,7 +745,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 
 
 #     observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-#     with load.open( "hip_common_name_stars.dat.gz" ) as f:
+#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
 #         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
 # 
 #     print( testSkyfieldStar( utcNowSkyfield, observer, star ) )
@@ -762,9 +763,9 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
 
 
-#     filterStarsByHipparcosIdentifierFromHipparcos( "hip_main.dat.gz", "hip_common_name_stars.dat.gz", [ i[ 1 ] for i in STARS ] )
+#     filterStarsByHipparcosIdentifierFromHipparcos( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS ] )
 
-    with load.open( "hip_common_name_stars.dat.gz" ) as f:
+    with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
         stars = hipparcos.load_dataframe( f )
     
     for nameHipparcosIdentifier in STARS:
@@ -815,6 +816,9 @@ SKYFIELD_PLANET_MOON = "moon"
 SKYFIELD_PLANET_SATURN = "saturn barycenter"
 SKYFIELD_PLANET_SUN = "sun"
 
+SKYFIELD_EPHEMERIS_PLANETS = "de438_2019-2023.bsp"
+SKYFIELD_EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
+
 latitudeDecimalDegrees = -33.8
 longitudeDecimalDegrees = 151.2
 elevationMetres = 100
@@ -836,21 +840,3 @@ testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevation
 
 
 # bl = getZenithAngleOfBrightLimbSkyfield( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDecimalDegrees ), observerSiderealTime )
-
-
-# barnard = Star( ra_hours = ( 17, 57, 48.49803 ), dec_degrees = ( 4, 41, 36.2072 ) )
-# ts = load.timescale()
-# t = ts.utcNow()
-# astrometric = observer.at( timeScaleNow ).observe( barnard )
-# ra, dec, distance = astrometric.apparent().radec()
-# az, az, distance = astrometric.apparent().altaz()
-# print(ra, dec, az, alt )
-
-
-# observer = ephem.city( cityName )
-# observer.date = utcNow
-# starName = "Cebalrai"
-# star = ephem.star( starName )
-# star.compute( observer )
-# print( star.ra, star.dec, star.az, star.alt )
-
