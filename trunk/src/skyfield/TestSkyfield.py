@@ -622,7 +622,7 @@ def testSkyfieldStar( utcNow, observer, star ):
     apparent = observer.at( utcNow ).observe( star ).apparent()
     alt, az, earthDistance = apparent.altaz()
     ra, dec, earthDistance = apparent.radec()
- 
+
     result = \
         "Constellation: " + str( "TODO" ), \
         "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
@@ -695,7 +695,6 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
 
 
-#TODO 
 def testSkyfieldMoon( timeScale, utcNow, ephemeris, observer, topos ):
     moon = ephemeris[ SKYFIELD_PLANET_MOON ]
     apparent = observer.at( utcNow ).observe( moon ).apparent()
@@ -785,6 +784,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 
 
 #TODO Testing moon phases....
+# https://rhodesmill.org/skyfield/almanac.html#phases-of-the-moon
     t0 = timeScale.utc( 2019, 1, 1 )
     t1 = timeScale.utc( 2019, 12, 31 )
     t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( load( SKYFIELD_EPHEMERIS_PLANETS ) ) )
