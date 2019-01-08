@@ -776,7 +776,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     print( "Saturn:", testSkyfieldPlanet( utcNowSkyfield, ephemerisPlanets, observer, SKYFIELD_PLANET_SATURN ) )
 
 
-    filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS_COMMON_NAMES ], 7 )
+#     filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS_COMMON_NAMES ], 6 )
 
 
 #     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
@@ -786,7 +786,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
         ephemerisStars = hipparcos.load_dataframe( f )
  
-    print( "Nubmer of stars: ", ephemerisStars.shape[ 0 ] )
+    print( "Number of stars: ", ephemerisStars.shape[ 0 ] )
     print( "Number of data columns: ", ephemerisStars.shape[ 1 ] )
 
 
@@ -842,7 +842,7 @@ SKYFIELD_PLANET_SATURN = "saturn barycenter"
 SKYFIELD_PLANET_SUN = "sun"
 
 SKYFIELD_EPHEMERIS_PLANETS = "de438_2019-2023.bsp"
-SKYFIELD_EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
+SKYFIELD_EPHEMERIS_STARS = "hip_common_name_stars_magnitude_6.dat.gz"
 
 latitudeDecimalDegrees = -33.8
 longitudeDecimalDegrees = 151.2
