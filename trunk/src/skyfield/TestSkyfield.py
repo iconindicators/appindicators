@@ -621,7 +621,7 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planetName ):
 #TODO Add alt, az.  Can these be obtained from ra/dec?
 def testSkyfieldStar( utcNow, observer, star ):
     astrometric = observer.at( utcNow ).observe( star )
-#     alt, az, earthDistance = astrometric.altaz()  #TODO There is no alt/az from astrometric...why?
+#     alt, az, earthDistance = astrometric.altaz()  #TODO There is no alt/az from astrometric, but apparent could be used...is this safe?
     ra, dec, earthDistance = astrometric.radec()
 
     result = \
