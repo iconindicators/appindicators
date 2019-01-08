@@ -85,6 +85,8 @@ from pandas.core.frame import DataFrame
 
 
 # https://www.cosmos.esa.int/web/hipparcos/common-star-names
+#TODO The star 3C 273 is a quasar that is magnitude 12 which is invisible!
+# So filter this list (and the underlying data) even further to say magnitude 6 or less.
 STARS = [ [ "Acamar", 13847 ], \
           [ "Achernar", 7588 ], \
           [ "Acrux", 60718 ], \
