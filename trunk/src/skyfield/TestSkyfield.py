@@ -621,15 +621,16 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planetName ):
 #TODO Add alt, az.  Can these be obtained from ra/dec?
 def testSkyfieldStar( utcNow, observer, star ):
     astrometric = observer.at( utcNow ).observe( star )
-#     alt, az, earthDistance = astrometric.altaz()  #TODO Why is this commented out?
+#     alt, az, earthDistance = astrometric.altaz()  #TODO There is no alt/az from astrometric...why?
     ra, dec, earthDistance = astrometric.radec()
 
     result = \
         "Constellation: " + str( "TODO" ), \
         "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
         "Tropical Sign: TODO", \
-        "Distance to Earth: " + str( earthDistance ) + " (may not be worth it as additional computation is needed for this to be accurate)", \
         "Bright Limb: " + str( "TODO" ), \
+        "Azimuth: " + str( "TODO" ), \
+        "Altitude: " + str( "TODO" ), \
         "Right Ascension: " + str( ra.hms() ), \
         "Declination: " + str( dec.dms() ), \
         "Rise: TODO", \
