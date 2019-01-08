@@ -553,13 +553,13 @@ def testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevat
     print( "Sun:", testPyephemSun( utcNow, observer ) )
 
     observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
+    print( "Moon:", testPyephemMoon( utcNow, observer ) )
+
+    observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
     print( "Saturn:", testPyephemPlanet( observer, ephem.Saturn( observer ) ) )
 
     observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
-    print( "Almach (star):", testPyephemStar( observer, ephem.star( "Almach" ) ) )
-
-    observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
-    print( "Moon:", testPyephemMoon( utcNow, observer ) )
+    print( "Rigel (star):", testPyephemStar( observer, ephem.star( "Rigel" ) ) )
 
 #     observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
 #     tropicalSignName, tropicalSignDegree, tropicalSignMinute = getTropicalSignPyEphem( ephem.Saturn( observer ), ephem.Date( utcNow ), utcNow )
@@ -589,13 +589,13 @@ def getSkyfieldTopos( latitudeDecimalDegrees, longitudeDecimalDegrees, elevation
 #TODO Add rise/set.
 #TODO For Saturn, return the earth/sun tilts.
 #TODO Add planetary moons with AZ/ATL/RA/DEC, earth visible, offset from planet.
-def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
-    thePlanet = ephemeris[ planet ]
+def testSkyfieldPlanet( utcNow, ephemeris, observer, planetName ):
+    thePlanet = ephemeris[ planetName ]
     apparent = observer.at( utcNow ).observe( thePlanet ).apparent()
     alt, az, earthDistance = apparent.altaz()
     ra, dec, sunDistance = ephemeris[ SKYFIELD_PLANET_SUN ].at( utcNow ).observe( thePlanet ).radec()
     ra, dec, earthDistance = apparent.radec()
-    illumination = almanac.fraction_illuminated( ephemeris, planet, utcNow ) * 100
+    illumination = almanac.fraction_illuminated( ephemeris, planetName, utcNow ) * 100
 
     result = \
         "Illumination: " + str( illumination ), \
@@ -621,9 +621,9 @@ def testSkyfieldPlanet( utcNow, ephemeris, observer, planet ):
 #TODO Add alt, az.  Can these be obtained from ra/dec?
 def testSkyfieldStar( utcNow, observer, star ):
     astrometric = observer.at( utcNow ).observe( star )
-#     alt, az, earthDistance = astrometric.altaz()
+#     alt, az, earthDistance = astrometric.altaz()  #TODO Why is this commented out?
     ra, dec, earthDistance = astrometric.radec()
-    
+
     result = \
         "Constellation: " + str( "TODO" ), \
         "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
@@ -727,50 +727,56 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
 #     print( utcNowSkyfield.utc )
 
-#TODO This ephemeris contains only planets...what about planetary moons?
-    ephemeris = load( SKYFIELD_EPHEMERIS_PLANETS )
+#TODO This ephemerisPlanets contains only planets...what about planetary moons?
+    ephemerisPlanets = load( SKYFIELD_EPHEMERIS_PLANETS )
 
-#     print( ephemeris[ "saturn barycenter" ].target_name )
-#     for planet in ephemeris.names():
+#     print( ephemerisPlanets[ "saturn barycenter" ].target_name )
+#     for planet in ephemerisPlanets.names():
 #         print( planet )
-#         thing = ephemeris[ planet ]
+#         thing = ephemerisPlanets[ planet ]
 #         print( thing.target, thing.target_name )
 
 
-    observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemerisPlanets[ SKYFIELD_PLANET_EARTH ] )
     topos = getSkyfieldTopos( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
-    print( testSkyfieldSun( timeScale, utcNowSkyfield, ephemeris, observer, topos ) )
-    print( testSkyfieldMoon( timeScale, utcNowSkyfield, ephemeris, observer, topos ) )
 
 
-#     observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
-#         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
-# 
-#     print( testSkyfieldStar( utcNowSkyfield, observer, star ) )
+    print( "Sun:", testSkyfieldSun( timeScale, utcNowSkyfield, ephemerisPlanets, observer, topos ) )
 
 
-    observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
-    print( testSkyfieldPlanet( utcNowSkyfield, ephemeris, observer, SKYFIELD_PLANET_SATURN ) )
+    print( "Moon:", testSkyfieldMoon( timeScale, utcNowSkyfield, ephemerisPlanets, observer, topos ) )
+
+
+    print( "Saturn:", testSkyfieldPlanet( utcNowSkyfield, ephemerisPlanets, observer, SKYFIELD_PLANET_SATURN ) )
 
 
 #     filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS ] )
 
+
+#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
+#         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
+# 
     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
-        stars = hipparcos.load_dataframe( f )
-    
-    for nameHipparcosIdentifier in STARS:
-        print( Star.from_dataframe( stars.loc[ nameHipparcosIdentifier[ 1 ] ] ) )
+        ephemerisStars = hipparcos.load_dataframe( f )
+
+    print( "Rigel (star):", testSkyfieldStar( utcNowSkyfield, observer, Star.from_dataframe( ephemerisStars.loc[ 24436 ] ) ) )
+
+
+#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
+#         ephemerisStars = hipparcos.load_dataframe( f )
+# 
+#     for nameHipparcosIdentifier in STARS:
+#         print( Star.from_dataframe( ephemerisStars.loc[ nameHipparcosIdentifier[ 1 ] ] ) )
 #TODO This list https://en.wikipedia.org/wiki/List_of_proper_names_of_stars
 # does not have the HIP number, so difficult to automate a lookup.
 # https://www.obliquity.com/skyeye/misc/name.html
-
+#
 #TODO According to 
 # https://github.com/skyfielders/python-skyfield/issues/39
 # https://github.com/skyfielders/python-skyfield/pull/40
 # skyfield might support somehow star names out of the box...
-# ...so that means taking the data, selecting only stars of magnitude 2.5 or so and keep those.
-# See revision 999 for code to filter stars by magnitude.
+# ...so that means taking the data, selecting only ephemerisStars of magnitude 2.5 or so and keep those.
+# See revision 999 for code to filter ephemerisStars by magnitude.
 
 
 #     print()
@@ -779,7 +785,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 #     
 #     t0 = timeScale.utc(2018, 9, 12, 4)
 #     t1 = timeScale.utc(2018, 9, 13, 4)
-#     t, y = almanac.find_discrete(t0, t1, almanac.sunrise_sunset(ephemeris, bluffton))
+#     t, y = almanac.find_discrete(t0, t1, almanac.sunrise_sunset(ephemerisPlanets, bluffton))
 #     
 #     print(t.utc_iso())
 #     print(y)
@@ -789,14 +795,14 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 #     
 #     t0 = timeScale.utc(2018, 9, 12)
 #     t1 = timeScale.utc(2018, 9, 13)
-#     t, y = almanac.find_discrete(t0, t1, almanac.sunrise_sunset(ephemeris, bluffton))
+#     t, y = almanac.find_discrete(t0, t1, almanac.sunrise_sunset(ephemerisPlanets, bluffton))
 #     
 #     print(t.utc_iso())
 #     print(y)
 
 
-# def getPlanetFromEphemeris( ephemeris ):
-#     for code in ephemeris.names():
+# def getPlanetFromEphemeris( ephemerisPlanets ):
+#     for code in ephemerisPlanets.names():
         
 
 SKYFIELD_PLANET_EARTH = "earth"
