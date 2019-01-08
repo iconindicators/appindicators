@@ -85,9 +85,7 @@ from pandas.core.frame import DataFrame
 
 
 # https://www.cosmos.esa.int/web/hipparcos/common-star-names
-#TODO The star 3C 273 is a quasar that is magnitude 12 which is invisible!
-# So filter this list (and the underlying data) even further to say magnitude 6 or less.
-STARS = [ [ "Acamar", 13847 ], \
+STARS_COMMON_NAMES = [ [ "Acamar", 13847 ], \
           [ "Achernar", 7588 ], \
           [ "Acrux", 60718 ], \
           [ "Adhara", 33579 ], \
@@ -568,12 +566,24 @@ def testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevat
 #     print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
 
 
-def filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
+def filterStarsByMagnitudeFromHipparcos( hipparcosInputGzipFile, hipparcosOutputGzipFile, maximumMagnitude ):
+    try:
+        with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
+            for line in inFile:
+                if len( line.decode()[ 41 : 46 ].strip() ) > 0 and float( line.decode()[ 41 : 46 ] ) <= float( maximumMagnitude ):
+                    outFile.write( line )
+
+    except Exception as e:
+        print( e )
+
+
+def filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers, maximumMagnitude ):
     try:
         with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
             for line in inFile:
                 hip = int( line.decode()[ 2 : 14 ].strip() )
-                if hip in hipparcosIdentifiers:
+                magnitude = line.decode()[ 41 : 46 ]
+                if hip in hipparcosIdentifiers and len( magnitude.strip() ) > 0 and float( magnitude ) <= float( maximumMagnitude ):
                     outFile.write( line )
 
     except Exception as e:
@@ -766,22 +776,27 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     print( "Saturn:", testSkyfieldPlanet( utcNowSkyfield, ephemerisPlanets, observer, SKYFIELD_PLANET_SATURN ) )
 
 
-#     filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS ] )
+    filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS_COMMON_NAMES ], 7 )
 
 
 #     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
 #         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
 # 
-#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
-#         ephemerisStars = hipparcos.load_dataframe( f )
-# 
+    
+    with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
+        ephemerisStars = hipparcos.load_dataframe( f )
+ 
+    print( "Nubmer of stars: ", ephemerisStars.shape[ 0 ] )
+    print( "Number of data columns: ", ephemerisStars.shape[ 1 ] )
+
+
 #     print( "Rigel (star):", testSkyfieldStar( utcNowSkyfield, observer, Star.from_dataframe( ephemerisStars.loc[ 24436 ] ) ) )
 
 
 #     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
 #         ephemerisStars = hipparcos.load_dataframe( f )
 # 
-#     for nameHipparcosIdentifier in STARS:
+#     for nameHipparcosIdentifier in STARS_COMMON_NAMES:
 #         print( Star.from_dataframe( ephemerisStars.loc[ nameHipparcosIdentifier[ 1 ] ] ) )
 #TODO This list https://en.wikipedia.org/wiki/List_of_proper_names_of_stars
 # does not have the HIP number, so difficult to automate a lookup.
