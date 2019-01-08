@@ -636,6 +636,27 @@ def testSkyfieldStar( utcNow, observer, star ):
         "Rise: TODO", \
         "Set: TODO"
 
+
+#TODO Testing using apparent and comparing against astrometric...seems good, but maybe clarify with an issue.
+#     astrometric = observer.at( utcNow ).observe( star ).apparent()
+#     alt, az, earthDistance = astrometric.altaz()  #TODO There is no alt/az from astrometric, but apparent could be used...is this safe?
+#     ra, dec, earthDistance = astrometric.radec()
+# 
+#     result += \
+#         "Constellation: " + str( "TODO" ), \
+#         "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
+#         "Tropical Sign: TODO", \
+#         "Bright Limb: " + str( "TODO" ), \
+#         "Azimuth: " + str( az.dms() ), \
+#         "Altitude: " + str( alt.dms() ), \
+#         "Right Ascension: " + str( ra.hms() ), \
+#         "Declination: " + str( dec.dms() ), \
+#         "Rise: TODO", \
+#         "Set: TODO"
+
+# Rigel (star): ('Constellation: TODO', 'Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210', 'Tropical Sign: TODO', 'Bright Limb: TODO', 'Azimuth: TODO', 'Altitude: TODO', 'Right Ascension: (5.0, 14.0, 32.274744877635385)', 'Declination: (-8.0, -12.0, -5.91663479782801)', 'Rise: TODO', 'Set: TODO', 'Constellation: TODO', 'Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210', 'Tropical Sign: TODO', 'Bright Limb: TODO', 'Azimuth: (89.0, 21.0, 56.492755842686165)', 'Altitude: (15.0, 46.0, 16.26952090155828)', 'Right Ascension: (5.0, 14.0, 33.517634447711316)', 'Declination: (-8.0, -12.0, -9.683920602692524)', 'Rise: TODO', 'Set: TODO')
+
+
     return result
 
 
