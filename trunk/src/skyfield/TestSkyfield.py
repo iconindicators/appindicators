@@ -704,6 +704,12 @@ def testSkyfieldMoon( timeScale, utcNow, ephemeris, observer, topos ):
 
 #     zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, ra, dec ) )
 
+    t0 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
+    t1 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month + 2, 1 ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.  
+    t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( load( SKYFIELD_EPHEMERIS_PLANETS ) ) )
+    moonPhaseDatesTimes = t.utc_iso()
+    moonPhaseNames = [ almanac.MOON_PHASES[ yi ] for yi in y ]
+
     return \
         "Illumination: " + str( illumination ), \
         "Constellation: TODO", \
@@ -717,7 +723,11 @@ def testSkyfieldMoon( timeScale, utcNow, ephemeris, observer, topos ):
         "Rise: TODO", \
         "Set: TODO", \
         "Current Phase: TODO", \
-        "Date for next Phases: TODO", \
+        "Dates for next Phases: " + \
+            moonPhaseNames[ 0 ] + " " + moonPhaseDatesTimes[ 0 ] + ", " + \
+            moonPhaseNames[ 1 ] + " " + moonPhaseDatesTimes[ 1 ] + ", " + \
+            moonPhaseNames[ 2 ] + " " + moonPhaseDatesTimes[ 2 ] + ", " + \
+            moonPhaseNames[ 3 ] + " " + moonPhaseDatesTimes[ 3 ], \
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
 
 
@@ -781,18 +791,6 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 # skyfield might support somehow star names out of the box...
 # ...so that means taking the data, selecting only ephemerisStars of magnitude 2.5 or so and keep those.
 # See revision 999 for code to filter ephemerisStars by magnitude.
-
-
-#TODO Testing moon phases....
-# https://rhodesmill.org/skyfield/almanac.html#phases-of-the-moon
-    t0 = timeScale.utc( 2019, 1, 1 )
-    t1 = timeScale.utc( 2019, 12, 31 )
-    t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( load( SKYFIELD_EPHEMERIS_PLANETS ) ) )
-    
-    print( t.utc_iso() )
-    print( y )
-    print( [ almanac.MOON_PHASES[ yi ] for yi in y ] )
-
 
 
 #     print()
