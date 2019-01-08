@@ -695,15 +695,18 @@ def testSkyfieldSun( timeScale, utcNow, ephemeris, observer, topos ):
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
 
 
+#TODO 
 def testSkyfieldMoon( timeScale, utcNow, ephemeris, observer, topos ):
     moon = ephemeris[ SKYFIELD_PLANET_MOON ]
     apparent = observer.at( utcNow ).observe( moon ).apparent()
     alt, az, earthDistance = apparent.altaz()
     ra, dec, earthDistance = apparent.radec()
+    illumination = almanac.fraction_illuminated( ephemeris, SKYFIELD_PLANET_MOON, utcNow ) * 100
 
 #     zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, ra, dec ) )
 
     return \
+        "Illumination: " + str( illumination ), \
         "Constellation: TODO", \
         "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
         "Tropical Sign: TODO", \
@@ -714,6 +717,8 @@ def testSkyfieldMoon( timeScale, utcNow, ephemeris, observer, topos ):
         "Declination: " + str( dec.dms() ), \
         "Rise: TODO", \
         "Set: TODO", \
+        "Current Phase: TODO", \
+        "Date for next Phases: TODO", \
         "Eclipse Date/Time, Latitude/Longitude, Type: TODO"
 
 
@@ -777,6 +782,17 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 # skyfield might support somehow star names out of the box...
 # ...so that means taking the data, selecting only ephemerisStars of magnitude 2.5 or so and keep those.
 # See revision 999 for code to filter ephemerisStars by magnitude.
+
+
+#TODO Testing moon phases....
+    t0 = timeScale.utc( 2019, 1, 1 )
+    t1 = timeScale.utc( 2019, 12, 31 )
+    t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( load( SKYFIELD_EPHEMERIS_PLANETS ) ) )
+    
+    print( t.utc_iso() )
+    print( y )
+    print( [ almanac.MOON_PHASES[ yi ] for yi in y ] )
+
 
 
 #     print()
