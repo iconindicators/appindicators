@@ -766,7 +766,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     print( "Saturn:", testSkyfieldPlanet( utcNowSkyfield, ephemerisPlanets, observer, SKYFIELD_PLANET_SATURN ) )
 
 
-    filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS_COMMON_NAMES ] )
+#     filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS_COMMON_NAMES ] )
 
 #     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
 #         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
