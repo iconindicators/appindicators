@@ -776,14 +776,14 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 # 
 
 
-#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
-#         ephemerisStars = hipparcos.load_dataframe( f )
-#  
+    with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
+        ephemerisStars = hipparcos.load_dataframe( f )
+  
 #     print( "Number of stars: ", ephemerisStars.shape[ 0 ] )
 #     print( "Number of data columns: ", ephemerisStars.shape[ 1 ] )
 
 
-#     print( "Rigel (star):", testSkyfieldStar( utcNowSkyfield, observer, Star.from_dataframe( ephemerisStars.loc[ 24436 ] ) ) )
+    print( "Rigel (star):", testSkyfieldStar( utcNowSkyfield, observer, Star.from_dataframe( ephemerisStars.loc[ 24436 ] ) ) )
 
 
 #     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
