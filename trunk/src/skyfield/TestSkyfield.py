@@ -740,7 +740,7 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     print()
 
 #TODO Might need to cache deltat.data and deltat.preds as the backend website was down and I couldn't get them except at a backup site.
-# What other files are downloaded?  Need to also grab: https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat
+# What other files are downloaded?  Need to also grab: https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat  Be careful...this file expires!
 
     timeScale = load.timescale()
     utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
