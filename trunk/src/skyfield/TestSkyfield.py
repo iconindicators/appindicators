@@ -85,102 +85,104 @@ from pandas.core.frame import DataFrame
 
 
 # https://www.cosmos.esa.int/web/hipparcos/common-star-names
-STARS_COMMON_NAMES = [ [ "Acamar", 13847 ], \
-          [ "Achernar", 7588 ], \
-          [ "Acrux", 60718 ], \
-          [ "Adhara", 33579 ], \
-          [ "Agena", 68702 ], \
-          [ "Albireo", 95947 ], \
-          [ "Alcor", 65477 ], \
-          [ "Alcyone", 17702 ], \
-          [ "Aldebaran", 21421 ], \
-          [ "Alderamin", 105199 ], \
-          [ "Algenib", 1067 ], \
-          [ "Algieba", 50583 ], \
-          [ "Algol", 14576 ], \
-          [ "Alhena", 31681 ], \
-          [ "Alioth", 62956 ], \
-          [ "Alkaid", 67301 ], \
-          [ "Almaak", 9640 ], \
-          [ "Alnair", 109268 ], \
-          [ "Alnath", 25428 ], \
-          [ "Alnilam", 26311 ], \
-          [ "Alnitak", 26727 ], \
-          [ "Alphard", 46390 ], \
-          [ "Alphekka", 76267 ], \
-          [ "Alpheratz", 677 ], \
-          [ "Alshain", 98036 ], \
-          [ "Altair", 97649 ], \
-          [ "Ankaa", 2081 ], \
-          [ "Antares", 80763 ], \
-          [ "Arcturus", 69673 ], \
-          [ "Arneb", 25985 ], \
-          [ "Babcock's star", 112247 ], \
-          [ "Barnard's star", 87937 ], \
-          [ "Bellatrix", 25336 ], \
-          [ "Betelgeuse", 27989 ], \
-          [ "Campbell's star", 96295 ], \
-          [ "Canopus", 30438 ], \
-          [ "Capella", 24608 ], \
-          [ "Caph", 746 ], \
-          [ "Castor", 36850 ], \
-          [ "Cor Caroli", 63125 ], \
-          [ "Cyg X-1", 98298 ], \
-          [ "Deneb", 102098 ], \
-          [ "Denebola", 57632 ], \
-          [ "Diphda", 3419 ], \
-          [ "Dubhe", 54061 ], \
-          [ "Enif", 107315 ], \
-          [ "Etamin", 87833 ], \
-          [ "Fomalhaut", 113368 ], \
-          [ "Groombridge 1830", 57939 ], \
-          [ "Hadar", 68702 ], \
-          [ "Hamal", 9884 ], \
-          [ "Izar", 72105 ], \
-          [ "Kapteyn's star", 24186 ], \
-          [ "Kaus Australis", 90185 ], \
-          [ "Kocab", 72607 ], \
-          [ "Kruger 60", 110893 ], \
-          [ "Luyten's star", 36208 ], \
-          [ "Markab", 113963 ], \
-          [ "Megrez", 59774 ], \
-          [ "Menkar", 14135 ], \
-          [ "Merak", 53910 ], \
-          [ "Mintaka", 25930 ], \
-          [ "Mira", 10826 ], \
-          [ "Mirach", 5447 ], \
-          [ "Mirphak", 15863 ], \
-          [ "Mizar", 65378 ], \
-          [ "Nihal", 25606 ], \
-          [ "Nunki", 92855 ], \
-          [ "Phad", 58001 ], \
-          [ "Pleione", 17851 ], \
-          [ "Polaris", 11767 ], \
-          [ "Pollux", 37826 ], \
-          [ "Procyon", 37279 ], \
-          [ "Proxima", 70890 ], \
-          [ "Rasalgethi", 84345 ], \
-          [ "Rasalhague", 86032 ], \
-          [ "Red Rectangle", 30089 ], \
-          [ "Regulus", 49669 ], \
-          [ "Rigel", 24436 ], \
-          [ "Rigil Kent", 71683 ], \
-          [ "Sadalmelik", 109074 ], \
-          [ "Saiph", 27366 ], \
-          [ "Scheat", 113881 ], \
-          [ "Shaula", 85927 ], \
-          [ "Shedir", 3179 ], \
-          [ "Sheliak", 92420 ], \
-          [ "Sirius", 32349 ], \
-          [ "Spica", 65474 ], \
-          [ "Tarazed", 97278 ], \
-          [ "Thuban", 68756 ], \
-          [ "Unukalhai", 77070 ], \
-          [ "Van Maanen 2", 3829 ], \
-          [ "Vega", 91262 ], \
-          [ "Vindemiatrix", 63608 ], \
-          [ "Zaurak", 18543 ], \
-          [ "3C 273", 60936 ] ]
+# This list contained a duplicate Hipparcos Identifier of 68702 for a star with two common names: Agena and Hadar.
+# The official name is Hadar and so Agena has been removed.
+STARS_COMMON_NAMES = [ \
+    [ "Acamar", 13847 ], \
+    [ "Achernar", 7588 ], \
+    [ "Acrux", 60718 ], \
+    [ "Adhara", 33579 ], \
+    [ "Albireo", 95947 ], \
+    [ "Alcor", 65477 ], \
+    [ "Alcyone", 17702 ], \
+    [ "Aldebaran", 21421 ], \
+    [ "Alderamin", 105199 ], \
+    [ "Algenib", 1067 ], \
+    [ "Algieba", 50583 ], \
+    [ "Algol", 14576 ], \
+    [ "Alhena", 31681 ], \
+    [ "Alioth", 62956 ], \
+    [ "Alkaid", 67301 ], \
+    [ "Almaak", 9640 ], \
+    [ "Alnair", 109268 ], \
+    [ "Alnath", 25428 ], \
+    [ "Alnilam", 26311 ], \
+    [ "Alnitak", 26727 ], \
+    [ "Alphard", 46390 ], \
+    [ "Alphekka", 76267 ], \
+    [ "Alpheratz", 677 ], \
+    [ "Alshain", 98036 ], \
+    [ "Altair", 97649 ], \
+    [ "Ankaa", 2081 ], \
+    [ "Antares", 80763 ], \
+    [ "Arcturus", 69673 ], \
+    [ "Arneb", 25985 ], \
+    [ "Babcock's star", 112247 ], \
+    [ "Barnard's star", 87937 ], \
+    [ "Bellatrix", 25336 ], \
+    [ "Betelgeuse", 27989 ], \
+    [ "Campbell's star", 96295 ], \
+    [ "Canopus", 30438 ], \
+    [ "Capella", 24608 ], \
+    [ "Caph", 746 ], \
+    [ "Castor", 36850 ], \
+    [ "Cor Caroli", 63125 ], \
+    [ "Cyg X-1", 98298 ], \
+    [ "Deneb", 102098 ], \
+    [ "Denebola", 57632 ], \
+    [ "Diphda", 3419 ], \
+    [ "Dubhe", 54061 ], \
+    [ "Enif", 107315 ], \
+    [ "Etamin", 87833 ], \
+    [ "Fomalhaut", 113368 ], \
+    [ "Groombridge 1830", 57939 ], \
+    [ "Hadar", 68702 ], \
+    [ "Hamal", 9884 ], \
+    [ "Izar", 72105 ], \
+    [ "Kapteyn's star", 24186 ], \
+    [ "Kaus Australis", 90185 ], \
+    [ "Kocab", 72607 ], \
+    [ "Kruger 60", 110893 ], \
+    [ "Luyten's star", 36208 ], \
+    [ "Markab", 113963 ], \
+    [ "Megrez", 59774 ], \
+    [ "Menkar", 14135 ], \
+    [ "Merak", 53910 ], \
+    [ "Mintaka", 25930 ], \
+    [ "Mira", 10826 ], \
+    [ "Mirach", 5447 ], \
+    [ "Mirphak", 15863 ], \
+    [ "Mizar", 65378 ], \
+    [ "Nihal", 25606 ], \
+    [ "Nunki", 92855 ], \
+    [ "Phad", 58001 ], \
+    [ "Pleione", 17851 ], \
+    [ "Polaris", 11767 ], \
+    [ "Pollux", 37826 ], \
+    [ "Procyon", 37279 ], \
+    [ "Proxima", 70890 ], \
+    [ "Rasalgethi", 84345 ], \
+    [ "Rasalhague", 86032 ], \
+    [ "Red Rectangle", 30089 ], \
+    [ "Regulus", 49669 ], \
+    [ "Rigel", 24436 ], \
+    [ "Rigil Kent", 71683 ], \
+    [ "Sadalmelik", 109074 ], \
+    [ "Saiph", 27366 ], \
+    [ "Scheat", 113881 ], \
+    [ "Shaula", 85927 ], \
+    [ "Shedir", 3179 ], \
+    [ "Sheliak", 92420 ], \
+    [ "Sirius", 32349 ], \
+    [ "Spica", 65474 ], \
+    [ "Tarazed", 97278 ], \
+    [ "Thuban", 68756 ], \
+    [ "Unukalhai", 77070 ], \
+    [ "Van Maanen 2", 3829 ], \
+    [ "Vega", 91262 ], \
+    [ "Vindemiatrix", 63608 ], \
+    [ "Zaurak", 18543 ], \
+    [ "3C 273", 60936 ] ]
 
 
 # Must get a new observer after a rising/setting computation and before calculations for a new body.    
@@ -566,14 +568,13 @@ def testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevat
 #     print( tropicalSignName, tropicalSignDegree, tropicalSignMinute )
 
 
-def filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers, maximumMagnitude ):
+def filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
     try:
         with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
             for line in inFile:
                 hip = int( line.decode()[ 2 : 14 ].strip() )
-                magnitude = line.decode()[ 41 : 46 ]
-                if hip in hipparcosIdentifiers and len( magnitude.strip() ) > 0 and float( magnitude ) <= float( maximumMagnitude ):
-                    outFile.write( line )
+                if hip in hipparcosIdentifiers:
+                        outFile.write( line )
 
     except Exception as e:
         print( e ) #TODO Handle betterer.
@@ -765,18 +766,18 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     print( "Saturn:", testSkyfieldPlanet( utcNowSkyfield, ephemerisPlanets, observer, SKYFIELD_PLANET_SATURN ) )
 
 
-#     filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS_COMMON_NAMES ], 6 )
-
+    filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS_COMMON_NAMES ] )
 
 #     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
 #         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
 # 
-    
-    with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
-        ephemerisStars = hipparcos.load_dataframe( f )
- 
-    print( "Number of stars: ", ephemerisStars.shape[ 0 ] )
-    print( "Number of data columns: ", ephemerisStars.shape[ 1 ] )
+
+
+#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
+#         ephemerisStars = hipparcos.load_dataframe( f )
+#  
+#     print( "Number of stars: ", ephemerisStars.shape[ 0 ] )
+#     print( "Number of data columns: ", ephemerisStars.shape[ 1 ] )
 
 
 #     print( "Rigel (star):", testSkyfieldStar( utcNowSkyfield, observer, Star.from_dataframe( ephemerisStars.loc[ 24436 ] ) ) )
@@ -831,7 +832,7 @@ SKYFIELD_PLANET_SATURN = "saturn barycenter"
 SKYFIELD_PLANET_SUN = "sun"
 
 SKYFIELD_EPHEMERIS_PLANETS = "de438_2019-2023.bsp"
-SKYFIELD_EPHEMERIS_STARS = "hip_common_name_stars_magnitude_6.dat.gz"
+SKYFIELD_EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
 
 latitudeDecimalDegrees = -33.8
 longitudeDecimalDegrees = 151.2
