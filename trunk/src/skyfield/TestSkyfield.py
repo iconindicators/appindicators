@@ -47,8 +47,8 @@
 #     Sun
 #     Saturn + Moons
 #     Orion - Rigel
-#     Comet
-#     Satellite 
+#     Comet https://github.com/skyfielders/python-skyfield/issues/196
+#     Satellite https://github.com/skyfielders/python-skyfield/issues/115
 
 
 #     Attributes calulated/provided by pyephem: 
