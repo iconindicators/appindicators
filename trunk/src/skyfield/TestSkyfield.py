@@ -70,9 +70,6 @@
 #         moon/sun eclipse
 
 
-# https://stackoverflow.com/questions/28867022/python-convert-au-to-km
-# https://stackoverflow.com/questions/53011697/difference-in-sun-earth-distance-with-computedate-and-computeobserver
-
 import datetime, ephem, gzip, math, pytz
 
 from ephem.cities import _city_data
@@ -717,7 +714,7 @@ def testSkyfieldMoon( timeScale, utcNow, ephemeris, observer, topos ):
         "Constellation: TODO", \
         "Magnitude: TODO https://github.com/skyfielders/python-skyfield/issues/210", \
         "Tropical Sign: TODO", \
-        "Distance to Earth: " + str( earthDistance ), \
+        "Distance to Earth: " + str( earthDistance.km ), \
         "Azimuth: " + str( az.dms() ), \
         "Altitude: " + str( alt.dms() ), \
         "Right Ascension: " + str( ra.hms() ), \
