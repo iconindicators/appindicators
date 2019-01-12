@@ -840,6 +840,3 @@ testPyephem( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationM
 print()
 print()
 testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
-
-
-# bl = getZenithAngleOfBrightLimbSkyfield( city, saturn, sunRA.radians, sunDEC.radians, ra.radians, dec.radians, math.radians( latitudeDecimalDegrees ), observerSiderealTime )
