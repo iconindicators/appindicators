@@ -768,33 +768,19 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
 
 #     filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS_COMMON_NAMES ] )
 
-#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
-#         star = Star.from_dataframe( hipparcos.load_dataframe( f ).loc[ 21421 ] )
-# 
-
-
     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
         ephemerisStars = hipparcos.load_dataframe( f )
   
 #     print( "Number of stars: ", ephemerisStars.shape[ 0 ] )
 #     print( "Number of data columns: ", ephemerisStars.shape[ 1 ] )
 
+    star = Star.from_dataframe( ephemerisStars.loc[ 24436 ] )
+    print( "Rigel (star):", testSkyfieldStar( utcNowSkyfield, observer, star ) )
 
-    print( "Rigel (star):", testSkyfieldStar( utcNowSkyfield, observer, Star.from_dataframe( ephemerisStars.loc[ 24436 ] ) ) )
 
-
-#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
-#         ephemerisStars = hipparcos.load_dataframe( f )
-# 
-#     for nameHipparcosIdentifier in STARS_COMMON_NAMES:
-#         print( Star.from_dataframe( ephemerisStars.loc[ nameHipparcosIdentifier[ 1 ] ] ) )
-#TODO This list https://en.wikipedia.org/wiki/List_of_proper_names_of_stars
-# does not have the HIP number, so difficult to automate a lookup.
-# https://www.obliquity.com/skyeye/misc/name.html
-#
 #TODO According to 
-# https://github.com/skyfielders/python-skyfield/issues/39
-# https://github.com/skyfielders/python-skyfield/pull/40
+#     https://github.com/skyfielders/python-skyfield/issues/39
+#     https://github.com/skyfielders/python-skyfield/pull/40
 # skyfield might support somehow star names out of the box...
 # ...so that means taking the data, selecting only ephemerisStars of magnitude 2.5 or so and keep those.
 # See revision 999 for code to filter ephemerisStars by magnitude.
@@ -842,7 +828,9 @@ elevationMetres = 100
 # https://rhodesmill.org/skyfield/time.html
 
 
-# indicator-lunar revision 755 changed from local date/time to UTC for calculations (I think).
+#TODO For possible future reference...
+# ...indicator-lunar revision 755 changed from local date/time to UTC for calculations (I think).
+
 
 utcNow = datetime.datetime.utcnow()
 print( utcNow )
