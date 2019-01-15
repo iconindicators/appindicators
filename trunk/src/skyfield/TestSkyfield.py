@@ -220,7 +220,7 @@ def getZenithAngleOfBrightLimbPyEphem( city, body ):
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
 #TODO The city at this point has UTC as the time, but I think needs to change to be local time for the sidereal calculation.
-    print( "Local sidereal time (hms):", city.sidereal_time() )
+    print( "Local sidereal time (hms):", city.sidereal_time(), type( city.sidereal_time() ) )
     print( "bodyRA (hms)", body.ra )
     hourAngle = city.sidereal_time() - body.ra
     print( "hour angle", hourAngle )
@@ -233,10 +233,13 @@ def getZenithAngleOfBrightLimbPyEphem( city, body ):
     o = ephem.Observer()
     print( "GMT sidereal time:", o.sidereal_time(), type( o.sidereal_time() ) )
     print( "longitude", city.lon, type( city.lon ) )
-    print( "longitude (hms)", city.lon * 24.0 / 360.0, type( city.lon * 24.0 / 360.0 ) )
+    print( "longitude:", float( city.lon ) * 180.0 / ephem.pi )
+    print( "longitude (decimal hms)", float( city.lon ) * 180.0 / ephem.pi * 24.0 / 360.0, type( city.lon * 24.0 / 360.0 ) )
+    print( "longitude (decimal hms)", ephem.degrees( city.lon ) * 24.0 / 360.0, type( city.lon * 24.0 / 360.0 ) )
     print( "longitude ", ephem.degrees( str( city.lon * 24.0 / 360.0 ) ), type( ephem.degrees( str( city.lon * 24.0 / 360.0 )) ) )
     print( "bodyRA", body.ra, type( body.ra ) )
-    hourAngle = o.sidereal_time() - ( ephem.degrees( str( city.lon * 24.0 / 360.0 ) ) ) - body.ra
+    print( "", ephem.degrees( str( float( city.lon ) * 180.0 / float( ephem.pi ) * 24.0 / 360.0 ) ) )
+    hourAngle = o.sidereal_time() - ephem.degrees( str( float( city.lon ) * 180.0 / float( ephem.pi ) * 24.0 / 360.0 ) ) - body.ra
     print( "hour angle", hourAngle )
 
     return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
@@ -701,7 +704,7 @@ def testSkyfieldMoon( timeScale, utcNow, ephemeris, observer, topos ):
     ra, dec, earthDistance = apparent.radec()
     illumination = almanac.fraction_illuminated( ephemeris, SKYFIELD_PLANET_MOON, utcNow ) * 100
 
-#     zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, ra, dec ) )
+    zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, ra, dec ) )
 
     t0 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month, utcNow.utc_datetime().day )
     t1 = timeScale.utc( utcNow.utc_datetime().year, utcNow.utc_datetime().month + 2, 1 ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.  
