@@ -245,6 +245,19 @@ def getZenithAngleOfBrightLimbPyEphem( city, body ):
     return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
 
 
+#TOOO Reading on how to maybe calculate hour angle, sidereal time and so on...
+# https://www.madinstro.net/sundry/navcel.html
+# https://www.quora.com/How-do-I-calculate-the-hour-angle
+# https://astronomy.stackexchange.com/questions/12666/calculation-of-hour-angle
+# https://nptel.ac.in/courses/105107122/modules/module8/html/11.htm
+# https://astro.unl.edu/classaction/animations/200level/siderealTimeAndHourAngleDemo.html
+# http://faculty.virginia.edu/skrutskie/ASTR3130/notes/astr3130_week02.pdf
+# http://sundials.org/index.php/teachers-corner/sundial-mathematics
+# https://journal.hautehorlogerie.org/en/pilot-watches-mastering-the-hour-angle-ii/
+# https://en.wikipedia.org/wiki/Hour_angle
+# https://astronavigationdemystified.com/local-hour-angle-and-greenwich-hour-angle/
+
+
 def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, bodyRA, bodyDec, ):
     sunRA, sunDec, earthDistance = observer.at( utcNow ).observe( ephemeris[ SKYFIELD_PLANET_SUN ] ).apparent().radec()
 
