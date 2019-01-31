@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
 
@@ -41,13 +41,13 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 from threading import Thread
-import json, logging, os, pythonutils, threading, time, virtualmachine
+import datetime, json, logging, os, pythonutils, threading, time, virtualmachine
 
 
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.58"
+    VERSION = "1.0.59"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -65,6 +65,8 @@ class IndicatorVirtualBox:
     CONFIG_SHOW_SUBMENU = "showSubmenu"
     CONFIG_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
 
+    NOTIFICATION_DELAY_IN_SECONDS = 10
+
 
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG ) ] )
@@ -73,6 +75,8 @@ class IndicatorVirtualBox:
         self.scrollUUID = None
 
         Notify.init( INDICATOR_NAME )
+        self.dateTimeOfLastNotification = datetime.datetime.now()
+
         self.loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorVirtualBox.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
@@ -179,7 +183,8 @@ class IndicatorVirtualBox:
         numberOfWindowsWithTheSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
         if numberOfWindowsWithTheSameName == "0":
             message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtualMachineName )
-            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
+            summary = _( "Warning" )
+            self.sendNotificationWithDelay( summary, message )
 
         elif numberOfWindowsWithTheSameName == "1":
             for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
@@ -189,7 +194,16 @@ class IndicatorVirtualBox:
                     break
         else:
             message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window of the same name." ).format( virtualMachineName )
-            Notify.Notification.new( _( "Warning" ), message, IndicatorVirtualBox.ICON ).show()
+            summary = _( "Warning" )
+            self.sendNotificationWithDelay( summary, message )
+
+
+    # Zealous mouse wheel scrolling can cause too many notifications, subsequently popping the graphics stack!
+    # Prevent notifications from appearing until a set time has elapsed since the previous notification.
+    def sendNotificationWithDelay( self, summary, message ):
+        if( self.dateTimeOfLastNotification + datetime.timedelta( seconds = IndicatorVirtualBox.NOTIFICATION_DELAY_IN_SECONDS ) < datetime.datetime.now() ):
+            Notify.Notification.new( summary, message, IndicatorVirtualBox.ICON ).show()
+            self.dateTimeOfLastNotification = datetime.datetime.now()
 
 
     # It is assumed that VirtualBox is installed!

@@ -1,11 +1,11 @@
 # Russian translation for indicator-virtual-box.
-# Copyright (C) 2015-2017 Bernard Giannetti
+# Copyright (C) 2015-2019 Bernard Giannetti
 # This file is distributed under the same license as the indicator-virtual-box package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2015-2017.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2019.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-virtual-box 1.0.58\n"
+"Project-Id-Version: indicator-virtual-box 1.0.59\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2017-09-16 00:17+1000\n"
 "PO-Revision-Date: 2017-09-18 12:09+0300\n"
