@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.60-1) trusty; urgency=low
+
+  * Bug fix: Handle different locations of the VirtualBox executable as it can
+    vary depending on version and method of installation.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 25 Mar 2019 13:07:50 +1000
+
+
 indicator-virtual-box (1.0.59-1) trusty; urgency=low
 
   * Bug fix: Zealous mouse wheel scrolling can cause too many notifications,

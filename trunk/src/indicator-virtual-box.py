@@ -47,7 +47,7 @@ import datetime, json, logging, os, pythonutils, threading, time, virtualmachine
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.59"
+    VERSION = "1.0.60"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -227,12 +227,11 @@ class IndicatorVirtualBox:
 
     def onLaunchVirtualBoxManager( self, widget ):
         windowID = None
-        processID = pythonutils.processGet( "ps -ef | awk '{ if( $NF == \"/usr/lib/virtualbox/VirtualBox\" ) print $2; }'" )
+        processID = pythonutils.processGet( "ps -ef | awk '{ if( $NF == \"" + self.getVirtualBox() + "\" ) print $2; }'" )
         if( processID is not None and processID != "" ):
             windowID = pythonutils.processGet( "wmctrl -lp | awk '{ if( $3 == " + processID.strip() + " ) print $1; }'" )
-
         if windowID is None or windowID == "":
-            pythonutils.processCall( "/usr/lib/virtualbox/VirtualBox &" )
+            pythonutils.processCall( self.getVirtualBox() + " &" )
         else:
             pythonutils.processCall( "wmctrl -ia " + windowID.strip() )
 
@@ -398,6 +397,10 @@ class IndicatorVirtualBox:
             isInstalled = result.find( "VBoxManage" ) > -1
 
         return isInstalled
+
+
+    # The executable VirtualBox may exist in different locations, depending on how it was installed.
+    def getVirtualBox( self ): return pythonutils.processGet( "which VirtualBox" ).strip()
 
 
     def getStartCommand( self, uuid ):
