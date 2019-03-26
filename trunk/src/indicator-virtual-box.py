@@ -226,12 +226,17 @@ class IndicatorVirtualBox:
 
 
     def onLaunchVirtualBoxManager( self, widget ):
+        # The executable VirtualBox may exist in different locations, depending on how it was installed.
+        # No need to check for a None value as this function will never be called if VBoxManage (VirtualBox) is not installed.
+        virtualBoxExecutable = pythonutils.processGet( "which VirtualBox" ).strip()
+
         windowID = None
-        processID = pythonutils.processGet( "ps -ef | awk '{ if( $NF == \"" + self.getVirtualBox() + "\" ) print $2; }'" )
+        processID = pythonutils.processGet( "ps -ef | awk '{ if( $NF == \"" + virtualBoxExecutable + "\" ) print $2; }'" )
         if( processID is not None and processID != "" ):
             windowID = pythonutils.processGet( "wmctrl -lp | awk '{ if( $3 == " + processID.strip() + " ) print $1; }'" )
+
         if windowID is None or windowID == "":
-            pythonutils.processCall( self.getVirtualBox() + " &" )
+            pythonutils.processCall( virtualBoxExecutable + " &" )
         else:
             pythonutils.processCall( "wmctrl -ia " + windowID.strip() )
 
@@ -397,10 +402,6 @@ class IndicatorVirtualBox:
             isInstalled = result.find( "VBoxManage" ) > -1
 
         return isInstalled
-
-
-    # The executable VirtualBox may exist in different locations, depending on how it was installed.
-    def getVirtualBox( self ): return pythonutils.processGet( "which VirtualBox" ).strip()
 
 
     def getStartCommand( self, uuid ):
