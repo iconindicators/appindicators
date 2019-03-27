@@ -152,6 +152,12 @@ class IndicatorPPADownloadStatistics:
                 else:
                     self.createMenuItemForStatusMessage( menu, ppa )
 
+#TODO In progress...
+# {"filters": {}, "ppas": [["gnome-terminator", "ppa", "bionic", "amd64"], ["thebernmeister", "ppa", "bionic", "amd64"], ["thebernmeister", "ppa", "xenial", "amd64"]], "sortByDownloadAmount": 5, "ignoreVersionArchitectureSpecific": true, "combinePPAs": false, "sortByDownload": false, "showSubmenu": false}
+#         print( len( ppas ) )
+#         print( ppas )
+#         self.indicator.set_secondary_activate_target( menuItem )
+
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
