@@ -53,7 +53,7 @@ import concurrent.futures, json, locale, logging, operator, os, pythonutils, thr
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.63"
+    VERSION = "1.0.64"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -153,10 +153,10 @@ class IndicatorPPADownloadStatistics:
                     self.createMenuItemForStatusMessage( menu, ppa )
 
 #TODO In progress...
-# {"filters": {}, "ppas": [["gnome-terminator", "ppa", "bionic", "amd64"], ["thebernmeister", "ppa", "bionic", "amd64"], ["thebernmeister", "ppa", "xenial", "amd64"]], "sortByDownloadAmount": 5, "ignoreVersionArchitectureSpecific": true, "combinePPAs": false, "sortByDownload": false, "showSubmenu": false}
-#         print( len( ppas ) )
-#         print( ppas )
-#         self.indicator.set_secondary_activate_target( menuItem )
+        # Allow middle mouse click on the icon to open the PPA in the browser,
+        # but only makes sense when there is one PPA.
+        if len( ppas ) == 1:
+            self.indicator.set_secondary_activate_target( menuItem )
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )

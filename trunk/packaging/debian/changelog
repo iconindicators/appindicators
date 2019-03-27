@@ -1,3 +1,13 @@
+indicator-ppa-download-statistics (1.0.64-1) xenial; urgency=low
+
+  * Update release to trusty as precise is end of life.
+  * Added TODO to the list of series.   <--------------------TODO Add whatever "e" version...
+  * When one PPA is present, can now middle mouse click the indicator icon to 
+    opens that PPA's page in a web browser.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 27 Mar 2019 22:27:26 +1000
+
+
 indicator-ppa-download-statistics (1.0.63-1) trusty; urgency=low
 
   * Added a URL timeout when attempting downloads.
