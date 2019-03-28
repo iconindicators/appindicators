@@ -152,9 +152,7 @@ class IndicatorPPADownloadStatistics:
                 else:
                     self.createMenuItemForStatusMessage( menu, ppa )
 
-#TODO In progress...
-        # Allow middle mouse click on the icon to open the PPA in the browser,
-        # but only makes sense when there is one PPA.
+        # When only one PPA is present, enable middle mouse click on the icon to open the PPA in the browser.
         if len( ppas ) == 1:
             self.indicator.set_secondary_activate_target( menuItem )
 
