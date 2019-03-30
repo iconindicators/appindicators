@@ -500,6 +500,10 @@ def testSiderealTime():
     st = t.gmst
     print( st )
 
+#TODO May help...
+# https://stackoverflow.com/questions/53240745/pyephem-ra-dec-to-gha-dec
+# https://stackoverflow.com/questions/13664935/is-this-how-to-compute-greenwich-hour-angle-with-pyephem-under-python-3
+
     print( load.timescale().now().gmst )
 
     sss = ts.utc( utcNow.replace( tzinfo = pytz.UTC ) )
