@@ -1,12 +1,12 @@
 # Portable Object Template for indicator-tide.
-# Copyright (C) 2015-2018 Bernard Giannetti
+# Copyright (C) 2015-2019 Bernard Giannetti
 # This file is distributed under the same license as the indicator-tide package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-tide 1.0.14\n"
+"Project-Id-Version: indicator-tide 1.0.15\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2018-10-03 18:24+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"

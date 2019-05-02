@@ -1,3 +1,11 @@
+indicator-tide (1.0.15-1) xenial; urgency=low
+
+  * Update release to xenial as trusty is end of life.
+  * Update debian/control Standards-Version to 3.9.7.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 2 May 2019 19:37:17 +1000
+
+
 indicator-tide (1.0.14-1) trusty; urgency=low
 
   * Fixed incorrect grammar in About dialog.
