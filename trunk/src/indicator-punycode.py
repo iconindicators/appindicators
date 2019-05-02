@@ -46,7 +46,7 @@ import encodings.idna, json, logging, os, pythonutils, re, threading
 class IndicatorPunycode:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.6"
+    VERSION = "1.0.7"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
