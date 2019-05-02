@@ -47,7 +47,7 @@ import datetime, json, logging, os, pythonutils, threading, time, virtualmachine
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.60"
+    VERSION = "1.0.61"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"

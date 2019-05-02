@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.61-1) xenial; urgency=low
+
+  * Update release to xenial as trusty is end of life.
+  * Update debian/control Standards-Version to 3.9.7.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 2 May 2019 19:38:54 +1000
+
+
 indicator-virtual-box (1.0.60-1) trusty; urgency=low
 
   * Bug fix: Handle different locations of the VirtualBox executable as it can
