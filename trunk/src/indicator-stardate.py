@@ -45,7 +45,7 @@ import datetime, json, logging, os, pythonutils, stardate, threading
 class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.36"
+    VERSION = "1.0.37"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
