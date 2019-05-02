@@ -53,7 +53,7 @@ import concurrent.futures, json, locale, logging, operator, os, pythonutils, thr
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.64"
+    VERSION = "1.0.65"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
