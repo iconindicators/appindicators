@@ -1,6 +1,7 @@
 indicator-ppa-download-statistics (1.0.64-1) xenial; urgency=low
 
   * Update release to xenial as trusty is end of life.
+  * Update debian/control Standards-Version to 3.9.7.
   * Added eoan to the list of series.
   * When only one PPA is present, enable middle mouse click on the icon to
     open the PPA in the browser.
