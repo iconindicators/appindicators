@@ -1,3 +1,11 @@
+indicator-on-this-day (1.0.4-1) xenial; urgency=low
+
+  * Update release to xenial as trusty is end of life.
+  * Update debian/control Standards-Version to 3.9.7.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 2 May 2019 19:27:39 +1000
+
+
 indicator-on-this-day (1.0.3-1) trusty; urgency=low
 
   * Allow the user to limit the number of events such that a scroll bar does
