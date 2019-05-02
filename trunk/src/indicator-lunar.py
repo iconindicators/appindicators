@@ -58,7 +58,7 @@ class AstronomicalBodyType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star,
 class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.80"
+    VERSION = "1.0.81"
     ICON = INDICATOR_NAME
     ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
     ICON_BASE_PATH = tempfile.gettempdir()

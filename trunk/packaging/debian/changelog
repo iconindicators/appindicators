@@ -1,3 +1,11 @@
+indicator-lunar (1.0.81-1) xenial; urgency=low
+
+  * Update release to xenial as trusty is end of life.
+  * Update debian/control Standards-Version to 3.9.7.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 2 May 2019 19:11:30 +1000
+
+
 indicator-lunar (1.0.80-1) trusty; urgency=low
 
   * Remove extraneous whitespace from comet names.
