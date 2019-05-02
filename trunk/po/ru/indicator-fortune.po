@@ -1,11 +1,11 @@
 # Russian translation for indicator-fortune.
-# Copyright (C) 2015-2017 Bernard Giannetti
+# Copyright (C) 2015-2019 Bernard Giannetti
 # This file is distributed under the same license as the indicator-fortune package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2015-2017.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2019.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-fortune 1.0.28\n"
+"Project-Id-Version: indicator-fortune 1.0.29\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2017-09-14 19:44+1000\n"
 "PO-Revision-Date: 2017-07-04 16:43+0300\n"

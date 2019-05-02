@@ -1,3 +1,11 @@
+indicator-fortune (1.0.29-1) xenial; urgency=low
+
+  * Update release to xenial as trusty is end of life.
+  * Update debian/control Standards-Version to 3.9.7.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 2 May 2019 19:04:07 +1000
+
+
 indicator-fortune (1.0.28-1) trusty; urgency=low
 
   * Removed user config migration code.
