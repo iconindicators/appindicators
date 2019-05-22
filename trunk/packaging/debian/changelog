@@ -563,7 +563,7 @@ indicator-virtual-box (1.0.3-1) precise; urgency=low
 
 indicator-virtual-box (1.0.2-1) precise; urgency=low
 
-  * Unity appindicator does not support stying in the menu items.
+  * Unity appindicator does not support styling in the menu items.
     To indicate a running VM "---" is placed either side of the VM name.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 7 Jul 2012 18:59:21 +1000
