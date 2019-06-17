@@ -131,7 +131,6 @@ class IndicatorLunar:
     DATA_BRIGHT_LIMB = "BRIGHT LIMB"
     DATA_CONSTELLATION = "CONSTELLATION"
     DATA_DAWN = "DAWN"
-    DATA_DECLINATION = "DECLINATION"
     DATA_DISTANCE_TO_EARTH = "DISTANCE TO EARTH"
     DATA_DISTANCE_TO_EARTH_KM = "DISTANCE TO EARTH KM"
     DATA_DISTANCE_TO_SUN = "DISTANCE TO SUN"
@@ -154,7 +153,6 @@ class IndicatorLunar:
     DATA_NAME = "NAME" # Only used for the CITY "body" tag.
     DATA_NEW = "NEW"
     DATA_PHASE = "PHASE"
-    DATA_RIGHT_ASCENSION = "RIGHT ASCENSION"
     DATA_RISE_AZIMUTH = "RISE AZIMUTH"
     DATA_RISE_TIME = "RISE TIME"
     DATA_SET_AZIMUTH = "SET AZIMUTH"
@@ -176,7 +174,6 @@ class IndicatorLunar:
         DATA_BRIGHT_LIMB,
         DATA_CONSTELLATION,
         DATA_DAWN,
-        DATA_DECLINATION,
         DATA_DISTANCE_TO_EARTH,
         DATA_DISTANCE_TO_EARTH_KM,
         DATA_DISTANCE_TO_SUN,
@@ -199,7 +196,6 @@ class IndicatorLunar:
         DATA_NAME,
         DATA_NEW,
         DATA_PHASE,
-        DATA_RIGHT_ASCENSION,
         DATA_RISE_AZIMUTH,
         DATA_RISE_TIME,
         DATA_SET_AZIMUTH,
@@ -219,14 +215,12 @@ class IndicatorLunar:
         DATA_ALTITUDE,
         DATA_AZIMUTH,
         DATA_CONSTELLATION,
-        DATA_DECLINATION,
         DATA_ECLIPSE_DATE_TIME,
         DATA_ECLIPSE_LATITUDE,
         DATA_ECLIPSE_LONGITUDE,
         DATA_ECLIPSE_TYPE,
         DATA_MAGNITUDE,
         DATA_MESSAGE,
-        DATA_RIGHT_ASCENSION,
         DATA_RISE_TIME,
         DATA_SET_TIME,
         DATA_TROPICAL_SIGN_NAME,
@@ -244,13 +238,11 @@ class IndicatorLunar:
         DATA_AZIMUTH,
         DATA_BRIGHT_LIMB,
         DATA_CONSTELLATION,
-        DATA_DECLINATION,
         DATA_DISTANCE_TO_EARTH,
         DATA_DISTANCE_TO_SUN,
         DATA_ILLUMINATION,
         DATA_MAGNITUDE,
         DATA_MESSAGE,
-        DATA_RIGHT_ASCENSION,
         DATA_RISE_TIME,
         DATA_SET_TIME,
         DATA_TROPICAL_SIGN_NAME,
@@ -260,9 +252,7 @@ class IndicatorLunar:
     DATA_TAGS_PLANETARY_MOON = [
         DATA_ALTITUDE,
         DATA_AZIMUTH,
-        DATA_DECLINATION,
         DATA_EARTH_VISIBLE,
-        DATA_RIGHT_ASCENSION,
         DATA_X_OFFSET,
         DATA_Y_OFFSET,
         DATA_Z_OFFSET ]
@@ -278,10 +268,8 @@ class IndicatorLunar:
         DATA_ALTITUDE,
         DATA_AZIMUTH,
         DATA_CONSTELLATION,
-        DATA_DECLINATION,
         DATA_MAGNITUDE,
         DATA_MESSAGE,
-        DATA_RIGHT_ASCENSION,
         DATA_RISE_TIME,
         DATA_SET_TIME,
         DATA_TROPICAL_SIGN_NAME,
@@ -293,7 +281,6 @@ class IndicatorLunar:
         DATA_AZIMUTH,
         DATA_CONSTELLATION,
         DATA_DAWN,
-        DATA_DECLINATION,
         DATA_DUSK,
         DATA_ECLIPSE_DATE_TIME,
         DATA_ECLIPSE_LATITUDE,
@@ -302,7 +289,6 @@ class IndicatorLunar:
         DATA_EQUINOX,
         DATA_MAGNITUDE,
         DATA_MESSAGE,
-        DATA_RIGHT_ASCENSION,
         DATA_RISE_TIME,
         DATA_SET_TIME,
         DATA_SOLSTICE,
@@ -316,7 +302,6 @@ class IndicatorLunar:
         DATA_BRIGHT_LIMB                : _( "BRIGHT LIMB" ),
         DATA_CONSTELLATION              : _( "CONSTELLATION" ),
         DATA_DAWN                       : _( "DAWN" ),
-        DATA_DECLINATION                : _( "DECLINATION" ),
         DATA_DISTANCE_TO_EARTH          : _( "DISTANCE TO EARTH" ),
         DATA_DISTANCE_TO_EARTH_KM       : _( "DISTANCE TO EARTH KM" ),
         DATA_DISTANCE_TO_SUN            : _( "DISTANCE TO SUN" ),
@@ -339,7 +324,6 @@ class IndicatorLunar:
         DATA_NAME                       : _( "NAME" ), # Only used for CITY "body" tag.
         DATA_NEW                        : _( "NEW" ),
         DATA_PHASE                      : _( "PHASE" ),
-        DATA_RIGHT_ASCENSION            : _( "RIGHT ASCENSION" ),
         DATA_RISE_AZIMUTH               : _( "RISE AZIMUTH" ),
         DATA_RISE_TIME                  : _( "RISE TIME" ),
         DATA_SET_AZIMUTH                : _( "SET AZIMUTH" ),
@@ -1259,7 +1243,7 @@ class IndicatorLunar:
 
             dataTag = moonName.upper()
             subMenu = Gtk.Menu()
-            self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, AstronomicalBodyType.PlanetaryMoon, dataTag )
+            self.updateAzimuthAltitudeMenu( subMenu, AstronomicalBodyType.PlanetaryMoon, dataTag )
             subMenu.append( Gtk.SeparatorMenuItem() )
 
             subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + self.getDisplayData( ( AstronomicalBodyType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ) ) )
@@ -1455,7 +1439,7 @@ class IndicatorLunar:
             subMenu.append( Gtk.MenuItem( _( "Sun Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SUN_TILT, ) ) ) )
 
         subMenu.append( Gtk.SeparatorMenuItem() )
-        self.updateRightAscensionDeclinationAzimuthAltitudeMenu( subMenu, astronomicalBodyType, dataTag )
+        self.updateAzimuthAltitudeMenu( subMenu, astronomicalBodyType, dataTag )
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
@@ -1484,13 +1468,11 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
-    def updateRightAscensionDeclinationAzimuthAltitudeMenu( self, menu, astronomicalBodyType, dataTag ):
+    def updateAzimuthAltitudeMenu( self, menu, astronomicalBodyType, dataTag ):
         key = ( astronomicalBodyType, dataTag )
         menu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
         menu.append( Gtk.MenuItem( _( "Altitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ALTITUDE, ) ) ) )
         menu.append( Gtk.SeparatorMenuItem() )
-        menu.append( Gtk.MenuItem( _( "Right Ascension: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RIGHT_ASCENSION, ) ) ) )
-        menu.append( Gtk.MenuItem( _( "Declination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DECLINATION, ) ) ) )
 
 
     def updateSatellitesMenu( self, menu ):
@@ -1544,7 +1526,6 @@ class IndicatorLunar:
                 if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data:
                     if self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
                         subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( _( "Declination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DECLINATION, ) ) ) )
 
                     subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ) )
                 else:
@@ -1606,10 +1587,7 @@ class IndicatorLunar:
            key[ 2 ] == IndicatorLunar.DATA_AZIMUTH or \
            key[ 2 ] == IndicatorLunar.DATA_RISE_AZIMUTH or \
            key[ 2 ] == IndicatorLunar.DATA_SET_AZIMUTH:
-            if source is None:
-                displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")"
-            elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
-                displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "°"
+            displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "°"
 
         elif key[ 2 ] == IndicatorLunar.DATA_BRIGHT_LIMB or \
              key[ 2 ] == IndicatorLunar.DATA_EARTH_TILT or \
@@ -1635,16 +1613,6 @@ class IndicatorLunar:
                     displayData = self.getLocalDateTime( self.data[ key ], self.dateTimeFormat )
                 elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
                     displayData = self.getLocalDateTime( self.data[ key ], self.satelliteNotificationTimeFormat )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_DECLINATION:
-            dec = self.data[ key ]
-            if self.getDecimalDegrees( self.data[ key ], False, 0 ) < 0.0:
-                dec = dec [ 1 : ]
-                direction = _( "S" )
-            else:
-                direction = _( "N" )
-
-            displayData = str( self.getDecimalDegrees( dec, False, 0 ) ) + "° " + direction + " (" + self.trimDecimal( self.data[ key ] ) + ")"
 
         elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH or \
              key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_SUN:
@@ -1707,9 +1675,6 @@ class IndicatorLunar:
 
         elif key[ 2 ] == IndicatorLunar.DATA_NAME:
             displayData = self.data[ key ]
-
-        elif key[ 2 ] == IndicatorLunar.DATA_RIGHT_ASCENSION:
-            displayData = str( self.getDecimalDegrees( self.data[ key ], True, 0 ) ) + "° (" + self.trimDecimal( self.data[ key ] ) + ")" 
 
         elif key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_NAME:
             displayData = IndicatorLunar.TROPICAL_SIGN_TRANSLATIONS[ self.data[ key ] ] 
@@ -2059,7 +2024,7 @@ class IndicatorLunar:
                     for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
                         moon = getattr( ephem, moonName )() # Dynamically instantiate the moon object.
                         moon.compute( city )
-                        self.updateRightAscensionDeclinationAzimuthAltitude( moon, AstronomicalBodyType.PlanetaryMoon, moonName.upper() )
+                        self.updateAzimuthAltitude( moon, AstronomicalBodyType.PlanetaryMoon, moonName.upper() )
                         key = ( AstronomicalBodyType.PlanetaryMoon, moonName.upper() )
                         self.data[ key + ( IndicatorLunar.DATA_EARTH_VISIBLE, ) ] = str( bool( moon.earth_visible ) )
                         self.data[ key + ( IndicatorLunar.DATA_X_OFFSET, ) ] = str( round( moon.x, 1 ) )
@@ -2143,7 +2108,7 @@ class IndicatorLunar:
                astronomicalBodyType == AstronomicalBodyType.Planet:
                 self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] = str( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), body ) ) )
 
-            self.updateRightAscensionDeclinationAzimuthAltitude( body, astronomicalBodyType, dataTag )
+            self.updateAzimuthAltitude( body, astronomicalBodyType, dataTag )
 
 
     def hideBody( self, astronomicalBodyType, dataTag, hideIfNeverUp ):
@@ -2157,12 +2122,10 @@ class IndicatorLunar:
     def getPhase( self, body ): return round( body.phase )
 
 
-    # Compute the right ascension, declination, azimuth and altitude for a body.
+    # Compute the azimuth and altitude for a body.
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
-    def updateRightAscensionDeclinationAzimuthAltitude( self, body, astronomicalBodyType, dataTag ):
+    def updateAzimuthAltitude( self, body, astronomicalBodyType, dataTag ):
         key = ( astronomicalBodyType, dataTag )
-        self.data[ key + ( IndicatorLunar.DATA_RIGHT_ASCENSION, ) ] = str( body.ra )
-        self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] = str( body.dec )
         self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( body.az )
         self.data[ key + ( IndicatorLunar.DATA_ALTITUDE, ) ] = str( body.alt )
 
@@ -2276,7 +2239,6 @@ class IndicatorLunar:
                 if satellite.circumpolar:
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR
                     self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( satellite.az )
-                    self.data[ key + ( IndicatorLunar.DATA_DECLINATION, ) ] = str( satellite.dec )
                 elif satellite.neverup:
                     message = IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES
                 else:
