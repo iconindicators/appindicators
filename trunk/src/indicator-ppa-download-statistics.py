@@ -53,7 +53,7 @@ import concurrent.futures, json, locale, logging, operator, os, pythonutils, tem
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.65"
+    VERSION = "1.0.66"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -93,9 +93,10 @@ class IndicatorPPADownloadStatistics:
         Notify.init( INDICATOR_NAME )
         self.loadConfig()
 
-        # The icon for this indicator (when installing or displaying in a list of programs) is fine,
-        # yet when used in as the icon for the actual indicator, looks odd as the text does not match other text labels.
-        # Therefore, create an empty icon and use the indicator label to display the text "PPA".
+        # On Ubuntu 16.04 (and other Unity based versions), the icon "text" does not behave as does label text of other indicators.
+        # When clicked, label text becomes bolder, whereas the icon "text" remains the same.
+        # On Ubuntu 18.04 (and other GNOME Shell versions), the label text becomes bolder on mouse over and mouse click.
+        # Ideally, use a label for the text of "PPA" and a dummy/empty icon, but alas, this does not work under GNOME Shell.
         # Inspiration from https://github.com/fossfreedom/indicator-sysmonitor.
         if pythonutils.processGet( "lsb_release -sc" ).strip() == "xenial":
             fileHandle, icon = tempfile.mkstemp( suffix = ".svg" )
@@ -114,10 +115,6 @@ class IndicatorPPADownloadStatistics:
             self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
             self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
-#TODO Make an option to let user specify if a text label is used (with dynamic icon) or use the real icon?
-
-#TODO Or maybe make the icon text bolder and see if that at least looks better.
-
         self.update()
 
 
@@ -126,8 +123,6 @@ class IndicatorPPADownloadStatistics:
 
     def update( self ):
         self.buildMenu()
-
-        if True: return #TODO Remove
 
         if pythonutils.isConnectedToInternet():
             Thread( target = self.getPPADownloadStatistics ).start()
