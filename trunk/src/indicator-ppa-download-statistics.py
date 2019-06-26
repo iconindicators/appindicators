@@ -5,7 +5,7 @@
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.         
+# (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -93,8 +93,36 @@ class IndicatorPPADownloadStatistics:
         Notify.init( INDICATOR_NAME )
         self.loadConfig()
 
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+#         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+#         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
+
+        import tempfile
+        fileHandle, icon = tempfile.mkstemp( suffix = ".svg" )
+        with open( icon, "w" ) as f:
+            svg = '<?xml version="1.1" encoding="UTF-8" \
+                         standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" \
+                         height="10" width="10" version="1.0" \
+                         xmlns:xlink="http://www.w3.org/1999/xlink"></svg>'
+            svg = '<?xml version="1.0" encoding="utf-8"?><svg version="1.1" \
+                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" \
+                         x="0px" y="0px" height="10" width="1"  viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" stroke="black" stroke-width="3" fill="red" /></svg>'
+
+            f.write( svg )
+            f.close()
+
+        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, icon, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator.set_label( "PPA", "" )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
+
+#         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+#         self.indicator.set_icon_theme_path( "/home/bernard/Downloads" )
+#         self.indicator.set_icon_full( "indicator-ppa", "" )
+#         self.indicator.set_label( "PPA", "" )
+#         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
+        
 
         self.update()
 
@@ -104,6 +132,7 @@ class IndicatorPPADownloadStatistics:
 
     def update( self ):
         self.buildMenu()
+        return #TODO Remove
 
         if pythonutils.isConnectedToInternet():
             Thread( target = self.getPPADownloadStatistics ).start()
