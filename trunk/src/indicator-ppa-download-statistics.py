@@ -109,10 +109,12 @@ class IndicatorPPADownloadStatistics:
             f.close()
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, icon, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_label( "PPA", "" )
+        self.indicator.set_label( "PPA    ", "" )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
 #TODO Make an option to let user specify if a text label is used (with dynamic icon) or use the real icon?
+
+#TODO Or maybe make the icon text bolder and see if that at least looks better.
 
         self.update()
 
