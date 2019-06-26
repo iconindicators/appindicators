@@ -93,21 +93,18 @@ class IndicatorPPADownloadStatistics:
         Notify.init( INDICATOR_NAME )
         self.loadConfig()
 
-#         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-#         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
 
         import tempfile
+
+        # The icon for this indicator (when installing or displaying in a list of programs) is fine,
+        # yet when used in as the icon for the actual indicator, looks odd as the text does not match other text labels.
+        # Therefore, create an empty icon and use the indicator label to display the text "PPA".
+        # Inspiration from https://github.com/fossfreedom/indicator-sysmonitor.
         fileHandle, icon = tempfile.mkstemp( suffix = ".svg" )
         with open( icon, "w" ) as f:
-            svg = '<?xml version="1.1" encoding="UTF-8" \
-                         standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" \
-                         height="10" width="10" version="1.0" \
-                         xmlns:xlink="http://www.w3.org/1999/xlink"></svg>'
-            svg = '<?xml version="1.0" encoding="utf-8"?><svg version="1.1" \
-                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" \
-                         x="0px" y="0px" height="10" width="1"  viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" stroke="black" stroke-width="3" fill="red" /></svg>'
-
+            svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> \
+                   <svg id="empty" xmlns="http://www.w3.org/2000/svg" height="22" width="1" version="1.0" \
+                        xmlns:xlink="http://www.w3.org/1999/xlink"></svg>'
             f.write( svg )
             f.close()
 
@@ -115,14 +112,7 @@ class IndicatorPPADownloadStatistics:
         self.indicator.set_label( "PPA", "" )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
-
-#         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-#         self.indicator.set_icon_theme_path( "/home/bernard/Downloads" )
-#         self.indicator.set_icon_full( "indicator-ppa", "" )
-#         self.indicator.set_label( "PPA", "" )
-#         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
-        
+#TODO Make an option to let user specify if a text label is used (with dynamic icon) or use the real icon?
 
         self.update()
 
@@ -132,7 +122,6 @@ class IndicatorPPADownloadStatistics:
 
     def update( self ):
         self.buildMenu()
-        return #TODO Remove
 
         if pythonutils.isConnectedToInternet():
             Thread( target = self.getPPADownloadStatistics ).start()
