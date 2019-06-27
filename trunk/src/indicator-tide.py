@@ -97,7 +97,7 @@ class IndicatorTide:
                 "Until you upgrade to the latest version of the indicator, only UK ports will be available." )
 
             Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
-
+#TODO Write this to the log!
 
     def main( self ): Gtk.main()
 
