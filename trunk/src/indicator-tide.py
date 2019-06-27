@@ -109,6 +109,7 @@ class IndicatorTide:
 
             tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )
             if len( tidalReadings ) == 0:
+#TODO Write this to the log!
                 summary = _( "Error" )
                 message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
             else:
