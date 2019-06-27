@@ -97,7 +97,7 @@ class IndicatorTide:
                 "Until you upgrade to the latest version of the indicator, only UK ports will be available." )
 
             Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
-#TODO Write this to the log!
+            logging.warning( message )
 
     def main( self ): Gtk.main()
 
@@ -109,9 +109,9 @@ class IndicatorTide:
 
             tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )
             if len( tidalReadings ) == 0:
-#TODO Write this to the log!
                 summary = _( "Error" )
                 message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
+                logging.error( message )
             else:
                 summary = _( "Tidal data ready" )
                 if self.cachedDataInUse:
