@@ -104,7 +104,6 @@ class IndicatorOnThisDay:
                 for event in events:
                     if today == event.getDate():
                         Notify.Notification.new( _( "On this day..." ), event.getDescription(), IndicatorOnThisDay.ICON ).show()
-#TODO Is this necessary?  Maybe make a preference or just dump.
 
 
     def buildMenu( self, events ):
