@@ -8,7 +8,7 @@
 # Install (and upgrade to) latest skyfield: 
 #     sudo apt-get install python3-pip
 #     sudo pip3 install --upgrade skyfield
-#     sudo pip install --upgrade pytz
+#     sudo pip3 install --upgrade pytz
 #     sudo pip3 install --upgrade pandas
 
 # https://github.com/skyfielders/python-skyfield
