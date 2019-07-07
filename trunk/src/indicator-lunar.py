@@ -210,7 +210,7 @@ class IndicatorLunar:
         DATA_X_OFFSET,
         DATA_Y_OFFSET,
         DATA_Z_OFFSET ]
-    
+
     DATA_TAGS_MOON = [
         DATA_ALTITUDE,
         DATA_AZIMUTH,
@@ -475,7 +475,7 @@ class IndicatorLunar:
 
     PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
-    PLANET_MOONS = { 
+    PLANET_MOONS = {
         PLANET_JUPITER : [ MOON_JUPITER_CALLISTO, MOON_JUPITER_EUROPA, MOON_JUPITER_GANYMEDE, MOON_JUPITER_IO ],
         PLANET_MARS : [ MOON_MARS_DEIMOS, MOON_MARS_PHOBOS ],
         PLANET_SATURN : [ MOON_SATURN_DIONE, MOON_SATURN_ENCELADUS, MOON_SATURN_HYPERION, MOON_SATURN_IAPETUS, MOON_SATURN_MIMAS, MOON_SATURN_RHEA, MOON_SATURN_TETHYS, MOON_SATURN_TITAN ],
@@ -485,20 +485,20 @@ class IndicatorLunar:
         PLANET_MERCURY        : _( "Mercury" ),
         PLANET_VENUS          : _( "Venus" ),
         PLANET_MARS           : _( "Mars" ),
-        PLANET_JUPITER        : _( "Jupiter" ), 
+        PLANET_JUPITER        : _( "Jupiter" ),
         PLANET_SATURN         : _( "Saturn" ),
         PLANET_URANUS         : _( "Uranus" ),
         PLANET_NEPTUNE        : _( "Neptune" ),
         PLANET_PLUTO          : _( "Pluto" ),
-    
+
         MOON_MARS_DEIMOS      : _( "Deimos" ),
         MOON_MARS_PHOBOS      : _( "Phobos" ),
-    
+
         MOON_JUPITER_CALLISTO : _( "Callisto" ),
         MOON_JUPITER_EUROPA   : _( "Europa" ),
         MOON_JUPITER_GANYMEDE : _( "Ganymede" ),
         MOON_JUPITER_IO       : _( "Io" ),
-    
+
         MOON_SATURN_DIONE     : _( "Dione" ),
         MOON_SATURN_ENCELADUS : _( "Enceladus" ),
         MOON_SATURN_HYPERION  : _( "Hyperion" ),
@@ -507,7 +507,7 @@ class IndicatorLunar:
         MOON_SATURN_RHEA      : _( "Rhea" ),
         MOON_SATURN_TETHYS    : _( "Tethys" ),
         MOON_SATURN_TITAN     : _( "Titan" ),
-    
+
         MOON_URANUS_ARIEL     : _( "Ariel" ),
         MOON_URANUS_MIRANDA   : _( "Miranda" ),
         MOON_URANUS_OBERON    : _( "Oberon" ),
@@ -515,239 +515,239 @@ class IndicatorLunar:
         MOON_URANUS_UMBRIEL   : _( "Umbriel" ) }
 
     PLANET_AND_MOON_TAGS_TRANSLATIONS = {
-        "MERCURY"   : _( "MERCURY" ), 
-        "VENUS"     : _( "VENUS" ), 
-        "MARS"      : _( "MARS" ), 
-        "JUPITER"   : _( "JUPITER" ), 
-        "SATURN"    : _( "SATURN" ), 
-        "URANUS"    : _( "URANUS" ), 
-        "NEPTUNE"   : _( "NEPTUNE" ), 
-        "PLUTO"     : _( "PLUTO" ), 
+        "MERCURY"   : _( "MERCURY" ),
+        "VENUS"     : _( "VENUS" ),
+        "MARS"      : _( "MARS" ),
+        "JUPITER"   : _( "JUPITER" ),
+        "SATURN"    : _( "SATURN" ),
+        "URANUS"    : _( "URANUS" ),
+        "NEPTUNE"   : _( "NEPTUNE" ),
+        "PLUTO"     : _( "PLUTO" ),
 
-        "DEIMOS"    : _( "DEIMOS" ), 
-        "PHOBOS"    : _( "PHOBOS" ), 
+        "DEIMOS"    : _( "DEIMOS" ),
+        "PHOBOS"    : _( "PHOBOS" ),
 
-        "CALLISTO"  : _( "CALLISTO" ), 
-        "EUROPA"    : _( "EUROPA" ), 
-        "GANYMEDE"  : _( "GANYMEDE" ), 
-        "IO"        : _( "IO" ), 
+        "CALLISTO"  : _( "CALLISTO" ),
+        "EUROPA"    : _( "EUROPA" ),
+        "GANYMEDE"  : _( "GANYMEDE" ),
+        "IO"        : _( "IO" ),
 
-        "DIONE"     : _( "DIONE" ), 
-        "ENCELADUS" : _( "ENCELADUS" ), 
-        "HYPERION"  : _( "HYPERION" ), 
-        "IAPETUS"   : _( "IAPETUS" ), 
-        "MIMAS"     : _( "MIMAS" ), 
-        "RHEA"      : _( "RHEA" ), 
-        "TETHYS"    : _( "TETHYS" ), 
-        "TITAN"     : _( "TITAN" ), 
+        "DIONE"     : _( "DIONE" ),
+        "ENCELADUS" : _( "ENCELADUS" ),
+        "HYPERION"  : _( "HYPERION" ),
+        "IAPETUS"   : _( "IAPETUS" ),
+        "MIMAS"     : _( "MIMAS" ),
+        "RHEA"      : _( "RHEA" ),
+        "TETHYS"    : _( "TETHYS" ),
+        "TITAN"     : _( "TITAN" ),
 
-        "ARIEL"     : _( "ARIEL" ), 
-        "MIRANDA"   : _( "MIRANDA" ), 
-        "OBERON"    : _( "OBERON" ), 
-        "TITANIA"   : _( "TITANIA" ), 
+        "ARIEL"     : _( "ARIEL" ),
+        "MIRANDA"   : _( "MIRANDA" ),
+        "OBERON"    : _( "OBERON" ),
+        "TITANIA"   : _( "TITANIA" ),
         "UMBRIEL"   : _( "UMBRIEL" ) }
 
     # Translated star names.
     # Sourced from cns_namemap in ephem.stars.stars
     STAR_NAMES_TRANSLATIONS = {
-        "Achernar"        : _( "Achernar" ), 
-        "Adara"           : _( "Adara" ), 
-        "Agena"           : _( "Agena" ), 
-        "Albereo"         : _( "Albereo" ), 
-        "Alcaid"          : _( "Alcaid" ), 
-        "Alcor"           : _( "Alcor" ), 
-        "Alcyone"         : _( "Alcyone" ), 
-        "Aldebaran"       : _( "Aldebaran" ), 
-        "Alderamin"       : _( "Alderamin" ), 
-        "Alfirk"          : _( "Alfirk" ), 
-        "Algenib"         : _( "Algenib" ), 
-        "Algieba"         : _( "Algieba" ), 
-        "Algol"           : _( "Algol" ), 
-        "Alhena"          : _( "Alhena" ), 
-        "Alioth"          : _( "Alioth" ), 
-        "Almach"          : _( "Almach" ), 
-        "Alnair"          : _( "Alnair" ), 
-        "Alnilam"         : _( "Alnilam" ), 
-        "Alnitak"         : _( "Alnitak" ), 
-        "Alphard"         : _( "Alphard" ), 
-        "Alphecca"        : _( "Alphecca" ), 
-        "Alshain"         : _( "Alshain" ), 
-        "Altair"          : _( "Altair" ), 
-        "Antares"         : _( "Antares" ), 
-        "Arcturus"        : _( "Arcturus" ), 
-        "Arkab Posterior" : _( "Arkab Posterior" ), 
-        "Arkab Prior"     : _( "Arkab Prior" ), 
-        "Arneb"           : _( "Arneb" ), 
-        "Atlas"           : _( "Atlas" ), 
-        "Bellatrix"       : _( "Bellatrix" ), 
-        "Betelgeuse"      : _( "Betelgeuse" ), 
-        "Canopus"         : _( "Canopus" ), 
-        "Capella"         : _( "Capella" ), 
-        "Caph"            : _( "Caph" ), 
-        "Castor"          : _( "Castor" ), 
-        "Cebalrai"        : _( "Cebalrai" ), 
-        "Deneb"           : _( "Deneb" ), 
-        "Denebola"        : _( "Denebola" ), 
-        "Dubhe"           : _( "Dubhe" ), 
-        "Electra"         : _( "Electra" ), 
-        "Elnath"          : _( "Elnath" ), 
-        "Enif"            : _( "Enif" ), 
-        "Etamin"          : _( "Etamin" ), 
-        "Fomalhaut"       : _( "Fomalhaut" ), 
-        "Gienah Corvi"    : _( "Gienah Corvi" ), 
-        "Hamal"           : _( "Hamal" ), 
-        "Izar"            : _( "Izar" ), 
-        "Kaus Australis"  : _( "Kaus Australis" ), 
-        "Kochab"          : _( "Kochab" ), 
-        "Maia"            : _( "Maia" ), 
-        "Markab"          : _( "Markab" ), 
-        "Megrez"          : _( "Megrez" ), 
-        "Menkalinan"      : _( "Menkalinan" ), 
-        "Menkar"          : _( "Menkar" ), 
-        "Merak"           : _( "Merak" ), 
-        "Merope"          : _( "Merope" ), 
-        "Mimosa"          : _( "Mimosa" ), 
-        "Minkar"          : _( "Minkar" ), 
-        "Mintaka"         : _( "Mintaka" ), 
-        "Mirach"          : _( "Mirach" ), 
-        "Mirzam"          : _( "Mirzam" ), 
-        "Mizar"           : _( "Mizar" ), 
-        "Naos"            : _( "Naos" ), 
-        "Nihal"           : _( "Nihal" ), 
-        "Nunki"           : _( "Nunki" ), 
-        "Peacock"         : _( "Peacock" ), 
-        "Phecda"          : _( "Phecda" ), 
-        "Polaris"         : _( "Polaris" ), 
-        "Pollux"          : _( "Pollux" ), 
-        "Procyon"         : _( "Procyon" ), 
-        "Rasalgethi"      : _( "Rasalgethi" ), 
-        "Rasalhague"      : _( "Rasalhague" ), 
-        "Regulus"         : _( "Regulus" ), 
-        "Rigel"           : _( "Rigel" ), 
-        "Rukbat"          : _( "Rukbat" ), 
-        "Sadalmelik"      : _( "Sadalmelik" ), 
-        "Sadr"            : _( "Sadr" ), 
-        "Saiph"           : _( "Saiph" ), 
-        "Scheat"          : _( "Scheat" ), 
-        "Schedar"         : _( "Schedar" ), 
-        "Shaula"          : _( "Shaula" ), 
-        "Sheliak"         : _( "Sheliak" ), 
-        "Sirius"          : _( "Sirius" ), 
-        "Sirrah"          : _( "Sirrah" ), 
-        "Spica"           : _( "Spica" ), 
-        "Sulafat"         : _( "Sulafat" ), 
-        "Tarazed"         : _( "Tarazed" ), 
-        "Taygeta"         : _( "Taygeta" ), 
-        "Thuban"          : _( "Thuban" ), 
-        "Unukalhai"       : _( "Unukalhai" ), 
-        "Vega"            : _( "Vega" ), 
-        "Vindemiatrix"    : _( "Vindemiatrix" ), 
-        "Wezen"           : _( "Wezen" ), 
+        "Achernar"        : _( "Achernar" ),
+        "Adara"           : _( "Adara" ),
+        "Agena"           : _( "Agena" ),
+        "Albereo"         : _( "Albereo" ),
+        "Alcaid"          : _( "Alcaid" ),
+        "Alcor"           : _( "Alcor" ),
+        "Alcyone"         : _( "Alcyone" ),
+        "Aldebaran"       : _( "Aldebaran" ),
+        "Alderamin"       : _( "Alderamin" ),
+        "Alfirk"          : _( "Alfirk" ),
+        "Algenib"         : _( "Algenib" ),
+        "Algieba"         : _( "Algieba" ),
+        "Algol"           : _( "Algol" ),
+        "Alhena"          : _( "Alhena" ),
+        "Alioth"          : _( "Alioth" ),
+        "Almach"          : _( "Almach" ),
+        "Alnair"          : _( "Alnair" ),
+        "Alnilam"         : _( "Alnilam" ),
+        "Alnitak"         : _( "Alnitak" ),
+        "Alphard"         : _( "Alphard" ),
+        "Alphecca"        : _( "Alphecca" ),
+        "Alshain"         : _( "Alshain" ),
+        "Altair"          : _( "Altair" ),
+        "Antares"         : _( "Antares" ),
+        "Arcturus"        : _( "Arcturus" ),
+        "Arkab Posterior" : _( "Arkab Posterior" ),
+        "Arkab Prior"     : _( "Arkab Prior" ),
+        "Arneb"           : _( "Arneb" ),
+        "Atlas"           : _( "Atlas" ),
+        "Bellatrix"       : _( "Bellatrix" ),
+        "Betelgeuse"      : _( "Betelgeuse" ),
+        "Canopus"         : _( "Canopus" ),
+        "Capella"         : _( "Capella" ),
+        "Caph"            : _( "Caph" ),
+        "Castor"          : _( "Castor" ),
+        "Cebalrai"        : _( "Cebalrai" ),
+        "Deneb"           : _( "Deneb" ),
+        "Denebola"        : _( "Denebola" ),
+        "Dubhe"           : _( "Dubhe" ),
+        "Electra"         : _( "Electra" ),
+        "Elnath"          : _( "Elnath" ),
+        "Enif"            : _( "Enif" ),
+        "Etamin"          : _( "Etamin" ),
+        "Fomalhaut"       : _( "Fomalhaut" ),
+        "Gienah Corvi"    : _( "Gienah Corvi" ),
+        "Hamal"           : _( "Hamal" ),
+        "Izar"            : _( "Izar" ),
+        "Kaus Australis"  : _( "Kaus Australis" ),
+        "Kochab"          : _( "Kochab" ),
+        "Maia"            : _( "Maia" ),
+        "Markab"          : _( "Markab" ),
+        "Megrez"          : _( "Megrez" ),
+        "Menkalinan"      : _( "Menkalinan" ),
+        "Menkar"          : _( "Menkar" ),
+        "Merak"           : _( "Merak" ),
+        "Merope"          : _( "Merope" ),
+        "Mimosa"          : _( "Mimosa" ),
+        "Minkar"          : _( "Minkar" ),
+        "Mintaka"         : _( "Mintaka" ),
+        "Mirach"          : _( "Mirach" ),
+        "Mirzam"          : _( "Mirzam" ),
+        "Mizar"           : _( "Mizar" ),
+        "Naos"            : _( "Naos" ),
+        "Nihal"           : _( "Nihal" ),
+        "Nunki"           : _( "Nunki" ),
+        "Peacock"         : _( "Peacock" ),
+        "Phecda"          : _( "Phecda" ),
+        "Polaris"         : _( "Polaris" ),
+        "Pollux"          : _( "Pollux" ),
+        "Procyon"         : _( "Procyon" ),
+        "Rasalgethi"      : _( "Rasalgethi" ),
+        "Rasalhague"      : _( "Rasalhague" ),
+        "Regulus"         : _( "Regulus" ),
+        "Rigel"           : _( "Rigel" ),
+        "Rukbat"          : _( "Rukbat" ),
+        "Sadalmelik"      : _( "Sadalmelik" ),
+        "Sadr"            : _( "Sadr" ),
+        "Saiph"           : _( "Saiph" ),
+        "Scheat"          : _( "Scheat" ),
+        "Schedar"         : _( "Schedar" ),
+        "Shaula"          : _( "Shaula" ),
+        "Sheliak"         : _( "Sheliak" ),
+        "Sirius"          : _( "Sirius" ),
+        "Sirrah"          : _( "Sirrah" ),
+        "Spica"           : _( "Spica" ),
+        "Sulafat"         : _( "Sulafat" ),
+        "Tarazed"         : _( "Tarazed" ),
+        "Taygeta"         : _( "Taygeta" ),
+        "Thuban"          : _( "Thuban" ),
+        "Unukalhai"       : _( "Unukalhai" ),
+        "Vega"            : _( "Vega" ),
+        "Vindemiatrix"    : _( "Vindemiatrix" ),
+        "Wezen"           : _( "Wezen" ),
         "Zaurak"          : _( "Zaurak" ) }
 
     # Data tag star names.
     # Sourced from cns_namemap in ephem.stars.stars
     STAR_TAGS_TRANSLATIONS = {
-        "ACHERNAR"        : _( "ACHERNAR" ), 
-        "ADARA"           : _( "ADARA" ), 
-        "AGENA"           : _( "AGENA" ), 
-        "ALBEREO"         : _( "ALBEREO" ), 
-        "ALCAID"          : _( "ALCAID" ), 
-        "ALCOR"           : _( "ALCOR" ), 
-        "ALCYONE"         : _( "ALCYONE" ), 
-        "ALDEBARAN"       : _( "ALDEBARAN" ), 
-        "ALDERAMIN"       : _( "ALDERAMIN" ), 
-        "ALFIRK"          : _( "ALFIRK" ), 
-        "ALGENIB"         : _( "ALGENIB" ), 
-        "ALGIEBA"         : _( "ALGIEBA" ), 
-        "ALGOL"           : _( "ALGOL" ), 
-        "ALHENA"          : _( "ALHENA" ), 
-        "ALIOTH"          : _( "ALIOTH" ), 
-        "ALMACH"          : _( "ALMACH" ), 
-        "ALNAIR"          : _( "ALNAIR" ), 
-        "ALNILAM"         : _( "ALNILAM" ), 
-        "ALNITAK"         : _( "ALNITAK" ), 
-        "ALPHARD"         : _( "ALPHARD" ), 
-        "ALPHECCA"        : _( "ALPHECCA" ), 
-        "ALSHAIN"         : _( "ALSHAIN" ), 
-        "ALTAIR"          : _( "ALTAIR" ), 
-        "ANTARES"         : _( "ANTARES" ), 
-        "ARCTURUS"        : _( "ARCTURUS" ), 
-        "ARKAB POSTERIOR" : _( "ARKAB POSTERIOR" ), 
-        "ARKAB PRIOR"     : _( "ARKAB PRIOR" ), 
-        "ARNEB"           : _( "ARNEB" ), 
-        "ATLAS"           : _( "ATLAS" ), 
-        "BELLATRIX"       : _( "BELLATRIX" ), 
-        "BETELGEUSE"      : _( "BETELGEUSE" ), 
-        "CANOPUS"         : _( "CANOPUS" ), 
-        "CAPELLA"         : _( "CAPELLA" ), 
-        "CAPH"            : _( "CAPH" ), 
-        "CASTOR"          : _( "CASTOR" ), 
-        "CEBALRAI"        : _( "CEBALRAI" ), 
-        "DENEB"           : _( "DENEB" ), 
-        "DENEBOLA"        : _( "DENEBOLA" ), 
-        "DUBHE"           : _( "DUBHE" ), 
-        "ELECTRA"         : _( "ELECTRA" ), 
-        "ELNATH"          : _( "ELNATH" ), 
-        "ENIF"            : _( "ENIF" ), 
-        "ETAMIN"          : _( "ETAMIN" ), 
-        "FOMALHAUT"       : _( "FOMALHAUT" ), 
-        "GIENAH CORVI"    : _( "GIENAH CORVI" ), 
-        "HAMAL"           : _( "HAMAL" ), 
-        "IZAR"            : _( "IZAR" ), 
-        "KAUS AUSTRALIS"  : _( "KAUS AUSTRALIS" ), 
-        "KOCHAB"          : _( "KOCHAB" ), 
-        "MAIA"            : _( "MAIA" ), 
-        "MARKAB"          : _( "MARKAB" ), 
-        "MEGREZ"          : _( "MEGREZ" ), 
-        "MENKALINAN"      : _( "MENKALINAN" ), 
-        "MENKAR"          : _( "MENKAR" ), 
-        "MERAK"           : _( "MERAK" ), 
-        "MEROPE"          : _( "MEROPE" ), 
-        "MIMOSA"          : _( "MIMOSA" ), 
-        "MINKAR"          : _( "MINKAR" ), 
-        "MINTAKA"         : _( "MINTAKA" ), 
-        "MIRACH"          : _( "MIRACH" ), 
-        "MIRZAM"          : _( "MIRZAM" ), 
-        "MIZAR"           : _( "MIZAR" ), 
-        "NAOS"            : _( "NAOS" ), 
-        "NIHAL"           : _( "NIHAL" ), 
-        "NUNKI"           : _( "NUNKI" ), 
-        "PEACOCK"         : _( "PEACOCK" ), 
-        "PHECDA"          : _( "PHECDA" ), 
-        "POLARIS"         : _( "POLARIS" ), 
-        "POLLUX"          : _( "POLLUX" ), 
-        "PROCYON"         : _( "PROCYON" ), 
-        "RASALGETHI"      : _( "RASALGETHI" ), 
-        "RASALHAGUE"      : _( "RASALHAGUE" ), 
-        "REGULUS"         : _( "REGULUS" ), 
-        "RIGEL"           : _( "RIGEL" ), 
-        "RUKBAT"          : _( "RUKBAT" ), 
-        "SADALMELIK"      : _( "SADALMELIK" ), 
-        "SADR"            : _( "SADR" ), 
-        "SAIPH"           : _( "SAIPH" ), 
-        "SCHEAT"          : _( "SCHEAT" ), 
-        "SCHEDAR"         : _( "SCHEDAR" ), 
-        "SHAULA"          : _( "SHAULA" ), 
-        "SHELIAK"         : _( "SHELIAK" ), 
-        "SIRIUS"          : _( "SIRIUS" ), 
-        "SIRRAH"          : _( "SIRRAH" ), 
-        "SPICA"           : _( "SPICA" ), 
-        "SULAFAT"         : _( "SULAFAT" ), 
-        "TARAZED"         : _( "TARAZED" ), 
-        "TAYGETA"         : _( "TAYGETA" ), 
-        "THUBAN"          : _( "THUBAN" ), 
-        "UNUKALHAI"       : _( "UNUKALHAI" ), 
-        "VEGA"            : _( "VEGA" ), 
-        "VINDEMIATRIX"    : _( "VINDEMIATRIX" ), 
-        "WEZEN"           : _( "WEZEN" ), 
+        "ACHERNAR"        : _( "ACHERNAR" ),
+        "ADARA"           : _( "ADARA" ),
+        "AGENA"           : _( "AGENA" ),
+        "ALBEREO"         : _( "ALBEREO" ),
+        "ALCAID"          : _( "ALCAID" ),
+        "ALCOR"           : _( "ALCOR" ),
+        "ALCYONE"         : _( "ALCYONE" ),
+        "ALDEBARAN"       : _( "ALDEBARAN" ),
+        "ALDERAMIN"       : _( "ALDERAMIN" ),
+        "ALFIRK"          : _( "ALFIRK" ),
+        "ALGENIB"         : _( "ALGENIB" ),
+        "ALGIEBA"         : _( "ALGIEBA" ),
+        "ALGOL"           : _( "ALGOL" ),
+        "ALHENA"          : _( "ALHENA" ),
+        "ALIOTH"          : _( "ALIOTH" ),
+        "ALMACH"          : _( "ALMACH" ),
+        "ALNAIR"          : _( "ALNAIR" ),
+        "ALNILAM"         : _( "ALNILAM" ),
+        "ALNITAK"         : _( "ALNITAK" ),
+        "ALPHARD"         : _( "ALPHARD" ),
+        "ALPHECCA"        : _( "ALPHECCA" ),
+        "ALSHAIN"         : _( "ALSHAIN" ),
+        "ALTAIR"          : _( "ALTAIR" ),
+        "ANTARES"         : _( "ANTARES" ),
+        "ARCTURUS"        : _( "ARCTURUS" ),
+        "ARKAB POSTERIOR" : _( "ARKAB POSTERIOR" ),
+        "ARKAB PRIOR"     : _( "ARKAB PRIOR" ),
+        "ARNEB"           : _( "ARNEB" ),
+        "ATLAS"           : _( "ATLAS" ),
+        "BELLATRIX"       : _( "BELLATRIX" ),
+        "BETELGEUSE"      : _( "BETELGEUSE" ),
+        "CANOPUS"         : _( "CANOPUS" ),
+        "CAPELLA"         : _( "CAPELLA" ),
+        "CAPH"            : _( "CAPH" ),
+        "CASTOR"          : _( "CASTOR" ),
+        "CEBALRAI"        : _( "CEBALRAI" ),
+        "DENEB"           : _( "DENEB" ),
+        "DENEBOLA"        : _( "DENEBOLA" ),
+        "DUBHE"           : _( "DUBHE" ),
+        "ELECTRA"         : _( "ELECTRA" ),
+        "ELNATH"          : _( "ELNATH" ),
+        "ENIF"            : _( "ENIF" ),
+        "ETAMIN"          : _( "ETAMIN" ),
+        "FOMALHAUT"       : _( "FOMALHAUT" ),
+        "GIENAH CORVI"    : _( "GIENAH CORVI" ),
+        "HAMAL"           : _( "HAMAL" ),
+        "IZAR"            : _( "IZAR" ),
+        "KAUS AUSTRALIS"  : _( "KAUS AUSTRALIS" ),
+        "KOCHAB"          : _( "KOCHAB" ),
+        "MAIA"            : _( "MAIA" ),
+        "MARKAB"          : _( "MARKAB" ),
+        "MEGREZ"          : _( "MEGREZ" ),
+        "MENKALINAN"      : _( "MENKALINAN" ),
+        "MENKAR"          : _( "MENKAR" ),
+        "MERAK"           : _( "MERAK" ),
+        "MEROPE"          : _( "MEROPE" ),
+        "MIMOSA"          : _( "MIMOSA" ),
+        "MINKAR"          : _( "MINKAR" ),
+        "MINTAKA"         : _( "MINTAKA" ),
+        "MIRACH"          : _( "MIRACH" ),
+        "MIRZAM"          : _( "MIRZAM" ),
+        "MIZAR"           : _( "MIZAR" ),
+        "NAOS"            : _( "NAOS" ),
+        "NIHAL"           : _( "NIHAL" ),
+        "NUNKI"           : _( "NUNKI" ),
+        "PEACOCK"         : _( "PEACOCK" ),
+        "PHECDA"          : _( "PHECDA" ),
+        "POLARIS"         : _( "POLARIS" ),
+        "POLLUX"          : _( "POLLUX" ),
+        "PROCYON"         : _( "PROCYON" ),
+        "RASALGETHI"      : _( "RASALGETHI" ),
+        "RASALHAGUE"      : _( "RASALHAGUE" ),
+        "REGULUS"         : _( "REGULUS" ),
+        "RIGEL"           : _( "RIGEL" ),
+        "RUKBAT"          : _( "RUKBAT" ),
+        "SADALMELIK"      : _( "SADALMELIK" ),
+        "SADR"            : _( "SADR" ),
+        "SAIPH"           : _( "SAIPH" ),
+        "SCHEAT"          : _( "SCHEAT" ),
+        "SCHEDAR"         : _( "SCHEDAR" ),
+        "SHAULA"          : _( "SHAULA" ),
+        "SHELIAK"         : _( "SHELIAK" ),
+        "SIRIUS"          : _( "SIRIUS" ),
+        "SIRRAH"          : _( "SIRRAH" ),
+        "SPICA"           : _( "SPICA" ),
+        "SULAFAT"         : _( "SULAFAT" ),
+        "TARAZED"         : _( "TARAZED" ),
+        "TAYGETA"         : _( "TAYGETA" ),
+        "THUBAN"          : _( "THUBAN" ),
+        "UNUKALHAI"       : _( "UNUKALHAI" ),
+        "VEGA"            : _( "VEGA" ),
+        "VINDEMIATRIX"    : _( "VINDEMIATRIX" ),
+        "WEZEN"           : _( "WEZEN" ),
         "ZAURAK"          : _( "ZAURAK" ) }
 
     BODY_TAGS_TRANSLATIONS = dict(
-        list( CITY_TAG_TRANSLATION.items() ) + 
-        list( MOON_TAG_TRANSLATION.items() ) + 
-        list( PLANET_AND_MOON_TAGS_TRANSLATIONS.items() ) + 
-        list( STAR_TAGS_TRANSLATIONS.items() ) + 
+        list( CITY_TAG_TRANSLATION.items() ) +
+        list( MOON_TAG_TRANSLATION.items() ) +
+        list( PLANET_AND_MOON_TAGS_TRANSLATIONS.items() ) +
+        list( STAR_TAGS_TRANSLATIONS.items() ) +
         list( SUN_TAG_TRANSLATION.items() ) )
 
     STARS_BY_CONSTELLATION = {
@@ -961,7 +961,7 @@ class IndicatorLunar:
 
             # Update backend...
             self.updateCometOEData()
-            self.updateSatelliteTLEData() 
+            self.updateSatelliteTLEData()
 
             self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_NAME ) ] = self.cityName
@@ -1303,7 +1303,7 @@ class IndicatorLunar:
                         else:
                             menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.INDENT + starNameTranslated )
                             menu.append( menuItem )
-  
+
                         self.updateCommonMenu( menuItem, AstronomicalBodyType.Star, dataTag )
             else:
                 stars = sorted( stars, key = lambda x: ( x[ 1 ] ) )
@@ -1410,7 +1410,7 @@ class IndicatorLunar:
            astronomicalBodyType == AstronomicalBodyType.Planet or \
            astronomicalBodyType == AstronomicalBodyType.Star or \
            astronomicalBodyType == AstronomicalBodyType.Sun:
-            tropicalSignName = self.getDisplayData( key + ( IndicatorLunar.DATA_TROPICAL_SIGN_NAME, ) ) 
+            tropicalSignName = self.getDisplayData( key + ( IndicatorLunar.DATA_TROPICAL_SIGN_NAME, ) )
             tropicalSignDegree = self.getDisplayData( key + ( IndicatorLunar.DATA_TROPICAL_SIGN_DEGREE, ) )
             tropicalSignMinute = self.getDisplayData( key + ( IndicatorLunar.DATA_TROPICAL_SIGN_MINUTE, ) )
             subMenu.append( Gtk.MenuItem( _( "Tropical Sign: " ) + tropicalSignName + " " + tropicalSignDegree + tropicalSignMinute ) )
@@ -1704,7 +1704,7 @@ class IndicatorLunar:
         return localDateTimeString
 
 
-    # Takes a string in the format of HH:MM:SS.S and converts to degrees (°) in decimal. 
+    # Takes a string in the format of HH:MM:SS.S and converts to degrees (°) in decimal.
     def getDecimalDegrees( self, stringInput, isHours, roundAmount ):
         t = tuple( stringInput.split( ":" ) )
         x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
@@ -1763,14 +1763,14 @@ class IndicatorLunar:
 
                 else:
                     pythonutils.writeCacheBinary( self.cometOEData, INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging )
-    
+
                 # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
                 self.lastUpdateCometOE = datetime.datetime.utcnow()
 
             else:
                 # Set the next update to occur when the cache is due to expire.
                 self.lastUpdateCometOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
-    
+
             if self.cometsAddNew:
                 self.addNewComets()
 
@@ -1833,7 +1833,7 @@ class IndicatorLunar:
             if illuminationPercentage == 50: # Quarter
                 svg = svgStart + '"' + svgEnd
             elif illuminationPercentage < 50: # Crescent
-                svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( 50 - illuminationPercentage ) / 50.0 * radius ) + ' 0 0 0 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd 
+                svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( 50 - illuminationPercentage ) / 50.0 * radius ) + ' 0 0 0 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd
             else: # Gibbous
                 svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( illuminationPercentage - 50 ) / 50.0 * radius ) + ' 0 1 1 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd
 
@@ -2002,7 +2002,7 @@ class IndicatorLunar:
             key = ( astronomicalBodyType, dataTag )
             self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ] + ".0" # Needed to bring the date/time format into line with date/time generated by PyEphem.
             self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
-            self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ] 
+            self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
             self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
@@ -2043,7 +2043,7 @@ class IndicatorLunar:
     # Computes the rise/set and other information for comets.
     #
     # http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
-    # http://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html        
+    # http://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
     def updateComets( self, ephemNow, hideIfNeverUp, hideIfGreaterThanMagnitude ):
         for key in self.comets:
             if key in self.cometOEData:
@@ -2351,7 +2351,7 @@ class IndicatorLunar:
         if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
                 [ IndicatorLunar.AUTHOR ],
-                IndicatorLunar.ABOUT_COMMENTS, 
+                IndicatorLunar.ABOUT_COMMENTS,
                 IndicatorLunar.ABOUT_CREDITS,
                 _( "Credits" ),
                 Gtk.License.GPL_3_0,
@@ -2533,7 +2533,7 @@ class IndicatorLunar:
         hideBodyIfNeverUpCheckbox = Gtk.CheckButton( _( "Hide bodies which are 'never up'" ) )
         hideBodyIfNeverUpCheckbox.set_margin_top( 10 )
         hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
-        hideBodyIfNeverUpCheckbox.set_tooltip_text( _( 
+        hideBodyIfNeverUpCheckbox.set_tooltip_text( _(
             "If checked, planets, moon, sun,\n" + \
             "comets and stars which rise/set or\n" + \
             "are 'always up' will only be shown.\n\n" + \
@@ -2544,7 +2544,7 @@ class IndicatorLunar:
         groupStarsByConstellationCheckbox = Gtk.CheckButton( _( "Group stars by constellation" ) )
         groupStarsByConstellationCheckbox.set_margin_top( 10 )
         groupStarsByConstellationCheckbox.set_active( self.groupStarsByConstellation )
-        groupStarsByConstellationCheckbox.set_tooltip_text( _( 
+        groupStarsByConstellationCheckbox.set_tooltip_text( _(
             "If checked, stars are grouped by constellation.\n\n" + \
             "Otherwise stars are listed by name." ) )
         grid.attach( groupStarsByConstellationCheckbox, 0, 5, 1, 1 )
@@ -2555,7 +2555,7 @@ class IndicatorLunar:
         dateTimeFormatEntry = Gtk.Entry()
         dateTimeFormatEntry.set_text( self.dateTimeFormat )
         dateTimeFormatEntry.set_hexpand( True )
-        dateTimeFormatEntry.set_tooltip_text( _( 
+        dateTimeFormatEntry.set_tooltip_text( _(
             "Specify the format of attributes containing a date/time.\n\n" + \
             "Refer to http://docs.python.org/3/library/datetime.html" ) )
         box.pack_start( dateTimeFormatEntry, True, True, 0 )
@@ -2572,7 +2572,7 @@ class IndicatorLunar:
         spinnerCometMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
         spinnerCometMagnitude.set_adjustment( Gtk.Adjustment( self.cometsMagnitude, -30, 30, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerCometMagnitude.set_value( self.cometsMagnitude ) # ...so need to force the initial value by explicitly setting it.
-        spinnerCometMagnitude.set_tooltip_text( _( 
+        spinnerCometMagnitude.set_tooltip_text( _(
             "Comets with a magnitude greater\n" + \
             "than that specified are hidden." ) )
 
@@ -2602,7 +2602,7 @@ class IndicatorLunar:
         hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( _( "Hide satellites which have no upcoming visible pass" ) )
         hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 10 )
         hideSatelliteIfNoVisiblePassCheckbox.set_active( self.hideSatelliteIfNoVisiblePass )
-        hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text( _( 
+        hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text( _(
             "If checked, only satellites with an\n" + \
             "upcoming visible pass are displayed.\n\n" + \
             "Otherwise all passes are shown." ) )
@@ -2611,7 +2611,7 @@ class IndicatorLunar:
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
-        satellitesAddNewCheckbox.set_tooltip_text( _( 
+        satellitesAddNewCheckbox.set_tooltip_text( _(
             "If checked all satellites are added\n" + \
             "to the list of checked satellites." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 11, 1, 1 )
@@ -2627,7 +2627,7 @@ class IndicatorLunar:
 
         tree = Gtk.TreeView( planetStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.set_tooltip_text( _( 
+        tree.set_tooltip_text( _(
             "Check a planet to display in the menu.\n\n" + \
             "Clicking the header of the first column\n" + \
             "will toggle all checkboxes." ) )
@@ -2805,11 +2805,11 @@ class IndicatorLunar:
         treeViewColumn.set_sort_column_id( 1 )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = 2 ) 
+        treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = 2 )
         treeViewColumn.set_sort_column_id( 2 )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = 3 ) 
+        treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = 3 )
         treeViewColumn.set_sort_column_id( 3 )
         tree.append_column( treeViewColumn )
 
@@ -2831,7 +2831,7 @@ class IndicatorLunar:
         TLEURLEntry = Gtk.Entry()
         TLEURLEntry.set_text( self.satelliteTLEURL )
         TLEURLEntry.set_hexpand( True )
-        TLEURLEntry.set_tooltip_text( _( 
+        TLEURLEntry.set_tooltip_text( _(
             "The URL from which to source\n" + \
             "satellite TLE data.\n\n" + \
             "To specify a local file, use 'file:///'\n" + \
@@ -2958,7 +2958,7 @@ class IndicatorLunar:
         satelliteNotificationTimeFormatEntry = Gtk.Entry()
         satelliteNotificationTimeFormatEntry.set_text( self.satelliteNotificationTimeFormat )
         satelliteNotificationTimeFormatEntry.set_hexpand( True )
-        satelliteNotificationTimeFormatEntry.set_tooltip_text( _( 
+        satelliteNotificationTimeFormatEntry.set_tooltip_text( _(
             "Specify the format of the rise/set time.\n\n" + \
             "Refer to http://docs.python.org/3/library/datetime.html" ) )
         box.pack_start( satelliteNotificationTimeFormatEntry, True, True, 0 )
@@ -2994,7 +2994,7 @@ class IndicatorLunar:
         spinner = Gtk.SpinButton()
         spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 0, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.werewolfWarningStartIlluminationPercentage ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( _( 
+        spinner.set_tooltip_text( _(
             "Notifications are shown from the specified\n" + \
             "illumination, commencing after a new moon." ) )
         spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
@@ -3072,7 +3072,7 @@ class IndicatorLunar:
         global _city_data
         cities = sorted( _city_data.keys(), key = locale.strxfrm )
         city = Gtk.ComboBoxText.new_with_entry()
-        city.set_tooltip_text( _( 
+        city.set_tooltip_text( _(
             "Choose a city from the list.\n" + \
             "Or, add in your own city name." ) )
         for c in cities:
@@ -3360,11 +3360,11 @@ class IndicatorLunar:
 
 
     def onFetchCometSatelliteData( self,
-                                   button, entry, grid, store, 
-                                   astronomicalBodyType, 
-                                   dataURL, 
-                                   cacheBasename, cacheMaximumAgeHours, lastUpdate, downloadPeriodHours, 
-                                   summary, message, 
+                                   button, entry, grid, store,
+                                   astronomicalBodyType,
+                                   dataURL,
+                                   cacheBasename, cacheMaximumAgeHours, lastUpdate, downloadPeriodHours,
+                                   summary, message,
                                    getDataFunction ):
         # Flush comet/satellite data.
         for key in list( self.data ): # Gets the keys and allows iteration with removal.
@@ -3620,7 +3620,7 @@ class IndicatorLunar:
                 for i in range( 0, len( data ), 3 ):
                     tle = satellite.TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
                     satelliteTLEData[ ( tle.getName().upper(), tle.getNumber() ) ] = tle
-    
+
             except Exception as e:
                 satelliteTLEData = None
                 logging.exception( e )
@@ -3749,7 +3749,7 @@ class IndicatorLunar:
 
     def saveConfig( self ):
         if self.cometsAddNew:
-            comets = [ ] 
+            comets = [ ]
         else:
             comets = self.comets # Only write out the list of comets if the user elects to not add new.
 
