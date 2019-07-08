@@ -4,6 +4,8 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
     so a major overhaul is required...
   * Tropical Sign was removed as it is astrological, not astronomical;
     it is hoped to create a new Indicator Astrological.
+  * Only visible satellite passes are shown (occurring during dawn/dusk)
+    as there is no point showing when a non-visible pass occurs!
   * Removed Right Ascension and Declination from all items.
     Azimuth and Altitude are more useful and sufficient.
   * Removed decimal degrees from Azimuth/Altitude; was overkill.

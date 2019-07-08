@@ -97,7 +97,6 @@ class IndicatorLunar:
     CONFIG_DATE_TIME_FORMAT = "dateTimeFormat"
     CONFIG_INDICATOR_TEXT = "indicatorText"
     CONFIG_GROUP_STARS_BY_CONSTELLATION = "groupStarsByConstellation"
-    CONFIG_HIDE_SATELLITE_IF_NO_VISIBLE_PASS = "hideSatelliteIfNoVisiblePass"
     CONFIG_PLANETS = "planets"
     CONFIG_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
     CONFIG_SATELLITE_NOTIFICATION_SUMMARY = "satelliteNotificationSummary"
@@ -159,7 +158,6 @@ class IndicatorLunar:
     DATA_SOLSTICE = "SOLSTICE"
     DATA_SUN_TILT = "SUN TILT"
     DATA_THIRD_QUARTER = "THIRD QUARTER"
-    DATA_VISIBLE = "VISIBLE"
     DATA_X_OFFSET = "X OFFSET"
     DATA_Y_OFFSET = "Y OFFSET"
     DATA_Z_OFFSET = "Z OFFSET"
@@ -199,7 +197,6 @@ class IndicatorLunar:
         DATA_SOLSTICE,
         DATA_SUN_TILT,
         DATA_THIRD_QUARTER,
-        DATA_VISIBLE,
         DATA_X_OFFSET,
         DATA_Y_OFFSET,
         DATA_Z_OFFSET ]
@@ -248,8 +245,7 @@ class IndicatorLunar:
         DATA_RISE_AZIMUTH,
         DATA_RISE_TIME,
         DATA_SET_AZIMUTH,
-        DATA_SET_TIME,
-        DATA_VISIBLE ]
+        DATA_SET_TIME ]
 
     DATA_TAGS_STAR = [
         DATA_ALTITUDE,
@@ -312,7 +308,6 @@ class IndicatorLunar:
         DATA_SOLSTICE                   : _( "SOLSTICE" ),
         DATA_SUN_TILT                   : _( "SUN TILT" ),
         DATA_THIRD_QUARTER              : _( "THIRD QUARTER" ),
-        DATA_VISIBLE                    : _( "VISIBLE" ),
         DATA_X_OFFSET                   : _( "X OFFSET" ),
         DATA_Y_OFFSET                   : _( "Y OFFSET" ),
         DATA_Z_OFFSET                   : _( "Z OFFSET" ) }
@@ -814,7 +809,6 @@ class IndicatorLunar:
     SATELLITE_TAG_RISE_TIME = "[RISE TIME]"
     SATELLITE_TAG_SET_AZIMUTH = "[SET AZIMUTH]"
     SATELLITE_TAG_SET_TIME = "[SET TIME]"
-    SATELLITE_TAG_VISIBLE = "[VISIBLE]"
 
     SATELLITE_TAG_NAME_TRANSLATION = "[" + _( "NAME" ) + "]"
     SATELLITE_TAG_NUMBER_TRANSLATION = "[" + _( "NUMBER" ) + "]"
@@ -823,7 +817,6 @@ class IndicatorLunar:
     SATELLITE_TAG_RISE_TIME_TRANSLATION = "[" + _( "RISE TIME" ) + "]"
     SATELLITE_TAG_SET_AZIMUTH_TRANSLATION = "[" + _( "SET AZIMUTH" ) + "]"
     SATELLITE_TAG_SET_TIME_TRANSLATION = "[" + _( "SET TIME" ) + "]"
-    SATELLITE_TAG_VISIBLE_TRANSLATION = "[" + _( "VISIBLE" ) + "]"
 
     SATELLITE_TAG_TRANSLATIONS = Gtk.ListStore( str, str ) # Tag, translated tag.
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_NAME.strip( "[]" ), SATELLITE_TAG_NAME_TRANSLATION.strip( "[]" ) ] )
@@ -833,7 +826,6 @@ class IndicatorLunar:
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_TIME.strip( "[]" ), SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ), SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_VISIBLE.strip( "[]" ), SATELLITE_TAG_VISIBLE_TRANSLATION.strip( "[]" ) ] )
 
     # The download period serves two purposes:
     #    Prevent over-taxing the download source (which may result in being blocked).
@@ -938,7 +930,7 @@ class IndicatorLunar:
             # When it comes time to display, conversion to local time takes place.
             ephemNow = ephem.now()
 
-            self.updateAstronomicalInformation( ephemNow, self.hideBodyIfNeverUp, self.cometsMagnitude, self.hideSatelliteIfNoVisiblePass )
+            self.updateAstronomicalInformation( ephemNow, self.hideBodyIfNeverUp, self.cometsMagnitude )
 
             # Update frontend...
             self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
@@ -1083,9 +1075,7 @@ class IndicatorLunar:
                       replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
                       replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
                       replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, self.getDisplayData( key + ( IndicatorLunar.DATA_VISIBLE, ) ) )
-
+                      replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime )
             if summary == "":
                 summary = " " # The notification summary text must not be empty (at least on Unity).
 
@@ -1096,8 +1086,7 @@ class IndicatorLunar:
                       replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
                       replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
                       replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_VISIBLE, self.getDisplayData( key + ( IndicatorLunar.DATA_VISIBLE, ) ) )
+                      replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime )
 
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
@@ -1434,7 +1423,6 @@ class IndicatorLunar:
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
             key = ( AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
             if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
-               self.hideSatelliteIfNoVisiblePass and \
                (
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA or \
                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES or \
@@ -1490,9 +1478,6 @@ class IndicatorLunar:
                     subMenu.append( Gtk.MenuItem( _( "Set" ) ) )
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SET_TIME, ) ) ) )
                     subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ) ) )
-
-                    if not self.hideSatelliteIfNoVisiblePass:
-                        subMenu.append( Gtk.MenuItem( _( "Visible: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_VISIBLE, ) ) ) )
 
                     # Add the rise to the next update, ensuring it is not in the past.
                     # Subtract a minute from the rise time to spoof the next update to happen earlier.
@@ -1574,8 +1559,7 @@ class IndicatorLunar:
         elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM:
             displayData = str( locale.format( "%d", int( self.data[ key ] ), grouping = True ) ) + " " + _( "km" )
 
-        elif key[ 2 ] == IndicatorLunar.DATA_EARTH_VISIBLE or \
-             key[ 2 ] == IndicatorLunar.DATA_VISIBLE:
+        elif key[ 2 ] == IndicatorLunar.DATA_EARTH_VISIBLE:
             if self.data[ key ] == IndicatorLunar.TRUE_TEXT:
                 displayData = IndicatorLunar.TRUE_TEXT_TRANSLATION
             else:
@@ -1836,13 +1820,13 @@ class IndicatorLunar:
             os.remove( oldIcon )
 
 
-    def updateAstronomicalInformation( self, ephemNow, hideBodyIfNeverUp, hideCometGreaterThanMagnitude, hideSatelliteIfNoVisiblePass ):
+    def updateAstronomicalInformation( self, ephemNow, hideBodyIfNeverUp, hideCometGreaterThanMagnitude ):
         self.updateMoon( ephemNow, hideBodyIfNeverUp )
         self.updateSun( ephemNow, hideBodyIfNeverUp )
         self.updatePlanets( ephemNow, hideBodyIfNeverUp )
         self.updateStars( ephemNow, hideBodyIfNeverUp )
         self.updateComets( ephemNow, hideBodyIfNeverUp, hideCometGreaterThanMagnitude )
-        self.updateSatellites( ephemNow, hideSatelliteIfNoVisiblePass )
+        self.updateSatellites( ephemNow )
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -2121,13 +2105,13 @@ class IndicatorLunar:
     #   http://www.heavens-above.com
     #   http://in-the-sky.org
     #
-    # For planets/stars, the immediately next rise/set time is shown.
+    # For planets/stars, the immediate next rise/set time is shown.
     # If already above the horizon, the set time is shown followed by the rise time for the following pass.
     # This makes sense as planets/stars are slow moving.
     #
     # However, as satellites are faster moving and pass several times a day, a different approach is used.
     # When a notification is displayed indicating a satellite is now passing overhead,
-    # the user may want to see the rise/set for the current pass (rather than the set for the current pass and rise for the next pass).
+    # the user would want to see the rise/set for the current pass (rather than the set for the current pass and rise for the next pass).
     #
     # Therefore...
     #    If a satellite is yet to rise, show the upcoming rise/set time.
@@ -2135,15 +2119,15 @@ class IndicatorLunar:
     #
     # This allows the user to see the rise/set time for the current pass as it is happening.
     # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
-    def updateSatellites( self, ephemNow, hideIfNoVisiblePass ):
+    def updateSatellites( self, ephemNow ):
         for key in self.satellites:
             if key in self.satelliteTLEData:
-                self.calculateNextSatellitePass( ephemNow, key, self.satelliteTLEData[ key ], hideIfNoVisiblePass )
+                self.calculateNextSatellitePass( ephemNow, key, self.satelliteTLEData[ key ] )
             else:
                 self.data[ ( AstronomicalBodyType.Satellite, " ".join( key ), IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
-    def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE, hideOnNoVisiblePass ):
+    def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
         key = ( AstronomicalBodyType.Satellite, " ".join( key ) )
         currentDateTime = ephemNow
         endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 2 ) # Stop looking for passes 2 days from ephemNow.
@@ -2178,9 +2162,9 @@ class IndicatorLunar:
                     currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
                     continue
 
-            # Now have a satellite rise/transit/set; determine if the pass is visible (and if the user wants only visible passes).
+            # Now have a satellite rise/transit/set; determine if the pass is visible.
             passIsVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
-            if hideOnNoVisiblePass and not passIsVisible:
+            if not passIsVisible:
                 currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
                 continue
 
@@ -2189,7 +2173,6 @@ class IndicatorLunar:
             self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = str( nextPass[ 1 ] )
             self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = str( nextPass[ 4 ].datetime() )
             self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( nextPass[ 5 ] )
-            self.data[ key + ( IndicatorLunar.DATA_VISIBLE, ) ] = str( passIsVisible )
 
             break
 
@@ -2346,9 +2329,7 @@ class IndicatorLunar:
                       self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
                       self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
 
-            hideBody = self.hideBodyIfNeverUp or self.hideSatelliteIfNoVisiblePass
-
-            if hideMessage and hideBody:
+            if hideMessage and self.hideBodyIfNeverUp:
                 continue
 
             self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
@@ -2519,22 +2500,13 @@ class IndicatorLunar:
             "International Designator." ) )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 9, 1, 1 )
 
-        hideSatelliteIfNoVisiblePassCheckbox = Gtk.CheckButton( _( "Hide satellites which have no upcoming visible pass" ) )
-        hideSatelliteIfNoVisiblePassCheckbox.set_margin_top( 10 )
-        hideSatelliteIfNoVisiblePassCheckbox.set_active( self.hideSatelliteIfNoVisiblePass )
-        hideSatelliteIfNoVisiblePassCheckbox.set_tooltip_text( _(
-            "If checked, only satellites with an\n" + \
-            "upcoming visible pass are displayed.\n\n" + \
-            "Otherwise all passes are shown." ) )
-        grid.attach( hideSatelliteIfNoVisiblePassCheckbox, 0, 10, 1, 1 )
-
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
         satellitesAddNewCheckbox.set_tooltip_text( _(
             "If checked all satellites are added\n" + \
             "to the list of checked satellites." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 11, 1, 1 )
+        grid.attach( satellitesAddNewCheckbox, 0, 10, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -2825,7 +2797,6 @@ class IndicatorLunar:
             IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION + "\n\n" + \
             _( notifyOSDInformation ) )
 
         box.pack_start( satelliteNotificationSummaryText, True, True, 0 )
@@ -2854,7 +2825,6 @@ class IndicatorLunar:
             IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
             IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION + "\n\n" + \
             _( notifyOSDInformation ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -3102,7 +3072,6 @@ class IndicatorLunar:
             self.cometsMagnitude = spinnerCometMagnitude.get_value_as_int()
             self.cometsAddNew = cometsAddNewCheckbox.get_active()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
-            self.hideSatelliteIfNoVisiblePass = hideSatelliteIfNoVisiblePassCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active()
 
             self.planets = [ ]
@@ -3400,8 +3369,7 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, satelliteNotificationTimeFormatEntry.get_text().strip() ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, satelliteNotificationTimeFormatEntry.get_text().strip() ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, satelliteNotificationTimeFormatEntry.get_text().strip() ) )
 
             message = message. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
@@ -3410,8 +3378,7 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, satelliteNotificationTimeFormatEntry.get_text().strip() ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, satelliteNotificationTimeFormatEntry.get_text().strip() ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_VISIBLE_TRANSLATION, IndicatorLunar.TRUE_TEXT_TRANSLATION )
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, satelliteNotificationTimeFormatEntry.get_text().strip() ) )
 
         if summary == "":
             summary = " " # The notification summary text must not be empty (at least on Unity).
@@ -3445,9 +3412,7 @@ class IndicatorLunar:
                           self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
                           self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
 
-                hideBody = self.hideBodyIfNeverUp or self.hideSatelliteIfNoVisiblePass
-
-                if hideMessage and hideBody:
+                if hideMessage and self.hideBodyIfNeverUp:
                     continue
 
                 astronomicalBodyType = key[ 0 ]
@@ -3574,7 +3539,6 @@ class IndicatorLunar:
         self.dateTimeFormat = IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS
         self.groupStarsByConstellation = False
         self.hideBodyIfNeverUp = True
-        self.hideSatelliteIfNoVisiblePass = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
 
         self.comets = [ ]
@@ -3621,7 +3585,6 @@ class IndicatorLunar:
         self.dateTimeFormat = config.get( IndicatorLunar.CONFIG_DATE_TIME_FORMAT, self.dateTimeFormat )
         self.groupStarsByConstellation = config.get( IndicatorLunar.CONFIG_GROUP_STARS_BY_CONSTELLATION, self.groupStarsByConstellation )
         self.hideBodyIfNeverUp = config.get( IndicatorLunar.CONFIG_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
-        self.hideSatelliteIfNoVisiblePass = config.get( IndicatorLunar.CONFIG_HIDE_SATELLITE_IF_NO_VISIBLE_PASS, self.hideSatelliteIfNoVisiblePass )
         self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, self.indicatorText )
 
         # The Minor Planet Center changed the URL protocol to be https (rather than http).
@@ -3686,7 +3649,6 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_DATE_TIME_FORMAT: self.dateTimeFormat,
             IndicatorLunar.CONFIG_GROUP_STARS_BY_CONSTELLATION: self.groupStarsByConstellation,
             IndicatorLunar.CONFIG_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
-            IndicatorLunar.CONFIG_HIDE_SATELLITE_IF_NO_VISIBLE_PASS: self.hideSatelliteIfNoVisiblePass,
             IndicatorLunar.CONFIG_INDICATOR_TEXT: self.indicatorText,
             IndicatorLunar.CONFIG_COMET_OE_URL: self.cometOEURL,
             IndicatorLunar.CONFIG_COMETS: comets,
