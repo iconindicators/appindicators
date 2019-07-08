@@ -1983,7 +1983,12 @@ class IndicatorLunar:
                 if math.isnan( comet.earth_distance ) or math.isnan( comet.phase ) or math.isnan( comet.size ) or math.isnan( comet.sun_distance ): # Have found tha data file may contain ***** in lieu of actual data!
                     self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_BAD_DATA
                 else:
-                    if float( comet.mag ) <= float( hideIfGreaterThanMagnitude ):
+#TODO Rethink this...maybe just show a notification or log something (first time indicator runs)?
+# Or maybe just let it slide and show the comet as is?
+                    # Have found that some comets have a magnitude of -327 or similar,
+                    # which is one hundred times brighter than the sun!
+                    # So only show comets which are less bright than the moon.
+                    if float( comet.mag ) <= float( hideIfGreaterThanMagnitude ) and float( comet.mag ) > -11.0:
                         self.updateCommon( comet, AstronomicalBodyType.Comet, key, ephemNow, hideIfNeverUp )
             else:
                 self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
