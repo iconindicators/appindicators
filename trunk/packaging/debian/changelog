@@ -1,6 +1,10 @@
 indicator-lunar (1.0.81-1) xenial; urgency=low
 
-  * Removed Right Ascension and Declination from all items;
+  * Under GNOME Shell the indicator grinds to a halt,
+    so a major overhaul is required...
+  * Tropical Sign was removed as it is astrological, not astronomical;
+    it is hoped to create a new Indicator Astrological.
+  * Removed Right Ascension and Declination from all items.
     Azimuth and Altitude are more useful and sufficient.
   * Removed decimal degrees from Azimuth/Altitude; was overkill.
   * Removed old eclipse information.

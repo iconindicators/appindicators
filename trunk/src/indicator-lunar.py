@@ -75,8 +75,7 @@ class IndicatorLunar:
     ABOUT_CREDIT_PYEPHEM = _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
     ABOUT_CREDIT_COMET = _( "Comet OE data by Minor Planet Center. http://www.minorplanetcenter.net" )
     ABOUT_CREDIT_SATELLITE = _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" )
-    ABOUT_CREDIT_TROPICAL_SIGN = _( "Tropical Sign by Ignius Drake." )
-    ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_TROPICAL_SIGN, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
+    ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_BRIGHT_LIMB, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
     DATE_TIME_FORMAT_HHcolonMMcolonSS = "%H:%M:%S"
     DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
@@ -160,9 +159,6 @@ class IndicatorLunar:
     DATA_SOLSTICE = "SOLSTICE"
     DATA_SUN_TILT = "SUN TILT"
     DATA_THIRD_QUARTER = "THIRD QUARTER"
-    DATA_TROPICAL_SIGN_NAME = "TROPICAL SIGN NAME"
-    DATA_TROPICAL_SIGN_DEGREE = "TROPICAL SIGN DEGREE"
-    DATA_TROPICAL_SIGN_MINUTE = "TROPICAL SIGN MINUTE"
     DATA_VISIBLE = "VISIBLE"
     DATA_X_OFFSET = "X OFFSET"
     DATA_Y_OFFSET = "Y OFFSET"
@@ -203,9 +199,6 @@ class IndicatorLunar:
         DATA_SOLSTICE,
         DATA_SUN_TILT,
         DATA_THIRD_QUARTER,
-        DATA_TROPICAL_SIGN_NAME,
-        DATA_TROPICAL_SIGN_DEGREE,
-        DATA_TROPICAL_SIGN_MINUTE,
         DATA_VISIBLE,
         DATA_X_OFFSET,
         DATA_Y_OFFSET,
@@ -222,10 +215,7 @@ class IndicatorLunar:
         DATA_MAGNITUDE,
         DATA_MESSAGE,
         DATA_RISE_TIME,
-        DATA_SET_TIME,
-        DATA_TROPICAL_SIGN_NAME,
-        DATA_TROPICAL_SIGN_DEGREE,
-        DATA_TROPICAL_SIGN_MINUTE ]
+        DATA_SET_TIME ]
 
     DATA_TAGS_COMET = [
         DATA_RISE_AZIMUTH,
@@ -244,10 +234,7 @@ class IndicatorLunar:
         DATA_MAGNITUDE,
         DATA_MESSAGE,
         DATA_RISE_TIME,
-        DATA_SET_TIME,
-        DATA_TROPICAL_SIGN_NAME,
-        DATA_TROPICAL_SIGN_DEGREE,
-        DATA_TROPICAL_SIGN_MINUTE ]
+        DATA_SET_TIME ]
 
     DATA_TAGS_PLANETARY_MOON = [
         DATA_ALTITUDE,
@@ -271,10 +258,7 @@ class IndicatorLunar:
         DATA_MAGNITUDE,
         DATA_MESSAGE,
         DATA_RISE_TIME,
-        DATA_SET_TIME,
-        DATA_TROPICAL_SIGN_NAME,
-        DATA_TROPICAL_SIGN_DEGREE,
-        DATA_TROPICAL_SIGN_MINUTE ]
+        DATA_SET_TIME ]
 
     DATA_TAGS_SUN = [
         DATA_ALTITUDE,
@@ -291,10 +275,7 @@ class IndicatorLunar:
         DATA_MESSAGE,
         DATA_RISE_TIME,
         DATA_SET_TIME,
-        DATA_SOLSTICE,
-        DATA_TROPICAL_SIGN_NAME,
-        DATA_TROPICAL_SIGN_DEGREE,
-        DATA_TROPICAL_SIGN_MINUTE ]
+        DATA_SOLSTICE ]
 
     DATA_TAGS_TRANSLATIONS = {
         DATA_ALTITUDE                   : _( "ALTITUDE" ),
@@ -331,9 +312,6 @@ class IndicatorLunar:
         DATA_SOLSTICE                   : _( "SOLSTICE" ),
         DATA_SUN_TILT                   : _( "SUN TILT" ),
         DATA_THIRD_QUARTER              : _( "THIRD QUARTER" ),
-        DATA_TROPICAL_SIGN_NAME         : _( "TROPICAL SIGN NAME" ),
-        DATA_TROPICAL_SIGN_DEGREE       : _( "TROPICAL SIGN DEGREE" ),
-        DATA_TROPICAL_SIGN_MINUTE       : _( "TROPICAL SIGN MINUTE" ),
         DATA_VISIBLE                    : _( "VISIBLE" ),
         DATA_X_OFFSET                   : _( "X OFFSET" ),
         DATA_Y_OFFSET                   : _( "Y OFFSET" ),
@@ -882,21 +860,6 @@ class IndicatorLunar:
         _( "Set Time: " ) + SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
         _( "Set Azimuth: " ) + SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
 
-    TROPICAL_SIGNS = [ "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces" ]
-    TROPICAL_SIGN_TRANSLATIONS = {
-        "Aries"         : _( "Aries" ),
-        "Taurus"        : _( "Taurus" ),
-        "Gemini"        : _( "Gemini" ),
-        "Cancer"        : _( "Cancer" ),
-        "Leo"           : _( "Leo" ),
-        "Virgo"         : _( "Virgo" ),
-        "Libra"         : _( "Libra" ),
-        "Scorpio"       : _( "Scorpio" ),
-        "Sagittarius"   : _( "Sagittarius" ),
-        "Capricorn"     : _( "Capricorn" ),
-        "Aquarius"      : _( "Aquarius" ),
-        "Pisces"        : _( "Pisces" ) }
-
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
@@ -1406,15 +1369,6 @@ class IndicatorLunar:
 
         subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_MAGNITUDE, ) ) ) )
 
-        if astronomicalBodyType == AstronomicalBodyType.Moon or \
-           astronomicalBodyType == AstronomicalBodyType.Planet or \
-           astronomicalBodyType == AstronomicalBodyType.Star or \
-           astronomicalBodyType == AstronomicalBodyType.Sun:
-            tropicalSignName = self.getDisplayData( key + ( IndicatorLunar.DATA_TROPICAL_SIGN_NAME, ) )
-            tropicalSignDegree = self.getDisplayData( key + ( IndicatorLunar.DATA_TROPICAL_SIGN_DEGREE, ) )
-            tropicalSignMinute = self.getDisplayData( key + ( IndicatorLunar.DATA_TROPICAL_SIGN_MINUTE, ) )
-            subMenu.append( Gtk.MenuItem( _( "Tropical Sign: " ) + tropicalSignName + " " + tropicalSignDegree + tropicalSignMinute ) )
-
         if astronomicalBodyType == AstronomicalBodyType.Moon:
             subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ) ) )
 
@@ -1591,8 +1545,7 @@ class IndicatorLunar:
 
         elif key[ 2 ] == IndicatorLunar.DATA_BRIGHT_LIMB or \
              key[ 2 ] == IndicatorLunar.DATA_EARTH_TILT or \
-             key[ 2 ] == IndicatorLunar.DATA_SUN_TILT or \
-             key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_DEGREE:
+             key[ 2 ] == IndicatorLunar.DATA_SUN_TILT:
             displayData = self.data[ key ] + "°"
 
         elif key[ 2 ] == IndicatorLunar.DATA_CONSTELLATION:
@@ -1675,12 +1628,6 @@ class IndicatorLunar:
 
         elif key[ 2 ] == IndicatorLunar.DATA_NAME:
             displayData = self.data[ key ]
-
-        elif key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_NAME:
-            displayData = IndicatorLunar.TROPICAL_SIGN_TRANSLATIONS[ self.data[ key ] ] 
-
-        elif key[ 2 ] == IndicatorLunar.DATA_TROPICAL_SIGN_MINUTE:
-            displayData = self.data[ key ] + "'"
 
         elif key[ 2 ] == IndicatorLunar.DATA_X_OFFSET or \
              key[ 2 ] == IndicatorLunar.DATA_Y_OFFSET or \
@@ -2058,7 +2005,7 @@ class IndicatorLunar:
                 self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
-    # Calculates the common attributes such as rise/set, illumination, constellation, magnitude, tropical sign, distance, bright limb angle and RA/Dec/Az/Alt.
+    # Calculates the common attributes such as rise/set, illumination, constellation, magnitude, distance, bright limb angle and RA/Dec/Az/Alt.
     # Data tags such as RISE_TIME and/or MESSAGE will be added to the data dict.
     def updateCommon( self, body, astronomicalBodyType, dataTag, ephemNow, hideIfNeverUp ):
         key = ( astronomicalBodyType, dataTag )
@@ -2084,12 +2031,6 @@ class IndicatorLunar:
 
             self.data[ key + ( IndicatorLunar.DATA_CONSTELLATION, ) ] = ephem.constellation( body )[ 1 ]
             self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] = str( round( body.mag, 1 ) )
-
-            if astronomicalBodyType != AstronomicalBodyType.Comet:
-                tropicalSignName, tropicalSignDegree, tropicalSignMinute = self.getTropicalSign( body, ephemNow )
-                self.data[ key + ( IndicatorLunar.DATA_TROPICAL_SIGN_NAME, ) ] = tropicalSignName
-                self.data[ key + ( IndicatorLunar.DATA_TROPICAL_SIGN_DEGREE, ) ] = tropicalSignDegree
-                self.data[ key + ( IndicatorLunar.DATA_TROPICAL_SIGN_MINUTE, ) ] = tropicalSignMinute
 
             if astronomicalBodyType == AstronomicalBodyType.Moon:
                 self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ] = str( round( body.earth_distance * ephem.meters_per_au / 1000 ) )
@@ -2128,27 +2069,6 @@ class IndicatorLunar:
         key = ( astronomicalBodyType, dataTag )
         self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( body.az )
         self.data[ key + ( IndicatorLunar.DATA_ALTITUDE, ) ] = str( body.alt )
-
-
-    # Code courtesy of Ignius Drake.
-    def getTropicalSign( self, body, ephemNow ):
-        ( year, month, day ) = ephemNow.triple()
-        epochAdjusted = float( year ) + float( month ) / 12.0 + float( day ) / 365.242
-        ephemNowDate = str( ephemNow ).split( " " )
-
-        bodyCopy = body.copy() # Computing the tropical sign changes the body's date/time/epoch (shared by other downstream calculations), so make a copy of the body and use that.
-        bodyCopy.compute( ephemNowDate[ 0 ], epoch = str( epochAdjusted ) )
-        planetCoordinates = str( ephem.Ecliptic( bodyCopy ).lon ).split( ":" )
-
-        if float( planetCoordinates[ 2 ] ) > 30:
-            planetCoordinates[ 1 ] = str( int ( planetCoordinates[ 1 ] ) + 1 )
-
-        tropicalSignDegree = int( planetCoordinates[ 0 ] ) % 30
-        tropicalSignMinute = str( planetCoordinates[ 1 ] )
-        tropicalSignIndex = int( planetCoordinates[ 0 ] ) / 30
-        tropicalSignName = IndicatorLunar.TROPICAL_SIGNS[ int( tropicalSignIndex ) ]
-
-        return ( tropicalSignName, str( tropicalSignDegree ), tropicalSignMinute )
 
 
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body.
