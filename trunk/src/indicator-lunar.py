@@ -2463,6 +2463,14 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 6, 1, 1 )
 
+        cometsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new comets" ) )
+        cometsAddNewCheckbox.set_margin_top( 10 )
+        cometsAddNewCheckbox.set_active( self.cometsAddNew )
+        cometsAddNewCheckbox.set_tooltip_text( _(
+            "If checked, all comets are added\n" + \
+            "to the list of checked comets." ) )
+        grid.attach( cometsAddNewCheckbox, 0, 7, 1, 1 )
+
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
@@ -2479,15 +2487,15 @@ class IndicatorLunar:
 
         box.pack_start( spinnerCometMagnitude, False, False, 0 )
 
-        grid.attach( box, 0, 7, 1, 1 )
+        grid.attach( box, 0, 8, 1, 1 )
 
-        cometsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new comets" ) )
-        cometsAddNewCheckbox.set_margin_top( 10 )
-        cometsAddNewCheckbox.set_active( self.cometsAddNew )
-        cometsAddNewCheckbox.set_tooltip_text( _(
-            "If checked, all comets are added\n" + \
-            "to the list of checked comets." ) )
-        grid.attach( cometsAddNewCheckbox, 0, 8, 1, 1 )
+        satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
+        satellitesAddNewCheckbox.set_margin_top( 10 )
+        satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
+        satellitesAddNewCheckbox.set_tooltip_text( _(
+            "If checked all satellites are added\n" + \
+            "to the list of checked satellites." ) )
+        grid.attach( satellitesAddNewCheckbox, 0, 9, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
@@ -2498,15 +2506,7 @@ class IndicatorLunar:
             "Otherwise satellites are sorted\n" + \
             "by Name, Number and then\n" + \
             "International Designator." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 9, 1, 1 )
-
-        satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
-        satellitesAddNewCheckbox.set_margin_top( 10 )
-        satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
-        satellitesAddNewCheckbox.set_tooltip_text( _(
-            "If checked all satellites are added\n" + \
-            "to the list of checked satellites." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 10, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 10, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
