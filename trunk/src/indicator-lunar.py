@@ -1180,7 +1180,7 @@ class IndicatorLunar:
                 satellitesSubMenu = Gtk.Menu()
                 satellitesMenuItem.set_submenu( satellitesSubMenu )
 
-            now = str( datetime.datetime.utcnow() )
+            utcNow = datetime.datetime.utcnow()
             for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
                 key = ( AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
                 subMenu = Gtk.Menu()
@@ -1190,23 +1190,34 @@ class IndicatorLunar:
 
                     subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ) )
                 else:
-                    subMenu.append( Gtk.MenuItem( _( "Rise" ) ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ) ) )
+#TODO Hide notification and make all passes show.
+#Check the maths for when a satellite is more than two minutes from rising,
+#a satellite is yet to rise,
+#a satellite is currently rising.
 
-                    subMenu.append( Gtk.MenuItem( _( "Set" ) ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SET_TIME, ) ) ) )
-                    subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ) ) )
+                    riseTime = self.toDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] )
+                    dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60
+                    if dateTimeDifferenceInMinutes > 2: # If this satellite will rise more than two minutes from now, then only show the rise time.
+                        subMenu.append( Gtk.MenuItem( _( "Rise Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) ) )
+
+                    else: # This satellite will rise within the next two minutes, so show all data.
+                        subMenu.append( Gtk.MenuItem( _( "Rise" ) ) )
+                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ) ) )
+
+                        subMenu.append( Gtk.MenuItem( _( "Set" ) ) )
+                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SET_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ) ) )
 
                     # Add the rise to the next update, ensuring it is not in the past.
                     # Subtract a minute from the rise time to spoof the next update to happen earlier.
                     # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
-                    riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 ) )
-                    if riseTimeMinusOneMinute > now:
-                        self.nextUpdate = self.getSmallestDateTime( riseTimeMinusOneMinute, self.nextUpdate )
+                    riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
+                    if riseTimeMinusOneMinute > utcNow:
+                        self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate )
 
                     # Add the set time to the next update, ensuring it is not in the past.
-                    if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > now:
+                    if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > str( utcNow ):
                         self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
 
                 self.addOnSatelliteHandler( subMenu, satelliteName, satelliteNumber )
