@@ -6,6 +6,9 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
     it is hoped to create a new Indicator Astrological.
   * Only visible satellite passes are shown (occurring during dawn/dusk)
     as there is no point showing when a non-visible pass occurs!
+  * Sometimes the magnitude for a comet is clearly wrong and have a magnitude
+    brighter than the sun.  So in these cases, show a notification on startup
+    and also log to file.
   * Removed Right Ascension and Declination from all items.
     Azimuth and Altitude are more useful and sufficient.
   * Removed decimal degrees from Azimuth/Altitude; was overkill.

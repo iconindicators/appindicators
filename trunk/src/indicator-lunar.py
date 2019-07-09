@@ -874,6 +874,7 @@ class IndicatorLunar:
 
 
     def __init__( self ):
+        self.firstRun = True
         self.data = { } # Key is a tuple of AstronomicalBodyType, a data tag (upper case( and data tag (upper case).  Value is the data ready for display.
         self.cometOEData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
         self.satelliteNotifications = { }
@@ -915,6 +916,7 @@ class IndicatorLunar:
                 GLib.source_remove( self.updateTimerID )
 
             # Update backend...
+            self.cometMagnitudeLooksDodgy = False
             self.updateCometOEData()
             self.updateSatelliteTLEData()
 
@@ -943,6 +945,13 @@ class IndicatorLunar:
             if self.showSatelliteNotification:
                 self.notificationSatellite()
 
+            if self.firstRun:
+                if self.cometMagnitudeLooksDodgy:
+                    summary = _( "Comet Magnitude Suspicious" )
+                    message = _( "The magnitude of at least one comet has a suspicious value!" )
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+                    logging.info( "At least one comet has a magnitude which looks suspicious." )
+
             self.nextUpdate = self.toDateTime( self.nextUpdate ) # Parse from string back into a datetime.
             nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
 
@@ -953,7 +962,7 @@ class IndicatorLunar:
                 nextUpdateInSeconds = ( 60 * 60 )
 
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update, True )
-
+            self.firstRun = False
 
     def updateMenu( self ):
         menu = Gtk.Menu()
@@ -1326,6 +1335,12 @@ class IndicatorLunar:
                 else:
                     self.updateCommonMenu( menuItem, AstronomicalBodyType.Comet, key )
                     self.addOnCometHandler( menuItem.get_submenu(), key )
+
+                    # Sometimes the magnitude for a comet is clearly wrong (have seen -327 for example).
+                    # Determine if any magnitudes are brighter than say the moon and report to the user.
+                    cometMagnitude = float( self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MAGNITUDE ) ] )
+                    if( int( cometMagnitude ) < -10.0 ):
+                        self.cometMagnitudeLooksDodgy = True
 
 
     def addOnCometHandler( self, subMenu, comet ):
@@ -1983,12 +1998,7 @@ class IndicatorLunar:
                 if math.isnan( comet.earth_distance ) or math.isnan( comet.phase ) or math.isnan( comet.size ) or math.isnan( comet.sun_distance ): # Have found tha data file may contain ***** in lieu of actual data!
                     self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_BAD_DATA
                 else:
-#TODO Rethink this...maybe just show a notification or log something (first time indicator runs)?
-# Or maybe just let it slide and show the comet as is?
-                    # Have found that some comets have a magnitude of -327 or similar,
-                    # which is one hundred times brighter than the sun!
-                    # So only show comets which are less bright than the moon.
-                    if float( comet.mag ) <= float( hideIfGreaterThanMagnitude ) and float( comet.mag ) > -11.0:
+                    if float( comet.mag ) <= float( hideIfGreaterThanMagnitude ):
                         self.updateCommon( comet, AstronomicalBodyType.Comet, key, ephemNow, hideIfNeverUp )
             else:
                 self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
