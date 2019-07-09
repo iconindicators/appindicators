@@ -96,7 +96,6 @@ class IndicatorLunar:
     CONFIG_HIDE_BODY_IF_NEVER_UP = "hideBodyIfNeverUp"
     CONFIG_DATE_TIME_FORMAT = "dateTimeFormat"
     CONFIG_INDICATOR_TEXT = "indicatorText"
-    CONFIG_GROUP_STARS_BY_CONSTELLATION = "groupStarsByConstellation"
     CONFIG_PLANETS = "planets"
     CONFIG_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
     CONFIG_SATELLITE_NOTIFICATION_SUMMARY = "satelliteNotificationSummary"
@@ -127,7 +126,6 @@ class IndicatorLunar:
     DATA_ALTITUDE = "ALTITUDE"
     DATA_AZIMUTH = "AZIMUTH"
     DATA_BRIGHT_LIMB = "BRIGHT LIMB"
-    DATA_CONSTELLATION = "CONSTELLATION"
     DATA_DAWN = "DAWN"
     DATA_DISTANCE_TO_EARTH = "DISTANCE TO EARTH"
     DATA_DISTANCE_TO_EARTH_KM = "DISTANCE TO EARTH KM"
@@ -166,7 +164,6 @@ class IndicatorLunar:
         DATA_ALTITUDE,
         DATA_AZIMUTH,
         DATA_BRIGHT_LIMB,
-        DATA_CONSTELLATION,
         DATA_DAWN,
         DATA_DISTANCE_TO_EARTH,
         DATA_DISTANCE_TO_EARTH_KM,
@@ -204,7 +201,6 @@ class IndicatorLunar:
     DATA_TAGS_MOON = [
         DATA_ALTITUDE,
         DATA_AZIMUTH,
-        DATA_CONSTELLATION,
         DATA_ECLIPSE_DATE_TIME,
         DATA_ECLIPSE_LATITUDE,
         DATA_ECLIPSE_LONGITUDE,
@@ -224,7 +220,6 @@ class IndicatorLunar:
         DATA_ALTITUDE,
         DATA_AZIMUTH,
         DATA_BRIGHT_LIMB,
-        DATA_CONSTELLATION,
         DATA_DISTANCE_TO_EARTH,
         DATA_DISTANCE_TO_SUN,
         DATA_ILLUMINATION,
@@ -250,7 +245,6 @@ class IndicatorLunar:
     DATA_TAGS_STAR = [
         DATA_ALTITUDE,
         DATA_AZIMUTH,
-        DATA_CONSTELLATION,
         DATA_MAGNITUDE,
         DATA_MESSAGE,
         DATA_RISE_TIME,
@@ -259,7 +253,6 @@ class IndicatorLunar:
     DATA_TAGS_SUN = [
         DATA_ALTITUDE,
         DATA_AZIMUTH,
-        DATA_CONSTELLATION,
         DATA_DAWN,
         DATA_DUSK,
         DATA_ECLIPSE_DATE_TIME,
@@ -277,7 +270,6 @@ class IndicatorLunar:
         DATA_ALTITUDE                   : _( "ALTITUDE" ),
         DATA_AZIMUTH                    : _( "AZIMUTH" ),
         DATA_BRIGHT_LIMB                : _( "BRIGHT LIMB" ),
-        DATA_CONSTELLATION              : _( "CONSTELLATION" ),
         DATA_DAWN                       : _( "DAWN" ),
         DATA_DISTANCE_TO_EARTH          : _( "DISTANCE TO EARTH" ),
         DATA_DISTANCE_TO_EARTH_KM       : _( "DISTANCE TO EARTH KM" ),
@@ -311,99 +303,6 @@ class IndicatorLunar:
         DATA_X_OFFSET                   : _( "X OFFSET" ),
         DATA_Y_OFFSET                   : _( "Y OFFSET" ),
         DATA_Z_OFFSET                   : _( "Z OFFSET" ) }
-
-    # Translated constellations.
-    # Sourced from cns_namemap in ephem/libastro/constel.c
-    CONSTELLATIONS_TRANSLATIONS = {
-        "Andromeda"           : _( "Andromeda" ),
-        "Antlia"              : _( "Antlia" ),
-        "Apus"                : _( "Apus" ),
-        "Aquila"              : _( "Aquila" ),
-        "Aquarius"            : _( "Aquarius" ),
-        "Ara"                 : _( "Ara" ),
-        "Aries"               : _( "Aries" ),
-        "Auriga"              : _( "Auriga" ),
-        "Bootes"              : _( "Bootes" ),
-        "Canis Major"         : _( "Canis Major" ),
-        "Canis Minor"         : _( "Canis Minor" ),
-        "Canes Venatici"      : _( "Canes Venatici" ),
-        "Caelum"              : _( "Caelum" ),
-        "Camelopardalis"      : _( "Camelopardalis" ),
-        "Capricornus"         : _( "Capricornus" ),
-        "Carina"              : _( "Carina" ),
-        "Cassiopeia"          : _( "Cassiopeia" ),
-        "Centaurus"           : _( "Centaurus" ),
-        "Cepheus"             : _( "Cepheus" ),
-        "Cetus"               : _( "Cetus" ),
-        "Chamaeleon"          : _( "Chamaeleon" ),
-        "Circinus"            : _( "Circinus" ),
-        "Cancer"              : _( "Cancer" ),
-        "Columba"             : _( "Columba" ),
-        "Coma Berenices"      : _( "Coma Berenices" ),
-        "Corona Australis"    : _( "Corona Australis" ),
-        "Corona Borealis"     : _( "Corona Borealis" ),
-        "Crater"              : _( "Crater" ),
-        "Crux"                : _( "Crux" ),
-        "Corvus"              : _( "Corvus" ),
-        "Cygnus"              : _( "Cygnus" ),
-        "Delphinus"           : _( "Delphinus" ),
-        "Dorado"              : _( "Dorado" ),
-        "Draco"               : _( "Draco" ),
-        "Equuleus"            : _( "Equuleus" ),
-        "Eridanus"            : _( "Eridanus" ),
-        "Fornax"              : _( "Fornax" ),
-        "Gemini"              : _( "Gemini" ),
-        "Grus"                : _( "Grus" ),
-        "Hercules"            : _( "Hercules" ),
-        "Horologium"          : _( "Horologium" ),
-        "Hydra"               : _( "Hydra" ),
-        "Hydrus"              : _( "Hydrus" ),
-        "Indus"               : _( "Indus" ),
-        "Leo Minor"           : _( "Leo Minor" ),
-        "Lacerta"             : _( "Lacerta" ),
-        "Leo"                 : _( "Leo" ),
-        "Lepus"               : _( "Lepus" ),
-        "Libra"               : _( "Libra" ),
-        "Lupus"               : _( "Lupus" ),
-        "Lynx"                : _( "Lynx" ),
-        "Lyra"                : _( "Lyra" ),
-        "Mensa"               : _( "Mensa" ),
-        "Microscopium"        : _( "Microscopium" ),
-        "Monoceros"           : _( "Monoceros" ),
-        "Musca"               : _( "Musca" ),
-        "Norma"               : _( "Norma" ),
-        "Octans"              : _( "Octans" ),
-        "Ophiuchus"           : _( "Ophiuchus" ),
-        "Orion"               : _( "Orion" ),
-        "Pavo"                : _( "Pavo" ),
-        "Pegasus"             : _( "Pegasus" ),
-        "Perseus"             : _( "Perseus" ),
-        "Phoenix"             : _( "Phoenix" ),
-        "Pictor"              : _( "Pictor" ),
-        "Piscis Austrinus"    : _( "Piscis Austrinus" ),
-        "Pisces"              : _( "Pisces" ),
-        "Puppis"              : _( "Puppis" ),
-        "Pyxis"               : _( "Pyxis" ),
-        "Reticulum"           : _( "Reticulum" ),
-        "Sculptor"            : _( "Sculptor" ),
-        "Scorpius"            : _( "Scorpius" ),
-        "Scutum"              : _( "Scutum" ),
-        "Serpens Caput"       : _( "Serpens Caput" ),
-        "Sextans"             : _( "Sextans" ),
-        "Sagitta"             : _( "Sagitta" ),
-        "Sagittarius"         : _( "Sagittarius" ),
-        "Taurus"              : _( "Taurus" ),
-        "Telescopium"         : _( "Telescopium" ),
-        "Triangulum Australe" : _( "Triangulum Australe" ),
-        "Triangulum"          : _( "Triangulum" ),
-        "Tucana"              : _( "Tucana" ),
-        "Ursa Major"          : _( "Ursa Major" ),
-        "Ursa Minor"          : _( "Ursa Minor" ),
-        "Vela"                : _( "Vela" ),
-        "Virgo"               : _( "Virgo" ),
-        "Volans"              : _( "Volans" ),
-        "Vulpecula"           : _( "Vulpecula" ),
-        "Serpens Cauda"       : _( "Serpens Cauda" ) }
 
     CITY_TAG = "CITY"
     CITY_TAG_TRANSLATION = { CITY_TAG : _( "CITY" ) }
@@ -722,49 +621,6 @@ class IndicatorLunar:
         list( PLANET_AND_MOON_TAGS_TRANSLATIONS.items() ) +
         list( STAR_TAGS_TRANSLATIONS.items() ) +
         list( SUN_TAG_TRANSLATION.items() ) )
-
-    STARS_BY_CONSTELLATION = {
-        "Andromeda":        [ "Almach", "Mirach", "Sirrah" ],
-        "Aries":            [ "Hamal" ],
-        "Aquarius":         [ "Sadalmelik" ],
-        "Aquila":           [ "Alshain", "Altair", "Tarazed" ],
-        "Auriga":           [ "Menkalinan", "Elnath", "Capella" ],
-        "Bootes":           [ "Arcturus", "Izar" ],
-        "Canis Major":      [ "Adara", "Sirius", "Mirzam", "Wezen" ],
-        "Canis Minor":      [ "Procyon" ],
-        "Carina":           [ "Canopus" ],
-        "Cassiopeia":       [ "Schedar", "Caph" ],
-        "Centaurus":        [ "Agena" ],
-        "Cepheus":          [ "Alderamin", "Alfirk" ],
-        "Cetus":            [ "Menkar" ],
-        "Corona Borealis":  [ "Alphecca" ],
-        "Corvus":           [ "Gienah Corvi", "Minkar" ],
-        "Crux":             [ "Mimosa" ],
-        "Cygnus":           [ "Sadr", "Albereo", "Deneb" ],
-        "Draco":            [ "Etamin", "Thuban" ],
-        "Eridanus":         [ "Achernar", "Zaurak" ],
-        "Gemini":           [ "Castor", "Alhena", "Pollux" ],
-        "Grus":             [ "Alnair" ],
-        "Hercules":         [ "Rasalgethi" ],
-        "Hydra":            [ "Alphard" ],
-        "Leo":              [ "Algieba", "Denebola", "Regulus" ],
-        "Lepus":            [  "Nihal", "Arneb" ],
-        "Lyra":             [ "Sheliak", "Sulafat", "Vega" ],
-        "Ophiuchus":        [ "Rasalhague", "Cebalrai" ],
-        "Orion":            [ "Alnilam", "Mintaka", "Saiph", "Alnitak", "Betelgeuse", "Bellatrix", "Rigel" ],
-        "Pavo":             [ "Peacock" ],
-        "Pegasus":          [ "Scheat", "Algenib", "Enif", "Markab" ],
-        "Perseus":          [ "Algol" ],
-        "Piscis Austrinus": [ "Fomalhaut" ],
-        "Puppis":           [ "Naos" ],
-        "Sagittarius":      [ "Arkab Prior", "Arkab Posterior", "Rukbat", "Nunki", "Kaus Australis" ],
-        "Scorpius":         [ "Antares", "Shaula" ],
-        "Serpens Caput":    [ "Unukalhai" ],
-        "Taurus":           [ "Taygeta", "Alcyone", "Atlas", "Aldebaran", "Merope", "Electra", "Maia" ],
-        "Ursa Major":       [ "Phecda", "Alioth", "Dubhe", "Megrez", "Alcaid", "Alcor", "Mizar", "Merak" ],
-        "Ursa Minor":       [ "Polaris", "Kochab" ],
-        "Virgo":            [ "Vindemiatrix", "Spica" ] }
-
 
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
     LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
@@ -1235,48 +1091,17 @@ class IndicatorLunar:
                 starsSubMenu = Gtk.Menu()
                 starsMenuItem.set_submenu( starsSubMenu )
 
-            if self.groupStarsByConstellation:
-                constellations = { }
-                for starName, starNameTranslated in stars:
-                    constellationTranslated = self.getDisplayData( ( AstronomicalBodyType.Star, starName.upper(), IndicatorLunar.DATA_CONSTELLATION ) )
-                    if constellationTranslated not in constellations:
-                        constellations[ constellationTranslated ] = [ ]
+            stars = sorted( stars, key = lambda x: ( x[ 1 ] ) )
+            for starName, starNameTranslated in stars:
+                dataTag = starName.upper()
+                if self.showStarsAsSubMenu:
+                    menuItem = Gtk.MenuItem( starNameTranslated )
+                    starsSubMenu.append( menuItem )
+                else:
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starNameTranslated )
+                    menu.append( menuItem )
 
-                    constellations[ constellationTranslated ].append( [ starName, starNameTranslated ] )
-
-                for constellationTranslated in sorted( constellations ):
-                    if self.showStarsAsSubMenu:
-                        constellationMenuItem = Gtk.MenuItem( constellationTranslated )
-                        starsSubMenu.append( constellationMenuItem )
-                        constellationSubMenu = Gtk.Menu()
-                        constellationMenuItem.set_submenu( constellationSubMenu )
-                    else:
-                        menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + constellationTranslated )
-                        menu.append( menuItem )
-
-                    stars = sorted( constellations[ constellationTranslated ], key = lambda x: ( x[ 1 ] ) )
-                    for starName, starNameTranslated in stars:
-                        dataTag = starName.upper()
-                        if self.showStarsAsSubMenu:
-                            menuItem = Gtk.MenuItem( starNameTranslated )
-                            constellationSubMenu.append( menuItem )
-                        else:
-                            menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.INDENT + starNameTranslated )
-                            menu.append( menuItem )
-
-                        self.updateCommonMenu( menuItem, AstronomicalBodyType.Star, dataTag )
-            else:
-                stars = sorted( stars, key = lambda x: ( x[ 1 ] ) )
-                for starName, starNameTranslated in stars:
-                    dataTag = starName.upper()
-                    if self.showStarsAsSubMenu:
-                        menuItem = Gtk.MenuItem( starNameTranslated )
-                        starsSubMenu.append( menuItem )
-                    else:
-                        menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starNameTranslated )
-                        menu.append( menuItem )
-
-                    self.updateCommonMenu( menuItem, AstronomicalBodyType.Star, dataTag )
+                self.updateCommonMenu( menuItem, AstronomicalBodyType.Star, dataTag )
 
 
     def updateCometsMenu( self, menu ):
@@ -1395,9 +1220,6 @@ class IndicatorLunar:
            astronomicalBodyType == AstronomicalBodyType.Planet:
             subMenu.append( Gtk.MenuItem( _( "Illumination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ILLUMINATION, ) ) ) )
 
-        if ( astronomicalBodyType == AstronomicalBodyType.Star and not self.groupStarsByConstellation ) or not astronomicalBodyType == AstronomicalBodyType.Star:
-            subMenu.append( Gtk.MenuItem( _( "Constellation: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_CONSTELLATION, ) ) ) )
-
         subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_MAGNITUDE, ) ) ) )
 
         if astronomicalBodyType == AstronomicalBodyType.Moon:
@@ -1434,9 +1256,6 @@ class IndicatorLunar:
         if astronomicalBodyType == AstronomicalBodyType.Moon or \
            astronomicalBodyType == AstronomicalBodyType.Planet:
             subMenu.append( Gtk.MenuItem( _( "Illumination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ILLUMINATION, ) ) ) )
-
-        if ( astronomicalBodyType == AstronomicalBodyType.Star and not self.groupStarsByConstellation ) or not astronomicalBodyType == AstronomicalBodyType.Star:
-            subMenu.append( Gtk.MenuItem( _( "Constellation: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_CONSTELLATION, ) ) ) )
 
         subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_MAGNITUDE, ) ) ) )
 
@@ -1614,9 +1433,6 @@ class IndicatorLunar:
              key[ 2 ] == IndicatorLunar.DATA_EARTH_TILT or \
              key[ 2 ] == IndicatorLunar.DATA_SUN_TILT:
             displayData = self.data[ key ] + "°"
-
-        elif key[ 2 ] == IndicatorLunar.DATA_CONSTELLATION:
-            displayData = IndicatorLunar.CONSTELLATIONS_TRANSLATIONS[ self.data[ key ] ]
 
         elif key[ 2 ] == IndicatorLunar.DATA_DAWN or \
              key[ 2 ] == IndicatorLunar.DATA_DUSK or \
@@ -2071,7 +1887,7 @@ class IndicatorLunar:
                 self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
-    # Calculates the common attributes such as rise/set, illumination, constellation, magnitude, distance, bright limb angle and RA/Dec/Az/Alt.
+    # Calculates the common attributes such as rise/set, illumination, magnitude, distance, bright limb angle and RA/Dec/Az/Alt.
     # Data tags such as RISE_TIME and/or MESSAGE will be added to the data dict.
     def updateCommon( self, body, astronomicalBodyType, dataTag, ephemNow, hideIfNeverUp ):
         key = ( astronomicalBodyType, dataTag )
@@ -2095,7 +1911,6 @@ class IndicatorLunar:
                astronomicalBodyType == AstronomicalBodyType.Planet:
                 self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] = str( self.getPhase( body ) )
 
-            self.data[ key + ( IndicatorLunar.DATA_CONSTELLATION, ) ] = ephem.constellation( body )[ 1 ]
             self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] = str( round( body.mag, 1 ) )
 
             if astronomicalBodyType == AstronomicalBodyType.Moon:
@@ -2524,14 +2339,6 @@ class IndicatorLunar:
             "Does not apply to satellites." ) )
         grid.attach( hideBodyIfNeverUpCheckbox, 0, 4, 1, 1 )
 
-        groupStarsByConstellationCheckbox = Gtk.CheckButton( _( "Group stars by constellation" ) )
-        groupStarsByConstellationCheckbox.set_margin_top( 10 )
-        groupStarsByConstellationCheckbox.set_active( self.groupStarsByConstellation )
-        groupStarsByConstellationCheckbox.set_tooltip_text( _(
-            "If checked, stars are grouped by constellation.\n\n" + \
-            "Otherwise stars are listed by name." ) )
-        grid.attach( groupStarsByConstellationCheckbox, 0, 5, 1, 1 )
-
         box = Gtk.Box( spacing = 6 )
         box.pack_start( Gtk.Label( _( "Date/time format" ) ), False, False, 0 )
 
@@ -2543,7 +2350,7 @@ class IndicatorLunar:
             "Refer to http://docs.python.org/3/library/datetime.html" ) )
         box.pack_start( dateTimeFormatEntry, True, True, 0 )
 
-        grid.attach( box, 0, 6, 1, 1 )
+        grid.attach( box, 0, 5, 1, 1 )
 
         cometsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new comets" ) )
         cometsAddNewCheckbox.set_margin_top( 10 )
@@ -2551,7 +2358,7 @@ class IndicatorLunar:
         cometsAddNewCheckbox.set_tooltip_text( _(
             "If checked, all comets are added\n" + \
             "to the list of checked comets." ) )
-        grid.attach( cometsAddNewCheckbox, 0, 7, 1, 1 )
+        grid.attach( cometsAddNewCheckbox, 0, 6, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -2569,7 +2376,7 @@ class IndicatorLunar:
 
         box.pack_start( spinnerCometMagnitude, False, False, 0 )
 
-        grid.attach( box, 0, 8, 1, 1 )
+        grid.attach( box, 0, 7, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
@@ -2577,7 +2384,7 @@ class IndicatorLunar:
         satellitesAddNewCheckbox.set_tooltip_text( _(
             "If checked all satellites are added\n" + \
             "to the list of checked satellites." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 9, 1, 1 )
+        grid.attach( satellitesAddNewCheckbox, 0, 8, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
@@ -2588,7 +2395,7 @@ class IndicatorLunar:
             "Otherwise satellites are sorted\n" + \
             "by Name, Number and then\n" + \
             "International Designator." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 10, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 9, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -2621,15 +2428,13 @@ class IndicatorLunar:
 
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name, constellation translated name.
+        stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
         for starName in IndicatorLunar.STAR_NAMES_TRANSLATIONS.keys():
             starTranslated = IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ]
-            constellation = [ k for k, v in IndicatorLunar.STARS_BY_CONSTELLATION.items() if starName in v ][ 0 ]
-            constellationTranslated = IndicatorLunar.CONSTELLATIONS_TRANSLATIONS[ constellation ]
-            stars.append( [ starName in self.stars, starName, starTranslated, constellationTranslated ] )
+            stars.append( [ starName in self.stars, starName, starTranslated ] )
 
         stars = sorted( stars, key = lambda x: ( x[ 2 ] ) )
-        starStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, star name (not displayed), translated star name, constellation translated name.
+        starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name (not displayed), star translated name.
         for star in stars:
             starStore.append( star )
 
@@ -2652,10 +2457,6 @@ class IndicatorLunar:
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 )
         treeViewColumn.set_sort_column_id( 2 )
-        tree.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Constellation" ), Gtk.CellRendererText(), text = 3 )
-        treeViewColumn.set_sort_column_id( 3 )
         tree.append_column( treeViewColumn )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -3150,7 +2951,6 @@ class IndicatorLunar:
             self.showCometsAsSubMenu = showCometsAsSubmenuCheckbox.get_active()
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
             self.hideBodyIfNeverUp = hideBodyIfNeverUpCheckbox.get_active()
-            self.groupStarsByConstellation = groupStarsByConstellationCheckbox.get_active()
             self.cometsMagnitude = spinnerCometMagnitude.get_value_as_int()
             self.cometsAddNew = cometsAddNewCheckbox.get_active()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
@@ -3619,7 +3419,6 @@ class IndicatorLunar:
         self.getDefaultCity()
 
         self.dateTimeFormat = IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS
-        self.groupStarsByConstellation = False
         self.hideBodyIfNeverUp = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
 
@@ -3665,7 +3464,6 @@ class IndicatorLunar:
         _city_data[ self.cityName ] = ( str( cityLatitude ), str( cityLongitude ), float( cityElevation ) ) # Insert/overwrite the cityName and information into the cities.
 
         self.dateTimeFormat = config.get( IndicatorLunar.CONFIG_DATE_TIME_FORMAT, self.dateTimeFormat )
-        self.groupStarsByConstellation = config.get( IndicatorLunar.CONFIG_GROUP_STARS_BY_CONSTELLATION, self.groupStarsByConstellation )
         self.hideBodyIfNeverUp = config.get( IndicatorLunar.CONFIG_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
         self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, self.indicatorText )
 
@@ -3729,7 +3527,6 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
             IndicatorLunar.CONFIG_CITY_NAME: self.cityName,
             IndicatorLunar.CONFIG_DATE_TIME_FORMAT: self.dateTimeFormat,
-            IndicatorLunar.CONFIG_GROUP_STARS_BY_CONSTELLATION: self.groupStarsByConstellation,
             IndicatorLunar.CONFIG_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
             IndicatorLunar.CONFIG_INDICATOR_TEXT: self.indicatorText,
             IndicatorLunar.CONFIG_COMET_OE_URL: self.cometOEURL,
