@@ -950,7 +950,6 @@ class IndicatorLunar:
                     summary = _( "Comet Magnitude Suspicious" )
                     message = _( "The magnitude of at least one comet has a suspicious value!" )
                     Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-                    logging.info( "At least one comet has a magnitude which looks suspicious." )
 
             self.nextUpdate = self.toDateTime( self.nextUpdate ) # Parse from string back into a datetime.
             nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
@@ -1361,6 +1360,74 @@ class IndicatorLunar:
 
 
     def updateCommonMenu( self, menuItem, astronomicalBodyType, dataTag ):
+        key = ( astronomicalBodyType, dataTag )
+        subMenu = Gtk.Menu()
+
+        # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
+        # Therefore only check for the presence of these two messages.
+        if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data:
+            # This function only handles the messages of 'always up' and 'never up'.
+            # Other messages are handled by the specific functions (comet, satellite).
+            if self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_ALWAYS_UP or \
+               self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP:
+                subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ) )
+        else:
+            data = [ ]
+            data.append( [ key + ( IndicatorLunar.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
+            data.append( [ key + ( IndicatorLunar.DATA_SET_TIME, ), _( "Set: " ), self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ] )
+            self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
+
+            if astronomicalBodyType == AstronomicalBodyType.Sun:
+                data.append( [ key + ( IndicatorLunar.DATA_DAWN, ), _( "Dawn: " ), self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] ] )
+                data.append( [ key + ( IndicatorLunar.DATA_DUSK, ), _( "Dusk: " ), self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ] )
+                self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ) )
+ 
+            data = sorted( data, key = lambda x: ( x[ 2 ] ) )
+            for theKey, text, dateTime in data:
+                subMenu.append( Gtk.MenuItem( text + self.getDisplayData( theKey ) ) )
+
+        subMenu.append( Gtk.SeparatorMenuItem() )
+
+        self.updateAzimuthAltitudeMenu( subMenu, astronomicalBodyType, dataTag )
+        subMenu.append( Gtk.SeparatorMenuItem() )
+
+        if astronomicalBodyType == AstronomicalBodyType.Moon or \
+           astronomicalBodyType == AstronomicalBodyType.Planet:
+            subMenu.append( Gtk.MenuItem( _( "Illumination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ILLUMINATION, ) ) ) )
+
+        if ( astronomicalBodyType == AstronomicalBodyType.Star and not self.groupStarsByConstellation ) or not astronomicalBodyType == AstronomicalBodyType.Star:
+            subMenu.append( Gtk.MenuItem( _( "Constellation: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_CONSTELLATION, ) ) ) )
+
+        subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_MAGNITUDE, ) ) ) )
+
+        if astronomicalBodyType == AstronomicalBodyType.Moon:
+            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ) ) )
+
+        if astronomicalBodyType == AstronomicalBodyType.Moon or \
+           astronomicalBodyType == AstronomicalBodyType.Comet or \
+           astronomicalBodyType == AstronomicalBodyType.Planet or \
+           astronomicalBodyType == AstronomicalBodyType.Sun:
+            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ) ) )
+
+        if astronomicalBodyType == AstronomicalBodyType.Moon or \
+           astronomicalBodyType == AstronomicalBodyType.Comet or \
+           astronomicalBodyType == AstronomicalBodyType.Planet:
+            subMenu.append( Gtk.MenuItem( _( "Distance to Sun: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ) ) )
+
+        if astronomicalBodyType == AstronomicalBodyType.Moon or \
+           astronomicalBodyType == AstronomicalBodyType.Planet:
+            subMenu.append( Gtk.MenuItem( _( "Bright Limb: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ) ) )
+
+        if astronomicalBodyType == AstronomicalBodyType.Planet and \
+           dataTag == IndicatorLunar.PLANET_SATURN.upper():
+            subMenu.append( Gtk.MenuItem( _( "Earth Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_EARTH_TILT, ) ) ) )
+            subMenu.append( Gtk.MenuItem( _( "Sun Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SUN_TILT, ) ) ) )
+
+        menuItem.set_submenu( subMenu )
+
+
+#TODO Delete when happy with new version above.
+    def updateCommonMenuORIGINAL( self, menuItem, astronomicalBodyType, dataTag ):
         key = ( astronomicalBodyType, dataTag )
         subMenu = Gtk.Menu()
 
