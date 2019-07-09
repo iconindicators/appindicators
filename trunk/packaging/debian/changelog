@@ -5,12 +5,14 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
     they are astrological, not astronomical.
   * Only visible satellite passes are shown (occurring during dawn/dusk);
     there is no point showing non-visible passes.
-  * Sometimes the magnitude for a comet is outrageously wrong;
-    a notification is shown on startup when this occurs.
   * Removed Right Ascension and Declination from all items;
     Azimuth and Altitude are more useful and sufficient.
   * Removed decimal degrees from Azimuth/Altitude; was overkill.
+  * Removed planetary moons as each essentially has the same azimuth and
+    altitude as the parent planet.
   * Reordered attributes to show rise/set, then az/alt then other attributes.
+  * Sometimes the magnitude for a comet is outrageously wrong;
+    a notification is shown on startup when this occurs.
   * Removed old eclipse information.
   * Update release to xenial as trusty is end of life.
   * Update debian/control Standards-Version to 3.9.7.

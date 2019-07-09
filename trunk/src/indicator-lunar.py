@@ -156,9 +156,6 @@ class IndicatorLunar:
     DATA_SOLSTICE = "SOLSTICE"
     DATA_SUN_TILT = "SUN TILT"
     DATA_THIRD_QUARTER = "THIRD QUARTER"
-    DATA_X_OFFSET = "X OFFSET"
-    DATA_Y_OFFSET = "Y OFFSET"
-    DATA_Z_OFFSET = "Z OFFSET"
 
     DATA_TAGS_ALL = [
         DATA_ALTITUDE,
@@ -193,10 +190,7 @@ class IndicatorLunar:
         DATA_SET_TIME,
         DATA_SOLSTICE,
         DATA_SUN_TILT,
-        DATA_THIRD_QUARTER,
-        DATA_X_OFFSET,
-        DATA_Y_OFFSET,
-        DATA_Z_OFFSET ]
+        DATA_THIRD_QUARTER ]
 
     DATA_TAGS_MOON = [
         DATA_ALTITUDE,
@@ -231,10 +225,7 @@ class IndicatorLunar:
     DATA_TAGS_PLANETARY_MOON = [
         DATA_ALTITUDE,
         DATA_AZIMUTH,
-        DATA_EARTH_VISIBLE,
-        DATA_X_OFFSET,
-        DATA_Y_OFFSET,
-        DATA_Z_OFFSET ]
+        DATA_EARTH_VISIBLE ]
 
     DATA_TAGS_SATELLITE = [
         DATA_RISE_AZIMUTH,
@@ -299,10 +290,7 @@ class IndicatorLunar:
         DATA_SET_TIME                   : _( "SET TIME" ),
         DATA_SOLSTICE                   : _( "SOLSTICE" ),
         DATA_SUN_TILT                   : _( "SUN TILT" ),
-        DATA_THIRD_QUARTER              : _( "THIRD QUARTER" ),
-        DATA_X_OFFSET                   : _( "X OFFSET" ),
-        DATA_Y_OFFSET                   : _( "Y OFFSET" ),
-        DATA_Z_OFFSET                   : _( "Z OFFSET" ) }
+        DATA_THIRD_QUARTER              : _( "THIRD QUARTER" ) }
 
     CITY_TAG = "CITY"
     CITY_TAG_TRANSLATION = { CITY_TAG : _( "CITY" ) }
@@ -322,38 +310,9 @@ class IndicatorLunar:
     PLANET_NEPTUNE = "Neptune"
     PLANET_PLUTO = "Pluto"
 
-    MOON_JUPITER_CALLISTO = "Callisto"
-    MOON_JUPITER_EUROPA = "Europa"
-    MOON_JUPITER_GANYMEDE = "Ganymede"
-    MOON_JUPITER_IO = "Io"
-
-    MOON_MARS_DEIMOS = "Deimos"
-    MOON_MARS_PHOBOS = "Phobos"
-
-    MOON_SATURN_DIONE = "Dione"
-    MOON_SATURN_ENCELADUS = "Enceladus"
-    MOON_SATURN_HYPERION = "Hyperion"
-    MOON_SATURN_IAPETUS = "Iapetus"
-    MOON_SATURN_MIMAS = "Mimas"
-    MOON_SATURN_RHEA = "Rhea"
-    MOON_SATURN_TETHYS = "Tethys"
-    MOON_SATURN_TITAN = "Titan"
-
-    MOON_URANUS_ARIEL = "Ariel"
-    MOON_URANUS_MIRANDA = "Miranda"
-    MOON_URANUS_OBERON = "Oberon"
-    MOON_URANUS_TITANIA = "Titania"
-    MOON_URANUS_UMBRIEL = "Umbriel"
-
     PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
-    PLANET_MOONS = {
-        PLANET_JUPITER : [ MOON_JUPITER_CALLISTO, MOON_JUPITER_EUROPA, MOON_JUPITER_GANYMEDE, MOON_JUPITER_IO ],
-        PLANET_MARS : [ MOON_MARS_DEIMOS, MOON_MARS_PHOBOS ],
-        PLANET_SATURN : [ MOON_SATURN_DIONE, MOON_SATURN_ENCELADUS, MOON_SATURN_HYPERION, MOON_SATURN_IAPETUS, MOON_SATURN_MIMAS, MOON_SATURN_RHEA, MOON_SATURN_TETHYS, MOON_SATURN_TITAN ],
-        PLANET_URANUS : [ MOON_URANUS_ARIEL, MOON_URANUS_MIRANDA, MOON_URANUS_OBERON, MOON_URANUS_TITANIA, MOON_URANUS_UMBRIEL ] }
-
-    PLANET_AND_MOON_NAMES_TRANSLATIONS = {
+    PLANET_NAMES_TRANSLATIONS = {
         PLANET_MERCURY        : _( "Mercury" ),
         PLANET_VENUS          : _( "Venus" ),
         PLANET_MARS           : _( "Mars" ),
@@ -361,32 +320,9 @@ class IndicatorLunar:
         PLANET_SATURN         : _( "Saturn" ),
         PLANET_URANUS         : _( "Uranus" ),
         PLANET_NEPTUNE        : _( "Neptune" ),
-        PLANET_PLUTO          : _( "Pluto" ),
+        PLANET_PLUTO          : _( "Pluto" ) }
 
-        MOON_MARS_DEIMOS      : _( "Deimos" ),
-        MOON_MARS_PHOBOS      : _( "Phobos" ),
-
-        MOON_JUPITER_CALLISTO : _( "Callisto" ),
-        MOON_JUPITER_EUROPA   : _( "Europa" ),
-        MOON_JUPITER_GANYMEDE : _( "Ganymede" ),
-        MOON_JUPITER_IO       : _( "Io" ),
-
-        MOON_SATURN_DIONE     : _( "Dione" ),
-        MOON_SATURN_ENCELADUS : _( "Enceladus" ),
-        MOON_SATURN_HYPERION  : _( "Hyperion" ),
-        MOON_SATURN_IAPETUS   : _( "Iapetus" ),
-        MOON_SATURN_MIMAS     : _( "Mimas" ),
-        MOON_SATURN_RHEA      : _( "Rhea" ),
-        MOON_SATURN_TETHYS    : _( "Tethys" ),
-        MOON_SATURN_TITAN     : _( "Titan" ),
-
-        MOON_URANUS_ARIEL     : _( "Ariel" ),
-        MOON_URANUS_MIRANDA   : _( "Miranda" ),
-        MOON_URANUS_OBERON    : _( "Oberon" ),
-        MOON_URANUS_TITANIA   : _( "Titania" ),
-        MOON_URANUS_UMBRIEL   : _( "Umbriel" ) }
-
-    PLANET_AND_MOON_TAGS_TRANSLATIONS = {
+    PLANET_TAGS_TRANSLATIONS = {
         "MERCURY"   : _( "MERCURY" ),
         "VENUS"     : _( "VENUS" ),
         "MARS"      : _( "MARS" ),
@@ -394,30 +330,7 @@ class IndicatorLunar:
         "SATURN"    : _( "SATURN" ),
         "URANUS"    : _( "URANUS" ),
         "NEPTUNE"   : _( "NEPTUNE" ),
-        "PLUTO"     : _( "PLUTO" ),
-
-        "DEIMOS"    : _( "DEIMOS" ),
-        "PHOBOS"    : _( "PHOBOS" ),
-
-        "CALLISTO"  : _( "CALLISTO" ),
-        "EUROPA"    : _( "EUROPA" ),
-        "GANYMEDE"  : _( "GANYMEDE" ),
-        "IO"        : _( "IO" ),
-
-        "DIONE"     : _( "DIONE" ),
-        "ENCELADUS" : _( "ENCELADUS" ),
-        "HYPERION"  : _( "HYPERION" ),
-        "IAPETUS"   : _( "IAPETUS" ),
-        "MIMAS"     : _( "MIMAS" ),
-        "RHEA"      : _( "RHEA" ),
-        "TETHYS"    : _( "TETHYS" ),
-        "TITAN"     : _( "TITAN" ),
-
-        "ARIEL"     : _( "ARIEL" ),
-        "MIRANDA"   : _( "MIRANDA" ),
-        "OBERON"    : _( "OBERON" ),
-        "TITANIA"   : _( "TITANIA" ),
-        "UMBRIEL"   : _( "UMBRIEL" ) }
+        "PLUTO"     : _( "PLUTO" ) }
 
     # Translated star names.
     # Sourced from cns_namemap in ephem.stars.stars
@@ -618,7 +531,7 @@ class IndicatorLunar:
     BODY_TAGS_TRANSLATIONS = dict(
         list( CITY_TAG_TRANSLATION.items() ) +
         list( MOON_TAG_TRANSLATION.items() ) +
-        list( PLANET_AND_MOON_TAGS_TRANSLATIONS.items() ) +
+        list( PLANET_TAGS_TRANSLATIONS.items() ) +
         list( STAR_TAGS_TRANSLATIONS.items() ) +
         list( SUN_TAG_TRANSLATION.items() ) )
 
@@ -1032,44 +945,13 @@ class IndicatorLunar:
             for planetName in planets:
                 dataTag = planetName.upper()
                 if self.showPlanetsAsSubMenu:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.PLANET_AND_MOON_NAMES_TRANSLATIONS[ planetName ] )
+                    menuItem = Gtk.MenuItem( IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     subMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.PLANET_AND_MOON_NAMES_TRANSLATIONS[ planetName ] )
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     menu.append( menuItem )
 
                 self.updateCommonMenu( menuItem, AstronomicalBodyType.Planet, dataTag )
-
-                # Planetary moons.
-                if planetName in IndicatorLunar.PLANET_MOONS:
-                    menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-                    menuItem.get_submenu().append( Gtk.MenuItem( _( "Major Moons" ) ) )
-                    self.updatePlanetMoonsMenu( menuItem, IndicatorLunar.PLANET_MOONS[ planetName ] )
-
-
-    def updatePlanetMoonsMenu( self, menuItem, moonNames ):
-        moonNamesTranslated = [ ] # Lists the moon names in alphabetical order in the local language.
-        for moonName in moonNames:
-            moonNamesTranslated.append( [ moonName, IndicatorLunar.PLANET_AND_MOON_NAMES_TRANSLATIONS[ moonName ] ] )
-
-        moonNamesTranslated = sorted( moonNamesTranslated, key = lambda x: ( x[ 1 ] ) )
-        for moonName, moonNameTranslated in moonNamesTranslated:
-            moonMenuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.PLANET_AND_MOON_NAMES_TRANSLATIONS[ moonName ] )
-            menuItem.get_submenu().append( moonMenuItem )
-
-            dataTag = moonName.upper()
-            subMenu = Gtk.Menu()
-            self.updateAzimuthAltitudeMenu( subMenu, AstronomicalBodyType.PlanetaryMoon, dataTag )
-            subMenu.append( Gtk.SeparatorMenuItem() )
-
-            subMenu.append( Gtk.MenuItem( _( "Earth Visible: " ) + self.getDisplayData( ( AstronomicalBodyType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_EARTH_VISIBLE ) ) ) )
-            subMenu.append( Gtk.SeparatorMenuItem() )
-
-            subMenu.append( Gtk.MenuItem( _( "Offset from Planet (in planet radii)" ) ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "X: " ) + self.getDisplayData( ( AstronomicalBodyType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_X_OFFSET ) ) ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Y: " ) + self.getDisplayData( ( AstronomicalBodyType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_Y_OFFSET ) ) ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Z: " ) + self.getDisplayData( ( AstronomicalBodyType.PlanetaryMoon, dataTag, IndicatorLunar.DATA_Z_OFFSET ) ) ) )
-            moonMenuItem.set_submenu( subMenu )
 
 
     def updateStarsMenu( self, menu ):
@@ -1244,70 +1126,6 @@ class IndicatorLunar:
            dataTag == IndicatorLunar.PLANET_SATURN.upper():
             subMenu.append( Gtk.MenuItem( _( "Earth Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_EARTH_TILT, ) ) ) )
             subMenu.append( Gtk.MenuItem( _( "Sun Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SUN_TILT, ) ) ) )
-
-        menuItem.set_submenu( subMenu )
-
-
-#TODO Delete when happy with new version above.
-    def updateCommonMenuORIGINAL( self, menuItem, astronomicalBodyType, dataTag ):
-        key = ( astronomicalBodyType, dataTag )
-        subMenu = Gtk.Menu()
-
-        if astronomicalBodyType == AstronomicalBodyType.Moon or \
-           astronomicalBodyType == AstronomicalBodyType.Planet:
-            subMenu.append( Gtk.MenuItem( _( "Illumination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ILLUMINATION, ) ) ) )
-
-        subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_MAGNITUDE, ) ) ) )
-
-        if astronomicalBodyType == AstronomicalBodyType.Moon:
-            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ) ) )
-
-        if astronomicalBodyType == AstronomicalBodyType.Moon or \
-           astronomicalBodyType == AstronomicalBodyType.Comet or \
-           astronomicalBodyType == AstronomicalBodyType.Planet or \
-           astronomicalBodyType == AstronomicalBodyType.Sun:
-            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ) ) )
-
-        if astronomicalBodyType == AstronomicalBodyType.Moon or \
-           astronomicalBodyType == AstronomicalBodyType.Comet or \
-           astronomicalBodyType == AstronomicalBodyType.Planet:
-            subMenu.append( Gtk.MenuItem( _( "Distance to Sun: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ) ) )
-
-        if astronomicalBodyType == AstronomicalBodyType.Moon or \
-           astronomicalBodyType == AstronomicalBodyType.Planet:
-            subMenu.append( Gtk.MenuItem( _( "Bright Limb: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ) ) )
-
-        if astronomicalBodyType == AstronomicalBodyType.Planet and \
-           dataTag == IndicatorLunar.PLANET_SATURN.upper():
-            subMenu.append( Gtk.MenuItem( _( "Earth Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_EARTH_TILT, ) ) ) )
-            subMenu.append( Gtk.MenuItem( _( "Sun Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SUN_TILT, ) ) ) )
-
-        subMenu.append( Gtk.SeparatorMenuItem() )
-        self.updateAzimuthAltitudeMenu( subMenu, astronomicalBodyType, dataTag )
-        subMenu.append( Gtk.SeparatorMenuItem() )
-
-        # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
-        # Therefore only check for the presence of these two messages.
-        if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data:
-            # This function only handles the messages of 'always up' and 'never up'.
-            # Other messages are handled by the specific functions (comet, satellite).
-            if self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_ALWAYS_UP or \
-               self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP:
-                subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ) )
-        else:
-            data = [ ]
-            data.append( [ key + ( IndicatorLunar.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
-            data.append( [ key + ( IndicatorLunar.DATA_SET_TIME, ), _( "Set: " ), self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ] )
-            self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
-
-            if astronomicalBodyType == AstronomicalBodyType.Sun:
-                data.append( [ key + ( IndicatorLunar.DATA_DAWN, ), _( "Dawn: " ), self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] ] )
-                data.append( [ key + ( IndicatorLunar.DATA_DUSK, ), _( "Dusk: " ), self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ] )
-                self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ) )
-
-            data = sorted( data, key = lambda x: ( x[ 2 ] ) )
-            for key, text, dateTime in data:
-                subMenu.append( Gtk.MenuItem( text + self.getDisplayData( key ) ) )
 
         menuItem.set_submenu( subMenu )
 
@@ -1509,11 +1327,6 @@ class IndicatorLunar:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
 
         elif key[ 2 ] == IndicatorLunar.DATA_NAME:
-            displayData = self.data[ key ]
-
-        elif key[ 2 ] == IndicatorLunar.DATA_X_OFFSET or \
-             key[ 2 ] == IndicatorLunar.DATA_Y_OFFSET or \
-             key[ 2 ] == IndicatorLunar.DATA_Z_OFFSET:
             displayData = self.data[ key ]
 
         if displayData is None:
@@ -1847,18 +1660,6 @@ class IndicatorLunar:
                     key = ( AstronomicalBodyType.Planet, planetName.upper() )
                     self.data[ key + ( IndicatorLunar.DATA_EARTH_TILT, ) ] = str( round( math.degrees( planet.earth_tilt ), 1 ) )
                     self.data[ key + ( IndicatorLunar.DATA_SUN_TILT, ) ] = str( round( math.degrees( planet.sun_tilt ), 1 ) )
-
-                city = self.getCity( ephemNow )
-                if planetName in IndicatorLunar.PLANET_MOONS:
-                    for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
-                        moon = getattr( ephem, moonName )() # Dynamically instantiate the moon object.
-                        moon.compute( city )
-                        self.updateAzimuthAltitude( moon, AstronomicalBodyType.PlanetaryMoon, moonName.upper() )
-                        key = ( AstronomicalBodyType.PlanetaryMoon, moonName.upper() )
-                        self.data[ key + ( IndicatorLunar.DATA_EARTH_VISIBLE, ) ] = str( bool( moon.earth_visible ) )
-                        self.data[ key + ( IndicatorLunar.DATA_X_OFFSET, ) ] = str( round( moon.x, 1 ) )
-                        self.data[ key + ( IndicatorLunar.DATA_Y_OFFSET, ) ] = str( round( moon.y, 1 ) )
-                        self.data[ key + ( IndicatorLunar.DATA_Z_OFFSET, ) ] = str( round( moon.z, 1 ) )
 
 
     # http://aa.usno.navy.mil/data/docs/mrst.php
@@ -2404,7 +2205,7 @@ class IndicatorLunar:
 
         planetStore = Gtk.ListStore( bool, str, str ) # Show/hide, planet name (not displayed), translated planet name.
         for planetName in IndicatorLunar.PLANETS:
-            planetStore.append( [ planetName in self.planets, planetName, IndicatorLunar.PLANET_AND_MOON_NAMES_TRANSLATIONS[ planetName ] ] )
+            planetStore.append( [ planetName in self.planets, planetName, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] ] )
 
         tree = Gtk.TreeView( planetStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
