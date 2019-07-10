@@ -2764,9 +2764,6 @@ class IndicatorLunar:
         dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
         self.checkboxToggled( dataStore[ row ][ 1 ].upper(), AstronomicalBodyType.Planet, dataStore[ row ][ 0 ] )
         planetName = dataStore[ row ][ 1 ]
-        if planetName in IndicatorLunar.PLANET_MOONS:
-            for moonName in IndicatorLunar.PLANET_MOONS[ planetName ]:
-                self.checkboxToggled( moonName.upper(), AstronomicalBodyType.PlanetaryMoon, dataStore[ row ][ 0 ] )
 
 
     def onCometStarSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalBodyType ):
