@@ -125,14 +125,8 @@ class IndicatorLunar:
 
     DATA_ALTITUDE = "ALTITUDE"
     DATA_AZIMUTH = "AZIMUTH"
-    DATA_BRIGHT_LIMB = "BRIGHT LIMB"
     DATA_DAWN = "DAWN"
-    DATA_DISTANCE_TO_EARTH = "DISTANCE TO EARTH"
-    DATA_DISTANCE_TO_EARTH_KM = "DISTANCE TO EARTH KM"
-    DATA_DISTANCE_TO_SUN = "DISTANCE TO SUN"
     DATA_DUSK = "DUSK"
-    DATA_EARTH_TILT = "EARTH TILT"
-    DATA_EARTH_VISIBLE = "EARTH VISIBLE"
     DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
     DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
     DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
@@ -141,7 +135,6 @@ class IndicatorLunar:
     DATA_EQUINOX = "EQUINOX"
     DATA_FIRST_QUARTER = "FIRST QUARTER"
     DATA_FULL = "FULL"
-    DATA_ILLUMINATION = "ILLUMINATION"
     DATA_LATITUDE = "LATITUDE" # Only used for the CITY "body" tag.
     DATA_LONGITUDE = "LONGITUDE" # Only used for the CITY "body" tag.
     DATA_MAGNITUDE = "MAGNITUDE"
@@ -154,20 +147,13 @@ class IndicatorLunar:
     DATA_SET_AZIMUTH = "SET AZIMUTH"
     DATA_SET_TIME = "SET TIME"
     DATA_SOLSTICE = "SOLSTICE"
-    DATA_SUN_TILT = "SUN TILT"
     DATA_THIRD_QUARTER = "THIRD QUARTER"
 
     DATA_TAGS_ALL = [
         DATA_ALTITUDE,
         DATA_AZIMUTH,
-        DATA_BRIGHT_LIMB,
         DATA_DAWN,
-        DATA_DISTANCE_TO_EARTH,
-        DATA_DISTANCE_TO_EARTH_KM,
-        DATA_DISTANCE_TO_SUN,
         DATA_DUSK,
-        DATA_EARTH_TILT,
-        DATA_EARTH_VISIBLE,
         DATA_ECLIPSE_DATE_TIME,
         DATA_ECLIPSE_LATITUDE,
         DATA_ECLIPSE_LONGITUDE,
@@ -176,7 +162,6 @@ class IndicatorLunar:
         DATA_EQUINOX,
         DATA_FIRST_QUARTER,
         DATA_FULL,
-        DATA_ILLUMINATION,
         DATA_LATITUDE,
         DATA_LONGITUDE,
         DATA_MAGNITUDE,
@@ -189,8 +174,15 @@ class IndicatorLunar:
         DATA_SET_AZIMUTH,
         DATA_SET_TIME,
         DATA_SOLSTICE,
-        DATA_SUN_TILT,
         DATA_THIRD_QUARTER ]
+
+    DATA_TAGS_COMET = [
+        DATA_MAGNITUDE,
+        DATA_MESSAGE,
+        DATA_RISE_AZIMUTH,
+        DATA_RISE_TIME,
+        DATA_SET_AZIMUTH,
+        DATA_SET_TIME ]
 
     DATA_TAGS_MOON = [
         DATA_ALTITUDE,
@@ -199,35 +191,20 @@ class IndicatorLunar:
         DATA_ECLIPSE_LATITUDE,
         DATA_ECLIPSE_LONGITUDE,
         DATA_ECLIPSE_TYPE,
-        DATA_MAGNITUDE,
         DATA_MESSAGE,
+        DATA_PHASE,
         DATA_RISE_TIME,
-        DATA_SET_TIME ]
-
-    DATA_TAGS_COMET = [
-        DATA_RISE_AZIMUTH,
-        DATA_RISE_TIME,
-        DATA_SET_AZIMUTH,
         DATA_SET_TIME ]
 
     DATA_TAGS_PLANET = [
         DATA_ALTITUDE,
         DATA_AZIMUTH,
-        DATA_BRIGHT_LIMB,
-        DATA_DISTANCE_TO_EARTH,
-        DATA_DISTANCE_TO_SUN,
-        DATA_ILLUMINATION,
-        DATA_MAGNITUDE,
         DATA_MESSAGE,
         DATA_RISE_TIME,
         DATA_SET_TIME ]
 
-    DATA_TAGS_PLANETARY_MOON = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_EARTH_VISIBLE ]
-
     DATA_TAGS_SATELLITE = [
+        DATA_MESSAGE,
         DATA_RISE_AZIMUTH,
         DATA_RISE_TIME,
         DATA_SET_AZIMUTH,
@@ -236,7 +213,6 @@ class IndicatorLunar:
     DATA_TAGS_STAR = [
         DATA_ALTITUDE,
         DATA_AZIMUTH,
-        DATA_MAGNITUDE,
         DATA_MESSAGE,
         DATA_RISE_TIME,
         DATA_SET_TIME ]
@@ -251,7 +227,6 @@ class IndicatorLunar:
         DATA_ECLIPSE_LONGITUDE,
         DATA_ECLIPSE_TYPE,
         DATA_EQUINOX,
-        DATA_MAGNITUDE,
         DATA_MESSAGE,
         DATA_RISE_TIME,
         DATA_SET_TIME,
@@ -260,14 +235,8 @@ class IndicatorLunar:
     DATA_TAGS_TRANSLATIONS = {
         DATA_ALTITUDE                   : _( "ALTITUDE" ),
         DATA_AZIMUTH                    : _( "AZIMUTH" ),
-        DATA_BRIGHT_LIMB                : _( "BRIGHT LIMB" ),
         DATA_DAWN                       : _( "DAWN" ),
-        DATA_DISTANCE_TO_EARTH          : _( "DISTANCE TO EARTH" ),
-        DATA_DISTANCE_TO_EARTH_KM       : _( "DISTANCE TO EARTH KM" ),
-        DATA_DISTANCE_TO_SUN            : _( "DISTANCE TO SUN" ),
         DATA_DUSK                       : _( "DUSK" ),
-        DATA_EARTH_TILT                 : _( "EARTH TILT" ),
-        DATA_EARTH_VISIBLE              : _( "EARTH VISIBLE" ),
         DATA_ECLIPSE_DATE_TIME          : _( "ECLIPSE DATE TIME" ),
         DATA_ECLIPSE_LATITUDE           : _( "ECLIPSE LATITUDE" ),
         DATA_ECLIPSE_LONGITUDE          : _( "ECLIPSE LONGITUDE" ),
@@ -276,7 +245,6 @@ class IndicatorLunar:
         DATA_EQUINOX                    : _( "EQUINOX" ),
         DATA_FIRST_QUARTER              : _( "FIRST QUARTER" ),
         DATA_FULL                       : _( "FULL" ),
-        DATA_ILLUMINATION               : _( "ILLUMINATION" ),
         DATA_LATITUDE                   : _( "LATITUDE" ),
         DATA_LONGITUDE                  : _( "LONGITUDE" ),
         DATA_MAGNITUDE                  : _( "MAGNITUDE" ),
@@ -289,7 +257,6 @@ class IndicatorLunar:
         DATA_SET_AZIMUTH                : _( "SET AZIMUTH" ),
         DATA_SET_TIME                   : _( "SET TIME" ),
         DATA_SOLSTICE                   : _( "SOLSTICE" ),
-        DATA_SUN_TILT                   : _( "SUN TILT" ),
         DATA_THIRD_QUARTER              : _( "THIRD QUARTER" ) }
 
     CITY_TAG = "CITY"
@@ -1212,11 +1179,6 @@ class IndicatorLunar:
            key[ 2 ] == IndicatorLunar.DATA_SET_AZIMUTH:
             displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "°"
 
-        elif key[ 2 ] == IndicatorLunar.DATA_BRIGHT_LIMB or \
-             key[ 2 ] == IndicatorLunar.DATA_EARTH_TILT or \
-             key[ 2 ] == IndicatorLunar.DATA_SUN_TILT:
-            displayData = self.data[ key ] + "°"
-
         elif key[ 2 ] == IndicatorLunar.DATA_DAWN or \
              key[ 2 ] == IndicatorLunar.DATA_DUSK or \
              key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_DATE_TIME or \
@@ -1232,19 +1194,6 @@ class IndicatorLunar:
                     displayData = self.getLocalDateTime( self.data[ key ], self.dateTimeFormat )
                 elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
                     displayData = self.getLocalDateTime( self.data[ key ], self.satelliteNotificationTimeFormat )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH or \
-             key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_SUN:
-            displayData = self.data[ key ] + " " + _( "ua" )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM:
-            displayData = str( locale.format( "%d", int( self.data[ key ] ), grouping = True ) ) + " " + _( "km" )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_EARTH_VISIBLE:
-            if self.data[ key ] == IndicatorLunar.TRUE_TEXT:
-                displayData = IndicatorLunar.TRUE_TEXT_TRANSLATION
-            else:
-                displayData = IndicatorLunar.FALSE_TEXT_TRANSLATION
 
         elif key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_LATITUDE:
             latitude = self.data[ key ]
@@ -1274,9 +1223,6 @@ class IndicatorLunar:
 
         elif key[ 2 ] == IndicatorLunar.DATA_ELEVATION:
             displayData = self.data[ key ] + " " + _( "m" )
-
-        elif key[ 2 ] == IndicatorLunar.DATA_ILLUMINATION:
-            displayData = self.data[ key ] + "%"
 
         elif key[ 2 ] == IndicatorLunar.DATA_LATITUDE or \
              key[ 2 ] == IndicatorLunar.DATA_LONGITUDE:
@@ -1518,9 +1464,8 @@ class IndicatorLunar:
             self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp )
             if not self.hideBody( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, hideIfNeverUp ):
                 key = ( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
-                self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] = str( self.getPhase( ephem.Moon( self.getCity( ephemNow ) ) ) )
-                lunarIlluminationPercentage = int( self.data[ key  + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
-                self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
+                illuminationPercentage = int( self.getPhase( ephem.Moon( self.getCity( ephemNow ) ) ) )
+                self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, illuminationPercentage )
                 self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
                 self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
                 self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
@@ -1621,11 +1566,6 @@ class IndicatorLunar:
             planet = getattr( ephem, planetName )() # Dynamically instantiate the planet object.
             planet.compute( self.getCity( ephemNow ) )
             self.updateCommon( planet, AstronomicalBodyType.Planet, planetName.upper(), ephemNow, hideIfNeverUp )
-            if not self.hideBody( AstronomicalBodyType.Planet, planetName.upper(), hideIfNeverUp ):
-                if planetName == IndicatorLunar.PLANET_SATURN:
-                    key = ( AstronomicalBodyType.Planet, planetName.upper() )
-                    self.data[ key + ( IndicatorLunar.DATA_EARTH_TILT, ) ] = str( round( math.degrees( planet.earth_tilt ), 1 ) )
-                    self.data[ key + ( IndicatorLunar.DATA_SUN_TILT, ) ] = str( round( math.degrees( planet.sun_tilt ), 1 ) )
 
 
     # http://aa.usno.navy.mil/data/docs/mrst.php
