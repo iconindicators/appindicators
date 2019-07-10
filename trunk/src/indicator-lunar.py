@@ -643,7 +643,6 @@ class IndicatorLunar:
 
 
     def __init__( self ):
-        self.firstRun = True
         self.data = { } # Key is a tuple of AstronomicalBodyType, a data tag (upper case( and data tag (upper case).  Value is the data ready for display.
         self.cometOEData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
         self.satelliteNotifications = { }
@@ -714,12 +713,6 @@ class IndicatorLunar:
             if self.showSatelliteNotification:
                 self.notificationSatellite()
 
-            if self.firstRun:
-                if self.cometMagnitudeLooksDodgy:
-                    summary = _( "Suspicious Comet Magnitude" )
-                    message = _( "The magnitude of at least one comet has a dubious value!" )
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
             self.nextUpdate = self.toDateTime( self.nextUpdate ) # Parse from string back into a datetime.
             nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
 
@@ -730,7 +723,6 @@ class IndicatorLunar:
                 nextUpdateInSeconds = ( 60 * 60 )
 
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update, True )
-            self.firstRun = False
 
     def updateMenu( self ):
         menu = Gtk.Menu()
@@ -1035,6 +1027,8 @@ class IndicatorLunar:
                     menuItem.set_submenu( subMenu )
                 else:
                     self.updateCommonMenu( menuItem, AstronomicalBodyType.Comet, key )
+                    menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+                    menuItem.get_submenu().append( Gtk.MenuItem( _( "Magnitude: " ) + self.getDisplayData( ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MAGNITUDE ) ) ) )
                     self.addOnCometHandler( menuItem.get_submenu(), key )
 
                     # Sometimes the magnitude for a comet is clearly wrong (have seen -327 for example).
@@ -1092,37 +1086,6 @@ class IndicatorLunar:
 
         subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
         subMenu.append( Gtk.MenuItem( _( "Altitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ALTITUDE, ) ) ) )
-
-        subMenu.append( Gtk.SeparatorMenuItem() )
-
-        if astronomicalBodyType == AstronomicalBodyType.Moon or \
-           astronomicalBodyType == AstronomicalBodyType.Planet:
-            subMenu.append( Gtk.MenuItem( _( "Illumination: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ILLUMINATION, ) ) ) )
-
-        subMenu.append( Gtk.MenuItem( _( "Magnitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_MAGNITUDE, ) ) ) )
-
-        if astronomicalBodyType == AstronomicalBodyType.Moon:
-            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ) ) )
-
-        if astronomicalBodyType == AstronomicalBodyType.Moon or \
-           astronomicalBodyType == AstronomicalBodyType.Comet or \
-           astronomicalBodyType == AstronomicalBodyType.Planet or \
-           astronomicalBodyType == AstronomicalBodyType.Sun:
-            subMenu.append( Gtk.MenuItem( _( "Distance to Earth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ) ) )
-
-        if astronomicalBodyType == AstronomicalBodyType.Moon or \
-           astronomicalBodyType == AstronomicalBodyType.Comet or \
-           astronomicalBodyType == AstronomicalBodyType.Planet:
-            subMenu.append( Gtk.MenuItem( _( "Distance to Sun: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ) ) )
-
-        if astronomicalBodyType == AstronomicalBodyType.Moon or \
-           astronomicalBodyType == AstronomicalBodyType.Planet:
-            subMenu.append( Gtk.MenuItem( _( "Bright Limb: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ) ) )
-
-        if astronomicalBodyType == AstronomicalBodyType.Planet and \
-           dataTag == IndicatorLunar.PLANET_SATURN.upper():
-            subMenu.append( Gtk.MenuItem( _( "Earth Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_EARTH_TILT, ) ) ) )
-            subMenu.append( Gtk.MenuItem( _( "Sun Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SUN_TILT, ) ) ) )
 
         menuItem.set_submenu( subMenu )
 
@@ -1555,6 +1518,7 @@ class IndicatorLunar:
             self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp )
             if not self.hideBody( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, hideIfNeverUp ):
                 key = ( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
+                self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] = str( self.getPhase( ephem.Moon( self.getCity( ephemNow ) ) ) )
                 lunarIlluminationPercentage = int( self.data[ key  + ( IndicatorLunar.DATA_ILLUMINATION, ) ] )
                 self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
                 self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
@@ -1685,12 +1649,13 @@ class IndicatorLunar:
                     self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_BAD_DATA
                 else:
                     if float( comet.mag ) <= float( hideIfGreaterThanMagnitude ):
+                        self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MAGNITUDE ) ] = str( float( comet.mag ) )
                         self.updateCommon( comet, AstronomicalBodyType.Comet, key, ephemNow, hideIfNeverUp )
             else:
                 self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
-    # Calculates the common attributes such as rise/set, illumination, magnitude, distance, bright limb angle and Az/Alt.
+    # Calculates the common attributes such as rise/set and azimuth/altitude.
     # Data tags such as RISE_TIME and/or MESSAGE will be added to the data dict.
     def updateCommon( self, body, astronomicalBodyType, dataTag, ephemNow, hideIfNeverUp ):
         key = ( astronomicalBodyType, dataTag )
@@ -1710,30 +1675,8 @@ class IndicatorLunar:
         if not self.hideBody( astronomicalBodyType, dataTag, hideIfNeverUp ):
             body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
 
-            if astronomicalBodyType == AstronomicalBodyType.Moon or \
-               astronomicalBodyType == AstronomicalBodyType.Planet:
-                self.data[ key + ( IndicatorLunar.DATA_ILLUMINATION, ) ] = str( self.getPhase( body ) )
-
-            self.data[ key + ( IndicatorLunar.DATA_MAGNITUDE, ) ] = str( round( body.mag, 1 ) )
-
-            if astronomicalBodyType == AstronomicalBodyType.Moon:
-                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH_KM, ) ] = str( round( body.earth_distance * ephem.meters_per_au / 1000 ) )
-                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 5 ) )
-                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ] = str( round( body.sun_distance, 2 ) )
-
-            if astronomicalBodyType == AstronomicalBodyType.Comet or \
-               astronomicalBodyType == AstronomicalBodyType.Planet:
-                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 1 ) )
-                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_SUN, ) ] = str( round( body.sun_distance, 1 ) )
-
-            if astronomicalBodyType == AstronomicalBodyType.Sun:
-                self.data[ key + ( IndicatorLunar.DATA_DISTANCE_TO_EARTH, ) ] = str( round( body.earth_distance, 2 ) )
-
-            if astronomicalBodyType == AstronomicalBodyType.Moon or \
-               astronomicalBodyType == AstronomicalBodyType.Planet:
-                self.data[ key + ( IndicatorLunar.DATA_BRIGHT_LIMB, ) ] = str( round( self.getZenithAngleOfBrightLimb( self.getCity( ephemNow ), body ) ) )
-
-            self.updateAzimuthAltitude( body, astronomicalBodyType, dataTag )
+            self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( body.az )
+            self.data[ key + ( IndicatorLunar.DATA_ALTITUDE, ) ] = str( body.alt )
 
 
     def hideBody( self, astronomicalBodyType, dataTag, hideIfNeverUp ):
