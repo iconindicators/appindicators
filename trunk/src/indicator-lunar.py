@@ -957,13 +957,8 @@ class IndicatorLunar:
     def updateStarsMenu( self, menu ):
         stars = [ ] # List of lists.  Each sublist contains the star name followed by the translated name.
         for starName in self.stars:
-            key = ( AstronomicalBodyType.Star, starName.upper() )
-            if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
-               self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
-               self.hideBodyIfNeverUp:
-                continue
-
-            stars.append( [ starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
+            if not self.hideBody( AstronomicalBodyType.Star, starName.upper(), self.hideBodyIfNeverUp ):
+                stars.append( [ starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
 
         if len( stars ) > 0:
             starsMenuItem = Gtk.MenuItem( _( "Stars" ) )
@@ -1095,7 +1090,9 @@ class IndicatorLunar:
 
         subMenu.append( Gtk.SeparatorMenuItem() )
 
-        self.updateAzimuthAltitudeMenu( subMenu, astronomicalBodyType, dataTag )
+        subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
+        subMenu.append( Gtk.MenuItem( _( "Altitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ALTITUDE, ) ) ) )
+
         subMenu.append( Gtk.SeparatorMenuItem() )
 
         if astronomicalBodyType == AstronomicalBodyType.Moon or \
@@ -1128,13 +1125,6 @@ class IndicatorLunar:
             subMenu.append( Gtk.MenuItem( _( "Sun Tilt: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SUN_TILT, ) ) ) )
 
         menuItem.set_submenu( subMenu )
-
-
-    def updateAzimuthAltitudeMenu( self, menu, astronomicalBodyType, dataTag ):
-        key = ( astronomicalBodyType, dataTag )
-        menu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
-        menu.append( Gtk.MenuItem( _( "Altitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ALTITUDE, ) ) ) )
-        menu.append( Gtk.SeparatorMenuItem() )
 
 
     def updateSatellitesMenu( self, menu ):
@@ -1700,7 +1690,7 @@ class IndicatorLunar:
                 self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
 
 
-    # Calculates the common attributes such as rise/set, illumination, magnitude, distance, bright limb angle and RA/Dec/Az/Alt.
+    # Calculates the common attributes such as rise/set, illumination, magnitude, distance, bright limb angle and Az/Alt.
     # Data tags such as RISE_TIME and/or MESSAGE will be added to the data dict.
     def updateCommon( self, body, astronomicalBodyType, dataTag, ephemNow, hideIfNeverUp ):
         key = ( astronomicalBodyType, dataTag )
