@@ -716,8 +716,8 @@ class IndicatorLunar:
 
             if self.firstRun:
                 if self.cometMagnitudeLooksDodgy:
-                    summary = _( "Comet Magnitude Suspicious" )
-                    message = _( "The magnitude of at least one comet has a suspicious value!" )
+                    summary = _( "Suspicious Comet Magnitude" )
+                    message = _( "The magnitude of at least one comet has a dubious value!" )
                     Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
 
             self.nextUpdate = self.toDateTime( self.nextUpdate ) # Parse from string back into a datetime.
@@ -1190,13 +1190,14 @@ class IndicatorLunar:
 
                     subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ) )
                 else:
-#TODO Hide notification and make all passes show.
+#TODO Test this...
+#Hide notification and make all passes visible (comment out the check for visible only passes).
 #Check the maths for when a satellite is more than two minutes from rising,
-#a satellite is yet to rise,
-#a satellite is currently rising.
+#also for a satellite yet to rise,
+#also a satellite currently rising.
 
                     riseTime = self.toDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] )
-                    dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60
+                    dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60 # If the satellite is currently rising, we'll get a negative but that's okay.
                     if dateTimeDifferenceInMinutes > 2: # If this satellite will rise more than two minutes from now, then only show the rise time.
                         subMenu.append( Gtk.MenuItem( _( "Rise Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) ) )
 
