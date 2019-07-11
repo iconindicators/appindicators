@@ -650,7 +650,6 @@ class IndicatorLunar:
                 GLib.source_remove( self.updateTimerID )
 
             # Update backend...
-            self.cometMagnitudeLooksDodgy = False
             self.updateCometOEData()
             self.updateSatelliteTLEData()
 
@@ -729,8 +728,15 @@ class IndicatorLunar:
             self.previousLunarIlluminationPercentage = lunarIlluminationPercentage
             self.previousThemeName = themeName
             self.purgeIcons()
-            iconName = self.getIconName()
-            self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngle, self.getIconFilename( iconName ) )
+
+            # Ideally should be able to create the icon with the same name each time.
+            # Due to a bug, the icon name must change between calls to setting the icon.
+            # So change the name each time - using the current date/time.
+            #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
+            #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
+            iconName = IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
+            iconFilename = IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
+            self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngle, iconFilename )
             self.indicator.set_icon( iconName )
 
 
@@ -995,19 +1001,11 @@ class IndicatorLunar:
                     self.updateCommonMenu( menuItem, AstronomicalBodyType.Comet, key )
                     menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
                     menuItem.get_submenu().append( Gtk.MenuItem( _( "Magnitude: " ) + self.getDisplayData( ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MAGNITUDE ) ) ) )
-                    self.addOnCometHandler( menuItem.get_submenu(), key )
 
-                    # Sometimes the magnitude for a comet is clearly wrong (have seen -327 for example).
-                    # Determine if any magnitudes are brighter than say the moon and report to the user.
-                    cometMagnitude = float( self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MAGNITUDE ) ] )
-                    if( int( cometMagnitude ) < -10.0 ):
-                        self.cometMagnitudeLooksDodgy = True
-
-
-    def addOnCometHandler( self, subMenu, comet ):
-        for child in subMenu.get_children():
-            child.set_name( comet )
-            child.connect( "activate", self.onComet )
+                    # Add handler.
+                    for child in menuItem.get_submenu().get_children():
+                        child.set_name( key )
+                        child.connect( "activate", self.onComet )
 
 
     def onComet( self, widget ):
@@ -1140,7 +1138,10 @@ class IndicatorLunar:
                     if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > str( utcNow ):
                         self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
 
-                self.addOnSatelliteHandler( subMenu, satelliteName, satelliteNumber )
+                # Add handler.
+                for child in subMenu.get_children():
+                    child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
+                    child.connect( "activate", self.onSatellite )
 
                 if self.showSatellitesAsSubMenu:
                     menuItem = Gtk.MenuItem( menuText )
@@ -1150,12 +1151,6 @@ class IndicatorLunar:
                     menu.append( menuItem )
 
                 menuItem.set_submenu( subMenu )
-
-
-    def addOnSatelliteHandler( self, subMenu, satelliteName, satelliteNumber ):
-        for child in subMenu.get_children():
-            child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
-            child.connect( "activate", self.onSatellite )
 
 
     def onSatellite( self, widget ):
@@ -1270,9 +1265,6 @@ class IndicatorLunar:
             decimalDegrees = round( math.copysign( x, y ), roundAmount )
 
         return decimalDegrees
-
-
-    def trimDecimal( self, stringInput ): return re.sub( "\.(\d+)", "", stringInput )
 
 
     def toDateTime( self, dateTimeAsString ):
@@ -1422,17 +1414,6 @@ class IndicatorLunar:
             themeColour = "fff200" # Default to hicolor.
 
         return themeColour
-
-
-    # Ideally should be able to create the icon with the same name each time.
-    # Due to a bug, the icon name must change between calls to setting the icon.
-    # So change the name each time - using the current date/time.
-    #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
-    #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
-    def getIconName( self ): return IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
-
-
-    def getIconFilename( self, iconName ): return IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
 
 
     def purgeIcons( self ):
@@ -1627,14 +1608,6 @@ class IndicatorLunar:
 
 
     def getPhase( self, body ): return round( body.phase )
-
-
-    # Compute the azimuth and altitude for a body.
-    # http://www.satellite-calculations.com/Satellite/suncalc.htm
-    def updateAzimuthAltitude( self, body, astronomicalBodyType, dataTag ):
-        key = ( astronomicalBodyType, dataTag )
-        self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( body.az )
-        self.data[ key + ( IndicatorLunar.DATA_ALTITUDE, ) ] = str( body.alt )
 
 
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body.
