@@ -391,7 +391,7 @@ class IndicatorOnThisDay:
                 treeiter = store.iter_next( treeiter )
 
             self.copyToClipboard = radioCopyToClipboard.get_active()
-            self.searchURL = searchEngineEntry.get_text().strip()            
+            self.searchURL = searchEngineEntry.get_text().strip()
             self.notify = notifyCheckbox.get_active()
             self.saveConfig()
             pythonutils.setAutoStart( IndicatorOnThisDay.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
