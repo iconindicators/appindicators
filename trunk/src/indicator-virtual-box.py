@@ -64,6 +64,7 @@ class IndicatorVirtualBox:
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     CONFIG_SHOW_SUBMENU = "showSubmenu"
     CONFIG_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
+    CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME = "virtualboxManagerWindowName"
 
     NOTIFICATION_DELAY_IN_SECONDS = 10
 
@@ -230,15 +231,19 @@ class IndicatorVirtualBox:
         # No need to check for a None value as this function will never be called if VBoxManage (VirtualBox) is not installed.
         virtualBoxExecutable = pythonutils.processGet( "which VirtualBox" ).strip()
 
+        # The executable for VirtualBox manager was not always appearing in the process list
+        # because the executable might be a script which calls another executable.
+        # So using processes to find the window kept failing.
+        # Instead, now have the user type in the title of the window into the preferences and find the window by that.
+        result = pythonutils.processGet( "wmctrl -l | grep \"" + self.virtualboxManagerWindowName + "\"" )
         windowID = None
-        processID = pythonutils.processGet( "ps -ef | awk '{ if( $NF == \"" + virtualBoxExecutable + "\" ) print $2; }'" )
-        if( processID is not None and processID != "" ):
-            windowID = pythonutils.processGet( "wmctrl -lp | awk '{ if( $3 == " + processID.strip() + " ) print $1; }'" )
+        if result is not None:
+            windowID = result.split()[ 0 ]
 
         if windowID is None or windowID == "":
             pythonutils.processCall( virtualBoxExecutable + " &" )
         else:
-            pythonutils.processCall( "wmctrl -ia " + windowID.strip() )
+            pythonutils.processCall( "wmctrl -ia " + windowID )
 
 
     # Returns a list of running VM names and list of corresponding running VM UUIDs.
@@ -490,13 +495,29 @@ class IndicatorVirtualBox:
         grid.set_margin_top( 10 )        
         grid.set_margin_bottom( 10 )
 
+        box = Gtk.Box( spacing = 6 )
+        box.set_hexpand( True )
+
+        label = Gtk.Label( _( "VirtualBox™ Manager" ) )
+        label.set_halign( Gtk.Align.START )
+        box.pack_start( label, False, False, 0 )
+
+        windowName = Gtk.Entry()
+        windowName.set_tooltip_text( _( \
+            "The name (window title) of VirtualBox™ Manager.\n" + \
+            "You may have to specify in you local language." ) )
+        windowName.set_text( self.virtualboxManagerWindowName )
+        box.pack_start( windowName, True, True, 0 )
+
+        grid.attach( box, 0, 0, 1, 1 )
+
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show groups as submenus" ) )
         showAsSubmenusCheckbox.set_tooltip_text( _(
             "If checked, groups are shown using submenus.\n\n" + \
             "Otherwise groups are shown as an indented list." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
 
-        row = 0
+        row = 1
         if groupsExist:
             grid.attach( showAsSubmenusCheckbox, 0, row, 1, 1 )
             row += 1
@@ -546,6 +567,7 @@ class IndicatorVirtualBox:
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
+            self.virtualboxManagerWindowName = windowName.get_text().strip()
             self.delayBetweenAutoStartInSeconds = spinnerDelay.get_value_as_int()
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
@@ -661,6 +683,7 @@ class IndicatorVirtualBox:
         self.refreshIntervalInMinutes = 15
         self.showSubmenu = False
         self.virtualMachinePreferences = { } # Store information about VMs (not groups). Key is VM UUID; value is [ autostart (bool), start command (str) ]
+        self.virtualboxManagerWindowName = "Oracle VM VirtualBox Manager"
 
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
@@ -668,6 +691,7 @@ class IndicatorVirtualBox:
         self.refreshIntervalInMinutes = config.get( IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
         self.showSubmenu = config.get( IndicatorVirtualBox.CONFIG_SHOW_SUBMENU, self.showSubmenu )
         self.virtualMachinePreferences = config.get( IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES, self.virtualMachinePreferences )
+        self.virtualboxManagerWindowName = config.get( IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME, self.virtualboxManagerWindowName )
 
 
     def saveConfig( self ):
@@ -675,7 +699,8 @@ class IndicatorVirtualBox:
             IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START: self.delayBetweenAutoStartInSeconds,
             IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
             IndicatorVirtualBox.CONFIG_SHOW_SUBMENU: self.showSubmenu,
-            IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences
+            IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences,
+            IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME: self.virtualboxManagerWindowName
         }
 
         pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
