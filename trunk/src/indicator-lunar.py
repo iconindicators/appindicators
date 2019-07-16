@@ -31,6 +31,14 @@
 #  http://www.flaticon.com/search/satellite
 
 
+#TODO Keep the magnitude of comets?  What is the point...but then what about when a bogus magnitude is present?
+# If we notify the user, then need to show magnitude.
+
+#TODO Have an option to hide a non-satellite body if below the horizon?
+
+#TODO Have an option to hide all but the rise time for a non-satellite body if below the horizon?
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
