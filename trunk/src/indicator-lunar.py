@@ -32,7 +32,7 @@
 
 
 #TODO
-On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared:
+# On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared:
 # 
 # 2019-07-13 17:10:02,976 - root - ERROR - [Errno 2] No such file or directory: '/usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg'
 # Traceback (most recent call last):
