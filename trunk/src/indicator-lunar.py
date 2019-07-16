@@ -31,6 +31,17 @@
 #  http://www.flaticon.com/search/satellite
 
 
+#TODO
+On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared:
+# 
+# 2019-07-13 17:10:02,976 - root - ERROR - [Errno 2] No such file or directory: '/usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg'
+# Traceback (most recent call last):
+#   File "/usr/share/indicator-lunar/indicator-lunar.py", line 1897, in getThemeColour
+#     with open( iconFilenameForCurrentTheme, "r" ) as file:
+# FileNotFoundError: [Errno 2] No such file or directory: '/usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg'
+# 2019-07-13 17:10:02,989 - root - ERROR - Error reading SVG icon: /usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg
+
+
 #TODO Keep the magnitude of comets?  What is the point...but then what about when a bogus magnitude is present?
 # If we notify the user, then need to show magnitude.
 
