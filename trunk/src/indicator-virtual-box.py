@@ -505,7 +505,7 @@ class IndicatorVirtualBox:
         windowName = Gtk.Entry()
         windowName.set_tooltip_text( _( \
             "The name (window title) of VirtualBox™ Manager.\n" + \
-            "You may have to specify in you local language." ) )
+            "You may have to adjust for your local language." ) )
         windowName.set_text( self.virtualboxManagerWindowName )
         box.pack_start( windowName, True, True, 0 )
 
