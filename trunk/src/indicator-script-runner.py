@@ -329,7 +329,7 @@ class IndicatorScriptRunner:
         hideGroupsCheckbox.set_sensitive( not self.showScriptsInSubmenus )
         hideGroupsCheckbox.set_margin_left( pythonutils.INDENT_WIDGET_LEFT * 2 )
         hideGroupsCheckbox.set_tooltip_text( _(
-            "If checked, only scripts names are displayed.\n\n" + \
+            "If checked, only script names are displayed.\n\n" + \
             "Otherwise, script names are indented within each group." ) )
 
         grid.attach( hideGroupsCheckbox, 0, 3, 1, 1 )
