@@ -37,6 +37,12 @@
 #TODO Have an option to hide a non-satellite body if below the horizon?
 
 #TODO Have an option to hide all but the rise time for a non-satellite body if below the horizon?
+# Already do this for satellites!
+
+#TODO Remove solstice/equinox from Sun?  
+# The purpose of the indicator is to give information about an object for observation,
+# possibly for a specific date/event.
+# Solstice/equinox is not an observable event.
 
 
 INDICATOR_NAME = "indicator-lunar"
