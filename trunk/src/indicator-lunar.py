@@ -3006,7 +3006,6 @@ class IndicatorLunar:
                 data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
                 for i in range( 0, len( data ) ):
                     if not data[ i ].startswith( "#" ):
-
                         cometName = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # Found that the comet name can have multiple whitespace, so remove.
                         cometData = data[ i ][ data[ i ].index( "," ) : ]
                         cometOEData[ cometName.upper() ] = cometName + cometData
