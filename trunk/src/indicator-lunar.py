@@ -50,8 +50,6 @@
 #TODO Have an option to hide all but the rise time for a non-satellite body if below the horizon?
 # Already do this for satellites!
 
-#TODO Check all indicators that show any notify: are all notifications shown really needed, or just over zealous?
-
 
 INDICATOR_NAME = "indicator-lunar"
 import gettext
