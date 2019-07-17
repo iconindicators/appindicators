@@ -42,9 +42,8 @@
 # 2019-07-13 17:10:02,989 - root - ERROR - Error reading SVG icon: /usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg
 
 
-#TODO Keep the magnitude of comets?  What is the point...but then what about when a bogus magnitude is present?
-# If we notify the user, then need to show magnitude.
-# Have sent a message to MPC to look at the data format as it looks odd for the two dodgy magnitude comets.
+#TODO Have sent a message to MPC to look at the data format as it looks odd for the two dodgy magnitude comets.
+#Maybe there is a way to screen out dodgy data?
 
 #TODO Have an option to hide a non-satellite body if below the horizon?
 
@@ -156,7 +155,6 @@ class IndicatorLunar:
     DATA_FULL = "FULL"
     DATA_LATITUDE = "LATITUDE" # Only used for the CITY "body" tag.
     DATA_LONGITUDE = "LONGITUDE" # Only used for the CITY "body" tag.
-    DATA_MAGNITUDE = "MAGNITUDE"
     DATA_MESSAGE = "MESSAGE"
     DATA_NAME = "NAME" # Only used for the CITY "body" tag.
     DATA_NEW = "NEW"
@@ -181,7 +179,6 @@ class IndicatorLunar:
         DATA_FULL,
         DATA_LATITUDE,
         DATA_LONGITUDE,
-        DATA_MAGNITUDE,
         DATA_MESSAGE,
         DATA_NAME,
         DATA_NEW,
@@ -193,7 +190,6 @@ class IndicatorLunar:
         DATA_THIRD_QUARTER ]
 
     DATA_TAGS_COMET = [
-        DATA_MAGNITUDE,
         DATA_MESSAGE,
         DATA_RISE_AZIMUTH,
         DATA_RISE_TIME,
@@ -260,7 +256,6 @@ class IndicatorLunar:
         DATA_FULL                       : _( "FULL" ),
         DATA_LATITUDE                   : _( "LATITUDE" ),
         DATA_LONGITUDE                  : _( "LONGITUDE" ),
-        DATA_MAGNITUDE                  : _( "MAGNITUDE" ),
         DATA_MESSAGE                    : _( "MESSAGE" ),
         DATA_NAME                       : _( "NAME" ), # Only used for CITY "body" tag.
         DATA_NEW                        : _( "NEW" ),
@@ -999,8 +994,6 @@ class IndicatorLunar:
                     menuItem.set_submenu( subMenu )
                 else:
                     self.updateCommonMenu( menuItem, AstronomicalBodyType.Comet, key )
-                    menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-                    menuItem.get_submenu().append( Gtk.MenuItem( _( "Magnitude: " ) + self.getDisplayData( ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MAGNITUDE ) ) ) )
 
                     # Add handler.
                     for child in menuItem.get_submenu().get_children():
@@ -1219,9 +1212,6 @@ class IndicatorLunar:
         elif key[ 2 ] == IndicatorLunar.DATA_LATITUDE or \
              key[ 2 ] == IndicatorLunar.DATA_LONGITUDE:
             displayData = self.data[ key ] + "°"
-
-        elif key[ 2 ] == IndicatorLunar.DATA_MAGNITUDE:
-            displayData = self.data[ key ]
 
         elif key[ 2 ] == IndicatorLunar.DATA_MESSAGE:
             displayData = self.data[ key ]
@@ -1562,7 +1552,6 @@ class IndicatorLunar:
                     self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_BAD_DATA
                 else:
                     if float( comet.mag ) <= float( hideIfGreaterThanMagnitude ):
-                        self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MAGNITUDE ) ] = str( float( comet.mag ) )
                         self.updateCommon( comet, AstronomicalBodyType.Comet, key, ephemNow, hideIfNeverUp )
             else:
                 self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
