@@ -50,10 +50,7 @@
 #TODO Have an option to hide all but the rise time for a non-satellite body if below the horizon?
 # Already do this for satellites!
 
-#TODO Remove solstice/equinox from Sun?  
-# The purpose of the indicator is to give information about an object for observation,
-# possibly for a specific date/event.
-# Solstice/equinox is not an observable event.
+#TODO Check all indicators that show any notify: are all notifications shown really needed, or just over zealous?
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -156,7 +153,6 @@ class IndicatorLunar:
     DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
     DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
     DATA_ELEVATION = "ELEVATION" # Only used for the CITY "body" tag.
-    DATA_EQUINOX = "EQUINOX"
     DATA_FIRST_QUARTER = "FIRST QUARTER"
     DATA_FULL = "FULL"
     DATA_LATITUDE = "LATITUDE" # Only used for the CITY "body" tag.
@@ -170,7 +166,6 @@ class IndicatorLunar:
     DATA_RISE_TIME = "RISE TIME"
     DATA_SET_AZIMUTH = "SET AZIMUTH"
     DATA_SET_TIME = "SET TIME"
-    DATA_SOLSTICE = "SOLSTICE"
     DATA_THIRD_QUARTER = "THIRD QUARTER"
 
     DATA_TAGS_ALL = [
@@ -183,7 +178,6 @@ class IndicatorLunar:
         DATA_ECLIPSE_LONGITUDE,
         DATA_ECLIPSE_TYPE,
         DATA_ELEVATION,
-        DATA_EQUINOX,
         DATA_FIRST_QUARTER,
         DATA_FULL,
         DATA_LATITUDE,
@@ -197,7 +191,6 @@ class IndicatorLunar:
         DATA_RISE_TIME,
         DATA_SET_AZIMUTH,
         DATA_SET_TIME,
-        DATA_SOLSTICE,
         DATA_THIRD_QUARTER ]
 
     DATA_TAGS_COMET = [
@@ -250,11 +243,9 @@ class IndicatorLunar:
         DATA_ECLIPSE_LATITUDE,
         DATA_ECLIPSE_LONGITUDE,
         DATA_ECLIPSE_TYPE,
-        DATA_EQUINOX,
         DATA_MESSAGE,
         DATA_RISE_TIME,
-        DATA_SET_TIME,
-        DATA_SOLSTICE ]
+        DATA_SET_TIME ]
 
     DATA_TAGS_TRANSLATIONS = {
         DATA_ALTITUDE                   : _( "ALTITUDE" ),
@@ -266,7 +257,6 @@ class IndicatorLunar:
         DATA_ECLIPSE_LONGITUDE          : _( "ECLIPSE LONGITUDE" ),
         DATA_ECLIPSE_TYPE               : _( "ECLIPSE TYPE" ),
         DATA_ELEVATION                  : _( "ELEVATION" ),
-        DATA_EQUINOX                    : _( "EQUINOX" ),
         DATA_FIRST_QUARTER              : _( "FIRST QUARTER" ),
         DATA_FULL                       : _( "FULL" ),
         DATA_LATITUDE                   : _( "LATITUDE" ),
@@ -280,7 +270,6 @@ class IndicatorLunar:
         DATA_RISE_TIME                  : _( "RISE TIME" ),
         DATA_SET_AZIMUTH                : _( "SET AZIMUTH" ),
         DATA_SET_TIME                   : _( "SET TIME" ),
-        DATA_SOLSTICE                   : _( "SOLSTICE" ),
         DATA_THIRD_QUARTER              : _( "THIRD QUARTER" ) }
 
     CITY_TAG = "CITY"
@@ -891,19 +880,6 @@ class IndicatorLunar:
             menu.append( menuItem )
             self.updateCommonMenu( menuItem, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
             menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-
-            # Solstice/Equinox.
-            equinox = self.data[ key + ( IndicatorLunar.DATA_EQUINOX, ) ]
-            solstice = self.data[ key + ( IndicatorLunar.DATA_SOLSTICE, ) ]
-            self.nextUpdate = self.getSmallestDateTime( equinox, self.getSmallestDateTime( self.nextUpdate, solstice ) )
-            if equinox < solstice:
-                menuItem.get_submenu().append( Gtk.MenuItem( _( "Equinox: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_EQUINOX, ) ) ) )
-                menuItem.get_submenu().append( Gtk.MenuItem( _( "Solstice: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SOLSTICE, ) ) ) )
-            else:
-                menuItem.get_submenu().append( Gtk.MenuItem( _( "Solstice: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SOLSTICE, ) ) ) )
-                menuItem.get_submenu().append( Gtk.MenuItem( _( "Equinox: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_EQUINOX, ) ) ) )
-
-            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
             self.updateEclipseMenu( menuItem.get_submenu(), AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
 
 
@@ -1201,13 +1177,11 @@ class IndicatorLunar:
         elif key[ 2 ] == IndicatorLunar.DATA_DAWN or \
              key[ 2 ] == IndicatorLunar.DATA_DUSK or \
              key[ 2 ] == IndicatorLunar.DATA_ECLIPSE_DATE_TIME or \
-             key[ 2 ] == IndicatorLunar.DATA_EQUINOX or \
              key[ 2 ] == IndicatorLunar.DATA_FIRST_QUARTER or \
              key[ 2 ] == IndicatorLunar.DATA_FULL or \
              key[ 2 ] == IndicatorLunar.DATA_NEW or \
              key[ 2 ] == IndicatorLunar.DATA_RISE_TIME or \
              key[ 2 ] == IndicatorLunar.DATA_SET_TIME or \
-             key[ 2 ] == IndicatorLunar.DATA_SOLSTICE or \
              key[ 2 ] == IndicatorLunar.DATA_THIRD_QUARTER:
                 if source is None:
                     displayData = self.getLocalDateTime( self.data[ key ], self.dateTimeFormat )
@@ -1539,11 +1513,6 @@ class IndicatorLunar:
 
                 except ( ephem.AlwaysUpError, ephem.NeverUpError ):
                     pass # No need to add a message here as update common would already have done so.
-
-                equinox = ephem.next_equinox( ephemNow )
-                solstice = ephem.next_solstice( ephemNow )
-                self.data[ key + ( IndicatorLunar.DATA_EQUINOX, ) ] = str( equinox.datetime() )
-                self.data[ key + ( IndicatorLunar.DATA_SOLSTICE, ) ] = str( solstice.datetime() )
 
                 self.updateEclipse( ephemNow, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
 
