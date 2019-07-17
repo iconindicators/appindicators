@@ -45,6 +45,11 @@
 #TODO Have sent a message to MPC to look at the data format as it looks odd for the two dodgy magnitude comets.
 #Maybe there is a way to screen out dodgy data?
 
+#TODO Maybe show other stuff for comets?
+# https://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
+# But this means changing to the name orbital elements...or maybe leaving comets as is and add a new thing for OE?
+# Maybe rename to OE as it catches all (and they are treated identically by PyEphem).
+
 #TODO Have an option to hide a non-satellite body if below the horizon?
 
 #TODO Have an option to hide all but the rise time for a non-satellite body if below the horizon?
