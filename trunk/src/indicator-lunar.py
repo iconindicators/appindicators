@@ -1289,7 +1289,7 @@ class IndicatorLunar:
             pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
             self.cometOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
             if self.cometOEData is None:
-                self.cometOEData = self.getCometOEData( self.cometOEURL )
+                self.cometOEData = self.getCometOEData( self.cometOEURL ) # Format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId468501
 
                 if self.cometOEData is None:
                     self.cometOEData = { }
