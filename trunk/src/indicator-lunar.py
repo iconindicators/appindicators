@@ -751,7 +751,7 @@ class IndicatorLunar:
             iconName = IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
             iconFilename = IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
             self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngle, iconFilename )
-            self.indicator.set_icon( iconName )
+            self.indicator.set_icon_full( iconName, "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
 
 
     def notificationFullMoon( self, ephemNow ):
