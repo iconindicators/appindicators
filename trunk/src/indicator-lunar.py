@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from curses.ascii import alt
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -51,10 +52,6 @@
 # But this means changing to the name orbital elements...or maybe leaving comets as is and add a new thing for OE?
 # Maybe rename to OE as it catches all (and they are treated identically by PyEphem).
 # By extension, allow for multiple URLs for the OEs (see the URL above)?  ... and ditto for satellites?
-
-
-#TODO Have an option to hide all but the rise time for a non-satellite body if below the horizon?
-# Already do this for satellites!
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -1021,6 +1018,7 @@ class IndicatorLunar:
     def updateCommonMenu( self, menuItem, astronomicalBodyType, dataTag ):
         key = ( astronomicalBodyType, dataTag )
         subMenu = Gtk.Menu()
+        altitude = int( self.getDecimalDegrees( self.data[ key + ( IndicatorLunar.DATA_ALTITUDE, ) ], False, 0 ) )
 
         # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
         # Therefore only check for the presence of these two messages.
@@ -1033,22 +1031,26 @@ class IndicatorLunar:
         else:
             data = [ ]
             data.append( [ key + ( IndicatorLunar.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
-            data.append( [ key + ( IndicatorLunar.DATA_SET_TIME, ), _( "Set: " ), self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ] )
+            if altitude >= 0:
+                data.append( [ key + ( IndicatorLunar.DATA_SET_TIME, ), _( "Set: " ), self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ] )
+
             self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] ) )
 
             if astronomicalBodyType == AstronomicalBodyType.Sun:
                 data.append( [ key + ( IndicatorLunar.DATA_DAWN, ), _( "Dawn: " ), self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] ] )
-                data.append( [ key + ( IndicatorLunar.DATA_DUSK, ), _( "Dusk: " ), self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ] )
+                if altitude >= 0:
+                    data.append( [ key + ( IndicatorLunar.DATA_DUSK, ), _( "Dusk: " ), self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ] )
+
                 self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] ) )
  
             data = sorted( data, key = lambda x: ( x[ 2 ] ) )
             for theKey, text, dateTime in data:
                 subMenu.append( Gtk.MenuItem( text + self.getDisplayData( theKey ) ) )
 
-        subMenu.append( Gtk.SeparatorMenuItem() )
-
-        subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
-        subMenu.append( Gtk.MenuItem( _( "Altitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ALTITUDE, ) ) ) )
+        if altitude >= 0:
+            subMenu.append( Gtk.SeparatorMenuItem() )
+            subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( _( "Altitude: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_ALTITUDE, ) ) ) )
 
         menuItem.set_submenu( subMenu )
 
@@ -1582,7 +1584,6 @@ class IndicatorLunar:
 
         if not self.hideBody( astronomicalBodyType, dataTag, hideIfNeverUp ):
             body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-
             self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( body.az )
             self.data[ key + ( IndicatorLunar.DATA_ALTITUDE, ) ] = str( body.alt )
 
