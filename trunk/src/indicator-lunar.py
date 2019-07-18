@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from curses.ascii import alt
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -52,6 +51,21 @@ from curses.ascii import alt
 # But this means changing to the name orbital elements...or maybe leaving comets as is and add a new thing for OE?
 # Maybe rename to OE as it catches all (and they are treated identically by PyEphem).
 # By extension, allow for multiple URLs for the OEs (see the URL above)?  ... and ditto for satellites?
+# https://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
+# Have added in some of the extra MPC data files and found that there are a ton of new visible OEs.
+# These could have dodgy magnitudes, as warned on the MPC site...
+#...so maybe need some way to flag to the user magnitudes greater than the moon?
+# Maybe put in a special subgroup?
+# Use the OSD?
+
+
+#TODO If we want to have multiple source data files for comets (now OEs), then need to maybe also allow this for satellites too.
+# COuld do a couple of ways...
+# 1) Have a radio button on each of the satellite/comets tabs: one for default data file and one which enables the 
+# text field to let the user add ONE text file (so the multiple files by default are hidden from the user).
+# Don't like hiding the information from the user.
+# 2) Have a button which brings up a text box dialog, not text field, to let a multiline entry,
+# so we can have multiple URLs.
 
 
 INDICATOR_NAME = "indicator-lunar"
