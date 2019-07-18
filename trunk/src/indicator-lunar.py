@@ -66,6 +66,7 @@
 # Don't like hiding the information from the user.
 # 2) Have a button which brings up a text box dialog, not text field, to let a multiline entry,
 # so we can have multiple URLs.
+# Use a Gtk.TextView?  https://python-gtk-3-tutorial.readthedocs.io/en/latest/gallery.html
 
 
 INDICATOR_NAME = "indicator-lunar"
