@@ -29,6 +29,7 @@ from ephem.cities import _city_data
 from ephem.stars import stars
 
 
+#TODO DOes this need to be a class?  What about an array of strings or something?
 class AstronomicalBodyType: Comet, Moon, Planet, Satellite, Star, Sun = range( 6 ) #TODO Comet will/may have to change to OE?
 
 
