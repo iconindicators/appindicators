@@ -31,6 +31,10 @@
 #  http://www.flaticon.com/search/satellite
 
 
+
+#TODO Maybe remove the hide body if never up?  If the body is never up, then just don't show anything about it!
+
+
 #TODO
 # On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared:
 # 
