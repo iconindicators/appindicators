@@ -596,9 +596,11 @@ def filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzi
     try:
         with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
             for line in inFile:
-                hip = int( line.decode()[ 2 : 14 ].strip() )
+                hip = int( line.decode()[ 9 : 14 ].strip() ) #TODO Was 2 but according to ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe it should be 9.
                 if hip in hipparcosIdentifiers:
-                        outFile.write( line )
+#                     magnitude = int( line.decode()[ 42 : 46 ].strip() ) #TODO This barfs...dunno why as it should be the same as pulling out the hip.
+#                     print( hip, magnitude )
+                    outFile.write( line )
 
     except Exception as e:
         print( e ) #TODO Handle betterer.
@@ -793,13 +795,18 @@ def testSkyfield( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, eleva
     print( "Saturn:", testSkyfieldPlanet( utcNowSkyfield, ephemerisPlanets, observer, SKYFIELD_PLANET_SATURN ) )
 
 
-#     filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS_COMMON_NAMES ] )
-
-    with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
+# NOTE: First time skyfield is run, use the hipparcos.URL version which gets the file hip_main.dat.gz
+# Can then use the filterStars function to make a subset/smaller file (which presumably would be included in the final indicator).
+    with load.open( hipparcos.URL ) as f:
         ephemerisStars = hipparcos.load_dataframe( f )
+
+    filterStarsByHipparcosIdentifier( "hip_main.dat.gz", SKYFIELD_EPHEMERIS_STARS, [ i[ 1 ] for i in STARS_COMMON_NAMES ] )
+#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
+#         ephemerisStars = hipparcos.load_dataframe( f )
   
-#     print( "Number of stars: ", ephemerisStars.shape[ 0 ] )
-#     print( "Number of data columns: ", ephemerisStars.shape[ 1 ] )
+#TODO This list of stars are common name stars...what about stars that are visible but not in this list...how many of those are there?
+    print( "Number of stars: ", ephemerisStars.shape[ 0 ] )
+    print( "Number of data columns: ", ephemerisStars.shape[ 1 ] )
 
     star = Star.from_dataframe( ephemerisStars.loc[ 24436 ] )
     print( "Rigel (star):", testSkyfieldStar( utcNowSkyfield, observer, star ) )
