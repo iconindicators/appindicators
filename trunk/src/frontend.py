@@ -811,7 +811,7 @@ class IndicatorLunar:
         for satelliteName, satelliteNumber, in self.satellites:
             key = ( AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
             if ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.data: # Assume all other information is present!
-               satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
+                satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
 
         if self.satellitesSortByDateTime:
             satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
@@ -902,7 +902,6 @@ class IndicatorLunar:
 
     def updateSunMenu( self, menu ):
         if self.showSun and not self.hideBody( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG, self.hideBodyIfNeverUp ):
-            key = ( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
             menuItem = Gtk.MenuItem( _( "Sun" ) )
             menu.append( menuItem )
             self.updateCommonMenu( menuItem, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
@@ -1454,60 +1453,6 @@ class IndicatorLunar:
             key in self.data and \
             self.data[ key ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
             hideIfNeverUp
-
-
-    def getPhase( self, body ): return round( body.phase )
-
-
-    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body.
-    # Measured in degrees counter clockwise from a positive y axis.
-    #
-    # References:
-    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
-    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
-    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
-    #  http://www.geoastro.de/SME/
-    #  http://futureboy.us/fsp/moon.fsp
-    #  http://www.timeanddate.com/moon/australia/sydney
-    #  https://www.calsky.com/cs.cgi?cha=6&sec=1
-    #
-    # Other references...
-    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
-    #  https://sites.google.com/site/astronomicalalgorithms
-    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
-    #  https://github.com/brandon-rhodes/pyephem/issues/24
-    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
-    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-    def getZenithAngleOfBrightLimb( self, city, body ):
-        sun = ephem.Sun( city )
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-        y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
-        x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
-        positionAngleOfBrightLimb = math.atan2( y, x )
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
-        # https://tycho.usno.navy.mil/sidereal.html
-        # http://www.wwu.edu/skywise/skymobile/skywatch.html
-        # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-        hourAngle = city.sidereal_time() - body.ra
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-        y = math.sin( hourAngle )
-        x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
-        parallacticAngle = math.atan2( y, x )
-
-        return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
-
-
-    # Used to instantiate a new city object/observer.
-    # Typically after calculations (or exceptions) the city date is altered.
-    def getCity( self, date = None ):
-        city = ephem.city( self.cityName )
-        if date is not None:
-            city.date = date
-
-        return city
 
 
     def onAbout( self, widget ):
