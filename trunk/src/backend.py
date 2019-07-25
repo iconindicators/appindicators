@@ -23,10 +23,9 @@
 #If PyEphem uses radians but Skyfield always uses degrees for example, standardise data formats.
 
 
-import eclipse, ephem, math, pythonutils, satellite
+import eclipse, ephem, math, satellite
 
 from ephem.cities import _city_data
-from ephem.stars import stars
 
 
 #TODO DOes this need to be a class?  What about an array of strings or something?
@@ -283,25 +282,24 @@ MESSAGE_SATELLITE_VALUE_ERROR = "SATELLITE_VALUE_ERROR"
 #TODO Does city name come originally from pyephem?  Can it be anything and is then matched later with pyephem's list of cities?
 #City name would have to come from PyEphem originally...and so some sort of error has to burp back up on a bad city name.
 #TODO Document: missing ephem import results in None return.
-def getAstronomicalInformation( utcNow, logging, cityName,
-                                      planets, #TODO Need a comment about the list of planets: is upper case or case sensitive...same for stars/comets, satellites.  Skyfield may be different!
-                                      stars,
-                                      satellites, satelliteData,
-                                      comets, cometData, cometMagnitude = 6 ):
+def getAstronomicalInformation( utcNow, cityName,
+                                planets, #TODO Need a comment about the list of planets: is upper case or case sensitive...same for stars/comets, satellites.  Skyfield may be different!
+                                stars,
+                                satellites, satelliteData,
+                                comets, cometData, cometMagnitude = 6 ):
 
     # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
-    # Value is the data as a string.
+    # Value is the astronomical data (or equivalent) as a string.
     data = { }
 
     data[ ( None, NAME_TAG_CITY, DATA_NAME ) ] = cityName
-    global _city_data
     data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = str( round( float( _city_data.get( cityName )[ 0 ] ), 1 ) )
     data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = str( round( float( _city_data.get( cityName )[ 1 ] ), 1 ) )
     data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = str( _city_data.get( cityName )[ 2 ] )
 
     ephemNow = ephem.Date( utcNow )
-    __calculateMoon( ephemNow, cityName, data, logging )
-    __calculateSun( ephemNow, cityName, data, logging )
+    __calculateMoon( ephemNow, cityName, data )
+    __calculateSun( ephemNow, cityName, data )
     __calculatePlanets( ephemNow, cityName, data, planets )
     __calculateStars( ephemNow, cityName, data, stars )
     __calculateComets( ephemNow, cityName, data, comets, cometData, cometMagnitude )
@@ -329,7 +327,7 @@ def getAstronomicalInformation( utcNow, logging, cityName,
 # http://www.geoastro.de/altazsunmoon/index.htm
 # http://www.geoastro.de/sundata/index.html
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
-def __calculateMoon( ephemNow, cityName, data, logging ):
+def __calculateMoon( ephemNow, cityName, data ):
     __calculateCommon( ephemNow, cityName, data, ephem.Moon(), AstronomicalBodyType.Moon, NAME_TAG_MOON )
     key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
     moon = ephem.Moon()
@@ -341,7 +339,7 @@ def __calculateMoon( ephemNow, cityName, data, logging ):
     data[ key + ( DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
     data[ key + ( DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
     data[ key + ( DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
-    __calculateEclipse( ephemNow, data, AstronomicalBodyType.Moon, NAME_TAG_MOON, logging )
+    __calculateEclipse( ephemNow, data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
 
 # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
@@ -430,7 +428,7 @@ def __getLunarPhase( ephemNow, illuminationPercentage ):
 # http://www.geoastro.de/altazsunmoon/index.htm
 # http://futureboy.us/fsp/sun.fsp
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
-def __calculateSun( ephemNow, cityName, data, logging ):
+def __calculateSun( ephemNow, cityName, data ):
     __calculateCommon( ephemNow, cityName, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
     key = ( AstronomicalBodyType.Sun, NAME_TAG_SUN )
     try:
@@ -446,20 +444,17 @@ def __calculateSun( ephemNow, cityName, data, logging ):
     except ( ephem.AlwaysUpError, ephem.NeverUpError ):
         pass # No need to add a message here as update common would already have done so.
 
-    __calculateEclipse( ephemNow, data, AstronomicalBodyType.Sun, NAME_TAG_SUN, logging )
+    __calculateEclipse( ephemNow, data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
 
 
 # Calculate next eclipse for either the Sun or Moon.
-def __calculateEclipse( ephemNow, data, astronomicalBodyType, dataTag, logging ):
-    eclipseInformation = eclipse.getEclipseForUTC( ephemNow.datetime(), astronomicalBodyType == AstronomicalBodyType.Moon )
-    if eclipseInformation is None:
-        logging.error( "No eclipse information found!" )
-    else:
-        key = ( astronomicalBodyType, dataTag )
-        data[ key + ( DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ] + ".0" # Needed to bring the date/time format into line with date/time generated by PyEphem.
-        data[ key + ( DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
-        data[ key + ( DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
-        data[ key + ( DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
+def __calculateEclipse( ephemNow, data, astronomicalBodyType, dataTag ):
+    eclipseInformation = eclipse.getEclipseForUTC( ephemNow.datetime(), astronomicalBodyType == AstronomicalBodyType.Moon ) # Used to check for a None return, but this should never happen!
+    key = ( astronomicalBodyType, dataTag )
+    data[ key + ( DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ] + ".0" # Needed to bring the date/time format into line with date/time generated by PyEphem.
+    data[ key + ( DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
+    data[ key + ( DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
+    data[ key + ( DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
 # http://www.geoastro.de/planets/index.html
@@ -675,15 +670,15 @@ def __getCity( cityName, date ):
     return city
 
 
+#TODO Remove after testing done.
 import datetime
 
 utcNow = datetime.datetime.utcnow()
-logging = None
 cityName = "Sydney"
 planets = PLANETS
 stars = STARS
 
-result = getAstronomicalInformation( utcNow, logging, cityName, planets, stars,
+result = getAstronomicalInformation( utcNow, cityName, planets, stars,
                                       [ ], [ ],
                                       [ ], [ ], 6 )
 
