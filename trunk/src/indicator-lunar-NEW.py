@@ -94,7 +94,7 @@ except:
     sys.exit()
 
 
-class AstronomicalBodyType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star, Sun = range( 7 )
+class AstronomicalBodyType: Comet, Moon, Planet, Satellite, Star, Sun = range( 6 )
 
 
 class IndicatorLunar:
@@ -2980,8 +2980,6 @@ class IndicatorLunar:
                     if bodyTag == IndicatorLunar.PLANET_SATURN.upper():
                         tags.append( IndicatorLunar.DATA_EARTH_TILT )
                         tags.append( IndicatorLunar.DATA_SUN_TILT )
-                elif astronomicalBodyType == AstronomicalBodyType.PlanetaryMoon:
-                    tags = IndicatorLunar.DATA_TAGS_PLANETARY_MOON
                 elif astronomicalBodyType == AstronomicalBodyType.Satellite:
                     tags = IndicatorLunar.DATA_TAGS_SATELLITE
                 elif astronomicalBodyType == AstronomicalBodyType.Star:
