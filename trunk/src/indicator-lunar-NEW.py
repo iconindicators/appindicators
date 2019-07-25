@@ -83,7 +83,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
-import calendar, datetime, eclipse, glob, locale, logging, math, os, pythonutils, re, satellite, tempfile, threading, webbrowser
+import backend, calendar, datetime, eclipse, glob, locale, logging, math, os, pythonutils, re, satellite, tempfile, threading, webbrowser
 
 try:
     import ephem
@@ -683,19 +683,28 @@ class IndicatorLunar:
             self.updateCometOEData()
             self.updateSatelliteTLEData()
 
-            self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
-            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_NAME ) ] = self.cityName
+#             self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
+#             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_NAME ) ] = self.cityName
+# 
+#             global _city_data
+#             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LATITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 0 ] ), 1 ) )
+#             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LONGITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 1 ] ), 1 ) )
+#             self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_ELEVATION ) ] = str( _city_data.get( self.cityName )[ 2 ] )
+# 
+#             # UTC, used in all calculations which is required by pyephem.
+#             # When it comes time to display, conversion to local time takes place.
+#             ephemNow = ephem.now()
+# 
+#             self.updateAstronomicalInformation( ephemNow, self.hideBodyIfNeverUp, self.cometsMagnitude )
 
-            global _city_data
-            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LATITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 0 ] ), 1 ) )
-            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LONGITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 1 ] ), 1 ) )
-            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_ELEVATION ) ] = str( _city_data.get( self.cityName )[ 2 ] )
+            utcNow = datetime.datetime.utcnow()
+            cityName = self.cityName
+            planets = self.planets
+            stars = self.stars
+            self.data = backend.getAstronomicalInformation( utcNow, cityName, planets, stars,
+                                                  [ ], [ ],
+                                                  [ ], [ ], 6 )
 
-            # UTC, used in all calculations which is required by pyephem.
-            # When it comes time to display, conversion to local time takes place.
-            ephemNow = ephem.now()
-
-            self.updateAstronomicalInformation( ephemNow, self.hideBodyIfNeverUp, self.cometsMagnitude )
 
             # Update frontend...
             self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
