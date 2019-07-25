@@ -94,11 +94,7 @@ except:
     sys.exit()
 
 
-import datetime
-import backend
-
-
-class AstronomicalBodyType: Comet, Moon, Planet, Satellite, Star, Sun = range( 6 )
+class AstronomicalBodyType: Comet, Moon, Planet, PlanetaryMoon, Satellite, Star, Sun = range( 7 )
 
 
 class IndicatorLunar:
@@ -643,7 +639,6 @@ class IndicatorLunar:
 
 
     def __init__( self ):
-
         self.data = { } # Key is a tuple of AstronomicalBodyType, a data tag (upper case( and data tag (upper case).  Value is the data ready for display.
         self.cometOEData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
         self.satelliteNotifications = { }
@@ -688,22 +683,19 @@ class IndicatorLunar:
             self.updateCometOEData()
             self.updateSatelliteTLEData()
 
+            self.data.clear() # Must clear the data on each update, otherwise data will accumulate (if a planet/star/satellite was added then removed, the computed data remains).     
+            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_NAME ) ] = self.cityName
 
-
-            utcNow = datetime.datetime.utcnow()
-
-            #TODO Get proper values.
-            cityName = "Sydney"
-            planets = backend.PLANETS
-            stars = backend.STARS
-
-            self.data = backend.getAstronomicalInformation( utcNow, logging, cityName, planets, stars,
-                                                  [ ], [ ],
-                                                  [ ], [ ], 6 )
+            global _city_data
+            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LATITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 0 ] ), 1 ) )
+            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_LONGITUDE ) ] = str( round( float( _city_data.get( self.cityName )[ 1 ] ), 1 ) )
+            self.data[ ( None, IndicatorLunar.CITY_TAG, IndicatorLunar.DATA_ELEVATION ) ] = str( _city_data.get( self.cityName )[ 2 ] )
 
             # UTC, used in all calculations which is required by pyephem.
             # When it comes time to display, conversion to local time takes place.
             ephemNow = ephem.now()
+
+            self.updateAstronomicalInformation( ephemNow, self.hideBodyIfNeverUp, self.cometsMagnitude )
 
             # Update frontend...
             self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
@@ -727,15 +719,14 @@ class IndicatorLunar:
 
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update, True )
 
-
     def updateMenu( self ):
         menu = Gtk.Menu()
         self.updateMoonMenu( menu )
         self.updateSunMenu( menu )
         self.updatePlanetsMenu( menu )
         self.updateStarsMenu( menu )
-#         self.updateCometsMenu( menu )
-#         self.updateSatellitesMenu( menu )
+        self.updateCometsMenu( menu )
+        self.updateSatellitesMenu( menu )
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
@@ -780,9 +771,8 @@ class IndicatorLunar:
 
 
     def notificationFullMoon( self, ephemNow ):
-#         lunarIlluminationPercentage = int( self.getPhase( ephem.Moon( self.getCity( ephemNow ) ) ) )
-#         lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
-        lunarPhase = self.data[ ( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, IndicatorLunar.DATA_PHASE ) ]
+        lunarIlluminationPercentage = int( self.getPhase( ephem.Moon( self.getCity( ephemNow ) ) ) )
+        lunarPhase = self.getLunarPhase( ephemNow, lunarIlluminationPercentage )
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT ) or \
@@ -790,7 +780,6 @@ class IndicatorLunar:
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS ) or \
             ( lunarPhase == IndicatorLunar.LUNAR_PHASE_FULL_MOON )
 
-        lunarIlluminationPercentage = self.data[ ( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, backend.DATA_ILLUMINATION ) ]
         if phaseIsBetweenNewAndFullInclusive and \
            lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
            ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) < datetime.datetime.utcnow() ):
@@ -811,7 +800,7 @@ class IndicatorLunar:
         for satelliteName, satelliteNumber, in self.satellites:
             key = ( AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
             if ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.data: # Assume all other information is present!
-                satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
+               satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
 
         if self.satellitesSortByDateTime:
             satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
@@ -902,6 +891,7 @@ class IndicatorLunar:
 
     def updateSunMenu( self, menu ):
         if self.showSun and not self.hideBody( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG, self.hideBodyIfNeverUp ):
+            key = ( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
             menuItem = Gtk.MenuItem( _( "Sun" ) )
             menu.append( menuItem )
             self.updateCommonMenu( menuItem, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
@@ -1447,12 +1437,380 @@ class IndicatorLunar:
             os.remove( oldIcon )
 
 
+    def updateAstronomicalInformation( self, ephemNow, hideBodyIfNeverUp, hideCometGreaterThanMagnitude ):
+        self.updateMoon( ephemNow, hideBodyIfNeverUp )
+        self.updateSun( ephemNow, hideBodyIfNeverUp )
+        self.updatePlanets( ephemNow, hideBodyIfNeverUp )
+        self.updateStars( ephemNow, hideBodyIfNeverUp )
+        self.updateComets( ephemNow, hideBodyIfNeverUp, hideCometGreaterThanMagnitude )
+        self.updateSatellites( ephemNow )
+
+
+    # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
+    # http://futureboy.us/fsp/moon.fsp
+    # http://www.geoastro.de/moondata/index.html
+    # http://www.geoastro.de/SME/index.htm
+    # http://www.geoastro.de/elevazmoon/index.htm
+    # http://www.geoastro.de/altazsunmoon/index.htm
+    # http://www.geoastro.de/sundata/index.html
+    # http://www.satellite-calculations.com/Satellite/suncalc.htm
+    def updateMoon( self, ephemNow, hideIfNeverUp ):
+        if self.showMoon:
+            self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp )
+            if not self.hideBody( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, hideIfNeverUp ):
+                key = ( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
+                illuminationPercentage = int( self.getPhase( ephem.Moon( self.getCity( ephemNow ) ) ) )
+                self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, illuminationPercentage )
+                self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+                self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
+                self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+                self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
+                self.updateEclipse( ephemNow, AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
+
+
+    # Get the lunar phase for the given date/time and illumination percentage.
+    #
+    #    ephemNow Date/time.
+    #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
+    def getLunarPhase( self, ephemNow, illuminationPercentage ):
+        nextFullMoonDate = ephem.next_full_moon( ephemNow )
+        nextNewMoonDate = ephem.next_new_moon( ephemNow )
+        phase = None
+        if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
+            # Between a new moon and a full moon...
+            if( illuminationPercentage > 99 ):
+                phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
+            elif illuminationPercentage <= 99 and illuminationPercentage > 50:
+                phase = IndicatorLunar.LUNAR_PHASE_WAXING_GIBBOUS
+            elif illuminationPercentage == 50:
+                phase = IndicatorLunar.LUNAR_PHASE_FIRST_QUARTER
+            elif illuminationPercentage < 50 and illuminationPercentage >= 1:
+                phase = IndicatorLunar.LUNAR_PHASE_WAXING_CRESCENT
+            else: # illuminationPercentage < 1
+                phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
+        else:
+            # Between a full moon and the next new moon...
+            if( illuminationPercentage > 99 ):
+                phase = IndicatorLunar.LUNAR_PHASE_FULL_MOON
+            elif illuminationPercentage <= 99 and illuminationPercentage > 50:
+                phase = IndicatorLunar.LUNAR_PHASE_WANING_GIBBOUS
+            elif illuminationPercentage == 50:
+                phase = IndicatorLunar.LUNAR_PHASE_THIRD_QUARTER
+            elif illuminationPercentage < 50 and illuminationPercentage >= 1:
+                phase = IndicatorLunar.LUNAR_PHASE_WANING_CRESCENT
+            else: # illuminationPercentage < 1
+                phase = IndicatorLunar.LUNAR_PHASE_NEW_MOON
+
+        return phase
+
+
+    # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
+    # http://www.ga.gov.au/geodesy/astro/sunrise.jsp
+    # http://www.geoastro.de/elevaz/index.htm
+    # http://www.geoastro.de/SME/index.htm
+    # http://www.geoastro.de/altazsunmoon/index.htm
+    # http://futureboy.us/fsp/sun.fsp
+    # http://www.satellite-calculations.com/Satellite/suncalc.htm
+    def updateSun( self, ephemNow, hideIfNeverUp ):
+        if self.showSun:
+            city = self.getCity( ephemNow )
+            sun = ephem.Sun( city )
+            self.updateCommon( sun, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG, ephemNow, hideIfNeverUp )
+            if not self.hideBody( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG, hideIfNeverUp ):
+                key = ( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
+                try:
+                    # Dawn/Dusk.
+                    city = self.getCity( ephemNow )
+                    city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
+                    dawn = city.next_rising( sun, use_center = True )
+                    dusk = city.next_setting( sun, use_center = True )
+                    self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] = str( dawn.datetime() )
+                    self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] = str( dusk.datetime() )
+
+                except ( ephem.AlwaysUpError, ephem.NeverUpError ):
+                    pass # No need to add a message here as update common would already have done so.
+
+                self.updateEclipse( ephemNow, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
+
+
+    def updateEclipse( self, ephemNow, astronomicalBodyType, dataTag ):
+        if dataTag == IndicatorLunar.SUN_TAG:
+            eclipseInformation = eclipse.getEclipseForUTC( ephemNow.datetime(), False )
+        else:
+            eclipseInformation = eclipse.getEclipseForUTC( ephemNow.datetime(), True )
+
+        if eclipseInformation is None:
+            logging.error( "No eclipse information found!" )
+        else:
+            key = ( astronomicalBodyType, dataTag )
+            self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ] + ".0" # Needed to bring the date/time format into line with date/time generated by PyEphem.
+            self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
+            self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
+            self.data[ key + ( IndicatorLunar.DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
+
+
+    # http://www.geoastro.de/planets/index.html
+    # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
+    def updatePlanets( self, ephemNow, hideIfNeverUp ):
+        for planetName in self.planets:
+            planet = getattr( ephem, planetName )() # Dynamically instantiate the planet object.
+            planet.compute( self.getCity( ephemNow ) )
+            self.updateCommon( planet, AstronomicalBodyType.Planet, planetName.upper(), ephemNow, hideIfNeverUp )
+
+
+    # http://aa.usno.navy.mil/data/docs/mrst.php
+    def updateStars( self, ephemNow, hideIfNeverUp ):
+        for starName in self.stars:
+            star = ephem.star( starName )
+            star.compute( self.getCity( ephemNow ) )
+            self.updateCommon( star, AstronomicalBodyType.Star, star.name.upper(), ephemNow, hideIfNeverUp )
+
+
+    # Computes the rise/set and other information for comets.
+    #
+    # http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
+    # http://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
+    def updateComets( self, ephemNow, hideIfNeverUp, hideIfGreaterThanMagnitude ):
+        for key in self.comets:
+            if key in self.cometOEData:
+                comet = ephem.readdb( self.cometOEData[ key ] )
+                comet.compute( self.getCity( ephemNow ) )
+                if math.isnan( comet.earth_distance ) or math.isnan( comet.phase ) or math.isnan( comet.size ) or math.isnan( comet.sun_distance ): # Have found tha data file may contain ***** in lieu of actual data!
+                    self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_BAD_DATA
+                else:
+                    if float( comet.mag ) <= float( hideIfGreaterThanMagnitude ):
+                        self.updateCommon( comet, AstronomicalBodyType.Comet, key, ephemNow, hideIfNeverUp )
+            else:
+                self.data[ ( AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
+
+
+    # Calculates the common attributes such as rise/set and azimuth/altitude.
+    # Data tags such as RISE_TIME and/or MESSAGE will be added to the data dict.
+    def updateCommon( self, body, astronomicalBodyType, dataTag, ephemNow, hideIfNeverUp ):
+        key = ( astronomicalBodyType, dataTag )
+        try:
+            city = self.getCity( ephemNow )
+            rising = city.next_rising( body )
+            setting = city.next_setting( body )
+            self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = str( rising.datetime() )
+            self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = str( setting.datetime() )
+
+        except ephem.AlwaysUpError:
+            self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_ALWAYS_UP
+
+        except ephem.NeverUpError:
+            self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
+
+        if not self.hideBody( astronomicalBodyType, dataTag, hideIfNeverUp ):
+            body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+            self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( body.az )
+            self.data[ key + ( IndicatorLunar.DATA_ALTITUDE, ) ] = str( body.alt )
+
+
     def hideBody( self, astronomicalBodyType, dataTag, hideIfNeverUp ):
         key = ( astronomicalBodyType, dataTag, IndicatorLunar.DATA_MESSAGE )
         return \
             key in self.data and \
             self.data[ key ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
             hideIfNeverUp
+
+
+    def getPhase( self, body ): return round( body.phase )
+
+
+    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body.
+    # Measured in degrees counter clockwise from a positive y axis.
+    #
+    # References:
+    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
+    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
+    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
+    #  http://www.geoastro.de/SME/
+    #  http://futureboy.us/fsp/moon.fsp
+    #  http://www.timeanddate.com/moon/australia/sydney
+    #  https://www.calsky.com/cs.cgi?cha=6&sec=1
+    #
+    # Other references...
+    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
+    #  https://sites.google.com/site/astronomicalalgorithms
+    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
+    #  https://github.com/brandon-rhodes/pyephem/issues/24
+    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
+    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
+    def getZenithAngleOfBrightLimb( self, city, body ):
+        sun = ephem.Sun( city )
+
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
+        y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
+        x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
+        positionAngleOfBrightLimb = math.atan2( y, x )
+
+        # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
+        # https://tycho.usno.navy.mil/sidereal.html
+        # http://www.wwu.edu/skywise/skymobile/skywatch.html
+        # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
+        hourAngle = city.sidereal_time() - body.ra
+
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+        y = math.sin( hourAngle )
+        x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+        parallacticAngle = math.atan2( y, x )
+
+        return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+
+
+    # Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
+    #
+    # Other sources/background:
+    #   http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
+    #   http://spotthestation.nasa.gov/sightings
+    #   http://www.n2yo.com
+    #   http://www.heavens-above.com
+    #   http://in-the-sky.org
+    #
+    # For planets/stars, the immediate next rise/set time is shown.
+    # If already above the horizon, the set time is shown followed by the rise time for the following pass.
+    # This makes sense as planets/stars are slow moving.
+    #
+    # However, as satellites are faster moving and pass several times a day, a different approach is used.
+    # When a notification is displayed indicating a satellite is now passing overhead,
+    # the user would want to see the rise/set for the current pass (rather than the set for the current pass and rise for the next pass).
+    #
+    # Therefore...
+    #    If a satellite is yet to rise, show the upcoming rise/set time.
+    #    If a satellite is currently passing over, show the rise/set time for that pass.
+    #
+    # This allows the user to see the rise/set time for the current pass as it is happening.
+    # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
+    def updateSatellites( self, ephemNow ):
+        for key in self.satellites:
+            if key in self.satelliteTLEData:
+                self.calculateNextSatellitePass( ephemNow, key, self.satelliteTLEData[ key ] )
+            else:
+                self.data[ ( AstronomicalBodyType.Satellite, " ".join( key ), IndicatorLunar.DATA_MESSAGE ) ] = IndicatorLunar.MESSAGE_DATA_NO_DATA
+
+
+    def calculateNextSatellitePass( self, ephemNow, key, satelliteTLE ):
+        key = ( AstronomicalBodyType.Satellite, " ".join( key ) )
+        currentDateTime = ephemNow
+        endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 2 ) # Stop looking for passes 2 days from ephemNow.
+        message = None
+        while currentDateTime < endDateTime:
+            city = self.getCity( currentDateTime )
+            satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+            satellite.compute( city )
+            try:
+                nextPass = city.next_pass( satellite )
+
+            except ValueError:
+                if satellite.circumpolar:
+                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR
+                    self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( satellite.az )
+                elif satellite.neverup:
+                    message = IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES
+                else:
+                    message = IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
+
+                break
+
+            if not self.isSatellitePassValid( nextPass ):
+                message = IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS
+                break
+
+            # The pass is valid.  If the satellite is currently passing, work out when it rose...
+            if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
+                setTime = nextPass[ 4 ]
+                nextPass = self.calculateSatellitePassForRisingPriorToNow( currentDateTime, satelliteTLE )
+                if nextPass is None:
+                    currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
+                    continue
+
+            # Now have a satellite rise/transit/set; determine if the pass is visible.
+            passIsVisible = self.isSatellitePassVisible( satellite, nextPass[ 2 ] )
+            if not passIsVisible:
+                currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
+                continue
+
+            # The pass is visible and the user wants only visible passes OR the user wants any pass...
+            self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] = str( nextPass[ 0 ].datetime() )
+            self.data[ key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ] = str( nextPass[ 1 ] )
+            self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] = str( nextPass[ 4 ].datetime() )
+            self.data[ key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ] = str( nextPass[ 5 ] )
+
+            break
+
+        if currentDateTime >= endDateTime:
+            message = IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME
+
+        if message is not None:
+            self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = message
+
+
+    def calculateSatellitePassForRisingPriorToNow( self, ephemNow, satelliteTLE ):
+        currentDateTime = ephem.Date( ephemNow - ephem.minute ) # Start looking from one minute ago.
+        endDateTime = ephem.Date( ephemNow - ephem.hour * 1 ) # Only look back an hour for the rise time (then just give up).
+        nextPass = None
+        while currentDateTime > endDateTime:
+            city = self.getCity( currentDateTime )
+            satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+            satellite.compute( city )
+            try:
+                nextPass = city.next_pass( satellite )
+                if not self.isSatellitePassValid( nextPass ):
+                    nextPass = None
+                    break # Unlikely to happen but better to be safe and check!
+
+                if nextPass[ 0 ] < nextPass[ 4 ]:
+                    break
+
+                currentDateTime = ephem.Date( currentDateTime - ephem.minute )
+
+            except:
+                nextPass = None
+                break # This should never happen as the satellite has a rise and set (is not circumpolar or never up).
+
+        return nextPass
+
+
+    def isSatellitePassValid( self, satellitePass ):
+        return \
+            satellitePass is not None and \
+            len( satellitePass ) == 6 and \
+            satellitePass[ 0 ] is not None and \
+            satellitePass[ 1 ] is not None and \
+            satellitePass[ 2 ] is not None and \
+            satellitePass[ 3 ] is not None and \
+            satellitePass[ 4 ] is not None and \
+            satellitePass[ 5 ] is not None
+
+
+    # Determine if a satellite pass is visible or not...
+    #
+    #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
+    #    http://www.celestrak.com/columns/v03n01
+    #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
+    def isSatellitePassVisible( self, satellite, passDateTime ):
+        city = self.getCity( passDateTime )
+        city.pressure = 0
+        city.horizon = "-0:34"
+
+        satellite.compute( city )
+        sun = ephem.Sun()
+        sun.compute( city )
+
+        return satellite.eclipsed is False and \
+               sun.alt > ephem.degrees( "-18" ) and \
+               sun.alt < ephem.degrees( "-6" )
+
+
+    # Used to instantiate a new city object/observer.
+    # Typically after calculations (or exceptions) the city date is altered.
+    def getCity( self, date = None ):
+        city = ephem.city( self.cityName )
+        if date is not None:
+            city.date = date
+
+        return city
 
 
     def onAbout( self, widget ):
