@@ -134,7 +134,6 @@ class IndicatorLunar:
     CONFIG_COMETS = "comets"
     CONFIG_COMETS_ADD_NEW = "cometsAddNew"
     CONFIG_COMETS_MAGNITUDE = "cometsMagnitude"
-    CONFIG_HIDE_BODY_IF_NEVER_UP = "hideBodyIfNeverUp"
     CONFIG_DATE_TIME_FORMAT = "dateTimeFormat"
     CONFIG_INDICATOR_TEXT = "indicatorText"
     CONFIG_PLANETS = "planets"
@@ -703,10 +702,11 @@ class IndicatorLunar:
             cityName = self.cityName
             planets = self.planets
             stars = self.stars
-            self.data = astro.getAstronomicalInformation( utcNow, cityName, planets, stars,
-                                                  [ ], [ ],
-                                                  [ ], [ ], 6 )
-
+            self.data = astro.getAstronomicalInformation( utcNow, logging, self.cityName,
+                                                          self.planets,
+                                                          self.stars,
+                                                          [ ], [ ],
+                                                          [ ], [ ], 6 )
 
             # Update frontend...
             self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
@@ -874,7 +874,7 @@ class IndicatorLunar:
 
 
     def updateMoonMenu( self, menu ):
-        if self.showMoon and not self.hideBody( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, self.hideBodyIfNeverUp ):
+        if self.showMoon:
             key = ( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
             menuItem = Gtk.MenuItem( _( "Moon" ) )
             menu.append( menuItem )
@@ -901,7 +901,7 @@ class IndicatorLunar:
 
 
     def updateSunMenu( self, menu ):
-        if self.showSun and not self.hideBody( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG, self.hideBodyIfNeverUp ):
+        if self.showSun:
             key = ( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
             menuItem = Gtk.MenuItem( _( "Sun" ) )
             menu.append( menuItem )
@@ -923,8 +923,7 @@ class IndicatorLunar:
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planetName in self.planets:
-            if not self.hideBody( AstronomicalBodyType.Planet, planetName.upper(), self.hideBodyIfNeverUp ):
-                planets.append( planetName )
+            planets.append( planetName )
 
         if len( planets ) > 0:
             menuItem = Gtk.MenuItem( _( "Planets" ) )
@@ -949,8 +948,7 @@ class IndicatorLunar:
     def updateStarsMenu( self, menu ):
         stars = [ ] # List of lists.  Each sublist contains the star name followed by the translated name.
         for starName in self.stars:
-            if not self.hideBody( AstronomicalBodyType.Star, starName.upper(), self.hideBodyIfNeverUp ):
-                stars.append( [ starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
+            stars.append( [ starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
 
         if len( stars ) > 0:
             starsMenuItem = Gtk.MenuItem( _( "Stars" ) )
@@ -977,14 +975,14 @@ class IndicatorLunar:
         comets = [ ]
         for comet in self.comets:
             key = ( AstronomicalBodyType.Comet, comet )
-            if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
-               self.hideBodyIfNeverUp and \
-               (
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP or \
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_BAD_DATA or \
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA
-               ):
-                continue # Skip comets which are never up or have no data or have bad data AND the user wants to hide comets on such conditions.
+#             if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
+#                self.hideBodyIfNeverUp and \
+#                (
+#                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP or \
+#                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_BAD_DATA or \
+#                     self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA
+#                ):
+#                 continue # Skip comets which are never up or have no data or have bad data AND the user wants to hide comets on such conditions.
 
             if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data or \
                key + ( IndicatorLunar.DATA_RISE_TIME, ) in self.data:
@@ -1468,15 +1466,14 @@ class IndicatorLunar:
     def updateMoon( self, ephemNow, hideIfNeverUp ):
         if self.showMoon:
             self.updateCommon( ephem.Moon( self.getCity( ephemNow ) ), AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, ephemNow, hideIfNeverUp )
-            if not self.hideBody( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG, hideIfNeverUp ):
-                key = ( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
-                illuminationPercentage = int( self.getPhase( ephem.Moon( self.getCity( ephemNow ) ) ) )
-                self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, illuminationPercentage )
-                self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
-                self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
-                self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
-                self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
-                self.updateEclipse( ephemNow, AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
+            key = ( AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
+            illuminationPercentage = int( self.getPhase( ephem.Moon( self.getCity( ephemNow ) ) ) )
+            self.data[ key + ( IndicatorLunar.DATA_PHASE, ) ] = self.getLunarPhase( ephemNow, illuminationPercentage )
+            self.data[ key + ( IndicatorLunar.DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+            self.data[ key + ( IndicatorLunar.DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
+            self.data[ key + ( IndicatorLunar.DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+            self.data[ key + ( IndicatorLunar.DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
+            self.updateEclipse( ephemNow, AstronomicalBodyType.Moon, IndicatorLunar.MOON_TAG )
 
 
     # Get the lunar phase for the given date/time and illumination percentage.
@@ -1527,21 +1524,20 @@ class IndicatorLunar:
             city = self.getCity( ephemNow )
             sun = ephem.Sun( city )
             self.updateCommon( sun, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG, ephemNow, hideIfNeverUp )
-            if not self.hideBody( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG, hideIfNeverUp ):
-                key = ( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
-                try:
-                    # Dawn/Dusk.
-                    city = self.getCity( ephemNow )
-                    city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
-                    dawn = city.next_rising( sun, use_center = True )
-                    dusk = city.next_setting( sun, use_center = True )
-                    self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] = str( dawn.datetime() )
-                    self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] = str( dusk.datetime() )
+            key = ( AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
+            try:
+                # Dawn/Dusk.
+                city = self.getCity( ephemNow )
+                city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
+                dawn = city.next_rising( sun, use_center = True )
+                dusk = city.next_setting( sun, use_center = True )
+                self.data[ key + ( IndicatorLunar.DATA_DAWN, ) ] = str( dawn.datetime() )
+                self.data[ key + ( IndicatorLunar.DATA_DUSK, ) ] = str( dusk.datetime() )
 
-                except ( ephem.AlwaysUpError, ephem.NeverUpError ):
-                    pass # No need to add a message here as update common would already have done so.
+            except ( ephem.AlwaysUpError, ephem.NeverUpError ):
+                pass # No need to add a message here as update common would already have done so.
 
-                self.updateEclipse( ephemNow, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
+            self.updateEclipse( ephemNow, AstronomicalBodyType.Sun, IndicatorLunar.SUN_TAG )
 
 
     def updateEclipse( self, ephemNow, astronomicalBodyType, dataTag ):
@@ -1612,18 +1608,9 @@ class IndicatorLunar:
         except ephem.NeverUpError:
             self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] = IndicatorLunar.MESSAGE_BODY_NEVER_UP
 
-        if not self.hideBody( astronomicalBodyType, dataTag, hideIfNeverUp ):
-            body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-            self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( body.az )
-            self.data[ key + ( IndicatorLunar.DATA_ALTITUDE, ) ] = str( body.alt )
-
-
-    def hideBody( self, astronomicalBodyType, dataTag, hideIfNeverUp ):
-        key = ( astronomicalBodyType, dataTag, IndicatorLunar.DATA_MESSAGE )
-        return \
-            key in self.data and \
-            self.data[ key ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP and \
-            hideIfNeverUp
+        body.compute( self.getCity( ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+        self.data[ key + ( IndicatorLunar.DATA_AZIMUTH, ) ] = str( body.az )
+        self.data[ key + ( IndicatorLunar.DATA_ALTITUDE, ) ] = str( body.alt )
 
 
     def getPhase( self, body ): return round( body.phase )
@@ -1903,8 +1890,8 @@ class IndicatorLunar:
                       self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
                       self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
 
-            if hideMessage and self.hideBodyIfNeverUp:
-                continue
+#             if hideMessage and self.hideBodyIfNeverUp:
+#                 continue
 
             self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
             tag = "[" + key[ 1 ] + " " + key[ 2 ] + "]"
@@ -2005,17 +1992,6 @@ class IndicatorLunar:
 
         grid.attach( box, 0, 3, 1, 1 )
 
-        hideBodyIfNeverUpCheckbox = Gtk.CheckButton( _( "Hide bodies which are 'never up'" ) )
-        hideBodyIfNeverUpCheckbox.set_margin_top( 10 )
-        hideBodyIfNeverUpCheckbox.set_active( self.hideBodyIfNeverUp )
-        hideBodyIfNeverUpCheckbox.set_tooltip_text( _(
-            "If checked, planets, moon, sun,\n" + \
-            "comets and stars which rise/set or\n" + \
-            "are 'always up' will only be shown.\n\n" + \
-            "Otherwise all bodies are shown.\n\n" + \
-            "Does not apply to satellites." ) )
-        grid.attach( hideBodyIfNeverUpCheckbox, 0, 4, 1, 1 )
-
         box = Gtk.Box( spacing = 6 )
         box.pack_start( Gtk.Label( _( "Date/time format" ) ), False, False, 0 )
 
@@ -2027,7 +2003,7 @@ class IndicatorLunar:
             "Refer to http://docs.python.org/3/library/datetime.html" ) )
         box.pack_start( dateTimeFormatEntry, True, True, 0 )
 
-        grid.attach( box, 0, 5, 1, 1 )
+        grid.attach( box, 0, 4, 1, 1 )
 
         cometsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new comets" ) )
         cometsAddNewCheckbox.set_margin_top( 10 )
@@ -2035,7 +2011,7 @@ class IndicatorLunar:
         cometsAddNewCheckbox.set_tooltip_text( _(
             "If checked, all comets are added\n" + \
             "to the list of checked comets." ) )
-        grid.attach( cometsAddNewCheckbox, 0, 6, 1, 1 )
+        grid.attach( cometsAddNewCheckbox, 0, 5, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -2053,7 +2029,7 @@ class IndicatorLunar:
 
         box.pack_start( spinnerCometMagnitude, False, False, 0 )
 
-        grid.attach( box, 0, 7, 1, 1 )
+        grid.attach( box, 0, 6, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
@@ -2061,7 +2037,7 @@ class IndicatorLunar:
         satellitesAddNewCheckbox.set_tooltip_text( _(
             "If checked all satellites are added\n" + \
             "to the list of checked satellites." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 8, 1, 1 )
+        grid.attach( satellitesAddNewCheckbox, 0, 7, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
@@ -2072,7 +2048,7 @@ class IndicatorLunar:
             "Otherwise satellites are sorted\n" + \
             "by Name, Number and then\n" + \
             "International Designator." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 9, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 8, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -2627,7 +2603,6 @@ class IndicatorLunar:
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showCometsAsSubMenu = showCometsAsSubmenuCheckbox.get_active()
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
-            self.hideBodyIfNeverUp = hideBodyIfNeverUpCheckbox.get_active()
             self.cometsMagnitude = spinnerCometMagnitude.get_value_as_int()
             self.cometsAddNew = cometsAddNewCheckbox.get_active()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
@@ -2968,8 +2943,8 @@ class IndicatorLunar:
                           self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
                           self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
 
-                if hideMessage and self.hideBodyIfNeverUp:
-                    continue
+#                 if hideMessage and self.hideBodyIfNeverUp:
+#                     continue
 
                 astronomicalBodyType = key[ 0 ]
                 bodyTag = key[ 1 ]
@@ -3090,7 +3065,6 @@ class IndicatorLunar:
         self.getDefaultCity()
 
         self.dateTimeFormat = IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS
-        self.hideBodyIfNeverUp = True
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
 
         self.comets = [ ]
@@ -3135,7 +3109,6 @@ class IndicatorLunar:
         _city_data[ self.cityName ] = ( str( cityLatitude ), str( cityLongitude ), float( cityElevation ) ) # Insert/overwrite the cityName and information into the cities.
 
         self.dateTimeFormat = config.get( IndicatorLunar.CONFIG_DATE_TIME_FORMAT, self.dateTimeFormat )
-        self.hideBodyIfNeverUp = config.get( IndicatorLunar.CONFIG_HIDE_BODY_IF_NEVER_UP, self.hideBodyIfNeverUp )
         self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, self.indicatorText )
 
         # The Minor Planet Center changed the URL protocol to be https (rather than http).
@@ -3198,7 +3171,6 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_CITY_LONGITUDE: _city_data.get( self.cityName )[ 1 ],
             IndicatorLunar.CONFIG_CITY_NAME: self.cityName,
             IndicatorLunar.CONFIG_DATE_TIME_FORMAT: self.dateTimeFormat,
-            IndicatorLunar.CONFIG_HIDE_BODY_IF_NEVER_UP: self.hideBodyIfNeverUp,
             IndicatorLunar.CONFIG_INDICATOR_TEXT: self.indicatorText,
             IndicatorLunar.CONFIG_COMET_OE_URL: self.cometOEURL,
             IndicatorLunar.CONFIG_COMETS: comets,
