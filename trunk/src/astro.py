@@ -1,0 +1,685 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Backend to calculate all astronomical information using PyEphem.
+
+
+#TODO Can the data added to the dict be standardised, so that if the backend changes, the frontend does not notice?
+#If PyEphem uses radians but Skyfield always uses degrees for example, standardise data formats.
+
+
+import eclipse, ephem, math, satellite
+
+from ephem.cities import _city_data
+
+
+#TODO DOes this need to be a class?  What about an array of strings or something?
+class AstronomicalBodyType: Comet, Moon, Planet, Satellite, Star, Sun = range( 6 ) #TODO Comet will/may have to change to OE?
+
+
+DATA_ALTITUDE = "ALTITUDE"
+DATA_AZIMUTH = "AZIMUTH"
+DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used when creating the icon.
+DATA_DAWN = "DAWN"
+DATA_DUSK = "DUSK"
+DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
+DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
+DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
+DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
+DATA_ELEVATION = "ELEVATION" # Used for city.
+DATA_FIRST_QUARTER = "FIRST QUARTER"
+DATA_FULL = "FULL"
+DATA_ILLUMINATION = "ILLUMINATION" # Used for creating the icon.
+DATA_LATITUDE = "LATITUDE" # Used for city.
+DATA_LONGITUDE = "LONGITUDE" # Used for city.
+DATA_MESSAGE = "MESSAGE"
+DATA_NAME = "NAME" # Used for city.
+DATA_NEW = "NEW"
+DATA_PHASE = "PHASE"
+DATA_RISE_AZIMUTH = "RISE AZIMUTH"
+DATA_RISE_TIME = "RISE TIME"
+DATA_SET_AZIMUTH = "SET AZIMUTH"
+DATA_SET_TIME = "SET TIME"
+DATA_THIRD_QUARTER = "THIRD QUARTER"
+
+#TODO Need a way to ensure that not all tags appear in the preferences list such as bright limb...or maybe who cares?
+
+#TODO Maybe need a list of star names...or a function which the frontend can call to get the star names?
+#At some point in the front end, star names (and planet names) need to be translated.
+
+DATA_ALL = [
+    DATA_ALTITUDE,
+    DATA_AZIMUTH,
+    DATA_BRIGHT_LIMB, # TODO Should this be here if not used for display?  Ditto for illumination.
+    DATA_DAWN,
+    DATA_DUSK,
+    DATA_ECLIPSE_DATE_TIME,
+    DATA_ECLIPSE_LATITUDE,
+    DATA_ECLIPSE_LONGITUDE,
+    DATA_ECLIPSE_TYPE,
+    DATA_ELEVATION,
+    DATA_FIRST_QUARTER,
+    DATA_FULL,
+    DATA_ILLUMINATION,
+    DATA_LATITUDE,
+    DATA_LONGITUDE,
+    DATA_MESSAGE,
+    DATA_NAME,
+    DATA_NEW,
+    DATA_PHASE,
+    DATA_RISE_AZIMUTH,
+    DATA_RISE_TIME,
+    DATA_SET_AZIMUTH,
+    DATA_SET_TIME,
+    DATA_THIRD_QUARTER ]
+
+DATA_COMET = [
+    DATA_MESSAGE,
+    DATA_RISE_AZIMUTH,
+    DATA_RISE_TIME,
+    DATA_SET_AZIMUTH,
+    DATA_SET_TIME ]
+
+DATA_MOON = [
+    DATA_ALTITUDE,
+    DATA_AZIMUTH,
+    DATA_BRIGHT_LIMB, #TODO Need a translation?  Depends if this is shown in the prefs.
+    DATA_ECLIPSE_DATE_TIME,
+    DATA_ECLIPSE_LATITUDE,
+    DATA_ECLIPSE_LONGITUDE,
+    DATA_ECLIPSE_TYPE,
+    DATA_ILLUMINATION, #TODO Need a translation?  Depends if this is shown in the prefs.
+    DATA_MESSAGE,
+    DATA_PHASE,
+    DATA_RISE_TIME,
+    DATA_SET_TIME ]
+
+DATA_PLANET = [
+    DATA_ALTITUDE,
+    DATA_AZIMUTH,
+    DATA_MESSAGE,
+    DATA_RISE_TIME,
+    DATA_SET_TIME ]
+
+DATA_SATELLITE = [
+    DATA_MESSAGE,
+    DATA_RISE_AZIMUTH,
+    DATA_RISE_TIME,
+    DATA_SET_AZIMUTH,
+    DATA_SET_TIME ]
+
+DATA_STAR = [
+    DATA_ALTITUDE,
+    DATA_AZIMUTH,
+    DATA_MESSAGE,
+    DATA_RISE_TIME,
+    DATA_SET_TIME ]
+
+DATA_SUN = [
+    DATA_ALTITUDE,
+    DATA_AZIMUTH,
+    DATA_DAWN,
+    DATA_DUSK,
+    DATA_ECLIPSE_DATE_TIME,
+    DATA_ECLIPSE_LATITUDE,
+    DATA_ECLIPSE_LONGITUDE,
+    DATA_ECLIPSE_TYPE,
+    DATA_MESSAGE,
+    DATA_RISE_TIME,
+    DATA_SET_TIME ]
+
+NAME_TAG_CITY = "CITY"
+NAME_TAG_MOON = "MOON"
+NAME_TAG_SUN = "SUN"
+
+PLANET_MERCURY = "MERCURY"
+PLANET_VENUS = "VENUS"
+PLANET_MARS = "MARS"
+PLANET_JUPITER = "JUPITER"
+PLANET_SATURN = "SATURN"
+PLANET_URANUS = "URANUS"
+PLANET_NEPTUNE = "NEPTUNE"
+PLANET_PLUTO = "PLUTO"
+
+#TODO Do I need the planets each defined as above?  Can't I do a simliar thing to the stars?
+PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
+
+# From cns_namemap in ephem.stars.stars
+STARS = [
+    "ACHERNAR",
+    "ADARA",
+    "AGENA",
+    "ALBEREO",
+    "ALCAID",
+    "ALCOR",
+    "ALCYONE",
+    "ALDEBARAN",
+    "ALDERAMIN",
+    "ALFIRK",
+    "ALGENIB",
+    "ALGIEBA",
+    "ALGOL",
+    "ALHENA",
+    "ALIOTH",
+    "ALMACH",
+    "ALNAIR",
+    "ALNILAM",
+    "ALNITAK",
+    "ALPHARD",
+    "ALPHECCA",
+    "ALSHAIN",
+    "ALTAIR",
+    "ANTARES",
+    "ARCTURUS",
+    "ARKAB POSTERIOR",
+    "ARKAB PRIOR",
+    "ARNEB",
+    "ATLAS",
+    "BELLATRIX",
+    "BETELGEUSE",
+    "CANOPUS",
+    "CAPELLA",
+    "CAPH",
+    "CASTOR",
+    "CEBALRAI",
+    "DENEB",
+    "DENEBOLA",
+    "DUBHE",
+    "ELECTRA",
+    "ELNATH",
+    "ENIF",
+    "ETAMIN",
+    "FOMALHAUT",
+    "GIENAH CORVI",
+    "HAMAL",
+    "IZAR",
+    "KAUS AUSTRALIS",
+    "KOCHAB",
+    "MAIA",
+    "MARKAB",
+    "MEGREZ",
+    "MENKALINAN",
+    "MENKAR",
+    "MERAK",
+    "MEROPE",
+    "MIMOSA",
+    "MINKAR",
+    "MINTAKA",
+    "MIRACH",
+    "MIRZAM",
+    "MIZAR",
+    "NAOS",
+    "NIHAL",
+    "NUNKI",
+    "PEACOCK",
+    "PHECDA",
+    "POLARIS",
+    "POLLUX",
+    "PROCYON",
+    "RASALGETHI",
+    "RASALHAGUE",
+    "REGULUS",
+    "RIGEL",
+    "RUKBAT",
+    "SADALMELIK",
+    "SADR",
+    "SAIPH",
+    "SCHEAT",
+    "SCHEDAR",
+    "SHAULA",
+    "SHELIAK",
+    "SIRIUS",
+    "SIRRAH",
+    "SPICA",
+    "SULAFAT",
+    "TARAZED",
+    "TAYGETA",
+    "THUBAN",
+    "UNUKALHAI",
+    "VEGA",
+    "VINDEMIATRIX",
+    "WEZEN",
+    "ZAURAK" ]
+
+
+LUNAR_PHASE_FULL_MOON = "FULL_MOON"
+LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
+LUNAR_PHASE_THIRD_QUARTER = "THIRD_QUARTER"
+LUNAR_PHASE_WANING_CRESCENT = "WANING_CRESCENT"
+LUNAR_PHASE_NEW_MOON = "NEW_MOON"
+LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
+LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
+LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
+
+MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
+MESSAGE_BODY_NEVER_UP = "BODY_NEVER_UP"
+MESSAGE_DATA_BAD_DATA = "DATA_BAD_DATA"
+MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE = "DATA_CANNOT_ACCESS_DATA_SOURCE"
+MESSAGE_DATA_NO_DATA = "DATA_NO_DATA"
+MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE = "DATA_NO_DATA_FOUND_AT_SOURCE"
+MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
+MESSAGE_SATELLITE_NEVER_RISES = "SATELLITE_NEVER_RISES"
+MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME = "SATELLITE_NO_PASSES_WITHIN_TIME_FRAME"
+MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = "SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS"
+MESSAGE_SATELLITE_VALUE_ERROR = "SATELLITE_VALUE_ERROR"
+
+
+#TODO Does city name come originally from pyephem?  Can it be anything and is then matched later with pyephem's list of cities?
+#City name would have to come from PyEphem originally...and so some sort of error has to burp back up on a bad city name.
+#TODO Document: missing ephem import results in None return.
+def getAstronomicalInformation( utcNow, cityName,
+                                planets, #TODO Need a comment about the list of planets: is upper case or case sensitive...same for stars/comets, satellites.  Skyfield may be different!
+                                stars,
+                                satellites, satelliteData,
+                                comets, cometData, cometMagnitude = 6 ):
+
+    # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
+    # Value is the astronomical data (or equivalent) as a string.
+    data = { }
+
+    data[ ( None, NAME_TAG_CITY, DATA_NAME ) ] = cityName
+    data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = str( round( float( _city_data.get( cityName )[ 0 ] ), 1 ) )
+    data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = str( round( float( _city_data.get( cityName )[ 1 ] ), 1 ) )
+    data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = str( _city_data.get( cityName )[ 2 ] )
+
+    ephemNow = ephem.Date( utcNow )
+    __calculateMoon( ephemNow, cityName, data )
+    __calculateSun( ephemNow, cityName, data )
+    __calculatePlanets( ephemNow, cityName, data, planets )
+    __calculateStars( ephemNow, cityName, data, stars )
+    __calculateComets( ephemNow, cityName, data, comets, cometData, cometMagnitude )
+    __calculateSatellites( ephemNow, cityName, data, satellites, satelliteData )
+
+# Update frontend...
+#         self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
+#         self.nextUpdate = self.toDateTime( self.nextUpdate ) # Parse from string back into a datetime.
+#         nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
+# 
+#         # Ensure the update period is positive, at most every minute and at least every hour.
+#         if nextUpdateInSeconds < 60:
+#             nextUpdateInSeconds = 60
+#         elif nextUpdateInSeconds > ( 60 * 60 ):
+#             nextUpdateInSeconds = ( 60 * 60 )
+
+    return data # TODO Also return next update date/time.
+
+
+# http://www.ga.gov.au/geodesy/astro/moonrise.jsp
+# http://futureboy.us/fsp/moon.fsp
+# http://www.geoastro.de/moondata/index.html
+# http://www.geoastro.de/SME/index.htm
+# http://www.geoastro.de/elevazmoon/index.htm
+# http://www.geoastro.de/altazsunmoon/index.htm
+# http://www.geoastro.de/sundata/index.html
+# http://www.satellite-calculations.com/Satellite/suncalc.htm
+def __calculateMoon( ephemNow, cityName, data ):
+    __calculateCommon( ephemNow, cityName, data, ephem.Moon(), AstronomicalBodyType.Moon, NAME_TAG_MOON )
+    key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
+    moon = ephem.Moon()
+    moon.compute( __getCity( cityName, ephemNow ) )
+    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, cityName, moon ) ) ) )
+    data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) )
+    data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( ephemNow, int( moon.phase ) )
+    data[ key + ( DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+    data[ key + ( DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
+    data[ key + ( DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+    data[ key + ( DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
+    __calculateEclipse( ephemNow, data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+
+
+# Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
+# Measured in degrees counter clockwise from a positive y axis.
+#
+# References:
+#  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
+#  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
+#  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
+#  http://www.geoastro.de/SME/
+#  http://futureboy.us/fsp/moon.fsp
+#  http://www.timeanddate.com/moon/australia/sydney
+#  https://www.calsky.com/cs.cgi?cha=6&sec=1
+#
+# Other references...
+#  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
+#  https://sites.google.com/site/astronomicalalgorithms
+#  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
+#  https://github.com/brandon-rhodes/pyephem/issues/24
+#  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
+#  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
+def __getZenithAngleOfBrightLimb( ephemNow, cityName, body ): #TODO Verify this still works!
+    city = __getCity( cityName, ephemNow )
+    sun = ephem.Sun( city )
+    body.compute( city )
+
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
+    y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
+    x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
+    positionAngleOfBrightLimb = math.atan2( y, x )
+
+    # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
+    # https://tycho.usno.navy.mil/sidereal.html
+    # http://www.wwu.edu/skywise/skymobile/skywatch.html
+    # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
+    hourAngle = city.sidereal_time() - body.ra
+
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+    y = math.sin( hourAngle )
+    x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+    parallacticAngle = math.atan2( y, x )
+
+    return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+
+
+# Get the lunar phase for the given date/time and illumination percentage.
+#
+#    ephemNow Date/time.
+#    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
+def __getLunarPhase( ephemNow, illuminationPercentage ):
+    nextFullMoonDate = ephem.next_full_moon( ephemNow )
+    nextNewMoonDate = ephem.next_new_moon( ephemNow )
+    phase = None
+    if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
+        # Between a new moon and a full moon...
+        if( illuminationPercentage > 99 ):
+            phase = LUNAR_PHASE_FULL_MOON
+        elif illuminationPercentage <= 99 and illuminationPercentage > 50:
+            phase = LUNAR_PHASE_WAXING_GIBBOUS
+        elif illuminationPercentage == 50:
+            phase = LUNAR_PHASE_FIRST_QUARTER
+        elif illuminationPercentage < 50 and illuminationPercentage >= 1:
+            phase = LUNAR_PHASE_WAXING_CRESCENT
+        else: # illuminationPercentage < 1
+            phase = LUNAR_PHASE_NEW_MOON
+    else:
+        # Between a full moon and the next new moon...
+        if( illuminationPercentage > 99 ):
+            phase = LUNAR_PHASE_FULL_MOON
+        elif illuminationPercentage <= 99 and illuminationPercentage > 50:
+            phase = LUNAR_PHASE_WANING_GIBBOUS
+        elif illuminationPercentage == 50:
+            phase = LUNAR_PHASE_THIRD_QUARTER
+        elif illuminationPercentage < 50 and illuminationPercentage >= 1:
+            phase = LUNAR_PHASE_WANING_CRESCENT
+        else: # illuminationPercentage < 1
+            phase = LUNAR_PHASE_NEW_MOON
+
+    return phase
+
+
+# http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
+# http://www.ga.gov.au/geodesy/astro/sunrise.jsp
+# http://www.geoastro.de/elevaz/index.htm
+# http://www.geoastro.de/SME/index.htm
+# http://www.geoastro.de/altazsunmoon/index.htm
+# http://futureboy.us/fsp/sun.fsp
+# http://www.satellite-calculations.com/Satellite/suncalc.htm
+def __calculateSun( ephemNow, cityName, data ):
+    __calculateCommon( ephemNow, cityName, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
+    key = ( AstronomicalBodyType.Sun, NAME_TAG_SUN )
+    try:
+        # Dawn/Dusk.
+        city = __getCity( cityName, ephemNow )
+        city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
+        sun = ephem.Sun( city )
+        dawn = city.next_rising( sun, use_center = True )
+        dusk = city.next_setting( sun, use_center = True )
+        data[ key + ( DATA_DAWN, ) ] = str( dawn.datetime() )
+        data[ key + ( DATA_DUSK, ) ] = str( dusk.datetime() )
+
+    except ( ephem.AlwaysUpError, ephem.NeverUpError ):
+        pass # No need to add a message here as update common would already have done so.
+
+    __calculateEclipse( ephemNow, data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
+
+
+# Calculate next eclipse for either the Sun or Moon.
+def __calculateEclipse( ephemNow, data, astronomicalBodyType, dataTag ):
+    eclipseInformation = eclipse.getEclipseForUTC( ephemNow.datetime(), astronomicalBodyType == AstronomicalBodyType.Moon ) # Used to check for a None return, but this should never happen!
+    key = ( astronomicalBodyType, dataTag )
+    data[ key + ( DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ] + ".0" # Needed to bring the date/time format into line with date/time generated by PyEphem.
+    data[ key + ( DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
+    data[ key + ( DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
+    data[ key + ( DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
+
+
+# http://www.geoastro.de/planets/index.html
+# http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
+def __calculatePlanets( ephemNow, cityName, data, planets ):
+    for planet in planets:
+        planetObject = getattr( ephem, planet.title() )()
+        __calculateCommon( ephemNow, cityName, data, planetObject, AstronomicalBodyType.Planet, planet )
+
+
+# http://aa.usno.navy.mil/data/docs/mrst.php
+def __calculateStars( ephemNow, cityName, data, stars ):
+    for star in stars:
+        starObject = ephem.star( star.title() )
+        __calculateCommon( ephemNow, cityName, data, starObject, AstronomicalBodyType.Star, star )
+
+
+# http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
+# http://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
+#TODO Check with Oleg...if we do add the abilty for multiple files,
+# then rename all stuff to OE...or have a separate thing for comets and so on?
+#Problem is if a user adds their own source files, then we don't know what they are...so best to keep as OE.
+def __calculateComets( ephemNow, cityName, data, comets, cometData, cometMagnitude ):
+    for key in comets:
+        if key in cometData:
+            comet = ephem.readdb( cometData[ key ] )
+            comet.compute( __getCity( cityName, ephemNow ) )
+            if math.isnan( comet.earth_distance ) or math.isnan( comet.phase ) or math.isnan( comet.size ) or math.isnan( comet.sun_distance ): # Have found the data file may contain ***** in lieu of actual data!
+                data[ ( AstronomicalBodyType.Comet, key, DATA_MESSAGE ) ] = MESSAGE_DATA_BAD_DATA
+            else:
+                if float( comet.mag ) <= float( cometMagnitude ):
+                    __calculateCommon( ephemNow, cityName, data, comet, AstronomicalBodyType.Comet, key )
+        else:
+            data[ ( AstronomicalBodyType.Comet, key, DATA_MESSAGE ) ] = MESSAGE_DATA_NO_DATA
+
+
+def __calculateCommon( ephemNow, cityName, data, body, astronomicalBodyType, nameTag ):
+    key = ( astronomicalBodyType, nameTag )
+    try:
+        city = __getCity( cityName, ephemNow )
+        rising = city.next_rising( body )
+        setting = city.next_setting( body )
+        data[ key + ( DATA_RISE_TIME, ) ] = str( rising.datetime() )
+        data[ key + ( DATA_SET_TIME, ) ] = str( setting.datetime() )
+
+    except ephem.AlwaysUpError:
+        data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_BODY_ALWAYS_UP
+
+    except ephem.NeverUpError:
+        data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_BODY_NEVER_UP
+
+    body.compute( __getCity( cityName, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+    data[ key + ( DATA_AZIMUTH, ) ] = str( body.az )
+    data[ key + ( DATA_ALTITUDE, ) ] = str( body.alt )
+
+
+#TODO Probabaly not needed.
+#     def __hideBody( data, astronomicalBodyType, nameTag, hideIfNeverUp ):
+#         key = ( astronomicalBodyType, nameTag, DATA_MESSAGE )
+#         return \
+#             key in data and \
+#             data[ key ] == MESSAGE_BODY_NEVER_UP and \
+#             hideIfNeverUp
+
+
+# Uses TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
+#
+# Other sources/background:
+#   http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
+#   http://spotthestation.nasa.gov/sightings
+#   http://www.n2yo.com
+#   http://www.heavens-above.com
+#   http://in-the-sky.org
+#
+# For planets/stars, the immediate next rise/set time is shown.
+# If already above the horizon, the set time is shown followed by the rise time for the following pass.
+# This makes sense as planets/stars are slow moving.
+#
+# However, as satellites are faster moving and pass several times a day, a different approach is used.
+# When a notification is displayed indicating a satellite is now passing overhead,
+# the user would want to see the rise/set for the current pass (rather than the set for the current pass and rise for the next pass).
+#
+# Therefore...
+#    If a satellite is yet to rise, show the upcoming rise/set time.
+#    If a satellite is currently passing over, show the rise/set time for that pass.
+#
+# This allows the user to see the rise/set time for the current pass as it is happening.
+# When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
+def __calculateSatellites( ephemNow, cityName, data, satellites, satelliteData ):
+    for key in satellites:
+        if key in satelliteData:
+            __calculateNextSatellitePass( ephemNow, key, satelliteData[ key ] )
+        else:
+            data[ ( AstronomicalBodyType.Satellite, " ".join( key ), DATA_MESSAGE ) ] = MESSAGE_DATA_NO_DATA
+
+
+def __calculateNextSatellitePass( ephemNow, cityName, data, key, satelliteTLE ):
+    key = ( AstronomicalBodyType.Satellite, " ".join( key ) )
+    currentDateTime = ephemNow
+    endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 2 ) # Stop looking for passes 2 days from ephemNow.
+    message = None
+    while currentDateTime < endDateTime:
+        city = __getCity( cityName, currentDateTime )
+        satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+        satellite.compute( city )
+        try:
+            nextPass = city.next_pass( satellite )
+
+        except ValueError:
+            if satellite.circumpolar:
+                data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_SATELLITE_IS_CIRCUMPOLAR
+                data[ key + ( DATA_AZIMUTH, ) ] = str( satellite.az )
+            elif satellite.neverup:
+                message = MESSAGE_SATELLITE_NEVER_RISES
+            else:
+                message = MESSAGE_SATELLITE_VALUE_ERROR
+
+            break
+
+        if not __isSatellitePassValid( nextPass ):
+            message = MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS
+            break
+
+        # The pass is valid.  If the satellite is currently passing, work out when it rose...
+        if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
+            setTime = nextPass[ 4 ]
+            nextPass = __calculateSatellitePassForRisingPriorToNow( currentDateTime, satelliteTLE )
+            if nextPass is None:
+                currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
+                continue
+
+        # Now have a satellite rise/transit/set; determine if the pass is visible.
+        passIsVisible = __isSatellitePassVisible( nextPass[ 2 ], cityName, satellite )
+        if not passIsVisible:
+            currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
+            continue
+
+        # The pass is visible and the user wants only visible passes OR the user wants any pass...
+        data[ key + ( DATA_RISE_TIME, ) ] = str( nextPass[ 0 ].datetime() )
+        data[ key + ( DATA_RISE_AZIMUTH, ) ] = str( nextPass[ 1 ] )
+        data[ key + ( DATA_SET_TIME, ) ] = str( nextPass[ 4 ].datetime() )
+        data[ key + ( DATA_SET_AZIMUTH, ) ] = str( nextPass[ 5 ] )
+
+        break
+
+    if currentDateTime >= endDateTime:
+        message = MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME
+
+    if message is not None:
+        data[ key + ( DATA_MESSAGE, ) ] = message
+
+
+def __calculateSatellitePassForRisingPriorToNow( ephemNow, cityName, satelliteTLE ):
+    currentDateTime = ephem.Date( ephemNow - ephem.minute ) # Start looking from one minute ago.
+    endDateTime = ephem.Date( ephemNow - ephem.hour * 1 ) # Only look back an hour for the rise time (then just give up).
+    nextPass = None
+    while currentDateTime > endDateTime:
+        city = __getCity( cityName, currentDateTime )
+        satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+        satellite.compute( city )
+        try:
+            nextPass = city.next_pass( satellite )
+            if not __isSatellitePassValid( nextPass ):
+                nextPass = None
+                break # Unlikely to happen but better to be safe and check!
+
+            if nextPass[ 0 ] < nextPass[ 4 ]:
+                break
+
+            currentDateTime = ephem.Date( currentDateTime - ephem.minute )
+
+        except:
+            nextPass = None
+            break # This should never happen as the satellite has a rise and set (is not circumpolar or never up).
+
+    return nextPass
+
+
+def __isSatellitePassValid( satellitePass ):
+    return \
+        satellitePass is not None and \
+        len( satellitePass ) == 6 and \
+        satellitePass[ 0 ] is not None and \
+        satellitePass[ 1 ] is not None and \
+        satellitePass[ 2 ] is not None and \
+        satellitePass[ 3 ] is not None and \
+        satellitePass[ 4 ] is not None and \
+        satellitePass[ 5 ] is not None
+
+
+# Determine if a satellite pass is visible or not...
+#
+#    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
+#    http://www.celestrak.com/columns/v03n01
+#    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
+def __isSatellitePassVisible( passDateTime, cityName, satellite ):
+    city = __getCity( cityName, passDateTime )
+    city.pressure = 0
+    city.horizon = "-0:34"
+
+    satellite.compute( city )
+    sun = ephem.Sun()
+    sun.compute( city )
+
+    return satellite.eclipsed is False and \
+           sun.alt > ephem.degrees( "-18" ) and \
+           sun.alt < ephem.degrees( "-6" )
+
+
+def __getCity( cityName, date ):
+    city = ephem.city( cityName )
+    city.date = date
+    return city
+
+
+#TODO Remove after testing done.
+import datetime
+
+utcNow = datetime.datetime.utcnow()
+cityName = "Sydney"
+planets = PLANETS
+stars = STARS
+
+result = getAstronomicalInformation( utcNow, cityName, planets, stars,
+                                      [ ], [ ],
+                                      [ ], [ ], 6 )
+
+print( result )
