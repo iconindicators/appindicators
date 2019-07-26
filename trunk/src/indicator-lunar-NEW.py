@@ -83,7 +83,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
-import backend, calendar, datetime, eclipse, glob, locale, logging, math, os, pythonutils, re, satellite, tempfile, threading, webbrowser
+import astro, calendar, datetime, eclipse, glob, locale, logging, math, os, pythonutils, re, satellite, tempfile, threading, webbrowser
 
 try:
     import ephem
@@ -697,11 +697,13 @@ class IndicatorLunar:
 # 
 #             self.updateAstronomicalInformation( ephemNow, self.hideBodyIfNeverUp, self.cometsMagnitude )
 
+#TODO Is it feasible to remove all elements of PyEphem so that none of it is imported in the frontend?
+#Any city stuff is passed/verified by the backend.
             utcNow = datetime.datetime.utcnow()
             cityName = self.cityName
             planets = self.planets
             stars = self.stars
-            self.data = backend.getAstronomicalInformation( utcNow, cityName, planets, stars,
+            self.data = astro.getAstronomicalInformation( utcNow, cityName, planets, stars,
                                                   [ ], [ ],
                                                   [ ], [ ], 6 )
 
