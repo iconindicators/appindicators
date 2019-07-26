@@ -34,7 +34,7 @@ class AstronomicalBodyType: Comet, Moon, Planet, Satellite, Star, Sun = range( 6
 
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
-DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used when creating the icon.
+DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used when creating the icon; not intended for display to the user.
 DATA_DAWN = "DAWN"
 DATA_DUSK = "DUSK"
 DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
@@ -44,7 +44,7 @@ DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
 DATA_ELEVATION = "ELEVATION" # Used for city.
 DATA_FIRST_QUARTER = "FIRST QUARTER"
 DATA_FULL = "FULL"
-DATA_ILLUMINATION = "ILLUMINATION" # Used for creating the icon.
+DATA_ILLUMINATION = "ILLUMINATION" # Used when creating the icon; not intended for display to the user.
 DATA_LATITUDE = "LATITUDE" # Used for city.
 DATA_LONGITUDE = "LONGITUDE" # Used for city.
 DATA_MESSAGE = "MESSAGE"
@@ -62,10 +62,11 @@ DATA_THIRD_QUARTER = "THIRD QUARTER"
 #TODO Maybe need a list of star names...or a function which the frontend can call to get the star names?
 #At some point in the front end, star names (and planet names) need to be translated.
 
+ #TODO Is this meant to be a list of user visible tags?  If so or not, what about bright limb and illumination?
 DATA_ALL = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
-    DATA_BRIGHT_LIMB, # TODO Should this be here if not used for display?  Ditto for illumination.
+    DATA_BRIGHT_LIMB,
     DATA_DAWN,
     DATA_DUSK,
     DATA_ECLIPSE_DATE_TIME,
@@ -255,7 +256,6 @@ STARS = [
     "VINDEMIATRIX",
     "WEZEN",
     "ZAURAK" ]
-
 
 LUNAR_PHASE_FULL_MOON = "FULL_MOON"
 LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
