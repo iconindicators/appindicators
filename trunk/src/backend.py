@@ -282,7 +282,7 @@ MESSAGE_SATELLITE_VALUE_ERROR = "SATELLITE_VALUE_ERROR"
 #TODO Does city name come originally from pyephem?  Can it be anything and is then matched later with pyephem's list of cities?
 #City name would have to come from PyEphem originally...and so some sort of error has to burp back up on a bad city name.
 #TODO Document: missing ephem import results in None return.
-def getAstronomicalInformation( utcNow, cityName,
+def getAstronomicalInformation( utcNow, city,
                                 planets, #TODO Need a comment about the list of planets: is upper case or case sensitive...same for stars/comets, satellites.  Skyfield may be different!
                                 stars,
                                 satellites, satelliteData,
@@ -292,18 +292,18 @@ def getAstronomicalInformation( utcNow, cityName,
     # Value is the astronomical data (or equivalent) as a string.
     data = { }
 
-    data[ ( None, NAME_TAG_CITY, DATA_NAME ) ] = cityName
-    data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = str( round( float( _city_data.get( cityName )[ 0 ] ), 1 ) )
-    data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = str( round( float( _city_data.get( cityName )[ 1 ] ), 1 ) )
-    data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = str( _city_data.get( cityName )[ 2 ] )
+    data[ ( None, NAME_TAG_CITY, DATA_NAME ) ] = city
+    data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = str( round( float( _city_data.get( city )[ 0 ] ), 1 ) )
+    data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = str( round( float( _city_data.get( city )[ 1 ] ), 1 ) )
+    data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = str( _city_data.get( city )[ 2 ] )
 
     ephemNow = ephem.Date( utcNow )
-    __calculateMoon( ephemNow, cityName, data )
-    __calculateSun( ephemNow, cityName, data )
-    __calculatePlanets( ephemNow, cityName, data, planets )
-    __calculateStars( ephemNow, cityName, data, stars )
-    __calculateComets( ephemNow, cityName, data, comets, cometData, cometMagnitude )
-    __calculateSatellites( ephemNow, cityName, data, satellites, satelliteData )
+    __calculateMoon( ephemNow, city, data )
+    __calculateSun( ephemNow, city, data )
+    __calculatePlanets( ephemNow, city, data, planets )
+    __calculateStars( ephemNow, city, data, stars )
+    __calculateComets( ephemNow, city, data, comets, cometData, cometMagnitude )
+    __calculateSatellites( ephemNow, city, data, satellites, satelliteData )
 
 # Update frontend...
 #         self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
@@ -327,12 +327,12 @@ def getAstronomicalInformation( utcNow, cityName,
 # http://www.geoastro.de/altazsunmoon/index.htm
 # http://www.geoastro.de/sundata/index.html
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
-def __calculateMoon( ephemNow, cityName, data ):
-    __calculateCommon( ephemNow, cityName, data, ephem.Moon(), AstronomicalBodyType.Moon, NAME_TAG_MOON )
+def __calculateMoon( ephemNow, city, data ):
+    __calculateCommon( ephemNow, city, data, ephem.Moon(), AstronomicalBodyType.Moon, NAME_TAG_MOON )
     key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
     moon = ephem.Moon()
-    moon.compute( __getCity( cityName, ephemNow ) )
-    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, cityName, moon ) ) ) )
+    moon.compute( __getCity( city, ephemNow ) )
+    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, city, moon ) ) ) )
     data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) )
     data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( ephemNow, int( moon.phase ) )
     data[ key + ( DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
@@ -361,8 +361,8 @@ def __calculateMoon( ephemNow, cityName, data ):
 #  https://github.com/brandon-rhodes/pyephem/issues/24
 #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
 #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-def __getZenithAngleOfBrightLimb( ephemNow, cityName, body ): #TODO Verify this still works!
-    city = __getCity( cityName, ephemNow )
+def __getZenithAngleOfBrightLimb( ephemNow, city, body ): #TODO Verify this still works!
+    city = __getCity( city, ephemNow )
     sun = ephem.Sun( city )
     body.compute( city )
 
@@ -428,12 +428,12 @@ def __getLunarPhase( ephemNow, illuminationPercentage ):
 # http://www.geoastro.de/altazsunmoon/index.htm
 # http://futureboy.us/fsp/sun.fsp
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
-def __calculateSun( ephemNow, cityName, data ):
-    __calculateCommon( ephemNow, cityName, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
+def __calculateSun( ephemNow, city, data ):
+    __calculateCommon( ephemNow, city, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
     key = ( AstronomicalBodyType.Sun, NAME_TAG_SUN )
     try:
         # Dawn/Dusk.
-        city = __getCity( cityName, ephemNow )
+        city = __getCity( city, ephemNow )
         city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
         sun = ephem.Sun( city )
         dawn = city.next_rising( sun, use_center = True )
@@ -459,17 +459,17 @@ def __calculateEclipse( ephemNow, data, astronomicalBodyType, dataTag ):
 
 # http://www.geoastro.de/planets/index.html
 # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
-def __calculatePlanets( ephemNow, cityName, data, planets ):
+def __calculatePlanets( ephemNow, city, data, planets ):
     for planet in planets:
         planetObject = getattr( ephem, planet.title() )()
-        __calculateCommon( ephemNow, cityName, data, planetObject, AstronomicalBodyType.Planet, planet )
+        __calculateCommon( ephemNow, city, data, planetObject, AstronomicalBodyType.Planet, planet )
 
 
 # http://aa.usno.navy.mil/data/docs/mrst.php
-def __calculateStars( ephemNow, cityName, data, stars ):
+def __calculateStars( ephemNow, city, data, stars ):
     for star in stars:
         starObject = ephem.star( star.title() )
-        __calculateCommon( ephemNow, cityName, data, starObject, AstronomicalBodyType.Star, star )
+        __calculateCommon( ephemNow, city, data, starObject, AstronomicalBodyType.Star, star )
 
 
 # http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
@@ -477,24 +477,24 @@ def __calculateStars( ephemNow, cityName, data, stars ):
 #TODO Check with Oleg...if we do add the abilty for multiple files,
 # then rename all stuff to OE...or have a separate thing for comets and so on?
 #Problem is if a user adds their own source files, then we don't know what they are...so best to keep as OE.
-def __calculateComets( ephemNow, cityName, data, comets, cometData, cometMagnitude ):
+def __calculateComets( ephemNow, city, data, comets, cometData, cometMagnitude ):
     for key in comets:
         if key in cometData:
             comet = ephem.readdb( cometData[ key ] )
-            comet.compute( __getCity( cityName, ephemNow ) )
+            comet.compute( __getCity( city, ephemNow ) )
             if math.isnan( comet.earth_distance ) or math.isnan( comet.phase ) or math.isnan( comet.size ) or math.isnan( comet.sun_distance ): # Have found the data file may contain ***** in lieu of actual data!
                 data[ ( AstronomicalBodyType.Comet, key, DATA_MESSAGE ) ] = MESSAGE_DATA_BAD_DATA
             else:
                 if float( comet.mag ) <= float( cometMagnitude ):
-                    __calculateCommon( ephemNow, cityName, data, comet, AstronomicalBodyType.Comet, key )
+                    __calculateCommon( ephemNow, city, data, comet, AstronomicalBodyType.Comet, key )
         else:
             data[ ( AstronomicalBodyType.Comet, key, DATA_MESSAGE ) ] = MESSAGE_DATA_NO_DATA
 
 
-def __calculateCommon( ephemNow, cityName, data, body, astronomicalBodyType, nameTag ):
+def __calculateCommon( ephemNow, city, data, body, astronomicalBodyType, nameTag ):
     key = ( astronomicalBodyType, nameTag )
     try:
-        city = __getCity( cityName, ephemNow )
+        city = __getCity( city, ephemNow )
         rising = city.next_rising( body )
         setting = city.next_setting( body )
         data[ key + ( DATA_RISE_TIME, ) ] = str( rising.datetime() )
@@ -506,7 +506,7 @@ def __calculateCommon( ephemNow, cityName, data, body, astronomicalBodyType, nam
     except ephem.NeverUpError:
         data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_BODY_NEVER_UP
 
-    body.compute( __getCity( cityName, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+    body.compute( __getCity( city, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
     data[ key + ( DATA_AZIMUTH, ) ] = str( body.az )
     data[ key + ( DATA_ALTITUDE, ) ] = str( body.alt )
 
