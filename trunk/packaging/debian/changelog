@@ -13,6 +13,7 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
     Azimuth and Altitude are sufficient.
   * Removed extraneous decimal degrees from Azimuth/Altitude.
   * Removed planetary moons; each has the same Azimuth/Altitude as the parent.
+  * Removed werewolf warning percentage from preferences and fixed at 99%.
   * Sometimes the magnitude for a comet is outrageously wrong;
     as a consequence, Magnitude is shown for comets.
   * Removed old eclipse information.

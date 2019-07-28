@@ -138,7 +138,6 @@ class IndicatorLunar:
     CONFIG_SHOW_SUN = "showSun"
     CONFIG_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     CONFIG_STARS = "stars"
-    CONFIG_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE = "werewolfWarningStartIlluminationPercentage"
     CONFIG_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
@@ -741,6 +740,7 @@ class IndicatorLunar:
         key = ( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astro.DATA_ILLUMINATION, ) ] )
         lunarBrightLimbAngle = int( self.data[ key + ( astro.DATA_BRIGHT_LIMB, ) ] )
+        werewolfWarningPercentage = 99
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == astro.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == astro.LUNAR_PHASE_WAXING_CRESCENT ) or \
@@ -749,7 +749,7 @@ class IndicatorLunar:
             ( lunarPhase == astro.LUNAR_PHASE_FULL_MOON )
 
         if phaseIsBetweenNewAndFullInclusive and \
-           lunarIlluminationPercentage >= self.werewolfWarningStartIlluminationPercentage and \
+           lunarIlluminationPercentage >= werewolfWarningPercentage and \
            ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) < datetime.datetime.utcnow() ):
 
             summary = self.werewolfWarningSummary
@@ -2007,26 +2007,6 @@ class IndicatorLunar:
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
 
-        label = Gtk.Label( _( "Illumination (%)" ) )
-        label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        box.pack_start( label, False, False, 0 )
-
-        spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment( self.werewolfWarningStartIlluminationPercentage, 0, 100, 1, 0, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinner.set_value( self.werewolfWarningStartIlluminationPercentage ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( _(
-            "Notifications are shown from the specified\n" + \
-            "illumination, commencing after a new moon." ) )
-        spinner.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        box.pack_start( spinner, False, False, 0 )
-
-        grid.attach( box, 0, 6, 1, 1 )
-
-        showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, spinner )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
-
         label = Gtk.Label( _( "Summary" ) )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         box.pack_start( label, False, False, 0 )
@@ -2037,7 +2017,7 @@ class IndicatorLunar:
         werewolfNotificationSummaryText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         box.pack_start( werewolfNotificationSummaryText, True, True, 0 )
 
-        grid.attach( box, 0, 7, 1, 1 )
+        grid.attach( box, 0, 6, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationSummaryText )
 
@@ -2061,7 +2041,7 @@ class IndicatorLunar:
 
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        grid.attach( box, 0, 8, 1, 1 )
+        grid.attach( box, 0, 7, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationMessageText )
 
@@ -2070,7 +2050,7 @@ class IndicatorLunar:
         test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         test.connect( "clicked", self.onTestNotificationClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, None, True )
         test.set_tooltip_text( _( "Show the notification using the current summary/message." ) )
-        grid.attach( test, 0, 9, 1, 1 )
+        grid.attach( test, 0, 8, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
@@ -2251,7 +2231,6 @@ class IndicatorLunar:
             self.satelliteNotificationMessage = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, pythonutils.getTextViewText( satelliteNotificationMessageText ) )
 
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
-            self.werewolfWarningStartIlluminationPercentage = spinner.get_value_as_int()
             self.werewolfWarningSummary = werewolfNotificationSummaryText.get_text()
             self.werewolfWarningMessage = pythonutils.getTextViewText( werewolfNotificationMessageText )
 
@@ -2689,7 +2668,6 @@ class IndicatorLunar:
 
         self.stars = [ ]
 
-        self.werewolfWarningStartIlluminationPercentage = 99
         self.werewolfWarningMessage = IndicatorLunar.WEREWOLF_WARNING_MESSAGE_DEFAULT
         self.werewolfWarningSummary = IndicatorLunar.WEREWOLF_WARNING_SUMMARY_DEFAULT
 
@@ -2743,7 +2721,6 @@ class IndicatorLunar:
         self.showSun = config.get( IndicatorLunar.CONFIG_SHOW_SUN, self.showSun )
         self.showWerewolfWarning = config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
         self.stars = config.get( IndicatorLunar.CONFIG_STARS, self.stars )
-        self.werewolfWarningStartIlluminationPercentage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
         self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, self.werewolfWarningMessage )
         self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, self.werewolfWarningSummary )
 
@@ -2802,7 +2779,6 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_SHOW_SUN: self.showSun,
             IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
             IndicatorLunar.CONFIG_STARS: self.stars,
-            IndicatorLunar.CONFIG_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE: self.werewolfWarningStartIlluminationPercentage,
             IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE: self.werewolfWarningMessage,
             IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY: self.werewolfWarningSummary
         }
