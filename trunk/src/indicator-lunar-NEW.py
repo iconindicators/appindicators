@@ -31,7 +31,6 @@
 #  http://www.flaticon.com/search/satellite
 
 
-
 #TODO
 # On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared:
 # 
@@ -297,7 +296,6 @@ class IndicatorLunar:
         astro.PLANET_NEPTUNE    : _( "NEPTUNE" ),
         astro.PLANET_PLUTO      : _( "PLUTO" ) }
 
-    # Translated star names.
     STAR_NAMES_TRANSLATIONS = {
         astro.STARS[ 0 ]    : _( "Achernar" ),
         astro.STARS[ 1 ]    : _( "Adara" ),
@@ -394,7 +392,6 @@ class IndicatorLunar:
         astro.STARS[ 92 ]   : _( "Wezen" ),
         astro.STARS[ 93 ]   : _( "Zaurak" ) }
 
-    # Data tag star names.
     STAR_TAGS_TRANSLATIONS = {
         astro.STARS[ 0 ]    : _( "ACHERNAR" ),
         astro.STARS[ 1 ]    : _( "ADARA" ),
@@ -614,8 +611,8 @@ class IndicatorLunar:
 
     def __init__( self ):
         self.cometOEData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
-        self.satelliteNotifications = { }
         self.satelliteTLEData = { } # Key: ( satellite name upper cased, satellite number ) ; Value: satellite.TLE object.  Can be empty but never None.
+        self.satelliteNotifications = { }
 
         self.toggleCometsTable = True
         self.togglePlanetsTable = True
@@ -641,21 +638,6 @@ class IndicatorLunar:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.loadConfig()
-
-        #TODO Temporarily upper case planets and stars.
-        #TODO What to do for release?  End user config will contain lower case versions...
-        #...so can either put in a hack that will be removed in 6 months when the next eclipse update happens.
-        #Or just cop it.
-        tmp = []
-        for planet in self.planets:
-            tmp.append( planet.upper() )
-        self.planets = tmp
-        
-        tmp = []
-        for star in self.stars:
-            tmp.append( star.upper() )
-        self.stars = tmp
-        
         self.update( True )
 
 
@@ -2735,7 +2717,7 @@ class IndicatorLunar:
         self.comets = config.get( IndicatorLunar.CONFIG_COMETS, self.comets )
         self.cometsAddNew = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, self.cometsAddNew )
         self.cometsMagnitude = config.get( IndicatorLunar.CONFIG_COMETS_MAGNITUDE, self.cometsMagnitude )
-        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, self.planets ) #TODO This will need to either upper case everthing or something else.
+        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, self.planets )
         self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
         self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
         self.satelliteNotificationTimeFormat = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_TIME_FORMAT, self.satelliteNotificationTimeFormat )
@@ -2760,10 +2742,25 @@ class IndicatorLunar:
         self.showStarsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
         self.showSun = config.get( IndicatorLunar.CONFIG_SHOW_SUN, self.showSun )
         self.showWerewolfWarning = config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
-        self.stars = config.get( IndicatorLunar.CONFIG_STARS, self.stars )  #TODO This will need to either upper case everthing or something else.
+        self.stars = config.get( IndicatorLunar.CONFIG_STARS, self.stars )
         self.werewolfWarningStartIlluminationPercentage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_START_ILLUMINATION_PERCENTAGE, self.werewolfWarningStartIlluminationPercentage )
         self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, self.werewolfWarningMessage )
         self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, self.werewolfWarningSummary )
+
+        #TODO Temporary hack...
+        # Convert planet/star to upper case.
+        # Remove this hack after next release.
+        tmp = []
+        for planet in self.planets:
+            tmp.append( planet.upper() )
+        self.planets = tmp
+        
+        tmp = []
+        for star in self.stars:
+            tmp.append( star.upper() )
+        self.stars = tmp
+
+        self.saveConfig()
 
 
     def saveConfig( self ):
