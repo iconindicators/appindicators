@@ -658,19 +658,19 @@ class IndicatorLunar:
                                                           self.city, self.latitude, self.longitude, self.elevation,
                                                           self.planets,
                                                           self.stars,
-                                                          [ ], [ ],
-                                                          [ ], [ ], self.cometsMagnitude )
+                                                          self.satellites, self.satelliteTLEData,
+                                                          self.comets, self.cometOEData, self.cometsMagnitude )
 
             # Update frontend...
             self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
             self.updateMenu()
             self.updateIconAndLabel()
 
-#             if self.showWerewolfWarning:
-#                 self.notificationFullMoon( ephemNow )
+            if self.showWerewolfWarning:
+                self.notificationFullMoon()
 
-#             if self.showSatelliteNotification:
-#                 self.notificationSatellite()
+            if self.showSatelliteNotification:
+                self.notificationSatellite()
 
             self.nextUpdate = self.toDateTime( self.nextUpdate ) # Parse from string back into a datetime.
             nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
@@ -691,7 +691,7 @@ class IndicatorLunar:
         self.updatePlanetsMenu( menu )
         self.updateStarsMenu( menu )
         self.updateCometsMenu( menu )
-#         self.updateSatellitesMenu( menu )
+        self.updateSatellitesMenu( menu )
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
@@ -736,10 +736,11 @@ class IndicatorLunar:
             self.indicator.set_icon_full( iconName, "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
 
 
-    def notificationFullMoon( self, ephemNow ):
+    def notificationFullMoon( self ):
         key = ( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astro.DATA_ILLUMINATION, ) ] )
         lunarBrightLimbAngle = int( self.data[ key + ( astro.DATA_BRIGHT_LIMB, ) ] )
+        lunarPhase = self.data[ key + ( astro.DATA_PHASE, ) ]
         werewolfWarningPercentage = 99
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == astro.LUNAR_PHASE_NEW_MOON ) or \

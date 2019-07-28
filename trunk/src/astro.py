@@ -487,7 +487,7 @@ def __calculateComets( ephemNow, data, comets, cometData, cometMaximumMagnitude 
                 data[ ( AstronomicalBodyType.Comet, key, DATA_MESSAGE ) ] = MESSAGE_DATA_BAD_DATA
             else:
                 if float( comet.mag ) <= float( cometMaximumMagnitude ):
-                    __calculateCommon( ephemNow, data, data, comet, AstronomicalBodyType.Comet, key )
+                    __calculateCommon( ephemNow, data, comet, AstronomicalBodyType.Comet, key )
         else:
             data[ ( AstronomicalBodyType.Comet, key, DATA_MESSAGE ) ] = MESSAGE_DATA_NO_DATA
 
@@ -538,7 +538,7 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
 def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
     for key in satellites:
         if key in satelliteData:
-            __calculateNextSatellitePass( ephemNow, key, satelliteData[ key ] )
+            __calculateNextSatellitePass( ephemNow, data, key, satelliteData[ key ] )
         else:
             data[ ( AstronomicalBodyType.Satellite, " ".join( key ), DATA_MESSAGE ) ] = MESSAGE_DATA_NO_DATA
 
@@ -579,7 +579,7 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
                 continue
 
         # Now have a satellite rise/transit/set; determine if the pass is visible.
-        passIsVisible = __isSatellitePassVisible( data, nextPass[ 2 ], city, satellite )
+        passIsVisible = __isSatellitePassVisible( data, nextPass[ 2 ], satellite )
         if not passIsVisible:
             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
             continue
