@@ -283,33 +283,26 @@ MESSAGE_SATELLITE_VALUE_ERROR = "SATELLITE_VALUE_ERROR"
 #
 #TODO Maybe return the dict and a status message: OK, bad city...what else?
 def getAstronomicalInformation( utcNow,
-                                city, latitude, longitude, elevation,
+                                cityName, latitude, longitude, elevation,
                                 planets,
                                 stars,
                                 satellites, satelliteData,
-                                comets, cometData, cometMagnitude = 6 ):
+                                comets, cometData, cometMaximumMagnitude ):
 
     data = { }
 
-    data[ ( None, NAME_TAG_CITY, DATA_NAME ) ] = city
+    data[ ( None, NAME_TAG_CITY, DATA_NAME ) ] = cityName
     data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = latitude
     data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = longitude
     data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = elevation
 
-#TODO Am not using the lat/long/elev passed in...
-#...maybe create a city object here and pass that around and use a clone city function when a clean city object is needed.
-#Otherwise, have to pass lat/lon/elev into every single function.
-#     city.lat = latitude
-#     city.lon = longitude
-#     city.elev = elevation
-
     ephemNow = ephem.Date( utcNow )
-    __calculateMoon( ephemNow, city, data )
-    __calculateSun( ephemNow, city, data )
-    __calculatePlanets( ephemNow, city, data, planets )
-    __calculateStars( ephemNow, city, data, stars )
-    __calculateComets( ephemNow, city, data, comets, cometData, cometMagnitude )
-    __calculateSatellites( ephemNow, city, data, satellites, satelliteData )
+    __calculateMoon( ephemNow, data )
+    __calculateSun( ephemNow, data )
+    __calculatePlanets( ephemNow, data, planets )
+    __calculateStars( ephemNow, data, stars )
+    __calculateComets( ephemNow, data, comets, cometData, cometMaximumMagnitude )
+    __calculateSatellites( ephemNow, data, satellites, satelliteData )
 
     return data
 
@@ -332,18 +325,18 @@ def getLatitudeLongitudeElevation( city ): return _city_data.get( city )[ 0 ], \
 # http://www.geoastro.de/altazsunmoon/index.htm
 # http://www.geoastro.de/sundata/index.html
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
-def __calculateMoon( ephemNow, city, data ):
-    __calculateCommon( ephemNow, city, data, ephem.Moon(), AstronomicalBodyType.Moon, NAME_TAG_MOON )
+def __calculateMoon( ephemNow, data ):
+    __calculateCommon( ephemNow, data, ephem.Moon(), AstronomicalBodyType.Moon, NAME_TAG_MOON )
     key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
     moon = ephem.Moon()
-    moon.compute( __getCity( city, ephemNow ) )
-    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, city, moon ) ) ) )
+    moon.compute( __getCity( data, ephemNow ) )
     data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) )
     data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( ephemNow, int( moon.phase ) )
     data[ key + ( DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
     data[ key + ( DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
     data[ key + ( DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
     data[ key + ( DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
+    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Pass in a clean instance of the moon (just to be safe).
     __calculateEclipse( ephemNow, data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
 
@@ -366,10 +359,10 @@ def __calculateMoon( ephemNow, city, data ):
 #  https://github.com/brandon-rhodes/pyephem/issues/24
 #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
 #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-def __getZenithAngleOfBrightLimb( ephemNow, city, body ): #TODO Would be nice to figure out how to make this not use PyEphem internally but pass in sun/moon ra/dec and pass in or calculate the city lat and sidereal time.
-    theCity = __getCity( city, ephemNow )
-    sun = ephem.Sun( theCity )
-    body.compute( theCity )
+def __getZenithAngleOfBrightLimb( ephemNow, data, body ): #TODO Would be nice to make this not use PyEphem internally but pass in sun/moon ra/dec and pass in or calculate the city lat and sidereal time.
+    city = __getCity( data, ephemNow )
+    sun = ephem.Sun( city )
+    body.compute( city )
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
     y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
@@ -380,11 +373,11 @@ def __getZenithAngleOfBrightLimb( ephemNow, city, body ): #TODO Would be nice to
     # https://tycho.usno.navy.mil/sidereal.html
     # http://www.wwu.edu/skywise/skymobile/skywatch.html
     # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-    hourAngle = theCity.sidereal_time() - body.ra
+    hourAngle = city.sidereal_time() - body.ra
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
     y = math.sin( hourAngle )
-    x = math.tan( theCity.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+    x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
     parallacticAngle = math.atan2( y, x )
 
     return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
@@ -433,16 +426,16 @@ def __getLunarPhase( ephemNow, illuminationPercentage ):
 # http://www.geoastro.de/altazsunmoon/index.htm
 # http://futureboy.us/fsp/sun.fsp
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
-def __calculateSun( ephemNow, city, data ):
-    __calculateCommon( ephemNow, city, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
+def __calculateSun( ephemNow, data ):
+    __calculateCommon( ephemNow, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
     key = ( AstronomicalBodyType.Sun, NAME_TAG_SUN )
     try:
         # Dawn/Dusk.
-        theCity = __getCity( city, ephemNow )
-        theCity.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
-        sun = ephem.Sun( theCity )
-        dawn = theCity.next_rising( sun, use_center = True )
-        dusk = theCity.next_setting( sun, use_center = True )
+        city = __getCity( data, ephemNow )
+        city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
+        sun = ephem.Sun( city )
+        dawn = city.next_rising( sun, use_center = True )
+        dusk = city.next_setting( sun, use_center = True )
         data[ key + ( DATA_DAWN, ) ] = str( dawn.datetime() )
         data[ key + ( DATA_DUSK, ) ] = str( dusk.datetime() )
 
@@ -468,17 +461,17 @@ def __calculateEclipse( ephemNow, data, astronomicalBodyType, dataTag ):
 
 # http://www.geoastro.de/planets/index.html
 # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
-def __calculatePlanets( ephemNow, city, data, planets ):
+def __calculatePlanets( ephemNow, data, planets ):
     for planet in planets:
         planetObject = getattr( ephem, planet.title() )()
-        __calculateCommon( ephemNow, city, data, planetObject, AstronomicalBodyType.Planet, planet )
+        __calculateCommon( ephemNow, data, planetObject, AstronomicalBodyType.Planet, planet )
 
 
 # http://aa.usno.navy.mil/data/docs/mrst.php
-def __calculateStars( ephemNow, city, data, stars ):
+def __calculateStars( ephemNow, data, stars ):
     for star in stars:
         starObject = ephem.star( star.title() )
-        __calculateCommon( ephemNow, city, data, starObject, AstronomicalBodyType.Star, star )
+        __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star )
 
 
 # http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
@@ -486,26 +479,26 @@ def __calculateStars( ephemNow, city, data, stars ):
 #TODO Check with Oleg...if we do add the abilty for multiple files,
 # then rename all stuff to OE...or have a separate thing for comets and so on?
 #Problem is if a user adds their own source files, then we don't know what they are...so best to keep as OE.
-def __calculateComets( ephemNow, city, data, comets, cometData, cometMagnitude ):
+def __calculateComets( ephemNow, data, comets, cometData, cometMaximumMagnitude ):
     for key in comets:
         if key in cometData:
             comet = ephem.readdb( cometData[ key ] )
-            comet.compute( __getCity( city, ephemNow ) )
+            comet.compute( __getCity( data, ephemNow ) )
             if math.isnan( comet.earth_distance ) or math.isnan( comet.phase ) or math.isnan( comet.size ) or math.isnan( comet.sun_distance ): # Have found the data file may contain ***** in lieu of actual data!
                 data[ ( AstronomicalBodyType.Comet, key, DATA_MESSAGE ) ] = MESSAGE_DATA_BAD_DATA
             else:
-                if float( comet.mag ) <= float( cometMagnitude ):
-                    __calculateCommon( ephemNow, city, data, comet, AstronomicalBodyType.Comet, key )
+                if float( comet.mag ) <= float( cometMaximumMagnitude ):
+                    __calculateCommon( ephemNow, data, data, comet, AstronomicalBodyType.Comet, key )
         else:
             data[ ( AstronomicalBodyType.Comet, key, DATA_MESSAGE ) ] = MESSAGE_DATA_NO_DATA
 
 
-def __calculateCommon( ephemNow, city, data, body, astronomicalBodyType, nameTag ):
+def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
     key = ( astronomicalBodyType, nameTag )
     try:
-        theCity = __getCity( city, ephemNow )
-        rising = theCity.next_rising( body )
-        setting = theCity.next_setting( body )
+        city = __getCity( data, ephemNow )
+        rising = city.next_rising( body )
+        setting = city.next_setting( body )
         data[ key + ( DATA_RISE_TIME, ) ] = str( rising.datetime() )
         data[ key + ( DATA_SET_TIME, ) ] = str( setting.datetime() )
 
@@ -515,7 +508,7 @@ def __calculateCommon( ephemNow, city, data, body, astronomicalBodyType, nameTag
     except ephem.NeverUpError:
         data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_BODY_NEVER_UP
 
-    body.compute( __getCity( city, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+    body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
     data[ key + ( DATA_AZIMUTH, ) ] = str( body.az )
     data[ key + ( DATA_ALTITUDE, ) ] = str( body.alt )
 
@@ -543,25 +536,25 @@ def __calculateCommon( ephemNow, city, data, body, astronomicalBodyType, nameTag
 #
 # This allows the user to see the rise/set time for the current pass as it is happening.
 # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
-def __calculateSatellites( ephemNow, city, data, satellites, satelliteData ):
+def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
     for key in satellites:
         if key in satelliteData:
-            __calculateNextSatellitePass( ephemNow, city, key, satelliteData[ key ] )
+            __calculateNextSatellitePass( ephemNow, key, satelliteData[ key ] )
         else:
             data[ ( AstronomicalBodyType.Satellite, " ".join( key ), DATA_MESSAGE ) ] = MESSAGE_DATA_NO_DATA
 
 
-def __calculateNextSatellitePass( ephemNow, city, data, key, satelliteTLE ):
+def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
     key = ( AstronomicalBodyType.Satellite, " ".join( key ) )
     currentDateTime = ephemNow
     endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 2 ) # Stop looking for passes 2 days from ephemNow.
     message = None
     while currentDateTime < endDateTime:
-        theCity = __getCity( city, currentDateTime )
+        city = __getCity( data, currentDateTime )
         satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
-        satellite.compute( theCity )
+        satellite.compute( city )
         try:
-            nextPass = theCity.next_pass( satellite )
+            nextPass = city.next_pass( satellite )
 
         except ValueError:
             if satellite.circumpolar:
@@ -581,13 +574,13 @@ def __calculateNextSatellitePass( ephemNow, city, data, key, satelliteTLE ):
         # The pass is valid.  If the satellite is currently passing, work out when it rose...
         if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
             setTime = nextPass[ 4 ]
-            nextPass = __calculateSatellitePassForRisingPriorToNow( currentDateTime, satelliteTLE )
+            nextPass = __calculateSatellitePassForRisingPriorToNow( currentDateTime, data, satelliteTLE )
             if nextPass is None:
                 currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
                 continue
 
         # Now have a satellite rise/transit/set; determine if the pass is visible.
-        passIsVisible = __isSatellitePassVisible( nextPass[ 2 ], city, satellite )
+        passIsVisible = __isSatellitePassVisible( data, nextPass[ 2 ], city, satellite )
         if not passIsVisible:
             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
             continue
@@ -607,16 +600,16 @@ def __calculateNextSatellitePass( ephemNow, city, data, key, satelliteTLE ):
         data[ key + ( DATA_MESSAGE, ) ] = message
 
 
-def __calculateSatellitePassForRisingPriorToNow( ephemNow, city, satelliteTLE ):
+def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
     currentDateTime = ephem.Date( ephemNow - ephem.minute ) # Start looking from one minute ago.
     endDateTime = ephem.Date( ephemNow - ephem.hour * 1 ) # Only look back an hour for the rise time (then just give up).
     nextPass = None
     while currentDateTime > endDateTime:
-        theCity = __getCity( city, currentDateTime )
+        city = __getCity( data, currentDateTime )
         satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
-        satellite.compute( theCity )
+        satellite.compute( city )
         try:
-            nextPass = theCity.next_pass( satellite )
+            nextPass = city.next_pass( satellite )
             if not __isSatellitePassValid( nextPass ):
                 nextPass = None
                 break # Unlikely to happen but better to be safe and check!
@@ -650,21 +643,25 @@ def __isSatellitePassValid( satellitePass ):
 #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
 #    http://www.celestrak.com/columns/v03n01
 #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
-def __isSatellitePassVisible( passDateTime, city, satellite ):
-    theCity = __getCity( city, passDateTime ) #Use our own function?
-    theCity.pressure = 0
-    theCity.horizon = "-0:34"
+def __isSatellitePassVisible( data, passDateTime, satellite ):
+    city = __getCity( data, passDateTime ) #Use our own function?
+    city.pressure = 0
+    city.horizon = "-0:34"
 
-    satellite.compute( theCity )
+    satellite.compute( city )
     sun = ephem.Sun()
-    sun.compute( theCity )
+    sun.compute( city )
 
     return satellite.eclipsed is False and \
            sun.alt > ephem.degrees( "-18" ) and \
            sun.alt < ephem.degrees( "-6" )
 
 
-def __getCity( city, date ):
-    city = ephem.city( city )
+def __getCity( data, date ):
+    city = ephem.city( data[ ( None, NAME_TAG_CITY, DATA_NAME ) ] ) #TODO What if the user has given a city name that is not in the list of cities?  Test!
     city.date = date
+    city.lat = data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
+    city.lon = data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
+    city.elev = data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ]
+
     return city
