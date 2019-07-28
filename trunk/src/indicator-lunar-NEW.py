@@ -2077,8 +2077,13 @@ class IndicatorLunar:
         city.set_tooltip_text( _(
             "Choose a city from the list.\n" + \
             "Or, add in your own city name." ) )
-        for c in astro.getCities():
-#TODO Need to add in the self.city if it is NOT in the list of cities from astro/pyephem.
+
+        cities = astro.getCities()
+        if self.city not in cities:
+            cities.append( self.city )
+            cities = sorted( cities, key = locale.strxfrm )
+
+        for c in cities:
             city.append_text( c )
 
         box.pack_start( city, False, False, 0 )
@@ -2500,6 +2505,8 @@ class IndicatorLunar:
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
+        
+        #TODO Can the city ever be empty?  So do we need the check below?
         if city != "" and city in astro.getCities(): # Populate the latitude/longitude/elevation if the city exists, otherwise let the user specify.
             latitude, longitude, elevation = astro.getLatitudeLongitudeElevation( city )
             latitude.set_text( latitude )
