@@ -767,8 +767,8 @@ class IndicatorLunar:
         satelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber, in self.satellites:
             key = ( astro.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
-            if ( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) in self.data: # Assume all other information is present!
-               satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ] )
+            if ( key + ( astro.DATA_RISE_TIME, ) ) in self.data: # Assume all other information is present!
+               satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( astro.DATA_RISE_TIME, ) ] ] )
 
         if self.satellitesSortByDateTime:
             satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
@@ -784,8 +784,8 @@ class IndicatorLunar:
                 # Ensure that the current rise/set matches that of the previous notification.
                 # Due to a quirk of the astro backend, the date/time may not match exactly (be out by a few seconds or more).
                 # So need to ensure that the current rise/set and the previous rise/set overlap to be sure it is the same transit.
-                currentRise = self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
-                currentSet = self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ]
+                currentRise = self.data[ key + ( astro.DATA_RISE_TIME, ) ]
+                currentSet = self.data[ key + ( astro.DATA_SET_TIME, ) ]
                 previousRise, previousSet = self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ]
                 overlap = ( currentRise < previousSet ) and ( currentSet > previousRise )
                 if overlap:
@@ -793,18 +793,18 @@ class IndicatorLunar:
 
             # Ensure the current time is within the rise/set...
             # Subtract a minute from the rise time to force the notification to take place just prior to the satellite rise.
-            riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 ) )
+            riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( astro.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 ) )
             if utcNow < riseTimeMinusOneMinute or \
-               utcNow > self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ]:
+               utcNow > self.data[ key + ( astro.DATA_SET_TIME, ) ]:
                 continue
 
-            self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ], self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] )
+            self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( astro.DATA_RISE_TIME, ) ], self.data[ key + ( astro.DATA_SET_TIME, ) ] )
 
             # Parse the satellite summary/message to create the notification...
-            riseTime = self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
-            riseAzimuth = self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
-            setTime = self.getDisplayData( key + ( IndicatorLunar.DATA_SET_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
-            setAzimuth = self.getDisplayData( key + ( IndicatorLunar.DATA_SET_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            riseTime = self.getDisplayData( key + ( astro.DATA_RISE_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            riseAzimuth = self.getDisplayData( key + ( astro.DATA_RISE_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            setTime = self.getDisplayData( key + ( astro.DATA_SET_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            setAzimuth = self.getDisplayData( key + ( astro.DATA_SET_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
             tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
 
             summary = self.satelliteNotificationSummary. \
@@ -937,9 +937,9 @@ class IndicatorLunar:
             key = ( astro.AstronomicalBodyType.Comet, comet )
             if key + ( astro.DATA_MESSAGE, ) in self.data and \
                (
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP or \
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_BAD_DATA or \
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA
+                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_NEVER_UP or \
+                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_DATA_BAD_DATA or \
+                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_DATA_NO_DATA
                ):
                 continue # Skip comets which are never up or have no data or have bad data AND the user wants to hide comets on such conditions.
 
@@ -971,16 +971,16 @@ class IndicatorLunar:
                 missing = ( key not in self.cometOEData ) # This scenario should be covered by the 'no data' clause below...but just in case catch it here!
 
                 badData = ( key in self.cometOEData and \
-                          ( astro.AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) in self.data ) and \
-                          self.data[ ( astro.AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_DATA_BAD_DATA
+                          ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) in self.data ) and \
+                          self.data[ ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) ] == astro.MESSAGE_DATA_BAD_DATA
 
                 noData = ( key in self.cometOEData and \
-                         ( astro.AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) in self.data ) and \
-                          self.data[ ( astro.AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA
+                         ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) in self.data ) and \
+                          self.data[ ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) ] == astro.MESSAGE_DATA_NO_DATA
 
                 if missing or badData or noData:
                     subMenu = Gtk.Menu()
-                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( astro.AstronomicalBodyType.Comet, key, IndicatorLunar.DATA_MESSAGE ) ) ) )
+                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) ) ) )
                     menuItem.set_submenu( subMenu )
                 else:
                     self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Comet, key )
@@ -1046,26 +1046,26 @@ class IndicatorLunar:
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
             key = ( astro.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
-            if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
+            if key + ( astro.DATA_MESSAGE, ) in self.data and \
                (
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_DATA_NO_DATA or \
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES or \
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
-                    self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
+                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_DATA_NO_DATA or \
+                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_NEVER_RISES or \
+                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
+                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
+                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_VALUE_ERROR
                ):
                 continue
 
-            if key + ( IndicatorLunar.DATA_RISE_TIME, ) in self.data:
+            if key + ( astro.DATA_RISE_TIME, ) in self.data:
                 internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
-                riseTime = self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ]
-            elif key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data and \
-                 self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] != IndicatorLunar.MESSAGE_DATA_NO_DATA: # Any message other than "no data" will have satellite TLE data.
+                riseTime = self.data[ key + ( astro.DATA_RISE_TIME, ) ]
+            elif key + ( astro.DATA_MESSAGE, ) in self.data and \
+                 self.data[ key + ( astro.DATA_MESSAGE, ) ] != astro.MESSAGE_DATA_NO_DATA: # Any message other than "no data" will have satellite TLE data.
                 internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
-                riseTime = self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ]
+                riseTime = self.data[ key + ( astro.DATA_MESSAGE, ) ]
             else:
                 internationalDesignator = "" # No TLE data so cannot retrieve any information about the satellite.
-                riseTime = self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ]
+                riseTime = self.data[ key + ( astro.DATA_MESSAGE, ) ]
 
             menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
                                                          .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
@@ -1089,11 +1089,11 @@ class IndicatorLunar:
             for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
                 key = ( astro.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
                 subMenu = Gtk.Menu()
-                if key + ( IndicatorLunar.DATA_MESSAGE, ) in self.data:
-                    if self.data[ key + ( IndicatorLunar.DATA_MESSAGE, ) ] == IndicatorLunar.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
-                        subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_AZIMUTH, ) ) ) )
+                if key + ( astro.DATA_MESSAGE, ) in self.data:
+                    if self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
+                        subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
 
-                    subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( IndicatorLunar.DATA_MESSAGE, ) ) ) )
+                    subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
                 else:
 #TODO Test this...
 #Hide notification and make all passes visible (comment out the check for visible only passes).
@@ -1101,30 +1101,30 @@ class IndicatorLunar:
 #also for a satellite yet to rise,
 #also a satellite currently rising.
 
-                    riseTime = self.toDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] )
+                    riseTime = self.toDateTime( self.data[ key + ( astro.DATA_RISE_TIME, ) ] )
                     dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60 # If the satellite is currently rising, we'll get a negative but that's okay.
                     if dateTimeDifferenceInMinutes > 2: # If this satellite will rise more than two minutes from now, then only show the rise time.
-                        subMenu.append( Gtk.MenuItem( _( "Rise Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
 
                     else: # This satellite will rise within the next two minutes, so show all data.
                         subMenu.append( Gtk.MenuItem( _( "Rise" ) ) )
-                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_RISE_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_RISE_AZIMUTH, ) ) ) )
 
                         subMenu.append( Gtk.MenuItem( _( "Set" ) ) )
-                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SET_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( IndicatorLunar.DATA_SET_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_SET_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_SET_AZIMUTH, ) ) ) )
 
                     # Add the rise to the next update, ensuring it is not in the past.
                     # Subtract a minute from the rise time to spoof the next update to happen earlier.
                     # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
-                    riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( IndicatorLunar.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
+                    riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astro.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
                     if riseTimeMinusOneMinute > utcNow:
                         self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate )
 
                     # Add the set time to the next update, ensuring it is not in the past.
-                    if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > str( utcNow ):
-                        self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
+                    if self.data[ key + ( astro.DATA_SET_TIME, ) ] > str( utcNow ):
+                        self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( astro.DATA_SET_TIME, ) ], self.nextUpdate )
 
                 # Add handler.
                 for child in subMenu.get_children():
@@ -1476,13 +1476,13 @@ class IndicatorLunar:
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
         for key in self.data.keys():
-            hideMessage = self.data[ key ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP or \
-                      self.data[ key ] == IndicatorLunar.MESSAGE_DATA_BAD_DATA or \
-                      self.data[ key ] == IndicatorLunar.MESSAGE_DATA_NO_DATA or \
-                      self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES or \
-                      self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
-                      self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
-                      self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
+            hideMessage = self.data[ key ] == astro.MESSAGE_BODY_NEVER_UP or \
+                      self.data[ key ] == astro.MESSAGE_DATA_BAD_DATA or \
+                      self.data[ key ] == astro.MESSAGE_DATA_NO_DATA or \
+                      self.data[ key ] == astro.MESSAGE_SATELLITE_NEVER_RISES or \
+                      self.data[ key ] == astro.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
+                      self.data[ key ] == astro.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
+                      self.data[ key ] == astro.MESSAGE_SATELLITE_VALUE_ERROR
 
             if hideMessage:
                 continue
@@ -2508,13 +2508,13 @@ class IndicatorLunar:
 
             # Only add tags for data which has not been removed.
             for key in self.data.keys():
-                hideMessage = self.data[ key ] == IndicatorLunar.MESSAGE_BODY_NEVER_UP or \
-                          self.data[ key ] == IndicatorLunar.MESSAGE_DATA_BAD_DATA or \
-                          self.data[ key ] == IndicatorLunar.MESSAGE_DATA_NO_DATA or \
-                          self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NEVER_RISES or \
-                          self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
-                          self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
-                          self.data[ key ] == IndicatorLunar.MESSAGE_SATELLITE_VALUE_ERROR
+                hideMessage = self.data[ key ] == astro.MESSAGE_BODY_NEVER_UP or \
+                              self.data[ key ] == astro.MESSAGE_DATA_BAD_DATA or \
+                              self.data[ key ] == astro.MESSAGE_DATA_NO_DATA or \
+                              self.data[ key ] == astro.MESSAGE_SATELLITE_NEVER_RISES or \
+                              self.data[ key ] == astro.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
+                              self.data[ key ] == astro.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
+                              self.data[ key ] == astro.MESSAGE_SATELLITE_VALUE_ERROR
 
                 if hideMessage:
                     continue
