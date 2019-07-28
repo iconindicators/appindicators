@@ -275,13 +275,14 @@ MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = "SATELLITE_UNABLE_TO_COMPUTE_NEX
 MESSAGE_SATELLITE_VALUE_ERROR = "SATELLITE_VALUE_ERROR"
 
 
-#TODO Does city name come originally from pyephem?  Can it be anything and is then matched later with pyephem's list of cities?
-#City name would have to come from PyEphem originally...and so some sort of error has to burp back up on a bad city name.
 # Returns a dict with astronomical information...
 #     Key is a tuple of AstronomicalBodyType, a name tag and a data tag.
 #     Value is the data as a string.
 #
 #TODO Maybe return the dict and a status message: OK, bad city...what else?
+#
+#TODO Does city name come originally from pyephem?  Can it be anything and is then matched later with pyephem's list of cities?
+#City name would have to come from PyEphem originally...and so some sort of error has to burp back up on a bad city name.
 def getAstronomicalInformation( utcNow,
                                 cityName, latitude, longitude, elevation,
                                 planets,
