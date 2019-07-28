@@ -2077,7 +2077,8 @@ class IndicatorLunar:
         city.set_tooltip_text( _(
             "Choose a city from the list.\n" + \
             "Or, add in your own city name." ) )
-        for c in astro.getCities(): #TODO Need to add in the self.city if it is NOT in the list of cities from astro/pyephem.
+        for c in astro.getCities():
+#TODO Need to add in the self.city if it is NOT in the list of cities from astro/pyephem.
             city.append_text( c )
 
         box.pack_start( city, False, False, 0 )
@@ -2115,8 +2116,7 @@ class IndicatorLunar:
         grid.attach( box, 0, 3, 1, 1 )
 
         city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
-#TODO Have to get a list of cities, add the user defined city into the list if exists.
-#         city.set_active( cities.index( self.city ) )
+        city.set_active( cities.index( self.city ) )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
