@@ -56,11 +56,7 @@ DATA_SET_AZIMUTH = "SET AZIMUTH"
 DATA_SET_TIME = "SET TIME"
 DATA_THIRD_QUARTER = "THIRD QUARTER"
 
-#TODO Need a way to ensure that not all tags appear in the preferences list such as bright limb...or maybe who cares?
-
- #TODO Is this meant to be a list of user visible tags?  
- #If so or not, what about bright limb and illumination?
-DATA_ALL = [
+DATA_TAGS = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
     DATA_BRIGHT_LIMB,
@@ -661,6 +657,6 @@ def __getCity( data, date ):
     city.date = date
     city.lat = data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
     city.lon = data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
-    city.elev = data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ]
+    city.elev = float( data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] )
 
     return city

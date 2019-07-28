@@ -1477,6 +1477,9 @@ class IndicatorLunar:
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
         for key in self.data.keys():
+            if key[ 2 ] == astro.DATA_BRIGHT_LIMB or key[ 2 ] == astro.DATA_ILLUMINATION:
+                continue # Some data tags are only present for calculations, not intended for the end user.
+
             hideMessage = self.data[ key ] == astro.MESSAGE_BODY_NEVER_UP or \
                       self.data[ key ] == astro.MESSAGE_DATA_BAD_DATA or \
                       self.data[ key ] == astro.MESSAGE_DATA_NO_DATA or \
@@ -2112,7 +2115,8 @@ class IndicatorLunar:
         grid.attach( box, 0, 3, 1, 1 )
 
         city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
-        city.set_active( cities.index( self.city ) )
+#TODO Have to get a list of cities, add the user defined city into the list if exists.
+#         city.set_active( cities.index( self.city ) )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
@@ -2130,7 +2134,7 @@ class IndicatorLunar:
 
         # The visibility of some GUI objects must be determined AFTER the dialog is shown.
         self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), astro.AstronomicalBodyType.Comet )
-        self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), AstronomicalBodyType.Satellite )
+        self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), astro.AstronomicalBodyType.Satellite )
 
         # Last thing to do after everything else is built.
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
@@ -2727,6 +2731,7 @@ class IndicatorLunar:
 
         #TODO Temporary hack...
         # Convert planet/star to upper case.
+        # Convert elevation from float to str.
         # Remove this hack after next release.
         tmp = []
         for planet in self.planets:
@@ -2737,6 +2742,8 @@ class IndicatorLunar:
         for star in self.stars:
             tmp.append( star.upper() )
         self.stars = tmp
+
+        self.elevation = str( self.elevation )
 
         self.saveConfig()
 
