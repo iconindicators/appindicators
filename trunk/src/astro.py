@@ -33,7 +33,7 @@ class AstronomicalBodyType: Comet, Moon, Planet, Satellite, Star, Sun = range( 6
 
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
-DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used when creating the icon; not intended for display to the user.
+DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
 DATA_DAWN = "DAWN"
 DATA_DUSK = "DUSK"
 DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
@@ -43,7 +43,7 @@ DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
 DATA_ELEVATION = "ELEVATION" # Used for city.
 DATA_FIRST_QUARTER = "FIRST QUARTER"
 DATA_FULL = "FULL"
-DATA_ILLUMINATION = "ILLUMINATION" # Used when creating the icon; not intended for display to the user.
+DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
 DATA_LATITUDE = "LATITUDE" # Used for city.
 DATA_LONGITUDE = "LONGITUDE" # Used for city.
 DATA_MESSAGE = "MESSAGE"
@@ -58,10 +58,8 @@ DATA_THIRD_QUARTER = "THIRD QUARTER"
 
 #TODO Need a way to ensure that not all tags appear in the preferences list such as bright limb...or maybe who cares?
 
-#TODO Maybe need a list of star names...or a function which the frontend can call to get the star names?
-#At some point in the front end, star names (and planet names) need to be translated.
-
- #TODO Is this meant to be a list of user visible tags?  If so or not, what about bright limb and illumination?
+ #TODO Is this meant to be a list of user visible tags?  
+ #If so or not, what about bright limb and illumination?
 DATA_ALL = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
@@ -98,12 +96,12 @@ DATA_COMET = [
 DATA_MOON = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
-    DATA_BRIGHT_LIMB, #TODO Need a translation?  Depends if this is shown in the prefs.
+    DATA_BRIGHT_LIMB,
     DATA_ECLIPSE_DATE_TIME,
     DATA_ECLIPSE_LATITUDE,
     DATA_ECLIPSE_LONGITUDE,
     DATA_ECLIPSE_TYPE,
-    DATA_ILLUMINATION, #TODO Need a translation?  Depends if this is shown in the prefs.
+    DATA_ILLUMINATION,
     DATA_MESSAGE,
     DATA_PHASE,
     DATA_RISE_TIME,
@@ -282,6 +280,8 @@ MESSAGE_SATELLITE_VALUE_ERROR = "SATELLITE_VALUE_ERROR"
 # Returns a dict with astronomical information...
 #     Key is a tuple of AstronomicalBodyType, a name tag and a data tag.
 #     Value is the data as a string.
+#
+#TODO Maybe return the dict and a status message: OK, bad city...what else?
 def getAstronomicalInformation( utcNow,
                                 city, latitude, longitude, elevation,
                                 planets,
@@ -295,6 +295,13 @@ def getAstronomicalInformation( utcNow,
     data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = latitude
     data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = longitude
     data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = elevation
+
+#TODO Am not using the lat/long/elev passed in...
+#...maybe create a city object here and pass that around and use a clone city function when a clean city object is needed.
+#Otherwise, have to pass lat/lon/elev into every single function.
+#     city.lat = latitude
+#     city.lon = longitude
+#     city.elev = elevation
 
     ephemNow = ephem.Date( utcNow )
     __calculateMoon( ephemNow, city, data )
@@ -311,6 +318,7 @@ def getAstronomicalInformation( utcNow,
 def getCities(): return sorted( _city_data.keys(), key = locale.strxfrm )
 
 
+# TODO Wrap in try/except and return None across the board on error.
 def getLatitudeLongitudeElevation( city ): return _city_data.get( city )[ 0 ], \
                                                   _city_data.get( city )[ 1 ], \
                                                   str( _city_data.get( city )[ 2 ] )
