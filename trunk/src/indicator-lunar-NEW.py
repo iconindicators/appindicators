@@ -108,9 +108,6 @@ class IndicatorLunar:
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT = "%Y-%m-%d %H:%M:%S.%f"
 
-    DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
-    INDENT = "    "
-
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
     CONFIG_CITY_LONGITUDE = "cityLongitude"
@@ -119,12 +116,10 @@ class IndicatorLunar:
     CONFIG_COMETS = "comets"
     CONFIG_COMETS_ADD_NEW = "cometsAddNew"
     CONFIG_COMETS_MAGNITUDE = "cometsMagnitude"
-    CONFIG_DATE_TIME_FORMAT = "dateTimeFormat"
     CONFIG_INDICATOR_TEXT = "indicatorText"
     CONFIG_PLANETS = "planets"
     CONFIG_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
     CONFIG_SATELLITE_NOTIFICATION_SUMMARY = "satelliteNotificationSummary"
-    CONFIG_SATELLITE_NOTIFICATION_TIME_FORMAT = "satelliteNotificationTimeFormat"
     CONFIG_SATELLITE_TLE_URL = "satelliteTLEURL"
     CONFIG_SATELLITES = "satellites"
     CONFIG_SATELLITES_ADD_NEW = "satellitesAddNew"
@@ -141,139 +136,33 @@ class IndicatorLunar:
     CONFIG_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
-    DATA_ALTITUDE = "ALTITUDE"
-    DATA_AZIMUTH = "AZIMUTH"
-    DATA_DAWN = "DAWN"
-    DATA_DUSK = "DUSK"
-    DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
-    DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
-    DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
-    DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
-    DATA_ELEVATION = "ELEVATION" # Only used for the CITY "body" tag.
-    DATA_FIRST_QUARTER = "FIRST QUARTER"
-    DATA_FULL = "FULL"
-    DATA_LATITUDE = "LATITUDE" # Only used for the CITY "body" tag.
-    DATA_LONGITUDE = "LONGITUDE" # Only used for the CITY "body" tag.
-    DATA_MESSAGE = "MESSAGE"
-    DATA_NAME = "NAME" # Only used for the CITY "body" tag.
-    DATA_NEW = "NEW"
-    DATA_PHASE = "PHASE"
-    DATA_RISE_AZIMUTH = "RISE AZIMUTH"
-    DATA_RISE_TIME = "RISE TIME"
-    DATA_SET_AZIMUTH = "SET AZIMUTH"
-    DATA_SET_TIME = "SET TIME"
-    DATA_THIRD_QUARTER = "THIRD QUARTER"
-
-    DATA_TAGS_ALL = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_DAWN,
-        DATA_DUSK,
-        DATA_ECLIPSE_DATE_TIME,
-        DATA_ECLIPSE_LATITUDE,
-        DATA_ECLIPSE_LONGITUDE,
-        DATA_ECLIPSE_TYPE,
-        DATA_ELEVATION,
-        DATA_FIRST_QUARTER,
-        DATA_FULL,
-        DATA_LATITUDE,
-        DATA_LONGITUDE,
-        DATA_MESSAGE,
-        DATA_NAME,
-        DATA_NEW,
-        DATA_PHASE,
-        DATA_RISE_AZIMUTH,
-        DATA_RISE_TIME,
-        DATA_SET_AZIMUTH,
-        DATA_SET_TIME,
-        DATA_THIRD_QUARTER ]
-
-    DATA_TAGS_COMET = [
-        DATA_MESSAGE,
-        DATA_RISE_AZIMUTH,
-        DATA_RISE_TIME,
-        DATA_SET_AZIMUTH,
-        DATA_SET_TIME ]
-
-    DATA_TAGS_MOON = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_ECLIPSE_DATE_TIME,
-        DATA_ECLIPSE_LATITUDE,
-        DATA_ECLIPSE_LONGITUDE,
-        DATA_ECLIPSE_TYPE,
-        DATA_MESSAGE,
-        DATA_PHASE,
-        DATA_RISE_TIME,
-        DATA_SET_TIME ]
-
-    DATA_TAGS_PLANET = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_MESSAGE,
-        DATA_RISE_TIME,
-        DATA_SET_TIME ]
-
-    DATA_TAGS_SATELLITE = [
-        DATA_MESSAGE,
-        DATA_RISE_AZIMUTH,
-        DATA_RISE_TIME,
-        DATA_SET_AZIMUTH,
-        DATA_SET_TIME ]
-
-    DATA_TAGS_STAR = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_MESSAGE,
-        DATA_RISE_TIME,
-        DATA_SET_TIME ]
-
-    DATA_TAGS_SUN = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_DAWN,
-        DATA_DUSK,
-        DATA_ECLIPSE_DATE_TIME,
-        DATA_ECLIPSE_LATITUDE,
-        DATA_ECLIPSE_LONGITUDE,
-        DATA_ECLIPSE_TYPE,
-        DATA_MESSAGE,
-        DATA_RISE_TIME,
-        DATA_SET_TIME ]
-
     DATA_TAGS_TRANSLATIONS = {
-        DATA_ALTITUDE                   : _( "ALTITUDE" ),
-        DATA_AZIMUTH                    : _( "AZIMUTH" ),
-        DATA_DAWN                       : _( "DAWN" ),
-        DATA_DUSK                       : _( "DUSK" ),
-        DATA_ECLIPSE_DATE_TIME          : _( "ECLIPSE DATE TIME" ),
-        DATA_ECLIPSE_LATITUDE           : _( "ECLIPSE LATITUDE" ),
-        DATA_ECLIPSE_LONGITUDE          : _( "ECLIPSE LONGITUDE" ),
-        DATA_ECLIPSE_TYPE               : _( "ECLIPSE TYPE" ),
-        DATA_ELEVATION                  : _( "ELEVATION" ),
-        DATA_FIRST_QUARTER              : _( "FIRST QUARTER" ),
-        DATA_FULL                       : _( "FULL" ),
-        DATA_LATITUDE                   : _( "LATITUDE" ),
-        DATA_LONGITUDE                  : _( "LONGITUDE" ),
-        DATA_MESSAGE                    : _( "MESSAGE" ),
-        DATA_NAME                       : _( "NAME" ), # Only used for CITY "body" tag.
-        DATA_NEW                        : _( "NEW" ),
-        DATA_PHASE                      : _( "PHASE" ),
-        DATA_RISE_AZIMUTH               : _( "RISE AZIMUTH" ),
-        DATA_RISE_TIME                  : _( "RISE TIME" ),
-        DATA_SET_AZIMUTH                : _( "SET AZIMUTH" ),
-        DATA_SET_TIME                   : _( "SET TIME" ),
-        DATA_THIRD_QUARTER              : _( "THIRD QUARTER" ) }
+        astro.DATA_ALTITUDE             : _( "ALTITUDE" ),
+        astro.DATA_AZIMUTH              : _( "AZIMUTH" ),
+        astro.DATA_DAWN                 : _( "DAWN" ),
+        astro.DATA_DUSK                 : _( "DUSK" ),
+        astro.DATA_ECLIPSE_DATE_TIME    : _( "ECLIPSE DATE TIME" ),
+        astro.DATA_ECLIPSE_LATITUDE     : _( "ECLIPSE LATITUDE" ),
+        astro.DATA_ECLIPSE_LONGITUDE    : _( "ECLIPSE LONGITUDE" ),
+        astro.DATA_ECLIPSE_TYPE         : _( "ECLIPSE TYPE" ),
+        astro.DATA_ELEVATION            : _( "ELEVATION" ),
+        astro.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
+        astro.DATA_FULL                 : _( "FULL" ),
+        astro.DATA_LATITUDE             : _( "LATITUDE" ),
+        astro.DATA_LONGITUDE            : _( "LONGITUDE" ),
+        astro.DATA_MESSAGE              : _( "MESSAGE" ),
+        astro.DATA_NAME                 : _( "NAME" ), # Only used for CITY "body" tag.
+        astro.DATA_NEW                  : _( "NEW" ),
+        astro.DATA_PHASE                : _( "PHASE" ),
+        astro.DATA_RISE_AZIMUTH         : _( "RISE AZIMUTH" ),
+        astro.DATA_RISE_TIME            : _( "RISE TIME" ),
+        astro.DATA_SET_AZIMUTH          : _( "SET AZIMUTH" ),
+        astro.DATA_SET_TIME             : _( "SET TIME" ),
+        astro.DATA_THIRD_QUARTER        : _( "THIRD QUARTER" ) }
 
-#TODO What to do with these?
-    CITY_TAG = "CITY"
-    CITY_TAG_TRANSLATION = { CITY_TAG : _( "CITY" ) }
-
-    MOON_TAG = "MOON"
-    MOON_TAG_TRANSLATION = { MOON_TAG : _( "MOON" ) }
-
-    SUN_TAG = "SUN"
-    SUN_TAG_TRANSLATION = { SUN_TAG : _( "SUN" ) }
+    CITY_TAG_TRANSLATION = { astro.NAME_TAG_CITY: _( "CITY" ) }
+    MOON_TAG_TRANSLATION = { astro.NAME_TAG_MOON : _( "MOON" ) }
+    SUN_TAG_TRANSLATION = { astro.NAME_TAG_SUN : _( "SUN" ) }
 
     PLANET_NAMES_TRANSLATIONS = {
         astro.PLANET_MERCURY    : _( "Mercury" ),
@@ -574,7 +463,7 @@ class IndicatorLunar:
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
-    INDICATOR_TEXT_DEFAULT = "[" + MOON_TAG + " " + DATA_PHASE + "]"
+    INDICATOR_TEXT_DEFAULT = "[" + astro.NAME_TAG_MOON + " " + astro.DATA_PHASE + "]"
 
 #TODO Use astro.
     MESSAGE_BODY_ALWAYS_UP = _( "Always Up!" )
@@ -603,6 +492,8 @@ class IndicatorLunar:
     MESSAGE_TRANSLATION_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_TRANSLATION_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
+    MESSAGE_DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
+    INDENT = "    "
     
     # Data is displayed using a default format, but when an alternate format is required, specify using a source below.
     SOURCE_SATELLITE_NOTIFICATION = 0
@@ -613,6 +504,7 @@ class IndicatorLunar:
         self.satelliteTLEData = { } # Key: ( satellite name upper cased, satellite number ) ; Value: satellite.TLE object.  Can be empty but never None.
         self.satelliteNotifications = { }
 
+#TODO Do these need to live here?  Do we need to recall the state globally or maybe just within each calling of prefs?
         self.toggleCometsTable = True
         self.togglePlanetsTable = True
         self.toggleSatellitesTable = True
@@ -670,7 +562,7 @@ class IndicatorLunar:
                 self.notificationFullMoon()
 
             if self.showSatelliteNotification:
-                self.notificationSatellite()
+                self.notificationSatellites()
 
             self.nextUpdate = self.toDateTime( self.nextUpdate ) # Parse from string back into a datetime.
             nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
@@ -686,8 +578,12 @@ class IndicatorLunar:
 
     def updateMenu( self ):
         menu = Gtk.Menu()
-        self.updateMoonMenu( menu )
-        self.updateSunMenu( menu )
+        if self.showMoon:
+            self.updateMoonMenu( menu )
+
+        if self.showSun:
+            self.updateSunMenu( menu )
+
         self.updatePlanetsMenu( menu )
         self.updateStarsMenu( menu )
         self.updateCometsMenu( menu )
@@ -763,7 +659,7 @@ class IndicatorLunar:
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
-    def notificationSatellite( self ):
+    def notificationSatellites( self ):
         # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
         satelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber, in self.satellites:
@@ -832,40 +728,38 @@ class IndicatorLunar:
 
 
     def updateMoonMenu( self, menu ):
-        if self.showMoon:
-            key = ( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
-            menuItem = Gtk.MenuItem( _( "Moon" ) )
-            menu.append( menuItem )
-            self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
-            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-            menuItem.get_submenu().append( Gtk.MenuItem( _( "Phase: " ) + self.getDisplayData( key + ( astro.DATA_PHASE, ) ) ) )
-            menuItem.get_submenu().append( Gtk.MenuItem( _( "Next Phases" ) ) )
+        key = ( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
+        menuItem = Gtk.MenuItem( _( "Moon" ) )
+        menu.append( menuItem )
+        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
+        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+        menuItem.get_submenu().append( Gtk.MenuItem( _( "Phase: " ) + self.getDisplayData( key + ( astro.DATA_PHASE, ) ) ) )
+        menuItem.get_submenu().append( Gtk.MenuItem( _( "Next Phases" ) ) )
 
-            # Determine which phases occur by date rather than using the phase calculated.
-            # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
-            nextPhases = [ ]
-            nextPhases.append( [ self.data[ key + ( astro.DATA_FIRST_QUARTER, ) ], _( "First Quarter: " ), key + ( astro.DATA_FIRST_QUARTER, ) ] )
-            nextPhases.append( [ self.data[ key + ( astro.DATA_FULL, ) ], _( "Full: " ), key + ( astro.DATA_FULL, ) ] )
-            nextPhases.append( [ self.data[ key + ( astro.DATA_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astro.DATA_THIRD_QUARTER, ) ] )
-            nextPhases.append( [ self.data[ key + ( astro.DATA_NEW, ) ], _( "New: " ), key + ( astro.DATA_NEW, ) ] )
+        # Determine which phases occur by date rather than using the phase calculated.
+        # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
+        nextPhases = [ ]
+        nextPhases.append( [ self.data[ key + ( astro.DATA_FIRST_QUARTER, ) ], _( "First Quarter: " ), key + ( astro.DATA_FIRST_QUARTER, ) ] )
+        nextPhases.append( [ self.data[ key + ( astro.DATA_FULL, ) ], _( "Full: " ), key + ( astro.DATA_FULL, ) ] )
+        nextPhases.append( [ self.data[ key + ( astro.DATA_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astro.DATA_THIRD_QUARTER, ) ] )
+        nextPhases.append( [ self.data[ key + ( astro.DATA_NEW, ) ], _( "New: " ), key + ( astro.DATA_NEW, ) ] )
 
-            nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
-            for dateTime, displayText, key in nextPhases:
-                menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + displayText + self.getDisplayData( key ) ) )
-                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, dateTime )
+        nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
+        for dateTime, displayText, key in nextPhases:
+            menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + displayText + self.getDisplayData( key ) ) )
+            self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, dateTime )
 
-            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-            self.updateEclipseMenu( menuItem.get_submenu(), astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
+        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+        self.updateEclipseMenu( menuItem.get_submenu(), astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
 
 
     def updateSunMenu( self, menu ):
-        if self.showSun:
-            key = ( astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
-            menuItem = Gtk.MenuItem( _( "Sun" ) )
-            menu.append( menuItem )
-            self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
-            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-            self.updateEclipseMenu( menuItem.get_submenu(), astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
+        key = ( astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
+        menuItem = Gtk.MenuItem( _( "Sun" ) )
+        menu.append( menuItem )
+        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
+        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+        self.updateEclipseMenu( menuItem.get_submenu(), astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
 
 
     def updateEclipseMenu( self, menu, astronomicalBodyType, nameTag ):
@@ -1043,6 +937,8 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
+#TODO The satellites don't have the indent.
+#Appears to happen with all objects/bodies...did this always happen?  Compare with laptop.
     def updateSatellitesMenu( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
@@ -1154,6 +1050,7 @@ class IndicatorLunar:
             webbrowser.open( url )
 
 
+#TODO Rename the source to better reflect how it affects the date/time format.
     def getDisplayData( self, key, source = None ):
         displayData = None
         if key[ 2 ] == astro.DATA_ALTITUDE or \
@@ -1172,9 +1069,9 @@ class IndicatorLunar:
              key[ 2 ] == astro.DATA_SET_TIME or \
              key[ 2 ] == astro.DATA_THIRD_QUARTER:
                 if source is None:
-                    displayData = self.getLocalDateTime( self.data[ key ], self.dateTimeFormat )
+                    displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
                 elif source == astro.SOURCE_SATELLITE_NOTIFICATION:
-                    displayData = self.getLocalDateTime( self.data[ key ], self.satelliteNotificationTimeFormat )
+                    displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
 
         elif key[ 2 ] == astro.DATA_ECLIPSE_LATITUDE:
             latitude = self.data[ key ]
@@ -1465,7 +1362,6 @@ class IndicatorLunar:
             "such as a comet/satellite not on the list,\n" + \
             "the tag will be automatically removed." ) )
         box.pack_start( indicatorText, True, True, 0 )
-
         grid.attach( box, 0, 0, 1, 1 )
 
         self.tagsAdded = { } # A list would use less memory, but a dict (after running timing tests) is significantly faster!
@@ -1549,15 +1445,14 @@ class IndicatorLunar:
         showMoonCheckbox = Gtk.CheckButton( _( "Moon" ) )
         showMoonCheckbox.set_active( self.showMoon )
         showMoonCheckbox.set_tooltip_text( _( "Show the moon." ) )
-        showMoonCheckbox.connect( "toggled", self.onMoonSunToggled, IndicatorLunar.MOON_TAG, astro.AstronomicalBodyType.Moon )
+        showMoonCheckbox.connect( "toggled", self.onMoonSunToggled, astro.NAME_TAG_MOON, astro.AstronomicalBodyType.Moon )
         box.pack_start( showMoonCheckbox, False, False, 0 )
 
         showSunCheckbox = Gtk.CheckButton( _( "Sun" ) )
         showSunCheckbox.set_active( self.showSun )
         showSunCheckbox.set_tooltip_text( _( "Show the sun." ) )
-        showSunCheckbox.connect( "toggled", self.onMoonSunToggled, IndicatorLunar.SUN_TAG, astro.AstronomicalBodyType.Sun )
+        showSunCheckbox.connect( "toggled", self.onMoonSunToggled, astro.NAME_TAG_SUN, astro.AstronomicalBodyType.Sun )
         box.pack_start( showSunCheckbox, False, False, 0 )
-
         grid.attach( box, 0, 1, 1, 1 )
 
         label = Gtk.Label( _( "Show as submenus" ) )
@@ -1587,21 +1482,7 @@ class IndicatorLunar:
         showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
         showSatellitesAsSubmenuCheckbox.set_tooltip_text( _( "Show satellites as submenus." ) )
         box.pack_start( showSatellitesAsSubmenuCheckbox, False, False, 0 )
-
         grid.attach( box, 0, 3, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.pack_start( Gtk.Label( _( "Date/time format" ) ), False, False, 0 )
-
-        dateTimeFormatEntry = Gtk.Entry()
-        dateTimeFormatEntry.set_text( self.dateTimeFormat )
-        dateTimeFormatEntry.set_hexpand( True )
-        dateTimeFormatEntry.set_tooltip_text( _(
-            "Specify the format of attributes containing a date/time.\n\n" + \
-            "Refer to http://docs.python.org/3/library/datetime.html" ) )
-        box.pack_start( dateTimeFormatEntry, True, True, 0 )
-
-        grid.attach( box, 0, 4, 1, 1 )
 
         cometsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new comets" ) )
         cometsAddNewCheckbox.set_margin_top( 10 )
@@ -1609,7 +1490,7 @@ class IndicatorLunar:
         cometsAddNewCheckbox.set_tooltip_text( _(
             "If checked, all comets are added\n" + \
             "to the list of checked comets." ) )
-        grid.attach( cometsAddNewCheckbox, 0, 5, 1, 1 )
+        grid.attach( cometsAddNewCheckbox, 0, 4, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -1626,8 +1507,7 @@ class IndicatorLunar:
             "than that specified are hidden." ) )
 
         box.pack_start( spinnerCometMagnitude, False, False, 0 )
-
-        grid.attach( box, 0, 6, 1, 1 )
+        grid.attach( box, 0, 5, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
@@ -1635,7 +1515,7 @@ class IndicatorLunar:
         satellitesAddNewCheckbox.set_tooltip_text( _(
             "If checked all satellites are added\n" + \
             "to the list of checked satellites." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 7, 1, 1 )
+        grid.attach( satellitesAddNewCheckbox, 0, 6, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
@@ -1646,7 +1526,7 @@ class IndicatorLunar:
             "Otherwise satellites are sorted\n" + \
             "by Name, Number and then\n" + \
             "International Designator." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 8, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 7, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -1796,7 +1676,6 @@ class IndicatorLunar:
                        _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
                        self.getCometOEData )
         box.pack_start( fetch, False, False, 0 )
-
         cometGrid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( cometGrid, Gtk.Label( _( "Comets" ) ) )
@@ -1890,7 +1769,6 @@ class IndicatorLunar:
                        self.getSatelliteTLEData )
 
         box.pack_start( fetch, False, False, 0 )
-
         satelliteGrid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( satelliteGrid, Gtk.Label( _( "Satellites" ) ) )
@@ -1934,7 +1812,6 @@ class IndicatorLunar:
             _( notifyOSDInformation ) )
 
         box.pack_start( satelliteNotificationSummaryText, True, True, 0 )
-
         grid.attach( box, 0, 1, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteNotificationSummaryText )
@@ -1967,37 +1844,19 @@ class IndicatorLunar:
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( satelliteNotificationMessageText )
         box.pack_start( scrolledWindow, True, True, 0 )
-
         grid.attach( box, 0, 2, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, scrolledWindow )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
-
-        label = Gtk.Label( _( "Time format" ) )
-        label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        box.pack_start( label, False, False, 0 )
-
-        satelliteNotificationTimeFormatEntry = Gtk.Entry()
-        satelliteNotificationTimeFormatEntry.set_text( self.satelliteNotificationTimeFormat )
-        satelliteNotificationTimeFormatEntry.set_hexpand( True )
-        satelliteNotificationTimeFormatEntry.set_tooltip_text( _(
-            "Specify the format of the rise/set time.\n\n" + \
-            "Refer to http://docs.python.org/3/library/datetime.html" ) )
-        box.pack_start( satelliteNotificationTimeFormatEntry, True, True, 0 )
-
-        grid.attach( box, 0, 3, 1, 1 )
-
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        test.connect( "clicked", self.onTestNotificationClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, satelliteNotificationTimeFormatEntry, False )
+        test.connect( "clicked", self.onTestNotificationClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, False )
         test.set_tooltip_text( _(
             "Show the notification bubble.\n" + \
             "Tags will be substituted with\n" + \
             "mock text." ) )
-        grid.attach( test, 0, 4, 1, 1 )
+        grid.attach( test, 0, 3, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
@@ -2006,7 +1865,7 @@ class IndicatorLunar:
         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
         showWerewolfWarningCheckbox.set_tooltip_text( _(
             "Hourly screen notification leading up to full moon." ) )
-        grid.attach( showWerewolfWarningCheckbox, 0, 5, 1, 1 )
+        grid.attach( showWerewolfWarningCheckbox, 0, 4, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
@@ -2020,8 +1879,7 @@ class IndicatorLunar:
         werewolfNotificationSummaryText.set_tooltip_text( _( "The summary for the werewolf notification.\n\n" ) + notifyOSDInformation )
         werewolfNotificationSummaryText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         box.pack_start( werewolfNotificationSummaryText, True, True, 0 )
-
-        grid.attach( box, 0, 6, 1, 1 )
+        grid.attach( box, 0, 5, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationSummaryText )
 
@@ -2044,17 +1902,16 @@ class IndicatorLunar:
         scrolledWindow.add( werewolfNotificationMessageText )
 
         box.pack_start( scrolledWindow, True, True, 0 )
-
-        grid.attach( box, 0, 7, 1, 1 )
+        grid.attach( box, 0, 6, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationMessageText )
 
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        test.connect( "clicked", self.onTestNotificationClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, None, True )
+        test.connect( "clicked", self.onTestNotificationClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, True )
         test.set_tooltip_text( _( "Show the notification using the current summary/message." ) )
-        grid.attach( test, 0, 8, 1, 1 )
+        grid.attach( test, 0, 7, 1, 1 )
 
         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
@@ -2087,7 +1944,6 @@ class IndicatorLunar:
             city.append_text( c )
 
         box.pack_start( city, False, False, 0 )
-
         grid.attach( box, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -2097,7 +1953,6 @@ class IndicatorLunar:
         latitude = Gtk.Entry()
         latitude.set_tooltip_text( _( "Latitude of your location in decimal degrees." ) )
         box.pack_start( latitude, False, False, 0 )
-
         grid.attach( box, 0, 1, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -2107,7 +1962,6 @@ class IndicatorLunar:
         longitude = Gtk.Entry()
         longitude.set_tooltip_text( _( "Longitude of your location in decimal degrees." ) )
         box.pack_start( longitude, False, False, 0 )
-
         grid.attach( box, 0, 2, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -2117,7 +1971,6 @@ class IndicatorLunar:
         elevation = Gtk.Entry()
         elevation.set_tooltip_text( _( "Height in metres above sea level." ) )
         box.pack_start( elevation, False, False, 0 )
-
         grid.attach( box, 0, 3, 1, 1 )
 
         city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
@@ -2177,8 +2030,6 @@ class IndicatorLunar:
                 continue
 
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
-            self.dateTimeFormat = dateTimeFormatEntry.get_text().strip()
-            self.satelliteNotificationTimeFormat = satelliteNotificationTimeFormatEntry.get_text().strip()
             self.showMoon = showMoonCheckbox.get_active()
             self.showSun = showSunCheckbox.get_active()
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
@@ -2463,7 +2314,7 @@ class IndicatorLunar:
                 self.onCometStarSatelliteToggled( widget, row, dataStore, sortStore, astronomicalBodyType )
 
 
-    def onTestNotificationClicked( self, button, summaryEntry, messageTextView, satelliteNotificationTimeFormatEntry, isFullMoon ):
+    def onTestNotificationClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
         summary = summaryEntry.get_text()
         message = pythonutils.getTextViewText( messageTextView )
 
@@ -2481,18 +2332,18 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, satelliteNotificationTimeFormatEntry.get_text().strip() ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, satelliteNotificationTimeFormatEntry.get_text().strip() ) )
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) )
 
             message = message. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, satelliteNotificationTimeFormatEntry.get_text().strip() ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, satelliteNotificationTimeFormatEntry.get_text().strip() ) )
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) )
 
         if summary == "":
             summary = " " # The notification summary text must not be empty (at least on Unity).
@@ -2508,10 +2359,10 @@ class IndicatorLunar:
         
         #TODO Can the city ever be empty?  So do we need the check below?
         if city != "" and city in astro.getCities(): # Populate the latitude/longitude/elevation if the city exists, otherwise let the user specify.
-            latitude, longitude, elevation = astro.getLatitudeLongitudeElevation( city )
-            latitude.set_text( latitude )
-            longitude.set_text( longitude )
-            elevation.set_text( elevation )
+            theLatitude, theLongitude, theElevation = astro.getLatitudeLongitudeElevation( city )
+            latitude.set_text( theLatitude )
+            longitude.set_text( theLongitude )
+            elevation.set_text( theElevation )
 
 
     def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
@@ -2559,7 +2410,7 @@ class IndicatorLunar:
                     tags = IndicatorLunar.DATA_TAGS_SUN
 
                 for tag in tags:
-                    self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.DISPLAY_NEEDS_REFRESH, displayTagsStore )
+                    self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH, displayTagsStore )
 
 
     def addNewSatellites( self ):
@@ -2649,7 +2500,6 @@ class IndicatorLunar:
 
 
     def loadConfig( self ):
-        self.dateTimeFormat = IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS
         self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
 
         self.comets = [ ]
@@ -2663,7 +2513,6 @@ class IndicatorLunar:
 
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
         self.satelliteNotificationSummary = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT
-        self.satelliteNotificationTimeFormat = IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS
         self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
         self.satellites = [ ]
         self.satellitesAddNew = False
@@ -2692,7 +2541,6 @@ class IndicatorLunar:
         self.latitude = config.get( IndicatorLunar.CONFIG_CITY_LATITUDE, self.latitude )
         self.longitude = config.get( IndicatorLunar.CONFIG_CITY_LONGITUDE, self.longitude )
 
-        self.dateTimeFormat = config.get( IndicatorLunar.CONFIG_DATE_TIME_FORMAT, self.dateTimeFormat )
         self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, self.indicatorText )
 
         # The Minor Planet Center changed the URL protocol to be https (rather than http).
@@ -2710,7 +2558,6 @@ class IndicatorLunar:
         self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, self.planets )
         self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
         self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
-        self.satelliteNotificationTimeFormat = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_TIME_FORMAT, self.satelliteNotificationTimeFormat )
 
         # See comment above for OE URL as to why this code is necessary...
         originalURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL ).startswith( "http://" ) and \
@@ -2771,7 +2618,6 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_CITY_LATITUDE: self.latitude,
             IndicatorLunar.CONFIG_CITY_LONGITUDE: self.longitude,
             IndicatorLunar.CONFIG_CITY_NAME: self.city,
-            IndicatorLunar.CONFIG_DATE_TIME_FORMAT: self.dateTimeFormat,
             IndicatorLunar.CONFIG_INDICATOR_TEXT: self.indicatorText,
             IndicatorLunar.CONFIG_COMET_OE_URL: self.cometOEURL,
             IndicatorLunar.CONFIG_COMETS: comets,
@@ -2780,7 +2626,6 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_PLANETS: self.planets,
             IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
             IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,
-            IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_TIME_FORMAT: self.satelliteNotificationTimeFormat,
             IndicatorLunar.CONFIG_SATELLITE_TLE_URL: self.satelliteTLEURL,
             IndicatorLunar.CONFIG_SATELLITES: satellites,
             IndicatorLunar.CONFIG_SATELLITES_ADD_NEW: self.satellitesAddNew,
