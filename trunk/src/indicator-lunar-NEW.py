@@ -500,6 +500,17 @@ class IndicatorLunar:
 
 
     def __init__( self ):
+
+                # On Ubuntu 16.04 (and other Unity based versions), the icon "text" does not behave as does label text of other indicators.
+        # When clicked, label text becomes bolder, whereas the icon "text" remains the same.
+        # On Ubuntu 18.04 (and other GNOME Shell versions), the label text becomes bolder on mouse over and mouse click.
+        # Ideally, use a label for the text of "PPA" and a dummy/empty icon, but alas, this does not work under GNOME Shell.
+        # Inspiration from https://github.com/fossfreedom/indicator-sysmonitor.
+#         if pythonutils.processGet( "lsb_release -sc" ).strip() == "xenial":
+#TODO If we can make a function isUbuntu1604() then add to python utils and get indicator virtual box to use it too.
+# Then use a lamba function to call isUbuntu1604() and take a number as parameter to work out the number of indents to return.
+        
+        
         self.cometOEData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
         self.satelliteTLEData = { } # Key: ( satellite name upper cased, satellite number ) ; Value: satellite.TLE object.  Can be empty but never None.
         self.satelliteNotifications = { }
