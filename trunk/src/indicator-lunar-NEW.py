@@ -1068,7 +1068,7 @@ class IndicatorLunar:
              key[ 2 ] == astro.DATA_THIRD_QUARTER:
                 if source is None:
                     displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-                elif source == astro.SOURCE_SATELLITE_NOTIFICATION:
+                elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
                     displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
 
         elif key[ 2 ] == astro.DATA_ECLIPSE_LATITUDE:
