@@ -733,8 +733,8 @@ class IndicatorLunar:
         menu.append( menuItem )
         self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        menuItem.get_submenu().append( Gtk.MenuItem( _( "Phase: " ) + self.getDisplayData( key + ( astro.DATA_PHASE, ) ) ) )
-        menuItem.get_submenu().append( Gtk.MenuItem( _( "Next Phases" ) ) )
+        menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Phase: " ) + self.getDisplayData( key + ( astro.DATA_PHASE, ) ) ) )
+        menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Next Phases" ) ) )
 
         # Determine which phases occur by date rather than using the phase calculated.
         # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
@@ -746,7 +746,7 @@ class IndicatorLunar:
 
         nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
         for dateTime, displayText, key in nextPhases:
-            menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + displayText + self.getDisplayData( key ) ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT * 2 + displayText + self.getDisplayData( key ) ) )
             self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, dateTime )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
@@ -767,14 +767,15 @@ class IndicatorLunar:
         if key + ( astro.DATA_MESSAGE, ) in self.data:
             logging.error( "No eclipse information found!" )
         else:
-            menu.append( Gtk.MenuItem( _( "Eclipse" ) ) )
-            menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_DATE_TIME, ) ) ) )
+            menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Eclipse" ) ) )
+            menu.append( Gtk.MenuItem( IndicatorLunar.INDENT * 2 + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_DATE_TIME, ) ) ) )
             latitude = self.getDisplayData( key + ( astro.DATA_ECLIPSE_LATITUDE, ) )
             longitude = self.getDisplayData( key + ( astro.DATA_ECLIPSE_LONGITUDE, ) )
-            menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
-            menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Type: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_TYPE, ) ) ) )
+            menu.append( Gtk.MenuItem( IndicatorLunar.INDENT * 2 + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
+            menu.append( Gtk.MenuItem( IndicatorLunar.INDENT * 2 + _( "Type: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_TYPE, ) ) ) )
 
 
+#TODO Have added a bunch of INDENTs...make sure it looks okay on both Unity and GNOME Shell!
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planetName in self.planets:
@@ -791,7 +792,7 @@ class IndicatorLunar:
             for planetName in planets:
                 nameTag = planetName.upper()
                 if self.showPlanetsAsSubMenu:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
+                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     subMenu.append( menuItem )
                 else:
                     menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
@@ -905,34 +906,31 @@ class IndicatorLunar:
         # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
         # Therefore only check for the presence of these two messages.
         if key + ( astro.DATA_MESSAGE, ) in self.data:
-            # This function only handles the messages of 'always up' and 'never up'.
-            # Other messages are handled by the specific functions (comet, satellite).
-            if self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_ALWAYS_UP or \
-               self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_NEVER_UP:
-                subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
+            if self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_ALWAYS_UP:
+                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
         else:
             data = [ ]
             data.append( [ key + ( astro.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( astro.DATA_RISE_TIME, ) ] ] )
+            self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astro.DATA_RISE_TIME, ) ] )
             if altitude >= 0:
                 data.append( [ key + ( astro.DATA_SET_TIME, ), _( "Set: " ), self.data[ key + ( astro.DATA_SET_TIME, ) ] ] )
-
-            self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( astro.DATA_RISE_TIME, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astro.DATA_SET_TIME, ) ] ) )
+                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astro.DATA_SET_TIME, ) ] )
 
             if astronomicalBodyType == astro.AstronomicalBodyType.Sun:
                 data.append( [ key + ( astro.DATA_DAWN, ), _( "Dawn: " ), self.data[ key + ( astro.DATA_DAWN, ) ] ] )
+                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astro.DATA_DAWN, ) ] )
                 if altitude >= 0:
                     data.append( [ key + ( astro.DATA_DUSK, ), _( "Dusk: " ), self.data[ key + ( astro.DATA_DUSK, ) ] ] )
+                    self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astro.DATA_DUSK, ) ] )
 
-                self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( astro.DATA_DAWN, ) ], self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astro.DATA_DUSK, ) ] ) )
- 
             data = sorted( data, key = lambda x: ( x[ 2 ] ) )
             for theKey, text, dateTime in data:
-                subMenu.append( Gtk.MenuItem( text + self.getDisplayData( theKey ) ) )
+                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + text + self.getDisplayData( theKey ) ) )
 
         if altitude >= 0:
             subMenu.append( Gtk.SeparatorMenuItem() )
-            subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
-            subMenu.append( Gtk.MenuItem( _( "Altitude: " ) + self.getDisplayData( key + ( astro.DATA_ALTITUDE, ) ) ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Altitude: " ) + self.getDisplayData( key + ( astro.DATA_ALTITUDE, ) ) ) )
 
         menuItem.set_submenu( subMenu )
 
@@ -2543,34 +2541,21 @@ class IndicatorLunar:
 
         self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, self.indicatorText )
 
-        # The Minor Planet Center changed the URL protocol to be https (rather than http).
-        # The URLs for OE and TLE are now set to use https.
-        # Therefore some users may still have the default URLs in their preferences and if so, convert from http to https.
-        originalURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL ).startswith( "http://" ) and \
-                      config.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL ).endswith( IndicatorLunar.COMET_OE_URL[ 5 : ] )
-
-        if not originalURL:
-            self.cometOEURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL )
-
+        self.cometOEURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL )
         self.comets = config.get( IndicatorLunar.CONFIG_COMETS, self.comets )
         self.cometsAddNew = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, self.cometsAddNew )
         self.cometsMagnitude = config.get( IndicatorLunar.CONFIG_COMETS_MAGNITUDE, self.cometsMagnitude )
+
         self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, self.planets )
+
         self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
         self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
-
-        # See comment above for OE URL as to why this code is necessary...
-        originalURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL ).startswith( "http://" ) and \
-                      config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL ).endswith( IndicatorLunar.SATELLITE_TLE_URL[ 5 : ] )
-
-        if not originalURL:
-            self.satelliteTLEURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL )
-
+        self.satelliteTLEURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL )
         self.satellites = config.get( IndicatorLunar.CONFIG_SATELLITES, self.satellites )
         self.satellites = [ tuple( l ) for l in self.satellites ] # Converts from a list of lists to a list of tuples...go figure!
-
         self.satellitesAddNew = config.get( IndicatorLunar.CONFIG_SATELLITES_ADD_NEW, self.satellitesAddNew )
         self.satellitesSortByDateTime = config.get( IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME, self.satellitesSortByDateTime )
+
         self.showMoon = config.get( IndicatorLunar.CONFIG_SHOW_MOON, self.showMoon )
         self.showCometsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_COMETS_AS_SUBMENU, self.showCometsAsSubMenu )
         self.showPlanetsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
@@ -2579,11 +2564,13 @@ class IndicatorLunar:
         self.showStarsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
         self.showSun = config.get( IndicatorLunar.CONFIG_SHOW_SUN, self.showSun )
         self.showWerewolfWarning = config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
+
         self.stars = config.get( IndicatorLunar.CONFIG_STARS, self.stars )
+
         self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, self.werewolfWarningMessage )
         self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, self.werewolfWarningSummary )
 
-        #TODO Temporary hack...
+        #TODO Start of temporary hack...
         # Convert planet/star to upper case.
         # Convert elevation from float to str.
         # Remove this hack after next release.
@@ -2600,6 +2587,7 @@ class IndicatorLunar:
         self.elevation = str( self.elevation )
 
         self.saveConfig()
+        #TODO End of hack!
 
 
     def saveConfig( self ):
