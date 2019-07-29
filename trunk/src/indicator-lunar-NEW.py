@@ -499,18 +499,16 @@ class IndicatorLunar:
     SOURCE_SATELLITE_NOTIFICATION = 0
 
 
-    def __init__( self ):
-
-                # On Ubuntu 16.04 (and other Unity based versions), the icon "text" does not behave as does label text of other indicators.
-        # When clicked, label text becomes bolder, whereas the icon "text" remains the same.
-        # On Ubuntu 18.04 (and other GNOME Shell versions), the label text becomes bolder on mouse over and mouse click.
-        # Ideally, use a label for the text of "PPA" and a dummy/empty icon, but alas, this does not work under GNOME Shell.
-        # Inspiration from https://github.com/fossfreedom/indicator-sysmonitor.
-#         if pythonutils.processGet( "lsb_release -sc" ).strip() == "xenial":
 #TODO If we can make a function isUbuntu1604() then add to python utils and get indicator virtual box to use it too.
 # Then use a lamba function to call isUbuntu1604() and take a number as parameter to work out the number of indents to return.
-        
-        
+    def indent( self, i ):
+        if pythonutils.processGet( "lsb_release -sc" ).strip() == "xenial":
+            return IndicatorLunar.INDENT * ( i - 1 )
+        else:
+            return IndicatorLunar.INDENT * i
+
+
+    def __init__( self ):
         self.cometOEData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
         self.satelliteTLEData = { } # Key: ( satellite name upper cased, satellite number ) ; Value: satellite.TLE object.  Can be empty but never None.
         self.satelliteNotifications = { }
@@ -744,8 +742,8 @@ class IndicatorLunar:
         menu.append( menuItem )
         self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Phase: " ) + self.getDisplayData( key + ( astro.DATA_PHASE, ) ) ) )
-        menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Next Phases" ) ) )
+        menuItem.get_submenu().append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astro.DATA_PHASE, ) ) ) )
+        menuItem.get_submenu().append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Next Phases" ) ) )
 
         # Determine which phases occur by date rather than using the phase calculated.
         # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
@@ -757,7 +755,7 @@ class IndicatorLunar:
 
         nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
         for dateTime, displayText, key in nextPhases:
-            menuItem.get_submenu().append( Gtk.MenuItem( IndicatorLunar.INDENT * 2 + displayText + self.getDisplayData( key ) ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( self.INDENT( 2 ) + displayText + self.getDisplayData( key ) ) )
             self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, dateTime )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
@@ -778,12 +776,12 @@ class IndicatorLunar:
         if key + ( astro.DATA_MESSAGE, ) in self.data:
             logging.error( "No eclipse information found!" )
         else:
-            menu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Eclipse" ) ) )
-            menu.append( Gtk.MenuItem( IndicatorLunar.INDENT * 2 + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_DATE_TIME, ) ) ) )
+            menu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Eclipse" ) ) )
+            menu.append( Gtk.MenuItem( self.INDENT( 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_DATE_TIME, ) ) ) )
             latitude = self.getDisplayData( key + ( astro.DATA_ECLIPSE_LATITUDE, ) )
             longitude = self.getDisplayData( key + ( astro.DATA_ECLIPSE_LONGITUDE, ) )
-            menu.append( Gtk.MenuItem( IndicatorLunar.INDENT * 2 + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
-            menu.append( Gtk.MenuItem( IndicatorLunar.INDENT * 2 + _( "Type: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_TYPE, ) ) ) )
+            menu.append( Gtk.MenuItem( self.INDENT( 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
+            menu.append( Gtk.MenuItem( self.INDENT( 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_TYPE, ) ) ) )
 
 
 #TODO Have added a bunch of INDENTs...make sure it looks okay on both Unity and GNOME Shell!
@@ -803,10 +801,10 @@ class IndicatorLunar:
             for planetName in planets:
                 nameTag = planetName.upper()
                 if self.showPlanetsAsSubMenu:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
+                    menuItem = Gtk.MenuItem( self.INDENT( 2 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     subMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
+                    menuItem = Gtk.MenuItem( self.INDENT( 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     menu.append( menuItem )
 
                 self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Planet, nameTag )
@@ -832,7 +830,7 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( starNameTranslated )
                     starsSubMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + starNameTranslated )
+                    menuItem = Gtk.MenuItem( self.INDENT( 1 ) + starNameTranslated )
                     menu.append( menuItem )
 
                 self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Star, nameTag )
@@ -871,7 +869,7 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( displayName )
                     cometsSubMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + displayName )
+                    menuItem = Gtk.MenuItem( self.INDENT( 1 ) + displayName )
                     menu.append( menuItem )
 
                 # Comet data may not exist or comet data exists but is bad.
@@ -918,7 +916,7 @@ class IndicatorLunar:
         # Therefore only check for the presence of these two messages.
         if key + ( astro.DATA_MESSAGE, ) in self.data:
             if self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_ALWAYS_UP:
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
+                subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
         else:
             data = [ ]
             data.append( [ key + ( astro.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( astro.DATA_RISE_TIME, ) ] ] )
@@ -936,12 +934,12 @@ class IndicatorLunar:
 
             data = sorted( data, key = lambda x: ( x[ 2 ] ) )
             for theKey, text, dateTime in data:
-                subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + text + self.getDisplayData( theKey ) ) )
+                subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + text + self.getDisplayData( theKey ) ) )
 
         if altitude >= 0:
             subMenu.append( Gtk.SeparatorMenuItem() )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
-            subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Altitude: " ) + self.getDisplayData( key + ( astro.DATA_ALTITUDE, ) ) ) )
+            subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astro.DATA_ALTITUDE, ) ) ) )
 
         menuItem.set_submenu( subMenu )
 
@@ -1014,12 +1012,12 @@ class IndicatorLunar:
 
                     else: # This satellite will rise within the next two minutes, so show all data.
                         subMenu.append( Gtk.MenuItem( _( "Rise" ) ) )
-                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_RISE_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_RISE_AZIMUTH, ) ) ) )
 
                         subMenu.append( Gtk.MenuItem( _( "Set" ) ) )
-                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_SET_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( IndicatorLunar.INDENT + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_SET_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_SET_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_SET_AZIMUTH, ) ) ) )
 
                     # Add the rise to the next update, ensuring it is not in the past.
                     # Subtract a minute from the rise time to spoof the next update to happen earlier.
@@ -1041,7 +1039,7 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( menuText )
                     satellitesSubMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( IndicatorLunar.INDENT + menuText )
+                    menuItem = Gtk.MenuItem( self.INDENT( 1 ) + menuText )
                     menu.append( menuItem )
 
                 menuItem.set_submenu( subMenu )
