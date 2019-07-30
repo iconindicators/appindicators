@@ -184,7 +184,7 @@ class IndicatorTide:
                     if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
                         self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
                     else:
-                        self.createAndAppendMenuItem( subMenu, menuItemText, tidalReading.getURL() )
+                        self.createAndAppendMenuItem( subMenu, indent + indent + menuItemText, tidalReading.getURL() ) #TODO Added indent here for GNOME Shell.
                 else:
                     self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
 
