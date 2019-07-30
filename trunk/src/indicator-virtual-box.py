@@ -104,6 +104,7 @@ class IndicatorVirtualBox:
 
 
     def buildMenu( self ):
+        INDENT = "    " #TODO Add to pythonutils
         menu = Gtk.Menu()
         if self.isVBoxManageInstalled():
             virtualMachines = self.getVirtualMachines()
@@ -119,21 +120,20 @@ class IndicatorVirtualBox:
                             currentMenu = stack.pop()
 
                         if virtualMachine.isGroup():
-                            menuItem = Gtk.MenuItem( virtualMachine.getGroupName() )
+                            menuItem = Gtk.MenuItem( INDENT * virtualMachine.getIndent() + virtualMachine.getGroupName() )
                             currentMenu.append( menuItem )
                             subMenu = Gtk.Menu()
                             menuItem.set_submenu( subMenu )
                             stack.append( currentMenu )
                             currentMenu = subMenu
                         else:
-                            currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, "", virtualMachine.getUUID() in runningVMUUIDs ) )
+                            currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, INDENT * virtualMachine.getIndent(), virtualMachine.getUUID() in runningVMUUIDs ) )
                 else:
                     for virtualMachine in virtualMachines:
-                        indent = "    " * virtualMachine.getIndent()
                         if virtualMachine.isGroup():
-                            menu.append( Gtk.MenuItem( indent + virtualMachine.getGroupName() ) )
+                            menu.append( Gtk.MenuItem( INDENT * virtualMachine.getIndent() + virtualMachine.getGroupName() ) )
                         else:
-                            menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, virtualMachine.getUUID() in runningVMUUIDs ) )
+                            menu.append( self.createMenuItemForVirtualMachine( virtualMachine, INDENT * virtualMachine.getIndent(), virtualMachine.getUUID() in runningVMUUIDs ) )
 
             menu.append( Gtk.SeparatorMenuItem() )
             menuItem = Gtk.MenuItem( _( "Launch VirtualBox™ Manager" ) )
