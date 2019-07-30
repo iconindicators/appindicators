@@ -32,6 +32,10 @@
 #  http://www.ukho.gov.uk/easytide
 
 
+#TODO Need to fix submenus such that scripts are indented (on GNOME Shell but not Unity).
+
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
