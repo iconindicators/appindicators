@@ -31,6 +31,9 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 
 
+#TODO Need to fix submenus such that scripts are indented (on GNOME Shell but not Unity).
+
+
 INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
