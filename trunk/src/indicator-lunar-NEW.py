@@ -499,15 +499,6 @@ class IndicatorLunar:
     SOURCE_SATELLITE_NOTIFICATION = 0
 
 
-#TODO If we can make a function isUbuntu1604() then add to python utils and get indicator virtual box to use it too.
-# Then use a lamba function to call isUbuntu1604() and take a number as parameter to work out the number of indents to return.
-    def indent( self, i ):
-        if pythonutils.processGet( "lsb_release -sc" ).strip() == "xenial":
-            return IndicatorLunar.INDENT * ( i - 1 )
-        else:
-            return IndicatorLunar.INDENT * i
-
-
     def __init__( self ):
         self.cometOEData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
         self.satelliteTLEData = { } # Key: ( satellite name upper cased, satellite number ) ; Value: satellite.TLE object.  Can be empty but never None.
