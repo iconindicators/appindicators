@@ -31,9 +31,6 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 
 
-#TODO Need to fix submenus such that scripts are indented (on GNOME Shell but not Unity).
-
-
 INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -120,8 +117,6 @@ class IndicatorVirtualBox:
                             currentMenu = stack.pop()
 
                         if virtualMachine.isGroup():
-#                             menuItem = Gtk.MenuItem( virtualMachine.getGroupName() )
-#                             menuItem = Gtk.MenuItem( INDENT * virtualMachine.getIndent() + virtualMachine.getGroupName() )
                             menuItem = Gtk.MenuItem( pythonutils.indent( 0, virtualMachine.getIndent() ) + virtualMachine.getGroupName() )
                             currentMenu.append( menuItem )
                             subMenu = Gtk.Menu()
@@ -129,8 +124,6 @@ class IndicatorVirtualBox:
                             stack.append( currentMenu )
                             currentMenu = subMenu
                         else:
-#                             currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, "", virtualMachine.getUUID() in runningVMUUIDs ) )
-#                             currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, INDENT * virtualMachine.getIndent(), virtualMachine.getUUID() in runningVMUUIDs ) )
                             currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, pythonutils.indent( 0, virtualMachine.getIndent() ), virtualMachine.getUUID() in runningVMUUIDs ) )
                 else:
                     for virtualMachine in virtualMachines:
