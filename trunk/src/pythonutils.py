@@ -183,6 +183,21 @@ def createPreferencesAboutQuitMenuItems( menu, prependSeparator, onPreferencesHa
     menu.append( menuItem )
 
 
+def isUbuntu1604(): return processGet( "lsb_release -sc" ).strip() == "xenial"
+
+
+# Provides indent spacing for menu items,
+# given Ubuntu 16.04 (Unity) and Ubuntu 18.04+ (GNOME Shell) differences.
+def indent( indentUnity, indentGnomeShell ):
+    INDENT = "    "
+    if isUbuntu1604():
+        indent = INDENT * indentUnity
+    else:
+        indent = INDENT * indentGnomeShell
+
+    return indent
+
+
 def showAboutDialog(
         authors, # List of authors.
         comments, # Comments.
