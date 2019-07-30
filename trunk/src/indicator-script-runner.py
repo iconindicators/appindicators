@@ -64,8 +64,6 @@ class IndicatorScriptRunner:
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
 
-#TODO Need to fix submenus such that scripts are indented (on GNOME Shell but not Unity).
-
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorScriptRunner.LOG ) ] )
         self.dialogLock = threading.Lock()
@@ -84,15 +82,15 @@ class IndicatorScriptRunner:
     def buildMenu( self ):
         menu = Gtk.Menu()
 
-        INDENT = "    " #TODO Add to pythonutils
         if self.showScriptsInSubmenus:
             scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
+            indent = pythonutils.indent( 0, 1 )
             for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
                 menuItem = Gtk.MenuItem( group )
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
-                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, INDENT ) #TODO Added indent
+                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, indent )
         else:
             if self.hideGroups:
                 for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
@@ -100,9 +98,10 @@ class IndicatorScriptRunner:
 
             else:
                 scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
+                indent = pythonutils.indent( 1, 1 )
                 for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
                     menu.append( Gtk.MenuItem( group + "..." ) )
-                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, INDENT ) #TODO Added indent
+                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( self.scripts ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
