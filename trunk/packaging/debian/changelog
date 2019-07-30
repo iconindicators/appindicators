@@ -1,8 +1,9 @@
 indicator-ppa-download-statistics (1.0.66-1) xenial; urgency=low
 
-  * On Ubuntu 16.04, changed the icon to an empty icon and now uses
-    "PPA" in the label text to look as per other indicators with a label.
-    Ubuntu 18.04 remains unchanged as empty icons are treated as full size.
+  * For Unity, the icon has been changed to an empty icon and uses "PPA" in
+    the label text to match other indicators with a label.
+    For GNOME Shell no change as empty icons are treated as full size.
+  * Corrected the indents for menu items for GNOME Shell.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 26 Jun 2019 23:20:53 +1000
 
