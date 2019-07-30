@@ -34,6 +34,9 @@
 #  http://help.launchpad.net/API/Hacking
 
 
+#TODO I checked show submenus, then OK, then check combine then ok, then uncheck both and the results had double ups...verify!
+
+
 INDICATOR_NAME = "indicator-ppa-download-statistics"
 import gettext
 gettext.install( INDICATOR_NAME )
