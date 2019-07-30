@@ -64,6 +64,8 @@ class IndicatorScriptRunner:
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
 
+#TODO Need to fix submenus such that scripts are indented (on GNOME Shell but not Unity).
+
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorScriptRunner.LOG ) ] )
         self.dialogLock = threading.Lock()
