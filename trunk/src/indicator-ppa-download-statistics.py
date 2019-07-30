@@ -34,9 +34,6 @@
 #  http://help.launchpad.net/API/Hacking
 
 
-#TODO I checked show submenus, then OK, then check combine then ok, then uncheck both and the results had double ups...verify!
-
-
 INDICATOR_NAME = "indicator-ppa-download-statistics"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -185,7 +182,6 @@ class IndicatorPPADownloadStatistics:
         menu.show_all()
 
 
-#TODO Verify on 16.04 that when submenus are used, the results are not too far indented (ditto for message below).
     def createMenuItemForPublishedBinary( self, menu, indent, ppa, publishedBinary ):
         label = indent + publishedBinary.getPackageName()
         if publishedBinary.getPackageVersion() is None:
@@ -211,7 +207,7 @@ class IndicatorPPADownloadStatistics:
         else:
             message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
-        menuItem = Gtk.MenuItem( indent + message ) #TODO Need to test this...not sure how to make a message appear.
+        menuItem = Gtk.MenuItem( indent + message )
         menu.append( menuItem )
 
 
