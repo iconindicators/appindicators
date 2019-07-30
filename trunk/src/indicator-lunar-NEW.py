@@ -733,8 +733,8 @@ class IndicatorLunar:
         menu.append( menuItem )
         self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        menuItem.get_submenu().append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astro.DATA_PHASE, ) ) ) )
-        menuItem.get_submenu().append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Next Phases" ) ) )
+        menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astro.DATA_PHASE, ) ) ) )
+        menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
 
         # Determine which phases occur by date rather than using the phase calculated.
         # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
@@ -745,8 +745,9 @@ class IndicatorLunar:
         nextPhases.append( [ self.data[ key + ( astro.DATA_NEW, ) ], _( "New: " ), key + ( astro.DATA_NEW, ) ] )
 
         nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
+        indent = pythonutils.indent( 1, 2 )
         for dateTime, displayText, key in nextPhases:
-            menuItem.get_submenu().append( Gtk.MenuItem( self.INDENT( 2 ) + displayText + self.getDisplayData( key ) ) )
+            menuItem.get_submenu().append( Gtk.MenuItem( indent + displayText + self.getDisplayData( key ) ) )
             self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, dateTime )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
@@ -767,15 +768,14 @@ class IndicatorLunar:
         if key + ( astro.DATA_MESSAGE, ) in self.data:
             logging.error( "No eclipse information found!" )
         else:
-            menu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Eclipse" ) ) )
-            menu.append( Gtk.MenuItem( self.INDENT( 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_DATE_TIME, ) ) ) )
+            menu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Eclipse" ) ) )
+            menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_DATE_TIME, ) ) ) )
             latitude = self.getDisplayData( key + ( astro.DATA_ECLIPSE_LATITUDE, ) )
             longitude = self.getDisplayData( key + ( astro.DATA_ECLIPSE_LONGITUDE, ) )
-            menu.append( Gtk.MenuItem( self.INDENT( 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
-            menu.append( Gtk.MenuItem( self.INDENT( 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_TYPE, ) ) ) )
+            menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
+            menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_TYPE, ) ) ) )
 
 
-#TODO Have added a bunch of INDENTs...make sure it looks okay on both Unity and GNOME Shell!
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planetName in self.planets:
@@ -792,10 +792,10 @@ class IndicatorLunar:
             for planetName in planets:
                 nameTag = planetName.upper()
                 if self.showPlanetsAsSubMenu:
-                    menuItem = Gtk.MenuItem( self.INDENT( 2 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 2 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     subMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( self.INDENT( 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     menu.append( menuItem )
 
                 self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Planet, nameTag )
@@ -821,7 +821,7 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( starNameTranslated )
                     starsSubMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( self.INDENT( 1 ) + starNameTranslated )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + starNameTranslated )
                     menu.append( menuItem )
 
                 self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Star, nameTag )
@@ -860,7 +860,7 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( displayName )
                     cometsSubMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( self.INDENT( 1 ) + displayName )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
                     menu.append( menuItem )
 
                 # Comet data may not exist or comet data exists but is bad.
@@ -907,7 +907,7 @@ class IndicatorLunar:
         # Therefore only check for the presence of these two messages.
         if key + ( astro.DATA_MESSAGE, ) in self.data:
             if self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_ALWAYS_UP:
-                subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
+                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
         else:
             data = [ ]
             data.append( [ key + ( astro.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( astro.DATA_RISE_TIME, ) ] ] )
@@ -925,18 +925,16 @@ class IndicatorLunar:
 
             data = sorted( data, key = lambda x: ( x[ 2 ] ) )
             for theKey, text, dateTime in data:
-                subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + text + self.getDisplayData( theKey ) ) )
+                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + text + self.getDisplayData( theKey ) ) )
 
         if altitude >= 0:
             subMenu.append( Gtk.SeparatorMenuItem() )
-            subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
-            subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astro.DATA_ALTITUDE, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astro.DATA_ALTITUDE, ) ) ) )
 
         menuItem.set_submenu( subMenu )
 
 
-#TODO The satellites don't have the indent.
-#Appears to happen with all objects/bodies...did this always happen?  Compare with laptop.
     def updateSatellitesMenu( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
@@ -1003,12 +1001,12 @@ class IndicatorLunar:
 
                     else: # This satellite will rise within the next two minutes, so show all data.
                         subMenu.append( Gtk.MenuItem( _( "Rise" ) ) )
-                        subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_RISE_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_RISE_AZIMUTH, ) ) ) )
 
                         subMenu.append( Gtk.MenuItem( _( "Set" ) ) )
-                        subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_SET_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( self.INDENT( 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_SET_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_SET_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_SET_AZIMUTH, ) ) ) )
 
                     # Add the rise to the next update, ensuring it is not in the past.
                     # Subtract a minute from the rise time to spoof the next update to happen earlier.
@@ -1030,7 +1028,7 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( menuText )
                     satellitesSubMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( self.INDENT( 1 ) + menuText )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + menuText )
                     menu.append( menuItem )
 
                 menuItem.set_submenu( subMenu )
