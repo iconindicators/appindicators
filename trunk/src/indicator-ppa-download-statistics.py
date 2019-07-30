@@ -73,7 +73,6 @@ class IndicatorPPADownloadStatistics:
 
     ARCHITECTURES = [ "amd64", "i386" ]
 
-    INDENT = "    "
 
     CONFIG_COMBINE_PPAS = "combinePPAs"
     CONFIG_FILTERS = "filters"
@@ -101,7 +100,7 @@ class IndicatorPPADownloadStatistics:
         # On Ubuntu 18.04 (and other GNOME Shell versions), the label text becomes bolder on mouse over and mouse click.
         # Ideally, use a label for the text of "PPA" and a dummy/empty icon, but alas, this does not work under GNOME Shell.
         # Inspiration from https://github.com/fossfreedom/indicator-sysmonitor.
-        if pythonutils.processGet( "lsb_release -sc" ).strip() == "xenial":
+        if pythonutils.isUbuntu1604():
             fileHandle, icon = tempfile.mkstemp( suffix = ".svg" )
             with open( icon, "w" ) as f:
                 svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> \
@@ -149,6 +148,7 @@ class IndicatorPPADownloadStatistics:
             self.sortByDownloadAndClip( ppas )
 
         if self.showSubmenu:
+            indent = pythonutils.indent( 0, 1 )
             for ppa in ppas:
                 menuItem = Gtk.MenuItem( ppa.getKey() )
                 menu.append( menuItem )
@@ -156,13 +156,14 @@ class IndicatorPPADownloadStatistics:
                 if ppa.getStatus() == PPA.STATUS_OK:
                     publishedBinaries = ppa.getPublishedBinaries()
                     for publishedBinary in publishedBinaries:
-                        self.createMenuItemForPublishedBinary( subMenu, ppa, publishedBinary )
+                        self.createMenuItemForPublishedBinary( subMenu, indent, ppa, publishedBinary )
                         menuItem.set_submenu( subMenu )
                 else:
-                    self.createMenuItemForStatusMessage( subMenu, ppa )
+                    self.createMenuItemForStatusMessage( subMenu, indent, ppa )
                     menuItem.set_submenu( subMenu )
 
         else:
+            indent = pythonutils.indent( 1, 1 )
             for ppa in ppas:
                 menuItem = Gtk.MenuItem( ppa.getKey() )
                 menu.append( menuItem )
@@ -171,9 +172,9 @@ class IndicatorPPADownloadStatistics:
                 if ppa.getStatus() == PPA.STATUS_OK:
                     publishedBinaries = ppa.getPublishedBinaries()
                     for publishedBinary in publishedBinaries:
-                        self.createMenuItemForPublishedBinary( menu, ppa, publishedBinary )
+                        self.createMenuItemForPublishedBinary( menu, indent, ppa, publishedBinary )
                 else:
-                    self.createMenuItemForStatusMessage( menu, ppa )
+                    self.createMenuItemForStatusMessage( menu, indent, ppa )
 
         # When only one PPA is present, enable middle mouse click on the icon to open the PPA in the browser.
         if len( ppas ) == 1:
@@ -185,8 +186,8 @@ class IndicatorPPADownloadStatistics:
 
 
 #TODO Verify on 16.04 that when submenus are used, the results are not too far indented (ditto for message below).
-    def createMenuItemForPublishedBinary( self, menu, ppa, publishedBinary ):
-        label = IndicatorPPADownloadStatistics.INDENT + publishedBinary.getPackageName()
+    def createMenuItemForPublishedBinary( self, menu, indent, ppa, publishedBinary ):
+        label = indent + publishedBinary.getPackageName()
         if publishedBinary.getPackageVersion() is None:
             label += ":  " + str( publishedBinary.getDownloadCount() )
         else:
@@ -198,7 +199,7 @@ class IndicatorPPADownloadStatistics:
         menu.append( menuItem )
 
 
-    def createMenuItemForStatusMessage( self, menu, ppa ):
+    def createMenuItemForStatusMessage( self, menu, indent, ppa ):
         if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
         elif ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
@@ -210,7 +211,7 @@ class IndicatorPPADownloadStatistics:
         else:
             message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
-        menuItem = Gtk.MenuItem( IndicatorPPADownloadStatistics.INDENT + message )
+        menuItem = Gtk.MenuItem( indent + message ) #TODO Need to test this...not sure how to make a message appear.
         menu.append( menuItem )
 
 
