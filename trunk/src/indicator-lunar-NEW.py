@@ -578,10 +578,10 @@ class IndicatorLunar:
 
     def updateMenu( self ):
         menu = Gtk.Menu()
-        if self.showMoon:
+        if self.showMoon and not self.bodyNeverUp( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON ):
             self.updateMoonMenu( menu )
 
-        if self.showSun:
+        if self.showSun and not self.bodyNeverUp( astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN ):
             self.updateSunMenu( menu )
 
         self.updatePlanetsMenu( menu )
@@ -779,6 +779,9 @@ class IndicatorLunar:
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planetName in self.planets:
+            if self.bodyNeverUp( astro.AstronomicalBodyType.Planet, planetName ):
+                continue
+
             planets.append( planetName )
 
         if len( planets ) > 0:
@@ -790,20 +793,22 @@ class IndicatorLunar:
                 menuItem.set_submenu( subMenu )
 
             for planetName in planets:
-                nameTag = planetName.upper()
                 if self.showPlanetsAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 2 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] ) #TODO For Ubuntu 16.04, the spacing should be 0...like stars...so check!
                     subMenu.append( menuItem )
                 else:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     menu.append( menuItem )
 
-                self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Planet, nameTag )
+                self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Planet, planetName )
 
 
     def updateStarsMenu( self, menu ):
         stars = [ ] # List of lists.  Each sublist contains the star name followed by the translated name.
         for starName in self.stars:
+            if self.bodyNeverUp( astro.AstronomicalBodyType.Star, starName ):
+                continue
+
             stars.append( [ starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
 
         if len( stars ) > 0:
@@ -818,7 +823,7 @@ class IndicatorLunar:
             for starName, starNameTranslated in stars:
                 nameTag = starName.upper()
                 if self.showStarsAsSubMenu:
-                    menuItem = Gtk.MenuItem( starNameTranslated )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + starNameTranslated )
                     starsSubMenu.append( menuItem )
                 else:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + starNameTranslated )
@@ -839,6 +844,8 @@ class IndicatorLunar:
                ):
                 continue # Skip comets which are never up or have no data or have bad data AND the user wants to hide comets on such conditions.
 
+#TODO Does this ensure that comets which are never up will not appear in the menu?  
+# Do we need to do checks similar to that for moon/sun or planets/stars?
             if key + ( astro.DATA_MESSAGE, ) in self.data or \
                key + ( astro.DATA_RISE_TIME, ) in self.data:
                 comets.append( comet ) # Either key must be present - otherwise the comet has been dropped due to having too large a magnitude.
@@ -896,6 +903,11 @@ class IndicatorLunar:
         url = IndicatorLunar.COMET_ON_CLICK_URL + objectID.replace( "/", "%2F" ).replace( " ", "+" )
         if len( url ) > 0:
             webbrowser.open( url )
+
+
+    def bodyNeverUp( self, astronomicalBodyType, nameTag ):
+        key = ( astronomicalBodyType, nameTag )
+        return key + ( astro.DATA_MESSAGE, ) in self.data and self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_NEVER_UP
 
 
     def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag ):
