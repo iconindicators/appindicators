@@ -84,6 +84,7 @@ class IndicatorScriptRunner:
     def buildMenu( self ):
         menu = Gtk.Menu()
 
+        INDENT = "    " #TODO Add to pythonutils
         if self.showScriptsInSubmenus:
             scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
             for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
@@ -91,7 +92,7 @@ class IndicatorScriptRunner:
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
-                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, "" )
+                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, INDENT ) #TODO Added indent
         else:
             if self.hideGroups:
                 for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
@@ -101,7 +102,7 @@ class IndicatorScriptRunner:
                 scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
                 for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
                     menu.append( Gtk.MenuItem( group + "..." ) )
-                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, "        " )
+                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, INDENT ) #TODO Added indent
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( self.scripts ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
