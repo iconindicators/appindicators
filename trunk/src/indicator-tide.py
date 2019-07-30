@@ -32,10 +32,6 @@
 #  http://www.ukho.gov.uk/easytide
 
 
-#TODO Need to fix submenus such that scripts are indented (on GNOME Shell but not Unity).
-
-
-
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -181,11 +177,11 @@ class IndicatorTide:
 
                 if self.showAsSubMenus:
                     if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
-                        self.createAndAppendMenuItem( menu, pythonutils.indent( 2, 1 ) + menuItemText, tidalReading.getURL() )
+                        self.createAndAppendMenuItem( menu, pythonutils.indent( 2, 2 ) + menuItemText, tidalReading.getURL() )
                     else:
-                        self.createAndAppendMenuItem( subMenu, pythonutils.indent( 0, 1 ) + menuItemText, tidalReading.getURL() ) #TODO Added indent here for GNOME Shell.
+                        self.createAndAppendMenuItem( subMenu, pythonutils.indent( 0, 2 ) + menuItemText, tidalReading.getURL() ) #TODO Added indent here for GNOME Shell.
                 else:
-                    self.createAndAppendMenuItem( menu, pythonutils.indent( 2, 1 ) + menuItemText, tidalReading.getURL() )
+                    self.createAndAppendMenuItem( menu, pythonutils.indent( 2, 2 ) + menuItemText, tidalReading.getURL() )
 
                 previousMonth = tidalDateTimeLocal.month
                 previousDay = tidalDateTimeLocal.day
