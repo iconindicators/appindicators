@@ -919,7 +919,7 @@ class IndicatorLunar:
         # Therefore only check for the presence of these two messages.
         if key + ( astro.DATA_MESSAGE, ) in self.data:
             if self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_ALWAYS_UP:
-                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
+                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 2 ) + self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
         else:
             data = [ ]
             data.append( [ key + ( astro.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( astro.DATA_RISE_TIME, ) ] ] )
@@ -937,12 +937,14 @@ class IndicatorLunar:
 
             data = sorted( data, key = lambda x: ( x[ 2 ] ) )
             for theKey, text, dateTime in data:
-                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + text + self.getDisplayData( theKey ) ) )
+                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 2 ) + text + self.getDisplayData( theKey ) ) )
+#TODO The 2 may be a 1, depending if the item is in a sub-submenu or not...sun/moon are different to star/planet/comet....
+#so will need another parameter into this function.
 
         if altitude >= 0:
             subMenu.append( Gtk.SeparatorMenuItem() )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astro.DATA_ALTITUDE, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astro.DATA_ALTITUDE, ) ) ) )
 
         menuItem.set_submenu( subMenu )
 
