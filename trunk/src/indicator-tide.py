@@ -138,7 +138,6 @@ class IndicatorTide:
         else:
             menuItemText = _( "{0}, {1}" ).format( ports.getPortName( tidalReadings[ 0 ].getPortID() ), ports.getCountry( tidalReadings[ 0 ].getPortID() ) )
             self.createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
-            indent = "    "
             allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
             previousMonth = -1
             previousDay = -1
@@ -155,7 +154,7 @@ class IndicatorTide:
                     firstTidalReading = False
 
                 if not( tidalDateTimeLocal.month == previousMonth and tidalDateTimeLocal.day == previousDay ):
-                    menuItemText = indent + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
+                    menuItemText = pythonutils.indent( 1, 1 ) + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
                     if self.showAsSubMenus:
                         if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
                             self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
@@ -182,11 +181,11 @@ class IndicatorTide:
 
                 if self.showAsSubMenus:
                     if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
-                        self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
+                        self.createAndAppendMenuItem( menu, pythonutils.indent( 2, 1 ) + menuItemText, tidalReading.getURL() )
                     else:
-                        self.createAndAppendMenuItem( subMenu, indent + indent + menuItemText, tidalReading.getURL() ) #TODO Added indent here for GNOME Shell.
+                        self.createAndAppendMenuItem( subMenu, pythonutils.indent( 0, 1 ) + menuItemText, tidalReading.getURL() ) #TODO Added indent here for GNOME Shell.
                 else:
-                    self.createAndAppendMenuItem( menu, indent + indent + menuItemText, tidalReading.getURL() )
+                    self.createAndAppendMenuItem( menu, pythonutils.indent( 2, 1 ) + menuItemText, tidalReading.getURL() )
 
                 previousMonth = tidalDateTimeLocal.month
                 previousDay = tidalDateTimeLocal.day
