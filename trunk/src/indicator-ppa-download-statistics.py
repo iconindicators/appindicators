@@ -184,6 +184,7 @@ class IndicatorPPADownloadStatistics:
         menu.show_all()
 
 
+#TODO Verify on 16.04 that when submenus are used, the results are not too far indented (ditto for message below).
     def createMenuItemForPublishedBinary( self, menu, ppa, publishedBinary ):
         label = IndicatorPPADownloadStatistics.INDENT + publishedBinary.getPackageName()
         if publishedBinary.getPackageVersion() is None:
