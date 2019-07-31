@@ -729,10 +729,14 @@ class IndicatorLunar:
 
     def updateMoonMenu( self, menu ):
         key = ( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
+
         menuItem = Gtk.MenuItem( _( "Moon" ) )
         menu.append( menuItem )
+
         self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON, False )
+
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+
         menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astro.DATA_PHASE, ) ) ) )
         menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
 
