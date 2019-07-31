@@ -731,7 +731,7 @@ class IndicatorLunar:
         key = ( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
         menuItem = Gtk.MenuItem( _( "Moon" ) )
         menu.append( menuItem )
-        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
+        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON, False )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astro.DATA_PHASE, ) ) ) )
         menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
@@ -758,7 +758,7 @@ class IndicatorLunar:
         key = ( astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
         menuItem = Gtk.MenuItem( _( "Sun" ) )
         menu.append( menuItem )
-        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
+        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN, False )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         self.updateEclipseMenu( menuItem.get_submenu(), astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
 
@@ -800,7 +800,7 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     menu.append( menuItem )
 
-                self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Planet, planetName )
+                self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Planet, planetName, self.showPlanetsAsSubMenu )
 
 
     def updateStarsMenu( self, menu ):
@@ -829,7 +829,7 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + starNameTranslated )
                     menu.append( menuItem )
 
-                self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Star, nameTag )
+                self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Star, nameTag, self.showStarsAsSubMenu )
 
 
     def updateCometsMenu( self, menu ):
@@ -864,7 +864,7 @@ class IndicatorLunar:
                     displayName = key # There is a comet but no data for it.
 
                 if self.showCometsAsSubMenu:
-                    menuItem = Gtk.MenuItem( displayName )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
                     cometsSubMenu.append( menuItem )
                 else:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
@@ -883,10 +883,10 @@ class IndicatorLunar:
 
                 if missing or badData or noData:
                     subMenu = Gtk.Menu()
-                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) ) ) )
+                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) ) ) ) #TODO Needs indent?
                     menuItem.set_submenu( subMenu )
                 else:
-                    self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Comet, key )
+                    self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Comet, key, self.showCometsAsSubMenu )
 
                     # Add handler.
                     for child in menuItem.get_submenu().get_children():
@@ -910,16 +910,17 @@ class IndicatorLunar:
         return key + ( astro.DATA_MESSAGE, ) in self.data and self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_NEVER_UP
 
 
-    def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag ):
+    def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag, isSubMenu ):
         key = ( astronomicalBodyType, nameTag )
         subMenu = Gtk.Menu()
         altitude = int( self.getDecimalDegrees( self.data[ key + ( astro.DATA_ALTITUDE, ) ], False, 0 ) )
+        indent = pythonutils.indent( 0, 2 if isSubMenu else 2 )
 
         # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
         # Therefore only check for the presence of these two messages.
         if key + ( astro.DATA_MESSAGE, ) in self.data:
             if self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_ALWAYS_UP:
-                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 2 ) + self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
+                subMenu.append( Gtk.MenuItem( indent + self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
         else:
             data = [ ]
             data.append( [ key + ( astro.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( astro.DATA_RISE_TIME, ) ] ] )
@@ -937,14 +938,14 @@ class IndicatorLunar:
 
             data = sorted( data, key = lambda x: ( x[ 2 ] ) )
             for theKey, text, dateTime in data:
-                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 2 ) + text + self.getDisplayData( theKey ) ) )
+                subMenu.append( Gtk.MenuItem( indent + text + self.getDisplayData( theKey ) ) )
 #TODO The 2 may be a 1, depending if the item is in a sub-submenu or not...sun/moon are different to star/planet/comet....
 #so will need another parameter into this function.
 
         if altitude >= 0:
             subMenu.append( Gtk.SeparatorMenuItem() )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astro.DATA_ALTITUDE, ) ) ) )
+            subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astro.DATA_ALTITUDE, ) ) ) )
 
         menuItem.set_submenu( subMenu )
 
