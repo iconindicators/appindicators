@@ -944,8 +944,6 @@ class IndicatorLunar:
             data = sorted( data, key = lambda x: ( x[ 2 ] ) )
             for theKey, text, dateTime in data:
                 subMenu.append( Gtk.MenuItem( indent + text + self.getDisplayData( theKey ) ) )
-#TODO The 2 may be a 1, depending if the item is in a sub-submenu or not...sun/moon are different to star/planet/comet....
-#so will need another parameter into this function.
 
         if altitude >= 0:
             subMenu.append( Gtk.SeparatorMenuItem() )
@@ -999,12 +997,13 @@ class IndicatorLunar:
                 satellitesMenuItem.set_submenu( satellitesSubMenu )
 
             utcNow = datetime.datetime.utcnow()
+            indent = pythonutils.indent( 0, 2 )
             for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
                 key = ( astro.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
                 subMenu = Gtk.Menu()
                 if key + ( astro.DATA_MESSAGE, ) in self.data:
                     if self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
-                        subMenu.append( Gtk.MenuItem( _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
 
                     subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
                 else:
@@ -1017,16 +1016,18 @@ class IndicatorLunar:
                     riseTime = self.toDateTime( self.data[ key + ( astro.DATA_RISE_TIME, ) ] )
                     dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60 # If the satellite is currently rising, we'll get a negative but that's okay.
                     if dateTimeDifferenceInMinutes > 2: # If this satellite will rise more than two minutes from now, then only show the rise time.
-                        subMenu.append( Gtk.MenuItem( _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
 
                     else: # This satellite will rise within the next two minutes, so show all data.
-                        subMenu.append( Gtk.MenuItem( _( "Rise" ) ) )
-                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_RISE_AZIMUTH, ) ) ) )
+#TODO Test this during a satellite pass for both GNOME Shell and Unity.
+#I suspect Unity needs an extra indent on the date/time and azimuth menu items.
+                        subMenu.append( Gtk.MenuItem( indent + _( "Rise" ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_RISE_AZIMUTH, ) ) ) )
 
-                        subMenu.append( Gtk.MenuItem( _( "Set" ) ) )
-                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_SET_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_SET_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + _( "Set" ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_SET_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_SET_AZIMUTH, ) ) ) )
 
                     # Add the rise to the next update, ensuring it is not in the past.
                     # Subtract a minute from the rise time to spoof the next update to happen earlier.
@@ -1048,7 +1049,7 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + menuText )
                     satellitesSubMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + menuText )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + menuText )
                     menu.append( menuItem )
 
                 menuItem.set_submenu( subMenu )
