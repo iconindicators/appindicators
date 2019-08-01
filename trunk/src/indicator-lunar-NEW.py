@@ -798,7 +798,7 @@ class IndicatorLunar:
 
             for planetName in planets:
                 if self.showPlanetsAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] ) #TODO For Ubuntu 16.04, the spacing should be 0...like stars...so check!
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     subMenu.append( menuItem )
                 else:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
@@ -827,10 +827,10 @@ class IndicatorLunar:
             for starName, starNameTranslated in stars:
                 nameTag = starName.upper()
                 if self.showStarsAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + starNameTranslated )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + starNameTranslated )
                     starsSubMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + starNameTranslated )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + starNameTranslated )
                     menu.append( menuItem )
 
                 self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Star, nameTag, self.showStarsAsSubMenu )
@@ -871,7 +871,7 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
                     cometsSubMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
                     menu.append( menuItem )
 
                 # Comet data may not exist or comet data exists but is bad.
@@ -1044,7 +1044,7 @@ class IndicatorLunar:
                     child.connect( "activate", self.onSatellite )
 
                 if self.showSatellitesAsSubMenu:
-                    menuItem = Gtk.MenuItem( menuText )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + menuText )
                     satellitesSubMenu.append( menuItem )
                 else:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + menuText )
