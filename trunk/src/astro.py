@@ -272,7 +272,7 @@ def getAstronomicalInformation( utcNow,
 
     data = { }
 
-    # Used to create the city...removed before passing back to the caller.
+    # Used internally to create the observer/city...removed before passing back to the caller.
     data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = latitude
     data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = longitude
     data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = elevation
@@ -296,7 +296,7 @@ def getAstronomicalInformation( utcNow,
 def getCities(): return sorted( _city_data.keys(), key = locale.strxfrm )
 
 
-# TODO Wrap in try/except and return None across the board on error.
+# Returns the latitude, longitude and elevation (all as strings) for the PyEphem city.
 def getLatitudeLongitudeElevation( city ): return _city_data.get( city )[ 0 ], \
                                                   _city_data.get( city )[ 1 ], \
                                                   str( _city_data.get( city )[ 2 ] )
