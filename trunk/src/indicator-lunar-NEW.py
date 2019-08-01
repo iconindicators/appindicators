@@ -2490,7 +2490,7 @@ class IndicatorLunar:
                     theCity = city
                     break
 
-            if theCity is None or theCity == "":
+            if theCity is None or not theCity:
                 theCity = cities[ 0 ]
 
         except Exception as e:
@@ -2536,12 +2536,14 @@ class IndicatorLunar:
 
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-        self.city = self.getDefaultCity()
-        self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME, self.city )
-        self.latitude, self.longitude, self.elevation = astro.getLatitudeLongitudeElevation( self.city ) #TODO This could return None...check the actual function.
-        self.elevation = config.get( IndicatorLunar.CONFIG_CITY_ELEVATION, self.elevation )
-        self.latitude = config.get( IndicatorLunar.CONFIG_CITY_LATITUDE, self.latitude )
-        self.longitude = config.get( IndicatorLunar.CONFIG_CITY_LONGITUDE, self.longitude )
+        self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME ) # Returns None if the key is not found.
+        if self.city is None:
+            self.city = self.getDefaultCity()
+            self.latitude, self.longitude, self.elevation = astro.getLatitudeLongitudeElevation( self.city )
+        else:
+            self.elevation = config.get( IndicatorLunar.CONFIG_CITY_ELEVATION )
+            self.latitude = config.get( IndicatorLunar.CONFIG_CITY_LATITUDE )
+            self.longitude = config.get( IndicatorLunar.CONFIG_CITY_LONGITUDE )
 
         self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, self.indicatorText )
 
