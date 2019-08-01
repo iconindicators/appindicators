@@ -47,9 +47,6 @@ XDG_KEY_CACHE = "XDG_CACHE_HOME"
 XDG_KEY_CONFIG = "XDG_CONFIG_HOME"
 
 
-def getVersion(): return "1.0.0"
-
-
 def processCall( command ):
     try:
         subprocess.call( command, shell = True )
