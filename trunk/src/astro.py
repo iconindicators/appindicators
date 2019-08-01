@@ -479,6 +479,7 @@ def __calculateStars( ephemNow, data, stars ):
 # Centaurs, transneptunians and NEOs.
 # This list has 4 URLs from the MPC...so how to present that to the user?
 # IF we go this way, need a comment somewhere about Pluto living in the Planet tab.
+#FIRST thing to do is load each of the minor planet URLs, screen out for magnitude less than 6 and do a count to see if this is worth it!
 def __calculateComets( ephemNow, data, comets, cometData, cometMaximumMagnitude ):
     for key in comets:
         if key in cometData:
