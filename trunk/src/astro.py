@@ -474,6 +474,7 @@ def __calculateStars( ephemNow, data, stars ):
 #TODO Check with Oleg...if we do add the abilty for multiple files,
 # then rename all stuff to OE...or have a separate thing for comets and so on?
 #Problem is if a user adds their own source files, then we don't know what they are...so best to keep as OE.
+# Could instead have addition astro body types: NEW, asteroid, minor planets?
 def __calculateComets( ephemNow, data, comets, cometData, cometMaximumMagnitude ):
     for key in comets:
         if key in cometData:
