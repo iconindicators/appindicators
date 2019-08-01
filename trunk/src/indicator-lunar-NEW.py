@@ -145,13 +145,9 @@ class IndicatorLunar:
         astro.DATA_ECLIPSE_LATITUDE     : _( "ECLIPSE LATITUDE" ),
         astro.DATA_ECLIPSE_LONGITUDE    : _( "ECLIPSE LONGITUDE" ),
         astro.DATA_ECLIPSE_TYPE         : _( "ECLIPSE TYPE" ),
-        astro.DATA_ELEVATION            : _( "ELEVATION" ),
         astro.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
         astro.DATA_FULL                 : _( "FULL" ),
-        astro.DATA_LATITUDE             : _( "LATITUDE" ),
-        astro.DATA_LONGITUDE            : _( "LONGITUDE" ),
         astro.DATA_MESSAGE              : _( "MESSAGE" ),
-        astro.DATA_NAME                 : _( "NAME" ), # Only used for CITY "body" tag.
         astro.DATA_NEW                  : _( "NEW" ),
         astro.DATA_PHASE                : _( "PHASE" ),
         astro.DATA_RISE_AZIMUTH         : _( "RISE AZIMUTH" ),
@@ -481,7 +477,7 @@ class IndicatorLunar:
 #TODO Likley need to put these into a dict, keyed off from the astro messages.
 #Then in getdisplaydata for the message type, use the astro.message and pull the translated/text message from this dict.
     MESSAGE_TRANSLATION_BODY_ALWAYS_UP = _( "Always Up!" )
-    MESSAGE_TRANSLATION_BODY_NEVER_UP = _( "Never Up!" )
+    MESSAGE_TRANSLATION_BODY_NEVER_UP = _( "Never Up!" ) #TODO Needed?  Not if we always drop never up bodies.
     MESSAGE_TRANSLATION_DATA_BAD_DATA = _( "Bad data!" )
     MESSAGE_TRANSLATION_DATA_CANNOT_ACCESS_DATA_SOURCE = _( "Cannot access the data source\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_TRANSLATION_DATA_NO_DATA = _( "No data!" )
@@ -493,7 +489,6 @@ class IndicatorLunar:
     MESSAGE_TRANSLATION_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
     MESSAGE_DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
-    INDENT = "    "
     
     # Data is displayed using a default format, but when an alternate format is required, specify using a source below.
     SOURCE_SATELLITE_NOTIFICATION = 0
@@ -547,7 +542,7 @@ class IndicatorLunar:
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             # Value is the astronomical data (or equivalent) as a string.
             self.data = astro.getAstronomicalInformation( datetime.datetime.utcnow(),
-                                                          self.city, self.latitude, self.longitude, self.elevation,
+                                                          self.latitude, self.longitude, self.elevation,
                                                           self.planets,
                                                           self.stars,
                                                           self.satellites, self.satelliteTLEData,
@@ -1116,21 +1111,11 @@ class IndicatorLunar:
             else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
                 displayData = _( "Total" )
 
-        elif key[ 2 ] == astro.DATA_ELEVATION:
-            displayData = self.data[ key ] + " " + _( "m" )
-
-        elif key[ 2 ] == astro.DATA_LATITUDE or \
-             key[ 2 ] == astro.DATA_LONGITUDE:
-            displayData = self.data[ key ] + "°"
-
         elif key[ 2 ] == astro.DATA_MESSAGE: #TODO Will need to take the message and pull out the translation from a dict.
             displayData = self.data[ key ]
 
         elif key[ 2 ] == astro.DATA_PHASE:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
-
-        elif key[ 2 ] == astro.DATA_NAME:
-            displayData = self.data[ key ]
 
         if displayData is None:  # Returning None is not good but better to let it crash and find out about it than hide the problem.
             logging.error( "Unknown/unhandled key: " + key )
@@ -2553,7 +2538,7 @@ class IndicatorLunar:
 
         self.city = self.getDefaultCity()
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME, self.city )
-        self.latitude, self.longitude, self.elevation = astro.getLatitudeLongitudeElevation( self.city )
+        self.latitude, self.longitude, self.elevation = astro.getLatitudeLongitudeElevation( self.city ) #TODO This could return None...check the actual function.
         self.elevation = config.get( IndicatorLunar.CONFIG_CITY_ELEVATION, self.elevation )
         self.latitude = config.get( IndicatorLunar.CONFIG_CITY_LATITUDE, self.latitude )
         self.longitude = config.get( IndicatorLunar.CONFIG_CITY_LONGITUDE, self.longitude )

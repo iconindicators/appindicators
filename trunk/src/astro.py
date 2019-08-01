@@ -19,16 +19,12 @@
 # Calculate astronomical information using PyEphem.
 
 
-#TODO Can the data added to the dict be standardised, so that if the backend changes, the frontend does not notice?
-#If PyEphem uses radians but Skyfield always uses degrees for example, standardise data formats.
-
-
 import eclipse, ephem, locale, math, satellite
 
 from ephem.cities import _city_data
 
 
-class AstronomicalBodyType: Comet, Moon, Planet, Satellite, Star, Sun = range( 6 ) #TODO Comet will/may have to change to OE?
+class AstronomicalBodyType: Comet, Moon, Planet, Satellite, Star, Sun = range( 6 )
 
 
 DATA_ALTITUDE = "ALTITUDE"
@@ -40,14 +36,13 @@ DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
 DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
 DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
 DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
-DATA_ELEVATION = "ELEVATION" # Used for city.
+DATA_ELEVATION = "ELEVATION" # Internally used for city.
 DATA_FIRST_QUARTER = "FIRST QUARTER"
 DATA_FULL = "FULL"
 DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
-DATA_LATITUDE = "LATITUDE" # Used for city.
-DATA_LONGITUDE = "LONGITUDE" # Used for city.
+DATA_LATITUDE = "LATITUDE" # Internally used for city.
+DATA_LONGITUDE = "LONGITUDE" # Internally used for city.
 DATA_MESSAGE = "MESSAGE"
-DATA_NAME = "NAME" # Used for city.
 DATA_NEW = "NEW"
 DATA_PHASE = "PHASE"
 DATA_RISE_AZIMUTH = "RISE AZIMUTH"
@@ -66,14 +61,10 @@ DATA_TAGS = [
     DATA_ECLIPSE_LATITUDE,
     DATA_ECLIPSE_LONGITUDE,
     DATA_ECLIPSE_TYPE,
-    DATA_ELEVATION,
     DATA_FIRST_QUARTER,
     DATA_FULL,
     DATA_ILLUMINATION,
-    DATA_LATITUDE,
-    DATA_LONGITUDE,
     DATA_MESSAGE,
-    DATA_NAME,
     DATA_NEW,
     DATA_PHASE,
     DATA_RISE_AZIMUTH,
@@ -272,13 +263,8 @@ MESSAGE_SATELLITE_VALUE_ERROR = "SATELLITE_VALUE_ERROR"
 # Returns a dict with astronomical information...
 #     Key is a tuple of AstronomicalBodyType, a name tag and a data tag.
 #     Value is the data as a string.
-#
-#TODO Maybe return the dict and a status message: OK, bad city...what else?
-#
-#TODO Does city name come originally from pyephem?  Can it be anything and is then matched later with pyephem's list of cities?
-#City name would have to come from PyEphem originally...and so some sort of error has to burp back up on a bad city name.
 def getAstronomicalInformation( utcNow,
-                                cityName, latitude, longitude, elevation,
+                                latitude, longitude, elevation,
                                 planets,
                                 stars,
                                 satellites, satelliteData,
@@ -286,7 +272,7 @@ def getAstronomicalInformation( utcNow,
 
     data = { }
 
-    data[ ( None, NAME_TAG_CITY, DATA_NAME ) ] = cityName
+    # Used to create the city...removed before passing back to the caller.
     data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = latitude
     data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = longitude
     data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = elevation
@@ -298,6 +284,10 @@ def getAstronomicalInformation( utcNow,
     __calculateStars( ephemNow, data, stars )
     __calculateComets( ephemNow, data, comets, cometData, cometMaximumMagnitude )
     __calculateSatellites( ephemNow, data, satellites, satelliteData )
+
+    del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
+    del data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
+    del data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ]
 
     return data
 
@@ -331,7 +321,7 @@ def __calculateMoon( ephemNow, data ):
     data[ key + ( DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
     data[ key + ( DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
     data[ key + ( DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
-    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Pass in a clean instance of the moon (just to be safe).
+    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Pass in a clean instance (just to be safe).
     __calculateEclipse( ephemNow, data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
 
@@ -354,7 +344,7 @@ def __calculateMoon( ephemNow, data ):
 #  https://github.com/brandon-rhodes/pyephem/issues/24
 #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
 #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-def __getZenithAngleOfBrightLimb( ephemNow, data, body ): #TODO Would be nice to make this not use PyEphem internally but pass in sun/moon ra/dec and pass in or calculate the city lat and sidereal time.
+def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
     city = __getCity( data, ephemNow )
     sun = ephem.Sun( city )
     body.compute( city )
@@ -645,7 +635,7 @@ def __isSatellitePassValid( satellitePass ):
 #    http://www.celestrak.com/columns/v03n01
 #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
 def __isSatellitePassVisible( data, passDateTime, satellite ):
-    city = __getCity( data, passDateTime ) #Use our own function?
+    city = __getCity( data, passDateTime )
     city.pressure = 0
     city.horizon = "-0:34"
 
@@ -659,7 +649,7 @@ def __isSatellitePassVisible( data, passDateTime, satellite ):
 
 
 def __getCity( data, date ):
-    city = ephem.city( data[ ( None, NAME_TAG_CITY, DATA_NAME ) ] ) #TODO What if the user has given a city name that is not in the list of cities?  Test!
+    city = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
     city.date = date
     city.lat = data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
     city.lon = data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
