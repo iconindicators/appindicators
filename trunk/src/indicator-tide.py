@@ -32,6 +32,11 @@
 #  http://www.ukho.gov.uk/easytide
 
 
+#TODO Update icons for 19.04 (Yaru).
+
+#TODO Update license.
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
