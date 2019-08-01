@@ -733,7 +733,7 @@ class IndicatorLunar:
         menuItem = Gtk.MenuItem( _( "Moon" ) )
         menu.append( menuItem )
 
-        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON, False )
+        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON, 1, 1 )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
@@ -762,7 +762,7 @@ class IndicatorLunar:
         key = ( astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
         menuItem = Gtk.MenuItem( _( "Sun" ) )
         menu.append( menuItem )
-        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN, False )
+        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN, 1, 1 )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         self.updateEclipseMenu( menuItem.get_submenu(), astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
 
@@ -800,11 +800,11 @@ class IndicatorLunar:
                 if self.showPlanetsAsSubMenu:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     subMenu.append( menuItem )
+                    self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Planet, planetName, 0, 2 )
                 else:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     menu.append( menuItem )
-
-                self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Planet, planetName, self.showPlanetsAsSubMenu )
+                    self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Planet, planetName, 2, 2 )
 
 
     def updateStarsMenu( self, menu ):
@@ -829,11 +829,12 @@ class IndicatorLunar:
                 if self.showStarsAsSubMenu:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + starNameTranslated )
                     starsSubMenu.append( menuItem )
+                    self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Star, nameTag, 0, 2 )
+
                 else:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + starNameTranslated )
                     menu.append( menuItem )
-
-                self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Star, nameTag, self.showStarsAsSubMenu )
+                    self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Star, nameTag, 2, 2 )
 
 
     def updateCometsMenu( self, menu ):
@@ -890,7 +891,7 @@ class IndicatorLunar:
                     subMenu.append( Gtk.MenuItem( self.getDisplayData( ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) ) ) ) #TODO Needs indent?
                     menuItem.set_submenu( subMenu )
                 else:
-                    self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Comet, key, self.showCometsAsSubMenu )
+                    self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Comet, key, 0 if self.showCometsAsSubMenu else 2, 2 )
 
                     # Add handler.
                     for child in menuItem.get_submenu().get_children():
@@ -914,11 +915,11 @@ class IndicatorLunar:
         return key + ( astro.DATA_MESSAGE, ) in self.data and self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_NEVER_UP
 
 
-    def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag, isSubMenu ):
+    def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
         key = ( astronomicalBodyType, nameTag )
         subMenu = Gtk.Menu()
         altitude = int( self.getDecimalDegrees( self.data[ key + ( astro.DATA_ALTITUDE, ) ], False, 0 ) )
-        indent = pythonutils.indent( 0, 2 if isSubMenu else 2 )
+        indent = pythonutils.indent( indentUnity, indentGnomeShell )
 
         # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
         # Therefore only check for the presence of these two messages.
