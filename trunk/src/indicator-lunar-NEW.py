@@ -2653,30 +2653,4 @@ class IndicatorLunar:
         pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
-#TODO Testing OE stuff
-# import ephem
-# 
-# 
-# urls = [ "file:///home/bernard/Desktop/MinorPlanets/Soft03CritList.txt",
-#          "file:///home/bernard/Desktop/MinorPlanets/Soft03Distant.txt",
-#          "file:///home/bernard/Desktop/MinorPlanets/Soft03Unusual.txt",
-#          "file:///home/bernard/Desktop/MinorPlanets/Soft03Bright.txt" ]
-# 
-# for url in urls:
-#     print( url )
-#     data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-#     for i in range( 0, len( data ) ):
-#         if not data[ i ].startswith( "#" ):
-#             cometName = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # Found that the comet name can have multiple whitespace, so remove.
-#             cometData = data[ i ][ data[ i ].index( "," ) : ]
-#             comet = ephem.readdb( cometName + cometData )
-#             comet.compute( ephem.city( "Sydney" ) )
-#             if math.isnan( comet.earth_distance ) or math.isnan( comet.phase ) or math.isnan( comet.size ) or math.isnan( comet.sun_distance ):
-#                 print( data[ i ] )
-#             else:
-#                 if float( comet.mag ) <= 3.0:
-#                     print( data[ i ] )
-# 
-#     print()
-
 if __name__ == "__main__": IndicatorLunar().main()
