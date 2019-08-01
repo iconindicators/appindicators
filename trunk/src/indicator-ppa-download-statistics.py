@@ -70,7 +70,6 @@ class IndicatorPPADownloadStatistics:
 
     ARCHITECTURES = [ "amd64", "i386" ]
 
-
     CONFIG_COMBINE_PPAS = "combinePPAs"
     CONFIG_FILTERS = "filters"
     CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC = "ignoreVersionArchitectureSpecific"
