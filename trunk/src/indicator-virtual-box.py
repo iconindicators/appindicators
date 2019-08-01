@@ -41,7 +41,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 from threading import Thread
-import datetime, json, logging, os, pythonutils, threading, time, virtualmachine
+import datetime, logging, os, pythonutils, threading, time, virtualmachine
 
 
 class IndicatorVirtualBox:
@@ -101,7 +101,6 @@ class IndicatorVirtualBox:
 
 
     def buildMenu( self ):
-        INDENT = "    " #TODO Add to pythonutils
         menu = Gtk.Menu()
         if self.isVBoxManageInstalled():
             virtualMachines = self.getVirtualMachines()
