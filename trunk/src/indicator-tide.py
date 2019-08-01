@@ -42,7 +42,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
-import datetime, json, locale, logging, os, ports, pythonutils, re, threading, tide, time, webbrowser
+import datetime, locale, logging, os, ports, pythonutils, re, threading, tide, webbrowser
 
 
 class IndicatorTide:
