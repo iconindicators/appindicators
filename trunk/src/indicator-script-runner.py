@@ -40,7 +40,7 @@ gi.require_version( "AppIndicator3", "0.1" )
 from gi.repository import AppIndicator3, GLib, Gtk
 from script import Info
 from threading import Thread
-import copy, json, logging, os, pythonutils, threading
+import copy, logging, os, pythonutils, threading
 
 
 class IndicatorScriptRunner:
