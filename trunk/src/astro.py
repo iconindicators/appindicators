@@ -475,6 +475,10 @@ def __calculateStars( ephemNow, data, stars ):
 # then rename all stuff to OE...or have a separate thing for comets and so on?
 #Problem is if a user adds their own source files, then we don't know what they are...so best to keep as OE.
 # Could instead have addition astro body types: NEW, asteroid, minor planets?
+#Perhaps instead, keep comets as they are, but add in Minor Planets and can explain that include
+# Centaurs, transneptunians and NEOs.
+# This list has 4 URLs from the MPC...so how to present that to the user?
+# IF we go this way, need a comment somewhere about Pluto living in the Planet tab.
 def __calculateComets( ephemNow, data, comets, cometData, cometMaximumMagnitude ):
     for key in comets:
         if key in cometData:
