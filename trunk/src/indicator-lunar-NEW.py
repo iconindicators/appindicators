@@ -44,7 +44,13 @@
 
 #TODO Have sent a message to MPC to look at the data format as it looks odd for the two dodgy magnitude comets.
 #Maybe there is a way to screen out dodgy data?
-
+#MPC responded and they are looking into it.
+#
+#However given that all other bodies either have a fixed magnitude or none,
+# then comets are the only body with a magnitude that we care about.
+#Further, if we add minor planets (also from the MPC), then the magnitude problem could get even worse.
+#So we could show an OSD when the indicator starts up telling the user of bad mags,
+#but we could either show the mag with the comet and/or just in the data list in the preferences.
 
 #TODO Maybe show other stuff for comets?
 # https://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
@@ -405,6 +411,8 @@ class IndicatorLunar:
     COMET_OE_DOWNLOAD_PERIOD_HOURS = 24
 
     COMET_ON_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+
+# https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"

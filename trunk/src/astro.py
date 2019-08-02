@@ -24,7 +24,7 @@ import eclipse, ephem, locale, math, satellite
 from ephem.cities import _city_data
 
 
-class AstronomicalBodyType: Comet, Moon, Planet, Satellite, Star, Sun = range( 6 )
+class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
 
 
 DATA_ALTITUDE = "ALTITUDE"
@@ -74,6 +74,13 @@ DATA_TAGS = [
     DATA_THIRD_QUARTER ]
 
 DATA_COMET = [
+    DATA_MESSAGE,
+    DATA_RISE_AZIMUTH,
+    DATA_RISE_TIME,
+    DATA_SET_AZIMUTH,
+    DATA_SET_TIME ]
+
+DATA_MINOR_PLANET = [
     DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
     DATA_RISE_TIME,
@@ -268,7 +275,8 @@ def getAstronomicalInformation( utcNow,
                                 planets,
                                 stars,
                                 satellites, satelliteData,
-                                comets, cometData, cometMaximumMagnitude ):
+                                comets, cometData, cometMaximumMagnitude,
+                                minorPlanets, minorPlanetData, minorPlanetMaximumMagnitude ):
 
     data = { }
 
@@ -282,7 +290,8 @@ def getAstronomicalInformation( utcNow,
     __calculateSun( ephemNow, data )
     __calculatePlanets( ephemNow, data, planets )
     __calculateStars( ephemNow, data, stars )
-    __calculateComets( ephemNow, data, comets, cometData, cometMaximumMagnitude )
+    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, cometMaximumMagnitude )
+    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, minorPlanetMaximumMagnitude )
     __calculateSatellites( ephemNow, data, satellites, satelliteData )
 
     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
@@ -459,33 +468,23 @@ def __calculateStars( ephemNow, data, stars ):
         __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star )
 
 
-# http://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
-# http://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
-#TODO Check with Oleg...if we do add the abilty for multiple files,
-# then rename all stuff to OE...or have a separate thing for comets and so on?
-#Problem is if a user adds their own source files, then we don't know what they are...so best to keep as OE.
-# Could instead have addition astro body types: NEW, asteroid, minor planets?
-#Perhaps instead, keep comets as they are, but add in Minor Planets and can explain that include
-# Centaurs, transneptunians and NEOs.
-# This list has 4 URLs from the MPC...so how to present that to the user?
-# IF we go this way, need a comment somewhere about Pluto living in the Planet tab.
-#FIRST thing to do is load each of the minor planet URLs, screen out for magnitude less than 6 and do a count to see if this is worth it!
-#
-# Out of the minor planet data files, Soft03Unusual.txt only has data for magnitudes less than 6, so just use that.
-# This means we can dispense with the multiple data sources idea
-# (particularly with Celestrak author told me there is only one file really for satellites).
-def __calculateComets( ephemNow, data, comets, cometData, cometMaximumMagnitude ):
-    for key in comets:
-        if key in cometData:
-            comet = ephem.readdb( cometData[ key ] )
-            comet.compute( __getCity( data, ephemNow ) )
-            if math.isnan( comet.earth_distance ) or math.isnan( comet.phase ) or math.isnan( comet.size ) or math.isnan( comet.sun_distance ): # Have found the data file may contain ***** in lieu of actual data!
-                data[ ( AstronomicalBodyType.Comet, key, DATA_MESSAGE ) ] = MESSAGE_DATA_BAD_DATA
+# Compute data for comets or minor planets.
+# Reference https://minorplanetcenter.net//iau/Ephemerides/Soft03.html
+# The default source for comets is https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
+# The default source for minor planets is https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt
+# Have tried the other data sources for minor planets (NEOs, centaurs, transneptunians) and none have magnitude less than 6.
+def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, maximumMagnitude ):
+    for key in cometsOrMinorPlanets:
+        if key in cometOrMinorPlanetData:
+            body = ephem.readdb( cometOrMinorPlanetData[ key ] )
+            body.compute( __getCity( data, ephemNow ) )
+            if math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ): # Have found the data file may contain ***** in lieu of actual data!
+                data[ ( astronomicalBodyType, key, DATA_MESSAGE ) ] = MESSAGE_DATA_BAD_DATA
             else:
-                if float( comet.mag ) <= float( cometMaximumMagnitude ):
-                    __calculateCommon( ephemNow, data, comet, AstronomicalBodyType.Comet, key )
+                if float( body.mag ) <= float( maximumMagnitude ):
+                    __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
         else:
-            data[ ( AstronomicalBodyType.Comet, key, DATA_MESSAGE ) ] = MESSAGE_DATA_NO_DATA
+            data[ ( astronomicalBodyType, key, DATA_MESSAGE ) ] = MESSAGE_DATA_NO_DATA
 
 
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
@@ -660,29 +659,3 @@ def __getCity( data, date ):
     city.elev = float( data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] )
 
     return city
-
-
-from urllib.request import urlopen
-import datetime, pythonutils, re
-
-urls = [ "file:///home/bernard/Desktop/MinorPlanetCenter/Soft03Bright.txt",
-         "file:///home/bernard/Desktop/MinorPlanetCenter/Soft03CritList.txt",
-         "file:///home/bernard/Desktop/MinorPlanetCenter/Soft03Distant.txt",
-         "file:///home/bernard/Desktop/MinorPlanetCenter/Soft03Cmt.txt",
-         "file:///home/bernard/Desktop/MinorPlanetCenter/Soft03Unusual.txt" ]
-
-for url in urls:
-    print( url, "\n" )
-    data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-    for i in range( 0, len( data ) ):
-        if not data[ i ].startswith( "#" ):
-            cometName = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # Found that the comet name can have multiple whitespace, so remove.
-            comet = ephem.readdb( data[ i ] )
-            comet.compute( ephem.city( "Sydney" ) )
-            if math.isnan( comet.earth_distance ) or math.isnan( comet.phase ) or math.isnan( comet.size ) or math.isnan( comet.sun_distance ): # Have found the data file may contain ***** in lieu of actual data!
-                continue
-            else:
-                if float( comet.mag ) <= 2.0:
-                    print( "\t", cometName, comet.mag )
-
-    print()
