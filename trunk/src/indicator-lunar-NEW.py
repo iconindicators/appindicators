@@ -105,7 +105,7 @@ class IndicatorLunar:
     ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, comet, star and satellite information." )
     ABOUT_CREDIT_ECLIPSE = _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" )
     ABOUT_CREDIT_PYEPHEM = _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
-    ABOUT_CREDIT_COMET = _( "Comet OE data by Minor Planet Center. http://www.minorplanetcenter.net" )
+    ABOUT_CREDIT_COMET = _( "Comet OE data by Minor Planet Center. http://www.minorplanetcenter.net" ) #TODO Add a whole new line for minor planets or add to this line.
     ABOUT_CREDIT_SATELLITE = _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" )
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
@@ -121,7 +121,10 @@ class IndicatorLunar:
     CONFIG_COMET_OE_URL = "cometOEURL"
     CONFIG_COMETS = "comets"
     CONFIG_COMETS_ADD_NEW = "cometsAddNew"
-    CONFIG_COMETS_MAGNITUDE = "cometsMagnitude"
+    CONFIG_MAGNITUDE = "magnitude"
+    CONFIG_MINOR_PLANET_OE_URL = "minorPlanetOEURL"
+    CONFIG_MINOR_PLANETS = "minorPlanets"
+    CONFIG_MINOR_PLANETS_ADD_NEW = "minorPlanetsAddNew"
     CONFIG_INDICATOR_TEXT = "indicatorText"
     CONFIG_PLANETS = "planets"
     CONFIG_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
@@ -412,7 +415,22 @@ class IndicatorLunar:
 
     COMET_ON_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
-# https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt
+    # The download period serves two purposes:
+    #    Prevent over-taxing the download source (which may result in being blocked).
+    #    Download as often as necessary for accuracy.
+    #
+    # The cache age ensures the data retrieved from the cache is not stale.
+    #
+    # The cache has two uses:
+    #    Act as a source when restarting the indicator.
+    #    Act as a source when offline.
+    MINOR_PLANET_OE_CACHE_BASENAME = "minorplanet-oe-"
+    MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS = 30
+    MINOR_PLANET_OE_URL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt"
+    MINOR_PLANET_OE_DOWNLOAD_PERIOD_HOURS = 24
+
+#TODO Verify this works.
+    MINOR_PLANET_ON_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -504,11 +522,13 @@ class IndicatorLunar:
 
     def __init__( self ):
         self.cometOEData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
+        self.minorPlanetOEData = { } # Key is the minor planet name, upper cased; value is the minor planet data string.  Can be empty but never None.
         self.satelliteTLEData = { } # Key: ( satellite name upper cased, satellite number ) ; Value: satellite.TLE object.  Can be empty but never None.
         self.satelliteNotifications = { }
 
 #TODO Do these need to live here?  Do we need to recall the state globally or maybe just within each calling of prefs?
         self.toggleCometsTable = True
+        self.toggleMinorPlanetsTable = True
         self.togglePlanetsTable = True
         self.toggleSatellitesTable = True
         self.toggleStarsTable = True
@@ -524,6 +544,7 @@ class IndicatorLunar:
 
         # Initialise last update date/times to the past...
         self.lastUpdateCometOE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+        self.lastUpdateMinorPlanetOE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         self.lastUpdateSatelliteTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
@@ -545,6 +566,7 @@ class IndicatorLunar:
 
             # Update backend...
             self.updateCometOEData()
+            self.updateMinorPlanetOEData()
             self.updateSatelliteTLEData()
 
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
@@ -554,7 +576,9 @@ class IndicatorLunar:
                                                           self.planets,
                                                           self.stars,
                                                           self.satellites, self.satelliteTLEData,
-                                                          self.comets, self.cometOEData, self.cometsMagnitude )
+                                                          self.comets, self.cometOEData,
+                                                          self.minorPlanets, self.minorPlanetOEData,
+                                                          self.magnitude )
 
             # Update frontend...
             self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
@@ -589,7 +613,8 @@ class IndicatorLunar:
 
         self.updatePlanetsMenu( menu )
         self.updateStarsMenu( menu )
-        self.updateCometsMenu( menu )
+        self.updateCometsOrMinorPlanetsMenu( menu, astro.AstronomicalBodyType.Comet )
+        self.updateCometsOrMinorPlanetsMenu( menu, astro.AstronomicalBodyType.MinorPlanet )
         self.updateSatellitesMenu( menu )
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
@@ -840,6 +865,71 @@ class IndicatorLunar:
                 self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Star, nameTag, 0, 2 )
 
 
+    def updateCometsOrMinorPlanetsMenu( self, menu, astronomicalBodyType ):
+        bodies = [ ]
+        for body in self.comets:
+            key = ( astronomicalBodyType, body )
+            if key + ( astro.DATA_MESSAGE, ) in self.data and \
+               (
+                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_NEVER_UP or \
+                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_DATA_BAD_DATA or \
+                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_DATA_NO_DATA
+               ):
+                continue # Skip bodies which are never up or have no data or have bad data AND the user wants to hide bodies on such conditions.
+
+#TODO Does this ensure that bodies which are never up will not appear in the menu?  
+# Do we need to do checks similar to that for moon/sun or planets/stars?
+            if key + ( astro.DATA_MESSAGE, ) in self.data or \
+               key + ( astro.DATA_RISE_TIME, ) in self.data:
+                bodies.append( body ) # Either key must be present - otherwise the body has been dropped due to having too large a magnitude.
+
+        if len( bodies ) > 0:
+            menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astro.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
+            menu.append( menuItem )
+            if self.showCometsAsSubMenu:
+                subMenu = Gtk.Menu()
+                menuItem.set_submenu( subMenu )
+
+            oeData = self.cometOEData if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanetOEData
+            showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
+            for key in sorted( bodies ): # Sorting by key also sorts the display name identically.
+                if key in oeData:
+                    displayName = self.getCometOrMinorPlanetDisplayName( oeData[ key ] )
+                else:
+                    displayName = key # There is a body but no data for it.
+
+                if showAsSubMenu:
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
+                    subMenu.append( menuItem )
+                else:
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
+                    menu.append( menuItem )
+
+                # Comet data may not exist or body data exists but is bad.
+                missing = ( key not in oeData ) # This scenario should be covered by the 'no data' clause below...but just in case catch it here!
+
+                badData = ( key in oeData and \
+                          ( astronomicalBodyType, key, astro.DATA_MESSAGE ) in self.data ) and \
+                          self.data[ ( astronomicalBodyType, key, astro.DATA_MESSAGE ) ] == astro.MESSAGE_DATA_BAD_DATA
+
+                noData = ( key in oeData and \
+                         ( astronomicalBodyType, key, astro.DATA_MESSAGE ) in self.data ) and \
+                          self.data[ ( astronomicalBodyType, key, astro.DATA_MESSAGE ) ] == astro.MESSAGE_DATA_NO_DATA
+
+                if missing or badData or noData:
+                    subMenu = Gtk.Menu()
+                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( astronomicalBodyType, key, astro.DATA_MESSAGE ) ) ) ) #TODO Needs indent?
+                    menuItem.set_submenu( subMenu )
+                else:
+                    self.updateCommonMenu( menuItem, astronomicalBodyType, key, 0, 2 )
+
+                    # Add handler.
+                    for child in menuItem.get_submenu().get_children():
+                        child.set_name( key )
+                        child.connect( "activate", self.onCometOrMinorPlanet, astronomicalBodyType )
+
+
+#TODO Delete
     def updateCometsMenu( self, menu ):
         comets = [ ]
         for comet in self.comets:
@@ -902,6 +992,19 @@ class IndicatorLunar:
                         child.connect( "activate", self.onComet )
 
 
+    def onCometOrMinorPlanet( self, widget, astronomicalBodyType ):
+        if "(" in widget.props.name:
+            objectID = widget.props.name[ : widget.props.name.find( "(" ) ].strip()
+        else:
+            objectID = widget.props.name[ : widget.props.name.find( "/" ) ].strip()
+
+        onClickURL = IndicatorLunar.COMET_ON_CLICK_URL if astronomicalBodyType == astro.AstronomicalBodyType.Comet else IndicatorLunar.MINOR_PLANET_ON_CLICK_URL
+        url = onClickURL + objectID.replace( "/", "%2F" ).replace( " ", "+" )
+        if len( url ) > 0:
+            webbrowser.open( url )
+
+
+#TODO Remove
     def onComet( self, widget ):
         if "(" in widget.props.name:
             objectID = widget.props.name[ : widget.props.name.find( "(" ) ].strip()
@@ -1178,12 +1281,45 @@ class IndicatorLunar:
         return secondDateTimeAsString
 
 
+#TODO See if this can be combined with the comet function below.
+    def updateMinorPlanetOEData( self ):
+        if datetime.datetime.utcnow() > ( self.lastUpdateMinorPlanetOE + datetime.timedelta( hours = IndicatorLunar.MINOR_PLANET_OE_DOWNLOAD_PERIOD_HOURS ) ):
+            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS )
+            self.minorPlanetOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
+            if self.minorPlanetOEData is None:
+                self.minorPlanetOEData = self.getMinorPlanetOEData( self.minorPlanetOEURL )
+
+                if self.minorPlanetOEData is None:
+                    self.minorPlanetOEData = { }
+                    summary = _( "Error Retrieving Minor Planet OE Data" ) #TODO New translation
+                    message = _( "The minor planet OE data source could not be reached." ) #TODO New translation
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+                elif len( self.minorPlanetOEData ) == 0:
+                    summary = _( "Empty Minor Planet OE Data" ) #TODO New translation
+                    message = _( "The minor planet OE data retrieved was empty." ) #TODO New translation
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+                else:
+                    pythonutils.writeCacheBinary( self.minorPlanetOEData, INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, logging )
+
+                # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
+                self.lastUpdateMinorPlanetOE = datetime.datetime.utcnow()
+
+            else:
+                # Set the next update to occur when the cache is due to expire.
+                self.lastUpdateMinorPlanetOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS )
+
+            if self.minorPlanetsAddNew:
+                self.addNewMinorPlanets()
+
+
     def updateCometOEData( self ):
         if datetime.datetime.utcnow() > ( self.lastUpdateCometOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) ):
             pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
             self.cometOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
             if self.cometOEData is None:
-                self.cometOEData = self.getCometOEData( self.cometOEURL ) # Format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId468501
+                self.cometOEData = self.getCometOEData( self.cometOEURL )
 
                 if self.cometOEData is None:
                     self.cometOEData = { }
@@ -1345,9 +1481,10 @@ class IndicatorLunar:
         TAB_MENU = 1
         TAB_PLANETS_STARS = 2
         TAB_COMETS = 3
-        TAB_SATELLITES = 4
-        TAB_NOTIFICATIONS = 5
-        TAB_GENERAL = 6
+        TAB_MINOR_PLANETS = 4
+        TAB_SATELLITES = 5
+        TAB_NOTIFICATIONS = 6
+        TAB_GENERAL = 7
 
         notebook = Gtk.Notebook()
 
@@ -1488,6 +1625,12 @@ class IndicatorLunar:
         showCometsAsSubmenuCheckbox.set_active( self.showCometsAsSubMenu )
         box.pack_start( showCometsAsSubmenuCheckbox, False, False, 0 )
 
+#TODO New trans
+        showMinorPlanetsAsSubmenuCheckbox = Gtk.CheckButton( _( "Minor Planets" ) )
+        showMinorPlanetsAsSubmenuCheckbox.set_tooltip_text( _( "Show minor planets as submenus." ) )
+        showMinorPlanetsAsSubmenuCheckbox.set_active( self.showMinorPlanetsAsSubMenu )
+        box.pack_start( showMinorPlanetsAsSubmenuCheckbox, False, False, 0 )
+
         showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( _( "Satellites" ) )
         showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
         showSatellitesAsSubmenuCheckbox.set_tooltip_text( _( "Show satellites as submenus." ) )
@@ -1502,30 +1645,42 @@ class IndicatorLunar:
             "to the list of checked comets." ) )
         grid.attach( cometsAddNewCheckbox, 0, 4, 1, 1 )
 
+#TODO New trans
+        minorPlanetsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new minor planets" ) )
+        minorPlanetsAddNewCheckbox.set_margin_top( 10 )
+        minorPlanetsAddNewCheckbox.set_active( self.minorPlanetsAddNew )
+        minorPlanetsAddNewCheckbox.set_tooltip_text( _(
+            "If checked, all minor planets are added\n" + \
+            "to the list of checked minor planets." ) )
+        grid.attach( cometsAddNewCheckbox, 0, 5, 1, 1 )
+
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Hide comets greater than magnitude" ) ), False, False, 0 )
+#TODO Trans
+        box.pack_start( Gtk.Label( _( "Hide comets and minor planets greater than magnitude" ) ), False, False, 0 )
 
-        spinnerCometMagnitude = Gtk.SpinButton()
-        spinnerCometMagnitude.set_numeric( True )
-        spinnerCometMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
-        spinnerCometMagnitude.set_adjustment( Gtk.Adjustment( self.cometsMagnitude, -30, 30, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinnerCometMagnitude.set_value( self.cometsMagnitude ) # ...so need to force the initial value by explicitly setting it.
-        spinnerCometMagnitude.set_tooltip_text( _(
-            "Comets with a magnitude greater\n" + \
-            "than that specified are hidden." ) )
+#TODO Comet magnitude
+#TODO Trans
+        spinnerMagnitude = Gtk.SpinButton()
+        spinnerMagnitude.set_numeric( True )
+        spinnerMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
+        spinnerMagnitude.set_adjustment( Gtk.Adjustment( self.magnitude, -30, 30, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerMagnitude.set_value( self.magnitude ) # ...so need to force the initial value by explicitly setting it.
+        spinnerMagnitude.set_tooltip_text( _(
+            "Comets and minor planets with a magnitude\n" + \
+            "greater than that specified are hidden." ) )
 
-        box.pack_start( spinnerCometMagnitude, False, False, 0 )
-        grid.attach( box, 0, 5, 1, 1 )
-
+        box.pack_start( spinnerMagnitude, False, False, 0 )
+        grid.attach( box, 0, 6, 1, 1 )
+        
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
         satellitesAddNewCheckbox.set_tooltip_text( _(
             "If checked all satellites are added\n" + \
             "to the list of checked satellites." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 6, 1, 1 )
+        grid.attach( satellitesAddNewCheckbox, 0, 7, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
@@ -1536,7 +1691,7 @@ class IndicatorLunar:
             "Otherwise satellites are sorted\n" + \
             "by Name, Number and then\n" + \
             "International Designator." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 7, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 8, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -1689,6 +1844,90 @@ class IndicatorLunar:
         cometGrid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( cometGrid, Gtk.Label( _( "Comets" ) ) )
+
+        # Minor Planets.
+        minorPlanetGrid = Gtk.Grid() #TODO Need to add to same place below as cometGrid
+        minorPlanetGrid.set_column_spacing( 10 )
+        minorPlanetGrid.set_row_spacing( 10 )
+        minorPlanetGrid.set_margin_left( 10 )
+        minorPlanetGrid.set_margin_right( 10 )
+        minorPlanetGrid.set_margin_top( 10 )
+        minorPlanetGrid.set_margin_bottom( 10 )
+
+        minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
+        minorPlanetStoreSort = Gtk.TreeModelSort( model = minorPlanetStore )
+        minorPlanetStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
+
+        tree = Gtk.TreeView( minorPlanetStoreSort )
+        tree.set_tooltip_text( _(
+            "Check a minor planet to display in the menu.\n\n" + \
+            "Clicking the header of the first column\n" + \
+            "will toggle all checkboxes." ) )
+
+        renderer_toggle = Gtk.CellRendererToggle()
+        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, minorPlanetStore, minorPlanetStoreSort, astro.AstronomicalBodyType.MinorPlanet)
+        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+        treeViewColumn.set_clickable( True )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, minorPlanetStore, minorPlanetStoreSort, displayTagsStore, astro.AstronomicalBodyType.MinorPlanet )
+        tree.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
+        tree.append_column( treeViewColumn )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+        scrolledWindow.add( tree )
+        minorPlanetGrid.attach( scrolledWindow, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label( _( "Minor Planet OE data" ) ), False, False, 0 ) #TODO New translation
+
+        self.minorPlanetOEDataNew = None
+        self.minorPlanetOEURLNew = None
+
+        minorPlanetURLEntry = Gtk.Entry()
+        minorPlanetURLEntry.set_text( self.minorPlanetOEURL )
+#TODO New trans.
+        minorPlanetURLEntry.set_tooltip_text( _(
+            "The URL from which to source\n" + \
+            "minor planet OE data.\n\n" + \
+            "To specify a local file, use 'file:///'\n" + \
+            "and the filename.\n\n" + \
+            "Set a bogus URL such as 'http://'\n" + \
+            "to disable." ) )
+        box.pack_start( minorPlanetURLEntry, True, True, 0 )
+
+        fetch = Gtk.Button( _( "Fetch" ) )
+#TODO New tranas.
+        fetch.set_tooltip_text( _(
+            "Retrieve the minor planet OE data.\n\n" + \
+            "If the URL is empty, the default\n" + \
+            "URL will be used.\n\n" + \
+            "If using the default URL, the\n" + \
+            "download may be blocked to\n" + \
+            "avoid burdening the source." ) )
+        fetch.connect( "clicked",
+                       self.onFetchCometSatelliteData,
+                       minorPlanetURLEntry,
+                       minorPlanetGrid,
+                       minorPlanetStore,
+                       astro.AstronomicalBodyType.MinorPlanet,
+                       IndicatorLunar.MINOR_PLANET_OE_URL,
+                       IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME,
+                       IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS,
+                       self.lastUpdateMinorPlanetOE,
+                       IndicatorLunar.MINOR_PLANET_OE_DOWNLOAD_PERIOD_HOURS,
+                       _( "Minor planet data fetch aborted" ),# TODO Trnas
+                       _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
+                       self.getMinorPlanetOEData )
+        box.pack_start( fetch, False, False, 0 )
+        minorPlanetGrid.attach( box, 0, 1, 1, 1 )
+
+        notebook.append_page( minorPlanetGrid, Gtk.Label( _( "Minor Planets" ) ) ) #TODO New trans.
 
         # Satellites.
         satelliteGrid = Gtk.Grid()
@@ -2001,7 +2240,9 @@ class IndicatorLunar:
         dialog.show_all()
 
         # The visibility of some GUI objects must be determined AFTER the dialog is shown.
+#TODO Rename to include Minor Planets
         self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), astro.AstronomicalBodyType.Comet )
+        self.updateCometSatellitePreferencesTab( minorPlanetGrid, minorPlanetStore, self.minorPlanetOEData, self.minorPlanets, minorPlanetURLEntry.get_text().strip(), astro.AstronomicalBodyType.MinorPlanet )
         self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), astro.AstronomicalBodyType.Satellite )
 
         # Last thing to do after everything else is built.
@@ -2045,8 +2286,9 @@ class IndicatorLunar:
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
             self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
             self.showCometsAsSubMenu = showCometsAsSubmenuCheckbox.get_active()
+            self.showMinorPlanetsAsSubMenu = showMinorPlanetsAsSubmenuCheckbox.get_active()
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
-            self.cometsMagnitude = spinnerCometMagnitude.get_value_as_int()
+            self.magnitude = spinnerMagnitude.get_value_as_int()
             self.cometsAddNew = cometsAddNewCheckbox.get_active()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active()
@@ -2061,7 +2303,7 @@ class IndicatorLunar:
                 if row[ 0 ]:
                     self.stars.append( row[ 1 ] )
 
-            if self.cometOEURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
+            if self.cometOEURLNew is not None: # The URL is initialised to None.  If it is not None, a fetch has taken place.
                 self.cometOEURL = self.cometOEURLNew # The URL may or may not be valid, but it will not be None.
                 if self.cometOEDataNew is None:
                     self.cometOEData = { } # The retrieved data was bad, so reset to empty data.
@@ -2079,8 +2321,8 @@ class IndicatorLunar:
                     if comet[ 0 ]:
                         self.comets.append( comet[ 1 ].upper() )
 
-            if self.satelliteTLEURLNew is not None: # The URL is initialsed to None.  If it is not None, a fetch has taken place.
-                self.satelliteTLEURL = self.satelliteTLEURLNew # The URL may or may not be valie, but it will not be None.
+            if self.satelliteTLEURLNew is not None: # The URL is initialised to None.  If it is not None, a fetch has taken place.
+                self.satelliteTLEURL = self.satelliteTLEURLNew # The URL may or may not be valid, but it will not be None.
                 if self.satelliteTLEDataNew is None:
                     self.satelliteTLEData = { } # The retrieved data was bad, so reset to empty data.
                 else:
@@ -2125,7 +2367,7 @@ class IndicatorLunar:
 
         isCometOrSatellite = \
             astronomicalBodyType is not None and \
-            ( astronomicalBodyType == astro.AstronomicalBodyType.Comet or astronomicalBodyType == astro.AstronomicalBodyType.Satellite )
+            ( astronomicalBodyType == astro.AstronomicalBodyType.Comet or astronomicalBodyType == astro.AstronomicalBodyType.MinorPlanet or astronomicalBodyType == astro.AstronomicalBodyType.Satellite )
 
         if isCometOrSatellite:
             translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Don't translate the names of the comets/satellites.
@@ -2176,6 +2418,7 @@ class IndicatorLunar:
         planetName = dataStore[ row ][ 1 ]
 
 
+#TODO Include MP
     def onCometStarSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalBodyType ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
@@ -2189,6 +2432,7 @@ class IndicatorLunar:
         self.checkboxToggled( bodyTag, astronomicalBodyType, dataStore[ actualRow ][ 0 ] )
 
 
+#TODO Include MP
     def updateCometSatellitePreferencesTab( self, grid, dataStore, data, bodies, url, astronomicalBodyType ):
         dataStore.clear()
         if data is None:
@@ -2202,10 +2446,11 @@ class IndicatorLunar:
                     tle = data[ key ]
                     checked = ( tle.getName().upper(), tle.getNumber() ) in bodies
                     dataStore.append( [ checked, tle.getName(), tle.getNumber(), tle.getInternationalDesignator() ] )
-            else:
+
+            else: # Comet or Minor Planet
                 for key in data:
                     oe = data[ key ]
-                    dataStore.append( [ key in bodies, self.getCometDisplayName( oe ) ] )
+                    dataStore.append( [ key in bodies, self.getCometOrMinorPlanetDisplayName( oe ) ] )
 
         # Hide/show the label and scrolled window as appropriate.
         # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
@@ -2223,6 +2468,7 @@ class IndicatorLunar:
                     child.hide()
 
 
+#TODO Include MP
     def onFetchCometSatelliteData( self,
                                    button, entry, grid, store,
                                    astronomicalBodyType,
@@ -2306,11 +2552,15 @@ class IndicatorLunar:
                 self.onPlanetToggled( widget, row, dataStore )
 
         elif astronomicalBodyType == astro.AstronomicalBodyType.Comet or \
+             astronomicalBodyType == astro.AstronomicalBodyType.MinorPlanet or \
              astronomicalBodyType == astro.AstronomicalBodyType.Satellite or \
              astronomicalBodyType == astro.AstronomicalBodyType.Star:
             if astronomicalBodyType == astro.AstronomicalBodyType.Comet:
                 toggle = self.toggleCometsTable
                 self.toggleCometsTable = not self.toggleCometsTable
+            elif astronomicalBodyType == astro.AstronomicalBodyType.MinorPlanet:
+                toggle = self.toggleMinorPlanetsTable
+                self.toggleMinorPlanetsTable = not self.toggleMinorPlanetsTable
             elif astronomicalBodyType == astro.AstronomicalBodyType.Satellite:
                 toggle = self.toggleSatellitesTable
                 self.toggleSatellitesTable = not self.toggleSatellitesTable
@@ -2405,6 +2655,8 @@ class IndicatorLunar:
                 bodyTag = key[ 1 ]
                 if astronomicalBodyType == astro.AstronomicalBodyType.Comet:
                     tags = IndicatorLunar.DATA_TAGS_COMET
+                if astronomicalBodyType == astro.AstronomicalBodyType.MinorPlanet:
+                    tags = IndicatorLunar.DATA_TAGS_MINOR_PLANET
                 elif astronomicalBodyType == astro.AstronomicalBodyType.Moon:
                     tags = IndicatorLunar.DATA_TAGS_MOON
                 elif astronomicalBodyType == astro.AstronomicalBodyType.Planet:
@@ -2435,7 +2687,48 @@ class IndicatorLunar:
                 self.comets.append( key )
 
 
+    def addNewMinorPlanets( self ):
+        for key in self.minorPlanetOEData:
+            if key not in self.minorPlanets:
+                self.minorPlanets.append( key )
+
+
+    def getCometOrMinorPlanetDisplayName( self, cometOrMinorPlanet ): return cometOrMinorPlanet[ 0 : cometOrMinorPlanet.index( "," ) ]
+
+
+#TODO Remove
     def getCometDisplayName( self, comet ): return comet[ 0 : comet.index( "," ) ]
+
+
+    # Returns a dict/hashtable of the comets (comets) data from the specified URL (may be empty).
+    # Key: comet name, upper cased ; Value: entire comet string.
+    # On error, returns None.
+#TODO Can this be combined to also do comets?
+    def getMinorPlanetOEData( self, url ):
+        minorPlanetOEData = None # Indicates error.
+        if pythonutils.isConnectedToInternet():
+            try:
+                # Minor planets are read from a URL which assumes the XEphem format.
+                # For example
+                #
+#TODO Fix this line
+                #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
+                #
+                # from which the first field (up to the first ',') is the name.
+                minorPlanetOEData = { }
+                data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+                for i in range( 0, len( data ) ):
+                    if not data[ i ].startswith( "#" ):
+                        minorPlanetName = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # Found that the minor planet name can have multiple whitespace, so remove.
+                        minorPlanetData = data[ i ][ data[ i ].index( "," ) : ]
+                        minorPlanetOEData[ minorPlanetName.upper() ] = minorPlanetName + minorPlanetData
+
+            except Exception as e:
+                minorPlanetOEData = None
+                logging.exception( e )
+                logging.error( "Error retrieving minor planet OE data from " + str( url ) )
+
+        return minorPlanetOEData
 
 
     # Returns a dict/hashtable of the comets (comets) data from the specified URL (may be empty).
@@ -2514,8 +2807,13 @@ class IndicatorLunar:
 
         self.comets = [ ]
         self.cometsAddNew = False
-        self.cometsMagnitude = 6 # More or less what's visible with the naked eye or binoculars.
         self.cometOEURL = IndicatorLunar.COMET_OE_URL
+
+        self.minorPlanets = [ ]
+        self.minorPlanetsAddNew = False
+        self.minorPlanetOEURL = IndicatorLunar.MINOR_PLANET_OE_URL
+
+        self.magnitude = 6 # More or less what's visible with the naked eye or binoculars.
 
         self.planets = [ ]
         for planetName in astro.PLANETS:
@@ -2530,6 +2828,7 @@ class IndicatorLunar:
 
         self.showMoon = True
         self.showCometsAsSubMenu = True
+        self.showMinorPlanetsAsSubMenu = True
         self.showPlanetsAsSubMenu = False
         self.showSatelliteNotification = True
         self.showSatellitesAsSubMenu = True
@@ -2558,7 +2857,12 @@ class IndicatorLunar:
         self.cometOEURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL )
         self.comets = config.get( IndicatorLunar.CONFIG_COMETS, self.comets )
         self.cometsAddNew = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, self.cometsAddNew )
-        self.cometsMagnitude = config.get( IndicatorLunar.CONFIG_COMETS_MAGNITUDE, self.cometsMagnitude )
+
+        self.minorPlanetOEURL = config.get( IndicatorLunar.MINOR_PLANET_OE_URL, self.minorPlanetOEURL )
+        self.minorPlanets = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS, self.minorPlanets )
+        self.minorPlanetsAddNew = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW, self.minorPlanetsAddNew )
+
+        self.magnitude = config.get( IndicatorLunar.CONFIG_MAGNITUDE, self.magnitude )
 
         self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, self.planets )
 
@@ -2622,9 +2926,12 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_CITY_NAME: self.city,
             IndicatorLunar.CONFIG_INDICATOR_TEXT: self.indicatorText,
             IndicatorLunar.CONFIG_COMET_OE_URL: self.cometOEURL,
-            IndicatorLunar.CONFIG_COMETS: comets,
+            IndicatorLunar.CONFIG_COMETS: self.comets,
             IndicatorLunar.CONFIG_COMETS_ADD_NEW: self.cometsAddNew,
-            IndicatorLunar.CONFIG_COMETS_MAGNITUDE: self.cometsMagnitude,
+            IndicatorLunar.CONFIG_MINOR_PLANET_OE_URL: self.minorPlanetOEURL,
+            IndicatorLunar.CONFIG_MINOR_PLANETS: self.minorPlanets,
+            IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW: self.minorPlanetsAddNew,
+            IndicatorLunar.CONFIG_MAGNITUDE: self.magnitude,
             IndicatorLunar.CONFIG_PLANETS: self.planets,
             IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
             IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,

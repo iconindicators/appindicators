@@ -275,8 +275,9 @@ def getAstronomicalInformation( utcNow,
                                 planets,
                                 stars,
                                 satellites, satelliteData,
-                                comets, cometData, cometMaximumMagnitude,
-                                minorPlanets, minorPlanetData, minorPlanetMaximumMagnitude ):
+                                comets, cometData,
+                                minorPlanets, minorPlanetData,
+                                magnitude ):
 
     data = { }
 
@@ -290,8 +291,8 @@ def getAstronomicalInformation( utcNow,
     __calculateSun( ephemNow, data )
     __calculatePlanets( ephemNow, data, planets )
     __calculateStars( ephemNow, data, stars )
-    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, cometMaximumMagnitude )
-    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, minorPlanetMaximumMagnitude )
+    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
+    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
     __calculateSatellites( ephemNow, data, satellites, satelliteData )
 
     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
