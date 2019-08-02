@@ -470,6 +470,10 @@ def __calculateStars( ephemNow, data, stars ):
 # This list has 4 URLs from the MPC...so how to present that to the user?
 # IF we go this way, need a comment somewhere about Pluto living in the Planet tab.
 #FIRST thing to do is load each of the minor planet URLs, screen out for magnitude less than 6 and do a count to see if this is worth it!
+#
+# Out of the minor planet data files, Soft03Unusual.txt only has data for magnitudes less than 6, so just use that.
+# This means we can dispense with the multiple data sources idea
+# (particularly with Celestrak author told me there is only one file really for satellites).
 def __calculateComets( ephemNow, data, comets, cometData, cometMaximumMagnitude ):
     for key in comets:
         if key in cometData:
