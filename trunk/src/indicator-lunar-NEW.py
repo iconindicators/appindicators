@@ -74,6 +74,11 @@
 # so we can have multiple URLs.
 # Use a Gtk.TextView?  https://python-gtk-3-tutorial.readthedocs.io/en/latest/gallery.html
 
+#TODO The minor planets file takes a while to load...
+#Check if it takes a while to load on startup.
+#Check when preferences startup...maybe show teh prefs dialog but make it opaque with a message?
+#The toggle to select all takes a while, so maybe remove from comets/sats/minp?
+
 
 INDICATOR_NAME = "indicator-lunar"
 import gettext
