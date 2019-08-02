@@ -1,17 +1,19 @@
 indicator-lunar (1.0.81-1) xenial; urgency=low
 
-  * Under GNOME Shell the indicator grinds to a halt, requiring an overhaul.
-    The indicator's purpose is assist the home astronomer to locate an object.
+  * Under GNOME Shell, the indicator grinds to a halt and menu items beyond
+    the bottom of the screen are truncated.  A massive overhaul has been done:
+    any item/attribute/preference that does not directly assist the home
+    astronomer to locate an object has been removed.
   * The attributes Tropical Sign, Constellation, Magnitude, Bright Limb,
-    Illumination and Distance have been removed as they are interesting but
+    Illumination and Distance have been removed; they are interesting but
     unnecessary for object location.
   * Only visible satellite passes (dawn/dusk) are shown; there is no point
     showing non-visible passes.
-  * Removed Right Ascension and Declination from all items;
-    Azimuth and Altitude are sufficient.
+  * Removed Right Ascension and Declination from all items; Azimuth and
+    Altitude are sufficient.
   * Removed decimal degrees from Azimuth/Altitude.
-  * Removed planetary moons as each effectively has the same Azimuth/Altitude
-    as the parent.
+  * Removed planetary moons; each effectively has the same Azimuth/Altitude as
+    the parent.
   * Removed werewolf warning percentage from preferences and fixed at 99%.
   * Removed date/time format from preferences; now uses ISO 8601.
   * Removed old eclipse information.
