@@ -656,3 +656,29 @@ def __getCity( data, date ):
     city.elev = float( data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] )
 
     return city
+
+
+from urllib.request import urlopen
+import datetime, pythonutils, re
+
+urls = [ "file:///home/bernard/Desktop/MinorPlanetCenter/Soft03Bright.txt",
+         "file:///home/bernard/Desktop/MinorPlanetCenter/Soft03CritList.txt",
+         "file:///home/bernard/Desktop/MinorPlanetCenter/Soft03Distant.txt",
+         "file:///home/bernard/Desktop/MinorPlanetCenter/Soft03Cmt.txt",
+         "file:///home/bernard/Desktop/MinorPlanetCenter/Soft03Unusual.txt" ]
+
+for url in urls:
+    print( url, "\n" )
+    data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+    for i in range( 0, len( data ) ):
+        if not data[ i ].startswith( "#" ):
+            cometName = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # Found that the comet name can have multiple whitespace, so remove.
+            comet = ephem.readdb( data[ i ] )
+            comet.compute( ephem.city( "Sydney" ) )
+            if math.isnan( comet.earth_distance ) or math.isnan( comet.phase ) or math.isnan( comet.size ) or math.isnan( comet.sun_distance ): # Have found the data file may contain ***** in lieu of actual data!
+                continue
+            else:
+                if float( comet.mag ) <= 2.0:
+                    print( "\t", cometName, comet.mag )
+
+    print()
