@@ -574,6 +574,8 @@ class IndicatorLunar:
             self.updateMinorPlanetOEData()
             self.updateSatelliteTLEData()
 
+            utcNow = datetime.datetime.utcnow()
+            print( "getAstronomicalInformation" )
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             # Value is the astronomical data (or equivalent) as a string.
             self.data = astro.getAstronomicalInformation( datetime.datetime.utcnow(),
@@ -584,10 +586,16 @@ class IndicatorLunar:
                                                           self.comets, self.cometOEData,
                                                           self.minorPlanets, self.minorPlanetOEData,
                                                           self.magnitude )
+            print( "getAstronomicalInformation:", ( datetime.datetime.utcnow() - utcNow ) )
 
             # Update frontend...
             self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
-            self.updateMenu()
+
+            utcNow = datetime.datetime.utcnow()
+            print( "updateMenu" )
+            self.updateMenu() #TODO Takes 5 seconds...what is the biggest drain?  Satellites?
+            print( "updateMenu:", ( datetime.datetime.utcnow() - utcNow ) )
+
             self.updateIconAndLabel()
 
             if self.showWerewolfWarning:
@@ -1381,6 +1389,44 @@ class IndicatorLunar:
 
             if self.satellitesAddNew:
                 self.addNewSatellites()
+
+
+    def updateOEorTLEData( self, lastUpdate, downloadPeriodInHours, cacheBasename, cacheMaximumAgeInHours, dataURL, 
+                           addNew, addNewFunction,
+                           getDataFunction,
+                           summaryDataIsNone, messageDataIsNone,
+                           summaryDataIsEmpty, messageDataIsEmpty ):
+        if datetime.datetime.utcnow() > ( lastUpdate + datetime.timedelta( hours = downloadPeriodInHours ) ):
+            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBasename, cacheMaximumAgeInHours )
+            data, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBasename, logging )
+            if data is None:
+                data = getDataFunction( dataURL )
+
+                if data is None:
+                    data = { }
+                    summary = summaryDataIsNone
+                    message = messageDataIsNone
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+                elif len( data ) == 0:
+                    summary = summaryDataIsEmpty
+                    message = messageDataIsEmpty
+                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+                else:
+                    pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBasename, logging )
+
+                # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
+                lastUpdate = datetime.datetime.utcnow()
+
+            else:
+                # Set the next update to occur when the cache is due to expire.
+                lastUpdate = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = cacheMaximumAgeInHours )
+
+            if addNew:
+                addNewFunction()
+                
+        return data, lastUpdate
 
 
     # Creates an SVG icon file representing the moon given the illumination and bright limb angle.
