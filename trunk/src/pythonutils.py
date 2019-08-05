@@ -382,7 +382,7 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
         if file.startswith( baseName ):
             files.append( file )
 
-    # Sort the matching files by date - all file(s) will be newer than the cache maximum date/time.
+    # Sort the matching files by date.
     files.sort()
     data = None
     dateTime = None
