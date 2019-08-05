@@ -557,6 +557,10 @@ class IndicatorLunar:
         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS )
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
+
         self.loadConfig()
         self.update( True )
 
@@ -570,9 +574,9 @@ class IndicatorLunar:
                 GLib.source_remove( self.updateTimerID )
 
             # Update backend...
-            self.updateCometOEData()
-            self.updateMinorPlanetOEData()
-            self.updateSatelliteTLEData()
+            self.cometOEData = self.updateOEorTLEData( IndicatorLunar.COMET_OE_CACHE_BASENAME, self.getCometOEData, self.cometOEURL, self.cometsAddNew, self.addNewComets )
+            self.minorPlanetOEData = self.updateOEorTLEData( IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, self.getMinorPlanetOEData, self.minorPlanetOEURL, self.minorPlanetsAddNew, self.addNewMinorPlanets )
+            self.satelliteTLEData = self.updateOEorTLEData( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, self.getSatelliteTLEData, self.satelliteTLEURL, self.satellitesAddNew, self.addNewSatellites)
 
             utcNow = datetime.datetime.utcnow()
             print( "getAstronomicalInformation" )
@@ -597,6 +601,8 @@ class IndicatorLunar:
             print( "updateMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
             self.updateIconAndLabel()
+
+            self.notificationOEandTLE( self.cometOEData, self.minorPlanetOEData, self.satelliteTLEData )
 
             if self.showWerewolfWarning:
                 self.notificationFullMoon()
@@ -671,6 +677,38 @@ class IndicatorLunar:
             iconFilename = IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
             self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngle, iconFilename )
             self.indicator.set_icon_full( iconName, "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
+
+
+    def notificationOEandTLE( cometOEData, minorPlanetOEData, satelliteTLEData ):
+        if cometOEData is None:
+            summary = _( "Error Retrieving Comet OE Data" )
+            message = _( "The comet OE data source could not be reached." )
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+        elif len( cometOEData ) == 0:
+            summary = _( "Empty Comet OE Data" )
+            message = _( "The comet OE data retrieved was empty." )
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+        if minorPlanetOEData is None:
+            summary = _( "Error Retrieving Minor Planet OE Data" ) #TODO New translation
+            message = _( "The minor planet OE data source could not be reached." ) #TODO New translation
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+        elif len( minorPlanetOEData ) == 0:
+            summary = _( "Empty Minor Planet OE Data" ) #TODO New translation
+            message = _( "The minor planet OE data retrieved was empty." ) #TODO New translation
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+        if satelliteTLEData is None:
+            summary = _( "Error Retrieving Satellite TLE Data" )
+            message = _( "The satellite TLE data source could not be reached." )
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
+
+        elif len( satelliteTLEData ) == 0:
+            summary = _( "Empty Satellite TLE Data" )
+            message = _( "The satellite TLE data retrieved was empty." )
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
 
 
     def notificationFullMoon( self ):
@@ -1297,7 +1335,6 @@ class IndicatorLunar:
 #TODO See if this can be combined with the comet function below.
     def updateMinorPlanetOEData( self ):
         if datetime.datetime.utcnow() > ( self.lastUpdateMinorPlanetOE + datetime.timedelta( hours = IndicatorLunar.MINOR_PLANET_OE_DOWNLOAD_PERIOD_HOURS ) ):
-            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS )
             self.minorPlanetOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
             if self.minorPlanetOEData is None:
                 self.minorPlanetOEData = self.getMinorPlanetOEData( self.minorPlanetOEURL )
@@ -1327,9 +1364,9 @@ class IndicatorLunar:
                 self.addNewMinorPlanets()
 
 
+#TODO Delete
     def updateCometOEData( self ):
         if datetime.datetime.utcnow() > ( self.lastUpdateCometOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) ):
-            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
             self.cometOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
             if self.cometOEData is None:
                 self.cometOEData = self.getCometOEData( self.cometOEURL )
@@ -1359,9 +1396,9 @@ class IndicatorLunar:
                 self.addNewComets()
 
 
+#TODO Delete
     def updateSatelliteTLEData( self ):
         if datetime.datetime.utcnow() > ( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
-            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
             self.satelliteTLEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging )
             if self.satelliteTLEData is None:
                 self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
@@ -1391,42 +1428,18 @@ class IndicatorLunar:
                 self.addNewSatellites()
 
 
-    def updateOEorTLEData( self, lastUpdate, downloadPeriodInHours, cacheBasename, cacheMaximumAgeInHours, dataURL, 
-                           addNew, addNewFunction,
-                           getDataFunction,
-                           summaryDataIsNone, messageDataIsNone,
-                           summaryDataIsEmpty, messageDataIsEmpty ):
-        if datetime.datetime.utcnow() > ( lastUpdate + datetime.timedelta( hours = downloadPeriodInHours ) ):
-            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBasename, cacheMaximumAgeInHours )
-            data, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBasename, logging )
-            if data is None:
-                data = getDataFunction( dataURL )
+#TODO Need to handle stale cache file.
+#TODO Need to handle when getting data from original source that we don't do it sooner than allowable time window.
+    def updateOEorTLEData( self, cacheBasename, getDataFunction, dataURL, addNew, addNewFunction ):
+        data, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBasename, logging )
+        if data is None: # TODO If data is NOne, do we return None or empty?  How does the caller/backend expect things?
+            data = getDataFunction( dataURL )
+            if data is not None and len( data ) == 0:
+                pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBasename, logging )
+                if addNew:
+                    addNewFunction()
 
-                if data is None:
-                    data = { }
-                    summary = summaryDataIsNone
-                    message = messageDataIsNone
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-                elif len( data ) == 0:
-                    summary = summaryDataIsEmpty
-                    message = messageDataIsEmpty
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-                else:
-                    pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBasename, logging )
-
-                # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
-                lastUpdate = datetime.datetime.utcnow()
-
-            else:
-                # Set the next update to occur when the cache is due to expire.
-                lastUpdate = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = cacheMaximumAgeInHours )
-
-            if addNew:
-                addNewFunction()
-                
-        return data, lastUpdate
+        return data
 
 
     # Creates an SVG icon file representing the moon given the illumination and bright limb angle.
