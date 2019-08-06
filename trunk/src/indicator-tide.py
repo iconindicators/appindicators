@@ -37,6 +37,17 @@
 #TODO Update license.
 
 
+#TODO Noticed in the .cache directory:
+# 
+# tidal-20190801173418  
+# tidal-20190801173455
+# tidal-20190801173439  
+# tidal-20190801173513
+#
+# Which are all from the same date/day and around the same time...why???
+
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
