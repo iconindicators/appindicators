@@ -565,6 +565,11 @@ class IndicatorLunar:
         self.update( True )
 
 
+#TODO The list of minor planets in the preferences takes a long time to load...
+#Maybe as the data is loaded (downloaded or from cache) computer all magnitudes and either cull to the value set in the spinner,
+#or set an upper limit of magnitude, say 20.
+
+
     def main( self ): Gtk.main()
 
 #TODO Thinking about updating oe and tle data...
@@ -573,6 +578,9 @@ class IndicatorLunar:
 #    Purge the cache of old files.
 #    List of object is set to empty.
 #    Data is set to empty.
+#    Set default lunar icon.
+#    Set label as "Initialising...".
+#    No menu.
 # 
 # On an update...
 #    Read file from cache if the data is empty.  
@@ -603,6 +611,11 @@ class IndicatorLunar:
             self.cometOEData = self.updateOEorTLEData( IndicatorLunar.COMET_OE_CACHE_BASENAME, self.getCometOEData, self.cometOEURL, self.cometsAddNew, self.addNewComets )
             self.minorPlanetOEData = self.updateOEorTLEData( IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, self.getMinorPlanetOEData, self.minorPlanetOEURL, self.minorPlanetsAddNew, self.addNewMinorPlanets )
             self.satelliteTLEData = self.updateOEorTLEData( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, self.getSatelliteTLEData, self.satelliteTLEURL, self.satellitesAddNew, self.addNewSatellites)
+
+            self.addNewMinorPlanets()
+            self.magnitude = 20
+
+            print("Number comets:", len(self.cometOEData))
 
             utcNow = datetime.datetime.utcnow()
             print( "getAstronomicalInformation" )
@@ -705,7 +718,7 @@ class IndicatorLunar:
             self.indicator.set_icon_full( iconName, "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
 
 
-    def notificationOEandTLE( cometOEData, minorPlanetOEData, satelliteTLEData ):
+    def notificationOEandTLE( self, cometOEData, minorPlanetOEData, satelliteTLEData ):
         if cometOEData is None:
             summary = _( "Error Retrieving Comet OE Data" )
             message = _( "The comet OE data source could not be reached." )
@@ -742,7 +755,6 @@ class IndicatorLunar:
         lunarIlluminationPercentage = int( self.data[ key + ( astro.DATA_ILLUMINATION, ) ] )
         lunarBrightLimbAngle = int( self.data[ key + ( astro.DATA_BRIGHT_LIMB, ) ] )
         lunarPhase = self.data[ key + ( astro.DATA_PHASE, ) ]
-        werewolfWarningPercentage = 99
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == astro.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == astro.LUNAR_PHASE_WAXING_CRESCENT ) or \
@@ -751,7 +763,7 @@ class IndicatorLunar:
             ( lunarPhase == astro.LUNAR_PHASE_FULL_MOON )
 
         if phaseIsBetweenNewAndFullInclusive and \
-           lunarIlluminationPercentage >= werewolfWarningPercentage and \
+           lunarIlluminationPercentage >= 99 and \
            ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) < datetime.datetime.utcnow() ):
 
             summary = self.werewolfWarningSummary
