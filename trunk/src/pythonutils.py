@@ -382,19 +382,19 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
         if file.startswith( baseName ):
             files.append( file )
 
-    # Sort the matching files by date.
-    files.sort()
+    # Read in the most recent file...
     data = None
     dateTime = None
-    for file in reversed( files ): # Look at the most recent file first.
-        filename = cacheDirectory + "/" + file
+    if len( files ) > 0:
+        files.sort()
+        files.reverse()
+        filename = cacheDirectory + "/" + files[ 0 ]
         try:
             with open( filename, "rb" ) as f:
                 data = pickle.load( f )
 
             if data is not None and len( data ) > 0:
-                dateTime = file[ len( baseName ) : ]
-                break
+                dateTime = files[ 0 ][ len( baseName ) : ]
 
         except Exception as e:
             data = None
