@@ -580,17 +580,17 @@ class IndicatorLunar:
 #    Data is set to empty.
 #    Set default lunar icon.
 #    Set label as "Initialising...".
-#    No menu.
+#    No menu.  Or possibly menu showing "Initialsing..." and don't show the label.
 # 
 # On an update...
 #    Read file from cache if the data is empty.  
 #        On startup this makes sense; but what if the user has unchecked all comets say...do we still load the data each time?
 #        The data will only be downloaded or read from cache typically once per day and will be deferred in a thread...so maybe not an issue.
 #    If file does not exist, then download and write to cache.
+#    
 # 
-# 
-# 
-# 
+#    Build menu.
+#    Update icon/label.
 # 
 # 
 # 
