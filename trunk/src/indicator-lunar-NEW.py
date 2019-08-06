@@ -567,6 +567,32 @@ class IndicatorLunar:
 
     def main( self ): Gtk.main()
 
+#TODO Thinking about updating oe and tle data...
+#
+# On initialisation...
+#    Purge the cache of old files.
+#    List of object is set to empty.
+#    Data is set to empty.
+# 
+# On an update...
+#    Read file from cache if the data is empty.  
+#        On startup this makes sense; but what if the user has unchecked all comets say...do we still load the data each time?
+#        The data will only be downloaded or read from cache typically once per day and will be deferred in a thread...so maybe not an issue.
+#    If file does not exist, then download and write to cache.
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+
+
 
     def update( self, scheduled ):
         with threading.Lock():
