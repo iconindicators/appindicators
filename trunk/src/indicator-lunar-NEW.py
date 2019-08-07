@@ -557,10 +557,6 @@ class IndicatorLunar:
         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS )
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
-
         self.loadConfig()
         self.update( True )
 
@@ -610,14 +606,16 @@ class IndicatorLunar:
                 GLib.source_remove( self.updateTimerID )
 
             # Update backend...
-            self.cometOEData = {}
-            self.minorPlanetOEData = {}
 #             self.cometOEData = self.updateOEorTLEData( IndicatorLunar.COMET_OE_CACHE_BASENAME, self.getCometOEData, self.cometOEURL, self.cometsAddNew, self.addNewComets )
 #             self.minorPlanetOEData = self.updateOEorTLEData( IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, self.getMinorPlanetOEData, self.minorPlanetOEURL, self.minorPlanetsAddNew, self.addNewMinorPlanets )
-            self.satelliteTLEData = self.updateOEorTLEData( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, self.getSatelliteTLEData, self.satelliteTLEURL, self.satellitesAddNew, self.addNewSatellites)
 
-            self.addNewMinorPlanets()
-            self.magnitude = 20
+#TODO Can return valid data, or None or empty.
+#TODO Don't forget to add new items if data is valid.
+            self.satelliteTLEData = self.updateOEorTLEData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, self.getSatelliteTLEData, self.satelliteTLEURL )
+
+
+#             self.addNewMinorPlanets()
+#             self.magnitude = 20
 
             utcNow = datetime.datetime.utcnow()
             print( "getAstronomicalInformation" )
@@ -1470,16 +1468,28 @@ class IndicatorLunar:
 
 #TODO Need to handle stale cache file.
 #TODO Need to handle when getting data from original source that we don't do it sooner than allowable time window.
-    def updateOEorTLEData( self, cacheBasename, getDataFunction, dataURL, addNew, addNewFunction ):
-        data, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBasename, logging )
-        if data is None: # TODO If data is NOne, do we return None or empty?  How does the caller/backend expect things?
-            data = getDataFunction( dataURL )
-            if data is not None and len( data ) == 0:
-                pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBasename, logging )
-                if addNew:
-                    addNewFunction()
+#TODO Put in comment about return of data being valid (non-empty), or empty, or None.
+    def updateOEorTLEData( self, existingData, cacheBasename, cacheMaximumAgeHours, getDataFunction, dataURL ):
+        if existingData: # Have existing data; ensure data is not stale.
+            cacheAge = pythonutils.getCacheDateTime( INDICATOR_NAME, cacheBaseName ) + datetime.timedelta( hours = cacheMaximumAgeHours )
+            newData = existingData
+            if datetime.datetime.utcnow() > cacheAge:
+                pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBasename, cacheMaximumAgeHours )
+                newData = getDataFunction( dataURL )
+                if newData is not None and not newData:
+                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBasename, logging )
 
-        return data
+        else:
+            # Have no data, so read from cache and if that fails, download.
+            newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBasename, logging )
+            if newData is None:
+                newData = getDataFunction( dataURL )
+                if newData is not None and not newData:
+                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBasename, logging )
+
+#Best not to return a None; only {} (empty) or not {}.
+#But then how to communicate between bad source and empty data?  Or do we care?  Maybe pass back some token?
+        return newData
 
 
     # Creates an SVG icon file representing the moon given the illumination and bright limb angle.
