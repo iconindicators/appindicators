@@ -598,27 +598,37 @@ class IndicatorLunar:
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
-            # Update backend...
-#             self.cometOEData = self.updateOEorTLEData( IndicatorLunar.COMET_OE_CACHE_BASENAME, self.getCometOEData, self.cometOEURL, self.cometsAddNew, self.addNewComets )
-#             self.minorPlanetOEData = self.updateOEorTLEData( IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, self.getMinorPlanetOEData, self.minorPlanetOEURL, self.minorPlanetsAddNew, self.addNewMinorPlanets )
+# Get data for comets, minor planets and satellites and update                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+            self.cometOEData = self.updateData( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, self.getCometOEData, self.cometOEURL )
+            if self.cometsAddNew and self.cometOEData is not None:
+                self.addNewComets()
 
-#TODO Can return valid data, or None or empty.
-#TODO Don't forget to add new items if data is valid.
-            self.satelliteTLEData = self.updateOEorTLEData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, self.getSatelliteTLEData, self.satelliteTLEURL )
+            self.minorPlanetOEData = self.updateData( self.minorPlanetOEData, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS, self.getMinorPlanetOEData, self.minorPlanetOEURL )
+            if self.minorPlanetsAddNew and self.minorPlanetOEData is not None:
+                self.addNewMinorPlanets()
+
+            self.satelliteTLEData = self.updateData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, self.getSatelliteTLEData, self.satelliteTLEURL )
+            if self.satellitesAddNew and self.satelliteTLEData is not None:
+                self.addNewSatellites()
 
             utcNow = datetime.datetime.utcnow()
             print( "getAstronomicalInformation" )
 
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             # Value is the astronomical data (or equivalent) as a string.
+#TODO If we do a run and have data and comets selected...
+#...then do a run and the data fails to download and cache is stale, we have no data.
+# If we now call astro, we have a valid list of comets (minor planets or satellites) but invalid data.
+# What to do?
             self.data = astro.getAstronomicalInformation( datetime.datetime.utcnow(),
                                                           self.latitude, self.longitude, self.elevation,
                                                           self.planets,
                                                           self.stars,
-                                                          self.satellites, self.satelliteTLEData,
-                                                          self.comets, self.cometOEData,
-                                                          self.minorPlanets, self.minorPlanetOEData,
+                                                          self.satellites, None if self.satelliteTLEData is None else self.satelliteTLEData,
+                                                          self.comets, None if self.cometOEData is None else self.cometOEData,
+                                                          self.minorPlanets, None if self.minorPlanetOEData is None else self.minorPlanetOEData,
                                                           self.magnitude )
+
             print( "getAstronomicalInformation:", ( datetime.datetime.utcnow() - utcNow ) )
 
             # Update frontend...
@@ -631,7 +641,7 @@ class IndicatorLunar:
 
             self.updateIconAndLabel()
 
-            self.notificationOEandTLE( self.cometOEData, self.minorPlanetOEData, self.satelliteTLEData )
+            self.notificationBadData( self.cometOEData, self.minorPlanetOEData, self.satelliteTLEData )
 
             if self.showWerewolfWarning:
                 self.notificationFullMoon()
@@ -653,20 +663,50 @@ class IndicatorLunar:
 
     def updateMenu( self ):
         menu = Gtk.Menu()
-        if self.showMoon and not self.bodyNeverUp( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON ):
+
+        utcNow = datetime.datetime.utcnow()
+        print( "updateMoon" )
+        if self.showMoon and not self.bodyIsNeverUp( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON ):
             self.updateMoonMenu( menu )
+        print( "updateMoon:", ( datetime.datetime.utcnow() - utcNow ) )
 
-        if self.showSun and not self.bodyNeverUp( astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN ):
+        utcNow = datetime.datetime.utcnow()
+        print( "updateSun" )
+        if self.showSun and not self.bodyIsNeverUp( astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN ):
             self.updateSunMenu( menu )
+        print( "updateSun:", ( datetime.datetime.utcnow() - utcNow ) )
 
+        utcNow = datetime.datetime.utcnow()
+        print( "updatePlanets" )
         self.updatePlanetsMenu( menu )
+        print( "updatePlanets:", ( datetime.datetime.utcnow() - utcNow ) )
+
+        utcNow = datetime.datetime.utcnow()
+        print( "updateStars" )
         self.updateStarsMenu( menu )
-        self.updateCometsOrMinorPlanetsMenu( menu, astro.AstronomicalBodyType.Comet )
-        self.updateCometsOrMinorPlanetsMenu( menu, astro.AstronomicalBodyType.MinorPlanet )
+        print( "updateStars:", ( datetime.datetime.utcnow() - utcNow ) )
+
+        utcNow = datetime.datetime.utcnow()
+        print( "updateComets" )
+        self.updateCometsMinorPlanetsMenu( menu, astro.AstronomicalBodyType.Comet )
+        print( "updateComets:", ( datetime.datetime.utcnow() - utcNow ) )
+
+        utcNow = datetime.datetime.utcnow()
+        print( "updateMinorPlanet" )
+        self.updateCometsMinorPlanetsMenu( menu, astro.AstronomicalBodyType.MinorPlanet )
+        print( "updateMinorPlanet:", ( datetime.datetime.utcnow() - utcNow ) )
+
+        utcNow = datetime.datetime.utcnow()
+        print( "updateSatellites" )
         self.updateSatellitesMenu( menu )
+        print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
+
+        utcNow = datetime.datetime.utcnow()
+        print( "updatePAQ" )
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
+        print( "updatePAQ:", ( datetime.datetime.utcnow() - utcNow ) )
 
 
     def updateIconAndLabel( self ):
@@ -708,15 +748,10 @@ class IndicatorLunar:
             self.indicator.set_icon_full( iconName, "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
 
 
-    def notificationOEandTLE( self, cometOEData, minorPlanetOEData, satelliteTLEData ):
+    def notificationBadData( self, cometOEData, minorPlanetOEData, satelliteTLEData ):
         if cometOEData is None:
             summary = _( "Error Retrieving Comet OE Data" )
             message = _( "The comet OE data source could not be reached." )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-        elif len( cometOEData ) == 0:
-            summary = _( "Empty Comet OE Data" )
-            message = _( "The comet OE data retrieved was empty." )
             Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
 
         if minorPlanetOEData is None:
@@ -724,19 +759,9 @@ class IndicatorLunar:
             message = _( "The minor planet OE data source could not be reached." ) #TODO New translation
             Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
 
-        elif len( minorPlanetOEData ) == 0:
-            summary = _( "Empty Minor Planet OE Data" ) #TODO New translation
-            message = _( "The minor planet OE data retrieved was empty." ) #TODO New translation
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
         if satelliteTLEData is None:
             summary = _( "Error Retrieving Satellite TLE Data" )
             message = _( "The satellite TLE data source could not be reached." )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-        elif len( satelliteTLEData ) == 0:
-            summary = _( "Empty Satellite TLE Data" )
-            message = _( "The satellite TLE data retrieved was empty." )
             Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
 
 
@@ -890,7 +915,7 @@ class IndicatorLunar:
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planetName in self.planets:
-            if self.bodyNeverUp( astro.AstronomicalBodyType.Planet, planetName ):
+            if self.bodyIsNeverUp( astro.AstronomicalBodyType.Planet, planetName ):
                 continue
 
             planets.append( planetName )
@@ -917,7 +942,7 @@ class IndicatorLunar:
     def updateStarsMenu( self, menu ):
         stars = [ ] # List of lists.  Each sublist contains the star name followed by the translated name.
         for starName in self.stars:
-            if self.bodyNeverUp( astro.AstronomicalBodyType.Star, starName ):
+            if self.bodyIsNeverUp( astro.AstronomicalBodyType.Star, starName ):
                 continue
 
             stars.append( [ starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
@@ -944,68 +969,35 @@ class IndicatorLunar:
                 self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Star, nameTag, 0, 2 )
 
 
-    def updateCometsOrMinorPlanetsMenu( self, menu, astronomicalBodyType ):
-        bodies = [ ]
-        for body in self.comets:
-            key = ( astronomicalBodyType, body )
-            if key + ( astro.DATA_MESSAGE, ) in self.data and \
-               (
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_NEVER_UP or \
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_DATA_BAD_DATA or \
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_DATA_NO_DATA
-               ):
-                continue # Skip bodies which are never up or have no data or have bad data AND the user wants to hide bodies on such conditions.
+    def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
+        menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astro.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
+        menu.append( menuItem )
+        if self.showCometsAsSubMenu:
+            subMenu = Gtk.Menu()
+            menuItem.set_submenu( subMenu )
 
-#TODO Does this ensure that bodies which are never up will not appear in the menu?  
-# Do we need to do checks similar to that for moon/sun or planets/stars?
-            if key + ( astro.DATA_MESSAGE, ) in self.data or \
-               key + ( astro.DATA_RISE_TIME, ) in self.data:
-                bodies.append( body ) # Either key must be present - otherwise the body has been dropped due to having too large a magnitude.
+        oeData = self.cometOEData if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanetOEData
+        bodies = self.comets if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanets
+        showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
+        for key in sorted( bodies ): # Sorting by key also sorts the display name identically.
+            if key in oeData:
+                displayName = self.getCometOrMinorPlanetDisplayName( oeData[ key ] )
+            else:
+                displayName = key # There is a body but no data for it.
 
-        if len( bodies ) > 0:
-            menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astro.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
-            menu.append( menuItem )
-            if self.showCometsAsSubMenu:
-                subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
+            if showAsSubMenu:
+                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
+                subMenu.append( menuItem )
+            else:
+                menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
+                menu.append( menuItem )
 
-            oeData = self.cometOEData if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanetOEData
-            showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
-            for key in sorted( bodies ): # Sorting by key also sorts the display name identically.
-                if key in oeData:
-                    displayName = self.getCometOrMinorPlanetDisplayName( oeData[ key ] )
-                else:
-                    displayName = key # There is a body but no data for it.
+            self.updateCommonMenu( menuItem, astronomicalBodyType, key, 0, 2 )
 
-                if showAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
-                    subMenu.append( menuItem )
-                else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
-                    menu.append( menuItem )
-
-                # Comet data may not exist or body data exists but is bad.
-                missing = ( key not in oeData ) # This scenario should be covered by the 'no data' clause below...but just in case catch it here!
-
-                badData = ( key in oeData and \
-                          ( astronomicalBodyType, key, astro.DATA_MESSAGE ) in self.data ) and \
-                          self.data[ ( astronomicalBodyType, key, astro.DATA_MESSAGE ) ] == astro.MESSAGE_DATA_BAD_DATA
-
-                noData = ( key in oeData and \
-                         ( astronomicalBodyType, key, astro.DATA_MESSAGE ) in self.data ) and \
-                          self.data[ ( astronomicalBodyType, key, astro.DATA_MESSAGE ) ] == astro.MESSAGE_DATA_NO_DATA
-
-                if missing or badData or noData:
-                    subMenu = Gtk.Menu()
-                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( astronomicalBodyType, key, astro.DATA_MESSAGE ) ) ) ) #TODO Needs indent?
-                    menuItem.set_submenu( subMenu )
-                else:
-                    self.updateCommonMenu( menuItem, astronomicalBodyType, key, 0, 2 )
-
-                    # Add handler.
-                    for child in menuItem.get_submenu().get_children():
-                        child.set_name( key )
-                        child.connect( "activate", self.onCometOrMinorPlanet, astronomicalBodyType )
+            # Add handler.
+            for child in menuItem.get_submenu().get_children():
+                child.set_name( key )
+                child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
 
 
 #TODO Delete
@@ -1071,7 +1063,7 @@ class IndicatorLunar:
                         child.connect( "activate", self.onComet )
 
 
-    def onCometOrMinorPlanet( self, widget, astronomicalBodyType ):
+    def onCometMinorPlanet( self, widget, astronomicalBodyType ):
         if "(" in widget.props.name:
             objectID = widget.props.name[ : widget.props.name.find( "(" ) ].strip()
         else:
@@ -1095,7 +1087,9 @@ class IndicatorLunar:
             webbrowser.open( url )
 
 
-    def bodyNeverUp( self, astronomicalBodyType, nameTag ):
+#TODO Can get rid of this...
+#But for showing say the sun, need a way to check if it is present in the self.data.
+    def bodyIsNeverUp( self, astronomicalBodyType, nameTag ):
         key = ( astronomicalBodyType, nameTag )
         return key + ( astro.DATA_MESSAGE, ) in self.data and self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_NEVER_UP
 
@@ -1458,7 +1452,7 @@ class IndicatorLunar:
 
     # Get the data from the cache, or if stale, download from the source.
     # On success, returns non-empty dict of data; no data returns an empty dict; source error returns None.
-    def updateOEorTLEData( self, existingData, cacheBaseName, cacheMaximumAgeHours, getDataFunction, dataURL ):
+    def updateData( self, existingData, cacheBaseName, cacheMaximumAgeHours, getDataFunction, dataURL ):
         if existingData: # Have existing data; ensure data is not stale.
             cacheDateTimeStamp = datetime.datetime.strptime( pythonutils.getCacheDateTime( INDICATOR_NAME, cacheBaseName ), pythonutils.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
             cacheAge = cacheDateTimeStamp + datetime.timedelta( hours = cacheMaximumAgeHours )
@@ -1466,7 +1460,7 @@ class IndicatorLunar:
             if datetime.datetime.utcnow() > cacheAge:
                 pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, cacheMaximumAgeHours )
                 newData = getDataFunction( dataURL )
-                if newData is not None and newData:
+                if newData is not None:
                     pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
 
         else:
@@ -1474,7 +1468,7 @@ class IndicatorLunar:
             newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging )
             if newData is None:
                 newData = getDataFunction( dataURL )
-                if newData is not None and newData:
+                if newData is not None:
                     pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
 
         return newData
@@ -2777,18 +2771,22 @@ class IndicatorLunar:
                     self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH, displayTagsStore )
 
 
+#TODO Find all callers and ensure that TLE data is not None and list of satellites is not None.
+#TODO Can the three functions below be combined into one?
     def addNewSatellites( self ):
         for key in self.satelliteTLEData:
             if key not in self.satellites:
                 self.satellites.append( key )
 
 
+#TODO Find all callers and ensure that OE data is not None and list of comets is not None.
     def addNewComets( self ):
         for key in self.cometOEData:
             if key not in self.comets:
                 self.comets.append( key )
 
 
+#TODO Find all callers and ensure that OE data is not None and list of minor planets is not None.
     def addNewMinorPlanets( self ):
         for key in self.minorPlanetOEData:
             if key not in self.minorPlanets:
