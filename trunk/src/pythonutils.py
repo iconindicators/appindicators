@@ -357,6 +357,21 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
     return success
 
 
+#TODO Test!!!
+def getCacheDateTime( applicationBaseDirectory, baseName ):
+    cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
+    theFile = ""
+    for file in os.listdir( cacheDirectory ):
+        if file.startswith( baseName ) and file > theFile:
+            theFile = file
+
+    dateTime = None
+    if theFile: # A value of "" evaluates to False.
+        dateTime = theFile[ len( baseName ) : ]
+
+    return dateTime
+
+
 # Read the most recent binary object from the cache.
 #
 # applicationBaseDirectory: The directory used as the final part of the overall path.
@@ -374,7 +389,7 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
 #
 # Files which pass the filter are sorted by date/time and the most recent file is read.
 #
-# Returns a tuple of the binary object and the (string) date/time, or a tuple of (None, None) on error.
+# Returns the binary object; None on error.
 def readCacheBinary( applicationBaseDirectory, baseName, logging ):
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     theFile = ""
@@ -382,30 +397,19 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
         if file.startswith( baseName ) and file > theFile:
             theFile = file
 
-    # Read in the most recent file...
     data = None
-    dateTime = None
     if theFile: # A value of "" evaluates to False.
         filename = cacheDirectory + "/" + theFile
         try:
             with open( filename, "rb" ) as f:
                 data = pickle.load( f )
 
-            if data is not None and len( data ) > 0:
-                dateTime = theFile[ len( baseName ) : ]
-
         except Exception as e:
             data = None
-            dateTime = None
             logging.exception( e )
             logging.error( "Error reading from cache: " + filename )
 
-    # Only return None or non-empty.
-    if data is None or len( data ) == 0:
-        data = None
-        dateTime = None
-
-    return ( data, dateTime )
+    return data
 
 
 # Writes an object as a binary file.
@@ -424,7 +428,7 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
 def writeCacheBinary( binaryData, applicationBaseDirectory, baseName, logging ):
     success = True
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
-    filename = cacheDirectory + "/" + baseName + datetime.datetime.now().strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+    filename = cacheDirectory + "/" + baseName + datetime.datetime.utcnow().strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
     try:
         with open( filename, "wb" ) as f:
             pickle.dump( binaryData, f )
@@ -466,7 +470,7 @@ def removeFileFromCache( applicationBaseDirectory, fileName ):
 # and is older than the cache maximum age is discarded.
 def removeOldFilesFromCache( applicationBaseDirectory, baseName, cacheMaximumAgeInHours ):
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
-    cacheMaximumAgeDateTime = datetime.datetime.now() - datetime.timedelta( hours = cacheMaximumAgeInHours )
+    cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = cacheMaximumAgeInHours )
     cacheMaximumDateTimeString = cacheMaximumAgeDateTime.strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
     for file in os.listdir( cacheDirectory ):
         if file.startswith( baseName ):
