@@ -278,6 +278,8 @@ def getAstronomicalInformation( utcNow,
                                 comets, cometData,
                                 minorPlanets, minorPlanetData,
                                 magnitude ):
+    
+    print( "Magnitude:", magnitude )
 
     data = { }
 
@@ -475,8 +477,7 @@ def __calculateStars( ephemNow, data, stars ):
 # The default source for minor planets is https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt
 # Have tried the other data sources for minor planets (NEOs, centaurs, transneptunians) and none have magnitude less than 6.
 def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, maximumMagnitude ):
-    print( "maximum magnitude:", maximumMagnitude ) #TODO Testing
-    print("Number of minor planets:", len(cometsOrMinorPlanets))
+    print( "Number of " + ( "comets" if astronomicalBodyType == AstronomicalBodyType.Comet else "minor bodies" ) +  ":", len( cometsOrMinorPlanets ) )
     count = 0
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
@@ -490,7 +491,7 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
                     count += 1
         else:
             data[ ( astronomicalBodyType, key, DATA_MESSAGE ) ] = MESSAGE_DATA_NO_DATA
-    print( "Minor planets passed:", count )
+    print( "Number of " + ( "comets" if astronomicalBodyType == AstronomicalBodyType.Comet else "minor bodies" ) +  " passed:", count )
 
 
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):

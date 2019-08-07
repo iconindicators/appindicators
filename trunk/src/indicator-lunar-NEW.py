@@ -576,18 +576,20 @@ class IndicatorLunar:
 #
 # On initialisation...
 #    Purge the cache of old files.
-#    List of object is set to empty.
+#    List of objects is set to empty.
 #    Data is set to empty.
 #    Set default lunar icon.
 #    Set label as "Initialising...".
 #    No menu.  Or possibly menu showing "Initialsing..." and don't show the label.
 # 
 # On an update...
-#    Read file from cache if the data is empty.  
-#        On startup this makes sense; but what if the user has unchecked all comets say...do we still load the data each time?
-#        The data will only be downloaded or read from cache typically once per day and will be deferred in a thread...so maybe not an issue.
-#    If file does not exist, then download and write to cache.
-#    
+#    If data is empty
+#        Read file from cache
+#        On startup this makes sense; but what if the user has unchecked all comets...do we still load the data each time?
+#        The data will only be downloaded or read from cache typically once per day and will be deferred in a thread...maybe not an issue.
+#        If file does not exist, download and write to cache.
+#    Else data is not empty
+#        Get datetime from cache file and compare to current time.  If more than the window has elapsed, download new file and cache.
 # 
 #    Build menu.
 #    Update icon/label.
@@ -608,14 +610,14 @@ class IndicatorLunar:
                 GLib.source_remove( self.updateTimerID )
 
             # Update backend...
-            self.cometOEData = self.updateOEorTLEData( IndicatorLunar.COMET_OE_CACHE_BASENAME, self.getCometOEData, self.cometOEURL, self.cometsAddNew, self.addNewComets )
-            self.minorPlanetOEData = self.updateOEorTLEData( IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, self.getMinorPlanetOEData, self.minorPlanetOEURL, self.minorPlanetsAddNew, self.addNewMinorPlanets )
+            self.cometOEData = {}
+            self.minorPlanetOEData = {}
+#             self.cometOEData = self.updateOEorTLEData( IndicatorLunar.COMET_OE_CACHE_BASENAME, self.getCometOEData, self.cometOEURL, self.cometsAddNew, self.addNewComets )
+#             self.minorPlanetOEData = self.updateOEorTLEData( IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, self.getMinorPlanetOEData, self.minorPlanetOEURL, self.minorPlanetsAddNew, self.addNewMinorPlanets )
             self.satelliteTLEData = self.updateOEorTLEData( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, self.getSatelliteTLEData, self.satelliteTLEURL, self.satellitesAddNew, self.addNewSatellites)
 
             self.addNewMinorPlanets()
             self.magnitude = 20
-
-            print("Number comets:", len(self.cometOEData))
 
             utcNow = datetime.datetime.utcnow()
             print( "getAstronomicalInformation" )
@@ -1767,7 +1769,7 @@ class IndicatorLunar:
         spinnerMagnitude = Gtk.SpinButton()
         spinnerMagnitude.set_numeric( True )
         spinnerMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
-        spinnerMagnitude.set_adjustment( Gtk.Adjustment( self.magnitude, -30, 30, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerMagnitude.set_adjustment( Gtk.Adjustment( self.magnitude, -10, 15, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerMagnitude.set_value( self.magnitude ) # ...so need to force the initial value by explicitly setting it.
         spinnerMagnitude.set_tooltip_text( _(
             "Comets and minor planets with a magnitude\n" + \
@@ -2919,7 +2921,8 @@ class IndicatorLunar:
 
         self.planets = [ ]
         for planetName in astro.PLANETS:
-            self.planets.append( planetName )
+            if not( planetName == astro.PLANET_NEPTUNE or planetName == astro.PLANET_PLUTO ): # Neptune and Pluto are not visible to naked eye, so hide by default.
+                self.planets.append( planetName )
 
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
         self.satelliteNotificationSummary = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT
