@@ -416,7 +416,7 @@ class IndicatorLunar:
     COMET_OE_CACHE_BASENAME = "comet-oe-"
     COMET_OE_CACHE_MAXIMUM_AGE_HOURS = 30
     COMET_OE_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
-    COMET_OE_DOWNLOAD_PERIOD_HOURS = 24
+    COMET_OE_DOWNLOAD_PERIOD_HOURS = 24 # TODO Probably don't need this anymore...
 
     COMET_ON_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
@@ -432,7 +432,7 @@ class IndicatorLunar:
     MINOR_PLANET_OE_CACHE_BASENAME = "minorplanet-oe-"
     MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS = 30
     MINOR_PLANET_OE_URL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt"
-    MINOR_PLANET_OE_DOWNLOAD_PERIOD_HOURS = 24
+    MINOR_PLANET_OE_DOWNLOAD_PERIOD_HOURS = 24 # TODO Probably don't need this anymore...
 
 #TODO Verify this works.
     MINOR_PLANET_ON_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
@@ -473,7 +473,7 @@ class IndicatorLunar:
     #    Act as a source when offline.
     SATELLITE_TLE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS = 18
-    SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 12
+    SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 12 # TODO Probably don't need this anymore...
     SATELLITE_TLE_URL = "https://celestrak.com/NORAD/elements/visual.txt"
 
     SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
@@ -593,13 +593,6 @@ class IndicatorLunar:
 # 
 # 
 # 
-# 
-# 
-# 
-# 
-
-
-
     def update( self, scheduled ):
         with threading.Lock():
             if not scheduled:
@@ -613,12 +606,9 @@ class IndicatorLunar:
 #TODO Don't forget to add new items if data is valid.
             self.satelliteTLEData = self.updateOEorTLEData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, self.getSatelliteTLEData, self.satelliteTLEURL )
 
-
-#             self.addNewMinorPlanets()
-#             self.magnitude = 20
-
             utcNow = datetime.datetime.utcnow()
             print( "getAstronomicalInformation" )
+
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             # Value is the astronomical data (or equivalent) as a string.
             self.data = astro.getAstronomicalInformation( datetime.datetime.utcnow(),
@@ -1466,29 +1456,27 @@ class IndicatorLunar:
                 self.addNewSatellites()
 
 
-#TODO Need to handle stale cache file.
-#TODO Need to handle when getting data from original source that we don't do it sooner than allowable time window.
-#TODO Put in comment about return of data being valid (non-empty), or empty, or None.
-    def updateOEorTLEData( self, existingData, cacheBasename, cacheMaximumAgeHours, getDataFunction, dataURL ):
+    # Get the data from the cache, or if stale, download from the source.
+    # On success, returns non-empty dict of data; no data returns an empty dict; source error returns None.
+    def updateOEorTLEData( self, existingData, cacheBaseName, cacheMaximumAgeHours, getDataFunction, dataURL ):
         if existingData: # Have existing data; ensure data is not stale.
-            cacheAge = pythonutils.getCacheDateTime( INDICATOR_NAME, cacheBaseName ) + datetime.timedelta( hours = cacheMaximumAgeHours )
+            cacheDateTimeStamp = datetime.datetime.strptime( pythonutils.getCacheDateTime( INDICATOR_NAME, cacheBaseName ), pythonutils.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            cacheAge = cacheDateTimeStamp + datetime.timedelta( hours = cacheMaximumAgeHours )
             newData = existingData
             if datetime.datetime.utcnow() > cacheAge:
-                pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBasename, cacheMaximumAgeHours )
+                pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, cacheMaximumAgeHours )
                 newData = getDataFunction( dataURL )
-                if newData is not None and not newData:
-                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBasename, logging )
+                if newData is not None and newData:
+                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
 
         else:
             # Have no data, so read from cache and if that fails, download.
-            newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBasename, logging )
+            newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging )
             if newData is None:
                 newData = getDataFunction( dataURL )
-                if newData is not None and not newData:
-                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBasename, logging )
+                if newData is not None and newData:
+                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
 
-#Best not to return a None; only {} (empty) or not {}.
-#But then how to communicate between bad source and empty data?  Or do we care?  Maybe pass back some token?
         return newData
 
 
@@ -2587,7 +2575,7 @@ class IndicatorLunar:
                                    button, entry, grid, store,
                                    astronomicalBodyType,
                                    dataURL,
-                                   cacheBasename, cacheMaximumAgeHours, lastUpdate, downloadPeriodHours,
+                                   cacheBaseName, cacheMaximumAgeHours, lastUpdate, downloadPeriodHours,
                                    summary, message,
                                    getDataFunction ):
         # Flush comet/satellite data.
@@ -2610,8 +2598,8 @@ class IndicatorLunar:
 
         # If the URL is the default, use the cache to avoid annoying the default data source.
         if urlNew == dataURL:
-            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBasename, cacheMaximumAgeHours )
-            dataNew, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBasename, logging ) # Returned data is either None or non-empty.
+            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, cacheMaximumAgeHours )
+            dataNew, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Returned data is either None or non-empty.
             if dataNew is None:
                 # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
                 if datetime.datetime.utcnow() < ( lastUpdate + datetime.timedelta( hours = downloadPeriodHours ) ):
