@@ -377,24 +377,22 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
 # Returns a tuple of the binary object and the (string) date/time, or a tuple of (None, None) on error.
 def readCacheBinary( applicationBaseDirectory, baseName, logging ):
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
-    files = [ ]
+    theFile = ""
     for file in os.listdir( cacheDirectory ):
-        if file.startswith( baseName ):
-            files.append( file )
+        if file.startswith( baseName ) and file > theFile:
+            theFile = file
 
     # Read in the most recent file...
     data = None
     dateTime = None
-    if len( files ) > 0:
-        files.sort()
-        files.reverse()
-        filename = cacheDirectory + "/" + files[ 0 ]
+    if theFile: # A value of "" evaluates to False.
+        filename = cacheDirectory + "/" + theFile
         try:
             with open( filename, "rb" ) as f:
                 data = pickle.load( f )
 
             if data is not None and len( data ) > 0:
-                dateTime = files[ 0 ][ len( baseName ) : ]
+                dateTime = theFile[ len( baseName ) : ]
 
         except Exception as e:
             data = None
@@ -403,7 +401,7 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
             logging.error( "Error reading from cache: " + filename )
 
     # Only return None or non-empty.
-    if data is None or len( data ) == 0: # Return None or a non-empty object.
+    if data is None or len( data ) == 0:
         data = None
         dateTime = None
 
