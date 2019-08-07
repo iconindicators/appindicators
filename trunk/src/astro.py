@@ -485,6 +485,7 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
     print( "Number of " + ( "comets" if astronomicalBodyType == AstronomicalBodyType.Comet else "minor bodies" ) +  " passed:", count )
 
 
+# TODO Might need to return a flag to let the caller know if any data was added.
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
     key = ( astronomicalBodyType, nameTag )
     try:
