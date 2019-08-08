@@ -992,11 +992,10 @@ class IndicatorLunar:
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
         bodies = self.comets if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanets
         if len( bodies ) > 0:
-            menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astro.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
-            menu.append( menuItem )
+            menuHeader = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astro.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
             if self.showCometsAsSubMenu:
                 subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
+                menuHeader.set_submenu( subMenu )
 
             countRise = 0
             countUp = 0
@@ -1004,9 +1003,14 @@ class IndicatorLunar:
 
             oeData = self.cometOEData if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanetOEData
             showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
+            atLeastOneBodyAdded = False
             for name in sorted( bodies ): # Sorting by name also sorts the display name identically.
                 if ( astronomicalBodyType, name, astro.DATA_RISE_TIME ) in self.data or \
                    ( astronomicalBodyType, name, astro.MESSAGE_BODY_ALWAYS_UP ) in self.data:
+
+                     # May have comets or minor planets, but no data was computed as they are never up or some other exception,
+                     # so use a flag to identify if any body has been added then add the main menu header at the end if need be.
+                    atLeastOneBodyAdded = True
 
                     if ( astronomicalBodyType, name, astro.DATA_RISE_TIME ) in self.data:
                         countRise += 1
@@ -1035,6 +1039,9 @@ class IndicatorLunar:
                     for child in menuItem.get_submenu().get_children():
                         child.set_name( name )
                         child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
+
+            if atLeastOneBodyAdded:
+                menu.append( menuHeader ) 
 
         print( countUp, countRise, countSet )
 
