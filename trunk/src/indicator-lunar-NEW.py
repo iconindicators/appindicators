@@ -611,6 +611,12 @@ class IndicatorLunar:
             if self.satellitesAddNew and self.satelliteTLEData is not None:
                 self.addNewSatellites()
 
+#TODO Testing
+#             self.addNewComets()
+#             self.addNewMinorPlanets()
+#             self.addNewSatellites()
+
+
             utcNow = datetime.datetime.utcnow()
             print( "getAstronomicalInformation" )
 
@@ -628,6 +634,12 @@ class IndicatorLunar:
                                                           self.comets, None if self.cometOEData is None else self.cometOEData,
                                                           self.minorPlanets, None if self.minorPlanetOEData is None else self.minorPlanetOEData,
                                                           self.magnitude )
+
+#TODO After the backend is done, filter the comet and minor planet listings
+# to only those present in the data.
+#This will only be bodies that have the right magnitude and will rise (or always up).
+#What we want is a list of bodies that match the magnitude (to show in the prefereneces). 
+#So maybe run the backend again or have a function to get just this information?
 
             print( "getAstronomicalInformation:", ( datetime.datetime.utcnow() - utcNow ) )
 
@@ -970,34 +982,35 @@ class IndicatorLunar:
 
 
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
-        menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astro.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
-        menu.append( menuItem )
-        if self.showCometsAsSubMenu:
-            subMenu = Gtk.Menu()
-            menuItem.set_submenu( subMenu )
-
-        oeData = self.cometOEData if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanetOEData
         bodies = self.comets if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanets
-        showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
-        for key in sorted( bodies ): # Sorting by key also sorts the display name identically.
-            if key in oeData:
-                displayName = self.getCometOrMinorPlanetDisplayName( oeData[ key ] )
-            else:
-                displayName = key # There is a body but no data for it.
+        if len( bodies ) > 0:
+            menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astro.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
+            menu.append( menuItem )
+            if self.showCometsAsSubMenu:
+                subMenu = Gtk.Menu()
+                menuItem.set_submenu( subMenu )
 
-            if showAsSubMenu:
-                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
-                subMenu.append( menuItem )
-            else:
-                menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
-                menu.append( menuItem )
-
-            self.updateCommonMenu( menuItem, astronomicalBodyType, key, 0, 2 )
-
-            # Add handler.
-            for child in menuItem.get_submenu().get_children():
-                child.set_name( key )
-                child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
+            oeData = self.cometOEData if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanetOEData
+            showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
+            for key in sorted( bodies ): # Sorting by key also sorts the display name identically.
+                if key in oeData:
+                    displayName = self.getCometOrMinorPlanetDisplayName( oeData[ key ] )
+                else:
+                    displayName = key # There is a body but no data for it.
+    
+                if showAsSubMenu:
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
+                    subMenu.append( menuItem )
+                else:
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
+                    menu.append( menuItem )
+    
+                self.updateCommonMenu( menuItem, astronomicalBodyType, key, 0, 2 )
+    
+                # Add handler.
+                for child in menuItem.get_submenu().get_children():
+                    child.set_name( key )
+                    child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
 
 
 #TODO Delete

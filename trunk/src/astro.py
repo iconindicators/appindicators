@@ -482,17 +482,13 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
         if key in cometOrMinorPlanetData:
             body = ephem.readdb( cometOrMinorPlanetData[ key ] )
             body.compute( __getCity( data, ephemNow ) )
-            if math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ): # Have found the data file may contain ***** in lieu of actual data!
-                continue
-
-            else:
-                if float( body.mag ) <= float( maximumMagnitude ):
-                    __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
-                    count += 1
+            bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
+            if not bad and float( body.mag ) <= float( maximumMagnitude ):
+                __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
+                count += 1
     print( "Number of " + ( "comets" if astronomicalBodyType == AstronomicalBodyType.Comet else "minor bodies" ) +  " passed:", count )
 
 
-# TODO Might need to return a flag to let the caller know if any data was added.
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
     neverUp = False
     key = ( astronomicalBodyType, nameTag )
