@@ -593,6 +593,10 @@ class IndicatorLunar:
 # 
 # 
 # 
+
+
+#TODO Maybe add a preference that hides an object if below the horizon (but will rise).
+# How does this effect satellites?    
     def update( self, scheduled ):
         with threading.Lock():
             if not scheduled:
@@ -600,14 +604,17 @@ class IndicatorLunar:
 
 # Get data for comets, minor planets and satellites and update                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
             self.cometOEData = self.updateData( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, self.getCometOEData, self.cometOEURL )
+            self.cometsAddNew = True
             if self.cometsAddNew and self.cometOEData is not None:
                 self.addNewComets()
 
             self.minorPlanetOEData = self.updateData( self.minorPlanetOEData, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS, self.getMinorPlanetOEData, self.minorPlanetOEURL )
+            self.minorPlanetsAddNew = True
             if self.minorPlanetsAddNew and self.minorPlanetOEData is not None:
                 self.addNewMinorPlanets()
 
             self.satelliteTLEData = self.updateData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, self.getSatelliteTLEData, self.satelliteTLEURL )
+            self.satellitesAddNew = True
             if self.satellitesAddNew and self.satelliteTLEData is not None:
                 self.addNewSatellites()
 
@@ -708,10 +715,11 @@ class IndicatorLunar:
         self.updateCometsMinorPlanetsMenu( menu, astro.AstronomicalBodyType.MinorPlanet )
         print( "updateMinorPlanet:", ( datetime.datetime.utcnow() - utcNow ) )
 
-        utcNow = datetime.datetime.utcnow()
-        print( "updateSatellites" )
-        self.updateSatellitesMenu( menu )
-        print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
+#TODO Fix me!
+#         utcNow = datetime.datetime.utcnow()
+#         print( "updateSatellites" )
+#         self.updateSatellitesMenu( menu )
+#         print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
         print( "updatePAQ" )
@@ -990,27 +998,45 @@ class IndicatorLunar:
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
 
+            countRise = 0
+            countUp = 0
+            countSet = 0
+
             oeData = self.cometOEData if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanetOEData
             showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
-            for key in sorted( bodies ): # Sorting by key also sorts the display name identically.
-                if key in oeData:
-                    displayName = self.getCometOrMinorPlanetDisplayName( oeData[ key ] )
-                else:
-                    displayName = key # There is a body but no data for it.
-    
-                if showAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
-                    subMenu.append( menuItem )
-                else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
-                    menu.append( menuItem )
-    
-                self.updateCommonMenu( menuItem, astronomicalBodyType, key, 0, 2 )
-    
-                # Add handler.
-                for child in menuItem.get_submenu().get_children():
-                    child.set_name( key )
-                    child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
+            for name in sorted( bodies ): # Sorting by name also sorts the display name identically.
+                if ( astronomicalBodyType, name, astro.DATA_RISE_TIME ) in self.data or \
+                   ( astronomicalBodyType, name, astro.MESSAGE_BODY_ALWAYS_UP ) in self.data:
+
+                    if ( astronomicalBodyType, name, astro.DATA_RISE_TIME ) in self.data:
+                        countRise += 1
+
+                    if ( astronomicalBodyType, name, astro.MESSAGE_BODY_ALWAYS_UP ) in self.data:
+                        countUp += 1
+
+                    if ( astronomicalBodyType, name, astro.DATA_SET_TIME ) in self.data:
+                        countSet += 1
+
+                    if name in oeData:
+                        displayName = self.getCometOrMinorPlanetDisplayName( oeData[ name ] )
+                    else:
+                        displayName = name # There is a body but no data for it.
+
+                    if showAsSubMenu:
+                        menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
+                        subMenu.append( menuItem )
+                    else:
+                        menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
+                        menu.append( menuItem )
+
+                    self.updateCommonMenu( menuItem, astronomicalBodyType, name, 0, 2 )
+
+                    # Add handler.
+                    for child in menuItem.get_submenu().get_children():
+                        child.set_name( name )
+                        child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
+
+        print( countUp, countRise, countSet )
 
 
 #TODO Delete

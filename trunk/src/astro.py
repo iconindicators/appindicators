@@ -478,12 +478,13 @@ def __calculateStars( ephemNow, data, stars ):
 def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, maximumMagnitude ):
     print( "Number of " + ( "comets" if astronomicalBodyType == AstronomicalBodyType.Comet else "minor bodies" ) +  ":", len( cometsOrMinorPlanets ) )
     count = 0
+    minimumMagnitude = -15.0 # Have found dodgy magnitudes that are brighter than the sun...so cull.
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
             body = ephem.readdb( cometOrMinorPlanetData[ key ] )
             body.compute( __getCity( data, ephemNow ) )
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
-            if not bad and float( body.mag ) <= float( maximumMagnitude ):
+            if not bad and float( body.mag ) >= minimumMagnitude and float( body.mag ) <= float( maximumMagnitude ):
                 __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
                 count += 1
     print( "Number of " + ( "comets" if astronomicalBodyType == AstronomicalBodyType.Comet else "minor bodies" ) +  " passed:", count )
