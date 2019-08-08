@@ -263,12 +263,14 @@ LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
 MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 
+MAGNITUDE_MINIMUM = -15 # Have found dodgy magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
+
 
 # Returns a dict with astronomical information...
 #     Key is a tuple of AstronomicalBodyType, a name tag and a data tag.
 #     Value is the data as a string.
 #
-# NOTE: Any error when computing a body or if a body never rises, that body is dropped.
+# NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
 def getAstronomicalInformation( utcNow,
                                 latitude, longitude, elevation,
                                 planets,
@@ -478,13 +480,12 @@ def __calculateStars( ephemNow, data, stars ):
 def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, maximumMagnitude ):
     print( "Number of " + ( "comets" if astronomicalBodyType == AstronomicalBodyType.Comet else "minor bodies" ) +  ":", len( cometsOrMinorPlanets ) )
     count = 0
-    minimumMagnitude = -15.0 # Have found dodgy magnitudes that are brighter than the sun...so cull.
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
             body = ephem.readdb( cometOrMinorPlanetData[ key ] )
             body.compute( __getCity( data, ephemNow ) )
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
-            if not bad and float( body.mag ) >= minimumMagnitude and float( body.mag ) <= float( maximumMagnitude ):
+            if not bad and float( body.mag ) >= float( MAGNITUDE_MINIMUM ) and float( body.mag ) <= float( maximumMagnitude ):
                 __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
                 count += 1
     print( "Number of " + ( "comets" if astronomicalBodyType == AstronomicalBodyType.Comet else "minor bodies" ) +  " passed:", count )
