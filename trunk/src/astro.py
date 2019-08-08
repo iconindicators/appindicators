@@ -27,6 +27,10 @@ from ephem.cities import _city_data
 class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
 
 
+#TODO Need to test with a lat/long such that bodies rise/set, always up and never up.
+
+
+
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
 DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
@@ -318,18 +322,21 @@ def getLatitudeLongitudeElevation( city ): return _city_data.get( city )[ 0 ], \
 # http://www.geoastro.de/sundata/index.html
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
 def __calculateMoon( ephemNow, data ):
-    __calculateCommon( ephemNow, data, ephem.Moon(), AstronomicalBodyType.Moon, NAME_TAG_MOON )
-    key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
+    neverUp = __calculateCommon( ephemNow, data, ephem.Moon(), AstronomicalBodyType.Moon, NAME_TAG_MOON )
     moon = ephem.Moon()
     moon.compute( __getCity( data, ephemNow ) )
-    data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) )
-    data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( ephemNow, int( moon.phase ) )
-    data[ key + ( DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
-    data[ key + ( DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
-    data[ key + ( DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
-    data[ key + ( DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
-    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Pass in a clean instance (just to be safe).
-    __calculateEclipse( ephemNow, data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+    key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
+    data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
+    data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( ephemNow, int( moon.phase ) ) # Need for notification.
+    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Pass in a clean instance (just to be safe).  Needed for icon.
+
+    if not neverUp:
+        data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( ephemNow, int( moon.phase ) )
+        data[ key + ( DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+        data[ key + ( DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
+        data[ key + ( DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+        data[ key + ( DATA_NEW, ) ] = str( ephem.next_new_moon( ephemNow ).datetime() )
+        __calculateEclipse( ephemNow, data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
 
 # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
@@ -419,28 +426,28 @@ def __getLunarPhase( ephemNow, illuminationPercentage ):
 # http://futureboy.us/fsp/sun.fsp
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
 def __calculateSun( ephemNow, data ):
-    __calculateCommon( ephemNow, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
-    key = ( AstronomicalBodyType.Sun, NAME_TAG_SUN )
-    try:
-        # Dawn/Dusk.
-        city = __getCity( data, ephemNow )
-        city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
-        sun = ephem.Sun( city )
-        dawn = city.next_rising( sun, use_center = True )
-        dusk = city.next_setting( sun, use_center = True )
-        data[ key + ( DATA_DAWN, ) ] = str( dawn.datetime() )
-        data[ key + ( DATA_DUSK, ) ] = str( dusk.datetime() )
+    neverUp = __calculateCommon( ephemNow, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
+    if not neverUp:
+        try:
+            # Dawn/Dusk.
+            city = __getCity( data, ephemNow )
+            city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
+            sun = ephem.Sun( city )
+            dawn = city.next_rising( sun, use_center = True )
+            dusk = city.next_setting( sun, use_center = True )
+            key = ( AstronomicalBodyType.Sun, NAME_TAG_SUN )
+            data[ key + ( DATA_DAWN, ) ] = str( dawn.datetime() )
+            data[ key + ( DATA_DUSK, ) ] = str( dusk.datetime() )
+    
+        except ( ephem.AlwaysUpError, ephem.NeverUpError ):
+            pass # No need to add a message here as update common would already have done so.
 
-    except ( ephem.AlwaysUpError, ephem.NeverUpError ):
-        pass # No need to add a message here as update common would already have done so.
-
-    __calculateEclipse( ephemNow, data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
+        __calculateEclipse( ephemNow, data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
 
 
 # Calculate next eclipse for either the Sun or Moon.
 def __calculateEclipse( ephemNow, data, astronomicalBodyType, dataTag ):
     eclipseInformation = eclipse.getEclipseForUTC( ephemNow.datetime(), astronomicalBodyType == AstronomicalBodyType.Moon )
-    key = ( astronomicalBodyType, dataTag )
     key = ( astronomicalBodyType, dataTag )
     data[ key + ( DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ] + ".0" # Needed to bring the date/time format into line with date/time generated by PyEphem.
     data[ key + ( DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
@@ -487,6 +494,7 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
 
 # TODO Might need to return a flag to let the caller know if any data was added.
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
+    neverUp = False
     key = ( astronomicalBodyType, nameTag )
     try:
         city = __getCity( data, ephemNow )
@@ -499,11 +507,14 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
         data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_BODY_ALWAYS_UP
 
     except ephem.NeverUpError:
-        pass
+        neverUp = True
 
-    body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-    data[ key + ( DATA_AZIMUTH, ) ] = str( body.az )
-    data[ key + ( DATA_ALTITUDE, ) ] = str( body.alt )
+    if not neverUp:
+        body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+        data[ key + ( DATA_AZIMUTH, ) ] = str( body.az )
+        data[ key + ( DATA_ALTITUDE, ) ] = str( body.alt )
+
+    return neverUp
 
 
 # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
