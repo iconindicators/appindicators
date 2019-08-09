@@ -280,8 +280,6 @@ def getAstronomicalInformation( utcNow,
                                 minorPlanets, minorPlanetData,
                                 magnitude ):
     
-    print( "Magnitude:", magnitude )
-
     data = { }
 
     # Used internally to create the observer/city...removed before passing back to the caller.
@@ -478,8 +476,6 @@ def __calculateStars( ephemNow, data, stars ):
 # The default source for minor planets is https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt
 # Have tried the other data sources for minor planets (NEOs, centaurs, transneptunians) and none have magnitude less than 6.
 def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, maximumMagnitude ):
-    print( "Number of " + ( "comets" if astronomicalBodyType == AstronomicalBodyType.Comet else "minor bodies" ) +  ":", len( cometsOrMinorPlanets ) )
-    count = 0
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
             body = ephem.readdb( cometOrMinorPlanetData[ key ] )
@@ -487,9 +483,6 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
             if not bad and float( body.mag ) >= float( MAGNITUDE_MINIMUM ) and float( body.mag ) <= float( maximumMagnitude ):
                 __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
-                print( body.mag )
-                count += 1
-    print( "Number of " + ( "comets" if astronomicalBodyType == AstronomicalBodyType.Comet else "minor bodies" ) +  " passed:", count )
 
 
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
