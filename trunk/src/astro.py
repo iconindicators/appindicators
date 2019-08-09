@@ -487,6 +487,7 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
             if not bad and float( body.mag ) >= float( MAGNITUDE_MINIMUM ) and float( body.mag ) <= float( maximumMagnitude ):
                 __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
+                print( body.mag )
                 count += 1
     print( "Number of " + ( "comets" if astronomicalBodyType == AstronomicalBodyType.Comet else "minor bodies" ) +  " passed:", count )
 

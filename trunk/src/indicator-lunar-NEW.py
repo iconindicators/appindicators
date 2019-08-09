@@ -715,11 +715,10 @@ class IndicatorLunar:
         self.updateCometsMinorPlanetsMenu( menu, astro.AstronomicalBodyType.MinorPlanet )
         print( "updateMinorPlanet:", ( datetime.datetime.utcnow() - utcNow ) )
 
-#TODO Fix me!
-#         utcNow = datetime.datetime.utcnow()
-#         print( "updateSatellites" )
-#         self.updateSatellitesMenu( menu )
-#         print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
+        utcNow = datetime.datetime.utcnow()
+        print( "updateSatellites" )
+        self.updateSatellitesMenu( menu )
+        print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
         print( "updatePAQ" )
@@ -997,10 +996,6 @@ class IndicatorLunar:
                 subMenu = Gtk.Menu()
                 menuHeader.set_submenu( subMenu )
 
-            countRise = 0
-            countUp = 0
-            countSet = 0
-
             oeData = self.cometOEData if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanetOEData
             showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
             atLeastOneBodyAdded = False
@@ -1011,15 +1006,6 @@ class IndicatorLunar:
                      # May have comets or minor planets, but no data was computed as they are never up or some other exception,
                      # so use a flag to identify if any body has been added then add the main menu header at the end if need be.
                     atLeastOneBodyAdded = True
-
-                    if ( astronomicalBodyType, name, astro.DATA_RISE_TIME ) in self.data:
-                        countRise += 1
-
-                    if ( astronomicalBodyType, name, astro.MESSAGE_BODY_ALWAYS_UP ) in self.data:
-                        countUp += 1
-
-                    if ( astronomicalBodyType, name, astro.DATA_SET_TIME ) in self.data:
-                        countSet += 1
 
                     if name in oeData:
                         displayName = self.getCometOrMinorPlanetDisplayName( oeData[ name ] )
@@ -1043,71 +1029,6 @@ class IndicatorLunar:
             if atLeastOneBodyAdded:
                 menu.append( menuHeader ) 
 
-        print( countUp, countRise, countSet )
-
-
-#TODO Delete
-    def updateCometsMenu( self, menu ):
-        comets = [ ]
-        for comet in self.comets:
-            key = ( astro.AstronomicalBodyType.Comet, comet )
-            if key + ( astro.DATA_MESSAGE, ) in self.data and \
-               (
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_NEVER_UP or \
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_DATA_BAD_DATA or \
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_DATA_NO_DATA
-               ):
-                continue # Skip comets which are never up or have no data or have bad data AND the user wants to hide comets on such conditions.
-
-#TODO Does this ensure that comets which are never up will not appear in the menu?  
-# Do we need to do checks similar to that for moon/sun or planets/stars?
-            if key + ( astro.DATA_MESSAGE, ) in self.data or \
-               key + ( astro.DATA_RISE_TIME, ) in self.data:
-                comets.append( comet ) # Either key must be present - otherwise the comet has been dropped due to having too large a magnitude.
-
-        if len( comets ) > 0:
-            menuItem = Gtk.MenuItem( _( "Comets" ) )
-            menu.append( menuItem )
-            if self.showCometsAsSubMenu:
-                cometsSubMenu = Gtk.Menu()
-                menuItem.set_submenu( cometsSubMenu )
-
-            for key in sorted( comets ): # Sorting by key also sorts the display name identically.
-                if key in self.cometOEData:
-                    displayName = self.getCometDisplayName( self.cometOEData[ key ] )
-                else:
-                    displayName = key # There is a comet but no data for it.
-
-                if self.showCometsAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
-                    cometsSubMenu.append( menuItem )
-                else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
-                    menu.append( menuItem )
-
-                # Comet data may not exist or comet data exists but is bad.
-                missing = ( key not in self.cometOEData ) # This scenario should be covered by the 'no data' clause below...but just in case catch it here!
-
-                badData = ( key in self.cometOEData and \
-                          ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) in self.data ) and \
-                          self.data[ ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) ] == astro.MESSAGE_DATA_BAD_DATA
-
-                noData = ( key in self.cometOEData and \
-                         ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) in self.data ) and \
-                          self.data[ ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) ] == astro.MESSAGE_DATA_NO_DATA
-
-                if missing or badData or noData:
-                    subMenu = Gtk.Menu()
-                    subMenu.append( Gtk.MenuItem( self.getDisplayData( ( astro.AstronomicalBodyType.Comet, key, astro.DATA_MESSAGE ) ) ) ) #TODO Needs indent?
-                    menuItem.set_submenu( subMenu )
-                else:
-                    self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Comet, key, 0, 2 )
-
-                    # Add handler.
-                    for child in menuItem.get_submenu().get_children():
-                        child.set_name( key )
-                        child.connect( "activate", self.onComet )
-
 
     def onCometMinorPlanet( self, widget, astronomicalBodyType ):
         if "(" in widget.props.name:
@@ -1117,18 +1038,6 @@ class IndicatorLunar:
 
         onClickURL = IndicatorLunar.COMET_ON_CLICK_URL if astronomicalBodyType == astro.AstronomicalBodyType.Comet else IndicatorLunar.MINOR_PLANET_ON_CLICK_URL
         url = onClickURL + objectID.replace( "/", "%2F" ).replace( " ", "+" )
-        if len( url ) > 0:
-            webbrowser.open( url )
-
-
-#TODO Remove
-    def onComet( self, widget ):
-        if "(" in widget.props.name:
-            objectID = widget.props.name[ : widget.props.name.find( "(" ) ].strip()
-        else:
-            objectID = widget.props.name[ : widget.props.name.find( "/" ) ].strip()
-
-        url = IndicatorLunar.COMET_ON_CLICK_URL + objectID.replace( "/", "%2F" ).replace( " ", "+" )
         if len( url ) > 0:
             webbrowser.open( url )
 
