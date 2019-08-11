@@ -564,6 +564,8 @@ class IndicatorLunar:
 #TODO Maybe add in a hack preference, only visible under GNOME Shell
 # which groups satellites / comets / minor planets into bunches of 10
 # to get around the scrolling problem.
+# Not very nice; could instead break up the comets / minor planets into sub-submenus by magnitude.
+# Not sure how/what to do for satellites...
 
 
 #TODO The list of minor planets in the preferences takes a long time to load...
