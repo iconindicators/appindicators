@@ -561,6 +561,11 @@ class IndicatorLunar:
         self.update( True )
 
 
+#TODO Maybe add in a hack preference, only visible under GNOME Shell
+# which groups satellites / comets / minor planets into bunches of 10
+# to get around the scrolling problem.
+
+
 #TODO The list of minor planets in the preferences takes a long time to load...
 #Maybe as the data is loaded (downloaded or from cache) computer all magnitudes and either cull to the value set in the spinner,
 #or set an upper limit of magnitude, say 20.
