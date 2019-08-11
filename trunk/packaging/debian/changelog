@@ -1,9 +1,9 @@
 indicator-lunar (1.0.81-1) xenial; urgency=low
 
   * Under GNOME Shell, the indicator grinds to a halt and menu items beyond
-    the bottom of the screen are truncated.  A massive overhaul has been done:
-    any item/attribute/preference that does not directly assist the home
-    astronomer to locate an object has been removed.
+    the bottom of the screen are truncated.
+    Therefore, any item/attribute/preference which does not directly assist
+    the home astronomer to locate an object has been removed.
   * The attributes Tropical Sign, Constellation, Magnitude, Bright Limb,
     Illumination and Distance have been removed; they are interesting but
     unnecessary for object location.
