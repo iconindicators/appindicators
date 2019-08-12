@@ -327,11 +327,10 @@ def __calculateMoon( ephemNow, data ):
     moon.compute( __getCity( data, ephemNow ) )
     key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
     data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
-    data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( ephemNow, int( moon.phase ) ) # Need for notification.
+    data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Pass in a clean instance (just to be safe).  Needed for icon.
 
     if not neverUp:
-        data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( ephemNow, int( moon.phase ) )
         data[ key + ( DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
         data[ key + ( DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
         data[ key + ( DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
@@ -384,11 +383,10 @@ def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
 
 # Get the lunar phase for the given date/time and illumination percentage.
 #
-#    ephemNow Date/time.
 #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
-def __getLunarPhase( ephemNow, illuminationPercentage ):
-    nextFullMoonDate = ephem.next_full_moon( ephemNow )
-    nextNewMoonDate = ephem.next_new_moon( ephemNow )
+#    nextFullMoonDate The date of the next full moon.
+#    nextNewMoonDate The date of the next new moon.
+def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate ):
     phase = None
     if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
         # Between a new moon and a full moon...
