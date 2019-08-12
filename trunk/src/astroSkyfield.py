@@ -19,14 +19,15 @@
 # Calculate astronomical information using Skyfield.
 
 
-from skyfield.api import load
+from skyfield import almanac
+from skyfield.api import load, Topos
 
 # from skyfield import almanac, positionlib
 # from skyfield.api import load, Star, Topos
 # from skyfield.data import hipparcos
 # from pandas.core.frame import DataFrame
 
-import pytz
+import gzip, pytz
 # import datetime, ephem, gzip, math, pytz
 
 
@@ -269,7 +270,7 @@ def getAstronomicalInformation( utcNow,
                                 comets, cometData,
                                 minorPlanets, minorPlanetData,
                                 magnitude ):
-    
+
     data = { }
 
     # Used internally to create the observer/city...removed before passing back to the caller.
@@ -279,18 +280,129 @@ def getAstronomicalInformation( utcNow,
 
     timeScale = load.timescale()
     utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
+    ephemerisPlanets = load( EPHEMERIS_PLANETS )
+    observer = getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
+    topos = getSkyfieldTopos( latitude, longitude, elevation )
 
-    ephemNow = ephem.Date( utcNow )
-    __calculateMoon( ephemNow, data )
-    __calculateSun( ephemNow, data )
-    __calculatePlanets( ephemNow, data, planets )
-    __calculateStars( ephemNow, data, stars )
-    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
-    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
-    __calculateSatellites( ephemNow, data, satellites, satelliteData )
+    __calculateMoon( utcNowSkyfield, data, timeScale, observer, topos, ephemerisPlanets )
+#     __calculateSun( ephemNow, data )
+#     __calculatePlanets( ephemNow, data, planets )
+#     __calculateStars( ephemNow, data, stars )
+#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
+#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
+#     __calculateSatellites( ephemNow, data, satellites, satelliteData )
 
     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
     del data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
     del data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ]
 
     return data
+
+
+# http://www.ga.gov.au/geodesy/astro/moonrise.jsp
+# http://futureboy.us/fsp/moon.fsp
+# http://www.geoastro.de/moondata/index.html
+# http://www.geoastro.de/SME/index.htm
+# http://www.geoastro.de/elevazmoon/index.htm
+# http://www.geoastro.de/altazsunmoon/index.htm
+# http://www.geoastro.de/sundata/index.html
+# http://www.satellite-calculations.com/Satellite/suncalc.htm
+def __calculateMoon( utcNow, data, timeScale, observer, topos, ephemeris ):
+    moon = ephemeris[ MOON ]
+    __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, moon, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+
+    illumination = almanac.fraction_illuminated( ephemeris, MOON, utcNow ) * 100 # Needed for icon.
+
+    utcNowDateTime = utcNow.utc_datetime()
+    t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day )
+    t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month + 2, 1 ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.
+#TODO Test the above line for Feb.
+# https://rhodesmill.org/skyfield/almanac.html
+    
+    t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemeris ) )
+    moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
+
+    moonPhaseDateTimes = t.utc_iso()
+    nextNewMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
+    nextFirstQuarterISO = moonPhaseDateTimes[ ( moonPhases.index( "First Quarter" ) ) ]
+    nextThirdQuarterISO = moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ]
+    nextFullMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
+
+    moonPhaseDateTimes = t.utc_datetime()
+    nextNewMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
+    nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
+
+    key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
+    data[ key + ( DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
+    import astro
+    data[ key + ( DATA_PHASE, ) ] = astro.__getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
+#TODO
+#     zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, ra, dec ) )
+#     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Pass in a clean instance (just to be safe).  Needed for icon.
+
+    data[ key + ( DATA_FIRST_QUARTER, ) ] = nextFirstQuarterISO
+    data[ key + ( DATA_FULL, ) ] = nextFullMoonISO
+    data[ key + ( DATA_THIRD_QUARTER, ) ] = nextThirdQuarterISO
+    data[ key + ( DATA_NEW, ) ] = nextNewMoonISO
+
+    astro.__calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+
+
+#TODO May not need some of the arguments
+def __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, body, astronomicalBodyType, nameTag ):
+    neverUp = False
+    key = ( astronomicalBodyType, nameTag )
+    apparent = observer.at( utcNow ).observe( body ).apparent()
+    alt, az, earthDistance = apparent.altaz()
+#TODO How to know when body is always up?
+
+#TODO Add in rise/set.
+# https://rhodesmill.org/skyfield/almanac.html
+    utcNowDateTime = utcNow.utc_datetime()
+    t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
+    t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 1, utcNowDateTime.hour )
+
+#     t0 = timeScale.utc( 2019, 9, 12, 4 )
+#     t1 = timeScale.utc( 2019, 9, 13, 4 )
+    t, y = almanac.find_discrete( t0, t1, almanac.sunrise_sunset( ephemeris, topos ) )
+    t = t.utc_iso( delimiter = ' ' )
+    if y[ 0 ]:
+#TODO Check the format of the data going in...is it a string and does it contain Z or other stuff?
+        data[ key + ( DATA_RISE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+        data[ key + ( DATA_SET_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+
+    else:
+        data[ key + ( DATA_RISE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+        data[ key + ( DATA_SET_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+
+
+#TODO How to know when body is never up?
+
+    if not neverUp:
+        data[ key + ( DATA_AZIMUTH, ) ] = str( az )
+        data[ key + ( DATA_ALTITUDE, ) ] = str( alt )
+
+    return neverUp
+
+
+def getSkyfieldObserver( latitude, longitude, elevation, earth ):
+    return earth + Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
+
+
+def getSkyfieldTopos( latitude, longitude, elevation ):
+    return Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
+
+
+#TODO Keep this here?
+def filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
+    try:
+        with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
+            for line in inFile:
+                hip = int( line.decode()[ 9 : 14 ].strip() ) #TODO Was 2 but according to ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe it should be 9.
+                if hip in hipparcosIdentifiers:
+#                     magnitude = int( line.decode()[ 42 : 46 ].strip() ) #TODO This barfs...dunno why as it should be the same as pulling out the hip.
+#                     print( hip, magnitude )
+                    outFile.write( line )
+
+    except Exception as e:
+        print( e ) #TODO Handle betterer.

@@ -557,13 +557,23 @@ class IndicatorLunar:
         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
+        self.loadConfig()
+
 
 #TODO Testing skyfield
         import astroSkyfield
-        astroSkyfield.getStuffed()
+        x = astroSkyfield.getAstronomicalInformation( datetime.datetime.utcnow(),
+                                                  float( self.latitude ), float( self.longitude ), float( self.elevation ),
+                                                  self.planets,
+                                                  self.stars,
+                                                  self.satellites, None if self.satelliteTLEData is None else self.satelliteTLEData,
+                                                  self.comets, None if self.cometOEData is None else self.cometOEData,
+                                                  self.minorPlanets, None if self.minorPlanetOEData is None else self.minorPlanetOEData,
+                                                  self.magnitude )
 
+        print( x )
+        if True: return
 
-        self.loadConfig()
         self.update( True )
 
 
@@ -1373,6 +1383,7 @@ class IndicatorLunar:
 
     # Converts a UTC datetime string in the format given to local datetime string.
     def getLocalDateTime( self, utcDateTimeString, formatString ):
+#         if True: return utcDateTimeString # TODO Testing to compare against Skyfield
         utcDateTime = self.toDateTime( utcDateTimeString )
         timestamp = calendar.timegm( utcDateTime.timetuple() )
         localDateTime = datetime.datetime.fromtimestamp( timestamp )
