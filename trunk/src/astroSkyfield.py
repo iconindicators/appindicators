@@ -27,7 +27,7 @@ from skyfield.api import load, Topos
 # from skyfield.data import hipparcos
 # from pandas.core.frame import DataFrame
 
-import gzip, pytz
+import eclipse, gzip, pytz
 # import datetime, ephem, gzip, math, pytz
 
 
@@ -248,6 +248,15 @@ STARS_COMMON_NAMES = [ \
     [ "3C 273", 60936 ] ]
 
 
+LUNAR_PHASE_FULL_MOON = "FULL_MOON"
+LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
+LUNAR_PHASE_THIRD_QUARTER = "THIRD_QUARTER"
+LUNAR_PHASE_WANING_CRESCENT = "WANING_CRESCENT"
+LUNAR_PHASE_NEW_MOON = "NEW_MOON"
+LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
+LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
+LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
+
 PLANET_EARTH = "earth"
 PLANET_SATURN = "saturn barycenter"
 
@@ -256,10 +265,6 @@ SUN = "sun"
 
 EPHEMERIS_PLANETS = "skyfield/de438_2019-2023.bsp"
 EPHEMERIS_STARS = "skyfield/hip_common_name_stars.dat.gz"
-
-latitudeDecimalDegrees = -33.8
-longitudeDecimalDegrees = 151.2
-elevationMetres = 100
 
 
 def getAstronomicalInformation( utcNow,
@@ -308,44 +313,87 @@ def getAstronomicalInformation( utcNow,
 # http://www.geoastro.de/sundata/index.html
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
 def __calculateMoon( utcNow, data, timeScale, observer, topos, ephemeris ):
+    key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
     moon = ephemeris[ MOON ]
-    __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, moon, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+    neverUp = __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, moon, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
     illumination = almanac.fraction_illuminated( ephemeris, MOON, utcNow ) * 100 # Needed for icon.
+    data[ key + ( DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
     utcNowDateTime = utcNow.utc_datetime()
     t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day )
     t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month + 2, 1 ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.
 #TODO Test the above line for Feb.
 # https://rhodesmill.org/skyfield/almanac.html
-    
     t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemeris ) )
     moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
-
-    moonPhaseDateTimes = t.utc_iso()
-    nextNewMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
-    nextFirstQuarterISO = moonPhaseDateTimes[ ( moonPhases.index( "First Quarter" ) ) ]
-    nextThirdQuarterISO = moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ]
-    nextFullMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
-
     moonPhaseDateTimes = t.utc_datetime()
     nextNewMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
     nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
+    data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
 
-    key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
-    data[ key + ( DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
-    import astro
-    data[ key + ( DATA_PHASE, ) ] = astro.__getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
 #TODO
 #     zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, ra, dec ) )
 #     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Pass in a clean instance (just to be safe).  Needed for icon.
 
-    data[ key + ( DATA_FIRST_QUARTER, ) ] = nextFirstQuarterISO
-    data[ key + ( DATA_FULL, ) ] = nextFullMoonISO
-    data[ key + ( DATA_THIRD_QUARTER, ) ] = nextThirdQuarterISO
-    data[ key + ( DATA_NEW, ) ] = nextNewMoonISO
+    if not neverUp:
+        moonPhaseDateTimes = t.utc_iso()
+        nextNewMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
+        nextFirstQuarterISO = moonPhaseDateTimes[ ( moonPhases.index( "First Quarter" ) ) ]
+        nextThirdQuarterISO = moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ]
+        nextFullMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
 
-    astro.__calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+        data[ key + ( DATA_FIRST_QUARTER, ) ] = nextFirstQuarterISO
+        data[ key + ( DATA_FULL, ) ] = nextFullMoonISO
+        data[ key + ( DATA_THIRD_QUARTER, ) ] = nextThirdQuarterISO
+        data[ key + ( DATA_NEW, ) ] = nextNewMoonISO
+
+        __calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+
+
+# Get the lunar phase for the given date/time and illumination percentage.
+#
+#    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
+#    nextFullMoonDate The date of the next full moon.
+#    nextNewMoonDate The date of the next new moon.
+def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate ):
+    phase = None
+    if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
+        # Between a new moon and a full moon...
+        if( illuminationPercentage > 99 ):
+            phase = LUNAR_PHASE_FULL_MOON
+        elif illuminationPercentage <= 99 and illuminationPercentage > 50:
+            phase = LUNAR_PHASE_WAXING_GIBBOUS
+        elif illuminationPercentage == 50:
+            phase = LUNAR_PHASE_FIRST_QUARTER
+        elif illuminationPercentage < 50 and illuminationPercentage >= 1:
+            phase = LUNAR_PHASE_WAXING_CRESCENT
+        else: # illuminationPercentage < 1
+            phase = LUNAR_PHASE_NEW_MOON
+    else:
+        # Between a full moon and the next new moon...
+        if( illuminationPercentage > 99 ):
+            phase = LUNAR_PHASE_FULL_MOON
+        elif illuminationPercentage <= 99 and illuminationPercentage > 50:
+            phase = LUNAR_PHASE_WANING_GIBBOUS
+        elif illuminationPercentage == 50:
+            phase = LUNAR_PHASE_THIRD_QUARTER
+        elif illuminationPercentage < 50 and illuminationPercentage >= 1:
+            phase = LUNAR_PHASE_WANING_CRESCENT
+        else: # illuminationPercentage < 1
+            phase = LUNAR_PHASE_NEW_MOON
+
+    return phase
+
+
+# Calculate next eclipse for either the Sun or Moon.
+def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
+    eclipseInformation = eclipse.getEclipseForUTC( utcNow, astronomicalBodyType == AstronomicalBodyType.Moon )
+    key = ( astronomicalBodyType, dataTag )
+    data[ key + ( DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ] + ".0" # Needed to bring the date/time format into line with date/time generated by PyEphem.
+    data[ key + ( DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
+    data[ key + ( DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
+    data[ key + ( DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
 #TODO May not need some of the arguments
