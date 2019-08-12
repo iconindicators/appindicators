@@ -566,6 +566,8 @@ class IndicatorLunar:
 # to get around the scrolling problem.
 # Not very nice; could instead break up the comets / minor planets into sub-submenus by magnitude.
 # Not sure how/what to do for satellites...
+# For Skyfield, there are a LOT of stars if we filter by magnitude (mag <= 6)...
+#...which means we could also submenu stars by magnitude.
 
 
 #TODO The list of minor planets in the preferences takes a long time to load...
@@ -724,7 +726,7 @@ class IndicatorLunar:
 
         utcNow = datetime.datetime.utcnow()
         print( "updateSatellites" )
-        self.updateSatellitesMenu( menu )
+#         self.updateSatellitesMenu( menu )
         print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
