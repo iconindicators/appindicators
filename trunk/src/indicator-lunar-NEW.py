@@ -557,6 +557,12 @@ class IndicatorLunar:
         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
+
+#TODO Testing skyfield
+        import astroSkyfield
+        astroSkyfield.getStuffed()
+
+
         self.loadConfig()
         self.update( True )
 
