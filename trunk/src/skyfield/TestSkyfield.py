@@ -606,12 +606,12 @@ def filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzi
         print( e ) #TODO Handle betterer.
 
 
-def getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, earth ):
-    return earth + Topos( latitude_degrees = latitudeDecimalDegrees, longitude_degrees = longitudeDecimalDegrees, elevation_m = elevationMetres )
+def getSkyfieldObserver( latitude, longitude, elevation, earth ):
+    return earth + Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
 
 
-def getSkyfieldTopos( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres ):
-    return Topos( latitude_degrees = latitudeDecimalDegrees, longitude_degrees = longitudeDecimalDegrees, elevation_m = elevationMetres )
+def getSkyfieldTopos( latitude, longitude, elevation ):
+    return Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
 
 
 #TODO Add rise/set.
