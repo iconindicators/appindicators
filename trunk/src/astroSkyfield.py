@@ -18,13 +18,13 @@
 
 # Calculate astronomical information using Skyfield.
 
+
 #TODO Can pip3 be run from the install?
 # Install (and upgrade to) latest skyfield: 
 #     sudo apt-get install python3-pip
 #     sudo pip3 install --upgrade skyfield
 #     sudo pip3 install --upgrade pytz
 #     sudo pip3 install --upgrade pandas
-
 
 
 from skyfield import almanac
@@ -154,8 +154,8 @@ NAME_TAG_CITY = "CITY"
 NAME_TAG_MOON = "MOON"
 NAME_TAG_SUN = "SUN"
 
-MOON = "moon"
-SUN = "sun"
+MOON = "MOON"
+SUN = "SUN"
 
 PLANET_MERCURY = "MERCURY BARYCENTER"
 PLANET_EARTH = "EARTH"
@@ -315,16 +315,16 @@ def getAstronomicalInformation( utcNow,
     utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
     ephemerisPlanets = load( EPHEMERIS_PLANETS )
     observer = __getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
-    topos = __getSkyfieldTopos( latitude, longitude, elevation )
+
+    __calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
+    __calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
+    __calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, PLANETS ) # TODO Should use passed in list of planets eventually.
+
     with load.open( EPHEMERIS_STARS ) as f:
         ephemerisStars = hipparcos.load_dataframe( f )
 
-    __calculateMoon( utcNowSkyfield, data, timeScale, observer, topos, ephemerisPlanets )
-    __calculateSun( utcNowSkyfield, data, timeScale, observer, topos, ephemerisPlanets )
-    __calculatePlanets( utcNowSkyfield, data, timeScale, observer, topos, ephemerisPlanets, PLANETS ) # TODO Should use passed in list of planets eventually.
-
-    stars = [ "Acamar", "Achernar", "Acrux" ] #TODO Testing
-    __calculateStars( utcNowSkyfield, data, timeScale, observer, topos, ephemerisStars, stars ) #TODO Ensure passed in stars match those in STARS
+    stars = list( STARS )#TODO Testing
+    __calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars ) #TODO Ensure passed in stars match those in STARS
 
 #     Comet https://github.com/skyfielders/python-skyfield/issues/196
 #     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
@@ -348,10 +348,10 @@ def getAstronomicalInformation( utcNow,
 # http://www.geoastro.de/altazsunmoon/index.htm
 # http://www.geoastro.de/sundata/index.html
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
-def __calculateMoon( utcNow, data, timeScale, observer, topos, ephemeris ):
+def __calculateMoon( utcNow, data, timeScale, observer, ephemeris ):
     key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
     moon = ephemeris[ MOON ]
-    neverUp = __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, moon, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+    neverUp = __calculateCommon( utcNow, data, timeScale, observer, moon, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
     illumination = almanac.fraction_illuminated( ephemeris, MOON, utcNow ) * 100 # Needed for icon.
     data[ key + ( DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
@@ -422,7 +422,16 @@ def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate )
     return phase
 
 
-# Calculate next eclipse for either the Sun or Moon.
+def __calculateSun( utcNow, data, timeScale, observer, ephemeris ):
+    sun = ephemeris[ SUN ]
+    neverUp = __calculateCommon( utcNow, data, timeScale, observer, sun, AstronomicalBodyType.Sun, NAME_TAG_SUN )
+    if not neverUp:
+#TODO Skyfield does not calculate dawn/dusk, but there is a workaround
+# https://github.com/skyfielders/python-skyfield/issues/225
+        __calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
+
+
+# Calculate next eclipse for the Sun or Moon.
 def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
     eclipseInformation = eclipse.getEclipseForUTC( utcNow, astronomicalBodyType == AstronomicalBodyType.Moon )
     key = ( astronomicalBodyType, dataTag )
@@ -432,26 +441,17 @@ def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
     data[ key + ( DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
-def __calculateSun( utcNow, data, timeScale, observer, topos, ephemeris ):
-    sun = ephemeris[ SUN ]
-    neverUp = __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, sun, AstronomicalBodyType.Sun, NAME_TAG_SUN )
-    if not neverUp:
-#TODO Skyfield does calculate dawn/dusk, but there is a workaround
-# https://github.com/skyfielders/python-skyfield/issues/225
-        __calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
-
-
-def __calculatePlanets( utcNow, data, timeScale, observer, topos, ephemeris, planets ):
+def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets ):
     for planet in planets:
-        __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, ephemeris[ planet ], AstronomicalBodyType.Planet, planet )
+        __calculateCommon( utcNow, data, timeScale, observer, ephemeris[ planet ], AstronomicalBodyType.Planet, planet )
 
 
-def __calculateStars( utcNow, data, timeScale, observer, topos, ephemeris, stars ):
+def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars ):
     for star in stars:
-        __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
+        __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
 
 
-def __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, body, astronomicalBodyType, nameTag ):
+def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBodyType, nameTag ):
     neverUp = False
     key = ( astronomicalBodyType, nameTag )
 
