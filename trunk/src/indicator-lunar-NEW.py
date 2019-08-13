@@ -584,7 +584,9 @@ class IndicatorLunar:
 # Not sure how/what to do for satellites...
 # For Skyfield, there are a LOT of stars if we filter by magnitude (mag <= 6)...
 #...which means we could also submenu stars by magnitude.
-
+# For satellites, what is the point of always showing the next rises for the next two days?
+# Maybe only somehow show for the next window...but that window could be different depending on your latitude.
+# Also, if a user wants to know when the ISS next rises, if we only show the next window, then that user is screwed.
 
 #TODO The list of minor planets in the preferences takes a long time to load...
 #Maybe as the data is loaded (downloaded or from cache) computer all magnitudes and either cull to the value set in the spinner,
