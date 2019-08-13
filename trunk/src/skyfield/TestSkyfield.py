@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 
-#TODO Originall I wanted to match feature/attribute against PyEphem.
-# Since Ubuntu 18.04 (GNOME Shell) and its many issues, I have focused the intent of Indicator Lunar.
-# Specifically, the indicator's sole purpose is to provide rise/set and az/alt information for celestial objects.
-# All other information such as illumination, bright limb, constellation and so on are irrelevant (and available elsewhere online).
-# Therefore Skyfield is much closer to being available for a swap over from PyEphem (apart from handling orbital elements such as comets).
-
 
 # Use
 #    https://ssd.jpl.nasa.gov/horizons.cgi

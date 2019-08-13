@@ -18,17 +18,25 @@
 
 # Calculate astronomical information using Skyfield.
 
+#TODO Can pip3 be run from the install?
+# Install (and upgrade to) latest skyfield: 
+#     sudo apt-get install python3-pip
+#     sudo pip3 install --upgrade skyfield
+#     sudo pip3 install --upgrade pytz
+#     sudo pip3 install --upgrade pandas
+
+
 
 from skyfield import almanac
 from skyfield.api import load, Topos
+from skyfield.data import hipparcos
 
-# from skyfield import almanac, positionlib
-# from skyfield.api import load, Star, Topos
-# from skyfield.data import hipparcos
+# from skyfield import positionlib
+# from skyfield.api import Star
 # from pandas.core.frame import DataFrame
 
 import eclipse, gzip, pytz
-# import datetime, ephem, gzip, math, pytz
+# import datetime, math
 
 
 class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
@@ -146,107 +154,20 @@ NAME_TAG_CITY = "CITY"
 NAME_TAG_MOON = "MOON"
 NAME_TAG_SUN = "SUN"
 
+MOON = "moon"
+SUN = "sun"
 
-# https://www.cosmos.esa.int/web/hipparcos/common-star-names
-# This list contained a duplicate Hipparcos Identifier of 68702 for a star with two common names: Agena and Hadar.
-# The official name is Hadar and so Agena has been removed.
-STARS_COMMON_NAMES = [ \
-    [ "Acamar", 13847 ], \
-    [ "Achernar", 7588 ], \
-    [ "Acrux", 60718 ], \
-    [ "Adhara", 33579 ], \
-    [ "Albireo", 95947 ], \
-    [ "Alcor", 65477 ], \
-    [ "Alcyone", 17702 ], \
-    [ "Aldebaran", 21421 ], \
-    [ "Alderamin", 105199 ], \
-    [ "Algenib", 1067 ], \
-    [ "Algieba", 50583 ], \
-    [ "Algol", 14576 ], \
-    [ "Alhena", 31681 ], \
-    [ "Alioth", 62956 ], \
-    [ "Alkaid", 67301 ], \
-    [ "Almaak", 9640 ], \
-    [ "Alnair", 109268 ], \
-    [ "Alnath", 25428 ], \
-    [ "Alnilam", 26311 ], \
-    [ "Alnitak", 26727 ], \
-    [ "Alphard", 46390 ], \
-    [ "Alphekka", 76267 ], \
-    [ "Alpheratz", 677 ], \
-    [ "Alshain", 98036 ], \
-    [ "Altair", 97649 ], \
-    [ "Ankaa", 2081 ], \
-    [ "Antares", 80763 ], \
-    [ "Arcturus", 69673 ], \
-    [ "Arneb", 25985 ], \
-    [ "Babcock's star", 112247 ], \
-    [ "Barnard's star", 87937 ], \
-    [ "Bellatrix", 25336 ], \
-    [ "Betelgeuse", 27989 ], \
-    [ "Campbell's star", 96295 ], \
-    [ "Canopus", 30438 ], \
-    [ "Capella", 24608 ], \
-    [ "Caph", 746 ], \
-    [ "Castor", 36850 ], \
-    [ "Cor Caroli", 63125 ], \
-    [ "Cyg X-1", 98298 ], \
-    [ "Deneb", 102098 ], \
-    [ "Denebola", 57632 ], \
-    [ "Diphda", 3419 ], \
-    [ "Dubhe", 54061 ], \
-    [ "Enif", 107315 ], \
-    [ "Etamin", 87833 ], \
-    [ "Fomalhaut", 113368 ], \
-    [ "Groombridge 1830", 57939 ], \
-    [ "Hadar", 68702 ], \
-    [ "Hamal", 9884 ], \
-    [ "Izar", 72105 ], \
-    [ "Kapteyn's star", 24186 ], \
-    [ "Kaus Australis", 90185 ], \
-    [ "Kocab", 72607 ], \
-    [ "Kruger 60", 110893 ], \
-    [ "Luyten's star", 36208 ], \
-    [ "Markab", 113963 ], \
-    [ "Megrez", 59774 ], \
-    [ "Menkar", 14135 ], \
-    [ "Merak", 53910 ], \
-    [ "Mintaka", 25930 ], \
-    [ "Mira", 10826 ], \
-    [ "Mirach", 5447 ], \
-    [ "Mirphak", 15863 ], \
-    [ "Mizar", 65378 ], \
-    [ "Nihal", 25606 ], \
-    [ "Nunki", 92855 ], \
-    [ "Phad", 58001 ], \
-    [ "Pleione", 17851 ], \
-    [ "Polaris", 11767 ], \
-    [ "Pollux", 37826 ], \
-    [ "Procyon", 37279 ], \
-    [ "Proxima", 70890 ], \
-    [ "Rasalgethi", 84345 ], \
-    [ "Rasalhague", 86032 ], \
-    [ "Red Rectangle", 30089 ], \
-    [ "Regulus", 49669 ], \
-    [ "Rigel", 24436 ], \
-    [ "Rigil Kent", 71683 ], \
-    [ "Sadalmelik", 109074 ], \
-    [ "Saiph", 27366 ], \
-    [ "Scheat", 113881 ], \
-    [ "Shaula", 85927 ], \
-    [ "Shedir", 3179 ], \
-    [ "Sheliak", 92420 ], \
-    [ "Sirius", 32349 ], \
-    [ "Spica", 65474 ], \
-    [ "Tarazed", 97278 ], \
-    [ "Thuban", 68756 ], \
-    [ "Unukalhai", 77070 ], \
-    [ "Van Maanen 2", 3829 ], \
-    [ "Vega", 91262 ], \
-    [ "Vindemiatrix", 63608 ], \
-    [ "Zaurak", 18543 ], \
-    [ "3C 273", 60936 ] ]
+PLANET_MERCURY = "MERCURY BARYCENTER"
+PLANET_EARTH = "EARTH"
+PLANET_VENUS = "VENUS BARYCENTER"
+PLANET_MARS = "MARS BARYCENTER"
+PLANET_JUPITER = "JUPITER BARYCENTER"
+PLANET_SATURN = "SATURN BARYCENTER"
+PLANET_URANUS = "URANUS BARYCENTER"
+PLANET_NEPTUNE = "NEPTUNE BARYCENTER"
+PLANET_PLUTO = "PLUTO BARYCENTER"
 
+PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
 LUNAR_PHASE_FULL_MOON = "FULL_MOON"
 LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
@@ -257,13 +178,107 @@ LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
 LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
 LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
-PLANET_EARTH = "earth"
-PLANET_SATURN = "saturn barycenter"
+# https://www.cosmos.esa.int/web/hipparcos/common-star-names
+# This list contained a duplicate Hipparcos Identifier of 68702 for a star with two common names: Agena and Hadar.
+# The official name is Hadar and so Agena has been removed.
+STARS = {
+    "Acamar"            : 13847,
+    "Achernar"          : 7588,
+    "Acrux"             : 60718,
+    "Adhara"            : 33579,
+    "Albireo"           : 95947,
+    "Alcor"             : 65477,
+    "Alcyone"           : 17702,
+    "Aldebaran"         : 21421,
+    "Alderamin"         : 105199,
+    "Algenib"           : 1067,
+    "Algieba"           : 50583,
+    "Algol"             : 14576,
+    "Alhena"            : 31681,
+    "Alioth"            : 62956,
+    "Alkaid"            : 67301,
+    "Almaak"            : 9640,
+    "Alnair"            : 109268,
+    "Alnath"            : 25428,
+    "Alnilam"           : 26311,
+    "Alnitak"           : 26727,
+    "Alphard"           : 46390,
+    "Alphekka"          : 76267,
+    "Alpheratz"         : 677,
+    "Alshain"           : 98036,
+    "Altair"            : 97649,
+    "Ankaa"             : 2081,
+    "Antares"           : 80763,
+    "Arcturus"          : 69673,
+    "Arneb"             : 25985,
+    "Babcock's star"    : 112247,
+    "Barnard's star"    : 87937,
+    "Bellatrix"         : 25336,
+    "Betelgeuse"        : 27989,
+    "Campbell's star"   : 96295,
+    "Canopus"           : 30438,
+    "Capella"           : 24608,
+    "Caph"              : 746,
+    "Castor"            : 36850,
+    "Cor Caroli"        : 63125,
+    "Cyg X-1"           : 98298,
+    "Deneb"             : 102098,
+    "Denebola"          : 57632,
+    "Diphda"            : 3419,
+    "Dubhe"             : 54061,
+    "Enif"              : 107315,
+    "Etamin"            : 87833,
+    "Fomalhaut"         : 113368,
+    "Groombridge 1830"  : 57939,
+    "Hadar"             : 68702,
+    "Hamal"             : 9884,
+    "Izar"              : 72105,
+    "Kapteyn's star"    : 24186,
+    "Kaus Australis"    : 90185,
+    "Kocab"             : 72607,
+    "Kruger 60"         : 110893,
+    "Luyten's star"     : 36208,
+    "Markab"            : 113963,
+    "Megrez"            : 59774,
+    "Menkar"            : 14135,
+    "Merak"             : 53910,
+    "Mintaka"           : 25930,
+    "Mira"              : 10826,
+    "Mirach"            : 5447,
+    "Mirphak"           : 15863,
+    "Mizar"             : 65378,
+    "Nihal"             : 25606,
+    "Nunki"             : 92855,
+    "Phad"              : 58001,
+    "Pleione"           : 17851,
+    "Polaris"           : 11767,
+    "Pollux"            : 37826,
+    "Procyon"           : 37279,
+    "Proxima"           : 70890,
+    "Rasalgethi"        : 84345,
+    "Rasalhague"        : 86032,
+    "Red Rectangle"     : 30089,
+    "Regulus"           : 49669,
+    "Rigel"             : 24436,
+    "Rigil Kent"        : 71683,
+    "Sadalmelik"        : 109074,
+    "Saiph"             : 27366,
+    "Scheat"            : 113881,
+    "Shaula"            : 85927,
+    "Shedir"            : 3179,
+    "Sheliak"           : 92420,
+    "Sirius"            : 32349,
+    "Spica"             : 65474,
+    "Tarazed"           : 97278,
+    "Thuban"            : 68756,
+    "Unukalhai"         : 77070,
+    "Van Maanen 2"      : 3829,
+    "Vega"              : 91262,
+    "Vindemiatrix"      : 63608,
+    "Zaurak"            : 18543,
+    "3C 273"            : 60936 }
 
-MOON = "moon"
-SUN = "sun"
-
-EPHEMERIS_PLANETS = "skyfield/de438_2019-2023.bsp"
+EPHEMERIS_PLANETS = "skyfield/de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
 EPHEMERIS_STARS = "skyfield/hip_common_name_stars.dat.gz"
 
 MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
@@ -274,6 +289,9 @@ MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 # What other files are downloaded?  Need to also grab: https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat  Be careful...this file expires!
 
 
+# TODO Use
+#    https://ssd.jpl.nasa.gov/horizons.cgi
+# to verify results.
 def getAstronomicalInformation( utcNow,
                                 latitude, longitude, elevation,
                                 planets,
@@ -298,13 +316,21 @@ def getAstronomicalInformation( utcNow,
     ephemerisPlanets = load( EPHEMERIS_PLANETS )
     observer = getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
     topos = getSkyfieldTopos( latitude, longitude, elevation )
+    with load.open( EPHEMERIS_STARS ) as f:
+        ephemerisStars = hipparcos.load_dataframe( f )
 
     __calculateMoon( utcNowSkyfield, data, timeScale, observer, topos, ephemerisPlanets )
     __calculateSun( utcNowSkyfield, data, timeScale, observer, topos, ephemerisPlanets )
-#     __calculatePlanets( ephemNow, data, planets )
-#     __calculateStars( ephemNow, data, stars )
+    __calculatePlanets( utcNowSkyfield, data, timeScale, observer, topos, ephemerisPlanets, PLANETS ) # TODO Should use passed in list of planets eventually.
+
+    stars = [ "Acamar", "Achernar", "Acrux" ] #TODO Testing
+    __calculateStars( utcNowSkyfield, data, timeScale, observer, topos, ephemerisStars, stars ) #TODO Ensure passed in stars match those in STARS
+
+#     Comet https://github.com/skyfielders/python-skyfield/issues/196
 #     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
 #     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
+
+#     Satellite https://github.com/skyfielders/python-skyfield/issues/115
 #     __calculateSatellites( ephemNow, data, satellites, satelliteData )
 
     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
@@ -414,6 +440,16 @@ def __calculateSun( utcNow, data, timeScale, observer, topos, ephemeris ):
 # https://github.com/skyfielders/python-skyfield/issues/225
         __calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
 
+
+def __calculatePlanets( utcNow, data, timeScale, observer, topos, ephemeris, planets ):
+    for planet in planets:
+        __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, ephemeris[ planet ], AstronomicalBodyType.Planet, planet )
+
+
+def __calculateStars( utcNow, data, timeScale, observer, topos, ephemeris, stars ):
+    for star in stars:
+        __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, ephemeris[ star ], AstronomicalBodyType.Star, star )
+Star.from_dataframe( ephemerisStars.loc[ 24436 ] )
 
 def __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, body, astronomicalBodyType, nameTag ):
     neverUp = False
