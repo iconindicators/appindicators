@@ -270,6 +270,10 @@ MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
 MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 
 
+#TODO Might need to cache deltat.data and deltat.preds as the backend website was down and I couldn't get them except at a backup site.
+# What other files are downloaded?  Need to also grab: https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat  Be careful...this file expires!
+
+
 def getAstronomicalInformation( utcNow,
                                 latitude, longitude, elevation,
                                 planets,
@@ -296,7 +300,7 @@ def getAstronomicalInformation( utcNow,
     topos = getSkyfieldTopos( latitude, longitude, elevation )
 
     __calculateMoon( utcNowSkyfield, data, timeScale, observer, topos, ephemerisPlanets )
-#     __calculateSun( ephemNow, data )
+    __calculateSun( utcNowSkyfield, data, timeScale, observer, topos, ephemerisPlanets )
 #     __calculatePlanets( ephemNow, data, planets )
 #     __calculateStars( ephemNow, data, stars )
 #     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
@@ -400,6 +404,15 @@ def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
     data[ key + ( DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
     data[ key + ( DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
     data[ key + ( DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
+
+
+def __calculateSun( utcNow, data, timeScale, observer, topos, ephemeris ):
+    sun = ephemeris[ SUN ]
+    neverUp = __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, sun, AstronomicalBodyType.Sun, NAME_TAG_SUN )
+    if not neverUp:
+#TODO Skyfield does calculate dawn/dusk, but there is a workaround
+# https://github.com/skyfielders/python-skyfield/issues/225
+        __calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
 
 
 def __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, body, astronomicalBodyType, nameTag ):
