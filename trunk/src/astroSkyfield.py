@@ -276,6 +276,8 @@ def getAstronomicalInformation( utcNow,
                                 minorPlanets, minorPlanetData,
                                 magnitude ):
 
+    latitude = -78
+
     data = { }
 
     # Used internally to create the observer/city...removed before passing back to the caller.
@@ -413,6 +415,10 @@ def __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, body
 #     t0 = timeScale.utc( 2019, 9, 12, 4 )
 #     t1 = timeScale.utc( 2019, 9, 13, 4 )
     t, y = almanac.find_discrete( t0, t1, almanac.sunrise_sunset( ephemeris, topos ) )
+    if not t: # Never up and always up
+        x = almanac.sunrise_sunset( ephemeris, topos )
+        y = x.is_sun_up_at()
+
     t = t.utc_iso( delimiter = ' ' )
     if y[ 0 ]:
 #TODO Check the format of the data going in...is it a string and does it contain Z or other stuff?
