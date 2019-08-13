@@ -266,6 +266,9 @@ SUN = "sun"
 EPHEMERIS_PLANETS = "skyfield/de438_2019-2023.bsp"
 EPHEMERIS_STARS = "skyfield/hip_common_name_stars.dat.gz"
 
+MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
+MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
+
 
 def getAstronomicalInformation( utcNow,
                                 latitude, longitude, elevation,
@@ -276,7 +279,8 @@ def getAstronomicalInformation( utcNow,
                                 minorPlanets, minorPlanetData,
                                 magnitude ):
 
-    latitude = -78
+    latitude = -38
+    print( "latitude", latitude )
 
     data = { }
 
@@ -286,7 +290,7 @@ def getAstronomicalInformation( utcNow,
     data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = elevation
 
     timeScale = load.timescale()
-    utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
+    utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
     ephemerisPlanets = load( EPHEMERIS_PLANETS )
     observer = getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
     topos = getSkyfieldTopos( latitude, longitude, elevation )
@@ -398,41 +402,34 @@ def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
     data[ key + ( DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
-#TODO May not need some of the arguments
 def __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, body, astronomicalBodyType, nameTag ):
     neverUp = False
     key = ( astronomicalBodyType, nameTag )
-    apparent = observer.at( utcNow ).observe( body ).apparent()
-    alt, az, earthDistance = apparent.altaz()
-#TODO How to know when body is always up?
 
-#TODO Add in rise/set.
-# https://rhodesmill.org/skyfield/almanac.html
     utcNowDateTime = utcNow.utc_datetime()
     t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
     t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 1, utcNowDateTime.hour )
 
-#     t0 = timeScale.utc( 2019, 9, 12, 4 )
-#     t1 = timeScale.utc( 2019, 9, 13, 4 )
     t, y = almanac.find_discrete( t0, t1, almanac.sunrise_sunset( ephemeris, topos ) )
-    if not t: # Never up and always up
-        x = almanac.sunrise_sunset( ephemeris, topos )
-        y = x.is_sun_up_at()
+    if t:
+        t = t.utc_iso( delimiter = ' ' )
+        if y[ 0 ]:
+            data[ key + ( DATA_RISE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+            data[ key + ( DATA_SET_TIME, ) ] = str( t[ 1 ][ : -1 ] )
 
-    t = t.utc_iso( delimiter = ' ' )
-    if y[ 0 ]:
-#TODO Check the format of the data going in...is it a string and does it contain Z or other stuff?
-        data[ key + ( DATA_RISE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
-        data[ key + ( DATA_SET_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+        else:
+            data[ key + ( DATA_RISE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+            data[ key + ( DATA_SET_TIME, ) ] = str( t[ 0 ][ : -1 ] )
 
     else:
-        data[ key + ( DATA_RISE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
-        data[ key + ( DATA_SET_TIME, ) ] = str( t[ 0 ][ : -1 ] )
-
-
-#TODO How to know when body is never up?
+        if almanac.sunrise_sunset( ephemeris, topos )( t0 ):
+            data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_BODY_ALWAYS_UP
+        else:
+            neverUp = True
 
     if not neverUp:
+        apparent = observer.at( utcNow ).observe( body ).apparent()
+        alt, az, distance = apparent.altaz()
         data[ key + ( DATA_AZIMUTH, ) ] = str( az )
         data[ key + ( DATA_ALTITUDE, ) ] = str( alt )
 

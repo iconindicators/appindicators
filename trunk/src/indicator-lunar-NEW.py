@@ -572,7 +572,8 @@ class IndicatorLunar:
                                                   self.magnitude )
 
         print( x )
-        if True: return
+        import sys
+        if True: sys.exit()
 
         self.update( True )
 
