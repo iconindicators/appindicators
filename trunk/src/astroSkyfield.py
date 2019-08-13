@@ -28,11 +28,11 @@
 
 
 from skyfield import almanac
-from skyfield.api import load, Topos
+from skyfield.api import load, Star, Topos
 from skyfield.data import hipparcos
+from skyfield.nutationlib import iau2000b
 
 # from skyfield import positionlib
-# from skyfield.api import Star
 # from pandas.core.frame import DataFrame
 
 import eclipse, gzip, pytz
@@ -278,8 +278,8 @@ STARS = {
     "Zaurak"            : 18543,
     "3C 273"            : 60936 }
 
-EPHEMERIS_PLANETS = "skyfield/de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
-EPHEMERIS_STARS = "skyfield/hip_common_name_stars.dat.gz"
+EPHEMERIS_PLANETS = "de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
+EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
 
 MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
 MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
@@ -314,8 +314,8 @@ def getAstronomicalInformation( utcNow,
     timeScale = load.timescale()
     utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
     ephemerisPlanets = load( EPHEMERIS_PLANETS )
-    observer = getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
-    topos = getSkyfieldTopos( latitude, longitude, elevation )
+    observer = __getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
+    topos = __getSkyfieldTopos( latitude, longitude, elevation )
     with load.open( EPHEMERIS_STARS ) as f:
         ephemerisStars = hipparcos.load_dataframe( f )
 
@@ -448,8 +448,8 @@ def __calculatePlanets( utcNow, data, timeScale, observer, topos, ephemeris, pla
 
 def __calculateStars( utcNow, data, timeScale, observer, topos, ephemeris, stars ):
     for star in stars:
-        __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, ephemeris[ star ], AstronomicalBodyType.Star, star )
-Star.from_dataframe( ephemerisStars.loc[ 24436 ] )
+        __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
+
 
 def __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, body, astronomicalBodyType, nameTag ):
     neverUp = False
@@ -459,7 +459,8 @@ def __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, body
     t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
     t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 1, utcNowDateTime.hour )
 
-    t, y = almanac.find_discrete( t0, t1, almanac.sunrise_sunset( ephemeris, topos ) )
+#     t, y = almanac.find_discrete( t0, t1, almanac.sunrise_sunset( ephemeris, topos ) )  #TODO Original Skyfield function only supports sun rise/set.
+    t, y = almanac.find_discrete( t0, t1, __bodyrise_bodyset( observer, body ) )
     if t:
         t = t.utc_iso( delimiter = ' ' )
         if y[ 0 ]:
@@ -471,7 +472,8 @@ def __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, body
             data[ key + ( DATA_SET_TIME, ) ] = str( t[ 0 ][ : -1 ] )
 
     else:
-        if almanac.sunrise_sunset( ephemeris, topos )( t0 ):
+#        if almanac.sunrise_sunset( ephemeris, topos )( t0 ): #TODO Original Skyfield function only supports sun rise/set.
+        if __bodyrise_bodyset( observer, body )( t0 ):
             data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_BODY_ALWAYS_UP
         else:
             neverUp = True
@@ -485,12 +487,26 @@ def __calculateCommon( utcNow, data, timeScale, observer, topos, ephemeris, body
     return neverUp
 
 
-def getSkyfieldObserver( latitude, longitude, elevation, earth ):
+def __getSkyfieldObserver( latitude, longitude, elevation, earth ):
     return earth + Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
 
 
-def getSkyfieldTopos( latitude, longitude, elevation ):
+def __getSkyfieldTopos( latitude, longitude, elevation ):
     return Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
+
+
+#TODO Have copied the code from skyfield/almanac.py as per
+# https://github.com/skyfielders/python-skyfield/issues/226
+# to compute rise/set for any body.
+def __bodyrise_bodyset( observer, body ):
+
+    def is_body_up_at( t ):
+        t._nutation_angles = iau2000b( t.tt )
+        return observer.at( t ).observe( body ).apparent().altaz()[ 0 ].degrees > -0.8333
+
+    is_body_up_at.rough_period = 0.5
+
+    return is_body_up_at
 
 
 #TODO Keep this here?
