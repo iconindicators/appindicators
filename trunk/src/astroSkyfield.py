@@ -509,12 +509,22 @@ def __bodyrise_bodyset( observer, body ):
     return is_body_up_at
 
 
-# Opens the input star catalogue, filters out stars not listed as common named stars and writes out a new file.
-# Format for input file:
+# Loads the Skyfield catalogue of stars and filters out those not listed as common named.
+#
+# Common name stars:
+#     https://www.cosmos.esa.int/web/hipparcos/common-star-names
+#
+# Format of Skyfield catalogue:
 #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
-def __filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
+def createListOfStars():
+    import os.path
+    catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ] # First time Skyfield is run, the catalogue is downloaded.
+    if not os.path.isfile( catalogue ):
+        load.open( hipparcos.URL )
+
     try:
-        with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
+        hipparcosIdentifiers = list( STARS.values() )
+        with gzip.open( catalogue, "rb" ) as inFile, gzip.open( EPHEMERIS_STARS, "wb" ) as outFile:
             for line in inFile:
                 hip = int( line.decode()[ 8 : 14 ].strip() )
                 if hip in hipparcosIdentifiers:
@@ -523,17 +533,6 @@ def __filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputG
 
     except Exception as e:
         print( e ) #TODO Handle betterer.
-
-
-# Loads the default catalogue of stars and filters out those not listed as common named.
-# https://www.cosmos.esa.int/web/hipparcos/common-star-names
-def createListOfStars():
-    import os.path
-    catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ] # First time Skyfield is run, the catalogue is downloaded.
-    if not os.path.isfile( catalogue ):
-        load.open( hipparcos.URL )
-
-    __filterStarsByHipparcosIdentifier( catalogue, EPHEMERIS_STARS, list( STARS.values() ) )
 
 #TODO This list of stars are common name stars...what about stars that are visible but not in this list...how many of those are there?
 #     print( "Number of stars: ", ephemerisStars.shape[ 0 ] )
