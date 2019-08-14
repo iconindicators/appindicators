@@ -487,10 +487,12 @@ def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBody
     return neverUp
 
 
+#TODO Only called in one place...and if so, just move the code in place and delete this function.
 def __getSkyfieldObserver( latitude, longitude, elevation, earth ):
     return earth + Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
 
 
+#TODO Not used...delete?
 def __getSkyfieldTopos( latitude, longitude, elevation ):
     return Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
 
