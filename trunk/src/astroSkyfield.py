@@ -539,3 +539,187 @@ def createListOfCommonNamedStars():
 
 
 createListOfCommonNamedStars()
+
+
+
+
+
+#TOOO Reading on how to maybe calculate hour angle, sidereal time and so on...
+# https://www.madinstro.net/sundry/navcel.html
+# https://www.quora.com/How-do-I-calculate-the-hour-angle
+# https://astronomy.stackexchange.com/questions/12666/calculation-of-hour-angle
+# https://nptel.ac.in/courses/105107122/modules/module8/html/11.htm
+# https://astro.unl.edu/classaction/animations/200level/siderealTimeAndHourAngleDemo.html
+# http://faculty.virginia.edu/skrutskie/ASTR3130/notes/astr3130_week02.pdf
+# http://sundials.org/index.php/teachers-corner/sundial-mathematics
+# https://journal.hautehorlogerie.org/en/pilot-watches-mastering-the-hour-angle-ii/
+# https://en.wikipedia.org/wiki/Hour_angle
+# https://astronavigationdemystified.com/local-hour-angle-and-greenwich-hour-angle/
+
+
+def getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, bodyRA, bodyDec, ):
+    sunRA, sunDec, earthDistance = observer.at( utcNow ).observe( ephemeris[ SKYFIELD_PLANET_SUN ] ).apparent().radec()
+
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
+    y = math.cos( sunDec.radians ) * math.sin( sunRA.radians - bodyRA.radians )
+    x = math.sin( sunDec.radians ) * math.cos( bodyDec.radians ) - math.cos( sunDec.radians ) * math.sin( bodyDec.radians ) * math.cos( sunRA.radians - bodyRA.radians )
+    positionAngleOfBrightLimb = math.atan2( y, x )
+
+    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+
+#TODO Is this screwing up the timescale?
+#     print( "Local sidereal time:", timeScale.utc( utcNow.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
+
+
+#     print( "GMST", load.timescale().now().gmst )
+#     print( "GMST", utcNow.gmst )
+
+#     https://stackoverflow.com/questions/25837452/python-get-current-time-in-right-timezone
+    from datetime import datetime, timezone, timedelta
+    utc_dt = datetime.now( timezone.utc ) # UTC time
+    dt = utc_dt.astimezone() # local time
+#     print( "UTC with timezone information:", utc_dt )
+#     print( "Local time with timezone information:", dt )
+
+    zzz = timeScale.utc( dt )
+#     print( "UTC from time object:", zzz )
+#     print( "GMST:", zzz.gmst )
+
+    from skyfield.units import Angle
+    longitude = None
+    for positive in observer.positives:
+        if type( positive ).__name__ == "Topos":
+            longitude = positive.longitude
+            break
+
+    import numpy
+#     print( "GMST", utcNow.gmst, type( utcNow.gmst ) )
+    print( "GMST (hours)", utcNow.gmst, type( utcNow.gmst ) )
+#     print( "GMST radians", numpy.radians( utcNow.gmst ), type( numpy.radians( utcNow.gmst ) ) )
+#     print( "GMST angle", Angle( hours = utcNow.gmst ), Angle( hours = utcNow.gmst ) )
+    print( "Longitude", longitude, type( longitude ) ) 
+    print( "Longitude (degrees)", longitude._degrees, type( longitude ) ) 
+    print( "Longitude as time", longitude._degrees * 24.0 / 360.0 )
+#     print( "Longitude radians", longitude.radians, type( longitude.radians ) ) 
+#     print( "Longitude degrees", longitude.degrees, type( longitude.degrees ) ) 
+    print( "bodyRA", bodyRA, type( bodyRA ) )
+#     print( "bodyRA radians", bodyRA.radians, type( bodyRA.radians ) )
+    print( "bodyRA hours", bodyRA._hours, type( bodyRA._hours) )
+#     hourAngle = numpy.radians( utcNow.gmst ) - longitude.radians - bodyRA.radians
+#     print( "hour angle", numpy.radians( hourAngle ) )
+    hourAngle = utcNow.gmst - ( - 24.0 * longitude._degrees / 360.0 ) - bodyRA._hours
+    print( "hour angle", hourAngle )
+#     hourAngle = Angle( hours = utcNow.gmst ) - longitude - bodyRA
+#     print( "hour angle", hourAngle )
+
+    import time
+    print( "Local time zone:", time.strftime( "%z" ) )
+    print( "Local time zone:", timezone( timedelta( seconds =- time.timezone ) ) )
+
+#     from time import gmtime, strftime
+#     print(strftime("%z", gmtime()))
+#     import time; print( time.tzname )
+#     print( time.tzname[time.daylight] )
+#     print( time.localtime().tm_isdst )
+#     print( datetime.datetime.now(datetime.timezone.utc).astimezone().tzname() )
+#     print( pytz.all_timezones )
+#     utcNowSkyfield = timeScale.utc( load.timescale().now().replace( tzinfo = pytz.UTC ) )
+#     print( "Timescale now tzinfo utc gmst", utcNowSkyfield.gmst )
+    
+    
+#     sss = timeScale.utc( datetime.datetime.utcnow() )
+#     print( "Timescale datetime utc now gmst", sss.gmst )
+
+
+#     hourAngle = city.sidereal_time() - bodyRA
+#     y = math.sin( hourAngle )
+#     x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
+#     parallacticAngle = math.atan2( y, x )
+
+#     hourAngleNEW = observerSiderealTime - bodyRA
+#     yNEW = math.sin( hourAngleNEW )
+#     xNEW = math.tan( observerLatitude ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngleNEW )
+#     parallacticAngleNEW = math.atan2( yNEW, xNEW )
+
+#     orig = math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+#     new = math.degrees( ( positionAngleOfBrightLimbNEW - parallacticAngleNEW ) % ( 2.0 * math.pi ) )
+#     return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+    return ""
+
+
+def testSiderealTime():
+    madrid = ephem.city('Madrid')
+    madrid.date = '1978/10/3 11:32'
+    print( "Madrid", madrid.sidereal_time())
+
+
+    madrid = ephem.city('Sydney')
+    madrid.date = '1978/10/3 11:32'
+    print( "Sydney", madrid.sidereal_time())
+
+
+    ts = load.timescale()
+    t = ts.utc(1978, 10, 3,11,32, 0)
+    st = t.gmst
+    print( st )
+
+#TODO May help...
+# https://stackoverflow.com/questions/53240745/pyephem-ra-dec-to-gha-dec
+# https://stackoverflow.com/questions/13664935/is-this-how-to-compute-greenwich-hour-angle-with-pyephem-under-python-3
+
+    print( load.timescale().now().gmst )
+
+    sss = ts.utc( utcNow.replace( tzinfo = pytz.UTC ) )
+    sss = ts.utc( datetime.datetime.utcnow() )
+    print( sss.gmst )
+
+    import sys
+    sys.exit()
+
+    ephemeris = load( SKYFIELD_EPHEMERIS_PLANETS )
+    sun = ephemeris[ SKYFIELD_PLANET_SUN ]
+
+    observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    timescale = load.timescale()
+    utcNowSkyfield = timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
+    apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
+    alt, az, earthDistance = apparent.altaz()
+    sunRA, sunDEC, earthDistance = apparent.radec()
+
+    thePlanet = ephemeris[ SKYFIELD_PLANET_SATURN ]
+    apparent = observer.at( utcNowSkyfield ).observe( thePlanet ).apparent()
+    ra, dec, earthDistance = apparent.radec()
+
+    observerSiderealTime = utcNowSkyfield.gmst
+
+
+    observer = getPyephemObserver( utcNow, latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres )
+    city = ephem.city( "Sydney" )
+    city.date = utcNow
+    sun = ephem.Sun( observer )
+    saturn = ephem.Saturn( observer )
+
+    ephemeris = load( SKYFIELD_EPHEMERIS_PLANETS )
+    sun = ephemeris[ SKYFIELD_PLANET_SUN ]
+
+    observer = getSkyfieldObserver( latitudeDecimalDegrees, longitudeDecimalDegrees, elevationMetres, ephemeris[ SKYFIELD_PLANET_EARTH ] )
+    timescale = load.timescale()
+    utcNowSkyfield = timescale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
+    apparent = observer.at( utcNowSkyfield ).observe( sun ).apparent()
+    sunRA, sunDEC, earthDistance = apparent.radec()
+
+    apparent = observer.at( utcNowSkyfield ).observe( ephemeris[ SKYFIELD_PLANET_SATURN ] ).apparent()
+    ra, dec, earthDistance = apparent.radec()
+
+# https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
+# http://astro.subhashbose.com/siderealtime/
+# http://www.wwu.edu/skywise/skymobile/skywatch.html
+# http://www.jgiesen.de/astro/astroJS/siderealClock/
+# http://neoprogrammics.com/sidereal_time_calculator/index.php   <------ does not match the other sites.
+    observerSiderealTime = utcNowSkyfield.gmst
+    print( city.sidereal_time() )
+    print( '%.6f' % city.sidereal_time() )
+    print( observerSiderealTime )
+
+    print( timescale.utc( utcNow.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gmst )
+    print( timescale.utc( utcNow.replace( tzinfo = pytz.timezone( "Australia/Sydney" ) ) ).gast )
