@@ -509,45 +509,35 @@ def __bodyrise_bodyset( observer, body ):
     return is_body_up_at
 
 
-def createListOfStars():
-# NOTE: First time skyfield is run, use the hipparcos.URL version which gets the file hip_main.dat.gz
-# Can then use the filterStars function to make a subset/smaller file (which presumably would be included in the final indicator).
-    with load.open( hipparcos.URL ) as f:
-        ephemeris = hipparcos.load_dataframe( f )
-
-    __filterStarsByHipparcosIdentifier( "hip_main.dat.gz", EPHEMERIS_STARS, list( STARS.values() ) )
-#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
-#         ephemerisStars = hipparcos.load_dataframe( f )
-  
-#TODO This list of stars are common name stars...what about stars that are visible but not in this list...how many of those are there?
-#     print( "Number of stars: ", ephemerisStars.shape[ 0 ] )
-#     print( "Number of data columns: ", ephemerisStars.shape[ 1 ] )
-
-
-
-#TODO Keep this here?
-#
-# ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
+# Opens the input star catalogue, filters out stars not listed as common named stars and writes out a new file.
+# Format for input file:
+#     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
 def __filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
-    print( "Number of ids:", len( hipparcosIdentifiers ) )
-    counts = { }
-    for hip in STARS.values():
-        counts[ hip ] = 0
-
     try:
         with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
             for line in inFile:
                 hip = int( line.decode()[ 8 : 14 ].strip() )
                 if hip in hipparcosIdentifiers:
-                    counts[ hip ] += 1
-
-#                     magnitude = int( line.decode()[ 42 : 46 ].strip() ) #TODO This barfs...dunno why as it should be the same as pulling out the hip.
-#                     print( hip, magnitude )
-#                     outFile.write( line ) #TODO Put this back in!
+#                     magnitude = float( line.decode()[ 41 : 46 ].strip() )
+                    outFile.write( line )
 
     except Exception as e:
         print( e ) #TODO Handle betterer.
 
+
+# Loads the default catalogue of stars and filters out those not listed as common named.
+# https://www.cosmos.esa.int/web/hipparcos/common-star-names
+def createListOfStars():
+    import os.path
+    catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ] # First time Skyfield is run, the catalogue is downloaded.
+    if not os.path.isfile( catalogue ):
+        load.open( hipparcos.URL )
+
+    __filterStarsByHipparcosIdentifier( catalogue, EPHEMERIS_STARS, list( STARS.values() ) )
+
+#TODO This list of stars are common name stars...what about stars that are visible but not in this list...how many of those are there?
+#     print( "Number of stars: ", ephemerisStars.shape[ 0 ] )
+#     print( "Number of data columns: ", ephemerisStars.shape[ 1 ] )
 
 
 createListOfStars()
