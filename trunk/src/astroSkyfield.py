@@ -509,16 +509,41 @@ def __bodyrise_bodyset( observer, body ):
     return is_body_up_at
 
 
+def createListOfStars():
+# NOTE: First time skyfield is run, use the hipparcos.URL version which gets the file hip_main.dat.gz
+# Can then use the filterStars function to make a subset/smaller file (which presumably would be included in the final indicator).
+    with load.open( hipparcos.URL ) as f:
+        ephemeris = hipparcos.load_dataframe( f )
+
+    __filterStarsByHipparcosIdentifier( "hip_main.dat.gz", EPHEMERIS_STARS, list( STARS.values() ) )
+#     with load.open( SKYFIELD_EPHEMERIS_STARS ) as f:
+#         ephemerisStars = hipparcos.load_dataframe( f )
+  
+#TODO This list of stars are common name stars...what about stars that are visible but not in this list...how many of those are there?
+#     print( "Number of stars: ", ephemerisStars.shape[ 0 ] )
+#     print( "Number of data columns: ", ephemerisStars.shape[ 1 ] )
+
+
+
 #TODO Keep this here?
-def filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
+def __filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
+    print( "Number of ids:", len( hipparcosIdentifiers ) )
     try:
+        [key for key in dict.keys() if (dict[key] == value)]
+https://stackoverflow.com/questions/8023306/get-key-by-value-in-dictionary        
         with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
+            count = 0
             for line in inFile:
                 hip = int( line.decode()[ 9 : 14 ].strip() ) #TODO Was 2 but according to ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe it should be 9.
                 if hip in hipparcosIdentifiers:
 #                     magnitude = int( line.decode()[ 42 : 46 ].strip() ) #TODO This barfs...dunno why as it should be the same as pulling out the hip.
 #                     print( hip, magnitude )
-                    outFile.write( line )
-
+#                     outFile.write( line )
+                    count += 1
+                    print(  hip )
     except Exception as e:
         print( e ) #TODO Handle betterer.
+
+    print( "Count:", count )
+
+createListOfStars()
