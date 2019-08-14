@@ -32,9 +32,6 @@ from skyfield.api import load, Star, Topos
 from skyfield.data import hipparcos
 from skyfield.nutationlib import iau2000b
 
-# from skyfield import positionlib
-# from pandas.core.frame import DataFrame
-
 import eclipse, gzip, pytz
 # import datetime, math
 
@@ -446,6 +443,12 @@ def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets ):
         __calculateCommon( utcNow, data, timeScale, observer, ephemeris[ planet ], AstronomicalBodyType.Planet, planet )
 
 
+#TODO According to 
+#     https://github.com/skyfielders/python-skyfield/issues/39
+#     https://github.com/skyfielders/python-skyfield/pull/40
+# skyfield might support somehow star names out of the box...
+# ...so that means taking the data, selecting only ephemerisStars of magnitude 2.5 or so and keep those.
+# See revision 999 for code to filter ephemerisStars by magnitude.
 def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars ):
     for star in stars:
         __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
