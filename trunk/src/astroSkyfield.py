@@ -526,24 +526,28 @@ def createListOfStars():
 
 
 #TODO Keep this here?
+#
+# ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
 def __filterStarsByHipparcosIdentifier( hipparcosInputGzipFile, hipparcosOutputGzipFile, hipparcosIdentifiers ):
     print( "Number of ids:", len( hipparcosIdentifiers ) )
+    counts = { }
+    for hip in STARS.values():
+        counts[ hip ] = 0
+
     try:
-        [key for key in dict.keys() if (dict[key] == value)]
-https://stackoverflow.com/questions/8023306/get-key-by-value-in-dictionary        
         with gzip.open( hipparcosInputGzipFile, "rb" ) as inFile, gzip.open( hipparcosOutputGzipFile, "wb" ) as outFile:
-            count = 0
             for line in inFile:
-                hip = int( line.decode()[ 9 : 14 ].strip() ) #TODO Was 2 but according to ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe it should be 9.
+                hip = int( line.decode()[ 8 : 14 ].strip() )
                 if hip in hipparcosIdentifiers:
+                    counts[ hip ] += 1
+
 #                     magnitude = int( line.decode()[ 42 : 46 ].strip() ) #TODO This barfs...dunno why as it should be the same as pulling out the hip.
 #                     print( hip, magnitude )
-#                     outFile.write( line )
-                    count += 1
-                    print(  hip )
+#                     outFile.write( line ) #TODO Put this back in!
+
     except Exception as e:
         print( e ) #TODO Handle betterer.
 
-    print( "Count:", count )
+
 
 createListOfStars()
