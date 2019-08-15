@@ -151,6 +151,7 @@ NAME_TAG_CITY = "CITY"
 NAME_TAG_MOON = "MOON"
 NAME_TAG_SUN = "SUN"
 
+#TODO Why have these?  Aren't the name tags above sufficient?
 MOON = "MOON"
 SUN = "SUN"
 
