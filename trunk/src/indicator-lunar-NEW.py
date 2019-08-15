@@ -151,240 +151,240 @@ class IndicatorLunar:
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
     DATA_TAGS_TRANSLATIONS = {
-        astro.DATA_ALTITUDE             : _( "ALTITUDE" ),
-        astro.DATA_AZIMUTH              : _( "AZIMUTH" ),
-        astro.DATA_DAWN                 : _( "DAWN" ),
-        astro.DATA_DUSK                 : _( "DUSK" ),
-        astro.DATA_ECLIPSE_DATE_TIME    : _( "ECLIPSE DATE TIME" ),
-        astro.DATA_ECLIPSE_LATITUDE     : _( "ECLIPSE LATITUDE" ),
-        astro.DATA_ECLIPSE_LONGITUDE    : _( "ECLIPSE LONGITUDE" ),
-        astro.DATA_ECLIPSE_TYPE         : _( "ECLIPSE TYPE" ),
-        astro.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
-        astro.DATA_FULL                 : _( "FULL" ),
-        astro.DATA_MESSAGE              : _( "MESSAGE" ),
-        astro.DATA_NEW                  : _( "NEW" ),
-        astro.DATA_PHASE                : _( "PHASE" ),
-        astro.DATA_RISE_AZIMUTH         : _( "RISE AZIMUTH" ),
-        astro.DATA_RISE_TIME            : _( "RISE TIME" ),
-        astro.DATA_SET_AZIMUTH          : _( "SET AZIMUTH" ),
-        astro.DATA_SET_TIME             : _( "SET TIME" ),
-        astro.DATA_THIRD_QUARTER        : _( "THIRD QUARTER" ) }
+        astroPyephem.DATA_ALTITUDE             : _( "ALTITUDE" ),
+        astroPyephem.DATA_AZIMUTH              : _( "AZIMUTH" ),
+        astroPyephem.DATA_DAWN                 : _( "DAWN" ),
+        astroPyephem.DATA_DUSK                 : _( "DUSK" ),
+        astroPyephem.DATA_ECLIPSE_DATE_TIME    : _( "ECLIPSE DATE TIME" ),
+        astroPyephem.DATA_ECLIPSE_LATITUDE     : _( "ECLIPSE LATITUDE" ),
+        astroPyephem.DATA_ECLIPSE_LONGITUDE    : _( "ECLIPSE LONGITUDE" ),
+        astroPyephem.DATA_ECLIPSE_TYPE         : _( "ECLIPSE TYPE" ),
+        astroPyephem.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
+        astroPyephem.DATA_FULL                 : _( "FULL" ),
+        astroPyephem.DATA_MESSAGE              : _( "MESSAGE" ),
+        astroPyephem.DATA_NEW                  : _( "NEW" ),
+        astroPyephem.DATA_PHASE                : _( "PHASE" ),
+        astroPyephem.DATA_RISE_AZIMUTH         : _( "RISE AZIMUTH" ),
+        astroPyephem.DATA_RISE_TIME            : _( "RISE TIME" ),
+        astroPyephem.DATA_SET_AZIMUTH          : _( "SET AZIMUTH" ),
+        astroPyephem.DATA_SET_TIME             : _( "SET TIME" ),
+        astroPyephem.DATA_THIRD_QUARTER        : _( "THIRD QUARTER" ) }
 
-    CITY_TAG_TRANSLATION = { astro.NAME_TAG_CITY: _( "CITY" ) }
-    MOON_TAG_TRANSLATION = { astro.NAME_TAG_MOON : _( "MOON" ) }
-    SUN_TAG_TRANSLATION = { astro.NAME_TAG_SUN : _( "SUN" ) }
+    CITY_TAG_TRANSLATION = { astroPyephem.NAME_TAG_CITY: _( "CITY" ) }
+    MOON_TAG_TRANSLATION = { astroPyephem.NAME_TAG_MOON : _( "MOON" ) }
+    SUN_TAG_TRANSLATION = { astroPyephem.NAME_TAG_SUN : _( "SUN" ) }
 
     PLANET_NAMES_TRANSLATIONS = {
-        astro.PLANET_MERCURY    : _( "Mercury" ),
-        astro.PLANET_VENUS      : _( "Venus" ),
-        astro.PLANET_MARS       : _( "Mars" ),
-        astro.PLANET_JUPITER    : _( "Jupiter" ),
-        astro.PLANET_SATURN     : _( "Saturn" ),
-        astro.PLANET_URANUS     : _( "Uranus" ),
-        astro.PLANET_NEPTUNE    : _( "Neptune" ),
-        astro.PLANET_PLUTO      : _( "Pluto" ) }
+        astroPyephem.PLANET_MERCURY    : _( "Mercury" ),
+        astroPyephem.PLANET_VENUS      : _( "Venus" ),
+        astroPyephem.PLANET_MARS       : _( "Mars" ),
+        astroPyephem.PLANET_JUPITER    : _( "Jupiter" ),
+        astroPyephem.PLANET_SATURN     : _( "Saturn" ),
+        astroPyephem.PLANET_URANUS     : _( "Uranus" ),
+        astroPyephem.PLANET_NEPTUNE    : _( "Neptune" ),
+        astroPyephem.PLANET_PLUTO      : _( "Pluto" ) }
 
     PLANET_TAGS_TRANSLATIONS = {
-        astro.PLANET_MERCURY    : _( "MERCURY" ),
-        astro.PLANET_VENUS      : _( "VENUS" ),
-        astro.PLANET_MARS       : _( "MARS" ),
-        astro.PLANET_JUPITER    : _( "JUPITER" ),
-        astro.PLANET_SATURN     : _( "SATURN" ),
-        astro.PLANET_URANUS     : _( "URANUS" ),
-        astro.PLANET_NEPTUNE    : _( "NEPTUNE" ),
-        astro.PLANET_PLUTO      : _( "PLUTO" ) }
+        astroPyephem.PLANET_MERCURY    : _( "MERCURY" ),
+        astroPyephem.PLANET_VENUS      : _( "VENUS" ),
+        astroPyephem.PLANET_MARS       : _( "MARS" ),
+        astroPyephem.PLANET_JUPITER    : _( "JUPITER" ),
+        astroPyephem.PLANET_SATURN     : _( "SATURN" ),
+        astroPyephem.PLANET_URANUS     : _( "URANUS" ),
+        astroPyephem.PLANET_NEPTUNE    : _( "NEPTUNE" ),
+        astroPyephem.PLANET_PLUTO      : _( "PLUTO" ) }
 
     STAR_NAMES_TRANSLATIONS = {
-        astro.STARS[ 0 ]    : _( "Achernar" ),
-        astro.STARS[ 1 ]    : _( "Adara" ),
-        astro.STARS[ 2 ]    : _( "Agena" ),
-        astro.STARS[ 3 ]    : _( "Albereo" ),
-        astro.STARS[ 4 ]    : _( "Alcaid" ),
-        astro.STARS[ 5 ]    : _( "Alcor" ),
-        astro.STARS[ 6 ]    : _( "Alcyone" ),
-        astro.STARS[ 7 ]    : _( "Aldebaran" ),
-        astro.STARS[ 8 ]    : _( "Alderamin" ),
-        astro.STARS[ 9 ]    : _( "Alfirk" ),
-        astro.STARS[ 10 ]   : _( "Algenib" ),
-        astro.STARS[ 11 ]   : _( "Algieba" ),
-        astro.STARS[ 12 ]   : _( "Algol" ),
-        astro.STARS[ 13 ]   : _( "Alhena" ),
-        astro.STARS[ 14 ]   : _( "Alioth" ),
-        astro.STARS[ 15 ]   : _( "Almach" ),
-        astro.STARS[ 16 ]   : _( "Alnair" ),
-        astro.STARS[ 17 ]   : _( "Alnilam" ),
-        astro.STARS[ 18 ]   : _( "Alnitak" ),
-        astro.STARS[ 19 ]   : _( "Alphard" ),
-        astro.STARS[ 20 ]   : _( "Alphecca" ),
-        astro.STARS[ 21 ]   : _( "Alshain" ),
-        astro.STARS[ 22 ]   : _( "Altair" ),
-        astro.STARS[ 23 ]   : _( "Antares" ),
-        astro.STARS[ 24 ]   : _( "Arcturus" ),
-        astro.STARS[ 25 ]   : _( "Arkab Posterior" ),
-        astro.STARS[ 26 ]   : _( "Arkab Prior" ),
-        astro.STARS[ 27 ]   : _( "Arneb" ),
-        astro.STARS[ 28 ]   : _( "Atlas" ),
-        astro.STARS[ 29 ]   : _( "Bellatrix" ),
-        astro.STARS[ 30 ]   : _( "Betelgeuse" ),
-        astro.STARS[ 31 ]   : _( "Canopus" ),
-        astro.STARS[ 32 ]   : _( "Capella" ),
-        astro.STARS[ 33 ]   : _( "Caph" ),
-        astro.STARS[ 34 ]   : _( "Castor" ),
-        astro.STARS[ 35 ]   : _( "Cebalrai" ),
-        astro.STARS[ 36 ]   : _( "Deneb" ),
-        astro.STARS[ 37 ]   : _( "Denebola" ),
-        astro.STARS[ 38 ]   : _( "Dubhe" ),
-        astro.STARS[ 39 ]   : _( "Electra" ),
-        astro.STARS[ 40 ]   : _( "Elnath" ),
-        astro.STARS[ 41 ]   : _( "Enif" ),
-        astro.STARS[ 42 ]   : _( "Etamin" ),
-        astro.STARS[ 43 ]   : _( "Fomalhaut" ),
-        astro.STARS[ 44 ]   : _( "Gienah Corvi" ),
-        astro.STARS[ 45 ]   : _( "Hamal" ),
-        astro.STARS[ 46 ]   : _( "Izar" ),
-        astro.STARS[ 47 ]   : _( "Kaus Australis" ),
-        astro.STARS[ 48 ]   : _( "Kochab" ),
-        astro.STARS[ 49 ]   : _( "Maia" ),
-        astro.STARS[ 50 ]   : _( "Markab" ),
-        astro.STARS[ 51 ]   : _( "Megrez" ),
-        astro.STARS[ 52 ]   : _( "Menkalinan" ),
-        astro.STARS[ 53 ]   : _( "Menkar" ),
-        astro.STARS[ 54 ]   : _( "Merak" ),
-        astro.STARS[ 55 ]   : _( "Merope" ),
-        astro.STARS[ 56 ]   : _( "Mimosa" ),
-        astro.STARS[ 57 ]   : _( "Minkar" ),
-        astro.STARS[ 58 ]   : _( "Mintaka" ),
-        astro.STARS[ 59 ]   : _( "Mirach" ),
-        astro.STARS[ 60 ]   : _( "Mirzam" ),
-        astro.STARS[ 61 ]   : _( "Mizar" ),
-        astro.STARS[ 62 ]   : _( "Naos" ),
-        astro.STARS[ 63 ]   : _( "Nihal" ),
-        astro.STARS[ 64 ]   : _( "Nunki" ),
-        astro.STARS[ 65 ]   : _( "Peacock" ),
-        astro.STARS[ 66 ]   : _( "Phecda" ),
-        astro.STARS[ 67 ]   : _( "Polaris" ),
-        astro.STARS[ 68 ]   : _( "Pollux" ),
-        astro.STARS[ 69 ]   : _( "Procyon" ),
-        astro.STARS[ 70 ]   : _( "Rasalgethi" ),
-        astro.STARS[ 71 ]   : _( "Rasalhague" ),
-        astro.STARS[ 72 ]   : _( "Regulus" ),
-        astro.STARS[ 73 ]   : _( "Rigel" ),
-        astro.STARS[ 74 ]   : _( "Rukbat" ),
-        astro.STARS[ 75 ]   : _( "Sadalmelik" ),
-        astro.STARS[ 76 ]   : _( "Sadr" ),
-        astro.STARS[ 77 ]   : _( "Saiph" ),
-        astro.STARS[ 78 ]   : _( "Scheat" ),
-        astro.STARS[ 79 ]   : _( "Schedar" ),
-        astro.STARS[ 80 ]   : _( "Shaula" ),
-        astro.STARS[ 81 ]   : _( "Sheliak" ),
-        astro.STARS[ 82 ]   : _( "Sirius" ),
-        astro.STARS[ 83 ]   : _( "Sirrah" ),
-        astro.STARS[ 84 ]   : _( "Spica" ),
-        astro.STARS[ 85 ]   : _( "Sulafat" ),
-        astro.STARS[ 86 ]   : _( "Tarazed" ),
-        astro.STARS[ 87 ]   : _( "Taygeta" ),
-        astro.STARS[ 88 ]   : _( "Thuban" ),
-        astro.STARS[ 89 ]   : _( "Unukalhai" ),
-        astro.STARS[ 90 ]   : _( "Vega" ),
-        astro.STARS[ 91 ]   : _( "Vindemiatrix" ),
-        astro.STARS[ 92 ]   : _( "Wezen" ),
-        astro.STARS[ 93 ]   : _( "Zaurak" ) }
+        astroPyephem.STARS[ 0 ]    : _( "Achernar" ),
+        astroPyephem.STARS[ 1 ]    : _( "Adara" ),
+        astroPyephem.STARS[ 2 ]    : _( "Agena" ),
+        astroPyephem.STARS[ 3 ]    : _( "Albereo" ),
+        astroPyephem.STARS[ 4 ]    : _( "Alcaid" ),
+        astroPyephem.STARS[ 5 ]    : _( "Alcor" ),
+        astroPyephem.STARS[ 6 ]    : _( "Alcyone" ),
+        astroPyephem.STARS[ 7 ]    : _( "Aldebaran" ),
+        astroPyephem.STARS[ 8 ]    : _( "Alderamin" ),
+        astroPyephem.STARS[ 9 ]    : _( "Alfirk" ),
+        astroPyephem.STARS[ 10 ]   : _( "Algenib" ),
+        astroPyephem.STARS[ 11 ]   : _( "Algieba" ),
+        astroPyephem.STARS[ 12 ]   : _( "Algol" ),
+        astroPyephem.STARS[ 13 ]   : _( "Alhena" ),
+        astroPyephem.STARS[ 14 ]   : _( "Alioth" ),
+        astroPyephem.STARS[ 15 ]   : _( "Almach" ),
+        astroPyephem.STARS[ 16 ]   : _( "Alnair" ),
+        astroPyephem.STARS[ 17 ]   : _( "Alnilam" ),
+        astroPyephem.STARS[ 18 ]   : _( "Alnitak" ),
+        astroPyephem.STARS[ 19 ]   : _( "Alphard" ),
+        astroPyephem.STARS[ 20 ]   : _( "Alphecca" ),
+        astroPyephem.STARS[ 21 ]   : _( "Alshain" ),
+        astroPyephem.STARS[ 22 ]   : _( "Altair" ),
+        astroPyephem.STARS[ 23 ]   : _( "Antares" ),
+        astroPyephem.STARS[ 24 ]   : _( "Arcturus" ),
+        astroPyephem.STARS[ 25 ]   : _( "Arkab Posterior" ),
+        astroPyephem.STARS[ 26 ]   : _( "Arkab Prior" ),
+        astroPyephem.STARS[ 27 ]   : _( "Arneb" ),
+        astroPyephem.STARS[ 28 ]   : _( "Atlas" ),
+        astroPyephem.STARS[ 29 ]   : _( "Bellatrix" ),
+        astroPyephem.STARS[ 30 ]   : _( "Betelgeuse" ),
+        astroPyephem.STARS[ 31 ]   : _( "Canopus" ),
+        astroPyephem.STARS[ 32 ]   : _( "Capella" ),
+        astroPyephem.STARS[ 33 ]   : _( "Caph" ),
+        astroPyephem.STARS[ 34 ]   : _( "Castor" ),
+        astroPyephem.STARS[ 35 ]   : _( "Cebalrai" ),
+        astroPyephem.STARS[ 36 ]   : _( "Deneb" ),
+        astroPyephem.STARS[ 37 ]   : _( "Denebola" ),
+        astroPyephem.STARS[ 38 ]   : _( "Dubhe" ),
+        astroPyephem.STARS[ 39 ]   : _( "Electra" ),
+        astroPyephem.STARS[ 40 ]   : _( "Elnath" ),
+        astroPyephem.STARS[ 41 ]   : _( "Enif" ),
+        astroPyephem.STARS[ 42 ]   : _( "Etamin" ),
+        astroPyephem.STARS[ 43 ]   : _( "Fomalhaut" ),
+        astroPyephem.STARS[ 44 ]   : _( "Gienah Corvi" ),
+        astroPyephem.STARS[ 45 ]   : _( "Hamal" ),
+        astroPyephem.STARS[ 46 ]   : _( "Izar" ),
+        astroPyephem.STARS[ 47 ]   : _( "Kaus Australis" ),
+        astroPyephem.STARS[ 48 ]   : _( "Kochab" ),
+        astroPyephem.STARS[ 49 ]   : _( "Maia" ),
+        astroPyephem.STARS[ 50 ]   : _( "Markab" ),
+        astroPyephem.STARS[ 51 ]   : _( "Megrez" ),
+        astroPyephem.STARS[ 52 ]   : _( "Menkalinan" ),
+        astroPyephem.STARS[ 53 ]   : _( "Menkar" ),
+        astroPyephem.STARS[ 54 ]   : _( "Merak" ),
+        astroPyephem.STARS[ 55 ]   : _( "Merope" ),
+        astroPyephem.STARS[ 56 ]   : _( "Mimosa" ),
+        astroPyephem.STARS[ 57 ]   : _( "Minkar" ),
+        astroPyephem.STARS[ 58 ]   : _( "Mintaka" ),
+        astroPyephem.STARS[ 59 ]   : _( "Mirach" ),
+        astroPyephem.STARS[ 60 ]   : _( "Mirzam" ),
+        astroPyephem.STARS[ 61 ]   : _( "Mizar" ),
+        astroPyephem.STARS[ 62 ]   : _( "Naos" ),
+        astroPyephem.STARS[ 63 ]   : _( "Nihal" ),
+        astroPyephem.STARS[ 64 ]   : _( "Nunki" ),
+        astroPyephem.STARS[ 65 ]   : _( "Peacock" ),
+        astroPyephem.STARS[ 66 ]   : _( "Phecda" ),
+        astroPyephem.STARS[ 67 ]   : _( "Polaris" ),
+        astroPyephem.STARS[ 68 ]   : _( "Pollux" ),
+        astroPyephem.STARS[ 69 ]   : _( "Procyon" ),
+        astroPyephem.STARS[ 70 ]   : _( "Rasalgethi" ),
+        astroPyephem.STARS[ 71 ]   : _( "Rasalhague" ),
+        astroPyephem.STARS[ 72 ]   : _( "Regulus" ),
+        astroPyephem.STARS[ 73 ]   : _( "Rigel" ),
+        astroPyephem.STARS[ 74 ]   : _( "Rukbat" ),
+        astroPyephem.STARS[ 75 ]   : _( "Sadalmelik" ),
+        astroPyephem.STARS[ 76 ]   : _( "Sadr" ),
+        astroPyephem.STARS[ 77 ]   : _( "Saiph" ),
+        astroPyephem.STARS[ 78 ]   : _( "Scheat" ),
+        astroPyephem.STARS[ 79 ]   : _( "Schedar" ),
+        astroPyephem.STARS[ 80 ]   : _( "Shaula" ),
+        astroPyephem.STARS[ 81 ]   : _( "Sheliak" ),
+        astroPyephem.STARS[ 82 ]   : _( "Sirius" ),
+        astroPyephem.STARS[ 83 ]   : _( "Sirrah" ),
+        astroPyephem.STARS[ 84 ]   : _( "Spica" ),
+        astroPyephem.STARS[ 85 ]   : _( "Sulafat" ),
+        astroPyephem.STARS[ 86 ]   : _( "Tarazed" ),
+        astroPyephem.STARS[ 87 ]   : _( "Taygeta" ),
+        astroPyephem.STARS[ 88 ]   : _( "Thuban" ),
+        astroPyephem.STARS[ 89 ]   : _( "Unukalhai" ),
+        astroPyephem.STARS[ 90 ]   : _( "Vega" ),
+        astroPyephem.STARS[ 91 ]   : _( "Vindemiatrix" ),
+        astroPyephem.STARS[ 92 ]   : _( "Wezen" ),
+        astroPyephem.STARS[ 93 ]   : _( "Zaurak" ) }
 
     STAR_TAGS_TRANSLATIONS = {
-        astro.STARS[ 0 ]    : _( "ACHERNAR" ),
-        astro.STARS[ 1 ]    : _( "ADARA" ),
-        astro.STARS[ 2 ]    : _( "AGENA" ),
-        astro.STARS[ 3 ]    : _( "ALBEREO" ),
-        astro.STARS[ 4 ]    : _( "ALCAID" ),
-        astro.STARS[ 5 ]    : _( "ALCOR" ),
-        astro.STARS[ 6 ]    : _( "ALCYONE" ),
-        astro.STARS[ 7 ]    : _( "ALDEBARAN" ),
-        astro.STARS[ 8 ]    : _( "ALDERAMIN" ),
-        astro.STARS[ 9 ]    : _( "ALFIRK" ),
-        astro.STARS[ 10 ]   : _( "ALGENIB" ),
-        astro.STARS[ 11 ]   : _( "ALGIEBA" ),
-        astro.STARS[ 12 ]   : _( "ALGOL" ),
-        astro.STARS[ 13 ]   : _( "ALHENA" ),
-        astro.STARS[ 14 ]   : _( "ALIOTH" ),
-        astro.STARS[ 15 ]   : _( "ALMACH" ),
-        astro.STARS[ 16 ]   : _( "ALNAIR" ),
-        astro.STARS[ 17 ]   : _( "ALNILAM" ),
-        astro.STARS[ 18 ]   : _( "ALNITAK" ),
-        astro.STARS[ 19 ]   : _( "ALPHARD" ),
-        astro.STARS[ 20 ]   : _( "ALPHECCA" ),
-        astro.STARS[ 21 ]   : _( "ALSHAIN" ),
-        astro.STARS[ 22 ]   : _( "ALTAIR" ),
-        astro.STARS[ 23 ]   : _( "ANTARES" ),
-        astro.STARS[ 24 ]   : _( "ARCTURUS" ),
-        astro.STARS[ 25 ]   : _( "ARKAB POSTERIOR" ),
-        astro.STARS[ 26 ]   : _( "ARKAB PRIOR" ),
-        astro.STARS[ 27 ]   : _( "ARNEB" ),
-        astro.STARS[ 28 ]   : _( "ATLAS" ),
-        astro.STARS[ 29 ]   : _( "BELLATRIX" ),
-        astro.STARS[ 30 ]   : _( "BETELGEUSE" ),
-        astro.STARS[ 31 ]   : _( "CANOPUS" ),
-        astro.STARS[ 32 ]   : _( "CAPELLA" ),
-        astro.STARS[ 33 ]   : _( "CAPH" ),
-        astro.STARS[ 34 ]   : _( "CASTOR" ),
-        astro.STARS[ 35 ]   : _( "CEBALRAI" ),
-        astro.STARS[ 36 ]   : _( "DENEB" ),
-        astro.STARS[ 37 ]   : _( "DENEBOLA" ),
-        astro.STARS[ 38 ]   : _( "DUBHE" ),
-        astro.STARS[ 39 ]   : _( "ELECTRA" ),
-        astro.STARS[ 40 ]   : _( "ELNATH" ),
-        astro.STARS[ 41 ]   : _( "ENIF" ),
-        astro.STARS[ 42 ]   : _( "ETAMIN" ),
-        astro.STARS[ 43 ]   : _( "FOMALHAUT" ),
-        astro.STARS[ 44 ]   : _( "GIENAH CORVI" ),
-        astro.STARS[ 45 ]   : _( "HAMAL" ),
-        astro.STARS[ 46 ]   : _( "IZAR" ),
-        astro.STARS[ 47 ]   : _( "KAUS AUSTRALIS" ),
-        astro.STARS[ 48 ]   : _( "KOCHAB" ),
-        astro.STARS[ 49 ]   : _( "MAIA" ),
-        astro.STARS[ 50 ]   : _( "MARKAB" ),
-        astro.STARS[ 51 ]   : _( "MEGREZ" ),
-        astro.STARS[ 52 ]   : _( "MENKALINAN" ),
-        astro.STARS[ 53 ]   : _( "MENKAR" ),
-        astro.STARS[ 54 ]   : _( "MERAK" ),
-        astro.STARS[ 55 ]   : _( "MEROPE" ),
-        astro.STARS[ 56 ]   : _( "MIMOSA" ),
-        astro.STARS[ 57 ]   : _( "MINKAR" ),
-        astro.STARS[ 58 ]   : _( "MINTAKA" ),
-        astro.STARS[ 59 ]   : _( "MIRACH" ),
-        astro.STARS[ 60 ]   : _( "MIRZAM" ),
-        astro.STARS[ 61 ]   : _( "MIZAR" ),
-        astro.STARS[ 62 ]   : _( "NAOS" ),
-        astro.STARS[ 63 ]   : _( "NIHAL" ),
-        astro.STARS[ 64 ]   : _( "NUNKI" ),
-        astro.STARS[ 65 ]   : _( "PEACOCK" ),
-        astro.STARS[ 66 ]   : _( "PHECDA" ),
-        astro.STARS[ 67 ]   : _( "POLARIS" ),
-        astro.STARS[ 68 ]   : _( "POLLUX" ),
-        astro.STARS[ 69 ]   : _( "PROCYON" ),
-        astro.STARS[ 70 ]   : _( "RASALGETHI" ),
-        astro.STARS[ 71 ]   : _( "RASALHAGUE" ),
-        astro.STARS[ 72 ]   : _( "REGULUS" ),
-        astro.STARS[ 73 ]   : _( "RIGEL" ),
-        astro.STARS[ 74 ]   : _( "RUKBAT" ),
-        astro.STARS[ 75 ]   : _( "SADALMELIK" ),
-        astro.STARS[ 76 ]   : _( "SADR" ),
-        astro.STARS[ 77 ]   : _( "SAIPH" ),
-        astro.STARS[ 78 ]   : _( "SCHEAT" ),
-        astro.STARS[ 79 ]   : _( "SCHEDAR" ),
-        astro.STARS[ 80 ]   : _( "SHAULA" ),
-        astro.STARS[ 81 ]   : _( "SHELIAK" ),
-        astro.STARS[ 82 ]   : _( "SIRIUS" ),
-        astro.STARS[ 83 ]   : _( "SIRRAH" ),
-        astro.STARS[ 84 ]   : _( "SPICA" ),
-        astro.STARS[ 85 ]   : _( "SULAFAT" ),
-        astro.STARS[ 86 ]   : _( "TARAZED" ),
-        astro.STARS[ 87 ]   : _( "TAYGETA" ),
-        astro.STARS[ 88 ]   : _( "THUBAN" ),
-        astro.STARS[ 89 ]   : _( "UNUKALHAI" ),
-        astro.STARS[ 90 ]   : _( "VEGA" ),
-        astro.STARS[ 91 ]   : _( "VINDEMIATRIX" ),
-        astro.STARS[ 92 ]   : _( "WEZEN" ),
-        astro.STARS[ 93 ]   : _( "ZAURAK" ) }
+        astroPyephem.STARS[ 0 ]    : _( "ACHERNAR" ),
+        astroPyephem.STARS[ 1 ]    : _( "ADARA" ),
+        astroPyephem.STARS[ 2 ]    : _( "AGENA" ),
+        astroPyephem.STARS[ 3 ]    : _( "ALBEREO" ),
+        astroPyephem.STARS[ 4 ]    : _( "ALCAID" ),
+        astroPyephem.STARS[ 5 ]    : _( "ALCOR" ),
+        astroPyephem.STARS[ 6 ]    : _( "ALCYONE" ),
+        astroPyephem.STARS[ 7 ]    : _( "ALDEBARAN" ),
+        astroPyephem.STARS[ 8 ]    : _( "ALDERAMIN" ),
+        astroPyephem.STARS[ 9 ]    : _( "ALFIRK" ),
+        astroPyephem.STARS[ 10 ]   : _( "ALGENIB" ),
+        astroPyephem.STARS[ 11 ]   : _( "ALGIEBA" ),
+        astroPyephem.STARS[ 12 ]   : _( "ALGOL" ),
+        astroPyephem.STARS[ 13 ]   : _( "ALHENA" ),
+        astroPyephem.STARS[ 14 ]   : _( "ALIOTH" ),
+        astroPyephem.STARS[ 15 ]   : _( "ALMACH" ),
+        astroPyephem.STARS[ 16 ]   : _( "ALNAIR" ),
+        astroPyephem.STARS[ 17 ]   : _( "ALNILAM" ),
+        astroPyephem.STARS[ 18 ]   : _( "ALNITAK" ),
+        astroPyephem.STARS[ 19 ]   : _( "ALPHARD" ),
+        astroPyephem.STARS[ 20 ]   : _( "ALPHECCA" ),
+        astroPyephem.STARS[ 21 ]   : _( "ALSHAIN" ),
+        astroPyephem.STARS[ 22 ]   : _( "ALTAIR" ),
+        astroPyephem.STARS[ 23 ]   : _( "ANTARES" ),
+        astroPyephem.STARS[ 24 ]   : _( "ARCTURUS" ),
+        astroPyephem.STARS[ 25 ]   : _( "ARKAB POSTERIOR" ),
+        astroPyephem.STARS[ 26 ]   : _( "ARKAB PRIOR" ),
+        astroPyephem.STARS[ 27 ]   : _( "ARNEB" ),
+        astroPyephem.STARS[ 28 ]   : _( "ATLAS" ),
+        astroPyephem.STARS[ 29 ]   : _( "BELLATRIX" ),
+        astroPyephem.STARS[ 30 ]   : _( "BETELGEUSE" ),
+        astroPyephem.STARS[ 31 ]   : _( "CANOPUS" ),
+        astroPyephem.STARS[ 32 ]   : _( "CAPELLA" ),
+        astroPyephem.STARS[ 33 ]   : _( "CAPH" ),
+        astroPyephem.STARS[ 34 ]   : _( "CASTOR" ),
+        astroPyephem.STARS[ 35 ]   : _( "CEBALRAI" ),
+        astroPyephem.STARS[ 36 ]   : _( "DENEB" ),
+        astroPyephem.STARS[ 37 ]   : _( "DENEBOLA" ),
+        astroPyephem.STARS[ 38 ]   : _( "DUBHE" ),
+        astroPyephem.STARS[ 39 ]   : _( "ELECTRA" ),
+        astroPyephem.STARS[ 40 ]   : _( "ELNATH" ),
+        astroPyephem.STARS[ 41 ]   : _( "ENIF" ),
+        astroPyephem.STARS[ 42 ]   : _( "ETAMIN" ),
+        astroPyephem.STARS[ 43 ]   : _( "FOMALHAUT" ),
+        astroPyephem.STARS[ 44 ]   : _( "GIENAH CORVI" ),
+        astroPyephem.STARS[ 45 ]   : _( "HAMAL" ),
+        astroPyephem.STARS[ 46 ]   : _( "IZAR" ),
+        astroPyephem.STARS[ 47 ]   : _( "KAUS AUSTRALIS" ),
+        astroPyephem.STARS[ 48 ]   : _( "KOCHAB" ),
+        astroPyephem.STARS[ 49 ]   : _( "MAIA" ),
+        astroPyephem.STARS[ 50 ]   : _( "MARKAB" ),
+        astroPyephem.STARS[ 51 ]   : _( "MEGREZ" ),
+        astroPyephem.STARS[ 52 ]   : _( "MENKALINAN" ),
+        astroPyephem.STARS[ 53 ]   : _( "MENKAR" ),
+        astroPyephem.STARS[ 54 ]   : _( "MERAK" ),
+        astroPyephem.STARS[ 55 ]   : _( "MEROPE" ),
+        astroPyephem.STARS[ 56 ]   : _( "MIMOSA" ),
+        astroPyephem.STARS[ 57 ]   : _( "MINKAR" ),
+        astroPyephem.STARS[ 58 ]   : _( "MINTAKA" ),
+        astroPyephem.STARS[ 59 ]   : _( "MIRACH" ),
+        astroPyephem.STARS[ 60 ]   : _( "MIRZAM" ),
+        astroPyephem.STARS[ 61 ]   : _( "MIZAR" ),
+        astroPyephem.STARS[ 62 ]   : _( "NAOS" ),
+        astroPyephem.STARS[ 63 ]   : _( "NIHAL" ),
+        astroPyephem.STARS[ 64 ]   : _( "NUNKI" ),
+        astroPyephem.STARS[ 65 ]   : _( "PEACOCK" ),
+        astroPyephem.STARS[ 66 ]   : _( "PHECDA" ),
+        astroPyephem.STARS[ 67 ]   : _( "POLARIS" ),
+        astroPyephem.STARS[ 68 ]   : _( "POLLUX" ),
+        astroPyephem.STARS[ 69 ]   : _( "PROCYON" ),
+        astroPyephem.STARS[ 70 ]   : _( "RASALGETHI" ),
+        astroPyephem.STARS[ 71 ]   : _( "RASALHAGUE" ),
+        astroPyephem.STARS[ 72 ]   : _( "REGULUS" ),
+        astroPyephem.STARS[ 73 ]   : _( "RIGEL" ),
+        astroPyephem.STARS[ 74 ]   : _( "RUKBAT" ),
+        astroPyephem.STARS[ 75 ]   : _( "SADALMELIK" ),
+        astroPyephem.STARS[ 76 ]   : _( "SADR" ),
+        astroPyephem.STARS[ 77 ]   : _( "SAIPH" ),
+        astroPyephem.STARS[ 78 ]   : _( "SCHEAT" ),
+        astroPyephem.STARS[ 79 ]   : _( "SCHEDAR" ),
+        astroPyephem.STARS[ 80 ]   : _( "SHAULA" ),
+        astroPyephem.STARS[ 81 ]   : _( "SHELIAK" ),
+        astroPyephem.STARS[ 82 ]   : _( "SIRIUS" ),
+        astroPyephem.STARS[ 83 ]   : _( "SIRRAH" ),
+        astroPyephem.STARS[ 84 ]   : _( "SPICA" ),
+        astroPyephem.STARS[ 85 ]   : _( "SULAFAT" ),
+        astroPyephem.STARS[ 86 ]   : _( "TARAZED" ),
+        astroPyephem.STARS[ 87 ]   : _( "TAYGETA" ),
+        astroPyephem.STARS[ 88 ]   : _( "THUBAN" ),
+        astroPyephem.STARS[ 89 ]   : _( "UNUKALHAI" ),
+        astroPyephem.STARS[ 90 ]   : _( "VEGA" ),
+        astroPyephem.STARS[ 91 ]   : _( "VINDEMIATRIX" ),
+        astroPyephem.STARS[ 92 ]   : _( "WEZEN" ),
+        astroPyephem.STARS[ 93 ]   : _( "ZAURAK" ) }
 
     BODY_TAGS_TRANSLATIONS = dict(
         list( CITY_TAG_TRANSLATION.items() ) +
@@ -394,14 +394,14 @@ class IndicatorLunar:
         list( SUN_TAG_TRANSLATION.items() ) )
 
     LUNAR_PHASE_NAMES_TRANSLATIONS = {
-        astro.LUNAR_PHASE_FULL_MOON         : _( "Full Moon" ),
-        astro.LUNAR_PHASE_WANING_GIBBOUS    : _( "Waning Gibbous" ),
-        astro.LUNAR_PHASE_THIRD_QUARTER     : _( "Third Quarter" ),
-        astro.LUNAR_PHASE_WANING_CRESCENT   : _( "Waning Crescent" ),
-        astro.LUNAR_PHASE_NEW_MOON          : _( "New Moon" ),
-        astro.LUNAR_PHASE_WAXING_CRESCENT   : _( "Waxing Crescent" ),
-        astro.LUNAR_PHASE_FIRST_QUARTER     : _( "First Quarter" ),
-        astro.LUNAR_PHASE_WAXING_GIBBOUS    : _( "Waxing Gibbous" )
+        astroPyephem.LUNAR_PHASE_FULL_MOON         : _( "Full Moon" ),
+        astroPyephem.LUNAR_PHASE_WANING_GIBBOUS    : _( "Waning Gibbous" ),
+        astroPyephem.LUNAR_PHASE_THIRD_QUARTER     : _( "Third Quarter" ),
+        astroPyephem.LUNAR_PHASE_WANING_CRESCENT   : _( "Waning Crescent" ),
+        astroPyephem.LUNAR_PHASE_NEW_MOON          : _( "New Moon" ),
+        astroPyephem.LUNAR_PHASE_WAXING_CRESCENT   : _( "Waxing Crescent" ),
+        astroPyephem.LUNAR_PHASE_FIRST_QUARTER     : _( "First Quarter" ),
+        astroPyephem.LUNAR_PHASE_WAXING_GIBBOUS    : _( "Waxing Gibbous" )
     }
 
     # The download period serves two purposes:
@@ -490,9 +490,9 @@ class IndicatorLunar:
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
-    INDICATOR_TEXT_DEFAULT = "[" + astro.NAME_TAG_MOON + " " + astro.DATA_PHASE + "]"
+    INDICATOR_TEXT_DEFAULT = "[" + astroPyephem.NAME_TAG_MOON + " " + astroPyephem.DATA_PHASE + "]"
 
-#TODO Use astro.
+#TODO Use astroPyephem.
     MESSAGE_BODY_ALWAYS_UP = _( "Always Up!" )
     MESSAGE_BODY_NEVER_UP = _( "Never Up!" )
     MESSAGE_DATA_BAD_DATA = _( "Bad data!" )
@@ -506,7 +506,7 @@ class IndicatorLunar:
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
 #TODO Likley need to put these into a dict, keyed off from the astro messages.
-#Then in getdisplaydata for the message type, use the astro.message and pull the translated/text message from this dict.
+#Then in getdisplaydata for the message type, use the astroPyephem.message and pull the translated/text message from this dict.
     MESSAGE_TRANSLATION_BODY_ALWAYS_UP = _( "Always Up!" )
     MESSAGE_TRANSLATION_BODY_NEVER_UP = _( "Never Up!" ) #TODO Needed?  Not if we always drop never up bodies.
     MESSAGE_TRANSLATION_DATA_BAD_DATA = _( "Bad data!" )
@@ -561,19 +561,19 @@ class IndicatorLunar:
 
 
 #TODO Testing skyfield
-        import astroSkyfield
-        x = astroSkyfield.getAstronomicalInformation( datetime.datetime.utcnow(),
-                                                  float( self.latitude ), float( self.longitude ), float( self.elevation ),
-                                                  self.planets,
-                                                  self.stars,
-                                                  self.satellites, None if self.satelliteTLEData is None else self.satelliteTLEData,
-                                                  self.comets, None if self.cometOEData is None else self.cometOEData,
-                                                  self.minorPlanets, None if self.minorPlanetOEData is None else self.minorPlanetOEData,
-                                                  self.magnitude )
-
-        print( x )
-        import sys
-        if True: sys.exit()
+#         import astroSkyfield
+#         x = astroSkyfield.getAstronomicalInformation( datetime.datetime.utcnow(),
+#                                                   float( self.latitude ), float( self.longitude ), float( self.elevation ),
+#                                                   self.planets,
+#                                                   self.stars,
+#                                                   self.satellites, None if self.satelliteTLEData is None else self.satelliteTLEData,
+#                                                   self.comets, None if self.cometOEData is None else self.cometOEData,
+#                                                   self.minorPlanets, None if self.minorPlanetOEData is None else self.minorPlanetOEData,
+#                                                   self.magnitude )
+# 
+#         print( x )
+#         import sys
+#         if True: sys.exit()
 
         self.update( True )
 
@@ -665,7 +665,7 @@ class IndicatorLunar:
 #...then do a run and the data fails to download and cache is stale, we have no data.
 # If we now call astro, we have a valid list of comets (minor planets or satellites) but invalid data.
 # What to do?
-            self.data = astro.getAstronomicalInformation( datetime.datetime.utcnow(),
+            self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
                                                           self.latitude, self.longitude, self.elevation,
                                                           self.planets,
                                                           self.stars,
@@ -717,13 +717,13 @@ class IndicatorLunar:
 
         utcNow = datetime.datetime.utcnow()
         print( "updateMoon" )
-        if self.showMoon and not self.bodyIsNeverUp( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON ):
+        if self.showMoon and not self.bodyIsNeverUp( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON ):
             self.updateMoonMenu( menu )
         print( "updateMoon:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
         print( "updateSun" )
-        if self.showSun and not self.bodyIsNeverUp( astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN ):
+        if self.showSun and not self.bodyIsNeverUp( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN ):
             self.updateSunMenu( menu )
         print( "updateSun:", ( datetime.datetime.utcnow() - utcNow ) )
 
@@ -739,12 +739,12 @@ class IndicatorLunar:
 
         utcNow = datetime.datetime.utcnow()
         print( "updateComets" )
-        self.updateCometsMinorPlanetsMenu( menu, astro.AstronomicalBodyType.Comet )
+        self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.Comet )
         print( "updateComets:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
         print( "updateMinorPlanet" )
-        self.updateCometsMinorPlanetsMenu( menu, astro.AstronomicalBodyType.MinorPlanet )
+        self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
         print( "updateMinorPlanet:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
@@ -772,9 +772,9 @@ class IndicatorLunar:
         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput )
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
-        key = ( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
-        lunarIlluminationPercentage = int( self.data[ key + ( astro.DATA_ILLUMINATION, ) ] )
-        lunarBrightLimbAngle = int( self.data[ key + ( astro.DATA_BRIGHT_LIMB, ) ] )
+        key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
+        lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
+        lunarBrightLimbAngle = int( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] )
 
         themeName = self.getThemeName()
         noChange = \
@@ -817,16 +817,16 @@ class IndicatorLunar:
 
 
     def notificationFullMoon( self ):
-        key = ( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
-        lunarIlluminationPercentage = int( self.data[ key + ( astro.DATA_ILLUMINATION, ) ] )
-        lunarBrightLimbAngle = int( self.data[ key + ( astro.DATA_BRIGHT_LIMB, ) ] )
-        lunarPhase = self.data[ key + ( astro.DATA_PHASE, ) ]
+        key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
+        lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
+        lunarBrightLimbAngle = int( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] )
+        lunarPhase = self.data[ key + ( astroPyephem.DATA_PHASE, ) ]
         phaseIsBetweenNewAndFullInclusive = \
-            ( lunarPhase == astro.LUNAR_PHASE_NEW_MOON ) or \
-            ( lunarPhase == astro.LUNAR_PHASE_WAXING_CRESCENT ) or \
-            ( lunarPhase == astro.LUNAR_PHASE_FIRST_QUARTER ) or \
-            ( lunarPhase == astro.LUNAR_PHASE_WAXING_GIBBOUS ) or \
-            ( lunarPhase == astro.LUNAR_PHASE_FULL_MOON )
+            ( lunarPhase == astroPyephem.LUNAR_PHASE_NEW_MOON ) or \
+            ( lunarPhase == astroPyephem.LUNAR_PHASE_WAXING_CRESCENT ) or \
+            ( lunarPhase == astroPyephem.LUNAR_PHASE_FIRST_QUARTER ) or \
+            ( lunarPhase == astroPyephem.LUNAR_PHASE_WAXING_GIBBOUS ) or \
+            ( lunarPhase == astroPyephem.LUNAR_PHASE_FULL_MOON )
 
         if phaseIsBetweenNewAndFullInclusive and \
            lunarIlluminationPercentage >= 99 and \
@@ -846,9 +846,9 @@ class IndicatorLunar:
         # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
         satelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber, in self.satellites:
-            key = ( astro.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
-            if ( key + ( astro.DATA_RISE_TIME, ) ) in self.data: # Assume all other information is present!
-               satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( astro.DATA_RISE_TIME, ) ] ] )
+            key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
+            if ( key + ( astroPyephem.DATA_RISE_TIME, ) ) in self.data: # Assume all other information is present!
+               satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ] )
 
         if self.satellitesSortByDateTime:
             satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
@@ -857,15 +857,15 @@ class IndicatorLunar:
 
         utcNow = str( datetime.datetime.utcnow() )
         for satelliteName, satelliteNumber, riseTime in satelliteNameNumberRiseTimes:
-            key = ( astro.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
+            key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
 
             if ( satelliteName, satelliteNumber ) in self.satelliteNotifications:
                 # There has been a previous notification for this satellite.
                 # Ensure that the current rise/set matches that of the previous notification.
                 # Due to a quirk of the astro backend, the date/time may not match exactly (be out by a few seconds or more).
                 # So need to ensure that the current rise/set and the previous rise/set overlap to be sure it is the same transit.
-                currentRise = self.data[ key + ( astro.DATA_RISE_TIME, ) ]
-                currentSet = self.data[ key + ( astro.DATA_SET_TIME, ) ]
+                currentRise = self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ]
+                currentSet = self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ]
                 previousRise, previousSet = self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ]
                 overlap = ( currentRise < previousSet ) and ( currentSet > previousRise )
                 if overlap:
@@ -873,18 +873,18 @@ class IndicatorLunar:
 
             # Ensure the current time is within the rise/set...
             # Subtract a minute from the rise time to force the notification to take place just prior to the satellite rise.
-            riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( astro.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 ) )
+            riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 ) )
             if utcNow < riseTimeMinusOneMinute or \
-               utcNow > self.data[ key + ( astro.DATA_SET_TIME, ) ]:
+               utcNow > self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ]:
                 continue
 
-            self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( astro.DATA_RISE_TIME, ) ], self.data[ key + ( astro.DATA_SET_TIME, ) ] )
+            self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ], self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ] )
 
             # Parse the satellite summary/message to create the notification...
-            riseTime = self.getDisplayData( key + ( astro.DATA_RISE_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
-            riseAzimuth = self.getDisplayData( key + ( astro.DATA_RISE_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
-            setTime = self.getDisplayData( key + ( astro.DATA_SET_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
-            setAzimuth = self.getDisplayData( key + ( astro.DATA_SET_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            riseTime = self.getDisplayData( key + ( astroPyephem.DATA_RISE_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            riseAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            setTime = self.getDisplayData( key + ( astroPyephem.DATA_SET_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            setAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
             tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
 
             summary = self.satelliteNotificationSummary. \
@@ -911,25 +911,25 @@ class IndicatorLunar:
 
 
     def updateMoonMenu( self, menu ):
-        key = ( astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
+        key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
 
         menuItem = Gtk.MenuItem( _( "Moon" ) )
         menu.append( menuItem )
 
-        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON, 0, 1 )
+        self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
 
-        menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astro.DATA_PHASE, ) ) ) )
+        menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
         menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
 
         # Determine which phases occur by date rather than using the phase calculated.
         # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
         nextPhases = [ ]
-        nextPhases.append( [ self.data[ key + ( astro.DATA_FIRST_QUARTER, ) ], _( "First Quarter: " ), key + ( astro.DATA_FIRST_QUARTER, ) ] )
-        nextPhases.append( [ self.data[ key + ( astro.DATA_FULL, ) ], _( "Full: " ), key + ( astro.DATA_FULL, ) ] )
-        nextPhases.append( [ self.data[ key + ( astro.DATA_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astro.DATA_THIRD_QUARTER, ) ] )
-        nextPhases.append( [ self.data[ key + ( astro.DATA_NEW, ) ], _( "New: " ), key + ( astro.DATA_NEW, ) ] )
+        nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_FIRST_QUARTER, ) ], _( "First Quarter: " ), key + ( astroPyephem.DATA_FIRST_QUARTER, ) ] )
+        nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_FULL, ) ], _( "Full: " ), key + ( astroPyephem.DATA_FULL, ) ] )
+        nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astroPyephem.DATA_THIRD_QUARTER, ) ] )
+        nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_NEW, ) ], _( "New: " ), key + ( astroPyephem.DATA_NEW, ) ] )
 
         nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
         indent = pythonutils.indent( 1, 2 )
@@ -938,35 +938,35 @@ class IndicatorLunar:
             self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, dateTime )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        self.updateEclipseMenu( menuItem.get_submenu(), astro.AstronomicalBodyType.Moon, astro.NAME_TAG_MOON )
+        self.updateEclipseMenu( menuItem.get_submenu(), astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
 
 
     def updateSunMenu( self, menu ):
-        key = ( astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
+        key = ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
         menuItem = Gtk.MenuItem( _( "Sun" ) )
         menu.append( menuItem )
-        self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN, 0, 1 )
+        self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1 )
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        self.updateEclipseMenu( menuItem.get_submenu(), astro.AstronomicalBodyType.Sun, astro.NAME_TAG_SUN )
+        self.updateEclipseMenu( menuItem.get_submenu(), astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
 
 
     def updateEclipseMenu( self, menu, astronomicalBodyType, nameTag ):
         key = ( astronomicalBodyType, nameTag )
-        if key + ( astro.DATA_MESSAGE, ) in self.data:
+        if key + ( astroPyephem.DATA_MESSAGE, ) in self.data:
             logging.error( "No eclipse information found!" )
         else:
             menu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Eclipse" ) ) )
-            menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_DATE_TIME, ) ) ) )
-            latitude = self.getDisplayData( key + ( astro.DATA_ECLIPSE_LATITUDE, ) )
-            longitude = self.getDisplayData( key + ( astro.DATA_ECLIPSE_LONGITUDE, ) )
+            menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_DATE_TIME, ) ) ) )
+            latitude = self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_LATITUDE, ) )
+            longitude = self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_LONGITUDE, ) )
             menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
-            menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astro.DATA_ECLIPSE_TYPE, ) ) ) )
+            menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_TYPE, ) ) ) )
 
 
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planetName in self.planets:
-            if self.bodyIsNeverUp( astro.AstronomicalBodyType.Planet, planetName ):
+            if self.bodyIsNeverUp( astroPyephem.AstronomicalBodyType.Planet, planetName ):
                 continue
 
             planets.append( planetName )
@@ -987,13 +987,13 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
                     menu.append( menuItem )
 
-                self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Planet, planetName, 0, 2 )
+                self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Planet, planetName, 0, 2 )
 
 
     def updateStarsMenu( self, menu ):
         stars = [ ] # List of lists.  Each sublist contains the star name followed by the translated name.
         for starName in self.stars:
-            if self.bodyIsNeverUp( astro.AstronomicalBodyType.Star, starName ):
+            if self.bodyIsNeverUp( astroPyephem.AstronomicalBodyType.Star, starName ):
                 continue
 
             stars.append( [ starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
@@ -1017,23 +1017,23 @@ class IndicatorLunar:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + starNameTranslated )
                     menu.append( menuItem )
 
-                self.updateCommonMenu( menuItem, astro.AstronomicalBodyType.Star, nameTag, 0, 2 )
+                self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, nameTag, 0, 2 )
 
 
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
-        bodies = self.comets if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanets
+        bodies = self.comets if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanets
         if len( bodies ) > 0:
-            menuHeader = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astro.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
+            menuHeader = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
             if self.showCometsAsSubMenu:
                 subMenu = Gtk.Menu()
                 menuHeader.set_submenu( subMenu )
 
-            oeData = self.cometOEData if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.minorPlanetOEData
-            showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astro.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
+            oeData = self.cometOEData if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanetOEData
+            showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
             atLeastOneBodyAdded = False
             for name in sorted( bodies ): # Sorting by name also sorts the display name identically.
-                if ( astronomicalBodyType, name, astro.DATA_RISE_TIME ) in self.data or \
-                   ( astronomicalBodyType, name, astro.MESSAGE_BODY_ALWAYS_UP ) in self.data:
+                if ( astronomicalBodyType, name, astroPyephem.DATA_RISE_TIME ) in self.data or \
+                   ( astronomicalBodyType, name, astroPyephem.MESSAGE_BODY_ALWAYS_UP ) in self.data:
 
                      # May have comets or minor planets, but no data was computed as they are never up or some other exception,
                      # so use a flag to identify if any body has been added then add the main menu header at the end if need be.
@@ -1068,7 +1068,7 @@ class IndicatorLunar:
         else:
             objectID = widget.props.name[ : widget.props.name.find( "/" ) ].strip()
 
-        onClickURL = IndicatorLunar.COMET_ON_CLICK_URL if astronomicalBodyType == astro.AstronomicalBodyType.Comet else IndicatorLunar.MINOR_PLANET_ON_CLICK_URL
+        onClickURL = IndicatorLunar.COMET_ON_CLICK_URL if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else IndicatorLunar.MINOR_PLANET_ON_CLICK_URL
         url = onClickURL + objectID.replace( "/", "%2F" ).replace( " ", "+" )
         if len( url ) > 0:
             webbrowser.open( url )
@@ -1078,34 +1078,34 @@ class IndicatorLunar:
 #But for showing say the sun, need a way to check if it is present in the self.data.
     def bodyIsNeverUp( self, astronomicalBodyType, nameTag ):
         key = ( astronomicalBodyType, nameTag )
-        return key + ( astro.DATA_MESSAGE, ) in self.data and self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_NEVER_UP
+        return key + ( astroPyephem.DATA_MESSAGE, ) in self.data and self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_BODY_NEVER_UP
 
 
     def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
         key = ( astronomicalBodyType, nameTag )
         subMenu = Gtk.Menu()
-        altitude = int( self.getDecimalDegrees( self.data[ key + ( astro.DATA_ALTITUDE, ) ], False, 0 ) )
+        altitude = int( self.getDecimalDegrees( self.data[ key + ( astroPyephem.DATA_ALTITUDE, ) ], False, 0 ) )
         indent = pythonutils.indent( indentUnity, indentGnomeShell )
 
         # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
         # Therefore only check for the presence of these two messages.
-        if key + ( astro.DATA_MESSAGE, ) in self.data:
-            if self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_BODY_ALWAYS_UP:
-                subMenu.append( Gtk.MenuItem( indent + self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
+        if key + ( astroPyephem.DATA_MESSAGE, ) in self.data:
+            if self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_BODY_ALWAYS_UP:
+                subMenu.append( Gtk.MenuItem( indent + self.getDisplayData( key + ( astroPyephem.DATA_MESSAGE, ) ) ) )
         else:
             data = [ ]
-            data.append( [ key + ( astro.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( astro.DATA_RISE_TIME, ) ] ] )
-            self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astro.DATA_RISE_TIME, ) ] )
+            data.append( [ key + ( astroPyephem.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ] )
+            self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] )
             if altitude >= 0:
-                data.append( [ key + ( astro.DATA_SET_TIME, ), _( "Set: " ), self.data[ key + ( astro.DATA_SET_TIME, ) ] ] )
-                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astro.DATA_SET_TIME, ) ] )
+                data.append( [ key + ( astroPyephem.DATA_SET_TIME, ), _( "Set: " ), self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ] ] )
+                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ] )
 
-            if astronomicalBodyType == astro.AstronomicalBodyType.Sun:
-                data.append( [ key + ( astro.DATA_DAWN, ), _( "Dawn: " ), self.data[ key + ( astro.DATA_DAWN, ) ] ] )
-                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astro.DATA_DAWN, ) ] )
+            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Sun:
+                data.append( [ key + ( astroPyephem.DATA_DAWN, ), _( "Dawn: " ), self.data[ key + ( astroPyephem.DATA_DAWN, ) ] ] )
+                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_DAWN, ) ] )
                 if altitude >= 0:
-                    data.append( [ key + ( astro.DATA_DUSK, ), _( "Dusk: " ), self.data[ key + ( astro.DATA_DUSK, ) ] ] )
-                    self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astro.DATA_DUSK, ) ] )
+                    data.append( [ key + ( astroPyephem.DATA_DUSK, ), _( "Dusk: " ), self.data[ key + ( astroPyephem.DATA_DUSK, ) ] ] )
+                    self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_DUSK, ) ] )
 
             data = sorted( data, key = lambda x: ( x[ 2 ] ) )
             for theKey, text, dateTime in data:
@@ -1113,8 +1113,8 @@ class IndicatorLunar:
 
         if altitude >= 0:
             subMenu.append( Gtk.SeparatorMenuItem() )
-            subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
-            subMenu.append( Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astro.DATA_ALTITUDE, ) ) ) )
+            subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
 
         menuItem.set_submenu( subMenu )
 
@@ -1122,13 +1122,13 @@ class IndicatorLunar:
     def updateSatellitesMenu( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
-            key = ( astro.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
-            if key + ( astro.DATA_RISE_TIME, ) in self.data:
+            key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
+            if key + ( astroPyephem.DATA_RISE_TIME, ) in self.data:
                 internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
-                riseTime = self.data[ key + ( astro.DATA_RISE_TIME, ) ]
-            elif key + ( astro.DATA_MESSAGE, ) in self.data and self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
+                riseTime = self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ]
+            elif key + ( astroPyephem.DATA_MESSAGE, ) in self.data and self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
                 internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
-                riseTime = self.data[ key + ( astro.DATA_MESSAGE, ) ] #TODO SHould not be a rise time but a message...fix.
+                riseTime = self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] #TODO SHould not be a rise time but a message...fix.
             else:
                 print( "Dodgy satellite information:", key )
                 pass #TODO Maybe log as we should not hit this.
@@ -1157,13 +1157,13 @@ class IndicatorLunar:
 
 
     def createSatelliteMenu( self, satelliteName, satelliteNumber, menuText ):
-        key = ( astro.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
+        key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
         subMenu = Gtk.Menu()
-        if key + ( astro.DATA_MESSAGE, ) in self.data:
-            if self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
-                subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
+        if key + ( astroPyephem.DATA_MESSAGE, ) in self.data:
+            if self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
+                subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
 
-            subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
+            subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( astroPyephem.DATA_MESSAGE, ) ) ) )
         else:
 #TODO Test this...
 #Hide notification and make all passes visible (comment out the check for visible only passes).
@@ -1171,32 +1171,32 @@ class IndicatorLunar:
 #also for a satellite yet to rise,
 #also a satellite currently rising.
 
-            riseTime = self.toDateTime( self.data[ key + ( astro.DATA_RISE_TIME, ) ] )
+            riseTime = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] )
             dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60 # If the satellite is currently rising, we'll get a negative but that's okay.
             if dateTimeDifferenceInMinutes > 2: # If this satellite will rise more than two minutes from now, then only show the rise time.
-                subMenu.append( Gtk.MenuItem( indent + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
+                subMenu.append( Gtk.MenuItem( indent + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_TIME, ) ) ) )
 
             else: # This satellite will rise within the next two minutes, so show all data.
 #TODO Test this during a satellite pass for both GNOME Shell and Unity.
 #I suspect Unity needs an extra indent on the date/time and azimuth menu items.
                 subMenu.append( Gtk.MenuItem( indent + _( "Rise" ) ) )
-                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
-                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_RISE_AZIMUTH, ) ) ) )
+                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_TIME, ) ) ) )
+                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ) ) )
 
                 subMenu.append( Gtk.MenuItem( indent + _( "Set" ) ) )
-                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_SET_TIME, ) ) ) )
-                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_SET_AZIMUTH, ) ) ) )
+                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_TIME, ) ) ) )
+                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ) ) )
 
             # Add the rise to the next update, ensuring it is not in the past.
             # Subtract a minute from the rise time to spoof the next update to happen earlier.
             # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
-            riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astro.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
+            riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
             if riseTimeMinusOneMinute > utcNow:
                 self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate )
 
             # Add the set time to the next update, ensuring it is not in the past.
-            if self.data[ key + ( astro.DATA_SET_TIME, ) ] > str( utcNow ):
-                self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( astro.DATA_SET_TIME, ) ], self.nextUpdate )
+            if self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ] > str( utcNow ):
+                self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ], self.nextUpdate )
 
         # Add handler.
         for child in subMenu.get_children():
@@ -1216,27 +1216,27 @@ class IndicatorLunar:
     def updateSatellitesMenuORIGINAL( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
-            key = ( astro.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
-            if key + ( astro.DATA_MESSAGE, ) in self.data and \
+            key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
+            if key + ( astroPyephem.DATA_MESSAGE, ) in self.data and \
                (
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_DATA_NO_DATA or \
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_NEVER_RISES or \
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
-                    self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_VALUE_ERROR
+                    self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_DATA_NO_DATA or \
+                    self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_NEVER_RISES or \
+                    self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
+                    self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
+                    self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_VALUE_ERROR
                ):
                 continue
 
-            if key + ( astro.DATA_RISE_TIME, ) in self.data:
+            if key + ( astroPyephem.DATA_RISE_TIME, ) in self.data:
                 internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
-                riseTime = self.data[ key + ( astro.DATA_RISE_TIME, ) ]
-            elif key + ( astro.DATA_MESSAGE, ) in self.data and \
-                 self.data[ key + ( astro.DATA_MESSAGE, ) ] != astro.MESSAGE_DATA_NO_DATA: # Any message other than "no data" will have satellite TLE data.
+                riseTime = self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ]
+            elif key + ( astroPyephem.DATA_MESSAGE, ) in self.data and \
+                 self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] != astroPyephem.MESSAGE_DATA_NO_DATA: # Any message other than "no data" will have satellite TLE data.
                 internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
-                riseTime = self.data[ key + ( astro.DATA_MESSAGE, ) ]
+                riseTime = self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ]
             else:
                 internationalDesignator = "" # No TLE data so cannot retrieve any information about the satellite.
-                riseTime = self.data[ key + ( astro.DATA_MESSAGE, ) ]
+                riseTime = self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ]
 
             menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
                                                          .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
@@ -1259,13 +1259,13 @@ class IndicatorLunar:
             utcNow = datetime.datetime.utcnow()
             indent = pythonutils.indent( 0, 2 )
             for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
-                key = ( astro.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
+                key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
                 subMenu = Gtk.Menu()
-                if key + ( astro.DATA_MESSAGE, ) in self.data:
-                    if self.data[ key + ( astro.DATA_MESSAGE, ) ] == astro.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
-                        subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_AZIMUTH, ) ) ) )
+                if key + ( astroPyephem.DATA_MESSAGE, ) in self.data:
+                    if self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
+                        subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
 
-                    subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( astro.DATA_MESSAGE, ) ) ) )
+                    subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( astroPyephem.DATA_MESSAGE, ) ) ) )
                 else:
 #TODO Test this...
 #Hide notification and make all passes visible (comment out the check for visible only passes).
@@ -1273,32 +1273,32 @@ class IndicatorLunar:
 #also for a satellite yet to rise,
 #also a satellite currently rising.
 
-                    riseTime = self.toDateTime( self.data[ key + ( astro.DATA_RISE_TIME, ) ] )
+                    riseTime = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] )
                     dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60 # If the satellite is currently rising, we'll get a negative but that's okay.
                     if dateTimeDifferenceInMinutes > 2: # If this satellite will rise more than two minutes from now, then only show the rise time.
-                        subMenu.append( Gtk.MenuItem( indent + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_TIME, ) ) ) )
 
                     else: # This satellite will rise within the next two minutes, so show all data.
 #TODO Test this during a satellite pass for both GNOME Shell and Unity.
 #I suspect Unity needs an extra indent on the date/time and azimuth menu items.
                         subMenu.append( Gtk.MenuItem( indent + _( "Rise" ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_RISE_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_RISE_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ) ) )
 
                         subMenu.append( Gtk.MenuItem( indent + _( "Set" ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astro.DATA_SET_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astro.DATA_SET_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ) ) )
 
                     # Add the rise to the next update, ensuring it is not in the past.
                     # Subtract a minute from the rise time to spoof the next update to happen earlier.
                     # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
-                    riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astro.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
+                    riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
                     if riseTimeMinusOneMinute > utcNow:
                         self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate )
 
                     # Add the set time to the next update, ensuring it is not in the past.
-                    if self.data[ key + ( astro.DATA_SET_TIME, ) ] > str( utcNow ):
-                        self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( astro.DATA_SET_TIME, ) ], self.nextUpdate )
+                    if self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ] > str( utcNow ):
+                        self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ], self.nextUpdate )
 
                 # Add handler.
                 for child in subMenu.get_children():
@@ -1330,41 +1330,41 @@ class IndicatorLunar:
 #TODO Rename the source to better reflect how it affects the date/time format.
     def getDisplayData( self, key, source = None ):
         displayData = None
-        if key[ 2 ] == astro.DATA_ALTITUDE or \
-           key[ 2 ] == astro.DATA_AZIMUTH or \
-           key[ 2 ] == astro.DATA_RISE_AZIMUTH or \
-           key[ 2 ] == astro.DATA_SET_AZIMUTH:
+        if key[ 2 ] == astroPyephem.DATA_ALTITUDE or \
+           key[ 2 ] == astroPyephem.DATA_AZIMUTH or \
+           key[ 2 ] == astroPyephem.DATA_RISE_AZIMUTH or \
+           key[ 2 ] == astroPyephem.DATA_SET_AZIMUTH:
             displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "°"
 
-        elif key[ 2 ] == astro.DATA_DAWN or \
-             key[ 2 ] == astro.DATA_DUSK or \
-             key[ 2 ] == astro.DATA_ECLIPSE_DATE_TIME or \
-             key[ 2 ] == astro.DATA_FIRST_QUARTER or \
-             key[ 2 ] == astro.DATA_FULL or \
-             key[ 2 ] == astro.DATA_NEW or \
-             key[ 2 ] == astro.DATA_RISE_TIME or \
-             key[ 2 ] == astro.DATA_SET_TIME or \
-             key[ 2 ] == astro.DATA_THIRD_QUARTER:
+        elif key[ 2 ] == astroPyephem.DATA_DAWN or \
+             key[ 2 ] == astroPyephem.DATA_DUSK or \
+             key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
+             key[ 2 ] == astroPyephem.DATA_FIRST_QUARTER or \
+             key[ 2 ] == astroPyephem.DATA_FULL or \
+             key[ 2 ] == astroPyephem.DATA_NEW or \
+             key[ 2 ] == astroPyephem.DATA_RISE_TIME or \
+             key[ 2 ] == astroPyephem.DATA_SET_TIME or \
+             key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
                 if source is None:
                     displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
                 elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
                     displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
 
-        elif key[ 2 ] == astro.DATA_ECLIPSE_LATITUDE:
+        elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_LATITUDE:
             latitude = self.data[ key ]
             if latitude[ 0 ] == "-":
                 displayData = latitude[ 1 : ] + "° " + _( "S" )
             else:
                 displayData = latitude + "° " +_( "N" )
 
-        elif key[ 2 ] == astro.DATA_ECLIPSE_LONGITUDE:
+        elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_LONGITUDE:
             longitude = self.data[ key ]
             if longitude[ 0 ] == "-":
                 displayData = longitude[ 1 : ] + "° " + _( "E" )
             else:
                 displayData = longitude + "° " +_( "W" )
 
-        elif key[ 2 ] == astro.DATA_ECLIPSE_TYPE:
+        elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_TYPE:
             if self.data[ key ] == eclipse.ECLIPSE_TYPE_ANNULAR:
                 displayData = _( "Annular" )
             elif self.data[ key ] == eclipse.ECLIPSE_TYPE_HYBRID:
@@ -1376,10 +1376,10 @@ class IndicatorLunar:
             else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
                 displayData = _( "Total" )
 
-        elif key[ 2 ] == astro.DATA_MESSAGE: #TODO Will need to take the message and pull out the translation from a dict.
+        elif key[ 2 ] == astroPyephem.DATA_MESSAGE: #TODO Will need to take the message and pull out the translation from a dict.
             displayData = self.data[ key ]
 
-        elif key[ 2 ] == astro.DATA_PHASE:
+        elif key[ 2 ] == astroPyephem.DATA_PHASE:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
 
         if displayData is None:  # Returning None is not good but better to let it crash and find out about it than hide the problem.
@@ -1698,16 +1698,16 @@ class IndicatorLunar:
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
         for key in self.data.keys():
-            if key[ 2 ] == astro.DATA_BRIGHT_LIMB or key[ 2 ] == astro.DATA_ILLUMINATION:
+            if key[ 2 ] == astroPyephem.DATA_BRIGHT_LIMB or key[ 2 ] == astroPyephem.DATA_ILLUMINATION:
                 continue # Some data tags are only present for calculations, not intended for the end user.
 
-            hideMessage = self.data[ key ] == astro.MESSAGE_BODY_NEVER_UP or \
-                      self.data[ key ] == astro.MESSAGE_DATA_BAD_DATA or \
-                      self.data[ key ] == astro.MESSAGE_DATA_NO_DATA or \
-                      self.data[ key ] == astro.MESSAGE_SATELLITE_NEVER_RISES or \
-                      self.data[ key ] == astro.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
-                      self.data[ key ] == astro.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
-                      self.data[ key ] == astro.MESSAGE_SATELLITE_VALUE_ERROR
+            hideMessage = self.data[ key ] == astroPyephem.MESSAGE_BODY_NEVER_UP or \
+                      self.data[ key ] == astroPyephem.MESSAGE_DATA_BAD_DATA or \
+                      self.data[ key ] == astroPyephem.MESSAGE_DATA_NO_DATA or \
+                      self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_NEVER_RISES or \
+                      self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
+                      self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
+                      self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_VALUE_ERROR
 
             if hideMessage:
                 continue
@@ -1770,13 +1770,13 @@ class IndicatorLunar:
         showMoonCheckbox = Gtk.CheckButton( _( "Moon" ) )
         showMoonCheckbox.set_active( self.showMoon )
         showMoonCheckbox.set_tooltip_text( _( "Show the moon." ) )
-        showMoonCheckbox.connect( "toggled", self.onMoonSunToggled, astro.NAME_TAG_MOON, astro.AstronomicalBodyType.Moon )
+        showMoonCheckbox.connect( "toggled", self.onMoonSunToggled, astroPyephem.NAME_TAG_MOON, astroPyephem.AstronomicalBodyType.Moon )
         box.pack_start( showMoonCheckbox, False, False, 0 )
 
         showSunCheckbox = Gtk.CheckButton( _( "Sun" ) )
         showSunCheckbox.set_active( self.showSun )
         showSunCheckbox.set_tooltip_text( _( "Show the sun." ) )
-        showSunCheckbox.connect( "toggled", self.onMoonSunToggled, astro.NAME_TAG_SUN, astro.AstronomicalBodyType.Sun )
+        showSunCheckbox.connect( "toggled", self.onMoonSunToggled, astroPyephem.NAME_TAG_SUN, astroPyephem.AstronomicalBodyType.Sun )
         box.pack_start( showSunCheckbox, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -1877,7 +1877,7 @@ class IndicatorLunar:
         box = Gtk.Box( spacing = 20 )
 
         planetStore = Gtk.ListStore( bool, str, str ) # Show/hide, planet name (not displayed), translated planet name.
-        for planetName in astro.PLANETS:
+        for planetName in astroPyephem.PLANETS:
             planetStore.append( [ planetName in self.planets, planetName, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] ] )
 
         tree = Gtk.TreeView( planetStore )
@@ -1891,7 +1891,7 @@ class IndicatorLunar:
         renderer_toggle.connect( "toggled", self.onPlanetToggled, planetStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore, None, displayTagsStore, astro.AstronomicalBodyType.Planet )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore, None, displayTagsStore, astroPyephem.AstronomicalBodyType.Planet )
         tree.append_column( treeViewColumn )
 
         tree.append_column( Gtk.TreeViewColumn( _( "Planet" ), Gtk.CellRendererText(), text = 2 ) )
@@ -1923,10 +1923,10 @@ class IndicatorLunar:
             "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, starStore, starStoreSort, astro.AstronomicalBodyType.Star )
+        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, starStore, starStoreSort, astroPyephem.AstronomicalBodyType.Star )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, starStoreSort, displayTagsStore, astro.AstronomicalBodyType.Star )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore, starStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.Star )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 )
@@ -1961,10 +1961,10 @@ class IndicatorLunar:
             "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, cometStore, cometStoreSort, astro.AstronomicalBodyType.Comet )
+        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, cometStore, cometStoreSort, astroPyephem.AstronomicalBodyType.Comet )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore, cometStoreSort, displayTagsStore, astro.AstronomicalBodyType.Comet )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore, cometStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.Comet )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2009,7 +2009,7 @@ class IndicatorLunar:
                        cometURLEntry,
                        cometGrid,
                        cometStore,
-                       astro.AstronomicalBodyType.Comet,
+                       astroPyephem.AstronomicalBodyType.Comet,
                        IndicatorLunar.COMET_OE_URL,
                        IndicatorLunar.COMET_OE_CACHE_BASENAME,
                        IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS,
@@ -2043,10 +2043,10 @@ class IndicatorLunar:
             "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, minorPlanetStore, minorPlanetStoreSort, astro.AstronomicalBodyType.MinorPlanet)
+        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, minorPlanetStore, minorPlanetStoreSort, astroPyephem.AstronomicalBodyType.MinorPlanet)
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, minorPlanetStore, minorPlanetStoreSort, displayTagsStore, astro.AstronomicalBodyType.MinorPlanet )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, minorPlanetStore, minorPlanetStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.MinorPlanet )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2093,7 +2093,7 @@ class IndicatorLunar:
                        minorPlanetURLEntry,
                        minorPlanetGrid,
                        minorPlanetStore,
-                       astro.AstronomicalBodyType.MinorPlanet,
+                       astroPyephem.AstronomicalBodyType.MinorPlanet,
                        IndicatorLunar.MINOR_PLANET_OE_URL,
                        IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME,
                        IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS,
@@ -2127,10 +2127,10 @@ class IndicatorLunar:
             "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, satelliteStore, satelliteStoreSort, astro.AstronomicalBodyType.Satellite )
+        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, satelliteStore, satelliteStoreSort, astroPyephem.AstronomicalBodyType.Satellite )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, astro.AstronomicalBodyType.Satellite )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.Satellite )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
@@ -2185,7 +2185,7 @@ class IndicatorLunar:
                        TLEURLEntry,
                        satelliteGrid,
                        satelliteStore,
-                       astro.AstronomicalBodyType.Satellite,
+                       astroPyephem.AstronomicalBodyType.Satellite,
                        IndicatorLunar.SATELLITE_TLE_URL,
                        IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME,
                        IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS,
@@ -2362,7 +2362,7 @@ class IndicatorLunar:
             "Choose a city from the list.\n" + \
             "Or, add in your own city name." ) )
 
-        cities = astro.getCities()
+        cities = astroPyephem.getCities()
         if self.city not in cities:
             cities.append( self.city )
             cities = sorted( cities, key = locale.strxfrm )
@@ -2419,9 +2419,9 @@ class IndicatorLunar:
 
         # The visibility of some GUI objects must be determined AFTER the dialog is shown.
 #TODO Rename to include Minor Planets
-        self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), astro.AstronomicalBodyType.Comet )
-        self.updateCometSatellitePreferencesTab( minorPlanetGrid, minorPlanetStore, self.minorPlanetOEData, self.minorPlanets, minorPlanetURLEntry.get_text().strip(), astro.AstronomicalBodyType.MinorPlanet )
-        self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), astro.AstronomicalBodyType.Satellite )
+        self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Comet )
+        self.updateCometSatellitePreferencesTab( minorPlanetGrid, minorPlanetStore, self.minorPlanetOEData, self.minorPlanets, minorPlanetURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.MinorPlanet )
+        self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Satellite )
 
         # Last thing to do after everything else is built.
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
@@ -2545,7 +2545,7 @@ class IndicatorLunar:
 
         isCometOrSatellite = \
             astronomicalBodyType is not None and \
-            ( astronomicalBodyType == astro.AstronomicalBodyType.Comet or astronomicalBodyType == astro.AstronomicalBodyType.MinorPlanet or astronomicalBodyType == astro.AstronomicalBodyType.Satellite )
+            ( astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet or astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite )
 
         if isCometOrSatellite:
             translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Don't translate the names of the comets/satellites.
@@ -2592,7 +2592,7 @@ class IndicatorLunar:
 
     def onPlanetToggled( self, widget, row, dataStore ):
         dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
-        self.checkboxToggled( dataStore[ row ][ 1 ].upper(), astro.AstronomicalBodyType.Planet, dataStore[ row ][ 0 ] )
+        self.checkboxToggled( dataStore[ row ][ 1 ].upper(), astroPyephem.AstronomicalBodyType.Planet, dataStore[ row ][ 0 ] )
         planetName = dataStore[ row ][ 1 ]
 
 
@@ -2600,9 +2600,9 @@ class IndicatorLunar:
     def onCometStarSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalBodyType ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
-        if astronomicalBodyType == astro.AstronomicalBodyType.Comet:
+        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
             bodyTag = dataStore[ actualRow ][ 1 ].upper()
-        if astronomicalBodyType == astro.AstronomicalBodyType.Satellite:
+        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
             bodyTag = dataStore[ actualRow ][ 1 ] + " " + dataStore[ actualRow ][ 2 ]
         else: # Assume star.
             bodyTag = dataStore[ actualRow ][ 1 ].upper()
@@ -2619,7 +2619,7 @@ class IndicatorLunar:
             message = IndicatorLunar.MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE.format( url )
         else:
             message = None
-            if astronomicalBodyType == astro.AstronomicalBodyType.Satellite:
+            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
                 for key in data:
                     tle = data[ key ]
                     checked = ( tle.getName().upper(), tle.getNumber() ) in bodies
@@ -2687,7 +2687,7 @@ class IndicatorLunar:
             dataNew = getDataFunction( urlNew ) # The comet/satellite data can be None, empty or non-empty.
 
         if dataNew is None:
-            if astronomicalBodyType == astro.AstronomicalBodyType.Comet:
+            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
                 summary = _( "Error Retrieving Comet OE Data" )
                 message = _( "The comet OE data source could not be reached." )
             else: # Assume it's a satellite.
@@ -2699,7 +2699,7 @@ class IndicatorLunar:
         self.updateCometSatellitePreferencesTab( grid, store, dataNew, [ ], urlNew, astronomicalBodyType )
 
         # Assign back to original bodies...
-        if astronomicalBodyType == astro.AstronomicalBodyType.Comet:
+        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
             self.cometOEURLNew = urlNew
             self.cometOEDataNew = dataNew
         else: # Assume it's a satellite.
@@ -2722,24 +2722,24 @@ class IndicatorLunar:
 
 
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalBodyType ):
-        if astronomicalBodyType == astro.AstronomicalBodyType.Planet:
+        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Planet:
             toggle = self.togglePlanetsTable
             self.togglePlanetsTable = not self.togglePlanetsTable
             for row in range( len( dataStore ) ):
                 dataStore[ row ][ 0 ] = bool( not toggle )
                 self.onPlanetToggled( widget, row, dataStore )
 
-        elif astronomicalBodyType == astro.AstronomicalBodyType.Comet or \
-             astronomicalBodyType == astro.AstronomicalBodyType.MinorPlanet or \
-             astronomicalBodyType == astro.AstronomicalBodyType.Satellite or \
-             astronomicalBodyType == astro.AstronomicalBodyType.Star:
-            if astronomicalBodyType == astro.AstronomicalBodyType.Comet:
+        elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or \
+             astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet or \
+             astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite or \
+             astronomicalBodyType == astroPyephem.AstronomicalBodyType.Star:
+            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
                 toggle = self.toggleCometsTable
                 self.toggleCometsTable = not self.toggleCometsTable
-            elif astronomicalBodyType == astro.AstronomicalBodyType.MinorPlanet:
+            elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet:
                 toggle = self.toggleMinorPlanetsTable
                 self.toggleMinorPlanetsTable = not self.toggleMinorPlanetsTable
-            elif astronomicalBodyType == astro.AstronomicalBodyType.Satellite:
+            elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
                 toggle = self.toggleSatellitesTable
                 self.toggleSatellitesTable = not self.toggleSatellitesTable
             else:
@@ -2796,8 +2796,8 @@ class IndicatorLunar:
         city = combobox.get_active_text()
         
         #TODO Can the city ever be empty?  So do we need the check below?
-        if city != "" and city in astro.getCities(): # Populate the latitude/longitude/elevation if the city exists, otherwise let the user specify.
-            theLatitude, theLongitude, theElevation = astro.getLatitudeLongitudeElevation( city )
+        if city != "" and city in astroPyephem.getCities(): # Populate the latitude/longitude/elevation if the city exists, otherwise let the user specify.
+            theLatitude, theLongitude, theElevation = astroPyephem.getLatitudeLongitudeElevation( city )
             latitude.set_text( theLatitude )
             longitude.set_text( theLongitude )
             elevation.set_text( theElevation )
@@ -2809,13 +2809,13 @@ class IndicatorLunar:
 
             # Only add tags for data which has not been removed.
             for key in self.data.keys():
-                hideMessage = self.data[ key ] == astro.MESSAGE_BODY_NEVER_UP or \
-                              self.data[ key ] == astro.MESSAGE_DATA_BAD_DATA or \
-                              self.data[ key ] == astro.MESSAGE_DATA_NO_DATA or \
-                              self.data[ key ] == astro.MESSAGE_SATELLITE_NEVER_RISES or \
-                              self.data[ key ] == astro.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
-                              self.data[ key ] == astro.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
-                              self.data[ key ] == astro.MESSAGE_SATELLITE_VALUE_ERROR
+                hideMessage = self.data[ key ] == astroPyephem.MESSAGE_BODY_NEVER_UP or \
+                              self.data[ key ] == astroPyephem.MESSAGE_DATA_BAD_DATA or \
+                              self.data[ key ] == astroPyephem.MESSAGE_DATA_NO_DATA or \
+                              self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_NEVER_RISES or \
+                              self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
+                              self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
+                              self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_VALUE_ERROR
 
                 if hideMessage:
                     continue
@@ -2831,22 +2831,22 @@ class IndicatorLunar:
             for key in self.tagsAdded:
                 astronomicalBodyType = key[ 0 ]
                 bodyTag = key[ 1 ]
-                if astronomicalBodyType == astro.AstronomicalBodyType.Comet:
+                if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
                     tags = IndicatorLunar.DATA_TAGS_COMET
-                if astronomicalBodyType == astro.AstronomicalBodyType.MinorPlanet:
+                if astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet:
                     tags = IndicatorLunar.DATA_TAGS_MINOR_PLANET
-                elif astronomicalBodyType == astro.AstronomicalBodyType.Moon:
+                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Moon:
                     tags = IndicatorLunar.DATA_TAGS_MOON
-                elif astronomicalBodyType == astro.AstronomicalBodyType.Planet:
+                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Planet:
                     tags = IndicatorLunar.DATA_TAGS_PLANET
                     if bodyTag == IndicatorLunar.PLANET_SATURN.upper():
                         tags.append( IndicatorLunar.DATA_EARTH_TILT )
                         tags.append( IndicatorLunar.DATA_SUN_TILT )
-                elif astronomicalBodyType == astro.AstronomicalBodyType.Satellite:
+                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
                     tags = IndicatorLunar.DATA_TAGS_SATELLITE
-                elif astronomicalBodyType == astro.AstronomicalBodyType.Star:
+                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Star:
                     tags = IndicatorLunar.DATA_TAGS_STAR
-                elif astronomicalBodyType == astro.AstronomicalBodyType.Sun:
+                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Sun:
                     tags = IndicatorLunar.DATA_TAGS_SUN
 
                 for tag in tags:
@@ -2969,7 +2969,7 @@ class IndicatorLunar:
         try:
             timezone = pythonutils.processGet( "cat /etc/timezone" )
             theCity = None
-            cities = astro.getCities()
+            cities = astroPyephem.getCities()
             for city in cities:
                 if city in timezone:
                     theCity = city
@@ -3000,8 +3000,8 @@ class IndicatorLunar:
         self.magnitude = 6 # More or less what's visible with the naked eye or binoculars.
 
         self.planets = [ ]
-        for planetName in astro.PLANETS:
-            if not( planetName == astro.PLANET_NEPTUNE or planetName == astro.PLANET_PLUTO ): # Neptune and Pluto are not visible to naked eye, so hide by default.
+        for planetName in astroPyephem.PLANETS:
+            if not( planetName == astroPyephem.PLANET_NEPTUNE or planetName == astroPyephem.PLANET_PLUTO ): # Neptune and Pluto are not visible to naked eye, so hide by default.
                 self.planets.append( planetName )
 
         self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
@@ -3031,7 +3031,7 @@ class IndicatorLunar:
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME ) # Returns None if the key is not found.
         if self.city is None:
             self.city = self.getDefaultCity()
-            self.latitude, self.longitude, self.elevation = astro.getLatitudeLongitudeElevation( self.city )
+            self.latitude, self.longitude, self.elevation = astroPyephem.getLatitudeLongitudeElevation( self.city )
         else:
             self.elevation = config.get( IndicatorLunar.CONFIG_CITY_ELEVATION )
             self.latitude = config.get( IndicatorLunar.CONFIG_CITY_LATITUDE )
