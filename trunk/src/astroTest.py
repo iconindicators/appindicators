@@ -5,14 +5,12 @@
 import astroPyephem, astroSkyfield, datetime
 
 
-# Not exactly useful as the keys for stars are different between Skyfield and Pyephem.
-#TODO Would be more useful if we compared planets and then specific keys of the other objects
-# (specific stars, comets, satellites).
 def compareResults( resultsPyephem, resultsSkyfield ):
 
     results = [ ]
     for dataTag in astroPyephem.DATA_MOON:
-        if ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, dataTag ) not in resultsSkyfield:
+        if ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, dataTag ) in resultsPyephem and \
+           ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, dataTag ) not in resultsSkyfield:
             results.append( dataTag )
 
     if results:
@@ -20,7 +18,8 @@ def compareResults( resultsPyephem, resultsSkyfield ):
 
     results = [ ]
     for dataTag in astroSkyfield.DATA_MOON:
-        if ( astroSkyfield.AstronomicalBodyType.Moon, astroSkyfield.NAME_TAG_MOON, dataTag ) not in resultsPyephem:
+        if ( astroSkyfield.AstronomicalBodyType.Moon, astroSkyfield.NAME_TAG_MOON, dataTag ) in resultsSkyfield and \
+           ( astroSkyfield.AstronomicalBodyType.Moon, astroSkyfield.NAME_TAG_MOON, dataTag ) not in resultsPyephem:
             results.append( dataTag )
 
     if results:

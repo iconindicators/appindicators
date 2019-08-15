@@ -380,7 +380,7 @@ def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
     x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
     parallacticAngle = math.atan2( y, x )
 
-    return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+    return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
 
 # Get the lunar phase for the given date/time and illumination percentage.

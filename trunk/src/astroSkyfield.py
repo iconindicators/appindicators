@@ -364,7 +364,7 @@ def __calculateMoon( utcNow, data, timeScale, observer, ephemeris ):
     nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
     data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
 
-    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( __getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ SUN ], moon ) ) # Needed for icon.
+    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ SUN ], moon ) ) ) ) # Needed for icon.
 
     if not neverUp:
         moonPhaseDateTimes = t.utc_iso()
@@ -592,7 +592,7 @@ def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
     x = math.tan( latitude.radians ) * math.cos( bodyDec.radians ) - math.sin( bodyDec.radians ) * math.cos( hourAngle )
     parallacticAngle = math.atan2( y, x )
 
-    return math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) )
+    return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
 
 #TOOO Reading on how to maybe calculate hour angle, sidereal time and so on...
