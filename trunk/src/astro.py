@@ -30,6 +30,8 @@ class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, S
 #TODO Need to test with a lat/long such that bodies rise/set, always up and never up.
 
 
+#TODO Consider renaming to astroPyephem.py
+
 
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
