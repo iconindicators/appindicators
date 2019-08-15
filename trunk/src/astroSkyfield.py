@@ -326,7 +326,7 @@ def getAstronomicalInformation( utcNow,
 #     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
 
 #     Satellite https://github.com/skyfielders/python-skyfield/issues/115
-#     __calculateSatellites( ephemNow, data, satellites, satelliteData )
+    __calculateSatellites( ephemNow, data, satellites, satelliteData )
 
 #TODO May not be required.
 #     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
@@ -561,6 +561,35 @@ def __bodyrise_bodyset( observer, body ):
     is_body_up_at.rough_period = 0.5
 
     return is_body_up_at
+
+
+# Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
+#
+# Other sources/background:
+#   http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
+#   http://spotthestation.nasa.gov/sightings
+#   http://www.n2yo.com
+#   http://www.heavens-above.com
+#   http://in-the-sky.org
+#
+# For planets/stars, the immediate next rise/set time is shown.
+# If already above the horizon, the set time is shown followed by the rise time for the following pass.
+# This makes sense as planets/stars are slow moving.
+#
+# However, as satellites are faster moving and pass several times a day, a different approach is used.
+# When a notification is displayed indicating a satellite is now passing overhead,
+# the user would want to see the rise/set for the current pass (rather than the set for the current pass and rise for the next pass).
+#
+# Therefore...
+#    If a satellite is yet to rise, show the upcoming rise/set time.
+#    If a satellite is currently passing over, show the rise/set time for that pass.
+#
+# This allows the user to see the rise/set time for the current pass as it is happening.
+# When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
+def __calculateSatellites( utcNow, data, satellites, satelliteData ):
+    for key in satellites:
+        if key in satelliteData:
+            __calculateNextSatellitePass( utcNow, data, key, satelliteData[ key ] )
 
 
 # Loads the Skyfield catalogue of stars and filters out those not listed as common named.
