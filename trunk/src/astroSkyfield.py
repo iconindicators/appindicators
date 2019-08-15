@@ -319,8 +319,7 @@ def getAstronomicalInformation( utcNow,
     with load.open( EPHEMERIS_STARS ) as f:
         ephemerisStars = hipparcos.load_dataframe( f )
 
-    stars = list( STARS )#TODO Testing
-    __calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars ) #TODO Ensure passed in stars match those in STARS
+    __calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars )
 
 #     Comet https://github.com/skyfielders/python-skyfield/issues/196
 #     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
