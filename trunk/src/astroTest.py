@@ -73,8 +73,8 @@ compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyT
 for ( planetPyephem, planetSkyfield ) in zip( astroPyephem.PLANETS, astroSkyfield.PLANETS ):
     compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Planet, planetPyephem, planetSkyfield, astroPyephem.DATA_PLANET, astroSkyfield.DATA_PLANET )
 
-# The list of stars between Pyephem and Skyfield do not match 100%, so choose a handful of stars in both...
-compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, "ACHERNAR", "Achernar", astroPyephem.DATA_STAR, astroSkyfield.DATA_STAR )
-compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, "ALGOL", "Algol", astroPyephem.DATA_STAR, astroSkyfield.DATA_STAR )
-compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, "IZAR", "Izar", astroPyephem.DATA_STAR, astroSkyfield.DATA_STAR )
-compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, "SAIPH", "Saiph", astroPyephem.DATA_STAR, astroSkyfield.DATA_STAR )
+# The list of stars between Pyephem and Skyfield do not match 100%, so choose a handful of stars common to both...
+starsPyephem = [ "ACHERNAR", "ALGOL", "IZAR", "SAIPH" ]
+starsSkyfield = [ "Achernar", "Algol", "Izar", "Saiph" ]
+for ( starPyephem, starSkyfield ) in zip( starsPyephem, starsSkyfield ):
+    compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, starPyephem, starSkyfield, astroPyephem.DATA_STAR, astroSkyfield.DATA_STAR )
