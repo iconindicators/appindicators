@@ -23,6 +23,9 @@
 # http://celestrak.com/columns/v04n03
 
 
+from urllib.request import urlopen
+
+
 class TLE:
     def __init__( self, tleTitle, tleLine1, tleLine2 ):
         self.tleTitle = tleTitle
@@ -59,3 +62,27 @@ class TLE:
 
 
     def __repr__( self ): return self.__str__()
+
+
+# Downloads TLE data from the URL.
+#
+# On success, returns a dict:
+#    Key: ( satellite name, satellite number ) ;
+#    Value: satellite.TLE object.
+#
+# On error, may write to the log (if not None) and returns None.
+def download( url, logging ):
+    try:
+        tleData = { }
+        data = urlopen( url ).read().decode( "utf8" ).splitlines()
+        for i in range( 0, len( data ), 3 ):
+            tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
+            tleData[ ( tle.getName().upper(), tle.getNumber() ) ] = tle
+
+    except Exception as e:
+        tleData = None
+        if logging is not None:
+            logging.exception( e )
+            logging.error( "Error retrieving satellite TLE data from " + str( url ) )
+
+    return tleData

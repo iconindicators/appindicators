@@ -27,8 +27,10 @@
 #     sudo pip3 install --upgrade pandas
 
 
+from datetime import timedelta
+
 from skyfield import almanac
-from skyfield.api import load, Star, Topos
+from skyfield.api import EarthSatellite, load, Star, Topos
 from skyfield.constants import DEG2RAD
 from skyfield.data import hipparcos
 from skyfield.nutationlib import iau2000b
@@ -326,7 +328,7 @@ def getAstronomicalInformation( utcNow,
 #     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
 
 #     Satellite https://github.com/skyfielders/python-skyfield/issues/115
-    __calculateSatellites( ephemNow, data, satellites, satelliteData )
+    __calculateSatellites( utcNowSkyfield, data, timeScale, satellites, satelliteData )
 
 #TODO May not be required.
 #     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
@@ -545,8 +547,8 @@ def __getSkyfieldObserver( latitude, longitude, elevation, earth ):
 
 
 #TODO Not used...delete?
-def __getSkyfieldTopos( latitude, longitude, elevation ):
-    return Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
+# def __getSkyfieldTopos( latitude, longitude, elevation ):
+#     return Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
 
 
 #TODO Have copied the code from skyfield/almanac.py as per
@@ -586,10 +588,116 @@ def __bodyrise_bodyset( observer, body ):
 #
 # This allows the user to see the rise/set time for the current pass as it is happening.
 # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
-def __calculateSatellites( utcNow, data, satellites, satelliteData ):
+def __calculateSatellites( utcNow, data, timeScale, satellites, satelliteData ):
     for key in satellites:
         if key in satelliteData:
-            __calculateNextSatellitePass( utcNow, data, key, satelliteData[ key ] )
+            __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteData[ key ] )
+
+
+def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
+    key = ( AstronomicalBodyType.Satellite, " ".join( key ) )
+    currentDateTime = utcNow.J
+    endDateTime = timeScale.utc( ( utcNow.utc_datetime() + timedelta( days = 24 * 2 ) ).replace( tzinfo = pytz.UTC ) ).J #TODO Maybe pass this in as it won't change per satellite.
+
+#TODO rise/set not yet implemented in Skyfield
+# https://github.com/skyfielders/python-skyfield/issues/115
+#     while currentDateTime < endDateTime:
+#         satellite = EarthSatellite( satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2(), satelliteTLE.getTLETitle() )
+
+#         city = __getCity( data, currentDateTime )
+#         satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+#         satellite.compute( city )
+#         try:
+#             nextPass = city.next_pass( satellite )
+# 
+#         except ValueError:
+#             if satellite.circumpolar:
+#                 data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_SATELLITE_IS_CIRCUMPOLAR
+#                 data[ key + ( DATA_AZIMUTH, ) ] = str( satellite.az )
+# 
+#             break
+# 
+#         if not __isSatellitePassValid( nextPass ):
+#             break
+# 
+#         # The pass is valid.  If the satellite is currently passing, work out when it rose...
+#         if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
+#             setTime = nextPass[ 4 ]
+#             nextPass = __calculateSatellitePassForRisingPriorToNow( currentDateTime, data, satelliteTLE )
+#             if nextPass is None:
+#                 currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
+#                 continue
+# 
+#         # Now have a satellite rise/transit/set; determine if the pass is visible.
+#         passIsVisible = __isSatellitePassVisible( data, nextPass[ 2 ], satellite )
+#         if not passIsVisible:
+#             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
+#             continue
+# 
+#         # The pass is visible and the user wants only visible passes OR the user wants any pass...
+#         data[ key + ( DATA_RISE_TIME, ) ] = str( nextPass[ 0 ].datetime() )
+#         data[ key + ( DATA_RISE_AZIMUTH, ) ] = str( nextPass[ 1 ] )
+#         data[ key + ( DATA_SET_TIME, ) ] = str( nextPass[ 4 ].datetime() )
+#         data[ key + ( DATA_SET_AZIMUTH, ) ] = str( nextPass[ 5 ] )
+# 
+#         break
+# 
+# 
+# def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
+#     currentDateTime = ephem.Date( ephemNow - ephem.minute ) # Start looking from one minute ago.
+#     endDateTime = ephem.Date( ephemNow - ephem.hour * 1 ) # Only look back an hour for the rise time (then just give up).
+#     nextPass = None
+#     while currentDateTime > endDateTime:
+#         city = __getCity( data, currentDateTime )
+#         satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+#         satellite.compute( city )
+#         try:
+#             nextPass = city.next_pass( satellite )
+#             if not __isSatellitePassValid( nextPass ):
+#                 nextPass = None
+#                 break # Unlikely to happen but better to be safe and check!
+# 
+#             if nextPass[ 0 ] < nextPass[ 4 ]:
+#                 break
+# 
+#             currentDateTime = ephem.Date( currentDateTime - ephem.minute )
+# 
+#         except:
+#             nextPass = None
+#             break # This should never happen as the satellite has a rise and set (is not circumpolar or never up).
+# 
+#     return nextPass
+# 
+# 
+# def __isSatellitePassValid( satellitePass ):
+#     return \
+#         satellitePass is not None and \
+#         len( satellitePass ) == 6 and \
+#         satellitePass[ 0 ] is not None and \
+#         satellitePass[ 1 ] is not None and \
+#         satellitePass[ 2 ] is not None and \
+#         satellitePass[ 3 ] is not None and \
+#         satellitePass[ 4 ] is not None and \
+#         satellitePass[ 5 ] is not None
+# 
+# 
+# # Determine if a satellite pass is visible or not...
+# #
+# #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
+# #    http://www.celestrak.com/columns/v03n01
+# #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
+# def __isSatellitePassVisible( data, passDateTime, satellite ):
+#     city = __getCity( data, passDateTime )
+#     city.pressure = 0
+#     city.horizon = "-0:34"
+# 
+#     satellite.compute( city )
+#     sun = ephem.Sun()
+#     sun.compute( city )
+# 
+#     return satellite.eclipsed is False and \
+#            sun.alt > ephem.degrees( "-18" ) and \
+#            sun.alt < ephem.degrees( "-6" )
 
 
 # Loads the Skyfield catalogue of stars and filters out those not listed as common named.

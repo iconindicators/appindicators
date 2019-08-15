@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 
-import astroPyephem, astroSkyfield, datetime
+from skyfield.api import Topos, load
+
+import astroPyephem, astroSkyfield, datetime, satellite
+from src.celestrak.TestCelestrak import tleData
 
 
 def compareResults( resultsPyephem, resultsSkyfield, astronomicalBodyType, nameTagPyephem, nameTagSkyfield, dataTagsPyephem, dataTagsSkyfield ):
@@ -46,12 +49,21 @@ longitude = 151.2111111
 elevation = 100
 magnitude = 6
 
+
+#TODO rise/set not yet implemented in Skyfield
+# https://github.com/skyfielders/python-skyfield/issues/115
+tleData = satellite.download( "https://celestrak.com/NORAD/elements/visual.txt", None )
+satellites = [ ]
+for key in tleData:
+    satellites.append( key )
+
+
 print( "Running Skyfield..." )
 resultsSkyfield = astroSkyfield.getAstronomicalInformation( utcNow,
                                                             latitude, longitude, elevation,
                                                             astroSkyfield.PLANETS,
                                                             astroSkyfield.STARS,
-                                                            [], [],
+                                                            satellites, tleData,
                                                             [], [],
                                                             [], [],
                                                             magnitude )
@@ -61,7 +73,7 @@ resultsPyephem = astroPyephem.getAstronomicalInformation( utcNow,
                                                           latitude, longitude, elevation,
                                                           astroPyephem.PLANETS,
                                                           astroPyephem.STARS,
-                                                          [], [],
+                                                          satellites, tleData,
                                                           [], [],
                                                           [], [],
                                                           magnitude )

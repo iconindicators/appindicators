@@ -2942,6 +2942,8 @@ class IndicatorLunar:
         return cometOEData
 
 
+#TODO Use the new download method in satellite.py
+#...and can we make a similar thing for comets/minor planets (will need a new file)?
     # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
     # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
     # On error, returns None.
