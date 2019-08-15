@@ -33,7 +33,7 @@ from skyfield.constants import DEG2RAD
 from skyfield.data import hipparcos
 from skyfield.nutationlib import iau2000b
 
-import eclipse, gzip, math, pytz
+import eclipse, gzip, math, pytz, satellite
 
 
 class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
@@ -300,10 +300,11 @@ def getAstronomicalInformation( utcNow,
 
     data = { }
 
-    # Used internally to create the observer/city...removed before passing back to the caller.
-    data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = latitude
-    data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = longitude
-    data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = elevation
+#TODO May not be required.
+#     # Used internally to create the observer/city...removed before passing back to the caller.
+#     data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = str( latitude )
+#     data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = str( longitude )
+#     data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = str( elevation )
 
     timeScale = load.timescale()
     utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
@@ -312,7 +313,7 @@ def getAstronomicalInformation( utcNow,
 
     __calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
     __calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
-    __calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, PLANETS ) # TODO Should use passed in list of planets eventually.
+    __calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets )
 
     with load.open( EPHEMERIS_STARS ) as f:
         ephemerisStars = hipparcos.load_dataframe( f )
@@ -327,9 +328,10 @@ def getAstronomicalInformation( utcNow,
 #     Satellite https://github.com/skyfielders/python-skyfield/issues/115
 #     __calculateSatellites( ephemNow, data, satellites, satelliteData )
 
-    del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
-    del data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
-    del data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ]
+#TODO May not be required.
+#     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
+#     del data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
+#     del data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ]
 
     return data
 
@@ -347,7 +349,7 @@ def __calculateMoon( utcNow, data, timeScale, observer, ephemeris ):
     moon = ephemeris[ MOON ]
     neverUp = __calculateCommon( utcNow, data, timeScale, observer, moon, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
-    illumination = almanac.fraction_illuminated( ephemeris, MOON, utcNow ) * 100 # Needed for icon.
+    illumination = str( int( almanac.fraction_illuminated( ephemeris, MOON, utcNow ) * 100 ) ) # Needed for icon.
     data[ key + ( DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
     utcNowDateTime = utcNow.utc_datetime()
@@ -362,10 +364,7 @@ def __calculateMoon( utcNow, data, timeScale, observer, ephemeris ):
     nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
     data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
 
-#TODO
-    z = __getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ SUN ], moon )
-#     zenithAngleOfBrightLimb = str( getZenithAngleOfBrightLimbSkyfield( timeScale, utcNow, ephemeris, observer, ra, dec ) )
-#     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Pass in a clean instance (just to be safe).  Needed for icon.
+    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( __getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ SUN ], moon ) ) # Needed for icon.
 
     if not neverUp:
         moonPhaseDateTimes = t.utc_iso()
@@ -458,7 +457,7 @@ def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBody
 
     utcNowDateTime = utcNow.utc_datetime()
     t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
-    t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 1, utcNowDateTime.hour )
+    t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 2, utcNowDateTime.hour ) # Look two days ahead as one day ahead may miss the next rise or set.
 
 #     t, y = almanac.find_discrete( t0, t1, almanac.sunrise_sunset( ephemeris, topos ) )  #TODO Original Skyfield function only supports sun rise/set.
     t, y = almanac.find_discrete( t0, t1, __bodyrise_bodyset( observer, body ) )
@@ -482,8 +481,8 @@ def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBody
     if not neverUp:
         apparent = observer.at( utcNow ).observe( body ).apparent()
         alt, az, distance = apparent.altaz()
-        data[ key + ( DATA_AZIMUTH, ) ] = str( az )
-        data[ key + ( DATA_ALTITUDE, ) ] = str( alt )
+        data[ key + ( DATA_AZIMUTH, ) ] = str( az.radians )
+        data[ key + ( DATA_ALTITUDE, ) ] = str( alt.radians )
 
     return neverUp
 

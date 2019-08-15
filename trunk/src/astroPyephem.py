@@ -285,9 +285,9 @@ def getAstronomicalInformation( utcNow,
     data = { }
 
     # Used internally to create the observer/city...removed before passing back to the caller.
-    data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = latitude
-    data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = longitude
-    data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = elevation
+    data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = str( latitude )
+    data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = str( longitude )
+    data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = str( elevation )
 
     ephemNow = ephem.Date( utcNow )
     __calculateMoon( ephemNow, data )
@@ -503,8 +503,8 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
 
     if not neverUp:
         body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-        data[ key + ( DATA_AZIMUTH, ) ] = str( body.az )
-        data[ key + ( DATA_ALTITUDE, ) ] = str( body.alt )
+        data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
+        data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
 
     return neverUp
 
