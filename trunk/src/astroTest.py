@@ -5,37 +5,39 @@
 import astroPyephem, astroSkyfield, datetime
 
 
-def compareResults( resultsPyephem, resultsSkyfield, astronomicalBodyType, nameTag, dataTagsPyephem, dataTagsSkyfield ):
+def compareResults( resultsPyephem, resultsSkyfield, astronomicalBodyType, nameTagPyephem, nameTagSkyfield, dataTagsPyephem, dataTagsSkyfield ):
 
     results = [ ]
     for dataTag in dataTagsPyephem:
-        if ( astronomicalBodyType, nameTag, dataTag ) in resultsPyephem and \
-           ( astronomicalBodyType, nameTag, dataTag ) not in resultsSkyfield:
+        if ( astronomicalBodyType, nameTagPyephem, dataTag ) in resultsPyephem and \
+           ( astronomicalBodyType, nameTagSkyfield, dataTag ) not in resultsSkyfield:
             results.append( dataTag )
 
     if results:
-        print( nameTag, "keys in Pyephem not in Skyfield:", results )
+        print( nameTagPyephem, "keys in Pyephem not in Skyfield:", results )
 
     results = [ ]
     for dataTag in dataTagsSkyfield:
-        if ( astronomicalBodyType, nameTag, dataTag ) in resultsSkyfield and \
-           ( astronomicalBodyType, nameTag, dataTag ) not in resultsPyephem:
+        if ( astronomicalBodyType, nameTagSkyfield, dataTag ) in resultsSkyfield and \
+           ( astronomicalBodyType, nameTagPyephem, dataTag ) not in resultsPyephem:
             results.append( dataTag )
 
     if results:
-        print( nameTag, "keys in Skyfield not in Pyephem:", results )
+        print( nameTagSkyfield, "keys in Skyfield not in Pyephem:", results )
 
     results = [ ]
     for dataTag in dataTagsPyephem:
-        key = ( astronomicalBodyType, nameTag, dataTag )
-        if key in resultsPyephem and key in resultsSkyfield and resultsPyephem[ key ] != resultsSkyfield[ key ]:
+        keyPyephem = ( astronomicalBodyType, nameTagPyephem, dataTag )
+        keySkyfield = ( astronomicalBodyType, nameTagSkyfield, dataTag )
+        if keyPyephem in resultsPyephem and keySkyfield in resultsSkyfield and resultsPyephem[ keyPyephem ] != resultsSkyfield[ keySkyfield ]:
             results.append( dataTag )
 
     if results:
-        print( nameTag, "values in Pyephem which differ from Skyfield:" )
+        print( nameTagPyephem, "values in Pyephem which differ from Skyfield:" )
         for dataTag in results:
-            key = ( astronomicalBodyType, nameTag, dataTag )
-            print( "\t", dataTag, resultsPyephem[ key ], resultsSkyfield[ key ] )
+            keyPyephem = ( astronomicalBodyType, nameTagPyephem, dataTag )
+            keySkyfield = ( astronomicalBodyType, nameTagSkyfield, dataTag )
+            print( "\t", dataTag, resultsPyephem[ keyPyephem ], resultsSkyfield[ keySkyfield ] )
 
 
 utcNow = datetime.datetime.utcnow()
@@ -65,5 +67,14 @@ resultsPyephem = astroPyephem.getAstronomicalInformation( utcNow,
                                                           magnitude )
 
 print( "Crunching results..." )
-compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Moon, astroSkyfield.NAME_TAG_MOON, astroPyephem.DATA_MOON, astroSkyfield.DATA_MOON )
-compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Sun, astroSkyfield.NAME_TAG_SUN, astroPyephem.DATA_SUN, astroSkyfield.DATA_SUN )
+compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, astroSkyfield.NAME_TAG_MOON, astroPyephem.DATA_MOON, astroSkyfield.DATA_MOON )
+compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroSkyfield.NAME_TAG_SUN, astroPyephem.DATA_SUN, astroSkyfield.DATA_SUN )
+
+for ( planetPyephem, planetSkyfield ) in zip( astroPyephem.PLANETS, astroSkyfield.PLANETS ):
+    compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Planet, planetPyephem, planetSkyfield, astroPyephem.DATA_PLANET, astroSkyfield.DATA_PLANET )
+
+# The list of stars between Pyephem and Skyfield do not match 100%, so choose a handful of stars in both...
+compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, "ACHERNAR", "Achernar", astroPyephem.DATA_STAR, astroSkyfield.DATA_STAR )
+compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, "ALGOL", "Algol", astroPyephem.DATA_STAR, astroSkyfield.DATA_STAR )
+compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, "IZAR", "Izar", astroPyephem.DATA_STAR, astroSkyfield.DATA_STAR )
+compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, "SAIPH", "Saiph", astroPyephem.DATA_STAR, astroSkyfield.DATA_STAR )
