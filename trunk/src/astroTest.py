@@ -2,10 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from skyfield.api import Topos, load
-
 import astroPyephem, astroSkyfield, datetime, satellite
-from src.celestrak.TestCelestrak import tleData
 
 
 def compareResults( resultsPyephem, resultsSkyfield, astronomicalBodyType, nameTagPyephem, nameTagSkyfield, dataTagsPyephem, dataTagsSkyfield ):
@@ -52,7 +49,7 @@ magnitude = 6
 
 #TODO rise/set not yet implemented in Skyfield
 # https://github.com/skyfielders/python-skyfield/issues/115
-tleData = satellite.download( "https://celestrak.com/NORAD/elements/visual.txt", None )
+tleData = satellite.download( "https://celestrak.com/NORAD/elements/visual.txt" )
 satellites = [ ]
 for key in tleData:
     satellites.append( key )
