@@ -285,7 +285,9 @@ def getAstronomicalInformation( utcNow,
     data = { }
 
     # Used internally to create the observer/city...removed before passing back to the caller.
-#TODO Consider passing the lat, long, elev into each function, rather than termporarily holding in the dict?    
+#TODO Consider passing the lat, long, elev into each function, rather than termporarily holding in the dict?
+#If we do pass in lat/long/elev, maybe consider each function returns it's own dict with the data...and join that dict to the main dict.
+#Can that be done?    
     data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = str( latitude )
     data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = str( longitude )
     data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = str( elevation )
