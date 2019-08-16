@@ -1084,7 +1084,8 @@ class IndicatorLunar:
     def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
         key = ( astronomicalBodyType, nameTag )
         subMenu = Gtk.Menu()
-        altitude = int( self.getDecimalDegrees( self.data[ key + ( astroPyephem.DATA_ALTITUDE, ) ], False, 0 ) )
+#         altitude = int( self.getDecimalDegrees( self.data[ key + ( astroPyephem.DATA_ALTITUDE, ) ] ) ) #TODO This does not need to convert...just use the sign.
+        altitude = float( self.data[ key + ( astroPyephem.DATA_ALTITUDE, ) ] )
         indent = pythonutils.indent( indentUnity, indentGnomeShell )
 
         # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
@@ -1327,14 +1328,14 @@ class IndicatorLunar:
             webbrowser.open( url )
 
 
-#TODO Rename the source to better reflect how it affects the date/time format.
+#TODO Rename the source parameter to better reflect how it affects the date/time format.
     def getDisplayData( self, key, source = None ):
         displayData = None
         if key[ 2 ] == astroPyephem.DATA_ALTITUDE or \
            key[ 2 ] == astroPyephem.DATA_AZIMUTH or \
            key[ 2 ] == astroPyephem.DATA_RISE_AZIMUTH or \
            key[ 2 ] == astroPyephem.DATA_SET_AZIMUTH:
-            displayData = str( self.getDecimalDegrees( self.data[ key ], False, 0 ) ) + "°"
+            displayData = str( math.degrees( float( self.data[ key ] ) ) ) + "°"
 
         elif key[ 2 ] == astroPyephem.DATA_DAWN or \
              key[ 2 ] == astroPyephem.DATA_DUSK or \
@@ -1398,22 +1399,6 @@ class IndicatorLunar:
         localDateTimeString = localDateTime.strftime( formatString )
 
         return localDateTimeString
-
-
-    # Takes a string in the format of HH:MM:SS.S and converts to degrees (°) in decimal.
-    def getDecimalDegrees( self, stringInput, isHours, roundAmount ):
-        t = tuple( stringInput.split( ":" ) )
-        x = ( float( t[ 2 ] ) / 60.0 + float( t[ 1 ] ) ) / 60.0 + abs( float( t[ 0 ] ) )
-        if isHours:
-            x = x * 15.0
-
-        y = float( t[ 0 ] )
-        if roundAmount == 0:
-            decimalDegrees = round( math.copysign( x, y ) )
-        else:
-            decimalDegrees = round( math.copysign( x, y ), roundAmount )
-
-        return decimalDegrees
 
 
     def toDateTime( self, dateTimeAsString ):
