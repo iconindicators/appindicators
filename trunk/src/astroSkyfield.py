@@ -314,21 +314,38 @@ def getAstronomicalInformation( utcNow,
     ephemerisPlanets = load( EPHEMERIS_PLANETS )
     observer = __getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
 
+    import datetime
+    utcNow = datetime.datetime.utcnow()
     __calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
-    __calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
-    __calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets )
+    print( "updateMoon:", ( datetime.datetime.utcnow() - utcNow ) )
 
+    utcNow = datetime.datetime.utcnow()
+    __calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
+    print( "updateSun:", ( datetime.datetime.utcnow() - utcNow ) )
+
+    utcNow = datetime.datetime.utcnow()
+    __calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets )
+    print( "updatePlanets:", ( datetime.datetime.utcnow() - utcNow ) )
+
+    utcNow = datetime.datetime.utcnow()
     with load.open( EPHEMERIS_STARS ) as f:
         ephemerisStars = hipparcos.load_dataframe( f )
 
     __calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars )
+    print( "updateStars:", ( datetime.datetime.utcnow() - utcNow ) )
 
 #     Comet https://github.com/skyfielders/python-skyfield/issues/196
+#     utcNow = datetime.datetime.utcnow()
 #     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
+#     print( "updateComets:", ( datetime.datetime.utcnow() - utcNow ) )
+#     utcNow = datetime.datetime.utcnow()
 #     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
+#     print( "updateMinorPlanets:", ( datetime.datetime.utcnow() - utcNow ) )
 
 #     Satellite https://github.com/skyfielders/python-skyfield/issues/115
+#     utcNow = datetime.datetime.utcnow()
     __calculateSatellites( utcNowSkyfield, data, timeScale, satellites, satelliteData )
+#     print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
 
 #TODO May not be required.
 #     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
