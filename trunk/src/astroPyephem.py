@@ -30,9 +30,6 @@ class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, S
 #TODO Need to test with a lat/long such that bodies rise/set, always up and never up.
 
 
-#TODO Consider renaming to astroPyephem.py
-
-
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
 DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
@@ -285,9 +282,6 @@ def getAstronomicalInformation( utcNow,
     data = { }
 
     # Used internally to create the observer/city...removed before passing back to the caller.
-#TODO Consider passing the lat, long, elev into each function, rather than termporarily holding in the dict?
-#If we do pass in lat/long/elev, maybe consider each function returns it's own dict with the data...and join that dict to the main dict.
-#Can that be done?    
     data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = str( latitude )
     data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = str( longitude )
     data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = str( elevation )
@@ -479,7 +473,10 @@ def __calculateStars( ephemNow, data, stars ):
 # The default source for minor planets is https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt
 # Have tried the other data sources for minor planets (NEOs, centaurs, transneptunians) and none have magnitude less than 6.
 def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, maximumMagnitude ):
-    mags = [ 0, 0, 0, 0, 0, 0 ]#TODO Debug
+#TODO Debug
+    mags = [ 0, 0, 0, 0, 0, 0 ]
+    magsAndAbove = [ 0, 0, 0, 0, 0, 0 ]
+
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
             body = ephem.readdb( cometOrMinorPlanetData[ key ] )
@@ -487,9 +484,18 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
             if not bad and float( body.mag ) >= float( MAGNITUDE_MINIMUM ) and float( body.mag ) <= float( maximumMagnitude ):
                 __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
-                mags[ int( float( body.mag ) ) ] += 1 #TODO Debug
 
+#TODO Debug
+                mags[ int( float( body.mag ) ) ] += 1 
+                if float( body.mag ) < 0.0: print( "negative magnitude:", float( body.mag ) )
+                if float( data[ ( astronomicalBodyType, key, DATA_ALTITUDE ) ] ) > 0:
+                    magsAndAbove[ int( float( body.mag ) ) ] += 1
+
+
+#TODO Debug
     print( mags )
+    print( magsAndAbove )
+
 
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
     neverUp = False
