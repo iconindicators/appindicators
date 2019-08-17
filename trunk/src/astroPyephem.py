@@ -287,13 +287,35 @@ def getAstronomicalInformation( utcNow,
     data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = str( elevation )
 
     ephemNow = ephem.Date( utcNow )
+
+    import datetime
+    utcNow = datetime.datetime.utcnow()
     __calculateMoon( ephemNow, data )
+    print( "updateMoon:", ( datetime.datetime.utcnow() - utcNow ) )
+
+    utcNow = datetime.datetime.utcnow()
     __calculateSun( ephemNow, data )
+    print( "updateSun:", ( datetime.datetime.utcnow() - utcNow ) )
+
+    utcNow = datetime.datetime.utcnow()
     __calculatePlanets( ephemNow, data, planets )
+    print( "updatePlanets:", ( datetime.datetime.utcnow() - utcNow ) )
+
+    utcNow = datetime.datetime.utcnow()
     __calculateStars( ephemNow, data, stars )
+    print( "updateStars:", ( datetime.datetime.utcnow() - utcNow ) )
+
+    utcNow = datetime.datetime.utcnow()
     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
+    print( "updateComets:", ( datetime.datetime.utcnow() - utcNow ) )
+
+    utcNow = datetime.datetime.utcnow()
     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
+    print( "updateMinorPlanets:", ( datetime.datetime.utcnow() - utcNow ) )
+
+    utcNow = datetime.datetime.utcnow()
     __calculateSatellites( ephemNow, data, satellites, satelliteData )
+    print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
 
     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
     del data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
