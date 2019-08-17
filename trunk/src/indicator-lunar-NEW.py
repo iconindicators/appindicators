@@ -31,6 +31,14 @@
 #  http://www.flaticon.com/search/satellite
 
 
+#TODO Consider dropping the message always up (and circumpolar).
+#No point telling a user this as they can infer...
+#If there is no rise/set time, the object is always up.
+# Might need to rethink for satellites as they can orbit in odd ways so
+# it could be possible that for a location (near the poles) that some satellites will rise/set and some are circumpolar...
+# so have two sets of menus?
+
+
 #TODO
 # On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared:
 # 
@@ -519,6 +527,9 @@ class IndicatorLunar:
     MESSAGE_TRANSLATION_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_TRANSLATION_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
+    MESSAGE_TRANSLATIONS = {
+        astroPyephem.MESSAGE_BODY_ALWAYS_UP : MESSAGE_TRANSLATION_BODY_ALWAYS_UP }
+
     MESSAGE_DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
     
     # Data is displayed using a default format, but when an alternate format is required, specify using a source below.
@@ -1004,87 +1015,91 @@ class IndicatorLunar:
 
                 self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, nameTag, 0, 2 )
 
-
+#TODO Takes too long!
+#Try another way...take list of bodies, iterate over that and determine if we create the menu.
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
-        keys = [ item for item in self.data if item[ 0 ] == astronomicalBodyType ]
-        if keys:
-            menuHeader = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
-            menu.append( menuHeader ) 
+        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
+            print( "Number of comets", len( self.comets ) )
+            print( self.comets )
+        else:
+            print( "Number of minor", len( self.minorPlanets ) )
+            print( self.minorPlanets )
+
+        keysForAstronomicalBodyType = [ item for item in self.data if item[ 0 ] == astronomicalBodyType ]
+        bodies = [ ]
+        for key in keysForAstronomicalBodyType:
+            if key[ 2 ] == astroPyephem.DATA_RISE_TIME or key[ 2 ] == astroPyephem.DATA_MESSAGE: # A body must have a rise time or a message.
+                bodies.append( key[ 1 ] )
+
+        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
+            print( "Number of comets", len( bodies ) )
+        else:
+            print( "Number of minor", len( bodies ) )
+
+        if bodies:
+            menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
+            menu.append( menuItem ) 
             if self.showCometsAsSubMenu:
                 subMenu = Gtk.Menu()
-                menuHeader.set_submenu( subMenu )
+                menuItem.set_submenu( subMenu )
 
-            oeData = self.cometOEData if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanetOEData
             showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
-            atLeastOneBodyAdded = False
-            for name in sorted( bodies ): # Sorting by name also sorts the display name identically.
-                if ( astronomicalBodyType, name, astroPyephem.DATA_RISE_TIME ) in self.data or \
-                   ( astronomicalBodyType, name, astroPyephem.MESSAGE_BODY_ALWAYS_UP ) in self.data:
+            for name in sorted( bodies ):
+                if showAsSubMenu:
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name )
+                    subMenu.append( menuItem )
+                else:
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + name )
+                    menu.append( menuItem )
 
-                     # May have comets or minor planets, but no data was computed as they are never up or some other exception,
-                     # so use a flag to identify if any body has been added then add the main menu header at the end if need be.
-                    atLeastOneBodyAdded = True
+                self.updateCommonMenu( menuItem, astronomicalBodyType, name, 0, 2 )
 
-                    if name in oeData:
-                        displayName = self.getCometOrMinorPlanetDisplayName( oeData[ name ] )
-                    else:
-                        displayName = name # There is a body but no data for it.
-
-                    if showAsSubMenu:
-                        menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
-                        subMenu.append( menuItem )
-                    else:
-                        menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
-                        menu.append( menuItem )
-
-                    self.updateCommonMenu( menuItem, astronomicalBodyType, name, 0, 2 )
-
-                    # Add handler.
-                    for child in menuItem.get_submenu().get_children():
-                        child.set_name( name )
-                        child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
+                # Add handler.
+                for child in menuItem.get_submenu().get_children():
+                    child.set_name( name )
+                    child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
 
 
-        bodies = self.comets if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanets
-        if len( bodies ) > 0:
-            print( len( bodies ))
-            menuHeader = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
-            if self.showCometsAsSubMenu:
-                subMenu = Gtk.Menu()
-                menuHeader.set_submenu( subMenu )
-
-            oeData = self.cometOEData if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanetOEData
-            showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
-            atLeastOneBodyAdded = False
-            for name in sorted( bodies ): # Sorting by name also sorts the display name identically.
-                if ( astronomicalBodyType, name, astroPyephem.DATA_RISE_TIME ) in self.data or \
-                   ( astronomicalBodyType, name, astroPyephem.MESSAGE_BODY_ALWAYS_UP ) in self.data:
-
-                     # May have comets or minor planets, but no data was computed as they are never up or some other exception,
-                     # so use a flag to identify if any body has been added then add the main menu header at the end if need be.
-                    atLeastOneBodyAdded = True
-
-                    if name in oeData:
-                        displayName = self.getCometOrMinorPlanetDisplayName( oeData[ name ] )
-                    else:
-                        displayName = name # There is a body but no data for it.
-
-                    if showAsSubMenu:
-                        menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
-                        subMenu.append( menuItem )
-                    else:
-                        menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
-                        menu.append( menuItem )
-
-                    self.updateCommonMenu( menuItem, astronomicalBodyType, name, 0, 2 )
-
-                    # Add handler.
-                    for child in menuItem.get_submenu().get_children():
-                        child.set_name( name )
-                        child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
-
-            if atLeastOneBodyAdded:
-                menu.append( menuHeader ) 
+#         bodies = self.comets if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanets
+#         if len( bodies ) > 0:
+#             print( len( bodies ))
+#             menuHeader = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
+#             if self.showCometsAsSubMenu:
+#                 subMenu = Gtk.Menu()
+#                 menuHeader.set_submenu( subMenu )
+# 
+#             oeData = self.cometOEData if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanetOEData
+#             showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
+#             atLeastOneBodyAdded = False
+#             for name in sorted( bodies ): # Sorting by name also sorts the display name identically.
+#                 if ( astronomicalBodyType, name, astroPyephem.DATA_RISE_TIME ) in self.data or \
+#                    ( astronomicalBodyType, name, astroPyephem.MESSAGE_BODY_ALWAYS_UP ) in self.data:
+# 
+#                      # May have comets or minor planets, but no data was computed as they are never up or some other exception,
+#                      # so use a flag to identify if any body has been added then add the main menu header at the end if need be.
+#                     atLeastOneBodyAdded = True
+# 
+#                     if name in oeData:
+#                         displayName = self.getCometOrMinorPlanetDisplayName( oeData[ name ] )
+#                     else:
+#                         displayName = name # There is a body but no data for it.
+# 
+#                     if showAsSubMenu:
+#                         menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
+#                         subMenu.append( menuItem )
+#                     else:
+#                         menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
+#                         menu.append( menuItem )
+# 
+#                     self.updateCommonMenu( menuItem, astronomicalBodyType, name, 0, 2 )
+# 
+#                     # Add handler.
+#                     for child in menuItem.get_submenu().get_children():
+#                         child.set_name( name )
+#                         child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
+# 
+#             if atLeastOneBodyAdded:
+#                 menu.append( menuHeader ) 
 
 
     def onCometMinorPlanet( self, widget, astronomicalBodyType ):
@@ -1403,7 +1418,7 @@ class IndicatorLunar:
                 displayData = _( "Total" )
 
         elif key[ 2 ] == astroPyephem.DATA_MESSAGE: #TODO Will need to take the message and pull out the translation from a dict.
-            displayData = self.data[ key ]
+            displayData = IndicatorLunar.MESSAGE_TRANSLATIONS[ self.data[ key ] ]
 
         elif key[ 2 ] == astroPyephem.DATA_PHASE:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
