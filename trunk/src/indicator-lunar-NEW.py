@@ -655,10 +655,6 @@ class IndicatorLunar:
 #             self.addNewMinorPlanets()
 #             self.addNewSatellites()
 
-
-            utcNow = datetime.datetime.utcnow()
-            print( "getAstronomicalInformation" )
-
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             # Value is the astronomical data (or equivalent) as a string.
 #TODO If we do a run and have data and comets selected...
@@ -680,13 +676,10 @@ class IndicatorLunar:
 #What we want is a list of bodies that match the magnitude (to show in the prefereneces). 
 #So maybe run the backend again or have a function to get just this information?
 
-            print( "getAstronomicalInformation:", ( datetime.datetime.utcnow() - utcNow ) )
-
             # Update frontend...
             self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
 
             utcNow = datetime.datetime.utcnow()
-            print( "updateMenu" )
             self.updateMenu() #TODO Takes 5 seconds...what is the biggest drain?  Satellites?
             print( "updateMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
@@ -716,48 +709,40 @@ class IndicatorLunar:
         menu = Gtk.Menu()
 
         utcNow = datetime.datetime.utcnow()
-        print( "updateMoon" )
         if self.showMoon and not self.bodyIsNeverUp( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON ):
             self.updateMoonMenu( menu )
-        print( "updateMoon:", ( datetime.datetime.utcnow() - utcNow ) )
+        print( "updateMoonMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
-        print( "updateSun" )
         if self.showSun and not self.bodyIsNeverUp( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN ):
             self.updateSunMenu( menu )
-        print( "updateSun:", ( datetime.datetime.utcnow() - utcNow ) )
+        print( "updateSunMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
-        print( "updatePlanets" )
         self.updatePlanetsMenu( menu )
-        print( "updatePlanets:", ( datetime.datetime.utcnow() - utcNow ) )
+        print( "updatePlanetsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
-        print( "updateStars" )
         self.updateStarsMenu( menu )
-        print( "updateStars:", ( datetime.datetime.utcnow() - utcNow ) )
+        print( "updateStarsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
-        print( "updateComets" )
         self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.Comet )
-        print( "updateComets:", ( datetime.datetime.utcnow() - utcNow ) )
+        print( "updateCometsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
-        print( "updateMinorPlanet" )
         self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
-        print( "updateMinorPlanet:", ( datetime.datetime.utcnow() - utcNow ) )
+        print( "updateMinorPlanetMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
-        print( "updateSatellites" )
 #         self.updateSatellitesMenu( menu )
-        print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
+        print( "updateSatellitesMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
-        print( "updatePAQ" )
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-        print( "updatePAQ:", ( datetime.datetime.utcnow() - utcNow ) )
+        print( "updatePAQMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
 
     def updateIconAndLabel( self ):
@@ -1021,8 +1006,48 @@ class IndicatorLunar:
 
 
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
+        keys = [ item for item in self.data if item[ 0 ] == astronomicalBodyType ]
+        if keys:
+            menuHeader = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
+            menu.append( menuHeader ) 
+            if self.showCometsAsSubMenu:
+                subMenu = Gtk.Menu()
+                menuHeader.set_submenu( subMenu )
+
+            oeData = self.cometOEData if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanetOEData
+            showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
+            atLeastOneBodyAdded = False
+            for name in sorted( bodies ): # Sorting by name also sorts the display name identically.
+                if ( astronomicalBodyType, name, astroPyephem.DATA_RISE_TIME ) in self.data or \
+                   ( astronomicalBodyType, name, astroPyephem.MESSAGE_BODY_ALWAYS_UP ) in self.data:
+
+                     # May have comets or minor planets, but no data was computed as they are never up or some other exception,
+                     # so use a flag to identify if any body has been added then add the main menu header at the end if need be.
+                    atLeastOneBodyAdded = True
+
+                    if name in oeData:
+                        displayName = self.getCometOrMinorPlanetDisplayName( oeData[ name ] )
+                    else:
+                        displayName = name # There is a body but no data for it.
+
+                    if showAsSubMenu:
+                        menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + displayName )
+                        subMenu.append( menuItem )
+                    else:
+                        menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + displayName )
+                        menu.append( menuItem )
+
+                    self.updateCommonMenu( menuItem, astronomicalBodyType, name, 0, 2 )
+
+                    # Add handler.
+                    for child in menuItem.get_submenu().get_children():
+                        child.set_name( name )
+                        child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
+
+
         bodies = self.comets if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanets
         if len( bodies ) > 0:
+            print( len( bodies ))
             menuHeader = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
             if self.showCometsAsSubMenu:
                 subMenu = Gtk.Menu()
