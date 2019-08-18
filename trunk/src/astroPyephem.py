@@ -261,7 +261,9 @@ LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
 LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
 LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
-MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
+MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP" # TODO Do we need these two things?  Maybe ditch them...and no need to tell a
+#  user the body is always up...if there is an altitude > 0, the object is up
+# and also if there is no rise/set the body is always up.
 MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 
 MAGNITUDE_MINIMUM = -10.0 # Have found dodgy magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
@@ -331,7 +333,6 @@ def getCities(): return sorted( _city_data.keys(), key = locale.strxfrm )
 
 
 # Returns the latitude, longitude and elevation (all as strings) for the PyEphem city.
-#TODO The returned values should be floats.
 def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[ 0 ] ), \
                                                   float( _city_data.get( city )[ 1 ] ), \
                                                   _city_data.get( city )[ 2 ]
@@ -450,7 +451,8 @@ def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate )
 def __calculateSun( ephemNow, data ):
     neverUp = __calculateCommon( ephemNow, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
     if not neverUp:
-#TODO If this is removed, then remove the dawn/dusk stuff.        
+#TODO If this is removed, then remove the dawn/dusk stuff.       
+#If kept, ensure that skyfield can be modified to calculate dawn/dusk. 
 #         try:
 #             # Dawn/Dusk.
 #             city = __getCity( data, ephemNow )
@@ -481,6 +483,7 @@ def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
 # http://www.geoastro.de/planets/index.html
 # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
 def __calculatePlanets( ephemNow, data, planets ):
+    print( "Number of planets:", len(planets))#TODO debug
     for planet in planets:
         planetObject = getattr( ephem, planet.title() )()
         __calculateCommon( ephemNow, data, planetObject, AstronomicalBodyType.Planet, planet )
@@ -559,37 +562,7 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
         if ( astronomicalBodyType == AstronomicalBodyType.Comet or \
              astronomicalBodyType == AstronomicalBodyType.MinorPlanet or \
              astronomicalBodyType == AstronomicalBodyType.Planet or \
-             astronomicalBodyType == AstronomicalBodyType.Star ) and \
-             key + ( DATA_RISE_TIME, ) not in data: # Only add the magnitude if the body is above the horizon.
-            data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
-
-    return neverUp
-
-
-def __calculateCommonORIG( ephemNow, data, body, astronomicalBodyType, nameTag ):
-    neverUp = False
-    key = ( astronomicalBodyType, nameTag )
-    try:
-        city = __getCity( data, ephemNow )
-        rising = city.next_rising( body )
-        setting = city.next_setting( body )
-        data[ key + ( DATA_RISE_TIME, ) ] = str( rising.datetime() )
-        data[ key + ( DATA_SET_TIME, ) ] = str( setting.datetime() )
-
-    except ephem.AlwaysUpError:
-        data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_BODY_ALWAYS_UP
-
-    except ephem.NeverUpError:
-        neverUp = True
-
-    if not neverUp:
-        body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-        data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
-        data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
- 
-        if astronomicalBodyType == AstronomicalBodyType.Comet or \
-           astronomicalBodyType == AstronomicalBodyType.MinorPlanet or \
-           astronomicalBodyType == AstronomicalBodyType.Star:
+             astronomicalBodyType == AstronomicalBodyType.Star ):
             data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
 
     return neverUp
