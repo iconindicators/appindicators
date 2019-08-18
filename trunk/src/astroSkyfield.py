@@ -518,16 +518,8 @@ def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets ):
 # ...so that means taking the data, selecting only ephemerisStars of magnitude 2.5 or so and keep those.
 # See revision 999 for code to filter ephemerisStars by magnitude.
 def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars ):
-
-    x = ephemeris.values.tolist()    
-    y = ephemeris.columns    
-    keys = ephemeris.keys    
     for star in stars:
-        b = ephemeris.loc[ STARS[ star ] ]
-        mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Compare a known star to that in Pyephem and make sure this is right!
-        a = Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] )
-#         print( star, )
-# df = df[df['magnitude'] <= 2.5]        
+#         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
         __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
 
 
