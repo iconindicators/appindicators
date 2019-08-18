@@ -262,7 +262,7 @@ LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
 MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 
-MAGNITUDE_MINIMUM = -15 # Have found dodgy magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
+MAGNITUDE_MINIMUM = -15.0 # Have found dodgy magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
 
 
 # Returns a dict with astronomical information...
@@ -278,13 +278,8 @@ def getAstronomicalInformation( utcNow,
                                 comets, cometData,
                                 minorPlanets, minorPlanetData,
                                 magnitude ):
-    
+
     data = { }
-    
-    print( type(latitude))
-    print( type(longitude))
-    print( type(elevation))
-    print( type(magnitude))
 
     # Used internally to create the observer/city...removed before passing back to the caller.
     data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = str( latitude )
@@ -334,9 +329,10 @@ def getCities(): return sorted( _city_data.keys(), key = locale.strxfrm )
 
 
 # Returns the latitude, longitude and elevation (all as strings) for the PyEphem city.
-def getLatitudeLongitudeElevation( city ): return _city_data.get( city )[ 0 ], \
-                                                  _city_data.get( city )[ 1 ], \
-                                                  str( _city_data.get( city )[ 2 ] )
+#TODO The returned values should be floats.
+def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[ 0 ] ), \
+                                                  float( _city_data.get( city )[ 1 ] ), \
+                                                  _city_data.get( city )[ 2 ]
 
 
 # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -499,7 +495,7 @@ def __calculateStars( ephemNow, data, stars ):
 # The default source for comets is https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
 # The default source for minor planets is https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt
 # Have tried the other data sources for minor planets (NEOs, centaurs, transneptunians) and none have magnitude less than 6.
-def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, maximumMagnitude ):
+def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitude ):
 #TODO Debug
     mags = [ 0, 0, 0, 0, 0, 0 ]
     magsAndAbove = [ 0, 0, 0, 0, 0, 0 ]
@@ -509,14 +505,14 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
             body = ephem.readdb( cometOrMinorPlanetData[ key ] )
             body.compute( __getCity( data, ephemNow ) )
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
-            if not bad and float( body.mag ) >= float( MAGNITUDE_MINIMUM ) and float( body.mag ) <= float( maximumMagnitude ):
+            if not bad and body.mag >= MAGNITUDE_MINIMUM and body.mag <= magnitude:
                 __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
 
 #TODO Debug
-                mags[ int( float( body.mag ) ) ] += 1 
-                if float( body.mag ) < 0.0: print( "negative magnitude:", float( body.mag ) )
+                mags[ int( body.mag ) ] += 1 
+                if body.mag < 0.0: print( "negative magnitude:", body.mag )
                 if float( data[ ( astronomicalBodyType, key, DATA_ALTITUDE ) ] ) > 0:
-                    magsAndAbove[ int( float( body.mag ) ) ] += 1
+                    magsAndAbove[ int( body.mag ) ] += 1
 
 
 #TODO Debug

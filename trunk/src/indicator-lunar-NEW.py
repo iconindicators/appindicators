@@ -679,7 +679,7 @@ class IndicatorLunar:
                                                           self.satellites, None if self.satelliteTLEData is None else self.satelliteTLEData,
                                                           self.comets, None if self.cometOEData is None else self.cometOEData,
                                                           self.minorPlanets, None if self.minorPlanetOEData is None else self.minorPlanetOEData,
-                                                          self.magnitude )
+                                                          float( self.magnitude ) )
 
 #TODO After the backend is done, filter the comet and minor planet listings
 # to only those present in the data.
@@ -2495,7 +2495,7 @@ class IndicatorLunar:
             self.werewolfWarningMessage = pythonutils.getTextViewText( werewolfNotificationMessageText )
 
             self.city = cityValue
-            self.latitude = latitudeValue
+            self.latitude = latitudeValue #TODO Ensure these come out as float.
             self.longitude = longitudeValue
             self.elevation = elevationValue
 
@@ -3044,19 +3044,20 @@ class IndicatorLunar:
 
         #TODO Start of temporary hack...
         # Convert planet/star to upper case.
-        # Convert elevation from float to str.
+        # Convert lat/long from str to float.
         # Remove this hack after next release.
         tmp = []
         for planet in self.planets:
             tmp.append( planet.upper() )
         self.planets = tmp
-        
+
         tmp = []
         for star in self.stars:
             tmp.append( star.upper() )
         self.stars = tmp
 
-        self.elevation = str( self.elevation )
+        self.latitude = float( self.latitude )
+        self.longitude = float( self.longitude )
 
         self.saveConfig()
         #TODO End of hack!
