@@ -22,6 +22,7 @@
 import eclipse, ephem, locale, math, satellite
 
 from ephem.cities import _city_data
+from _ast import Or
 
 
 class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
@@ -45,6 +46,7 @@ DATA_FULL = "FULL"
 DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
 DATA_LATITUDE = "LATITUDE" # Internally used for city.
 DATA_LONGITUDE = "LONGITUDE" # Internally used for city.
+DATA_MAGNITUDE = "MAGNITUDE"
 DATA_MESSAGE = "MESSAGE"
 DATA_NEW = "NEW"
 DATA_PHASE = "PHASE"
@@ -489,7 +491,7 @@ def __calculateStars( ephemNow, data, stars ):
     for star in stars:
         starObject = ephem.star( star.title() )
         __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star )
-#TODO May need to include magnitude to let the frontend submenu by mag...but ensure that skyfield can generate mag for stars, etc.        
+#TODO May need to include magnitude to let the frontend submenu by mag.
 
 
 # Compute data for comets or minor planets.
@@ -499,8 +501,8 @@ def __calculateStars( ephemNow, data, stars ):
 # Have tried the other data sources for minor planets (NEOs, centaurs, transneptunians) and none have magnitude less than 6.
 def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitude ):
 #TODO Debug
-    mags = [ 0, 0, 0, 0, 0, 0 ]
-    magsAndAbove = [ 0, 0, 0, 0, 0, 0 ]
+#     mags = [ 0, 0, 0, 0, 0, 0 ]
+#     magsAndAbove = [ 0, 0, 0, 0, 0, 0 ]
 
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
@@ -511,17 +513,22 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
                 __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
 
 #TODO Debug
-                mags[ int( body.mag ) ] += 1 
-                if body.mag < 0.0: print( "negative magnitude:", body.mag )
-                if float( data[ ( astronomicalBodyType, key, DATA_ALTITUDE ) ] ) > 0:
-                    magsAndAbove[ int( body.mag ) ] += 1
+#                 mags[ int( body.mag ) ] += 1 
+#                 if body.mag < 0.0: print( "negative magnitude:", body.mag )
+#                 if float( data[ ( astronomicalBodyType, key, DATA_ALTITUDE ) ] ) > 0:
+#                     magsAndAbove[ int( body.mag ) ] += 1
 
 
 #TODO Debug
-    print( mags )
-    print( magsAndAbove )
+#     print( mags )
+#     print( magsAndAbove )
 
 
+#TODO Consider this...
+#If the body is never up, no data added.
+#If the body is always up, add az/alt/mag
+#If the body is below the horizon, add rise/mag
+#If the body is above the horizon, add set/alt/az/mag
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
     neverUp = False
     key = ( astronomicalBodyType, nameTag )
@@ -542,6 +549,11 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
         body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
         data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
         data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
+ 
+        if astronomicalBodyType == AstronomicalBodyType.Comet or \
+           astronomicalBodyType == AstronomicalBodyType.MinorPlanet or \
+           astronomicalBodyType == AstronomicalBodyType.Star:
+            data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
 
     return neverUp
 

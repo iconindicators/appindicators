@@ -169,6 +169,7 @@ class IndicatorLunar:
         astroPyephem.DATA_ECLIPSE_TYPE         : _( "ECLIPSE TYPE" ),
         astroPyephem.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
         astroPyephem.DATA_FULL                 : _( "FULL" ),
+        astroPyephem.DATA_MAGNITUDE            : _( "MAGNITUDE" ),
         astroPyephem.DATA_MESSAGE              : _( "MESSAGE" ),
         astroPyephem.DATA_NEW                  : _( "NEW" ),
         astroPyephem.DATA_PHASE                : _( "PHASE" ),
@@ -1052,6 +1053,12 @@ class IndicatorLunar:
 
 #TODO Can get rid of this...
 #But for showing say the sun, need a way to check if it is present in the self.data.
+#TODO Check for moon, planets, stars, comets, and minor planets.
+#If something is never up, there will/should be no data in the dict.
+#If something will rise, there should only be a rise time.
+#If something is always up, there should only be az/alt.
+#If something is above the horizon, there should be rise/set/alt/az.
+#...see comment in updatecommon in pyephem backend. 
     def bodyIsNeverUp( self, astronomicalBodyType, nameTag ):
         key = ( astronomicalBodyType, nameTag )
         return key + ( astroPyephem.DATA_MESSAGE, ) in self.data and self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_BODY_NEVER_UP
