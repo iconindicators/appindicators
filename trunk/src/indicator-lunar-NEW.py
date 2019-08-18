@@ -1067,6 +1067,27 @@ class IndicatorLunar:
     def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
         key = ( astronomicalBodyType, nameTag )
         subMenu = Gtk.Menu()
+        indent = pythonutils.indent( indentUnity, indentGnomeShell )
+
+        if key + ( astroPyephem.DATA_RISE_TIME, ) in self.data:
+            subMenu.append( Gtk.MenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_TIME, ) ) ) )
+            self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] )
+
+        else:
+            if key + ( astroPyephem.DATA_SET_TIME, ) in self.data:
+                subMenu.append( Gtk.MenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_TIME, ) ) ) )
+                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ] )
+
+            subMenu.append( Gtk.SeparatorMenuItem() )
+            subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
+
+        menuItem.set_submenu( subMenu )
+
+
+    def updateCommonMenuORIG( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
+        key = ( astronomicalBodyType, nameTag )
+        subMenu = Gtk.Menu()
 #         altitude = int( self.getDecimalDegrees( self.data[ key + ( astroPyephem.DATA_ALTITUDE, ) ] ) ) #TODO This does not need to convert...just use the sign.
         altitude = float( self.data[ key + ( astroPyephem.DATA_ALTITUDE, ) ] )
         indent = pythonutils.indent( indentUnity, indentGnomeShell )

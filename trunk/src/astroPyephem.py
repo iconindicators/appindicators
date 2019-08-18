@@ -450,19 +450,20 @@ def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate )
 def __calculateSun( ephemNow, data ):
     neverUp = __calculateCommon( ephemNow, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
     if not neverUp:
-        try:
-            # Dawn/Dusk.
-            city = __getCity( data, ephemNow )
-            city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
-            sun = ephem.Sun( city )
-            dawn = city.next_rising( sun, use_center = True )
-            dusk = city.next_setting( sun, use_center = True )
-            key = ( AstronomicalBodyType.Sun, NAME_TAG_SUN )
-            data[ key + ( DATA_DAWN, ) ] = str( dawn.datetime() )
-            data[ key + ( DATA_DUSK, ) ] = str( dusk.datetime() )
-    
-        except ( ephem.AlwaysUpError, ephem.NeverUpError ):
-            pass # No need to add a message here as update common would already have done so.
+#TODO If this is removed, then remove the dawn/dusk stuff.        
+#         try:
+#             # Dawn/Dusk.
+#             city = __getCity( data, ephemNow )
+#             city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
+#             sun = ephem.Sun( city )
+#             dawn = city.next_rising( sun, use_center = True )
+#             dusk = city.next_setting( sun, use_center = True )
+#             key = ( AstronomicalBodyType.Sun, NAME_TAG_SUN )
+#             data[ key + ( DATA_DAWN, ) ] = str( dawn.datetime() )
+#             data[ key + ( DATA_DUSK, ) ] = str( dusk.datetime() )
+#     
+#         except ( ephem.AlwaysUpError, ephem.NeverUpError ):
+#             pass # No need to add a message here as update common would already have done so.
 
         __calculateEclipse( ephemNow.datetime(), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
 
@@ -529,7 +530,43 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
 #If the body is always up, add az/alt/mag
 #If the body is below the horizon, add rise/mag
 #If the body is above the horizon, add set/alt/az/mag
+
+#TODO Consider removing the prefs for hide/show moon/sun.
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
+    neverUp = False
+    key = ( astronomicalBodyType, nameTag )
+    try:
+        city = __getCity( data, ephemNow )
+        rising = city.next_rising( body )
+        setting = city.next_setting( body )
+
+        if rising > setting: # Above the horizon.
+            data[ key + ( DATA_SET_TIME, ) ] = str( setting.datetime() )
+        else: # Below the horizon.
+            data[ key + ( DATA_RISE_TIME, ) ] = str( rising.datetime() )
+
+    except ephem.AlwaysUpError:
+        pass
+
+    except ephem.NeverUpError:
+        neverUp = True
+
+    if not neverUp and key + ( DATA_RISE_TIME, ) not in data:
+        body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+        data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
+        data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
+
+        if ( astronomicalBodyType == AstronomicalBodyType.Comet or \
+             astronomicalBodyType == AstronomicalBodyType.MinorPlanet or \
+             astronomicalBodyType == AstronomicalBodyType.Planet or \
+             astronomicalBodyType == AstronomicalBodyType.Star ) and \
+             key + ( DATA_RISE_TIME, ) not in data: # Only add the magnitude if the body is above the horizon.
+            data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
+
+    return neverUp
+
+
+def __calculateCommonORIG( ephemNow, data, body, astronomicalBodyType, nameTag ):
     neverUp = False
     key = ( astronomicalBodyType, nameTag )
     try:
