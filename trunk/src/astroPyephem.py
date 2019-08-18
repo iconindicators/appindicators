@@ -271,7 +271,7 @@ MAGNITUDE_MINIMUM = -15 # Have found dodgy magnitudes in comet OE data which are
 #
 # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
 def getAstronomicalInformation( utcNow,
-                                latitude, longitude, elevation,
+                                latitude, longitude, elevation, #TODO Should these be floats/ints rather than strings (as in magnitude)?
                                 planets,
                                 stars,
                                 satellites, satelliteData,
@@ -280,6 +280,11 @@ def getAstronomicalInformation( utcNow,
                                 magnitude ):
     
     data = { }
+    
+    print( type(latitude))
+    print( type(longitude))
+    print( type(elevation))
+    print( type(magnitude))
 
     # Used internally to create the observer/city...removed before passing back to the caller.
     data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = str( latitude )
