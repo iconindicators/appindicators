@@ -262,7 +262,7 @@ LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
 MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 
-MAGNITUDE_MINIMUM = -15.0 # Have found dodgy magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
+MAGNITUDE_MINIMUM = -10.0 # Have found dodgy magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
 
 
 # Returns a dict with astronomical information...
