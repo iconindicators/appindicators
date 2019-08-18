@@ -721,12 +721,12 @@ class IndicatorLunar:
         menu = Gtk.Menu()
 
         utcNow = datetime.datetime.utcnow()
-        if self.showMoon and not self.bodyIsNeverUp( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON ):
+        if self.showMoon:
             self.updateMoonMenu( menu )
         print( "updateMoonMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
-        if self.showSun and not self.bodyIsNeverUp( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN ):
+        if self.showSun:
             self.updateSunMenu( menu )
         print( "updateSunMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
@@ -962,9 +962,10 @@ class IndicatorLunar:
 
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
-        for key in self.data.keys():
-            if key[ 0 ] == astroPyephem.AstronomicalBodyType.Planet and key[ 2 ] == astroPyephem.DATA_ALTITUDE: # A body must have an altitude.
-                planets.append( [ key[ 1 ], IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ key[ 1 ] ] ] )
+        for planet in self.planets:
+            if ( astroPyephem.AstronomicalBodyType.Planet, planet, astroPyephem.DATA_RISE_TIME ) in self.data or \
+               ( astroPyephem.AstronomicalBodyType.Planet, planet, astroPyephem.DATA_ALTITUDE ) in self.data:
+                planets.append( [ planet, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planet ] ] )
 
         if planets:
             menuItem = Gtk.MenuItem( _( "Planets" ) )
@@ -973,7 +974,7 @@ class IndicatorLunar:
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
 
-            for name, translatedName in sorted( planets, key = lambda x: ( x[ 1 ] ) ):
+            for name, translatedName in planets:
                 if self.showPlanetsAsSubMenu:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
                     subMenu.append( menuItem )
@@ -986,9 +987,10 @@ class IndicatorLunar:
 
     def updateStarsMenu( self, menu ):
         stars = [ ]
-        for key in self.data.keys():
-            if key[ 0 ] == astroPyephem.AstronomicalBodyType.Star and key[ 2 ] == astroPyephem.DATA_ALTITUDE: # A body must have an altitude.
-                stars.append( [ key[ 1 ], IndicatorLunar.STAR_NAMES_TRANSLATIONS[ key[ 1 ] ] ] )
+        for star in self.stars:
+            if ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_RISE_TIME ) in self.data or \
+               ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_ALTITUDE ) in self.data:
+                stars.append( [ star, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ star ] ] )
 
         if stars:
             print( "Number of stars:", len(stars))#TODO debug
@@ -998,7 +1000,7 @@ class IndicatorLunar:
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
 
-            for name, translatedName in sorted( stars, key = lambda x: ( x[ 1 ] ) ):
+            for name, translatedName in stars:
                 if self.showStarsAsSubMenu:
                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
                     subMenu.append( menuItem )
@@ -1051,19 +1053,6 @@ class IndicatorLunar:
             webbrowser.open( url )
 
 
-#TODO Can get rid of this...
-#But for showing say the sun, need a way to check if it is present in the self.data.
-#TODO Check for moon, planets, stars, comets, and minor planets.
-#If something is never up, there will/should be no data in the dict.
-#If something will rise, there should only be a rise time.
-#If something is always up, there should only be az/alt.
-#If something is above the horizon, there should be rise/set/alt/az.
-#...see comment in updatecommon in pyephem backend. 
-    def bodyIsNeverUp( self, astronomicalBodyType, nameTag ):
-        key = ( astronomicalBodyType, nameTag )
-        return key + ( astroPyephem.DATA_MESSAGE, ) in self.data and self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_BODY_NEVER_UP
-
-
     def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
         key = ( astronomicalBodyType, nameTag )
         subMenu = Gtk.Menu()
@@ -1076,9 +1065,9 @@ class IndicatorLunar:
         else:
             if key + ( astroPyephem.DATA_SET_TIME, ) in self.data:
                 subMenu.append( Gtk.MenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_TIME, ) ) ) )
+                subMenu.append( Gtk.SeparatorMenuItem() )
                 self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ] )
 
-            subMenu.append( Gtk.SeparatorMenuItem() )
             subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
             subMenu.append( Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
 
