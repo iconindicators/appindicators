@@ -987,33 +987,27 @@ class IndicatorLunar:
 
 
     def updateStarsMenu( self, menu ):
-        stars = [ ] # List of lists.  Each sublist contains the star name followed by the translated name.
-        for starName in self.stars:
-            if self.bodyIsNeverUp( astroPyephem.AstronomicalBodyType.Star, starName ):
-                continue
+        stars = [ ]
+        for key in self.data.keys():
+            if key[ 0 ] == astroPyephem.AstronomicalBodyType.Star and key[ 2 ] == astroPyephem.DATA_ALTITUDE: # A body must have an altitude.
+                stars.append( [ key[ 1 ], IndicatorLunar.STAR_NAMES_TRANSLATIONS[ key[ 1 ] ] ] )
 
-            stars.append( [ starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
-
-        if len( stars ) > 0:
-            starsMenuItem = Gtk.MenuItem( _( "Stars" ) )
-            menu.append( starsMenuItem )
-
+        if stars:
+            menuItem = Gtk.MenuItem( _( "Stars" ) )
+            menu.append( menuItem ) 
             if self.showStarsAsSubMenu:
-                starsSubMenu = Gtk.Menu()
-                starsMenuItem.set_submenu( starsSubMenu )
+                subMenu = Gtk.Menu()
+                menuItem.set_submenu( subMenu )
 
-            stars = sorted( stars, key = lambda x: ( x[ 1 ] ) )
-            for starName, starNameTranslated in stars:
-                nameTag = starName.upper()
+            for name, translatedName in sorted( stars, key = lambda x: ( x[ 1 ] ) ):
                 if self.showStarsAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + starNameTranslated )
-                    starsSubMenu.append( menuItem )
-
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
+                    subMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + starNameTranslated )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + translatedName )
                     menu.append( menuItem )
 
-                self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, nameTag, 0, 2 )
+                self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
 
 
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
