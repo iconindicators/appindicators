@@ -961,29 +961,26 @@ class IndicatorLunar:
 
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
-        for planetName in self.planets:
-            if self.bodyIsNeverUp( astroPyephem.AstronomicalBodyType.Planet, planetName ):
-                continue
+        for key in self.data.keys():
+            if key[ 0 ] == astroPyephem.AstronomicalBodyType.Planet and key[ 2 ] == astroPyephem.DATA_ALTITUDE: # A body must have an altitude.
+                planets.append( [ key[ 1 ], IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ key[ 1 ] ] ] )
 
-            planets.append( planetName )
-
-        if len( planets ) > 0:
+        if planets:
             menuItem = Gtk.MenuItem( _( "Planets" ) )
-            menu.append( menuItem )
-
+            menu.append( menuItem ) 
             if self.showPlanetsAsSubMenu:
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
 
-            for planetName in planets:
+            for name, translatedName in sorted( planets, key = lambda x: ( x[ 1 ] ) ):
                 if self.showPlanetsAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
                     subMenu.append( menuItem )
                 else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + translatedName )
                     menu.append( menuItem )
 
-                self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Planet, planetName, 0, 2 )
+                self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Planet, name, 0, 2 )
 
 
     def updateStarsMenu( self, menu ):
@@ -993,6 +990,7 @@ class IndicatorLunar:
                 stars.append( [ key[ 1 ], IndicatorLunar.STAR_NAMES_TRANSLATIONS[ key[ 1 ] ] ] )
 
         if stars:
+            print( "Number of stars:", len(stars))#TODO debug
             menuItem = Gtk.MenuItem( _( "Stars" ) )
             menu.append( menuItem ) 
             if self.showStarsAsSubMenu:
@@ -1069,8 +1067,9 @@ class IndicatorLunar:
         # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
         # Therefore only check for the presence of these two messages.
         if key + ( astroPyephem.DATA_MESSAGE, ) in self.data:
-            if self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_BODY_ALWAYS_UP:
-                subMenu.append( Gtk.MenuItem( indent + self.getDisplayData( key + ( astroPyephem.DATA_MESSAGE, ) ) ) )
+            pass #TODO Consider ditching the message for common (satellite is another matter).
+#             if self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_BODY_ALWAYS_UP:
+#                 subMenu.append( Gtk.MenuItem( indent + self.getDisplayData( key + ( astroPyephem.DATA_MESSAGE, ) ) ) )
         else:
             data = [ ]
             data.append( [ key + ( astroPyephem.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ] )
@@ -1313,7 +1312,7 @@ class IndicatorLunar:
            key[ 2 ] == astroPyephem.DATA_AZIMUTH or \
            key[ 2 ] == astroPyephem.DATA_RISE_AZIMUTH or \
            key[ 2 ] == astroPyephem.DATA_SET_AZIMUTH:
-            displayData = str( math.degrees( float( self.data[ key ] ) ) ) + "°"
+            displayData = str( round( math.degrees( float( self.data[ key ] ) ) ) ) + "°"
 
         elif key[ 2 ] == astroPyephem.DATA_DAWN or \
              key[ 2 ] == astroPyephem.DATA_DUSK or \
@@ -1355,7 +1354,7 @@ class IndicatorLunar:
             else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
                 displayData = _( "Total" )
 
-        elif key[ 2 ] == astroPyephem.DATA_MESSAGE: #TODO Will need to take the message and pull out the translation from a dict.
+        elif key[ 2 ] == astroPyephem.DATA_MESSAGE: #TODO Will need to take the message and pull out the translation from a dict....or not...delete this if 
             displayData = IndicatorLunar.MESSAGE_TRANSLATIONS[ self.data[ key ] ]
 
         elif key[ 2 ] == astroPyephem.DATA_PHASE:

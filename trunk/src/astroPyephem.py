@@ -485,9 +485,11 @@ def __calculatePlanets( ephemNow, data, planets ):
 
 # http://aa.usno.navy.mil/data/docs/mrst.php
 def __calculateStars( ephemNow, data, stars ):
+    print( "Number of stars:", len(stars))#TODO debug
     for star in stars:
         starObject = ephem.star( star.title() )
         __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star )
+#TODO May need to include magnitude to let the frontend submenu by mag...but ensure that skyfield can generate mag for stars, etc.        
 
 
 # Compute data for comets or minor planets.
