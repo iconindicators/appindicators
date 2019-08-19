@@ -275,7 +275,7 @@ MAGNITUDE_MINIMUM = -10.0 # Have found dodgy magnitudes in comet OE data which a
 #
 # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
 def getAstronomicalInformation( utcNow,
-                                latitude, longitude, elevation, #TODO Should these be floats/ints rather than strings (as in magnitude)?
+                                latitude, longitude, elevation,
                                 planets,
                                 stars,
                                 satellites, satelliteData,
@@ -492,10 +492,20 @@ def __calculatePlanets( ephemNow, data, planets ):
 # http://aa.usno.navy.mil/data/docs/mrst.php
 def __calculateStars( ephemNow, data, stars ):
     print( "Number of stars:", len(stars))#TODO debug
+    mags = [ 0, 0, 0, 0, 0, 0 ]
     for star in stars:
         starObject = ephem.star( star.title() )
         __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star )
+
+        key = ( AstronomicalBodyType.Star, star, DATA_MAGNITUDE ) 
+        if key in data: 
+            print( data[ key ] ) 
+            mags[ int( float( data[ key ] ) ) ] += 1 
+
+    print( "Star mags:", mags ) #TODO the count here does not match that in the indicator (thirty something versus eighty).
+
 #TODO May need to include magnitude to let the frontend submenu by mag.
+
 
 
 # Compute data for comets or minor planets.
@@ -562,12 +572,8 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
 
         if ( astronomicalBodyType == AstronomicalBodyType.Comet or \
              astronomicalBodyType == AstronomicalBodyType.MinorPlanet or \
-             astronomicalBodyType == AstronomicalBodyType.Planet or \
              astronomicalBodyType == AstronomicalBodyType.Star ):
             data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
-            
-            if astronomicalBodyType == AstronomicalBodyType.Star:
-                print( int( float( body.mag ) ) )
 
     return neverUp
 

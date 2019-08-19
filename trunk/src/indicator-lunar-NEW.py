@@ -913,7 +913,7 @@ class IndicatorLunar:
 
         self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
 
-        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() ) #TODO Is there a condition in which no items are added in the common menu?
 
         menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
         menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
@@ -941,7 +941,7 @@ class IndicatorLunar:
         menuItem = Gtk.MenuItem( _( "Sun" ) )
         menu.append( menuItem )
         self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1 )
-        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
+        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() ) #TODO Is there a condition in which no items are added in the common menu?
         self.updateEclipseMenu( menuItem.get_submenu(), astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
 
 
