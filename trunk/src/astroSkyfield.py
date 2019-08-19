@@ -153,10 +153,6 @@ NAME_TAG_CITY = "CITY"
 NAME_TAG_MOON = "MOON"
 NAME_TAG_SUN = "SUN"
 
-#TODO Why have these?  Aren't the name tags above sufficient?
-MOON = "MOON"
-SUN = "SUN"
-
 PLANET_MERCURY = "MERCURY BARYCENTER"
 PLANET_EARTH = "EARTH"
 PLANET_VENUS = "VENUS BARYCENTER"
@@ -365,10 +361,10 @@ def getAstronomicalInformation( utcNow,
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
 def __calculateMoon( utcNow, data, timeScale, observer, ephemeris ):
     key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
-    moon = ephemeris[ MOON ]
+    moon = ephemeris[ "MOON" ]
     neverUp = __calculateCommon( utcNow, data, timeScale, observer, moon, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
-    illumination = str( int( almanac.fraction_illuminated( ephemeris, MOON, utcNow ) * 100 ) ) # Needed for icon.
+    illumination = str( int( almanac.fraction_illuminated( ephemeris, "MOON", utcNow ) * 100 ) ) # Needed for icon.
     data[ key + ( DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
     utcNowDateTime = utcNow.utc_datetime()
@@ -383,7 +379,7 @@ def __calculateMoon( utcNow, data, timeScale, observer, ephemeris ):
     nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
     data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
 
-    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ SUN ], moon ) ) ) ) # Needed for icon.
+    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ "SUN" ], moon ) ) ) ) # Needed for icon.
 
     if not neverUp:
         moonPhaseDateTimes = t.utc_iso()
@@ -488,7 +484,7 @@ def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
 
 
 def __calculateSun( utcNow, data, timeScale, observer, ephemeris ):
-    sun = ephemeris[ SUN ]
+    sun = ephemeris[ "SUN" ]
     neverUp = __calculateCommon( utcNow, data, timeScale, observer, sun, AstronomicalBodyType.Sun, NAME_TAG_SUN )
     if not neverUp:
 #TODO Skyfield does not calculate dawn/dusk, but there is a workaround
