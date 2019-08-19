@@ -60,6 +60,7 @@
 #So we could show an OSD when the indicator starts up telling the user of bad mags,
 #but we could either show the mag with the comet and/or just in the data list in the preferences.
 
+
 #TODO Maybe show other stuff for comets?
 # https://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
 # But this means changing to the name orbital elements...or maybe leaving comets as is and add a new thing for OE?
@@ -72,15 +73,6 @@
 # Maybe put in a special subgroup?
 # Use the OSD?
 
-
-#TODO If we want to have multiple source data files for comets (now OEs), then need to maybe also allow this for satellites too.
-# COuld do a couple of ways...
-# 1) Have a radio button on each of the satellite/comets tabs: one for default data file and one which enables the 
-# text field to let the user add ONE text file (so the multiple files by default are hidden from the user).
-# Don't like hiding the information from the user.
-# 2) Have a button which brings up a text box dialog, not text field, to let a multiline entry,
-# so we can have multiple URLs.
-# Use a Gtk.TextView?  https://python-gtk-3-tutorial.readthedocs.io/en/latest/gallery.html
 
 #TODO The minor planets file takes a while to load...
 #Check if it takes a while to load on startup.
