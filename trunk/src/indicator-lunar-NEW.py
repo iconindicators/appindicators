@@ -966,6 +966,7 @@ class IndicatorLunar:
                 planets.append( [ planet, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planet ] ] )
 
         if planets:
+            print( "number planets", len( planets))
             menuItem = Gtk.MenuItem( _( "Planets" ) )
             menu.append( menuItem ) 
             if self.showPlanetsAsSubMenu:

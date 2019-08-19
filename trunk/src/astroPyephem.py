@@ -22,7 +22,6 @@
 import eclipse, ephem, locale, math, satellite
 
 from ephem.cities import _city_data
-from _ast import Or
 
 
 class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
@@ -266,7 +265,7 @@ LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 # and also if there is no rise/set the body is always up.
 MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 
-MAGNITUDE_MINIMUM = -10.0 # Have found dodgy magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
+MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
 
 
 # Returns a dict with astronomical information...
@@ -332,7 +331,7 @@ def getAstronomicalInformation( utcNow,
 def getCities(): return sorted( _city_data.keys(), key = locale.strxfrm )
 
 
-# Returns the latitude, longitude and elevation (all as strings) for the PyEphem city.
+# Returns the latitude, longitude and elevation for the PyEphem city.
 def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[ 0 ] ), \
                                                   float( _city_data.get( city )[ 1 ] ), \
                                                   _city_data.get( city )[ 2 ]
@@ -353,7 +352,7 @@ def __calculateMoon( ephemNow, data ):
     key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
     data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
     data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
-    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Pass in a clean instance (just to be safe).  Needed for icon.
+    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Needed for icon.
 
     if not neverUp:
         data[ key + ( DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
@@ -492,7 +491,7 @@ def __calculatePlanets( ephemNow, data, planets ):
 # http://aa.usno.navy.mil/data/docs/mrst.php
 def __calculateStars( ephemNow, data, stars ):
     print( "Number of stars:", len(stars))#TODO debug
-    mags = [ 0, 0, 0, 0, 0, 0 ]
+    mags = [ 0, 0, 0, 0, 0, 0, 0, 0 ]
     for star in stars:
         starObject = ephem.star( star.title() )
         __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star )
@@ -500,7 +499,7 @@ def __calculateStars( ephemNow, data, stars ):
         key = ( AstronomicalBodyType.Star, star, DATA_MAGNITUDE ) 
         if key in data: 
             print( data[ key ] ) 
-            mags[ int( float( data[ key ] ) ) ] += 1 
+            mags[ int( float( data[ key ] ) + 2 ) ] += 1 
 
     print( "Star mags:", mags ) #TODO the count here does not match that in the indicator (thirty something versus eighty).
 
@@ -565,10 +564,11 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
     except ephem.NeverUpError:
         neverUp = True
 
-    if not neverUp and key + ( DATA_RISE_TIME, ) not in data:
-        body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-        data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
-        data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
+    if not neverUp:
+        if key + ( DATA_RISE_TIME, ) not in data:
+            body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+            data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
+            data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
 
         if ( astronomicalBodyType == AstronomicalBodyType.Comet or \
              astronomicalBodyType == AstronomicalBodyType.MinorPlanet or \
