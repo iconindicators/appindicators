@@ -115,7 +115,7 @@ class IndicatorLunar:
     SVG_FULL_MOON_FILE = ICON_BASE_PATH + "/." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
 
-    ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, comet, star and satellite information." )
+    ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, comet, star and satellite information." ) #TODO If minor planets are added, include here too.
     ABOUT_CREDIT_ECLIPSE = _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" )
     ABOUT_CREDIT_PYEPHEM = _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
     ABOUT_CREDIT_COMET = _( "Comet OE data by Minor Planet Center. http://www.minorplanetcenter.net" ) #TODO Add a whole new line for minor planets or add to this line.
@@ -501,9 +501,7 @@ class IndicatorLunar:
 
     INDICATOR_TEXT_DEFAULT = "[" + astroPyephem.NAME_TAG_MOON + " " + astroPyephem.DATA_PHASE + "]"
 
-#TODO Use astroPyephem.
-    MESSAGE_BODY_ALWAYS_UP = _( "Always Up!" )
-    MESSAGE_BODY_NEVER_UP = _( "Never Up!" )
+#TODO Check which of these are still needed.
     MESSAGE_DATA_BAD_DATA = _( "Bad data!" )
     MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE = _( "Cannot access the data source\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_DATA_NO_DATA = _( "No data!" )
@@ -516,8 +514,6 @@ class IndicatorLunar:
 
 #TODO Likley need to put these into a dict, keyed off from the astro messages.
 #Then in getdisplaydata for the message type, use the astroPyephem.message and pull the translated/text message from this dict.
-    MESSAGE_TRANSLATION_BODY_ALWAYS_UP = _( "Always Up!" )
-    MESSAGE_TRANSLATION_BODY_NEVER_UP = _( "Never Up!" ) #TODO Needed?  Not if we always drop never up bodies.
     MESSAGE_TRANSLATION_DATA_BAD_DATA = _( "Bad data!" )
     MESSAGE_TRANSLATION_DATA_CANNOT_ACCESS_DATA_SOURCE = _( "Cannot access the data source\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_TRANSLATION_DATA_NO_DATA = _( "No data!" )
@@ -528,8 +524,10 @@ class IndicatorLunar:
     MESSAGE_TRANSLATION_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_TRANSLATION_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
-    MESSAGE_TRANSLATIONS = {
-        astroPyephem.MESSAGE_BODY_ALWAYS_UP : MESSAGE_TRANSLATION_BODY_ALWAYS_UP }
+
+    #TODO Needed?
+#     MESSAGE_TRANSLATIONS = {
+#         astroPyephem.MESSAGE_BODY_ALWAYS_UP : MESSAGE_TRANSLATION_BODY_ALWAYS_UP }
 
     MESSAGE_DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
     
@@ -1372,8 +1370,8 @@ class IndicatorLunar:
             else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
                 displayData = _( "Total" )
 
-        elif key[ 2 ] == astroPyephem.DATA_MESSAGE: #TODO Will need to take the message and pull out the translation from a dict....or not...delete this if 
-            displayData = IndicatorLunar.MESSAGE_TRANSLATIONS[ self.data[ key ] ]
+#         elif key[ 2 ] == astroPyephem.DATA_MESSAGE: #TODO Will need to take the message and pull out the translation from a dict....or not...delete this if 
+#             displayData = IndicatorLunar.MESSAGE_TRANSLATIONS[ self.data[ key ] ]
 
         elif key[ 2 ] == astroPyephem.DATA_PHASE:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
@@ -1680,17 +1678,6 @@ class IndicatorLunar:
         for key in self.data.keys():
             if key[ 2 ] == astroPyephem.DATA_BRIGHT_LIMB or key[ 2 ] == astroPyephem.DATA_ILLUMINATION:
                 continue # Some data tags are only present for calculations, not intended for the end user.
-
-            hideMessage = self.data[ key ] == astroPyephem.MESSAGE_BODY_NEVER_UP or \
-                      self.data[ key ] == astroPyephem.MESSAGE_DATA_BAD_DATA or \
-                      self.data[ key ] == astroPyephem.MESSAGE_DATA_NO_DATA or \
-                      self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_NEVER_RISES or \
-                      self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
-                      self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
-                      self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_VALUE_ERROR
-
-            if hideMessage:
-                continue
 
             self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
             tag = "[" + key[ 1 ] + " " + key[ 2 ] + "]"
@@ -2789,16 +2776,6 @@ class IndicatorLunar:
 
             # Only add tags for data which has not been removed.
             for key in self.data.keys():
-                hideMessage = self.data[ key ] == astroPyephem.MESSAGE_BODY_NEVER_UP or \
-                              self.data[ key ] == astroPyephem.MESSAGE_DATA_BAD_DATA or \
-                              self.data[ key ] == astroPyephem.MESSAGE_DATA_NO_DATA or \
-                              self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_NEVER_RISES or \
-                              self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
-                              self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
-                              self.data[ key ] == astroPyephem.MESSAGE_SATELLITE_VALUE_ERROR
-
-                if hideMessage:
-                    continue
 
                 astronomicalBodyType = key[ 0 ]
                 bodyTag = key[ 1 ]

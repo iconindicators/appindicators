@@ -261,7 +261,7 @@ LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
 LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
 LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
-MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP" # TODO Do we need these two things?  Maybe ditch them...and no need to tell a
+# TODO Do we need?  No need to tell a
 #  user the body is always up...if there is an altitude > 0, the object is up
 # and also if there is no rise/set the body is always up.
 MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
@@ -533,6 +533,7 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
 #If the body is always up, add az/alt/mag
 #If the body is below the horizon, add rise/mag
 #If the body is above the horizon, add set/alt/az/mag
+#Add this information to the main public function header.
 
 #TODO Consider removing the prefs for hide/show moon/sun.
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
@@ -564,6 +565,9 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
              astronomicalBodyType == AstronomicalBodyType.Planet or \
              astronomicalBodyType == AstronomicalBodyType.Star ):
             data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
+            
+            if astronomicalBodyType == AstronomicalBodyType.Star:
+                print( int( float( body.mag ) ) )
 
     return neverUp
 
