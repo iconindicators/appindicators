@@ -1074,6 +1074,7 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
+#TODO Keep in case we include dawn/dusk stuff for the Sun.
     def updateCommonMenuORIG( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
         key = ( astronomicalBodyType, nameTag )
         subMenu = Gtk.Menu()
