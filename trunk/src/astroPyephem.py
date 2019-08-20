@@ -29,9 +29,6 @@ class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, S
 
 #TODO Need to test with a lat/long such that bodies rise/set, always up and never up.
 
-#TODO Not sure if this is needed here.
-# DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
-
 
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
@@ -241,11 +238,6 @@ LUNAR_PHASE_NEW_MOON = "NEW_MOON"
 LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
 LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
 LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
-
-# TODO No need to tell a user the body is always up...if there is an altitude > 0,
-# the object is up and also if there is no rise/set the body is always up.
-# Might instead need to show circumpolar satellites in their own menu/submenu?
-MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 
 MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
 
@@ -571,6 +563,7 @@ def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
 def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
     key = ( AstronomicalBodyType.Satellite, " ".join( key ) )
     currentDateTime = ephemNow
+#TODO Need to think about how far into the future we look...but not sure how without limiting things.
     endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 2 ) # Stop looking for passes 2 days from now.
     while currentDateTime < endDateTime:
         city = __getCity( data, currentDateTime )
@@ -581,7 +574,6 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
 
         except ValueError:
             if satellite.circumpolar:
-                data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_SATELLITE_IS_CIRCUMPOLAR
                 data[ key + ( DATA_AZIMUTH, ) ] = str( satellite.az )
 
             break
@@ -603,7 +595,7 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
             continue
 
-        # The pass is visible and the user wants only visible passes OR the user wants any pass...
+        # The pass is visible ,,,
         data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
         data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 1 ] )
         data[ key + ( DATA_SET_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 4 ].datetime() )
@@ -650,7 +642,7 @@ def __isSatellitePassValid( satellitePass ):
         satellitePass[ 5 ] is not None
 
 
-# Determine if a satellite pass is visible or not...
+# Determine if a satellite pass is visible.
 #
 #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
 #    http://www.celestrak.com/columns/v03n01

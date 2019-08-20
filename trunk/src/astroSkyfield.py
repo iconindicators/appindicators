@@ -277,6 +277,7 @@ STARS = {
 EPHEMERIS_PLANETS = "de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
 EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
 
+#
 MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
 MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 
@@ -546,7 +547,7 @@ def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBody
     else:
 #        if almanac.sunrise_sunset( ephemeris, topos )( t0 ): #TODO Original Skyfield function only supports sun rise/set.
         if __bodyrise_bodyset( observer, body )( t0 ):
-            data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_BODY_ALWAYS_UP
+            data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_BODY_ALWAYS_UP #TODO Remove this...work out the logic of using t0.
         else:
             neverUp = True
 

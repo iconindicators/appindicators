@@ -94,7 +94,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
-import astroPyephem, calendar, datetime, eclipse, glob, locale, logging, math, os, pythonutils, re, satellite, tempfile, threading, webbrowser
+import astroPyephem, datetime, eclipse, glob, locale, logging, math, os, pythonutils, re, satellite, tempfile, threading, webbrowser
 
 
 class IndicatorLunar:
@@ -119,9 +119,7 @@ class IndicatorLunar:
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
     DATE_TIME_FORMAT_HHcolonMMcolonSS = "%H:%M:%S"
-    DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S" #TODO Delete
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT = "%Y-%m-%d %H:%M:%S.%f"
 
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
@@ -742,7 +740,7 @@ class IndicatorLunar:
         print( "updateMinorPlanetMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
-#         self.updateSatellitesMenu( menu )
+        self.updateSatellitesMenu( menu )
         print( "updateSatellitesMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
@@ -1297,9 +1295,9 @@ class IndicatorLunar:
              key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
              key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
                 if source is None:
-                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
+                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ).replace( ' ', '  ' )
                 elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
-                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
+                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) #TODO The format string is the format of the INPUT string, not the output
 
         elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_LATITUDE:
             latitude = self.data[ key ]
