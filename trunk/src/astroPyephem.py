@@ -19,7 +19,7 @@
 # Calculate astronomical information using PyEphem.
 
 
-import eclipse, ephem, locale, math, satellite
+import eclipse, ephem, locale, math, pythonutils, satellite
 
 from ephem.cities import _city_data
 
@@ -320,7 +320,7 @@ def getAstronomicalInformation( utcNow,
     print( "updateMinorPlanets:", ( datetime.datetime.utcnow() - utcNow ) )
 
     utcNow = datetime.datetime.utcnow()
-#     __calculateSatellites( ephemNow, data, satellites, satelliteData )
+    __calculateSatellites( ephemNow, data, satellites, satelliteData )
     print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
 
     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
@@ -359,10 +359,10 @@ def __calculateMoon( ephemNow, data ):
 
     if not neverUp:
 #TODO Check date/time to remove fractional seconds.
-        data[ key + ( DATA_FIRST_QUARTER, ) ] = __toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
-        data[ key + ( DATA_FULL, ) ] = __toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
-        data[ key + ( DATA_THIRD_QUARTER, ) ] = __toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
-        data[ key + ( DATA_NEW, ) ] = __toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
+        data[ key + ( DATA_FIRST_QUARTER, ) ] = pythonutils.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+        data[ key + ( DATA_FULL, ) ] = pythonutils.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
+        data[ key + ( DATA_THIRD_QUARTER, ) ] = pythonutils.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+        data[ key + ( DATA_NEW, ) ] = pythonutils.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
         __calculateEclipse( ephemNow.datetime(), data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
 
@@ -454,54 +454,7 @@ def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate )
 def __calculateSun( ephemNow, data ):
     neverUp = __calculateCommon( ephemNow, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
     if not neverUp:
-        try:
-            city = __getCity( data, ephemNow )
-            city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical; http://stackoverflow.com/a/18622944/2156453
-            sun = ephem.Sun( city )
-            dawn = city.next_rising( sun, use_center = True )
-            dusk = city.next_setting( sun, use_center = True )
-
-#TODO Check date/time to remove fractional seconds.
-            format = "%Y-%m-%d %H:%M:%S"
-#             if dawn > dusk : # Above the horizon.
-#                 
-#                 data[ key + ( DATA_SET_TIME, ) ] = str( dusk.datetime() )
-#             else: # Below the horizon.
-#                 data[ key + ( DATA_RISE_TIME, ) ] = str( dawn.datetime() )
-
-        except ( ephem.AlwaysUpError, ephem.NeverUpError ):
-            pass
-
-
-#TODO If this is removed, then remove the dawn/dusk stuff.       
-#If kept, ensure that skyfield can be modified to calculate dawn/dusk. 
-#         try:
-#             # Dawn/Dusk.
-#             city = __getCity( data, ephemNow )
-#             city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
-#             sun = ephem.Sun( city )
-#             dawn = city.next_rising( sun, use_center = True )
-#             dusk = city.next_setting( sun, use_center = True )
-#             key = ( AstronomicalBodyType.Sun, NAME_TAG_SUN )
-#             data[ key + ( DATA_DAWN, ) ] = str( dawn.datetime() )
-#             data[ key + ( DATA_DUSK, ) ] = str( dusk.datetime() )
-#     
-#         except ( ephem.AlwaysUpError, ephem.NeverUpError ):
-#             pass # No need to add a message here as update common would already have done so.
-
         __calculateEclipse( ephemNow.datetime(), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
-
-
-    # Converts a UTC datetime string in the format given to local datetime string.
-#     def getLocalDateTime( utcDateTimeString, formatString ):
-# #         if True: return utcDateTimeString # TODO Testing to compare against Skyfield
-#         utcDateTime = self.toDateTime( utcDateTimeString )
-#         timestamp = calendar.timegm( utcDateTime.timetuple() )
-#         localDateTime = datetime.datetime.fromtimestamp( timestamp )
-#         localDateTime.replace( microsecond = utcDateTime.microsecond )
-#         localDateTimeString = localDateTime.strftime( formatString )
-# 
-#         return localDateTimeString
 
 
 # Calculate next eclipse for either the Sun or Moon.
@@ -588,11 +541,10 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
         rising = city.next_rising( body )
         setting = city.next_setting( body )
 
-#TODO Check date/time to remove fractional seconds.
         if rising > setting: # Above the horizon.
-            data[ key + ( DATA_SET_TIME, ) ] = __toDateTimeString( setting.datetime() )
+            data[ key + ( DATA_SET_TIME, ) ] = pythonutils.toDateTimeString( setting.datetime() )
         else: # Below the horizon.
-            data[ key + ( DATA_RISE_TIME, ) ] = __toDateTimeString( rising.datetime() )
+            data[ key + ( DATA_RISE_TIME, ) ] = pythonutils.toDateTimeString( rising.datetime() )
 
     except ephem.AlwaysUpError:
         pass
@@ -612,10 +564,6 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
             data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
 
     return neverUp
-
-
-# Convert from a datetime to string, dropping any fractional seconds.
-def __toDateTimeString( dateTime ): return str( dateTime ).split( '.' )[ 0 ]
 
 
 # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
@@ -684,10 +632,10 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
 
         # The pass is visible and the user wants only visible passes OR the user wants any pass...
 #TODO Check date/time to remove fractional seconds...may not apply as for rise/set for bodies, but check nonetheless.
-        data[ key + ( DATA_RISE_TIME, ) ] = str( nextPass[ 0 ].datetime() )
-        data[ key + ( DATA_RISE_AZIMUTH, ) ] = str( nextPass[ 1 ] )
-        data[ key + ( DATA_SET_TIME, ) ] = str( nextPass[ 4 ].datetime() )
-        data[ key + ( DATA_SET_AZIMUTH, ) ] = str( nextPass[ 5 ] )
+        data[ key + ( DATA_RISE_TIME, ) ] = pythonutils.toDateTimeString(  nextPass[ 0 ].datetime() )
+        data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString(  nextPass[ 1 ] )
+        data[ key + ( DATA_SET_TIME, ) ] = pythonutils.toDateTimeString(  nextPass[ 4 ].datetime() )
+        data[ key + ( DATA_SET_AZIMUTH, ) ] = pythonutils.toDateTimeString(  nextPass[ 5 ] )
 
         break
 

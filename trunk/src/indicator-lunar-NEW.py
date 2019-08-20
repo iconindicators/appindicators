@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from calendar import formatstring
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -115,7 +116,7 @@ class IndicatorLunar:
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
     DATE_TIME_FORMAT_HHcolonMMcolonSS = "%H:%M:%S"
-    DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+    DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S" #TODO Delete
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT = "%Y-%m-%d %H:%M:%S.%f"
 
@@ -695,8 +696,9 @@ class IndicatorLunar:
             if self.showSatelliteNotification:
                 self.notificationSatellites()
 
-            self.nextUpdate = self.toDateTime( self.nextUpdate ) # Parse from string back into a datetime.
-            nextUpdateInSeconds = int( ( self.nextUpdate - datetime.datetime.utcnow() ).total_seconds() )
+#TODO The line below is wrong and unnecessary...I think!
+#             self.nextUpdate = self.toDateTime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) # Parse from string back into a datetime.
+            nextUpdateInSeconds = int( ( self.toDateTime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) - datetime.datetime.utcnow() ).total_seconds() )
 
             # Ensure the update period is positive, at most every minute and at least every hour.
             if nextUpdateInSeconds < 60:
@@ -737,7 +739,7 @@ class IndicatorLunar:
         print( "updateMinorPlanetMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
-#         self.updateSatellitesMenu( menu )
+        self.updateSatellitesMenu( menu )
         print( "updateSatellitesMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
@@ -860,7 +862,7 @@ class IndicatorLunar:
 
             # Ensure the current time is within the rise/set...
             # Subtract a minute from the rise time to force the notification to take place just prior to the satellite rise.
-            riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 ) )
+            riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) - datetime.timedelta( minutes = 1 ) )
             if utcNow < riseTimeMinusOneMinute or \
                utcNow > self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ]:
                 continue
@@ -1065,47 +1067,6 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
-#TODO Keep in case we include dawn/dusk stuff for the Sun.
-    def updateCommonMenuORIG( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
-        key = ( astronomicalBodyType, nameTag )
-        subMenu = Gtk.Menu()
-#         altitude = int( self.getDecimalDegrees( self.data[ key + ( astroPyephem.DATA_ALTITUDE, ) ] ) ) #TODO This does not need to convert...just use the sign.
-        altitude = float( self.data[ key + ( astroPyephem.DATA_ALTITUDE, ) ] )
-        indent = pythonutils.indent( indentUnity, indentGnomeShell )
-
-        # The backend function to update common data may add the "always up" or "never up" messages (and nothing else).
-        # Therefore only check for the presence of these two messages.
-        if key + ( astroPyephem.DATA_MESSAGE, ) in self.data:
-            pass #TODO Consider ditching the message for common (satellite is another matter).
-#             if self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_BODY_ALWAYS_UP:
-#                 subMenu.append( Gtk.MenuItem( indent + self.getDisplayData( key + ( astroPyephem.DATA_MESSAGE, ) ) ) )
-        else:
-            data = [ ]
-            data.append( [ key + ( astroPyephem.DATA_RISE_TIME, ), _( "Rise: " ), self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ] )
-            self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] )
-            if altitude >= 0:
-                data.append( [ key + ( astroPyephem.DATA_SET_TIME, ), _( "Set: " ), self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ] ] )
-                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ] )
-
-            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Sun:
-                data.append( [ key + ( astroPyephem.DATA_DAWN, ), _( "Dawn: " ), self.data[ key + ( astroPyephem.DATA_DAWN, ) ] ] )
-                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_DAWN, ) ] )
-                if altitude >= 0:
-                    data.append( [ key + ( astroPyephem.DATA_DUSK, ), _( "Dusk: " ), self.data[ key + ( astroPyephem.DATA_DUSK, ) ] ] )
-                    self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_DUSK, ) ] )
-
-            data = sorted( data, key = lambda x: ( x[ 2 ] ) )
-            for theKey, text, dateTime in data:
-                subMenu.append( Gtk.MenuItem( indent + text + self.getDisplayData( theKey ) ) )
-
-        if altitude >= 0:
-            subMenu.append( Gtk.SeparatorMenuItem() )
-            subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
-            subMenu.append( Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
-
-        menuItem.set_submenu( subMenu )
-
-
     def updateSatellitesMenu( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
@@ -1140,7 +1101,7 @@ class IndicatorLunar:
         utcNow = datetime.datetime.utcnow()
         indent = pythonutils.indent( 0, 2 )
         for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
-            createSatelliteMenu( satelliteName, satelliteNumber, menuText )
+            self.createSatelliteMenu( satelliteName, satelliteNumber, menuText )
 
 
     def createSatelliteMenu( self, satelliteName, satelliteNumber, menuText ):
@@ -1158,7 +1119,7 @@ class IndicatorLunar:
 #also for a satellite yet to rise,
 #also a satellite currently rising.
 
-            riseTime = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] )
+            riseTime = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
             dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60 # If the satellite is currently rising, we'll get a negative but that's okay.
             if dateTimeDifferenceInMinutes > 2: # If this satellite will rise more than two minutes from now, then only show the rise time.
                 subMenu.append( Gtk.MenuItem( indent + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_TIME, ) ) ) )
@@ -1177,9 +1138,9 @@ class IndicatorLunar:
             # Add the rise to the next update, ensuring it is not in the past.
             # Subtract a minute from the rise time to spoof the next update to happen earlier.
             # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
-            riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
+            riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) - datetime.timedelta( minutes = 1 )
             if riseTimeMinusOneMinute > utcNow:
-                self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate )
+                self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate ) #TODO Verify the format of riseTimeMinuOneMinute is the same as self.nextUpdate
 
             # Add the set time to the next update, ensuring it is not in the past.
             if self.data[ key + ( astroPyephem.DATA_SET_TIME, ) ] > str( utcNow ):
@@ -1260,7 +1221,7 @@ class IndicatorLunar:
 #also for a satellite yet to rise,
 #also a satellite currently rising.
 
-                    riseTime = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] )
+                    riseTime = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
                     dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60 # If the satellite is currently rising, we'll get a negative but that's okay.
                     if dateTimeDifferenceInMinutes > 2: # If this satellite will rise more than two minutes from now, then only show the rise time.
                         subMenu.append( Gtk.MenuItem( indent + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_TIME, ) ) ) )
@@ -1279,7 +1240,7 @@ class IndicatorLunar:
                     # Add the rise to the next update, ensuring it is not in the past.
                     # Subtract a minute from the rise time to spoof the next update to happen earlier.
                     # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
-                    riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
+                    riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) - datetime.timedelta( minutes = 1 )
                     if riseTimeMinusOneMinute > utcNow:
                         self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate )
 
@@ -1333,9 +1294,9 @@ class IndicatorLunar:
              key[ 2 ] == astroPyephem.DATA_SET_TIME or \
              key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
                 if source is None:
-                    displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
+                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
                 elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
-                    displayData = self.getLocalDateTime( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
+                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
 
         elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_LATITUDE:
             latitude = self.data[ key ]
@@ -1375,32 +1336,21 @@ class IndicatorLunar:
         return displayData
 
 
-    # Converts a UTC datetime string in the format given to local datetime string.
-    def getLocalDateTime( self, utcDateTimeString, formatString ):
-#         if True: return utcDateTimeString # TODO Testing to compare against Skyfield
-        utcDateTime = self.toDateTime( utcDateTimeString )
-        timestamp = calendar.timegm( utcDateTime.timetuple() )
-        localDateTime = datetime.datetime.fromtimestamp( timestamp )
-        localDateTime.replace( microsecond = utcDateTime.microsecond )
-        localDateTimeString = localDateTime.strftime( formatString )
-
-        return localDateTimeString
+    # Converts a UTC datetime string in the format given to local datetime string in the format.
+#TODO If this is used by both bodies and satellites, then satellites don't want the date, just the time...so do we need some other parameter?    
+    def toLocalDateTimeString( self, utcDateTimeString, formatString ):
+        localDateTimeString = str( datetime.datetime.strptime( utcDateTimeString, formatString ).replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
+        components = localDateTimeString.split( ':' )
+        return components[ 0 ] + ":" + components[ 1 ]
 
 
-#TODO Not needed.
-    def toDateTime( self, dateTimeAsString ):
-        # Have found (very seldom) that a date/time may be generated from the PyEphem backend
-        # with the .%f component which may mean the value is zero but PyEphem dropped it.
-        # However this means the format does not match and parsing into a DateTime object fails.
-        # So pre-check for .%f and if missing, add in ".0" to keep the parsing happy.
-        s = dateTimeAsString
-        if re.search( r"\.\d+$", s ) is None:
-            s += ".0"
-
-        return datetime.datetime.strptime( s, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSSdotFLOAT )
+    def toDateTime( self, dateTimeAsString, formatString ): return datetime.datetime.strptime( dateTimeAsString, formatString )
 
 
     # Compare two string dates in the format YYYY MM DD HH:MM:SS, returning the earliest.
+#TODO Verify this works for strings if a time is 08:xx:yy versus 18:xx:yy...is the 18 greater?
+#Or do we need to do the comparison as datetime objects?    
+#TODO Write with one return statement!
     def getSmallestDateTime( self, firstDateTimeAsString, secondDateTimeAsString ):
         if firstDateTimeAsString < secondDateTimeAsString:
             return firstDateTimeAsString
@@ -2731,18 +2681,18 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) )
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) )
 
             message = message. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.getLocalDateTime( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.getLocalDateTime( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) )
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) )
 
         if summary == "":
             summary = " " # The notification summary text must not be empty (at least on Unity).
