@@ -129,6 +129,10 @@ def setAutoStart( desktopFile, isSet, logging, autoStartPath = AUTOSTART_PATH, d
             pass
 
 
+# Convert from a datetime to string, dropping any fractional seconds, in the format YYYY-MM-DD HH:MM:SS
+def toDateTimeString( dateTime ): return str( dateTime ).split( '.' )[ 0 ]
+
+
 # Shows a message dialog.
 #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
 def showMessage( parent, messageType, message, title ):
