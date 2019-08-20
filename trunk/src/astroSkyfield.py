@@ -60,9 +60,9 @@ DATA_MESSAGE = "MESSAGE"
 DATA_NEW = "NEW"
 DATA_PHASE = "PHASE"
 DATA_RISE_AZIMUTH = "RISE AZIMUTH"
-DATA_RISE_TIME = "RISE TIME"
+DATA_RISE_DATE_TIME = "RISE DATE TIME"
 DATA_SET_AZIMUTH = "SET AZIMUTH"
-DATA_SET_TIME = "SET TIME"
+DATA_SET_DATE_TIME = "SET DATE TIME"
 DATA_THIRD_QUARTER = "THIRD QUARTER"
 
 DATA_TAGS = [
@@ -82,24 +82,24 @@ DATA_TAGS = [
     DATA_NEW,
     DATA_PHASE,
     DATA_RISE_AZIMUTH,
-    DATA_RISE_TIME,
+    DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
-    DATA_SET_TIME,
+    DATA_SET_DATE_TIME,
     DATA_THIRD_QUARTER ]
 
 DATA_COMET = [
     DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
-    DATA_RISE_TIME,
+    DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
-    DATA_SET_TIME ]
+    DATA_SET_DATE_TIME ]
 
 DATA_MINOR_PLANET = [
     DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
-    DATA_RISE_TIME,
+    DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
-    DATA_SET_TIME ]
+    DATA_SET_DATE_TIME ]
 
 DATA_MOON = [
     DATA_ALTITUDE,
@@ -112,29 +112,29 @@ DATA_MOON = [
     DATA_ILLUMINATION,
     DATA_MESSAGE,
     DATA_PHASE,
-    DATA_RISE_TIME,
-    DATA_SET_TIME ]
+    DATA_RISE_DATE_TIME,
+    DATA_SET_DATE_TIME ]
 
 DATA_PLANET = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
     DATA_MESSAGE,
-    DATA_RISE_TIME,
-    DATA_SET_TIME ]
+    DATA_RISE_DATE_TIME,
+    DATA_SET_DATE_TIME ]
 
 DATA_SATELLITE = [
     DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
-    DATA_RISE_TIME,
+    DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
-    DATA_SET_TIME ]
+    DATA_SET_DATE_TIME ]
 
 DATA_STAR = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
     DATA_MESSAGE,
-    DATA_RISE_TIME,
-    DATA_SET_TIME ]
+    DATA_RISE_DATE_TIME,
+    DATA_SET_DATE_TIME ]
 
 DATA_SUN = [
     DATA_ALTITUDE,
@@ -146,8 +146,8 @@ DATA_SUN = [
     DATA_ECLIPSE_LONGITUDE,
     DATA_ECLIPSE_TYPE,
     DATA_MESSAGE,
-    DATA_RISE_TIME,
-    DATA_SET_TIME ]
+    DATA_RISE_DATE_TIME,
+    DATA_SET_DATE_TIME ]
 
 NAME_TAG_CITY = "CITY"
 NAME_TAG_MOON = "MOON"
@@ -536,12 +536,12 @@ def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBody
     if t:
         t = t.utc_iso( delimiter = ' ' )
         if y[ 0 ]:
-            data[ key + ( DATA_RISE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
-            data[ key + ( DATA_SET_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+            data[ key + ( DATA_RISE_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+            data[ key + ( DATA_SET_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
 
         else:
-            data[ key + ( DATA_RISE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
-            data[ key + ( DATA_SET_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+            data[ key + ( DATA_RISE_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+            data[ key + ( DATA_SET_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
 
     else:
 #        if almanac.sunrise_sunset( ephemeris, topos )( t0 ): #TODO Original Skyfield function only supports sun rise/set.
@@ -653,9 +653,9 @@ def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
 #             continue
 # 
 #         # The pass is visible and the user wants only visible passes OR the user wants any pass...
-#         data[ key + ( DATA_RISE_TIME, ) ] = str( nextPass[ 0 ].datetime() )
+#         data[ key + ( DATA_RISE_DATE_TIME, ) ] = str( nextPass[ 0 ].datetime() )
 #         data[ key + ( DATA_RISE_AZIMUTH, ) ] = str( nextPass[ 1 ] )
-#         data[ key + ( DATA_SET_TIME, ) ] = str( nextPass[ 4 ].datetime() )
+#         data[ key + ( DATA_SET_DATE_TIME, ) ] = str( nextPass[ 4 ].datetime() )
 #         data[ key + ( DATA_SET_AZIMUTH, ) ] = str( nextPass[ 5 ] )
 # 
 #         break

@@ -53,46 +53,25 @@ DATA_MESSAGE = "MESSAGE"
 DATA_NEW = "NEW"
 DATA_PHASE = "PHASE"
 DATA_RISE_AZIMUTH = "RISE AZIMUTH"
-DATA_RISE_TIME = "RISE TIME"
+DATA_RISE_DATE_TIME = "RISE DATE TIME"
 DATA_SET_AZIMUTH = "SET AZIMUTH"
-DATA_SET_TIME = "SET TIME"
+DATA_SET_DATE_TIME = "SET DATE TIME"
 DATA_THIRD_QUARTER = "THIRD QUARTER"
 
-DATA_TAGS = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_BRIGHT_LIMB,
-    DATA_DAWN,
-    DATA_DUSK,
-    DATA_ECLIPSE_DATE_TIME,
-    DATA_ECLIPSE_LATITUDE,
-    DATA_ECLIPSE_LONGITUDE,
-    DATA_ECLIPSE_TYPE,
-    DATA_FIRST_QUARTER,
-    DATA_FULL,
-    DATA_ILLUMINATION,
-    DATA_MESSAGE,
-    DATA_NEW,
-    DATA_PHASE,
-    DATA_RISE_AZIMUTH,
-    DATA_RISE_TIME,
-    DATA_SET_AZIMUTH,
-    DATA_SET_TIME,
-    DATA_THIRD_QUARTER ]
-
+#TODO Are these sub-lists needed?  They are not referenced in the indicator front end.
 DATA_COMET = [
     DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
-    DATA_RISE_TIME,
+    DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
-    DATA_SET_TIME ]
+    DATA_SET_DATE_TIME ]
 
 DATA_MINOR_PLANET = [
     DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
-    DATA_RISE_TIME,
+    DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
-    DATA_SET_TIME ]
+    DATA_SET_DATE_TIME ]
 
 DATA_MOON = [
     DATA_ALTITUDE,
@@ -105,29 +84,29 @@ DATA_MOON = [
     DATA_ILLUMINATION,
     DATA_MESSAGE,
     DATA_PHASE,
-    DATA_RISE_TIME,
-    DATA_SET_TIME ]
+    DATA_RISE_DATE_TIME,
+    DATA_SET_DATE_TIME ]
 
 DATA_PLANET = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
     DATA_MESSAGE,
-    DATA_RISE_TIME,
-    DATA_SET_TIME ]
+    DATA_RISE_DATE_TIME,
+    DATA_SET_DATE_TIME ]
 
 DATA_SATELLITE = [
     DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
-    DATA_RISE_TIME,
+    DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
-    DATA_SET_TIME ]
+    DATA_SET_DATE_TIME ]
 
 DATA_STAR = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
     DATA_MESSAGE,
-    DATA_RISE_TIME,
-    DATA_SET_TIME ]
+    DATA_RISE_DATE_TIME,
+    DATA_SET_DATE_TIME ]
 
 DATA_SUN = [
     DATA_ALTITUDE,
@@ -139,8 +118,8 @@ DATA_SUN = [
     DATA_ECLIPSE_LONGITUDE,
     DATA_ECLIPSE_TYPE,
     DATA_MESSAGE,
-    DATA_RISE_TIME,
-    DATA_SET_TIME ]
+    DATA_RISE_DATE_TIME,
+    DATA_SET_DATE_TIME ]
 
 NAME_TAG_CITY = "CITY"
 NAME_TAG_MOON = "MOON"
@@ -263,9 +242,9 @@ LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
 LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
 LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
-# TODO Do we need?  No need to tell a
-#  user the body is always up...if there is an altitude > 0, the object is up
-# and also if there is no rise/set the body is always up.
+# TODO No need to tell a user the body is always up...if there is an altitude > 0,
+# the object is up and also if there is no rise/set the body is always up.
+# Might instead need to show circumpolar satellites in their own menu/submenu?
 MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 
 MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
@@ -276,6 +255,12 @@ MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are bri
 #     Value is the data as a string.
 #
 # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
+#TODO Consider this...
+#If the body is never up, no data added.
+#If the body is always up, add az/alt/mag
+#If the body is below the horizon, add rise/mag
+#If the body is above the horizon, add set/alt/az/mag
+#Add this information to the function header.
 def getAstronomicalInformation( utcNow,
                                 latitude, longitude, elevation,
                                 planets,
@@ -358,7 +343,6 @@ def __calculateMoon( ephemNow, data ):
     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Needed for icon.
 
     if not neverUp:
-#TODO Check date/time to remove fractional seconds.
         data[ key + ( DATA_FIRST_QUARTER, ) ] = pythonutils.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
         data[ key + ( DATA_FULL, ) ] = pythonutils.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
         data[ key + ( DATA_THIRD_QUARTER, ) ] = pythonutils.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
@@ -489,10 +473,7 @@ def __calculateStars( ephemNow, data, stars ):
 #             print( data[ key ] ) 
 #             mags[ int( float( data[ key ] ) + 2 ) ] += 1 
 
-#     print( "Star mags:", mags ) #TODO the count here does not match that in the indicator (thirty something versus eighty).
-
-#TODO May need to include magnitude to let the frontend submenu by mag.
-
+#     print( "Star mags:", mags ) 
 
 
 # Compute data for comets or minor planets.
@@ -525,14 +506,6 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
 #     print( magsAndAbove )
 
 
-#TODO Consider this...
-#If the body is never up, no data added.
-#If the body is always up, add az/alt/mag
-#If the body is below the horizon, add rise/mag
-#If the body is above the horizon, add set/alt/az/mag
-#Add this information to the main public function header.
-
-#TODO Consider removing the prefs for hide/show moon/sun.
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
     neverUp = False
     key = ( astronomicalBodyType, nameTag )
@@ -542,9 +515,9 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
         setting = city.next_setting( body )
 
         if rising > setting: # Above the horizon.
-            data[ key + ( DATA_SET_TIME, ) ] = pythonutils.toDateTimeString( setting.datetime() )
+            data[ key + ( DATA_SET_DATE_TIME, ) ] = pythonutils.toDateTimeString( setting.datetime() )
         else: # Below the horizon.
-            data[ key + ( DATA_RISE_TIME, ) ] = pythonutils.toDateTimeString( rising.datetime() )
+            data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( rising.datetime() )
 
     except ephem.AlwaysUpError:
         pass
@@ -553,7 +526,7 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
         neverUp = True
 
     if not neverUp:
-        if key + ( DATA_RISE_TIME, ) not in data:
+        if key + ( DATA_RISE_DATE_TIME, ) not in data:
             body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
             data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
             data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
@@ -631,11 +604,10 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
             continue
 
         # The pass is visible and the user wants only visible passes OR the user wants any pass...
-#TODO Check date/time to remove fractional seconds...may not apply as for rise/set for bodies, but check nonetheless.
-        data[ key + ( DATA_RISE_TIME, ) ] = pythonutils.toDateTimeString(  nextPass[ 0 ].datetime() )
-        data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString(  nextPass[ 1 ] )
-        data[ key + ( DATA_SET_TIME, ) ] = pythonutils.toDateTimeString(  nextPass[ 4 ].datetime() )
-        data[ key + ( DATA_SET_AZIMUTH, ) ] = pythonutils.toDateTimeString(  nextPass[ 5 ] )
+        data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
+        data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 1 ] )
+        data[ key + ( DATA_SET_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 4 ].datetime() )
+        data[ key + ( DATA_SET_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 5 ] )
 
         break
 
