@@ -575,7 +575,8 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
         except ValueError:
             if satellite.circumpolar:
                 data[ key + ( DATA_AZIMUTH, ) ] = str( satellite.az )
-
+                data[ key + ( DATA_ALTITUDE, ) ] = str( satellite.alt )
+                print( key, "is circumpolar,", str( satellite.az ), str( satellite.alt ) ) #TODO Testing
             break
 
         if not __isSatellitePassValid( nextPass ):
@@ -583,13 +584,18 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
 
         # The pass is valid.  If the satellite is currently passing, work out when it rose...
         if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
+#TODO What if this satellite pass is not a visible pass? 
+#Why do we need this clause of code anyway?
+#Is it because the indicator migth be run in the middle of a visible period?
+#Or is it during a visible period the backend is continually updated?
+
             setTime = nextPass[ 4 ]
             nextPass = __calculateSatellitePassForRisingPriorToNow( currentDateTime, data, satelliteTLE )
             if nextPass is None:
                 currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
                 continue
 
-        # Now have a satellite rise/transit/set; determine if the pass is visible.
+        # The satellite has a rise/transit/set; determine if the pass is visible.
         passIsVisible = __isSatellitePassVisible( data, nextPass[ 2 ], satellite )
         if not passIsVisible:
             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
