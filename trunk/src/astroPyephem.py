@@ -29,6 +29,8 @@ class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, S
 
 #TODO Need to test with a lat/long such that bodies rise/set, always up and never up.
 
+DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
+
 
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
@@ -324,6 +326,21 @@ def getAstronomicalInformation( utcNow,
     del data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
     del data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ]
 
+
+#TODO Testing
+    for key in data.keys():
+        if key[ 2 ] == DATA_DAWN or \
+           key[ 2 ] == DATA_DUSK or \
+           key[ 2 ] == DATA_ECLIPSE_DATE_TIME or \
+           key[ 2 ] == DATA_FIRST_QUARTER or \
+           key[ 2 ] == DATA_FULL or \
+           key[ 2 ] == DATA_NEW or \
+           key[ 2 ] == DATA_RISE_TIME or \
+           key[ 2 ] == DATA_SET_TIME or \
+           key[ 2 ] == DATA_THIRD_QUARTER:
+            print( data[ key ] )
+
+
     return data
 
 
@@ -355,6 +372,7 @@ def __calculateMoon( ephemNow, data ):
     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Needed for icon.
 
     if not neverUp:
+#TODO Check date/time to remove fractional seconds.
         data[ key + ( DATA_FIRST_QUARTER, ) ] = str( ephem.next_first_quarter_moon( ephemNow ).datetime() )
         data[ key + ( DATA_FULL, ) ] = str( ephem.next_full_moon( ephemNow ).datetime() )
         data[ key + ( DATA_THIRD_QUARTER, ) ] = str( ephem.next_last_quarter_moon( ephemNow ).datetime() )
@@ -450,6 +468,25 @@ def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate )
 def __calculateSun( ephemNow, data ):
     neverUp = __calculateCommon( ephemNow, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
     if not neverUp:
+        try:
+            city = __getCity( data, ephemNow )
+            city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical; http://stackoverflow.com/a/18622944/2156453
+            sun = ephem.Sun( city )
+            dawn = city.next_rising( sun, use_center = True )
+            dusk = city.next_setting( sun, use_center = True )
+
+#TODO Check date/time to remove fractional seconds.
+            format = "%Y-%m-%d %H:%M:%S"
+#             if dawn > dusk : # Above the horizon.
+#                 
+#                 data[ key + ( DATA_SET_TIME, ) ] = str( dusk.datetime() )
+#             else: # Below the horizon.
+#                 data[ key + ( DATA_RISE_TIME, ) ] = str( dawn.datetime() )
+
+        except ( ephem.AlwaysUpError, ephem.NeverUpError ):
+            pass
+
+
 #TODO If this is removed, then remove the dawn/dusk stuff.       
 #If kept, ensure that skyfield can be modified to calculate dawn/dusk. 
 #         try:
@@ -467,6 +504,34 @@ def __calculateSun( ephemNow, data ):
 #             pass # No need to add a message here as update common would already have done so.
 
         __calculateEclipse( ephemNow.datetime(), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
+
+
+    # Converts a UTC datetime string in the format given to local datetime string.
+#     def getLocalDateTime( utcDateTimeString, formatString ):
+# #         if True: return utcDateTimeString # TODO Testing to compare against Skyfield
+#         utcDateTime = self.toDateTime( utcDateTimeString )
+#         timestamp = calendar.timegm( utcDateTime.timetuple() )
+#         localDateTime = datetime.datetime.fromtimestamp( timestamp )
+#         localDateTime.replace( microsecond = utcDateTime.microsecond )
+#         localDateTimeString = localDateTime.strftime( formatString )
+# 
+#         return localDateTimeString
+
+
+#TODO Not needed
+    def toDateTime( dateTimeAsString ):
+        import datetime, re
+        
+        # Have found (very seldom) that a date/time may be generated from the PyEphem backend
+        # with the .%f component which may mean the value is zero but PyEphem dropped it.
+        # However this means the format does not match and parsing into a DateTime object fails.
+        # So pre-check for .%f and if missing, add in ".0" to keep the parsing happy.
+        s = dateTimeAsString
+        if re.search( r"\.\d+$", s ) is None:
+            s += ".0"
+
+        return datetime.datetime.strptime( s, "%Y-%m-%d %H:%M:%S.%f" )
+
 
 
 # Calculate next eclipse for either the Sun or Moon.
@@ -491,17 +556,17 @@ def __calculatePlanets( ephemNow, data, planets ):
 # http://aa.usno.navy.mil/data/docs/mrst.php
 def __calculateStars( ephemNow, data, stars ):
     print( "Number of stars:", len(stars))#TODO debug
-    mags = [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+#     mags = [ 0, 0, 0, 0, 0, 0, 0, 0 ]
     for star in stars:
         starObject = ephem.star( star.title() )
         __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star )
 
-        key = ( AstronomicalBodyType.Star, star, DATA_MAGNITUDE ) 
-        if key in data: 
-            print( data[ key ] ) 
-            mags[ int( float( data[ key ] ) + 2 ) ] += 1 
+#         key = ( AstronomicalBodyType.Star, star, DATA_MAGNITUDE ) 
+#         if key in data: 
+#             print( data[ key ] ) 
+#             mags[ int( float( data[ key ] ) + 2 ) ] += 1 
 
-    print( "Star mags:", mags ) #TODO the count here does not match that in the indicator (thirty something versus eighty).
+#     print( "Star mags:", mags ) #TODO the count here does not match that in the indicator (thirty something versus eighty).
 
 #TODO May need to include magnitude to let the frontend submenu by mag.
 
@@ -553,6 +618,7 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
         rising = city.next_rising( body )
         setting = city.next_setting( body )
 
+#TODO Check date/time to remove fractional seconds.
         if rising > setting: # Above the horizon.
             data[ key + ( DATA_SET_TIME, ) ] = str( setting.datetime() )
         else: # Below the horizon.
@@ -576,6 +642,22 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
             data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
 
     return neverUp
+
+
+    # Convert from a datetime to string, dropping any fractional seconds.
+    def __toDateTimeString( dateTime ):
+        import datetime, re
+#TODO Check this comment...see if we can get data generated without the .0
+        # Strip fractional seconds from time before converting to string.
+        # Occasionally Pyephem will generate a time without fractional seconds.
+        # Check for .%f and if missing, add in ".0" to keep the parsing happy.
+        dateTimeAsString = str( dateTime )
+        if re.search( r"\.\d+$", dateTimeAsString ) is None:
+            dateTimeAsString += ".0"
+
+        dateTimeAsString = dateTimeAsString.split( '.' )[ 0 ]
+
+        return datetime.datetime.strptime( dateTimeAsString, DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
 
 
 # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
@@ -643,6 +725,7 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
             continue
 
         # The pass is visible and the user wants only visible passes OR the user wants any pass...
+#TODO Check date/time to remove fractional seconds...may not apply as for rise/set for bodies, but check nonetheless.
         data[ key + ( DATA_RISE_TIME, ) ] = str( nextPass[ 0 ].datetime() )
         data[ key + ( DATA_RISE_AZIMUTH, ) ] = str( nextPass[ 1 ] )
         data[ key + ( DATA_SET_TIME, ) ] = str( nextPass[ 4 ].datetime() )
