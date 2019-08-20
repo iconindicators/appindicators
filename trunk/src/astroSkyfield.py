@@ -65,28 +65,7 @@ DATA_SET_AZIMUTH = "SET AZIMUTH"
 DATA_SET_DATE_TIME = "SET DATE TIME"
 DATA_THIRD_QUARTER = "THIRD QUARTER"
 
-DATA_TAGS = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_BRIGHT_LIMB,
-    DATA_DAWN,
-    DATA_DUSK,
-    DATA_ECLIPSE_DATE_TIME,
-    DATA_ECLIPSE_LATITUDE,
-    DATA_ECLIPSE_LONGITUDE,
-    DATA_ECLIPSE_TYPE,
-    DATA_FIRST_QUARTER,
-    DATA_FULL,
-    DATA_ILLUMINATION,
-    DATA_MESSAGE,
-    DATA_NEW,
-    DATA_PHASE,
-    DATA_RISE_AZIMUTH,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_AZIMUTH,
-    DATA_SET_DATE_TIME,
-    DATA_THIRD_QUARTER ]
-
+#TODO Are these sub-lists needed?  They are not referenced in the indicator front end.
 DATA_COMET = [
     DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
@@ -276,10 +255,6 @@ STARS = {
 
 EPHEMERIS_PLANETS = "de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
 EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
-
-#
-MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
-MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 
 
 #TODO Pyephem can return fractional seconds in rise/set date/times...so they have been removed...
@@ -532,8 +507,7 @@ def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBody
     t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
     t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 2, utcNowDateTime.hour ) # Look two days ahead as one day ahead may miss the next rise or set.
 
-#     t, y = almanac.find_discrete( t0, t1, almanac.sunrise_sunset( ephemeris, topos ) )  #TODO Original Skyfield function only supports sun rise/set.
-    t, y = almanac.find_discrete( t0, t1, __bodyrise_bodyset( observer, body ) )
+    t, y = almanac.find_discrete( t0, t1, __bodyrise_bodyset( observer, body ) ) # Original Skyfield function only suppots sun rise/set, so have generalised to any body.
     if t:
         t = t.utc_iso( delimiter = ' ' )
         if y[ 0 ]:
@@ -545,11 +519,10 @@ def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBody
             data[ key + ( DATA_SET_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
 
     else:
-#        if almanac.sunrise_sunset( ephemeris, topos )( t0 ): #TODO Original Skyfield function only supports sun rise/set.
-        if __bodyrise_bodyset( observer, body )( t0 ):
-            data[ key + ( DATA_MESSAGE, ) ] = MESSAGE_BODY_ALWAYS_UP #TODO Remove this...work out the logic of using t0.
+        if __bodyrise_bodyset( observer, body )( t0 ): # Taken and modified from Skyfield almanac.find_discrete.
+            pass # Body is up (and so always up).
         else:
-            neverUp = True
+            neverUp = True # Body is down (and so never up). 
 
     if not neverUp:
         apparent = observer.at( utcNow ).observe( body ).apparent()
@@ -573,6 +546,8 @@ def __getSkyfieldObserver( latitude, longitude, elevation, earth ):
 #TODO Have copied the code from skyfield/almanac.py as per
 # https://github.com/skyfielders/python-skyfield/issues/226
 # to compute rise/set for any body.
+#
+# Returns true if the body is up at the time give; false if down.
 def __bodyrise_bodyset( observer, body ):
 
     def is_body_up_at( t ):
