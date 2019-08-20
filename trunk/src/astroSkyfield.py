@@ -281,6 +281,10 @@ MESSAGE_BODY_ALWAYS_UP = "BODY_ALWAYS_UP"
 MESSAGE_SATELLITE_IS_CIRCUMPOLAR = "SATELLITE_IS_CIRCUMPOLAR"
 
 
+#TODO Pyephem can return fractional seconds in rise/set date/times...so they have been removed...
+# ...not sure if skyfield will/could have the same problem.
+
+
 #TODO Might need to cache deltat.data and deltat.preds as the backend website was down and I couldn't get them except at a backup site.
 # What other files are downloaded?  Need to also grab: https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat  Be careful...this file expires!
 
