@@ -46,7 +46,6 @@ DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for
 DATA_LATITUDE = "LATITUDE" # Internally used for city.
 DATA_LONGITUDE = "LONGITUDE" # Internally used for city.
 DATA_MAGNITUDE = "MAGNITUDE"
-DATA_MESSAGE = "MESSAGE"
 DATA_NEW = "NEW"
 DATA_PHASE = "PHASE"
 DATA_RISE_AZIMUTH = "RISE AZIMUTH"
@@ -57,15 +56,12 @@ DATA_THIRD_QUARTER = "THIRD QUARTER"
 
 #TODO Are these sub-lists needed?  They are not referenced in the indicator front end.
 DATA_COMET = [
-    DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
     DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
     DATA_SET_DATE_TIME ]
 
 DATA_MINOR_PLANET = [
-    DATA_MESSAGE,
-    DATA_RISE_AZIMUTH,
     DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
     DATA_SET_DATE_TIME ]
@@ -79,7 +75,6 @@ DATA_MOON = [
     DATA_ECLIPSE_LONGITUDE,
     DATA_ECLIPSE_TYPE,
     DATA_ILLUMINATION,
-    DATA_MESSAGE,
     DATA_PHASE,
     DATA_RISE_DATE_TIME,
     DATA_SET_DATE_TIME ]
@@ -87,12 +82,10 @@ DATA_MOON = [
 DATA_PLANET = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
-    DATA_MESSAGE,
     DATA_RISE_DATE_TIME,
     DATA_SET_DATE_TIME ]
 
 DATA_SATELLITE = [
-    DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
     DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
@@ -101,7 +94,6 @@ DATA_SATELLITE = [
 DATA_STAR = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
-    DATA_MESSAGE,
     DATA_RISE_DATE_TIME,
     DATA_SET_DATE_TIME ]
 
@@ -114,7 +106,6 @@ DATA_SUN = [
     DATA_ECLIPSE_LATITUDE,
     DATA_ECLIPSE_LONGITUDE,
     DATA_ECLIPSE_TYPE,
-    DATA_MESSAGE,
     DATA_RISE_DATE_TIME,
     DATA_SET_DATE_TIME ]
 
@@ -576,7 +567,6 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
             if satellite.circumpolar:
                 data[ key + ( DATA_AZIMUTH, ) ] = str( satellite.az )
                 data[ key + ( DATA_ALTITUDE, ) ] = str( satellite.alt )
-                print( key, "is circumpolar,", str( satellite.az ), str( satellite.alt ) ) #TODO Testing
             break
 
         if not __isSatellitePassValid( nextPass ):
