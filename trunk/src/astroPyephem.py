@@ -584,7 +584,6 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
 
         # Determine if the pass is yet to happen or underway...
         if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
-#TODO Verify the transiting satellite is visible
             setTime = nextPass[ 4 ]
             nextPass = __calculateSatellitePassForRisingPriorToNow( currentDateTime, data, satelliteTLE )
             if nextPass is None:
@@ -597,7 +596,7 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
             continue
 
-        # The pass is visible ,,,
+        # The pass is visible.
         data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
         data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 1 ] )
         data[ key + ( DATA_SET_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 4 ].datetime() )
@@ -608,7 +607,7 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
 
 def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
     currentDateTime = ephem.Date( ephemNow - ephem.minute ) # Start looking from one minute ago.
-    endDateTime = ephem.Date( ephemNow - ephem.hour * 1 ) # Only look back an hour for the rise time (then just give up).
+    endDateTime = ephem.Date( ephemNow - ephem.hour ) # Only look back an hour for the rise time (then just give up).
     nextPass = None
     while currentDateTime > endDateTime:
         city = __getCity( data, currentDateTime )
@@ -621,7 +620,7 @@ def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
                 break # Unlikely to happen but better to be safe and check!
 
             if nextPass[ 0 ] < nextPass[ 4 ]:
-                break
+                break # Found the rise time!
 
             currentDateTime = ephem.Date( currentDateTime - ephem.minute )
 
