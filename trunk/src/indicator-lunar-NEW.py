@@ -1068,6 +1068,9 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
+#TODO Need to take into account circumpolar satellites...
+#If the user wants to show satellites by name, then circumpolar satellites can fit in the same list (just no rise/set, only az/alt).
+#If the user wants to show satellites by rise time, then circumpolar satellites need to live in their own submenu (showing only az/alt).
     def updateSatellitesMenu( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
