@@ -582,13 +582,10 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
         if not __isSatellitePassValid( nextPass ):
             break
 
-        # The pass is valid.  If the satellite is currently passing, work out when it rose...
-        if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
-#TODO What if this satellite pass is not a visible pass? 
-#Why do we need this clause of code anyway?
-#Is it because the indicator migth be run in the middle of a visible period?
-#Or is it during a visible period the backend is continually updated?
+#TODO I think we need to verify the pass is now visible...
 
+        # Determine if the pass is yet to happen or underway...
+        if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
             setTime = nextPass[ 4 ]
             nextPass = __calculateSatellitePassForRisingPriorToNow( currentDateTime, data, satelliteTLE )
             if nextPass is None:
