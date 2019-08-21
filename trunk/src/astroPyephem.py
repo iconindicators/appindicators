@@ -582,10 +582,9 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
         if not __isSatellitePassValid( nextPass ):
             break
 
-#TODO I think we need to verify the pass is now visible...
-
         # Determine if the pass is yet to happen or underway...
         if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
+#TODO Verify the transiting satellite is visible
             setTime = nextPass[ 4 ]
             nextPass = __calculateSatellitePassForRisingPriorToNow( currentDateTime, data, satelliteTLE )
             if nextPass is None:
