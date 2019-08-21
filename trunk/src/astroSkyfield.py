@@ -507,7 +507,7 @@ def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBody
     t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
     t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 2, utcNowDateTime.hour ) # Look two days ahead as one day ahead may miss the next rise or set.
 
-    t, y = almanac.find_discrete( t0, t1, __bodyrise_bodyset( observer, body ) ) # Original Skyfield function only suppots sun rise/set, so have generalised to any body.
+    t, y = almanac.find_discrete( t0, t1, __bodyrise_bodyset( observer, body ) ) # Original Skyfield function only supports sun rise/set, so have generalised to any body.
     if t:
         t = t.utc_iso( delimiter = ' ' )
         if y[ 0 ]:
