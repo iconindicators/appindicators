@@ -164,7 +164,6 @@ class IndicatorLunar:
         astroPyephem.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
         astroPyephem.DATA_FULL                 : _( "FULL" ),
         astroPyephem.DATA_MAGNITUDE            : _( "MAGNITUDE" ),
-        astroPyephem.DATA_MESSAGE              : _( "MESSAGE" ),
         astroPyephem.DATA_NEW                  : _( "NEW" ),
         astroPyephem.DATA_PHASE                : _( "PHASE" ),
         astroPyephem.DATA_RISE_AZIMUTH         : _( "RISE AZIMUTH" ),
@@ -942,15 +941,12 @@ class IndicatorLunar:
 
     def updateEclipseMenu( self, menu, astronomicalBodyType, nameTag ):
         key = ( astronomicalBodyType, nameTag )
-        if key + ( astroPyephem.DATA_MESSAGE, ) in self.data:
-            logging.error( "No eclipse information found!" )
-        else:
-            menu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Eclipse" ) ) )
-            menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_DATE_TIME, ) ) ) )
-            latitude = self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_LATITUDE, ) )
-            longitude = self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_LONGITUDE, ) )
-            menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
-            menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_TYPE, ) ) ) )
+        menu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Eclipse" ) ) )
+        menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_DATE_TIME, ) ) ) )
+        latitude = self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_LATITUDE, ) )
+        longitude = self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_LONGITUDE, ) )
+        menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
+        menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_TYPE, ) ) ) )
 
 
     def updatePlanetsMenu( self, menu ):
@@ -1073,7 +1069,7 @@ class IndicatorLunar:
 #If the user wants to show satellites by rise time, then circumpolar satellites need to live in their own submenu (showing only az/alt).
     def updateSatellitesMenu( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
-        for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
+        for satelliteName, satelliteNumber in self.satellites:
             key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
             if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
                 internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
@@ -1102,7 +1098,6 @@ class IndicatorLunar:
             satellitesSubMenu = Gtk.Menu()
             satellitesMenuItem.set_submenu( satellitesSubMenu )
 
-        utcNow = datetime.datetime.utcnow()
         indent = pythonutils.indent( 0, 2 )
         for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
             self.createSatelliteMenu( satelliteName, satelliteNumber, menuText )
@@ -1327,9 +1322,6 @@ class IndicatorLunar:
                 displayData = _( "Penumbral" )
             else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
                 displayData = _( "Total" )
-
-#         elif key[ 2 ] == astroPyephem.DATA_MESSAGE: #TODO Will need to take the message and pull out the translation from a dict....or not...delete this if 
-#             displayData = IndicatorLunar.MESSAGE_TRANSLATIONS[ self.data[ key ] ]
 
         elif key[ 2 ] == astroPyephem.DATA_PHASE:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]

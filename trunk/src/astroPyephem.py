@@ -587,6 +587,8 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
             continue
 
         # The pass is visible.
+#TODO If the pass is yet to rise, maybe just put in the rise time.  
+# If in transit, put in the set time/az and rise az (and maybe rise time).
         data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
         data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 1 ] )
         data[ key + ( DATA_SET_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 4 ].datetime() )
