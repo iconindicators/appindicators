@@ -554,9 +554,9 @@ def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
 def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
     key = ( AstronomicalBodyType.Satellite, " ".join( key ) )
     currentDateTime = ephemNow
-#TODO Need to think about how far into the future we look...but not sure how without limiting things.
-    endDateTime = ephem.Date( ephemNow + ephem.hour * 24 * 2 ) # Stop looking for passes 2 days from now.
+    endDateTime = ephem.Date( ephemNow + ephem.hour * 24 ) # Stop looking for passes 24 hours from now.
     while currentDateTime < endDateTime:
+        inTransit = False
         city = __getCity( data, currentDateTime )
         satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
         satellite.compute( city )
@@ -574,25 +574,31 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
 
         # Determine if the pass is yet to happen or underway...
         if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
+            inTransit = True
             setTime = nextPass[ 4 ]
             nextPass = __calculateSatellitePassForRisingPriorToNow( currentDateTime, data, satelliteTLE )
             if nextPass is None:
                 currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
                 continue
-
+            
         # The satellite has a rise/transit/set; determine if the pass is visible.
         passIsVisible = __isSatellitePassVisible( data, nextPass[ 2 ], satellite )
         if not passIsVisible:
-            currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 )
+            currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Look for the next pass.
             continue
 
         # The pass is visible.
-#TODO If the pass is yet to rise, maybe just put in the rise time.  
+#TODO If the pass is yet to rise, maybe just put in the rise time.   
+# If the rise time is say more 5 minutes before the current time, then only put in the rise time.
 # If in transit, put in the set time/az and rise az (and maybe rise time).
+        if nextPass[ 0 ] + ephem.
+        
         data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
-        data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 1 ] )
-        data[ key + ( DATA_SET_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 4 ].datetime() )
-        data[ key + ( DATA_SET_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 5 ] )
+
+        if inTransit:
+            data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 1 ] )
+            data[ key + ( DATA_SET_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 4 ].datetime() )
+            data[ key + ( DATA_SET_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 5 ] )
 
         break
 
