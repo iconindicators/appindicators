@@ -591,7 +591,10 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
 #TODO If the pass is yet to rise, maybe just put in the rise time.   
 # If the rise time is say more 5 minutes before the current time, then only put in the rise time.
 # If in transit, put in the set time/az and rise az (and maybe rise time).
-        if nextPass[ 0 ] + ephem.
+
+        # If rise < current time must be in transit, so add all info.
+        
+        if nextPass[ 4 ] < 
         
         data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
 
