@@ -31,60 +31,57 @@ from urllib.request import urlopen
 #Maybe combine into one file called elements or dataElements and that contains
 #classes/method for TLE and OE?
 class TLE:
-    def __init__( self, tleTitle, tleLine1, tleLine2 ):
-        self.tleTitle = tleTitle
-        self.tleLine1 = tleLine1
-        self.tleLine2 = tleLine2
+    def __init__( self, title, line1, line2 ):
+        self.title = title
+        self.line1 = line1
+        self.line2 = line2
 
 
-    def getTLETitle( self ): return self.tleTitle
+    def getTLETitle( self ): return self.title
 
 
-    def getTLELine1( self ): return self.tleLine1
+    def getTLELine1( self ): return self.line1
 
 
-    def getTLELine2( self ): return self.tleLine2
+    def getTLELine2( self ): return self.line2
 
 
-    def getName( self ): return self.tleTitle
+    def getName( self ): return self.title
 
 
-    def getNumber( self ): return self.tleLine1[ 2 : 7 ]
+    def getNumber( self ): return self.line1[ 2 : 7 ]
 
 
     def getInternationalDesignator( self ): 
-        launchYear = self.tleLine1[ 9 : 11 ]
+        launchYear = self.line1[ 9 : 11 ]
         if int( launchYear ) < 57:
             launchYear = "20" + launchYear
         else:
             launchYear = "19" + launchYear 
 
-        return launchYear + "-" + self.tleLine1[ 11 : 17 ].strip()
+        return launchYear + "-" + self.line1[ 11 : 17 ].strip()
 
 
-    def __str__( self ): return str( self.tleTitle ) + " | " + str( self.tleLine1 ) + " | " + str( self.tleLine2 )
+    def __str__( self ): return str( self.title ) + " | " + str( self.line1 ) + " | " + str( self.line2 )
 
 
     def __repr__( self ): return self.__str__()
 
 
-#TODO The dict should perhaps just be the satellite number as key, rather than a tuple.
-#Ensure the satellite number is unique!
-
 # Downloads TLE data from the URL.
 #
 # On success, returns a dict:
-#    Key: ( satellite name, satellite number ) ;
-#    Value: satellite.TLE object.
+#    Key: Satellite number
+#    Value: TLE object
 #
 # On error, may write to the log (if not None) and returns None.
 def download( url, logging = None ):
+    tleData = { }
     try:
-        tleData = { }
         data = urlopen( url ).read().decode( "utf8" ).splitlines()
         for i in range( 0, len( data ), 3 ):
             tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
-            tleData[ ( tle.getName().upper(), tle.getNumber() ) ] = tle
+            tleData[ ( tle.getNumber() ) ] = tle
 
     except Exception as e:
         tleData = None
