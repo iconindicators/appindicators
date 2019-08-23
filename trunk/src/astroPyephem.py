@@ -471,7 +471,7 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
 
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
-            body = ephem.readdb( cometOrMinorPlanetData[ key ] )
+            body = ephem.readdb( cometOrMinorPlanetData[ key ].getData() )
             body.compute( __getCity( data, ephemNow ) )
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
             if not bad and body.mag >= MAGNITUDE_MINIMUM and body.mag <= magnitude:
