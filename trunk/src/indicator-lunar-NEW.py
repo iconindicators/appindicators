@@ -1500,7 +1500,6 @@ class IndicatorLunar:
 
 
     def _onPreferences( self, widget ):
-
         TAB_ICON = 0
         TAB_MENU = 1
         TAB_PLANETS_STARS = 2
@@ -2463,7 +2462,7 @@ class IndicatorLunar:
             else: # Comet or Minor Planet
                 for key in data:
                     oe = data[ key ]
-                    dataStore.append( [ key in bodies, self.getCometOrMinorPlanetDisplayName( oe ) ] )
+                    dataStore.append( [ key in bodies, oe.getName() ] )
 
         # Hide/show the label and scrolled window as appropriate.
         # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
@@ -2698,14 +2697,6 @@ class IndicatorLunar:
         for key in self.minorPlanetOEData:
             if key not in self.minorPlanets:
                 self.minorPlanets.append( key )
-
-
-#TODO Move into orbitalelement file.
-    def getCometOrMinorPlanetDisplayName( self, cometOrMinorPlanet ): return cometOrMinorPlanet[ 0 : cometOrMinorPlanet.index( "," ) ]
-
-
-#TODO If needed (but looks like it is NOT needed), move into orbitalelement file.
-    def getCometDisplayName( self, comet ): return comet[ 0 : comet.index( "," ) ]
 
 
     def getDefaultCity( self ):
