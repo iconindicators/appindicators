@@ -537,9 +537,9 @@ class IndicatorLunar:
 
 
     def __init__( self ):
-        self.cometOEData = { } # Key is the comet name, upper cased; value is the comet data string.  Can be empty but never None.
-        self.minorPlanetOEData = { } # Key is the minor planet name, upper cased; value is the minor planet data string.  Can be empty but never None.
-        self.satelliteTLEData = { } # Key: ( satellite name upper cased, satellite number ) ; Value: satellite.TLE object.  Can be empty but never None.
+        self.cometOEData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
+        self.minorPlanetOEData = { } # Key: minor planet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
+        self.satelliteTLEData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satelliteNotifications = { }
 
 #TODO Do these need to live here?  Do we need to recall the state globally or maybe just within each calling of prefs?
@@ -1378,6 +1378,8 @@ class IndicatorLunar:
         else:
             # Have no data, so read from cache and if that fails, download.
             newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging )
+# TODO May need a check in here to verify the format of the data read back from the cache...
+# if we read in old cache data, this will catch it.  Assuming the data is not None.
             if newData is None:
                 newData = getDataFunction( dataURL )
                 if newData is not None:
@@ -2799,6 +2801,14 @@ class IndicatorLunar:
 
         self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, self.werewolfWarningMessage )
         self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, self.werewolfWarningSummary )
+
+#TODO If comet or satellite data is downloaded and cached by the current release (DEB) version,
+#and we run this new version, what will happen if we try to read in that data?
+#It will not be compatible...so will we try to download a clean version?
+#I suspect the data will be read but will be a dict (for satellites) with a tuple as key (name and number) rather than just number...
+#...which is not good at all.
+#This will also effect the list of satellites the user has chosen!
+#So run the DEB released version and create data files using that and test against this developement version.
 
         #TODO Start of temporary hack...
         # Convert planet/star to upper case.

@@ -49,7 +49,6 @@ class OE:
 #
 # On error, may write to the log (if not None) and returns None.
 def download( url, logging = None ):
-    url = "file:///home/bernard/Desktop/Soft03Cmt.txt"
     oeData = { }
     try:
         data = urlopen( url ).read().decode( "utf8" ).splitlines()
