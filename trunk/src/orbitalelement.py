@@ -54,7 +54,7 @@ def download( url, logging = None ):
         data = urlopen( url ).read().decode( "utf8" ).splitlines()
         for i in range( 0, len( data ) ):
             if not data[ i ].startswith( "#" ):
-                oe = OE( data[ i ] )
+                oe = OE( data[ i ].strip() )
                 oeData[ oe.getName().upper() ] = oe
 
     except Exception as e:
