@@ -1377,9 +1377,23 @@ class IndicatorLunar:
 
         else:
             # Have no data, so read from cache and if that fails, download.
-            newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging )
-# TODO May need a check in here to verify the format of the data read back from the cache...
-# if we read in old cache data, this will catch it.  Assuming the data is not None.
+            newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) #TODO This will return None for old format satellite cache data.
+
+#TODO Start of temporary hack...
+# There was a change of data formats between version 80 ad 81.
+# Satellites are using the TLE object but the file name was changed from satellite to twolineelement and is deemed an invalid object.
+# Therefore the read cache binary will throw an exception and return None.
+# Not a problem as a new version will be downloaded and the cache will eventually clear out.
+#
+# Comets will successfully read in because their objects (dict, tuple string) are valid.
+# Comets are still stored in a dict using a string as key but now with a new OE object as the value, which must be handled.
+# This check can be removed in version 82 or later.
+            if newData is not None and cacheBaseName == IndicatorLunar.COMET_OE_CACHE_BASENAME and newData:
+                randomValue = next( iter( newData.values() ) )
+                if not isinstance( randomValue, orbitalelement.OE ):
+                    newData = None
+#TODO End of hack!
+
             if newData is None:
                 newData = getDataFunction( dataURL )
                 if newData is not None:
@@ -2802,18 +2816,10 @@ class IndicatorLunar:
         self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, self.werewolfWarningMessage )
         self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, self.werewolfWarningSummary )
 
-#TODO If comet or satellite data is downloaded and cached by the current release (DEB) version,
-#and we run this new version, what will happen if we try to read in that data?
-#It will not be compatible...so will we try to download a clean version?
-#I suspect the data will be read but will be a dict (for satellites) with a tuple as key (name and number) rather than just number...
-#...which is not good at all.
-#This will also effect the list of satellites the user has chosen!
-#So run the DEB released version and create data files using that and test against this developement version.
-
-        #TODO Start of temporary hack...
-        # Convert planet/star to upper case.
-        # Convert lat/long from str to float.
-        # Remove this hack after next release.
+#TODO Start of temporary hack...
+# Convert planet/star to upper case.
+# Convert lat/long from str to float.
+# Remove this hack in release 82 or later.
         tmp = []
         for planet in self.planets:
             tmp.append( planet.upper() )
@@ -2828,7 +2834,7 @@ class IndicatorLunar:
         self.longitude = float( self.longitude )
 
         self.saveConfig()
-        #TODO End of hack!
+#TODO End of hack!
 
 
     def saveConfig( self ):
