@@ -22,25 +22,41 @@ from urllib.request import urlopen
 
 import re
 
-#TODO Add a class to hold OE, similar to TLE?
+
+class OE:
+    def __init__( self, data ):
+        self.data = data
+        self.name = re.sub( "\s\s+", "", self.data[ 0 : self.data.index( "," ) ] ) # The name can have multiple whitespace, so remove.
+
+
+    def getName( self ): return self.name
+
+
+    def getData( self ): return self.data
+
+
+    def __str__( self ): return self.data
+
+
+    def __repr__( self ): return self.__str__()
 
 
 # Downloads OE data in XEphem format from the URL.
 #
 # On success, returns a dict:
-#    Key: comet name, upper case ;
-#    Value: comet data line.
+#    Key: comet name (upper cased)
+#    Value: comet data line
 #
 # On error, may write to the log (if not None) and returns None.
 def download( url, logging = None ):
+    url = "file:///home/bernard/Desktop/Soft03Cmt.txt"
+    oeData = { }
     try:
-        oeData = { }
         data = urlopen( url ).read().decode( "utf8" ).splitlines()
         for i in range( 0, len( data ) ):
             if not data[ i ].startswith( "#" ):
-                name = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # The name can have multiple whitespace, so remove.
-                data = data[ i ][ data[ i ].index( "," ) : ]
-                oeData[ name.upper() ] = name + data
+                oe = OE( data[ i ] )
+                oeData[ oe.getName().upper() ] = oe
 
     except Exception as e:
         oeData = None

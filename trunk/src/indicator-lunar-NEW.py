@@ -50,6 +50,14 @@
 # 2019-07-13 17:10:02,989 - root - ERROR - Error reading SVG icon: /usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg
 
 
+#TODO Suspect that since satellites are now keyed off satellite number (rather than a tuple of name and number)
+# for both the list of satellites and satellite data and
+# comet/minorPlanets are now using their own class,
+# the user prefs may be broken, particular if a user has selected specific items rather than just add all.
+# So at some point, install the deb file that is on the PPA and start with no config file,
+# then add some satellites and comets and see if the new code base handle this...and then handles with all items added.
+
+
 #TODO Consider removing the prefs for hide/show moon/sun.
 #That is, always show these...ask Oleg about this.
 
@@ -94,7 +102,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 from urllib.request import urlopen
-import astroPyephem, datetime, eclipse, glob, locale, logging, math, os, pythonutils, re, satellite, tempfile, threading, webbrowser
+import astroPyephem, datetime, eclipse, glob, locale, logging, math, orbitalelement, os, pythonutils, re, tempfile, threading, twolineelement, webbrowser
 
 
 class IndicatorLunar:
@@ -638,17 +646,17 @@ class IndicatorLunar:
                 GLib.source_remove( self.updateTimerID )
 
 # Get data for comets, minor planets and satellites and update                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-            self.cometOEData = self.updateData( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, self.getCometOEData, self.cometOEURL )
+            self.cometOEData = self.updateData( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL )
             self.cometsAddNew = True
             if self.cometsAddNew and self.cometOEData is not None:
                 self.addNewComets()
 
-            self.minorPlanetOEData = self.updateData( self.minorPlanetOEData, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS, self.getMinorPlanetOEData, self.minorPlanetOEURL )
+            self.minorPlanetOEData = self.updateData( self.minorPlanetOEData, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL )
             self.minorPlanetsAddNew = True
             if self.minorPlanetsAddNew and self.minorPlanetOEData is not None:
                 self.addNewMinorPlanets()
 
-            self.satelliteTLEData = self.updateData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, self.getSatelliteTLEData, self.satelliteTLEURL )
+            self.satelliteTLEData = self.updateData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL )
             self.satellitesAddNew = True
             if self.satellitesAddNew and self.satelliteTLEData is not None:
                 self.addNewSatellites()
@@ -1352,102 +1360,6 @@ class IndicatorLunar:
             return firstDateTimeAsString
 
         return secondDateTimeAsString
-
-
-#TODO See if this can be combined with the comet function below.
-    def updateMinorPlanetOEData( self ):
-        if datetime.datetime.utcnow() > ( self.lastUpdateMinorPlanetOE + datetime.timedelta( hours = IndicatorLunar.MINOR_PLANET_OE_DOWNLOAD_PERIOD_HOURS ) ):
-            self.minorPlanetOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
-            if self.minorPlanetOEData is None:
-                self.minorPlanetOEData = self.getMinorPlanetOEData( self.minorPlanetOEURL )
-
-                if self.minorPlanetOEData is None:
-                    self.minorPlanetOEData = { }
-                    summary = _( "Error Retrieving Minor Planet OE Data" ) #TODO New translation
-                    message = _( "The minor planet OE data source could not be reached." ) #TODO New translation
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-                elif len( self.minorPlanetOEData ) == 0:
-                    summary = _( "Empty Minor Planet OE Data" ) #TODO New translation
-                    message = _( "The minor planet OE data retrieved was empty." ) #TODO New translation
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-                else:
-                    pythonutils.writeCacheBinary( self.minorPlanetOEData, INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, logging )
-
-                # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
-                self.lastUpdateMinorPlanetOE = datetime.datetime.utcnow()
-
-            else:
-                # Set the next update to occur when the cache is due to expire.
-                self.lastUpdateMinorPlanetOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS )
-
-            if self.minorPlanetsAddNew:
-                self.addNewMinorPlanets()
-
-
-#TODO Delete
-    def updateCometOEData( self ):
-        if datetime.datetime.utcnow() > ( self.lastUpdateCometOE + datetime.timedelta( hours = IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS ) ):
-            self.cometOEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging ) # Returned data is either None or non-empty.
-            if self.cometOEData is None:
-                self.cometOEData = self.getCometOEData( self.cometOEURL )
-
-                if self.cometOEData is None:
-                    self.cometOEData = { }
-                    summary = _( "Error Retrieving Comet OE Data" )
-                    message = _( "The comet OE data source could not be reached." )
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-                elif len( self.cometOEData ) == 0:
-                    summary = _( "Empty Comet OE Data" )
-                    message = _( "The comet OE data retrieved was empty." )
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-                else:
-                    pythonutils.writeCacheBinary( self.cometOEData, INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging )
-
-                # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
-                self.lastUpdateCometOE = datetime.datetime.utcnow()
-
-            else:
-                # Set the next update to occur when the cache is due to expire.
-                self.lastUpdateCometOE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
-
-            if self.cometsAddNew:
-                self.addNewComets()
-
-
-#TODO Delete
-    def updateSatelliteTLEData( self ):
-        if datetime.datetime.utcnow() > ( self.lastUpdateSatelliteTLE + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS ) ):
-            self.satelliteTLEData, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging )
-            if self.satelliteTLEData is None:
-                self.satelliteTLEData = self.getSatelliteTLEData( self.satelliteTLEURL )
-
-                if self.satelliteTLEData is None:
-                    self.satelliteTLEData = { }
-                    summary = _( "Error Retrieving Satellite TLE Data" )
-                    message = _( "The satellite TLE data source could not be reached." )
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-                elif len( self.satelliteTLEData ) == 0:
-                    summary = _( "Empty Satellite TLE Data" )
-                    message = _( "The satellite TLE data retrieved was empty." )
-                    Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-                else:
-                    pythonutils.writeCacheBinary( self.satelliteTLEData, INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging )
-
-                # Even if the data download failed or was empty, don't do another download until the required time elapses...don't want to bother the source!
-                self.lastUpdateSatelliteTLE = datetime.datetime.utcnow()
-
-            else:
-                # Set the next update to occur when the cache is due to expire.
-                self.lastUpdateSatelliteTLE = datetime.datetime.strptime( cacheDateTime, IndicatorLunar.DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + datetime.timedelta( hours = IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
-
-            if self.satellitesAddNew:
-                self.addNewSatellites()
 
 
     # Get the data from the cache, or if stale, download from the source.
@@ -2772,94 +2684,12 @@ class IndicatorLunar:
                 self.minorPlanets.append( key )
 
 
+#TODO Move into orbitalelement file.
     def getCometOrMinorPlanetDisplayName( self, cometOrMinorPlanet ): return cometOrMinorPlanet[ 0 : cometOrMinorPlanet.index( "," ) ]
 
 
-#TODO Remove
+#TODO If needed (but looks like it is NOT needed), move into orbitalelement file.
     def getCometDisplayName( self, comet ): return comet[ 0 : comet.index( "," ) ]
-
-
-    # Returns a dict/hashtable of the comets (comets) data from the specified URL (may be empty).
-    # Key: comet name, upper cased ; Value: entire comet string.
-    # On error, returns None.
-#TODO Can this be combined to also do comets?
-    def getMinorPlanetOEData( self, url ):
-        minorPlanetOEData = None # Indicates error.
-        if pythonutils.isConnectedToInternet():
-            try:
-                # Minor planets are read from a URL which assumes the XEphem format.
-                # For example
-                #
-#TODO Fix this line
-                #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
-                #
-                # from which the first field (up to the first ',') is the name.
-                minorPlanetOEData = { }
-                data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-                for i in range( 0, len( data ) ):
-                    if not data[ i ].startswith( "#" ):
-                        minorPlanetName = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # Found that the minor planet name can have multiple whitespace, so remove.
-                        minorPlanetData = data[ i ][ data[ i ].index( "," ) : ]
-                        minorPlanetOEData[ minorPlanetName.upper() ] = minorPlanetName + minorPlanetData
-
-            except Exception as e:
-                minorPlanetOEData = None
-                logging.exception( e )
-                logging.error( "Error retrieving minor planet OE data from " + str( url ) )
-
-        return minorPlanetOEData
-
-
-    # Returns a dict/hashtable of the comets (comets) data from the specified URL (may be empty).
-    # Key: comet name, upper cased ; Value: entire comet string.
-    # On error, returns None.
-    def getCometOEData( self, url ):
-        cometOEData = None # Indicates error.
-        if pythonutils.isConnectedToInternet():
-            try:
-                # Comets are read from a URL which assumes the XEphem format.
-                # For example
-                #
-                #    C/2002 Y1 (Juels-Holvorcem),e,103.7816,166.2194,128.8232,242.5695,0.0002609,0.99705756,0.0000,04/13.2508/2003,2000,g  6.5,4.0
-                #
-                # from which the first field (up to the first ',') is the name.
-                cometOEData = { }
-                data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-                for i in range( 0, len( data ) ):
-                    if not data[ i ].startswith( "#" ):
-                        cometName = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # Found that the comet name can have multiple whitespace, so remove.
-                        cometData = data[ i ][ data[ i ].index( "," ) : ]
-                        cometOEData[ cometName.upper() ] = cometName + cometData
-
-            except Exception as e:
-                cometOEData = None
-                logging.exception( e )
-                logging.error( "Error retrieving comet OE data from " + str( url ) )
-
-        return cometOEData
-
-
-#TODO Use the new download method in satellite.py
-#...and can we make a similar thing for comets/minor planets (will need a new file)?
-    # Returns a dict/hashtable of the satellite TLE data from the specified URL (may be empty).
-    # Key: ( satellite name, satellite number ) ; Value: satellite.TLE object.
-    # On error, returns None.
-    def getSatelliteTLEData( self, url ):
-        satelliteTLEData = None # Indicates error.
-        if pythonutils.isConnectedToInternet():
-            try:
-                satelliteTLEData = { }
-                data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-                for i in range( 0, len( data ), 3 ):
-                    tle = satellite.TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
-                    satelliteTLEData[ ( tle.getName().upper(), tle.getNumber() ) ] = tle
-
-            except Exception as e:
-                satelliteTLEData = None
-                logging.exception( e )
-                logging.error( "Error retrieving satellite TLE data from " + str( url ) )
-
-        return satelliteTLEData
 
 
     def getDefaultCity( self ):

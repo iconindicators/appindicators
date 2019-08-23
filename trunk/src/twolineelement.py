@@ -26,10 +26,6 @@
 from urllib.request import urlopen
 
 
-#TODO Maybe rename the file to twolineelement (because we have a file called orbitalelement)?
-#Naming the file satellite is fine but what to name the equivalent for comets and minor planets?
-#Maybe combine into one file called elements or dataElements and that contains
-#classes/method for TLE and OE?
 class TLE:
     def __init__( self, title, line1, line2 ):
         self.title = title
