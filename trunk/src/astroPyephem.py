@@ -594,7 +594,7 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
 
         # If rise < current time must be in transit, so add all info.
         
-        if nextPass[ 4 ] < 
+#         if nextPass[ 4 ] < 
         
         data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
 
