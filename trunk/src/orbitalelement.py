@@ -22,6 +22,8 @@ from urllib.request import urlopen
 
 import re
 
+#TODO Add a class to hold OE, similar to TLE?
+
 
 # Downloads OE data in XEphem format from the URL.
 #
