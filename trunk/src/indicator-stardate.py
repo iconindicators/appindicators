@@ -248,15 +248,11 @@ class IndicatorStardate:
 
 
     def loadConfig( self ):
-        self.padInteger = True
-        self.showClassic = True
-        self.showIssue = True
-
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-        self.padInteger = config.get( IndicatorStardate.CONFIG_PAD_INTEGER, self.padInteger )
-        self.showClassic = config.get( IndicatorStardate.CONFIG_SHOW_CLASSIC, self.showClassic )
-        self.showIssue = config.get( IndicatorStardate.CONFIG_SHOW_ISSUE, self.showIssue )
+        self.padInteger = config.get( IndicatorStardate.CONFIG_PAD_INTEGER, True )
+        self.showClassic = config.get( IndicatorStardate.CONFIG_SHOW_CLASSIC, True )
+        self.showIssue = config.get( IndicatorStardate.CONFIG_SHOW_ISSUE, True )
 
 
     def saveConfig( self ):

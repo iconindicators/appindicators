@@ -1,5 +1,6 @@
 indicator-stardate (1.0.37-1) xenial; urgency=low
 
+  * Tidy up load config of user preferences.
   * Update release to xenial as trusty is end of life.
   * Update debian/control Standards-Version to 3.9.7.
 
