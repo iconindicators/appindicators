@@ -5,6 +5,7 @@ indicator-virtual-box (1.0.61-1) xenial; urgency=low
     in the previous version to show the VirtualBox Manager window useless.
     Instead, add a text field and the user manually specifies the window name.
   * Corrected the indents for menu items for GNOME Shell.
+  * Tidy up load config of user preferences.
   * Update release to xenial as trusty is end of life.
   * Update debian/control Standards-Version to 3.9.7.
 

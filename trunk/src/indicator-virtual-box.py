@@ -679,19 +679,13 @@ class IndicatorVirtualBox:
 
 
     def loadConfig( self ):
-        self.delayBetweenAutoStartInSeconds = 10
-        self.refreshIntervalInMinutes = 15
-        self.showSubmenu = False
-        self.virtualMachinePreferences = { } # Store information about VMs (not groups). Key is VM UUID; value is [ autostart (bool), start command (str) ]
-        self.virtualboxManagerWindowName = "Oracle VM VirtualBox Manager"
-
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-        self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START, self.delayBetweenAutoStartInSeconds )
-        self.refreshIntervalInMinutes = config.get( IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
-        self.showSubmenu = config.get( IndicatorVirtualBox.CONFIG_SHOW_SUBMENU, self.showSubmenu )
-        self.virtualMachinePreferences = config.get( IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES, self.virtualMachinePreferences )
-        self.virtualboxManagerWindowName = config.get( IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME, self.virtualboxManagerWindowName )
+        self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START, 10 )
+        self.refreshIntervalInMinutes = config.get( IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES, 15 )
+        self.showSubmenu = config.get( IndicatorVirtualBox.CONFIG_SHOW_SUBMENU, False )
+        self.virtualMachinePreferences = config.get( IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES, { } ) # Store information about VMs (not groups). Key is VM UUID; value is [ autostart (bool), start command (str) ]
+        self.virtualboxManagerWindowName = config.get( IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME, "Oracle VM VirtualBox Manager" )
 
 
     def saveConfig( self ):
