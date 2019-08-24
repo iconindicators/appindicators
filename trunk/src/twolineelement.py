@@ -15,12 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Two-line Element Set.
-# http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
-# http://www.satobs.org/element.html
-# http://en.wikipedia.org/wiki/Two-line_element_set
-# https://www.mmto.org/obscats/tle.html
-# http://celestrak.com/columns/v04n03
+# Two Line Element - holds parameters to compute orbit for satellites.
 
 
 from urllib.request import urlopen

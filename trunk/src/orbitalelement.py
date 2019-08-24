@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Orbital Element - comets, minor planets, near earth objects, et al.
+# Orbital Element - holds parameters to compute orbits for comets, minor planets, near earth objects, et al.
 
 
 from urllib.request import urlopen
