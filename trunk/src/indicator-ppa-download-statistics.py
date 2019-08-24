@@ -857,13 +857,6 @@ class IndicatorPPADownloadStatistics:
 
 
     def loadConfig( self ):
-        self.sortByDownload = False
-        self.sortByDownloadAmount = 5
-        self.combinePPAs = False
-        self.ignoreVersionArchitectureSpecific = True
-        self.showSubmenu = False
-        self.filterAtDownload = True
-
         self.ppas = [ ]
         self.ppasPrevious = [ ] # Used to hold the most recent download for comparison.
         self.filters = { }
@@ -889,12 +882,12 @@ class IndicatorPPADownloadStatistics:
 
             self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
-            self.combinePPAs = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, self.combinePPAs )
+            self.combinePPAs = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, False )
             self.filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, { } )
-            self.ignoreVersionArchitectureSpecific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, self.ignoreVersionArchitectureSpecific )
-            self.showSubmenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, self.showSubmenu )
-            self.sortByDownload = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, self.sortByDownload )
-            self.sortByDownloadAmount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, self.sortByDownloadAmount )
+            self.ignoreVersionArchitectureSpecific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, True )
+            self.showSubmenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, False )
+            self.sortByDownload = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
+            self.sortByDownloadAmount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, 5 )
 
 
     def saveConfig( self ):

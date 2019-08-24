@@ -4,6 +4,7 @@ indicator-ppa-download-statistics (1.0.66-1) xenial; urgency=low
     the label text to match other indicators with a label.
     No change for GNOME Shell as empty icons are treated as full size.
   * Corrected the indents for menu items for GNOME Shell.
+  * Tidy up load config of user preferences.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 26 Jun 2019 23:20:53 +1000
 
