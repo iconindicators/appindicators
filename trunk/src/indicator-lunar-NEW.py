@@ -1079,6 +1079,13 @@ class IndicatorLunar:
 #If the user wants to show satellites by name, then circumpolar satellites can fit in the same list (just no rise/set, only az/alt).
 #If the user wants to show satellites by rise time, then circumpolar satellites need to live in their own submenu (showing only az/alt).
     def updateSatellitesMenu( self, menu ):
+        if self.satellitesSortByDateTime:
+            pass
+        else:
+            pass
+    
+    
+    def updateSatellitesMenuORIG( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites:
             key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
@@ -1286,6 +1293,7 @@ class IndicatorLunar:
 
 
 #TODO Rename the source parameter to better reflect how it affects the date/time format.
+#Or change source to be a date/time format, so that it is passed in.
     def getDisplayData( self, key, source = None ):
         displayData = None
         if key[ 2 ] == astroPyephem.DATA_ALTITUDE or \
