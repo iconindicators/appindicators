@@ -552,22 +552,13 @@ class IndicatorFortune:
 
 
     def loadConfig( self ):
-        self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
-        self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
-        self.notificationSummary = IndicatorFortune.NOTIFICATION_SUMMARY
-        self.refreshIntervalInMinutes = 15
-        self.skipFortuneCharacterCount = 360 # From experimentation, about 45 characters per line, but with word boundaries maintained, say 40 characters per line (with at most 9 lines).
-
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-        self.fortunes = config.get( IndicatorFortune.CONFIG_FORTUNES, self.fortunes ) # At a minimum, will always contain the default fortune (may or may not be enabled).
-        if self.fortunes == [ ]: # Previous versions allowed the default fortune to be deleted so it is possible the fortunes list can be empty.
-            self.fortunes = [ IndicatorFortune.DEFAULT_FORTUNE ]
-
-        self.middleMouseClickOnIcon = config.get( IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON, self.middleMouseClickOnIcon )
-        self.notificationSummary = config.get( IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY, self.notificationSummary )
-        self.refreshIntervalInMinutes = config.get( IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES, self.refreshIntervalInMinutes )
-        self.skipFortuneCharacterCount = config.get( IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT, self.skipFortuneCharacterCount )
+        self.fortunes = config.get( IndicatorFortune.CONFIG_FORTUNES, [ IndicatorFortune.DEFAULT_FORTUNE ] )
+        self.middleMouseClickOnIcon = config.get( IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON, IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
+        self.notificationSummary = config.get( IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY, IndicatorFortune.NOTIFICATION_SUMMARY )
+        self.refreshIntervalInMinutes = config.get( IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES, 15 )
+        self.skipFortuneCharacterCount = config.get( IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT, 360 ) # From experimentation, about 45 characters per line, but with word boundaries maintained, say 40 characters per line (with at most 9 lines).
 
 
     def saveConfig( self ):
