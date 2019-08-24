@@ -556,7 +556,6 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
     currentDateTime = ephemNow
     endDateTime = ephem.Date( ephemNow + ephem.hour * 24 ) # Stop looking for passes 24 hours from now.
     while currentDateTime < endDateTime:
-        inTransit = False
         city = __getCity( data, currentDateTime )
         satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getLine1(), satelliteTLE.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
         satellite.compute( city )
@@ -574,7 +573,6 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
 
         # Determine if the pass is yet to happen or underway...
         if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
-            inTransit = True
             setTime = nextPass[ 4 ]
             nextPass = __calculateSatellitePassForRisingPriorToNow( currentDateTime, data, satelliteTLE )
             if nextPass is None:
@@ -587,21 +585,15 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Look for the next pass.
             continue
 
-        # The pass is visible.
-#TODO If the pass is yet to rise, maybe just put in the rise time.   
-# If the rise time is say more 5 minutes before the current time, then only put in the rise time.
-# If in transit, put in the set time/az and rise az (and maybe rise time).
-
-        # If rise < current time must be in transit, so add all info.
-        
-#         if nextPass[ 4 ] < 
-        
-        data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
-
-        if inTransit:
+        # If a satellite is in transit or will rise within five minutes of now, then show all information...
+        if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ):
+            data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
             data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 1 ] )
             data[ key + ( DATA_SET_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 4 ].datetime() )
             data[ key + ( DATA_SET_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 5 ] )
+
+        else: # Satellite will rise later, so only add rise time.
+            data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
 
         break
 
