@@ -69,6 +69,11 @@ class IndicatorOnThisDay:
     CONFIG_NOTIFY = "notify"
     CONFIG_SEARCH_URL = "searchURL"
 
+    # By experiment, a height of 900 (pixels) will fit 37 menu items before a scroll bar is imposed by GTK.
+    # To arrive at a reasonable initial guess for a given screen height, compute a divisor and use that.
+    # So the divisor is 900 / 37 = 25.
+    DEFAULT_LINES = Gtk.Window().get_screen().get_height() / 25
+
 
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorOnThisDay.LOG ) ] )
@@ -551,24 +556,13 @@ class IndicatorOnThisDay:
 
 
     def loadConfig( self ):
-        self.calendars = [ IndicatorOnThisDay.DEFAULT_CALENDAR ]
-        self.copyToClipboard = True
-
-        # By experiment, a height of 900 (pixels) will fit 37 menu items before a scroll bar is imposed by GTK.
-        # To arrive at a reasonable initial guess for a given screen height, compute a divisor and use that.
-        # So the divisor is 900 / 37 = 25.
-        self.lines = Gtk.Window().get_screen().get_height() / 25
-
-        self.notify = True
-        self.searchURL = IndicatorOnThisDay.SEARCH_URL_DEFAULT
-
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-        self.calendars = config.get( IndicatorOnThisDay.CONFIG_CALENDARS, self.calendars )
-        self.copyToClipboard = config.get( IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD, self.copyToClipboard )
-        self.lines = config.get( IndicatorOnThisDay.CONFIG_LINES, self.lines )
-        self.notify = config.get( IndicatorOnThisDay.CONFIG_NOTIFY, self.notify )
-        self.searchURL = config.get( IndicatorOnThisDay.CONFIG_SEARCH_URL, self.searchURL )
+        self.calendars = config.get( IndicatorOnThisDay.CONFIG_CALENDARS, [ IndicatorOnThisDay.DEFAULT_CALENDAR ] )
+        self.copyToClipboard = config.get( IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD, True )
+        self.lines = config.get( IndicatorOnThisDay.CONFIG_LINES, IndicatorOnThisDay.DEFAULT_LINES )
+        self.notify = config.get( IndicatorOnThisDay.CONFIG_NOTIFY, True )
+        self.searchURL = config.get( IndicatorOnThisDay.CONFIG_SEARCH_URL, IndicatorOnThisDay.SEARCH_URL_DEFAULT )
 
 
     def saveConfig( self ):
