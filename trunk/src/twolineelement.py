@@ -33,13 +33,13 @@ class TLE:
         self.line2 = line2
 
 
-    def getTLETitle( self ): return self.title
+    def getTitle( self ): return self.title
 
 
-    def getTLELine1( self ): return self.line1
+    def getLine1( self ): return self.line1
 
 
-    def getTLELine2( self ): return self.line2
+    def getLine2( self ): return self.line2
 
 
     def getName( self ): return self.title

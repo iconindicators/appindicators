@@ -558,7 +558,7 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
     while currentDateTime < endDateTime:
         inTransit = False
         city = __getCity( data, currentDateTime )
-        satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+        satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getLine1(), satelliteTLE.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
         satellite.compute( city )
         try:
             nextPass = city.next_pass( satellite )
@@ -612,7 +612,7 @@ def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
     nextPass = None
     while currentDateTime > endDateTime:
         city = __getCity( data, currentDateTime )
-        satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getTLELine1(), satelliteTLE.getTLELine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+        satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getLine1(), satelliteTLE.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
         satellite.compute( city )
         try:
             nextPass = city.next_pass( satellite )
