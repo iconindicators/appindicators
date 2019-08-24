@@ -528,15 +528,10 @@ class IndicatorLunar:
     MESSAGE_TRANSLATION_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_TRANSLATION_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
-
-    #TODO Needed?
-#     MESSAGE_TRANSLATIONS = {
-#         astroPyephem.MESSAGE_BODY_ALWAYS_UP : MESSAGE_TRANSLATION_BODY_ALWAYS_UP }
-
     MESSAGE_DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
     
     # Data is displayed using a default format, but when an alternate format is required, specify using a source below.
-    SOURCE_SATELLITE_NOTIFICATION = 0
+    SOURCE_SATELLITE_NOTIFICATION = 0 #TODO Not sure if this will be kept...wait until getDisplayData is fixed.
 
 
     def __init__( self ):
@@ -572,23 +567,6 @@ class IndicatorLunar:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.loadConfig()
-
-
-#TODO Testing skyfield
-#         import astroSkyfield
-#         x = astroSkyfield.getAstronomicalInformation( datetime.datetime.utcnow(),
-#                                                   float( self.latitude ), float( self.longitude ), float( self.elevation ),
-#                                                   self.planets,
-#                                                   self.stars,
-#                                                   self.satellites, None if self.satelliteTLEData is None else self.satelliteTLEData,
-#                                                   self.comets, None if self.cometOEData is None else self.cometOEData,
-#                                                   self.minorPlanets, None if self.minorPlanetOEData is None else self.minorPlanetOEData,
-#                                                   self.magnitude )
-# 
-#         print( x )
-#         import sys
-#         if True: sys.exit()
-
         self.update( True )
 
 #TODO Look at
@@ -1083,8 +1061,8 @@ class IndicatorLunar:
             pass
         else:
             pass
-    
-    
+
+
     def updateSatellitesMenuORIG( self, menu ):
         menuTextSatelliteNameNumberRiseTimes = [ ]
         for satelliteName, satelliteNumber in self.satellites:
