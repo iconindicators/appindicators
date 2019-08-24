@@ -2666,9 +2666,6 @@ class IndicatorLunar:
                     tags = IndicatorLunar.DATA_TAGS_MOON
                 elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Planet:
                     tags = IndicatorLunar.DATA_TAGS_PLANET
-                    if bodyTag == IndicatorLunar.PLANET_SATURN.upper():
-                        tags.append( IndicatorLunar.DATA_EARTH_TILT )
-                        tags.append( IndicatorLunar.DATA_SUN_TILT )
                 elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
                     tags = IndicatorLunar.DATA_TAGS_SATELLITE
                 elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Star:
