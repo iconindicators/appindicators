@@ -795,18 +795,13 @@ class IndicatorScriptRunner:
 
 
     def loadConfig( self ):
-        self.scriptGroupDefault = ""
-        self.scriptNameDefault = ""
         self.scripts = [ ]
-        self.showScriptsInSubmenus = False
-        self.hideGroups = False
-
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
         if len( config ) > 0:
-            self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, self.hideGroups )
-            self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, self.scriptGroupDefault )
-            self.scriptNameDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT, self.scriptNameDefault )
-            self.showScriptsInSubmenus = config.get( IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, self.showScriptsInSubmenus )
+            self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
+            self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, "" )
+            self.scriptNameDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT, "" )
+            self.showScriptsInSubmenus = config.get( IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, False )
 
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
             defaultScriptFound = False
