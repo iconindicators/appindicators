@@ -453,21 +453,14 @@ class IndicatorTide:
 
 
     def loadConfig( self ):
-        self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
-        self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
-        self.menuItemTideFormatSansTime = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME
-        self.portID = None
-        self.showAsSubMenus = True
-        self.showAsSubMenusExceptFirstDay = True
-
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-        self.menuItemDateFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT, self.menuItemDateFormat )
-        self.menuItemTideFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT, self.menuItemTideFormat )
-        self.menuItemTideFormatSansTime = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME, self.menuItemTideFormatSansTime )
-        self.portID = config.get( IndicatorTide.CONFIG_PORT_ID, self.portID )
-        self.showAsSubMenus = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS, self.showAsSubMenus )
-        self.showAsSubMenusExceptFirstDay = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, self.showAsSubMenusExceptFirstDay )
+        self.menuItemDateFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT, IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT )
+        self.menuItemTideFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT, IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT )
+        self.menuItemTideFormatSansTime = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME, IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME )
+        self.portID = config.get( IndicatorTide.CONFIG_PORT_ID, None )
+        self.showAsSubMenus = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS, True )
+        self.showAsSubMenusExceptFirstDay = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, True )
 
         # Validate the port...
         if not ports.isValidPortID( self.portID ):
