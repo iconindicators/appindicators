@@ -2729,45 +2729,6 @@ class IndicatorLunar:
 
 
     def loadConfig( self ):
-        self.indicatorText = IndicatorLunar.INDICATOR_TEXT_DEFAULT
-
-        self.comets = [ ]
-        self.cometsAddNew = False
-        self.cometOEURL = IndicatorLunar.COMET_OE_URL
-
-        self.minorPlanets = [ ]
-        self.minorPlanetsAddNew = False
-        self.minorPlanetOEURL = IndicatorLunar.MINOR_PLANET_OE_URL
-
-        self.magnitude = 6 # More or less what's visible with the naked eye or binoculars.
-
-        self.planets = [ ]
-        for planetName in astroPyephem.PLANETS:
-            if not( planetName == astroPyephem.PLANET_NEPTUNE or planetName == astroPyephem.PLANET_PLUTO ): # Neptune and Pluto are not visible to naked eye, so hide by default.
-                self.planets.append( planetName )
-
-        self.satelliteNotificationMessage = IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT
-        self.satelliteNotificationSummary = IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT
-        self.satelliteTLEURL = IndicatorLunar.SATELLITE_TLE_URL
-        self.satellites = [ ]
-        self.satellitesAddNew = False
-        self.satellitesSortByDateTime = True
-
-        self.showMoon = True
-        self.showCometsAsSubMenu = True
-        self.showMinorPlanetsAsSubMenu = True
-        self.showPlanetsAsSubMenu = False
-        self.showSatelliteNotification = True
-        self.showSatellitesAsSubMenu = True
-        self.showStarsAsSubMenu = True
-        self.showSun = True
-        self.showWerewolfWarning = True
-
-        self.stars = [ ]
-
-        self.werewolfWarningMessage = IndicatorLunar.WEREWOLF_WARNING_MESSAGE_DEFAULT
-        self.werewolfWarningSummary = IndicatorLunar.WEREWOLF_WARNING_SUMMARY_DEFAULT
-
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME ) # Returns None if the key is not found.
@@ -2779,58 +2740,66 @@ class IndicatorLunar:
             self.latitude = config.get( IndicatorLunar.CONFIG_CITY_LATITUDE )
             self.longitude = config.get( IndicatorLunar.CONFIG_CITY_LONGITUDE )
 
-        self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, self.indicatorText )
+        self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, IndicatorLunar.INDICATOR_TEXT_DEFAULT )
 
-        self.cometOEURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, self.cometOEURL )
-        self.comets = config.get( IndicatorLunar.CONFIG_COMETS, self.comets )
-        self.cometsAddNew = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, self.cometsAddNew )
+        self.cometOEURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, IndicatorLunar.COMET_OE_URL )
+        self.comets = config.get( IndicatorLunar.CONFIG_COMETS, [ ] )
+        self.cometsAddNew = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, False )
 
-        self.minorPlanetOEURL = config.get( IndicatorLunar.MINOR_PLANET_OE_URL, self.minorPlanetOEURL )
-        self.minorPlanets = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS, self.minorPlanets )
-        self.minorPlanetsAddNew = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW, self.minorPlanetsAddNew )
+        self.minorPlanetOEURL = config.get( IndicatorLunar.MINOR_PLANET_OE_URL, IndicatorLunar.MINOR_PLANET_OE_URL )
+        self.minorPlanets = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS, [ ] )
+        self.minorPlanetsAddNew = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW, False )
 
-        self.magnitude = config.get( IndicatorLunar.CONFIG_MAGNITUDE, self.magnitude )
+        self.magnitude = config.get( IndicatorLunar.CONFIG_MAGNITUDE, 6 ) # More or less what's visible with the naked eye or binoculars.
 
-        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, self.planets )
+        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, astroPyephem.PLANETS[ : 6 ] ) # Drop Neptue and Pluto as not visible with naked eye.
 
-        self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, self.satelliteNotificationMessage )
-        self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, self.satelliteNotificationSummary )
-        self.satelliteTLEURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, self.satelliteTLEURL )
-        self.satellites = config.get( IndicatorLunar.CONFIG_SATELLITES, self.satellites )
-        self.satellites = [ tuple( l ) for l in self.satellites ] # Converts from a list of lists to a list of tuples...go figure!
-        self.satellitesAddNew = config.get( IndicatorLunar.CONFIG_SATELLITES_ADD_NEW, self.satellitesAddNew )
-        self.satellitesSortByDateTime = config.get( IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME, self.satellitesSortByDateTime )
+        self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT )
+        self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT )
+        self.satelliteTLEURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, IndicatorLunar.SATELLITE_TLE_URL )
+        self.satellites = config.get( IndicatorLunar.CONFIG_SATELLITES, [ ] )
+        self.satellitesAddNew = config.get( IndicatorLunar.CONFIG_SATELLITES_ADD_NEW, False )
+        self.satellitesSortByDateTime = config.get( IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME, True )
 
-        self.showMoon = config.get( IndicatorLunar.CONFIG_SHOW_MOON, self.showMoon )
-        self.showCometsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_COMETS_AS_SUBMENU, self.showCometsAsSubMenu )
-        self.showPlanetsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_PLANETS_AS_SUBMENU, self.showPlanetsAsSubMenu )
-        self.showSatelliteNotification = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION, self.showSatelliteNotification )
-        self.showSatellitesAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITES_AS_SUBMENU, self.showSatellitesAsSubMenu )
-        self.showStarsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_STARS_AS_SUBMENU, self.showStarsAsSubMenu )
-        self.showSun = config.get( IndicatorLunar.CONFIG_SHOW_SUN, self.showSun )
-        self.showWerewolfWarning = config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, self.showWerewolfWarning )
+        self.showMoon = config.get( IndicatorLunar.CONFIG_SHOW_MOON, True )
+        self.showCometsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_COMETS_AS_SUBMENU, True )
+        self.showPlanetsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_PLANETS_AS_SUBMENU, True )
+        self.showSatelliteNotification = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION, False )
+        self.showSatellitesAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITES_AS_SUBMENU, True )
+        self.showStarsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_STARS_AS_SUBMENU, True )
+        self.showSun = config.get( IndicatorLunar.CONFIG_SHOW_SUN, True )
+        self.showWerewolfWarning = config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, True )
 
-        self.stars = config.get( IndicatorLunar.CONFIG_STARS, self.stars )
+        self.stars = config.get( IndicatorLunar.CONFIG_STARS, [ ] )
 
-        self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, self.werewolfWarningMessage )
-        self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, self.werewolfWarningSummary )
+        self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, IndicatorLunar.WEREWOLF_WARNING_MESSAGE_DEFAULT )
+        self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, IndicatorLunar.WEREWOLF_WARNING_SUMMARY_DEFAULT )
 
 #TODO Start of temporary hack...
-# Convert planet/star to upper case.
 # Convert lat/long from str to float.
+# Convert planet/star to upper case.
+# Convert satellites from list of lists of tuple of satellite name and satellite number to list of satellite numbers.
 # Remove this hack in release 82 or later.
-        tmp = []
+        self.latitude = float( self.latitude )
+        self.longitude = float( self.longitude )
+
+        tmp = [ ]
         for planet in self.planets:
             tmp.append( planet.upper() )
         self.planets = tmp
 
-        tmp = []
+        tmp = [ ]
         for star in self.stars:
             tmp.append( star.upper() )
         self.stars = tmp
 
-        self.latitude = float( self.latitude )
-        self.longitude = float( self.longitude )
+        if self.satellites:
+            if isinstance( self.satellites[ 0 ], list ):
+                tmp = [ ]
+                for satelliteInfo in self.satellites:
+                    tmp.append( satelliteInfo[ 1 ] )
+
+                self.satellites = tmp
 
         self.saveConfig()
 #TODO End of hack!
@@ -2841,6 +2810,11 @@ class IndicatorLunar:
             comets = [ ]
         else:
             comets = self.comets # Only write out the list of comets if the user elects to not add new.
+
+        if self.minorPlanetsAddNew:
+            minorPlanets = [ ]
+        else:
+            minorPlanets = self.minorPlanets # Only write out the list of minor planets if the user elects to not add new.
 
         if self.satellitesAddNew:
             satellites = [ ]
@@ -2854,10 +2828,10 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_CITY_NAME: self.city,
             IndicatorLunar.CONFIG_INDICATOR_TEXT: self.indicatorText,
             IndicatorLunar.CONFIG_COMET_OE_URL: self.cometOEURL,
-            IndicatorLunar.CONFIG_COMETS: self.comets,
+            IndicatorLunar.CONFIG_COMETS: comets,
             IndicatorLunar.CONFIG_COMETS_ADD_NEW: self.cometsAddNew,
             IndicatorLunar.CONFIG_MINOR_PLANET_OE_URL: self.minorPlanetOEURL,
-            IndicatorLunar.CONFIG_MINOR_PLANETS: self.minorPlanets,
+            IndicatorLunar.CONFIG_MINOR_PLANETS: minorPlanets,
             IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW: self.minorPlanetsAddNew,
             IndicatorLunar.CONFIG_MAGNITUDE: self.magnitude,
             IndicatorLunar.CONFIG_PLANETS: self.planets,
