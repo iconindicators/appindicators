@@ -41,11 +41,11 @@ class OE:
     def __repr__( self ): return self.__str__()
 
 
-# Downloads OE data in XEphem format from the URL.
+# Downloads OE data for an object in XEphem format from the URL.
 #
 # On success, returns a dict:
-#    Key: comet name (upper cased)
-#    Value: comet data line
+#    Key: object name (upper cased)
+#    Value: data line
 #
 # On error, may write to the log (if not None) and returns None.
 def download( url, logging = None ):
