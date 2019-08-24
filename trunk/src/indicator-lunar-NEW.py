@@ -50,6 +50,9 @@
 # 2019-07-13 17:10:02,989 - root - ERROR - Error reading SVG icon: /usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg
 
 
+#TODO Will need to update the install file under packaging/debian to reflect changes in file names.
+
+
 #TODO Suspect that since satellites are now keyed off satellite number (rather than a tuple of name and number)
 # for both the list of satellites and satellite data and
 # comet/minorPlanets are now using their own class,
