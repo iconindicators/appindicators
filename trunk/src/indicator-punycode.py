@@ -290,17 +290,12 @@ class IndicatorPunycode:
 
 
     def loadConfig( self ):
-        self.dropPathQuery = False
-        self.inputClipboard = False
-        self.outputBoth = False
-        self.resultHistoryLength = 3
-
         config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
 
-        self.dropPathQuery = config.get( IndicatorPunycode.CONFIG_DROP_PATH_QUERY, self.dropPathQuery )
-        self.inputClipboard = config.get( IndicatorPunycode.CONFIG_INPUT_CLIPBOARD, self.inputClipboard )
-        self.outputBoth = config.get( IndicatorPunycode.CONFIG_OUTPUT_BOTH, self.outputBoth )
-        self.resultHistoryLength = config.get( IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH, self.resultHistoryLength )
+        self.dropPathQuery = config.get( IndicatorPunycode.CONFIG_DROP_PATH_QUERY, False )
+        self.inputClipboard = config.get( IndicatorPunycode.CONFIG_INPUT_CLIPBOARD, False )
+        self.outputBoth = config.get( IndicatorPunycode.CONFIG_OUTPUT_BOTH, False )
+        self.resultHistoryLength = config.get( IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH, 3 )
 
 
     def saveConfig( self ):
