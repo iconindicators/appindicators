@@ -230,8 +230,6 @@ LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
 LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
 LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
-MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
-
 
 # Returns a dict with astronomical information...
 #     Key is a tuple of AstronomicalBodyType, a name tag and a data tag.
@@ -469,6 +467,7 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
 #     mags = [ 0, 0, 0, 0, 0, 0 ]
 #     magsAndAbove = [ 0, 0, 0, 0, 0, 0 ]
 
+    MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
             body = ephem.readdb( cometOrMinorPlanetData[ key ].getData() )
