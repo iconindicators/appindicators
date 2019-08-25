@@ -552,7 +552,7 @@ def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
 
 
 def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
-    key = ( AstronomicalBodyType.Satellite, " ".join( key ) )
+    key = ( AstronomicalBodyType.Satellite, key )
     currentDateTime = ephemNow
     endDateTime = ephem.Date( ephemNow + ephem.hour * 24 ) # Stop looking for passes 24 hours from now.
     while currentDateTime < endDateTime:

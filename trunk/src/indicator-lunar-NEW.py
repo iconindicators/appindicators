@@ -152,6 +152,7 @@ class IndicatorLunar:
     CONFIG_SATELLITES_ADD_NEW = "satellitesAddNew"
     CONFIG_SATELLITES_SORT_BY_DATE_TIME = "satellitesSortByDateTime"
     CONFIG_SHOW_COMETS_AS_SUBMENU = "showCometsAsSubmenu"
+    CONFIG_SHOW_MINOR_PLANETS_AS_SUBMENU = "showMinorPlanetsAsSubmenu"
     CONFIG_SHOW_MOON = "showMoon"
     CONFIG_SHOW_PLANETS_AS_SUBMENU = "showPlanetsAsSubmenu"
     CONFIG_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
@@ -668,6 +669,10 @@ class IndicatorLunar:
 #What we want is a list of bodies that match the magnitude (to show in the prefereneces). 
 #So maybe run the backend again or have a function to get just this information?
 
+#TODO Remove when all done!
+#             import sys
+#             if True: sys.exit( 0 )
+
             # Update frontend...
             self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
 
@@ -1060,7 +1065,23 @@ class IndicatorLunar:
         if self.satellitesSortByDateTime:
             pass
         else:
-            pass
+            satelliteNumbersAndNames = [ ]
+            for satelliteNumber in self.satellites:
+                key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteNumber )
+                if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data or key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
+                    satelliteNumbersAndNames.append( [ satelliteNumber, self.satelliteTLEData[ satelliteNumber ].getName() ] )
+
+            if satelliteNumbersAndNames:
+                menuItem = Gtk.MenuItem( _( "Satellites" ) )
+                menu.append( menuItem )
+                if self.showSatellitesAsSubMenu:
+                    subMenu = Gtk.Menu()
+                    menuItem.set_submenu( subMenu )
+
+#                 indent = pythonutils.indent( 0, 2 )
+                satelliteNumbersAndNames = sorted( satelliteNumbersAndNames, key = lambda x: ( x[ 1 ], x[ 0 ] ) )
+                for satelliteNumber, satelliteName in satelliteNumbersAndNames:
+                    print( satelliteNumber, satelliteName )
 
 
     def updateSatellitesMenuORIG( self, menu ):
@@ -2741,6 +2762,7 @@ class IndicatorLunar:
 
         self.showMoon = config.get( IndicatorLunar.CONFIG_SHOW_MOON, True )
         self.showCometsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_COMETS_AS_SUBMENU, True )
+        self.showMinorPlanetsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_MINOR_PLANETS_AS_SUBMENU, True )
         self.showPlanetsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_PLANETS_AS_SUBMENU, True )
         self.showSatelliteNotification = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION, False )
         self.showSatellitesAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITES_AS_SUBMENU, True )
@@ -2821,6 +2843,7 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME: self.satellitesSortByDateTime,
             IndicatorLunar.CONFIG_SHOW_MOON: self.showMoon,
             IndicatorLunar.CONFIG_SHOW_COMETS_AS_SUBMENU: self.showCometsAsSubMenu,
+            IndicatorLunar.CONFIG_SHOW_MINOR_PLANETS_AS_SUBMENU: self.showCometsAsSubMenu,
             IndicatorLunar.CONFIG_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
             IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
             IndicatorLunar.CONFIG_SHOW_SATELLITES_AS_SUBMENU: self.showSatellitesAsSubMenu,
