@@ -1072,60 +1072,56 @@ class IndicatorLunar:
                     satelliteNumbersAndNames.append( [ satelliteNumber, self.satelliteTLEData[ satelliteNumber ].getName() ] )
 
             if satelliteNumbersAndNames:
-                menuItem = Gtk.MenuItem( _( "Satellites" ) )
-                menu.append( menuItem )
-                subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
+                satellitesMenuItem = Gtk.MenuItem( _( "Satellites" ) )
+                menu.append( satellitesMenuItem )
+
+#                 if self.showSatellitesAsSubMenu:
+#                     satellitesSubMenu = Gtk.Menu()
+#                     satellitesMenuItem.set_submenu( satellitesSubMenu )
 
                 satelliteNumbersAndNames = sorted( satelliteNumbersAndNames, key = lambda x: ( x[ 1 ], x[ 0 ] ) )
                 for satelliteNumber, satelliteName in satelliteNumbersAndNames:
                     key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteNumber )
 
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + menuText )
-                    satellitesSubMenu.append( menuItem )
-                    
-                    
-                    if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
-                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ) ) )
-                        
-                             
-                         or key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
+#TODO Why use this and not just join the name and number?  What is the international designator?
+                    menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
+                                                                 .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
+                                                                 .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ satelliteNumber ].getInternationalDesignator() )
 
-                    print( satelliteNumber, satelliteName )
-
-
-                menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
-                                                             .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
-                                                             .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, internationalDesignator )
-
-
-
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 2 ) + menuText )
+                    menu.append( menuItem )
 
                     subMenu = Gtk.Menu()
+                    menuItem.set_submenu( subMenu )
 
+                    if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
 
-                    
-                    
-                    riseTime = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-                    dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60 # If the satellite is currently rising, we'll get a negative but that's okay.
-                    if dateTimeDifferenceInMinutes > 2: # If this satellite will rise more than two minutes from now, then only show the rise time.
-                        subMenu.append( Gtk.MenuItem( indent + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
+                    elif key + ( astroPyephem.DATA_RISE_AZIMUTH, ) in self.data:
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Rise" ) ) )
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Set" ) ) )
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) ) )
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ) ) )
 
-                    else: # This satellite will rise within the next two minutes, so show all data.
-#TODO Test this during a satellite pass for both GNOME Shell and Unity.
-#I suspect Unity needs an extra indent on the date/time and azimuth menu items.
-                        subMenu.append( Gtk.MenuItem( indent + _( "Rise" ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ) ) )
+                    else:
+                        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
 
-                        subMenu.append( Gtk.MenuItem( indent + _( "Set" ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ) ) )
+                    if self.showSatellitesAsSubMenu:
+                        menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + menuText )
+                        satellitesSubMenu.append( menuItem )
+                    else:
+                        menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + menuText )
+                        menu.append( menuItem )
 
+                    menuItem.set_submenu( subMenu )
 
-
-
+                    # Add handler.
+                    for child in subMenu.get_children():
+                        child.set_name( satelliteNumber )
+                        child.connect( "activate", self.onSatellite )
 
 
     def updateSatellitesMenuORIG( self, menu ):
@@ -1324,15 +1320,14 @@ class IndicatorLunar:
 
 
     def onSatellite( self, widget ):
-        satelliteTLE = self.satelliteTLEData.get( tuple( widget.props.name.split( "-----" ) ) )
+        satelliteTLE = self.satelliteTLEData.get( widget.props.name )
 
         url = IndicatorLunar.SATELLITE_ON_CLICK_URL. \
               replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteTLE.getName() ). \
               replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteTLE.getNumber() ). \
               replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, satelliteTLE.getInternationalDesignator() )
 
-        if len( url ) > 0:
-            webbrowser.open( url )
+        webbrowser.open( url )
 
 
 #TODO Rename the source parameter to better reflect how it affects the date/time format.
