@@ -1075,20 +1075,17 @@ class IndicatorLunar:
                 menuItem = Gtk.MenuItem( _( "Satellites" ) )
                 menu.append( menuItem )
                 satelliteNumbersAndNames = sorted( satelliteNumbersAndNames, key = lambda x: ( x[ 1 ], x[ 0 ] ) )
+
+                if self.showSatellitesAsSubMenu:
+                    subMenu = Gtk.Menu()
+                    menuItem.set_submenu( subMenu )
+
                 for satelliteNumber, satelliteName in satelliteNumbersAndNames:
 
-#                     menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
-#                                                                  .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
-#                                                                  .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ satelliteNumber ].getInternationalDesignator() )
-
                     if self.showSatellitesAsSubMenu:
-                        subMenu = Gtk.Menu()
-                        menuItem.set_submenu( subMenu )
                         self.createSatelliteMenuNew( subMenu, satelliteNumber )
 
                     else:
-#                         menuItem = Gtk.MenuItem( pythonutils.indent( 1, 2 ) + menuText )
-#                         menu.append( menuItem )
                         self.createSatelliteMenuNew( menu, satelliteNumber )
 
 
