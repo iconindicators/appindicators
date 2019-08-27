@@ -1058,12 +1058,60 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
-#TODO Need to take into account circumpolar satellites...
-#If the user wants to show satellites by name, then circumpolar satellites can fit in the same list (just no rise/set, only az/alt).
-#If the user wants to show satellites by rise time, then circumpolar satellites need to live in their own submenu (showing only az/alt).
     def updateSatellitesMenu( self, menu ):
+        satellites = [ ]
+        satellitesCircumpolar = [ ]
+        for number in self.satellites:
+            key = ( astroPyephem.AstronomicalBodyType.Satellite, number )
+            if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
+                satellitesCircumpolar.append( [ number, self.satelliteTLEData[ number ].getName() ] )
+
+            elif key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
+                satellites.append( [ number, self.satelliteTLEData[ number ].getName() ] )
+
+        if self.satellitesSortByDateTime and ( satellites or satellitesCircumpolar ):
+            if satellites:
+#TODO Handle regular satellites...add in rise time.
+                pass
+
+            if satellitesCircumpolar:
+                menuItem = Gtk.MenuItem( _( "Satellites (Circumpolar)" ) )
+                menu.append( menuItem )
+                satellitesCircumpolar = sorted( satellitesCircumpolar, key = lambda x: ( x[ 1 ], x[ 0 ] ) )
+
+                if self.showSatellitesAsSubMenu:
+                    subMenu = Gtk.Menu()
+                    menuItem.set_submenu( subMenu )
+
+                for number, name in satellitesCircumpolar:
+                    self.createSatelliteMenuNew( menu, number )
+
+        if not self.satellitesSortByDateTime and ( satellites or satellitesCircumpolar ):
+            satellites = satellites + satellitesCircumpolar
+            menuItem = Gtk.MenuItem( _( "Satellites" ) )
+            menu.append( menuItem )
+            satellites = sorted( satellites, key = lambda x: ( x[ 1 ], x[ 0 ] ) )
+
+            if self.showSatellitesAsSubMenu:
+                subMenu = Gtk.Menu()
+                menuItem.set_submenu( subMenu )
+
+            for number, name in satellites:
+                self.createSatelliteMenuNew( menu, number )
+
+
+    def updateSatellitesMenuORIG( self, menu ):
         if self.satellitesSortByDateTime:
-            pass
+            satelliteNumbersAndNames = [ ]
+            satelliteNumbersAndNamesCircumpolar = [ ]
+            for satelliteNumber in self.satellites:
+                key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteNumber )
+                if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
+                    satelliteNumbersAndNamesCircumpolar.append( [ satelliteNumber, self.satelliteTLEData[ satelliteNumber ].getName() ] )
+
+                elif key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
+                    satelliteNumbersAndNames.append( [ satelliteNumber, self.satelliteTLEData[ satelliteNumber ].getName() ] )
+
         else:
             satelliteNumbersAndNames = [ ]
             for satelliteNumber in self.satellites:
@@ -1090,18 +1138,17 @@ class IndicatorLunar:
 
 
     def createSatelliteMenuNew( self, menu, satelliteNumber ):
-#TODO Why use this and not just join the name and number?  What is the international designator?
-        key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteNumber )
         menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, self.satelliteTLEData[ satelliteNumber ].getName() ) \
                                                      .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
                                                      .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ satelliteNumber ].getInternationalDesignator() )
- 
+
         menuItem = Gtk.MenuItem( pythonutils.indent( 1, 2 ) + menuText )
         menu.append( menuItem )
 
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
 
+        key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteNumber )
         if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
