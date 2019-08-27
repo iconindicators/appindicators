@@ -1077,30 +1077,30 @@ class IndicatorLunar:
                 satelliteNumbersAndNames = sorted( satelliteNumbersAndNames, key = lambda x: ( x[ 1 ], x[ 0 ] ) )
                 for satelliteNumber, satelliteName in satelliteNumbersAndNames:
 
-                    menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
-                                                                 .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
-                                                                 .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ satelliteNumber ].getInternationalDesignator() )
+#                     menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
+#                                                                  .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
+#                                                                  .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ satelliteNumber ].getInternationalDesignator() )
 
-                    if not self.showSatellitesAsSubMenu:
+                    if self.showSatellitesAsSubMenu:
                         subMenu = Gtk.Menu()
                         menuItem.set_submenu( subMenu )
                         self.createSatelliteMenuNew( subMenu, satelliteNumber )
- 
+
                     else:
-                        menuItem = Gtk.MenuItem( pythonutils.indent( 1, 2 ) + menuText )
-                        menu.append( menuItem )
+#                         menuItem = Gtk.MenuItem( pythonutils.indent( 1, 2 ) + menuText )
+#                         menu.append( menuItem )
                         self.createSatelliteMenuNew( menu, satelliteNumber )
 
 
     def createSatelliteMenuNew( self, menu, satelliteNumber ):
 #TODO Why use this and not just join the name and number?  What is the international designator?
         key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteNumber )
-#         menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, self.satelliteTLEData[ satelliteNumber ].getName() ) \
-#                                                      .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
-#                                                      .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ satelliteNumber ].getInternationalDesignator() )
-# 
-#         menuItem = Gtk.MenuItem( pythonutils.indent( 1, 2 ) + menuText )
-#         menu.append( menuItem )
+        menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, self.satelliteTLEData[ satelliteNumber ].getName() ) \
+                                                     .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
+                                                     .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ satelliteNumber ].getInternationalDesignator() )
+ 
+        menuItem = Gtk.MenuItem( pythonutils.indent( 1, 2 ) + menuText )
+        menu.append( menuItem )
 
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
