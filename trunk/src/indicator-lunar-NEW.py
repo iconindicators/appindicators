@@ -1112,8 +1112,6 @@ class IndicatorLunar:
         webbrowser.open( url )
 
 
-#TODO Rename the source parameter to better reflect how it affects the date/time format.
-#Or change source to be a date/time format, so that it is passed in.
     def getDisplayData( self, key, dateTimeFormat = None ):
         displayData = None
         if key[ 2 ] == astroPyephem.DATA_ALTITUDE or \
