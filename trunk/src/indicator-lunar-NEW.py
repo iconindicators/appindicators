@@ -1035,6 +1035,7 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
+#TODO Look at old satellite code...was there stuff to compute self.nextUpdate?
     def updateSatellitesMenu( self, menu ):
         satellites = [ ]
         satellitesCircumpolar = [ ]
