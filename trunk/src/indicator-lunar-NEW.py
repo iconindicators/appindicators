@@ -31,14 +31,6 @@
 #  http://www.flaticon.com/search/satellite
 
 
-#TODO Consider dropping the message always up (and circumpolar).
-#No point telling a user this as they can infer...
-#If there is no rise/set time, the object is always up.
-# Might need to rethink for satellites as they can orbit in odd ways so
-# it could be possible that for a location (near the poles) that some satellites will rise/set and some are circumpolar...
-# so have two sets of menus?
-
-
 #TODO
 # On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared:
 # 
@@ -63,17 +55,6 @@
 
 #TODO Consider removing the prefs for hide/show moon/sun.
 #That is, always show these...ask Oleg about this.
-
-
-#TODO Have sent a message to MPC to look at the data format as it looks odd for the two dodgy magnitude comets.
-#Maybe there is a way to screen out dodgy data?
-#MPC responded and they are looking into it.
-#
-#However given that all other bodies either have a fixed magnitude or none,
-# then comets are the only body with a magnitude that we care about.
-#Further, if we add minor planets (also from the MPC), then the magnitude problem could get even worse.
-#So we could show an OSD when the indicator starts up telling the user of bad mags,
-#but we could either show the mag with the comet and/or just in the data list in the preferences.
 
 
 #TODO Maybe show other stuff for comets?
@@ -104,7 +85,6 @@ gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
-from urllib.request import urlopen
 import astroPyephem, datetime, eclipse, glob, locale, logging, math, orbitalelement, os, pythonutils, re, tempfile, threading, twolineelement, webbrowser
 
 
