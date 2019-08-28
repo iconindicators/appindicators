@@ -530,9 +530,6 @@ class IndicatorLunar:
     MESSAGE_TRANSLATION_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
     MESSAGE_DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
-    
-    # Data is displayed using a default format, but when an alternate format is required, specify using a source below.
-    SOURCE_SATELLITE_NOTIFICATION = 0 #TODO Not sure if this will be kept...wait until getDisplayData is fixed.
 
 
     def __init__( self ):
@@ -864,10 +861,10 @@ class IndicatorLunar:
             self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ], self.data[ key + ( astroPyephem.DATA_SET_DATE_TIME, ) ] )
 
             # Parse the satellite summary/message to create the notification...
-            riseTime = self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
-            riseAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
-            setTime = self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
-            setAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ), IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION )
+            riseTime = self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
+            riseAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
+            setTime = self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
+            setAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
             tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
 
             summary = self.satelliteNotificationSummary. \
@@ -1136,7 +1133,7 @@ class IndicatorLunar:
 
 #TODO Rename the source parameter to better reflect how it affects the date/time format.
 #Or change source to be a date/time format, so that it is passed in.
-    def getDisplayData( self, key, source = None ):
+    def getDisplayData( self, key, dateTimeFormat = None ):
         displayData = None
         if key[ 2 ] == astroPyephem.DATA_ALTITUDE or \
            key[ 2 ] == astroPyephem.DATA_AZIMUTH or \
@@ -1153,10 +1150,10 @@ class IndicatorLunar:
              key[ 2 ] == astroPyephem.DATA_RISE_DATE_TIME or \
              key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
              key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
-                if source is None:
+                if dateTimeFormat is None:
                     displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ).replace( ' ', '  ' )
-                elif source == IndicatorLunar.SOURCE_SATELLITE_NOTIFICATION:
-                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) #TODO The format string is the format of the INPUT string, not the output
+                else:
+                    displayData = self.toLocalDateTimeString( self.data[ key ], dateTimeFormat ) #TODO The format string is the format of the INPUT string, not the output
 
         elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_LATITUDE:
             latitude = self.data[ key ]
