@@ -1070,6 +1070,7 @@ class IndicatorLunar:
                 satellites.append( [ number, self.satelliteTLEData[ number ].getName(), self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ] ] )
 
         if self.satellitesSortByDateTime and satellites:
+            print( "sort by date/time and satellites")
             satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
             menuItem = Gtk.MenuItem( _( "Satellites" ) )
             menu.append( menuItem )
@@ -1080,7 +1081,8 @@ class IndicatorLunar:
             for number, name, riseDateTime in satellites:
                 self.createSatelliteMenuNew( menu, number )
 
-        elif self.satellitesSortByDateTime and satellitesCircumpolar:
+        if self.satellitesSortByDateTime:# and satellitesCircumpolar:
+            print( "sort by date/time and satellites circumpolar")
             satellites = sorted( satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
             menuItem = Gtk.MenuItem( _( "Satellites (Circumpolar)" ) )
             menu.append( menuItem )
@@ -1091,8 +1093,9 @@ class IndicatorLunar:
             for number, name, riseDateTime in satellites:
                 self.createSatelliteMenuNew( menu, number )
 
-        elif not self.satellitesSortByDateTime and ( satellites or satellitesCircumpolar ):
-            satellites = sorted( satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
+        if not self.satellitesSortByDateTime and ( satellites or satellitesCircumpolar ):
+            print( "not sort by date/time and satellites")
+            satellites = sorted( satellites + satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
             menuItem = Gtk.MenuItem( _( "Satellites" ) )
             menu.append( menuItem )
             if self.showSatellitesAsSubMenu:
@@ -1101,39 +1104,6 @@ class IndicatorLunar:
 
             for number, name, riseDateTime in satellites:
                 self.createSatelliteMenuNew( menu, number )
-
-
-
-
-        if satellites or satellitesCircumpolar:
-            if not self.satellitesSortByDateTime:# TODO and ( satellites or satellitesCircumpolar ):
-                print("sort by date/time")
-                menuItem = Gtk.MenuItem( _( "Satellites" ) )
-                menu.append( menuItem )
-                satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
-
-                if self.showSatellitesAsSubMenu:
-                    subMenu = Gtk.Menu()
-                    menuItem.set_submenu( subMenu )
-
-                for number, name, riseDateTime in satellites:
-                    self.createSatelliteMenuNew( menu, number )
-
-#TODO Circumpolar
-
-            else:
-                print("sort by name")
-                satellites = satellites + satellitesCircumpolar
-                menuItem = Gtk.MenuItem( _( "Satellites" ) )
-                menu.append( menuItem )
-                satellites = sorted( satellites, key = lambda x: ( x[ 1 ], x[ 0 ] ) )
-
-                if self.showSatellitesAsSubMenu:
-                    subMenu = Gtk.Menu()
-                    menuItem.set_submenu( subMenu )
-
-                for number, name, riseDateTime in satellites:
-                    self.createSatelliteMenuNew( menu, number )
 
 
     def updateSatellitesMenuORIG( self, menu ):
