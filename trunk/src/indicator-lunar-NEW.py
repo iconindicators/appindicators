@@ -1070,77 +1070,24 @@ class IndicatorLunar:
                 satellites.append( [ number, self.satelliteTLEData[ number ].getName(), self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ] ] )
 
         if self.satellitesSortByDateTime and satellites:
-            print( "sort by date/time and satellites")
             satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
             menuItem = Gtk.MenuItem( _( "Satellites" ) )
-            menu.append( menuItem )
-            if self.showSatellitesAsSubMenu:
-                subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
 
-            for number, name, riseDateTime in satellites:
-                self.createSatelliteMenuNew( menu, number )
-
-        if self.satellitesSortByDateTime:# and satellitesCircumpolar:
-            print( "sort by date/time and satellites circumpolar")
+        if self.satellitesSortByDateTime and satellitesCircumpolar:
             satellites = sorted( satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
             menuItem = Gtk.MenuItem( _( "Satellites (Circumpolar)" ) )
-            menu.append( menuItem )
-            if self.showSatellitesAsSubMenu:
-                subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
-
-            for number, name, riseDateTime in satellites:
-                self.createSatelliteMenuNew( menu, number )
 
         if not self.satellitesSortByDateTime and ( satellites or satellitesCircumpolar ):
-            print( "not sort by date/time and satellites")
             satellites = sorted( satellites + satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
             menuItem = Gtk.MenuItem( _( "Satellites" ) )
-            menu.append( menuItem )
-            if self.showSatellitesAsSubMenu:
-                subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
 
-            for number, name, riseDateTime in satellites:
-                self.createSatelliteMenuNew( menu, number )
+        menu.append( menuItem )
+        if self.showSatellitesAsSubMenu:
+            subMenu = Gtk.Menu()
+            menuItem.set_submenu( subMenu )
 
-
-    def updateSatellitesMenuORIG( self, menu ):
-        if self.satellitesSortByDateTime:
-            satelliteNumbersAndNames = [ ]
-            satelliteNumbersAndNamesCircumpolar = [ ]
-            for satelliteNumber in self.satellites:
-                key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteNumber )
-                if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
-                    satelliteNumbersAndNamesCircumpolar.append( [ satelliteNumber, self.satelliteTLEData[ satelliteNumber ].getName() ] )
-
-                elif key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-                    satelliteNumbersAndNames.append( [ satelliteNumber, self.satelliteTLEData[ satelliteNumber ].getName() ] )
-
-        else:
-            satelliteNumbersAndNames = [ ]
-            for satelliteNumber in self.satellites:
-                key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteNumber )
-                if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data or key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-                    satelliteNumbersAndNames.append( [ satelliteNumber, self.satelliteTLEData[ satelliteNumber ].getName() ] )
-
-            if satelliteNumbersAndNames:
-                menuItem = Gtk.MenuItem( _( "Satellites" ) )
-                menu.append( menuItem )
-                satelliteNumbersAndNames = sorted( satelliteNumbersAndNames, key = lambda x: ( x[ 1 ], x[ 0 ] ) )
-
-                if self.showSatellitesAsSubMenu:
-                    subMenu = Gtk.Menu()
-                    menuItem.set_submenu( subMenu )
-
-                for satelliteNumber, satelliteName in satelliteNumbersAndNames:
-
-                    if self.showSatellitesAsSubMenu:
-                        self.createSatelliteMenuNew( subMenu, satelliteNumber )
-
-                    else:
-                        self.createSatelliteMenuNew( menu, satelliteNumber )
+        for number, name, riseDateTime in satellites:
+            self.createSatelliteMenuNew( menu, number )
 
 
     def createSatelliteMenuNew( self, menu, satelliteNumber ):
@@ -1174,201 +1121,6 @@ class IndicatorLunar:
         for child in subMenu.get_children():
             child.set_name( satelliteNumber )
             child.connect( "activate", self.onSatellite )
-
-
-    def updateSatellitesMenuORIG( self, menu ):
-        menuTextSatelliteNameNumberRiseTimes = [ ]
-        for satelliteName, satelliteNumber in self.satellites:
-            key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
-            if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-                internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
-                riseTime = self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ]
-            elif key + ( astroPyephem.DATA_MESSAGE, ) in self.data and self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
-                internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
-                riseTime = self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] #TODO SHould not be a rise time but a message...fix.
-            else:
-                print( "Dodgy satellite information:", key )
-                pass #TODO Maybe log as we should not hit this.
-
-            menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
-                                                         .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
-                                                         .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, internationalDesignator )
-
-            menuTextSatelliteNameNumberRiseTimes.append( [ menuText, satelliteName, satelliteNumber, riseTime ] )
-
-        if self.satellitesSortByDateTime:
-            menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 3 ], x[ 0 ], x[ 1 ], x[ 2 ] ) )
-        else:
-            menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ], x[ 3 ] ) )
-
-        satellitesMenuItem = Gtk.MenuItem( _( "Satellites" ) )
-        menu.append( satellitesMenuItem )
-        if self.showSatellitesAsSubMenu:
-            satellitesSubMenu = Gtk.Menu()
-            satellitesMenuItem.set_submenu( satellitesSubMenu )
-
-        indent = pythonutils.indent( 0, 2 )
-        for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
-            self.createSatelliteMenu( satelliteName, satelliteNumber, menuText )
-
-
-    def createSatelliteMenu( self, satelliteName, satelliteNumber, menuText ):
-        key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
-        subMenu = Gtk.Menu()
-        if key + ( astroPyephem.DATA_MESSAGE, ) in self.data:
-            if self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
-                subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
-
-            subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( astroPyephem.DATA_MESSAGE, ) ) ) )
-        else:
-#TODO Test this...
-#Hide notification and make all passes visible (comment out the check for visible only passes).
-#Check the maths for when a satellite is more than two minutes from rising,
-#also for a satellite yet to rise,
-#also a satellite currently rising.
-
-            riseTime = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-            dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60 # If the satellite is currently rising, we'll get a negative but that's okay.
-            if dateTimeDifferenceInMinutes > 2: # If this satellite will rise more than two minutes from now, then only show the rise time.
-                subMenu.append( Gtk.MenuItem( indent + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
-
-            else: # This satellite will rise within the next two minutes, so show all data.
-#TODO Test this during a satellite pass for both GNOME Shell and Unity.
-#I suspect Unity needs an extra indent on the date/time and azimuth menu items.
-                subMenu.append( Gtk.MenuItem( indent + _( "Rise" ) ) )
-                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
-                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ) ) )
-
-                subMenu.append( Gtk.MenuItem( indent + _( "Set" ) ) )
-                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) ) )
-                subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ) ) )
-
-            # Add the rise to the next update, ensuring it is not in the past.
-            # Subtract a minute from the rise time to spoof the next update to happen earlier.
-            # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
-            riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) - datetime.timedelta( minutes = 1 )
-            if riseTimeMinusOneMinute > utcNow:
-                self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate ) #TODO Verify the format of riseTimeMinuOneMinute is the same as self.nextUpdate
-
-            # Add the set time to the next update, ensuring it is not in the past.
-            if self.data[ key + ( astroPyephem.DATA_SET_DATE_TIME, ) ] > str( utcNow ):
-                self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( astroPyephem.DATA_SET_DATE_TIME, ) ], self.nextUpdate )
-
-        # Add handler.
-        for child in subMenu.get_children():
-            child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
-            child.connect( "activate", self.onSatellite )
-
-        if self.showSatellitesAsSubMenu:
-            menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + menuText )
-            satellitesSubMenu.append( menuItem )
-        else:
-            menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + menuText )
-            menu.append( menuItem )
-
-        menuItem.set_submenu( subMenu )
-
-
-    def updateSatellitesMenuORIGINAL( self, menu ):
-        menuTextSatelliteNameNumberRiseTimes = [ ]
-        for satelliteName, satelliteNumber in self.satellites: # key is satellite name/number.
-            key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
-            if key + ( astroPyephem.DATA_MESSAGE, ) in self.data and \
-               (
-                    self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_DATA_NO_DATA or \
-                    self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_NEVER_RISES or \
-                    self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME or \
-                    self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS or \
-                    self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_VALUE_ERROR
-               ):
-                continue
-
-            if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-                internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
-                riseTime = self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ]
-            elif key + ( astroPyephem.DATA_MESSAGE, ) in self.data and \
-                 self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] != astroPyephem.MESSAGE_DATA_NO_DATA: # Any message other than "no data" will have satellite TLE data.
-                internationalDesignator = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ].getInternationalDesignator()
-                riseTime = self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ]
-            else:
-                internationalDesignator = "" # No TLE data so cannot retrieve any information about the satellite.
-                riseTime = self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ]
-
-            menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteName ) \
-                                                         .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
-                                                         .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, internationalDesignator )
-
-            menuTextSatelliteNameNumberRiseTimes.append( [ menuText, satelliteName, satelliteNumber, riseTime ] )
-
-        if len( menuTextSatelliteNameNumberRiseTimes ) > 0:
-            if self.satellitesSortByDateTime:
-                menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 3 ], x[ 0 ], x[ 1 ], x[ 2 ] ) )
-            else:
-                menuTextSatelliteNameNumberRiseTimes = sorted( menuTextSatelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ], x[ 3 ] ) )
-
-            satellitesMenuItem = Gtk.MenuItem( _( "Satellites" ) )
-            menu.append( satellitesMenuItem )
-            if self.showSatellitesAsSubMenu:
-                satellitesSubMenu = Gtk.Menu()
-                satellitesMenuItem.set_submenu( satellitesSubMenu )
-
-            utcNow = datetime.datetime.utcnow()
-            indent = pythonutils.indent( 0, 2 )
-            for menuText, satelliteName, satelliteNumber, riseTime in menuTextSatelliteNameNumberRiseTimes: # key is satellite name/number.
-                key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteName + " " + satelliteNumber )
-                subMenu = Gtk.Menu()
-                if key + ( astroPyephem.DATA_MESSAGE, ) in self.data:
-                    if self.data[ key + ( astroPyephem.DATA_MESSAGE, ) ] == astroPyephem.MESSAGE_SATELLITE_IS_CIRCUMPOLAR:
-                        subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
-
-                    subMenu.append( Gtk.MenuItem( self.getDisplayData( key + ( astroPyephem.DATA_MESSAGE, ) ) ) )
-                else:
-#TODO Test this...
-#Hide notification and make all passes visible (comment out the check for visible only passes).
-#Check the maths for when a satellite is more than two minutes from rising,
-#also for a satellite yet to rise,
-#also a satellite currently rising.
-
-                    riseTime = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-                    dateTimeDifferenceInMinutes = ( riseTime - utcNow ).total_seconds() / 60 # If the satellite is currently rising, we'll get a negative but that's okay.
-                    if dateTimeDifferenceInMinutes > 2: # If this satellite will rise more than two minutes from now, then only show the rise time.
-                        subMenu.append( Gtk.MenuItem( indent + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
-
-                    else: # This satellite will rise within the next two minutes, so show all data.
-#TODO Test this during a satellite pass for both GNOME Shell and Unity.
-#I suspect Unity needs an extra indent on the date/time and azimuth menu items.
-                        subMenu.append( Gtk.MenuItem( indent + _( "Rise" ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ) ) )
-
-                        subMenu.append( Gtk.MenuItem( indent + _( "Set" ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) ) )
-                        subMenu.append( Gtk.MenuItem( indent + indent + pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ) ) )
-
-                    # Add the rise to the next update, ensuring it is not in the past.
-                    # Subtract a minute from the rise time to spoof the next update to happen earlier.
-                    # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
-                    riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) - datetime.timedelta( minutes = 1 )
-                    if riseTimeMinusOneMinute > utcNow:
-                        self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate )
-
-                    # Add the set time to the next update, ensuring it is not in the past.
-                    if self.data[ key + ( astroPyephem.DATA_SET_DATE_TIME, ) ] > str( utcNow ):
-                        self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( astroPyephem.DATA_SET_DATE_TIME, ) ], self.nextUpdate )
-
-                # Add handler.
-                for child in subMenu.get_children():
-                    child.set_name( satelliteName + "-----" + satelliteNumber ) # Cannot pass the tuple - must be a string.
-                    child.connect( "activate", self.onSatellite )
-
-                if self.showSatellitesAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + menuText )
-                    satellitesSubMenu.append( menuItem )
-                else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + menuText )
-                    menu.append( menuItem )
-
-                menuItem.set_submenu( subMenu )
 
 
     def onSatellite( self, widget ):
