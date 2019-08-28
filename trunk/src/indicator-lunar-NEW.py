@@ -1095,6 +1095,23 @@ class IndicatorLunar:
         else:
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
 
+#TODO see original code as there is more above this section below.
+# Rather than muck around with fudging times (apart from setting the rise time a minute earlier), 
+# get the code that works out when to do the next update and ensure that the next update time >= utc now (computed then and there).
+#
+
+# # Add the rise to the next update, ensuring it is not in the past.
+# # Subtract a minute from the rise time to spoof the next update to happen earlier.
+# # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
+# riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
+# if riseTimeMinusOneMinute > utcNow:
+# self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate )
+# 
+# # Add the set time to the next update, ensuring it is not in the past.
+# if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > str( utcNow ):
+# self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
+
+
         # Add handler.
         for child in subMenu.get_children():
             child.set_name( satelliteNumber )
