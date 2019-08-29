@@ -1163,6 +1163,7 @@ class IndicatorLunar:
 
     def getDisplayData( self, key, dateTimeFormat = None ):
         displayData = None
+
         if key[ 2 ] == astroPyephem.DATA_ALTITUDE or \
            key[ 2 ] == astroPyephem.DATA_AZIMUTH or \
            key[ 2 ] == astroPyephem.DATA_RISE_AZIMUTH or \
@@ -1210,7 +1211,6 @@ class IndicatorLunar:
         elif key[ 2 ] == astroPyephem.DATA_PHASE:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
 
-#TODO Maybe this should be else rather than None?
         if displayData is None:  # Returning None is not good but better to let it crash and find out about it than hide the problem.
             logging.error( "Unknown/unhandled key: " + key )
 
@@ -2242,6 +2242,7 @@ class IndicatorLunar:
         bodyTag = key[ 1 ]
         dataTag = key[ 2 ]
 
+#TODO How can the astro body type be none?
         isCometOrMinorPlanetOrSatellite = \
             astronomicalBodyType is not None and \
             (
@@ -2252,6 +2253,10 @@ class IndicatorLunar:
 
         if isCometOrMinorPlanetOrSatellite:
             translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Don't translate the names of the comets/satellites.
+
+            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite: print( key, value ) #TODO Testing
+
+        
         else:
             translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets/stars, etc.
 

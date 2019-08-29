@@ -579,7 +579,7 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
 
         except ValueError:
             if satellite.circumpolar:
-                data[ key + ( DATA_AZIMUTH, ) ] = str( satellite.az )
+                data[ key + ( DATA_AZIMUTH, ) ] = str( str( repr( satellite.az ) ) )
                 data[ key + ( DATA_ALTITUDE, ) ] = str( satellite.alt )
             break
 
@@ -603,9 +603,9 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
         # If a satellite is in transit or will rise within five minutes of now, then show all information...
         if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ):
             data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
-            data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 1 ] )
+            data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString( str( repr( nextPass[ 1 ] ) ) )
             data[ key + ( DATA_SET_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 4 ].datetime() )
-            data[ key + ( DATA_SET_AZIMUTH, ) ] = pythonutils.toDateTimeString( nextPass[ 5 ] )
+            data[ key + ( DATA_SET_AZIMUTH, ) ] = pythonutils.toDateTimeString( str( repr( nextPass[ 5 ] ) ) )
 
         else: # Satellite will rise later, so only add rise time.
             data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
