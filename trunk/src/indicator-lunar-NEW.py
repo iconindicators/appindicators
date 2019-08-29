@@ -651,8 +651,6 @@ class IndicatorLunar:
 #             if True: sys.exit( 0 )
 
             # Update frontend...
-            self.nextUpdate = str( datetime.datetime.utcnow() + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
-
             utcNow = datetime.datetime.utcnow()
             self.updateMenu() #TODO Takes 5 seconds...what is the biggest drain?  Satellites?
             print( "updateMenu:", ( datetime.datetime.utcnow() - utcNow ) )
@@ -667,17 +665,55 @@ class IndicatorLunar:
 #             if self.showSatelliteNotification:
 #                 self.notificationSatellites()
 
-#TODO The line below is wrong and unnecessary...I think!
-#             self.nextUpdate = self.toDateTime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) # Parse from string back into a datetime.
-            nextUpdateInSeconds = int( ( self.toDateTime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) - datetime.datetime.utcnow() ).total_seconds() )
+            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
 
-            # Ensure the update period is positive, at most every minute and at least every hour.
-            if nextUpdateInSeconds < 60:
-                nextUpdateInSeconds = 60
-            elif nextUpdateInSeconds > ( 60 * 60 ):
-                nextUpdateInSeconds = ( 60 * 60 )
 
-            self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.update, True )
+    def getNextUpdateTimeInSeconds( self ):
+        utcNow = datetime.datetime.utcnow()
+        utcNowString = str( utcNow )
+        nextUpdateTime = str( utcNow + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
+        for key in self.data:
+            if key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
+               key[ 2 ] == astroPyephem.DATA_FIRST_QUARTER or \
+               key[ 2 ] == astroPyephem.DATA_FULL or \
+               key[ 2 ] == astroPyephem.DATA_NEW or \
+               key[ 2 ] == astroPyephem.DATA_RISE_DATE_TIME or \
+               key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
+               key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
+
+#TODO Verify this works for strings if a time is 08:xx:yy versus 18:xx:yy...is the 18 greater?
+#Or do we need to do the comparison as datetime objects?    
+                if self.data[ key ] < nextUpdateTime and self.data[ key ] > utcNowString:
+                    nextUpdateTime = self.data[ key ]
+
+
+#TODO see satellite code in original indicator-lunar 
+# Rather than muck around with fudging times (apart from setting the rise time a minute earlier), 
+# get the code that works out when to do the next update and ensure
+# that the next update time >= utc now 
+#  
+# # Add the rise to the next update, ensuring it is not in the past.
+# # Subtract a minute from the rise time to spoof the next update to happen earlier.
+# # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
+# riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
+# if riseTimeMinusOneMinute > utcNow:
+# self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate )
+# 
+# # Add the set time to the next update, ensuring it is not in the past.
+# if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > str( utcNow ):
+# self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
+
+
+#TODO Need the code below?              
+#             nextUpdateInSeconds = int( ( self.toDateTime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) - datetime.datetime.utcnow() ).total_seconds() )
+# 
+#             # Ensure the update period is positive, at most every minute and at least every hour.
+#             if nextUpdateInSeconds < 60:
+#                 nextUpdateInSeconds = 60
+#             elif nextUpdateInSeconds > ( 60 * 60 ):
+#                 nextUpdateInSeconds = ( 60 * 60 )
+
+        return 100 #TODO REturn the calculated value!
 
 
     def updateMenu( self ):
@@ -895,7 +931,6 @@ class IndicatorLunar:
         indent = pythonutils.indent( 1, 2 )
         for dateTime, displayText, key in nextPhases:
             menuItem.get_submenu().append( Gtk.MenuItem( indent + displayText + self.getDisplayData( key ) ) )
-            self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, dateTime )
 
         menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
         self.updateEclipseMenu( menuItem.get_submenu(), astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
@@ -1021,13 +1056,11 @@ class IndicatorLunar:
 
         if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
             subMenu.append( Gtk.MenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
-            self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ] )
 
         else:
             if key + ( astroPyephem.DATA_SET_DATE_TIME, ) in self.data:
                 subMenu.append( Gtk.MenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) ) )
                 subMenu.append( Gtk.SeparatorMenuItem() )
-                self.nextUpdate = self.getSmallestDateTime( self.nextUpdate, self.data[ key + ( astroPyephem.DATA_SET_DATE_TIME, ) ] )
 
             subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
             subMenu.append( Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
@@ -1035,7 +1068,6 @@ class IndicatorLunar:
         menuItem.set_submenu( subMenu )
 
 
-#TODO Look at old satellite code...was there stuff to compute self.nextUpdate?
     def updateSatellitesMenu( self, menu ):
         satellites = [ ]
         satellitesCircumpolar = [ ]
@@ -1094,23 +1126,6 @@ class IndicatorLunar:
 
         else:
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
-
-#TODO see original code as there is more above this section below.
-# Rather than muck around with fudging times (apart from setting the rise time a minute earlier), 
-# get the code that works out when to do the next update and ensure that the next update time >= utc now (computed then and there).
-#
-
-# # Add the rise to the next update, ensuring it is not in the past.
-# # Subtract a minute from the rise time to spoof the next update to happen earlier.
-# # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
-# riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
-# if riseTimeMinusOneMinute > utcNow:
-# self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate )
-# 
-# # Add the set time to the next update, ensuring it is not in the past.
-# if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > str( utcNow ):
-# self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
-
 
         # Add handler.
         for child in subMenu.get_children():
