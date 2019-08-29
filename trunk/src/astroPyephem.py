@@ -52,6 +52,12 @@ DATA_SET_AZIMUTH = "SET AZIMUTH"
 DATA_SET_DATE_TIME = "SET DATE TIME"
 DATA_THIRD_QUARTER = "THIRD QUARTER"
 
+DATA_INTERNAL = [
+    DATA_BRIGHT_LIMB,
+    DATA_ELEVATION,
+    DATA_ILLUMINATION,
+    DATA_MAGNITUDE ]
+
 #TODO Are these sub-lists needed?  They are not referenced in the indicator front end.
 DATA_COMET = [
     DATA_RISE_AZIMUTH,
@@ -226,6 +232,9 @@ LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
 LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
 LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
+MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
+MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
+
 
 # Returns a dict with astronomical information...
 #     Key is a tuple of AstronomicalBodyType, a name tag and a data tag.
@@ -300,6 +309,18 @@ def getCities(): return sorted( _city_data.keys(), key = locale.strxfrm )
 def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[ 0 ] ), \
                                                   float( _city_data.get( city )[ 1 ] ), \
                                                   _city_data.get( city )[ 2 ]
+
+
+def getItemsLessThanMagnitude( items, orbitalElementData, maximumMagnitude ):
+    results = [ ]
+    for item in items:
+        body = ephem.readdb( orbitalElementData[ item ].getData() )
+        body.compute( ephem.city( "London" ) ) # Use any city; makes no difference to obtain the magnitude.
+        bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
+        if not bad and body.mag >= MAGNITUDE_MINIMUM and body.mag <= maximumMagnitude:
+            results.append(item )
+
+    return results
 
 
 # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -463,7 +484,6 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
 #     mags = [ 0, 0, 0, 0, 0, 0 ]
 #     magsAndAbove = [ 0, 0, 0, 0, 0, 0 ]
 
-    MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
             body = ephem.readdb( cometOrMinorPlanetData[ key ].getData() )

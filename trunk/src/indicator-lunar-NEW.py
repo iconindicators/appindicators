@@ -148,15 +148,13 @@ class IndicatorLunar:
     DATA_TAGS_TRANSLATIONS = {
         astroPyephem.DATA_ALTITUDE             : _( "ALTITUDE" ),
         astroPyephem.DATA_AZIMUTH              : _( "AZIMUTH" ),
-        astroPyephem.DATA_DAWN                 : _( "DAWN" ),
-        astroPyephem.DATA_DUSK                 : _( "DUSK" ),
         astroPyephem.DATA_ECLIPSE_DATE_TIME    : _( "ECLIPSE DATE TIME" ),
         astroPyephem.DATA_ECLIPSE_LATITUDE     : _( "ECLIPSE LATITUDE" ),
         astroPyephem.DATA_ECLIPSE_LONGITUDE    : _( "ECLIPSE LONGITUDE" ),
         astroPyephem.DATA_ECLIPSE_TYPE         : _( "ECLIPSE TYPE" ),
         astroPyephem.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
         astroPyephem.DATA_FULL                 : _( "FULL" ),
-        astroPyephem.DATA_MAGNITUDE            : _( "MAGNITUDE" ),
+        astroPyephem.DATA_MAGNITUDE            : _( "MAGNITUDE" ), #TODO Not yet used...if not used, add to internal tags; if used, add to display data and show as needed.
         astroPyephem.DATA_NEW                  : _( "NEW" ),
         astroPyephem.DATA_PHASE                : _( "PHASE" ),
         astroPyephem.DATA_RISE_AZIMUTH         : _( "RISE AZIMUTH" ),
@@ -598,6 +596,10 @@ class IndicatorLunar:
 # 
 
 
+#TODO If the backend/frontend are updating, and the user clicks on about/prefs, show a notification to tell the user they're blocked?
+#What about the other way?  If the about/prefs are open, disable the updates?
+
+
 #TODO Maybe add a preference that hides an object if below the horizon (but will rise).
 # How does this effect satellites?    
     def update( self, scheduled ):
@@ -621,10 +623,28 @@ class IndicatorLunar:
             if self.satellitesAddNew and self.satelliteTLEData is not None:
                 self.addNewSatellites()
 
-#TODO Testing
-#             self.addNewComets()
-#             self.addNewMinorPlanets()
-#             self.addNewSatellites()
+#TODO Cannot pass entire list of minor planets (and comets) to the Preferences as the list is too big.
+# So maybe after the data is downloaded or pulled from the cache,
+# pass the list to the backend (with a new function) and have that function return a list of comets/mps
+# which have a magnitude less than say 20.
+#Do this after data is downloaded/cached but before added (if add is true)?  Certainly before doing the backend calculations?
+            cometsCulled = astroPyephem.getItemsLessThanMagnitude( self.comets, self.cometOEData, astroPyephem.MAGNITUDE_MAXIMUM )
+            print( len( self.comets ), len( cometsCulled ) )
+            minorPlanetsCulled = astroPyephem.getItemsLessThanMagnitude( self.minorPlanets, self.minorPlanetOEData, astroPyephem.MAGNITUDE_MAXIMUM )
+            print( len( self.minorPlanets ), len( minorPlanetsCulled ) )
+            print( len( self.satellites ) )
+
+# 20
+# 1027 127
+# 18169 544
+# 158
+
+# 15
+# 1027 11
+# 18169 79
+# 158
+
+
 
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             # Value is the astronomical data (or equivalent) as a string.
@@ -639,17 +659,13 @@ class IndicatorLunar:
                                                           self.satellites, None if self.satelliteTLEData is None else self.satelliteTLEData,
                                                           self.comets, None if self.cometOEData is None else self.cometOEData,
                                                           self.minorPlanets, None if self.minorPlanetOEData is None else self.minorPlanetOEData,
-                                                          float( self.magnitude ) )
+                                                          self.magnitude )
 
 #TODO After the backend is done, filter the comet and minor planet listings
 # to only those present in the data.
 #This will only be bodies that have the right magnitude and will rise (or always up).
 #What we want is a list of bodies that match the magnitude (to show in the prefereneces). 
 #So maybe run the backend again or have a function to get just this information?
-
-#TODO Remove when all done!
-#             import sys
-#             if True: sys.exit( 0 )
 
             # Update frontend...
             utcNow = datetime.datetime.utcnow()
@@ -714,7 +730,7 @@ class IndicatorLunar:
 #             elif nextUpdateInSeconds > ( 60 * 60 ):
 #                 nextUpdateInSeconds = ( 60 * 60 )
 
-        return 100 #TODO REturn the calculated value!
+        return 10000 #TODO REturn the calculated value!
 
 
     def updateMenu( self ):
@@ -1153,9 +1169,7 @@ class IndicatorLunar:
            key[ 2 ] == astroPyephem.DATA_SET_AZIMUTH:
             displayData = str( round( math.degrees( float( self.data[ key ] ) ) ) ) + "°"
 
-        elif key[ 2 ] == astroPyephem.DATA_DAWN or \
-             key[ 2 ] == astroPyephem.DATA_DUSK or \
-             key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
+        elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
              key[ 2 ] == astroPyephem.DATA_FIRST_QUARTER or \
              key[ 2 ] == astroPyephem.DATA_FULL or \
              key[ 2 ] == astroPyephem.DATA_NEW or \
@@ -1387,8 +1401,8 @@ class IndicatorLunar:
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
-        self.tagsAdded = { } # A list would use less memory, but a dict (after running timing tests) is significantly faster!
-        self.tagsRemoved = { } # See above!
+        self.tagsAdded = { }
+        self.tagsRemoved = { }
 
         COLUMN_TAG = 0
         COLUMN_TRANSLATED_TAG = 1
@@ -1396,14 +1410,12 @@ class IndicatorLunar:
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
         for key in self.data.keys():
-            if key[ 2 ] == astroPyephem.DATA_BRIGHT_LIMB or key[ 2 ] == astroPyephem.DATA_ILLUMINATION:
-                continue # Some data tags are only present for calculations, not intended for the end user.
-
-            self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
-            tag = "[" + key[ 1 ] + " " + key[ 2 ] + "]"
-            if tag in tags:
-                i = tags.index( tag )
-                tags[ i ] = ""
+            if key[ 2 ] not in astroPyephem.DATA_INTERNAL:
+                self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
+                tag = "[" + key[ 1 ] + " " + key[ 2 ] + "]"
+                if tag in tags:
+                    i = tags.index( tag )
+                    tags[ i ] = ""
 
         unknownTags = [ ]
         for tag in tags:
@@ -1530,7 +1542,7 @@ class IndicatorLunar:
         spinnerMagnitude = Gtk.SpinButton()
         spinnerMagnitude.set_numeric( True )
         spinnerMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
-        spinnerMagnitude.set_adjustment( Gtk.Adjustment( self.magnitude, -10, 15, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerMagnitude.set_adjustment( Gtk.Adjustment( self.magnitude, int( astroPyephem.MAGNITUDE_MINIMUM ), int( astroPyephem.MAGNITUDE_MAXIMUM ), 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerMagnitude.set_value( self.magnitude ) # ...so need to force the initial value by explicitly setting it.
         spinnerMagnitude.set_tooltip_text( _(
             "Comets and minor planets with a magnitude\n" + \
@@ -1628,408 +1640,408 @@ class IndicatorLunar:
 
         notebook.append_page( box, Gtk.Label( _( "Planets / Stars" ) ) )
 
-        # Comets.
-        cometGrid = Gtk.Grid()
-        cometGrid.set_column_spacing( 10 )
-        cometGrid.set_row_spacing( 10 )
-        cometGrid.set_margin_left( 10 )
-        cometGrid.set_margin_right( 10 )
-        cometGrid.set_margin_top( 10 )
-        cometGrid.set_margin_bottom( 10 )
-
-        cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
-        cometStoreSort = Gtk.TreeModelSort( model = cometStore )
-        cometStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
-
-        tree = Gtk.TreeView( cometStoreSort )
-        tree.set_tooltip_text( _(
-            "Check a comet to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "will toggle all checkboxes." ) )
-
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, cometStore, cometStoreSort, astroPyephem.AstronomicalBodyType.Comet )
-        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
-        treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore, cometStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.Comet )
-        tree.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
-        tree.append_column( treeViewColumn )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( tree )
-        cometGrid.attach( scrolledWindow, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label( _( "Comet OE data" ) ), False, False, 0 )
-
-        self.cometOEDataNew = None
-        self.cometOEURLNew = None
-
-        cometURLEntry = Gtk.Entry()
-        cometURLEntry.set_text( self.cometOEURL )
-        cometURLEntry.set_tooltip_text( _(
-            "The URL from which to source\n" + \
-            "comet OE data.\n\n" + \
-            "To specify a local file, use 'file:///'\n" + \
-            "and the filename.\n\n" + \
-            "Set a bogus URL such as 'http://'\n" + \
-            "to disable." ) )
-        box.pack_start( cometURLEntry, True, True, 0 )
-
-        fetch = Gtk.Button( _( "Fetch" ) )
-        fetch.set_tooltip_text( _(
-            "Retrieve the comet OE data.\n\n" + \
-            "If the URL is empty, the default\n" + \
-            "URL will be used.\n\n" + \
-            "If using the default URL, the\n" + \
-            "download may be blocked to\n" + \
-            "avoid burdening the source." ) )
-        fetch.connect( "clicked",
-                       self.onFetchCometSatelliteData,
-                       cometURLEntry,
-                       cometGrid,
-                       cometStore,
-                       astroPyephem.AstronomicalBodyType.Comet,
-                       IndicatorLunar.COMET_OE_URL,
-                       IndicatorLunar.COMET_OE_CACHE_BASENAME,
-                       IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS,
-                       self.lastUpdateCometOE,
-                       IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS,
-                       _( "Comet data fetch aborted" ),
-                       _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
-                       self.getCometOEData )
-        box.pack_start( fetch, False, False, 0 )
-        cometGrid.attach( box, 0, 1, 1, 1 )
-
-        notebook.append_page( cometGrid, Gtk.Label( _( "Comets" ) ) )
-
-        # Minor Planets.
-        minorPlanetGrid = Gtk.Grid() #TODO Need to add to same place below as cometGrid
-        minorPlanetGrid.set_column_spacing( 10 )
-        minorPlanetGrid.set_row_spacing( 10 )
-        minorPlanetGrid.set_margin_left( 10 )
-        minorPlanetGrid.set_margin_right( 10 )
-        minorPlanetGrid.set_margin_top( 10 )
-        minorPlanetGrid.set_margin_bottom( 10 )
-
-        minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
-        minorPlanetStoreSort = Gtk.TreeModelSort( model = minorPlanetStore )
-        minorPlanetStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
-
-        tree = Gtk.TreeView( minorPlanetStoreSort )
-        tree.set_tooltip_text( _(
-            "Check a minor planet to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "will toggle all checkboxes." ) )
-
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, minorPlanetStore, minorPlanetStoreSort, astroPyephem.AstronomicalBodyType.MinorPlanet)
-        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
-        treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, minorPlanetStore, minorPlanetStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.MinorPlanet )
-        tree.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
-        tree.append_column( treeViewColumn )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( tree )
-        minorPlanetGrid.attach( scrolledWindow, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label( _( "Minor Planet OE data" ) ), False, False, 0 ) #TODO New translation
-
-        self.minorPlanetOEDataNew = None
-        self.minorPlanetOEURLNew = None
-
-        minorPlanetURLEntry = Gtk.Entry()
-        minorPlanetURLEntry.set_text( self.minorPlanetOEURL )
-#TODO New trans.
-        minorPlanetURLEntry.set_tooltip_text( _(
-            "The URL from which to source\n" + \
-            "minor planet OE data.\n\n" + \
-            "To specify a local file, use 'file:///'\n" + \
-            "and the filename.\n\n" + \
-            "Set a bogus URL such as 'http://'\n" + \
-            "to disable." ) )
-        box.pack_start( minorPlanetURLEntry, True, True, 0 )
-
-        fetch = Gtk.Button( _( "Fetch" ) )
-#TODO New tranas.
-        fetch.set_tooltip_text( _(
-            "Retrieve the minor planet OE data.\n\n" + \
-            "If the URL is empty, the default\n" + \
-            "URL will be used.\n\n" + \
-            "If using the default URL, the\n" + \
-            "download may be blocked to\n" + \
-            "avoid burdening the source." ) )
-        fetch.connect( "clicked",
-                       self.onFetchCometSatelliteData,
-                       minorPlanetURLEntry,
-                       minorPlanetGrid,
-                       minorPlanetStore,
-                       astroPyephem.AstronomicalBodyType.MinorPlanet,
-                       IndicatorLunar.MINOR_PLANET_OE_URL,
-                       IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME,
-                       IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS,
-                       self.lastUpdateMinorPlanetOE,
-                       IndicatorLunar.MINOR_PLANET_OE_DOWNLOAD_PERIOD_HOURS,
-                       _( "Minor planet data fetch aborted" ),# TODO Trnas
-                       _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
-                       self.getMinorPlanetOEData )
-        box.pack_start( fetch, False, False, 0 )
-        minorPlanetGrid.attach( box, 0, 1, 1, 1 )
-
-        notebook.append_page( minorPlanetGrid, Gtk.Label( _( "Minor Planets" ) ) ) #TODO New trans.
-
-        # Satellites.
-        satelliteGrid = Gtk.Grid()
-        satelliteGrid.set_column_spacing( 10 )
-        satelliteGrid.set_row_spacing( 10 )
-        satelliteGrid.set_margin_left( 10 )
-        satelliteGrid.set_margin_right( 10 )
-        satelliteGrid.set_margin_top( 10 )
-        satelliteGrid.set_margin_bottom( 10 )
-
-        satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
-        satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
-        satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
-
-        tree = Gtk.TreeView( satelliteStoreSort )
-        tree.set_tooltip_text( _(
-            "Check a satellite to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "will toggle all checkboxes." ) )
-
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, satelliteStore, satelliteStoreSort, astroPyephem.AstronomicalBodyType.Satellite )
-        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
-        treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.Satellite )
-        tree.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
-        treeViewColumn.set_sort_column_id( 1 )
-        tree.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = 2 )
-        treeViewColumn.set_sort_column_id( 2 )
-        tree.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = 3 )
-        treeViewColumn.set_sort_column_id( 3 )
-        tree.append_column( treeViewColumn )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( tree )
-        satelliteGrid.attach( scrolledWindow, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label( _( "Satellite TLE data" ) ), False, False, 0 )
-
-        self.satelliteTLEDataNew = None
-        self.satelliteTLEURLNew = None
-
-        TLEURLEntry = Gtk.Entry()
-        TLEURLEntry.set_text( self.satelliteTLEURL )
-        TLEURLEntry.set_hexpand( True )
-        TLEURLEntry.set_tooltip_text( _(
-            "The URL from which to source\n" + \
-            "satellite TLE data.\n\n" + \
-            "To specify a local file, use 'file:///'\n" + \
-            "and the filename.\n\n" + \
-            "Set a bogus URL such as 'http://'\n" + \
-            "to disable." ) )
-        box.pack_start( TLEURLEntry, True, True, 0 )
-
-        fetch = Gtk.Button( _( "Fetch" ) )
-        fetch.set_tooltip_text( _(
-            "Retrieve the satellite TLE data.\n\n" + \
-            "If the URL is empty, the default\n" + \
-            "URL will be used.\n\n" + \
-            "If using the default URL, the\n" + \
-            "download may be blocked to\n" + \
-            "avoid burdening the source." ) )
-        fetch.connect( "clicked",
-                       self.onFetchCometSatelliteData,
-                       TLEURLEntry,
-                       satelliteGrid,
-                       satelliteStore,
-                       astroPyephem.AstronomicalBodyType.Satellite,
-                       IndicatorLunar.SATELLITE_TLE_URL,
-                       IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME,
-                       IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS,
-                       self.lastUpdateSatelliteTLE,
-                       IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS,
-                       _( "Satellite TLE data fetch aborted" ),
-                       _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
-                       self.getSatelliteTLEData )
-
-        box.pack_start( fetch, False, False, 0 )
-        satelliteGrid.attach( box, 0, 1, 1, 1 )
-
-        notebook.append_page( satelliteGrid, Gtk.Label( _( "Satellites" ) ) )
-
-        # OSD (satellite and full moon).
-        notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
-
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
-
-        showSatelliteNotificationCheckbox = Gtk.CheckButton( _( "Satellite rise" ) )
-        showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
-        showSatelliteNotificationCheckbox.set_tooltip_text( _( "Screen notification when a satellite rises above the horizon." ) )
-        grid.attach( showSatelliteNotificationCheckbox, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
-
-        label = Gtk.Label( _( "Summary" ) )
-        label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        box.pack_start( label, False, False, 0 )
-
-        satelliteNotificationSummaryText = Gtk.Entry()
-        satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        satelliteNotificationSummaryText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationSummary ) )
-        satelliteNotificationSummaryText.set_tooltip_text( _(
-            "The summary for the satellite rise notification.\n\n" + \
-            "Available tags:\n\t" ) + \
-            IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
-            _( notifyOSDInformation ) )
-
-        box.pack_start( satelliteNotificationSummaryText, True, True, 0 )
-        grid.attach( box, 0, 1, 1, 1 )
-
-        showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteNotificationSummaryText )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
-
-        label = Gtk.Label( _( "Message" ) )
-        label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        label.set_valign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
-
-        satelliteNotificationMessageText = Gtk.TextView()
-        satelliteNotificationMessageText.get_buffer().set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationMessage ) )
-        satelliteNotificationMessageText.set_tooltip_text( _(
-            "The message for the satellite rise notification.\n\n" + \
-            "Available tags:\n\t" ) + \
-            IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
-            _( notifyOSDInformation ) )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( satelliteNotificationMessageText )
-        box.pack_start( scrolledWindow, True, True, 0 )
-        grid.attach( box, 0, 2, 1, 1 )
-
-        showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, scrolledWindow )
-
-        test = Gtk.Button( _( "Test" ) )
-        test.set_halign( Gtk.Align.END )
-        test.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
-        test.connect( "clicked", self.onTestNotificationClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, False )
-        test.set_tooltip_text( _(
-            "Show the notification bubble.\n" + \
-            "Tags will be substituted with\n" + \
-            "mock text." ) )
-        grid.attach( test, 0, 3, 1, 1 )
-
-        showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
-
-        showWerewolfWarningCheckbox = Gtk.CheckButton( _( "Werewolf warning" ) )
-        showWerewolfWarningCheckbox.set_margin_top( 10 )
-        showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
-        showWerewolfWarningCheckbox.set_tooltip_text( _(
-            "Hourly screen notification leading up to full moon." ) )
-        grid.attach( showWerewolfWarningCheckbox, 0, 4, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
-
-        label = Gtk.Label( _( "Summary" ) )
-        label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        box.pack_start( label, False, False, 0 )
-
-        werewolfNotificationSummaryText = Gtk.Entry()
-        werewolfNotificationSummaryText.set_text( self.werewolfWarningSummary )
-        werewolfNotificationSummaryText.set_tooltip_text( _( "The summary for the werewolf notification.\n\n" ) + notifyOSDInformation )
-        werewolfNotificationSummaryText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        box.pack_start( werewolfNotificationSummaryText, True, True, 0 )
-        grid.attach( box, 0, 5, 1, 1 )
-
-        showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationSummaryText )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
-
-        label = Gtk.Label( _( "Message" ) )
-        label.set_valign( Gtk.Align.START )
-        label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        box.pack_start( label, False, False, 0 )
-
-        werewolfNotificationMessageText = Gtk.TextView()
-        werewolfNotificationMessageText.get_buffer().set_text( self.werewolfWarningMessage )
-        werewolfNotificationMessageText.set_tooltip_text( _( "The message for the werewolf notification.\n\n" ) + notifyOSDInformation )
-        werewolfNotificationMessageText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( werewolfNotificationMessageText )
-
-        box.pack_start( scrolledWindow, True, True, 0 )
-        grid.attach( box, 0, 6, 1, 1 )
-
-        showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationMessageText )
-
-        test = Gtk.Button( _( "Test" ) )
-        test.set_halign( Gtk.Align.END )
-        test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
-        test.connect( "clicked", self.onTestNotificationClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, True )
-        test.set_tooltip_text( _( "Show the notification using the current summary/message." ) )
-        grid.attach( test, 0, 7, 1, 1 )
-
-        showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
-
-        notebook.append_page( grid, Gtk.Label( _( "Notifications" ) ) )
+#         # Comets.
+#         cometGrid = Gtk.Grid()
+#         cometGrid.set_column_spacing( 10 )
+#         cometGrid.set_row_spacing( 10 )
+#         cometGrid.set_margin_left( 10 )
+#         cometGrid.set_margin_right( 10 )
+#         cometGrid.set_margin_top( 10 )
+#         cometGrid.set_margin_bottom( 10 )
+# 
+#         cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
+#         cometStoreSort = Gtk.TreeModelSort( model = cometStore )
+#         cometStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
+# 
+#         tree = Gtk.TreeView( cometStoreSort )
+#         tree.set_tooltip_text( _(
+#             "Check a comet to display in the menu.\n\n" + \
+#             "Clicking the header of the first column\n" + \
+#             "will toggle all checkboxes." ) )
+# 
+#         renderer_toggle = Gtk.CellRendererToggle()
+#         renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, cometStore, cometStoreSort, astroPyephem.AstronomicalBodyType.Comet )
+#         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+#         treeViewColumn.set_clickable( True )
+#         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore, cometStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.Comet )
+#         tree.append_column( treeViewColumn )
+# 
+#         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
+#         tree.append_column( treeViewColumn )
+# 
+#         scrolledWindow = Gtk.ScrolledWindow()
+#         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+#         scrolledWindow.set_hexpand( True )
+#         scrolledWindow.set_vexpand( True )
+#         scrolledWindow.add( tree )
+#         cometGrid.attach( scrolledWindow, 0, 0, 1, 1 )
+# 
+#         box = Gtk.Box( spacing = 6 )
+#         box.set_margin_top( 10 )
+# 
+#         box.pack_start( Gtk.Label( _( "Comet OE data" ) ), False, False, 0 )
+# 
+#         self.cometOEDataNew = None
+#         self.cometOEURLNew = None
+# 
+#         cometURLEntry = Gtk.Entry()
+#         cometURLEntry.set_text( self.cometOEURL )
+#         cometURLEntry.set_tooltip_text( _(
+#             "The URL from which to source\n" + \
+#             "comet OE data.\n\n" + \
+#             "To specify a local file, use 'file:///'\n" + \
+#             "and the filename.\n\n" + \
+#             "Set a bogus URL such as 'http://'\n" + \
+#             "to disable." ) )
+#         box.pack_start( cometURLEntry, True, True, 0 )
+# 
+#         fetch = Gtk.Button( _( "Fetch" ) )
+#         fetch.set_tooltip_text( _(
+#             "Retrieve the comet OE data.\n\n" + \
+#             "If the URL is empty, the default\n" + \
+#             "URL will be used.\n\n" + \
+#             "If using the default URL, the\n" + \
+#             "download may be blocked to\n" + \
+#             "avoid burdening the source." ) )
+#         fetch.connect( "clicked",
+#                        self.onFetchCometSatelliteData,
+#                        cometURLEntry,
+#                        cometGrid,
+#                        cometStore,
+#                        astroPyephem.AstronomicalBodyType.Comet,
+#                        IndicatorLunar.COMET_OE_URL,
+#                        IndicatorLunar.COMET_OE_CACHE_BASENAME,
+#                        IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS,
+#                        self.lastUpdateCometOE,
+#                        IndicatorLunar.COMET_OE_DOWNLOAD_PERIOD_HOURS,
+#                        _( "Comet data fetch aborted" ),
+#                        _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
+#                        self.getCometOEData )
+#         box.pack_start( fetch, False, False, 0 )
+#         cometGrid.attach( box, 0, 1, 1, 1 )
+# 
+#         notebook.append_page( cometGrid, Gtk.Label( _( "Comets" ) ) )
+# 
+#         # Minor Planets.
+#         minorPlanetGrid = Gtk.Grid() #TODO Need to add to same place below as cometGrid
+#         minorPlanetGrid.set_column_spacing( 10 )
+#         minorPlanetGrid.set_row_spacing( 10 )
+#         minorPlanetGrid.set_margin_left( 10 )
+#         minorPlanetGrid.set_margin_right( 10 )
+#         minorPlanetGrid.set_margin_top( 10 )
+#         minorPlanetGrid.set_margin_bottom( 10 )
+# 
+#         minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
+#         minorPlanetStoreSort = Gtk.TreeModelSort( model = minorPlanetStore )
+#         minorPlanetStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
+# 
+#         tree = Gtk.TreeView( minorPlanetStoreSort )
+#         tree.set_tooltip_text( _(
+#             "Check a minor planet to display in the menu.\n\n" + \
+#             "Clicking the header of the first column\n" + \
+#             "will toggle all checkboxes." ) )
+# 
+#         renderer_toggle = Gtk.CellRendererToggle()
+#         renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, minorPlanetStore, minorPlanetStoreSort, astroPyephem.AstronomicalBodyType.MinorPlanet)
+#         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+#         treeViewColumn.set_clickable( True )
+#         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, minorPlanetStore, minorPlanetStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.MinorPlanet )
+#         tree.append_column( treeViewColumn )
+# 
+#         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
+#         tree.append_column( treeViewColumn )
+# 
+#         scrolledWindow = Gtk.ScrolledWindow()
+#         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+#         scrolledWindow.set_hexpand( True )
+#         scrolledWindow.set_vexpand( True )
+#         scrolledWindow.add( tree )
+#         minorPlanetGrid.attach( scrolledWindow, 0, 0, 1, 1 )
+# 
+#         box = Gtk.Box( spacing = 6 )
+#         box.set_margin_top( 10 )
+# 
+#         box.pack_start( Gtk.Label( _( "Minor Planet OE data" ) ), False, False, 0 ) #TODO New translation
+# 
+#         self.minorPlanetOEDataNew = None
+#         self.minorPlanetOEURLNew = None
+# 
+#         minorPlanetURLEntry = Gtk.Entry()
+#         minorPlanetURLEntry.set_text( self.minorPlanetOEURL )
+# #TODO New trans.
+#         minorPlanetURLEntry.set_tooltip_text( _(
+#             "The URL from which to source\n" + \
+#             "minor planet OE data.\n\n" + \
+#             "To specify a local file, use 'file:///'\n" + \
+#             "and the filename.\n\n" + \
+#             "Set a bogus URL such as 'http://'\n" + \
+#             "to disable." ) )
+#         box.pack_start( minorPlanetURLEntry, True, True, 0 )
+# 
+#         fetch = Gtk.Button( _( "Fetch" ) )
+# #TODO New tranas.
+#         fetch.set_tooltip_text( _(
+#             "Retrieve the minor planet OE data.\n\n" + \
+#             "If the URL is empty, the default\n" + \
+#             "URL will be used.\n\n" + \
+#             "If using the default URL, the\n" + \
+#             "download may be blocked to\n" + \
+#             "avoid burdening the source." ) )
+#         fetch.connect( "clicked",
+#                        self.onFetchCometSatelliteData,
+#                        minorPlanetURLEntry,
+#                        minorPlanetGrid,
+#                        minorPlanetStore,
+#                        astroPyephem.AstronomicalBodyType.MinorPlanet,
+#                        IndicatorLunar.MINOR_PLANET_OE_URL,
+#                        IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME,
+#                        IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS,
+#                        self.lastUpdateMinorPlanetOE,
+#                        IndicatorLunar.MINOR_PLANET_OE_DOWNLOAD_PERIOD_HOURS,
+#                        _( "Minor planet data fetch aborted" ),# TODO Trnas
+#                        _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
+#                        self.getMinorPlanetOEData )
+#         box.pack_start( fetch, False, False, 0 )
+#         minorPlanetGrid.attach( box, 0, 1, 1, 1 )
+# 
+#         notebook.append_page( minorPlanetGrid, Gtk.Label( _( "Minor Planets" ) ) ) #TODO New trans.
+# 
+#         # Satellites.
+#         satelliteGrid = Gtk.Grid()
+#         satelliteGrid.set_column_spacing( 10 )
+#         satelliteGrid.set_row_spacing( 10 )
+#         satelliteGrid.set_margin_left( 10 )
+#         satelliteGrid.set_margin_right( 10 )
+#         satelliteGrid.set_margin_top( 10 )
+#         satelliteGrid.set_margin_bottom( 10 )
+# 
+#         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
+#         satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
+#         satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
+# 
+#         tree = Gtk.TreeView( satelliteStoreSort )
+#         tree.set_tooltip_text( _(
+#             "Check a satellite to display in the menu.\n\n" + \
+#             "Clicking the header of the first column\n" + \
+#             "will toggle all checkboxes." ) )
+# 
+#         renderer_toggle = Gtk.CellRendererToggle()
+#         renderer_toggle.connect( "toggled", self.onCometStarSatelliteToggled, satelliteStore, satelliteStoreSort, astroPyephem.AstronomicalBodyType.Satellite )
+#         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+#         treeViewColumn.set_clickable( True )
+#         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore, satelliteStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.Satellite )
+#         tree.append_column( treeViewColumn )
+# 
+#         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
+#         treeViewColumn.set_sort_column_id( 1 )
+#         tree.append_column( treeViewColumn )
+# 
+#         treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = 2 )
+#         treeViewColumn.set_sort_column_id( 2 )
+#         tree.append_column( treeViewColumn )
+# 
+#         treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = 3 )
+#         treeViewColumn.set_sort_column_id( 3 )
+#         tree.append_column( treeViewColumn )
+# 
+#         scrolledWindow = Gtk.ScrolledWindow()
+#         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+#         scrolledWindow.set_hexpand( True )
+#         scrolledWindow.set_vexpand( True )
+#         scrolledWindow.add( tree )
+#         satelliteGrid.attach( scrolledWindow, 0, 0, 1, 1 )
+# 
+#         box = Gtk.Box( spacing = 6 )
+#         box.set_margin_top( 10 )
+# 
+#         box.pack_start( Gtk.Label( _( "Satellite TLE data" ) ), False, False, 0 )
+# 
+#         self.satelliteTLEDataNew = None
+#         self.satelliteTLEURLNew = None
+# 
+#         TLEURLEntry = Gtk.Entry()
+#         TLEURLEntry.set_text( self.satelliteTLEURL )
+#         TLEURLEntry.set_hexpand( True )
+#         TLEURLEntry.set_tooltip_text( _(
+#             "The URL from which to source\n" + \
+#             "satellite TLE data.\n\n" + \
+#             "To specify a local file, use 'file:///'\n" + \
+#             "and the filename.\n\n" + \
+#             "Set a bogus URL such as 'http://'\n" + \
+#             "to disable." ) )
+#         box.pack_start( TLEURLEntry, True, True, 0 )
+# 
+#         fetch = Gtk.Button( _( "Fetch" ) )
+#         fetch.set_tooltip_text( _(
+#             "Retrieve the satellite TLE data.\n\n" + \
+#             "If the URL is empty, the default\n" + \
+#             "URL will be used.\n\n" + \
+#             "If using the default URL, the\n" + \
+#             "download may be blocked to\n" + \
+#             "avoid burdening the source." ) )
+#         fetch.connect( "clicked",
+#                        self.onFetchCometSatelliteData,
+#                        TLEURLEntry,
+#                        satelliteGrid,
+#                        satelliteStore,
+#                        astroPyephem.AstronomicalBodyType.Satellite,
+#                        IndicatorLunar.SATELLITE_TLE_URL,
+#                        IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME,
+#                        IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS,
+#                        self.lastUpdateSatelliteTLE,
+#                        IndicatorLunar.SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS,
+#                        _( "Satellite TLE data fetch aborted" ),
+#                        _( "To avoid taxing the data source, the download was aborted. The next time the download will occur will be at {0}." ),
+#                        self.getSatelliteTLEData )
+# 
+#         box.pack_start( fetch, False, False, 0 )
+#         satelliteGrid.attach( box, 0, 1, 1, 1 )
+# 
+#         notebook.append_page( satelliteGrid, Gtk.Label( _( "Satellites" ) ) )
+# 
+#         # OSD (satellite and full moon).
+#         notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
+# 
+#         grid = Gtk.Grid()
+#         grid.set_column_spacing( 10 )
+#         grid.set_row_spacing( 10 )
+#         grid.set_margin_left( 10 )
+#         grid.set_margin_right( 10 )
+#         grid.set_margin_top( 10 )
+#         grid.set_margin_bottom( 10 )
+# 
+#         showSatelliteNotificationCheckbox = Gtk.CheckButton( _( "Satellite rise" ) )
+#         showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
+#         showSatelliteNotificationCheckbox.set_tooltip_text( _( "Screen notification when a satellite rises above the horizon." ) )
+#         grid.attach( showSatelliteNotificationCheckbox, 0, 0, 1, 1 )
+# 
+#         box = Gtk.Box( spacing = 6 )
+#         box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+# 
+#         label = Gtk.Label( _( "Summary" ) )
+#         label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
+#         box.pack_start( label, False, False, 0 )
+# 
+#         satelliteNotificationSummaryText = Gtk.Entry()
+#         satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
+#         satelliteNotificationSummaryText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationSummary ) )
+#         satelliteNotificationSummaryText.set_tooltip_text( _(
+#             "The summary for the satellite rise notification.\n\n" + \
+#             "Available tags:\n\t" ) + \
+#             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
+#             _( notifyOSDInformation ) )
+# 
+#         box.pack_start( satelliteNotificationSummaryText, True, True, 0 )
+#         grid.attach( box, 0, 1, 1, 1 )
+# 
+#         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteNotificationSummaryText )
+# 
+#         box = Gtk.Box( spacing = 6 )
+#         box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+# 
+#         label = Gtk.Label( _( "Message" ) )
+#         label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
+#         label.set_valign( Gtk.Align.START )
+#         box.pack_start( label, False, False, 0 )
+# 
+#         satelliteNotificationMessageText = Gtk.TextView()
+#         satelliteNotificationMessageText.get_buffer().set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationMessage ) )
+#         satelliteNotificationMessageText.set_tooltip_text( _(
+#             "The message for the satellite rise notification.\n\n" + \
+#             "Available tags:\n\t" ) + \
+#             IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
+#             IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
+#             _( notifyOSDInformation ) )
+# 
+#         scrolledWindow = Gtk.ScrolledWindow()
+#         scrolledWindow.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
+#         scrolledWindow.set_hexpand( True )
+#         scrolledWindow.set_vexpand( True )
+#         scrolledWindow.add( satelliteNotificationMessageText )
+#         box.pack_start( scrolledWindow, True, True, 0 )
+#         grid.attach( box, 0, 2, 1, 1 )
+# 
+#         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, scrolledWindow )
+# 
+#         test = Gtk.Button( _( "Test" ) )
+#         test.set_halign( Gtk.Align.END )
+#         test.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
+#         test.connect( "clicked", self.onTestNotificationClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, False )
+#         test.set_tooltip_text( _(
+#             "Show the notification bubble.\n" + \
+#             "Tags will be substituted with\n" + \
+#             "mock text." ) )
+#         grid.attach( test, 0, 3, 1, 1 )
+# 
+#         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
+# 
+#         showWerewolfWarningCheckbox = Gtk.CheckButton( _( "Werewolf warning" ) )
+#         showWerewolfWarningCheckbox.set_margin_top( 10 )
+#         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
+#         showWerewolfWarningCheckbox.set_tooltip_text( _(
+#             "Hourly screen notification leading up to full moon." ) )
+#         grid.attach( showWerewolfWarningCheckbox, 0, 4, 1, 1 )
+# 
+#         box = Gtk.Box( spacing = 6 )
+#         box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+# 
+#         label = Gtk.Label( _( "Summary" ) )
+#         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
+#         box.pack_start( label, False, False, 0 )
+# 
+#         werewolfNotificationSummaryText = Gtk.Entry()
+#         werewolfNotificationSummaryText.set_text( self.werewolfWarningSummary )
+#         werewolfNotificationSummaryText.set_tooltip_text( _( "The summary for the werewolf notification.\n\n" ) + notifyOSDInformation )
+#         werewolfNotificationSummaryText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
+#         box.pack_start( werewolfNotificationSummaryText, True, True, 0 )
+#         grid.attach( box, 0, 5, 1, 1 )
+# 
+#         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationSummaryText )
+# 
+#         box = Gtk.Box( spacing = 6 )
+#         box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+# 
+#         label = Gtk.Label( _( "Message" ) )
+#         label.set_valign( Gtk.Align.START )
+#         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
+#         box.pack_start( label, False, False, 0 )
+# 
+#         werewolfNotificationMessageText = Gtk.TextView()
+#         werewolfNotificationMessageText.get_buffer().set_text( self.werewolfWarningMessage )
+#         werewolfNotificationMessageText.set_tooltip_text( _( "The message for the werewolf notification.\n\n" ) + notifyOSDInformation )
+#         werewolfNotificationMessageText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
+# 
+#         scrolledWindow = Gtk.ScrolledWindow()
+#         scrolledWindow.set_hexpand( True )
+#         scrolledWindow.set_vexpand( True )
+#         scrolledWindow.add( werewolfNotificationMessageText )
+# 
+#         box.pack_start( scrolledWindow, True, True, 0 )
+#         grid.attach( box, 0, 6, 1, 1 )
+# 
+#         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationMessageText )
+# 
+#         test = Gtk.Button( _( "Test" ) )
+#         test.set_halign( Gtk.Align.END )
+#         test.set_sensitive( showWerewolfWarningCheckbox.get_active() )
+#         test.connect( "clicked", self.onTestNotificationClicked, werewolfNotificationSummaryText, werewolfNotificationMessageText, True )
+#         test.set_tooltip_text( _( "Show the notification using the current summary/message." ) )
+#         grid.attach( test, 0, 7, 1, 1 )
+# 
+#         showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
+# 
+#         notebook.append_page( grid, Gtk.Label( _( "Notifications" ) ) )
 
         # Location.
         grid = Gtk.Grid()
@@ -2062,7 +2074,7 @@ class IndicatorLunar:
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Latitude (DD)" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Latitude" ) ), False, False, 0 )
 
         latitude = Gtk.Entry()
         latitude.set_tooltip_text( _( "Latitude of your location in decimal degrees." ) )
@@ -2071,7 +2083,7 @@ class IndicatorLunar:
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Longitude (DD)" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Longitude" ) ), False, False, 0 )
 
         longitude = Gtk.Entry()
         longitude.set_tooltip_text( _( "Longitude of your location in decimal degrees." ) )
@@ -2080,7 +2092,7 @@ class IndicatorLunar:
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Elevation (m)" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Elevation" ) ), False, False, 0 )
 
         elevation = Gtk.Entry()
         elevation.set_tooltip_text( _( "Height in metres above sea level." ) )
@@ -2106,9 +2118,9 @@ class IndicatorLunar:
 
         # The visibility of some GUI objects must be determined AFTER the dialog is shown.
 #TODO Rename to include Minor Planets
-        self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Comet )
-        self.updateCometSatellitePreferencesTab( minorPlanetGrid, minorPlanetStore, self.minorPlanetOEData, self.minorPlanets, minorPlanetURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.MinorPlanet )
-        self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Satellite )
+#         self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Comet )
+#         self.updateCometSatellitePreferencesTab( minorPlanetGrid, minorPlanetStore, self.minorPlanetOEData, self.minorPlanets, minorPlanetURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.MinorPlanet )
+#         self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Satellite )
 
         # Last thing to do after everything else is built.
         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
@@ -2230,20 +2242,24 @@ class IndicatorLunar:
         bodyTag = key[ 1 ]
         dataTag = key[ 2 ]
 
-        isCometOrSatellite = \
+        isCometOrMinorPlanetOrSatellite = \
             astronomicalBodyType is not None and \
-            ( astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet or astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite )
+            (
+                astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or \
+                astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet or \
+                astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite
+            )
 
-        if isCometOrSatellite:
+        if isCometOrMinorPlanetOrSatellite:
             translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Don't translate the names of the comets/satellites.
         else:
-            translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag  ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets/starts, etc.
+            translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets/stars, etc.
 
         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
 
     def translateTags( self, tagsStore, originalToLocal, text ):
-        # The tags store contains at least 2 columns (if more, those columns are ignored).
+        # The tags store contains at least 2 columns (additional columns are ignored).
         # First column contains the original/untranslated tags.
         # Second column contains the translated tags.
         # Depending on the direction the translation, one of the columns contains the source tags to match.
@@ -2481,7 +2497,7 @@ class IndicatorLunar:
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
-        
+
         #TODO Can the city ever be empty?  So do we need the check below?
         if city != "" and city in astroPyephem.getCities(): # Populate the latitude/longitude/elevation if the city exists, otherwise let the user specify.
             theLatitude, theLongitude, theElevation = astroPyephem.getLatitudeLongitudeElevation( city )
