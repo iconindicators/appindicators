@@ -310,7 +310,9 @@ def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[
                                                   float( _city_data.get( city )[ 1 ] ), \
                                                   _city_data.get( city )[ 2 ]
 
-
+# Take a list of items (comet names or minor planet names)
+# and a corresponding dictionary of orbital element data
+# and return a list of items which have a magnitude less than or equal to the maximum magnitude.
 def getItemsLessThanMagnitude( items, orbitalElementData, maximumMagnitude ):
     results = [ ]
     for item in items:
