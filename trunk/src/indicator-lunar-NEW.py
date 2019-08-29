@@ -645,6 +645,11 @@ class IndicatorLunar:
 # 158
 
 
+#TODO Don't forget to test with very high latitudes (north and south) to force circumpolar satellites and never up.
+#TODO Don't forget to test during dusk/evening to see satellite passes in the menu.
+
+
+
 
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             # Value is the astronomical data (or equivalent) as a string.
