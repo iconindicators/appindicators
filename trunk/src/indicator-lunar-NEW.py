@@ -110,7 +110,8 @@ class IndicatorLunar:
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
     DATE_TIME_FORMAT_HHcolonMMcolonSS = "%H:%M:%S"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"#TODO Is this used to identify the format in self.data data/time data,
+#or used to display the data to the user?  For display, no need for seconds.
 
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
@@ -1195,6 +1196,7 @@ class IndicatorLunar:
         elif key[ 2 ] == astroPyephem.DATA_PHASE:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
 
+#TODO Maybe this should be else rather than None?
         if displayData is None:  # Returning None is not good but better to let it crash and find out about it than hide the problem.
             logging.error( "Unknown/unhandled key: " + key )
 
