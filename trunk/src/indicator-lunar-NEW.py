@@ -1097,10 +1097,10 @@ class IndicatorLunar:
             menuItem.set_submenu( subMenu )
 
         for number, name, riseDateTime in satellites:
-            self.createSatelliteMenuNew( menu, number )
+            self.updateSatelliteMenu( menu, number )
 
 
-    def createSatelliteMenuNew( self, menu, satelliteNumber ):
+    def updateSatelliteMenu( self, menu, satelliteNumber ):
         menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, self.satelliteTLEData[ satelliteNumber ].getName() ) \
                                                      .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
                                                      .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ satelliteNumber ].getInternationalDesignator() )
@@ -1209,18 +1209,8 @@ class IndicatorLunar:
         return components[ 0 ] + ":" + components[ 1 ]
 
 
+#TODO Once satellite notification is revisted, this function might go.
     def toDateTime( self, dateTimeAsString, formatString ): return datetime.datetime.strptime( dateTimeAsString, formatString )
-
-
-    # Compare two string dates in the format YYYY MM DD HH:MM:SS, returning the earliest.
-#TODO Verify this works for strings if a time is 08:xx:yy versus 18:xx:yy...is the 18 greater?
-#Or do we need to do the comparison as datetime objects?    
-#TODO Write with one return statement!
-    def getSmallestDateTime( self, firstDateTimeAsString, secondDateTimeAsString ):
-        if firstDateTimeAsString < secondDateTimeAsString:
-            return firstDateTimeAsString
-
-        return secondDateTimeAsString
 
 
     # Get the data from the cache, or if stale, download from the source.
