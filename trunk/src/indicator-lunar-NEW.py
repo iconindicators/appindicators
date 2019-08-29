@@ -657,7 +657,10 @@ class IndicatorLunar:
 #...then do a run and the data fails to download and cache is stale, we have no data.
 # If we now call astro, we have a valid list of comets (minor planets or satellites) but invalid data.
 # What to do?
-            self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
+#             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
+
+            from datetime import timezone
+            self.data = astroPyephem.getAstronomicalInformation( datetime.datetime( 2019, 8, 29, 9, 0, 0, 0, tzinfo = timezone.utc ),
                                                           self.latitude, self.longitude, self.elevation,
                                                           self.planets,
                                                           self.stars,
@@ -1114,20 +1117,24 @@ class IndicatorLunar:
             menuItem = Gtk.MenuItem( _( "Satellites" ) )
 
         menu.append( menuItem )
+
+        theMenu = menu
+        indent = 1
         if self.showSatellitesAsSubMenu:
-            subMenu = Gtk.Menu()
-            menuItem.set_submenu( subMenu )
+            theMenu = Gtk.Menu()
+            menuItem.set_submenu( theMenu )
+            indent = 0
 
         for number, name, riseDateTime in satellites:
-            self.updateSatelliteMenu( menu, number )
+            self.updateSatelliteMenu( theMenu, indent, number )
 
 
-    def updateSatelliteMenu( self, menu, satelliteNumber ):
+    def updateSatelliteMenu( self, menu, indent, satelliteNumber ):
         menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, self.satelliteTLEData[ satelliteNumber ].getName() ) \
                                                      .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
                                                      .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ satelliteNumber ].getInternationalDesignator() )
 
-        menuItem = Gtk.MenuItem( pythonutils.indent( 1, 2 ) + menuText )
+        menuItem = Gtk.MenuItem( pythonutils.indent( indent, 1 ) + menuText ) #TODO Indent needs to be adjusted for GNOME Shell.
         menu.append( menuItem )
 
         subMenu = Gtk.Menu()
@@ -1140,11 +1147,11 @@ class IndicatorLunar:
 
         elif key + ( astroPyephem.DATA_RISE_AZIMUTH, ) in self.data:
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Rise" ) ) )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 1, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 1, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ) ) )
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Set" ) ) )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) ) )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 1, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 1, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ) ) )
 
         else:
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
