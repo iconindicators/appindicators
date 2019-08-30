@@ -59,6 +59,8 @@ def download( url, logging = None ):
 
         if not oeData:
             oeData = None
+            if logging is not None:
+                logging.error( "No OE data found at " + str( url ) )
 
     except Exception as e:
         oeData = None

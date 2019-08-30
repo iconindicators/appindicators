@@ -76,6 +76,8 @@ def download( url, logging = None ):
 
         if not tleData:
             tleData = None
+            if logging is not None:
+                logging.error( "No TLE data found at " + str( url ) )
 
     except Exception as e:
         tleData = None
