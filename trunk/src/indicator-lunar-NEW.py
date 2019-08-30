@@ -607,20 +607,25 @@ class IndicatorLunar:
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
-# Get data for comets, minor planets and satellites and update                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-            self.cometOEData = self.updateData( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL )
+#TODO Testing
             self.cometsAddNew = True
-            if self.cometsAddNew and self.cometOEData is not None:
+            self.minorPlanetsAddNew = True
+            self.satellitesAddNew = True
+
+#TODO Need to check for None return which is an error, and report to user and set to empty [].
+            self.cometOEData = self.updateData( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL )
+            cometOEDataBad = True if self.cometOEData is None else False #TODO If None, set to [ ]?
+            if self.cometsAddNew:
                 self.addNewComets()
 
             self.minorPlanetOEData = self.updateData( self.minorPlanetOEData, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL )
-            self.minorPlanetsAddNew = True
-            if self.minorPlanetsAddNew and self.minorPlanetOEData is not None:
+            minorPlanetOEDataBad = True if self.minorPlanetOEData is None else False #TODO If None, set to [ ]?
+            if self.minorPlanetsAddNew:
                 self.addNewMinorPlanets()
 
             self.satelliteTLEData = self.updateData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL )
-            self.satellitesAddNew = True
-            if self.satellitesAddNew and self.satelliteTLEData is not None:
+            satelliteTLEDataBad = True if self.satelliteTLEData is None else False #TODO If None, set to [ ]?
+            if self.satellitesAddNew:
                 self.addNewSatellites()
 
 #TODO Cannot pass entire list of minor planets (and comets) to the Preferences as the list is too big.
@@ -658,15 +663,14 @@ class IndicatorLunar:
 # If we now call astro, we have a valid list of comets (minor planets or satellites) but invalid data.
 # What to do?
 #             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
-
-            from datetime import timezone
+            from datetime import timezone #TODO Testing for satellites
             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime( 2019, 8, 29, 9, 0, 0, 0, tzinfo = timezone.utc ),
                                                           self.latitude, self.longitude, self.elevation,
                                                           self.planets,
                                                           self.stars,
-                                                          self.satellites, None if self.satelliteTLEData is None else self.satelliteTLEData,
-                                                          self.comets, None if self.cometOEData is None else self.cometOEData,
-                                                          self.minorPlanets, None if self.minorPlanetOEData is None else self.minorPlanetOEData,
+                                                          self.satellites, self.satelliteTLEData,
+                                                          self.comets, self.cometOEData,
+                                                          self.minorPlanets, self.minorPlanetOEData,
                                                           self.magnitude )
 
 #TODO After the backend is done, filter the comet and minor planet listings
@@ -682,7 +686,8 @@ class IndicatorLunar:
 
             self.updateIconAndLabel()
 
-            self.notificationBadData( self.cometOEData, self.minorPlanetOEData, self.satelliteTLEData )
+#TODO Notify the user?  This will happen on each update!  Maybe just assume the error is logged and do not notify?
+            self.notificationBadData( cometOEDataBad, minorPlanetOEDataBad, satelliteTLEDataBad )
 
             if self.showWerewolfWarning:
                 self.notificationFullMoon()
@@ -691,6 +696,57 @@ class IndicatorLunar:
 #                 self.notificationSatellites()
 
             self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
+
+
+    # Get the data from the cache, or if stale, download from the source.
+    # On success, returns non-empty dict of data; no data returns an empty dict; source error returns None.
+#TODO Returning None (no internet say) is an error.  But what if somehow we get empty data returned...
+#...this is still a problem as such for the user.
+# So maybe write to the log to distinguish error types and return an empty [] and give the user a general error message?
+    def updateData( self, existingData, cacheBaseName, cacheMaximumAgeHours, getDataFunction, dataURL ):
+        if existingData: # Have existing data; ensure data is not stale.
+            cacheDateTimeStamp = datetime.datetime.strptime( pythonutils.getCacheDateTime( INDICATOR_NAME, cacheBaseName ), pythonutils.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            newData = existingData
+            if datetime.datetime.utcnow() > ( cacheDateTimeStamp + datetime.timedelta( hours = cacheMaximumAgeHours ) ):
+                newData = getDataFunction( dataURL )
+                if newData is not None:
+#TODO Cull data by magnitude here?
+                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
+
+        else:
+            # Have no data, so read from cache and if that fails, download.
+            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, cacheMaximumAgeHours )
+            newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Cached data is never written out empty, so is either valid or None.
+            #TODO This will return None for old format satellite cache data.  Is this a problem?
+
+#TODO Look at this again....can we just scrub the entire cache and avoid the hack below?
+#TODO Start of temporary hack...
+# There was a change of data formats between version 80 ad 81.
+# Satellites are using the TLE object but the file name was changed from satellite to twolineelement and is deemed an invalid object.
+# Therefore the read cache binary will throw an exception and return None.
+# Not a problem as a new version will be downloaded and the cache will eventually clear out.
+#
+# Comets will successfully read in because their objects (dict, tuple string) are valid.
+# Comets are still stored in a dict using a string as key but now with a new OE object as the value, which must be handled.
+# This check can be removed in version 82 or later.
+            if newData is not None and cacheBaseName == IndicatorLunar.COMET_OE_CACHE_BASENAME and newData:
+                randomValue = next( iter( newData.values() ) )
+                if not isinstance( randomValue, orbitalelement.OE ):
+                    newData = None
+#TODO End of hack!
+
+            if newData is None:
+                newData = getDataFunction( dataURL )
+                if newData is not None and newData:
+#TODO Cull data by magnitude here?
+                    newData = astroPyephem.getOrbitalElementsLessThanMagnitude( newData, astroPyephem.MAGNITUDE_MAXIMUM )
+                    if newData: # Cannot be None
+                        pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
+#TODO If the newData is None, we return None...does that mean None is passed in next time as existingData
+# (and if so, need to check against this)?
+# Maybe return [ ]?  Or is None used to tell the user of an issue?
+#Anyway, ensure that None is not passed in as the existingData.
+        return newData
 
 
     def getNextUpdateTimeInSeconds( self ):
@@ -820,18 +876,18 @@ class IndicatorLunar:
             self.indicator.set_icon_full( iconName, "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
 
 
-    def notificationBadData( self, cometOEData, minorPlanetOEData, satelliteTLEData ):
-        if cometOEData is None:
+    def notificationBadData( self, cometOEDataBad, minorPlanetOEDataBad, satelliteTLEDataBad ):
+        if cometOEDataBad is None:
             summary = _( "Error Retrieving Comet OE Data" )
             message = _( "The comet OE data source could not be reached." )
             Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
 
-        if minorPlanetOEData is None:
+        if minorPlanetOEDataBad is None:
             summary = _( "Error Retrieving Minor Planet OE Data" ) #TODO New translation
             message = _( "The minor planet OE data source could not be reached." ) #TODO New translation
             Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
 
-        if satelliteTLEData is None:
+        if satelliteTLEDataBad is None:
             summary = _( "Error Retrieving Satellite TLE Data" )
             message = _( "The satellite TLE data source could not be reached." )
             Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
@@ -1239,46 +1295,6 @@ class IndicatorLunar:
 
 #TODO Once satellite notification is revisted, this function might go.
     def toDateTime( self, dateTimeAsString, formatString ): return datetime.datetime.strptime( dateTimeAsString, formatString )
-
-
-    # Get the data from the cache, or if stale, download from the source.
-    # On success, returns non-empty dict of data; no data returns an empty dict; source error returns None.
-    def updateData( self, existingData, cacheBaseName, cacheMaximumAgeHours, getDataFunction, dataURL ):
-        if existingData: # Have existing data; ensure data is not stale.
-            cacheDateTimeStamp = datetime.datetime.strptime( pythonutils.getCacheDateTime( INDICATOR_NAME, cacheBaseName ), pythonutils.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-            cacheAge = cacheDateTimeStamp + datetime.timedelta( hours = cacheMaximumAgeHours )
-            newData = existingData
-            if datetime.datetime.utcnow() > cacheAge:
-                pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, cacheMaximumAgeHours )
-                newData = getDataFunction( dataURL )
-                if newData is not None:
-                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
-
-        else:
-            # Have no data, so read from cache and if that fails, download.
-            newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) #TODO This will return None for old format satellite cache data.
-
-#TODO Start of temporary hack...
-# There was a change of data formats between version 80 ad 81.
-# Satellites are using the TLE object but the file name was changed from satellite to twolineelement and is deemed an invalid object.
-# Therefore the read cache binary will throw an exception and return None.
-# Not a problem as a new version will be downloaded and the cache will eventually clear out.
-#
-# Comets will successfully read in because their objects (dict, tuple string) are valid.
-# Comets are still stored in a dict using a string as key but now with a new OE object as the value, which must be handled.
-# This check can be removed in version 82 or later.
-            if newData is not None and cacheBaseName == IndicatorLunar.COMET_OE_CACHE_BASENAME and newData:
-                randomValue = next( iter( newData.values() ) )
-                if not isinstance( randomValue, orbitalelement.OE ):
-                    newData = None
-#TODO End of hack!
-
-            if newData is None:
-                newData = getDataFunction( dataURL )
-                if newData is not None:
-                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
-
-        return newData
 
 
     # Creates an SVG icon file representing the moon given the illumination and bright limb angle.
