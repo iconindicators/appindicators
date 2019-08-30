@@ -212,7 +212,11 @@ def showAboutDialog(
         translatorCredit, # The result of calling _( "translator-credits" ) which returns a string or None.
         changeLogLabelBeforeLink, # Text to the left of the hyperlink in the changelog label.
         changeLogLabelAfterLink, # Text to the right of the hyperlink in the changelog label.
-        changeLogLabelAnchor ): # The anchor text of the hyperlink in the changelog label.
+        changeLogLabelAnchor, # The anchor text of the hyperlink in the changelog label.
+        errorLog, # Path to the log file (whether or not the actual file exists).
+        errorLogLabelBeforeLink, # Text to the left of the hyperlink in the errorlog label.
+        errorLogLabelAfterLink, # Text to the right of the hyperlink in the errorlog label.
+        errorLogLabelAnchor ): # The anchor text of the hyperlink in the errorlog label.
 
         aboutDialog = Gtk.AboutDialog()
 
@@ -249,6 +253,19 @@ def showAboutDialog(
             changeLogLabelToolTip = "file://" + os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog"
             label = Gtk.Label()
             label.set_markup( changeLogLabelBeforeLink + " <a href=\'" + "file://" + changeLog + "\' title=\'" + changeLogLabelToolTip + "\'>" + changeLogLabelAnchor + "</a> " + changeLogLabelAfterLink )
+            label.show()
+            notebookOrStack.add( label )
+
+        if os.path.exists( errorLog ):
+            notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ] #TODO If this stays, make it a function within a function...how to do this?
+            if type( notebookOrStack ).__name__ == "Notebook":
+                notebookOrStack = notebookOrStack.get_nth_page( 0 )
+            else: # Stack
+                notebookOrStack = notebookOrStack.get_children()[ 0 ]
+
+            errorLogLabelToolTip = "file://" + errorLog
+            label = Gtk.Label()
+            label.set_markup( errorLogLabelBeforeLink + " <a href=\'" + "file://" + errorLog + "\' title=\'" + errorLogLabelToolTip + "\'>" + errorLogLabelAnchor + "</a> " + errorLogLabelAfterLink )
             label.show()
             notebookOrStack.add( label )
 
