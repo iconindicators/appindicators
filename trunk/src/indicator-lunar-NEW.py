@@ -613,47 +613,25 @@ class IndicatorLunar:
             self.satellitesAddNew = True
 
 #TODO Need to check for None return which is an error, and report to user and set to empty [].
-            self.cometOEData = self.updateData( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL )
+#Do we set None return for data to be { } ?
+            self.cometOEData = self.updateData( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             cometOEDataBad = True if self.cometOEData is None else False #TODO If None, set to [ ]?
             if self.cometsAddNew:
                 self.addNewComets()
 
-            self.minorPlanetOEData = self.updateData( self.minorPlanetOEData, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL )
+            self.minorPlanetOEData = self.updateData( self.minorPlanetOEData, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             minorPlanetOEDataBad = True if self.minorPlanetOEData is None else False #TODO If None, set to [ ]?
             if self.minorPlanetsAddNew:
                 self.addNewMinorPlanets()
 
-            self.satelliteTLEData = self.updateData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL )
+            self.satelliteTLEData = self.updateData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL, None )
             satelliteTLEDataBad = True if self.satelliteTLEData is None else False #TODO If None, set to [ ]?
             if self.satellitesAddNew:
                 self.addNewSatellites()
 
-#TODO Cannot pass entire list of minor planets (and comets) to the Preferences as the list is too big.
-# So maybe after the data is downloaded or pulled from the cache,
-# pass the list to the backend (with a new function) and have that function return a list of comets/mps
-# which have a magnitude less than say 20.
-#Do this after data is downloaded/cached but before added (if add is true)?  Certainly before doing the backend calculations?
-            cometsCulled = astroPyephem.getItemsLessThanMagnitude( self.comets, self.cometOEData, astroPyephem.MAGNITUDE_MAXIMUM )
-            print( len( self.comets ), len( cometsCulled ) )
-            minorPlanetsCulled = astroPyephem.getItemsLessThanMagnitude( self.minorPlanets, self.minorPlanetOEData, astroPyephem.MAGNITUDE_MAXIMUM )
-            print( len( self.minorPlanets ), len( minorPlanetsCulled ) )
-            print( len( self.satellites ) )
-
-# 20
-# 1027 127
-# 18169 544
-# 158
-
-# 15
-# 1027 11
-# 18169 79
-# 158
-
 
 #TODO Don't forget to test with very high latitudes (north and south) to force circumpolar satellites and never up.
 #TODO Don't forget to test during dusk/evening to see satellite passes in the menu.
-
-
 
 
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
@@ -703,20 +681,22 @@ class IndicatorLunar:
 #TODO Returning None (no internet say) is an error.  But what if somehow we get empty data returned...
 #...this is still a problem as such for the user.
 # So maybe write to the log to distinguish error types and return an empty [] and give the user a general error message?
-    def updateData( self, existingData, cacheBaseName, cacheMaximumAgeHours, getDataFunction, dataURL ):
-        if existingData: # Have existing data; ensure data is not stale.
+    def updateData( self, existingData, cacheBaseName, cacheMaximumAgeHours, downloadDataFunction, dataURL, magnitudeFilterFunction ):
+        if existingData: # Ensure existing data is not stale.
             cacheDateTimeStamp = datetime.datetime.strptime( pythonutils.getCacheDateTime( INDICATOR_NAME, cacheBaseName ), pythonutils.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
             newData = existingData
             if datetime.datetime.utcnow() > ( cacheDateTimeStamp + datetime.timedelta( hours = cacheMaximumAgeHours ) ):
-                newData = getDataFunction( dataURL )
+                newData = downloadDataFunction( dataURL )
+                if newData is not None and magnitudeFilterFunction is not None:
+                    newData = magnitudeFilterFunction( newData, astroPyephem.MAGNITUDE_MAXIMUM )
+
                 if newData is not None:
-#TODO Cull data by magnitude here?
                     pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
 
         else:
             # Have no data, so read from cache and if that fails, download.
             pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, cacheMaximumAgeHours )
-            newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Cached data is never written out empty, so is either valid or None.
+            newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Either valid or None; empty data is never cached.
             #TODO This will return None for old format satellite cache data.  Is this a problem?
 
 #TODO Look at this again....can we just scrub the entire cache and avoid the hack below?
@@ -736,12 +716,12 @@ class IndicatorLunar:
 #TODO End of hack!
 
             if newData is None:
-                newData = getDataFunction( dataURL )
-                if newData is not None and newData:
-#TODO Cull data by magnitude here?
-                    newData = astroPyephem.getOrbitalElementsLessThanMagnitude( newData, astroPyephem.MAGNITUDE_MAXIMUM )
-                    if newData: # Cannot be None
-                        pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
+                newData = downloadDataFunction( dataURL ) # Either valid or None.
+                if newData is not None and magnitudeFilterFunction is not None:
+                    newData = magnitudeFilterFunction( newData, astroPyephem.MAGNITUDE_MAXIMUM )
+
+                if newData is not None:
+                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
 #TODO If the newData is None, we return None...does that mean None is passed in next time as existingData
 # (and if so, need to check against this)?
 # Maybe return [ ]?  Or is None used to tell the user of an issue?

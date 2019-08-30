@@ -61,11 +61,11 @@ class TLE:
 
 # Downloads TLE data from the URL.
 #
-# On success, returns a { } with:
+# On success, returns a non-empty dict:
 #    Key: Satellite number
 #    Value: TLE object
 #
-# Otherwise, may write to the log and returns { }.
+# Otherwise, returns None and may write to the log.
 def download( url, logging = None ):
     tleData = { }
     try:
@@ -74,11 +74,13 @@ def download( url, logging = None ):
             tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
             tleData[ ( tle.getNumber() ) ] = tle
 
-        if not tleData and logging is not None:
-            logging.error( "No TLE data found at " + str( url ) )
+        if not tleData:
+            tleData = None
+            if logging is not None:
+                logging.error( "No TLE data found at " + str( url ) )
 
     except Exception as e:
-        tleData = { }
+        tleData = None
         if logging is not None:
             logging.exception( e )
             logging.error( "Error retrieving TLE data from " + str( url ) )
