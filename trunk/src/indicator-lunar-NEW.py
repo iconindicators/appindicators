@@ -603,6 +603,10 @@ class IndicatorLunar:
 #TODO Maybe add a preference that hides an object if below the horizon (but will rise).
 # How does this effect satellites?    
     def update( self, scheduled ):
+        self.onAbout( None )
+        
+        if True: return
+        
         with threading.Lock():
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
@@ -1338,7 +1342,11 @@ class IndicatorLunar:
                 _( "translator-credits" ),
                 _( "View the" ),
                 _( "text file." ),
-                _( "changelog" ) )
+                _( "changelog" ),
+                IndicatorLunar.LOG,
+                _( "View the" ),
+                _( "text file." ),
+                _( "error log" ) )
 
             self.dialogLock.release()
 
