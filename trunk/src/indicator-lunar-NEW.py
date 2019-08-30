@@ -612,20 +612,20 @@ class IndicatorLunar:
             self.minorPlanetsAddNew = True
             self.satellitesAddNew = True
 
+
+#TODO Can we add a link to the log file in the About dialog?
+
 #TODO Need to check for None return which is an error, and report to user and set to empty [].
 #Do we set None return for data to be { } ?
             self.cometOEData = self.updateData( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
-            cometOEDataBad = True if self.cometOEData is None else False #TODO If None, set to [ ]?
             if self.cometsAddNew:
                 self.addNewComets()
 
             self.minorPlanetOEData = self.updateData( self.minorPlanetOEData, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
-            minorPlanetOEDataBad = True if self.minorPlanetOEData is None else False #TODO If None, set to [ ]?
             if self.minorPlanetsAddNew:
                 self.addNewMinorPlanets()
 
             self.satelliteTLEData = self.updateData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL, None )
-            satelliteTLEDataBad = True if self.satelliteTLEData is None else False #TODO If None, set to [ ]?
             if self.satellitesAddNew:
                 self.addNewSatellites()
 
@@ -664,8 +664,6 @@ class IndicatorLunar:
 
             self.updateIconAndLabel()
 
-#TODO Notify the user?  This will happen on each update!  Maybe just assume the error is logged and do not notify?
-            self.notificationBadData( cometOEDataBad, minorPlanetOEDataBad, satelliteTLEDataBad )
 
             if self.showWerewolfWarning:
                 self.notificationFullMoon()
@@ -848,23 +846,6 @@ class IndicatorLunar:
             iconFilename = IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
             self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngle, iconFilename )
             self.indicator.set_icon_full( iconName, "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
-
-
-    def notificationBadData( self, cometOEDataBad, minorPlanetOEDataBad, satelliteTLEDataBad ):
-        if cometOEDataBad is None:
-            summary = _( "Error Retrieving Comet OE Data" )
-            message = _( "The comet OE data source could not be reached." )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-        if minorPlanetOEDataBad is None:
-            summary = _( "Error Retrieving Minor Planet OE Data" ) #TODO New translation
-            message = _( "The minor planet OE data source could not be reached." ) #TODO New translation
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-        if satelliteTLEDataBad is None:
-            summary = _( "Error Retrieving Satellite TLE Data" )
-            message = _( "The satellite TLE data source could not be reached." )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
 
 
     def notificationFullMoon( self ):
