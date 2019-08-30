@@ -1413,6 +1413,7 @@ class IndicatorLunar:
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
+#TODO Hopefully not needed!
         self.tagsAdded = { }
         self.tagsRemoved = { }
 
@@ -1429,6 +1430,9 @@ class IndicatorLunar:
                     i = tags.index( tag )
                     tags[ i ] = ""
 
+#TODO Not sure what is happening here?
+# Are we stripping tags from the indicator text which no longer appear in the table?
+# Maybe just leave the tags there and the user can manually remove after they see displayed?  Ask Oleg.
         unknownTags = [ ]
         for tag in tags:
             if re.match( "\[[^\[^\]]+\]", tag ) is not None:
@@ -1526,7 +1530,8 @@ class IndicatorLunar:
         box.pack_start( showSatellitesAsSubmenuCheckbox, False, False, 0 )
         grid.attach( box, 0, 3, 1, 1 )
 
-        cometsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new comets" ) )
+#TODO New trans
+        cometsAddNewCheckbox = Gtk.CheckButton( _( "Add new comets" ) )
         cometsAddNewCheckbox.set_margin_top( 10 )
         cometsAddNewCheckbox.set_active( self.cometsAddNew )
         cometsAddNewCheckbox.set_tooltip_text( _(
@@ -1535,7 +1540,7 @@ class IndicatorLunar:
         grid.attach( cometsAddNewCheckbox, 0, 4, 1, 1 )
 
 #TODO New trans
-        minorPlanetsAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new minor planets" ) )
+        minorPlanetsAddNewCheckbox = Gtk.CheckButton( _( "Add new minor planets" ) )
         minorPlanetsAddNewCheckbox.set_margin_top( 10 )
         minorPlanetsAddNewCheckbox.set_active( self.minorPlanetsAddNew )
         minorPlanetsAddNewCheckbox.set_tooltip_text( _(
@@ -1563,7 +1568,8 @@ class IndicatorLunar:
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 6, 1, 1 )
         
-        satellitesAddNewCheckbox = Gtk.CheckButton( _( "Automatically add new satellites" ) )
+#TODO New trans
+        satellitesAddNewCheckbox = Gtk.CheckButton( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
         satellitesAddNewCheckbox.set_tooltip_text( _(
@@ -2135,7 +2141,8 @@ class IndicatorLunar:
 #         self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Satellite )
 
         # Last thing to do after everything else is built.
-        notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
+#TODO Fix this after all other stuff is sorted out.
+#         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
 
         while True:
             if dialog.run() != Gtk.ResponseType.OK:
@@ -2515,12 +2522,12 @@ class IndicatorLunar:
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
 
-        #TODO Can the city ever be empty?  So do we need the check below?
+#TODO Can the city ever be empty?  So do we need the check below?
         if city != "" and city in astroPyephem.getCities(): # Populate the latitude/longitude/elevation if the city exists, otherwise let the user specify.
             theLatitude, theLongitude, theElevation = astroPyephem.getLatitudeLongitudeElevation( city )
-            latitude.set_text( theLatitude )
-            longitude.set_text( theLongitude )
-            elevation.set_text( theElevation )
+            latitude.set_text( str( theLatitude ) )
+            longitude.set_text( str( theLongitude ) )
+            elevation.set_text( str( theElevation ) )
 
 
 #TODO Why not just clear the display tags store and just add stuff as needed?
