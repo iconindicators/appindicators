@@ -242,32 +242,24 @@ def showAboutDialog(
         if not( translatorCredit is None or translatorCredit == "" ):
             aboutDialog.set_translator_credits( translatorCredit )
 
-        changeLog = os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog"
-        if os.path.exists( changeLog ):
-            notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
-            if type( notebookOrStack ).__name__ == "Notebook":
-                notebookOrStack = notebookOrStack.get_nth_page( 0 )
-            else: # Stack
-                notebookOrStack = notebookOrStack.get_children()[ 0 ]
 
-            changeLogLabelToolTip = "file://" + os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog"
-            label = Gtk.Label()
-            label.set_markup( changeLogLabelBeforeLink + " <a href=\'" + "file://" + changeLog + "\' title=\'" + changeLogLabelToolTip + "\'>" + changeLogLabelAnchor + "</a> " + changeLogLabelAfterLink )
-            label.show()
-            notebookOrStack.add( label )
+        def addHyperlinkLabel( filePath, leftText, rightText, anchorText ):
+            if os.path.exists( filePath ):
+                notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
+                if type( notebookOrStack ).__name__ == "Notebook":
+                    notebookOrStack = notebookOrStack.get_nth_page( 0 )
+                else: # Stack
+                    notebookOrStack = notebookOrStack.get_children()[ 0 ]
 
-        if os.path.exists( errorLog ):
-            notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ] #TODO If this stays, make it a function within a function...how to do this?
-            if type( notebookOrStack ).__name__ == "Notebook":
-                notebookOrStack = notebookOrStack.get_nth_page( 0 )
-            else: # Stack
-                notebookOrStack = notebookOrStack.get_children()[ 0 ]
+                toolTip = "file://" + filePath
+                label = Gtk.Label()
+                label.set_markup( leftText + " <a href=\'" + "file://" + filePath + "\' title=\'" + toolTip + "\'>" + anchorText + "</a> " + rightText )
+                label.show()
+                notebookOrStack.add( label )
 
-            errorLogLabelToolTip = "file://" + errorLog
-            label = Gtk.Label()
-            label.set_markup( errorLogLabelBeforeLink + " <a href=\'" + "file://" + errorLog + "\' title=\'" + errorLogLabelToolTip + "\'>" + errorLogLabelAnchor + "</a> " + errorLogLabelAfterLink )
-            label.show()
-            notebookOrStack.add( label )
+
+        addHyperlinkLabel( os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog", changeLogLabelBeforeLink, changeLogLabelAfterLink, changeLogLabelAnchor )
+        addHyperlinkLabel( errorLog, errorLogLabelBeforeLink, errorLogLabelAfterLink, errorLogLabelAnchor )
 
         aboutDialog.run()
         aboutDialog.hide()
