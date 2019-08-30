@@ -2523,6 +2523,8 @@ class IndicatorLunar:
             elevation.set_text( theElevation )
 
 
+#TODO Why not just clear the display tags store and just add stuff as needed?
+# Is the code below that much faster than simply clear all and add?
     def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
         if pageNumber == 0: # User has clicked the first tab.
             displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
