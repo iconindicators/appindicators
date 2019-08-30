@@ -297,7 +297,11 @@ class IndicatorPPADownloadStatistics:
                 _( "translator-credits" ),
                 _( "View the" ),
                 _( "text file." ),
-                _( "changelog" ) )
+                _( "changelog" ),
+                IndicatorPPADownloadStatistics.LOG,
+                _( "View the" ),
+                _( "text file." ),
+                _( "error log" ) )
 
             self.dialogLock.release()
 
