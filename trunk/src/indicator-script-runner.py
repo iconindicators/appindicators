@@ -157,7 +157,11 @@ class IndicatorScriptRunner:
                 _( "translator-credits" ),
                 _( "View the" ),
                 _( "text file." ),
-                _( "changelog" ) )
+                _( "changelog" ),
+                IndicatorScriptRunner.LOG,
+                _( "View the" ),
+                _( "text file." ),
+                _( "error log" ) )
 
             self.dialogLock.release()
 
