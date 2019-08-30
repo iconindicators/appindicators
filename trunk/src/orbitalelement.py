@@ -43,11 +43,11 @@ class OE:
 
 # Downloads OE data for an object in XEphem format from the URL.
 #
-# On success, returns a non-empty dict:
+# On success, returns a { } with:
 #    Key: object name (upper cased)
 #    Value: data line
 #
-# Otherwise, may write to the log and returns None.
+# Otherwise, may write to the log and returns { }.
 def download( url, logging = None ):
     oeData = { }
     try:
@@ -57,13 +57,11 @@ def download( url, logging = None ):
                 oe = OE( data[ i ].strip() )
                 oeData[ oe.getName().upper() ] = oe
 
-        if not oeData:
-            oeData = None
-            if logging is not None:
+        if not oeData and logging is not None:
                 logging.error( "No OE data found at " + str( url ) )
 
     except Exception as e:
-        oeData = None
+        oeData = { }
         if logging is not None:
             logging.exception( e )
             logging.error( "Error retrieving OE data from " + str( url ) )
