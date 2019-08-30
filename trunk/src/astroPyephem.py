@@ -310,17 +310,18 @@ def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[
                                                   float( _city_data.get( city )[ 1 ] ), \
                                                   _city_data.get( city )[ 2 ]
 
-# Take a list of items (comet names or minor planet names)
-# and a corresponding dictionary of orbital element data
-# and return a list of items which have a magnitude less than or equal to the maximum magnitude.
-def getItemsLessThanMagnitude( items, orbitalElementData, maximumMagnitude ):
-    results = [ ]
-    for item in items:
-        body = ephem.readdb( orbitalElementData[ item ].getData() )
+# Take orbital element data (for comets or minor planet)
+# as dictionary, where the key is the body name and value is the orbital element data.
+#
+# Returns a dictionary in which each item has a magnitude less than or equal to the maximum magnitude.
+def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
+    results = { }
+    for key in orbitalElementData:
+        body = ephem.readdb( orbitalElementData[ key ].getData() )
         body.compute( ephem.city( "London" ) ) # Use any city; makes no difference to obtain the magnitude.
         bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
         if not bad and body.mag >= MAGNITUDE_MINIMUM and body.mag <= maximumMagnitude:
-            results.append(item )
+            results[ key ] = orbitalElementData[ key ]
 
     return results
 
