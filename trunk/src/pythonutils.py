@@ -398,6 +398,7 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     theFile = ""
     for file in os.listdir( cacheDirectory ):
+#TODO Ensure the > works with a file that is 201908 versus 201910        
         if file.startswith( baseName ) and file > theFile:
             theFile = file
 
