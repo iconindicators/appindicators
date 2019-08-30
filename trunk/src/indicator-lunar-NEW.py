@@ -677,18 +677,15 @@ class IndicatorLunar:
 
 
     # Get the data from the cache, or if stale, download from the source.
-    # On success, returns non-empty dict of data; no data returns an empty dict; source error returns None.
-#TODO Returning None (no internet say) is an error.  But what if somehow we get empty data returned...
-#...this is still a problem as such for the user.
-# So maybe write to the log to distinguish error types and return an empty [] and give the user a general error message?
-    def updateData( self, existingData, cacheBaseName, cacheMaximumAgeHours, downloadDataFunction, dataURL, magnitudeFilterFunction ):
-        if existingData: # Ensure existing data is not stale.
-            cacheDateTimeStamp = datetime.datetime.strptime( pythonutils.getCacheDateTime( INDICATOR_NAME, cacheBaseName ), pythonutils.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+    # On success, returns a non-empty { }; when no data or an error occurs, returns an empty { }.
+    def updateData( self, existingData, cacheBaseName, cacheMaximumAgeHours, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
+        if existingData:
             newData = existingData
-            if datetime.datetime.utcnow() > ( cacheDateTimeStamp + datetime.timedelta( hours = cacheMaximumAgeHours ) ):
-                newData = downloadDataFunction( dataURL )
+            cacheDateTimeStamp = datetime.datetime.strptime( pythonutils.getCacheDateTime( INDICATOR_NAME, cacheBaseName ), pythonutils.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            if datetime.datetime.utcnow() > ( cacheDateTimeStamp + datetime.timedelta( hours = cacheMaximumAgeHours ) ): # Ensure existing data is not stale.
+                newData = downloadDataFunction( dataURL ) # Either valid or None.
                 if newData is not None and magnitudeFilterFunction is not None:
-                    newData = magnitudeFilterFunction( newData, astroPyephem.MAGNITUDE_MAXIMUM )
+                    newData = magnitudeFilterFunction( newData, astroPyephem.MAGNITUDE_MAXIMUM ) # Either valid or None.
 
                 if newData is not None:
                     pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
@@ -697,9 +694,7 @@ class IndicatorLunar:
             # Have no data, so read from cache and if that fails, download.
             pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, cacheMaximumAgeHours )
             newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Either valid or None; empty data is never cached.
-            #TODO This will return None for old format satellite cache data.  Is this a problem?
 
-#TODO Look at this again....can we just scrub the entire cache and avoid the hack below?
 #TODO Start of temporary hack...
 # There was a change of data formats between version 80 ad 81.
 # Satellites are using the TLE object but the file name was changed from satellite to twolineelement and is deemed an invalid object.
@@ -709,23 +704,22 @@ class IndicatorLunar:
 # Comets will successfully read in because their objects (dict, tuple string) are valid.
 # Comets are still stored in a dict using a string as key but now with a new OE object as the value, which must be handled.
 # This check can be removed in version 82 or later.
-            if newData is not None and cacheBaseName == IndicatorLunar.COMET_OE_CACHE_BASENAME and newData:
-                randomValue = next( iter( newData.values() ) )
-                if not isinstance( randomValue, orbitalelement.OE ):
+            if newData is not None and cacheBaseName == IndicatorLunar.COMET_OE_CACHE_BASENAME:
+                if not isinstance( next( iter( newData.values() ) ), orbitalelement.OE ): # Check that the object loaded from cache matches the new OE object.
                     newData = None
 #TODO End of hack!
 
             if newData is None:
                 newData = downloadDataFunction( dataURL ) # Either valid or None.
                 if newData is not None and magnitudeFilterFunction is not None:
-                    newData = magnitudeFilterFunction( newData, astroPyephem.MAGNITUDE_MAXIMUM )
+                    newData = magnitudeFilterFunction( newData, astroPyephem.MAGNITUDE_MAXIMUM ) # Either valid or None.
 
                 if newData is not None:
                     pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
-#TODO If the newData is None, we return None...does that mean None is passed in next time as existingData
-# (and if so, need to check against this)?
-# Maybe return [ ]?  Or is None used to tell the user of an issue?
-#Anyway, ensure that None is not passed in as the existingData.
+
+        if newData is None:
+            newData = { }
+
         return newData
 
 
