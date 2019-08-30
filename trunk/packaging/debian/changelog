@@ -2,6 +2,8 @@ indicator-tide (1.0.15-1) xenial; urgency=low
 
   * Corrected the indents for menu items for GNOME Shell.
   * Tidy up load config of user preferences.
+  * Added a hyperlink to the About dialog which links to the error log
+    text file (only visible if the underlying file is present).
   * Update release to xenial as trusty is end of life.
   * Update debian/control Standards-Version to 3.9.7.
   * Added logging for when the license has expired and data unavailable.
