@@ -188,7 +188,11 @@ class IndicatorPunycode:
                 _( "translator-credits" ),
                 _( "View the" ),
                 _( "text file." ),
-                _( "changelog" ) )
+                _( "changelog" ),
+                IndicatorPunycode.LOG,
+                _( "View the" ),
+                _( "text file." ),
+                _( "error log" ) )
 
             self.dialogLock.release()
 
