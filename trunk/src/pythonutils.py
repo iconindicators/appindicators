@@ -393,16 +393,16 @@ def getCacheDateTime( applicationBaseDirectory, baseName ):
 #
 # Files which pass the filter are sorted by date/time and the most recent file is read.
 #
-# Returns the binary object; None on error.
+# Returns the binary object; None when no suitable cache file exists; None on error and logs.
 def readCacheBinary( applicationBaseDirectory, baseName, logging ):
     cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
+    data = None
     theFile = ""
     for file in os.listdir( cacheDirectory ):
 #TODO Ensure the > works with a file that is 201908 versus 201910        
         if file.startswith( baseName ) and file > theFile:
             theFile = file
 
-    data = None
     if theFile: # A value of "" evaluates to False.
         filename = cacheDirectory + "/" + theFile
         try:
