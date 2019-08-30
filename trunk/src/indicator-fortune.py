@@ -181,7 +181,11 @@ class IndicatorFortune:
                 _( "translator-credits" ),
                 _( "View the" ),
                 _( "text file." ),
-                _( "changelog" ) )
+                _( "changelog" ),
+                IndicatorFortune.LOG,
+                _( "View the" ),
+                _( "text file." ),
+                _( "error log" ) )
 
             self.dialogLock.release()
 
