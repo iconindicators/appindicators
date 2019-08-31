@@ -603,7 +603,22 @@ class IndicatorLunar:
 #TODO Maybe add a preference that hides an object if below the horizon (but will rise).
 # How does this effect satellites?    
     def update( self, scheduled ):
-        self.onAbout( None )
+
+#TODO Might try to instead of including the changelog in the install directory, copy from standard location to /tmp.
+#Need to overwrite the file each time.
+#Need to figure out how to launch text editor to view.
+#
+#         import gzip, shutil
+#         with gzip.open( "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz", 'r' ) as fileIn, open( "/tmp/" + INDICATOR_NAME + ".changelog", 'wb' ) as fileOut:
+#             shutil.copyfileobj( fileIn, fileOut )
+#
+#
+#         import webbrowser
+#         webbrowser.open(  "/tmp/indicator-lunar.changelog" )
+#
+
+
+#         self.onAbout( None )
         
         if True: return
         
