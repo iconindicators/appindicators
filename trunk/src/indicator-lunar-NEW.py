@@ -85,6 +85,7 @@ gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
+from threading import Timer
 import astroPyephem, datetime, eclipse, glob, locale, logging, math, orbitalelement, os, pythonutils, re, tempfile, threading, twolineelement, webbrowser
 
 
@@ -98,6 +99,8 @@ class IndicatorLunar:
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
+
+    START_UP_DELAY_IN_SECONDS = 2 # Delay the update function from kicking off and give the indicator time to start up in a simple state.
 
     SVG_FULL_MOON_FILE = ICON_BASE_PATH + "/." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
@@ -543,16 +546,16 @@ class IndicatorLunar:
         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
-
-#TODO Does not show...why?  
-#Maybe need to kick off in a thread?  Or the update shold be done in its own thread (like PPA)?
-#         menu = Gtk.Menu()
-#         menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
-#         self.indicator.set_menu( menu )
-#         menu.show_all()
-
         self.loadConfig()
-        self.update( True )
+
+#TODO Mention this new functionality in the changelog?
+#Look at PPA...how did we do the same thing?
+        menu = Gtk.Menu()
+        menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
+        self.indicator.set_menu( menu )
+        menu.show_all()
+
+        Timer( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update, kwargs = { "scheduled" : True } ).start()
 
 #TODO Look at
 # https://minorplanetcenter.net/iau/MPCORB.html
@@ -575,7 +578,12 @@ class IndicatorLunar:
 #or set an upper limit of magnitude, say 20.
 
 
-    def main( self ): Gtk.main()
+    def main( self ): 
+        Gtk.main()
+#         print("main")
+#         from threading import Thread
+#         Thread( target = self.update( True, initialising = True ) ).start()
+        
 
 #TODO Thinking about updating oe and tle data...
 #
@@ -598,20 +606,13 @@ class IndicatorLunar:
 # 
 #    Build menu.
 #    Update icon/label.
-# 
-# 
-# 
-# 
 
 
 #TODO If the backend/frontend are updating, and the user clicks on about/prefs, show a notification to tell the user they're blocked?
 #What about the other way?  If the about/prefs are open, disable the updates?
 
 
-#TODO Maybe add a preference that hides an object if below the horizon (but will rise).
-# How does this effect satellites?    
     def update( self, scheduled ):
-
         with threading.Lock():
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
@@ -620,9 +621,6 @@ class IndicatorLunar:
             self.cometsAddNew = True
             self.minorPlanetsAddNew = True
             self.satellitesAddNew = True
-
-
-#TODO Can we add a link to the log file in the About dialog?
 
 #TODO Need to check for None return which is an error, and report to user and set to empty [].
 #Do we set None return for data to be { } ?
