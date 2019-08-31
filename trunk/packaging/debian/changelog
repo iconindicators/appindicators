@@ -8,8 +8,8 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
     Illumination and Distance have been removed; they are interesting but
     unnecessary for object location.
   * TODO Need to comment on that always up and never up are no longer shown, that an object which is always up only shows az/alt and an object yet to rise will ony show rise time.
-  * Only visible satellite passes (dawn/dusk) are shown; there is no point
-    showing non-visible passes.
+  * Only visible satellite passes (dawn/dusk) are shown;
+    no point showing non-visible passes.
   * Removed Right Ascension and Declination from all items; Azimuth and
     Altitude are sufficient.
   * Removed decimal degrees from Azimuth/Altitude.
