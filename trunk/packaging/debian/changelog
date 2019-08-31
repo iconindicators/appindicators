@@ -10,11 +10,11 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * TODO Need to comment on that always up and never up are no longer shown, that an object which is always up only shows az/alt and an object yet to rise will ony show rise time.
   * Only visible satellite passes (dawn/dusk) are shown;
     no point showing non-visible passes.
-  * Removed Right Ascension and Declination from all items; Azimuth and
-    Altitude are sufficient.
+  * Removed Right Ascension and Declination from all items;
+    Azimuth/Altitude are sufficient.
   * Removed decimal degrees from Azimuth/Altitude.
-  * Removed planetary moons; each effectively has the same Azimuth/Altitude as
-    the parent.
+  * Removed planetary moons as each effectively has the same Azimuth/Altitude
+    as the parent planet.
   * Removed werewolf warning percentage from preferences and fixed at 99%.
   * Removed date/time format from preferences; now uses ISO 8601.
   * Added a hyperlink to the About dialog which links to the error log
