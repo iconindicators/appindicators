@@ -539,9 +539,17 @@ class IndicatorLunar:
         self.lastUpdateSatelliteTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, "", AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorLunar.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
+
+#TODO Does not show...why?  
+#Maybe need to kick off in a thread?  Or the update shold be done in its own thread (like PPA)?
+#         menu = Gtk.Menu()
+#         menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
+#         self.indicator.set_menu( menu )
+#         menu.show_all()
 
         self.loadConfig()
         self.update( True )
