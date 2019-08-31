@@ -19,7 +19,7 @@
 
 
 from gi.repository import Gtk
-import datetime, json, logging.handlers, os, pickle, shutil, socket, subprocess, sys
+import datetime, gzip, json, logging.handlers, os, pickle, shutil, socket, subprocess, sys
 
 
 AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
@@ -242,6 +242,13 @@ def showAboutDialog(
         if not( translatorCredit is None or translatorCredit == "" ):
             aboutDialog.set_translator_credits( translatorCredit )
 
+        changeLog = "/tmp/" + programName + ".changelog"
+        if os.path.isfile( changeLog ):
+            os.remove( changeLog )
+
+        with gzip.open( "/usr/share/doc/" + programName + "/changelog.Debian.gz", 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
+            shutil.copyfileobj( fileIn, fileOut )
+
 
         def addHyperlinkLabel( filePath, leftText, rightText, anchorText ):
             if os.path.exists( filePath ):
@@ -258,7 +265,7 @@ def showAboutDialog(
                 notebookOrStack.add( label )
 
 
-        addHyperlinkLabel( os.path.dirname( os.path.abspath( __file__ ) ) + "/changelog", changeLogLabelBeforeLink, changeLogLabelAfterLink, changeLogLabelAnchor )
+        addHyperlinkLabel( changeLog, changeLogLabelBeforeLink, changeLogLabelAfterLink, changeLogLabelAnchor )
         addHyperlinkLabel( errorLog, errorLogLabelBeforeLink, errorLogLabelAfterLink, errorLogLabelAnchor )
 
         aboutDialog.run()
