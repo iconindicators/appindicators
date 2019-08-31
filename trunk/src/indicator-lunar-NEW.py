@@ -604,25 +604,6 @@ class IndicatorLunar:
 # How does this effect satellites?    
     def update( self, scheduled ):
 
-#TODO Might try to instead of including the changelog in the install directory, copy from standard location to /tmp.
-# 
-#         import gzip, os, shutil, webbrowser
-#         if os.path.isfile( "/tmp/indicator-lunar.changelog" ):
-#             os.remove( "/tmp/indicator-lunar.changelog" )
-# 
-#         with gzip.open( "/usr/share/doc/" + INDICATOR_NAME + "/changelog.Debian.gz", 'r' ) as fileIn, open( "/tmp/" + INDICATOR_NAME + ".changelog", 'wb' ) as fileOut:
-#             shutil.copyfileobj( fileIn, fileOut )
-# 
-#         webbrowser.open(  "/tmp/indicator-lunar.changelog" )
-#
-# This works under eclipse, but test when installed under /usr/share/... and ensure the file can be written to and deleted from /tmp.
-
-
-
-#         self.onAbout( None )
-        
-        if True: return
-        
         with threading.Lock():
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
