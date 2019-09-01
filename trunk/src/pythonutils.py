@@ -496,7 +496,7 @@ def removeOldFilesFromCache( applicationBaseDirectory, baseName, cacheMaximumAge
     for file in os.listdir( cacheDirectory ):
         if file.startswith( baseName ):
             fileDateTime = file[ len( baseName ) : ]
-            if fileDateTime < cacheMaximumDateTimeString:
+            if fileDateTime < cacheMaximumDateTimeString: #TODO Test this...may need an actual datetime
                 os.remove( cacheDirectory + "/" + file )
 
 
