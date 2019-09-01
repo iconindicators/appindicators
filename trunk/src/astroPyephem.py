@@ -574,6 +574,11 @@ def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
             __calculateNextSatellitePass( ephemNow, data, key, satelliteData[ key ] )
 
 
+#TODO On Sep 1st I ran the indicator at 3pm and noticed that there were
+# satellites currently in transit with a rise date/time of Aug 29 18:40
+# and then satellites to rise Aug 30 4:52.
+# The TLE cache file had filename of satellite-tle-20190901045141
+#So something is wrong...perhaps in the string comparison of dates (might have to use datetime rather than dates).
 def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
     key = ( AstronomicalBodyType.Satellite, key )
     currentDateTime = ephemNow
