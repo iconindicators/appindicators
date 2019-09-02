@@ -547,6 +547,7 @@ class IndicatorLunar:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.loadConfig()
+#         self.update()
 
 #TODO Mention this new functionality in the changelog?
 #Look at PPA...how did we do the same thing?
@@ -555,7 +556,15 @@ class IndicatorLunar:
         self.indicator.set_menu( menu )
         menu.show_all()
 
-        Timer( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update, kwargs = { "scheduled" : True } ).start()
+        GLib.timeout_add_seconds( 5, self.update )
+#         print("main")
+#         from threading import Thread
+#         Thread( target = self.update( True ) ).start()
+        
+
+
+#         Timer( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update ).start()
+#         Timer( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update ).start()
 
 #TODO Look at
 # https://minorplanetcenter.net/iau/MPCORB.html
@@ -580,11 +589,6 @@ class IndicatorLunar:
 
     def main( self ): 
         Gtk.main()
-#         print("main")
-#         from threading import Thread
-#         Thread( target = self.update( True, initialising = True ) ).start()
-        
-
 #TODO Thinking about updating oe and tle data...
 #
 # On initialisation...
@@ -612,7 +616,7 @@ class IndicatorLunar:
 #What about the other way?  If the about/prefs are open, disable the updates?
 
 
-    def update( self, scheduled ):
+    def update( self, scheduled = True ):
         with threading.Lock():
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
@@ -671,14 +675,13 @@ class IndicatorLunar:
 
             self.updateIconAndLabel()
 
-
             if self.showWerewolfWarning:
                 self.notificationFullMoon()
 
 #             if self.showSatelliteNotification:
 #                 self.notificationSatellites()
 
-            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update, True )
+            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
 
 
     # Get the data from the cache, or if stale, download from the source.
