@@ -556,7 +556,7 @@ class IndicatorLunar:
         self.indicator.set_menu( menu )
         menu.show_all()
 
-        GLib.timeout_add_seconds( 5, self.update )
+        GLib.timeout_add_seconds( 2, self.update )
 #         print("main")
 #         from threading import Thread
 #         Thread( target = self.update( True ) ).start()
@@ -628,6 +628,7 @@ class IndicatorLunar:
 
 #TODO Need to check for None return which is an error, and report to user and set to empty [].
 #Do we set None return for data to be { } ?
+            print( "Updating data")#TODO Debug
             self.cometOEData = self.updateData( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
                 self.addNewComets()
@@ -1060,6 +1061,7 @@ class IndicatorLunar:
                 bodies.append( key[ 1 ] )
 
         if bodies:
+            print( "Number of comets or minor planets:", len(bodies ))#TODO debug
             menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
             menu.append( menuItem ) 
             if self.showCometsAsSubMenu:
@@ -1146,6 +1148,7 @@ class IndicatorLunar:
             menuItem.set_submenu( theMenu )
             indent = 0
 
+        print( "Number of satellites:", len(satellites))#TODO debug
         for number, name, riseDateTime in satellites:
             self.updateSatelliteMenu( theMenu, indent, number )
 
