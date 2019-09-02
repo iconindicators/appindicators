@@ -6,10 +6,10 @@ indicator-virtual-box (1.0.61-1) xenial; urgency=low
     Instead, add a text field and the user manually specifies the window name.
   * Corrected the indents for menu items for GNOME Shell.
   * Tidy up load config of user preferences.
-  * Added a hyperlink to the About dialog which links to the error log
-    text file (only visible if the underlying file is present).
-  * About dialog now pulls the changelog directly from /usr/doc rather than a
-    local copy in the installation directory.
+  * Added hyperlink to the About dialog which links to the error log text file
+    (only visible if the underlying file is present).
+  * About dialog now pulls the changelog directly from /usr/doc
+    rather than a local copy in the installation directory.
   * Update release to xenial as trusty is end of life.
   * Update debian/control Standards-Version to 3.9.7.
 
