@@ -31,6 +31,10 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 
 
+#TODO Look at VirtualBox version 4+ (I think there is a 5 and now a 6).
+#How is the config file different?  Location different, format different, compatibility with 4?
+
+
 INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
