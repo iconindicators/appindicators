@@ -50,6 +50,8 @@
 
 #TODO Check for any date comparison stuff...ensure it works...may use text (rather than datetime) which is suspect.
 
+#TODO In pythonutils, removed ---- debug before we do the release (then add it back for indicator lunar).
+
 
 INDICATOR_NAME = "indicator-tide"
 import gettext
