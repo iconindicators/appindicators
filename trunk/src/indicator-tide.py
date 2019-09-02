@@ -32,8 +32,6 @@
 #  http://www.ukho.gov.uk/easytide
 
 
-#TODO Update icons for 19.04 (Yaru).
-
 #TODO Update license.
 
 
@@ -46,6 +44,11 @@
 #
 # Which are all from the same date/day and around the same time...why???
 
+
+#TODO Check TODO in pythonutils...do any apply here?
+
+
+#TODO Check for any date comparison stuff...ensure it works...may use text (rather than datetime) which is suspect.
 
 
 INDICATOR_NAME = "indicator-tide"
