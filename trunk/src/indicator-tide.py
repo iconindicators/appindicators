@@ -127,6 +127,7 @@ class IndicatorTide:
                 GLib.source_remove( self.updateTimerID )
 
             tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )
+            self.buildMenu( tidalReadings )
             if len( tidalReadings ) == 0:
                 summary = _( "Error" )
                 message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
@@ -142,7 +143,6 @@ class IndicatorTide:
 
             Notify.Notification.new( summary, message, IndicatorTide.ICON ).show()
 
-            self.buildMenu( tidalReadings )
             self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds( tidalReadings ), self.update, True )
 
 
