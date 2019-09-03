@@ -492,6 +492,9 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
 #     mags = [ 0, 0, 0, 0, 0, 0 ]
 #     magsAndAbove = [ 0, 0, 0, 0, 0, 0 ]
 
+
+#TODO Have noticed that we get a pile of minor planets but all are always above the horizon (except for one that is always up).
+#Why are there none below the horzion (with just a rise date/time)?
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
             body = ephem.readdb( cometOrMinorPlanetData[ key ].getData() )
