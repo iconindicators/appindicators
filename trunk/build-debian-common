@@ -44,7 +44,6 @@ copyTopLevelAndSource()
   cp $NAME.py.desktop build/$NAME-$VERSION
 
   mkdir -p build/$NAME-$VERSION/src
-  cp packaging/debian/changelog build/$NAME-$VERSION/src
   cp $PYTHON_UTILS/src/pythonutils.py build/$NAME-$VERSION/src
 
   for item in "${_source[@]}"; do
