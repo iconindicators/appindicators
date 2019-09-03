@@ -46,9 +46,9 @@
 #
 # 
 # Another example where within less than one hour, the cache is updated three times.
-# tidal-2019 08 30 13 27 12
-# tidal-2019 08 30 13 29 41
-# tidal-2019 08 30 13 53 10
+# tidal-2019 08 30 13 27
+# tidal-2019 08 30 13 29
+# tidal-2019 08 30 13 53
 
 
 #TODO Check TODO in pythonutils...do any apply here?
@@ -116,8 +116,8 @@ class IndicatorTide:
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
-        self.cachedDataInUse = False
-        self.update( True )
+        tidalReadings = [ ]
+        self.update()
 
         if ports.isExpired():
             message = _(
@@ -130,36 +130,34 @@ class IndicatorTide:
     def main( self ): Gtk.main()
 
 
-    def update( self, scheduled ):
+    def update( self, scheduled = True ):
         with threading.Lock():
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
-            tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )
+#             tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )#TODO Original
+            tidalReadings = self.getTidalData( self.portID )
             self.buildMenu( tidalReadings )
-            if len( tidalReadings ) == 0:
-                summary = _( "Error" )
-                message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
-                logging.error( message )
-            else:
+            if tidalReadings:
                 summary = _( "Tidal data ready" )
-                if self.cachedDataInUse:
-                    summary = _( "Cached tidal data ready" )
-
                 message = _( "Tidal data is presented in the time zone of the port." )
                 if self.tidalReadingsAreAllDateTimes( tidalReadings ):
                     message = _( "Tidal data is presented in your local time zone." )
 
+            else:
+                summary = _( "Error" )
+                message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
+                logging.error( message )
+
+
             Notify.Notification.new( summary, message, IndicatorTide.ICON ).show()
 
-            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds( tidalReadings ), self.update, True )
+            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds( tidalReadings ), self.update )
 
 
     def buildMenu( self, tidalReadings ):
         menu = Gtk.Menu()
-        if len( tidalReadings ) == 0:
-            menu.append( Gtk.MenuItem( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
-        else:
+        if tidalReadings:
             menuItemText = _( "{0}, {1}" ).format( ports.getPortName( tidalReadings[ 0 ].getPortID() ), ports.getCountry( tidalReadings[ 0 ].getPortID() ) )
             self.createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
             allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
@@ -213,6 +211,9 @@ class IndicatorTide:
 
                 previousMonth = tidalDateTimeLocal.month
                 previousDay = tidalDateTimeLocal.day
+
+        else:
+            menu.append( Gtk.MenuItem( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
 
         pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
@@ -507,12 +508,30 @@ class IndicatorTide:
         pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
-    def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID ):
+    def getTidalDataFromUnitedKingdomHydrographicOfficeORIG( self, portID ):
         tidalReadings = [ ]
         if pythonutils.isConnectedToInternet():
             tidalReadings = self._getTidalDataFromUnitedKingdomHydrographicOffice( portID )
 
         return self.removeTidalReadingsPriorToToday( self.washTidalDataThroughCache( tidalReadings ) )
+
+
+#TODO If this works, test with existing cache data and see what happens.
+    def getTidalData( self, portID ):
+        tidalReadings = [ ]
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
+        tidalReadings = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, logging ) # Either valid or None; empty data is never cached.
+        if tidalReadings is not None:
+            tidalReadings = self.removeTidalReadingsPriorToToday( tidalReadings )
+            if not tidalReadings:
+                tidalReadings = None
+        
+        if tidalReadings is None: # There was no cached version or the cached version was stale; either way, need to do a download.
+            tidalReadings = self.removeTidalReadingsPriorToToday( self._getTidalDataFromUnitedKingdomHydrographicOffice( portID ) ) # Either empty or non-empty.
+            if tidalReadings:
+                pythonutils.writeCacheBinary( tidalReadings, INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, logging )
+
+        return tidalReadings
 
 
     def _getTidalDataFromUnitedKingdomHydrographicOffice( self, portID ):
@@ -637,7 +656,7 @@ class IndicatorTide:
     # If there is no data, read from the cache (discarding data older than today).
     def washTidalDataThroughCache( self, tidalReadings ):
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
-        if len( tidalReadings ) > 0:
+        if tidalReadings:
             pythonutils.writeCacheBinary( tidalReadings, INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, logging )
         else:
             self.cachedDataInUse = True
@@ -649,8 +668,11 @@ class IndicatorTide:
         return tidalReadings
 
 
-    # If all tidal readings comprise both a date and time, convert each reading to user local and then remove a reading if prior to user local today.
-    # Otherwise, tidal reading contain a mix of date and date/time or are date only: compare each reading to UTC midnight date only and remove if older. 
+    # If all tidal readings comprise both a date and time, convert each reading to user local date and time,
+    # then remove a reading if prior to user local today.
+    #
+    # Otherwise, tidal readings contain a mix of date and date/time or are date only.
+    # Compare each reading to UTC midnight date only and remove if older. 
     def removeTidalReadingsPriorToToday( self, tidalReadings ):
         if self.tidalReadingsAreAllDateTimes( tidalReadings ):
             todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
