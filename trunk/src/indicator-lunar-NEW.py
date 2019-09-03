@@ -546,6 +546,9 @@ class IndicatorLunar:
         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
+#TODO Maybe here do a purge of the cached files...only need to do it once per invokation of the indicator rather than during each update
+# or when getting data.
+
         self.loadConfig()
 #         self.update()
 
