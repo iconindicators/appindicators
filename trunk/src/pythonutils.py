@@ -379,21 +379,6 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
     return success
 
 
-#TODO Test!!!
-def getCacheDateTime( applicationBaseDirectory, baseName ):
-    cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
-    theFile = ""
-    for file in os.listdir( cacheDirectory ):
-        if file.startswith( baseName ) and file > theFile:
-            theFile = file
-
-    dateTime = None
-    if theFile: # A value of "" evaluates to False.
-        dateTime = theFile[ len( baseName ) : ]
-
-    return dateTime
-
-
 # Read the most recent binary object from the cache.
 #
 # applicationBaseDirectory: The directory used as the final part of the overall path.
@@ -417,8 +402,6 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
     data = None
     theFile = ""
     for file in os.listdir( cacheDirectory ):
-#TODO Ensure the > works with a file that is 201908 versus 201910        
-        if file.startswith( baseName ) and file > theFile:
             theFile = file
 
     if theFile: # A value of "" evaluates to False.
