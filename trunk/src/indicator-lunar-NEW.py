@@ -62,12 +62,6 @@
 # Use the OSD?
 
 
-#TODO The minor planets file takes a while to load...
-#Check if it takes a while to load on startup.
-#Check when preferences startup...maybe show teh prefs dialog but make it opaque with a message?
-#The toggle to select all takes a while, so maybe remove from comets/sats/minp?
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -553,15 +547,7 @@ class IndicatorLunar:
         self.indicator.set_menu( menu )
         menu.show_all()
 
-        GLib.timeout_add_seconds( 2, self.update )
-#         print("main")
-#         from threading import Thread
-#         Thread( target = self.update( True ) ).start()
-        
-
-
-#         Timer( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update ).start()
-#         Timer( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update ).start()
+        GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update )
 
 #TODO Look at
 # https://minorplanetcenter.net/iau/MPCORB.html
@@ -811,7 +797,7 @@ class IndicatorLunar:
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
         # If the underlying object has been unchecked or the object (satellite/comet) no longer exists,
-        # a tag for this object will not be substituded; so remove.
+        # a tag for this object will not be substituted; so remove.
         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput )
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
 
@@ -1244,7 +1230,7 @@ class IndicatorLunar:
         return components[ 0 ] + ":" + components[ 1 ]
 
 
-#TODO Once satellite notification is revisted, this function might go.
+#TODO Once satellite notification is revisited, this function might go.
     def toDateTime( self, dateTimeAsString, formatString ): return datetime.datetime.strptime( dateTimeAsString, formatString )
 
 

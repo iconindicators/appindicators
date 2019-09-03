@@ -505,7 +505,7 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
 
 #TODO Debug
 #                 mags[ int( body.mag ) ] += 1 
-#                 if body.mag < 0.0: print( "negative magnitude:", body.mag )
+#                 if body.mag <= MAGNITUDE_MINIMUM: print( "Dodgy magnitude:", body.mag )
 #                 if float( data[ ( astronomicalBodyType, key, DATA_ALTITUDE ) ] ) > 0:
 #                     magsAndAbove[ int( body.mag ) ] += 1
 
