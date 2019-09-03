@@ -35,28 +35,6 @@
 #TODO Update license.
 
 
-#TODO Noticed in the .cache directory:
-# 
-# tidal-2019 08 01 17 34  
-# tidal-2019 08 01 17 34
-# tidal-2019 08 01 17 34  
-# tidal-2019 08 01 17 35
-#
-# Which are all from the same date/day and around the same time...why???
-#
-# 
-# Another example where within less than one hour, the cache is updated three times.
-# tidal-2019 08 30 13 27
-# tidal-2019 08 30 13 29
-# tidal-2019 08 30 13 53
-
-
-#TODO Check TODO in pythonutils...do any apply here?
-
-
-#TODO Check for any date comparison stuff...ensure it works...may use text (rather than datetime) which is suspect.
-
-
 #TODO In pythonutils, remove ---- debug before we do the release (then add it back for indicator lunar).
 
 
@@ -116,7 +94,6 @@ class IndicatorTide:
         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
-        tidalReadings = [ ]
         self.update()
 
         if ports.isExpired():
@@ -127,6 +104,7 @@ class IndicatorTide:
             Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
             logging.warning( message )
 
+
     def main( self ): Gtk.main()
 
 
@@ -135,7 +113,6 @@ class IndicatorTide:
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
-#             tidalReadings = self.getTidalDataFromUnitedKingdomHydrographicOffice( self.portID )#TODO Original
             tidalReadings = self.getTidalData( self.portID )
             self.buildMenu( tidalReadings )
             if tidalReadings:
@@ -148,7 +125,6 @@ class IndicatorTide:
                 summary = _( "Error" )
                 message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
                 logging.error( message )
-
 
             Notify.Notification.new( summary, message, IndicatorTide.ICON ).show()
 
@@ -205,7 +181,7 @@ class IndicatorTide:
                     if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
                         self.createAndAppendMenuItem( menu, pythonutils.indent( 2, 2 ) + menuItemText, tidalReading.getURL() )
                     else:
-                        self.createAndAppendMenuItem( subMenu, pythonutils.indent( 0, 2 ) + menuItemText, tidalReading.getURL() ) #TODO Added indent here for GNOME Shell.
+                        self.createAndAppendMenuItem( subMenu, pythonutils.indent( 0, 2 ) + menuItemText, tidalReading.getURL() )
                 else:
                     self.createAndAppendMenuItem( menu, pythonutils.indent( 2, 2 ) + menuItemText, tidalReading.getURL() )
 
@@ -245,18 +221,18 @@ class IndicatorTide:
         # UKHO appears to update port data at GMT midnight (so update shortly after GMT midnight).
         utcnow = datetime.datetime.utcnow()
         fiveMinutesAfterUTCMidnight = ( utcnow + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
-        numberOfSecondsUntilFiveMinutesAfterUTCMidnight = ( fiveMinutesAfterUTCMidnight - utcnow ).total_seconds()
+        fiveMinutesAfterUTCMidnightInSeconds = ( fiveMinutesAfterUTCMidnight - utcnow ).total_seconds()
 
-        # Remove stale data (data from days prior to user local today); can only compute that for ports with date/time.
+        # Remove stale data (data from days prior to user local today); only makes sense for ports with date/time.
         now = datetime.datetime.now()
         fiveMinutesAfterLocalMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
-        numberOfSecondsUntilFiveMinutesAfterLocalMidnight = ( fiveMinutesAfterLocalMidnight - now ).total_seconds()
+        fiveMinutesAfterLocalMidnightInSeconds = ( fiveMinutesAfterLocalMidnight - now ).total_seconds()
 
         if self.tidalReadingsAreAllDateTimes( tidalReadings ):
-            nextUpdateTimeInSeconds = int( min( numberOfSecondsUntilFiveMinutesAfterUTCMidnight, numberOfSecondsUntilFiveMinutesAfterLocalMidnight ) )
+            nextUpdateTimeInSeconds = int( min( fiveMinutesAfterUTCMidnightInSeconds, fiveMinutesAfterLocalMidnightInSeconds ) )
         else:
-            nextUpdateTimeInSeconds = numberOfSecondsUntilFiveMinutesAfterUTCMidnight
-
+            nextUpdateTimeInSeconds = fiveMinutesAfterUTCMidnightInSeconds
+        
         return nextUpdateTimeInSeconds
 
 
@@ -508,14 +484,6 @@ class IndicatorTide:
         pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
-    def getTidalDataFromUnitedKingdomHydrographicOfficeORIG( self, portID ):
-        tidalReadings = [ ]
-        if pythonutils.isConnectedToInternet():
-            tidalReadings = self._getTidalDataFromUnitedKingdomHydrographicOffice( portID )
-
-        return self.removeTidalReadingsPriorToToday( self.washTidalDataThroughCache( tidalReadings ) )
-
-
 #TODO If this works, test with existing cache data and see what happens.
     def getTidalData( self, portID ):
         tidalReadings = [ ]
@@ -647,23 +615,6 @@ class IndicatorTide:
             tidalReadings = [ ]
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
-
-        return tidalReadings
-
-
-    # Takes a list of tidal readings and...
-    # If there is data, write to the cache.  It is assumed that all the tidal data is date sorted and of today's date or newer.
-    # If there is no data, read from the cache (discarding data older than today).
-    def washTidalDataThroughCache( self, tidalReadings ):
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
-        if tidalReadings:
-            pythonutils.writeCacheBinary( tidalReadings, INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, logging )
-        else:
-            self.cachedDataInUse = True
-            tidalReadings, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, logging )
-            if tidalReadings is None: # No data read or empty data read.
-                tidalReadings = [ ]
-                self.cachedDataInUse = False
 
         return tidalReadings
 
