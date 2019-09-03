@@ -3,7 +3,7 @@
 # Common code for the build-debian script for all indicators.
 #
 # Will need to install the packages:
-#   devscripts dh-make build-essential lintian
+#   sudo apt-get install devscripts dh-make build-essential lintian
 
 # Python Utils contains Python/build scripts common to all indicators.
 PYTHON_UTILS=../PythonUtils
