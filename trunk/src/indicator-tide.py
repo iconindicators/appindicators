@@ -43,6 +43,12 @@
 # tidal-2019 08 01 17 35
 #
 # Which are all from the same date/day and around the same time...why???
+#
+# 
+# Another example where within less than one hour, the cache is updated three times.
+# tidal-2019 08 30 13 27 12
+# tidal-2019 08 30 13 29 41
+# tidal-2019 08 30 13 53 10
 
 
 #TODO Check TODO in pythonutils...do any apply here?
@@ -50,7 +56,8 @@
 
 #TODO Check for any date comparison stuff...ensure it works...may use text (rather than datetime) which is suspect.
 
-#TODO In pythonutils, removed ---- debug before we do the release (then add it back for indicator lunar).
+
+#TODO In pythonutils, remove ---- debug before we do the release (then add it back for indicator lunar).
 
 
 INDICATOR_NAME = "indicator-tide"
