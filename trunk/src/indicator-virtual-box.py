@@ -31,8 +31,9 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 
 
-#TODO Look at VirtualBox version 4+ (I think there is a 5 and now a 6).
-#How is the config file different?  Location different, format different, compatibility with 4?
+#TODO Look at VirtualBox 6; how is the config file different?
+# Location different, format different, compatibility with 4?
+# Install VB 6 on Ubuntu 19.04 VM and test from there.
 
 
 INDICATOR_NAME = "indicator-virtual-box"
