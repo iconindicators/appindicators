@@ -484,7 +484,6 @@ class IndicatorTide:
         pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
 
-#TODO If this works, test with existing cache data and see what happens.
     def getTidalData( self, portID ):
         tidalReadings = [ ]
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
