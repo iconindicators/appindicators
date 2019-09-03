@@ -1,5 +1,4 @@
 indicator-fortune.py.desktop usr/share/applications
-src/changelog usr/share/indicator-fortune
 src/indicator-fortune.py usr/share/indicator-fortune
 src/pythonutils.py usr/share/indicator-fortune
 icons/hicolor/indicator-fortune.svg usr/share/icons/hicolor/scalable/apps
