@@ -45,14 +45,6 @@
 #TODO Will need to update the install file under packaging/debian to reflect changes in file names.
 
 
-#TODO Suspect that since satellites are now keyed off satellite number (rather than a tuple of name and number)
-# for both the list of satellites and satellite data and
-# comet/minorPlanets are now using their own class,
-# the user prefs may be broken, particular if a user has selected specific items rather than just add all.
-# So at some point, install the deb file that is on the PPA and start with no config file,
-# then add some satellites and comets and see if the new code base handle this...and then handles with all items added.
-
-
 #TODO Consider removing the prefs for hide/show moon/sun.
 #That is, always show these...ask Oleg about this.
 
@@ -536,7 +528,12 @@ class IndicatorLunar:
         self.dialogLock = threading.Lock()
         Notify.init( INDICATOR_NAME )
 
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS )
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
+
         # Initialise last update date/times to the past...
+#TODO Are these needed?
         self.lastUpdateCometOE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         self.lastUpdateMinorPlanetOE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         self.lastUpdateSatelliteTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
@@ -545,9 +542,6 @@ class IndicatorLunar:
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorLunar.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
-#TODO Maybe here do a purge of the cached files...only need to do it once per invokation of the indicator rather than during each update
-# or when getting data.
 
         self.loadConfig()
 #         self.update()
@@ -632,15 +626,15 @@ class IndicatorLunar:
 #TODO Need to check for None return which is an error, and report to user and set to empty [].
 #Do we set None return for data to be { } ?
             print( "Updating data")#TODO Debug
-            self.cometOEData = self.updateData( self.cometOEData, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
+            self.cometOEData = self.updateData( IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
                 self.addNewComets()
 
-            self.minorPlanetOEData = self.updateData( self.minorPlanetOEData, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
+            self.minorPlanetOEData = self.updateData( IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.minorPlanetsAddNew:
                 self.addNewMinorPlanets()
 
-            self.satelliteTLEData = self.updateData( self.satelliteTLEData, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL, None )
+            self.satelliteTLEData = self.updateData( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL, None )
             if self.satellitesAddNew:
                 self.addNewSatellites()
 
@@ -655,9 +649,9 @@ class IndicatorLunar:
 #...then do a run and the data fails to download and cache is stale, we have no data.
 # If we now call astro, we have a valid list of comets (minor planets or satellites) but invalid data.
 # What to do?
-#             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
-            from datetime import timezone #TODO Testing for satellites
-            self.data = astroPyephem.getAstronomicalInformation( datetime.datetime( 2019, 8, 29, 9, 0, 0, 0, tzinfo = timezone.utc ),
+            self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
+#             from datetime import timezone #TODO Testing for satellites
+#             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime( 2019, 8, 29, 9, 0, 0, 0, tzinfo = timezone.utc ),
                                                           self.latitude, self.longitude, self.elevation,
                                                           self.planets,
                                                           self.stars,
@@ -674,7 +668,7 @@ class IndicatorLunar:
 
             # Update frontend...
             utcNow = datetime.datetime.utcnow()
-            self.updateMenu() #TODO Takes 5 seconds...what is the biggest drain?  Satellites?
+            self.updateMenu()
             print( "updateMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
             self.updateIconAndLabel()
@@ -690,22 +684,8 @@ class IndicatorLunar:
 
     # Get the data from the cache, or if stale, download from the source.
     # On success, returns a non-empty { }; when no data or an error occurs, returns an empty { }.
-    def updateData( self, existingData, cacheBaseName, cacheMaximumAgeHours, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
-        if existingData:
-            newData = existingData
-            cacheDateTimeStamp = datetime.datetime.strptime( pythonutils.getCacheDateTime( INDICATOR_NAME, cacheBaseName ), pythonutils.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-            if datetime.datetime.utcnow() > ( cacheDateTimeStamp + datetime.timedelta( hours = cacheMaximumAgeHours ) ): # Ensure existing data is not stale.
-                newData = downloadDataFunction( dataURL ) # Either valid or None.
-                if newData is not None and magnitudeFilterFunction is not None:
-                    newData = magnitudeFilterFunction( newData, astroPyephem.MAGNITUDE_MAXIMUM ) # Either valid or None.
-
-                if newData is not None:
-                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
-
-        else:
-            # Have no data, so read from cache and if that fails, download.
-            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, cacheMaximumAgeHours )
-            newData = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Either valid or None; empty data is never cached.
+    def updateData( self, cacheBaseName, cacheMaximumAgeHours, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
+        data = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Either valid or None; empty data is never cached.
 
 #TODO Start of temporary hack...
 # There was a change of data formats between version 80 ad 81.
@@ -716,23 +696,23 @@ class IndicatorLunar:
 # Comets will successfully read in because their objects (dict, tuple string) are valid.
 # Comets are still stored in a dict using a string as key but now with a new OE object as the value, which must be handled.
 # This check can be removed in version 82 or later.
-            if newData is not None and cacheBaseName == IndicatorLunar.COMET_OE_CACHE_BASENAME:
-                if not isinstance( next( iter( newData.values() ) ), orbitalelement.OE ): # Check that the object loaded from cache matches the new OE object.
-                    newData = None
+        if data is not None and cacheBaseName == IndicatorLunar.COMET_OE_CACHE_BASENAME:
+            if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ): # Check that the object loaded from cache matches the new OE object.
+                data = None
 #TODO End of hack!
 
-            if newData is None:
-                newData = downloadDataFunction( dataURL ) # Either valid or None.
-                if newData is not None and magnitudeFilterFunction is not None:
-                    newData = magnitudeFilterFunction( newData, astroPyephem.MAGNITUDE_MAXIMUM ) # Either valid or None.
+        if data is None:
+            data = downloadDataFunction( dataURL ) # Either valid or None.
+            if magnitudeFilterFunction is not None and data is not None:
+                data = magnitudeFilterFunction( data, astroPyephem.MAGNITUDE_MAXIMUM ) # Either valid or None.
 
-                if newData is not None:
-                    pythonutils.writeCacheBinary( newData, INDICATOR_NAME, cacheBaseName, logging )
+            if data is not None:
+                pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBaseName, logging )
 
-        if newData is None:
-            newData = { }
+        if data is None:
+            data = { }
 
-        return newData
+        return data
 
 
     def getNextUpdateTimeInSeconds( self ):
