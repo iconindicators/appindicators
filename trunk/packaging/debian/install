@@ -1,5 +1,4 @@
 indicator-punycode.py.desktop usr/share/applications
-src/changelog usr/share/indicator-punycode
 src/indicator-punycode.py usr/share/indicator-punycode
 src/pythonutils.py usr/share/indicator-punycode
 icons/hicolor/indicator-punycode.svg usr/share/icons/hicolor/scalable/apps
