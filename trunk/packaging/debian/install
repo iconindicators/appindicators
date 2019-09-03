@@ -1,5 +1,4 @@
 indicator-ppa-download-statistics.py.desktop usr/share/applications
-src/changelog usr/share/indicator-ppa-download-statistics
 src/indicator-ppa-download-statistics.py usr/share/indicator-ppa-download-statistics
 src/ppa.py usr/share/indicator-ppa-download-statistics
 src/pythonutils.py usr/share/indicator-ppa-download-statistics
