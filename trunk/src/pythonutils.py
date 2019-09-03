@@ -288,6 +288,7 @@ def loadConfig( applicationBaseDirectory, configBaseFile, logging ):
                 config = json.load( f )
 
         except Exception as e:
+            config = { }
             logging.exception( e )
             logging.error( "Error reading configuration: " + configFile )
 
@@ -345,6 +346,7 @@ def readCacheText( applicationBaseDirectory, fileName, logging ):
         try:
             with open( cacheFile, "r" ) as f:
                 text = f.read()
+
         except Exception as e:
             text = None
             logging.exception( e )
@@ -525,7 +527,7 @@ def _getUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
 
 
 # Opens a socket to www.google.com and if successful,
-# we are connected to the internet and returns True (False otherwise).
+# we are deemed connected to the internet and returns True (False otherwise).
 def isConnectedToInternet():
     connected = False
     try:
