@@ -402,6 +402,7 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
     data = None
     theFile = ""
     for file in os.listdir( cacheDirectory ):
+        if file.startswith( baseName ) and file > theFile:
             theFile = file
 
     if theFile: # A value of "" evaluates to False.
