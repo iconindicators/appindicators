@@ -235,6 +235,8 @@ LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
 MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
 
+DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
+
 
 # Returns a dict with astronomical information...
 #     Key is a tuple of AstronomicalBodyType, a name tag and a data tag.
@@ -349,10 +351,10 @@ def __calculateMoon( ephemNow, data ):
     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Needed for icon.
 
     if not neverUp:
-        data[ key + ( DATA_FIRST_QUARTER, ) ] = pythonutils.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
-        data[ key + ( DATA_FULL, ) ] = pythonutils.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
-        data[ key + ( DATA_THIRD_QUARTER, ) ] = pythonutils.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
-        data[ key + ( DATA_NEW, ) ] = pythonutils.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
+        data[ key + ( DATA_FIRST_QUARTER, ) ] = __toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+        data[ key + ( DATA_FULL, ) ] = __toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
+        data[ key + ( DATA_THIRD_QUARTER, ) ] = __toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+        data[ key + ( DATA_NEW, ) ] = __toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
         __calculateEclipse( ephemNow.datetime(), data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
 
@@ -524,9 +526,9 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
         setting = city.next_setting( body )
 
         if rising > setting: # Above the horizon.
-            data[ key + ( DATA_SET_DATE_TIME, ) ] = pythonutils.toDateTimeString( setting.datetime() )
+            data[ key + ( DATA_SET_DATE_TIME, ) ] = __toDateTimeString( setting.datetime() )
         else: # Below the horizon.
-            data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( rising.datetime() )
+            data[ key + ( DATA_RISE_DATE_TIME, ) ] = __toDateTimeString( rising.datetime() )
 
     except ephem.AlwaysUpError:
         pass
@@ -620,14 +622,14 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
         # If a satellite is in transit or will rise within five minutes of now, then show all information...
         if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ):
 #             print( "transit" )#TODO
-            data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
-            data[ key + ( DATA_RISE_AZIMUTH, ) ] = pythonutils.toDateTimeString( str( repr( nextPass[ 1 ] ) ) )
-            data[ key + ( DATA_SET_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 4 ].datetime() )
-            data[ key + ( DATA_SET_AZIMUTH, ) ] = pythonutils.toDateTimeString( str( repr( nextPass[ 5 ] ) ) )
+            data[ key + ( DATA_RISE_DATE_TIME, ) ] = __toDateTimeString( nextPass[ 0 ].datetime() )
+            data[ key + ( DATA_RISE_AZIMUTH, ) ] = __toDateTimeString( str( repr( nextPass[ 1 ] ) ) )
+            data[ key + ( DATA_SET_DATE_TIME, ) ] = __toDateTimeString( nextPass[ 4 ].datetime() )
+            data[ key + ( DATA_SET_AZIMUTH, ) ] = __toDateTimeString( str( repr( nextPass[ 5 ] ) ) )
 
         else: # Satellite will rise later, so only add rise time.
 #             print( "below horizon" )#TODO
-            data[ key + ( DATA_RISE_DATE_TIME, ) ] = pythonutils.toDateTimeString( nextPass[ 0 ].datetime() )
+            data[ key + ( DATA_RISE_DATE_TIME, ) ] = __toDateTimeString( nextPass[ 0 ].datetime() )
 
         break
 
@@ -687,6 +689,9 @@ def __isSatellitePassVisible( data, passDateTime, satellite ):
     return satellite.eclipsed is False and \
            sun.alt > ephem.degrees( "-18" ) and \
            sun.alt < ephem.degrees( "-6" )
+
+
+def __toDateTimeString( dateTime ): return dateTime.strftime( DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
 
 def __getCity( data, date ):

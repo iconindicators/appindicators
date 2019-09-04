@@ -99,7 +99,7 @@ class IndicatorLunar:
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M:%S" #TODO Ask Oleg if I should drop the seconds or not...does it look odd without seconds?
 
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
@@ -872,9 +872,15 @@ class IndicatorLunar:
                 if overlap:
                     continue
 
+
+
             # Ensure the current time is within the rise/set...
             # Subtract a minute from the rise time to force the notification to take place just prior to the satellite rise.
+#TODO Use the function below to convert from string to datetime.
+#     def toDateTime( self, dateTimeAsString, formatString ): return datetime.datetime.strptime( dateTimeAsString, formatString )
             riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ) - datetime.timedelta( minutes = 1 ) )
+
+#TODO Is using strings safe here or do we need datetime?            
             if utcNow < riseTimeMinusOneMinute or \
                utcNow > self.data[ key + ( astroPyephem.DATA_SET_DATE_TIME, ) ]:
                 continue
@@ -1211,14 +1217,11 @@ class IndicatorLunar:
         return displayData
 
 
-    # Converts a UTC datetime string in the format given to local datetime string in the format.
-    def toLocalDateTimeString( self, utcDateTimeString, formatString ):
-        localDateTime = datetime.datetime.strptime( utcDateTimeString, pythonutils.GENERAL_DATE_TIME_FORMAT_YYYYcolonHHcolonMMspaceHHcolonMMcolonSS ).replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None )
-        return localDateTime.strftime( formatString )
-
-
-#TODO Once satellite notification is revisited, this function might go.
-    def toDateTime( self, dateTimeAsString, formatString ): return datetime.datetime.strptime( dateTimeAsString, formatString )
+    # Converts a UTC datetime string to a local datetime string in the format.
+    def toLocalDateTimeString( self, utcDateTimeString, format ):
+        utcDateTime = datetime.datetime.strptime( utcDateTimeString, astroPyephem.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+        localDateTime = utcDateTime.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None )
+        return localDateTime.strftime( format )
 
 
     # Creates an SVG icon file representing the moon given the illumination and bright limb angle.
