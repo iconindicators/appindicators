@@ -2,8 +2,18 @@
 #
 # Common code for the build-debian script for all indicators.
 #
-# Will need to install the packages:
-#   sudo apt-get install devscripts dh-make build-essential lintian
+# Install the packages:
+#   sudo apt-get install devscripts dh-make build-essential lintian gpg
+#
+# Import secret key into gpg.  In a terminal, change to the directory containing the files
+#
+#	'Bernard Giannetti.asc' pubring.pkr secring.skr
+#
+# and run
+#
+#	gpg --import secring.skr 
+#
+
 
 # Python Utils contains Python/build scripts common to all indicators.
 PYTHON_UTILS=../PythonUtils
