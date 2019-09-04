@@ -544,7 +544,6 @@ class IndicatorLunar:
 
         self.loadConfig()
 
-
 #TODO Look at
 # https://minorplanetcenter.net/iau/MPCORB.html
 # What is this?  Can we lump everything into one thing?
@@ -706,8 +705,6 @@ class IndicatorLunar:
                key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
                key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
 
-#TODO Verify this works for strings if a time is 08:xx:yy versus 18:xx:yy...is the 18 greater?
-#Or do we need to do the comparison as datetime objects?    
                 if self.data[ key ] < nextUpdateTime and self.data[ key ] > utcNowString:
                     nextUpdateTime = self.data[ key ]
 
