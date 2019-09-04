@@ -98,9 +98,8 @@ class IndicatorLunar:
     ABOUT_CREDIT_SATELLITE = _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" )
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
-    DATE_TIME_FORMAT_HHcolonMMcolonSS = "%H:%M:%S"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"#TODO Is this used to identify the format in self.data data/time data,
-#or used to display the data to the user?  For display, no need for seconds.
+    DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
 
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
@@ -543,6 +542,7 @@ class IndicatorLunar:
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
         self.loadConfig()
+        
 
 #TODO Look at
 # https://minorplanetcenter.net/iau/MPCORB.html
@@ -726,8 +726,8 @@ class IndicatorLunar:
 # self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
 
 
-#TODO Need the code below?              
-#             nextUpdateInSeconds = int( ( self.toDateTime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) - datetime.datetime.utcnow() ).total_seconds() )
+#TODO Might still need to ensure that the update does not happen too frequently?              
+#             nextUpdateInSeconds = int( ( self.toDateTime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ) - datetime.datetime.utcnow() ).total_seconds() )
 # 
 #             # Ensure the update period is positive, at most every minute and at least every hour.
 #             if nextUpdateInSeconds < 60:
@@ -874,7 +874,7 @@ class IndicatorLunar:
 
             # Ensure the current time is within the rise/set...
             # Subtract a minute from the rise time to force the notification to take place just prior to the satellite rise.
-            riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) - datetime.timedelta( minutes = 1 ) )
+            riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ) - datetime.timedelta( minutes = 1 ) )
             if utcNow < riseTimeMinusOneMinute or \
                utcNow > self.data[ key + ( astroPyephem.DATA_SET_DATE_TIME, ) ]:
                 continue
@@ -882,10 +882,10 @@ class IndicatorLunar:
             self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ], self.data[ key + ( astroPyephem.DATA_SET_DATE_TIME, ) ] )
 
             # Parse the satellite summary/message to create the notification...
-            riseTime = self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
-            riseAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
-            setTime = self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
-            setAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS )
+            riseTime = self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+            riseAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+            setTime = self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+            setAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
             tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
 
             summary = self.satelliteNotificationSummary. \
@@ -1172,9 +1172,9 @@ class IndicatorLunar:
              key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
              key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
                 if dateTimeFormat is None:
-                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ).replace( ' ', '  ' )
+                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ).replace( ' ', '  ' ) #TODO Does the double space appear in Unity and GNOME Shell?
                 else:
-                    displayData = self.toLocalDateTimeString( self.data[ key ], dateTimeFormat ) #TODO The format string is the format of the INPUT string, not the output
+                    displayData = self.toLocalDateTimeString( self.data[ key ], dateTimeFormat ) #TODO Do we need to add the double space as above?
 
         elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_LATITUDE:
             latitude = self.data[ key ]
@@ -1212,11 +1212,9 @@ class IndicatorLunar:
 
 
     # Converts a UTC datetime string in the format given to local datetime string in the format.
-#TODO If this is used by both bodies and satellites, then satellites don't want the date, just the time...so do we need some other parameter?    
     def toLocalDateTimeString( self, utcDateTimeString, formatString ):
-        localDateTimeString = str( datetime.datetime.strptime( utcDateTimeString, formatString ).replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
-        components = localDateTimeString.split( ':' )
-        return components[ 0 ] + ":" + components[ 1 ]
+        localDateTime = datetime.datetime.strptime( utcDateTimeString, pythonutils.GENERAL_DATE_TIME_FORMAT_YYYYcolonHHcolonMMspaceHHcolonMMcolonSS ).replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None )
+        return localDateTime.strftime( formatString )
 
 
 #TODO Once satellite notification is revisited, this function might go.
@@ -2443,18 +2441,18 @@ class IndicatorLunar:
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) )
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
             message = message. \
                 replace( IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                 replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) ). \
+                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
                 replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMMcolonSS ) )
+                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
         if summary == "":
             summary = " " # The notification summary text must not be empty (at least on Unity).
