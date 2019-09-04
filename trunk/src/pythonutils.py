@@ -26,6 +26,8 @@ AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
 
 CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
+GENERAL_DATE_TIME_FORMAT_YYYYcolonHHcolonMMspaceHHcolonMMcolonSS = "%Y:%m:%d %H:%M:%S"
+
 INDENT_WIDGET_LEFT = 20
 INDENT_TEXT_LEFT = 25
 
@@ -130,7 +132,7 @@ def setAutoStart( desktopFile, isSet, logging, autoStartPath = AUTOSTART_PATH, d
 
 
 # Convert from a datetime to string, dropping any fractional seconds, in the format YYYY-MM-DD HH:MM:SS
-def toDateTimeString( dateTime ): return str( dateTime ).split( '.' )[ 0 ]
+def toDateTimeString( dateTime ): return dateTime.strftime( GENERAL_DATE_TIME_FORMAT_YYYYcolonHHcolonMMspaceHHcolonMMcolonSS )
 
 
 # Shows a message dialog.
