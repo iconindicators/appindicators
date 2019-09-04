@@ -653,6 +653,7 @@ class IndicatorLunar:
             if self.showWerewolfWarning:
                 self.notificationFullMoon()
 
+#TODO Uncomment when all done...and test!
 #             if self.showSatelliteNotification:
 #                 self.notificationSatellites()
 
