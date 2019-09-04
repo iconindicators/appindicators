@@ -643,12 +643,6 @@ class IndicatorLunar:
                                                           self.minorPlanets, self.minorPlanetOEData,
                                                           self.magnitude )
 
-#TODO After the backend is done, filter the comet and minor planet listings
-# to only those present in the data.
-#This will only be bodies that have the right magnitude and will rise (or always up).
-#What we want is a list of bodies that match the magnitude (to show in the prefereneces). 
-#So maybe run the backend again or have a function to get just this information?
-
             # Update frontend...
             utcNow = datetime.datetime.utcnow()
             self.updateMenu()
