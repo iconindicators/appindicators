@@ -134,7 +134,7 @@ class IndicatorTide:
     def buildMenu( self, tidalReadings ):
         menu = Gtk.Menu()
         if tidalReadings:
-            menuItemText = _( "{0}, {1}" ).format( ports.getPortName( tidalReadings[ 0 ].getPortID() ), ports.getCountry( tidalReadings[ 0 ].getPortID() ) )
+            menuItemText = _( "{0}, {1}" ).format( ports.getPortName( self.portID ), ports.getCountry( self.portID ) )
             self.createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
             allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
             previousMonth = -1
