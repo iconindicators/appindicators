@@ -519,6 +519,15 @@ class IndicatorLunar:
 
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorLunar.LOG ) ] )
 
+        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorLunar.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
+        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
+        menu = Gtk.Menu()
+        menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
+        self.indicator.set_menu( menu )
+        menu.show_all()
+
         self.dialogLock = threading.Lock()
         Notify.init( INDICATOR_NAME )
 
@@ -533,18 +542,8 @@ class IndicatorLunar:
         self.lastUpdateSatelliteTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorLunar.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
         self.loadConfig()
 
-        menu = Gtk.Menu()
-        menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
-        self.indicator.set_menu( menu )
-        menu.show_all()
-
-        GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update )
 
 #TODO Look at
 # https://minorplanetcenter.net/iau/MPCORB.html
@@ -567,7 +566,8 @@ class IndicatorLunar:
 #or set an upper limit of magnitude, say 20.
 
 
-    def main( self ): 
+    def main( self ):
+        GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update ) # Start the background update as late as possible.
         Gtk.main()
 #TODO Thinking about updating oe and tle data...
 #
