@@ -86,7 +86,7 @@ class IndicatorLunar:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    START_UP_DELAY_IN_SECONDS = 2 # Delay the update function from kicking off and give the indicator time to start up in a simple state.
+    START_UP_DELAY_IN_SECONDS = 5 # Delay the update function from kicking off and give the indicator time to start up in a simple state.
 
     SVG_FULL_MOON_FILE = ICON_BASE_PATH + "/." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
@@ -538,10 +538,7 @@ class IndicatorLunar:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.loadConfig()
-#         self.update()
 
-#TODO Mention this new functionality in the changelog?
-#Look at PPA...how did we do the same thing?
         menu = Gtk.Menu()
         menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
         self.indicator.set_menu( menu )
