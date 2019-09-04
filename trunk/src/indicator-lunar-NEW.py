@@ -42,7 +42,10 @@
 # 2019-07-13 17:10:02,989 - root - ERROR - Error reading SVG icon: /usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg
 
 
-#TODO Will need to update the install file under packaging/debian to reflect changes in file names.
+#TODO Test with very high latitudes (north and south) to force circumpolar satellites and never up.
+
+
+#TODO Test during dusk/evening to see satellite passes in the menu.
 
 
 #TODO Consider removing the prefs for hide/show moon/sun.
@@ -86,15 +89,15 @@ class IndicatorLunar:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    START_UP_DELAY_IN_SECONDS = 5 # Delay the update function from kicking off and give the indicator time to start up in a simple state.
+    START_UP_DELAY_IN_SECONDS = 5 # Used to delay the update function which potentially takes a long time.
 
     SVG_FULL_MOON_FILE = ICON_BASE_PATH + "/." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
 
-    ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, comet, star and satellite information." ) #TODO If minor planets are added, include here too.
+    ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." )
     ABOUT_CREDIT_ECLIPSE = _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" )
     ABOUT_CREDIT_PYEPHEM = _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
-    ABOUT_CREDIT_COMET = _( "Comet OE data by Minor Planet Center. http://www.minorplanetcenter.net" ) #TODO Add a whole new line for minor planets or add to this line.
+    ABOUT_CREDIT_COMET = _( "Comet and Minor Planet OE data by Minor Planet Center. http://www.minorplanetcenter.net" )
     ABOUT_CREDIT_SATELLITE = _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" )
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
@@ -549,10 +552,8 @@ class IndicatorLunar:
 # What is this?  Can we lump everything into one thing?
 
 
-#TODO Maybe add in a hack preference, only visible under GNOME Shell
-# which groups satellites / comets / minor planets into bunches of 10
-# to get around the scrolling problem.
-# Not very nice; could instead break up the comets / minor planets into sub-submenus by magnitude.
+#TODO Maybe add a hack preference, perhaps only visible under GNOME Shell
+# which groups comets / minor planets into sub-submenus by magnitude.
 # Not sure how/what to do for satellites...
 # For Skyfield, there are a LOT of stars if we filter by magnitude (mag <= 6)...
 #...which means we could also submenu stars by magnitude.
@@ -560,39 +561,15 @@ class IndicatorLunar:
 # Maybe only somehow show for the next window...but that window could be different depending on your latitude.
 # Also, if a user wants to know when the ISS next rises, if we only show the next window, then that user is screwed.
 
-#TODO The list of minor planets in the preferences takes a long time to load...
-#Maybe as the data is loaded (downloaded or from cache) computer all magnitudes and either cull to the value set in the spinner,
-#or set an upper limit of magnitude, say 20.
-
 
     def main( self ):
         GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update ) # Start the background update as late as possible.
         Gtk.main()
-#TODO Thinking about updating oe and tle data...
-#
-# On initialisation...
-#    Purge the cache of old files.
-#    List of objects is set to empty.
-#    Data is set to empty.
-#    Set default lunar icon.
-#    Set label as "Initialising...".
-#    No menu.  Or possibly menu showing "Initialsing..." and don't show the label.
-# 
-# On an update...
-#    If data is empty
-#        Read file from cache
-#        On startup this makes sense; but what if the user has unchecked all comets...do we still load the data each time?
-#        The data will only be downloaded or read from cache typically once per day and will be deferred in a thread...maybe not an issue.
-#        If file does not exist, download and write to cache.
-#    Else data is not empty
-#        Get datetime from cache file and compare to current time.  If more than the window has elapsed, download new file and cache.
-# 
-#    Build menu.
-#    Update icon/label.
 
 
 #TODO If the backend/frontend are updating, and the user clicks on about/prefs, show a notification to tell the user they're blocked?
 #What about the other way?  If the about/prefs are open, disable the updates?
+#What do the other indicators do (PPA)?
 
 
     def update( self, scheduled = True ):
@@ -605,8 +582,9 @@ class IndicatorLunar:
             self.minorPlanetsAddNew = True
             self.satellitesAddNew = True
 
-#TODO Need to check for None return which is an error, and report to user and set to empty [].
-#Do we set None return for data to be { } ?
+#TODO If { } is returned, what does this mean?
+#Will the backend have a fit, particularly if there was a list of say comets/satellites from yesterday's run,
+#and now we cannot download data and the cache is stale?
             print( "Updating data")#TODO Debug
             self.cometOEData = self.updateData( IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
@@ -620,17 +598,8 @@ class IndicatorLunar:
             if self.satellitesAddNew:
                 self.addNewSatellites()
 
-
-#TODO Don't forget to test with very high latitudes (north and south) to force circumpolar satellites and never up.
-#TODO Don't forget to test during dusk/evening to see satellite passes in the menu.
-
-
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             # Value is the astronomical data (or equivalent) as a string.
-#TODO If we do a run and have data and comets selected...
-#...then do a run and the data fails to download and cache is stale, we have no data.
-# If we now call astro, we have a valid list of comets (minor planets or satellites) but invalid data.
-# What to do?
             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
 #             from datetime import timezone #TODO Testing for satellites
 #             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime( 2019, 8, 29, 9, 0, 0, 0, tzinfo = timezone.utc ),
@@ -652,7 +621,7 @@ class IndicatorLunar:
             if self.showWerewolfWarning:
                 self.notificationFullMoon()
 
-#TODO Uncomment when all done...and test!
+#TODO Uncomment when all done...don't forget to test!
 #             if self.showSatelliteNotification:
 #                 self.notificationSatellites()
 
@@ -707,7 +676,6 @@ class IndicatorLunar:
 
                 if self.data[ key ] < nextUpdateTime and self.data[ key ] > utcNowString:
                     nextUpdateTime = self.data[ key ]
-
 
 #TODO see satellite code in original indicator-lunar 
 # Rather than muck around with fudging times (apart from setting the rise time a minute earlier), 
@@ -871,7 +839,6 @@ class IndicatorLunar:
                 overlap = ( currentRise < previousSet ) and ( currentSet > previousRise )
                 if overlap:
                     continue
-
 
 
             # Ensure the current time is within the rise/set...
@@ -1211,7 +1178,8 @@ class IndicatorLunar:
         elif key[ 2 ] == astroPyephem.DATA_PHASE:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
 
-        if displayData is None:  # Returning None is not good but better to let it crash and find out about it than hide the problem.
+        if displayData is None:
+            displayData = "" # Better to show nothing and let None slip through and crash.
             logging.error( "Unknown/unhandled key: " + key )
 
         return displayData
