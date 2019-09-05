@@ -1195,7 +1195,7 @@ class IndicatorLunar:
         return displayData
 
 
-    # Converts a UTC datetime string to a local datetime string in the format.
+    # Converts a UTC datetime string to a local datetime string in the given format.
     def toLocalDateTimeString( self, utcDateTimeString, format ):
         utcDateTime = datetime.datetime.strptime( utcDateTimeString, astroPyephem.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
         localDateTime = utcDateTime.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None )
@@ -1445,7 +1445,6 @@ class IndicatorLunar:
         showCometsAsSubmenuCheckbox.set_active( self.showCometsAsSubMenu )
         box.pack_start( showCometsAsSubmenuCheckbox, False, False, 0 )
 
-#TODO New trans
         showMinorPlanetsAsSubmenuCheckbox = Gtk.CheckButton( _( "Minor Planets" ) )
         showMinorPlanetsAsSubmenuCheckbox.set_tooltip_text( _( "Show minor planets as submenus." ) )
         showMinorPlanetsAsSubmenuCheckbox.set_active( self.showMinorPlanetsAsSubMenu )
@@ -1457,7 +1456,6 @@ class IndicatorLunar:
         box.pack_start( showSatellitesAsSubmenuCheckbox, False, False, 0 )
         grid.attach( box, 0, 3, 1, 1 )
 
-#TODO New trans
         cometsAddNewCheckbox = Gtk.CheckButton( _( "Add new comets" ) )
         cometsAddNewCheckbox.set_margin_top( 10 )
         cometsAddNewCheckbox.set_active( self.cometsAddNew )
@@ -1466,7 +1464,6 @@ class IndicatorLunar:
             "to the list of checked comets." ) )
         grid.attach( cometsAddNewCheckbox, 0, 4, 1, 1 )
 
-#TODO New trans
         minorPlanetsAddNewCheckbox = Gtk.CheckButton( _( "Add new minor planets" ) )
         minorPlanetsAddNewCheckbox.set_margin_top( 10 )
         minorPlanetsAddNewCheckbox.set_active( self.minorPlanetsAddNew )
@@ -1478,11 +1475,8 @@ class IndicatorLunar:
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-#TODO Trans
         box.pack_start( Gtk.Label( _( "Hide comets and minor planets greater than magnitude" ) ), False, False, 0 )
 
-#TODO Comet magnitude
-#TODO Trans
         spinnerMagnitude = Gtk.SpinButton()
         spinnerMagnitude.set_numeric( True )
         spinnerMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
@@ -1495,7 +1489,7 @@ class IndicatorLunar:
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 6, 1, 1 )
 
-#TODO New trans
+#TODO Ensure this checkbox and that for comets/minorplanets have a listener that checks/unchecks the tables of comets/minorplanets/sats.
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
@@ -1548,13 +1542,12 @@ class IndicatorLunar:
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
         for starName in IndicatorLunar.STAR_NAMES_TRANSLATIONS.keys():
-            starTranslated = IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ]
-            stars.append( [ starName in self.stars, starName, starTranslated ] )
+            stars.append( [ starName in self.stars, starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
 
         stars = sorted( stars, key = lambda x: ( x[ 2 ] ) )
         starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name (not displayed), star translated name.
         for star in stars:
-            starStore.append( star ) #TODO Shouldn't there be a bool and str added here too????
+            starStore.append( star )
 
         starStoreSort = Gtk.TreeModelSort( model = starStore )
         starStoreSort.set_sort_column_id( 2, Gtk.SortType.ASCENDING )
@@ -1586,17 +1579,11 @@ class IndicatorLunar:
         notebook.append_page( box, Gtk.Label( _( "Planets / Stars" ) ) )
 
 
-#TODO COmbine comets and minor planets...refer to planets/stars above for layout.
 #TODO For each of comets, minor planets and satellites, check if the underlying data (tle/oe) is empty or not.  
 # If empty, don't show the table but a label with message instead.
+#May need to have individual variable names for each of the scrolledWindows to hide/show.
         # Comets.
-        cometGrid = Gtk.Grid()
-        cometGrid.set_column_spacing( 10 )
-        cometGrid.set_row_spacing( 10 )
-        cometGrid.set_margin_left( 10 )
-        cometGrid.set_margin_right( 10 )
-        cometGrid.set_margin_top( 10 )
-        cometGrid.set_margin_bottom( 10 )
+        box = Gtk.Box( spacing = 20 )
 
         cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
         for comet in self.cometOEData:
@@ -1618,7 +1605,7 @@ class IndicatorLunar:
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore, cometStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.Comet )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Comet" ), Gtk.CellRendererText(), text = 1 )
         tree.append_column( treeViewColumn )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -1626,23 +1613,8 @@ class IndicatorLunar:
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( tree )
-        cometGrid.attach( scrolledWindow, 0, 0, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        cometGrid.attach( box, 0, 1, 1, 1 )
-
-        notebook.append_page( cometGrid, Gtk.Label( _( "Comets" ) ) )
-
-        # Minor Planets.
-        minorPlanetGrid = Gtk.Grid() #TODO Need to add to same place below as cometGrid
-        minorPlanetGrid.set_column_spacing( 10 )
-        minorPlanetGrid.set_row_spacing( 10 )
-        minorPlanetGrid.set_margin_left( 10 )
-        minorPlanetGrid.set_margin_right( 10 )
-        minorPlanetGrid.set_margin_top( 10 )
-        minorPlanetGrid.set_margin_bottom( 10 )
+        box.pack_start( scrolledWindow, True, True, 0 )
 
         minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
         for minorPlanet in self.minorPlanetOEData:
@@ -1664,7 +1636,7 @@ class IndicatorLunar:
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, minorPlanetStore, minorPlanetStoreSort, displayTagsStore, astroPyephem.AstronomicalBodyType.MinorPlanet )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Minor Planet" ), Gtk.CellRendererText(), text = 1 )
         tree.append_column( treeViewColumn )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -1672,9 +1644,10 @@ class IndicatorLunar:
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( tree )
-        minorPlanetGrid.attach( scrolledWindow, 0, 0, 1, 1 )
 
-        notebook.append_page( minorPlanetGrid, Gtk.Label( _( "Minor Planets" ) ) ) #TODO New trans.
+        box.pack_start( scrolledWindow, True, True, 0 )
+
+        notebook.append_page( box, Gtk.Label( _( "Comets / Minor Planets" ) ) )
 
         # Satellites.
         satelliteGrid = Gtk.Grid()
