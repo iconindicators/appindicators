@@ -628,9 +628,9 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
         if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ):
 #             print( "transit" )#TODO
             data[ key + ( DATA_RISE_DATE_TIME, ) ] = __toDateTimeString( nextPass[ 0 ].datetime() )
-            data[ key + ( DATA_RISE_AZIMUTH, ) ] = __toDateTimeString( str( repr( nextPass[ 1 ] ) ) )
+            data[ key + ( DATA_RISE_AZIMUTH, ) ] = str( repr( nextPass[ 1 ] ) )
             data[ key + ( DATA_SET_DATE_TIME, ) ] = __toDateTimeString( nextPass[ 4 ].datetime() )
-            data[ key + ( DATA_SET_AZIMUTH, ) ] = __toDateTimeString( str( repr( nextPass[ 5 ] ) ) )
+            data[ key + ( DATA_SET_AZIMUTH, ) ] = str( repr( nextPass[ 5 ] ) )
 
         else: # Satellite will rise later, so only add rise time.
 #             print( "below horizon" )#TODO
