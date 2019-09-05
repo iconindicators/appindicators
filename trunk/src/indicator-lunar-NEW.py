@@ -1332,6 +1332,8 @@ class IndicatorLunar:
         self.tagsAdded = { }
         self.tagsRemoved = { }
 
+#TODO Need to handle satellites...want to include the name (and put it first) followed by number.
+#TODO Maybe have a column that is the type (planet, comet, star, ...)?
         COLUMN_TAG = 0
         COLUMN_TRANSLATED_TAG = 1
         COLUMN_VALUE = 2
