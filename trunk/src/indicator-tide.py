@@ -32,12 +32,6 @@
 #  http://www.ukho.gov.uk/easytide
 
 
-#TODO Update license.
-
-
-#TODO In pythonutils, remove ---- debug before we do the release (then add it back for indicator lunar).
-
-
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
