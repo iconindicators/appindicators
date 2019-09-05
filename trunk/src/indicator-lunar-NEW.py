@@ -1180,7 +1180,7 @@ class IndicatorLunar:
 
         if displayData is None:
             displayData = "" # Better to show nothing and let None slip through and crash.
-            logging.error( "Unknown/unhandled key: " + key )
+            logging.error( "Unknown key: " + key )
 
         return displayData
 
