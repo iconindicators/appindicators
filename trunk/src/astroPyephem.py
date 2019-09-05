@@ -19,7 +19,7 @@
 # Calculate astronomical information using PyEphem.
 
 
-import eclipse, ephem, locale, math, orbitalelement, pythonutils, twolineelement
+import eclipse, ephem, locale, math, orbitalelement, twolineelement
 
 from ephem.cities import _city_data
 
