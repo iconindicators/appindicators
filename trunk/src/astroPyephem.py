@@ -353,7 +353,8 @@ def __calculateMoon( ephemNow, data ):
 #TODO Debug    
     print( "Moon illumination:", data[ key + ( DATA_ILLUMINATION, ) ])
     print( "Moon phase:", data[ key + ( DATA_PHASE, ) ])
-    print( "Moon bright limb:", data[ key + ( DATA_BRIGHT_LIMB, ) ])
+    print( "Moon bright limb (radians):", data[ key + ( DATA_BRIGHT_LIMB, ) ])
+    print( "Moon bright limb (degrees):", math.degrees( float( data[ key + ( DATA_BRIGHT_LIMB, ) ] ) ) )
 
     if not neverUp:
         data[ key + ( DATA_FIRST_QUARTER, ) ] = __toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
@@ -363,6 +364,7 @@ def __calculateMoon( ephemNow, data ):
         __calculateEclipse( ephemNow.datetime(), data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
 
+#TODO Pretty sure the comment below should say radians, not degrees!
 # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
 # Measured in degrees counter clockwise from a positive y axis.
 #
