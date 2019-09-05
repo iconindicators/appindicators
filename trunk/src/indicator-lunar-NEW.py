@@ -1587,6 +1587,8 @@ class IndicatorLunar:
 
 
 #TODO COmbine comets and minor planets...refer to planets/stars above for layout.
+#TODO For each of comets, minor planets and satellites, check if the underlying data (tle/oe) is empty or not.  
+# If empty, don't show the table but a label with message instead.
         # Comets.
         cometGrid = Gtk.Grid()
         cometGrid.set_column_spacing( 10 )
@@ -2145,7 +2147,7 @@ class IndicatorLunar:
         self.checkboxToggled( bodyTag, astronomicalBodyType, dataStore[ actualRow ][ 0 ] )
 
 
-#TODO Include MP
+#TODO Include MP...but is this function needed?
     def updateCometSatellitePreferencesTab( self, grid, dataStore, data, bodies, url, astronomicalBodyType ):
         dataStore.clear()
         if data is None:
@@ -2179,67 +2181,6 @@ class IndicatorLunar:
                     child.show()
                 else:
                     child.hide()
-
-
-#TODO Include MP
-    def onFetchCometSatelliteData( self,
-                                   button, entry, grid, store,
-                                   astronomicalBodyType,
-                                   dataURL,
-                                   cacheBaseName, cacheMaximumAgeHours, lastUpdate, downloadPeriodHours,
-                                   summary, message,
-                                   getDataFunction ):
-        # Flush comet/satellite data.
-        for key in list( self.data ): # Gets the keys and allows iteration with removal.
-            if key[ 0 ] == astronomicalBodyType:
-                self.data.pop( key )
-
-        for key in list( self.tagsAdded ):
-            if key[ 0 ] == astronomicalBodyType:
-                self.tagsAdded.pop( t, None )
-
-        for key in list( self.tagsRemoved ):
-            if key[ 0 ] == astronomicalBodyType:
-                self.tagsRemoved.pop( t, None )
-
-        if entry.get_text().strip() == "":
-            entry.set_text( dataURL )
-
-        urlNew = entry.get_text().strip()
-
-        # If the URL is the default, use the cache to avoid annoying the default data source.
-        if urlNew == dataURL:
-            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, cacheMaximumAgeHours )
-            dataNew, cacheDateTime = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Returned data is either None or non-empty.
-            if dataNew is None:
-                # No cache data (either too old or just not there), so download only if it won't exceed the download time limit.
-                if datetime.datetime.utcnow() < ( lastUpdate + datetime.timedelta( hours = downloadPeriodHours ) ):
-                    nextDownload = str( lastUpdate + datetime.timedelta( hours = downloadPeriodHours ) )
-                    Notify.Notification.new( summary, message.format( nextDownload[ 0 : nextDownload.index( "." ) ] ), IndicatorLunar.ICON ).show()
-                else:
-                    dataNew = getDataFunction( urlNew ) # The comet/satellite data can be None, empty or non-empty.
-        else:
-            dataNew = getDataFunction( urlNew ) # The comet/satellite data can be None, empty or non-empty.
-
-        if dataNew is None:
-            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
-                summary = _( "Error Retrieving Comet OE Data" )
-                message = _( "The comet OE data source could not be reached." )
-            else: # Assume it's a satellite.
-                summary = _( "Error Retrieving Satellite TLE Data" )
-                message = _( "The satellite TLE data source could not be reached." )
-
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON ).show()
-
-        self.updateCometSatellitePreferencesTab( grid, store, dataNew, [ ], urlNew, astronomicalBodyType )
-
-        # Assign back to original bodies...
-        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
-            self.cometOEURLNew = urlNew
-            self.cometOEDataNew = dataNew
-        else: # Assume it's a satellite.
-            self.satelliteTLEURLNew = urlNew
-            self.satelliteTLEDataNew = dataNew
 
 
     def checkboxToggled( self, bodyTag, astronomicalBodyType, checked ):
@@ -2340,6 +2281,8 @@ class IndicatorLunar:
 
 #TODO Why not just clear the display tags store and just add stuff as needed?
 # Is the code below that much faster than simply clear all and add?
+#If we wait until we switch to the first tab to update the table, then need a handle to all the UI elements to poll each of them.
+#Maybe pass in lists of elements (list of checkboxes, list of tables/stores, etc)?
     def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
         if pageNumber == 0: # User has clicked the first tab.
             displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
