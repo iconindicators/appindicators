@@ -53,29 +53,10 @@
 # TODO Compute the following to the same level of detail as indicator-lunar:
 #     Moon
 #     Sun
-#     Saturn + Moons
-#     Orion - Rigel
-#     Comet https://github.com/skyfielders/python-skyfield/issues/196
-#     Satellite https://github.com/skyfielders/python-skyfield/issues/115
-
-
-#     Attributes calulated/provided by pyephem: 
-#         RA/DEC 
-#         ALT/AZ 
-#         Phase/Illumination 
-#         Distance to Earth/Sun 
-#         rise/set 
-#         moon phase and next phases 
-#         solstice/equinox 
-#         planetary moons RA/DEC/AZ/ALT/EarthVisible 
-#         Saturn earth/sun tilt
-#         Magnitude
-#
-#     Attributes which are calculated independently of pyephem:
-#         Bright Limb
-#         Tropical Sign
-#         Constellation (not applicable to all stars)
-#         moon/sun eclipse
+#     Planets
+#     Stars
+#     Comets - https://github.com/skyfielders/python-skyfield/issues/196
+#     Satellites - https://github.com/skyfielders/python-skyfield/issues/115
 
 
 import datetime, ephem, gzip, math, pytz
