@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 
 
+####
+####
+#### LEFT HERE AS A REFERENCE UNTIL astroSkyfield.py HITS PARITY WITH astroPyephem.
+####
+####
+
+
 # Use
 #    https://ssd.jpl.nasa.gov/horizons.cgi
 # to verify results.
