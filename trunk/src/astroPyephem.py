@@ -350,6 +350,11 @@ def __calculateMoon( ephemNow, data ):
     data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Needed for icon.
 
+#TODO Debug    
+    print( "Moon illumination:", data[ key + ( DATA_ILLUMINATION, ) ])
+    print( "Moon phase:", data[ key + ( DATA_PHASE, ) ])
+    print( "Moon bright limb:", data[ key + ( DATA_BRIGHT_LIMB, ) ])
+
     if not neverUp:
         data[ key + ( DATA_FIRST_QUARTER, ) ] = __toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
         data[ key + ( DATA_FULL, ) ] = __toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
