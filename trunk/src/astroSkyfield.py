@@ -722,4 +722,4 @@ def createListOfCommonNamedStars():
 
     print( "Done" )
 
-# createListOfCommonNamedStars()
+# createListOfCommonNamedStars() #Uncomment to create list of stars.
