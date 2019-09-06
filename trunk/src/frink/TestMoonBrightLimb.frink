@@ -1,95 +1,51 @@
 // To run, open a terminal:
-//	java -classpath frink.jar frink.parser.Frink -f TestMoonBrightLimb.frink
+//
+//	 java -classpath frink.jar frink.parser.Frink -f TestMoonBrightLimb.frink
+//
 // Both
-//	sun.frink (http://futureboy.us/frinksamp/sun.frink)
-//	frink.jar (http://futureboy.us/frinkjar/frink.jar)
+//
+//		sun.frink (http://futureboy.us/frinksamp/sun.frink)
+//		frink.jar (http://futureboy.us/frinkjar/frink.jar)
+//
 // must be present.
 //
 // Reference: http://futureboy.us/frinkdocs/
+//
+// Compare against:
+//		http://www.geoastro.de/elevaz/index.htm
+//		http://www.satellite-calculations.com/Satellite/suncalc.htm
 
 
 use sun.frink
 
 
 // Observer position, etc.
-lat = -33 degree
-long = -151 degree
+lat = -33 degree // Negative for South
+long = -151 degree // Negative for East
 now = now[]
 
-
-// Compare against
-//	http://www.geoastro.de/elevaz/index.htm
-//	http://www.satellite-calculations.com/Satellite/suncalc.htm
-[ ra, dec ] = sunApparentRADecl[ now ]
-println[ "Sun RA " + ra + " radians" ]
-println[ "Sun RA " + ( ra -> degrees ) + " degrees" ]
-println[]
-println[ "Sun Dec " + dec + " radians" ]
-println[ "Sun Dec " + ( dec -> degrees ) + " degrees" ]
-println[]
-
 [ az, alt ] = airlessSunAzimuthAltitude[ now, lat, long ]
-println[ "Sun Az " + ( az + 180 degrees ) mod circle + " radians" ]
-println[ "Sun Az " + ( ( ( az + 180 degrees ) mod circle ) -> degrees ) + " degrees" ]
+println[ "Sun:" ]
+println[ "  Az " + ( az + 180 degrees ) mod circle + " radians" ]
+println[ "  Alt " + alt + " radians" ]
+println[ "  Az " + ( ( ( az + 180 degrees ) mod circle ) -> degrees ) + " degrees" ]
+println[ "  Alt " + ( alt -> degrees ) + " degrees" ]
 println[]
-println[ "Sun Alt " + alt + " radians" ]
-println[ "Sun Alt " + ( alt -> degrees ) + " degrees" ]
-println[]
 
+println[ "Moon phase angle (degrees): " + moonPhaseAngle[ now ] ]
+println[ "Moon illuminated fraction : " + moonIlluminatedFraction[ now ] ]
+println[ "Moon position angle: " + moonPositionAngle[ now ] ]
+println[ "Moon position angle relative to zenith: " + moonPositionAngleRelativeToZenith[ now, lat, long ] ]
+[ ra, dec ] = moonApparentRADecl[ now ]
+println[ "Moon parallactic angle: " + parallacticAngle[ now, lat, long, ra, dec ] ]
+println[ "Moon position angle relative to zenith mod circle: " + moonPositionAngleRelativeToZenith[ now, lat, long ] mod circle ]
+println[ "Moon position angle relative to zenith mod circle (degrees): " + ( moonPositionAngleRelativeToZenith[ now, lat, long ] mod circle -> degrees ) ]
 
-positionAngleOfBrightLimb = moonPositionAngle[ now ]
-[ra, dec ] = moonApparentRADecl[ now ]
-parallacticAngle = parallacticAngle[ now, lat, long, ra, dec ]
-zenithAngleOfBrightLimb = moonPositionAngleRelativeToZenith[ now, lat, long ] mod circle
+//positionAngleOfBrightLimb = moonPositionAngle[ now ]
+//[ra, dec ] = moonApparentRADecl[ now ]
+//parallacticAngle = parallacticAngle[ now, lat, long, ra, dec ]
+//zenithAngleOfBrightLimb = moonPositionAngleRelativeToZenith[ now, lat, long ] mod circle
 
-println[ "Position angle of bright limb " + positionAngleOfBrightLimb ]
-println[ "Parallactic angle " + parallacticAngle ]
-println[ "Zenith Angle of Bright Limb (degrees) " + ( zenithAngleOfBrightLimb -> degrees ) ]  
-
-
-// Compare against the following Python script...
-/*
-import ephem, math
-
-# RA/Dec - independent of the observer.
-# Compare against
-#    http://www.geoastro.de/elevaz/index.htm
-#    http://www.satellite-calculations.com/Satellite/suncalc.htm
-city = ephem.Observer()
-city.lon = '151'
-city.lat = '-33'
-city.elevation = 0
-city.date = ephem.now()
-sun = ephem.Sun( city )
-body = ephem.Moon( city )
-
-print( "Sun RA", sun.ra + 0, "radians" ) # Adding a dummy zero turns the value into a float giving the decimal value.
-print( "Sun RA", sun.ra / math.pi * 180, "degrees" )
-print( "Sun RA", sun.ra, "HMS" )
-print()
-print( "Sun Dec", sun.dec + 0, "radians" ) # Adding a dummy zero turns the value into a float giving the decimal value.
-print( "Sun Dec", sun.dec / math.pi * 180, "degrees" )
-print( "Sun Dec", sun.dec, "DMS" )
-print()
-
-print( "Sun Az", sun.az + 0, "radians" ) # Adding a dummy zero turns the value into a float giving the decimal value.
-print( "Sun Az", sun.az / math.pi * 180, "degrees" )
-print( "Sun Az", sun.az, "HMS" )
-print()
-print( "Sun Alt", sun.alt + 0, "radians" ) # Adding a dummy zero turns the value into a float giving the decimal value.
-print( "Sun Alt", sun.alt / math.pi * 180, "degrees" )
-print( "Sun Alt", sun.alt, "DMS" )
-
-y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
-x = math.cos( body.dec ) * math.sin( sun.dec ) - math.sin( body.dec ) * math.cos( sun.dec ) * math.cos( sun.ra - body.ra )
-positionAngleOfBrightLimb = math.atan2( y, x )
-
-hourAngle = city.sidereal_time() - body.ra
-y = math.sin( hourAngle )
-x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
-parallacticAngle = math.atan2( y, x )
-
-print( "Position Angle of Bright Limb", positionAngleOfBrightLimb )
-print( "Parallactic Angle", parallacticAngle )
-print( "Zenith Angle of Bright Limb (degrees)", math.degrees( ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi ) ) )
-*/
+//println[ "Position angle of bright limb " + positionAngleOfBrightLimb ]
+//println[ "Parallactic angle " + parallacticAngle ]
+//println[ "Zenith Angle of Bright Limb (degrees) " + ( zenithAngleOfBrightLimb -> degrees ) ]  
