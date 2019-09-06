@@ -350,7 +350,7 @@ def __calculateMoon( ephemNow, data ):
     data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
 
-#TODO Debug    
+#TODO Debug
     print( "Moon illumination:", data[ key + ( DATA_ILLUMINATION, ) ] )
     print( "Moon phase:", data[ key + ( DATA_PHASE, ) ] )
     print( "Moon bright limb (radians):", data[ key + ( DATA_BRIGHT_LIMB, ) ] )
@@ -364,9 +364,8 @@ def __calculateMoon( ephemNow, data ):
         __calculateEclipse( ephemNow.datetime(), data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
 
-#TODO Pretty sure the comment below should say radians, not degrees!
 # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
-# Measured in degrees counter clockwise from a positive y axis.
+# Measured in radians counter clockwise from a positive y axis.
 #
 # References:
 #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).

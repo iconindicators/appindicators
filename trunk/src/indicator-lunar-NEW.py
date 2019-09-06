@@ -537,6 +537,8 @@ class IndicatorLunar:
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS )
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
 
+        self.removeOldIcons()
+
         # Initialise last update date/times to the past...
 #TODO Are these needed?
         self.lastUpdateCometOE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
@@ -772,30 +774,17 @@ class IndicatorLunar:
         lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
         lunarBrightLimbAngleInDegrees = int( float( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] ) ) #TODO Radians
 
-        themeName = self.getThemeName()
-        noChange = \
-            lunarBrightLimbAngleInDegrees == self.previousLunarBrightLimbAngleInDegrees and \
-            lunarIlluminationPercentage == self.previousLunarIlluminationPercentage and \
-            themeName == self.previousThemeName
-
-#TODO Why do we do all of this?  Maybe just do a purge and then create the icon with a new name each time.
-        if not noChange:
-            self.previousLunarBrightLimbAngleInDegrees = lunarBrightLimbAngleInDegrees
-            self.previousLunarIlluminationPercentage = lunarIlluminationPercentage
-            self.previousThemeName = themeName
-            self.purgeIcons()
-
-            # Ideally should be able to create the icon with the same name each time.
-            # Due to a bug, the icon name must change between calls to setting the icon.
-            # So change the name each time - using the current date/time.
-            #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
-            #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
+        # Ideally should be able to create the icon with the same name each time.
+        # Due to a bug, the icon name must change between calls to setting the icon.
+        # So change the name each time - using the current date/time.
+        #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
+        #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
 #TODO Does not show the icon under eclipse ...Ubuntu 18.04 only or 16.04 too?
-#             iconName = IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
-#             iconFilename = IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
-            self.createIcon( lunarIlluminationPercentage, math.degrees( lunarBrightLimbAngleInDegrees ), iconFilename )
-#             self.indicator.set_icon_theme_path( "IndicatorLunar.ICON_BASE_PATH" )
-#             self.indicator.set_icon_full( iconName + ".svg", "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
+#        iconName = IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
+#        iconFilename = IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
+        self.createIcon( lunarIlluminationPercentage, math.degrees( lunarBrightLimbAngleInDegrees ), iconFilename )
+#        self.indicator.set_icon_theme_path( "IndicatorLunar.ICON_BASE_PATH" )
+#        self.indicator.set_icon_full( iconName + ".svg", "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
 #
 #             import os
 #             print( "Icon:", iconFilename, os.path.isfile( iconFilename ) )
@@ -1273,7 +1262,7 @@ class IndicatorLunar:
         return themeColour
 
 
-    def purgeIcons( self ):
+    def removeOldIcons( self ):
         oldIcons = glob.glob( IndicatorLunar.ICON_BASE_PATH + "/" + IndicatorLunar.ICON_BASE_NAME + "*" )
         for oldIcon in oldIcons:
             os.remove( oldIcon )
