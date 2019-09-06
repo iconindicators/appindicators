@@ -389,9 +389,6 @@ def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
     sun = ephem.Sun( city )
     body.compute( city )
 
-    print( "Sun ra/dec:", sun.ra, sun.dec ) #TODO Test
-    print( "Moon ra/dec:", body.ra, body.dec ) #TODO Test
-
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
     y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
     x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
