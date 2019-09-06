@@ -789,10 +789,15 @@ class IndicatorLunar:
             # So change the name each time - using the current date/time.
             #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
             #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
-            iconName = IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
-            iconFilename = IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
-            self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngle, iconFilename )
-            self.indicator.set_icon_full( iconName, "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
+#TODO Does not show the icon under eclipse ...Ubuntu 18.04 only or 16.04 too?
+#             iconName = IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
+#             iconFilename = IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
+#             self.createIcon( lunarIlluminationPercentage, math.degrees( lunarBrightLimbAngle ), iconFilename )
+#             self.indicator.set_icon_theme_path( "IndicatorLunar.ICON_BASE_PATH" )
+#             self.indicator.set_icon_full( iconName + ".svg", "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
+#
+#             import os
+#             print( "Icon:", iconFilename, os.path.isfile( iconFilename ) )
 
 
     def notificationFullMoon( self ):
