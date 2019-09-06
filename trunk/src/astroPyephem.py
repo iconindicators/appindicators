@@ -348,12 +348,12 @@ def __calculateMoon( ephemNow, data ):
     key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
     data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
     data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
-    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) ) ) # Needed for icon.
+    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
 
 #TODO Debug    
-    print( "Moon illumination:", data[ key + ( DATA_ILLUMINATION, ) ])
-    print( "Moon phase:", data[ key + ( DATA_PHASE, ) ])
-    print( "Moon bright limb (radians):", data[ key + ( DATA_BRIGHT_LIMB, ) ])
+    print( "Moon illumination:", data[ key + ( DATA_ILLUMINATION, ) ] )
+    print( "Moon phase:", data[ key + ( DATA_PHASE, ) ] )
+    print( "Moon bright limb (radians):", data[ key + ( DATA_BRIGHT_LIMB, ) ] )
     print( "Moon bright limb (degrees):", math.degrees( float( data[ key + ( DATA_BRIGHT_LIMB, ) ] ) ) )
 
     if not neverUp:
@@ -389,10 +389,14 @@ def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
     sun = ephem.Sun( city )
     body.compute( city )
 
+    print( "Sun ra/dec:", sun.ra, sun.dec ) #TODO Test
+    print( "Moon ra/dec:", body.ra, body.dec ) #TODO Test
+
     # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
     y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
     x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
     positionAngleOfBrightLimb = math.atan2( y, x )
+    print( "Position angle of bright limb (radians):", positionAngleOfBrightLimb ) #TODO Test
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
     # https://tycho.usno.navy.mil/sidereal.html
@@ -404,6 +408,7 @@ def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
     y = math.sin( hourAngle )
     x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
     parallacticAngle = math.atan2( y, x )
+    print( "Parallactic angle (radians):", parallacticAngle ) #TODO Test
 
     return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 

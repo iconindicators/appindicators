@@ -32,20 +32,30 @@ println[ "  Az " + ( ( ( az + 180 degrees ) mod circle ) -> degrees ) + " degree
 println[ "  Alt " + ( alt -> degrees ) + " degrees" ]
 println[]
 
-println[ "Moon phase angle (degrees): " + moonPhaseAngle[ now ] ]
-println[ "Moon illuminated fraction : " + moonIlluminatedFraction[ now ] ]
-println[ "Moon position angle: " + moonPositionAngle[ now ] ]
-println[ "Moon position angle relative to zenith: " + moonPositionAngleRelativeToZenith[ now, lat, long ] ]
+[ az, alt ] = airlessMoonAzimuthAltitude[ now, lat, long ]
+println[ "Moon:" ]
+println[ "  Az " + ( az + 180 degrees ) mod circle + " radians" ]
+println[ "  Alt " + alt + " radians" ]
+println[ "  Az " + ( ( ( az + 180 degrees ) mod circle ) -> degrees ) + " degrees" ]
+println[ "  Alt " + ( alt -> degrees ) + " degrees" ]
+println[]
+
+[ az, alt ] = refractedMoonAzimuthAltitude[ now, lat, long ]
+println[ "Moon:" ]
+println[ "  Az " + ( az + 180 degrees ) mod circle + " radians" ]
+println[ "  Alt " + alt + " radians" ]
+println[ "  Az " + ( ( ( az + 180 degrees ) mod circle ) -> degrees ) + " degrees" ]
+println[ "  Alt " + ( alt -> degrees ) + " degrees" ]
+println[]
+
+println[ "Moon phase angle (0 <= degrees <= 180 ): " + moonPhaseAngle[ now ] ]
+println[ "Moon illuminated fraction (%) : " + moonIlluminatedFraction[ now ] * 100 ]
+println[ "Moon position angle (radians): " + moonPositionAngle[ now ] ]
+println[ "Moon position angle (degrees): " + ( moonPositionAngle[ now ] -> degrees ) ]
 [ ra, dec ] = moonApparentRADecl[ now ]
-println[ "Moon parallactic angle: " + parallacticAngle[ now, lat, long, ra, dec ] ]
-println[ "Moon position angle relative to zenith mod circle: " + moonPositionAngleRelativeToZenith[ now, lat, long ] mod circle ]
-println[ "Moon position angle relative to zenith mod circle (degrees): " + ( moonPositionAngleRelativeToZenith[ now, lat, long ] mod circle -> degrees ) ]
-
-//positionAngleOfBrightLimb = moonPositionAngle[ now ]
-//[ra, dec ] = moonApparentRADecl[ now ]
-//parallacticAngle = parallacticAngle[ now, lat, long, ra, dec ]
-//zenithAngleOfBrightLimb = moonPositionAngleRelativeToZenith[ now, lat, long ] mod circle
-
-//println[ "Position angle of bright limb " + positionAngleOfBrightLimb ]
-//println[ "Parallactic angle " + parallacticAngle ]
-//println[ "Zenith Angle of Bright Limb (degrees) " + ( zenithAngleOfBrightLimb -> degrees ) ]  
+println[ "Moon parallactic angle (radians): " + parallacticAngle[ now, lat, long, ra, dec ] ]
+println[ "Moon parallactic angle (degrees): " + ( parallacticAngle[ now, lat, long, ra, dec ] -> degrees ) ]
+println[ "Moon position angle relative to zenith (radians): " + moonPositionAngleRelativeToZenith[ now, lat, long ] ] // THIS IS THE MOON'S BRIGHT LIMB!
+println[ "Moon position angle relative to zenith (degrees): " + ( moonPositionAngleRelativeToZenith[ now, lat, long ] -> degrees ) ]
+println[ "Moon position angle relative to zenith mod circle (radians): " + moonPositionAngleRelativeToZenith[ now, lat, long ] mod circle ] //TODO Don't know where the 'mod circle' originated.
+println[ "Moon position angle relative to zenith mod circle (degrees): " + ( moonPositionAngleRelativeToZenith[ now, lat, long ] mod circle -> degrees ) ] //TODO Don't know where the 'mod circle' originated.

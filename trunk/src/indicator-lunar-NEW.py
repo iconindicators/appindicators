@@ -770,7 +770,7 @@ class IndicatorLunar:
 
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
-        lunarBrightLimbAngle = int( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] )
+        lunarBrightLimbAngle = int( float( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] ) ) #TODO Radians
 
         themeName = self.getThemeName()
         noChange = \
@@ -803,7 +803,7 @@ class IndicatorLunar:
     def notificationFullMoon( self ):
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
-        lunarBrightLimbAngle = int( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] )
+#         lunarBrightLimbAngle = int( float( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] ) ) #TODO Radians
         lunarPhase = self.data[ key + ( astroPyephem.DATA_PHASE, ) ]
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == astroPyephem.LUNAR_PHASE_NEW_MOON ) or \
