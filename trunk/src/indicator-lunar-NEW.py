@@ -516,7 +516,7 @@ class IndicatorLunar:
         self.toggleStarsTable = True
 
         self.previousLunarIlluminationPercentage = -1
-        self.previousLunarBrightLimbAngle = -1
+        self.previousLunarBrightLimbAngleInDegrees = -1
         self.previousThemeName = ""
 
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorLunar.LOG ) ] )
@@ -770,16 +770,17 @@ class IndicatorLunar:
 
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
-        lunarBrightLimbAngle = int( float( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] ) ) #TODO Radians
+        lunarBrightLimbAngleInDegrees = int( float( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] ) ) #TODO Radians
 
         themeName = self.getThemeName()
         noChange = \
-            lunarBrightLimbAngle == self.previousLunarBrightLimbAngle and \
+            lunarBrightLimbAngleInDegrees == self.previousLunarBrightLimbAngleInDegrees and \
             lunarIlluminationPercentage == self.previousLunarIlluminationPercentage and \
             themeName == self.previousThemeName
 
+#TODO Why do we do all of this?  Maybe just do a purge and then create the icon with a new name each time.
         if not noChange:
-            self.previousLunarBrightLimbAngle = lunarBrightLimbAngle
+            self.previousLunarBrightLimbAngleInDegrees = lunarBrightLimbAngleInDegrees
             self.previousLunarIlluminationPercentage = lunarIlluminationPercentage
             self.previousThemeName = themeName
             self.purgeIcons()
@@ -792,7 +793,7 @@ class IndicatorLunar:
 #TODO Does not show the icon under eclipse ...Ubuntu 18.04 only or 16.04 too?
 #             iconName = IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
 #             iconFilename = IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
-#             self.createIcon( lunarIlluminationPercentage, math.degrees( lunarBrightLimbAngle ), iconFilename )
+            self.createIcon( lunarIlluminationPercentage, math.degrees( lunarBrightLimbAngleInDegrees ), iconFilename )
 #             self.indicator.set_icon_theme_path( "IndicatorLunar.ICON_BASE_PATH" )
 #             self.indicator.set_icon_full( iconName + ".svg", "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
 #
