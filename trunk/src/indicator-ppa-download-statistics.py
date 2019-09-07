@@ -318,13 +318,7 @@ class IndicatorPPADownloadStatistics:
         notebook = Gtk.Notebook()
 
         # PPAs.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         ppaStore = Gtk.ListStore( str, str, str, str ) # PPA User, PPA Name, Series, Architecture.
         ppaStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
@@ -366,13 +360,7 @@ class IndicatorPPADownloadStatistics:
         notebook.append_page( grid, Gtk.Label( _( "PPAs" ) ) )
 
         # Filters.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         filterStore = Gtk.ListStore( str, str ) # 'PPA User | PPA Name', filter text.
         filterStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
@@ -413,13 +401,7 @@ class IndicatorPPADownloadStatistics:
         notebook.append_page( grid, Gtk.Label( _( "Filters" ) ) )
 
         # General settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show PPAs as submenus" ) )
         showAsSubmenusCheckbox.set_tooltip_text( _(
@@ -575,13 +557,7 @@ class IndicatorPPADownloadStatistics:
     def onPPADoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
 
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         label = Gtk.Label( _( "PPA User" ) )
         label.set_halign( Gtk.Align.START )
@@ -763,13 +739,7 @@ class IndicatorPPADownloadStatistics:
         filterTreeModel, filterTreeIter = filterTree.get_selection().get_selected()
         ppaTreeModel, ppaTreeIter = ppaTree.get_selection().get_selected()
 
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         label = Gtk.Label( _( "PPA User/Name" ) )
         label.set_halign( Gtk.Align.START )
