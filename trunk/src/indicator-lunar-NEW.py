@@ -393,38 +393,16 @@ class IndicatorLunar:
         astroPyephem.LUNAR_PHASE_WAXING_GIBBOUS    : _( "Waxing Gibbous" )
     }
 
-    # The download period serves two purposes:
-    #    Prevent over-taxing the download source (which may result in being blocked).
-    #    Download as often as necessary for accuracy.
-    #
-    # The cache age ensures the data retrieved from the cache is not stale.
-    #
-    # The cache has two uses:
-    #    Act as a source when restarting the indicator.
-    #    Act as a source when offline.
-    COMET_OE_CACHE_BASENAME = "comet-oe-"
-    COMET_OE_CACHE_MAXIMUM_AGE_HOURS = 30
-    COMET_OE_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
-    COMET_OE_DOWNLOAD_PERIOD_HOURS = 24 # TODO Probably don't need this anymore...
-
+    COMET_CACHE_BASENAME = "comet-oe-"
+    COMET_CACHE_MAXIMUM_AGE_HOURS = 30
+    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
     COMET_ON_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
-    # The download period serves two purposes:
-    #    Prevent over-taxing the download source (which may result in being blocked).
-    #    Download as often as necessary for accuracy.
-    #
-    # The cache age ensures the data retrieved from the cache is not stale.
-    #
-    # The cache has two uses:
-    #    Act as a source when restarting the indicator.
-    #    Act as a source when offline.
-    MINOR_PLANET_OE_CACHE_BASENAME = "minorplanet-oe-"
-    MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS = 30
-    MINOR_PLANET_OE_URL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt"
-    MINOR_PLANET_OE_DOWNLOAD_PERIOD_HOURS = 24 # TODO Probably don't need this anymore...
-
-#TODO Verify this works.
+    MINOR_PLANET_CACHE_BASENAME = "minorplanet-oe-"
+    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 30
+    MINOR_PLANET_DATA_URL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt"
     MINOR_PLANET_ON_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+#TODO Verify above url works.
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -451,21 +429,9 @@ class IndicatorLunar:
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ), SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
 
-    # The download period serves two purposes:
-    #    Prevent over-taxing the download source (which may result in being blocked).
-    #    Download as often as necessary for accuracy.
-    #
-    # The cache age ensures the data retrieved from the cache is not stale.
-    #
-    # The cache has two uses:
-    #    Act as a source when restarting the indicator.
-    #    Act as a source when offline.
-    SATELLITE_TLE_CACHE_BASENAME = "satellite-tle-"
-    SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS = 18
-    SATELLITE_TLE_DOWNLOAD_PERIOD_HOURS = 12 # TODO Probably don't need this anymore...
-    SATELLITE_TLE_URL = "https://celestrak.com/NORAD/elements/visual.txt"
-
-    SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
+    SATELLITE_CACHE_BASENAME = "satellite-tle-"
+    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 18
+    SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_MENU_TEXT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + _( " now rising..." )
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
@@ -475,6 +441,7 @@ class IndicatorLunar:
         _( "Rise Azimuth: " ) + SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n" + \
         _( "Set Time: " ) + SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
         _( "Set Azimuth: " ) + SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
+    SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
 
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
@@ -508,12 +475,12 @@ class IndicatorLunar:
 
 
     def __init__( self ):
-        self.cometOEData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
-        self.minorPlanetOEData = { } # Key: minor planet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
-        self.satelliteTLEData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
+        self.cometData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
+        self.minorPlanetData = { } # Key: minor planet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
+        self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satelliteNotifications = { }
 
-#TODO Do these need to live here?  Do we need to recall the state globally or maybe just within each calling of prefs?
+#TODO Do these need to live here?  Do we need to recall the state globally or maybe just within each calling of prefs? Needed at all?
         self.toggleCometsTable = True
         self.toggleMinorPlanetsTable = True
         self.togglePlanetsTable = True
@@ -534,9 +501,9 @@ class IndicatorLunar:
         self.dialogLock = threading.Lock()
         Notify.init( INDICATOR_NAME )
 
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS )
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
 
         # Remove old icons.
         oldIcons = glob.glob( IndicatorLunar.ICON_BASE_PATH + "/" + IndicatorLunar.ICON_BASE_NAME + "*" )
@@ -551,7 +518,7 @@ class IndicatorLunar:
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
         self.loadConfig()
-        
+
 
 #TODO Look at
 # https://minorplanetcenter.net/iau/MPCORB.html
@@ -592,21 +559,21 @@ class IndicatorLunar:
 #Will the backend have a fit, particularly if there was a list of say comets/satellites from yesterday's run,
 #and now we cannot download data and the cache is stale?
             print( "Updating data")#TODO Debug
-            self.cometOEData = self.updateData( IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
+            self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
                 self.addNewComets()
                 
             print( len( self.comets ) ) #TODO Debug
             print( self.comets ) #TODO Debug
 
-            self.minorPlanetOEData = self.updateData( IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
+            self.minorPlanetData = self.updateData( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.minorPlanetsAddNew:
                 self.addNewMinorPlanets()
 
             print( len( self.minorPlanets ) ) #TODO Debug
             print( self.minorPlanets ) #TODO Debug
 
-            self.satelliteTLEData = self.updateData( IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL, None )
+            self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL, None )
             if self.satellitesAddNew:
                 self.addNewSatellites()
 
@@ -621,9 +588,9 @@ class IndicatorLunar:
                                                           self.latitude, self.longitude, self.elevation,
                                                           self.planets,
                                                           self.stars,
-                                                          self.satellites, self.satelliteTLEData,
-                                                          self.comets, self.cometOEData,
-                                                          self.minorPlanets, self.minorPlanetOEData,
+                                                          self.satellites, self.satelliteData,
+                                                          self.comets, self.cometData,
+                                                          self.minorPlanets, self.minorPlanetData,
                                                           self.magnitude )
 
             # Update frontend...
@@ -657,7 +624,7 @@ class IndicatorLunar:
 # Comets will successfully read in because their objects (dict, tuple string) are valid.
 # Comets are still stored in a dict using a string as key but now with a new OE object as the value, which must be handled.
 # This check can be removed in version 82 or later.
-        if data is not None and cacheBaseName == IndicatorLunar.COMET_OE_CACHE_BASENAME:
+        if data is not None and cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME:
             if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ): # Check that the object loaded from cache matches the new OE object.
                 data = None
 #TODO End of hack!
@@ -816,7 +783,7 @@ class IndicatorLunar:
 
             self.createIcon( 100, None, IndicatorLunar.SVG_FULL_MOON_FILE )
             Notify.Notification.new( summary, self.werewolfWarningMessage, IndicatorLunar.SVG_FULL_MOON_FILE ).show()
-            os.remove( IndicatorLunar.SVG_FULL_MOON_FILE )
+            os.remove( IndicatorLunar.SVG_FULL_MOON_FILE ) #TODO Is this a race?  Will the file be deleted before being displayed?
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
@@ -869,7 +836,7 @@ class IndicatorLunar:
             riseAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
             setTime = self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
             setAzimuth = self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            tle = self.satelliteTLEData[ ( satelliteName, satelliteNumber ) ]
+            tle = self.satelliteData[ ( satelliteName, satelliteNumber ) ]
 
             summary = self.satelliteNotificationSummary. \
                       replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
@@ -1069,10 +1036,10 @@ class IndicatorLunar:
         for number in self.satellites:
             key = ( astroPyephem.AstronomicalBodyType.Satellite, number )
             if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
-                satellitesCircumpolar.append( [ number, self.satelliteTLEData[ number ].getName(), None ] )
+                satellitesCircumpolar.append( [ number, self.satelliteData[ number ].getName(), None ] )
 
             elif key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-                satellites.append( [ number, self.satelliteTLEData[ number ].getName(), self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ] ] )
+                satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ] ] )
 
         if self.satellitesSortByDateTime and satellites:
             satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
@@ -1102,9 +1069,9 @@ class IndicatorLunar:
 
 
     def updateSatelliteMenu( self, menu, indent, satelliteNumber ):
-        menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, self.satelliteTLEData[ satelliteNumber ].getName() ) \
+        menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, self.satelliteData[ satelliteNumber ].getName() ) \
                                                      .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
-                                                     .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteTLEData[ satelliteNumber ].getInternationalDesignator() )
+                                                     .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ satelliteNumber ].getInternationalDesignator() )
 
         menuItem = Gtk.MenuItem( pythonutils.indent( indent, 1 ) + menuText ) #TODO Indent needs to be adjusted for GNOME Shell.
         menu.append( menuItem )
@@ -1135,7 +1102,7 @@ class IndicatorLunar:
 
 
     def onSatellite( self, widget ):
-        satelliteTLE = self.satelliteTLEData.get( widget.props.name )
+        satelliteTLE = self.satelliteData.get( widget.props.name )
 
         url = IndicatorLunar.SATELLITE_ON_CLICK_URL. \
               replace( IndicatorLunar.SATELLITE_TAG_NAME, satelliteTLE.getName() ). \
@@ -1568,7 +1535,7 @@ class IndicatorLunar:
         box = Gtk.Box( spacing = 20 )
 
         cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
-        for comet in self.cometOEData:
+        for comet in self.cometData:
             cometStore.append( ( comet in self.comets, comet ) )
 
         cometStoreSort = Gtk.TreeModelSort( model = cometStore )
@@ -1599,7 +1566,7 @@ class IndicatorLunar:
         box.pack_start( scrolledWindow, True, True, 0 )
 
         minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
-        for minorPlanet in self.minorPlanetOEData:
+        for minorPlanet in self.minorPlanetData:
             minorPlanetStore.append( ( minorPlanet in self.minorPlanets, minorPlanet ) )
 
         minorPlanetStoreSort = Gtk.TreeModelSort( model = minorPlanetStore )
@@ -1641,8 +1608,8 @@ class IndicatorLunar:
         satelliteGrid.set_margin_bottom( 10 )
 
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
-        for satellite in self.satelliteTLEData:
-            satelliteStore.append( ( satellite in self.satellites, self.satelliteTLEData[ satellite ].getName(), satellite, self.satelliteTLEData[ satellite ].getInternationalDesignator() ) )
+        for satellite in self.satelliteData:
+            satelliteStore.append( ( satellite in self.satellites, self.satelliteData[ satellite ].getName(), satellite, self.satelliteData[ satellite ].getInternationalDesignator() ) )
 
         satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
         satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
@@ -1900,9 +1867,9 @@ class IndicatorLunar:
 
         # The visibility of some GUI objects must be determined AFTER the dialog is shown.
 #TODO Rename to include Minor Planets
-#         self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometOEData, self.comets, cometURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Comet )
-#         self.updateCometSatellitePreferencesTab( minorPlanetGrid, minorPlanetStore, self.minorPlanetOEData, self.minorPlanets, minorPlanetURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.MinorPlanet )
-#         self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteTLEData, self.satellites, TLEURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Satellite )
+#         self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometData, self.comets, cometURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Comet )
+#         self.updateCometSatellitePreferencesTab( minorPlanetGrid, minorPlanetStore, self.minorPlanetData, self.minorPlanets, minorPlanetURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.MinorPlanet )
+#         self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteData, self.satellites, TLEURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Satellite )
 
         # Last thing to do after everything else is built.
 #TODO Fix this after all other stuff is sorted out.
@@ -1966,11 +1933,11 @@ class IndicatorLunar:
             if self.cometOEURLNew is not None: # The URL is initialised to None.  If it is not None, a fetch has taken place.
                 self.cometOEURL = self.cometOEURLNew # The URL may or may not be valid, but it will not be None.
                 if self.cometOEDataNew is None:
-                    self.cometOEData = { } # The retrieved data was bad, so reset to empty data.
+                    self.cometData = { } # The retrieved data was bad, so reset to empty data.
                 else:
-                    self.cometOEData = self.cometOEDataNew # The retrieved data is good (but still could be empty).
+                    self.cometData = self.cometOEDataNew # The retrieved data is good (but still could be empty).
 
-                pythonutils.writeCacheBinary( self.cometOEData, INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, logging )
+                pythonutils.writeCacheBinary( self.cometData, INDICATOR_NAME, IndicatorLunar.COMET_CACHE_BASENAME, logging )
                 self.lastUpdateCometOE = datetime.datetime.utcnow()
 
             self.comets = [ ]
@@ -1984,11 +1951,11 @@ class IndicatorLunar:
             if self.satelliteTLEURLNew is not None: # The URL is initialised to None.  If it is not None, a fetch has taken place.
                 self.satelliteTLEURL = self.satelliteTLEURLNew # The URL may or may not be valid, but it will not be None.
                 if self.satelliteTLEDataNew is None:
-                    self.satelliteTLEData = { } # The retrieved data was bad, so reset to empty data.
+                    self.satelliteData = { } # The retrieved data was bad, so reset to empty data.
                 else:
-                    self.satelliteTLEData = self.satelliteTLEDataNew # The retrieved data is good (but still could be empty).
+                    self.satelliteData = self.satelliteTLEDataNew # The retrieved data is good (but still could be empty).
 
-                pythonutils.writeCacheBinary( self.satelliteTLEData, INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, logging )
+                pythonutils.writeCacheBinary( self.satelliteData, INDICATOR_NAME, IndicatorLunar.SATELLITE_CACHE_BASENAME, logging )
                 self.lastUpdateSatelliteTLE = datetime.datetime.utcnow()
 
             self.satellites = [ ]
@@ -2278,21 +2245,21 @@ class IndicatorLunar:
 #TODO Find all callers and ensure that TLE data is not None and list of satellites is not None.
 #TODO Can the three functions below be combined into one?
     def addNewSatellites( self ):
-        for key in self.satelliteTLEData:
+        for key in self.satelliteData:
             if key not in self.satellites:
                 self.satellites.append( key )
 
 
 #TODO Find all callers and ensure that OE data is not None and list of comets is not None.
     def addNewComets( self ):
-        for key in self.cometOEData:
+        for key in self.cometData:
             if key not in self.comets:
                 self.comets.append( key )
 
 
 #TODO Find all callers and ensure that OE data is not None and list of minor planets is not None.
     def addNewMinorPlanets( self ):
-        for key in self.minorPlanetOEData:
+        for key in self.minorPlanetData:
             if key not in self.minorPlanets:
                 self.minorPlanets.append( key )
 
@@ -2332,11 +2299,11 @@ class IndicatorLunar:
 
         self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, IndicatorLunar.INDICATOR_TEXT_DEFAULT )
 
-        self.cometOEURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, IndicatorLunar.COMET_OE_URL )
+        self.cometOEURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, IndicatorLunar.COMET_DATA_URL )
         self.comets = config.get( IndicatorLunar.CONFIG_COMETS, [ ] )
         self.cometsAddNew = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, False )
 
-        self.minorPlanetOEURL = config.get( IndicatorLunar.MINOR_PLANET_OE_URL, IndicatorLunar.MINOR_PLANET_OE_URL )
+        self.minorPlanetOEURL = config.get( IndicatorLunar.MINOR_PLANET_DATA_URL, IndicatorLunar.MINOR_PLANET_DATA_URL )
         self.minorPlanets = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS, [ ] )
         self.minorPlanetsAddNew = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW, False )
 
@@ -2346,7 +2313,7 @@ class IndicatorLunar:
 
         self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT )
         self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT )
-        self.satelliteTLEURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, IndicatorLunar.SATELLITE_TLE_URL )
+        self.satelliteTLEURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, IndicatorLunar.SATELLITE_DATA_URL )
         self.satellites = config.get( IndicatorLunar.CONFIG_SATELLITES, [ ] )
         self.satellitesAddNew = config.get( IndicatorLunar.CONFIG_SATELLITES_ADD_NEW, False )
         self.satellitesSortByDateTime = config.get( IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME, True )
