@@ -940,28 +940,46 @@ class IndicatorLunar:
 
     def updateStarsMenu( self, menu ):
         stars = [ ]
+        magnitudes = [ 0 ] * 17 # Magnitudes range from -1.44 for Sirius (which is -1 as an integer), up to a hard limit of 15.
+        magnitudes = { }
         for star in self.stars:
             if ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_RISE_DATE_TIME ) in self.data or \
                ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_ALTITUDE ) in self.data:
                 stars.append( [ star, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ star ] ] )
 
-        if stars:
-            print( "Number of stars:", len(stars))#TODO debug
-            menuItem = Gtk.MenuItem( _( "Stars" ) )
-            menu.append( menuItem ) 
-            if self.showStarsAsSubMenu:
-                subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
+                magnitude = int( float( self.data[ ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_MAGNITUDE ) ] ) )
+                if magnitude not in magnitudes:
+                    magnitudes[ magnitude ] = [ ]
 
-            for name, translatedName in stars:
-                if self.showStarsAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
-                    subMenu.append( menuItem )
-                else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + translatedName )
-                    menu.append( menuItem )
+                magnitudes[ magnitude ].append( star )
+#         print( magnitudes )
+# {
+#    -1: ['SIRIUS']
+#     0: ['ACHERNAR', 'AGENA', 'ALDEBARAN', 'ALTAIR', 'ARCTURUS', 'BETELGEUSE', 'CANOPUS', 'CAPELLA', 'PROCYON', 'RIGEL', 'SPICA', 'VEGA'], 
+#     1: ['ADARA', 'ALCAID', 'ALHENA', 'ALIOTH', 'ALNAIR', 'ALNILAM', 'ALNITAK', 'ALPHARD', 'ANTARES', 'BELLATRIX', 'CASTOR', 'DENEB', 'ELNATH', 'FOMALHAUT', 'KAUS AUSTRALIS', 'MENKALINAN', 'MIMOSA', 'MIRZAM', 'PEACOCK', 'POLLUX', 'REGULUS', 'SHAULA', 'WEZEN'], 
+#     2: ['ALCYONE', 'ALGENIB', 'ALGIEBA', 'ALGOL', 'ALMACH', 'ALPHECCA', 'ARNEB', 'CEBALRAI', 'DENEBOLA', 'ENIF', 'ETAMIN', 'GIENAH CORVI', 'HAMAL', 'IZAR', 'MARKAB', 'MENKAR', 'MERAK', 'MINTAKA', 'MIRACH', 'MIZAR', 'NAOS', 'NIHAL', 'NUNKI', 'PHECDA', 'RASALGETHI', 'RASALHAGUE', 'SADALMELIK', 'SADR', 'SAIPH', 'SCHEAT', 'SCHEDAR', 'SIRRAH', 'TARAZED', 'UNUKALHAI', 'VINDEMIATRIX', 'ZAURAK'], 
+#     3: ['ALBEREO', 'ALCOR', 'ALSHAIN', 'ARKAB PRIOR', 'ATLAS', 'ELECTRA', 'MAIA', 'MINKAR', 'RUKBAT', 'SHELIAK', 'SULAFAT'], 
+#     4: ['ARKAB POSTERIOR', 'MEROPE', 'TAYGETA'], 
+# }
+        
 
-                self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
+#         if stars:
+#             print( "Number of stars:", len(stars))#TODO debug
+#             menuItem = Gtk.MenuItem( _( "Stars" ) )
+#             menu.append( menuItem ) 
+#             if self.showStarsAsSubMenu:
+#                 subMenu = Gtk.Menu()
+#                 menuItem.set_submenu( subMenu )
+# 
+#             for name, translatedName in stars:
+#                 if self.showStarsAsSubMenu:
+#                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
+#                     subMenu.append( menuItem )
+#                 else:
+#                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + translatedName )
+#                     menu.append( menuItem )
+# 
+#                 self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
 
 
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
@@ -1583,7 +1601,7 @@ class IndicatorLunar:
         notebook.append_page( box, Gtk.Label( _( "Comets / Minor Planets" ) ) )
 
         # Satellites.
-#TODO If just a table, don't need a grid right?  Check with all other indicators.
+#TODO If just a table, don't need a grid right?  Use a box as with comets/minorplanets.
         satelliteGrid = Gtk.Grid()
         satelliteGrid.set_column_spacing( 10 )
         satelliteGrid.set_row_spacing( 10 )
