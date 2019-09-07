@@ -200,13 +200,7 @@ class IndicatorFortune:
         notebook = Gtk.Notebook()
 
         # Fortune file.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         store = Gtk.ListStore( str, str ) # Path to fortune; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
         for location, enabled in self.fortunes:
@@ -271,13 +265,7 @@ class IndicatorFortune:
         notebook.append_page( grid, Gtk.Label( _( "Fortunes" ) ) )
 
         # General.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -411,13 +399,7 @@ class IndicatorFortune:
     def onFortuneDoubleClick( self, treeview, rowNumber, treeViewColumn ):
         model, treeiter = treeview.get_selection().get_selected()
 
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
