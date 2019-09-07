@@ -520,10 +520,6 @@ class IndicatorLunar:
         self.toggleSatellitesTable = True
         self.toggleStarsTable = True
 
-        self.previousLunarIlluminationPercentage = -1
-        self.previousLunarBrightLimbAngleInDegrees = -1
-        self.previousThemeName = ""
-
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorLunar.LOG ) ] )
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorLunar.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
@@ -541,6 +537,11 @@ class IndicatorLunar:
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_OE_CACHE_BASENAME, IndicatorLunar.COMET_OE_CACHE_MAXIMUM_AGE_HOURS )
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS )
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
+
+        # Remove old icons.
+        oldIcons = glob.glob( IndicatorLunar.ICON_BASE_PATH + "/" + IndicatorLunar.ICON_BASE_NAME + "*" )
+        for oldIcon in oldIcons:
+            os.remove( oldIcon )
 
         # Initialise last update date/times to the past...
 #TODO Are these needed?
@@ -774,10 +775,6 @@ class IndicatorLunar:
         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
 
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
-        # Remove old icons.
-        oldIcons = glob.glob( IndicatorLunar.ICON_BASE_PATH + "/" + IndicatorLunar.ICON_BASE_NAME + "*" )
-        for oldIcon in oldIcons:
-            os.remove( oldIcon )
 
         # Ideally should be able to create the icon with the same name each time.
         # Due to a bug, the icon name must change between calls to setting the icon.
@@ -794,14 +791,13 @@ class IndicatorLunar:
         lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] ) ) )
         self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees, iconFilename )
-        self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
         self.indicator.set_icon_full( iconFilename, "" )
 
 
+#TODO Verify
     def notificationFullMoon( self ):
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
-#         lunarBrightLimbAngle = int( float( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] ) ) #TODO Radians
         lunarPhase = self.data[ key + ( astroPyephem.DATA_PHASE, ) ]
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == astroPyephem.LUNAR_PHASE_NEW_MOON ) or \
@@ -824,6 +820,7 @@ class IndicatorLunar:
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
+#TODO Verify
     def notificationSatellites( self ):
         # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
         satelliteNameNumberRiseTimes = [ ]
