@@ -38,7 +38,7 @@ TERMINAL_GNOME = "gnome-terminal"
 TERMINAL_LXDE = "lxterminal"
 TERMINAL_XFCE = "xfce4-terminal"
 
-URL_TIMEOUT_IN_SECONDS = 10
+URL_TIMEOUT_IN_SECONDS = 2 #TODO Was 10...leave as is?
 
 USER_DIRECTORY_CACHE = ".cache"
 USER_DIRECTORY_CONFIG = ".config"
@@ -507,9 +507,12 @@ def _getUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
 
 # Opens a socket to www.google.com and if successful,
 # we are deemed connected to the internet and returns True (False otherwise).
-def isConnectedToInternet():
+def isConnectedToInternet():  #TODO Used in PPA but not Tide.  Why?  Maybe ditch this if the timeout stuff (in orbital element download function) works.
     connected = False
     try:
+        #TODO A socket is not enough...I was on the laptop and this allowed me to connect via telstra air
+#         ...so maybe get the Google home page and look for "google"...or just try and use a timeout?
+#        Or ignore this and check in the download function.  Just try and download and parse...if we get nonsense, then that is bad.
         socket.create_connection( ( socket.gethostbyname( "www.google.com" ), 80 ), timeout = URL_TIMEOUT_IN_SECONDS ).close()
         connected = True
     except socket.error:
