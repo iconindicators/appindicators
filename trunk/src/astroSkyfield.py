@@ -694,10 +694,13 @@ def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
 #            sun.alt < ephem.degrees( "-6" )
 
 
-# Loads the Skyfield catalogue of stars and filters out those not listed as common named.
+# If all stars in the Skyfield catalogue were included, up to a limit of magnitude 15,
+# there would be over 100,000 stars and is impractical.
+#
+# Instead, present the user with the "common name" stars, see link below.
+#
+# Load the Skyfield catalogue of stars and filter out those not listed as "common name".
 # The final list of stars range in magnitude up to around 12.
-# The catalogue contains at least 1500 stars of magnitude 5 or less which are not common named.
-# Including those stars, or even all stars up to say magnitude 15 say, totals over 100,000 and is impractical.
 #
 # Common name stars:
 #     https://www.cosmos.esa.int/web/hipparcos/common-star-names
