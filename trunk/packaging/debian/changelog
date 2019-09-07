@@ -17,9 +17,11 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
     as the parent planet.
   * Removed werewolf warning percentage from preferences and fixed at 99%.
   * Removed date/time format from preferences; now uses ISO 8601.
-  * On startup, the indicator menu shows the single menu item "Initialising...".
+  * On startup, the indicator shows the single menu item "Initialising...".
     Once the indicator is updated, which could take a minute or more,
     the full menu is displayed.
+  * Preferences no longer allows user configurable TLE/OE data files;
+    code became too complicated to manage; defaults work well enough.
   * Added hyperlink to the About dialog which links to the error log text file
     (only visible if the underlying file is present).
   * About dialog now pulls the changelog directly from /usr/doc
