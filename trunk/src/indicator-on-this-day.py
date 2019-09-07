@@ -232,13 +232,7 @@ class IndicatorOnThisDay:
         notebook = Gtk.Notebook()
 
         # Calendar file settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         store = Gtk.ListStore( str, str ) # Path to calendar file; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
         for calendar in self.getCalendars():
@@ -301,13 +295,7 @@ class IndicatorOnThisDay:
         notebook.append_page( grid, Gtk.Label( _( "Calendars" ) ) )
 
         # General settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -457,13 +445,7 @@ class IndicatorOnThisDay:
         else: # This is an edit.
             isSystemCalendar = model[ treeiter ][ 0 ] in self.getCalendars()
 
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
