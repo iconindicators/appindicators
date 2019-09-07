@@ -164,6 +164,7 @@ def onRadio( self, *widgets ):
 
 
 #TODO Roll out to all indicators!
+#TODO For a notebook page with a single table, don't need a grid, so check where grids are used and remove.
 def createGrid():
     spacing = 10
     grid = Gtk.Grid()
