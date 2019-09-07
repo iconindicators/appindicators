@@ -180,13 +180,7 @@ class IndicatorScriptRunner:
         notebook = Gtk.Notebook()
 
         # User scripts.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -306,13 +300,7 @@ class IndicatorScriptRunner:
         notebook.append_page( grid, Gtk.Label( _( "Scripts" ) ) )
 
         # General settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         label = Gtk.Label( _( "Display" ) )
         label.set_halign( Gtk.Align.START )
@@ -435,13 +423,7 @@ class IndicatorScriptRunner:
             scriptName = model[ treeiter ][ 0 ]
             script = self.getScript( scripts, scriptGroup, scriptName )
 
-            grid = Gtk.Grid()
-            grid.set_column_spacing( 10 )
-            grid.set_row_spacing( 10 )
-            grid.set_margin_left( 10 )
-            grid.set_margin_right( 10 )
-            grid.set_margin_top( 10 )
-            grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
             box = Gtk.Box( spacing = 6 )
 
@@ -556,13 +538,7 @@ class IndicatorScriptRunner:
 
 
     def addEditScript( self, script, scripts, scriptGroupComboBox, scriptNameTreeView ):
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
