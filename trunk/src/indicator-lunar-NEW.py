@@ -1583,6 +1583,7 @@ class IndicatorLunar:
         notebook.append_page( box, Gtk.Label( _( "Comets / Minor Planets" ) ) )
 
         # Satellites.
+#TODO If just a table, don't need a grid right?  Check with all other indicators.
         satelliteGrid = Gtk.Grid()
         satelliteGrid.set_column_spacing( 10 )
         satelliteGrid.set_row_spacing( 10 )
