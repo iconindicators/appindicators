@@ -204,13 +204,7 @@ class IndicatorPunycode:
 
 
     def _onPreferences( self, widget ):
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         label = Gtk.Label( _( "Input source" ) )
         label.set_halign( Gtk.Align.START )
