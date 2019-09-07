@@ -550,10 +550,16 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
             data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
             data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
 
-        if ( astronomicalBodyType == AstronomicalBodyType.Comet or \
-             astronomicalBodyType == AstronomicalBodyType.MinorPlanet or \
-             astronomicalBodyType == AstronomicalBodyType.Star ):
+        if astronomicalBodyType == AstronomicalBodyType.Comet or \
+           astronomicalBodyType == AstronomicalBodyType.MinorPlanet or \
+           astronomicalBodyType == AstronomicalBodyType.Star:
             data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
+
+#TODO Testing
+        if astronomicalBodyType == AstronomicalBodyType.Star:
+            print( data[ ( AstronomicalBodyType.Star, nameTag, DATA_MAGNITUDE ) ], int( float( data[ ( AstronomicalBodyType.Star, nameTag, DATA_MAGNITUDE ) ] ) ) )
+
+
 
     return neverUp
 

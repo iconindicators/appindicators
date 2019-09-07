@@ -30,7 +30,13 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 #  http://www.flaticon.com/search/satellite
 
+
+#TODO If there is no data to download (no internet) and cache is stale,
+# ensure satellites/comets/minorplanets already selected by the user are not dropped.
+
+
 #TODO Test without internet connection...do so with cached items that are not stale, with cached items that are stale and no cached items.
+
 
 #TODO When no internet and no cached items, the satellites, comets and minor planets selected by the user might get blown away.
 #What to do?  If a user has checked specific items, then losing those because no data is available is not good.
@@ -68,6 +74,21 @@
 #...so maybe need some way to flag to the user magnitudes greater than the moon?
 # Maybe put in a special subgroup?
 # Use the OSD?
+
+
+#TODO If the backend/frontend are updating, and the user clicks on about/prefs, show a notification to tell the user they're blocked?
+#What about the other way?  If the about/prefs are open, disable the updates?
+#What do the other indicators do (PPA)?
+
+
+#TODO Maybe add a hack preference, perhaps only visible under GNOME Shell
+# which groups comets / minor planets into sub-submenus by magnitude.
+# Not sure how/what to do for satellites...
+# For Skyfield, there are a LOT of stars if we filter by magnitude (mag <= 6)...
+#...which means we could also submenu stars by magnitude.
+# For satellites, what is the point of always showing the next rises for the next two days?
+# Maybe only somehow show for the next window...but that window could be different depending on your latitude.
+# Also, if a user wants to know when the ISS next rises, if we only show the next window, then that user is screwed.
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -518,31 +539,10 @@ class IndicatorLunar:
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
         self.loadConfig()
+        GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update )
 
 
-#TODO Look at
-# https://minorplanetcenter.net/iau/MPCORB.html
-# What is this?  Can we lump everything into one thing?
-
-
-#TODO Maybe add a hack preference, perhaps only visible under GNOME Shell
-# which groups comets / minor planets into sub-submenus by magnitude.
-# Not sure how/what to do for satellites...
-# For Skyfield, there are a LOT of stars if we filter by magnitude (mag <= 6)...
-#...which means we could also submenu stars by magnitude.
-# For satellites, what is the point of always showing the next rises for the next two days?
-# Maybe only somehow show for the next window...but that window could be different depending on your latitude.
-# Also, if a user wants to know when the ISS next rises, if we only show the next window, then that user is screwed.
-
-
-    def main( self ):
-        GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update ) # Start the background update as late as possible.
-        Gtk.main()
-
-
-#TODO If the backend/frontend are updating, and the user clicks on about/prefs, show a notification to tell the user they're blocked?
-#What about the other way?  If the about/prefs are open, disable the updates?
-#What do the other indicators do (PPA)?
+    def main( self ): Gtk.main()
 
 
     def update( self, scheduled = True ):
@@ -562,7 +562,7 @@ class IndicatorLunar:
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
                 self.addNewComets()
-                
+
             print( len( self.comets ) ) #TODO Debug
             print( self.comets ) #TODO Debug
 
@@ -630,11 +630,7 @@ class IndicatorLunar:
 #TODO End of hack!
 
         if data is None:
-
-#             if not pythonutils.isConnectedToInternet(): return { }#TODO Hack for when no internet.
-
             data = downloadDataFunction( dataURL ) # Either valid or None.
-#             print( len( data ), dataURL )
             if magnitudeFilterFunction is not None and data is not None:
                 data = magnitudeFilterFunction( data, astroPyephem.MAGNITUDE_MAXIMUM ) # Either valid or None.
 
@@ -1053,7 +1049,6 @@ class IndicatorLunar:
             satellites = sorted( satellites + satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
             menuItem = Gtk.MenuItem( _( "Satellites" ) )
 
-        menuItem = Gtk.MenuItem( "No satellites" ) #TODO Hack
         menu.append( menuItem )  #TODO If no internet and no cache, then no satellites and the menuItem is never set so is uninitialised.
 
         theMenu = menu
@@ -1186,7 +1181,7 @@ class IndicatorLunar:
         width = 100
         height = 100
         radius = float( width / 2 ) * 0.8 # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
-        colour = pythonUtils.getThemeColour( IndicatorLunar.ICON, logging )
+        colour = pythonutils.getThemeColour( IndicatorLunar.ICON, logging )
         if illuminationPercentage == 0 or illuminationPercentage == 100:
             svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
 
@@ -1265,13 +1260,7 @@ class IndicatorLunar:
         notebook = Gtk.Notebook()
 
         # Icon.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -1343,13 +1332,7 @@ class IndicatorLunar:
         notebook.append_page( grid, Gtk.Label( _( "Icon" ) ) )
 
         # Menu.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         label = Gtk.Label( _( "Show" ) )
         label.set_halign( Gtk.Align.START )
@@ -1531,6 +1514,7 @@ class IndicatorLunar:
 #TODO For each of comets, minor planets and satellites, check if the underlying data (tle/oe) is empty or not.  
 # If empty, don't show the table but a label with message instead.
 #May need to have individual variable names for each of the scrolledWindows to hide/show.
+# Or maybe show only the items the user previously selected.
         # Comets.
         box = Gtk.Box( spacing = 20 )
 
@@ -1651,13 +1635,7 @@ class IndicatorLunar:
         # OSD (satellite and full moon).
         notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         showSatelliteNotificationCheckbox = Gtk.CheckButton( _( "Satellite rise" ) )
         showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
@@ -1793,13 +1771,7 @@ class IndicatorLunar:
         notebook.append_page( grid, Gtk.Label( _( "Notifications" ) ) )
 
         # Location.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
