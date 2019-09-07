@@ -771,15 +771,9 @@ class IndicatorLunar:
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
-        # If the underlying object has been unchecked or the object (satellite/comet) no longer exists,
-        # a tag for this object will not be substituted; so remove.
-        parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput )
+        parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
+
         self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
-
-        key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
-        lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
-        lunarBrightLimbAngleInDegrees = int( float( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] ) ) #TODO Radians
-
         # Remove old icons.
         oldIcons = glob.glob( IndicatorLunar.ICON_BASE_PATH + "/" + IndicatorLunar.ICON_BASE_NAME + "*" )
         for oldIcon in oldIcons:
@@ -790,18 +784,18 @@ class IndicatorLunar:
         # So change the name each time - using the current date/time.
         #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
         #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
-#TODO Does not show the icon under eclipse ...Ubuntu 18.04 only or 16.04 too?
         iconFilename = IndicatorLunar.ICON_BASE_PATH + \
                        "/" + \
                        IndicatorLunar.ICON_BASE_NAME + \
                        str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) ) + \
                        ".svg"
 
-        print( "icon:", iconFilename ) #TODO Testing
-
-        self.createIcon( lunarIlluminationPercentage, math.degrees( lunarBrightLimbAngleInDegrees ), iconFilename )
+        key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
+        lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
+        lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] ) ) )
+        self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees, iconFilename )
         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
-        self.indicator.set_icon_full( iconFilename, "" ) #TODO Works under Eclipse on 16.04 but not 18.04...why?
+        self.indicator.set_icon_full( iconFilename, "" )
 
 
     def notificationFullMoon( self ):
