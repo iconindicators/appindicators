@@ -491,13 +491,7 @@ class IndicatorVirtualBox:
         notebook.append_page( scrolledWindow, Gtk.Label( _( "Virtual Machines" ) ) )
 
         # General settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )        
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         box = Gtk.Box( spacing = 6 )
         box.set_hexpand( True )
@@ -606,13 +600,7 @@ class IndicatorVirtualBox:
 
 
     def editVirtualMachine( self, model, treeiter ):
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         label = Gtk.Label( _( "Start Command" ) )
         label.set_halign( Gtk.Align.START )
