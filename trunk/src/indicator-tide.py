@@ -264,13 +264,7 @@ class IndicatorTide:
         notebook = Gtk.Notebook()
 
         # Port settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -308,13 +302,7 @@ class IndicatorTide:
         notebook.append_page( grid, Gtk.Label( _( "Ports" ) ) )
 
         # General settings.
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show as submenus" ) )
         showAsSubmenusCheckbox.set_active( self.showAsSubMenus )
