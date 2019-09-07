@@ -30,6 +30,11 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 #  http://www.flaticon.com/search/satellite
 
+#TODO Test without internet connection...do so with cached items that are not stale, with cached items that are stale and no cached items.
+
+#TODO When no internet and no cached items, the satellites, comets and minor planets selected by the user might get blown away.
+#What to do?  If a user has checked specific items, then losing those because no data is available is not good.
+
 
 #TODO
 # On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared:
@@ -537,8 +542,6 @@ class IndicatorLunar:
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_OE_CACHE_MAXIMUM_AGE_HOURS )
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_TLE_CACHE_BASENAME, IndicatorLunar.SATELLITE_TLE_CACHE_MAXIMUM_AGE_HOURS )
 
-        self.removeOldIcons()
-
         # Initialise last update date/times to the past...
 #TODO Are these needed?
         self.lastUpdateCometOE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
@@ -659,8 +662,11 @@ class IndicatorLunar:
 #TODO End of hack!
 
         if data is None:
+
+#             if not pythonutils.isConnectedToInternet(): return { }#TODO Hack for when no internet.
+
             data = downloadDataFunction( dataURL ) # Either valid or None.
-            print( len( data ), dataURL )
+#             print( len( data ), dataURL )
             if magnitudeFilterFunction is not None and data is not None:
                 data = magnitudeFilterFunction( data, astroPyephem.MAGNITUDE_MAXIMUM ) # Either valid or None.
 
@@ -774,20 +780,28 @@ class IndicatorLunar:
         lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
         lunarBrightLimbAngleInDegrees = int( float( self.data[ key + ( astroPyephem.DATA_BRIGHT_LIMB, ) ] ) ) #TODO Radians
 
+        # Remove old icons.
+        oldIcons = glob.glob( IndicatorLunar.ICON_BASE_PATH + "/" + IndicatorLunar.ICON_BASE_NAME + "*" )
+        for oldIcon in oldIcons:
+            os.remove( oldIcon )
+
         # Ideally should be able to create the icon with the same name each time.
         # Due to a bug, the icon name must change between calls to setting the icon.
         # So change the name each time - using the current date/time.
         #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
         #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
 #TODO Does not show the icon under eclipse ...Ubuntu 18.04 only or 16.04 too?
-#        iconName = IndicatorLunar.ICON_BASE_NAME + str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) )
-#        iconFilename = IndicatorLunar.ICON_BASE_PATH + "/" + iconName + ".svg"
+        iconFilename = IndicatorLunar.ICON_BASE_PATH + \
+                       "/" + \
+                       IndicatorLunar.ICON_BASE_NAME + \
+                       str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) ) + \
+                       ".svg"
+
+        print( "icon:", iconFilename ) #TODO Testing
+
         self.createIcon( lunarIlluminationPercentage, math.degrees( lunarBrightLimbAngleInDegrees ), iconFilename )
-#        self.indicator.set_icon_theme_path( "IndicatorLunar.ICON_BASE_PATH" )
-#        self.indicator.set_icon_full( iconName + ".svg", "" ) #TODO Not sure why the icon does not appear under Eclipse...have tried this method as set_icon is deprecated.
-#
-#             import os
-#             print( "Icon:", iconFilename, os.path.isfile( iconFilename ) )
+        self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
+        self.indicator.set_icon_full( iconFilename, "" ) #TODO Works under Eclipse on 16.04 but not 18.04...why?
 
 
     def notificationFullMoon( self ):
@@ -1075,7 +1089,8 @@ class IndicatorLunar:
             satellites = sorted( satellites + satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
             menuItem = Gtk.MenuItem( _( "Satellites" ) )
 
-        menu.append( menuItem )
+        menuItem = Gtk.MenuItem( "No satellites" ) #TODO Hack
+        menu.append( menuItem )  #TODO If no internet and no cache, then no satellites and the menuItem is never set so is uninitialised.
 
         theMenu = menu
         indent = 1
@@ -1260,12 +1275,6 @@ class IndicatorLunar:
             themeColour = "fff200" # Default to hicolor.
 
         return themeColour
-
-
-    def removeOldIcons( self ):
-        oldIcons = glob.glob( IndicatorLunar.ICON_BASE_PATH + "/" + IndicatorLunar.ICON_BASE_NAME + "*" )
-        for oldIcon in oldIcons:
-            os.remove( oldIcon )
 
 
     def onAbout( self, widget ):

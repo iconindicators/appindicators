@@ -51,7 +51,10 @@ class OE:
 def download( url, logging = None ):
     oeData = { }
     try:
-        data = urlopen( url ).read().decode( "utf8" ).splitlines()
+        print( "oe")
+        data = urlopen( url, timeout = 1 ).read().decode( "utf8" ).splitlines() #TODO Was on laptop, no internet and got stuck here...no timeout ....why?  Look at old code for timeout.   Ditto for satellites.
+#Perhaps don't bother with the check internet function.
+#Instead just try and download (with a timeout of 2 secs say) and if we cannot download or get a bad parse, that is bad.
         for i in range( 0, len( data ) ):
             if not data[ i ].startswith( "#" ):
                 oe = OE( data[ i ].strip() )

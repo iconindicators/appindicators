@@ -69,7 +69,7 @@ class TLE:
 def download( url, logging = None ):
     tleData = { }
     try:
-        data = urlopen( url ).read().decode( "utf8" ).splitlines()
+        data = urlopen( url, timeout = 1 ).read().decode( "utf8" ).splitlines()
         for i in range( 0, len( data ), 3 ):
             tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
             tleData[ ( tle.getNumber() ) ] = tle
