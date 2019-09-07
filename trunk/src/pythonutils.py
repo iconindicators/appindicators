@@ -163,6 +163,19 @@ def onRadio( self, *widgets ):
         widget.set_sensitive( self.get_active() )
 
 
+#TODO Roll out to all indicators!
+def createGrid():
+    spacing = 10
+    grid = Gtk.Grid()
+    grid.set_column_spacing( spacing )
+    grid.set_row_spacing( spacing )
+    grid.set_margin_left( spacing )
+    grid.set_margin_right( spacing )
+    grid.set_margin_top( spacing )
+    grid.set_margin_bottom( spacing )
+    return grid
+
+
 def createPreferencesAboutQuitMenuItems( menu, prependSeparator, onPreferencesHandler, onAboutHandler, onQuitHandler ):
     if prependSeparator:
         menu.append( Gtk.SeparatorMenuItem() )
