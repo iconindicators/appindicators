@@ -1219,7 +1219,7 @@ class IndicatorLunar:
         width = 100
         height = 100
         radius = float( width / 2 ) * 0.8 # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
-        colour = self.getThemeColour()
+        colour = pythonUtils.getThemeColour( IndicatorLunar.ICON, logging )
         if illuminationPercentage == 0 or illuminationPercentage == 100:
             svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
 
@@ -1253,25 +1253,6 @@ class IndicatorLunar:
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing: " + svgFilename )
-
-
-    def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
-
-
-    def getThemeColour( self ):
-        iconFilenameForCurrentTheme = "/usr/share/icons/" + self.getThemeName() + "/scalable/apps/" + IndicatorLunar.ICON + ".svg"
-        try:
-            with open( iconFilenameForCurrentTheme, "r" ) as file:
-                data = file.read()
-                index = data.find( "style=\"fill:#" )
-                themeColour = data[ index + 13 : index + 19 ]
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error reading SVG icon: " + iconFilenameForCurrentTheme )
-            themeColour = "fff200" # Default to hicolor.
-
-        return themeColour
 
 
     def onAbout( self, widget ):
