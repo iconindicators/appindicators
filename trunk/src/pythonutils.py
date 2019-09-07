@@ -180,6 +180,27 @@ def createPreferencesAboutQuitMenuItems( menu, prependSeparator, onPreferencesHa
     menu.append( menuItem )
 
 
+def getThemeName(): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
+
+
+#TODO Verify this works for indicator lunar still.  
+#TODO Need a header comment specifying the expectation that a tag with the colour is present in the SVG file.
+def getThemeColour( iconName, logging ):
+    iconFilenameForCurrentTheme = "/usr/share/icons/" + getThemeName() + "/scalable/apps/" + iconName + ".svg"
+    try:
+        with open( iconFilenameForCurrentTheme, "r" ) as file:
+            data = file.read()
+            index = data.find( "style=\"fill:#" )
+            themeColour = data[ index + 13 : index + 19 ]
+
+    except Exception as e:
+        logging.exception( e )
+        logging.error( "Error reading SVG icon: " + iconFilenameForCurrentTheme )
+        themeColour = "fff200" # Default to hicolor.
+
+    return themeColour
+
+
 def isUbuntu1604(): return processGet( "lsb_release -sc" ).strip() == "xenial"
 
 
