@@ -35,7 +35,7 @@ from skyfield.constants import DEG2RAD
 from skyfield.data import hipparcos
 from skyfield.nutationlib import iau2000b
 
-import eclipse, gzip, math, pytz, satellite
+import eclipse, gzip, math, pytz, orbitalelement, twolineelement
 
 
 class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
@@ -721,6 +721,7 @@ def createListOfCommonNamedStars():
         for line in inFile:
             hip = int( line.decode()[ 8 : 14 ].strip() )
             if hip in hipparcosIdentifiers:
+#                 magnitude = float( line.decode()[ 42 : 46 ].strip() )
                 outFile.write( line )
 
     print( "Done" )
