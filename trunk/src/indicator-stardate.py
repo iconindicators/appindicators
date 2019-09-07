@@ -189,13 +189,7 @@ class IndicatorStardate:
 
 
     def _onPreferences( self, widget ):
-        grid = Gtk.Grid()
-        grid.set_column_spacing( 10 )
-        grid.set_row_spacing( 10 )
-        grid.set_margin_left( 10 )
-        grid.set_margin_right( 10 )
-        grid.set_margin_top( 10 )
-        grid.set_margin_bottom( 10 )
+        grid = pythonutils.createGrid()
 
         showClassicCheckbox = Gtk.CheckButton( _( "Show stardate 'classic'" ) )
         showClassicCheckbox.set_active( self.showClassic )
