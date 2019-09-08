@@ -1,5 +1,6 @@
 indicator-on-this-day (1.0.4-1) xenial; urgency=low
 
+  * The estimate for the number of menu items (lines) was off for GNOME Shell.
   * Tidy up load config of user preferences.
   * Added hyperlink to the About dialog which links to the error log text file
     (only visible if the underlying file is present).

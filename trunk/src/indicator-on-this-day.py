@@ -69,10 +69,11 @@ class IndicatorOnThisDay:
     CONFIG_NOTIFY = "notify"
     CONFIG_SEARCH_URL = "searchURL"
 
-    # By experiment, a height of 900 (pixels) will fit 37 menu items before a scroll bar is imposed by GTK.
-    # To arrive at a reasonable initial guess for a given screen height, compute a divisor and use that.
+    # By experiment under Unity, a screen height of 900 pixels accomodates 37 menu items before a scroll bar appears.
+    # For an initial guess for a given screen height, compute a divisor.
     # So the divisor is 900 / 37 = 25.
-    DEFAULT_LINES = Gtk.Window().get_screen().get_height() / 25
+    # For GNOME Shell, the equivalent divisor is 36.
+    DEFAULT_LINES = Gtk.Window().get_screen().get_height() / 25 if pythonutils.isUbuntu1604() else Gtk.Window().get_screen().get_height() / 36
 
 
     def __init__( self ):
