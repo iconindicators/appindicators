@@ -116,7 +116,8 @@ class IndicatorLunar:
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
 
-    START_UP_DELAY_IN_SECONDS = 5 # Used to delay the update function which potentially takes a long time.
+#TODO Put back to 5
+    START_UP_DELAY_IN_SECONDS = 1 # Used to delay the update function which potentially takes a long time.
 
     SVG_FULL_MOON_FILE = ICON_BASE_PATH + "/." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
     SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
@@ -552,9 +553,9 @@ class IndicatorLunar:
                 GLib.source_remove( self.updateTimerID )
 
 #TODO Testing
-            self.cometsAddNew = True
-            self.minorPlanetsAddNew = True
-            self.satellitesAddNew = True
+            self.cometsAddNew = False
+            self.minorPlanetsAddNew = False
+            self.satellitesAddNew = False
 
 #TODO If { } is returned, what does this mean?
 #Will the backend have a fit, particularly if there was a list of say comets/satellites from yesterday's run,
@@ -1056,6 +1057,8 @@ class IndicatorLunar:
             elif key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
                 satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ] ] )
 
+#TODO Not sure of the logic here...need to check!
+        menuItem = None
         if self.satellitesSortByDateTime and satellites:
             satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
             menuItem = Gtk.MenuItem( _( "Satellites" ) )
@@ -1068,6 +1071,7 @@ class IndicatorLunar:
             satellites = sorted( satellites + satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
             menuItem = Gtk.MenuItem( _( "Satellites" ) )
 
+        if menuItem is None: return #TODO Hack for when there are no satellites.
         menu.append( menuItem )  #TODO If no internet and no cache, then no satellites and the menuItem is never set so is uninitialised.
 
         theMenu = menu
@@ -1270,11 +1274,10 @@ class IndicatorLunar:
         TAB_ICON = 0
         TAB_MENU = 1
         TAB_PLANETS_STARS = 2
-        TAB_COMETS = 3
-        TAB_MINOR_PLANETS = 4
-        TAB_SATELLITES = 5
-        TAB_NOTIFICATIONS = 6
-        TAB_GENERAL = 7
+        TAB_COMETS_MINOR_PLANETS = 3
+        TAB_SATELLITES = 4
+        TAB_NOTIFICATIONS = 5
+        TAB_GENERAL = 6
 
         notebook = Gtk.Notebook()
 
@@ -1602,14 +1605,7 @@ class IndicatorLunar:
         notebook.append_page( box, Gtk.Label( _( "Comets / Minor Planets" ) ) )
 
         # Satellites.
-#TODO If just a table, don't need a grid right?  Use a box as with comets/minorplanets.
-        satelliteGrid = Gtk.Grid()
-        satelliteGrid.set_column_spacing( 10 )
-        satelliteGrid.set_row_spacing( 10 )
-        satelliteGrid.set_margin_left( 10 )
-        satelliteGrid.set_margin_right( 10 )
-        satelliteGrid.set_margin_top( 10 )
-        satelliteGrid.set_margin_bottom( 10 )
+        box = Gtk.Box()
 
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
         for satellite in self.satelliteData:
@@ -1648,10 +1644,10 @@ class IndicatorLunar:
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( tree )
-        satelliteGrid.attach( scrolledWindow, 0, 0, 1, 1 )
+        box.pack_start( scrolledWindow, True, True, 0 )
 
-        notebook.append_page( satelliteGrid, Gtk.Label( _( "Satellites" ) ) )
- 
+        notebook.append_page( box, Gtk.Label( _( "Satellites" ) ) )
+
         # OSD (satellite and full moon).
         notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
