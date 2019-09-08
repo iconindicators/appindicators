@@ -499,6 +499,15 @@ def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars ):
         __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
 
 
+#TODO  
+# https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
+# The MPC might provide comet / minor planet data in a different format which Skyfield can read.
+def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, observer, ephemeris, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitude ):
+#     for star in stars:
+#         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
+#         __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
+
+
 def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBodyType, nameTag ):
     neverUp = False
     key = ( astronomicalBodyType, nameTag )
