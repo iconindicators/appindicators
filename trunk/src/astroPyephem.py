@@ -56,7 +56,7 @@ DATA_INTERNAL = [
     DATA_BRIGHT_LIMB,
     DATA_ELEVATION,
     DATA_ILLUMINATION,
-    DATA_MAGNITUDE ]
+    DATA_MAGNITUDE ] #TODO If magnitude is shown in the menu, then maybe this should be available to the user (and not internal).
 
 #TODO Are these sub-lists needed?  They are not referenced in the indicator front end.
 DATA_COMET = [
