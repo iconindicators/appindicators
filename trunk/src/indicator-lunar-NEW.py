@@ -78,6 +78,11 @@
 #We still hard limit items by magnitude (nothing over 15).
 #But we dynamically (somehow) breakup the items by magnitude into groups.
 # So stars may be in groups by magnitude of -1, 0, 1, 2.0 - 2.5, 2.5 - 3.0, 3, 4. 
+#
+# First determine how many stars will be displayed and if that exceeds the available number of menu items, go to phase two.
+#
+# Take the number of menu items, divide by the number of availble menu items and that is the number of sub groups.
+# For each star int() the magnitude, sort ascendingly, then split the list by the number of sub groups.
 
 
 #TODO Maybe add a hack preference, perhaps only visible under GNOME Shell
