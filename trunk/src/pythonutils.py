@@ -230,6 +230,21 @@ def indent( indentUnity, indentGnomeShell ):
     return indent
 
 
+# Makes a guess at how many menu items will fit into an indicator menu. 
+#
+# By experiment under Unity, a screen height of 900 pixels accommodates 37 menu items before a scroll bar appears.
+# For an initial guess, compute a divisor: 900 / 37 = 25.
+#
+# For GNOME Shell, the equivalent divisor is 36.
+def getMenuItemsGuess(): 
+    if isUbuntu1604():
+        guess = Gtk.Window().get_screen().get_height() / 25
+    else:
+        guess = Gtk.Window().get_screen().get_height() / 36
+
+    return guess
+
+
 def showAboutDialog(
         authors, # List of authors.
         comments, # Comments.
