@@ -7,13 +7,15 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * The attributes Tropical Sign, Constellation, Magnitude, Bright Limb,
     Illumination and Distance have been removed; they are interesting but
     unnecessary for object location.
-  * TODO Need to comment on that always up and never up are no longer shown, that an object which is always up only shows az/alt and an object yet to rise will ony show rise time.
-  * Only visible satellite passes (dawn/dusk) are shown;
-    no point showing non-visible passes.
+  * Bodies which are 'never up' are no longer displayed.
+  * Bodies which are 'always up' are displayed, with only their current
+  * Bodies below the horizon will show a rise date/time.
+  * Bodies above the horizon will show a set date/time and Azimuth/Altitude.
+  * Only visible satellite passes (dawn/dusk) are shown.
   * Removed Right Ascension and Declination from all items;
     Azimuth/Altitude are sufficient.
   * Removed decimal degrees from Azimuth/Altitude.
-  * Removed planetary moons as each effectively has the same Azimuth/Altitude
+  * Removed planetary moons; each effectively has the same Azimuth/Altitude
     as the parent planet.
   * Removed werewolf warning percentage from preferences and fixed at 99%.
   * Removed date/time format from preferences; now uses ISO 8601.
