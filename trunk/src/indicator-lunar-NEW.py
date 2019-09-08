@@ -1320,6 +1320,8 @@ class IndicatorLunar:
 #TODO Not sure what is happening here?
 # Are we stripping tags from the indicator text which no longer appear in the table?
 # Maybe just leave the tags there and the user can manually remove after they see displayed?  Ask Oleg.
+# Tried the text [DEF][MOON PHASE][ABC] and commented out the code below and the ABC/DEF tags did not appear in the final label.  Why?
+#Maybe show the tags in the preferences always, but drop them when rendering?
         unknownTags = [ ]
         for tag in tags:
             if re.match( "\[[^\[^\]]+\]", tag ) is not None:
