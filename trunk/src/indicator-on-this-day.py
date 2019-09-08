@@ -69,12 +69,6 @@ class IndicatorOnThisDay:
     CONFIG_NOTIFY = "notify"
     CONFIG_SEARCH_URL = "searchURL"
 
-    # By experiment under Unity, a screen height of 900 pixels accomodates 37 menu items before a scroll bar appears.
-    # For an initial guess for a given screen height, compute a divisor.
-    # So the divisor is 900 / 37 = 25.
-    # For GNOME Shell, the equivalent divisor is 36.
-    DEFAULT_LINES = Gtk.Window().get_screen().get_height() / 25 if pythonutils.isUbuntu1604() else Gtk.Window().get_screen().get_height() / 36
-
 
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorOnThisDay.LOG ) ] )
@@ -547,7 +541,7 @@ class IndicatorOnThisDay:
 
         self.calendars = config.get( IndicatorOnThisDay.CONFIG_CALENDARS, [ IndicatorOnThisDay.DEFAULT_CALENDAR ] )
         self.copyToClipboard = config.get( IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD, True )
-        self.lines = config.get( IndicatorOnThisDay.CONFIG_LINES, IndicatorOnThisDay.DEFAULT_LINES )
+        self.lines = config.get( IndicatorOnThisDay.CONFIG_LINES, pythonutils.getMenuItemsGuess() )
         self.notify = config.get( IndicatorOnThisDay.CONFIG_NOTIFY, True )
         self.searchURL = config.get( IndicatorOnThisDay.CONFIG_SEARCH_URL, IndicatorOnThisDay.SEARCH_URL_DEFAULT )
 
