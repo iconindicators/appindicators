@@ -1965,9 +1965,9 @@ class IndicatorLunar:
             self.werewolfWarningMessage = pythonutils.getTextViewText( werewolfNotificationMessageText )
 
             self.city = cityValue
-            self.latitude = latitudeValue #TODO Ensure these come out as float.
-            self.longitude = longitudeValue
-            self.elevation = elevationValue
+            self.latitude = float( latitudeValue )
+            self.longitude = float( longitudeValue )
+            self.elevation = float( elevationValue )
 
             self.saveConfig()
             pythonutils.setAutoStart( IndicatorLunar.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
