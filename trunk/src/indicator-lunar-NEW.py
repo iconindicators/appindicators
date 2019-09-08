@@ -63,19 +63,6 @@
 #That is, always show these...ask Oleg about this.
 
 
-#TODO Maybe show other stuff for comets?
-# https://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
-# But this means changing to the name orbital elements...or maybe leaving comets as is and add a new thing for OE?
-# Maybe rename to OE as it catches all (and they are treated identically by PyEphem).
-# By extension, allow for multiple URLs for the OEs (see the URL above)?  ... and ditto for satellites?
-# https://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
-# Have added in some of the extra MPC data files and found that there are a ton of new visible OEs.
-# These could have dodgy magnitudes, as warned on the MPC site...
-#...so maybe need some way to flag to the user magnitudes greater than the moon?
-# Maybe put in a special subgroup?
-# Use the OSD?
-
-
 #TODO If the backend/frontend are updating, and the user clicks on about/prefs, show a notification to tell the user they're blocked?
 #What about the other way?  If the about/prefs are open, disable the updates?
 #What do the other indicators do (PPA)?
@@ -86,6 +73,15 @@
 # Not sure how/what to do for satellites...
 # For Skyfield, there are a LOT of stars if we filter by magnitude (mag <= 6)...
 #...which means we could also submenu stars by magnitude.
+#Perhaps get rid of the magnitude preference and add in a preference "number of lines or menu items"
+#as in indicator-on-this-day.  We then can figure out how many items to show in a given submenu.
+#We still hard limit items by magnitude (nothing over 15).
+#But we dynamically (somehow) breakup the items by magnitude into groups.
+# So stars may be in groups by magnitude of -1, 0, 1, 2.0 - 2.5, 2.5 - 3.0, 3, 4. 
+
+
+#TODO Maybe add a hack preference, perhaps only visible under GNOME Shell
+# for lots of satellites (and breaking the menu scroll.
 # For satellites, what is the point of always showing the next rises for the next two days?
 # Maybe only somehow show for the next window...but that window could be different depending on your latitude.
 # Also, if a user wants to know when the ISS next rises, if we only show the next window, then that user is screwed.
@@ -961,7 +957,7 @@ class IndicatorLunar:
 #     3: ['ALBEREO', 'ALCOR', 'ALSHAIN', 'ARKAB PRIOR', 'ATLAS', 'ELECTRA', 'MAIA', 'MINKAR', 'RUKBAT', 'SHELIAK', 'SULAFAT'], 
 #     4: ['ARKAB POSTERIOR', 'MEROPE', 'TAYGETA'], 
 # }
-        
+
 
 #         if stars:
 #             print( "Number of stars:", len(stars))#TODO debug
