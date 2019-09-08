@@ -163,7 +163,6 @@ def onRadio( self, *widgets ):
         widget.set_sensitive( self.get_active() )
 
 
-#TODO Roll out to all indicators!
 #TODO For a notebook page with a single table, don't need a grid, so check where grids are used and remove.
 def createGrid():
     spacing = 10
