@@ -1896,6 +1896,8 @@ class IndicatorLunar:
                 elevation.grab_focus()
                 continue
 
+#TODO If a satellite is added, do we remove the satellite name here, 
+# or save it and remove it when displayed (displayed in the Preferences and displayed in the final label)?
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.showMoon = showMoonCheckbox.get_active()
             self.showSun = showSunCheckbox.get_active()
