@@ -419,13 +419,12 @@ class IndicatorLunar:
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 30
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
-    COMET_ON_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
     MINOR_PLANET_CACHE_BASENAME = "minorplanet-oe-"
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 30
     MINOR_PLANET_DATA_URL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt"
-    MINOR_PLANET_ON_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
-#TODO Verify above url works.
+
+    MINOR_PLANET_CENTER_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -533,14 +532,28 @@ class IndicatorLunar:
         for oldIcon in oldIcons:
             os.remove( oldIcon )
 
-        # Initialise last update date/times to the past...
-#TODO Are these needed?
-        self.lastUpdateCometOE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
-        self.lastUpdateMinorPlanetOE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
-        self.lastUpdateSatelliteTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+#TODO Needed?
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
         self.loadConfig()
+        
+#TODO Testing other minor planet urls...include these?
+#         urls = [ "Soft03Cmt.txt", # Comets
+#                  "Soft03CritList.txt", # Critical-list minor planets
+#                  "Soft03Distant.txt", # Distant minor planets
+#                  "Soft03Unusual.txt", # Unusual minor planets
+#                  "Soft03Bright.txt" ] # Bright
+#         for url in urls:
+#             data = orbitalelement.download( "file:///home/bernard/Desktop/" + url )
+#             filteredData = astroPyephem.getOrbitalElementsLessThanMagnitude( data, 15.0 )
+#             print( url, len( data ), len( filteredData ) if filteredData is not None else "0" )
+# 
+# Soft03Cmt.txt 1027 8
+# Soft03CritList.txt 650 0
+# Soft03Distant.txt 3747 2
+# Soft03Unusual.txt 18169 81
+# Soft03Bright.txt 54 54        
+        
         GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update )
 
 
@@ -553,8 +566,8 @@ class IndicatorLunar:
                 GLib.source_remove( self.updateTimerID )
 
 #TODO Testing
-            self.cometsAddNew = False
-            self.minorPlanetsAddNew = False
+            self.cometsAddNew = True
+            self.minorPlanetsAddNew = True
             self.satellitesAddNew = True
 
 #TODO If { } is returned, what does this mean?
@@ -1014,19 +1027,29 @@ class IndicatorLunar:
                 # Add handler.
                 for child in menuItem.get_submenu().get_children():
                     child.set_name( name )
-                    child.connect( "activate", self.onCometMinorPlanet, astronomicalBodyType )
+                    child.connect( "activate", self.onCometMinorPlanet )
 
 
-    def onCometMinorPlanet( self, widget, astronomicalBodyType ):
-        if "(" in widget.props.name:
-            objectID = widget.props.name[ : widget.props.name.find( "(" ) ].strip()
+#TODO Test to make sure comets work (each clause)
+#TODO Need to make it work for minor planets.
+# https://www.iau.org/public/themes/naming
+# https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
+    def onCometMinorPlanet( self, widget, onClickURL ):
+        print( widget.props.name )
+        if "(" in widget.props.name: # P/1997 T3 (Lagerkvist-Carsenty)
+            id = widget.props.name[ : widget.props.name.find( "(" ) ].strip()
+            print( "(", id )
+
         else:
-            objectID = widget.props.name[ : widget.props.name.find( "/" ) ].strip()
+            postSlash = widget.props.name[ widget.props.name.find( "/" ) + 1 : ]
+            if re.search( '\d', postSlash ): # C/1931 AN
+                id = widget.props.name
 
-        onClickURL = IndicatorLunar.COMET_ON_CLICK_URL if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else IndicatorLunar.MINOR_PLANET_ON_CLICK_URL
-        url = onClickURL + objectID.replace( "/", "%2F" ).replace( " ", "+" )
-        if len( url ) > 0:
-            webbrowser.open( url )
+            else: # 97P/Metcalf-Brewington
+                id = widget.props.name[ : widget.props.name.find( "/" ) ].strip()
+
+        url = IndicatorLunar.MINOR_PLANET_CENTER_CLICK_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
+        webbrowser.open( url )
 
 
     def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
