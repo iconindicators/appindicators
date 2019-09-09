@@ -2178,7 +2178,7 @@ class IndicatorLunar:
     def addNewBodies( self, data, bodies ):
         for body in data:
             if body not in bodies:
-                bodies.appen( body )
+                bodies.append( body )
 
 
     def getDefaultCity( self ):
