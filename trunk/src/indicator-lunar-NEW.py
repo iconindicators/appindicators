@@ -1304,8 +1304,6 @@ class IndicatorLunar:
         self.tagsAdded = { }
         self.tagsRemoved = { }
 
-#TODO Need to handle satellites...want to include the name (and put it first) followed by number.
-#TODO Maybe have a column that is the type (planet, comet, star, ...)? We'll need translations for each of these as they are integers!  Ask Oleg.
         COLUMN_ASTRONOICAL_BODY_TYPE = 0
         COLUMN_TAG = 1
         COLUMN_TRANSLATED_TAG = 2
@@ -1315,6 +1313,8 @@ class IndicatorLunar:
         for key in self.data.keys():
             if key[ 2 ] not in astroPyephem.DATA_INTERNAL:
                 self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
+#TODO Need to handle satellite tags...
+#When to remove the satellite name from the tag?  Here or at render time or when?
                 tag = "[" + key[ 1 ] + " " + key[ 2 ] + "]"
                 if tag in tags:
                     i = tags.index( tag )
@@ -1374,13 +1374,11 @@ class IndicatorLunar:
         showMoonCheckbox = Gtk.CheckButton( _( "Moon" ) )
         showMoonCheckbox.set_active( self.showMoon )
         showMoonCheckbox.set_tooltip_text( _( "Show the moon." ) )
-        showMoonCheckbox.connect( "toggled", self.onMoonSunToggled, astroPyephem.NAME_TAG_MOON, astroPyephem.AstronomicalBodyType.Moon )
         box.pack_start( showMoonCheckbox, False, False, 0 )
 
         showSunCheckbox = Gtk.CheckButton( _( "Sun" ) )
         showSunCheckbox.set_active( self.showSun )
         showSunCheckbox.set_tooltip_text( _( "Show the sun." ) )
-        showSunCheckbox.connect( "toggled", self.onMoonSunToggled, astroPyephem.NAME_TAG_SUN, astroPyephem.AstronomicalBodyType.Sun )
         box.pack_start( showSunCheckbox, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -1898,7 +1896,7 @@ class IndicatorLunar:
 
 #TODO If a satellite is added, do we remove the satellite name here, 
 # or save it and remove it when displayed (displayed in the Preferences and displayed in the final label)?
-            self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
+#             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.showMoon = showMoonCheckbox.get_active()
             self.showSun = showSunCheckbox.get_active()
             self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
@@ -2013,9 +2011,6 @@ class IndicatorLunar:
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
 
 
-    def onMoonSunToggled( self, widget, moonSunTag, astronomicalBodyType ): self.checkboxToggled( moonSunTag, astronomicalBodyType, widget.get_active() )
-
-
     def onPlanetToggled( self, widget, row, dataStore ):
         dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
         self.checkboxToggled( dataStore[ row ][ 1 ].upper(), astroPyephem.AstronomicalBodyType.Planet, dataStore[ row ][ 0 ] )
@@ -2051,6 +2046,11 @@ class IndicatorLunar:
             self.tagsAdded.pop( t, None )
 
 
+#TODO When we decide whether to uncheck all or check all, initialise the flag variable in such a way 
+# that if all satellites for example are initially checked, then the next click should uncheck all.
+#If no satellites are checked, the first click should check all.
+#If one or more satellites are checked, the first click should check all.
+# Ditto for planets, stars, comets and minor planets.
     def onColumnHeaderClick( self, widget, dataStore, sortStore, displayTagsStore, astronomicalBodyType ):
         if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Planet:
             toggle = self.togglePlanetsTable
