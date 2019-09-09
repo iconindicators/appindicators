@@ -315,9 +315,7 @@ def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[
 # Takes a dictionary of orbital element data (for comets or minor planet),
 # in which the key is the body name and value is the orbital element data.
 #
-# On success, returns a similarly formatted, non-empty, dictionary
-# in which each item has a magnitude less than or equal to the maximum magnitude.
-# On error or if no data remains (magnitude is too low for example), None is returned.
+# Returns a dictionary in which each item has a magnitude less than or equal to the maximum magnitude.
 def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
     results = { }
     for key in orbitalElementData:
@@ -326,9 +324,6 @@ def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
         bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
         if not bad and body.mag >= MAGNITUDE_MINIMUM and body.mag <= maximumMagnitude:
             results[ key ] = orbitalElementData[ key ]
-
-    if not results:
-        results = None
 
     return results
 
@@ -510,7 +505,7 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
             body = ephem.readdb( cometOrMinorPlanetData[ key ].getData() )
             body.compute( __getCity( data, ephemNow ) )
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
-            if not bad and body.mag >= MAGNITUDE_MINIMUM and body.mag <= magnitude:
+            if not bad and body.mag >= MAGNITUDE_MINIMUM:# and body.mag <= magnitude:
                 __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
 
 #TODO Debug
