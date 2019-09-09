@@ -563,21 +563,21 @@ class IndicatorLunar:
             print( "Updating data")#TODO Debug
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
-                self.addNewComets()
+                self.addNewBodies( self.cometData, self.comets )
 
             print( len( self.comets ) ) #TODO Debug
             print( self.comets ) #TODO Debug
 
             self.minorPlanetData = self.updateData( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.minorPlanetsAddNew:
-                self.addNewMinorPlanets()
+                self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
             print( len( self.minorPlanets ) ) #TODO Debug
             print( self.minorPlanets ) #TODO Debug
 
             self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL, None )
             if self.satellitesAddNew:
-                self.addNewSatellites()
+                self.addNewBodies( self.satelliteData, self.satellites )
 
             print( len( self.satellites ) ) #TODO Debug
             print( self.satellites ) #TODO Debug
@@ -736,6 +736,8 @@ class IndicatorLunar:
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
+
+#TODO For satellites, tags will contain both the name and number...so ensure satellites work!
 
         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
 
@@ -1859,15 +1861,8 @@ class IndicatorLunar:
         dialog.set_icon_name( IndicatorLunar.ICON )
         dialog.show_all()
 
-        # The visibility of some GUI objects must be determined AFTER the dialog is shown.
-#TODO Rename to include Minor Planets
-#         self.updateCometSatellitePreferencesTab( cometGrid, cometStore, self.cometData, self.comets, cometURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Comet )
-#         self.updateCometSatellitePreferencesTab( minorPlanetGrid, minorPlanetStore, self.minorPlanetData, self.minorPlanets, minorPlanetURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.MinorPlanet )
-#         self.updateCometSatellitePreferencesTab( satelliteGrid, satelliteStore, self.satelliteData, self.satellites, TLEURLEntry.get_text().strip(), astroPyephem.AstronomicalBodyType.Satellite )
-
         # Last thing to do after everything else is built.
-#TODO Fix this after all other stuff is sorted out.
-#         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
+        notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
 
         while True:
             if dialog.run() != Gtk.ResponseType.OK:
@@ -1911,6 +1906,7 @@ class IndicatorLunar:
             self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
             self.cometsAddNew = cometsAddNewCheckbox.get_active()
+            self.minorPlanetsAddNew = minorPlanetsAddNewCheckbox.get_active()
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active()
 
@@ -1924,41 +1920,23 @@ class IndicatorLunar:
                 if row[ 0 ]:
                     self.stars.append( row[ 1 ] )
 
-            if self.cometOEURLNew is not None: # The URL is initialised to None.  If it is not None, a fetch has taken place.
-                self.cometOEURL = self.cometOEURLNew # The URL may or may not be valid, but it will not be None.
-                if self.cometOEDataNew is None:
-                    self.cometData = { } # The retrieved data was bad, so reset to empty data.
-                else:
-                    self.cometData = self.cometOEDataNew # The retrieved data is good (but still could be empty).
-
-                pythonutils.writeCacheBinary( self.cometData, INDICATOR_NAME, IndicatorLunar.COMET_CACHE_BASENAME, logging )
-                self.lastUpdateCometOE = datetime.datetime.utcnow()
-
             self.comets = [ ]
-            if self.cometsAddNew:
-                self.addNewComets()
-            else:
+            if not self.cometsAddNew:
                 for comet in cometStore:
                     if comet[ 0 ]:
                         self.comets.append( comet[ 1 ].upper() )
 
-            if self.satelliteTLEURLNew is not None: # The URL is initialised to None.  If it is not None, a fetch has taken place.
-                self.satelliteTLEURL = self.satelliteTLEURLNew # The URL may or may not be valid, but it will not be None.
-                if self.satelliteTLEDataNew is None:
-                    self.satelliteData = { } # The retrieved data was bad, so reset to empty data.
-                else:
-                    self.satelliteData = self.satelliteTLEDataNew # The retrieved data is good (but still could be empty).
-
-                pythonutils.writeCacheBinary( self.satelliteData, INDICATOR_NAME, IndicatorLunar.SATELLITE_CACHE_BASENAME, logging )
-                self.lastUpdateSatelliteTLE = datetime.datetime.utcnow()
+            self.minorPlanets = [ ]
+            if not self.minorPlanetsAddNew:
+                for minorPlanet in minorPlanetStore:
+                    if minorPlanet[ 0 ]:
+                        self.minorPlanets.append( minorPlanet[ 1 ].upper() )
 
             self.satellites = [ ]
-            if self.satellitesAddNew:
-                self.addNewSatellites()
-            else:
+            if not self.satellitesAddNew:
                 for satellite in satelliteStore:
                     if satellite[ 0 ]:
-                        self.satellites.append( ( satellite[ 1 ].upper(), satellite[ 2 ] ) )
+                        self.satellites.append( satellite[ 2 ] )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
@@ -2055,42 +2033,6 @@ class IndicatorLunar:
             bodyTag = dataStore[ actualRow ][ 1 ].upper()
 
         self.checkboxToggled( bodyTag, astronomicalBodyType, dataStore[ actualRow ][ 0 ] )
-
-
-#TODO Include MP...but is this function needed?
-    def updateCometSatellitePreferencesTab( self, grid, dataStore, data, bodies, url, astronomicalBodyType ):
-        dataStore.clear()
-        if data is None:
-            message = IndicatorLunar.MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE.format( url )
-        elif len( data ) == 0:
-            message = IndicatorLunar.MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE.format( url )
-        else:
-            message = None
-            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
-                for key in data:
-                    tle = data[ key ]
-                    checked = ( tle.getName().upper(), tle.getNumber() ) in bodies
-                    dataStore.append( [ checked, tle.getName(), tle.getNumber(), tle.getInternationalDesignator() ] )
-
-            else: # Comet or Minor Planet
-                for key in data:
-                    oe = data[ key ]
-                    dataStore.append( [ key in bodies, oe.getName() ] )
-
-        # Hide/show the label and scrolled window as appropriate.
-        # Ideally grid.get_child_at() should be used to get the Label and ScrolledWindow...but this does not work on Ubuntu 12.04.
-        for child in grid.get_children():
-            if child.__class__.__name__ == "Label":
-                if message is None:
-                    child.hide()
-                else:
-                    child.show()
-                    child.set_markup( message )
-            elif child.__class__.__name__ == "ScrolledWindow":
-                if message is None:
-                    child.show()
-                else:
-                    child.hide()
 
 
     def checkboxToggled( self, bodyTag, astronomicalBodyType, checked ):
@@ -2194,6 +2136,7 @@ class IndicatorLunar:
 #If we wait until we switch to the first tab to update the table, then need a handle to all the UI elements to poll each of them.
 #Maybe pass in lists of elements (list of checkboxes, list of tables/stores, etc)?
     def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
+        if True: return
         if pageNumber == 0: # User has clicked the first tab.
             displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
 
@@ -2230,26 +2173,10 @@ class IndicatorLunar:
                     self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH, displayTagsStore )
 
 
-#TODO Find all callers and ensure that TLE data is not None and list of satellites is not None.
-#TODO Can the three functions below be combined into one?
-    def addNewSatellites( self ):
-        for key in self.satelliteData:
-            if key not in self.satellites:
-                self.satellites.append( key )
-
-
-#TODO Find all callers and ensure that OE data is not None and list of comets is not None.
-    def addNewComets( self ):
-        for key in self.cometData:
-            if key not in self.comets:
-                self.comets.append( key )
-
-
-#TODO Find all callers and ensure that OE data is not None and list of minor planets is not None.
-    def addNewMinorPlanets( self ):
-        for key in self.minorPlanetData:
-            if key not in self.minorPlanets:
-                self.minorPlanets.append( key )
+    def addNewBodies( self, data, bodies ):
+        for body in data:
+            if body not in bodies:
+                bodies.appen( body )
 
 
     def getDefaultCity( self ):
