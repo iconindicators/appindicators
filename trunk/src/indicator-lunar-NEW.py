@@ -1304,10 +1304,11 @@ class IndicatorLunar:
 
 #TODO Need to handle satellites...want to include the name (and put it first) followed by number.
 #TODO Maybe have a column that is the type (planet, comet, star, ...)? We'll need translations for each of these as they are integers!  Ask Oleg.
-        COLUMN_TAG = 0
-        COLUMN_TRANSLATED_TAG = 1
-        COLUMN_VALUE = 2
-        displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
+        COLUMN_ASTRONOICAL_BODY_TYPE = 0
+        COLUMN_TAG = 1
+        COLUMN_TRANSLATED_TAG = 2
+        COLUMN_VALUE = 3
+        displayTagsStore = Gtk.ListStore( int, str, str, str ) # Astronomical body type, tag, translated tag, value.
         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
         for key in self.data.keys():
             if key[ 2 ] not in astroPyephem.DATA_INTERNAL:
@@ -1990,48 +1991,14 @@ class IndicatorLunar:
             translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
 
         elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite: # Don't translate names and add in satellite name/designator.
-# (4, '00877', 'RISE DATE TIME') 2019-09-09  18:25:14
-# (4, '05560', 'RISE DATE TIME') 2019-09-09  18:09:05
-# (4, '06073', 'RISE DATE TIME') 2019-09-09  18:33:55
-# (4, '06153', 'RISE DATE TIME') 2019-09-10  04:55:38
-            translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+            satelliteName = self.satelliteData[ bodyTag ].getName()
+#             satelliteInternationalDesignator = self.satelliteData[ satelliteNumber ].getInternationalDesignator() #TODO NOt sure if we need this.
+            translatedTag = satelliteName + " " + bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
 
-            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite: print( key, value ) #TODO Testing
         else:
             translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets and stars.
 
-        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
-
-
-    def appendToDisplayTagsStoreORIG( self, key, value, displayTagsStore ):
-        astronomicalBodyType = key[ 0 ]
-        bodyTag = key[ 1 ]
-        dataTag = key[ 2 ]
-
-#TODO How can the astro body type be none?
-        isCometOrMinorPlanetOrSatellite = \
-            astronomicalBodyType is not None and \
-            (
-                astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or \
-                astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet or \
-                astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite
-            )
-
-        if isCometOrMinorPlanetOrSatellite:
-            translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Don't translate the names of the comets/satellites.
-
-            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
-                print( key, value ) #TODO Testing
-# (4, '00877', 'RISE DATE TIME') 2019-09-09  18:25:14
-# (4, '05560', 'RISE DATE TIME') 2019-09-09  18:09:05
-# (4, '06073', 'RISE DATE TIME') 2019-09-09  18:33:55
-# (4, '06153', 'RISE DATE TIME') 2019-09-10  04:55:38
-
-        
-        else:
-            translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets/stars, etc.
-
-        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
+        displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, value ] )
 
 
     def translateTags( self, tagsStore, originalToLocal, text ):
