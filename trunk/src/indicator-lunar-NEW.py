@@ -555,7 +555,7 @@ class IndicatorLunar:
 #TODO Testing
             self.cometsAddNew = False
             self.minorPlanetsAddNew = False
-            self.satellitesAddNew = False
+            self.satellitesAddNew = True
 
 #TODO If { } is returned, what does this mean?
 #Will the backend have a fit, particularly if there was a list of say comets/satellites from yesterday's run,
@@ -1322,6 +1322,9 @@ class IndicatorLunar:
 # Maybe just leave the tags there and the user can manually remove after they see displayed?  Ask Oleg.
 # Tried the text [DEF][MOON PHASE][ABC] and commented out the code below and the ABC/DEF tags did not appear in the final label.  Why?
 #Maybe show the tags in the preferences always, but drop them when rendering?
+#Before making changes consider what happens if we leave unknown tags here, but then at render time is that an issue?
+#Not sure what to do now...
+# Leave tags in here, but what if a user has added in there own tags...can they do that?
         unknownTags = [ ]
         for tag in tags:
             if re.match( "\[[^\[^\]]+\]", tag ) is not None:
@@ -1982,6 +1985,29 @@ class IndicatorLunar:
         bodyTag = key[ 1 ]
         dataTag = key[ 2 ]
 
+        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or \
+           astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet: # Don't translate the names of comets or minor planets.
+            translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+
+        elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite: # Don't translate names and add in satellite name/designator.
+# (4, '00877', 'RISE DATE TIME') 2019-09-09  18:25:14
+# (4, '05560', 'RISE DATE TIME') 2019-09-09  18:09:05
+# (4, '06073', 'RISE DATE TIME') 2019-09-09  18:33:55
+# (4, '06153', 'RISE DATE TIME') 2019-09-10  04:55:38
+            translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+
+            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite: print( key, value ) #TODO Testing
+        else:
+            translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets and stars.
+
+        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
+
+
+    def appendToDisplayTagsStoreORIG( self, key, value, displayTagsStore ):
+        astronomicalBodyType = key[ 0 ]
+        bodyTag = key[ 1 ]
+        dataTag = key[ 2 ]
+
 #TODO How can the astro body type be none?
         isCometOrMinorPlanetOrSatellite = \
             astronomicalBodyType is not None and \
@@ -1994,7 +2020,12 @@ class IndicatorLunar:
         if isCometOrMinorPlanetOrSatellite:
             translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Don't translate the names of the comets/satellites.
 
-            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite: print( key, value ) #TODO Testing
+            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
+                print( key, value ) #TODO Testing
+# (4, '00877', 'RISE DATE TIME') 2019-09-09  18:25:14
+# (4, '05560', 'RISE DATE TIME') 2019-09-09  18:09:05
+# (4, '06073', 'RISE DATE TIME') 2019-09-09  18:33:55
+# (4, '06153', 'RISE DATE TIME') 2019-09-10  04:55:38
 
         
         else:
