@@ -634,14 +634,15 @@ class IndicatorLunar:
         data = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Either valid or None; empty data is never cached.
 
 #TODO Start of temporary hack...
-# There was a change of data formats between version 80 ad 81.
-# Satellites are using the TLE object but the file name was changed from satellite to twolineelement and is deemed an invalid object.
-# Therefore the read cache binary will throw an exception and return None.
+# Cache data formats changed between version 80 and 81.
+#
+# Satellites still use the TLE object, but the file name changed from satellite to twolineelement and is deemed an invalid object.
+# Therefore reading the cache binary will throw an exception and return None.
 # Not a problem as a new version will be downloaded and the cache will eventually clear out.
 #
 # Comets will successfully read in because their objects (dict, tuple string) are valid.
 # Comets are still stored in a dict using a string as key but now with a new OE object as the value, which must be handled.
-# This check can be removed in version 82 or later.
+# This check can be removed in version 82.
         if data is not None and cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME:
             if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ): # Check that the object loaded from cache matches the new OE object.
                 data = None
