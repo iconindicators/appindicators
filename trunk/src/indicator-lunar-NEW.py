@@ -933,6 +933,7 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_TYPE, ) ) ) )
 
 
+#TODO Can we put in an onClick for planets?
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planet in self.planets:
@@ -967,6 +968,8 @@ class IndicatorLunar:
 #         return [ int( len( bodies ) / 5 ), int( 2 * len( bodies ) / 5 ), int( 3 * len( bodies ) / 5 ), int( 4 * len( bodies ) / 5 ) ]
 #         return [ int( len( bodies ) / 6 ), int( 2 * len( bodies ) / 6 ), int( 3 * len( bodies ) / 6 ), int( 4 * len( bodies ) / 6 ), int( 5 * len( bodies ) / 6 ) ]
 
+
+#TODO Can we put in an onClick for stars?
     def updateStarsMenu( self, menu ):
         stars = [ ]
         magnitudes = [ 0 ] * 17 # Magnitudes range from -1.44 for Sirius (which is -1 as an integer), up to a hard limit of 15.
@@ -1060,26 +1063,18 @@ class IndicatorLunar:
         if bodies:
             print( "Number of comets or minor planets:", len(bodies ))#TODO debug
             menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
-            menu.append( menuItem ) 
-            if self.showCometsAsSubMenu:
-                subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
-
-            showAsSubMenu = self.showCometsAsSubMenu if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.showMinorPlanetsAsSubMenu
+            menu.append( menuItem )
+            subMenu = Gtk.Menu()
+            menuItem.set_submenu( subMenu )
             for name in sorted( bodies ):
-                if showAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name )
-                    subMenu.append( menuItem )
-                else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + name )
-                    menu.append( menuItem )
-
-                self.updateCommonMenu( menuItem, astronomicalBodyType, name, 0, 2 )
+                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name ) )
+                self.updateCommonMenuNEW( subMenu, astronomicalBodyType, name, 0, 2 )
 
                 # Add handler.
-                for child in menuItem.get_submenu().get_children():
-                    child.set_name( name )
-                    child.connect( "activate", self.onCometMinorPlanet )
+#TODO Fix                
+#                 for child in menuItem.get_submenu().get_children():
+#                     child.set_name( name )
+#                     child.connect( "activate", self.onCometMinorPlanet )
 
 
 #TODO Test to make sure comets work (each clause)
