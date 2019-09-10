@@ -538,6 +538,9 @@ class IndicatorLunar:
         self.loadConfig()
         
 #TODO Testing other minor planet urls...include these?
+# How to combine the minor planets sources into one?
+# Maybe just do separate downloads/caching for each and after that
+# have a special function to combine them all (just join a bunch of dicts hopefully).
 #         urls = [ "Soft03Cmt.txt", # Comets
 #                  "Soft03CritList.txt", # Critical-list minor planets
 #                  "Soft03Distant.txt", # Distant minor planets
