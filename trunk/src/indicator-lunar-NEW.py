@@ -962,10 +962,10 @@ class IndicatorLunar:
 #TODO This function is a place holder until we figure out how to split stuff up...based on a guess and calculation about menu items.
     def split( self, bodies ):
         splitIndices = [  ]
-        
-
-        return [ int( len( bodies ) / 3 ), int( 2 * len( bodies ) / 3 ) ]
-
+#         return [ int( len( bodies ) / 3 ), int( 2 * len( bodies ) / 3 ) ]
+#         return [ int( len( bodies ) / 4 ), int( 2 * len( bodies ) / 4 ), int( 3 * len( bodies ) / 4 ) ]
+#         return [ int( len( bodies ) / 5 ), int( 2 * len( bodies ) / 5 ), int( 3 * len( bodies ) / 5 ), int( 4 * len( bodies ) / 5 ) ]
+        return [ int( len( bodies ) / 6 ), int( 2 * len( bodies ) / 6 ), int( 3 * len( bodies ) / 6 ), int( 4 * len( bodies ) / 6 ), int( 5 * len( bodies ) / 6 ) ]
 
     def updateStarsMenu( self, menu ):
         stars = [ ]
@@ -1003,14 +1003,22 @@ class IndicatorLunar:
             menuItem.set_submenu( subMenu )
             start = 0
             splits = self.split( stars )
-            splits.append( len( stars) )
+            splits.append( len( stars) - 1 )
             for i in splits:
-                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + stars[ start ][ 1 ] )
+#                 print( start )
+#                 print( i )
+#                 print( stars[ start ][ 1 ] )
+#                 print( stars[ i ][ 1 ] )
+#                 print()
+                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + stars[ start ][ 1 ] + " - " + stars[ i ][ 1 ] )
                 subMenu.append( menuItem )
 #                 print( stars[ start : i ] )
+                subSubMenu = Gtk.Menu()
+                menuItem.set_submenu( subSubMenu )
                 for name, translatedName in stars[ start : i ]:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
-                    subMenu.append( menuItem )
+#                     print( translatedName )
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 2 ) + translatedName )
+                    subSubMenu.append( menuItem )
                     self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
 
                 start = i
@@ -1097,6 +1105,25 @@ class IndicatorLunar:
 
         url = IndicatorLunar.MINOR_PLANET_CENTER_CLICK_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
         webbrowser.open( url )
+
+
+    def updateCommonMenuNEW( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
+        key = ( astronomicalBodyType, nameTag )
+        subMenu = Gtk.Menu()
+        indent = pythonutils.indent( indentUnity, indentGnomeShell )
+
+        if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
+            subMenu.append( Gtk.MenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
+
+        else:
+            if key + ( astroPyephem.DATA_SET_DATE_TIME, ) in self.data:
+                subMenu.append( Gtk.MenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) ) )
+                subMenu.append( Gtk.SeparatorMenuItem() )
+
+            subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
+
+        menuItem.set_submenu( subMenu )
 
 
     def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
