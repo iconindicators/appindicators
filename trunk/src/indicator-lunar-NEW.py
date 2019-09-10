@@ -959,6 +959,14 @@ class IndicatorLunar:
                 self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Planet, name, 0, 2 )
 
 
+#TODO This function is a place holder until we figure out how to split stuff up...based on a guess and calculation about menu items.
+    def split( self, bodies ):
+        splitIndices = [  ]
+        
+
+        return [ int( len( bodies ) / 3 ), int( 2 * len( bodies ) / 3 ) ]
+
+
     def updateStarsMenu( self, menu ):
         stars = [ ]
         magnitudes = [ 0 ] * 17 # Magnitudes range from -1.44 for Sirius (which is -1 as an integer), up to a hard limit of 15.
@@ -984,14 +992,30 @@ class IndicatorLunar:
 # }
 
 
-#         if stars:
-#             print( "Number of stars:", len(stars))#TODO debug
-#             menuItem = Gtk.MenuItem( _( "Stars" ) )
-#             menu.append( menuItem ) 
-#             if self.showStarsAsSubMenu:
-#                 subMenu = Gtk.Menu()
-#                 menuItem.set_submenu( subMenu )
-# 
+        if stars:
+            print( "Number of stars:", len(stars))#TODO debug
+            menuItem = Gtk.MenuItem( _( "Stars" ) )
+            menu.append( menuItem ) 
+
+#             print( self.split( stars ) )
+
+            subMenu = Gtk.Menu()
+            menuItem.set_submenu( subMenu )
+            start = 0
+            splits = self.split( stars )
+            splits.append( len( stars) )
+            for i in splits:
+                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + stars[ start ][ 1 ] )
+                subMenu.append( menuItem )
+#                 print( stars[ start : i ] )
+                for name, translatedName in stars[ start : i ]:
+                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
+                    subMenu.append( menuItem )
+                    self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
+
+                start = i
+
+#  
 #             for name, translatedName in stars:
 #                 if self.showStarsAsSubMenu:
 #                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
@@ -999,7 +1023,26 @@ class IndicatorLunar:
 #                 else:
 #                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + translatedName )
 #                     menu.append( menuItem )
-# 
+#  
+#                 self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
+
+
+#         if stars:
+#             print( "Number of stars:", len(stars))#TODO debug
+#             menuItem = Gtk.MenuItem( _( "Stars" ) )
+#             menu.append( menuItem ) 
+#             if self.showStarsAsSubMenu:
+#                 subMenu = Gtk.Menu()
+#                 menuItem.set_submenu( subMenu )
+#  
+#             for name, translatedName in stars:
+#                 if self.showStarsAsSubMenu:
+#                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
+#                     subMenu.append( menuItem )
+#                 else:
+#                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + translatedName )
+#                     menu.append( menuItem )
+#  
 #                 self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
 
 
