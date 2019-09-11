@@ -65,6 +65,7 @@
 
 
 #TODO Maybe have a preference to hide an object (planet, star, comet, minor planet) if yet to rise.
+#Not sure if/how this may apply to satellites.
 
 
 INDICATOR_NAME = "indicator-lunar"
