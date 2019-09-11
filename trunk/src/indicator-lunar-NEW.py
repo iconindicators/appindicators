@@ -581,22 +581,22 @@ class IndicatorLunar:
             if self.cometsAddNew:
                 self.addNewBodies( self.cometData, self.comets )
 
-            print( len( self.comets ) ) #TODO Debug
-            print( self.comets ) #TODO Debug
+#             print( len( self.comets ) ) #TODO Debug
+#             print( self.comets ) #TODO Debug
 
             self.minorPlanetData = self.updateData( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.minorPlanetsAddNew:
                 self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
-            print( len( self.minorPlanets ) ) #TODO Debug
-            print( self.minorPlanets ) #TODO Debug
+#             print( len( self.minorPlanets ) ) #TODO Debug
+#             print( self.minorPlanets ) #TODO Debug
 
             self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL, None )
             if self.satellitesAddNew:
                 self.addNewBodies( self.satelliteData, self.satellites )
 
-            print( len( self.satellites ) ) #TODO Debug
-            print( self.satellites ) #TODO Debug
+#             print( len( self.satellites ) ) #TODO Debug
+#             print( self.satellites ) #TODO Debug
 
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             # Value is the astronomical data (or equivalent) as a string.
@@ -614,7 +614,7 @@ class IndicatorLunar:
             # Update frontend...
             utcNow = datetime.datetime.utcnow()
             self.updateMenu()
-            print( "updateMenu:", ( datetime.datetime.utcnow() - utcNow ) )
+#             print( "updateMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
             self.updateIconAndLabel()
 
@@ -713,38 +713,38 @@ class IndicatorLunar:
         utcNow = datetime.datetime.utcnow()
         if self.showMoon:
             self.updateMoonMenu( menu )
-        print( "updateMoonMenu:", ( datetime.datetime.utcnow() - utcNow ) )
+#         print( "updateMoonMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
         if self.showSun:
             self.updateSunMenu( menu )
-        print( "updateSunMenu:", ( datetime.datetime.utcnow() - utcNow ) )
+#         print( "updateSunMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
         self.updatePlanetsMenu( menu )
-        print( "updatePlanetsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
+#         print( "updatePlanetsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
         self.updateStarsMenu( menu )
-        print( "updateStarsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
+#         print( "updateStarsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
         self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.Comet )
-        print( "updateCometsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
+#         print( "updateCometsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
         self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
-        print( "updateMinorPlanetMenu:", ( datetime.datetime.utcnow() - utcNow ) )
+#         print( "updateMinorPlanetMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
         self.updateSatellitesMenu( menu )
-        print( "updateSatellitesMenu:", ( datetime.datetime.utcnow() - utcNow ) )
+#         print( "updateSatellitesMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
         utcNow = datetime.datetime.utcnow()
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-        print( "updatePAQMenu:", ( datetime.datetime.utcnow() - utcNow ) )
+#         print( "updatePAQMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
 
     def updateIconAndLabel( self ):
@@ -942,22 +942,31 @@ class IndicatorLunar:
                 planets.append( [ planet, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planet ] ] )
 
         if planets:
-            print( "number planets", len( planets))
             menuItem = Gtk.MenuItem( _( "Planets" ) )
             menu.append( menuItem ) 
-            if self.showPlanetsAsSubMenu:
-                subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
-
+            subMenu = Gtk.Menu()
+            menuItem.set_submenu( subMenu )
             for name, translatedName in planets:
-                if self.showPlanetsAsSubMenu:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
-                    subMenu.append( menuItem )
-                else:
-                    menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + translatedName )
-                    menu.append( menuItem )
+                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
+                self.updateCommonMenuNEW( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 0, 2 )
 
-                self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Planet, name, 0, 2 )
+
+#         if planets:
+#             menuItem = Gtk.MenuItem( _( "Planets" ) )
+#             menu.append( menuItem ) 
+#             if self.showPlanetsAsSubMenu:
+#                 subMenu = Gtk.Menu()
+#                 menuItem.set_submenu( subMenu )
+# 
+#             for name, translatedName in planets:
+#                 if self.showPlanetsAsSubMenu:
+#                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
+#                     subMenu.append( menuItem )
+#                 else:
+#                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + translatedName )
+#                     menu.append( menuItem )
+# 
+#                 self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Planet, name, 0, 2 )
 
 
 #TODO This function is a place holder until we figure out how to split stuff up...based on a guess and calculation about menu items.
@@ -996,7 +1005,7 @@ class IndicatorLunar:
 
 
         if stars:
-            print( "Number of stars:", len(stars))#TODO debug
+#             print( "Number of stars:", len(stars))#TODO debug
             menuItem = Gtk.MenuItem( _( "Stars" ) )
             menu.append( menuItem ) 
             subMenu = Gtk.Menu()
@@ -1061,7 +1070,7 @@ class IndicatorLunar:
                 bodies.append( key[ 1 ] )
 
         if bodies:
-            print( "Number of comets or minor planets:", len(bodies ))#TODO debug
+#             print( "Number of comets or minor planets:", len(bodies ))#TODO debug
             menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
             menu.append( menuItem )
             subMenu = Gtk.Menu()
@@ -1168,7 +1177,7 @@ class IndicatorLunar:
             menuItem.set_submenu( theMenu )
             indent = 0
 
-        print( "Number of satellites:", len(satellites))#TODO debug
+#         print( "Number of satellites:", len(satellites))#TODO debug
         for number, name, riseDateTime in satellites:
             self.updateSatelliteMenu( theMenu, indent, number )
 

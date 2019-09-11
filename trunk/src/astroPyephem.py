@@ -270,31 +270,31 @@ def getAstronomicalInformation( utcNow,
     import datetime
     utcNow = datetime.datetime.utcnow()
     __calculateMoon( ephemNow, data )
-    print( "updateMoon:", ( datetime.datetime.utcnow() - utcNow ) )
+#     print( "updateMoon:", ( datetime.datetime.utcnow() - utcNow ) )
 
     utcNow = datetime.datetime.utcnow()
     __calculateSun( ephemNow, data )
-    print( "updateSun:", ( datetime.datetime.utcnow() - utcNow ) )
+#     print( "updateSun:", ( datetime.datetime.utcnow() - utcNow ) )
 
     utcNow = datetime.datetime.utcnow()
     __calculatePlanets( ephemNow, data, planets )
-    print( "updatePlanets:", ( datetime.datetime.utcnow() - utcNow ) )
+#     print( "updatePlanets:", ( datetime.datetime.utcnow() - utcNow ) )
 
     utcNow = datetime.datetime.utcnow()
     __calculateStars( ephemNow, data, stars )
-    print( "updateStars:", ( datetime.datetime.utcnow() - utcNow ) )
+#     print( "updateStars:", ( datetime.datetime.utcnow() - utcNow ) )
 
     utcNow = datetime.datetime.utcnow()
     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
-    print( "updateComets:", ( datetime.datetime.utcnow() - utcNow ) )
+#     print( "updateComets:", ( datetime.datetime.utcnow() - utcNow ) )
 
     utcNow = datetime.datetime.utcnow()
     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
-    print( "updateMinorPlanets:", ( datetime.datetime.utcnow() - utcNow ) )
+#     print( "updateMinorPlanets:", ( datetime.datetime.utcnow() - utcNow ) )
 
     utcNow = datetime.datetime.utcnow()
     __calculateSatellites( ephemNow, data, satellites, satelliteData )
-    print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
+#     print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
 
     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
     del data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
@@ -350,10 +350,10 @@ def __calculateMoon( ephemNow, data ):
     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
 
 #TODO Debug
-    print( "Moon illumination:", data[ key + ( DATA_ILLUMINATION, ) ] )
-    print( "Moon phase:", data[ key + ( DATA_PHASE, ) ] )
-    print( "Moon bright limb (radians):", data[ key + ( DATA_BRIGHT_LIMB, ) ] )
-    print( "Moon bright limb (degrees):", math.degrees( float( data[ key + ( DATA_BRIGHT_LIMB, ) ] ) ) )
+#     print( "Moon illumination:", data[ key + ( DATA_ILLUMINATION, ) ] )
+#     print( "Moon phase:", data[ key + ( DATA_PHASE, ) ] )
+#     print( "Moon bright limb (radians):", data[ key + ( DATA_BRIGHT_LIMB, ) ] )
+#     print( "Moon bright limb (degrees):", math.degrees( float( data[ key + ( DATA_BRIGHT_LIMB, ) ] ) ) )
 
     if not neverUp:
         data[ key + ( DATA_FIRST_QUARTER, ) ] = __toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
@@ -391,7 +391,7 @@ def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
     y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
     x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
     positionAngleOfBrightLimb = math.atan2( y, x )
-    print( "Position angle of bright limb (radians):", positionAngleOfBrightLimb ) #TODO Test
+#     print( "Position angle of bright limb (radians):", positionAngleOfBrightLimb ) #TODO Test
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
     # https://tycho.usno.navy.mil/sidereal.html
@@ -403,7 +403,7 @@ def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
     y = math.sin( hourAngle )
     x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
     parallacticAngle = math.atan2( y, x )
-    print( "Parallactic angle (radians):", parallacticAngle ) #TODO Test
+#     print( "Parallactic angle (radians):", parallacticAngle ) #TODO Test
 
     return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
@@ -469,7 +469,7 @@ def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
 # http://www.geoastro.de/planets/index.html
 # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
 def __calculatePlanets( ephemNow, data, planets ):
-    print( "Number of planets:", len(planets))#TODO debug
+#     print( "Number of planets:", len(planets))#TODO debug
     for planet in planets:
         planetObject = getattr( ephem, planet.title() )()
         __calculateCommon( ephemNow, data, planetObject, AstronomicalBodyType.Planet, planet )
@@ -477,7 +477,7 @@ def __calculatePlanets( ephemNow, data, planets ):
 
 # http://aa.usno.navy.mil/data/docs/mrst.php
 def __calculateStars( ephemNow, data, stars ):
-    print( "Number of stars:", len(stars))#TODO debug
+#     print( "Number of stars:", len(stars))#TODO debug
 #     mags = [ 0, 0, 0, 0, 0, 0, 0, 0 ]
     for star in stars:
         starObject = ephem.star( star.title() )
@@ -555,8 +555,8 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
             data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
 
 #TODO Testing
-        if astronomicalBodyType == AstronomicalBodyType.Star:
-            print( data[ ( AstronomicalBodyType.Star, nameTag, DATA_MAGNITUDE ) ], int( float( data[ ( AstronomicalBodyType.Star, nameTag, DATA_MAGNITUDE ) ] ) ) )
+#         if astronomicalBodyType == AstronomicalBodyType.Star:
+#             print( data[ ( AstronomicalBodyType.Star, nameTag, DATA_MAGNITUDE ) ], int( float( data[ ( AstronomicalBodyType.Star, nameTag, DATA_MAGNITUDE ) ] ) ) )
 
 
 
