@@ -64,8 +64,7 @@
 #What do the other indicators do (PPA)?
 
 
-#TODO Maybe have a preference to hide an object (planet, star, comet, minor planet) if yet to rise.
-#Not sure if/how this may apply to satellites.
+#TODO For the preference to hide an object if yet to rise, does this also, somehow, apply to satellites?
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -1280,13 +1279,18 @@ class IndicatorLunar:
         # Menu.
         grid = pythonutils.createGrid()
 
+        hideBodiesBelowTheHorizonCheckbox = Gtk.CheckButton( _( "Hide bodies below the horizon" ) )
+        hideBodiesBelowTheHorizonCheckbox.set_active( self.hideBodiesBelowHorizon )
+        hideBodiesBelowTheHorizonCheckbox.set_tooltip_text( _( "If checked, all bodies below the horizon are hidden." ) )
+        grid.attach( hideBodiesBelowTheHorizonCheckbox, 0, 0, 1, 1 )
+
         cometsAddNewCheckbox = Gtk.CheckButton( _( "Add new comets" ) )
         cometsAddNewCheckbox.set_margin_top( 10 )
         cometsAddNewCheckbox.set_active( self.cometsAddNew )
         cometsAddNewCheckbox.set_tooltip_text( _(
             "If checked, all comets are added\n" + \
             "to the list of checked comets." ) )
-        grid.attach( cometsAddNewCheckbox, 0, 0, 1, 1 )
+        grid.attach( cometsAddNewCheckbox, 0, 1, 1, 1 )
 
         minorPlanetsAddNewCheckbox = Gtk.CheckButton( _( "Add new minor planets" ) )
         minorPlanetsAddNewCheckbox.set_margin_top( 10 )
@@ -1294,7 +1298,7 @@ class IndicatorLunar:
         minorPlanetsAddNewCheckbox.set_tooltip_text( _(
             "If checked, all minor planets are added\n" + \
             "to the list of checked minor planets." ) )
-        grid.attach( minorPlanetsAddNewCheckbox, 0, 1, 1, 1 )
+        grid.attach( minorPlanetsAddNewCheckbox, 0, 2, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -1311,7 +1315,7 @@ class IndicatorLunar:
             "greater than that specified are hidden." ) )
 
         box.pack_start( spinnerMagnitude, False, False, 0 )
-        grid.attach( box, 0, 2, 1, 1 )
+        grid.attach( box, 0, 3, 1, 1 )
 
 #TODO Ensure this checkbox and that for comets/minorplanets have a listener that checks/unchecks the tables of comets/minorplanets/sats.
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Add new satellites" ) )
@@ -1320,7 +1324,7 @@ class IndicatorLunar:
         satellitesAddNewCheckbox.set_tooltip_text( _(
             "If checked all satellites are added\n" + \
             "to the list of checked satellites." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 3, 1, 1 )
+        grid.attach( satellitesAddNewCheckbox, 0, 4, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
@@ -1331,7 +1335,7 @@ class IndicatorLunar:
             "Otherwise satellites are sorted\n" + \
             "by Name, Number and then\n" + \
             "International Designator." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 4, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 5, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -1761,8 +1765,7 @@ class IndicatorLunar:
 #TODO If a satellite is added, do we remove the satellite name here, 
 # or save it and remove it when displayed (displayed in the Preferences and displayed in the final label)?
 #             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
-            self.showMoon = showMoonCheckbox.get_active()
-            self.showSun = showSunCheckbox.get_active()
+            self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
             self.cometsAddNew = cometsAddNewCheckbox.get_active()
             self.minorPlanetsAddNew = minorPlanetsAddNewCheckbox.get_active()
@@ -1779,23 +1782,24 @@ class IndicatorLunar:
                 if row[ 0 ]:
                     self.stars.append( row[ 1 ] )
 
-            self.comets = [ ]
-            if not self.cometsAddNew:
-                for comet in cometStore:
-                    if comet[ 0 ]:
-                        self.comets.append( comet[ 1 ].upper() )
-
-            self.minorPlanets = [ ]
-            if not self.minorPlanetsAddNew:
-                for minorPlanet in minorPlanetStore:
-                    if minorPlanet[ 0 ]:
-                        self.minorPlanets.append( minorPlanet[ 1 ].upper() )
-
-            self.satellites = [ ]
-            if not self.satellitesAddNew:
-                for satellite in satelliteStore:
-                    if satellite[ 0 ]:
-                        self.satellites.append( satellite[ 2 ] )
+#TODO Needed if we already do this in the update?
+#             self.comets = [ ]
+#             if not self.cometsAddNew:
+#                 for comet in cometStore:
+#                     if comet[ 0 ]:
+#                         self.comets.append( comet[ 1 ].upper() )
+# 
+#             self.minorPlanets = [ ]
+#             if not self.minorPlanetsAddNew:
+#                 for minorPlanet in minorPlanetStore:
+#                     if minorPlanet[ 0 ]:
+#                         self.minorPlanets.append( minorPlanet[ 1 ].upper() )
+# 
+#             self.satellites = [ ]
+#             if not self.satellitesAddNew:
+#                 for satellite in satelliteStore:
+#                     if satellite[ 0 ]:
+#                         self.satellites.append( satellite[ 2 ] )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
