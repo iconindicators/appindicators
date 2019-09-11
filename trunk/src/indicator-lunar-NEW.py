@@ -880,19 +880,14 @@ class IndicatorLunar:
 
     def updateMoonMenu( self, menu ):
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
-
         menuItem = Gtk.MenuItem( _( "Moon" ) )
         menu.append( menuItem )
-
-#TODO Think I need to make a subMenu here and same for Sun.
-        self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
-
-#TODO Test this by making the moon never up.
-        if len( menuItem.get_submenu().get_children() ) > 0:
-            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() ) # Only add if the common menu added it stuff.
-
-        menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
-        menuItem.get_submenu().append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
+        menu.append( menuItem )
+        subMenu = Gtk.Menu()
+        menuItem.set_submenu( subMenu )
+        self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
+        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
+        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
 
         # Determine which phases occur by date rather than using the phase calculated.
         # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
@@ -905,23 +900,19 @@ class IndicatorLunar:
         nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
         indent = pythonutils.indent( 1, 2 )
         for dateTime, displayText, key in nextPhases:
-            menuItem.get_submenu().append( Gtk.MenuItem( indent + displayText + self.getDisplayData( key ) ) )
+            subMenu.append( Gtk.MenuItem( indent + displayText + self.getDisplayData( key ) ) )
 
-        menuItem.get_submenu().append( Gtk.SeparatorMenuItem() )
-        self.updateEclipseMenu( menuItem.get_submenu(), astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
+        self.updateEclipseMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
 
 
     def updateSunMenu( self, menu ):
         key = ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
         menuItem = Gtk.MenuItem( _( "Sun" ) )
         menu.append( menuItem )
-        self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1 )
-
-#TODO Test this by making the sun never up.
-        if len( menuItem.get_submenu().get_children() ) > 0:
-            menuItem.get_submenu().append( Gtk.SeparatorMenuItem() ) # Only add if the common menu added it stuff.
-
-        self.updateEclipseMenu( menuItem.get_submenu(), astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
+        subMenu = Gtk.Menu()
+        menuItem.set_submenu( subMenu )
+        self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1 )
+        self.updateEclipseMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
 
 
     def updateEclipseMenu( self, menu, astronomicalBodyType, nameTag ):
@@ -944,124 +935,30 @@ class IndicatorLunar:
 
         if planets:
             menuItem = Gtk.MenuItem( _( "Planets" ) )
-            menu.append( menuItem ) 
+            menu.append( menuItem )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name, translatedName in planets:
                 subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
-                self.updateCommonMenuNEW( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 0, 2 )
-
-
-#         if planets:
-#             menuItem = Gtk.MenuItem( _( "Planets" ) )
-#             menu.append( menuItem ) 
-#             if self.showPlanetsAsSubMenu:
-#                 subMenu = Gtk.Menu()
-#                 menuItem.set_submenu( subMenu )
-# 
-#             for name, translatedName in planets:
-#                 if self.showPlanetsAsSubMenu:
-#                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
-#                     subMenu.append( menuItem )
-#                 else:
-#                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + translatedName )
-#                     menu.append( menuItem )
-# 
-#                 self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Planet, name, 0, 2 )
-
-
-#TODO This function is a place holder until we figure out how to split stuff up...based on a guess and calculation about menu items.
-    def split( self, bodies ):
-        splitIndices = [  ]
-        return [ int( len( bodies ) / 3 ), int( 2 * len( bodies ) / 3 ) ]
-#         return [ int( len( bodies ) / 4 ), int( 2 * len( bodies ) / 4 ), int( 3 * len( bodies ) / 4 ) ]
-#         return [ int( len( bodies ) / 5 ), int( 2 * len( bodies ) / 5 ), int( 3 * len( bodies ) / 5 ), int( 4 * len( bodies ) / 5 ) ]
-#         return [ int( len( bodies ) / 6 ), int( 2 * len( bodies ) / 6 ), int( 3 * len( bodies ) / 6 ), int( 4 * len( bodies ) / 6 ), int( 5 * len( bodies ) / 6 ) ]
+                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 0, 2 )
 
 
 #TODO Can we put in an onClick for stars?
     def updateStarsMenu( self, menu ):
         stars = [ ]
-        magnitudes = [ 0 ] * 17 # Magnitudes range from -1.44 for Sirius (which is -1 as an integer), up to a hard limit of 15.
-        magnitudes = { }
         for star in self.stars:
             if ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_RISE_DATE_TIME ) in self.data or \
                ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_ALTITUDE ) in self.data:
                 stars.append( [ star, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ star ] ] )
 
-                magnitude = int( float( self.data[ ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_MAGNITUDE ) ] ) )
-                if magnitude not in magnitudes:
-                    magnitudes[ magnitude ] = [ ]
-
-                magnitudes[ magnitude ].append( star )
-#         print( magnitudes )
-# {
-#    -1: ['SIRIUS']
-#     0: ['ACHERNAR', 'AGENA', 'ALDEBARAN', 'ALTAIR', 'ARCTURUS', 'BETELGEUSE', 'CANOPUS', 'CAPELLA', 'PROCYON', 'RIGEL', 'SPICA', 'VEGA'], 
-#     1: ['ADARA', 'ALCAID', 'ALHENA', 'ALIOTH', 'ALNAIR', 'ALNILAM', 'ALNITAK', 'ALPHARD', 'ANTARES', 'BELLATRIX', 'CASTOR', 'DENEB', 'ELNATH', 'FOMALHAUT', 'KAUS AUSTRALIS', 'MENKALINAN', 'MIMOSA', 'MIRZAM', 'PEACOCK', 'POLLUX', 'REGULUS', 'SHAULA', 'WEZEN'], 
-#     2: ['ALCYONE', 'ALGENIB', 'ALGIEBA', 'ALGOL', 'ALMACH', 'ALPHECCA', 'ARNEB', 'CEBALRAI', 'DENEBOLA', 'ENIF', 'ETAMIN', 'GIENAH CORVI', 'HAMAL', 'IZAR', 'MARKAB', 'MENKAR', 'MERAK', 'MINTAKA', 'MIRACH', 'MIZAR', 'NAOS', 'NIHAL', 'NUNKI', 'PHECDA', 'RASALGETHI', 'RASALHAGUE', 'SADALMELIK', 'SADR', 'SAIPH', 'SCHEAT', 'SCHEDAR', 'SIRRAH', 'TARAZED', 'UNUKALHAI', 'VINDEMIATRIX', 'ZAURAK'], 
-#     3: ['ALBEREO', 'ALCOR', 'ALSHAIN', 'ARKAB PRIOR', 'ATLAS', 'ELECTRA', 'MAIA', 'MINKAR', 'RUKBAT', 'SHELIAK', 'SULAFAT'], 
-#     4: ['ARKAB POSTERIOR', 'MEROPE', 'TAYGETA'], 
-# }
-
-
         if stars:
-#             print( "Number of stars:", len(stars))#TODO debug
             menuItem = Gtk.MenuItem( _( "Stars" ) )
             menu.append( menuItem ) 
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name, translatedName in stars:
                 subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
-                self.updateCommonMenuNEW( subMenu, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
-
-
-#             subMenu = Gtk.Menu()
-#             menuItem.set_submenu( subMenu )
-#             start = 0
-#             splits = self.split( stars )
-#             splits.append( len( stars) - 1 )
-#             for i in splits:
-#                 menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + stars[ start ][ 1 ] + " - " + stars[ i ][ 1 ] )
-#                 subMenu.append( menuItem )
-#                 subSubMenu = Gtk.Menu()
-#                 menuItem.set_submenu( subSubMenu )
-#                 for name, translatedName in stars[ start : i ]:
-#                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 2 ) + translatedName )
-#                     subSubMenu.append( menuItem )
-#                     self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
-# 
-#                 start = i
-
-#  
-#             for name, translatedName in stars:
-#                 if self.showStarsAsSubMenu:
-#                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
-#                     subMenu.append( menuItem )
-#                 else:
-#                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + translatedName )
-#                     menu.append( menuItem )
-#  
-#                 self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
-
-
-#         if stars:
-#             print( "Number of stars:", len(stars))#TODO debug
-#             menuItem = Gtk.MenuItem( _( "Stars" ) )
-#             menu.append( menuItem ) 
-#             if self.showStarsAsSubMenu:
-#                 subMenu = Gtk.Menu()
-#                 menuItem.set_submenu( subMenu )
-#  
-#             for name, translatedName in stars:
-#                 if self.showStarsAsSubMenu:
-#                     menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
-#                     subMenu.append( menuItem )
-#                 else:
-#                     menuItem = Gtk.MenuItem( pythonutils.indent( 1, 1 ) + translatedName )
-#                     menu.append( menuItem )
-#  
-#                 self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
+                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
 
 
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
@@ -1071,14 +968,13 @@ class IndicatorLunar:
                 bodies.append( key[ 1 ] )
 
         if bodies:
-#             print( "Number of comets or minor planets:", len(bodies ))#TODO debug
             menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
             menu.append( menuItem )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name in sorted( bodies ):
                 subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name ) )
-                self.updateCommonMenuNEW( subMenu, astronomicalBodyType, name, 0, 2 )
+                self.updateCommonMenu( subMenu, astronomicalBodyType, name, 0, 2 )
 
                 # Add handler.
 #TODO Fix                
@@ -1109,7 +1005,7 @@ class IndicatorLunar:
         webbrowser.open( url )
 
 
-    def updateCommonMenuNEW( self, subMenu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
+    def updateCommonMenu( self, subMenu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
         key = ( astronomicalBodyType, nameTag )
         indent = pythonutils.indent( indentUnity, indentGnomeShell )
 
@@ -1122,25 +1018,6 @@ class IndicatorLunar:
 
             subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
             subMenu.append( Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
-
-
-    def updateCommonMenu( self, menuItem, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
-        key = ( astronomicalBodyType, nameTag )
-        subMenu = Gtk.Menu()
-        indent = pythonutils.indent( indentUnity, indentGnomeShell )
-
-        if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-            subMenu.append( Gtk.MenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
-
-        else:
-            if key + ( astroPyephem.DATA_SET_DATE_TIME, ) in self.data:
-                subMenu.append( Gtk.MenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) ) )
-                subMenu.append( Gtk.SeparatorMenuItem() )
-
-            subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
-            subMenu.append( Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
-
-        menuItem.set_submenu( subMenu )
 
 
     def updateSatellitesMenu( self, menu ):
