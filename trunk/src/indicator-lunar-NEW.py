@@ -64,6 +64,9 @@
 #What do the other indicators do (PPA)?
 
 
+#TODO Maybe have a preference to hide an object (planet, star, comet, minor planet) if yet to rise.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
