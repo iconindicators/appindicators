@@ -31,6 +31,11 @@
 #  http://www.flaticon.com/search/satellite
 
 
+#TODO Backed computes rise time even if the frontend will drop it...and so that information appears in the table in the preferences.
+# So perhaps need to pass in a flag to the backend to not put in bodies below the horizon...
+# ...does that mean we need to handle this in the front end menu building?
+
+
 #TODO If there is no data to download (no internet) and cache is stale,
 # ensure satellites/comets/minorplanets already selected by the user are not dropped.
 
