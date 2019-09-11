@@ -805,38 +805,43 @@ class IndicatorLunar:
 
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
-#TODO Need to take into account hide bodies below horizon preference!
+
+    def toBeDisplayed( self, astronomicalBodyType, nameTag ):
+        return ( astronomicalBodyType, nameTag, astroPyephem.DATA_ALTITUDE ) in self.data or \
+               ( astronomicalBodyType, nameTag, astroPyephem.DATA_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon
+
+
     def updateMoonMenu( self, menu ):
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
-        menuItem = Gtk.MenuItem( _( "Moon" ) )
-        menu.append( menuItem )
-        menu.append( menuItem )
-        subMenu = Gtk.Menu()
-        menuItem.set_submenu( subMenu )
-        self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
-        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
-        subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
+        if self.toBeDisplayed( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON ):
+            menuItem = Gtk.MenuItem( _( "Moon" ) )
+            menu.append( menuItem )
+            menu.append( menuItem )
+            subMenu = Gtk.Menu()
+            menuItem.set_submenu( subMenu )
+            self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
 
-        # Determine which phases occur by date rather than using the phase calculated.
-        # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
-        nextPhases = [ ]
-        nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_FIRST_QUARTER, ) ], _( "First Quarter: " ), key + ( astroPyephem.DATA_FIRST_QUARTER, ) ] )
-        nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_FULL, ) ], _( "Full: " ), key + ( astroPyephem.DATA_FULL, ) ] )
-        nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astroPyephem.DATA_THIRD_QUARTER, ) ] )
-        nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_NEW, ) ], _( "New: " ), key + ( astroPyephem.DATA_NEW, ) ] )
+            # Determine which phases occur by date rather than using the phase calculated.
+            # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
+            nextPhases = [ ]
+            nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_FIRST_QUARTER, ) ], _( "First Quarter: " ), key + ( astroPyephem.DATA_FIRST_QUARTER, ) ] )
+            nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_FULL, ) ], _( "Full: " ), key + ( astroPyephem.DATA_FULL, ) ] )
+            nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astroPyephem.DATA_THIRD_QUARTER, ) ] )
+            nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_NEW, ) ], _( "New: " ), key + ( astroPyephem.DATA_NEW, ) ] )
 
-        nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
-        indent = pythonutils.indent( 1, 2 )
-        for dateTime, displayText, key in nextPhases:
-            subMenu.append( Gtk.MenuItem( indent + displayText + self.getDisplayData( key ) ) )
+            nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
+            indent = pythonutils.indent( 1, 2 )
+            for dateTime, displayText, key in nextPhases:
+                subMenu.append( Gtk.MenuItem( indent + displayText + self.getDisplayData( key ) ) )
 
-        self.updateEclipseMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
+            self.updateEclipseMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
 
 
     def updateSunMenu( self, menu ):
         key = ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
-        if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data and not self.hideBodiesBelowHorizon or \
-           key + ( astroPyephem.DATA_ALTITUDE, ) in self.data:
+        if self.toBeDisplayed( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN ):
             menuItem = Gtk.MenuItem( _( "Sun" ) )
             menu.append( menuItem )
             subMenu = Gtk.Menu()
@@ -859,10 +864,7 @@ class IndicatorLunar:
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planet in self.planets:
-            if ( astroPyephem.AstronomicalBodyType.Planet, planet, astroPyephem.DATA_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon:
-                planets.append( [ planet, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planet ] ] )
-
-            elif ( astroPyephem.AstronomicalBodyType.Planet, planet, astroPyephem.DATA_ALTITUDE ) in self.data:
+            if self.toBeDisplayed( astroPyephem.AstronomicalBodyType.Planet, planet ):
                 planets.append( [ planet, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planet ] ] )
 
         if planets:
@@ -879,10 +881,7 @@ class IndicatorLunar:
     def updateStarsMenu( self, menu ):
         stars = [ ]
         for star in self.stars:
-            if ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon:
-                stars.append( [ star, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ star ] ] )
-
-            elif ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_ALTITUDE ) in self.data:
+            if self.toBeDisplayed( astroPyephem.AstronomicalBodyType.Star, star ):
                 stars.append( [ star, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ star ] ] )
 
         if stars:
@@ -898,10 +897,7 @@ class IndicatorLunar:
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
         bodies = [ ]
         for body in self.comets if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanets:
-            if ( astronomicalBodyType, body, astroPyephem.DATA_RISE_DATE_TIME )  in self.data and not self.hideBodiesBelowHorizon:
-                bodies.append( body )
-
-            elif ( astronomicalBodyType, body, astroPyephem.DATA_ALTITUDE ) in self.data:
+            if self.toBeDisplayed( astronomicalBodyType, body ):
                 bodies.append( body )
 
 # TODO The section below is similar enough to planets and stars...can we make a generic function?
