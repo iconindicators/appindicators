@@ -387,8 +387,16 @@ class IndicatorLunar:
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     MINOR_PLANET_CACHE_BASENAME = "minorplanet-oe-"
+    MINOR_PLANET_CACHE_BASENAMES = [ MINOR_PLANET_CACHE_BASENAME + "bright",
+                                     MINOR_PLANET_CACHE_BASENAME + "critical",
+                                     MINOR_PLANET_CACHE_BASENAME + "distant",
+                                     MINOR_PLANET_CACHE_BASENAME + "unusual" ]
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 30
-    MINOR_PLANET_DATA_URL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt"
+    MINOR_PLANET_DATA_BASE_URL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/"
+    MINOR_PLANET_DATA_URLS = [ MINOR_PLANET_DATA_BASE_URL + "Soft03Bright.txt", 
+                               MINOR_PLANET_DATA_BASE_URL + "Soft03CritList.txt",
+                               MINOR_PLANET_DATA_BASE_URL + "Soft03Distant.txt",
+                               MINOR_PLANET_DATA_BASE_URL + "Soft03Unusual.txt" ]
 
     MINOR_PLANET_CENTER_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
@@ -490,8 +498,9 @@ class IndicatorLunar:
         Notify.init( INDICATOR_NAME )
 
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
+        for cacheBaseName in INDICATOR_NAME.MINOR_PLANET_CACHE_BASENAMES:
+            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
 
         # Remove old icons.
         oldIcons = glob.glob( IndicatorLunar.ICON_BASE_PATH + "/" + IndicatorLunar.ICON_BASE_NAME + "*" )
@@ -502,7 +511,7 @@ class IndicatorLunar:
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
         self.loadConfig()
-        
+
 #TODO Testing other minor planet urls...include these?
 # How to combine the minor planets sources into one?
 # Maybe just do separate downloads/caching for each and after that
@@ -546,7 +555,8 @@ class IndicatorLunar:
             if self.cometsAddNew:
                 self.addNewBodies( self.cometData, self.comets )
 
-            self.minorPlanetData = self.updateData( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.MINOR_PLANET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
+# MINOR_PLANET_DATA_URLS
+            self.minorPlanetData = self.updateData( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.MINOR_PLANET_DATA_BASE_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.minorPlanetsAddNew:
                 self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 #TODO If we have multiple minor planet sources, when we combine (data file and list of minor planets), check for duplicates.
