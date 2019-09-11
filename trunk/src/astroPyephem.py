@@ -43,7 +43,6 @@ DATA_FULL = "FULL"
 DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
 DATA_LATITUDE = "LATITUDE" # Internally used for city.
 DATA_LONGITUDE = "LONGITUDE" # Internally used for city.
-DATA_MAGNITUDE = "MAGNITUDE" #TODO Remove if not used.
 DATA_NEW = "NEW"
 DATA_PHASE = "PHASE"
 DATA_RISE_AZIMUTH = "RISE AZIMUTH"
@@ -55,8 +54,7 @@ DATA_THIRD_QUARTER = "THIRD QUARTER"
 DATA_INTERNAL = [
     DATA_BRIGHT_LIMB,
     DATA_ELEVATION,
-    DATA_ILLUMINATION,
-    DATA_MAGNITUDE ] #TODO If magnitude is shown in the menu, then maybe this should be available to the user (and not internal).
+    DATA_ILLUMINATION ]
 
 #TODO Are these sub-lists needed?  They are not referenced in the indicator front end.
 DATA_COMET = [
@@ -242,13 +240,12 @@ DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
 #     Key is a tuple of AstronomicalBodyType, a name tag and a data tag.
 #     Value is the data as a string.
 #
+# If a body is never up, no data is added.
+# If a body is always up, azimuth/altitude are added.
+# If the body is below the horizon, only the rise date/time is added.
+# If the body is above the horizon, set date/time and azimuth/altitude are added.
+#
 # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
-#TODO Consider this...
-#If the body is never up, no data added.
-#If the body is always up, add az/alt/mag
-#If the body is below the horizon, add rise/mag
-#If the body is above the horizon, add set/alt/az/mag
-#Add this information to the function header.
 def getAstronomicalInformation( utcNow,
                                 latitude, longitude, elevation,
                                 planets,
@@ -452,11 +449,7 @@ def __calculateStars( ephemNow, data, stars ):
         __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star )
 
 
-#TODO Update comment below if we add other minor planet files.
 # Compute data for comets or minor planets.
-# Reference https://minorplanetcenter.net//iau/Ephemerides/Soft03.html
-# The default source for comets is https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
-# The default source for minor planets is https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt
 def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitude ):
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
@@ -491,12 +484,6 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
             body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
             data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
             data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
-
-#TODO Not sure if this will make it into the final cut.
-#         if astronomicalBodyType == AstronomicalBodyType.Comet or \
-#            astronomicalBodyType == AstronomicalBodyType.MinorPlanet or \
-#            astronomicalBodyType == AstronomicalBodyType.Star:
-#             data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
 
     return neverUp
 
