@@ -963,10 +963,12 @@ class IndicatorLunar:
 
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
         bodies = [ ]
-        for key in self.data.keys():
-            if key[ 0 ] == astronomicalBodyType and key[ 2 ] == astroPyephem.DATA_ALTITUDE: # A body must have an altitude.
-                bodies.append( key[ 1 ] )
+        for body in self.comets if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanets:
+            if ( astronomicalBodyType, body, astroPyephem.DATA_RISE_DATE_TIME ) in self.data or \
+               ( astronomicalBodyType, body, astroPyephem.DATA_ALTITUDE ) in self.data:
+                bodies.append( body )
 
+# TODO The section below is similar enough to planets and stars...can we make a generic function?
         if bodies:
             menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
             menu.append( menuItem )
