@@ -112,18 +112,16 @@ class IndicatorLunar:
     CONFIG_CITY_LATITUDE = "cityLatitude"
     CONFIG_CITY_LONGITUDE = "cityLongitude"
     CONFIG_CITY_NAME = "city"
-    CONFIG_COMET_OE_URL = "cometOEURL"
     CONFIG_COMETS = "comets"
     CONFIG_COMETS_ADD_NEW = "cometsAddNew"
     CONFIG_MAGNITUDE = "magnitude"
-    CONFIG_MINOR_PLANET_OE_URL = "minorPlanetOEURL"
     CONFIG_MINOR_PLANETS = "minorPlanets"
     CONFIG_MINOR_PLANETS_ADD_NEW = "minorPlanetsAddNew"
+    CONFIG_HIDE_BODIES_BELOW_HORIZON = "hideBodiesBelowHorizon"
     CONFIG_INDICATOR_TEXT = "indicatorText"
     CONFIG_PLANETS = "planets"
     CONFIG_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
     CONFIG_SATELLITE_NOTIFICATION_SUMMARY = "satelliteNotificationSummary"
-    CONFIG_SATELLITE_TLE_URL = "satelliteTLEURL"
     CONFIG_SATELLITES = "satellites"
     CONFIG_SATELLITES_ADD_NEW = "satellitesAddNew"
     CONFIG_SATELLITES_SORT_BY_DATE_TIME = "satellitesSortByDateTime"
@@ -545,11 +543,11 @@ class IndicatorLunar:
 #TODO If { } is returned, what does this mean?
 #Will the backend have a fit, particularly if there was a list of say comets/satellites from yesterday's run,
 #and now we cannot download data and the cache is stale?
-            self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
+            self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
                 self.addNewBodies( self.cometData, self.comets )
 
-            self.minorPlanetData = self.updateData( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
+            self.minorPlanetData = self.updateData( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.MINOR_PLANET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.minorPlanetsAddNew:
                 self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 #TODO If we have multiple minor planet sources, when we combine (data file and list of minor planets), check for duplicates.
@@ -558,7 +556,7 @@ class IndicatorLunar:
 #             print( len( self.minorPlanets ) ) #TODO Debug
 #             print( self.minorPlanets ) #TODO Debug
 
-            self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL, None )
+            self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, None )
             if self.satellitesAddNew:
                 self.addNewBodies( self.satelliteData, self.satellites )
 
@@ -844,12 +842,14 @@ class IndicatorLunar:
 
     def updateSunMenu( self, menu ):
         key = ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
-        menuItem = Gtk.MenuItem( _( "Sun" ) )
-        menu.append( menuItem )
-        subMenu = Gtk.Menu()
-        menuItem.set_submenu( subMenu )
-        self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1 )
-        self.updateEclipseMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
+        if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data and not self.hideBodiesBelowHorizon or \
+           key + ( astroPyephem.DATA_ALTITUDE, ) in self.data:
+            menuItem = Gtk.MenuItem( _( "Sun" ) )
+            menu.append( menuItem )
+            subMenu = Gtk.Menu()
+            menuItem.set_submenu( subMenu )
+            self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1 )
+            self.updateEclipseMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
 
 
     def updateEclipseMenu( self, menu, astronomicalBodyType, nameTag ):
@@ -866,8 +866,10 @@ class IndicatorLunar:
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planet in self.planets:
-            if ( astroPyephem.AstronomicalBodyType.Planet, planet, astroPyephem.DATA_RISE_DATE_TIME ) in self.data or \
-               ( astroPyephem.AstronomicalBodyType.Planet, planet, astroPyephem.DATA_ALTITUDE ) in self.data:
+            if ( astroPyephem.AstronomicalBodyType.Planet, planet, astroPyephem.DATA_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon:
+                planets.append( [ planet, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planet ] ] )
+
+            elif ( astroPyephem.AstronomicalBodyType.Planet, planet, astroPyephem.DATA_ALTITUDE ) in self.data:
                 planets.append( [ planet, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planet ] ] )
 
         if planets:
@@ -884,8 +886,10 @@ class IndicatorLunar:
     def updateStarsMenu( self, menu ):
         stars = [ ]
         for star in self.stars:
-            if ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_RISE_DATE_TIME ) in self.data or \
-               ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_ALTITUDE ) in self.data:
+            if ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon:
+                stars.append( [ star, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ star ] ] )
+
+            elif ( astroPyephem.AstronomicalBodyType.Star, star, astroPyephem.DATA_ALTITUDE ) in self.data:
                 stars.append( [ star, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ star ] ] )
 
         if stars:
@@ -901,8 +905,10 @@ class IndicatorLunar:
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
         bodies = [ ]
         for body in self.comets if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanets:
-            if ( astronomicalBodyType, body, astroPyephem.DATA_RISE_DATE_TIME ) in self.data or \
-               ( astronomicalBodyType, body, astroPyephem.DATA_ALTITUDE ) in self.data:
+            if ( astronomicalBodyType, body, astroPyephem.DATA_RISE_DATE_TIME )  in self.data and not self.hideBodiesBelowHorizon:
+                bodies.append( body )
+
+            elif ( astronomicalBodyType, body, astroPyephem.DATA_ALTITUDE ) in self.data:
                 bodies.append( body )
 
 # TODO The section below is similar enough to planets and stars...can we make a generic function?
@@ -2067,23 +2073,22 @@ class IndicatorLunar:
             self.latitude = config.get( IndicatorLunar.CONFIG_CITY_LATITUDE )
             self.longitude = config.get( IndicatorLunar.CONFIG_CITY_LONGITUDE )
 
-        self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, IndicatorLunar.INDICATOR_TEXT_DEFAULT )
-
-        self.cometOEURL = config.get( IndicatorLunar.CONFIG_COMET_OE_URL, IndicatorLunar.COMET_DATA_URL )
         self.comets = config.get( IndicatorLunar.CONFIG_COMETS, [ ] )
         self.cometsAddNew = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, False )
 
-        self.minorPlanetOEURL = config.get( IndicatorLunar.MINOR_PLANET_DATA_URL, IndicatorLunar.MINOR_PLANET_DATA_URL )
+        self.hideBodiesBelowHorizon = config.get( IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON, True )
+
+        self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, IndicatorLunar.INDICATOR_TEXT_DEFAULT )
+
         self.minorPlanets = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS, [ ] )
         self.minorPlanetsAddNew = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW, False )
 
         self.magnitude = config.get( IndicatorLunar.CONFIG_MAGNITUDE, 6 ) # More or less what's visible with the naked eye or binoculars.
 
-        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, astroPyephem.PLANETS[ : 6 ] ) # Drop Neptue and Pluto as not visible with naked eye.
+        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, astroPyephem.PLANETS[ : 6 ] ) # Drop Neptune and Pluto as not visible with naked eye.
 
         self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT )
         self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT )
-        self.satelliteTLEURL = config.get( IndicatorLunar.CONFIG_SATELLITE_TLE_URL, IndicatorLunar.SATELLITE_DATA_URL )
         self.satellites = config.get( IndicatorLunar.CONFIG_SATELLITES, [ ] )
         self.satellitesAddNew = config.get( IndicatorLunar.CONFIG_SATELLITES_ADD_NEW, False )
         self.satellitesSortByDateTime = config.get( IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME, True )
@@ -2147,18 +2152,16 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_CITY_LATITUDE: self.latitude,
             IndicatorLunar.CONFIG_CITY_LONGITUDE: self.longitude,
             IndicatorLunar.CONFIG_CITY_NAME: self.city,
-            IndicatorLunar.CONFIG_INDICATOR_TEXT: self.indicatorText,
-            IndicatorLunar.CONFIG_COMET_OE_URL: self.cometOEURL,
             IndicatorLunar.CONFIG_COMETS: comets,
             IndicatorLunar.CONFIG_COMETS_ADD_NEW: self.cometsAddNew,
-            IndicatorLunar.CONFIG_MINOR_PLANET_OE_URL: self.minorPlanetOEURL,
+            IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON: self.hideBodiesBelowHorizon,
+            IndicatorLunar.CONFIG_INDICATOR_TEXT: self.indicatorText,
             IndicatorLunar.CONFIG_MINOR_PLANETS: minorPlanets,
             IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW: self.minorPlanetsAddNew,
             IndicatorLunar.CONFIG_MAGNITUDE: self.magnitude,
             IndicatorLunar.CONFIG_PLANETS: self.planets,
             IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
             IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,
-            IndicatorLunar.CONFIG_SATELLITE_TLE_URL: self.satelliteTLEURL,
             IndicatorLunar.CONFIG_SATELLITES: satellites,
             IndicatorLunar.CONFIG_SATELLITES_ADD_NEW: self.satellitesAddNew,
             IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME: self.satellitesSortByDateTime,
