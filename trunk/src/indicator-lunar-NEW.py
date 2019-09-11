@@ -386,18 +386,17 @@ class IndicatorLunar:
     COMET_CACHE_MAXIMUM_AGE_HOURS = 30
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
-    MINOR_PLANET_CACHE_BASENAME = "minorplanet-oe-"
-    MINOR_PLANET_CACHE_BASENAMES = [ MINOR_PLANET_CACHE_BASENAME + "bright",
-                                     MINOR_PLANET_CACHE_BASENAME + "critical",
-                                     MINOR_PLANET_CACHE_BASENAME + "distant",
-                                     MINOR_PLANET_CACHE_BASENAME + "unusual" ]
+    MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright",
+                                     "minorplanet-oe-" + "critical",
+                                     "minorplanet-oe-" + "distant",
+                                     "minorplanet-oe-" + "unusual" ]
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 30
-    MINOR_PLANET_DATA_BASE_URL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/"
-    MINOR_PLANET_DATA_URLS = [ MINOR_PLANET_DATA_BASE_URL + "Soft03Bright.txt", 
-                               MINOR_PLANET_DATA_BASE_URL + "Soft03CritList.txt",
-                               MINOR_PLANET_DATA_BASE_URL + "Soft03Distant.txt",
-                               MINOR_PLANET_DATA_BASE_URL + "Soft03Unusual.txt" ]
+    MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt", 
+                               "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
+                               "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
+                               "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
+#TODO Might still end up making a duplicate of this: one for comets and one for minor planets.
     MINOR_PLANET_CENTER_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
     SATELLITE_TAG_NAME = "[NAME]"
@@ -499,7 +498,7 @@ class IndicatorLunar:
 
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
-        for cacheBaseName in INDICATOR_NAME.MINOR_PLANET_CACHE_BASENAMES:
+        for cacheBaseName in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
             pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
 
         # Remove old icons.
@@ -511,26 +510,6 @@ class IndicatorLunar:
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
         self.loadConfig()
-
-#TODO Testing other minor planet urls...include these?
-# How to combine the minor planets sources into one?
-# Maybe just do separate downloads/caching for each and after that
-# have a special function to combine them all (just join a bunch of dicts hopefully).
-#         urls = [ "Soft03Cmt.txt", # Comets
-#                  "Soft03CritList.txt", # Critical-list minor planets
-#                  "Soft03Distant.txt", # Distant minor planets
-#                  "Soft03Unusual.txt", # Unusual minor planets
-#                  "Soft03Bright.txt" ] # Bright
-#         for url in urls:
-#             data = orbitalelement.download( "file:///home/bernard/Desktop/" + url )
-#             filteredData = astroPyephem.getOrbitalElementsLessThanMagnitude( data, 15.0 )
-#             print( url, len( data ), len( filteredData ) if filteredData is not None else "0" )
-# 
-# Soft03Cmt.txt 1027 8
-# Soft03CritList.txt 650 0
-# Soft03Distant.txt 3747 2
-# Soft03Unusual.txt 18169 81
-# Soft03Bright.txt 54 54        
         
         GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update )
 
@@ -548,22 +527,23 @@ class IndicatorLunar:
             self.minorPlanetsAddNew = True
             self.satellitesAddNew = True
 
-#TODO If { } is returned, what does this mean?
-#Will the backend have a fit, particularly if there was a list of say comets/satellites from yesterday's run,
-#and now we cannot download data and the cache is stale?
+#TODO If { } is returned, will the backend have a fit, 
+# particularly if there was a list of say comets/satellites from yesterday's run,
+# and now we cannot download data and the cache is stale?
+            # Update data.
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
                 self.addNewBodies( self.cometData, self.comets )
 
-# MINOR_PLANET_DATA_URLS
-            self.minorPlanetData = self.updateData( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.MINOR_PLANET_DATA_BASE_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
+            self.minorPlanetData = { }
+            for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
+                minorPlanetData = self.updateData( baseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, url, astroPyephem.getOrbitalElementsLessThanMagnitude )
+                for key in minorPlanetData:
+                    if key not in self.minorPlanetData:
+                        self.minorPlanetData[ key ] = minorPlanetData[ key ]
+
             if self.minorPlanetsAddNew:
                 self.addNewBodies( self.minorPlanetData, self.minorPlanets )
-#TODO If we have multiple minor planet sources, when we combine (data file and list of minor planets), check for duplicates.
-
-
-#             print( len( self.minorPlanets ) ) #TODO Debug
-#             print( self.minorPlanets ) #TODO Debug
 
             self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, None )
             if self.satellitesAddNew:
@@ -582,7 +562,7 @@ class IndicatorLunar:
                                                           self.minorPlanets, self.minorPlanetData,
                                                           self.magnitude )
 
-            # Update frontend...
+            # Update frontend.
             self.updateMenu()
             self.updateIconAndLabel()
 
