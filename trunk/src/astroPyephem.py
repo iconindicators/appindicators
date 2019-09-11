@@ -364,7 +364,6 @@ def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
     y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
     x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
     positionAngleOfBrightLimb = math.atan2( y, x )
-#     print( "Position angle of bright limb (radians):", positionAngleOfBrightLimb ) #TODO Test
 
     # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
     # https://tycho.usno.navy.mil/sidereal.html
@@ -376,7 +375,6 @@ def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
     y = math.sin( hourAngle )
     x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
     parallacticAngle = math.atan2( y, x )
-#     print( "Parallactic angle (radians):", parallacticAngle ) #TODO Test
 
     return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
@@ -537,6 +535,7 @@ def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
 # and then satellites to rise Aug 30 4:52.
 # The TLE cache file had filename of satellite-tle-20190901045141
 #So something is wrong...perhaps in the string comparison of dates (might have to use datetime rather than dates).
+#Maybe this error was due to setting a dodgy date/time in the past (for testing) but using a TLE data file newer than the test time? 
 def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
     key = ( AstronomicalBodyType.Satellite, key )
     currentDateTime = ephemNow
