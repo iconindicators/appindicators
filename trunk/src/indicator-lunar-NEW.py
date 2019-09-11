@@ -151,14 +151,7 @@ class IndicatorLunar:
     CONFIG_SATELLITES = "satellites"
     CONFIG_SATELLITES_ADD_NEW = "satellitesAddNew"
     CONFIG_SATELLITES_SORT_BY_DATE_TIME = "satellitesSortByDateTime"
-    CONFIG_SHOW_COMETS_AS_SUBMENU = "showCometsAsSubmenu"
-    CONFIG_SHOW_MINOR_PLANETS_AS_SUBMENU = "showMinorPlanetsAsSubmenu"
-    CONFIG_SHOW_MOON = "showMoon"
-    CONFIG_SHOW_PLANETS_AS_SUBMENU = "showPlanetsAsSubmenu"
     CONFIG_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
-    CONFIG_SHOW_SATELLITES_AS_SUBMENU = "showSatellitesAsSubmenu"
-    CONFIG_SHOW_STARS_AS_SUBMENU = "showStarsAsSubmenu"
-    CONFIG_SHOW_SUN = "showSun"
     CONFIG_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     CONFIG_STARS = "stars"
     CONFIG_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
@@ -581,9 +574,6 @@ class IndicatorLunar:
             if self.cometsAddNew:
                 self.addNewBodies( self.cometData, self.comets )
 
-#             print( len( self.comets ) ) #TODO Debug
-#             print( self.comets ) #TODO Debug
-
             self.minorPlanetData = self.updateData( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.minorPlanetsAddNew:
                 self.addNewBodies( self.minorPlanetData, self.minorPlanets )
@@ -594,9 +584,6 @@ class IndicatorLunar:
             self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, self.satelliteTLEURL, None )
             if self.satellitesAddNew:
                 self.addNewBodies( self.satelliteData, self.satellites )
-
-#             print( len( self.satellites ) ) #TODO Debug
-#             print( self.satellites ) #TODO Debug
 
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             # Value is the astronomical data (or equivalent) as a string.
@@ -614,8 +601,6 @@ class IndicatorLunar:
             # Update frontend...
             utcNow = datetime.datetime.utcnow()
             self.updateMenu()
-#             print( "updateMenu:", ( datetime.datetime.utcnow() - utcNow ) )
-
             self.updateIconAndLabel()
 
             if self.showWerewolfWarning:
@@ -711,40 +696,16 @@ class IndicatorLunar:
         menu = Gtk.Menu()
 
         utcNow = datetime.datetime.utcnow()
-        if self.showMoon:
-            self.updateMoonMenu( menu )
-#         print( "updateMoonMenu:", ( datetime.datetime.utcnow() - utcNow ) )
-
-        utcNow = datetime.datetime.utcnow()
-        if self.showSun:
-            self.updateSunMenu( menu )
-#         print( "updateSunMenu:", ( datetime.datetime.utcnow() - utcNow ) )
-
-        utcNow = datetime.datetime.utcnow()
+        self.updateMoonMenu( menu )
+        self.updateSunMenu( menu )
         self.updatePlanetsMenu( menu )
-#         print( "updatePlanetsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
-
-        utcNow = datetime.datetime.utcnow()
         self.updateStarsMenu( menu )
-#         print( "updateStarsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
-
-        utcNow = datetime.datetime.utcnow()
         self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.Comet )
-#         print( "updateCometsMenu:", ( datetime.datetime.utcnow() - utcNow ) )
-
-        utcNow = datetime.datetime.utcnow()
         self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
-#         print( "updateMinorPlanetMenu:", ( datetime.datetime.utcnow() - utcNow ) )
-
-        utcNow = datetime.datetime.utcnow()
         self.updateSatellitesMenu( menu )
-#         print( "updateSatellitesMenu:", ( datetime.datetime.utcnow() - utcNow ) )
-
-        utcNow = datetime.datetime.utcnow()
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-#         print( "updatePAQMenu:", ( datetime.datetime.utcnow() - utcNow ) )
 
 
     def updateIconAndLabel( self ):
@@ -1052,10 +1013,9 @@ class IndicatorLunar:
 
         theMenu = menu
         indent = 1
-        if self.showSatellitesAsSubMenu:
-            theMenu = Gtk.Menu()
-            menuItem.set_submenu( theMenu )
-            indent = 0
+        theMenu = Gtk.Menu()
+        menuItem.set_submenu( theMenu )
+        indent = 0
 
 #         print( "Number of satellites:", len(satellites))#TODO debug
         for number, name, riseDateTime in satellites:
@@ -1338,65 +1298,13 @@ class IndicatorLunar:
         # Menu.
         grid = pythonutils.createGrid()
 
-        label = Gtk.Label( _( "Show" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 40 )
-        box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
-
-        showMoonCheckbox = Gtk.CheckButton( _( "Moon" ) )
-        showMoonCheckbox.set_active( self.showMoon )
-        showMoonCheckbox.set_tooltip_text( _( "Show the moon." ) )
-        box.pack_start( showMoonCheckbox, False, False, 0 )
-
-        showSunCheckbox = Gtk.CheckButton( _( "Sun" ) )
-        showSunCheckbox.set_active( self.showSun )
-        showSunCheckbox.set_tooltip_text( _( "Show the sun." ) )
-        box.pack_start( showSunCheckbox, False, False, 0 )
-        grid.attach( box, 0, 1, 1, 1 )
-
-        label = Gtk.Label( _( "Show as submenus" ) )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_top( 10 )
-        grid.attach( label, 0, 2, 1, 1 )
-
-        box = Gtk.Box( spacing = 40 )
-        box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
-
-        showPlanetsAsSubmenuCheckbox = Gtk.CheckButton( _( "Planets" ) )
-        showPlanetsAsSubmenuCheckbox.set_active( self.showPlanetsAsSubMenu )
-        showPlanetsAsSubmenuCheckbox.set_tooltip_text( _( "Show planets as submenus." ) )
-        box.pack_start( showPlanetsAsSubmenuCheckbox, False, False, 0 )
-
-        showStarsAsSubmenuCheckbox = Gtk.CheckButton( _( "Stars" ) )
-        showStarsAsSubmenuCheckbox.set_tooltip_text( _( "Show stars as submenus." ) )
-        showStarsAsSubmenuCheckbox.set_active( self.showStarsAsSubMenu )
-        box.pack_start( showStarsAsSubmenuCheckbox, False, False, 0 )
-
-        showCometsAsSubmenuCheckbox = Gtk.CheckButton( _( "Comets" ) )
-        showCometsAsSubmenuCheckbox.set_tooltip_text( _( "Show comets as submenus." ) )
-        showCometsAsSubmenuCheckbox.set_active( self.showCometsAsSubMenu )
-        box.pack_start( showCometsAsSubmenuCheckbox, False, False, 0 )
-
-        showMinorPlanetsAsSubmenuCheckbox = Gtk.CheckButton( _( "Minor Planets" ) )
-        showMinorPlanetsAsSubmenuCheckbox.set_tooltip_text( _( "Show minor planets as submenus." ) )
-        showMinorPlanetsAsSubmenuCheckbox.set_active( self.showMinorPlanetsAsSubMenu )
-        box.pack_start( showMinorPlanetsAsSubmenuCheckbox, False, False, 0 )
-
-        showSatellitesAsSubmenuCheckbox = Gtk.CheckButton( _( "Satellites" ) )
-        showSatellitesAsSubmenuCheckbox.set_active( self.showSatellitesAsSubMenu )
-        showSatellitesAsSubmenuCheckbox.set_tooltip_text( _( "Show satellites as submenus." ) )
-        box.pack_start( showSatellitesAsSubmenuCheckbox, False, False, 0 )
-        grid.attach( box, 0, 3, 1, 1 )
-
         cometsAddNewCheckbox = Gtk.CheckButton( _( "Add new comets" ) )
         cometsAddNewCheckbox.set_margin_top( 10 )
         cometsAddNewCheckbox.set_active( self.cometsAddNew )
         cometsAddNewCheckbox.set_tooltip_text( _(
             "If checked, all comets are added\n" + \
             "to the list of checked comets." ) )
-        grid.attach( cometsAddNewCheckbox, 0, 4, 1, 1 )
+        grid.attach( cometsAddNewCheckbox, 0, 0, 1, 1 )
 
         minorPlanetsAddNewCheckbox = Gtk.CheckButton( _( "Add new minor planets" ) )
         minorPlanetsAddNewCheckbox.set_margin_top( 10 )
@@ -1404,7 +1312,7 @@ class IndicatorLunar:
         minorPlanetsAddNewCheckbox.set_tooltip_text( _(
             "If checked, all minor planets are added\n" + \
             "to the list of checked minor planets." ) )
-        grid.attach( minorPlanetsAddNewCheckbox, 0, 5, 1, 1 )
+        grid.attach( minorPlanetsAddNewCheckbox, 0, 1, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -1421,7 +1329,7 @@ class IndicatorLunar:
             "greater than that specified are hidden." ) )
 
         box.pack_start( spinnerMagnitude, False, False, 0 )
-        grid.attach( box, 0, 6, 1, 1 )
+        grid.attach( box, 0, 2, 1, 1 )
 
 #TODO Ensure this checkbox and that for comets/minorplanets have a listener that checks/unchecks the tables of comets/minorplanets/sats.
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Add new satellites" ) )
@@ -1430,7 +1338,7 @@ class IndicatorLunar:
         satellitesAddNewCheckbox.set_tooltip_text( _(
             "If checked all satellites are added\n" + \
             "to the list of checked satellites." ) )
-        grid.attach( satellitesAddNewCheckbox, 0, 7, 1, 1 )
+        grid.attach( satellitesAddNewCheckbox, 0, 3, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
@@ -1441,7 +1349,7 @@ class IndicatorLunar:
             "Otherwise satellites are sorted\n" + \
             "by Name, Number and then\n" + \
             "International Designator." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 8, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
@@ -1873,11 +1781,6 @@ class IndicatorLunar:
 #             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.showMoon = showMoonCheckbox.get_active()
             self.showSun = showSunCheckbox.get_active()
-            self.showPlanetsAsSubMenu = showPlanetsAsSubmenuCheckbox.get_active()
-            self.showStarsAsSubMenu = showStarsAsSubmenuCheckbox.get_active()
-            self.showCometsAsSubMenu = showCometsAsSubmenuCheckbox.get_active()
-            self.showMinorPlanetsAsSubMenu = showMinorPlanetsAsSubmenuCheckbox.get_active()
-            self.showSatellitesAsSubMenu = showSatellitesAsSubmenuCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
             self.cometsAddNew = cometsAddNewCheckbox.get_active()
             self.minorPlanetsAddNew = minorPlanetsAddNewCheckbox.get_active()
@@ -2209,14 +2112,7 @@ class IndicatorLunar:
         self.satellitesAddNew = config.get( IndicatorLunar.CONFIG_SATELLITES_ADD_NEW, False )
         self.satellitesSortByDateTime = config.get( IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME, True )
 
-        self.showMoon = config.get( IndicatorLunar.CONFIG_SHOW_MOON, True )
-        self.showCometsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_COMETS_AS_SUBMENU, True )
-        self.showMinorPlanetsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_MINOR_PLANETS_AS_SUBMENU, True )
-        self.showPlanetsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_PLANETS_AS_SUBMENU, True )
         self.showSatelliteNotification = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION, False )
-        self.showSatellitesAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITES_AS_SUBMENU, True )
-        self.showStarsAsSubMenu = config.get( IndicatorLunar.CONFIG_SHOW_STARS_AS_SUBMENU, True )
-        self.showSun = config.get( IndicatorLunar.CONFIG_SHOW_SUN, True )
         self.showWerewolfWarning = config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, True )
 
         self.stars = config.get( IndicatorLunar.CONFIG_STARS, [ ] )
@@ -2290,14 +2186,7 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_SATELLITES: satellites,
             IndicatorLunar.CONFIG_SATELLITES_ADD_NEW: self.satellitesAddNew,
             IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME: self.satellitesSortByDateTime,
-            IndicatorLunar.CONFIG_SHOW_MOON: self.showMoon,
-            IndicatorLunar.CONFIG_SHOW_COMETS_AS_SUBMENU: self.showCometsAsSubMenu,
-            IndicatorLunar.CONFIG_SHOW_MINOR_PLANETS_AS_SUBMENU: self.showCometsAsSubMenu,
-            IndicatorLunar.CONFIG_SHOW_PLANETS_AS_SUBMENU: self.showPlanetsAsSubMenu,
             IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION: self.showSatelliteNotification,
-            IndicatorLunar.CONFIG_SHOW_SATELLITES_AS_SUBMENU: self.showSatellitesAsSubMenu,
-            IndicatorLunar.CONFIG_SHOW_STARS_AS_SUBMENU: self.showStarsAsSubMenu,
-            IndicatorLunar.CONFIG_SHOW_SUN: self.showSun,
             IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING: self.showWerewolfWarning,
             IndicatorLunar.CONFIG_STARS: self.stars,
             IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE: self.werewolfWarningMessage,
