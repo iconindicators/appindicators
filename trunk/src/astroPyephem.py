@@ -43,7 +43,7 @@ DATA_FULL = "FULL"
 DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
 DATA_LATITUDE = "LATITUDE" # Internally used for city.
 DATA_LONGITUDE = "LONGITUDE" # Internally used for city.
-DATA_MAGNITUDE = "MAGNITUDE"
+DATA_MAGNITUDE = "MAGNITUDE" #TODO Remove if not used.
 DATA_NEW = "NEW"
 DATA_PHASE = "PHASE"
 DATA_RISE_AZIMUTH = "RISE AZIMUTH"
@@ -267,34 +267,13 @@ def getAstronomicalInformation( utcNow,
 
     ephemNow = ephem.Date( utcNow )
 
-    import datetime
-    utcNow = datetime.datetime.utcnow()
     __calculateMoon( ephemNow, data )
-#     print( "updateMoon:", ( datetime.datetime.utcnow() - utcNow ) )
-
-    utcNow = datetime.datetime.utcnow()
     __calculateSun( ephemNow, data )
-#     print( "updateSun:", ( datetime.datetime.utcnow() - utcNow ) )
-
-    utcNow = datetime.datetime.utcnow()
     __calculatePlanets( ephemNow, data, planets )
-#     print( "updatePlanets:", ( datetime.datetime.utcnow() - utcNow ) )
-
-    utcNow = datetime.datetime.utcnow()
     __calculateStars( ephemNow, data, stars )
-#     print( "updateStars:", ( datetime.datetime.utcnow() - utcNow ) )
-
-    utcNow = datetime.datetime.utcnow()
     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
-#     print( "updateComets:", ( datetime.datetime.utcnow() - utcNow ) )
-
-    utcNow = datetime.datetime.utcnow()
     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
-#     print( "updateMinorPlanets:", ( datetime.datetime.utcnow() - utcNow ) )
-
-    utcNow = datetime.datetime.utcnow()
     __calculateSatellites( ephemNow, data, satellites, satelliteData )
-#     print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
 
     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
     del data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
@@ -348,12 +327,6 @@ def __calculateMoon( ephemNow, data ):
     data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
     data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
-
-#TODO Debug
-#     print( "Moon illumination:", data[ key + ( DATA_ILLUMINATION, ) ] )
-#     print( "Moon phase:", data[ key + ( DATA_PHASE, ) ] )
-#     print( "Moon bright limb (radians):", data[ key + ( DATA_BRIGHT_LIMB, ) ] )
-#     print( "Moon bright limb (degrees):", math.degrees( float( data[ key + ( DATA_BRIGHT_LIMB, ) ] ) ) )
 
     if not neverUp:
         data[ key + ( DATA_FIRST_QUARTER, ) ] = __toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
@@ -469,7 +442,6 @@ def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
 # http://www.geoastro.de/planets/index.html
 # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
 def __calculatePlanets( ephemNow, data, planets ):
-#     print( "Number of planets:", len(planets))#TODO debug
     for planet in planets:
         planetObject = getattr( ephem, planet.title() )()
         __calculateCommon( ephemNow, data, planetObject, AstronomicalBodyType.Planet, planet )
@@ -477,33 +449,17 @@ def __calculatePlanets( ephemNow, data, planets ):
 
 # http://aa.usno.navy.mil/data/docs/mrst.php
 def __calculateStars( ephemNow, data, stars ):
-#     print( "Number of stars:", len(stars))#TODO debug
-#     mags = [ 0, 0, 0, 0, 0, 0, 0, 0 ]
     for star in stars:
         starObject = ephem.star( star.title() )
         __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star )
 
-#         key = ( AstronomicalBodyType.Star, star, DATA_MAGNITUDE ) 
-#         if key in data: 
-#             print( data[ key ] ) 
-#             mags[ int( float( data[ key ] ) + 2 ) ] += 1 
 
-#     print( "Star mags:", mags ) 
-
-
+#TODO Update comment below if we add other minor planet files.
 # Compute data for comets or minor planets.
 # Reference https://minorplanetcenter.net//iau/Ephemerides/Soft03.html
 # The default source for comets is https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
 # The default source for minor planets is https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt
-# Have tried the other data sources for minor planets (NEOs, centaurs, transneptunians) and none have magnitude less than 6.
 def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitude ):
-#TODO Debug
-#     mags = [ 0, 0, 0, 0, 0, 0 ]
-#     magsAndAbove = [ 0, 0, 0, 0, 0, 0 ]
-
-
-#TODO Have noticed that we get a pile of minor planets but all are always above the horizon (except for one that is always up).
-#Why are there none below the horzion (with just a rise date/time)?
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
             body = ephem.readdb( cometOrMinorPlanetData[ key ].getData() )
@@ -511,17 +467,6 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
             if not bad and body.mag >= MAGNITUDE_MINIMUM and body.mag <= magnitude:
                 __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
-
-#TODO Debug
-#                 mags[ int( body.mag ) ] += 1 
-#                 if body.mag <= MAGNITUDE_MINIMUM: print( "Dodgy magnitude:", body.mag )
-#                 if float( data[ ( astronomicalBodyType, key, DATA_ALTITUDE ) ] ) > 0:
-#                     magsAndAbove[ int( body.mag ) ] += 1
-
-
-#TODO Debug
-#     print( mags )
-#     print( magsAndAbove )
 
 
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
@@ -549,16 +494,11 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
             data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
             data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
 
-        if astronomicalBodyType == AstronomicalBodyType.Comet or \
-           astronomicalBodyType == AstronomicalBodyType.MinorPlanet or \
-           astronomicalBodyType == AstronomicalBodyType.Star:
-            data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
-
-#TODO Testing
-#         if astronomicalBodyType == AstronomicalBodyType.Star:
-#             print( data[ ( AstronomicalBodyType.Star, nameTag, DATA_MAGNITUDE ) ], int( float( data[ ( AstronomicalBodyType.Star, nameTag, DATA_MAGNITUDE ) ] ) ) )
-
-
+#TODO Not sure if this will make it into the final cut.
+#         if astronomicalBodyType == AstronomicalBodyType.Comet or \
+#            astronomicalBodyType == AstronomicalBodyType.MinorPlanet or \
+#            astronomicalBodyType == AstronomicalBodyType.Star:
+#             data[ key + ( DATA_MAGNITUDE, ) ] = str( body.mag )
 
     return neverUp
 
