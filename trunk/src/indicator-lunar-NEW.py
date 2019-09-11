@@ -1562,7 +1562,7 @@ class IndicatorLunar:
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
 
-        label = Gtk.Label( _( "Message\n \n \n \n \n " ) ) #TODO Add comment
+        label = Gtk.Label( _( "Message\n \n \n \n \n " ) ) #TODO Add comment  Make this a minimum of three lines...but also factor in how many actual lines of text there are.   
         label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         label.set_valign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
@@ -1629,7 +1629,7 @@ class IndicatorLunar:
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
 
-        label = Gtk.Label( _( "Message\n \n \n " ) )  #TODO Add comment!
+        label = Gtk.Label( _( "Message\n \n " ) )  #TODO Add comment!  Make this a minimum of three lines (so two extra).
         label.set_valign( Gtk.Align.START )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         box.pack_start( label, False, False, 0 )
