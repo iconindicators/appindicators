@@ -59,37 +59,12 @@
 #TODO Test during dusk/evening to see satellite passes in the menu.
 
 
-#TODO Consider removing the prefs for hide/show moon/sun.
-#That is, always show these...ask Oleg about this.
-
-
 #TODO If the backend/frontend are updating, and the user clicks on about/prefs, show a notification to tell the user they're blocked?
 #What about the other way?  If the about/prefs are open, disable the updates?
 #What do the other indicators do (PPA)?
 
 
-#TODO Maybe add a hack preference, perhaps only visible under GNOME Shell
-# which groups comets / minor planets into sub-submenus by magnitude.
-# Not sure how/what to do for satellites...
-# For Skyfield, there are a LOT of stars if we filter by magnitude (mag <= 6)...
-#...which means we could also submenu stars by magnitude.
-#Perhaps get rid of the magnitude preference and add in a preference "number of lines or menu items"
-#as in indicator-on-this-day.  We then can figure out how many items to show in a given submenu.
-#We still hard limit items by magnitude (nothing over 15).
-#But we dynamically (somehow) breakup the items by magnitude into groups.
-# So stars may be in groups by magnitude of -1, 0, 1, 2.0 - 2.5, 2.5 - 3.0, 3, 4. 
-#
-# First determine how many stars will be displayed and if that exceeds the available number of menu items, go to phase two.
-#
-# Take the number of menu items, divide by the number of availble menu items and that is the number of sub groups.
-# For each star int() the magnitude, sort ascendingly, then split the list by the number of sub groups.
-
-
-#TODO Maybe add a hack preference, perhaps only visible under GNOME Shell
-# for lots of satellites (and breaking the menu scroll.
-# For satellites, what is the point of always showing the next rises for the next two days?
-# Maybe only somehow show for the next window...but that window could be different depending on your latitude.
-# Also, if a user wants to know when the ISS next rises, if we only show the next window, then that user is screwed.
+#TODO Maybe have a preference to hide an object (planet, star, comet, minor planet) if yet to rise.
 
 
 INDICATOR_NAME = "indicator-lunar"
