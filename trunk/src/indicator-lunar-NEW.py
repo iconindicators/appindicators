@@ -64,9 +64,6 @@
 #What do the other indicators do (PPA)?
 
 
-#TODO Maybe have a preference to hide an object (planet, star, comet, minor planet) if yet to rise.
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -544,7 +541,6 @@ class IndicatorLunar:
 #TODO If { } is returned, what does this mean?
 #Will the backend have a fit, particularly if there was a list of say comets/satellites from yesterday's run,
 #and now we cannot download data and the cache is stale?
-            print( "Updating data")#TODO Debug
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.cometOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
                 self.addNewBodies( self.cometData, self.comets )
@@ -576,7 +572,6 @@ class IndicatorLunar:
                                                           self.magnitude )
 
             # Update frontend...
-            utcNow = datetime.datetime.utcnow()
             self.updateMenu()
             self.updateIconAndLabel()
 
