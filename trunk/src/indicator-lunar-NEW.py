@@ -139,7 +139,6 @@ class IndicatorLunar:
         astroPyephem.DATA_ECLIPSE_TYPE         : _( "ECLIPSE TYPE" ),
         astroPyephem.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
         astroPyephem.DATA_FULL                 : _( "FULL" ),
-        astroPyephem.DATA_MAGNITUDE            : _( "MAGNITUDE" ), #TODO Not yet used...if not used, add to internal tags; if used, add to display data and show as needed.
         astroPyephem.DATA_NEW                  : _( "NEW" ),
         astroPyephem.DATA_PHASE                : _( "PHASE" ),
         astroPyephem.DATA_RISE_AZIMUTH         : _( "RISE AZIMUTH" ),
@@ -148,7 +147,7 @@ class IndicatorLunar:
         astroPyephem.DATA_SET_DATE_TIME        : _( "SET DATE TIME" ),
         astroPyephem.DATA_THIRD_QUARTER        : _( "THIRD QUARTER" ) }
 
-    CITY_TAG_TRANSLATION = { astroPyephem.NAME_TAG_CITY: _( "CITY" ) }
+    CITY_TAG_TRANSLATION = { astroPyephem.NAME_TAG_CITY: _( "CITY" ) } #TODO Is this needed?
     MOON_TAG_TRANSLATION = { astroPyephem.NAME_TAG_MOON : _( "MOON" ) }
     SUN_TAG_TRANSLATION = { astroPyephem.NAME_TAG_SUN : _( "SUN" ) }
 
