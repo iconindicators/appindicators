@@ -878,7 +878,7 @@ class IndicatorLunar:
             menuItem.set_submenu( subMenu )
             for name, translatedName in planets:
                 subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
-                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 0, 2 )
+                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 1, 2 )
 
 
 #TODO Can we put in an onClick for stars?
@@ -898,7 +898,7 @@ class IndicatorLunar:
             menuItem.set_submenu( subMenu )
             for name, translatedName in stars:
                 subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
-                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Star, name, 0, 2 )
+                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Star, name, 1, 2 )
 
 
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
@@ -918,7 +918,7 @@ class IndicatorLunar:
             menuItem.set_submenu( subMenu )
             for name in sorted( bodies ):
                 subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name ) )
-                self.updateCommonMenu( subMenu, astronomicalBodyType, name, 0, 2 )
+                self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2 )
 
                 # Add handler.
 #TODO Fix                
