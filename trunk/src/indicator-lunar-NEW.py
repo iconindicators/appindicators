@@ -577,6 +577,8 @@ class IndicatorLunar:
             self.minorPlanetData = self.updateData( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, self.minorPlanetOEURL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.minorPlanetsAddNew:
                 self.addNewBodies( self.minorPlanetData, self.minorPlanets )
+#TODO If we have multiple minor planet sources, when we combine (data file and list of minor planets), check for duplicates.
+
 
 #             print( len( self.minorPlanets ) ) #TODO Debug
 #             print( self.minorPlanets ) #TODO Debug
