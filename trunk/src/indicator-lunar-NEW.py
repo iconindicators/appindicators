@@ -884,6 +884,7 @@ class IndicatorLunar:
         menuItem = Gtk.MenuItem( _( "Moon" ) )
         menu.append( menuItem )
 
+#TODO Think I need to make a subMenu here and same for Sun.
         self.updateCommonMenu( menuItem, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
 
 #TODO Test this by making the moon never up.
