@@ -805,7 +805,7 @@ class IndicatorLunar:
 
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
-
+#TODO Need to take into account hide bodies below horizon preference!
     def updateMoonMenu( self, menu ):
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
         menuItem = Gtk.MenuItem( _( "Moon" ) )
