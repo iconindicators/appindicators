@@ -266,11 +266,11 @@ def getAstronomicalInformation( utcNow,
     ephemNow = ephem.Date( utcNow )
 
     __calculateMoon( ephemNow, data, hideIfBelowHorizon )
-    __calculateSun( ephemNow, data )
-    __calculatePlanets( ephemNow, data, planets )
-    __calculateStars( ephemNow, data, stars )
-    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
-    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
+    __calculateSun( ephemNow, data, hideIfBelowHorizon )
+    __calculatePlanets( ephemNow, data, planets, hideIfBelowHorizon )
+    __calculateStars( ephemNow, data, stars, hideIfBelowHorizon )
+    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude, hideIfBelowHorizon )
+    __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude, hideIfBelowHorizon )
     __calculateSatellites( ephemNow, data, satellites, satelliteData )
 
     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
@@ -318,20 +318,22 @@ def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
 # http://www.geoastro.de/sundata/index.html
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
 def __calculateMoon( ephemNow, data, hideIfBelowHorizon ):
-    neverUp, belowHorizon = __calculateCommon( ephemNow, data, ephem.Moon(), AstronomicalBodyType.Moon, NAME_TAG_MOON, hideIfBelowHorizon )
-    moon = ephem.Moon()
-    moon.compute( __getCity( data, ephemNow ) )
     key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
-    data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
-    data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
-    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
-
-    if not neverUp and not belowHorizon:
+    hidden = __calculateCommon( ephemNow, data, ephem.Moon(), AstronomicalBodyType.Moon, NAME_TAG_MOON, hideIfBelowHorizon )
+    if not hidden:
         data[ key + ( DATA_FIRST_QUARTER, ) ] = __toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
         data[ key + ( DATA_FULL, ) ] = __toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
         data[ key + ( DATA_THIRD_QUARTER, ) ] = __toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
         data[ key + ( DATA_NEW, ) ] = __toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
         __calculateEclipse( ephemNow.datetime(), data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+
+    # Used for internal processing; indirectly presented to the user.
+    moon = ephem.Moon()
+    moon.compute( __getCity( data, ephemNow ) )
+    data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
+    data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
+    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
+
 
 
 # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
@@ -419,9 +421,9 @@ def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate )
 # http://www.geoastro.de/altazsunmoon/index.htm
 # http://futureboy.us/fsp/sun.fsp
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
-def __calculateSun( ephemNow, data ):
-    neverUp = __calculateCommon( ephemNow, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN )
-    if not neverUp:
+def __calculateSun( ephemNow, data, hideIfBelowHorizon ):
+    hidden = __calculateCommon( ephemNow, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN, hideIfBelowHorizon )
+    if not hidden:
         __calculateEclipse( ephemNow.datetime(), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
 
 
@@ -437,32 +439,35 @@ def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
 
 # http://www.geoastro.de/planets/index.html
 # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
-def __calculatePlanets( ephemNow, data, planets ):
+def __calculatePlanets( ephemNow, data, planets, hideIfBelowHorizon ):
     for planet in planets:
         planetObject = getattr( ephem, planet.title() )()
-        __calculateCommon( ephemNow, data, planetObject, AstronomicalBodyType.Planet, planet )
+        __calculateCommon( ephemNow, data, planetObject, AstronomicalBodyType.Planet, planet, hideIfBelowHorizon )
 
 
 # http://aa.usno.navy.mil/data/docs/mrst.php
-def __calculateStars( ephemNow, data, stars ):
+def __calculateStars( ephemNow, data, stars, hideIfBelowHorizon ):
     for star in stars:
         starObject = ephem.star( star.title() )
-        __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star )
+        __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star, hideIfBelowHorizon )
 
 
 # Compute data for comets or minor planets.
-def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitude ):
+def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitude, hideIfBelowHorizon ):
     for key in cometsOrMinorPlanets:
         if key in cometOrMinorPlanetData:
             body = ephem.readdb( cometOrMinorPlanetData[ key ].getData() )
             body.compute( __getCity( data, ephemNow ) )
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
             if not bad and body.mag >= MAGNITUDE_MINIMUM and body.mag <= magnitude:
-                __calculateCommon( ephemNow, data, body, astronomicalBodyType, key )
+                __calculateCommon( ephemNow, data, body, astronomicalBodyType, key, hideIfBelowHorizon )
 
 
+#TODO Add function header explaining the how the rise time can be hidden if below the horizon.
+#Explain return logic/meaning.
+#Need a better or more descriptive name rather than dropped.  Maybe hidden?
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag, hideIfBelowHorizon ):
-    neverUp = False
+    dropped = False
     key = ( astronomicalBodyType, nameTag )
     try:
         city = __getCity( data, ephemNow )
@@ -471,26 +476,25 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag, hide
 
         if rising > setting: # Above the horizon.
             data[ key + ( DATA_SET_DATE_TIME, ) ] = __toDateTimeString( setting.datetime() )
-
-        else: # Below the horizon.
-            if not hideIfBelowHorizon:
-                data[ key + ( DATA_RISE_DATE_TIME, ) ] = __toDateTimeString( rising.datetime() )
-
-    except ephem.AlwaysUpError:
-        pass
-
-    except ephem.NeverUpError:
-        neverUp = True
-
-    if not neverUp:
-        if key + ( DATA_RISE_DATE_TIME, ) not in data:
             body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
             data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
             data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
 
-    belowHorizon = key + ( DATA_RISE_DATE_TIME, ) in data
+        else: # Below the horizon.
+            if hideIfBelowHorizon:
+                dropped = True
+            else:
+                data[ key + ( DATA_RISE_DATE_TIME, ) ] = __toDateTimeString( rising.datetime() )
 
-    return neverUp, belowHorizon
+    except ephem.AlwaysUpError:
+        body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+        data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
+        data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
+
+    except ephem.NeverUpError:
+        dropped = True
+
+    return dropped
 
 
 # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.

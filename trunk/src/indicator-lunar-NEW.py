@@ -562,10 +562,6 @@ class IndicatorLunar:
                                                           self.magnitude,
                                                           self.hideBodiesBelowHorizon )
 
-#TODO Remove
-#             if self.hideBodiesBelowHorizon:
-#                 self.flushBodiesBelowHorizon()
-
             # Update frontend.
             self.updateMenu()
             self.updateIconAndLabel()
@@ -612,16 +608,6 @@ class IndicatorLunar:
             data = { }
 
         return data
-
-#TODO Remove
-    def flushBodiesBelowHorizon( self ):
-        keysToDelete = [ ]
-        for key in self.data.keys():
-            if key[ 2 ] == astroPyephem.DATA_RISE_DATE_TIME and key[ 0 ] != astroPyephem.AstronomicalBodyType.Satellite:
-                keysToDelete.append( key )
-
-        for key in keysToDelete:
-            del self.data[ key ]
 
 
     def getNextUpdateTimeInSeconds( self ):
@@ -816,14 +802,14 @@ class IndicatorLunar:
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
 
-    def toBeDisplayed( self, astronomicalBodyType, nameTag ):
+    def display( self, astronomicalBodyType, nameTag ):
         return ( astronomicalBodyType, nameTag, astroPyephem.DATA_ALTITUDE ) in self.data or \
                ( astronomicalBodyType, nameTag, astroPyephem.DATA_RISE_DATE_TIME ) in self.data
 
 
     def updateMoonMenu( self, menu ):
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
-        if self.toBeDisplayed( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON ):
+        if self.display( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON ):
             menuItem = Gtk.MenuItem( _( "Moon" ) )
             menu.append( menuItem )
             menu.append( menuItem )
@@ -851,7 +837,7 @@ class IndicatorLunar:
 
     def updateSunMenu( self, menu ):
         key = ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
-        if self.toBeDisplayed( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN ):
+        if self.display( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN ):
             menuItem = Gtk.MenuItem( _( "Sun" ) )
             menu.append( menuItem )
             subMenu = Gtk.Menu()
@@ -874,7 +860,7 @@ class IndicatorLunar:
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planet in self.planets:
-            if self.toBeDisplayed( astroPyephem.AstronomicalBodyType.Planet, planet ):
+            if self.display( astroPyephem.AstronomicalBodyType.Planet, planet ):
                 planets.append( [ planet, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planet ] ] )
 
         if planets:
@@ -891,7 +877,7 @@ class IndicatorLunar:
     def updateStarsMenu( self, menu ):
         stars = [ ]
         for star in self.stars:
-            if self.toBeDisplayed( astroPyephem.AstronomicalBodyType.Star, star ):
+            if self.display( astroPyephem.AstronomicalBodyType.Star, star ):
                 stars.append( [ star, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ star ] ] )
 
         if stars:
@@ -907,7 +893,7 @@ class IndicatorLunar:
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
         bodies = [ ]
         for body in self.comets if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanets:
-            if self.toBeDisplayed( astronomicalBodyType, body ):
+            if self.display( astronomicalBodyType, body ):
                 bodies.append( body )
 
 # TODO The section below is similar enough to planets and stars...can we make a generic function?
