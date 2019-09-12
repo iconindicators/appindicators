@@ -559,10 +559,12 @@ class IndicatorLunar:
                                                           self.satellites, self.satelliteData,
                                                           self.comets, self.cometData,
                                                           self.minorPlanets, self.minorPlanetData,
-                                                          self.magnitude )
+                                                          self.magnitude,
+                                                          self.hideBodiesBelowHorizon )
 
-            if self.hideBodiesBelowHorizon:
-                self.flushBodiesBelowHorizon()
+#TODO Remove
+#             if self.hideBodiesBelowHorizon:
+#                 self.flushBodiesBelowHorizon()
 
             # Update frontend.
             self.updateMenu()
@@ -611,7 +613,7 @@ class IndicatorLunar:
 
         return data
 
-
+#TODO Remove
     def flushBodiesBelowHorizon( self ):
         keysToDelete = [ ]
         for key in self.data.keys():
