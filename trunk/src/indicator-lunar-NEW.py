@@ -31,11 +31,6 @@
 #  http://www.flaticon.com/search/satellite
 
 
-#TODO Backed computes rise time even if the frontend will drop it...and so that information appears in the table in the preferences.
-# So perhaps need to pass in a flag to the backend to not put in bodies below the horizon...
-# ...does that mean we need to handle this in the front end menu building?
-
-
 #TODO If there is no data to download (no internet) and cache is stale,
 # ensure satellites/comets/minorplanets already selected by the user are not dropped.
 
@@ -566,6 +561,9 @@ class IndicatorLunar:
                                                           self.minorPlanets, self.minorPlanetData,
                                                           self.magnitude )
 
+            if self.hideBodiesBelowHorizon:
+                self.flushBodiesBelowHorizon()
+
             # Update frontend.
             self.updateMenu()
             self.updateIconAndLabel()
@@ -612,6 +610,16 @@ class IndicatorLunar:
             data = { }
 
         return data
+
+
+    def flushBodiesBelowHorizon( self ):
+        keysToDelete = [ ]
+        for key in self.data.keys():
+            if key[ 2 ] == astroPyephem.DATA_RISE_DATE_TIME and key[ 0 ] != astroPyephem.AstronomicalBodyType.Satellite:
+                keysToDelete.append( key )
+
+        for key in keysToDelete:
+            del self.data[ key ]
 
 
     def getNextUpdateTimeInSeconds( self ):
@@ -808,7 +816,7 @@ class IndicatorLunar:
 
     def toBeDisplayed( self, astronomicalBodyType, nameTag ):
         return ( astronomicalBodyType, nameTag, astroPyephem.DATA_ALTITUDE ) in self.data or \
-               ( astronomicalBodyType, nameTag, astroPyephem.DATA_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon
+               ( astronomicalBodyType, nameTag, astroPyephem.DATA_RISE_DATE_TIME ) in self.data
 
 
     def updateMoonMenu( self, menu ):
