@@ -1205,6 +1205,9 @@ class IndicatorLunar:
         self.tagsAdded = { }
         self.tagsRemoved = { }
 
+#TODO Now that we can drop a body if below the horizon, that body may appear/disappear from the table depending on time of day.
+#The moon for example will drop in and out and so too will the tag.
+#So maybe don't drop stuff out...and if something is checked (when not checked on creating the dialog), add that object in (with data tags).
         COLUMN_ASTRONOICAL_BODY_TYPE = 0
         COLUMN_TAG = 1
         COLUMN_TRANSLATED_TAG = 2
