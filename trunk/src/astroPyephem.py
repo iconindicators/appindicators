@@ -461,6 +461,7 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
 
 
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
+    hideIfBelowHorizon = True
     neverUp = False
     key = ( astronomicalBodyType, nameTag )
     try:
@@ -470,8 +471,10 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
 
         if rising > setting: # Above the horizon.
             data[ key + ( DATA_SET_DATE_TIME, ) ] = __toDateTimeString( setting.datetime() )
+
         else: # Below the horizon.
-            data[ key + ( DATA_RISE_DATE_TIME, ) ] = __toDateTimeString( rising.datetime() )
+            if not hideIfBelowHorizon:
+                data[ key + ( DATA_RISE_DATE_TIME, ) ] = __toDateTimeString( rising.datetime() )
 
     except ephem.AlwaysUpError:
         pass
@@ -479,13 +482,13 @@ def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag ):
     except ephem.NeverUpError:
         neverUp = True
 
-    if not neverUp:
+    if not neverUp and not hideIfBelowHorizon:
         if key + ( DATA_RISE_DATE_TIME, ) not in data:
             body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
             data[ key + ( DATA_AZIMUTH, ) ] = str( repr( body.az ) )
             data[ key + ( DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
 
-    return neverUp
+    return neverUp, 
 
 
 # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
