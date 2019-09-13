@@ -67,7 +67,6 @@ class TLE:
 #
 # Otherwise, returns None and may write to the log.
 def download( url, logging = None ):
-    print( url )
     tleData = { }
     try:
         data = urlopen( url, timeout = 1 ).read().decode( "utf8" ).splitlines()
