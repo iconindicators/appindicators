@@ -67,6 +67,7 @@ class TLE:
 #
 # Otherwise, returns None and may write to the log.
 def download( url, logging = None ):
+    print( url )
     tleData = { }
     try:
         data = urlopen( url, timeout = 1 ).read().decode( "utf8" ).splitlines()
@@ -85,34 +86,5 @@ def download( url, logging = None ):
         if logging is not None:
             logging.error( "Error retrieving TLE data from " + str( url ) )
             logging.exception( e )
-
-    return tleData
-
-
-# Downloads TLE data from the URL.
-#
-# On success, returns a non-empty dict:
-#    Key: Satellite number
-#    Value: TLE object
-#
-# Otherwise, returns None and may write to the log.
-def downloadORIG( url, logging = None ):
-    tleData = { }
-    try:
-        data = urlopen( url, timeout = 1 ).read().decode( "utf8" ).splitlines()
-        for i in range( 0, len( data ), 3 ):
-            tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
-            tleData[ ( tle.getNumber() ) ] = tle
-
-        if not tleData:
-            tleData = None
-            if logging is not None:
-                logging.error( "No TLE data found at " + str( url ) )
-
-    except Exception as e:
-        tleData = None
-        if logging is not None:
-            logging.exception( e )
-            logging.error( "Error retrieving TLE data from " + str( url ) )
 
     return tleData

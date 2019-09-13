@@ -306,29 +306,6 @@ def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
     return results
 
 
-
-#TODO Remove
-#
-# Takes a dictionary of orbital element data (for comets or minor planets),
-# in which the key is the body name and value is the orbital element data.
-#
-# Returns a dictionary in which each item has a magnitude less than or equal to the maximum magnitude.
-# If no data remains (magnitude is too low for example), None is returned.
-def getOrbitalElementsLessThanMagnitudeORIG( orbitalElementData, maximumMagnitude ):
-    results = { }
-    for key in orbitalElementData:
-        body = ephem.readdb( orbitalElementData[ key ].getData() )
-        body.compute( ephem.city( "London" ) ) # Use any city; makes no difference to obtain the magnitude.
-        bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
-        if not bad and body.mag >= MAGNITUDE_MINIMUM and body.mag <= maximumMagnitude:
-            results[ key ] = orbitalElementData[ key ]
-
-    if not results:
-        results = None
-
-    return results
-
-
 # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
 # http://futureboy.us/fsp/moon.fsp
 # http://www.geoastro.de/moondata/index.html

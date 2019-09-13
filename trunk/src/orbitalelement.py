@@ -70,36 +70,3 @@ def download( url, logging = None ):
             logging.exception( e )
 
     return oeData
-
-
-# Downloads OE data for an object in XEphem format from the URL.
-#
-# On success, returns a non-empty dict:
-#    Key: object name (upper cased)
-#    Value: OE object
-#
-# Otherwise, returns None and may write to the log.
-def downloadORIG( url, logging = None ):
-    oeData = { }
-    try:
-        print( "oe")
-        data = urlopen( url, timeout = 1 ).read().decode( "utf8" ).splitlines() #TODO Was on laptop, no internet and got stuck here...no timeout ....why?  Look at old code for timeout.   Ditto for satellites.
-#Perhaps don't bother with the check internet function.
-#Instead just try and download (with a timeout of 2 secs say) and if we cannot download or get a bad parse, that is bad.
-        for i in range( 0, len( data ) ):
-            if not data[ i ].startswith( "#" ):
-                oe = OE( data[ i ].strip() )
-                oeData[ oe.getName().upper() ] = oe
-
-        if not oeData:
-            oeData = None
-            if logging is not None:
-                logging.error( "No OE data found at " + str( url ) )
-
-    except Exception as e:
-        oeData = None
-        if logging is not None:
-            logging.exception( e )
-            logging.error( "Error retrieving OE data from " + str( url ) )
-
-    return oeData

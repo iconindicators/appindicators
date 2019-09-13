@@ -577,9 +577,10 @@ class IndicatorLunar:
 
 
     # Get the data from the cache, or if stale, download from the source.
-    # On success, returns a non-empty { }; when no data or an error occurs, returns an empty { }.
+    #
+    # Returns a dictionary (may be empty).
     def updateData( self, cacheBaseName, cacheMaximumAgeHours, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
-        data = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Either valid or None; empty data is never cached.
+        data = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Either valid or None.
 
 #TODO Start of temporary hack...
 # Cache data formats changed between version 80 and 81.
@@ -601,42 +602,7 @@ class IndicatorLunar:
             if magnitudeFilterFunction is not None:
                 data = magnitudeFilterFunction( data, astroPyephem.MAGNITUDE_MAXIMUM )
 
-            if data:
-                pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBaseName, logging )
-
-        return data
-
-
-    # Get the data from the cache, or if stale, download from the source.
-    # On success, returns a non-empty { }; when no data or an error occurs, returns an empty { }.
-    def updateDataORIG( self, cacheBaseName, cacheMaximumAgeHours, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
-        data = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Either valid or None; empty data is never cached.
-
-#TODO Start of temporary hack...
-# Cache data formats changed between version 80 and 81.
-#
-# Satellites still use the TLE object, but the file name changed from satellite to twolineelement and is deemed an invalid object.
-# Therefore reading the cache binary will throw an exception and return None.
-# Not a problem as a new version will be downloaded and the cache will eventually clear out.
-#
-# Comets will successfully read in because their objects (dict, tuple string) are valid.
-# Comets are still stored in a dict using a string as key but now with a new OE object as the value, which must be handled.
-# This check can be removed in version 82.
-        if data is not None and cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME:
-            if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ): # Check that the object loaded from cache matches the new OE object.
-                data = None
-#TODO End of hack!
-
-        if data is None:
-            data = downloadDataFunction( dataURL ) # Either valid or None.
-            if magnitudeFilterFunction is not None and data is not None:
-                data = magnitudeFilterFunction( data, astroPyephem.MAGNITUDE_MAXIMUM ) # Either valid or None.
-
-            if data is not None:
-                pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBaseName, logging )
-
-        if data is None:
-            data = { }
+            pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBaseName, logging )
 
         return data
 
