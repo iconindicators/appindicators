@@ -472,6 +472,34 @@ class IndicatorLunar:
 
 
     def __init__( self ):
+
+        import time
+        from urllib.request import urlopen
+        for star in astroPyephem.STARS_TO_HIPPARCOS_IDENTIFIER:
+            print( star, astroPyephem.STARS_TO_HIPPARCOS_IDENTIFIER[ star ] )
+            hip = astroPyephem.STARS_TO_HIPPARCOS_IDENTIFIER[ star ]
+            url = "https://www.heavens-above.com/hipentry.aspx?lat=0&lng=0&loc=Unspecified&alt=0&tz=UCT&hip=" + str( hip ) 
+
+            try:
+                response = urlopen( url, timeout = 5 ).read().decode( "utf8" ).splitlines()
+                for line in response:
+                    if "<tr><td>Name:</td><td>" in line:
+                        name = line.split( "<tr><td>" )[ 1 ].split( "<td>")[ 1 ].split( "</td></tr>" )[ 0 ]
+                        print( name, str( hip ) )
+                        print()
+                        time.sleep( 5 )
+                        break
+            
+            except Exception as e:
+                print( url )
+                print( e )
+
+
+
+        import sys
+        if True : sys.exit()
+        
+        
         self.cometData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.minorPlanetData = { } # Key: minor planet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
