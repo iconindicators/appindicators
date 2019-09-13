@@ -869,7 +869,14 @@ class IndicatorLunar:
 
 
 #TODO Can we put in an onClick for stars?
+# https://www.cosmos.esa.int/
+# https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId=27989
+# https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId=27989&hdId=&tyc1=&tyc2=&tyc3=
+# https://www.heavens-above.com
 # https://www.heavens-above.com/hipentry.aspx?lat=0&lng=0&loc=Unspecified&alt=0&tz=UCT&cul=en&hip=27989
+# hip = astroPyephem.STARS_TO_HIPPARCOS_IDENTIFIER[ star ]
+# url = "https://www.heavens-above.com/hipentry.aspx?lat=0&lng=0&loc=Unspecified&alt=0&tz=UCT&hip=" + str( hip ) 
+
     def updateStarsMenu( self, menu ):
         stars = [ ]
         for star in self.stars:
