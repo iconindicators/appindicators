@@ -460,10 +460,6 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
                 __calculateCommon( ephemNow, data, body, astronomicalBodyType, key, hideIfBelowHorizon )
 
 
-#TODO Add function header explaining the how the rise time can be hidden if below the horizon.
-#Explain return logic/meaning.
-#Need a better or more descriptive name rather than dropped.  Maybe hidden?
-
 # Calculates common attributes such as rise/set date/tiem, azimuth/altitude.
 #
 # If hideIfBelowHorzion is True, if a body is below the horizon (but will rise), that body is dropped (no data stored).
