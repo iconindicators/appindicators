@@ -606,8 +606,8 @@ class IndicatorLunar:
             if data is not None:
                 pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBaseName, logging )
 
-        if data is None:
-            data = { }
+#         if data is None:
+#             data = { }
 
         return data
 

@@ -306,6 +306,9 @@ def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
     return results
 
 
+
+#TODO Remove
+#
 # Takes a dictionary of orbital element data (for comets or minor planets),
 # in which the key is the body name and value is the orbital element data.
 #
