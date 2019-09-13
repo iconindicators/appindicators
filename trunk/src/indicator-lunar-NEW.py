@@ -40,6 +40,7 @@
 
 #TODO When no internet and no cached items, the satellites, comets and minor planets selected by the user might get blown away.
 #What to do?  If a user has checked specific items, then losing those because no data is available is not good.
+#In this case the update function will/should return { }.
 
 
 #TODO
@@ -57,6 +58,8 @@
 
 
 #TODO Test during dusk/evening to see satellite passes in the menu.
+#             from datetime import timezone #TODO Testing for satellites
+#             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime( 2019, 8, 29, 9, 0, 0, 0, tzinfo = timezone.utc ),
 
 
 #TODO If the backend/frontend are updating, and the user clicks on about/prefs, show a notification to tell the user they're blocked?
@@ -453,7 +456,7 @@ class IndicatorLunar:
     MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
-#TODO Likley need to put these into a dict, keyed off from the astro messages.
+#TODO Likely need to put these into a dict, keyed off from the astro messages.
 #Then in getdisplaydata for the message type, use the astroPyephem.message and pull the translated/text message from this dict.
     MESSAGE_TRANSLATION_DATA_BAD_DATA = _( "Bad data!" )
     MESSAGE_TRANSLATION_DATA_CANNOT_ACCESS_DATA_SOURCE = _( "Cannot access the data source\n<a href=\'{0}'>{0}</a>" )
@@ -526,9 +529,6 @@ class IndicatorLunar:
             self.minorPlanetsAddNew = True
             self.satellitesAddNew = True
 
-#TODO If { } is returned, will the backend have a fit, 
-# particularly if there was a list of say comets/satellites from yesterday's run,
-# and now we cannot download data and the cache is stale?
             # Update data.
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
@@ -551,8 +551,6 @@ class IndicatorLunar:
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             # Value is the astronomical data (or equivalent) as a string.
             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
-#             from datetime import timezone #TODO Testing for satellites
-#             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime( 2019, 8, 29, 9, 0, 0, 0, tzinfo = timezone.utc ),
                                                           self.latitude, self.longitude, self.elevation,
                                                           self.planets,
                                                           self.stars,
@@ -595,7 +593,7 @@ class IndicatorLunar:
         if data is not None and cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME:
             if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ): # Check that the object loaded from cache matches the new OE object.
                 data = None
-#TODO End of hack!
+# End of hack!
 
         if data is None:
             data = downloadDataFunction( dataURL )
@@ -2118,7 +2116,7 @@ class IndicatorLunar:
                 self.satellites = tmp
 
         self.saveConfig()
-#TODO End of hack!
+# End of hack!
 
 
     def saveConfig( self ):
