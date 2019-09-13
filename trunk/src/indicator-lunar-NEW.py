@@ -920,6 +920,8 @@ class IndicatorLunar:
 #TODO Need to make it work for minor planets.
 # https://www.iau.org/public/themes/naming
 # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
+#TODO Can we put this logic into the main functions of each body and then pass some property down so each menu item gets it?
+#Then there will be one single on click function.
     def onCometMinorPlanet( self, widget, onClickURL ):
         print( widget.props.name )
         if "(" in widget.props.name: # P/1997 T3 (Lagerkvist-Carsenty)
