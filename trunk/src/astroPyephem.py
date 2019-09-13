@@ -56,7 +56,7 @@ DATA_INTERNAL = [
     DATA_ELEVATION,
     DATA_ILLUMINATION ]
 
-#TODO Are these sub-lists needed?  They are not referenced in the indicator front end.
+#TODO Are these sub-lists needed?  Might be needed for the Preferences dialgo.
 DATA_COMET = [
     DATA_RISE_AZIMUTH,
     DATA_RISE_DATE_TIME,
@@ -483,6 +483,15 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
 #TODO Add function header explaining the how the rise time can be hidden if below the horizon.
 #Explain return logic/meaning.
 #Need a better or more descriptive name rather than dropped.  Maybe hidden?
+
+# Calculates common attributes such as rise/set date/tiem, azimuth/altitude.
+#
+# If hideIfBelowHorzion is True, if a body is below the horizon (but will rise), that body is dropped (no data stored).
+# Otherwise the body will be included.
+#
+# Returns True if the body was dropped:
+#    The body is below the horizon and hideIfBelowHorizon is True.
+#    The body is never up.
 def __calculateCommon( ephemNow, data, body, astronomicalBodyType, nameTag, hideIfBelowHorizon ):
     dropped = False
     key = ( astronomicalBodyType, nameTag )
