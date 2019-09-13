@@ -125,7 +125,6 @@ PLANET_PLUTO = "PLUTO"
 PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
 # From cns_namemap in ephem.stars.stars
-#TODO Make a note about agena (better known as hadar...see astroSkyfield)
 STARS = [
     "ACHERNAR",
     "ADARA",
