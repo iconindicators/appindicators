@@ -869,6 +869,7 @@ class IndicatorLunar:
 
 
 #TODO Can we put in an onClick for stars?
+# https://www.heavens-above.com/hipentry.aspx?lat=0&lng=0&loc=Unspecified&alt=0&tz=UCT&cul=en&hip=27989
     def updateStarsMenu( self, menu ):
         stars = [ ]
         for star in self.stars:
