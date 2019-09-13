@@ -596,18 +596,13 @@ class IndicatorLunar:
                 data = None
 #TODO End of hack!
 
-#TODO Modify to handle return type of { } rather than None.
-
         if data is None:
-            data = downloadDataFunction( dataURL ) # Either valid or None.
-            if magnitudeFilterFunction is not None and data is not None:
-                data = magnitudeFilterFunction( data, astroPyephem.MAGNITUDE_MAXIMUM ) # Either valid or None.
+            data = downloadDataFunction( dataURL )
+            if magnitudeFilterFunction is not None:
+                data = magnitudeFilterFunction( data, astroPyephem.MAGNITUDE_MAXIMUM )
 
-            if data is not None:
+            if data:
                 pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBaseName, logging )
-
-#         if data is None:
-#             data = { }
 
         return data
 
