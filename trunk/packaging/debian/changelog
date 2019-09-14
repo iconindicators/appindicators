@@ -22,6 +22,7 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * Preferences no longer allows user configurable TLE/OE data files;
     code became too complicated to manage; defaults work well enough.
   * Added Minor Planets, courtesy of the Minor Planet Center.
+  * Added on-click URL for Minor Planets and Stars.
   * Added hyperlink to the About dialog which links to the error log text file
     (only visible if the underlying file is present).
   * About dialog now pulls the changelog directly from /usr/doc rather than
