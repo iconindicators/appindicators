@@ -878,7 +878,7 @@ class IndicatorLunar:
             menu.append( menuItem ) 
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            baseURL = "https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId="
+            baseURL = "https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId="#TODO Add to top of code
             for name, translatedName in stars:
                 url = baseURL + str( astroPyephem.STARS_TO_HIPPARCOS_IDENTIFIER[ name ] )
                 menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
@@ -903,15 +903,16 @@ class IndicatorLunar:
             menu.append( menuItem )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
+            baseURL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" #TODO Add to top of code
             for name in sorted( bodies ):
-                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name ) )
+                url = self.getCometOrMinorPlanetOnClickURL( name, astronomicalBodyType )
+                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name )
+                menuItem.set_name( url )
+                subMenu.append( menuItem )
                 self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2, "TODO" )
 
-                # Add handler.
-#TODO Fix                
-#                 for child in menuItem.get_submenu().get_children():
-#                     child.set_name( name )
-#                     child.connect( "activate", self.onCometMinorPlanet )
+            for child in subMenu.get_children():
+                child.connect( "activate", self.onMenuItemClick )
 
 
 #TODO Test to make sure comets work (each clause)
@@ -920,22 +921,25 @@ class IndicatorLunar:
 # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
 #TODO Can we put this logic into the main functions of each body and then pass some property down so each menu item gets it?
 #Then there will be one single on click function.
-    def onCometMinorPlanet( self, widget, onClickURL ):
-        print( widget.props.name )
-        if "(" in widget.props.name: # P/1997 T3 (Lagerkvist-Carsenty)
-            id = widget.props.name[ : widget.props.name.find( "(" ) ].strip()
-            print( "(", id )
+    def getCometOrMinorPlanetOnClickURL( self, name, astronomicalBodyType ):
+        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
+            if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
+                id = name[ : name.find( "(" ) ].strip()
+
+            else:
+                postSlash = name[ name.find( "/" ) + 1 : ]
+                if re.search( '\d', postSlash ): # C/1931 AN
+                    id = name
+
+                else: # 97P/Metcalf-Brewington
+                    id = name[ : name.find( "/" ) ].strip()
+
+            url = IndicatorLunar.MINOR_PLANET_CENTER_CLICK_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
 
         else:
-            postSlash = widget.props.name[ widget.props.name.find( "/" ) + 1 : ]
-            if re.search( '\d', postSlash ): # C/1931 AN
-                id = widget.props.name
+            url = "Minor Planets TODO"
 
-            else: # 97P/Metcalf-Brewington
-                id = widget.props.name[ : widget.props.name.find( "/" ) ].strip()
-
-        url = IndicatorLunar.MINOR_PLANET_CENTER_CLICK_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
-        webbrowser.open( url )
+        return url
 
 
     def updateCommonMenu( self, subMenu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
