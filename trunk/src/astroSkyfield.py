@@ -568,6 +568,8 @@ def __bodyrise_bodyset( observer, body ):
     return is_body_up_at
 
 
+#TODO Might be useful:https://github.com/skyfielders/python-skyfield/issues/242
+
 # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
 #
 # Other sources/background:
