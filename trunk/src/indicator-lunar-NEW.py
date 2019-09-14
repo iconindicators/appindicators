@@ -886,7 +886,6 @@ class IndicatorLunar:
                 subMenu.append( menuItem )
                 self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Star, name, 1, 2, url )
 
-#TODO Put into its own function?
             for child in subMenu.get_children():
                 child.connect( "activate", self.onMenuItemClick )
 
@@ -919,8 +918,6 @@ class IndicatorLunar:
 #TODO Need to make it work for minor planets.
 # https://www.iau.org/public/themes/naming
 # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
-#TODO Can we put this logic into the main functions of each body and then pass some property down so each menu item gets it?
-#Then there will be one single on click function.
     def getCometOrMinorPlanetOnClickURL( self, name, astronomicalBodyType ):
         if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
             if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
