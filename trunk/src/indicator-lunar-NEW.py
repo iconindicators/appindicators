@@ -851,7 +851,6 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_TYPE, ) ) ) )
 
 
-#TODO Can we put in an onClick for planets?
     def updatePlanetsMenu( self, menu ):
         planets = [ ]
         for planet in self.planets:
@@ -868,15 +867,6 @@ class IndicatorLunar:
                 self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 1, 2, "TODO" )
 
 
-#TODO Can we put in an onClick for stars?
-# https://www.cosmos.esa.int/
-# https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId=27989
-# https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId=27989&hdId=&tyc1=&tyc2=&tyc3=
-# https://www.heavens-above.com
-# https://www.heavens-above.com/hipentry.aspx?lat=0&lng=0&loc=Unspecified&alt=0&tz=UCT&cul=en&hip=27989
-# hip = astroPyephem.STARS_TO_HIPPARCOS_IDENTIFIER[ star ]
-# url = "https://www.heavens-above.com/hipentry.aspx?lat=0&lng=0&loc=Unspecified&alt=0&tz=UCT&hip=" + str( hip ) 
-
     def updateStarsMenu( self, menu ):
         stars = [ ]
         for star in self.stars:
@@ -884,12 +874,11 @@ class IndicatorLunar:
                 stars.append( [ star, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ star ] ] )
 
         if stars:
-#TODO Get permission!            
             menuItem = Gtk.MenuItem( _( "Stars" ) )
             menu.append( menuItem ) 
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            baseURL = "https://www.heavens-above.com/hipentry.aspx?lat=0&lng=0&loc=Unspecified&alt=0&tz=UCT&cul=en&hip="
+            baseURL = "https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId="
             for name, translatedName in stars:
                 url = baseURL + str( astroPyephem.STARS_TO_HIPPARCOS_IDENTIFIER[ name ] )
                 menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
@@ -1048,6 +1037,7 @@ class IndicatorLunar:
             child.connect( "activate", self.onSatellite )
 
 
+#TODO Eventually see if this can be combined with the generical onclick function.  OR can it be a lamba thingy?
     def onSatellite( self, widget ):
         satelliteTLE = self.satelliteData.get( widget.props.name )
 
