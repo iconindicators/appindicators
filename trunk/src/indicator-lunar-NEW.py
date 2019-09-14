@@ -897,7 +897,6 @@ class IndicatorLunar:
             if self.display( astronomicalBodyType, body ):
                 bodies.append( body )
 
-# TODO The section below is similar enough to planets and stars...can we make a generic function?
         if bodies:
             menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else _( "Minor Planets" ) )
             menu.append( menuItem )
