@@ -810,7 +810,7 @@ class IndicatorLunar:
             menu.append( menuItem )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
+            self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1, "TODO" )
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
 
@@ -837,7 +837,7 @@ class IndicatorLunar:
             menu.append( menuItem )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1 )
+            self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1, "TODO" )
             self.updateEclipseMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
 
 
@@ -865,7 +865,7 @@ class IndicatorLunar:
             menuItem.set_submenu( subMenu )
             for name, translatedName in planets:
                 subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
-                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 1, 2 )
+                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 1, 2, "TODO" )
 
 
 #TODO Can we put in an onClick for stars?
@@ -884,13 +884,22 @@ class IndicatorLunar:
                 stars.append( [ star, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ star ] ] )
 
         if stars:
+#TODO Get permission!            
             menuItem = Gtk.MenuItem( _( "Stars" ) )
             menu.append( menuItem ) 
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
+            baseURL = "https://www.heavens-above.com/hipentry.aspx?lat=0&lng=0&loc=Unspecified&alt=0&tz=UCT&cul=en&hip="
             for name, translatedName in stars:
-                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
-                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Star, name, 1, 2 )
+                url = baseURL + str( astroPyephem.STARS_TO_HIPPARCOS_IDENTIFIER[ name ] )
+                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
+                menuItem.set_name( url )
+                subMenu.append( menuItem )
+                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Star, name, 1, 2, url )
+
+#TODO Put into its own function?
+            for child in subMenu.get_children():
+                child.connect( "activate", self.onMenuItemClick )
 
 
     def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
@@ -907,7 +916,7 @@ class IndicatorLunar:
             menuItem.set_submenu( subMenu )
             for name in sorted( bodies ):
                 subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name ) )
-                self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2 )
+                self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2, "TODO" )
 
                 # Add handler.
 #TODO Fix                
@@ -940,19 +949,31 @@ class IndicatorLunar:
         webbrowser.open( url )
 
 
-    def updateCommonMenu( self, subMenu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell ):
+    def updateCommonMenu( self, subMenu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL ):
         key = ( astronomicalBodyType, nameTag )
         indent = pythonutils.indent( indentUnity, indentGnomeShell )
 
         if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-            subMenu.append( Gtk.MenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
+            menuItem = Gtk.MenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) )
+            menuItem.set_name( onClickURL )
+            subMenu.append( menuItem )
 
         else:
             if key + ( astroPyephem.DATA_SET_DATE_TIME, ) in self.data:
-                subMenu.append( Gtk.MenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) ) )
+                menuItem = Gtk.MenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) )
+                menuItem.set_name( onClickURL )
+                subMenu.append( menuItem )
 
-            subMenu.append( Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
-            subMenu.append( Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
+            menuItem = Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) )
+            menuItem.set_name( onClickURL )
+            subMenu.append( menuItem )
+
+            menuItem = Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) )
+            menuItem.set_name( onClickURL )
+            subMenu.append( menuItem )
+
+
+    def onMenuItemClick( self, widget ): webbrowser.open( widget.props.name )
 
 
     def updateSatellitesMenu( self, menu ):
