@@ -934,35 +934,33 @@ class IndicatorLunar:
             url = IndicatorLunar.MINOR_PLANET_CENTER_CLICK_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
 
         else:
-            url = "Minor Planets TODO"
+            url = "http://Minor-Planets-TODO.com"
 
         return url
 
 
     def updateCommonMenu( self, subMenu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
+
+        def createMenuItem( label, onClickURL, subMenu ):
+            menuItem = Gtk.MenuItem( label )
+            if onClickURL: menuItem.set_name( onClickURL )
+            subMenu.append( menuItem )
+        
         key = ( astronomicalBodyType, nameTag )
         indent = pythonutils.indent( indentUnity, indentGnomeShell )
 
         if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-            menuItem = Gtk.MenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) )
-            if onClickURL: menuItem.set_name( onClickURL )
-            subMenu.append( menuItem )
+            createMenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), onClickURL, subMenu )
 
         else:
             if key + ( astroPyephem.DATA_SET_DATE_TIME, ) in self.data:
-                menuItem = Gtk.MenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) )
-                if onClickURL: menuItem.set_name( onClickURL )
-                subMenu.append( menuItem )
+                createMenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ), onClickURL, subMenu )
 
-            menuItem = Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) )
-            if onClickURL: menuItem.set_name( onClickURL )
-            subMenu.append( menuItem )
-
-            menuItem = Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) )
-            if onClickURL: menuItem.set_name( onClickURL )
-            subMenu.append( menuItem )
+            createMenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ), onClickURL, subMenu )
+            createMenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ), onClickURL, subMenu )
 
 
+#TODO Try to use this also for satellites.
     def onMenuItemClick( self, widget ): webbrowser.open( widget.props.name )
 
 
