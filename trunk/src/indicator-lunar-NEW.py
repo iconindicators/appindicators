@@ -810,7 +810,7 @@ class IndicatorLunar:
             menu.append( menuItem )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1, "TODO" )
+            self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
 
@@ -837,7 +837,7 @@ class IndicatorLunar:
             menu.append( menuItem )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1, "TODO" )
+            self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1 )
             self.updateEclipseMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
 
 
@@ -864,7 +864,7 @@ class IndicatorLunar:
             menuItem.set_submenu( subMenu )
             for name, translatedName in planets:
                 subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
-                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 1, 2, "TODO" )
+                self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 1, 2 )
 
 
     def updateStarsMenu( self, menu ):
@@ -938,27 +938,27 @@ class IndicatorLunar:
         webbrowser.open( url )
 
 
-    def updateCommonMenu( self, subMenu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL ):
+    def updateCommonMenu( self, subMenu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
         key = ( astronomicalBodyType, nameTag )
         indent = pythonutils.indent( indentUnity, indentGnomeShell )
 
         if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
             menuItem = Gtk.MenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) )
-            menuItem.set_name( onClickURL )
+            if onClickURL: menuItem.set_name( onClickURL )
             subMenu.append( menuItem )
 
         else:
             if key + ( astroPyephem.DATA_SET_DATE_TIME, ) in self.data:
                 menuItem = Gtk.MenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) )
-                menuItem.set_name( onClickURL )
+                if onClickURL: menuItem.set_name( onClickURL )
                 subMenu.append( menuItem )
 
             menuItem = Gtk.MenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) )
-            menuItem.set_name( onClickURL )
+            if onClickURL: menuItem.set_name( onClickURL )
             subMenu.append( menuItem )
 
             menuItem = Gtk.MenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) )
-            menuItem.set_name( onClickURL )
+            if onClickURL: menuItem.set_name( onClickURL )
             subMenu.append( menuItem )
 
 
