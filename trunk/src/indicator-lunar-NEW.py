@@ -387,6 +387,7 @@ class IndicatorLunar:
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 30
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
+    COMET_SEARCH_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright",
                                      "minorplanet-oe-" + "critical",
@@ -398,8 +399,7 @@ class IndicatorLunar:
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
-#TODO Might still end up making a duplicate of this: one for comets and one for minor planets.
-    MINOR_PLANET_CENTER_CLICK_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+    MINOR_PLANET_SEARCH_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -439,6 +439,8 @@ class IndicatorLunar:
         _( "Set Time: " ) + SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
         _( "Set Azimuth: " ) + SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
     SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
+
+    STAR_SEARCH_URL = "https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId="
 
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
@@ -878,9 +880,8 @@ class IndicatorLunar:
             menu.append( menuItem ) 
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            baseURL = "https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId="#TODO Add to top of code
             for name, translatedName in stars:
-                url = baseURL + str( astroPyephem.STARS_TO_HIPPARCOS_IDENTIFIER[ name ] )
+                url = IndicatorLunar.STAR_SEARCH_URL + str( astroPyephem.STARS_TO_HIPPARCOS_IDENTIFIER[ name ] )
                 menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
@@ -902,7 +903,6 @@ class IndicatorLunar:
             menu.append( menuItem )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            baseURL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" #TODO Add to top of code
             for name in sorted( bodies ):
                 url = self.getCometOrMinorPlanetOnClickURL( name, astronomicalBodyType )
                 menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name )
@@ -931,7 +931,7 @@ class IndicatorLunar:
                 else: # 97P/Metcalf-Brewington
                     id = name[ : name.find( "/" ) ].strip()
 
-            url = IndicatorLunar.MINOR_PLANET_CENTER_CLICK_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
+            url = IndicatorLunar.COMET_SEARCH_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
 
         else:
             url = "http://Minor-Planets-TODO.com"
