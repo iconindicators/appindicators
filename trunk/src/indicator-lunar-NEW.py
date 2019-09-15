@@ -1079,7 +1079,51 @@ class IndicatorLunar:
     def onMenuItemClick( self, widget ): webbrowser.open( widget.props.name )
 
 
+
+#TODO
+# Circumpolar: Az/Alt
+# Yet to rise (more than 5 minutes away): rise date/time
+# Yet to rise (less than 5 minutes away) or in transit: rise date/time, set date/time, az/alt.
     def updateSatellitesMenu( self, menu ):
+        satellites = [ ]
+        satellitesCircumpolar = [ ]
+        for number in self.satellites:
+            key = ( astroPyephem.AstronomicalBodyType.Satellite, number )
+            if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
+                satellitesCircumpolar.append( [ number, self.satelliteData[ number ].getName(), None ] )
+
+            elif key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
+                satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ] ] )
+
+#TODO Not sure of the logic here...need to check!
+        menuItem = None
+        if self.satellitesSortByDateTime and satellites:
+            satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
+            menuItem = Gtk.MenuItem( _( "Satellites" ) )
+
+        if self.satellitesSortByDateTime and satellitesCircumpolar:
+            satellites = sorted( satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
+            menuItem = Gtk.MenuItem( _( "Satellites (Circumpolar)" ) )
+
+        if not self.satellitesSortByDateTime and ( satellites or satellitesCircumpolar ):
+            satellites = sorted( satellites + satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
+            menuItem = Gtk.MenuItem( _( "Satellites" ) )
+
+        if menuItem is None: return #TODO Hack for when there are no satellites.
+        menu.append( menuItem )  #TODO If no internet and no cache, then no satellites and the menuItem is never set so is uninitialised.
+
+        theMenu = menu
+        indent = 1
+        theMenu = Gtk.Menu()
+        menuItem.set_submenu( theMenu )
+        indent = 0
+
+#         print( "Number of satellites:", len(satellites))#TODO debug
+        for number, name, riseDateTime in satellites:
+            self.updateSatelliteMenu( theMenu, indent, number )
+
+
+    def updateSatellitesMenuORIG( self, menu ):
         satellites = [ ]
         satellitesCircumpolar = [ ]
         for number in self.satellites:
