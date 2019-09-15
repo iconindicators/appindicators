@@ -1029,6 +1029,10 @@ class IndicatorLunar:
                     id = name[ : name.find( "/" ) ].strip()
 
         else:
+            
+#TODO  Got this for 2010 AU118:
+# gvfs-open: TODO: error opening location: Error when getting information for file '/home/bernard/eclipse-workspace/IndicatorLunar/src/TODO': No such file or directory
+            
             url = IndicatorLunar.MINOR_PLANET_SEARCH_URL
             components = name.split( ' ' )
             if components[ 0 ].isnumeric() and components[ 1 ].isalpha(): # 433 Eros
