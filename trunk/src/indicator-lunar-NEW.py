@@ -1047,7 +1047,7 @@ class IndicatorLunar:
             else: # 229762 G!kunll'homdima
                 id = components[ 0 ] 
 
-            print( name, "\t\t\t", id )
+            print( name, "\t\t\t", id ) #TODO debug
         
         return url + id.replace( "/", "%2F" ).replace( " ", "+" )
 
@@ -1074,7 +1074,10 @@ class IndicatorLunar:
 
 
 #TODO Try to use this also for satellites.
-    def onMenuItemClick( self, widget ): webbrowser.open( widget.props.name )
+    def onMenuItemClick( self, widget ): 
+        
+        print( widget.props.name )#TODO Debug
+        webbrowser.open( widget.props.name )
 
 
     def updateSatellitesMenu( self, menu ):
