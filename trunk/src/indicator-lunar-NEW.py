@@ -1012,7 +1012,6 @@ class IndicatorLunar:
                 child.connect( "activate", self.onMenuItemClick )
 
 
-#TODO Test to make sure comets work (each clause)
 #TODO Need to make it work for minor planets.
 # https://www.iau.org/public/themes/naming
 # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
