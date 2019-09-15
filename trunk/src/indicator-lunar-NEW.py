@@ -1005,7 +1005,7 @@ class IndicatorLunar:
                 menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name )
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
-                self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2, "TODO" )
+                self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2, url )
                 subMenu.append( Gtk.SeparatorMenuItem() ) #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
 
             for child in subMenu.get_children():
@@ -1029,10 +1029,6 @@ class IndicatorLunar:
                     id = name[ : name.find( "/" ) ].strip()
 
         else:
-            
-#TODO  Got this for 2010 AU118:
-# gvfs-open: TODO: error opening location: Error when getting information for file '/home/bernard/eclipse-workspace/IndicatorLunar/src/TODO': No such file or directory
-            
             url = IndicatorLunar.MINOR_PLANET_SEARCH_URL
             components = name.split( ' ' )
             if components[ 0 ].isnumeric() and components[ 1 ].isalpha(): # 433 Eros
@@ -1047,8 +1043,6 @@ class IndicatorLunar:
             else: # 229762 G!kunll'homdima
                 id = components[ 0 ] 
 
-            print( name, "\t\t\t", id ) #TODO debug
-        
         return url + id.replace( "/", "%2F" ).replace( " ", "+" )
 
 
@@ -1074,10 +1068,7 @@ class IndicatorLunar:
 
 
 #TODO Try to use this also for satellites.
-    def onMenuItemClick( self, widget ): 
-        
-        print( widget.props.name )#TODO Debug
-        webbrowser.open( widget.props.name )
+    def onMenuItemClick( self, widget ): webbrowser.open( widget.props.name )
 
 
     def updateSatellitesMenu( self, menu ):
