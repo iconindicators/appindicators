@@ -963,6 +963,7 @@ class IndicatorLunar:
             for name, translatedName in planets:
                 subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
                 self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 1, 2 )
+                subMenu.append( Gtk.SeparatorMenuItem() ) #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
 
 
     def updateStarsMenu( self, menu ):
@@ -982,6 +983,7 @@ class IndicatorLunar:
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
                 self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Star, name, 1, 2, url )
+                subMenu.append( Gtk.SeparatorMenuItem() ) #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
 
             for child in subMenu.get_children():
                 child.connect( "activate", self.onMenuItemClick )
@@ -999,11 +1001,12 @@ class IndicatorLunar:
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name in sorted( bodies ):
-                url = self.getCometOrMinorPlanetOnClickURL( name, astronomicalBodyType )
+                url = self.getCometMinorPlanetOnClickURL( name, astronomicalBodyType )
                 menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name )
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
                 self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2, "TODO" )
+                subMenu.append( Gtk.SeparatorMenuItem() ) #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
 
             for child in subMenu.get_children():
                 child.connect( "activate", self.onMenuItemClick )
@@ -1013,7 +1016,7 @@ class IndicatorLunar:
 #TODO Need to make it work for minor planets.
 # https://www.iau.org/public/themes/naming
 # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
-    def getCometOrMinorPlanetOnClickURL( self, name, astronomicalBodyType ):
+    def getCometMinorPlanetOnClickURL( self, name, astronomicalBodyType ):
         if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
             if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
                 id = name[ : name.find( "(" ) ].strip()
@@ -1124,6 +1127,8 @@ class IndicatorLunar:
 
         else:
             subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
+
+        subMenu.append( Gtk.SeparatorMenuItem() ) #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
 
         # Add handler.
         for child in subMenu.get_children():
