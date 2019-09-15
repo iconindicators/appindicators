@@ -2121,11 +2121,6 @@ class IndicatorLunar:
             tmp.append( planet.upper() )
         self.planets = tmp
 
-        tmp = [ ]
-        for star in self.stars:
-            tmp.append( star.upper() )
-        self.stars = tmp
-
         if self.satellites:
             if isinstance( self.satellites[ 0 ], list ):
                 tmp = [ ]
