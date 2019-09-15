@@ -541,7 +541,7 @@ def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
 def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
     key = ( AstronomicalBodyType.Satellite, key )
     currentDateTime = ephemNow
-    endDateTime = ephem.Date( ephemNow + ephem.hour * 24 ) # Stop looking for passes 24 hours from now.
+    endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
     while currentDateTime < endDateTime:
         city = __getCity( data, currentDateTime )
         satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getLine1(), satelliteTLE.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
