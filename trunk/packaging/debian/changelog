@@ -1,27 +1,27 @@
 indicator-lunar (1.0.81-1) xenial; urgency=low
 
-  * Under GNOME Shell, the indicator grinds to a halt and
-    menu items beyond the bottom of the screen are truncated.
-    Therefore, any item/attribute/preference not directly assisting the
+  * Under GNOME Shell, the indicator grinds to a halt and menu items beyond
+    the bottom of the screen are truncated.
+    Consequently, any item/attribute/preference not directly assisting the
     home astronomer to locate an object has been removed.
-  * Bodies which are 'never up' are no longer displayed.
-  * Bodies which are 'always up' display their current Azimuth/Altitude.
-  * Bodies below the horizon display a rise date/time.
-  * Bodies above the horizon display a set date/time and Azimuth/Altitude.
-  * Only visible satellite passes (dawn/dusk) are shown.
-  * Removed Right Ascension and Declination from all items;
-    Azimuth/Altitude are sufficient.
-  * Removed decimal degrees from Azimuth/Altitude.
+  * Removed right ascension and declination from all items;
+    azimuth/altitude are sufficient.
+  * Removed decimal degrees from azimuth/altitude.
   * Removed planetary moons;
-    each effectively has the same Azimuth/Altitude as the parent planet.
+    each effectively has the same azimuth/altitude as the parent planet.
   * Removed werewolf warning percentage from preferences and fixed at 99%.
   * Removed date/time format from preferences; now uses ISO 8601.
-  * On startup, the indicator shows the single menu item "Initialising...".
-    Once the indicator is ready, the full menu is displayed.
   * Preferences no longer allows user configurable TLE/OE data files;
     code became too complicated to manage; defaults work well enough.
-  * Added Minor Planets, courtesy of the Minor Planet Center.
-  * Added on-click URL for Minor Planets and Stars.
+  * On startup, the indicator shows the single menu item "Initialising...".
+    Once the indicator is ready, the full menu is displayed.
+  * Bodies which are 'never up' are no longer displayed.
+  * Bodies which are 'always up' display their current azimuth/altitude.
+  * Bodies below the horizon display a rise date/time.
+  * Bodies above the horizon display a set date/time and azimuth/altitude.
+  * Only visible satellite passes (dawn/dusk) are shown.
+  * Added minor planets, courtesy of the Minor Planet Center.
+  * Added on-click URL for minor planets and stars.
   * Added hyperlink to the About dialog which links to the error log text file
     (only visible if the underlying file is present).
   * About dialog now pulls the changelog directly from /usr/doc rather than
