@@ -1047,6 +1047,8 @@ class IndicatorLunar:
             else: # 229762 G!kunll'homdima
                 id = components[ 0 ] 
 
+            print( name, "\t\t\t", id )
+        
         return url + id.replace( "/", "%2F" ).replace( " ", "+" )
 
 
