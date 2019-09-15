@@ -1012,11 +1012,11 @@ class IndicatorLunar:
                 child.connect( "activate", self.onMenuItemClick )
 
 
-#TODO Need to make it work for minor planets.
-# https://www.iau.org/public/themes/naming
-# https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
+    # https://www.iau.org/public/themes/naming
+    # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
     def getCometMinorPlanetOnClickURL( self, name, astronomicalBodyType ):
         if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
+            url = IndicatorLunar.COMET_SEARCH_URL
             if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
                 id = name[ : name.find( "(" ) ].strip()
 
@@ -1028,12 +1028,22 @@ class IndicatorLunar:
                 else: # 97P/Metcalf-Brewington
                     id = name[ : name.find( "/" ) ].strip()
 
-            url = IndicatorLunar.COMET_SEARCH_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
-
         else:
-            url = "http://Minor-Planets-TODO.com"
+            url = IndicatorLunar.MINOR_PLANET_SEARCH_URL
+            components = name.split( ' ' )
+            if components[ 0 ].isnumeric() and components[ 1 ].isalpha(): # 433 Eros
+                id = components[ 0 ] 
 
-        return url
+            elif components[ 0 ].isnumeric() and components[ 1 ].isnumeric(): # 465402 2008 HW1
+                id = components[ 0 ]
+
+            elif components[ 0 ].isnumeric() and components[ 1 ].isalnum(): # 1999 KL17
+                id = components[ 0 ] + " " + components[ 1 ]
+
+            else: # 229762 G!kunll'homdima
+                id = components[ 0 ] 
+
+        return url + id.replace( "/", "%2F" ).replace( " ", "+" )
 
 
     def updateCommonMenu( self, subMenu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
