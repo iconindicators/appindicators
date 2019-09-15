@@ -24,6 +24,7 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * Added on-click URL for minor planets and stars.
   * Added hyperlink to the About dialog which links to the error log text file
     (only visible if the underlying file is present).
+  * Added preference to hide a body if it is below the horizon (yet to rise).
   * About dialog now pulls the changelog directly from /usr/doc rather than
     a redundant duplicate in the installation directory.
   * Removed old eclipse information.
