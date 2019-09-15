@@ -132,6 +132,7 @@ NAME_TAG_CITY = "CITY"
 NAME_TAG_MOON = "MOON"
 NAME_TAG_SUN = "SUN"
 
+#TODO The indicator frontend expects just the planet names, capitalised similar to pyephem...can we internally here have a mapping?
 PLANET_MERCURY = "MERCURY BARYCENTER"
 PLANET_EARTH = "EARTH"
 PLANET_VENUS = "VENUS BARYCENTER"
@@ -153,6 +154,7 @@ LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
 LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
 LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
+#TODO The indicator frontend expects just the star names, capitalised similar to pyephem...can we internally here have a mapping?
 # https://www.cosmos.esa.int/web/hipparcos/common-star-names
 # This list contained a duplicate Hipparcos Identifier of 68702 for a star with two common names: Agena and Hadar.
 # The official name is Hadar and so Agena has been removed.
@@ -255,7 +257,6 @@ STARS = {
 
 EPHEMERIS_PLANETS = "de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
 EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
-
 
 #TODO Pyephem can return fractional seconds in rise/set date/times...so they have been removed...
 # ...not sure if skyfield will/could have the same problem.
@@ -503,6 +504,7 @@ def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars ):
 # https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
 # The MPC might provide comet / minor planet data in a different format which Skyfield can read.
 def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, observer, ephemeris, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitude ):
+    pass
 #     for star in stars:
 #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
 #         __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
@@ -737,4 +739,4 @@ def createListOfCommonNamedStars():
 
     print( "Done" )
 
-# createListOfCommonNamedStars() #Uncomment to create list of stars.
+#createListOfCommonNamedStars() # Uncomment to create list of stars.
