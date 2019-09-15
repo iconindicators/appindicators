@@ -963,8 +963,10 @@ class IndicatorLunar:
             for name, translatedName in planets:
                 subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
                 self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 1, 2 )
-                subMenu.append( Gtk.SeparatorMenuItem() ) #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
+                separator = Gtk.SeparatorMenuItem() #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
+                subMenu.append( separator ) 
 
+            subMenu.remove( separator )
 
     def updateStarsMenu( self, menu ):
         stars = [ ]
@@ -983,7 +985,10 @@ class IndicatorLunar:
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
                 self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Star, name, 1, 2, url )
-                subMenu.append( Gtk.SeparatorMenuItem() ) #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
+                separator = Gtk.SeparatorMenuItem() #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
+                subMenu.append( separator ) 
+
+            subMenu.remove( separator )
 
             for child in subMenu.get_children():
                 child.connect( "activate", self.onMenuItemClick )
@@ -1006,7 +1011,10 @@ class IndicatorLunar:
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
                 self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2, url )
-                subMenu.append( Gtk.SeparatorMenuItem() ) #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
+                separator = Gtk.SeparatorMenuItem() #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
+                subMenu.append( separator ) 
+
+            subMenu.remove( separator )
 
             for child in subMenu.get_children():
                 child.connect( "activate", self.onMenuItemClick )
