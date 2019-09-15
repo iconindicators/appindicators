@@ -221,6 +221,8 @@ STARS = [
     "WEZEN",
     "ZAURAK" ]
 
+#TODO What is the consequence of ditching the list of stars above and using only the dictionary below?
+
 STARS_TO_HIPPARCOS_IDENTIFIER = {
     "ACHERNAR"          : 7588,
     "ADARA"             : 33579,
