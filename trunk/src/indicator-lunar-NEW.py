@@ -1054,25 +1054,25 @@ class IndicatorLunar:
         return url + id.replace( "/", "%2F" ).replace( " ", "+" )
 
 
-    def updateCommonMenu( self, subMenu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
+    def updateCommonMenu( self, menu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
 
-        def createMenuItem( label, onClickURL, subMenu ):
+        def createMenuItem( label, onClickURL, menu ):
             menuItem = Gtk.MenuItem( label )
             if onClickURL: menuItem.set_name( onClickURL )
-            subMenu.append( menuItem )
+            menu.append( menuItem )
         
         key = ( astronomicalBodyType, nameTag )
         indent = pythonutils.indent( indentUnity, indentGnomeShell )
 
         if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-            createMenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), onClickURL, subMenu )
+            createMenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), onClickURL, menu )
 
         else:
             if key + ( astroPyephem.DATA_SET_DATE_TIME, ) in self.data:
-                createMenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ), onClickURL, subMenu )
+                createMenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ), onClickURL, menu )
 
-            createMenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ), onClickURL, subMenu )
-            createMenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ), onClickURL, subMenu )
+            createMenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ), onClickURL, menu )
+            createMenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ), onClickURL, menu )
 
 
 #TODO Try to use this also for satellites.
@@ -1087,40 +1087,92 @@ class IndicatorLunar:
     def updateSatellitesMenu( self, menu ):
         satellites = [ ]
         satellitesCircumpolar = [ ]
-        for number in self.satellites:
-            key = ( astroPyephem.AstronomicalBodyType.Satellite, number )
-            if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
-                satellitesCircumpolar.append( [ number, self.satelliteData[ number ].getName(), None ] )
+        if self.satellitesSortByDateTime:
+            for number in self.satellites:
+                key = ( astroPyephem.AstronomicalBodyType.Satellite, number )
+                if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
+                    satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ] ] )
 
-            elif key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-                satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ] ] )
+                elif key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
+                    satellitesCircumpolar.append( [ number, self.satelliteData[ number ].getName(), None ] )
 
-#TODO Not sure of the logic here...need to check!
-        menuItem = None
-        if self.satellitesSortByDateTime and satellites:
             satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
-            menuItem = Gtk.MenuItem( _( "Satellites" ) )
+            satellitesCircumpolar = sorted( satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
 
-        if self.satellitesSortByDateTime and satellitesCircumpolar:
-            satellites = sorted( satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
+        else:
+            for number in self.satellites:
+                key = ( astroPyephem.AstronomicalBodyType.Satellite, number )
+                if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data or key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
+                    satellites.append( [ number, self.satelliteData[ number ].getName(), None ] )
+
+            satellites = sorted( satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
+
+        if satellites:
+            menuItem = Gtk.MenuItem( _( "Satellites" ) )
+            menu.append( menuItem )
+            subMenu = Gtk.Menu()
+            menuItem.set_submenu( subMenu )
+            for number, name, riseDateTime in satellites:
+                url = IndicatorLunar.SATELLITE_ON_CLICK_URL. \
+                      replace( IndicatorLunar.SATELLITE_TAG_NAME, name ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_NUMBER, number ). \
+                      replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() )
+                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name )
+                menuItem.set_name( url )
+                subMenu.append( menuItem )
+                self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2, url )
+                separator = Gtk.SeparatorMenuItem() #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
+                subMenu.append( separator ) 
+
+            subMenu.remove( separator )
+
+            for child in subMenu.get_children():
+                child.connect( "activate", self.onMenuItemClick )
+            
+            
+            menuItem = Gtk.MenuItem( _( "Satellites" ) )
+            for number, name, riseDateTime in satellites:
+                self.updateSatelliteMenu( theMenu, indent, number )
+
+        if satellitesCircumpolar:
             menuItem = Gtk.MenuItem( _( "Satellites (Circumpolar)" ) )
+            for number, name, riseDateTime in satellitesCircumpolar:
+                self.updateSatelliteMenu( theMenu, indent, number )
 
-        if not self.satellitesSortByDateTime and ( satellites or satellitesCircumpolar ):
-            satellites = sorted( satellites + satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
-            menuItem = Gtk.MenuItem( _( "Satellites" ) )
 
-        if menuItem is None: return #TODO Hack for when there are no satellites.
-        menu.append( menuItem )  #TODO If no internet and no cache, then no satellites and the menuItem is never set so is uninitialised.
+    def updateSatelliteMenu( self, menu, indent, satelliteNumber ):
+        menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, self.satelliteData[ satelliteNumber ].getName() ) \
+                                                     .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
+                                                     .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ satelliteNumber ].getInternationalDesignator() )
 
-        theMenu = menu
-        indent = 1
-        theMenu = Gtk.Menu()
-        menuItem.set_submenu( theMenu )
-        indent = 0
+        menuItem = Gtk.MenuItem( pythonutils.indent( indent, 1 ) + menuText ) #TODO Indent needs to be adjusted for GNOME Shell.
+        menu.append( menuItem )
 
-#         print( "Number of satellites:", len(satellites))#TODO debug
-        for number, name, riseDateTime in satellites:
-            self.updateSatelliteMenu( theMenu, indent, number )
+        subMenu = Gtk.Menu()
+        menuItem.set_submenu( subMenu )
+
+        key = ( astroPyephem.AstronomicalBodyType.Satellite, satelliteNumber )
+        if key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ) ) )
+
+        elif key + ( astroPyephem.DATA_RISE_AZIMUTH, ) in self.data:
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Rise" ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 1, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 1, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Set" ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 1, 1 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ) ) )
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 1, 1 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ) ) )
+
+        else:
+            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ) ) )
+
+        subMenu.append( Gtk.SeparatorMenuItem() ) #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
+
+        # Add handler.
+        for child in subMenu.get_children():
+            child.set_name( satelliteNumber )
+            child.connect( "activate", self.onSatellite )
 
 
     def updateSatellitesMenuORIG( self, menu ):
@@ -1162,7 +1214,7 @@ class IndicatorLunar:
             self.updateSatelliteMenu( theMenu, indent, number )
 
 
-    def updateSatelliteMenu( self, menu, indent, satelliteNumber ):
+    def updateSatelliteMenuORIG( self, menu, indent, satelliteNumber ):
         menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, self.satelliteData[ satelliteNumber ].getName() ) \
                                                      .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, satelliteNumber ) \
                                                      .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ satelliteNumber ].getInternationalDesignator() )
