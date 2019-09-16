@@ -620,7 +620,7 @@ class IndicatorLunar:
             self.minorPlanetsAddNew = True
             self.satellitesAddNew = True
 
-            # Update data.
+            # Update comet, minor planet and satellite data.
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
                 self.addNewBodies( self.cometData, self.comets )
@@ -640,7 +640,7 @@ class IndicatorLunar:
                 self.addNewBodies( self.satelliteData, self.satellites )
 
             # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
-            # Value is the astronomical data (or equivalent) as a string.
+            # Value is the calculated astronomical data as a string.
             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
                                                           self.latitude, self.longitude, self.elevation,
                                                           self.planets,
@@ -744,15 +744,15 @@ class IndicatorLunar:
     def updateMenu( self ):
         menu = Gtk.Menu()
 
-#TODO Testing
         utcNow = datetime.datetime.utcnow()
-        self.updateMoonMenu( menu )
-        self.updateSunMenu( menu )
-        self.updatePlanetsMenu( menu )
-        self.updateStarsMenu( menu )
-        self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.Comet )
-        self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
-        self.updateSatellitesMenu( menu )
+#TODO Testing
+        self.updateMenuMoon( menu )
+        self.updateMenuSun( menu )
+        self.updateMenuPlanets( menu )
+        self.updateMenuStars( menu )
+        self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.Comet )
+        self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
+        self.updateMenuSatellites( menu )
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
@@ -886,7 +886,7 @@ class IndicatorLunar:
             Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
 
 
-    def updateMoonMenu( self, menu ):
+    def updateMenuMoon( self, menu ):
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
         if self.display( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON ):
             menuItem = Gtk.MenuItem( _( "Moon" ) )
@@ -914,7 +914,7 @@ class IndicatorLunar:
             self.updateEclipseMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
 
 
-    def updateSunMenu( self, menu ):
+    def updateMenuSun( self, menu ):
         key = ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
         if self.display( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN ):
             menuItem = Gtk.MenuItem( _( "Sun" ) )
@@ -935,7 +935,7 @@ class IndicatorLunar:
         menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_TYPE, ) ) ) )
 
 
-    def updatePlanetsMenu( self, menu ):
+    def updateMenuPlanets( self, menu ):
         planets = [ ]
         for planet in self.planets:
             if self.display( astroPyephem.AstronomicalBodyType.Planet, planet ):
@@ -955,7 +955,7 @@ class IndicatorLunar:
             subMenu.remove( separator )
 
 
-    def updateStarsMenu( self, menu ):
+    def updateMenuStars( self, menu ):
         stars = [ ]
         for star in self.stars:
             if self.display( astroPyephem.AstronomicalBodyType.Star, star ):
@@ -981,7 +981,7 @@ class IndicatorLunar:
                 child.connect( "activate", self.onMenuItemClick )
 
 
-    def updateCometsMinorPlanetsMenu( self, menu, astronomicalBodyType ):
+    def updateMenuCometsMinorPlanets( self, menu, astronomicalBodyType ):
         bodies = [ ]
         for body in self.comets if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet else self.minorPlanets:
             if self.display( astronomicalBodyType, body ):
@@ -1061,7 +1061,7 @@ class IndicatorLunar:
 # Circumpolar: Az/Alt
 # Yet to rise (more than 5 minutes away): rise date/time
 # Yet to rise (less than 5 minutes away) or in transit: rise date/time, set date/time, az/alt.
-    def updateSatellitesMenu( self, menu ):
+    def updateMenuSatellites( self, menu ):
         satellites = [ ]
         satellitesCircumpolar = [ ]
         if self.satellitesSortByDateTime:
@@ -1879,6 +1879,7 @@ class IndicatorLunar:
                     self.stars.append( row[ 1 ] )
 
 #TODO Needed if we already do this in the update?
+# If the option to addNewXYZ is not checked, then the user checks it, will the update handle it for us? 
 #             self.comets = [ ]
 #             if not self.cometsAddNew:
 #                 for comet in cometStore:
