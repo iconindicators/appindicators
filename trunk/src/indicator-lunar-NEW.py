@@ -1051,7 +1051,6 @@ class IndicatorLunar:
 
 
     def updateCommonMenu( self, menu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
-
         key = ( astronomicalBodyType, nameTag )
         indent = pythonutils.indent( indentUnity, indentGnomeShell )
 
@@ -1214,7 +1213,7 @@ class IndicatorLunar:
             displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
 
         if displayData is None:
-            displayData = "" # Better to show nothing and let None slip through and crash.
+            displayData = "" # Better to show nothing than let None slip through and crash.
             logging.error( "Unknown key: " + key )
 
         return displayData
