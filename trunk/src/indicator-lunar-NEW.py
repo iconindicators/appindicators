@@ -2002,63 +2002,6 @@ class IndicatorLunar:
             dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
 
 
-#     def onPlanetToggled( self, widget, row, dataStore ):
-#         dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
-#         self.checkboxToggled( dataStore[ row ][ 1 ].upper(), astroPyephem.AstronomicalBodyType.Planet, dataStore[ row ][ 0 ] )
-#         planetName = dataStore[ row ][ 1 ]
-
-
-#TODO Include MP
-#TODO Rename to table toggled or similar?
-    def onCometStarSatelliteToggled( self, widget, row, dataStore, sortStore, astronomicalBodyType ):
-        actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
-        dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
-        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet:
-            bodyTag = dataStore[ actualRow ][ 1 ].upper()
-
-        elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
-            bodyTag = dataStore[ actualRow ][ 1 ] + " " + dataStore[ actualRow ][ 2 ]
-
-        else: # Assume star.
-            bodyTag = dataStore[ actualRow ][ 1 ].upper()
-
-        self.checkboxToggled( bodyTag, astronomicalBodyType, dataStore[ actualRow ][ 0 ] )
-
-
-    def onCometStarSatelliteToggledORIG( self, widget, row, dataStore, sortStore, astronomicalBodyType ):
-        actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
-        dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
-        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet:
-            bodyTag = dataStore[ actualRow ][ 1 ].upper()
-
-        elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
-            bodyTag = dataStore[ actualRow ][ 1 ] + " " + dataStore[ actualRow ][ 2 ]
-
-        else: # Assume star.
-            bodyTag = dataStore[ actualRow ][ 1 ].upper()
-
-        self.checkboxToggled( bodyTag, astronomicalBodyType, dataStore[ actualRow ][ 0 ] )
-
-
-    def checkboxToggled( self, bodyTag, astronomicalBodyType, checked ):
-        # Maintain a record of bodies which are checked and unchecked by the user.
-        # This allows the update of the table in the first tab to happen quickly, rather than doing a slow update on a per-check basis.
-        # Use hashtables (dicts) to maintain the record of checked and unchecked bodies - no need to store a value, so None is used.
-        # Pass in None when doing a pop as it is possible was already checked.
-        t = ( astronomicalBodyType, bodyTag )
-        if checked:
-            self.tagsRemoved.pop( t, None )
-            self.tagsAdded[ t ] = None
-        else:
-            self.tagsRemoved[ t ] = None
-            self.tagsAdded.pop( t, None )
-
-
-#TODO When we decide whether to uncheck all or check all, initialise the flag variable in such a way 
-# that if all satellites for example are initially checked, then the next click should uncheck all.
-#If no satellites are checked, the first click should check all.
-#If one or more satellites are checked, the first click should check all.
-# Ditto for planets, stars, comets and minor planets.
     def onColumnHeaderClick( self, widget, dataStore ):
         atLeastOneItemChecked = False
         atLeastOneItemUnchecked = False
@@ -2080,37 +2023,6 @@ class IndicatorLunar:
 
         for row in range( len( dataStore ) ):
             dataStore[ row ][ 0 ] = value
-
-
-    def onColumnHeaderClickORIG( self, widget, dataStore, sortStore, displayTagsStore, astronomicalBodyType ):
-        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Planet:
-            toggle = self.togglePlanetsTable
-            self.togglePlanetsTable = not self.togglePlanetsTable
-            for row in range( len( dataStore ) ):
-                dataStore[ row ][ 0 ] = bool( not toggle )
-                self.onPlanetToggled( widget, row, dataStore )
-
-        elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or \
-             astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet or \
-             astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite or \
-             astronomicalBodyType == astroPyephem.AstronomicalBodyType.Star:
-            if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
-                toggle = self.toggleCometsTable
-                self.toggleCometsTable = not self.toggleCometsTable
-            elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet:
-                toggle = self.toggleMinorPlanetsTable
-                self.toggleMinorPlanetsTable = not self.toggleMinorPlanetsTable
-            elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
-                toggle = self.toggleSatellitesTable
-                self.toggleSatellitesTable = not self.toggleSatellitesTable
-            else:
-                toggle = self.toggleStarsTable
-                self.toggleStarsTable = not self.toggleStarsTable
-
-            for row in range( len( dataStore ) ):
-                dataStore[ row ][ 0 ] = bool( not toggle )
-                row = str( sortStore.convert_child_path_to_path( Gtk.TreePath.new_from_string( str( row ) ) ) ) # Need to convert the data store row to the sort store row.
-                self.onCometStarSatelliteToggled( widget, row, dataStore, sortStore, astronomicalBodyType )
 
 
     def onTestNotificationClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
