@@ -108,7 +108,7 @@ class IndicatorLunar:
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M:%S" #TODO Ask Oleg if I should drop the seconds or not...does it look odd without seconds?
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M" #:%S" #TODO Ask Oleg if I should drop the seconds or not...does it look odd without seconds?
 
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
@@ -753,13 +753,13 @@ class IndicatorLunar:
 
 #TODO Testing
         utcNow = datetime.datetime.utcnow()
-#         self.updateMoonMenu( menu )
-#         self.updateSunMenu( menu )
-#         self.updatePlanetsMenu( menu )
-#         self.updateStarsMenu( menu )
-#         self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.Comet )
-#         self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
-#         self.updateSatellitesMenu( menu )
+        self.updateMoonMenu( menu )
+        self.updateSunMenu( menu )
+        self.updatePlanetsMenu( menu )
+        self.updateStarsMenu( menu )
+        self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.Comet )
+        self.updateCometsMinorPlanetsMenu( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
+        self.updateSatellitesMenu( menu )
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
