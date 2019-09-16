@@ -464,7 +464,7 @@ def __calculateCometsOrMinorPlanets( ephemNow, data, astronomicalBodyType, comet
                 __calculateCommon( ephemNow, data, body, astronomicalBodyType, key, hideIfBelowHorizon )
 
 
-# Calculates common attributes such as rise/set date/tiem, azimuth/altitude.
+# Calculates common attributes such as rise/set date/time, azimuth/altitude.
 #
 # If hideIfBelowHorzion is True, if a body is below the horizon (but will rise), that body is dropped (no data stored).
 # Otherwise the body will be included.
