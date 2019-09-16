@@ -694,7 +694,7 @@ class IndicatorLunar:
 # End of hack!
 
         if data is None:
-            data = downloadDataFunction( dataURL )
+            data = downloadDataFunction( dataURL, logging )
             if magnitudeFilterFunction is not None:
                 data = magnitudeFilterFunction( data, astroPyephem.MAGNITUDE_MAXIMUM )
 
@@ -895,11 +895,6 @@ class IndicatorLunar:
             Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
 
 
-    def display( self, astronomicalBodyType, nameTag ):
-        return ( astronomicalBodyType, nameTag, astroPyephem.DATA_ALTITUDE ) in self.data or \
-               ( astronomicalBodyType, nameTag, astroPyephem.DATA_RISE_DATE_TIME ) in self.data
-
-
     def updateMoonMenu( self, menu ):
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
         if self.display( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON ):
@@ -967,6 +962,7 @@ class IndicatorLunar:
                 subMenu.append( separator ) 
 
             subMenu.remove( separator )
+
 
     def updateStarsMenu( self, menu ):
         stars = [ ]
@@ -1099,17 +1095,17 @@ class IndicatorLunar:
             satellites = sorted( satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
 
         if satellites:
-            self.updateSatelliteMenu( menu, _( "Satellites" ), satellites )
+            self.__updateSatellitesMenu( menu, _( "Satellites" ), satellites )
 
         if satellitesCircumpolar:
-            self.updateSatelliteMenu( menu, _( "Satellites (Circumpolar)" ), satellitesCircumpolar )
+            self.__updateSatellitesMenu( menu, _( "Satellites (Circumpolar)" ), satellitesCircumpolar )
 
 
 #TODO Test each clause...will have to adjust date/time and lat/long.
 # Circumpolar: Az/Alt
 # Yet to rise (more than 5 minutes away): rise date/time
 # Yet to rise (less than 5 minutes away) or in transit: rise date/time, set date/time, az/alt.
-    def updateSatelliteMenu( self, menu, label, satellites ):
+    def __updateSatellitesMenu( self, menu, label, satellites ):
         menuItem = Gtk.MenuItem( _( label ) )
         menu.append( menuItem )
         subMenu = Gtk.Menu()
@@ -1160,6 +1156,11 @@ class IndicatorLunar:
 
 
     def onMenuItemClick( self, widget ): webbrowser.open( widget.props.name )
+
+
+    def display( self, astronomicalBodyType, nameTag ):
+        return ( astronomicalBodyType, nameTag, astroPyephem.DATA_ALTITUDE ) in self.data or \
+               ( astronomicalBodyType, nameTag, astroPyephem.DATA_RISE_DATE_TIME ) in self.data
 
 
     def getDisplayData( self, key, dateTimeFormat = None ):

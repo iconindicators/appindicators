@@ -44,19 +44,13 @@ class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, S
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
 DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
-DATA_DAWN = "DAWN"
-DATA_DUSK = "DUSK"
 DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
 DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
 DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
 DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
-DATA_ELEVATION = "ELEVATION" # Internally used for city.
 DATA_FIRST_QUARTER = "FIRST QUARTER"
 DATA_FULL = "FULL"
 DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
-DATA_LATITUDE = "LATITUDE" # Internally used for city.
-DATA_LONGITUDE = "LONGITUDE" # Internally used for city.
-DATA_MESSAGE = "MESSAGE"
 DATA_NEW = "NEW"
 DATA_PHASE = "PHASE"
 DATA_RISE_AZIMUTH = "RISE AZIMUTH"
@@ -65,16 +59,18 @@ DATA_SET_AZIMUTH = "SET AZIMUTH"
 DATA_SET_DATE_TIME = "SET DATE TIME"
 DATA_THIRD_QUARTER = "THIRD QUARTER"
 
-#TODO Are these sub-lists needed?  They are not referenced in the indicator front end.
+DATA_INTERNAL = [
+    DATA_BRIGHT_LIMB,
+    DATA_ILLUMINATION ]
+
+#TODO Are these sub-lists needed?  Might be needed for the Preferences dialgo.
 DATA_COMET = [
-    DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
     DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
     DATA_SET_DATE_TIME ]
 
 DATA_MINOR_PLANET = [
-    DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
     DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
@@ -89,7 +85,6 @@ DATA_MOON = [
     DATA_ECLIPSE_LONGITUDE,
     DATA_ECLIPSE_TYPE,
     DATA_ILLUMINATION,
-    DATA_MESSAGE,
     DATA_PHASE,
     DATA_RISE_DATE_TIME,
     DATA_SET_DATE_TIME ]
@@ -97,12 +92,10 @@ DATA_MOON = [
 DATA_PLANET = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
-    DATA_MESSAGE,
     DATA_RISE_DATE_TIME,
     DATA_SET_DATE_TIME ]
 
 DATA_SATELLITE = [
-    DATA_MESSAGE,
     DATA_RISE_AZIMUTH,
     DATA_RISE_DATE_TIME,
     DATA_SET_AZIMUTH,
@@ -111,20 +104,16 @@ DATA_SATELLITE = [
 DATA_STAR = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
-    DATA_MESSAGE,
     DATA_RISE_DATE_TIME,
     DATA_SET_DATE_TIME ]
 
 DATA_SUN = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
-    DATA_DAWN,
-    DATA_DUSK,
     DATA_ECLIPSE_DATE_TIME,
     DATA_ECLIPSE_LATITUDE,
     DATA_ECLIPSE_LONGITUDE,
     DATA_ECLIPSE_TYPE,
-    DATA_MESSAGE,
     DATA_RISE_DATE_TIME,
     DATA_SET_DATE_TIME ]
 
@@ -144,15 +133,6 @@ PLANET_NEPTUNE = "NEPTUNE BARYCENTER"
 PLANET_PLUTO = "PLUTO BARYCENTER"
 
 PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
-
-LUNAR_PHASE_FULL_MOON = "FULL_MOON"
-LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
-LUNAR_PHASE_THIRD_QUARTER = "THIRD_QUARTER"
-LUNAR_PHASE_WANING_CRESCENT = "WANING_CRESCENT"
-LUNAR_PHASE_NEW_MOON = "NEW_MOON"
-LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
-LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
-LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
 #TODO The indicator frontend expects just the star names, capitalised similar to pyephem...can we internally here have a mapping?
 # https://www.cosmos.esa.int/web/hipparcos/common-star-names
@@ -258,6 +238,15 @@ STARS = {
 EPHEMERIS_PLANETS = "de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
 EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
 
+LUNAR_PHASE_FULL_MOON = "FULL_MOON"
+LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
+LUNAR_PHASE_THIRD_QUARTER = "THIRD_QUARTER"
+LUNAR_PHASE_WANING_CRESCENT = "WANING_CRESCENT"
+LUNAR_PHASE_NEW_MOON = "NEW_MOON"
+LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
+LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
+LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
+
 #TODO Pyephem can return fractional seconds in rise/set date/times...so they have been removed...
 # ...not sure if skyfield will/could have the same problem.
 
@@ -279,37 +268,18 @@ def getAstronomicalInformation( utcNow,
                                 magnitude ):
 
     data = { }
-
-#TODO May not be required.
-#     # Used internally to create the observer/city...removed before passing back to the caller.
-#     data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ] = str( latitude )
-#     data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ] = str( longitude )
-#     data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ] = str( elevation )
-
     timeScale = load.timescale()
     utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
     ephemerisPlanets = load( EPHEMERIS_PLANETS )
     observer = __getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
 
-    import datetime
-    utcNow = datetime.datetime.utcnow()
     __calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
-    print( "updateMoon:", ( datetime.datetime.utcnow() - utcNow ) )
-
-    utcNow = datetime.datetime.utcnow()
     __calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
-    print( "updateSun:", ( datetime.datetime.utcnow() - utcNow ) )
-
-    utcNow = datetime.datetime.utcnow()
     __calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets )
-    print( "updatePlanets:", ( datetime.datetime.utcnow() - utcNow ) )
-
-    utcNow = datetime.datetime.utcnow()
     with load.open( EPHEMERIS_STARS ) as f:
         ephemerisStars = hipparcos.load_dataframe( f )
 
     __calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars )
-    print( "updateStars:", ( datetime.datetime.utcnow() - utcNow ) )
 
 #     Comet https://github.com/skyfielders/python-skyfield/issues/196
 #     utcNow = datetime.datetime.utcnow()
@@ -323,11 +293,6 @@ def getAstronomicalInformation( utcNow,
 #     utcNow = datetime.datetime.utcnow()
     __calculateSatellites( utcNowSkyfield, data, timeScale, satellites, satelliteData )
 #     print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
-
-#TODO May not be required.
-#     del data[ ( None, NAME_TAG_CITY, DATA_LATITUDE ) ]
-#     del data[ ( None, NAME_TAG_CITY, DATA_LONGITUDE ) ]
-#     del data[ ( None, NAME_TAG_CITY, DATA_ELEVATION ) ]
 
     return data
 
