@@ -20,7 +20,7 @@
 
 from urllib.request import urlopen
 
-import re
+import pythonutils, re
 
 
 class OE:
@@ -43,18 +43,15 @@ class OE:
 
 # Downloads OE data for an object in XEphem format from the URL.
 #
-# On success, returns a non-empty dict:
+# Returns a dictionary:
 #    Key: object name (upper cased)
 #    Value: OE object
 #
-# Otherwise, returns None and may write to the log.
+# Otherwise, returns an empty dictionary and may write to the log.
 def download( url, logging = None ):
     oeData = { }
     try:
-        data = urlopen( url, timeout = 1 ).read().decode( "utf8" ).splitlines()
-#TODO Was on laptop, no internet and got stuck here...no timeout ....why?  Look at old code for timeout.   Ditto for satellites.
-#TODO Perhaps don't bother with the check internet function.
-#Instead just try and download (with a timeout of 2 secs say) and if we cannot download or get a bad parse, that is bad.
+        data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
         for i in range( 0, len( data ) ):
             if not data[ i ].startswith( "#" ):
                 oe = OE( data[ i ].strip() )

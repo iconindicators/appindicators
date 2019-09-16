@@ -20,6 +20,8 @@
 
 from urllib.request import urlopen
 
+import pythonutils
+
 
 class TLE:
     def __init__( self, title, line1, line2 ):
@@ -61,18 +63,15 @@ class TLE:
 
 # Downloads TLE data from the URL.
 #
-# On success, returns a non-empty dict:
+# Returns a dictionary:
 #    Key: Satellite number
 #    Value: TLE object
 #
-# Otherwise, returns None and may write to the log.
+# Otherwise, returns an empty dictionary and may write to the log.
 def download( url, logging = None ):
     tleData = { }
     try:
-        data = urlopen( url, timeout = 1 ).read().decode( "utf8" ).splitlines()
-#TODO Was on laptop, no internet and got stuck here...no timeout ....why?  Look at old code for timeout.   Ditto for satellites.
-#TODO Perhaps don't bother with the check internet function.
-#Instead just try and download (with a timeout of 2 secs say) and if we cannot download or get a bad parse, that is bad.
+        data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
         for i in range( 0, len( data ), 3 ):
             tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
             tleData[ ( tle.getNumber() ) ] = tle
