@@ -575,13 +575,6 @@ class IndicatorLunar:
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satelliteNotifications = { }
 
-#TODO Do these need to live here?  Do we need to recall the state globally or maybe just within each calling of prefs? Needed at all?
-        self.toggleCometsTable = True
-        self.toggleMinorPlanetsTable = True
-        self.togglePlanetsTable = True
-        self.toggleSatellitesTable = True
-        self.toggleStarsTable = True
-
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorLunar.LOG ) ] )
 
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorLunar.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
