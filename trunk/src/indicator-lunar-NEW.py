@@ -2020,8 +2020,14 @@ class IndicatorLunar:
 
         else:
             svgFile = IndicatorLunar.ICON_SATELLITE
-            utcNow = str( datetime.datetime.utcnow() ).split( '.' )[ 0 ] # Remove fractional seconds.
-            utcNowPlusTenMinutes = str( datetime.datetime.utcnow() + datetime.timedelta( minutes = 10 ) ).split( '.' )[ 0 ] # Remove fractional seconds.
+
+            utcNow = str( datetime.datetime.utcnow() )
+            if utcNow.index( '.' ) > -1:
+                utcNow = utcNow.split( '.' )[ 0 ] # Remove fractional seconds.
+
+            utcNowPlusTenMinutes = str( datetime.datetime.utcnow() + datetime.timedelta( minutes = 10 ) )
+            if utcNowPlusTenMinutes.index( '.' ) > -1:
+                utcNowPlusTenMinutes = utcNowPlusTenMinutes.split( '.' )[ 0 ] # Remove fractional seconds.
 
             # Mock data...
             summary = summary. \
