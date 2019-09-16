@@ -586,9 +586,7 @@ class IndicatorLunar:
         self.indicator.set_menu( menu )
         menu.show_all()
 
-        self.dialogLock = threading.Lock()
-        Notify.init( INDICATOR_NAME )
-
+        # Flush comet, minor planet and satellite caches.
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
         pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
         for cacheBaseName in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
@@ -599,11 +597,10 @@ class IndicatorLunar:
         for oldIcon in oldIcons:
             os.remove( oldIcon )
 
-#TODO Needed?
+        Notify.init( INDICATOR_NAME )
+        self.dialogLock = threading.Lock()
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
-
         self.loadConfig()
-        
         GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update )
 
 
@@ -790,15 +787,9 @@ class IndicatorLunar:
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
         lunarPhase = self.data[ key + ( astroPyephem.DATA_PHASE, ) ]
-#TODO Given that the % is now fixed at 99%, only really need to ensure the phase is Waxing Gibbous or Full Moon, right?
-        phaseIsBetweenNewAndFullInclusive = \
-            ( lunarPhase == astroPyephem.LUNAR_PHASE_NEW_MOON ) or \
-            ( lunarPhase == astroPyephem.LUNAR_PHASE_WAXING_CRESCENT ) or \
-            ( lunarPhase == astroPyephem.LUNAR_PHASE_FIRST_QUARTER ) or \
-            ( lunarPhase == astroPyephem.LUNAR_PHASE_WAXING_GIBBOUS ) or \
-            ( lunarPhase == astroPyephem.LUNAR_PHASE_FULL_MOON )
 
-        if phaseIsBetweenNewAndFullInclusive and \
+#TODO Maybe set to 98 rather than 99?
+        if ( lunarPhase == astroPyephem.LUNAR_PHASE_WAXING_GIBBOUS or lunarPhase == astroPyephem.LUNAR_PHASE_FULL_MOON ) and \
            lunarIlluminationPercentage >= 99 and \
            ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) < datetime.datetime.utcnow() ):
 
