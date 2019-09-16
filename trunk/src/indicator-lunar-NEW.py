@@ -790,6 +790,7 @@ class IndicatorLunar:
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
         lunarPhase = self.data[ key + ( astroPyephem.DATA_PHASE, ) ]
+#TODO Given that the % is now fixed at 99%, only really need to ensure the phase is Waxing Gibbous or Full Moon, right?
         phaseIsBetweenNewAndFullInclusive = \
             ( lunarPhase == astroPyephem.LUNAR_PHASE_NEW_MOON ) or \
             ( lunarPhase == astroPyephem.LUNAR_PHASE_WAXING_CRESCENT ) or \
