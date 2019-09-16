@@ -1473,7 +1473,7 @@ class IndicatorLunar:
             "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCheckbox, planetStore, None, astroPyephem.AstronomicalBodyType.Planet )
+        renderer_toggle.connect( "toggled", self.onCheckbox, planetStore, None, None )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore )
@@ -1496,10 +1496,7 @@ class IndicatorLunar:
         for star in stars:
             starStore.append( star )
 
-        starStoreSort = Gtk.TreeModelSort( model = starStore )
-        starStoreSort.set_sort_column_id( 2, Gtk.SortType.ASCENDING )
-
-        tree = Gtk.TreeView( starStoreSort )
+        tree = Gtk.TreeView( starStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.set_tooltip_text( _(
             "Check a star to display in the menu.\n\n" + \
@@ -1507,15 +1504,13 @@ class IndicatorLunar:
             "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCheckbox, starStore, starStoreSort, astroPyephem.AstronomicalBodyType.Star )
+        renderer_toggle.connect( "toggled", self.onCheckbox, starStore, None, None )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 )
-        treeViewColumn.set_sort_column_id( 2 )
-        tree.append_column( treeViewColumn )
+        tree.append_column( Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -1537,24 +1532,20 @@ class IndicatorLunar:
         for comet in self.cometData:
             cometStore.append( ( comet in self.comets, comet ) )
 
-        cometStoreSort = Gtk.TreeModelSort( model = cometStore )
-        cometStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
-
-        tree = Gtk.TreeView( cometStoreSort )
+        tree = Gtk.TreeView( cometStore )
         tree.set_tooltip_text( _(
             "Check a comet to display in the menu.\n\n" + \
             "Clicking the header of the first column\n" + \
             "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCheckbox, cometStore, cometStoreSort, astroPyephem.AstronomicalBodyType.Comet )
+        renderer_toggle.connect( "toggled", self.onCheckbox, cometStore, None, None )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Comet" ), Gtk.CellRendererText(), text = 1 )
-        tree.append_column( treeViewColumn )
+        tree.append_column( Gtk.TreeViewColumn( _( "Comet" ), Gtk.CellRendererText(), text = 1 ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -1568,24 +1559,20 @@ class IndicatorLunar:
         for minorPlanet in self.minorPlanetData:
             minorPlanetStore.append( ( minorPlanet in self.minorPlanets, minorPlanet ) )
 
-        minorPlanetStoreSort = Gtk.TreeModelSort( model = minorPlanetStore )
-        minorPlanetStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
-
-        tree = Gtk.TreeView( minorPlanetStoreSort )
+        tree = Gtk.TreeView( minorPlanetStore )
         tree.set_tooltip_text( _(
             "Check a minor planet to display in the menu.\n\n" + \
             "Clicking the header of the first column\n" + \
             "will toggle all checkboxes." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCheckbox, minorPlanetStore, minorPlanetStoreSort, astroPyephem.AstronomicalBodyType.MinorPlanet )
+        renderer_toggle.connect( "toggled", self.onCheckbox, minorPlanetStore, None, None )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, minorPlanetStore )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Minor Planet" ), Gtk.CellRendererText(), text = 1 )
-        tree.append_column( treeViewColumn )
+        tree.append_column( Gtk.TreeViewColumn( _( "Minor Planet" ), Gtk.CellRendererText(), text = 1 ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -1993,13 +1980,13 @@ class IndicatorLunar:
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
 
 
-    def onCheckbox( self, widget, row, dataStore, sortStore, astronomicalBodyType ):
-        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Planet: 
-            dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
-
-        else: # Star, comet, minor planet, satellite.
+    def onCheckbox( self, widget, row, dataStore, sortStore = None, astronomicalBodyType = None ):
+        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
             actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
             dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
+
+        else: # Planet, star, comet, minor planet.
+            dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
 
 
     def onColumnHeaderClick( self, widget, dataStore ):
