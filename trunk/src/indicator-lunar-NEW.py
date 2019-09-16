@@ -88,8 +88,6 @@ class IndicatorLunar:
     AUTHOR = "Bernard Giannetti"
     VERSION = "1.0.81"
     ICON = INDICATOR_NAME
-    ICON_BASE_NAME = "." + INDICATOR_NAME + "-illumination-icon-"
-    ICON_BASE_PATH = tempfile.gettempdir()
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -97,8 +95,10 @@ class IndicatorLunar:
 #TODO Put back to 5
     START_UP_DELAY_IN_SECONDS = 1 # Used to delay the update function which potentially takes a long time.
 
-    SVG_FULL_MOON_FILE = ICON_BASE_PATH + "/." + INDICATOR_NAME + "-fullmoon-icon" + ".svg"
-    SVG_SATELLITE_ICON = INDICATOR_NAME + "-satellite"
+    ICON_BASE_PATH = tempfile.gettempdir()
+    ICON_BASE_NAME = ICON_BASE_PATH + "/." + INDICATOR_NAME
+    ICON_FULL_MOON = ICON_BASE_NAME + "-fullmoon-icon" + ".svg" # Dynamically created in the temporary directory (typically /tmp).
+    ICON_SATELLITE = ICON_BASE_NAME + "-satellite" # Located in /usr/share/icons
 
     ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." )
     ABOUT_CREDIT_ECLIPSE = _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" )
@@ -602,7 +602,7 @@ class IndicatorLunar:
             pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
 
         # Remove old icons.
-        oldIcons = glob.glob( IndicatorLunar.ICON_BASE_PATH + "/" + IndicatorLunar.ICON_BASE_NAME + "*" )
+        oldIcons = glob.glob( IndicatorLunar.ICON_BASE_NAME + "*" )
         for oldIcon in oldIcons:
             os.remove( oldIcon )
 
@@ -770,7 +770,7 @@ class IndicatorLunar:
         parsedOutput = self.indicatorText
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
-                parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
+                parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) ) #TODO What if a tag is a satellite rise/set?  This is a different date/time format.
 
 #TODO For satellites, tags will contain both the name and number...so ensure satellites work!
 
@@ -783,11 +783,7 @@ class IndicatorLunar:
         # So change the name each time - using the current date/time.
         #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
         #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
-        iconFilename = IndicatorLunar.ICON_BASE_PATH + \
-                       "/" + \
-                       IndicatorLunar.ICON_BASE_NAME + \
-                       str( datetime.datetime.utcnow().strftime( "%y%m%d%H%M%S" ) ) + \
-                       ".svg"
+        iconFilename = IndicatorLunar.ICON_BASE_NAME + "-" + str( datetime.datetime.utcnow().strftime( "%Y%m%d%H%M%S" ) ) + ".svg"
 
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )
@@ -816,9 +812,10 @@ class IndicatorLunar:
             if self.werewolfWarningSummary == "":
                 summary = " " # The notification summary text cannot be empty (at least on Unity).
 
-            self.createIcon( 100, None, IndicatorLunar.SVG_FULL_MOON_FILE )
-            Notify.Notification.new( summary, self.werewolfWarningMessage, IndicatorLunar.SVG_FULL_MOON_FILE ).show()
-            os.remove( IndicatorLunar.SVG_FULL_MOON_FILE ) #TODO Is this a race?  Will the file be deleted before being displayed?
+            if not os.path.exists( IndicatorLunar.ICON_FULL_MOON ):
+                self.createIcon( 100, None, IndicatorLunar.ICON_FULL_MOON )
+
+            Notify.Notification.new( summary, self.werewolfWarningMessage, IndicatorLunar.ICON_FULL_MOON ).show()
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
@@ -893,7 +890,7 @@ class IndicatorLunar:
                       replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
                       replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime )
 
-            Notify.Notification.new( summary, message, IndicatorLunar.SVG_SATELLITE_ICON ).show()
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
 
 
     def updateMoonMenu( self, menu ):
@@ -1221,10 +1218,10 @@ class IndicatorLunar:
 
 
     # Converts a UTC datetime string to a local datetime string in the given format.
-    def toLocalDateTimeString( self, utcDateTimeString, format ):
+    def toLocalDateTimeString( self, utcDateTimeString, outputFormat ):
         utcDateTime = datetime.datetime.strptime( utcDateTimeString, astroPyephem.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
         localDateTime = utcDateTime.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None )
-        return localDateTime.strftime( format )
+        return localDateTime.strftime( outputFormat )
 
 
     # Creates an SVG icon file representing the moon given the illumination and bright limb angle.
@@ -2017,10 +2014,12 @@ class IndicatorLunar:
         message = pythonutils.getTextViewText( messageTextView )
 
         if isFullMoon:
-            svgFile = IndicatorLunar.SVG_FULL_MOON_FILE
-            self.createIcon( 100, None, svgFile )
+            if not os.path.exists( IndicatorLunar.ICON_FULL_MOON ):
+                svgFile = IndicatorLunar.ICON_FULL_MOON
+                self.createIcon( 100, None, svgFile )
+
         else:
-            svgFile = IndicatorLunar.SVG_SATELLITE_ICON
+            svgFile = IndicatorLunar.ICON_SATELLITE
             utcNow = str( datetime.datetime.utcnow() )
             utcNowPlusTenMinutes = str( datetime.datetime.utcnow() + datetime.timedelta( minutes = 10 ) )
 
@@ -2047,10 +2046,6 @@ class IndicatorLunar:
             summary = " " # The notification summary text must not be empty (at least on Unity).
 
         Notify.Notification.new( summary, message, svgFile ).show()
-
-#TODO This deletes the icon before the notification can show it.
-#         if isFullMoon:
-#             os.remove( svgFile )
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
