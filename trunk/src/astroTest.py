@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-import astroPyephem, astroSkyfield, datetime
+import astroPyephem, astroSkyfield, datetime, logging, orbitalelement, pythonutils, twolineelement
 
 
 def compareResults( resultsPyephem, resultsSkyfield, astronomicalBodyType, nameTagPyephem, nameTagSkyfield, dataTagsPyephem, dataTagsSkyfield ):
@@ -40,20 +40,21 @@ def compareResults( resultsPyephem, resultsSkyfield, astronomicalBodyType, nameT
             print( "\t", dataTag, resultsPyephem[ keyPyephem ], resultsSkyfield[ keySkyfield ] )
 
 
+logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( "astroTest.log" ) ] )
 utcNow = datetime.datetime.utcnow()
 latitude = -33.8599722
 longitude = 151.2111111
 elevation = 100
 magnitude = 6
+hideIfBelowHorizon = False
 
 
 #TODO rise/set not yet implemented in Skyfield
 # https://github.com/skyfielders/python-skyfield/issues/115
-# tleData = satellite.download( "https://celestrak.com/NORAD/elements/visual.txt" )
-# satellites = [ ]
-# for key in tleData:
-#     satellites.append( key )
-
+tleData = twolineelement.download( "https://celestrak.com/NORAD/elements/visual.txt", logging )
+satellites = [ ]
+for key in tleData:
+    satellites.append( key )
 
 print( "Running Skyfield..." )
 resultsSkyfield = astroSkyfield.getAstronomicalInformation( utcNow,
@@ -70,10 +71,11 @@ resultsPyephem = astroPyephem.getAstronomicalInformation( utcNow,
                                                           latitude, longitude, elevation,
                                                           astroPyephem.PLANETS,
                                                           astroPyephem.STARS,
-                                                          [], [], #satellites, tleData,
+                                                          satellites, tleData,
                                                           [], [],
                                                           [], [],
-                                                          magnitude )
+                                                          magnitude,
+                                                          hideIfBelowHorizon )
 
 print( "Crunching results..." )
 compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, astroSkyfield.NAME_TAG_MOON, astroPyephem.DATA_MOON, astroSkyfield.DATA_MOON )
