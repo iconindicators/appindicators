@@ -2056,9 +2056,7 @@ class IndicatorLunar:
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
-
-#TODO Can the city ever be empty?  So do we need the check below?
-        if city != "" and city in astroPyephem.getCities(): # Populate the latitude/longitude/elevation if the city exists, otherwise let the user specify.
+        if city in astroPyephem.getCities(): 
             theLatitude, theLongitude, theElevation = astroPyephem.getLatitudeLongitudeElevation( city )
             latitude.set_text( str( theLatitude ) )
             longitude.set_text( str( theLongitude ) )
