@@ -87,7 +87,7 @@ class IndicatorLunar:
 
     AUTHOR = "Bernard Giannetti"
     VERSION = "1.0.81"
-    ICON = INDICATOR_NAME
+    ICON = INDICATOR_NAME # Located in /usr/share/icons
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
