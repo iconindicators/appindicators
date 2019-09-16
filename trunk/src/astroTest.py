@@ -64,7 +64,8 @@ resultsSkyfield = astroSkyfield.getAstronomicalInformation( utcNow,
                                                             [], [], #satellites, tleData,
                                                             [], [],
                                                             [], [],
-                                                            magnitude )
+                                                            magnitude,
+                                                          hideIfBelowHorizon )
 
 print( "Running Pyephem..." )
 resultsPyephem = astroPyephem.getAstronomicalInformation( utcNow,

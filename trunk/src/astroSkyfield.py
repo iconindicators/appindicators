@@ -265,7 +265,8 @@ def getAstronomicalInformation( utcNow,
                                 satellites, satelliteData,
                                 comets, cometData,
                                 minorPlanets, minorPlanetData,
-                                magnitude ):
+                                magnitude,
+                                hideIfBelowHorizon ):
 
     data = { }
     timeScale = load.timescale()
@@ -273,20 +274,20 @@ def getAstronomicalInformation( utcNow,
     ephemerisPlanets = load( EPHEMERIS_PLANETS )
     observer = __getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
 
-    __calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
-    __calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
-    __calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets )
+    __calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
+    __calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
+    __calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets, hideIfBelowHorizon )
     with load.open( EPHEMERIS_STARS ) as f:
         ephemerisStars = hipparcos.load_dataframe( f )
 
-    __calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars )
+    __calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars, hideIfBelowHorizon )
 
 #     Comet https://github.com/skyfielders/python-skyfield/issues/196
 #     utcNow = datetime.datetime.utcnow()
-#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude )
+#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude, hideIfBelowHorizon )
 #     print( "updateComets:", ( datetime.datetime.utcnow() - utcNow ) )
 #     utcNow = datetime.datetime.utcnow()
-#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude )
+#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude, hideIfBelowHorizon )
 #     print( "updateMinorPlanets:", ( datetime.datetime.utcnow() - utcNow ) )
 
 #     Satellite https://github.com/skyfielders/python-skyfield/issues/115
@@ -305,7 +306,7 @@ def getAstronomicalInformation( utcNow,
 # http://www.geoastro.de/altazsunmoon/index.htm
 # http://www.geoastro.de/sundata/index.html
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
-def __calculateMoon( utcNow, data, timeScale, observer, ephemeris ):
+def __calculateMoon( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
     key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
     moon = ephemeris[ "MOON" ]
     neverUp = __calculateCommon( utcNow, data, timeScale, observer, moon, AstronomicalBodyType.Moon, NAME_TAG_MOON )
@@ -429,7 +430,7 @@ def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
     return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
 
-def __calculateSun( utcNow, data, timeScale, observer, ephemeris ):
+def __calculateSun( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
     sun = ephemeris[ "SUN" ]
     neverUp = __calculateCommon( utcNow, data, timeScale, observer, sun, AstronomicalBodyType.Sun, NAME_TAG_SUN )
     if not neverUp:
@@ -448,7 +449,7 @@ def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
     data[ key + ( DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
-def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets ):
+def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets, hideIfBelowHorizon ):
     for planet in planets:
         __calculateCommon( utcNow, data, timeScale, observer, ephemeris[ planet ], AstronomicalBodyType.Planet, planet )
 
@@ -459,7 +460,7 @@ def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets ):
 # skyfield might support somehow star names out of the box...
 # ...so that means taking the data, selecting only ephemerisStars of magnitude 2.5 or so and keep those.
 # See revision 999 for code to filter ephemerisStars by magnitude.
-def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars ):
+def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars, hideIfBelowHorizon ):
     for star in stars:
 #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
         __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
@@ -468,7 +469,7 @@ def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars ):
 #TODO  
 # https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
 # The MPC might provide comet / minor planet data in a different format which Skyfield can read.
-def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, observer, ephemeris, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitude ):
+def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, observer, ephemeris, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitude, hideIfBelowHorizon ):
     pass
 #     for star in stars:
 #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
