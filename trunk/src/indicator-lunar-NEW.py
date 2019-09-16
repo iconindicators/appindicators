@@ -98,7 +98,7 @@ class IndicatorLunar:
     ICON_BASE_PATH = tempfile.gettempdir()
     ICON_BASE_NAME = ICON_BASE_PATH + "/." + INDICATOR_NAME
     ICON_FULL_MOON = ICON_BASE_NAME + "-fullmoon-icon" + ".svg" # Dynamically created in the temporary directory (typically /tmp).
-    ICON_SATELLITE = ICON_BASE_NAME + "-satellite" # Located in /usr/share/icons
+    ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
 
     ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." )
     ABOUT_CREDIT_ECLIPSE = _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" )
@@ -2020,8 +2020,8 @@ class IndicatorLunar:
 
         else:
             svgFile = IndicatorLunar.ICON_SATELLITE
-            utcNow = str( datetime.datetime.utcnow() )
-            utcNowPlusTenMinutes = str( datetime.datetime.utcnow() + datetime.timedelta( minutes = 10 ) )
+            utcNow = str( datetime.datetime.utcnow() ).split( '.' )[ 0 ] # Remove fractional seconds.
+            utcNowPlusTenMinutes = str( datetime.datetime.utcnow() + datetime.timedelta( minutes = 10 ) ).split( '.' )[ 0 ] # Remove fractional seconds.
 
             # Mock data...
             summary = summary. \
