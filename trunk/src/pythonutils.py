@@ -41,7 +41,7 @@ TERMINAL_GNOME = "gnome-terminal"
 TERMINAL_LXDE = "lxterminal"
 TERMINAL_XFCE = "xfce4-terminal"
 
-URL_TIMEOUT_IN_SECONDS = 2 #TODO Was 10...leave as is?
+URL_TIMEOUT_IN_SECONDS = 2
 
 USER_DIRECTORY_CACHE = ".cache"
 USER_DIRECTORY_CONFIG = ".config"
@@ -166,7 +166,6 @@ def onRadio( self, *widgets ):
         widget.set_sensitive( self.get_active() )
 
 
-#TODO For a notebook page with a single table, don't need a grid, so check where grids are used and remove.
 def createGrid():
     spacing = 10
     grid = Gtk.Grid()
