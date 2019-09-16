@@ -18,8 +18,11 @@
 # General utilities.
 
 
+import gi
+gi.require_version('Gtk', '3.0')
+
 from gi.repository import Gtk
-import datetime, gzip, json, logging.handlers, os, pickle, shutil, socket, subprocess, sys
+import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess, sys
 
 
 AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
