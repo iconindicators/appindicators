@@ -2048,8 +2048,9 @@ class IndicatorLunar:
 
         Notify.Notification.new( summary, message, svgFile ).show()
 
-        if isFullMoon:
-            os.remove( svgFile )
+#TODO This deletes the icon before the notification can show it.
+#         if isFullMoon:
+#             os.remove( svgFile )
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
