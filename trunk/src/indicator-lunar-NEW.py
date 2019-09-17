@@ -747,13 +747,13 @@ class IndicatorLunar:
         menu = Gtk.Menu()
 
         utcNow = datetime.datetime.utcnow()
-#         self.updateMenuMoon( menu )
-#         self.updateMenuSun( menu )
-#         self.updateMenuPlanets( menu )
-#         self.updateMenuStars( menu )
-#         self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.Comet )
-#         self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
-#         self.updateMenuSatellites( menu )
+        self.updateMenuMoon( menu )
+        self.updateMenuSun( menu )
+        self.updateMenuPlanets( menu )
+        self.updateMenuStars( menu )
+        self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.Comet )
+        self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
+        self.updateMenuSatellites( menu )
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
@@ -1119,7 +1119,7 @@ class IndicatorLunar:
                 self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ), url, subMenu )
 
             elif key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-                self.createMenuItem( pythonutils.indent( 0, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
+                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
 
             else:
                 self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ), url, subMenu )
