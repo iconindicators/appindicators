@@ -1109,6 +1109,7 @@ class IndicatorLunar:
             menuItem.set_name( url )
             subMenu.append( menuItem )
 
+#TODO Suspect that the 0, 1, 1, 0, 1, 1 should be 1, 2, 2, 1, 2, 2  so wait for satellites to transit.
             key = ( astroPyephem.AstronomicalBodyType.Satellite, number )
             if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data and key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
                 self.createMenuItem( pythonutils.indent( 0, 2 ) + _( "Rise" ), url, subMenu )
@@ -1166,6 +1167,7 @@ class IndicatorLunar:
              key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
                 if dateTimeFormat is None:
                     displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ).replace( ' ', '  ' )
+
                 else:
                     displayData = self.toLocalDateTimeString( self.data[ key ], dateTimeFormat )
 
@@ -1173,6 +1175,7 @@ class IndicatorLunar:
             latitude = self.data[ key ]
             if latitude[ 0 ] == "-":
                 displayData = latitude[ 1 : ] + "° " + _( "S" )
+
             else:
                 displayData = latitude + "° " +_( "N" )
 
@@ -1180,18 +1183,23 @@ class IndicatorLunar:
             longitude = self.data[ key ]
             if longitude[ 0 ] == "-":
                 displayData = longitude[ 1 : ] + "° " + _( "E" )
+
             else:
                 displayData = longitude + "° " +_( "W" )
 
         elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_TYPE:
             if self.data[ key ] == eclipse.ECLIPSE_TYPE_ANNULAR:
                 displayData = _( "Annular" )
+
             elif self.data[ key ] == eclipse.ECLIPSE_TYPE_HYBRID:
                 displayData = _( "Hybrid (Annular/Total)" )
+
             elif self.data[ key ] == eclipse.ECLIPSE_TYPE_PARTIAL:
                 displayData = _( "Partial" )
+
             elif self.data[ key ] == eclipse.ECLIPSE_TYPE_PENUMBRAL:
                 displayData = _( "Penumbral" )
+
             else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
                 displayData = _( "Total" )
 
