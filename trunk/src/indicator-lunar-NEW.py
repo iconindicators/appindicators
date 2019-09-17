@@ -615,11 +615,6 @@ class IndicatorLunar:
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
-#TODO Testing
-            self.cometsAddNew = True
-            self.minorPlanetsAddNew = True
-            self.satellitesAddNew = True
-
             # Update comet, minor planet and satellite data.
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
@@ -714,6 +709,9 @@ class IndicatorLunar:
                 if dateTime > utcNowPlusOneMinute and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
+#TODO Found that a star was due to set and the update must have happened such that the star was at 0 altitude and 
+#yet still appeared in the menu (should have been dropped).
+#Maybe need to set the threshold for <= 0 rather than < 0.
         print( int( ( nextUpdateTime - utcNow ).total_seconds() ) ) #TODO Remove
         return int( ( nextUpdateTime - utcNow ).total_seconds() )
 
