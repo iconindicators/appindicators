@@ -528,7 +528,6 @@ class IndicatorLunar:
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 18
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_MENU_TEXT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
-    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + _( " now rising..." )
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
         _( "Number: " ) + SATELLITE_TAG_NUMBER_TRANSLATION + "\n" + \
         _( "International Designator: " ) + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n" + \
@@ -536,6 +535,7 @@ class IndicatorLunar:
         _( "Rise Azimuth: " ) + SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n" + \
         _( "Set Time: " ) + SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
         _( "Set Azimuth: " ) + SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
+    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + _( " now rising..." )
     SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
 
     STAR_SEARCH_URL = "https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId="
@@ -550,11 +550,6 @@ class IndicatorLunar:
     MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE = _( "Cannot access the data source\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_DATA_NO_DATA = _( "No data!" )
     MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE = _( "No data found at\n<a href=\'{0}'>{0}</a>" )
-    MESSAGE_SATELLITE_IS_CIRCUMPOLAR = _( "Satellite is circumpolar." )
-    MESSAGE_SATELLITE_NEVER_RISES = _( "Satellite never rises." )
-    MESSAGE_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME = _( "No passes within the next two days." )
-    MESSAGE_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
-    MESSAGE_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
 #TODO Likely need to put these into a dict, keyed off from the astro messages.
 #Then in getdisplaydata for the message type, use the astroPyephem.message and pull the translated/text message from this dict.
@@ -562,11 +557,6 @@ class IndicatorLunar:
     MESSAGE_TRANSLATION_DATA_CANNOT_ACCESS_DATA_SOURCE = _( "Cannot access the data source\n<a href=\'{0}'>{0}</a>" )
     MESSAGE_TRANSLATION_DATA_NO_DATA = _( "No data!" )
     MESSAGE_TRANSLATION_DATA_NO_DATA_FOUND_AT_SOURCE = _( "No data found at\n<a href=\'{0}'>{0}</a>" )
-    MESSAGE_TRANSLATION_SATELLITE_IS_CIRCUMPOLAR = _( "Satellite is circumpolar." )
-    MESSAGE_TRANSLATION_SATELLITE_NEVER_RISES = _( "Satellite never rises." )
-    MESSAGE_TRANSLATION_SATELLITE_NO_PASSES_WITHIN_TIME_FRAME = _( "No passes within the next two days." )
-    MESSAGE_TRANSLATION_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
-    MESSAGE_TRANSLATION_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
 #TODO Want a better expression!
     MESSAGE_DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
