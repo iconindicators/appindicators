@@ -1110,7 +1110,7 @@ class IndicatorLunar:
 
 #TODO Suspect that the 0, 1, 1, 0, 1, 1 should be 1, 2, 2, 1, 2, 2  so wait for satellites to transit.
             key = ( astroPyephem.AstronomicalBodyType.Satellite, number )
-            if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data and key + ( astroPyephem.DATA_AZIMUTH, ) in self.data:
+            if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data and key + ( astroPyephem.DATA_RISE_AZIMUTH, ) in self.data:
                 self.createMenuItem( pythonutils.indent( 0, 2 ) + _( "Rise" ), url, subMenu )
                 self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
                 self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ), url, subMenu )
@@ -1122,7 +1122,7 @@ class IndicatorLunar:
                 self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
 
             else:
-                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ), url, subMenu )
+                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ), url, subMenu )
                 self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ), url, subMenu )
 
             separator = Gtk.SeparatorMenuItem()
