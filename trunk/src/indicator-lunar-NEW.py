@@ -746,13 +746,13 @@ class IndicatorLunar:
         menu = Gtk.Menu()
 
         utcNow = datetime.datetime.utcnow()
-        self.updateMenuMoon( menu )
-        self.updateMenuSun( menu )
-        self.updateMenuPlanets( menu )
-        self.updateMenuStars( menu )
-        self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.Comet )
-        self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
-        self.updateMenuSatellites( menu )
+#         self.updateMenuMoon( menu )
+#         self.updateMenuSun( menu )
+#         self.updateMenuPlanets( menu )
+#         self.updateMenuStars( menu )
+#         self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.Comet )
+#         self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
+#         self.updateMenuSatellites( menu )
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
@@ -1325,22 +1325,21 @@ class IndicatorLunar:
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
-        COLUMN_ASTRONOICAL_BODY_TYPE = 0
-        COLUMN_TAG = 1
-        COLUMN_TRANSLATED_TAG = 2
-        COLUMN_VALUE = 3
-        displayTagsStore = Gtk.ListStore( int, str, str, str ) # Astronomical body type, tag, translated tag, value.
+        COLUMN_TAG = 0
+        COLUMN_TRANSLATED_TAG = 1
+        COLUMN_VALUE = 2
+        displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.initialiseDisplayTagsStore( displayTagsStore )
-        tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
-        for key in self.data.keys():
-            if key[ 2 ] not in astroPyephem.DATA_INTERNAL:
-#                 self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
+
+#         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
+#         for key in self.data.keys():
+#             if key[ 2 ] not in astroPyephem.DATA_INTERNAL:
 #TODO Need to handle satellite tags...
 #When to remove the satellite name from the tag?  Here or at render time or when?
-                tag = "[" + key[ 1 ] + " " + key[ 2 ] + "]"
-                if tag in tags:
-                    i = tags.index( tag )
-                    tags[ i ] = ""
+#                 tag = "[" + key[ 1 ] + " " + key[ 2 ] + "]"
+#                 if tag in tags:
+#                     i = tags.index( tag )
+#                     tags[ i ] = ""
 
 #TODO What is happening here?
 # Are we stripping tags from the indicator text which no longer appear in the table?
@@ -1350,12 +1349,14 @@ class IndicatorLunar:
 #Before making changes consider what happens if we leave unknown tags here, but then at render time is that an issue?
 #Not sure what to do now...
 # Leave tags in here, but what if a user has added in there own tags...can they do that?
-        unknownTags = [ ]
-        for tag in tags:
-            if re.match( "\[[^\[^\]]+\]", tag ) is not None:
-                self.indicatorText = self.indicatorText.replace( tag, "" )
+#         unknownTags = [ ]
+#         for tag in tags:
+#             if re.match( "\[[^\[^\]]+\]", tag ) is not None:
+#                 self.indicatorText = self.indicatorText.replace( tag, "" )
 
-        indicatorText.set_text( self.translateTags( displayTagsStore, True, self.indicatorText ) ) # Need to translate the tags into the local language.
+#TODO Assuming any satellite tags will only contain the satellite number (not name and intl desig)
+# need to pre-process the indicator text to insert the satellite name and intl desig.
+        indicatorText.set_text( self.translateTags( displayTagsStore, True, self.indicatorText ) ) # Translate tags into local language.
 
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
         displayTagsStoreSort.set_sort_column_id( COLUMN_TRANSLATED_TAG, Gtk.SortType.ASCENDING )
@@ -1852,9 +1853,8 @@ class IndicatorLunar:
                 elevation.grab_focus()
                 continue
 
-#TODO If a satellite is added, do we remove the satellite name here, 
-# or save it and remove it when displayed (displayed in the Preferences and displayed in the final label)?
-#             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
+#TODO Need a function that finds tags for satellites and then removes the name and int desig.  Do this after the translate function.
+            self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
             self.cometsAddNew = cometsAddNewCheckbox.get_active()
@@ -1918,6 +1918,7 @@ class IndicatorLunar:
         # Populate the display store using current data.
         for key in self.data.keys():
             if key[ 2 ] not in astroPyephem.DATA_INTERNAL:
+
                 astronomicalBodyType = key[ 0 ]
                 bodyTag = key[ 1 ]
                 dataTag = key[ 2 ]
@@ -1935,7 +1936,7 @@ class IndicatorLunar:
                 else:
                     translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets and stars.
 
-                displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, value ] )
+                displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
 #TODO Can we put the below code into a function(s) or smart loops or inner functions?
         # Add in bodies/tags which are not present in the current data.
@@ -1944,14 +1945,14 @@ class IndicatorLunar:
             for dataTag in astroPyephem.DATA_COMET:
                 if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
                     translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
-                    displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
 
         astronomicalBodyType = astroPyephem.AstronomicalBodyType.MinorPlanet
         for bodyTag in self.minorPlanetData:
             for dataTag in astroPyephem.DATA_MINOR_PLANET:
                 if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
                     translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
-                    displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
 
         astronomicalBodyType = astroPyephem.AstronomicalBodyType.Satellite
         for bodyTag in self.satelliteData:
@@ -1960,38 +1961,37 @@ class IndicatorLunar:
                     satelliteName = self.satelliteData[ bodyTag ].getName()
                     satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator() #TODO NOt sure if we need this.
                     translatedTag = satelliteName + " " + bodyTag + " " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
-                    displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
 
         astronomicalBodyType = astroPyephem.AstronomicalBodyType.Moon
         bodyTag = astroPyephem.NAME_TAG_MOON
         for dataTag in astroPyephem.DATA_MOON:
             if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
                 translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets and stars.
-                displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+                displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
 
         astronomicalBodyType = astroPyephem.AstronomicalBodyType.Sun
         bodyTag = astroPyephem.NAME_TAG_SUN
         for dataTag in astroPyephem.DATA_SUN:
             if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
                 translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets and stars.
-                displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+                displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
 
         astronomicalBodyType = astroPyephem.AstronomicalBodyType.Planet
         for bodyTag in astroPyephem.PLANETS:
             for dataTag in astroPyephem.DATA_PLANET:
                 if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
                     translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets and stars.
-                    displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
 
         astronomicalBodyType = astroPyephem.AstronomicalBodyType.Star
         for bodyTag in astroPyephem.STARS:
             for dataTag in astroPyephem.DATA_STAR:
                 if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
                     translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets and stars.
-                    displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
 
 
-#TODO Check!
     def translateTags( self, tagsStore, originalToLocal, text ):
         # The tags store contains at least 2 columns (additional columns are ignored).
         # First column contains the original/untranslated tags.
@@ -2013,6 +2013,7 @@ class IndicatorLunar:
                 if row[ i ] == tag:
                     translatedText = translatedText.replace( "[" + tag + "]", "[" + row[ j ] + "]" )
                     iter = None # Break and move on to next tag.
+
                 else:
                     iter = tagsStore.iter_next( iter )
 
