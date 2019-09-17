@@ -1929,6 +1929,80 @@ class IndicatorLunar:
 
                 elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite: # Don't translate names; add in name/designator.
                     satelliteName = self.satelliteData[ bodyTag ].getName()
+                    satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
+                    translatedTag = satelliteName + " " + bodyTag + " " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+
+                else:
+                    translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+
+                displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
+
+#TODO Can we put the below code into a function(s) or smart loops or inner functions?
+        # Add in bodyTags/tags which are not present in the current data.
+        items = [ [ astroPyephem.AstronomicalBodyType.Comet, self.cometData, astroPyephem.DATA_COMET ],
+                  [ astroPyephem.AstronomicalBodyType.MinorPlanet, self.minorPlanetData, astroPyephem.DATA_MINOR_PLANET ] ]
+
+        for item in items:
+            astronomicalBodyType = item[ 0 ]
+            bodyTags = item[ 1 ]
+            dataTags = item[ 2 ]
+            for bodyTag in bodyTags:
+                for dataTag in dataTags:
+                    if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
+                        translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+
+        astronomicalBodyType = astroPyephem.AstronomicalBodyType.Satellite
+        for bodyTag in self.satelliteData:
+            for dataTag in astroPyephem.DATA_SATELLITE:
+                if not ( astroPyephem.AstronomicalBodyType.Satellite, bodyTag, dataTag ) in self.data:
+                    satelliteName = self.satelliteData[ bodyTag ].getName()
+                    satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
+                    translatedTag = satelliteName + " " + bodyTag + " " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+
+        items = [ [ astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, astroPyephem.DATA_MOON ],
+                  [ astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_SUN ] ]
+
+        for item in items:
+            astronomicalBodyType = item[ 0 ]
+            bodyTag = item[ 1 ]
+            dataTags = item[ 2 ]
+            for dataTag in dataTags:
+                if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
+                    translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+
+        items = [ [ astroPyephem.AstronomicalBodyType.Planet, astroPyephem.PLANETS, astroPyephem.DATA_PLANET ],
+                  [ astroPyephem.AstronomicalBodyType.Star, astroPyephem.STARS, astroPyephem.DATA_STAR ] ]
+
+        for item in items:
+            astronomicalBodyType = item[ 0 ]
+            bodyTags = item[ 1 ]
+            dataTags = item[ 2 ]
+            for bodyTag in bodyTags:
+                for dataTag in dataTags:
+                    if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
+                        translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+
+
+    def initialiseDisplayTagsStoreORIG( self, displayTagsStore ):
+        # Populate the display store using current data.
+        for key in self.data.keys():
+            if key[ 2 ] not in astroPyephem.DATA_INTERNAL:
+
+                astronomicalBodyType = key[ 0 ]
+                bodyTag = key[ 1 ]
+                dataTag = key[ 2 ]
+                value = self.getDisplayData( key )
+
+                if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or \
+                   astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet: # Don't translate the names.
+                    translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+
+                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite: # Don't translate names; add in name/designator.
+                    satelliteName = self.satelliteData[ bodyTag ].getName()
                     satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator() #TODO NOt sure if we need this.
                     translatedTag = satelliteName + " " + bodyTag + " " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
 
