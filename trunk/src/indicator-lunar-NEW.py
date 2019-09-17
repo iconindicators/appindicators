@@ -720,8 +720,6 @@ class IndicatorLunar:
 
     def updateMenu( self ):
         menu = Gtk.Menu()
-
-        utcNow = datetime.datetime.utcnow()
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
         self.updateMenuPlanets( menu )
