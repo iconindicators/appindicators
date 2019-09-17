@@ -1913,7 +1913,6 @@ class IndicatorLunar:
         dialog.destroy()
 
 
-#TODO Ensure when double clicking a satellite tag, we get the right one given we now include the int desig (which was not included before).
     def initialiseDisplayTagsStore( self, displayTagsStore ):
         # Populate the display store using current data.
         for key in self.data.keys():
@@ -2000,6 +1999,7 @@ class IndicatorLunar:
         if originalToLocal:
             i = 0
             j = 1
+
         else:
             i = 1
             j = 0
@@ -2020,7 +2020,6 @@ class IndicatorLunar:
         return translatedText
 
 
-#TODO Check!
     def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, translatedTagColumnIndex, indicatorTextEntry ):
         model, treeiter = tree.get_selection().get_selected()
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
@@ -2146,6 +2145,7 @@ class IndicatorLunar:
         if self.city is None:
             self.city = self.getDefaultCity()
             self.latitude, self.longitude, self.elevation = astroPyephem.getLatitudeLongitudeElevation( self.city )
+
         else:
             self.elevation = config.get( IndicatorLunar.CONFIG_CITY_ELEVATION )
             self.latitude = config.get( IndicatorLunar.CONFIG_CITY_LATITUDE )
