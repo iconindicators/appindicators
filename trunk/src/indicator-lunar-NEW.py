@@ -638,8 +638,9 @@ class IndicatorLunar:
             if self.satellitesAddNew:
                 self.addNewBodies( self.satelliteData, self.satellites )
 
-            # Key is a tuple of AstronomicalBodyType, a name tag and data tag.
-            # Value is the calculated astronomical data as a string.
+            # Update backend.  Returned object is a dictionary:
+            #    Key is a tuple of AstronomicalBodyType, a name tag and data tag.
+            #    Value is the calculated astronomical data as a string.
             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
                                                           self.latitude, self.longitude, self.elevation,
                                                           self.planets,
@@ -744,7 +745,6 @@ class IndicatorLunar:
         menu = Gtk.Menu()
 
         utcNow = datetime.datetime.utcnow()
-#TODO Testing
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
         self.updateMenuPlanets( menu )
@@ -1163,9 +1163,9 @@ class IndicatorLunar:
              key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
              key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
                 if dateTimeFormat is None:
-                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ).replace( ' ', '  ' ) #TODO Does the double space appear in Unity and GNOME Shell?
+                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ).replace( ' ', '  ' ) #TODO Double space appears in GNOME Shell.  What about Unity?
                 else:
-                    displayData = self.toLocalDateTimeString( self.data[ key ], dateTimeFormat ) #TODO Do we need to add the double space as above?
+                    displayData = self.toLocalDateTimeString( self.data[ key ], dateTimeFormat )
 
         elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_LATITUDE:
             latitude = self.data[ key ]
