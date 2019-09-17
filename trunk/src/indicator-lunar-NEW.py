@@ -1324,6 +1324,10 @@ class IndicatorLunar:
 #TODO Now that we can drop a body if below the horizon, that body may appear/disappear from the table depending on time of day.
 #The moon for example will drop in and out and so too will the tag.
 #So maybe don't drop stuff out...and if something is checked (when not checked on creating the dialog), add that object in (with data tags).
+#
+# Could just show every possible body (whether checked or not) and the possible data tags for each body but NOT show data.
+# Or show data for bodies that have data.
+#Then a user can add any tag they want, but tags are removed at render time.
         COLUMN_ASTRONOICAL_BODY_TYPE = 0
         COLUMN_TAG = 1
         COLUMN_TRANSLATED_TAG = 2
@@ -1506,11 +1510,11 @@ class IndicatorLunar:
 
         notebook.append_page( box, Gtk.Label( _( "Planets / Stars" ) ) )
 
-
 #TODO For each of comets, minor planets and satellites, check if the underlying data (tle/oe) is empty or not.  
 # If empty, don't show the table but a label with message instead.
 #May need to have individual variable names for each of the scrolledWindows to hide/show.
 # Or maybe show only the items the user previously selected.
+# Or just show an empty table (if no data could be loaded, a log message will be written).
         # Comets.
         box = Gtk.Box( spacing = 20 )
 
