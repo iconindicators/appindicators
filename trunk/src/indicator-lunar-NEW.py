@@ -569,6 +569,7 @@ class IndicatorLunar:
     MESSAGE_TRANSLATION_SATELLITE_UNABLE_TO_COMPUTE_NEXT_PASS = _( "Unable to compute next pass!" )
     MESSAGE_TRANSLATION_SATELLITE_VALUE_ERROR = _( "ValueError" )
 
+#TODO Want a better expression!
     MESSAGE_DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
 
 
@@ -1318,17 +1319,6 @@ class IndicatorLunar:
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
-#TODO Hopefully not needed!
-        self.tagsAdded = { }
-        self.tagsRemoved = { }
-
-#TODO Now that we can drop a body if below the horizon, that body may appear/disappear from the table depending on time of day.
-#The moon for example will drop in and out and so too will the tag.
-#So maybe don't drop stuff out...and if something is checked (when not checked on creating the dialog), add that object in (with data tags).
-#
-# Could just show every possible body (whether checked or not) and the possible data tags for each body but NOT show data.
-# Or show data for bodies that have data.
-#Then a user can add any tag they want, but tags are removed at render time.
         COLUMN_ASTRONOICAL_BODY_TYPE = 0
         COLUMN_TAG = 1
         COLUMN_TRANSLATED_TAG = 2
@@ -1346,9 +1336,7 @@ class IndicatorLunar:
                     i = tags.index( tag )
                     tags[ i ] = ""
 
-        
-
-#TODO Not sure what is happening here?
+#TODO What is happening here?
 # Are we stripping tags from the indicator text which no longer appear in the table?
 # Maybe just leave the tags there and the user can manually remove after they see displayed?  Ask Oleg.
 # Tried the text [DEF][MOON PHASE][ABC] and commented out the code below and the ABC/DEF tags did not appear in the final label.  Why?
@@ -1430,7 +1418,6 @@ class IndicatorLunar:
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 3, 1, 1 )
 
-#TODO Ensure this checkbox and that for comets/minorplanets have a listener that checks/unchecks the tables of comets/minorplanets/sats.
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
@@ -1827,10 +1814,6 @@ class IndicatorLunar:
         dialog.set_icon_name( IndicatorLunar.ICON )
         dialog.show_all()
 
-        # Last thing to do after everything else is built.
-#TODO Hopefully no longer needed.        
-#         notebook.connect( "switch-page", self.onSwitchPage, displayTagsStore )
-
         while True:
             if dialog.run() != Gtk.ResponseType.OK:
                 break
@@ -2002,49 +1985,7 @@ class IndicatorLunar:
                     displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
 
 
-    def initialiseDisplayTagsStoreORIG( self, displayTagsStore ):
-        for key in self.data.keys():
-            if key[ 2 ] not in astroPyephem.DATA_INTERNAL:
-                astronomicalBodyType = key[ 0 ]
-                bodyTag = key[ 1 ]
-                dataTag = key[ 2 ]
-                value = self.getDisplayData( key )
-
-                if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or \
-                   astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet: # Don't translate the names of comets or minor planets.
-                    translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
-
-                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite: # Don't translate names and add in satellite name/designator.
-                    satelliteName = self.satelliteData[ bodyTag ].getName()
-#                     satelliteInternationalDesignator = self.satelliteData[ satelliteNumber ].getInternationalDesignator() #TODO NOt sure if we need this.
-                    translatedTag = satelliteName + " " + bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
-
-                else:
-                    translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets and stars.
-
-                displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, value ] )
-
-
-    def appendToDisplayTagsStoreORIG( self, key, value, displayTagsStore ):
-        astronomicalBodyType = key[ 0 ]
-        bodyTag = key[ 1 ]
-        dataTag = key[ 2 ]
-
-        if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet or \
-           astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet: # Don't translate the names of comets or minor planets.
-            translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
-
-        elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite: # Don't translate names and add in satellite name/designator.
-            satelliteName = self.satelliteData[ bodyTag ].getName()
-#             satelliteInternationalDesignator = self.satelliteData[ satelliteNumber ].getInternationalDesignator() #TODO NOt sure if we need this.
-            translatedTag = satelliteName + " " + bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
-
-        else:
-            translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ] # Translate names of planets and stars.
-
-        displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, value ] )
-
-
+#TODO Check!
     def translateTags( self, tagsStore, originalToLocal, text ):
         # The tags store contains at least 2 columns (additional columns are ignored).
         # First column contains the original/untranslated tags.
@@ -2072,6 +2013,7 @@ class IndicatorLunar:
         return translatedText
 
 
+#TODO Check!
     def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, translatedTagColumnIndex, indicatorTextEntry ):
         model, treeiter = tree.get_selection().get_selected()
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
@@ -2161,48 +2103,6 @@ class IndicatorLunar:
             latitude.set_text( str( theLatitude ) )
             longitude.set_text( str( theLongitude ) )
             elevation.set_text( str( theElevation ) )
-
-
-#TODO Why not just clear the display tags store and just add stuff as needed?
-# Is the code below that much faster than simply clear all and add?
-#If we wait until we switch to the first tab to update the table, then need a handle to all the UI elements to poll each of them.
-#Maybe pass in lists of elements (list of checkboxes, list of tables/stores, etc)?
-    def onSwitchPage( self, notebook, page, pageNumber, displayTagsStore ):
-        if True: return
-        if pageNumber == 0: # User has clicked the first tab.
-            displayTagsStore.clear() # List of lists, each sublist contains the tag, translated tag, value.
-
-            # Only add tags for data which has not been removed.
-            for key in self.data.keys():
-
-                astronomicalBodyType = key[ 0 ]
-                bodyTag = key[ 1 ]
-
-                if ( astronomicalBodyType, bodyTag ) not in self.tagsRemoved and \
-                   ( astronomicalBodyType, bodyTag ) not in self.tagsAdded:
-                    self.appendToDisplayTagsStore( key, self.getDisplayData( key ), displayTagsStore )
-
-            # Add tags for newly checked items (duplicates have been avoided by the above code).
-            for key in self.tagsAdded:
-                astronomicalBodyType = key[ 0 ]
-                bodyTag = key[ 1 ]
-                if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
-                    tags = IndicatorLunar.DATA_TAGS_COMET
-                if astronomicalBodyType == astroPyephem.AstronomicalBodyType.MinorPlanet:
-                    tags = IndicatorLunar.DATA_TAGS_MINOR_PLANET
-                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Moon:
-                    tags = IndicatorLunar.DATA_TAGS_MOON
-                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Planet:
-                    tags = IndicatorLunar.DATA_TAGS_PLANET
-                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite:
-                    tags = IndicatorLunar.DATA_TAGS_SATELLITE
-                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Star:
-                    tags = IndicatorLunar.DATA_TAGS_STAR
-                elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Sun:
-                    tags = IndicatorLunar.DATA_TAGS_SUN
-
-                for tag in tags:
-                    self.appendToDisplayTagsStore( key + ( tag, ), IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH, displayTagsStore )
 
 
     def addNewBodies( self, data, bodies ):
