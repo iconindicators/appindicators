@@ -65,15 +65,15 @@ DATA_INTERNAL = [
 
 #TODO Are these sub-lists needed?  Might be needed for the Preferences dialgo.
 DATA_COMET = [
-    DATA_RISE_AZIMUTH,
+    DATA_ALTITUDE,
+    DATA_AZIMUTH,
     DATA_RISE_DATE_TIME,
-    DATA_SET_AZIMUTH,
     DATA_SET_DATE_TIME ]
 
 DATA_MINOR_PLANET = [
-    DATA_RISE_AZIMUTH,
+    DATA_ALTITUDE,
+    DATA_AZIMUTH,
     DATA_RISE_DATE_TIME,
-    DATA_SET_AZIMUTH,
     DATA_SET_DATE_TIME ]
 
 DATA_MOON = [
