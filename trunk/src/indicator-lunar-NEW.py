@@ -486,7 +486,6 @@ class IndicatorLunar:
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 30
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
-    COMET_SEARCH_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright",
                                      "minorplanet-oe-" + "critical",
@@ -498,7 +497,7 @@ class IndicatorLunar:
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
-    MINOR_PLANET_SEARCH_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+    MINOR_PLANET_CENTER_SEARCH_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" # Used to search for minor planets and comets.
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -1005,8 +1004,8 @@ class IndicatorLunar:
     # https://www.iau.org/public/themes/naming
     # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
     def getCometMinorPlanetOnClickURL( self, name, astronomicalBodyType ):
+        url = IndicatorLunar.MINOR_PLANET_CENTER_SEARCH_URL
         if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
-            url = IndicatorLunar.COMET_SEARCH_URL
             if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
                 id = name[ : name.find( "(" ) ].strip()
 
@@ -1019,7 +1018,6 @@ class IndicatorLunar:
                     id = name[ : name.find( "/" ) ].strip()
 
         else:
-            url = IndicatorLunar.MINOR_PLANET_SEARCH_URL
             components = name.split( ' ' )
             if components[ 0 ].isnumeric() and components[ 1 ].isalpha(): # 433 Eros
                 id = components[ 0 ] 
