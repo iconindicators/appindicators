@@ -111,7 +111,7 @@ class IndicatorLunar:
     ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
 
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M" #:%S" #TODO Ask Oleg if I should drop the seconds or not...does it look odd without seconds?
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
 
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
@@ -709,11 +709,7 @@ class IndicatorLunar:
                 if dateTime > utcNowPlusOneMinute and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
-#TODO Found that a star was due to set and the update must have happened such that the star was at 0 altitude and 
-#yet still appeared in the menu (should have been dropped).
-#Maybe need to set the threshold for <= 0 rather than < 0.
-        print( int( ( nextUpdateTime - utcNow ).total_seconds() ) ) #TODO Remove
-        return int( ( nextUpdateTime - utcNow ).total_seconds() )
+        return int( ( nextUpdateTime - utcNow ).total_seconds() ) + 10 # Add some fat to ensure we don't do an update and leave in an item which as more or less set.
 
 
     def updateMenu( self ):
@@ -757,7 +753,7 @@ class IndicatorLunar:
         self.indicator.set_icon_full( iconFilename, "" )
 
 
-#TODO Verify
+#TODO Verify at next full moon.
     def notificationFullMoon( self ):
         key = ( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astroPyephem.DATA_ILLUMINATION, ) ] )

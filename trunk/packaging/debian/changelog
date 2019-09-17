@@ -10,7 +10,7 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * Removed planetary moons;
     each effectively has the same azimuth/altitude as the parent planet.
   * Removed werewolf warning percentage from preferences and fixed at 99%.
-  * Removed date/time format from preferences; now uses ISO 8601.
+  * Removed date/time format from preferences; uses ISO 8601 without seconds.
   * Preferences no longer allows user configurable TLE/OE data files;
     code became too complicated to manage; defaults work well enough.
   * On startup, the indicator shows the single menu item "Initialising...".
