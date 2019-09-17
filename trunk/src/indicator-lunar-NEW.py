@@ -1125,7 +1125,7 @@ class IndicatorLunar:
                 self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ), url, subMenu )
                 self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ), url, subMenu )
 
-            separator = Gtk.SeparatorMenuItem() #TODO Check out this on Ubuntu 16.04.  Send screenshots to Oleg and see what he thinks.  Does the separator appear on the last item?
+            separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator ) 
 
         subMenu.remove( separator )
