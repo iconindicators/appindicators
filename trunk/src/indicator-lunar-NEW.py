@@ -1948,6 +1948,7 @@ class IndicatorLunar:
 
                 displayTagsStore.append( [ astronomicalBodyType, bodyTag + " " + dataTag, translatedTag, value ] )
 
+#TODO Can we put the below code into a function(s) or smart loops or inner functions?
         # Add in bodies/tags which are not present in the current data.
         astronomicalBodyType = astroPyephem.AstronomicalBodyType.Comet
         for bodyTag in self.cometData:
