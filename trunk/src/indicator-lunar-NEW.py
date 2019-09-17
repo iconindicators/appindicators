@@ -699,8 +699,8 @@ class IndicatorLunar:
 
     def getNextUpdateTimeInSeconds( self ):
         utcNow = datetime.datetime.utcnow()
-        utcNowString = str( utcNow )
-        nextUpdateTime = str( utcNow + datetime.timedelta( hours = 1000 ) ) # Set a bogus date/time in the future.
+        utcNowPlusOneMinute = utcNow + datetime.timedelta( minutes = 1 )
+        nextUpdateTime = utcNow + datetime.timedelta( hours = 1000 ) # Set a bogus date/time in the future.
         for key in self.data:
             if key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
                key[ 2 ] == astroPyephem.DATA_FIRST_QUARTER or \
@@ -710,49 +710,25 @@ class IndicatorLunar:
                key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
                key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
 
-                if self.data[ key ] < nextUpdateTime and self.data[ key ] > utcNowString:
-                    nextUpdateTime = self.data[ key ]
+                dateTime = datetime.datetime.strptime( self.data[ key ], astroPyephem.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+                if dateTime > utcNowPlusOneMinute and dateTime < nextUpdateTime:
+                    nextUpdateTime = dateTime
 
-#TODO see satellite code in original indicator-lunar 
-# Rather than muck around with fudging times (apart from setting the rise time a minute earlier), 
-# get the code that works out when to do the next update and ensure
-# that the next update time >= utc now 
-#  
-# # Add the rise to the next update, ensuring it is not in the past.
-# # Subtract a minute from the rise time to spoof the next update to happen earlier.
-# # This allows the update to occur and satellite notification to take place just prior to the satellite rise.
-# riseTimeMinusOneMinute = self.toDateTime( self.data[ key + ( astroPyephem.DATA_RISE_TIME, ) ] ) - datetime.timedelta( minutes = 1 )
-# if riseTimeMinusOneMinute > utcNow:
-# self.nextUpdate = self.getSmallestDateTime( str( riseTimeMinusOneMinute ), self.nextUpdate )
-# 
-# # Add the set time to the next update, ensuring it is not in the past.
-# if self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ] > str( utcNow ):
-# self.nextUpdate = self.getSmallestDateTime( self.data[ key + ( IndicatorLunar.DATA_SET_TIME, ) ], self.nextUpdate )
-
-
-#TODO Might still need to ensure that the update does not happen too frequently?              
-#             nextUpdateInSeconds = int( ( self.toDateTime( self.nextUpdate, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ) - datetime.datetime.utcnow() ).total_seconds() )
-# 
-#             # Ensure the update period is positive, at most every minute and at least every hour.
-#             if nextUpdateInSeconds < 60:
-#                 nextUpdateInSeconds = 60
-#             elif nextUpdateInSeconds > ( 60 * 60 ):
-#                 nextUpdateInSeconds = ( 60 * 60 )
-
-        return 10000 #TODO REturn the calculated value!
+        print( int( ( nextUpdateTime - utcNow ).total_seconds() ) ) #TODO Remove
+        return int( ( nextUpdateTime - utcNow ).total_seconds() )
 
 
     def updateMenu( self ):
         menu = Gtk.Menu()
 
         utcNow = datetime.datetime.utcnow()
-#         self.updateMenuMoon( menu )
-#         self.updateMenuSun( menu )
-#         self.updateMenuPlanets( menu )
-#         self.updateMenuStars( menu )
-#         self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.Comet )
-#         self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
-#         self.updateMenuSatellites( menu )
+        self.updateMenuMoon( menu )
+        self.updateMenuSun( menu )
+        self.updateMenuPlanets( menu )
+        self.updateMenuStars( menu )
+        self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.Comet )
+        self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
+        self.updateMenuSatellites( menu )
         pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
