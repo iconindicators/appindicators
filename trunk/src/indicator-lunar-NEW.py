@@ -31,6 +31,9 @@
 #  http://www.flaticon.com/search/satellite
 
 
+#TODO Update screen shot
+# https://askubuntu.com/a/292529/67335
+
 #TODO If there is no data to download (no internet) and cache is stale,
 # ensure satellites/comets/minorplanets already selected by the user are not dropped.
 
