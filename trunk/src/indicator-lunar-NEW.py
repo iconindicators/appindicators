@@ -1163,7 +1163,7 @@ class IndicatorLunar:
              key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
              key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
                 if dateTimeFormat is None:
-                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ).replace( ' ', '  ' ) #TODO Double space appears in GNOME Shell.  What about Unity?
+                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ).replace( ' ', '  ' )
                 else:
                     displayData = self.toLocalDateTimeString( self.data[ key ], dateTimeFormat )
 
