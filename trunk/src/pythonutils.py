@@ -222,7 +222,7 @@ def isUbuntu1604(): return processGet( "lsb_release -sc" ).strip() == "xenial"
 # Provides indent spacing for menu items,
 # given Ubuntu 16.04 (Unity) and Ubuntu 18.04+ (GNOME Shell) differences.
 def indent( indentUnity, indentGnomeShell ):
-    INDENT = "      -" #TODO The - is for testing.
+    INDENT = "      "
     if isUbuntu1604():
         indent = INDENT * indentUnity
     else:
