@@ -1226,6 +1226,7 @@ class IndicatorLunar:
 
             if illuminationPercentage == 0: # New
                 svg = svgStart + '" fill="none" stroke="#' + colour + '" stroke-width="2" />'
+
             else: # Full
                 svg = svgStart + '" fill="#' + colour + '" />'
 
@@ -1235,8 +1236,10 @@ class IndicatorLunar:
 
             if illuminationPercentage == 50: # Quarter
                 svg = svgStart + '"' + svgEnd
+
             elif illuminationPercentage < 50: # Crescent
                 svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( 50 - illuminationPercentage ) / 50.0 * radius ) + ' 0 0 0 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd
+
             else: # Gibbous
                 svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( illuminationPercentage - 50 ) / 50.0 * radius ) + ' 0 1 1 ' + str( radius * 2 * -1 ) + ' + 0"' + svgEnd
 
