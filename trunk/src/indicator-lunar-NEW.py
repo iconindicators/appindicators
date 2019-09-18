@@ -1554,10 +1554,9 @@ class IndicatorLunar:
 
         else:
             tree.set_tooltip_text( _(
-                "Satellite data is unavailable; the source\n" + \
-                "could not be reached, or no data was\n" + \
-                "available from the source, or the data\n" + \
-                "was completely filtered by magnitude." ) )
+                "Satellite data is unavailable; the\n" + \
+                "source could not be reached, or no\n" + \
+                "data was available from the source." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onCheckbox, satelliteStore, satelliteStoreSort, astroPyephem.AstronomicalBodyType.Satellite )
