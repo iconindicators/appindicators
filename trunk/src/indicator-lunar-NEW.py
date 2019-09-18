@@ -1455,11 +1455,6 @@ class IndicatorLunar:
 
         notebook.append_page( box, Gtk.Label( _( "Planets / Stars" ) ) )
 
-#TODO For each of comets, minor planets and satellites, check if the underlying data (tle/oe) is empty or not.  
-# If empty, don't show the table but a label with message instead.
-#May need to have individual variable names for each of the scrolledWindows to hide/show.
-# Or maybe show only the items the user previously selected.
-# Or just show an empty table (if no data could be loaded, a log message will be written).
         # Comets.
         box = Gtk.Box( spacing = 20 )
 
