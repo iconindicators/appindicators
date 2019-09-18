@@ -1455,7 +1455,7 @@ class IndicatorLunar:
 
         notebook.append_page( box, Gtk.Label( _( "Planets / Stars" ) ) )
 
-        # Comets.
+        # Comets and minor planets.
         box = Gtk.Box( spacing = 20 )
 
         cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
