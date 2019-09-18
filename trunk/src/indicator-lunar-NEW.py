@@ -30,6 +30,13 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 #  http://www.flaticon.com/search/satellite
 
+#TODO What if we remove the list of planets, stars, comets, minor planets and satellites
+# and instead always add everything?
+# The only options we provide are
+#     The magnitude filter (excludes satellites) 
+#     Hide bodies below horizon (excludes satellites)
+#     Sort satellites by date/time. 
+
 
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
@@ -1818,13 +1825,13 @@ class IndicatorLunar:
                 continue
 
 #TODO Need a function that finds tags for satellites and then removes the name and int desig.  Do this after the translate function.
-            self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
+#             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
-            self.cometsAddNew = cometsAddNewCheckbox.get_active()
-            self.minorPlanetsAddNew = minorPlanetsAddNewCheckbox.get_active()
+            self.cometsAddNew = cometsAddNewCheckbox.get_active() # The update will add in new comets.
+            self.minorPlanetsAddNew = minorPlanetsAddNewCheckbox.get_active() # The update will add in new minor planets.
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
-            self.satellitesAddNew = satellitesAddNewCheckbox.get_active()
+            self.satellitesAddNew = satellitesAddNewCheckbox.get_active() # The update will add in new satellites.
 
             self.planets = [ ]
             for row in planetStore:
@@ -1837,7 +1844,8 @@ class IndicatorLunar:
                     self.stars.append( row[ 1 ] )
 
 #TODO Needed if we already do this in the update?
-# If the option to addNewXYZ is not checked, then the user checks it, will the update handle it for us? 
+# If the option to addNewXYZ is not checked, then the user checks it, will the update handle it for us?
+#More importantly, we need to add/remove checked comets if the add new option is not checked!  
 #             self.comets = [ ]
 #             if not self.cometsAddNew:
 #                 for comet in cometStore:
