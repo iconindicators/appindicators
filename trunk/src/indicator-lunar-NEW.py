@@ -70,9 +70,6 @@
 #What do the other indicators do (PPA)?
 
 
-#TODO For the preference to hide an object if yet to rise, does this also, somehow, apply to satellites?
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -1336,7 +1333,9 @@ class IndicatorLunar:
 
         hideBodiesBelowTheHorizonCheckbox = Gtk.CheckButton( _( "Hide bodies below the horizon" ) )
         hideBodiesBelowTheHorizonCheckbox.set_active( self.hideBodiesBelowHorizon )
-        hideBodiesBelowTheHorizonCheckbox.set_tooltip_text( _( "If checked, all bodies below the horizon are hidden." ) )
+        hideBodiesBelowTheHorizonCheckbox.set_tooltip_text( _(
+            "If checked, all bodies below the horizon\n" + \
+            "are hidden (excludes satellites)." ) )
         grid.attach( hideBodiesBelowTheHorizonCheckbox, 0, 0, 1, 1 )
 
         cometsAddNewCheckbox = Gtk.CheckButton( _( "Add new comets" ) )
