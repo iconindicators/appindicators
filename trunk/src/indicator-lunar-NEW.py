@@ -1891,7 +1891,10 @@ class IndicatorLunar:
 
         dialog.destroy()
 
-
+#TODO Satellites now have ':' between name, number and intl desig.  
+#Check this doesn't break the double click adding to the indicator text.
+#Check no satellite contains a : in the name or anywhere...if it does, then what?  Drop it?
+#Handle : when converting tags back and forth for the label text (in the preferences and when rendering.
     def initialiseDisplayTagsStore( self, displayTagsStore ):
         # Populate the display store using current data.
         for key in self.data.keys():
@@ -1909,7 +1912,7 @@ class IndicatorLunar:
                 elif astronomicalBodyType == astroPyephem.AstronomicalBodyType.Satellite: # Don't translate names; add in name/designator.
                     satelliteName = self.satelliteData[ bodyTag ].getName()
                     satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
-                    translatedTag = satelliteName + " " + bodyTag + " " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    translatedTag = satelliteName + " : " + bodyTag + " : " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
 
                 else:
                     translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
@@ -1936,7 +1939,7 @@ class IndicatorLunar:
                 if not ( astroPyephem.AstronomicalBodyType.Satellite, bodyTag, dataTag ) in self.data:
                     satelliteName = self.satelliteData[ bodyTag ].getName()
                     satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
-                    translatedTag = satelliteName + " " + bodyTag + " " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    translatedTag = satelliteName + " : " + bodyTag + " : " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
                     displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
         items = [ [ astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, astroPyephem.DATA_MOON ],
