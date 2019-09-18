@@ -590,6 +590,10 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
         break
 
 
+#TODO May not need this any more...
+# GitHub issue #63: 
+# The rise, culminate, and set returned by next_pass() are now consecutive values for a single pass. 
+# Pass singlepass=False to return the original next_rise, next_culminate, next_set even if next_set < next_rise (the satellite is already up).
 def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
     currentDateTime = ephem.Date( ephemNow - ephem.minute ) # Start looking from one minute ago.
     endDateTime = ephem.Date( ephemNow - ephem.hour ) # Only look back an hour for the rise time (then just give up).
