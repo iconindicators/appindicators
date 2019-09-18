@@ -159,7 +159,6 @@ class IndicatorLunar:
         astroPyephem.DATA_SET_DATE_TIME        : _( "SET DATE TIME" ),
         astroPyephem.DATA_THIRD_QUARTER        : _( "THIRD QUARTER" ) }
 
-    CITY_TAG_TRANSLATION = { astroPyephem.NAME_TAG_CITY: _( "CITY" ) } #TODO Is this needed?
     MOON_TAG_TRANSLATION = { astroPyephem.NAME_TAG_MOON : _( "MOON" ) }
     SUN_TAG_TRANSLATION = { astroPyephem.NAME_TAG_SUN : _( "SUN" ) }
 
@@ -472,7 +471,6 @@ class IndicatorLunar:
         "ZAURAK"            :	18543 }
 
     BODY_TAGS_TRANSLATIONS = dict(
-        list( CITY_TAG_TRANSLATION.items() ) +
         list( MOON_TAG_TRANSLATION.items() ) +
         list( PLANET_TAGS_TRANSLATIONS.items() ) +
         list( STAR_TAGS_TRANSLATIONS.items() ) +
