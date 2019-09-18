@@ -1850,26 +1850,23 @@ class IndicatorLunar:
                 if row[ 0 ]:
                     self.stars.append( row[ 1 ] )
 
-#TODO Needed if we already do this in the update?
-# If the option to addNewXYZ is not checked, then the user checks it, will the update handle it for us?
-#More importantly, we need to add/remove checked comets if the add new option is not checked!  
-#             self.comets = [ ]
-#             if not self.cometsAddNew:
-#                 for comet in cometStore:
-#                     if comet[ 0 ]:
-#                         self.comets.append( comet[ 1 ].upper() )
-# 
-#             self.minorPlanets = [ ]
-#             if not self.minorPlanetsAddNew:
-#                 for minorPlanet in minorPlanetStore:
-#                     if minorPlanet[ 0 ]:
-#                         self.minorPlanets.append( minorPlanet[ 1 ].upper() )
-# 
-#             self.satellites = [ ]
-#             if not self.satellitesAddNew:
-#                 for satellite in satelliteStore:
-#                     if satellite[ 0 ]:
-#                         self.satellites.append( satellite[ 2 ] )
+            self.comets = [ ]
+            if not self.cometsAddNew:
+                for comet in cometStore:
+                    if comet[ 0 ]:
+                        self.comets.append( comet[ 1 ].upper() )
+ 
+            self.minorPlanets = [ ]
+            if not self.minorPlanetsAddNew:
+                for minorPlanet in minorPlanetStore:
+                    if minorPlanet[ 0 ]:
+                        self.minorPlanets.append( minorPlanet[ 1 ].upper() )
+ 
+            self.satellites = [ ]
+            if not self.satellitesAddNew:
+                for satellite in satelliteStore:
+                    if satellite[ 0 ]:
+                        self.satellites.append( satellite[ 2 ] )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
