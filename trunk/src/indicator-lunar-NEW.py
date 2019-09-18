@@ -540,7 +540,7 @@ class IndicatorLunar:
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
-    INDICATOR_TEXT_DEFAULT = "[" + astroPyephem.NAME_TAG_MOON + " " + astroPyephem.DATA_PHASE + "]"
+    INDICATOR_TEXT_DEFAULT = " [" + astroPyephem.NAME_TAG_MOON + " " + astroPyephem.DATA_PHASE + "]"
 
 
     def __init__( self ):
