@@ -594,11 +594,11 @@ class IndicatorLunar:
                 GLib.source_remove( self.updateTimerID )
 
 #TODO Testing
-            self.planets = astroPyephem.PLANETS
-            self.stars = astroPyephem.STARS
-            self.cometsAddNew = True
-            self.minorPlanetsAddNew = True
-            self.satellitesAddNew = True
+#             self.planets = astroPyephem.PLANETS
+#             self.stars = astroPyephem.STARS
+#             self.cometsAddNew = True
+#             self.minorPlanetsAddNew = True
+#             self.satellitesAddNew = True
 
             # Update comet, minor planet and satellite data.
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
@@ -1885,6 +1885,9 @@ class IndicatorLunar:
             pythonutils.setAutoStart( IndicatorLunar.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.update, False )
             break
+
+#TODO Debug
+        print( "Preferences may not full save/work...the indicator text will NOT work at this point.  Modify the .json if need be." )
 
         dialog.destroy()
 
