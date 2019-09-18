@@ -1398,6 +1398,132 @@ class IndicatorLunar:
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
 
+
+#TODO Mock menu tab for when all bodies are added by default.
+        # Menu.
+        grid = pythonutils.createGrid()
+
+        hideBodiesBelowTheHorizonCheckbox = Gtk.CheckButton( _( "Hide bodies below the horizon" ) )
+        hideBodiesBelowTheHorizonCheckbox.set_active( self.hideBodiesBelowHorizon )
+        hideBodiesBelowTheHorizonCheckbox.set_tooltip_text( _(
+            "If checked, all bodies below the horizon\n" + \
+            "are hidden (excludes satellites)." ) )
+        grid.attach( hideBodiesBelowTheHorizonCheckbox, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
+
+        spinnerMagnitude = Gtk.SpinButton()
+        spinnerMagnitude.set_numeric( True )
+        spinnerMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
+        spinnerMagnitude.set_adjustment( Gtk.Adjustment( self.magnitude, int( astroPyephem.MAGNITUDE_MINIMUM ), int( astroPyephem.MAGNITUDE_MAXIMUM ), 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerMagnitude.set_value( self.magnitude ) # ...so need to force the initial value by explicitly setting it.
+        spinnerMagnitude.set_tooltip_text( _(
+            "Planets, stars, comets and minor planets with a magnitude\n" + \
+            "greater than that specified are hidden (excludes satellites)." ) )
+
+        box.pack_start( spinnerMagnitude, False, False, 0 )
+        grid.attach( box, 0, 1, 1, 1 )
+
+        sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
+        sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
+        sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
+        sortSatellitesByDateTimeCheckbox.set_tooltip_text( _(
+            "If checked, satellites are sorted\n" + \
+            "by rise date/time.\n\n" + \
+            "Otherwise satellites are sorted\n" + \
+            "by Name, Number and then\n" + \
+            "International Designator." ) )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 2, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "Menu 1" ) )
+
+
+#TODO Mock menu tab for when all bodies are added by default, but body types can be disabled.
+        # Menu.
+        grid = pythonutils.createGrid()
+
+        label = Gtk.Label( _( "Show" ) )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 40 )
+        box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+
+        showMoonCheckbox = Gtk.CheckButton( _( "Moon" ) )
+        showMoonCheckbox.set_tooltip_text( _( "Show moon." ) )
+        box.pack_start( showMoonCheckbox, False, False, 0 )
+        
+        showSunCheckbox = Gtk.CheckButton( _( "Sun" ) )
+        showSunCheckbox.set_tooltip_text( _( "Show sun." ) )
+        box.pack_start( showSunCheckbox, False, False, 0 )
+        
+        showPlanetsCheckbox = Gtk.CheckButton( _( "Planets" ) )
+        showPlanetsCheckbox.set_tooltip_text( _( "Show planets." ) )
+        box.pack_start( showPlanetsCheckbox, False, False, 0 )
+        
+        showStarsCheckbox = Gtk.CheckButton( _( "Stars" ) )
+        showStarsCheckbox.set_tooltip_text( _( "Show stars." ) )
+        box.pack_start( showStarsCheckbox, False, False, 0 )
+
+        grid.attach( box, 0, 1, 1, 1 )
+
+        box = Gtk.Box( spacing = 40 )
+        box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+
+        showCometsCheckbox = Gtk.CheckButton( _( "Comets" ) )
+        showCometsCheckbox.set_tooltip_text( _( "Show comets." ) )
+        box.pack_start( showCometsCheckbox, False, False, 0 )
+        
+        showMinorPlanetsCheckbox = Gtk.CheckButton( _( "Minor Planets" ) )
+        showMinorPlanetsCheckbox.set_tooltip_text( _( "Show minor planets." ) )
+        box.pack_start( showMinorPlanetsCheckbox, False, False, 0 )
+        
+        showSatellitesCheckbox = Gtk.CheckButton( _( "Satellites" ) )
+        showSatellitesCheckbox.set_tooltip_text( _( "Show satellites." ) )
+        box.pack_start( showSatellitesCheckbox, False, False, 0 )
+
+        grid.attach( box, 0, 2, 1, 1 )
+
+        hideBodiesBelowTheHorizonCheckbox = Gtk.CheckButton( _( "Hide bodies below the horizon" ) )
+        hideBodiesBelowTheHorizonCheckbox.set_active( self.hideBodiesBelowHorizon )
+        hideBodiesBelowTheHorizonCheckbox.set_tooltip_text( _(
+            "If checked, all bodies below the horizon\n" + \
+            "are hidden (excludes satellites)." ) )
+        grid.attach( hideBodiesBelowTheHorizonCheckbox, 0, 3, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
+
+        spinnerMagnitude = Gtk.SpinButton()
+        spinnerMagnitude.set_numeric( True )
+        spinnerMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
+        spinnerMagnitude.set_adjustment( Gtk.Adjustment( self.magnitude, int( astroPyephem.MAGNITUDE_MINIMUM ), int( astroPyephem.MAGNITUDE_MAXIMUM ), 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerMagnitude.set_value( self.magnitude ) # ...so need to force the initial value by explicitly setting it.
+        spinnerMagnitude.set_tooltip_text( _(
+            "Planets, stars, comets and minor planets with a magnitude\n" + \
+            "greater than that specified are hidden (excludes satellites)." ) )
+
+        box.pack_start( spinnerMagnitude, False, False, 0 )
+        grid.attach( box, 0, 4, 1, 1 )
+
+        sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
+        sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
+        sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
+        sortSatellitesByDateTimeCheckbox.set_tooltip_text( _(
+            "If checked, satellites are sorted\n" + \
+            "by rise date/time.\n\n" + \
+            "Otherwise satellites are sorted\n" + \
+            "by Name, Number and then\n" + \
+            "International Designator." ) )
+        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 5, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label( "Menu 2" ) )
+
         # Planets/Stars.
         box = Gtk.Box( spacing = 20 )
 
