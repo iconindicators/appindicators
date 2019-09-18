@@ -545,22 +545,6 @@ class IndicatorLunar:
 
     INDICATOR_TEXT_DEFAULT = "[" + astroPyephem.NAME_TAG_MOON + " " + astroPyephem.DATA_PHASE + "]"
 
-#TODO Check which of these are still needed.
-    MESSAGE_DATA_BAD_DATA = _( "Bad data!" )
-    MESSAGE_DATA_CANNOT_ACCESS_DATA_SOURCE = _( "Cannot access the data source\n<a href=\'{0}'>{0}</a>" )
-    MESSAGE_DATA_NO_DATA = _( "No data!" )
-    MESSAGE_DATA_NO_DATA_FOUND_AT_SOURCE = _( "No data found at\n<a href=\'{0}'>{0}</a>" )
-
-#TODO Likely need to put these into a dict, keyed off from the astro messages.
-#Then in getdisplaydata for the message type, use the astroPyephem.message and pull the translated/text message from this dict.
-    MESSAGE_TRANSLATION_DATA_BAD_DATA = _( "Bad data!" )
-    MESSAGE_TRANSLATION_DATA_CANNOT_ACCESS_DATA_SOURCE = _( "Cannot access the data source\n<a href=\'{0}'>{0}</a>" )
-    MESSAGE_TRANSLATION_DATA_NO_DATA = _( "No data!" )
-    MESSAGE_TRANSLATION_DATA_NO_DATA_FOUND_AT_SOURCE = _( "No data found at\n<a href=\'{0}'>{0}</a>" )
-
-#TODO Want a better expression!
-    MESSAGE_DISPLAY_NEEDS_REFRESH = _( "(needs refresh)" )
-
 
     def __init__( self ):
         self.cometData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
@@ -1331,7 +1315,12 @@ class IndicatorLunar:
         treeViewColumn.set_sort_column_id( COLUMN_VALUE )
         tree.append_column( treeViewColumn )
 
-        tree.set_tooltip_text( _( "Double click to add a tag to the icon text." ) )
+        tree.set_tooltip_text( _(
+            "Double click to add a tag to the icon text.\n" + \
+            "A tag with no value arises if a body is dropped\n" + \
+            "due to exceeding magnitude, or below the horizon\n" + \
+            "(no set date/time and no azimuth/altitude),\n" + \
+            "or above the horizon (no rise date/time)." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText )
 
@@ -1479,10 +1468,18 @@ class IndicatorLunar:
             cometStore.append( ( comet in self.comets, comet ) )
 
         tree = Gtk.TreeView( cometStore )
-        tree.set_tooltip_text( _(
-            "Check a comet to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "will toggle all checkboxes." ) )
+        if self.cometData:
+            tree.set_tooltip_text( _(
+                "Check a comet to display in the menu.\n\n" + \
+                "Clicking the header of the first column\n" + \
+                "will toggle all checkboxes." ) )
+
+        else:
+            tree.set_tooltip_text( _(
+                "Comet data is unavailable; the source\n" + \
+                "could not be reached, or no data was\n" + \
+                "available from the source, or the data\n" + \
+                "was completely filtered by magnitude." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onCheckbox, cometStore, None, None )
@@ -1506,10 +1503,18 @@ class IndicatorLunar:
             minorPlanetStore.append( ( minorPlanet in self.minorPlanets, minorPlanet ) )
 
         tree = Gtk.TreeView( minorPlanetStore )
-        tree.set_tooltip_text( _(
-            "Check a minor planet to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "will toggle all checkboxes." ) )
+        if self.minorPlanetData:
+            tree.set_tooltip_text( _(
+                "Check a minor planet to display in the menu.\n\n" + \
+                "Clicking the header of the first column\n" + \
+                "will toggle all checkboxes." ) )
+
+        else:
+            tree.set_tooltip_text( _(
+                "Minor planet data is unavailable; the source\n" + \
+                "could not be reached, or no data was\n" + \
+                "available from the source, or the data\n" + \
+                "was completely filtered by magnitude." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onCheckbox, minorPlanetStore, None, None )
@@ -1541,10 +1546,18 @@ class IndicatorLunar:
         satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView( satelliteStoreSort )
-        tree.set_tooltip_text( _(
-            "Check a satellite to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "will toggle all checkboxes." ) )
+        if self.satelliteData:
+            tree.set_tooltip_text( _(
+                "Check a satellite to display in the menu.\n\n" + \
+                "Clicking the header of the first column\n" + \
+                "will toggle all checkboxes." ) )
+
+        else:
+            tree.set_tooltip_text( _(
+                "Satellite data is unavailable; the source\n" + \
+                "could not be reached, or no data was\n" + \
+                "available from the source, or the data\n" + \
+                "was completely filtered by magnitude." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onCheckbox, satelliteStore, satelliteStoreSort, astroPyephem.AstronomicalBodyType.Satellite )
@@ -1907,7 +1920,7 @@ class IndicatorLunar:
                 for dataTag in dataTags:
                     if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
                         translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
-                        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+                        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
         astronomicalBodyType = astroPyephem.AstronomicalBodyType.Satellite
         for bodyTag in self.satelliteData:
@@ -1916,7 +1929,7 @@ class IndicatorLunar:
                     satelliteName = self.satelliteData[ bodyTag ].getName()
                     satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
                     translatedTag = satelliteName + " " + bodyTag + " " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
-                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
         items = [ [ astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, astroPyephem.DATA_MOON ],
                   [ astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_SUN ] ]
@@ -1928,7 +1941,7 @@ class IndicatorLunar:
             for dataTag in dataTags:
                 if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
                     translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
-                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
         items = [ [ astroPyephem.AstronomicalBodyType.Planet, astroPyephem.PLANETS, astroPyephem.DATA_PLANET ],
                   [ astroPyephem.AstronomicalBodyType.Star, astroPyephem.STARS, astroPyephem.DATA_STAR ] ]
@@ -1941,7 +1954,7 @@ class IndicatorLunar:
                 for dataTag in dataTags:
                     if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
                         translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
-                        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, IndicatorLunar.MESSAGE_DISPLAY_NEEDS_REFRESH ] )
+                        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
 
     def translateTags( self, tagsStore, originalToLocal, text ):
