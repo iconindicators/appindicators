@@ -595,6 +595,11 @@ class IndicatorLunar:
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
+#TODO Testing
+            self.cometsAddNew = True
+            self.minorPlanetsAddNew = True
+            self.satellitesAddNew = True
+
             # Update comet, minor planet and satellite data.
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
