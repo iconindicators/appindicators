@@ -596,6 +596,8 @@ class IndicatorLunar:
                 GLib.source_remove( self.updateTimerID )
 
 #TODO Testing
+            self.planets = astroPyephem.PLANETS
+            self.stars = astroPyephem.STARS
             self.cometsAddNew = True
             self.minorPlanetsAddNew = True
             self.satellitesAddNew = True
