@@ -36,6 +36,8 @@
 #     The magnitude filter (excludes satellites) 
 #     Hide bodies below horizon (excludes satellites)
 #     Sort satellites by date/time. 
+#
+# If OE/TLE data is unavailable, might write to the log (or somehow let the user know without being annoying).
 
 
 #TODO Update screen shot
