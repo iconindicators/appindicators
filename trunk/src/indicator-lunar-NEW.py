@@ -1251,14 +1251,6 @@ class IndicatorLunar:
 
 
     def _onPreferences( self, widget ):
-        TAB_ICON = 0
-        TAB_MENU = 1
-        TAB_PLANETS_STARS = 2
-        TAB_COMETS_MINOR_PLANETS = 3
-        TAB_SATELLITES = 4
-        TAB_NOTIFICATIONS = 5
-        TAB_GENERAL = 6
-
         notebook = Gtk.Notebook()
 
         # Icon.
