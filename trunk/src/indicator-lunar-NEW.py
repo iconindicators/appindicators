@@ -1064,11 +1064,11 @@ class IndicatorLunar:
             key = ( astroPyephem.AstronomicalBodyType.Satellite, number )
             if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data and key + ( astroPyephem.DATA_RISE_AZIMUTH, ) in self.data:
                 self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Rise" ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ), url, subMenu )
+                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
+                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ), url, subMenu )
                 self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Set" ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ), url, subMenu )
+                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ), url, subMenu )
+                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ), url, subMenu )
 
             elif key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
                 self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
