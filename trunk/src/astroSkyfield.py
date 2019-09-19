@@ -63,7 +63,6 @@ DATA_INTERNAL = [
     DATA_BRIGHT_LIMB,
     DATA_ILLUMINATION ]
 
-#TODO Are these sub-lists needed?  Might be needed for the Preferences dialgo.
 DATA_COMET = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,

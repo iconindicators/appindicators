@@ -55,7 +55,6 @@ DATA_INTERNAL = [
     DATA_BRIGHT_LIMB,
     DATA_ILLUMINATION ]
 
-#TODO Are these sub-lists needed?  Might be needed for the Preferences dialgo.
 DATA_COMET = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
@@ -115,8 +114,8 @@ NAME_TAG_CITY = "CITY"
 NAME_TAG_MOON = "MOON"
 NAME_TAG_SUN = "SUN"
 
-# Planet names are capitalised, whereas pyephem uses titled strings.
-# At the API we accept capitalised planet names, but internally we title them to satisfy pyephem.
+# Planet names are capitalised, whereas Pyephem uses titled strings.
+# At the API we accept capitalised planet names, but internally we title them to satisfy Pyephem.
 PLANET_MERCURY = "MERCURY"
 PLANET_VENUS = "VENUS"
 PLANET_MARS = "MARS"
@@ -129,8 +128,8 @@ PLANET_PLUTO = "PLUTO"
 PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
 # From ephem/stars.py
-# Star names are capitalised, whereas pyephem uses titled strings.
-# At the API we accept capitalised star names, but internally we title them to satisfy pyephem.
+# Star names are capitalised, whereas Pyephem uses titled strings.
+# At the API we accept capitalised star names, but internally we title them to satisfy Pyephem.
 STARS = [
     "ACHERNAR", 
     "ADARA", 
@@ -237,12 +236,12 @@ LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
 LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
 MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
-MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are brighter than the sun...so set a lower limit.
+MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are, erroneously, brighter than the sun, so set a lower limit.
 
 DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
 
 
-# Returns a dict with astronomical information...
+# Returns a dictionary with astronomical information:
 #     Key is a tuple of AstronomicalBodyType, a name tag and a data tag.
 #     Value is the data as a string.
 #
@@ -336,7 +335,6 @@ def __calculateMoon( ephemNow, data, hideIfBelowHorizon ):
     data[ key + ( DATA_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
     data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
     data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
-
 
 
 # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
