@@ -1505,8 +1505,6 @@ class IndicatorLunar:
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
         scrolledWindow.add( tree )
         box.pack_start( scrolledWindow, True, True, 0 )
 
