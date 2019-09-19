@@ -21,6 +21,7 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * Bodies above the horizon display a set date/time and azimuth/altitude.
   * Only visible satellite passes (dawn/dusk) are shown.
   * Added minor planets, courtesy of the Minor Planet Center.
+  * Added filtering by magnitude to planets and stars. 
   * Added on-click URL for minor planets and stars.
   * Added hyperlink to the About dialog which links to the error log text file
     (only visible if the underlying file is present).
