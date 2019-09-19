@@ -31,6 +31,9 @@
 #  http://www.flaticon.com/search/satellite
 
 
+#TODO Include planets and stars in the magnitude filter?
+
+
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
 
