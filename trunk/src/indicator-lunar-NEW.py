@@ -584,7 +584,7 @@ class IndicatorLunar:
 
 
     def update( self, scheduled = True ):
-        with threading.Lock():
+        with threading.Lock():  #TODO Can this be used for the dialog locking?  Or maybe the dialog locking used here?  Are they the same thing?
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
