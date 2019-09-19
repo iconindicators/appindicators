@@ -272,8 +272,8 @@ def getAstronomicalInformation( utcNow,
 
     __calculateMoon( ephemNow, data, hideIfBelowHorizon )
     __calculateSun( ephemNow, data, hideIfBelowHorizon )
-    __calculatePlanets( ephemNow, data, planets, hideIfBelowHorizon )
-    __calculateStars( ephemNow, data, stars, hideIfBelowHorizon )
+    __calculatePlanets( ephemNow, data, planets, magnitude, hideIfBelowHorizon )
+    __calculateStars( ephemNow, data, stars, magnitude, hideIfBelowHorizon )
     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitude, hideIfBelowHorizon )
     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude, hideIfBelowHorizon )
     __calculateSatellites( ephemNow, data, satellites, satelliteData )
@@ -440,17 +440,21 @@ def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
 
 # http://www.geoastro.de/planets/index.html
 # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
-def __calculatePlanets( ephemNow, data, planets, hideIfBelowHorizon ):
+def __calculatePlanets( ephemNow, data, planets, magnitude, hideIfBelowHorizon ):
     for planet in planets:
         planetObject = getattr( ephem, planet.title() )()
-        __calculateCommon( ephemNow, data, planetObject, AstronomicalBodyType.Planet, planet, hideIfBelowHorizon )
+        planetObject.compute( __getCity( data, ephemNow ) )
+        if planetObject.mag >= MAGNITUDE_MINIMUM and planetObject.mag <= magnitude:
+            __calculateCommon( ephemNow, data, planetObject, AstronomicalBodyType.Planet, planet, hideIfBelowHorizon )
 
 
 # http://aa.usno.navy.mil/data/docs/mrst.php
-def __calculateStars( ephemNow, data, stars, hideIfBelowHorizon ):
+def __calculateStars( ephemNow, data, stars, magnitude, hideIfBelowHorizon ):
     for star in stars:
         starObject = ephem.star( star.title() )
-        __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star, hideIfBelowHorizon )
+        starObject.compute( __getCity( data, ephemNow ) )
+        if starObject.mag >= MAGNITUDE_MINIMUM and starObject.mag <= magnitude:
+            __calculateCommon( ephemNow, data, starObject, AstronomicalBodyType.Star, star, hideIfBelowHorizon )
 
 
 # Compute data for comets or minor planets.

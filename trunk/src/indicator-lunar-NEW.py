@@ -1351,7 +1351,7 @@ class IndicatorLunar:
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Hide comets and minor planets greater than magnitude" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
 
         spinnerMagnitude = Gtk.SpinButton()
         spinnerMagnitude.set_numeric( True )
@@ -1359,8 +1359,8 @@ class IndicatorLunar:
         spinnerMagnitude.set_adjustment( Gtk.Adjustment( self.magnitude, int( astroPyephem.MAGNITUDE_MINIMUM ), int( astroPyephem.MAGNITUDE_MAXIMUM ), 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerMagnitude.set_value( self.magnitude ) # ...so need to force the initial value by explicitly setting it.
         spinnerMagnitude.set_tooltip_text( _(
-            "Comets and minor planets with a magnitude\n" + \
-            "greater than that specified are hidden." ) )
+            "Planets, stars, comets and minor planets with a\n" + \
+            "magnitude greater than that specified are hidden." ) )
 
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 3, 1, 1 )
