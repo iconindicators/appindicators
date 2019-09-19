@@ -2113,7 +2113,7 @@ class IndicatorLunar:
         self.comets = config.get( IndicatorLunar.CONFIG_COMETS, [ ] )
         self.cometsAddNew = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, False )
 
-        self.hideBodiesBelowHorizon = config.get( IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON, False )
+        self.hideBodiesBelowHorizon = config.get( IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON, True )
 
         self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, IndicatorLunar.INDICATOR_TEXT_DEFAULT )
 
