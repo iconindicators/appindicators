@@ -1529,8 +1529,8 @@ class IndicatorLunar:
         box.pack_start( label, False, False, 0 )
 
         satelliteNotificationSummaryText = Gtk.Entry()
-        satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         satelliteNotificationSummaryText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationSummary ) )
+        satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         satelliteNotificationSummaryText.set_tooltip_text( _(
             "The summary for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" ) + \
@@ -1552,8 +1552,8 @@ class IndicatorLunar:
         box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Message" ) + "\n \n \n \n \n " ) # Padding to ensure the textview for the message text is not too small.  
-        label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         label.set_valign( Gtk.Align.START )
+        label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         box.pack_start( label, False, False, 0 )
 
         satelliteNotificationMessageText = Gtk.TextView()
@@ -1571,7 +1571,7 @@ class IndicatorLunar:
             _( notifyOSDInformation ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
+        scrolledWindow.set_sensitive( showSatelliteNotificationCheckbox.get_active() ) #TODO DIFFERENT
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( satelliteNotificationMessageText )
@@ -1593,10 +1593,9 @@ class IndicatorLunar:
         showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
         showWerewolfWarningCheckbox = Gtk.CheckButton( _( "Werewolf warning" ) )
-        showWerewolfWarningCheckbox.set_margin_top( 10 )
+        showWerewolfWarningCheckbox.set_margin_top( 10 ) #TODO DIFFERENT
         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
-        showWerewolfWarningCheckbox.set_tooltip_text( _(
-            "Hourly screen notification leading up to full moon." ) )
+        showWerewolfWarningCheckbox.set_tooltip_text( _( "Hourly screen notification leading up to full moon." ) )
         grid.attach( showWerewolfWarningCheckbox, 0, 4, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -1608,8 +1607,8 @@ class IndicatorLunar:
 
         werewolfNotificationSummaryText = Gtk.Entry()
         werewolfNotificationSummaryText.set_text( self.werewolfWarningSummary )
-        werewolfNotificationSummaryText.set_tooltip_text( _( "The summary for the werewolf notification.\n\n" ) + notifyOSDInformation )
         werewolfNotificationSummaryText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
+        werewolfNotificationSummaryText.set_tooltip_text( _( "The summary for the werewolf notification.\n\n" ) + notifyOSDInformation )
         box.pack_start( werewolfNotificationSummaryText, True, True, 0 )
         grid.attach( box, 0, 5, 1, 1 )
 
@@ -1632,7 +1631,6 @@ class IndicatorLunar:
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( werewolfNotificationMessageText )
-
         box.pack_start( scrolledWindow, True, True, 0 )
         grid.attach( box, 0, 6, 1, 1 )
 
@@ -1972,6 +1970,66 @@ class IndicatorLunar:
 
         for row in range( len( dataStore ) ):
             dataStore[ row ][ 0 ] = value
+
+
+    def createNotificationPanel( self, grid, gridStartIndex,
+                                 showNotificationCheckboxLabel, showNotificationCheckboxLabelToolTip,
+                                 summaryLabel, summaryText, summaryToolTip,
+                                 messageLabel, messageText, messageToolTip,
+                                 testButtonText, testButtonToolTip ):
+
+        showNotificationCheckbox = Gtk.CheckButton( showNotificationCheckboxLabel )
+        showNotificationCheckbox.set_active( self.showSatelliteNotification )
+        showNotificationCheckbox.set_tooltip_text( showNotificationCheckboxLabelToolTip )
+        grid.attach( showNotificationCheckbox, 0, gridStartIndex, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+
+        label = Gtk.Label( summaryLabel )
+        label.set_sensitive( showNotificationCheckbox.get_active() )
+        box.pack_start( label, False, False, 0 )
+
+        notificationSummaryText = Gtk.Entry()
+        notificationSummaryText.set_sensitive( showNotificationCheckbox.get_active() )
+        notificationSummaryText.set_text( summaryText )
+        notificationSummaryText.set_tooltip_text( summaryToolTip )
+
+        box.pack_start( notificationSummaryText, True, True, 0 )
+        grid.attach( box, 0, gridStartIndex + 1, 1, 1 )
+
+        showNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, notificationSummaryText )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+
+        label = Gtk.Label( messageLabel )  
+        label.set_sensitive( showNotificationCheckbox.get_active() )
+        label.set_valign( Gtk.Align.START )
+        box.pack_start( label, False, False, 0 )
+
+        notificationMessageText = Gtk.TextView()
+        notificationMessageText.get_buffer().set_text( messageText )
+        notificationMessageText.set_tooltip_text( messageToolTip )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_sensitive( showNotificationCheckbox.get_active() )
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+        scrolledWindow.add( notificationMessageText )
+        box.pack_start( scrolledWindow, True, True, 0 )
+        grid.attach( box, 0, gridStartIndex + 2, 1, 1 )
+
+        showNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, scrolledWindow )
+
+        test = Gtk.Button( testButtonText )
+        test.set_halign( Gtk.Align.END )
+        test.set_sensitive( showNotificationCheckbox.get_active() )
+        test.connect( "clicked", self.onTestNotificationClicked, notificationSummaryText, notificationMessageText, False )
+        test.set_tooltip_text( testButtonToolTip )
+        grid.attach( test, 0, gridStartIndex + 3, 1, 1 )
+
+        showNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
 
 
     def onTestNotificationClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
