@@ -30,18 +30,10 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 #  http://www.flaticon.com/search/satellite
 
-#TODO What if we remove the list of planets, stars, comets, minor planets and satellites
-# and instead always add everything?
-# The only options we provide are
-#     The magnitude filter (excludes satellites) 
-#     Hide bodies below horizon (excludes satellites)
-#     Sort satellites by date/time. 
-#
-# If OE/TLE data is unavailable, might write to the log (or somehow let the user know without being annoying).
-
 
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
+
 
 #TODO If there is no data to download (no internet) and cache is stale,
 # ensure satellites/comets/minorplanets already selected by the user are not dropped.
