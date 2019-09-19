@@ -1453,7 +1453,7 @@ class IndicatorLunar:
 
         cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
         for comet in self.cometData:
-            cometStore.append( ( comet in self.comets, comet ) )
+            cometStore.append( ( comet in self.comets, comet ) ) #TODO Why is this a tuple whereas for planets/stars they use an array?  
 
         tree = Gtk.TreeView( cometStore )
         if self.cometData:
@@ -1488,7 +1488,7 @@ class IndicatorLunar:
 
         minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
         for minorPlanet in self.minorPlanetData:
-            minorPlanetStore.append( ( minorPlanet in self.minorPlanets, minorPlanet ) )
+            minorPlanetStore.append( ( minorPlanet in self.minorPlanets, minorPlanet ) )  #TODO Why is this a tuple whereas for planets/stars they use an array?
 
         tree = Gtk.TreeView( minorPlanetStore )
         if self.minorPlanetData:
@@ -1982,6 +1982,30 @@ class IndicatorLunar:
     def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, translatedTagColumnIndex, indicatorTextEntry ):
         model, treeiter = tree.get_selection().get_selected()
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
+
+
+    def createTable( self, bodies, listStore, toolTipText, columnHeaderText, columnIndex, box ):
+        for body in bodies:
+            listStore.append( body )
+
+        tree = Gtk.TreeView( listStore )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        tree.set_tooltip_text( toolTipText )
+
+        renderer_toggle = Gtk.CellRendererToggle()
+        renderer_toggle.connect( "toggled", self.onCheckbox, listStore, None, None )
+        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+        treeViewColumn.set_clickable( True )
+        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, listStore )
+        tree.append_column( treeViewColumn )
+
+        tree.append_column( Gtk.TreeViewColumn( columnHeaderText, Gtk.CellRendererText(), text = columnIndex ) )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( tree )
+
+        box.pack_start( scrolledWindow, True, True, 0 )
 
 
     def onCheckbox( self, widget, row, dataStore, sortStore = None, astronomicalBodyType = None ):
