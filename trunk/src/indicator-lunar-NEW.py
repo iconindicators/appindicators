@@ -1393,27 +1393,33 @@ class IndicatorLunar:
         for planetName in astroPyephem.PLANETS:
             planetStore.append( [ planetName in self.planets, planetName, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] ] )
 
-        tree = Gtk.TreeView( planetStore )
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.set_tooltip_text( _(
+        toolTipText = _(
             "Check a planet to display in the menu.\n\n" + \
             "Clicking the header of the first column\n" + \
-            "will toggle all checkboxes." ) )
+            "will toggle all checkboxes." )
+        self.createTable( planetStore, toolTipText, _( "Planet" ), 2, box )
 
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCheckbox, planetStore, None, None )
-        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
-        treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore )
-        tree.append_column( treeViewColumn )
-
-        tree.append_column( Gtk.TreeViewColumn( _( "Planet" ), Gtk.CellRendererText(), text = 2 ) )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
-        scrolledWindow.add( tree )
-
-        box.pack_start( scrolledWindow, True, True, 0 )
+#         tree = Gtk.TreeView( planetStore )
+#         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+#         tree.set_tooltip_text( _(
+#             "Check a planet to display in the menu.\n\n" + \
+#             "Clicking the header of the first column\n" + \
+#             "will toggle all checkboxes." ) )
+# 
+#         renderer_toggle = Gtk.CellRendererToggle()
+#         renderer_toggle.connect( "toggled", self.onCheckbox, planetStore, None, None )
+#         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+#         treeViewColumn.set_clickable( True )
+#         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, planetStore )
+#         tree.append_column( treeViewColumn )
+# 
+#         tree.append_column( Gtk.TreeViewColumn( _( "Planet" ), Gtk.CellRendererText(), text = 2 ) )
+# 
+#         scrolledWindow = Gtk.ScrolledWindow()
+#         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER )
+#         scrolledWindow.add( tree )
+# 
+#         box.pack_start( scrolledWindow, True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
         for starName in IndicatorLunar.STAR_NAMES_TRANSLATIONS.keys():
@@ -1424,27 +1430,33 @@ class IndicatorLunar:
         for star in stars:
             starStore.append( star )
 
-        tree = Gtk.TreeView( starStore )
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.set_tooltip_text( _(
+        toolTipText = _(
             "Check a star to display in the menu.\n\n" + \
             "Clicking the header of the first column\n" + \
-            "will toggle all checkboxes." ) )
+            "will toggle all checkboxes." )
+        self.createTable( starStore, toolTipText, _( "Star" ), 2, box )
 
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCheckbox, starStore, None, None )
-        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
-        treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore )
-        tree.append_column( treeViewColumn )
-
-        tree.append_column( Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 ) )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( tree )
-
-        box.pack_start( scrolledWindow, True, True, 0 )
+#         tree = Gtk.TreeView( starStore )
+#         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+#         tree.set_tooltip_text( _(
+#             "Check a star to display in the menu.\n\n" + \
+#             "Clicking the header of the first column\n" + \
+#             "will toggle all checkboxes." ) )
+# 
+#         renderer_toggle = Gtk.CellRendererToggle()
+#         renderer_toggle.connect( "toggled", self.onCheckbox, starStore, None, None )
+#         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+#         treeViewColumn.set_clickable( True )
+#         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, starStore )
+#         tree.append_column( treeViewColumn )
+# 
+#         tree.append_column( Gtk.TreeViewColumn( _( "Star" ), Gtk.CellRendererText(), text = 2 ) )
+# 
+#         scrolledWindow = Gtk.ScrolledWindow()
+#         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+#         scrolledWindow.add( tree )
+# 
+#         box.pack_start( scrolledWindow, True, True, 0 )
 
         notebook.append_page( box, Gtk.Label( _( "Planets / Stars" ) ) )
 
@@ -1455,71 +1467,101 @@ class IndicatorLunar:
         for comet in self.cometData:
             cometStore.append( ( comet in self.comets, comet ) ) #TODO Why is this a tuple whereas for planets/stars they use an array?  
 
-        tree = Gtk.TreeView( cometStore )
         if self.cometData:
-            tree.set_tooltip_text( _(
+            toolTipText = _(
                 "Check a comet to display in the menu.\n\n" + \
                 "Clicking the header of the first column\n" + \
-                "will toggle all checkboxes." ) )
+                "will toggle all checkboxes." )
 
         else:
-            tree.set_tooltip_text( _(
+            toolTipText = _(
                 "Comet data is unavailable; the source\n" + \
                 "could not be reached, or no data was\n" + \
                 "available from the source, or the data\n" + \
-                "was completely filtered by magnitude." ) )
+                "was completely filtered by magnitude." )
 
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCheckbox, cometStore, None, None )
-        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
-        treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore )
-        tree.append_column( treeViewColumn )
+        self.createTable( cometStore, toolTipText, _( "Comet" ), 1, box )
 
-        tree.append_column( Gtk.TreeViewColumn( _( "Comet" ), Gtk.CellRendererText(), text = 1 ) )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( tree )
-
-        box.pack_start( scrolledWindow, True, True, 0 )
+#         tree = Gtk.TreeView( cometStore )
+#         if self.cometData:
+#             tree.set_tooltip_text( _(
+#                 "Check a comet to display in the menu.\n\n" + \
+#                 "Clicking the header of the first column\n" + \
+#                 "will toggle all checkboxes." ) )
+# 
+#         else:
+#             tree.set_tooltip_text( _(
+#                 "Comet data is unavailable; the source\n" + \
+#                 "could not be reached, or no data was\n" + \
+#                 "available from the source, or the data\n" + \
+#                 "was completely filtered by magnitude." ) )
+# 
+#         renderer_toggle = Gtk.CellRendererToggle()
+#         renderer_toggle.connect( "toggled", self.onCheckbox, cometStore, None, None )
+#         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+#         treeViewColumn.set_clickable( True )
+#         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, cometStore )
+#         tree.append_column( treeViewColumn )
+# 
+#         tree.append_column( Gtk.TreeViewColumn( _( "Comet" ), Gtk.CellRendererText(), text = 1 ) )
+# 
+#         scrolledWindow = Gtk.ScrolledWindow()
+#         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+#         scrolledWindow.set_hexpand( True )
+#         scrolledWindow.set_vexpand( True )
+#         scrolledWindow.add( tree )
+# 
+#         box.pack_start( scrolledWindow, True, True, 0 )
 
         minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
         for minorPlanet in self.minorPlanetData:
             minorPlanetStore.append( ( minorPlanet in self.minorPlanets, minorPlanet ) )  #TODO Why is this a tuple whereas for planets/stars they use an array?
 
-        tree = Gtk.TreeView( minorPlanetStore )
         if self.minorPlanetData:
-            tree.set_tooltip_text( _(
+            toolTipText = _(
                 "Check a minor planet to display in the menu.\n\n" + \
                 "Clicking the header of the first column\n" + \
-                "will toggle all checkboxes." ) )
+                "will toggle all checkboxes." )
 
         else:
-            tree.set_tooltip_text( _(
+            toolTipText = _(
                 "Minor planet data is unavailable; the source\n" + \
                 "could not be reached, or no data was\n" + \
                 "available from the source, or the data\n" + \
-                "was completely filtered by magnitude." ) )
+                "was completely filtered by magnitude." )
 
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCheckbox, minorPlanetStore, None, None )
-        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
-        treeViewColumn.set_clickable( True )
-        treeViewColumn.connect( "clicked", self.onColumnHeaderClick, minorPlanetStore )
-        tree.append_column( treeViewColumn )
+        self.createTable( minorPlanetStore, toolTipText, _( "Minor Planet" ), 1, box )
 
-        tree.append_column( Gtk.TreeViewColumn( _( "Minor Planet" ), Gtk.CellRendererText(), text = 1 ) )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( tree )
-
-        box.pack_start( scrolledWindow, True, True, 0 )
+#         tree = Gtk.TreeView( minorPlanetStore )
+#         if self.minorPlanetData:
+#             tree.set_tooltip_text( _(
+#                 "Check a minor planet to display in the menu.\n\n" + \
+#                 "Clicking the header of the first column\n" + \
+#                 "will toggle all checkboxes." ) )
+# 
+#         else:
+#             tree.set_tooltip_text( _(
+#                 "Minor planet data is unavailable; the source\n" + \
+#                 "could not be reached, or no data was\n" + \
+#                 "available from the source, or the data\n" + \
+#                 "was completely filtered by magnitude." ) )
+# 
+#         renderer_toggle = Gtk.CellRendererToggle()
+#         renderer_toggle.connect( "toggled", self.onCheckbox, minorPlanetStore, None, None )
+#         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+#         treeViewColumn.set_clickable( True )
+#         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, minorPlanetStore )
+#         tree.append_column( treeViewColumn )
+# 
+#         tree.append_column( Gtk.TreeViewColumn( _( "Minor Planet" ), Gtk.CellRendererText(), text = 1 ) )
+# 
+#         scrolledWindow = Gtk.ScrolledWindow()
+#         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+#         scrolledWindow.set_hexpand( True )
+#         scrolledWindow.set_vexpand( True )
+#         scrolledWindow.add( tree )
+# 
+#         box.pack_start( scrolledWindow, True, True, 0 )
 
         notebook.append_page( box, Gtk.Label( _( "Comets / Minor Planets" ) ) )
 
@@ -1984,10 +2026,7 @@ class IndicatorLunar:
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
 
 
-    def createTable( self, bodies, listStore, toolTipText, columnHeaderText, columnIndex, box ):
-        for body in bodies:
-            listStore.append( body )
-
+    def createTable( self, listStore, toolTipText, columnHeaderText, columnIndex, box ):
         tree = Gtk.TreeView( listStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.set_tooltip_text( toolTipText )
