@@ -423,7 +423,7 @@ class IndicatorScriptRunner:
             scriptName = model[ treeiter ][ 0 ]
             script = self.getScript( scripts, scriptGroup, scriptName )
 
-        grid = pythonutils.createGrid()
+            grid = pythonutils.createGrid()
 
             box = Gtk.Box( spacing = 6 )
 
