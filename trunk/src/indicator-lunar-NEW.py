@@ -31,9 +31,6 @@
 #  http://www.flaticon.com/search/satellite
 
 
-#TODO Include planets and stars in the magnitude filter?
-
-
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
 
@@ -1835,7 +1832,7 @@ class IndicatorLunar:
 
                 displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
-        # Add in bodyTags/tags which are not present in the current data.
+        # Add in bodyTags/dataTags which are not present in the current data.
         items = [ [ astroPyephem.AstronomicalBodyType.Comet, self.cometData, astroPyephem.DATA_COMET ],
                   [ astroPyephem.AstronomicalBodyType.MinorPlanet, self.minorPlanetData, astroPyephem.DATA_MINOR_PLANET ] ]
 
