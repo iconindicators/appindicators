@@ -1515,7 +1515,6 @@ class IndicatorLunar:
 
         grid = pythonutils.createGrid()
 
-#TODO Maybe each of these can be put into a function?
         showSatelliteNotificationCheckbox = Gtk.CheckButton( _( "Satellite rise" ) )
         showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
         showSatelliteNotificationCheckbox.set_tooltip_text( _( "Screen notification when a satellite rises above the horizon." ) )
