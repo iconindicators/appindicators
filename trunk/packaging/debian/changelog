@@ -1,3 +1,10 @@
+indicator-script-runner (1.0.10-1) xenial; urgency=low
+
+  * Bug fix: Indentation error.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 20 Sep 2019 15:04:52 +1000
+
+
 indicator-script-runner (1.0.9-1) xenial; urgency=low
 
   * Correction of text in tooltip in Preferences.
