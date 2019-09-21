@@ -644,8 +644,8 @@ class IndicatorLunar:
 # Therefore reading the cache binary will throw an exception and return None.
 # Not a problem as a new version will be downloaded and the cache will eventually clear out.
 #
-# Comets will successfully read in because their objects (dict, tuple string) are valid.
-# Comets are still stored in a dict using a string as key but now with a new OE object as the value, which must be handled.
+# Comets will successfully read in because their objects (dictionary, tuple string) are valid.
+# Comets are still stored in a dictionary using a string as key but now with a new OE object as the value, which must be handled.
 # This check can be removed in version 82.
         if data is not None and cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME:
             if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ): # Check that the object loaded from cache matches the new OE object.
