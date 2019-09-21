@@ -585,6 +585,8 @@ class IndicatorLunar:
             if not scheduled:
                 GLib.source_remove( self.updateTimerID )
 
+            utcNow = datetime.datetime.utcnow() #TODO Test
+
             # Update comet, minor planet and satellite data.
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
@@ -604,6 +606,9 @@ class IndicatorLunar:
             if self.satellitesAddNew:
                 self.addNewBodies( self.satelliteData, self.satellites )
 
+            print( "Update data:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
+            utcNow = datetime.datetime.utcnow() #TODO Test
+
             # Update backend.  Returned object is a dictionary:
             #    Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             #    Value is the calculated astronomical data as a string.
@@ -617,6 +622,9 @@ class IndicatorLunar:
                                                           self.magnitude,
                                                           self.hideBodiesBelowHorizon )
 
+            print( "Update backend:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
+            utcNow = datetime.datetime.utcnow() #TODO Test
+
             # Update frontend.
             self.updateMenu()
             self.updateIconAndLabel()
@@ -627,6 +635,9 @@ class IndicatorLunar:
 #TODO Uncomment when all done...don't forget to test!
 #             if self.showSatelliteNotification:
 #                 self.notificationSatellites()
+
+            print( "Update frontend:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
+#             utcNow = datetime.datetime.utcnow() #TODO Test
 
             self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
 
