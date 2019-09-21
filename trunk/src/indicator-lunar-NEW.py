@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from curses.ascii import alt
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -29,6 +30,33 @@
 #  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
 #  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
 #  http://www.flaticon.com/search/satellite
+
+
+# TODO Attributes in currently released indicator which have been culled in the development version
+#  and why they should or should not be put back, assuming no performance degradation:
+# 
+#     Illumination - This is still calculated, but used internally for the moon to draw the icon.
+# 
+#      Constellation - Perhaps helpful for a user to find a star in lieu of using the Az/Alt.  However, constellations themselves are arbitrary and not based on science.
+# 
+#      Magnitude - This is still calculated, but used internally to filter out bodies.
+# 
+#      Tropical Sign - Used by astrologers and was put in as a kind favour.  Not based on science. 
+# 
+#      Distance to Earth, Distance to Sun - Not useful unless you have an Aluminum Falcon, https://www.youtube.com/watch?v=3F1d3QWsyk0.
+# 
+#      Bright Limb - This is still calculated, but used internally for the moon to draw the icon.
+# 
+#      RA/Dec - Removed as Az/Alt are much easier to use and give the same result (find a body in the night sky).
+# 
+#      Solstice/Equinox - Interesting information.
+# 
+#      Saturn: Earth Tilt, Sun Tilt - Interesting information.
+# 
+#      Planet Moons:
+#          Az/Alt, RA/Dec - Essentially identical to that of the parent planet.
+#          Earth Visible - May be visible from Earth, but chances are you ain't gonna actually see it!
+#          Offset from Planet, X, Y, Z - Useful if you have a big enough telescope.
 
 
 #TODO Update screen shot
