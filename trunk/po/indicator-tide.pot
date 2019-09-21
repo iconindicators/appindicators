@@ -187,7 +187,7 @@ msgid ""
 "    {1} - the tide level, measured in metres.\n"
 "\n"
 "This format is used when there is no time\n"
-"component in a tide reading"
+"component in a tide reading."
 msgstr ""
 
 #: indicator-tide.py:392

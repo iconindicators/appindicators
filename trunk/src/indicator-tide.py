@@ -48,7 +48,7 @@ import datetime, locale, logging, os, ports, pythonutils, re, threading, tide, w
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.15"
+    VERSION = "1.0.16"
     ICON = INDICATOR_NAME
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
@@ -373,7 +373,7 @@ class IndicatorTide:
             "    {0} - the tide is high or low.\n" + \
             "    {1} - the tide level, measured in metres.\n\n" + \
             "This format is used when there is no time\n" + \
-            "component in a tide reading" ).format( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG ) )
+            "component in a tide reading." ).format( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG ) )
         box.pack_start( tideFormatSansTime, True, True, 0 )
 
         grid.attach( box, 0, 5, 1, 1 )
