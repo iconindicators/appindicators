@@ -487,7 +487,7 @@ class IndicatorLunar:
                                      "minorplanet-oe-" + "critical",
                                      "minorplanet-oe-" + "distant",
                                      "minorplanet-oe-" + "unusual" ]
-    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 30
+    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt", 
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
@@ -521,7 +521,7 @@ class IndicatorLunar:
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
-    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 18
+    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 12
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_MENU_TEXT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
