@@ -319,13 +319,13 @@ def showAboutDialog(
         aboutDialog.hide()
 
 
-# Read a dict of configuration from a JSON text file.
+# Read a dictionary of configuration from a JSON text file.
 #
 # applicationBaseDirectory: The directory used as the final part of the overall path.
 # configBaseFile: The file name (without extension).
 # logging: A valid logger, used on error.
 #
-# Returns a dict of key/value pairs (empty when no file is present or an error occurs).
+# Returns a dictionary of key/value pairs (empty when no file is present or an error occurs).
 def loadConfig( applicationBaseDirectory, configBaseFile, logging ):
     configFile = _getConfigFile( applicationBaseDirectory, configBaseFile )
     config = { }
@@ -342,9 +342,9 @@ def loadConfig( applicationBaseDirectory, configBaseFile, logging ):
     return config
 
 
-# Write a dict of user configuration to a JSON text file.
+# Write a dictionary of user configuration to a JSON text file.
 #
-# config: dict of key/value pairs.
+# config: dictionary of key/value pairs.
 # applicationBaseDirectory: The directory used as the final part of the overall path.
 # configBaseFile: The file name (without extension).
 # logging: A valid logger, used on error.
