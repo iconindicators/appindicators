@@ -37,26 +37,27 @@ from curses.ascii import alt
 # 
 #     Illumination - This is still calculated, but used internally for the moon to draw the icon.
 # 
-#      Constellation - Perhaps helpful for a user to find a star in lieu of using the Az/Alt.  However, constellations themselves are arbitrary and not based on science.
+#     Constellation - Perhaps helpful for a user to find a star in lieu of using the Az/Alt.  
+#                     However, constellations themselves are arbitrary and not based on science.
 # 
-#      Magnitude - This is still calculated, but used internally to filter out bodies.
+#     Magnitude - This is still calculated, but used internally to filter out bodies.
 # 
-#      Tropical Sign - Used by astrologers and was put in as a kind favour.  Not based on science. 
+#     Tropical Sign - Used by astrologers and was put in as a kind favour.  Not based on science. 
 # 
-#      Distance to Earth, Distance to Sun - Not useful unless you have an Aluminum Falcon, https://www.youtube.com/watch?v=3F1d3QWsyk0.
+#     Distance to Earth, Distance to Sun - Not useful unless you have an Aluminum Falcon, https://www.youtube.com/watch?v=3F1d3QWsyk0.
 # 
-#      Bright Limb - This is still calculated, but used internally for the moon to draw the icon.
+#     Bright Limb - This is still calculated, but used internally for the moon to draw the icon.
 # 
-#      RA/Dec - Removed as Az/Alt are much easier to use and give the same result (find a body in the night sky).
+#     RA/Dec - Removed as Az/Alt are much easier to use and give the same result (find a body in the night sky).
 # 
-#      Solstice/Equinox - Interesting information.
+#     Solstice/Equinox - Interesting information.
 # 
-#      Saturn: Earth Tilt, Sun Tilt - Interesting information.
+#     Saturn: Earth Tilt, Sun Tilt - Interesting information.
 # 
-#      Planet Moons:
-#          Az/Alt, RA/Dec - Essentially identical to that of the parent planet.
-#          Earth Visible - May be visible from Earth, but chances are you ain't gonna actually see it!
-#          Offset from Planet, X, Y, Z - Useful if you have a big enough telescope.
+#     Planet Moons:
+#         Az/Alt, RA/Dec - Essentially identical to that of the parent planet.
+#         Earth Visible - May be visible from Earth, but chances are you ain't gonna actually see it!
+#         Offset from Planet, X, Y, Z - Useful if you have a big enough telescope.
 
 
 #TODO Update screen shot
