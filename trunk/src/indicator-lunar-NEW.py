@@ -523,10 +523,10 @@ class IndicatorLunar:
     COMET_CACHE_MAXIMUM_AGE_HOURS = 24
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
-    MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright",
-                                     "minorplanet-oe-" + "critical",
-                                     "minorplanet-oe-" + "distant",
-                                     "minorplanet-oe-" + "unusual" ]
+    MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
+                                     "minorplanet-oe-" + "critical-",
+                                     "minorplanet-oe-" + "distant-",
+                                     "minorplanet-oe-" + "unusual-" ]
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt", 
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
