@@ -117,9 +117,10 @@ class IndicatorLunar:
     AUTHOR = "Bernard Giannetti"
     VERSION = "1.0.81"
     ICON = INDICATOR_NAME # Located in /usr/share/icons
+    COPYRIGHT_START_YEAR = "2012"
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister"
+    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
 
 #TODO Put back to 5
     START_UP_DELAY_IN_SECONDS = 1 # Used to delay the update function which potentially takes a long time.
@@ -129,12 +130,12 @@ class IndicatorLunar:
     ICON_FULL_MOON = ICON_BASE_NAME + "-fullmoon-icon" + ".svg" # Dynamically created in the temporary directory (typically /tmp).
     ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
 
-    ABOUT_COMMENTS = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." )
-    ABOUT_CREDIT_ECLIPSE = _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" )
-    ABOUT_CREDIT_PYEPHEM = _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
-    ABOUT_CREDIT_COMET = _( "Comet and Minor Planet OE data by Minor Planet Center. http://www.minorplanetcenter.net" )
-    ABOUT_CREDIT_SATELLITE = _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" )
-    ABOUT_CREDITS = [ ABOUT_CREDIT_PYEPHEM, ABOUT_CREDIT_ECLIPSE, ABOUT_CREDIT_SATELLITE, ABOUT_CREDIT_COMET ]
+    COMMENTS = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." )
+    CREDIT_ECLIPSE = _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" )
+    CREDIT_PYEPHEM = _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
+    CREDIT_COMET_AND_MINOR_PLANETS = _( "Comet and Minor Planet OE data by Minor Planet Center. http://www.minorplanetcenter.net" )
+    CREDIT_SATELLITES = _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" )
+    CREDITS = [ CREDIT_PYEPHEM, CREDIT_ECLIPSE, CREDIT_SATELLITES, CREDIT_COMET_AND_MINOR_PLANETS ]
 
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
@@ -1247,9 +1248,12 @@ class IndicatorLunar:
     def onAbout( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
-                [ IndicatorLunar.AUTHOR ],
-                IndicatorLunar.ABOUT_COMMENTS,
-                IndicatorLunar.ABOUT_CREDITS,
+                [ IndicatorLunar.AUTHOR + " " + IndicatorLunar.WEBSITE ],
+                [ IndicatorLunar.AUTHOR + " " + IndicatorLunar.WEBSITE ],
+                IndicatorLunar.COMMENTS,
+                IndicatorLunar.AUTHOR,
+                IndicatorLunar.COPYRIGHT_START_YEAR,
+                IndicatorLunar.CREDITS,
                 _( "Credits" ),
                 Gtk.License.GPL_3_0,
                 IndicatorLunar.ICON,
