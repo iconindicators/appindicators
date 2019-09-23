@@ -48,11 +48,12 @@ import datetime, locale, logging, os, ports, pythonutils, re, threading, tide, w
 class IndicatorTide:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.16"
+    VERSION = "1.0.17"
     ICON = INDICATOR_NAME
+    COPYRIGHT_START_YEAR = "2015"
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister"
+    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
     COMMENTS = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() )
 
     CREDIT_UKHO_COPYRIGHT = _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. http://www.GOV.uk/UKHO" )
@@ -233,8 +234,11 @@ class IndicatorTide:
     def onAbout( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
-                [ IndicatorTide.AUTHOR ],
-                IndicatorTide.COMMENTS, 
+                [ IndicatorTide.AUTHOR + " " + IndicatorTide.WEBSITE ],
+                [ IndicatorTide.AUTHOR + " " + IndicatorTide.WEBSITE ],
+                IndicatorTide.COMMENTS,
+                IndicatorTide.AUTHOR,
+                IndicatorTide.COPYRIGHT_START_YEAR,
                 IndicatorTide.CREDITS,
                 _( "Credits" ),
                 Gtk.License.GPL_3_0,
