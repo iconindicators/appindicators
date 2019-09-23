@@ -46,11 +46,13 @@ import encodings.idna, json, logging, os, pythonutils, re, threading
 class IndicatorPunycode:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.7"
+    ARTIST = "Oleg Moiseichuk"
+    VERSION = "1.0.8"
     ICON = INDICATOR_NAME
+    COPYRIGHT_START_YEAR = "2016"
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister"
+    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
     COMMENTS = _( "Convert domain names between Unicode and ASCII." )
 
     CONFIG_DROP_PATH_QUERY = "dropPathQuery"
@@ -176,8 +178,11 @@ class IndicatorPunycode:
     def onAbout( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
-                [ IndicatorPunycode.AUTHOR ],
-                IndicatorPunycode.COMMENTS, 
+                [ IndicatorPunycode.AUTHOR + " " + IndicatorPunycode.WEBSITE ],
+                [ IndicatorPunycode.ARTIST ],
+                IndicatorPunycode.COMMENTS,
+                IndicatorPunycode.AUTHOR,
+                IndicatorPunycode.COPYRIGHT_START_YEAR,
                 [ ],
                 "",
                 Gtk.License.GPL_3_0,
