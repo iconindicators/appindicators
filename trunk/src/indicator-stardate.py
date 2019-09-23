@@ -45,11 +45,12 @@ import datetime, json, logging, os, pythonutils, stardate, threading
 class IndicatorStardate:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.37"
+    VERSION = "1.0.38"
     ICON = INDICATOR_NAME
+    COPYRIGHT_START_YEAR = "2012"
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister"
+    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
     COMMENTS = _( "Shows the current Star Trek™ stardate." )
     CREDITS = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ]
 
@@ -161,8 +162,11 @@ class IndicatorStardate:
     def onAbout( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
-                [ IndicatorStardate.AUTHOR ],
-                IndicatorStardate.COMMENTS, 
+                [ IndicatorStardate.AUTHOR + " " + IndicatorStardate.WEBSITE ],
+                [ IndicatorStardate.AUTHOR + " " + IndicatorStardate.WEBSITE ],
+                IndicatorStardate.COMMENTS,
+                IndicatorStardate.AUTHOR,
+                IndicatorStardate.COPYRIGHT_START_YEAR,
                 IndicatorStardate.CREDITS,
                 _( "Credits" ),
                 Gtk.License.GPL_3_0,

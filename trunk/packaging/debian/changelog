@@ -1,3 +1,10 @@
+indicator-stardate (1.0.38-1) xenial; urgency=low
+
+  * About dialog now shows copyright, artists and corrected URL for website.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Sep 2019 16:00:50 +1000
+
+
 indicator-stardate (1.0.37-1) xenial; urgency=low
 
   * Tidy up load config of user preferences.
