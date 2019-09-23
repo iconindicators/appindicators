@@ -248,7 +248,7 @@ def getMenuItemsGuess():
 
 def showAboutDialog(
         authors, # List of authors.
-        artists, # List of authors.
+        artists, # List of artists.
         comments, # Comments.
         copyrightName,
         copyrightStartYear,
