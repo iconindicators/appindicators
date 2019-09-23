@@ -1278,6 +1278,7 @@ class IndicatorLunar:
             GLib.idle_add( self.update )
 
 
+#TODO Do this for all other indicators.
     def onPreferences( self, widget ):
         if self.lock.acquire( blocking = False ):
             GLib.source_remove( self.updateTimerID )
