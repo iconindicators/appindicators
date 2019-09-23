@@ -53,11 +53,12 @@ import concurrent.futures, json, locale, logging, operator, os, pythonutils, tem
 class IndicatorPPADownloadStatistics:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.66"
+    VERSION = "1.0.67"
     ICON = INDICATOR_NAME
+    COPYRIGHT_START_YEAR = "2012"
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister"
+    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
     COMMENTS = _( "Display the total downloads of PPAs." )
 
     SERIES = [ "eoan",
@@ -277,8 +278,11 @@ class IndicatorPPADownloadStatistics:
     def onAbout( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
-                [ IndicatorPPADownloadStatistics.AUTHOR ],
-                IndicatorPPADownloadStatistics.COMMENTS, 
+                [ IndicatorPPADownloadStatistics.AUTHOR + " " + IndicatorPPADownloadStatistics.WEBSITE ],
+                [ IndicatorPPADownloadStatistics.AUTHOR + " " + IndicatorPPADownloadStatistics.WEBSITE ],
+                IndicatorPPADownloadStatistics.COMMENTS,
+                IndicatorPPADownloadStatistics.AUTHOR,
+                IndicatorPPADownloadStatistics.COPYRIGHT_START_YEAR,
                 [ ],
                 "",
                 Gtk.License.GPL_3_0,
