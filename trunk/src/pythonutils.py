@@ -248,7 +248,10 @@ def getMenuItemsGuess():
 
 def showAboutDialog(
         authors, # List of authors.
+        artists, # List of authors.
         comments, # Comments.
+        copyrightName,
+        copyrightStartYear,
         creditsPeople, # List of credits.
         creditsLabel, # Credit text.
         licenseType, # Any of Gtk.License.*
@@ -267,27 +270,19 @@ def showAboutDialog(
 
         aboutDialog = Gtk.AboutDialog()
 
-        if sys.version_info.major == 3 and sys.version_info.minor >= 4:
-            aboutDialog.set_authors( authors )
-            if len( creditsPeople ) > 0:
-                aboutDialog.add_credit_section( creditsLabel, creditsPeople )
-        else:
-            authorsAndCredits = authors
-            for credit in creditsPeople:
-                authorsAndCredits.append( credit )
-
-            aboutDialog.set_authors( authorsAndCredits )
-
+        aboutDialog.set_artists( artists )
+        aboutDialog.set_authors( authors )
         aboutDialog.set_comments( comments )
+        aboutDialog.set_copyright( "Copyright \xa9 " + copyrightStartYear + "-" + str( datetime.datetime.now().year ) + " " + copyrightName )
+        aboutDialog.add_credit_section( creditsLabel, creditsPeople )
         aboutDialog.set_license_type( licenseType )
         aboutDialog.set_logo_icon_name( logoIconName )
         aboutDialog.set_program_name( programName )
+        aboutDialog.set_translator_credits( translatorCredit )
         aboutDialog.set_version( version )
         aboutDialog.set_website( website )
         aboutDialog.set_website_label( website )
-
-        if not( translatorCredit is None or translatorCredit == "" ):
-            aboutDialog.set_translator_credits( translatorCredit )
+        aboutDialog.set_translator_credits( translatorCredit )
 
         changeLog = "/tmp/" + programName + ".changelog"
         if os.path.isfile( changeLog ):
@@ -344,7 +339,7 @@ def loadConfig( applicationBaseDirectory, configBaseFile, logging ):
 
 # Write a dictionary of user configuration to a JSON text file.
 #
-# config: dictionary of key/value pairs.
+# config: of key/value pairs.
 # applicationBaseDirectory: The directory used as the final part of the overall path.
 # configBaseFile: The file name (without extension).
 # logging: A valid logger, used on error.
