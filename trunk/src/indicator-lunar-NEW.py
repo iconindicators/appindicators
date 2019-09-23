@@ -31,6 +31,10 @@
 #  http://www.flaticon.com/search/satellite
 
 
+#TODO Maybe use set_sensitive on about/preferences (even quit) when updates start
+#or when one of the dialogs is shown.
+
+
 # TODO Attributes in currently released indicator which have been culled in the development version
 #  and why they should or should not be put back, assuming no performance degradation:
 # 
