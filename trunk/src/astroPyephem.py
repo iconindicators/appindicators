@@ -33,11 +33,14 @@ class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, S
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
 DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
+DATA_DAWN = "DAWN"
+DATA_DUSK = "DUSK"
 DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
 DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
 DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
 DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
 DATA_ELEVATION = "ELEVATION" # Internally used for city.
+DATA_EQUINOX = "EQUINOX"
 DATA_FIRST_QUARTER = "FIRST QUARTER"
 DATA_FULL = "FULL"
 DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
@@ -49,6 +52,7 @@ DATA_RISE_AZIMUTH = "RISE AZIMUTH"
 DATA_RISE_DATE_TIME = "RISE DATE TIME"
 DATA_SET_AZIMUTH = "SET AZIMUTH"
 DATA_SET_DATE_TIME = "SET DATE TIME"
+DATA_SOLSTICE = "SOLSTICE"
 DATA_THIRD_QUARTER = "THIRD QUARTER"
 
 DATA_INTERNAL = [
@@ -103,12 +107,16 @@ DATA_STAR = [
 DATA_SUN = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
+    DATA_DAWN,
+    DATA_DUSK,
     DATA_ECLIPSE_DATE_TIME,
     DATA_ECLIPSE_LATITUDE,
     DATA_ECLIPSE_LONGITUDE,
     DATA_ECLIPSE_TYPE,
+    DATA_EQUINOX,
     DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME ]
+    DATA_SET_DATE_TIME,
+    DATA_SOLSTICE ]
 
 NAME_TAG_CITY = "CITY"
 NAME_TAG_MOON = "MOON"
@@ -426,6 +434,26 @@ def __calculateSun( ephemNow, data, hideIfBelowHorizon ):
     hidden = __calculateCommon( ephemNow, data, ephem.Sun(), AstronomicalBodyType.Sun, NAME_TAG_SUN, hideIfBelowHorizon )
     if not hidden:
         __calculateEclipse( ephemNow.datetime(), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
+
+        key = ( AstronomicalBodyType.Sun, NAME_TAG_SUN )
+
+        equinox = ephem.next_equinox( ephemNow )
+        solstice = ephem.next_solstice( ephemNow )
+        data[ key + ( DATA_EQUINOX, ) ] = __toDateTimeString( equinox.datetime() )
+        data[ key + ( DATA_SOLSTICE, ) ] = __toDateTimeString( solstice.datetime() )
+
+        try:
+            # Dawn/Dusk.
+            city = __getCity( data, ephemNow )
+            city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
+            sun = ephem.Sun()
+            dawn = city.next_rising( sun, use_center = True )
+            dusk = city.next_setting( sun, use_center = True )
+            data[ key + ( DATA_DAWN, ) ] = __toDateTimeString( dawn.datetime() )
+            data[ key + ( DATA_DUSK, ) ] = __toDateTimeString( dusk.datetime() )
+
+        except ( ephem.AlwaysUpError, ephem.NeverUpError ):
+            pass
 
 
 # Calculate next eclipse for either the Sun or Moon.

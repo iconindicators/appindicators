@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from src import astroPyephem
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -68,6 +69,7 @@
 # Further, the sun/moon have eclipse information and the moon has phase information
 # which are NOT needed for finding the sun/moon.
 # So maybe adding solstice/equinox back in is okay.
+# Ditto for dawn/dusk.
 
 
 #TODO Update screen shot
@@ -660,6 +662,16 @@ class IndicatorLunar:
             # Update frontend.
             self.updateMenu()
             self.updateIconAndLabel()
+
+#TODO Testing
+            try:
+                print( "Equinox ", self.data[ ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_EQUINOX ) ] )
+                print( "Solstice ", self.data[ ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_SOLSTICE ) ] )
+                print( "Dawn ", self.data[ ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_DAWN ) ] )
+                print( "Dusk ", self.data[ ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_DUSK ) ] )
+
+            except Exception as e:
+                print( e )
 
             if self.showWerewolfWarning:
                 self.notificationFullMoon()
