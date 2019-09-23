@@ -665,10 +665,10 @@ class IndicatorLunar:
 
 #TODO Testing
             try:
-                print( "Equinox ", self.data[ ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_EQUINOX ) ] )
-                print( "Solstice ", self.data[ ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_SOLSTICE ) ] )
-                print( "Dawn ", self.data[ ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_DAWN ) ] )
-                print( "Dusk ", self.data[ ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_DUSK ) ] )
+                print( "Equinox ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_EQUINOX ) ) )
+                print( "Solstice ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_SOLSTICE ) ) )
+                print( "Dawn ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_DAWN ) ) )
+                print( "Dusk ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_DUSK ) ) )
 
             except Exception as e:
                 print( e )
@@ -1150,12 +1150,16 @@ class IndicatorLunar:
            key[ 2 ] == astroPyephem.DATA_SET_AZIMUTH:
             displayData = str( round( math.degrees( float( self.data[ key ] ) ) ) ) + "°"
 
-        elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
+        elif key[ 2 ] == astroPyephem.DATA_DUSK or \
+             key[ 2 ] == astroPyephem.DATA_DAWN or \
+             key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
+             key[ 2 ] == astroPyephem.DATA_EQUINOX or \
              key[ 2 ] == astroPyephem.DATA_FIRST_QUARTER or \
              key[ 2 ] == astroPyephem.DATA_FULL or \
              key[ 2 ] == astroPyephem.DATA_NEW or \
              key[ 2 ] == astroPyephem.DATA_RISE_DATE_TIME or \
              key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
+             key[ 2 ] == astroPyephem.DATA_SOLSTICE or \
              key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
                 if dateTimeFormat is None:
                     displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ).replace( ' ', '  ' )
