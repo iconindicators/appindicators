@@ -46,11 +46,12 @@ import logging, os, pythonutils, threading
 class IndicatorFortune:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.29"
+    VERSION = "1.0.30"
     ICON = INDICATOR_NAME
+    COPYRIGHT_START_YEAR = "2013"
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister"
+    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
     COMMENTS = _( "Calls the 'fortune' program displaying the result in the on-screen notification." )
 
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
@@ -169,8 +170,11 @@ class IndicatorFortune:
     def onAbout( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
-                [ IndicatorFortune.AUTHOR ],
-                IndicatorFortune.COMMENTS, 
+                [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
+                [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
+                IndicatorFortune.COMMENTS,
+                IndicatorFortune.AUTHOR,
+                IndicatorFortune.COPYRIGHT_START_YEAR,
                 [ ],
                 "",
                 Gtk.License.GPL_3_0,
