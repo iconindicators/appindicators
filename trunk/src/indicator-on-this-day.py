@@ -48,8 +48,9 @@ import fnmatch, logging, os, pythonutils, threading, webbrowser
 class IndicatorOnThisDay:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.4"
+    VERSION = "1.0.5"
     ICON = INDICATOR_NAME
+    COPYRIGHT_START_YEAR = "2017"
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
     WEBSITE = "https://launchpad.net/~thebernmeister"
@@ -196,8 +197,11 @@ class IndicatorOnThisDay:
     def onAbout( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
-                [ IndicatorOnThisDay.AUTHOR ],
-                IndicatorOnThisDay.COMMENTS, 
+                [ IndicatorOnThisDay.AUTHOR + " " + IndicatorOnThisDay.WEBSITE ],
+                [ IndicatorOnThisDay.AUTHOR + " " + IndicatorOnThisDay.WEBSITE ],
+                IndicatorOnThisDay.COMMENTS,
+                IndicatorOnThisDay.AUTHOR,
+                IndicatorOnThisDay.COPYRIGHT_START_YEAR,
                 [ ],
                 "",
                 Gtk.License.GPL_3_0,
