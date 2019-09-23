@@ -46,11 +46,12 @@ import copy, logging, os, pythonutils, threading
 class IndicatorScriptRunner:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.10"
+    VERSION = "1.0.11"
     ICON = INDICATOR_NAME
+    COPYRIGHT_START_YEAR = "2016"
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister"
+    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
     COMMENTS = _( "Run a terminal command or script from an indicator." )
 
     CONFIG_HIDE_GROUPS = "hideGroups"
@@ -145,8 +146,11 @@ class IndicatorScriptRunner:
     def onAbout( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
-                [ IndicatorScriptRunner.AUTHOR ],
-                IndicatorScriptRunner.COMMENTS, 
+                [ IndicatorScriptRunner.AUTHOR + " " + IndicatorScriptRunner.WEBSITE ],
+                [ IndicatorScriptRunner.AUTHOR + " " + IndicatorScriptRunner.WEBSITE ],
+                IndicatorScriptRunner.COMMENTS,
+                IndicatorScriptRunner.AUTHOR,
+                IndicatorScriptRunner.COPYRIGHT_START_YEAR,
                 [ ],
                 "",
                 Gtk.License.GPL_3_0,
