@@ -47,11 +47,12 @@ import datetime, logging, os, pythonutils, threading, time, virtualmachine
 class IndicatorVirtualBox:
 
     AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.61"
+    VERSION = "1.0.62"
     ICON = INDICATOR_NAME
+    COPYRIGHT_START_YEAR = "2012"
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister"
+    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
     COMMENTS = _( "Shows VirtualBox™ virtual machines and allows them to be started." )
 
     VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
@@ -422,8 +423,11 @@ class IndicatorVirtualBox:
     def onAbout( self, widget ):
         if self.dialogLock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
-                [ IndicatorVirtualBox.AUTHOR ],
-                IndicatorVirtualBox.COMMENTS, 
+                [ IndicatorVirtualBox.AUTHOR + " " + IndicatorVirtualBox.WEBSITE ],
+                [ IndicatorVirtualBox.AUTHOR + " " + IndicatorVirtualBox.WEBSITE ],
+                IndicatorVirtualBox.COMMENTS,
+                IndicatorVirtualBox.AUTHOR,
+                IndicatorVirtualBox.COPYRIGHT_START_YEAR,
                 [ ],
                 "",
                 Gtk.License.GPL_3_0,
