@@ -31,10 +31,6 @@
 #  http://www.flaticon.com/search/satellite
 
 
-#TODO Maybe use set_sensitive on about/preferences (even quit) when updates start
-#or when one of the dialogs is shown.
-
-
 # TODO Attributes in currently released indicator which have been culled in the development version
 #  and why they should or should not be put back, assuming no performance degradation:
 # 
@@ -107,11 +103,6 @@
 #TODO Test during dusk/evening to see satellite passes in the menu.
 #             from datetime import timezone #TODO Testing for satellites
 #             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime( 2019, 8, 29, 9, 0, 0, 0, tzinfo = timezone.utc ),
-
-
-#TODO If the backend/frontend are updating, and the user clicks on about/prefs, show a notification to tell the user they're blocked?
-#What about the other way?  If the about/prefs are open, disable the updates?
-#What do the other indicators do (PPA)?
 
 
 INDICATOR_NAME = "indicator-lunar"
