@@ -68,6 +68,10 @@
 #         Az/Alt, RA/Dec - Essentially identical to that of the parent planet.
 #         Earth Visible - May be visible from Earth, but chances are you ain't gonna actually see it!
 #         Offset from Planet, X, Y, Z - Useful if you have a big enough telescope.
+#
+# Further, the sun/moon have eclipse information and the moon has phase information
+# which are NOT needed for finding the sun/moon.
+# So maybe adding solstice/equinox back in is okay.
 
 
 #TODO Update screen shot
@@ -611,7 +615,7 @@ class IndicatorLunar:
             os.remove( oldIcon )
 
         Notify.init( INDICATOR_NAME )
-        self.dialogLock = threading.Lock()
+        self.lock = threading.Lock()
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         self.loadConfig()
         GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update )
@@ -620,11 +624,8 @@ class IndicatorLunar:
     def main( self ): Gtk.main()
 
 
-    def update( self, scheduled = True ):
-        with threading.Lock():
-            if not scheduled:
-                GLib.source_remove( self.updateTimerID )
-
+    def update( self ):
+        with self.lock:
             utcNow = datetime.datetime.utcnow() #TODO Test
 
             # Update comet, minor planet and satellite data.
@@ -730,6 +731,7 @@ class IndicatorLunar:
                 if dateTime > utcNowPlusOneMinute and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
+        print( datetime.datetime.now() + datetime.timedelta( seconds = int( ( nextUpdateTime - utcNow ).total_seconds() ) + 10 ) )
         return int( ( nextUpdateTime - utcNow ).total_seconds() ) + 10 # Add some fat to ensure we don't do an update and leave in an item which as more or less set.
 
 
@@ -1257,7 +1259,8 @@ class IndicatorLunar:
 
 
     def onAbout( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
+            GLib.source_remove( self.updateTimerID )
             pythonutils.showAboutDialog(
                 [ IndicatorLunar.AUTHOR + " " + IndicatorLunar.WEBSITE ],
                 [ IndicatorLunar.AUTHOR + " " + IndicatorLunar.WEBSITE ],
@@ -1280,13 +1283,16 @@ class IndicatorLunar:
                 _( "text file." ),
                 _( "error log" ) )
 
-            self.dialogLock.release()
+            self.lock.release()
+            GLib.idle_add( self.update )
 
 
     def onPreferences( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
+            GLib.source_remove( self.updateTimerID )
             self._onPreferences( widget )
-            self.dialogLock.release()
+            self.lock.release()
+            GLib.idle_add( self.update )
 
 
     def _onPreferences( self, widget ):
@@ -1848,7 +1854,6 @@ class IndicatorLunar:
 
             self.saveConfig()
             pythonutils.setAutoStart( IndicatorLunar.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.idle_add( self.update, False )
             break
 
 #TODO Debug
