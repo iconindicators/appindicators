@@ -53,7 +53,7 @@ class IndicatorOnThisDay:
     COPYRIGHT_START_YEAR = "2017"
     DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
     LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister"
+    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
     COMMENTS = _( "Calls the 'calendar' program and displays events in the menu." )
 
     CACHE_CALENDAR_FILENAME = "calendars"
