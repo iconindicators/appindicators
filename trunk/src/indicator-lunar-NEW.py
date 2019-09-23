@@ -34,22 +34,29 @@
 # TODO Attributes in currently released indicator which have been culled in the development version
 #  and why they should or should not be put back, assuming no performance degradation:
 # 
-#     Illumination - Still calculated for internal use (draw the moon icon).
+#     Illumination - Still calculated for internal use (draw the moon icon).  
+#                    Applies to moon and planets.
 # 
-#     Bright Limb - Still calculated for internal use (draw the moon icon).
+#     Bright Limb - Still calculated for internal use (draw the moon icon).  
+#                   Applies to moon and planets.
 # 
-#     Magnitude - Still calculated for internal use (filter out bodies).
+#     Magnitude - Still calculated for internal use (filter out bodies).  
+#                 Applies to moon, sun, planets, stars and comets.
 # 
 #     Constellation - Perhaps helpful for a user to find a star in lieu of using the Az/Alt.  
 #                     However, constellations themselves are arbitrary and not based on science.
+#                     Applies to moon, sun, planets, stars and comets.
 # 
-#     Tropical Sign - Used by astrologers and was put in as a kind favour.  Not based on science. 
+#     Tropical Sign - Used by astrologers and was put in as a kind favour.  
+#                     Not based on science.
+#                     Applies to moon, sun, planets, stars. 
 # 
 #     Distance to Earth, Distance to Sun - Not useful unless you have an Aluminum Falcon, https://www.youtube.com/watch?v=3F1d3QWsyk0.
+#                                          Applies to moon, sun, planets.
 # 
-#     RA/Dec - Removed as Az/Alt are much easier to use and give the same result (find a body in the night sky).
+#     RA/Dec - Az/Alt is much easier to use.
 # 
-#     Solstice/Equinox - Interesting information.
+#     Solstice/Equinox - Interesting information about the sun.
 # 
 #     Saturn: Earth Tilt, Sun Tilt - Interesting information.
 # 
