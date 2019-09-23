@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from curses.ascii import alt
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -35,18 +34,18 @@ from curses.ascii import alt
 # TODO Attributes in currently released indicator which have been culled in the development version
 #  and why they should or should not be put back, assuming no performance degradation:
 # 
-#     Illumination - This is still calculated, but used internally for the moon to draw the icon.
+#     Illumination - Still calculated for internal use (draw the moon icon).
+# 
+#     Bright Limb - Still calculated for internal use (draw the moon icon).
+# 
+#     Magnitude - Still calculated for internal use (filter out bodies).
 # 
 #     Constellation - Perhaps helpful for a user to find a star in lieu of using the Az/Alt.  
 #                     However, constellations themselves are arbitrary and not based on science.
 # 
-#     Magnitude - This is still calculated, but used internally to filter out bodies.
-# 
 #     Tropical Sign - Used by astrologers and was put in as a kind favour.  Not based on science. 
 # 
 #     Distance to Earth, Distance to Sun - Not useful unless you have an Aluminum Falcon, https://www.youtube.com/watch?v=3F1d3QWsyk0.
-# 
-#     Bright Limb - This is still calculated, but used internally for the moon to draw the icon.
 # 
 #     RA/Dec - Removed as Az/Alt are much easier to use and give the same result (find a body in the night sky).
 # 
