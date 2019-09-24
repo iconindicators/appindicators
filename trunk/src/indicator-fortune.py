@@ -175,6 +175,26 @@ class IndicatorFortune:
                 IndicatorFortune.COPYRIGHT_START_YEAR,
                 [ ],
                 "",
+                INDICATOR_NAME,
+                IndicatorFortune.WEBSITE,
+                IndicatorFortune.VERSION )
+
+            self.lock.release()
+            GLib.idle_add( self.showNewFortune )
+
+
+#TODO Remove
+    def onAboutORIG( self, widget ):
+        if self.lock.acquire( blocking = False ):
+            GLib.source_remove( self.updateTimerID )
+            pythonutils.showAboutDialog(
+                [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
+                [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
+                IndicatorFortune.COMMENTS,
+                IndicatorFortune.AUTHOR,
+                IndicatorFortune.COPYRIGHT_START_YEAR,
+                [ ],
+                "",
                 Gtk.License.GPL_3_0,
                 IndicatorFortune.ICON,
                 INDICATOR_NAME,
