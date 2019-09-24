@@ -67,7 +67,7 @@ class IndicatorScriptRunner:
 
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorScriptRunner.LOG ) ] )
-        self.dialogLock = threading.Lock()
+        self.lock = threading.Lock()
 
         self.loadConfig()
 
@@ -144,7 +144,7 @@ class IndicatorScriptRunner:
 
 
     def onAbout( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
                 [ IndicatorScriptRunner.AUTHOR + " " + IndicatorScriptRunner.WEBSITE ],
                 [ IndicatorScriptRunner.AUTHOR + " " + IndicatorScriptRunner.WEBSITE ],
@@ -167,13 +167,13 @@ class IndicatorScriptRunner:
                 _( "text file." ),
                 _( "error log" ) )
 
-            self.dialogLock.release()
+            self.lock.release()
 
 
     def onPreferences( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
             self._onPreferences( widget )
-            self.dialogLock.release()
+            self.lock.release()
 
 
     def _onPreferences( self, widget ):
