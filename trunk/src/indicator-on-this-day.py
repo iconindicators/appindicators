@@ -73,7 +73,7 @@ class IndicatorOnThisDay:
 
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorOnThisDay.LOG ) ] )
-        self.dialogLock = threading.Lock()
+        self.lock = threading.Lock()
 
         Notify.init( INDICATOR_NAME )
         self.loadConfig()
@@ -81,24 +81,21 @@ class IndicatorOnThisDay:
         self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorOnThisDay.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
-        self.update( True )
+        self.update()
 
 
     def main( self ): Gtk.main()
 
 
-    def update( self, scheduled ):
-        with threading.Lock():
-            if not scheduled:
-                GLib.source_remove( self.updateTimerID )
-
+    def update( self ):
+        with lock:
             events = self.getEvents()
             self.buildMenu( events )
 
             now = datetime.now()
             justAfterMidnight = ( now + timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 5 )
             fiveSecondsAfterMidnight = int( ( justAfterMidnight - now ).total_seconds() )
-            self.updateTimerID = GLib.timeout_add_seconds( fiveSecondsAfterMidnight, self.update, True )
+            self.updateTimerID = GLib.timeout_add_seconds( fiveSecondsAfterMidnight, self.update )
 
             if self.notify:
                 today = pythonutils.processGet( "date +'%b %d'" ).strip() # It is assumed/hoped the dates in the calendar result are short date format.
@@ -195,7 +192,7 @@ class IndicatorOnThisDay:
 
 
     def onAbout( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
                 [ IndicatorOnThisDay.AUTHOR + " " + IndicatorOnThisDay.WEBSITE ],
                 [ IndicatorOnThisDay.AUTHOR + " " + IndicatorOnThisDay.WEBSITE ],
@@ -218,13 +215,15 @@ class IndicatorOnThisDay:
                 _( "text file." ),
                 _( "error log" ) )
 
-            self.dialogLock.release()
+            self.lock.release()
 
 
     def onPreferences( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
+            GLib.source_remove( self.updateTimerID )
             self._onPreferences( widget )
-            self.dialogLock.release()
+            self.lock.release()
+            GLib.idle_add( self.update )
 
 
     def _onPreferences( self, widget ):
@@ -391,7 +390,6 @@ class IndicatorOnThisDay:
             self.notify = notifyCheckbox.get_active()
             self.saveConfig()
             pythonutils.setAutoStart( IndicatorOnThisDay.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.idle_add( self.update, False )
 
         dialog.destroy()
 
