@@ -72,6 +72,9 @@ from src import astroPyephem
 # Ditto for dawn/dusk.
 
 
+#TODO Maybe time the duration of each update and use that to ensure the next scheduled update is not before that amount of time elapses.
+
+
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
 
