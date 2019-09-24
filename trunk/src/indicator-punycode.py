@@ -63,7 +63,7 @@ class IndicatorPunycode:
 
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorPunycode.LOG ) ] )
-        self.dialogLock = threading.Lock()
+        self.lock = threading.Lock()
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
 
         Notify.init( INDICATOR_NAME )
@@ -176,7 +176,7 @@ class IndicatorPunycode:
 
 
     def onAbout( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
             pythonutils.showAboutDialog(
                 [ IndicatorPunycode.AUTHOR + " " + IndicatorPunycode.WEBSITE ],
                 [ IndicatorPunycode.ARTIST ],
@@ -199,13 +199,13 @@ class IndicatorPunycode:
                 _( "text file." ),
                 _( "error log" ) )
 
-            self.dialogLock.release()
+            self.lock.release()
 
 
     def onPreferences( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
             self._onPreferences( widget )
-            self.dialogLock.release()
+            self.lock.release()
 
 
     def _onPreferences( self, widget ):
