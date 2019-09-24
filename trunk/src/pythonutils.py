@@ -246,7 +246,79 @@ def getMenuItemsGuess():
     return guess
 
 
+#TODO Add notes about assumption of program name matching error log file (and its location),
+#and changelog file name/location...
+#...anything else?
+# Icon name is same as program name
+#
+# Shows an about dialog.
+#
+# Uses GPL 3.0
 def showAboutDialog(
+        programName, # Program name.
+        authors, # List of authors.
+        comments, # Comments.
+        copyrightStartYear,
+        website, # Website URL (used on click).
+        version, # String of the numeric program version.
+        creditsPeople = None, # List of credits.
+        copyrightName = None,  #TODO Default to author if single (not a list)
+        artists = None ): # List of artists.   #TODO Default to authors
+
+        copyright = "Copyright \xa9 " + 
+                    copyrightStartYear +
+                    "-" +
+                    str( datetime.datetime.now().year ) +
+                    " " +
+                    authors[ 0 ] if copyrightName is None and len( authors )#TODO Not going to work if authors has a email/url.
+
+        aboutDialog = Gtk.AboutDialog()
+
+        aboutDialog.set_artists( authors if artists is None else artists )
+        aboutDialog.set_authors( authors )
+        aboutDialog.set_comments( comments )
+        aboutDialog.set_copyright( copyright )
+        aboutDialog.add_credit_section( _( "Credits" ), creditsPeople ) #TODO Check that None can be passed in.
+        aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
+        aboutDialog.set_logo_icon_name( programName )
+        aboutDialog.set_program_name( programName )
+        aboutDialog.set_translator_credits( _( "translator-credits" ) )
+        aboutDialog.set_version( version )
+        aboutDialog.set_website( website )
+        aboutDialog.set_website_label( website )
+
+        changeLog = "/tmp/" + programName + ".changelog"
+        if os.path.isfile( changeLog ):
+            os.remove( changeLog )
+
+        with gzip.open( "/usr/share/doc/" + programName + "/changelog.Debian.gz", 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
+            shutil.copyfileobj( fileIn, fileOut )
+
+        errorLog = os.getenv( "HOME" ) + "/" + programName + ".log"
+
+
+        def addHyperlinkLabel( filePath, leftText, rightText, anchorText ):
+            if os.path.exists( filePath ):
+                notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
+                if type( notebookOrStack ).__name__ == "Notebook":
+                    notebookOrStack = notebookOrStack.get_nth_page( 0 )
+                else: # Stack
+                    notebookOrStack = notebookOrStack.get_children()[ 0 ]
+
+                toolTip = "file://" + filePath
+                label = Gtk.Label()
+                label.set_markup( leftText + " <a href=\'" + "file://" + filePath + "\' title=\'" + toolTip + "\'>" + anchorText + "</a> " + rightText )
+                label.show()
+                notebookOrStack.add( label )
+
+        addHyperlinkLabel( changeLog, _( "View the" ), _( "text file." ), _( "changelog" ) )
+        addHyperlinkLabel( errorLog, _( "View the" ), _( "text file." ), _( "error log" ) )
+
+        aboutDialog.run()
+        aboutDialog.hide()
+
+
+def showAboutDialogORIG(
         authors, # List of authors.
         artists, # List of artists.
         comments, # Comments.
