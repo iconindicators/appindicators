@@ -61,7 +61,7 @@ class IndicatorStardate:
 
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorStardate.LOG ) ] )
-        self.dialogLock = threading.Lock()
+        self.lock = threading.Lock()
         self.saveConfigTimerID = None
 
         self.loadConfig()
@@ -71,7 +71,7 @@ class IndicatorStardate:
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
 
         self.buildMenu()
-        self.update( True )
+        self.update()
 
 
     def main( self ): Gtk.main()
@@ -84,11 +84,8 @@ class IndicatorStardate:
         self.indicator.set_menu( menu )
 
 
-    def update( self, scheduled ):
-        with threading.Lock():
-            if not scheduled:
-                GLib.source_remove( self.updateTimerID )
-
+    def update( self ):
+        with self.lock:
             # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
             if self.showClassic:
                 stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
@@ -109,11 +106,11 @@ class IndicatorStardate:
                 numberOfSecondsToNextUpdate = int( ( oneSecondAfterMidnight - now ).total_seconds() )
 
             self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
-            self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.update, True )
+            self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.update )
 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        with threading.Lock():
+        with self.lock:
             # Based on the mouse wheel scroll event (irrespective of direction),
             # cycle through the possible combinations of options for display in the stardate.
             # If showing a 'classic' stardate and padding is not require, ignore the padding option.
@@ -151,7 +148,7 @@ class IndicatorStardate:
                 self.padInteger = True
                 self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
-            GLib.idle_add( self.update, False )
+            GLib.idle_add( self.update )
 
             if self.saveConfigTimerID is not None:
                 GLib.source_remove( self.saveConfigTimerID )
@@ -160,7 +157,8 @@ class IndicatorStardate:
 
 
     def onAbout( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
+            GLib.source_remove( self.updateTimerID )
             pythonutils.showAboutDialog(
                 [ IndicatorStardate.AUTHOR + " " + IndicatorStardate.WEBSITE ],
                 [ IndicatorStardate.AUTHOR + " " + IndicatorStardate.WEBSITE ],
@@ -183,13 +181,16 @@ class IndicatorStardate:
                 _( "text file." ),
                 _( "error log" ) )
 
-            self.dialogLock.release()
+            self.lock.release()
+            GLib.idle_add( self.update )
 
 
     def onPreferences( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
+            GLib.source_remove( self.updateTimerID )
             self._onPreferences( widget )
-            self.dialogLock.release()
+            self.lock.release()
+            GLib.idle_add( self.update )
 
 
     def _onPreferences( self, widget ):
@@ -239,7 +240,6 @@ class IndicatorStardate:
             self.showIssue = showIssueCheckbox.get_active()
             self.saveConfig() # A save timer could still be in force, but let it run as the same global values will just be re-saved.
             pythonutils.setAutoStart( IndicatorStardate.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.idle_add( self.update, False )
 
         dialog.destroy()
 
