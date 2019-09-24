@@ -72,7 +72,7 @@ class IndicatorFortune:
 
     def __init__( self ):
         logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorFortune.LOG ) ] )
-        self.dialogLock = threading.Lock()
+        self.lock = threading.Lock()
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
 
         Notify.init( INDICATOR_NAME )
@@ -83,7 +83,7 @@ class IndicatorFortune:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.buildMenu()
-        self.showNewFortune( True )
+        self.showNewFortune()
 
 
     def main( self ): Gtk.main()
@@ -93,7 +93,7 @@ class IndicatorFortune:
         menu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem( _( "New Fortune" ) )
-        menuItem.connect( "activate", lambda widget: self.showNewFortune( False ) )
+        menuItem.connect( "activate", lambda widget: self.showNewFortune() )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
             self.indicator.set_secondary_activate_target( menuItem )
@@ -115,14 +115,11 @@ class IndicatorFortune:
         menu.show_all()
 
 
-    def showNewFortune( self, scheduled ):
-        with threading.Lock():
-            if not scheduled:
-                GLib.source_remove( self.updateTimerID )
-
+    def showNewFortune( self ):
+        with self.lock:
             self._refreshFortune()
             self._showFortune()
-            self.updateTimerID = GLib.timeout_add_seconds( int( self.refreshIntervalInMinutes ) * 60, self.showNewFortune, True )
+            self.updateTimerID = GLib.timeout_add_seconds( int( self.refreshIntervalInMinutes ) * 60, self.showNewFortune )
 
 
     def _showFortune( self ):
@@ -168,7 +165,8 @@ class IndicatorFortune:
 
 
     def onAbout( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
+            GLib.source_remove( self.updateTimerID )
             pythonutils.showAboutDialog(
                 [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
                 [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
@@ -191,13 +189,16 @@ class IndicatorFortune:
                 _( "text file." ),
                 _( "error log" ) )
 
-            self.dialogLock.release()
+            self.lock.release()
+            GLib.idle_add( self.showNewFortune )
 
 
     def onPreferences( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ):
+            GLib.source_remove( self.updateTimerID )
             self._onPreferences( widget )
-            self.dialogLock.release()
+            self.lock.release()
+            GLib.idle_add( self.showNewFortune )
 
 
     def _onPreferences( self, widget ):
@@ -375,7 +376,6 @@ class IndicatorFortune:
             self.saveConfig()
             pythonutils.setAutoStart( IndicatorFortune.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
             GLib.idle_add( self.buildMenu )
-            GLib.idle_add( self.showNewFortune, False )
 
         dialog.destroy()
 
