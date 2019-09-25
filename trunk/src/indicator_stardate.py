@@ -41,16 +41,13 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
             comments = _( "Shows the current Star Trek™ stardate." ),
             copyrightStartYear = "2012",
             indicatorName = INDICATOR_NAME,
+            self.__update,
             version = "1.0.38",
             creditz = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ] )
 
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
         self.saveConfigTimerID = None
-        self.update()
-
-
-#TODO Maybe pass in to the init constructor the callback so we don't need to do this...?
-    def update( self ): super().update( self.__update )
+        super().update()
 
 
     def __update( self ):
