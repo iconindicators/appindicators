@@ -72,27 +72,24 @@ class IndicatorBase:
             updateCallback()
 
 
-    def buildMenu( self, menu, prependSeparator, onPreferences ):
-        self.__appendPreferencesAboutQuit( menu, prependSeparator, onPreferences, self.onAbout, Gtk.main_quit )
-        menu.show_all()
-        self.indicator.set_menu( menu )
-
-
-    def __appendPreferencesAboutQuit( self, menu, prependSeparator, onPreferencesHandler, onAboutHandler, onQuitHandler ):
+    def buildMenu( self, menu, prependSeparator, onPreferencesCallback ):
         if prependSeparator:
             menu.append( Gtk.SeparatorMenuItem() )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "Preferences" ) )
-        menuItem.connect( "activate", onPreferencesHandler )
+        menuItem.connect( "activate", self.onPreferences, onPreferencesCallback )
         menu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "About" ) )
-        menuItem.connect( "activate", onAboutHandler )
+        menuItem.connect( "activate", self.onAbout )
         menu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "Quit" ) )
-        menuItem.connect( "activate", onQuitHandler )
+        menuItem.connect( "activate", Gtk.main_quit )
         menu.append( menuItem )
+
+        menu.show_all()
+        self.indicator.set_menu( menu )
 
 
     def onAbout( self, widget ):
@@ -154,7 +151,7 @@ class IndicatorBase:
             notebookOrStack.add( label )
 
 
-    def onPreferences( self, onPreferencesCallback ):
+    def onPreferences( self, widget, onPreferencesCallback ):
         if self.lock.acquire( blocking = False ):
             GLib.source_remove( self.updateTimerID )
             onPreferencesCallback()
