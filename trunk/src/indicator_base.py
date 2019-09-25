@@ -73,12 +73,12 @@ class IndicatorBase:
             self.updateCallback()
 
 
-    def buildMenu( self, menu, prependSeparator, onPreferencesCallback ):
+    def buildMenu( self, menu, prependSeparator ):
         if prependSeparator:
             menu.append( Gtk.SeparatorMenuItem() )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "Preferences" ) )
-        menuItem.connect( "activate", self.onPreferences, onPreferencesCallback )
+        menuItem.connect( "activate", self.__onPreferences )
         menu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "About" ) )
@@ -103,11 +103,11 @@ class IndicatorBase:
             aboutDialog.set_comments( self.comments )
 
             copyrightText = "Copyright \xa9 " + \
-                        self.copyrightStartYear + \
-                        "-" + \
-                        str( datetime.datetime.now().year ) + \
-                        " " + \
-                        self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
+                self.copyrightStartYear + \
+                "-" + \
+                str( datetime.datetime.now().year ) + \
+                " " + \
+                self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
 
             aboutDialog.set_copyright( copyrightText )
             if self.creditz: aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
@@ -123,7 +123,8 @@ class IndicatorBase:
             if os.path.isfile( changeLog ):
                 os.remove( changeLog )
 
-            with gzip.open( "/usr/share/doc/" + self.indicatorName + "/changelog.Debian.gz", 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
+            changeLogGzipped = "/usr/share/doc/" + self.indicatorName + "/changelog.Debian.gz"
+            with gzip.open( changeLogGzipped, 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
                 shutil.copyfileobj( fileIn, fileOut )
 
             errorLog = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
@@ -152,10 +153,10 @@ class IndicatorBase:
             notebookOrStack.add( label )
 
 
-    def onPreferences( self, widget, onPreferencesCallback ):
+    def __onPreferences( self, widget ):
         if self.lock.acquire( blocking = False ):
             GLib.source_remove( self.updateTimerID )
-            onPreferencesCallback()
+            self.onPreferences() # Call to implementation in indicator.
             self.lock.release()
             GLib.idle_add( self.update )
 
