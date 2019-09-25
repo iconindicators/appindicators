@@ -265,19 +265,19 @@ def showAboutDialog(
         copyrightName = None,  #TODO Default to author if single (not a list)
         artists = None ): # List of artists.   #TODO Default to authors
 
-        copyright = "Copyright \xa9 " + 
-                    copyrightStartYear +
-                    "-" +
-                    str( datetime.datetime.now().year ) +
-                    " " +
-                    authors[ 0 ] if copyrightName is None and len( authors )#TODO Not going to work if authors has a email/url.
+        copyrightText = "Copyright \xa9 " + \
+                    copyrightStartYear + \
+                    "-" + \
+                    str( datetime.datetime.now().year ) + \
+                    " " + \
+                    authors[ 0 ] if copyrightName is None and len( authors ) > 1 else "TODO Fix this!"#TODO Not going to work if authors has a email/url.
 
         aboutDialog = Gtk.AboutDialog()
 
         aboutDialog.set_artists( authors if artists is None else artists )
         aboutDialog.set_authors( authors )
         aboutDialog.set_comments( comments )
-        aboutDialog.set_copyright( copyright )
+        aboutDialog.set_copyright( copyrightText )
         aboutDialog.add_credit_section( _( "Credits" ), creditsPeople ) #TODO Check that None can be passed in.
         aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
         aboutDialog.set_logo_icon_name( programName )
