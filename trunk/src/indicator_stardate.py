@@ -45,17 +45,13 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
             version = "1.0.38",
             comments = _( "Shows the current Star Trek™ stardate." ),
             copyrightStartYear = "2012",
-            updateCallback = self.__update,
             creditz = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ] )
 
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
         self.saveConfigTimerID = None
-        super().update()
 
 
-    def __update( self ):
-        super().buildMenu( Gtk.Menu(), False )
-
+    def update( self, menu ):
         # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
         if self.showClassic:
             stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
@@ -127,7 +123,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
 
 
     def onPreferences( self ):
-        grid = super().createGrid()
+        grid = self.createGrid()
 
         showClassicCheckbox = Gtk.CheckButton( _( "Show stardate 'classic'" ) )
         showClassicCheckbox.set_active( self.showClassic )
@@ -142,21 +138,21 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         showIssueCheckbox = Gtk.CheckButton( _( "Show ISSUE" ) )
         showIssueCheckbox.set_active( self.showIssue )
         showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
-        showIssueCheckbox.set_margin_left( super().INDENT_WIDGET_LEFT )
+        showIssueCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         showIssueCheckbox.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
         grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
 
         padIntegerCheckbox = Gtk.CheckButton( _( "Pad INTEGER" ) )
         padIntegerCheckbox.set_active( self.padInteger )
         padIntegerCheckbox.set_sensitive( showClassicCheckbox.get_active() )
-        padIntegerCheckbox.set_margin_left( super().INDENT_WIDGET_LEFT )
+        padIntegerCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
         grid.attach( padIntegerCheckbox, 0, 2, 1, 1 )
 
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_active( super().isAutoStart() )
+        autostartCheckbox.set_active( self.isAutoStart() )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 3, 1, 1 )
@@ -172,7 +168,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
             self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
             self.saveConfig() # A save timer could still be in force, but let it run as the same global values will just be re-saved. #TODO Cancel existing timer?  Think!
-            super().setAutoStart( autostartCheckbox.get_active() )
+            self.setAutoStart( autostartCheckbox.get_active() )
 
         dialog.destroy()
 
