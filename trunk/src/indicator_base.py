@@ -38,12 +38,12 @@ class IndicatorBase:
     XDG_KEY_CONFIG = "XDG_CONFIG_HOME"
 
 
-    def __init__( self, comments, copyrightStartYear, indicatorName, updateCallback, version, artwork = None, creditz = None ):
+    def __init__( self, indicatorName, version, comments, copyrightStartYear, updateCallback, artwork = None, creditz = None ):
+        self.indicatorName = indicatorName
+        self.version = version
         self.comments = comments
         self.copyrightStartYear = copyrightStartYear
-        self.indicatorName = indicatorName
         self.updateCallback = updateCallback
-        self.version = version
 
         self.desktopFile = self.indicatorName + ".py.desktop"
         self.icon = self.indicatorName
@@ -51,7 +51,6 @@ class IndicatorBase:
         self.website = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
 
         self.authors = [ "Bernard Giannetti" + " " + self.website ]
-
         self.artwork = artwork if artwork else self.authors
         self.creditz = creditz
 
