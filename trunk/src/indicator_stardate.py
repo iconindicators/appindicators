@@ -38,11 +38,11 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
+            indicatorName = INDICATOR_NAME,
+            version = "1.0.38",
             comments = _( "Shows the current Star Trek™ stardate." ),
             copyrightStartYear = "2012",
-            indicatorName = INDICATOR_NAME,
             updateCallback = self.__update,
-            version = "1.0.38",
             creditz = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ] )
 
         self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
