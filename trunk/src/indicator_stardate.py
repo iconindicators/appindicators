@@ -51,7 +51,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
 
 
     def __update( self ):
-        super().buildMenu( Gtk.Menu(), False, self.__onPreferences )
+        super().buildMenu( Gtk.Menu(), False )
 
         # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
         if self.showClassic:
@@ -123,7 +123,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
             self.saveConfigTimerID = GLib.timeout_add_seconds( 5, self.saveConfig ) # Defer the save to five seconds in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
 
 
-    def __onPreferences( self ):
+    def onPreferences( self ):
         grid = super().createGrid()
 
         showClassicCheckbox = Gtk.CheckButton( _( "Show stardate 'classic'" ) )
