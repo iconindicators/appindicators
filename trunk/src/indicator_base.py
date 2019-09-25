@@ -38,12 +38,11 @@ class IndicatorBase:
     XDG_KEY_CONFIG = "XDG_CONFIG_HOME"
 
 
-    def __init__( self, indicatorName, version, comments, copyrightStartYear, updateCallback, artwork = None, creditz = None ):
+    def __init__( self, indicatorName, version, comments, copyrightStartYear, artwork = None, creditz = None ):
         self.indicatorName = indicatorName
         self.version = version
         self.comments = comments
         self.copyrightStartYear = copyrightStartYear
-        self.updateCallback = updateCallback
 
         self.desktopFile = self.indicatorName + ".py.desktop"
         self.icon = self.indicatorName
@@ -62,18 +61,22 @@ class IndicatorBase:
 
         self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+        self.__update()
 
 
     def main( self ): Gtk.main()
 
 
-    def update( self ):
+    def __update( self ):
         with self.lock:
-            self.updateCallback()
+            menu = Gtk.Menu()
+            self.update( menu ) # Call to implementation in indicator.
+            self.__finaliseMenu( menu )
 
 
-    def buildMenu( self, menu, prependSeparator ):
-        if prependSeparator:
+    def __finaliseMenu( self, menu ):
+        print(len( menu.get_children() ))
+        if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "Preferences" ) )
