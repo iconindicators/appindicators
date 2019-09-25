@@ -23,6 +23,9 @@ INDICATOR_NAME = "indicator-stardate"
 import gettext
 gettext.install( INDICATOR_NAME )
 
+import gi
+gi.require_version('Gtk', '3.0')
+
 from gi.repository import GLib, Gtk
 
 import datetime, indicator_base, stardate
