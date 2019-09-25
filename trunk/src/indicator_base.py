@@ -82,7 +82,7 @@ class IndicatorBase:
         menu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "About" ) )
-        menuItem.connect( "activate", self.onAbout )
+        menuItem.connect( "activate", self.__onAbout )
         menu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "Quit" ) )
@@ -93,7 +93,7 @@ class IndicatorBase:
         self.indicator.set_menu( menu )
 
 
-    def onAbout( self, widget ):
+    def __onAbout( self, widget ):
         if self.lock.acquire( blocking = False ):
             GLib.source_remove( self.updateTimerID )
 
