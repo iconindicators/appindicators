@@ -59,7 +59,7 @@ class IndicatorBase:
         self.lock = threading.Lock()
         self.updateTimerID = None #TODO What if an indicator does not use this (then in the about/prefs when we remove it it'll barf).
 
-        self.loadConfig()
+        self.__loadConfig()
 
         self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -204,7 +204,7 @@ class IndicatorBase:
     # Read a dictionary of configuration from a JSON text file.
     #
     # Returns a dictionary of key/value pairs (empty when no file is present or an error occurs).
-    def loadConfig( self ):
+    def __loadConfig( self ):
         configFile = self._getConfigFile( self.indicatorName, self.indicatorName )
         config = { }
         if os.path.isfile( configFile ):
@@ -217,13 +217,14 @@ class IndicatorBase:
                 logging.exception( e )
                 logging.error( "Error reading configuration: " + configFile )
 
-        return config
+        self.loadConfig( config ) # Call to implementation in indicator.
 
 
     # Write a dictionary of user configuration to a JSON text file.
     #
     # config: Dictionary of key/value pairs.
-    def saveConfig( self, config ):
+    def __saveConfig( self ):
+        config = self.saveConfig() # Call to implementation in indicator.
         configFile = self._getConfigFile( self.indicatorName, self.indicatorName )
         success = True
         try:
