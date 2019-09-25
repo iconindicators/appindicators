@@ -41,7 +41,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
             comments = _( "Shows the current Star Trek™ stardate." ),
             copyrightStartYear = "2012",
             indicatorName = INDICATOR_NAME,
-            self.__update,
+            updateCallback = self.__update,
             version = "1.0.38",
             creditz = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ] )
 
