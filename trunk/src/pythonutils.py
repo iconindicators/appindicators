@@ -394,7 +394,7 @@ def showAboutDialogORIG(
 #
 # Returns a dictionary of key/value pairs (empty when no file is present or an error occurs).
 def loadConfig( applicationBaseDirectory, configBaseFile, logging ):
-    configFile = _getConfigFile( applicationBaseDirectory, configBaseFile )
+    configFile = __getConfigFile( applicationBaseDirectory, configBaseFile )
     config = { }
     if os.path.isfile( configFile ):
         try:
@@ -416,7 +416,7 @@ def loadConfig( applicationBaseDirectory, configBaseFile, logging ):
 # configBaseFile: The file name (without extension).
 # logging: A valid logger, used on error.
 def saveConfig( config, applicationBaseDirectory, configBaseFile, logging ):
-    configFile = _getConfigFile( applicationBaseDirectory, configBaseFile )
+    configFile = __getConfigFile( applicationBaseDirectory, configBaseFile )
     success = True
     try:
         with open( configFile, "w" ) as f:
@@ -434,8 +434,8 @@ def saveConfig( config, applicationBaseDirectory, configBaseFile, logging ):
 #
 # applicationBaseDirectory: The directory path used as the final part of the overall path.
 # configBaseFile: The file name (without extension).
-def _getConfigFile( applicationBaseDirectory, configBaseFile ):
-    return _getUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + configBaseFile + JSON_EXTENSION
+def __getConfigFile( applicationBaseDirectory, configBaseFile ):
+    return __getUserDirectory( XDG_KEY_CONFIG, USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + "/" + configBaseFile + JSON_EXTENSION
 
 
 # Obtain the full path to a cache file, creating if necessary the underlying path.
@@ -443,7 +443,7 @@ def _getConfigFile( applicationBaseDirectory, configBaseFile ):
 # applicationBaseDirectory: The directory path used as the final part of the overall path.
 # filename: The file name.
 def getCachePathname( applicationBaseDirectory, filename ):
-    return _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + filename
+    return __getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + filename
 
 
 # Read a text file from the cache.
@@ -454,7 +454,7 @@ def getCachePathname( applicationBaseDirectory, filename ):
 #
 # Returns the text contents or None on error.
 def readCacheText( applicationBaseDirectory, fileName, logging ):
-    cacheFile = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
+    cacheFile = __getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
     text = None
     if os.path.isfile( cacheFile ):
         try:
@@ -480,7 +480,7 @@ def readCacheText( applicationBaseDirectory, fileName, logging ):
 # logging: A valid logger, used on error.
 def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
     success = True
-    cacheFile = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
+    cacheFile = __getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
     try:
         with open( cacheFile, "w" ) as f:
             f.write( text )
@@ -512,7 +512,7 @@ def writeCacheText( applicationBaseDirectory, fileName, text, logging ):
 #
 # Returns the binary object; None when no suitable cache file exists; None on error and logs.
 def readCacheBinary( applicationBaseDirectory, baseName, logging ):
-    cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
+    cacheDirectory = __getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     data = None
     theFile = ""
     for file in os.listdir( cacheDirectory ):
@@ -548,7 +548,7 @@ def readCacheBinary( applicationBaseDirectory, baseName, logging ):
 # Returns True on success; False otherwise.
 def writeCacheBinary( binaryData, applicationBaseDirectory, baseName, logging ):
     success = True
-    cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
+    cacheDirectory = __getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     filename = cacheDirectory + "/" + baseName + datetime.datetime.utcnow().strftime( CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
     try:
         with open( filename, "wb" ) as f:
@@ -572,7 +572,7 @@ def writeCacheBinary( binaryData, applicationBaseDirectory, baseName, logging ):
 # or
 #     ~/.cache/applicationBaseDirectory/fileName
 def removeFileFromCache( applicationBaseDirectory, fileName ):
-    cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
+    cacheDirectory = __getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     for file in os.listdir( cacheDirectory ):
         if file == fileName:
             os.remove( cacheDirectory + "/" + file )
@@ -590,7 +590,7 @@ def removeFileFromCache( applicationBaseDirectory, fileName ):
 #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
 # and is older than the cache maximum age is discarded.
 def removeOldFilesFromCache( applicationBaseDirectory, baseName, cacheMaximumAgeInHours ):
-    cacheDirectory = _getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
+    cacheDirectory = __getUserDirectory( XDG_KEY_CACHE, USER_DIRECTORY_CACHE, applicationBaseDirectory )
     cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = cacheMaximumAgeInHours )
     for file in os.listdir( cacheDirectory ):
         if file.startswith( baseName ):
@@ -611,7 +611,7 @@ def removeOldFilesFromCache( applicationBaseDirectory, baseName, cacheMaximumAge
 #    ${XDGKey}/applicationBaseDirectory
 # or
 #    ~/.userBaseDirectory/applicationBaseDirectory
-def _getUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
+def __getUserDirectory( XDGKey, userBaseDirectory, applicationBaseDirectory ):
     if XDGKey in os.environ:
         directory = os.environ[ XDGKey ] + "/" + applicationBaseDirectory
     else:

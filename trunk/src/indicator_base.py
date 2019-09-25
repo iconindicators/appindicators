@@ -38,11 +38,11 @@ class IndicatorBase:
     XDG_KEY_CONFIG = "XDG_CONFIG_HOME"
 
 
-    def __init__( self, indicatorName, version, comments, copyrightStartYear, artwork = None, creditz = None ):
+    def __init__( self, indicatorName, version, copyrightStartYear, comments, artwork = None, creditz = None ):
         self.indicatorName = indicatorName
         self.version = version
-        self.comments = comments
         self.copyrightStartYear = copyrightStartYear
+        self.comments = comments
 
         self.desktopFile = self.indicatorName + ".py.desktop"
         self.icon = self.indicatorName
@@ -57,10 +57,10 @@ class IndicatorBase:
         self.lock = threading.Lock()
         self.updateTimerID = None #TODO What if an indicator does not use this (then in the about/prefs when we remove it it'll barf).
 
-        self.__loadConfig()
-
         self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+
+        self.__loadConfig()
         self.__update()
 
 
@@ -75,7 +75,6 @@ class IndicatorBase:
 
 
     def __finaliseMenu( self, menu ):
-        print(len( menu.get_children() ))
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
@@ -176,14 +175,16 @@ class IndicatorBase:
 
 
     def isAutoStart( self ):
+        autoStart = False
         try:
-            return \
-                os.path.exists( IndicatorBase.AUTOSTART_PATH + self.desktopFile ) and \
-                "X-GNOME-Autostart-enabled=true" in open( IndicatorBase.AUTOSTART_PATH + self.desktopFile ).read()
+            autoStart = os.path.exists( IndicatorBase.AUTOSTART_PATH + self.desktopFile ) and \
+                        "X-GNOME-Autostart-enabled=true" in open( IndicatorBase.AUTOSTART_PATH + self.desktopFile ).read()
 
         except Exception as e:
             logging.exception( e )
-            return False
+            autoStart = False
+
+        return autoStart
 
 
     def setAutoStart( self, isSet ):
@@ -205,10 +206,8 @@ class IndicatorBase:
 
 
     # Read a dictionary of configuration from a JSON text file.
-    #
-    # Returns a dictionary of key/value pairs (empty when no file is present or an error occurs).
     def __loadConfig( self ):
-        configFile = self._getConfigFile( self.indicatorName, self.indicatorName )
+        configFile = self.__getConfigFile( self.indicatorName, self.indicatorName )
         config = { }
         if os.path.isfile( configFile ):
             try:
@@ -224,11 +223,9 @@ class IndicatorBase:
 
 
     # Write a dictionary of user configuration to a JSON text file.
-    #
-    # config: Dictionary of key/value pairs.
     def __saveConfig( self ):
         config = self.saveConfig() # Call to implementation in indicator.
-        configFile = self._getConfigFile( self.indicatorName, self.indicatorName )
+        configFile = self.__getConfigFile( self.indicatorName, self.indicatorName )
         success = True
         try:
             with open( configFile, "w" ) as f:
@@ -246,8 +243,8 @@ class IndicatorBase:
     #
     # applicationBaseDirectory: The directory path used as the final part of the overall path.
     # configBaseFile: The file name (without extension).
-    def _getConfigFile( self, applicationBaseDirectory, configBaseFile ):
-        return self._getUserDirectory( IndicatorBase.XDG_KEY_CONFIG, IndicatorBase.USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + \
+    def __getConfigFile( self, applicationBaseDirectory, configBaseFile ):
+        return self.__getUserDirectory( IndicatorBase.XDG_KEY_CONFIG, IndicatorBase.USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + \
                "/" + \
                configBaseFile + \
                IndicatorBase.JSON_EXTENSION
@@ -265,7 +262,7 @@ class IndicatorBase:
     #    ${XDGKey}/applicationBaseDirectory
     # or
     #    ~/.userBaseDirectory/applicationBaseDirectory
-    def _getUserDirectory( self, XDGKey, userBaseDirectory, applicationBaseDirectory ):
+    def __getUserDirectory( self, XDGKey, userBaseDirectory, applicationBaseDirectory ):
         if XDGKey in os.environ:
             directory = os.environ[ XDGKey ] + "/" + applicationBaseDirectory
 
