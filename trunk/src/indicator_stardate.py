@@ -179,8 +179,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         showIssueCheckbox.set_sensitive( source.get_active() )
 
     
-    def loadConfig( self ):
-        config = super().loadConfig()
+    def loadConfig( self, config ):
         self.padInteger = config.get( IndicatorStardate.CONFIG_PAD_INTEGER, True )
         self.showClassic = config.get( IndicatorStardate.CONFIG_SHOW_CLASSIC, True )
         self.showIssue = config.get( IndicatorStardate.CONFIG_SHOW_ISSUE, True )
@@ -189,13 +188,11 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
     def saveConfig( self ):
         self.saveConfigTimerID = None # Reset the timer ID.
 
-        config = {
+        return {
             IndicatorStardate.CONFIG_PAD_INTEGER: self.padInteger,
             IndicatorStardate.CONFIG_SHOW_CLASSIC: self.showClassic,
             IndicatorStardate.CONFIG_SHOW_ISSUE: self.showIssue
         }
-
-        super().saveConfig( config )
 
 
 #TODO Sort this out.
