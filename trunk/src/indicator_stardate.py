@@ -49,11 +49,12 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         self.update()
 
 
+#TODO Maybe pass in to the init constructor the callback so we don't need to do this...?
     def update( self ): super().update( self.__update )
 
 
     def __update( self ):
-        super().buildMenu( Gtk.Menu(), False, self.onPreferences )
+        super().buildMenu( Gtk.Menu(), False, self.__onPreferences )
 
         # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
         if self.showClassic:
@@ -125,9 +126,6 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
             self.saveConfigTimerID = GLib.timeout_add_seconds( 5, self.saveConfig ) # Defer the save to five seconds in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
 
 
-    def onPreferences( self, widget ): super().onPreferences( self.__onPreferences )
-
-
     def __onPreferences( self ):
         grid = super().createGrid()
 
@@ -158,7 +156,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_active( super().isAutoStart( super().getLogging() ) )
+        autostartCheckbox.set_active( super().isAutoStart() )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 3, 1, 1 )
@@ -174,7 +172,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
             self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
             self.saveConfig() # A save timer could still be in force, but let it run as the same global values will just be re-saved. #TODO Cancel existing timer?  Think!
-            super().setAutoStart( autostartCheckbox.get_active(), super().getLogging() )
+            super().setAutoStart( autostartCheckbox.get_active() )
 
         dialog.destroy()
 
