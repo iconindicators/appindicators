@@ -58,6 +58,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
 
             # WHEN the stardate calculation is performed is NOT necessarily synchronised with WHEN the stardate actually changes.
             # Therefore update at a faster rate, say at one tenth of the period, but at most once per minute.
+#TODO Can we actually figure out when the next update should happen with some accuracy?
             numberOfSecondsToNextUpdate = int( fractionalPeriod / 10 )
             if numberOfSecondsToNextUpdate < 60:
                 numberOfSecondsToNextUpdate = 60
