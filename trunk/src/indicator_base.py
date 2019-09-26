@@ -31,7 +31,7 @@ gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 
 from gi.repository import AppIndicator3, GLib, Gtk
-import datetime, gzip, json, logging.handlers, os, shutil, threading
+import datetime, gzip, json, logging.handlers, os, shutil, subprocess, threading
 
 
 class IndicatorBase:
@@ -42,7 +42,9 @@ class IndicatorBase:
     JSON_EXTENSION = ".json"
     LOGGING_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     LOGGING_LEVEL = logging.DEBUG
+    USER_DIRECTORY_CACHE = ".cache"
     USER_DIRECTORY_CONFIG = ".config"
+    XDG_KEY_CACHE = "XDG_CACHE_HOME"
     XDG_KEY_CONFIG = "XDG_CONFIG_HOME"
 
 
@@ -68,10 +70,12 @@ class IndicatorBase:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.__loadConfig()
+#         self.__update()
+
+
+    def main( self ): 
         self.__update()
-
-
-    def main( self ): Gtk.main()
+        Gtk.main()
 
 
     def __update( self ):
@@ -182,6 +186,24 @@ class IndicatorBase:
             GLib.idle_add( self.__update )
 
 
+    # Shows a message dialog.
+    #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
+    def showMessage( self, parent, messageType, message, title ):
+        dialog = Gtk.MessageDialog( parent, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
+        dialog.set_title( title )
+        dialog.run()
+        dialog.destroy()
+
+
+    # Shows and OK/Cancel dialog prompt and returns either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
+    def showOKCancel( self, parent, message, title ):
+        dialog = Gtk.MessageDialog( parent, Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, message )
+        dialog.set_title( title )
+        response = dialog.run()
+        dialog.destroy()
+        return response
+
+    
     def createGrid( self ):
         spacing = 10
         grid = Gtk.Grid()
@@ -274,6 +296,69 @@ class IndicatorBase:
                IndicatorBase.JSON_EXTENSION
 
 
+    # Remove a file from the cache.
+    #
+    # applicationBaseDirectory: The directory used as the final part of the overall path.
+    # fileName: The file to remove.
+    #
+    # The file removed will be either
+    #     ${XDGKey}/applicationBaseDirectory/fileName
+    # or
+    #     ~/.cache/applicationBaseDirectory/fileName
+    def removeFileFromCache( self, applicationBaseDirectory, fileName ):
+        cacheDirectory = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, applicationBaseDirectory )
+        for file in os.listdir( cacheDirectory ):
+            if file == fileName:
+                os.remove( cacheDirectory + "/" + file )
+
+
+    # Read a text file from the cache.
+    #
+    # applicationBaseDirectory: The directory used as the final part of the overall path.
+    # fileName: The file name of the text file.
+    # logging: A valid logger, used on error.
+    #
+    # Returns the text contents or None on error.
+    def readCacheText( self, applicationBaseDirectory, fileName ):
+        cacheFile = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
+        text = None
+        if os.path.isfile( cacheFile ):
+            try:
+                with open( cacheFile, "r" ) as f:
+                    text = f.read()
+
+            except Exception as e:
+                text = None
+                logging.exception( e )
+                logging.error( "Error reading from cache: " + cacheFile )
+
+        if text is None or len( text ) == 0: # Return either None or non-empty text.
+            text = None
+
+        return text
+
+
+    # Write a text file to the cache.
+    #
+    # applicationBaseDirectory: The directory used as the final part of the overall path.
+    # fileName: The file name of the text file.
+    # text: The text to write.
+    # logging: A valid logger, used on error.
+    def writeCacheText( self, applicationBaseDirectory, fileName, text ):
+        success = True
+        cacheFile = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
+        try:
+            with open( cacheFile, "w" ) as f:
+                f.write( text )
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing to cache: " + cacheFile )
+            success = False
+
+        return success
+
+
     # Obtain (and create if not present) the directory for configuration, cache or similar.
     #
     # XDGKey: The XDG environment variable used to obtain the base directory of the configuration/cache.
@@ -297,6 +382,14 @@ class IndicatorBase:
             os.mkdir( directory )
 
         return directory
+
+
+    # Returns the result of calling the command.  On exception, returns None.
+    def processGet( self, command ):
+        try:
+            return subprocess.check_output( command, shell = True, universal_newlines = True )
+        except subprocess.CalledProcessError:
+            return None
 
 
 # Log file handler which truncates the file when the file size limit is reached.
