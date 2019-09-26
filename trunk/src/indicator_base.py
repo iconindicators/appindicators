@@ -17,6 +17,12 @@
 
 
 # Base class for application indicators.
+#
+# References:
+#     http://python-gtk-3-tutorial.readthedocs.org
+#     http://wiki.gnome.org/Projects/PyGObject/Threading
+#     http://wiki.ubuntu.com/NotifyOSD
+#     http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 
 
 import gi
