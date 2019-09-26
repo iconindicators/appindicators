@@ -24,13 +24,14 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
+gi.require_version( "Gdk", "3.0" )
 gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import GLib, Gtk, Notify
+from gi.repository import Gdk, GLib, Gtk, Notify
 
-import indicator_base
+import indicator_base, os
 
 
 class IndicatorFortune( indicator_base.IndicatorBase ):
@@ -61,13 +62,17 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
 #TODO Which of these should/can go into the base class?
         self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
         Notify.init( INDICATOR_NAME )
-        pythonutils.removeFileFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
-
-        self.buildMenu()
-        self.showNewFortune()
+        self.removeFileFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
 
 
     def update( self, menu ):
+        self.buildMenu( menu )
+        self.refreshFortune()
+        self.showFortune()
+        return int( self.refreshIntervalInMinutes ) * 60
+
+
+    def buildMenu( self, menu ):
         menuItem = Gtk.MenuItem( _( "New Fortune" ) )
         menuItem.connect( "activate", lambda widget: self.showNewFortune() )
         menu.append( menuItem )
@@ -81,31 +86,13 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
             self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
-        menuItem.connect( "activate", lambda widget: self._showFortune() )
+        menuItem.connect( "activate", lambda widget: self.showFortune() )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
             self.indicator.set_secondary_activate_target( menuItem )
 
 
-    def showNewFortune( self ):
-        with self.lock:
-            self._refreshFortune()
-            self._showFortune()
-            self.updateTimerID = GLib.timeout_add_seconds( int( self.refreshIntervalInMinutes ) * 60, self.showNewFortune )
-
-
-    def _showFortune( self ):
-        if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
-            notificationSummary = _( "WARNING. . ." )
-        else:
-            notificationSummary = self.notificationSummary
-            if notificationSummary == "":
-                notificationSummary = " "
-
-        Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), IndicatorFortune.ICON ).show()
-
-
-    def _refreshFortune( self ):
+    def refreshFortune( self ):
         if len( self.fortunes ) == 0:
             self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No fortunes are enabled!" )
         else:
@@ -122,82 +109,36 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
                 self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No enabled fortunes have a valid location!" )
             else:
                 while True:
-                    self.fortune = pythonutils.processGet( "fortune" + locations )
+                    self.fortune = self.processGet( "fortune" + locations )
                     if self.fortune is None: # Occurs when no fortune data is found...
                         self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "Ensure enabled fortunes contain fortune data!" )
                         break
 
                     elif len( self.fortune ) <= self.skipFortuneCharacterCount: # If the fortune is within the character limit keep it...
-                        history = pythonutils.readCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE, logging )
+                        history = self.readCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
                         if history is None:
                             history = ""
 
-                        pythonutils.writeCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n", logging )
+                        self.writeCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n" )
                         break
 
-# 
-#     def onAbout( self, widget ):
-#         if self.lock.acquire( blocking = False ):
-#             GLib.source_remove( self.updateTimerID )
-#             pythonutils.showAboutDialog(
-#                 [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
-#                 [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
-#                 IndicatorFortune.COMMENTS,
-#                 IndicatorFortune.AUTHOR,
-#                 IndicatorFortune.COPYRIGHT_START_YEAR,
-#                 [ ],
-#                 "",
-#                 INDICATOR_NAME,
-#                 IndicatorFortune.WEBSITE,
-#                 IndicatorFortune.VERSION )
-# 
-#             self.lock.release()
-#             GLib.idle_add( self.showNewFortune )
-# 
-# 
-# #TODO Remove
-#     def onAboutORIG( self, widget ):
-#         if self.lock.acquire( blocking = False ):
-#             GLib.source_remove( self.updateTimerID )
-#             pythonutils.showAboutDialog(
-#                 [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
-#                 [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
-#                 IndicatorFortune.COMMENTS,
-#                 IndicatorFortune.AUTHOR,
-#                 IndicatorFortune.COPYRIGHT_START_YEAR,
-#                 [ ],
-#                 "",
-#                 Gtk.License.GPL_3_0,
-#                 IndicatorFortune.ICON,
-#                 INDICATOR_NAME,
-#                 IndicatorFortune.WEBSITE,
-#                 IndicatorFortune.VERSION,
-#                 _( "translator-credits" ),
-#                 _( "View the" ),
-#                 _( "text file." ),
-#                 _( "changelog" ),
-#                 IndicatorFortune.LOG,
-#                 _( "View the" ),
-#                 _( "text file." ),
-#                 _( "error log" ) )
-# 
-#             self.lock.release()
-#             GLib.idle_add( self.showNewFortune )
+
+    def showFortune( self ):
+        if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
+            notificationSummary = _( "WARNING. . ." )
+        else:
+            notificationSummary = self.notificationSummary
+            if notificationSummary == "":
+                notificationSummary = " "
+
+        Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), self.icon ).show()
 
 
-    def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            GLib.source_remove( self.updateTimerID )
-            self._onPreferences( widget )
-            self.lock.release()
-            GLib.idle_add( self.showNewFortune )
-
-
-    def _onPreferences( self, widget ):
+    def onPreferences( self ):
         notebook = Gtk.Notebook()
 
         # Fortune file.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         store = Gtk.ListStore( str, str ) # Path to fortune; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
         for location, enabled in self.fortunes:
@@ -262,7 +203,7 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
         notebook.append_page( grid, Gtk.Label( _( "Fortunes" ) ) )
 
         # General.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -316,31 +257,32 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
 
         radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show a new fortune" ) )
         radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
-        radioMiddleMouseClickNewFortune.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        radioMiddleMouseClickNewFortune.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickNewFortune, 0, 4, 1, 1 )
 
         radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Copy current fortune to clipboard" ) )
         radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
-        radioMiddleMouseClickCopyLastFortune.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        radioMiddleMouseClickCopyLastFortune.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 5, 1, 1 )
 
         radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Show current fortune" ) )
         radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
-        radioMiddleMouseClickShowLastFortune.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        radioMiddleMouseClickShowLastFortune.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorFortune.DESKTOP_FILE, logging ) )
+        autostartCheckbox.set_active( self.isAutoStart() )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 7, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
+#TODO Can this stuff be created in the base class and then passed in? 
         dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorFortune.ICON )
+#         dialog.set_icon_name( self.icon ) #TODO Need to set an icon?
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -365,15 +307,14 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
 
                 treeiter = store.iter_next( treeiter )
 
-            self.saveConfig()
-            pythonutils.setAutoStart( IndicatorFortune.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.idle_add( self.buildMenu )
+            self.setAutoStart( autostartCheckbox.get_active() )
+            GLib.idle_add( self.requestSaveConfig() )
 
         dialog.destroy()
 
 
     def onFortuneReset( self, button, treeview ):
-        if pythonutils.showOKCancel( None, _( "Reset fortunes to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+        if self.showOKCancel( None, _( "Reset fortunes to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
             listStore = treeview.get_model().get_model()
             listStore.clear()
             listStore.append( [ IndicatorFortune.DEFAULT_FORTUNE, Gtk.STOCK_APPLY ]  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
@@ -382,10 +323,10 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
     def onFortuneRemove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ), INDICATOR_NAME )
+            self.showMessage( None, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ), INDICATOR_NAME )
         elif model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE:
-            pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "This is the default fortune and cannot be deleted." ), INDICATOR_NAME )
-        elif pythonutils.showOKCancel( None, _( "Remove the selected fortune?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+            self.showMessage( None, Gtk.MessageType.WARNING, _( "This is the default fortune and cannot be deleted." ), INDICATOR_NAME )
+        elif self.showOKCancel( None, _( "Remove the selected fortune?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
@@ -395,7 +336,7 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
     def onFortuneDoubleClick( self, treeview, rowNumber, treeViewColumn ):
         model, treeiter = treeview.get_selection().get_selected()
 
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -494,7 +435,7 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
             if dialog.run() == Gtk.ResponseType.OK:
 
                 if fortuneFileDirectory.get_text().strip() == "": # Will occur if the user does a browse, cancels the browse and hits okay.
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path cannot be empty." ), INDICATOR_NAME )
+                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path cannot be empty." ), INDICATOR_NAME )
                     fortuneFileDirectory.grab_focus()
                     continue
 
@@ -523,7 +464,7 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ 0 ] ):
-                    pythonutils.showMessage( dialog, Gtk.MessageType.INFO, _( "The fortune is part of your system and is already included." ), INDICATOR_NAME )
+                    self.showMessage( dialog, Gtk.MessageType.INFO, _( "The fortune is part of your system and is already included." ), INDICATOR_NAME )
                 else:
                     fortuneFileDirectory.set_text( dialog.get_filename() )
                     break
