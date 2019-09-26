@@ -117,12 +117,12 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
                 self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
 #TODO Needs to call self.__update instead.
-            GLib.idle_add( self.update ) #TODO Check this logic and does it interfere with any other update (also check save config in prefs)?
+            GLib.idle_add( super().__update ) #TODO Check this logic and does it interfere with any other update (also check save config in prefs)?
 
             if self.saveConfigTimerID is not None:
                 GLib.source_remove( self.saveConfigTimerID )
 
-            self.saveConfigTimerID = GLib.timeout_add_seconds( 5, self.saveConfig ) # Defer the save to five seconds in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
+            self.saveConfigTimerID = GLib.timeout_add_seconds( 5, self.__saveConfig ) # Defer the save to five seconds in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
 
 
     def onPreferences( self ):
@@ -171,7 +171,8 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
             self.padInteger = padIntegerCheckbox.get_active()
             self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
-            self.saveConfig() # A save timer could still be in force, but let it run as the same global values will just be re-saved. #TODO Cancel existing timer?  Think!
+            self.saveConfig() # A save timer could still be in force, but let it run as the same global values will just be re-saved. 
+#TODO Cancel existing timer?  Think!  Maybe put this save into a Glib.timeout_add_seconds call as per the mouse wheel.
             self.setAutoStart( autostartCheckbox.get_active() )
 
         dialog.destroy()
