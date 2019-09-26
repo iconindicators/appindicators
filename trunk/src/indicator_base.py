@@ -57,7 +57,7 @@ class IndicatorBase:
 
         logging.basicConfig( format = IndicatorBase.LOGGING_FORMAT, level = IndicatorBase.LOGGING_LEVEL, handlers = [ TruncatedFileHandler( self.log ) ] )
         self.lock = threading.Lock()
-        self.updateTimerID = None #TODO What if an indicator does not use this (then in the about/prefs when we remove it it'll barf).
+#         self.updateTimerID = None #TODO What if an indicator does not use this (then in the about/prefs when we remove it it'll barf).
 
         self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -139,7 +139,7 @@ class IndicatorBase:
             aboutDialog.hide()
 
             self.lock.release()
-            GLib.idle_add( self.update )
+            GLib.idle_add( self.__update )
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, rightText, anchorText ):
