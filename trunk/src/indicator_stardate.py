@@ -30,7 +30,6 @@ gi.require_version( "Gtk", "3.0" )
 from gi.repository import GLib, Gtk
 
 import datetime, indicator_base, stardate
-#TODO Should stardate be in a class too?
 
 
 class IndicatorStardate( indicator_base.IndicatorBase ):
