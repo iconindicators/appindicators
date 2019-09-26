@@ -57,7 +57,6 @@ class IndicatorBase:
 
         logging.basicConfig( format = IndicatorBase.LOGGING_FORMAT, level = IndicatorBase.LOGGING_LEVEL, handlers = [ TruncatedFileHandler( self.log ) ] )
         self.lock = threading.Lock()
-#         self.updateTimerID = None #TODO What if an indicator does not use this (then in the about/prefs when we remove it it'll barf).
 
         self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -98,6 +97,15 @@ class IndicatorBase:
 
         menu.show_all()
         self.indicator.set_menu( menu )
+
+
+    def requestMouseWheelScrollEvents( self ):
+        self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
+
+
+    def __onMouseWheelScroll( self, indicator, delta, scrollDirection ):
+        with self.lock:
+            self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
     def __onAbout( self, widget ):
