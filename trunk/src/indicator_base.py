@@ -199,7 +199,8 @@ class IndicatorBase:
                 shutil.copy( IndicatorBase.DESKTOP_PATH + self.desktopFile, IndicatorBase.AUTOSTART_PATH + self.desktopFile )
 
             else:
-                os.remove( IndicatorBase.AUTOSTART_PATH + self.desktopFile )
+                if os.path.exists( IndicatorBase.AUTOSTART_PATH + self.desktopFile ):
+                    os.remove( IndicatorBase.AUTOSTART_PATH + self.desktopFile )
 
         except Exception as e:
             logging.exception( e )
