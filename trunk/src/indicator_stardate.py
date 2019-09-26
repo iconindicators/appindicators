@@ -181,7 +181,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         padIntegerCheckbox.set_sensitive( source.get_active() )
         showIssueCheckbox.set_sensitive( source.get_active() )
 
-    
+
     def loadConfig( self, config ):
         self.padInteger = config.get( IndicatorStardate.CONFIG_PAD_INTEGER, True )
         self.showClassic = config.get( IndicatorStardate.CONFIG_SHOW_CLASSIC, True )
