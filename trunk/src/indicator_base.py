@@ -77,6 +77,9 @@ class IndicatorBase:
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
 
 
+    def requestUpdate( self ): self.__update()
+
+
     def __finaliseMenu( self, menu ):
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
@@ -224,6 +227,9 @@ class IndicatorBase:
                 logging.error( "Error reading configuration: " + configFile )
 
         self.loadConfig( config ) # Call to implementation in indicator.
+
+
+    def requestSaveConfig( self ): self.__saveConfig()
 
 
     # Write a dictionary of user configuration to a JSON text file.
