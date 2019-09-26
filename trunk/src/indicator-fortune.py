@@ -19,46 +19,21 @@
 # Application indicator which displays fortunes.
 
 
-# References:
-#  http://developer.gnome.org/pygobject
-#  http://developer.gnome.org/gtk3
-#  http://developer.gnome.org/gnome-devel-demos
-#  http://python-gtk-3-tutorial.readthedocs.org
-#  http://wiki.gnome.org/Projects/PyGObject/Threading
-#  http://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
-#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-
-
 INDICATOR_NAME = "indicator-fortune"
 import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "GLib", "2.0" )
+gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
-import logging, os, pythonutils, threading
+from gi.repository import GLib, Gtk, Notify
+
+import indicator_base
 
 
-class IndicatorFortune:
-
-    AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.30"
-    ICON = INDICATOR_NAME
-    COPYRIGHT_START_YEAR = "2013"
-    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
-    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
-    COMMENTS = _( "Calls the 'fortune' program displaying the result in the on-screen notification." )
-
-    DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
-    HISTORY_FILE = "fortune-history"
-
-    NOTIFICATION_SUMMARY = _( "Fortune. . ." )
-    NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, the notification summary should be emitted as a warning (rather than a regular fortune).
+class IndicatorFortune( indicator_base.IndicatorBase ):
 
     CONFIG_FORTUNES = "fortunes"
     CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
@@ -69,29 +44,30 @@ class IndicatorFortune:
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     CONFIG_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
+    DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
+    HISTORY_FILE = "fortune-history"
+
+    NOTIFICATION_SUMMARY = _( "Fortune. . ." )
+    NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, the notification summary should be emitted as a warning (rather than a regular fortune).
+
 
     def __init__( self ):
-        logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorFortune.LOG ) ] )
-        self.lock = threading.Lock()
-        self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
+        super().__init__(
+            indicatorName = INDICATOR_NAME,
+            version = "1.0.30",
+            copyrightStartYear = "2013",
+            comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
+#TODO Which of these should/can go into the base class?
+        self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
         Notify.init( INDICATOR_NAME )
         pythonutils.removeFileFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
-        self.loadConfig()
-
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorFortune.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.buildMenu()
         self.showNewFortune()
 
 
-    def main( self ): Gtk.main()
-
-
-    def buildMenu( self ):
-        menu = Gtk.Menu()
-
+    def update( self, menu ):
         menuItem = Gtk.MenuItem( _( "New Fortune" ) )
         menuItem.connect( "activate", lambda widget: self.showNewFortune() )
         menu.append( menuItem )
@@ -109,10 +85,6 @@ class IndicatorFortune:
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
             self.indicator.set_secondary_activate_target( menuItem )
-
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
-        self.indicator.set_menu( menu )
-        menu.show_all()
 
 
     def showNewFortune( self ):
@@ -163,54 +135,54 @@ class IndicatorFortune:
                         pythonutils.writeCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n", logging )
                         break
 
-
-    def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            GLib.source_remove( self.updateTimerID )
-            pythonutils.showAboutDialog(
-                [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
-                [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
-                IndicatorFortune.COMMENTS,
-                IndicatorFortune.AUTHOR,
-                IndicatorFortune.COPYRIGHT_START_YEAR,
-                [ ],
-                "",
-                INDICATOR_NAME,
-                IndicatorFortune.WEBSITE,
-                IndicatorFortune.VERSION )
-
-            self.lock.release()
-            GLib.idle_add( self.showNewFortune )
-
-
-#TODO Remove
-    def onAboutORIG( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            GLib.source_remove( self.updateTimerID )
-            pythonutils.showAboutDialog(
-                [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
-                [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
-                IndicatorFortune.COMMENTS,
-                IndicatorFortune.AUTHOR,
-                IndicatorFortune.COPYRIGHT_START_YEAR,
-                [ ],
-                "",
-                Gtk.License.GPL_3_0,
-                IndicatorFortune.ICON,
-                INDICATOR_NAME,
-                IndicatorFortune.WEBSITE,
-                IndicatorFortune.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ),
-                IndicatorFortune.LOG,
-                _( "View the" ),
-                _( "text file." ),
-                _( "error log" ) )
-
-            self.lock.release()
-            GLib.idle_add( self.showNewFortune )
+# 
+#     def onAbout( self, widget ):
+#         if self.lock.acquire( blocking = False ):
+#             GLib.source_remove( self.updateTimerID )
+#             pythonutils.showAboutDialog(
+#                 [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
+#                 [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
+#                 IndicatorFortune.COMMENTS,
+#                 IndicatorFortune.AUTHOR,
+#                 IndicatorFortune.COPYRIGHT_START_YEAR,
+#                 [ ],
+#                 "",
+#                 INDICATOR_NAME,
+#                 IndicatorFortune.WEBSITE,
+#                 IndicatorFortune.VERSION )
+# 
+#             self.lock.release()
+#             GLib.idle_add( self.showNewFortune )
+# 
+# 
+# #TODO Remove
+#     def onAboutORIG( self, widget ):
+#         if self.lock.acquire( blocking = False ):
+#             GLib.source_remove( self.updateTimerID )
+#             pythonutils.showAboutDialog(
+#                 [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
+#                 [ IndicatorFortune.AUTHOR + " " + IndicatorFortune.WEBSITE ],
+#                 IndicatorFortune.COMMENTS,
+#                 IndicatorFortune.AUTHOR,
+#                 IndicatorFortune.COPYRIGHT_START_YEAR,
+#                 [ ],
+#                 "",
+#                 Gtk.License.GPL_3_0,
+#                 IndicatorFortune.ICON,
+#                 INDICATOR_NAME,
+#                 IndicatorFortune.WEBSITE,
+#                 IndicatorFortune.VERSION,
+#                 _( "translator-credits" ),
+#                 _( "View the" ),
+#                 _( "text file." ),
+#                 _( "changelog" ),
+#                 IndicatorFortune.LOG,
+#                 _( "View the" ),
+#                 _( "text file." ),
+#                 _( "error log" ) )
+# 
+#             self.lock.release()
+#             GLib.idle_add( self.showNewFortune )
 
 
     def onPreferences( self, widget ):
@@ -561,9 +533,7 @@ class IndicatorFortune:
         dialog.destroy()
 
 
-    def loadConfig( self ):
-        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
-
+    def loadConfig( self, config ):
         self.fortunes = config.get( IndicatorFortune.CONFIG_FORTUNES, [ IndicatorFortune.DEFAULT_FORTUNE ] )
         self.middleMouseClickOnIcon = config.get( IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON, IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
         self.notificationSummary = config.get( IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY, IndicatorFortune.NOTIFICATION_SUMMARY )
@@ -572,7 +542,7 @@ class IndicatorFortune:
 
 
     def saveConfig( self ):
-        config = {
+        return {
             IndicatorFortune.CONFIG_FORTUNES: self.fortunes,
             IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON: self.middleMouseClickOnIcon,
             IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY: self.notificationSummary,
@@ -580,7 +550,5 @@ class IndicatorFortune:
             IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
         }
 
-        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
-
-if __name__ == "__main__": IndicatorFortune().main()
+IndicatorFortune().main()
