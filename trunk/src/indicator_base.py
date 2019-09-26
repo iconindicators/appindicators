@@ -72,8 +72,9 @@ class IndicatorBase:
     def __update( self ):
         with self.lock:
             menu = Gtk.Menu()
-            self.update( menu ) # Call to implementation in indicator.
+            nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
             self.__finaliseMenu( menu )
+            self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
 
 
     def __finaliseMenu( self, menu ):
@@ -161,7 +162,7 @@ class IndicatorBase:
             GLib.source_remove( self.updateTimerID )
             self.onPreferences() # Call to implementation in indicator.
             self.lock.release()
-            GLib.idle_add( self.update )
+            GLib.idle_add( self.__update )
 
 
     def createGrid( self ):
