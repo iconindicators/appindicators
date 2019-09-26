@@ -55,7 +55,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
     def update( self, menu ):
         # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
         if self.showClassic:
-            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
+            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.Stardate().getStardateClassic( datetime.datetime.utcnow() )
 
             # WHEN the stardate calculation is performed is NOT necessarily synchronised with WHEN the stardate actually changes.
             # Therefore update at a faster rate, say at one tenth of the period, but at most once per minute.
@@ -66,14 +66,14 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
 
         else:
             stardateIssue = None
-            stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardate2009Revised( datetime.datetime.utcnow() )
+            stardateInteger, stardateFraction, fractionalPeriod = stardate.Stardate().getStardate2009Revised( datetime.datetime.utcnow() )
 
             # For '2009 revised' the rollover only happens at midnight...so use that for the timer!        
             now = datetime.datetime.utcnow()
             oneSecondAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
             numberOfSecondsToNextUpdate = int( ( oneSecondAfterMidnight - now ).total_seconds() )
 
-        self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
+        self.indicator.set_label( stardate.Stardate().toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
         return numberOfSecondsToNextUpdate
 
 
@@ -83,8 +83,8 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
             # cycle through the possible combinations of options for display in the stardate.
             # If showing a 'classic' stardate and padding is not require, ignore the padding option.
             if self.showClassic:
-                stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
-                paddingRequired = stardate.requiresPadding( stardateIssue, stardateInteger )
+                stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.Stardate().getStardateClassic( datetime.datetime.utcnow() )
+                paddingRequired = stardate.Stardate().requiresPadding( stardateIssue, stardateInteger )
                 if paddingRequired:
                     if self.showIssue and self.padInteger:
                         self.showIssue = True
