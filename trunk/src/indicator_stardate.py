@@ -74,7 +74,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
             numberOfSecondsToNextUpdate = int( ( oneSecondAfterMidnight - now ).total_seconds() )
 
         self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
-        self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.update )
+        return numberOfSecondsToNextUpdate
 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
@@ -116,6 +116,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
                 self.padInteger = True
                 self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
+#TODO Needs to call self.__update instead.
             GLib.idle_add( self.update ) #TODO Check this logic and does it interfere with any other update (also check save config in prefs)?
 
             if self.saveConfigTimerID is not None:
