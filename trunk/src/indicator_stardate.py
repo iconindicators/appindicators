@@ -159,6 +159,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 3, 1, 1 )
 
+#TODO Can this stuff be created in the base class and then passed in? 
         dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
