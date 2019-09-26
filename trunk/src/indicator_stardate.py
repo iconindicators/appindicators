@@ -76,6 +76,8 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         return numberOfSecondsToNextUpdate
 
 
+#TODO Can this be put into the base class?
+#Need a function in the base class which the indicator calls to request to listen for scroll events.
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
         with self.lock:
             # Based on the mouse wheel scroll event (irrespective of direction),
