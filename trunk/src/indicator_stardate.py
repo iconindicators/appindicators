@@ -24,6 +24,7 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
+gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 
 from gi.repository import GLib, Gtk
