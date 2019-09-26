@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-#
+# -*- coding: utf-8 -*-
+
+
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -18,21 +20,21 @@ import datetime, stardate
 
 
 # Exercise the Stardate API.
-print( "Stardate API version: " + stardate.getVersion(), "\n" )
+print( "Stardate API version: " + stardate.Stardate().getVersion(), "\n" )
 
 utcNow = datetime.datetime.utcnow()
 print( "UTC now:", utcNow, "\n" )
 
-stardateClassic = stardate.getStardateClassic( utcNow )
+stardateClassic = stardate.Stardate().getStardateClassic( utcNow )
 print( "'classic' Stardate (issue, integer, fraction, fractionalPeriod):", stardateClassic )
-print( "'classic' Stardate (as string):", stardate.toStardateString( stardateClassic[ 0 ], stardateClassic[ 1 ], stardateClassic[ 2 ], True, False ) )
+print( "'classic' Stardate (as string):", stardate.Stardate().toStardateString( stardateClassic[ 0 ], stardateClassic[ 1 ], stardateClassic[ 2 ], True, False ) )
 
 # Use the calculated 'classic' Stardate to get the date/time (should be the same but rounding plays a part).
-print( "UTC now from 'classic' Stardate:", stardate.getGregorianFromStardateClassic( stardateClassic[ 0 ], stardateClassic[ 1 ], stardateClassic[ 2 ] ), "\n" )
+print( "UTC now from 'classic' Stardate:", stardate.Stardate().getGregorianFromStardateClassic( stardateClassic[ 0 ], stardateClassic[ 1 ], stardateClassic[ 2 ] ), "\n" )
 
-stardate2009Revised = stardate.getStardate2009Revised( utcNow )
+stardate2009Revised = stardate.Stardate().getStardate2009Revised( utcNow )
 print( "'2009Revised' Stardate (integer, fraction, fractionalPeriod):", stardate2009Revised )
-print( "'2009Revised' Stardate (as string):", stardate.toStardateString( None, stardate2009Revised[ 0 ], stardate2009Revised[ 1 ], None, False ) )
+print( "'2009Revised' Stardate (as string):", stardate.Stardate().toStardateString( None, stardate2009Revised[ 0 ], stardate2009Revised[ 1 ], None, False ) )
 
 # Use the calculated '2009Revised' Stardate to get the date/time (should be the same but rounding plays a part).
-print( "UTC now from '2009Revised' Stardate:", stardate.getGregorianFromStardate2009Revised( stardate2009Revised[ 0 ], stardate2009Revised[ 1 ] ) )
+print( "UTC now from '2009Revised' Stardate:", stardate.Stardate().getGregorianFromStardate2009Revised( stardate2009Revised[ 0 ], stardate2009Revised[ 1 ] ) )
