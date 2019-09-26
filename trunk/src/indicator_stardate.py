@@ -80,7 +80,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         with self.lock:
             # Based on the mouse wheel scroll event (irrespective of direction),
             # cycle through the possible combinations of options for display in the stardate.
-            # If showing a 'classic' stardate and padding is not require, ignore the padding option.
+            # If showing a 'classic' stardate and padding is not required, ignore the padding option.
             if self.showClassic:
                 stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.Stardate().getStardateClassic( datetime.datetime.utcnow() )
                 paddingRequired = stardate.Stardate().requiresPadding( stardateIssue, stardateInteger )
@@ -201,6 +201,4 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         }
 
 
-#TODO Sort this out.
-# if __name__ == "__main__": IndicatorStardate().main()
 IndicatorStardate().main()
