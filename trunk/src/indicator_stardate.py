@@ -47,7 +47,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
             comments = _( "Shows the current Star Trek™ stardate." ),
             creditz = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ] )
 
-        self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
+        self.requestMouseWheelScrollEvents()
         self.saveConfigTimerID = None
 
 
@@ -76,54 +76,51 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         return numberOfSecondsToNextUpdate
 
 
-#TODO Can this be put into the base class?
-#Need a function in the base class which the indicator calls to request to listen for scroll events.
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        with self.lock:
-            # Based on the mouse wheel scroll event (irrespective of direction),
-            # cycle through the possible combinations of options for display in the stardate.
-            # If showing a 'classic' stardate and padding is not required, ignore the padding option.
-            if self.showClassic:
-                stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.Stardate().getStardateClassic( datetime.datetime.utcnow() )
-                paddingRequired = stardate.Stardate().requiresPadding( stardateIssue, stardateInteger )
-                if paddingRequired:
-                    if self.showIssue and self.padInteger:
-                        self.showIssue = True
-                        self.padInteger = False
+        # Based on the mouse wheel scroll event (irrespective of direction),
+        # cycle through the possible combinations of options for display in the stardate.
+        # If showing a 'classic' stardate and padding is not required, ignore the padding option.
+        if self.showClassic:
+            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.Stardate().getStardateClassic( datetime.datetime.utcnow() )
+            paddingRequired = stardate.Stardate().requiresPadding( stardateIssue, stardateInteger )
+            if paddingRequired:
+                if self.showIssue and self.padInteger:
+                    self.showIssue = True
+                    self.padInteger = False
 
-                    elif self.showIssue and not self.padInteger:
-                        self.showIssue = False
-                        self.padInteger = True
+                elif self.showIssue and not self.padInteger:
+                    self.showIssue = False
+                    self.padInteger = True
 
-                    elif not self.showIssue and self.padInteger:
-                        self.showIssue = False
-                        self.padInteger = False
-
-                    else:
-                        self.showIssue = True
-                        self.padInteger = True
-                        self.showClassic = False # Shown all possible 'classic' options (when padding is required)...now move on to '2009 revised'.
+                elif not self.showIssue and self.padInteger:
+                    self.showIssue = False
+                    self.padInteger = False
 
                 else:
-                    if self.showIssue:
-                        self.showIssue = False
-
-                    else:
-                        self.showIssue = True
-                        self.showClassic = False # Shown all possible 'classic' options (when padding is not required)...now move on to '2009 revised'.
+                    self.showIssue = True
+                    self.padInteger = True
+                    self.showClassic = False # Shown all possible 'classic' options (when padding is required)...now move on to '2009 revised'.
 
             else:
-                self.showIssue = True
-                self.padInteger = True
-                self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
+                if self.showIssue:
+                    self.showIssue = False
 
-            GLib.idle_add( self.requestUpdate )
+                else:
+                    self.showIssue = True
+                    self.showClassic = False # Shown all possible 'classic' options (when padding is not required)...now move on to '2009 revised'.
 
-            if self.saveConfigTimerID:
-                GLib.source_remove( self.saveConfigTimerID )
+        else:
+            self.showIssue = True
+            self.padInteger = True
+            self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
-            # Defer the save; this avoids multiple saves when scrolling the mouse wheel like crazy!
-            self.saveConfigTimerID = GLib.timeout_add_seconds( 5, self.requestSaveConfig )
+        GLib.idle_add( self.requestUpdate )
+
+        if self.saveConfigTimerID:
+            GLib.source_remove( self.saveConfigTimerID )
+
+        # Defer the save; this avoids multiple saves when scrolling the mouse wheel like crazy!
+        self.saveConfigTimerID = GLib.timeout_add_seconds( 5, self.requestSaveConfig )
 
 
     def onPreferences( self ):
