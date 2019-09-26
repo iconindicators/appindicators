@@ -70,7 +70,6 @@ class IndicatorBase:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.__loadConfig()
-#         self.__update()
 
 
     def main( self ): 
@@ -187,6 +186,7 @@ class IndicatorBase:
 
 
     # Shows a message dialog.
+    #
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
     def showMessage( self, parent, messageType, message, title ):
         dialog = Gtk.MessageDialog( parent, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
