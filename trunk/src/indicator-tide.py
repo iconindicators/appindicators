@@ -63,10 +63,6 @@ class IndicatorTide( indicator_base.IndicatorBase ):
             creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. http://www.GOV.uk/UKHO" ),
                         _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." ) ] )
 
-
-#TODO Needed?
-#         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
-
         if ports.isExpired():
             message = _(
                 "The license for non-UK ports has expired. " + 
