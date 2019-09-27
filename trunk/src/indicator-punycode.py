@@ -228,8 +228,8 @@ class IndicatorPunycode( indicator_base.IndicatorBase ):
             self.outputBoth = outputBothCheckbox.get_active()
             self.dropPathQuery = dropPathQueryCheckbox.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
-            self.requestSaveConfig()
             self.setAutoStart( IndicatorPunycode.DESKTOP_FILE, autostartCheckbox.get_active() )
+            GLib.idle_add( self.requestSaveConfig() )
 
         dialog.destroy()
 
