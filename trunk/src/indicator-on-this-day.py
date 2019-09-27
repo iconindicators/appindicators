@@ -19,50 +19,25 @@
 # Application indicator which displays calendar events.
 
 
-# References:
-#  http://developer.gnome.org/pygobject
-#  http://developer.gnome.org/gtk3
-#  http://developer.gnome.org/gnome-devel-demos
-#  http://python-gtk-3-tutorial.readthedocs.org
-#  http://wiki.gnome.org/Projects/PyGObject/Threading
-#  http://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
-#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-
-
 INDICATOR_NAME = "indicator-on-this-day"
 import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "Gdk", "3.0" )
+gi.require_version( "GLib", "2.0" )
+gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from event import Event
-from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
 from datetime import date, datetime, timedelta
-import fnmatch, logging, os, pythonutils, threading, webbrowser
+from gi.repository import Gdk, GLib, Gtk, Notify
+
+import indicator_base, encodings.idna, re
+import fnmatch, os, webbrowser
 
 
-class IndicatorOnThisDay:
-
-    AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.5"
-    ICON = INDICATOR_NAME
-    COPYRIGHT_START_YEAR = "2017"
-    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
-    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
-    COMMENTS = _( "Calls the 'calendar' program and displays events in the menu." )
-
-    CACHE_CALENDAR_FILENAME = "calendars"
-    CACHE_CALENDAR_FULL_PATH = pythonutils.getCachePathname( INDICATOR_NAME, CACHE_CALENDAR_FILENAME )
-
-    DEFAULT_CALENDAR = "/usr/share/calendar/calendar.history"
-
-    TAG_EVENT = "["+ _( "EVENT" )+ "]"
-    SEARCH_URL_DEFAULT = "https://www.google.com/search?q=" + TAG_EVENT
+class IndicatorOnThisDay( indicator_base.IndicatorBase ):
 
     CONFIG_CALENDARS = "calendars"
     CONFIG_COPY_TO_CLIPBOARD = "copyToClipboard"
@@ -70,44 +45,38 @@ class IndicatorOnThisDay:
     CONFIG_NOTIFY = "notify"
     CONFIG_SEARCH_URL = "searchURL"
 
+    DEFAULT_CALENDAR = "/usr/share/calendar/calendar.history"
+    TAG_EVENT = "["+ _( "EVENT" )+ "]"
+    SEARCH_URL_DEFAULT = "https://www.google.com/search?q=" + TAG_EVENT
+
 
     def __init__( self ):
-        logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorOnThisDay.LOG ) ] )
-        self.lock = threading.Lock()
-
-        Notify.init( INDICATOR_NAME )
-        self.loadConfig()
-
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorOnThisDay.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
-        self.update()
+        super().__init__(
+            indicatorName = INDICATOR_NAME,
+            version = "1.0.5",
+            copyrightStartYear = "2017",
+            comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
 
 
-    def main( self ): Gtk.main()
+    def update( self, menu ):
+        events = self.getEvents()
+        self.buildMenu( menu, events )
+
+        now = datetime.now()
+        justAfterMidnight = ( now + timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 5 )
+        fiveSecondsAfterMidnight = int( ( justAfterMidnight - now ).total_seconds() )
+        self.updateTimerID = GLib.timeout_add_seconds( fiveSecondsAfterMidnight, self.update )
+
+        if self.notify:
+            today = self.processGet( "date +'%b %d'" ).strip() # It is assumed/hoped the dates in the calendar result are short date format.
+            for event in events:
+                if today == event.getDate():
+                    Notify.Notification.new( _( "On this day..." ), event.getDescription(), IndicatorOnThisDay.ICON ).show()
 
 
-    def update( self ):
-        with lock:
-            events = self.getEvents()
-            self.buildMenu( events )
-
-            now = datetime.now()
-            justAfterMidnight = ( now + timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 5 )
-            fiveSecondsAfterMidnight = int( ( justAfterMidnight - now ).total_seconds() )
-            self.updateTimerID = GLib.timeout_add_seconds( fiveSecondsAfterMidnight, self.update )
-
-            if self.notify:
-                today = pythonutils.processGet( "date +'%b %d'" ).strip() # It is assumed/hoped the dates in the calendar result are short date format.
-                for event in events:
-                    if today == event.getDate():
-                        Notify.Notification.new( _( "On this day..." ), event.getDescription(), IndicatorOnThisDay.ICON ).show()
-
-
-    def buildMenu( self, events ):
+    def buildMenu( self, menu, events ):
         menuItemMaximum = self.lines - 3 # Less three to account for About, Preferences and Quit.
         menuItemCount = 0
-        menu = Gtk.Menu()
         lastDate = ""
         for event in events:
             if event.getDate() != lastDate:
@@ -115,6 +84,7 @@ class IndicatorOnThisDay:
                     menu.append( Gtk.MenuItem( event.getDate() ) )
                     lastDate = event.getDate()
                     menuItemCount += 1
+
                 else:
                     break # Don't add the menu item for the new date and don't add a subsequent event.
 
@@ -132,10 +102,6 @@ class IndicatorOnThisDay:
             if menuItemCount == menuItemMaximum:
                 break
 
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, len( events ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
-        menu.show_all()
-        self.indicator.set_menu( menu )
-
 
     def getEvents( self ):
         # Write the path of each calendar file to a temporary file - allows for one call to calendar.
@@ -144,12 +110,12 @@ class IndicatorOnThisDay:
             if os.path.isfile( calendar ):
                 content += "#include <" +calendar + ">\n"
 
-        pythonutils.writeCacheText( INDICATOR_NAME, IndicatorOnThisDay.CACHE_CALENDAR_FILENAME, content, logging )
+        self.writeCacheText( INDICATOR_NAME, self.getCachePathname( "calendars" ), content )
 
         # Run the calendar command and parse the results, one event per line, sometimes...
         events = [ ]
-        command = "calendar -f " + IndicatorOnThisDay.CACHE_CALENDAR_FULL_PATH + " -A 366"
-        for line in pythonutils.processGet( command ).splitlines():
+        command = "calendar -f " + self.getCachePathname( "calendars" ) + " -A 366"
+        for line in self.processGet( command ).splitlines():
             if( line is None or len( line.strip() ) == 0 ):
                 continue # Ubuntu 17.04 inserts an empty line between events.
 
@@ -191,46 +157,11 @@ class IndicatorOnThisDay:
         return sortedEventsWithoutDuplicates
 
 
-    def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            pythonutils.showAboutDialog(
-                [ IndicatorOnThisDay.AUTHOR + " " + IndicatorOnThisDay.WEBSITE ],
-                [ IndicatorOnThisDay.AUTHOR + " " + IndicatorOnThisDay.WEBSITE ],
-                IndicatorOnThisDay.COMMENTS,
-                IndicatorOnThisDay.AUTHOR,
-                IndicatorOnThisDay.COPYRIGHT_START_YEAR,
-                [ ],
-                "",
-                Gtk.License.GPL_3_0,
-                IndicatorOnThisDay.ICON,
-                INDICATOR_NAME,
-                IndicatorOnThisDay.WEBSITE,
-                IndicatorOnThisDay.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ),
-                IndicatorOnThisDay.LOG,
-                _( "View the" ),
-                _( "text file." ),
-                _( "error log" ) )
-
-            self.lock.release()
-
-
-    def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            GLib.source_remove( self.updateTimerID )
-            self._onPreferences( widget )
-            self.lock.release()
-            GLib.idle_add( self.update )
-
-
-    def _onPreferences( self, widget ):
+    def onPreferences( self ):
         notebook = Gtk.Notebook()
 
         # Calendar file settings.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         store = Gtk.ListStore( str, str ) # Path to calendar file; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
         for calendar in self.getCalendars():
@@ -240,6 +171,7 @@ class IndicatorOnThisDay:
         for calendar in self.calendars:
             if os.path.isfile( calendar ):
                 store.append( [ calendar, Gtk.STOCK_APPLY ] )
+
             else:
                 store.append( [ calendar, Gtk.STOCK_DIALOG_ERROR ] )
 
@@ -293,7 +225,7 @@ class IndicatorOnThisDay:
         notebook.append_page( grid, Gtk.Label( _( "Calendars" ) ) )
 
         # General settings.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -316,18 +248,18 @@ class IndicatorOnThisDay:
         radioCopyToClipboard = Gtk.RadioButton.new_with_label_from_widget( None, _( "Copy event to clipboard" ) )
         radioCopyToClipboard.set_tooltip_text( _( "Copy the event text and date to the clipboard." ) )
         radioCopyToClipboard.set_active( self.copyToClipboard )
-        radioCopyToClipboard.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        radioCopyToClipboard.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioCopyToClipboard, 0, 2, 1, 1 )
 
         radioInternetSearch = Gtk.RadioButton.new_with_label_from_widget( radioCopyToClipboard, _( "Search event on the internet" ) )
         radioInternetSearch.set_tooltip_text( _( "Open the default web browser and search for the event." ) )
         radioInternetSearch.set_active( not self.copyToClipboard )
-        radioInternetSearch.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        radioInternetSearch.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioInternetSearch, 0, 3, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_hexpand( True )
-        box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT * 2 )
+        box.set_margin_left( self.INDENT_WIDGET_LEFT * 2 )
 
         label = Gtk.Label( _( "URL" ) )
         label.set_halign( Gtk.Align.START )
@@ -361,7 +293,7 @@ class IndicatorOnThisDay:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorOnThisDay.DESKTOP_FILE, logging ) )
+        autostartCheckbox.set_active( self.isAutoStart() )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
@@ -374,7 +306,6 @@ class IndicatorOnThisDay:
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
-
             self.lines = spinner.get_value_as_int()
 
             self.calendars = [ ]
@@ -388,8 +319,8 @@ class IndicatorOnThisDay:
             self.copyToClipboard = radioCopyToClipboard.get_active()
             self.searchURL = searchEngineEntry.get_text().strip()
             self.notify = notifyCheckbox.get_active()
-            self.saveConfig()
-            pythonutils.setAutoStart( IndicatorOnThisDay.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+            self.setAutoStart( autostartCheckbox.get_active() )
+            GLib.idle_add( self.requestSaveConfig() )
 
         dialog.destroy()
 
@@ -411,12 +342,13 @@ class IndicatorOnThisDay:
 
 
     def onCalendarReset( self, button, treeview ):
-        if pythonutils.showOKCancel( None, _( "Reset calendars to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+        if self.showOKCancel( None, _( "Reset calendars to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
             listStore = treeview.get_model().get_model()
             listStore.clear()
             for calendar in self.getCalendars():
                 if calendar == IndicatorOnThisDay.DEFAULT_CALENDAR:
                     listStore.append( [ IndicatorOnThisDay.DEFAULT_CALENDAR, Gtk.STOCK_APPLY ] )
+
                 else:
                     listStore.append( [ calendar, None ] )
 
@@ -424,10 +356,12 @@ class IndicatorOnThisDay:
     def onCalendarRemove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            pythonutils.showMessage( None, Gtk.MessageType.ERROR, _( "No calendar has been selected." ), INDICATOR_NAME )
+            self.showMessage( None, Gtk.MessageType.ERROR, _( "No calendar has been selected." ), INDICATOR_NAME )
+
         elif model[ treeiter ][ 0 ] in self.getCalendars():
-            pythonutils.showMessage( None, Gtk.MessageType.WARNING, _( "This calendar is part of your system\nand cannot be removed." ), INDICATOR_NAME )
-        elif pythonutils.showOKCancel( None, _( "Remove the selected calendar?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+            self.showMessage( None, Gtk.MessageType.WARNING, _( "This calendar is part of your system\nand cannot be removed." ), INDICATOR_NAME )
+
+        elif self.showOKCancel( None, _( "Remove the selected calendar?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
@@ -439,10 +373,11 @@ class IndicatorOnThisDay:
 
         if rowNumber is None: # This is an add.
             isSystemCalendar = False
+
         else: # This is an edit.
             isSystemCalendar = model[ treeiter ][ 0 ] in self.getCalendars()
 
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -464,6 +399,7 @@ class IndicatorOnThisDay:
             browseButton.set_tooltip_text( _(
                 "This calendar is part of your\n" + \
                 "system and cannot be modified." ) )
+
         else:
             browseButton.set_tooltip_text( _( 
                 "Choose a calendar file.\n\n" + \
@@ -477,6 +413,7 @@ class IndicatorOnThisDay:
         enabledCheckbox = Gtk.CheckButton( _( "Enabled" ) )
         if rowNumber is None: # This is an add.
             enabledCheckbox.set_active( True )
+
         else:
             enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
 
@@ -484,6 +421,7 @@ class IndicatorOnThisDay:
 
         if rowNumber is None:
             title = _( "Add Calendar" )
+
         else:
             title = _( "Edit Calendar" )
 
@@ -500,12 +438,12 @@ class IndicatorOnThisDay:
             if dialog.run() == Gtk.ResponseType.OK:
 
                 if not isSystemCalendar and fileEntry.get_text().strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The calendar path cannot be empty." ), INDICATOR_NAME )
+                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The calendar path cannot be empty." ), INDICATOR_NAME )
                     fileEntry.grab_focus()
                     continue
     
                 if not isSystemCalendar and not os.path.exists( fileEntry.get_text().strip() ):
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The calendar path does not exist." ), INDICATOR_NAME )
+                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The calendar path does not exist." ), INDICATOR_NAME )
                     fileEntry.grab_focus()
                     continue
 
@@ -528,28 +466,28 @@ class IndicatorOnThisDay:
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 if dialog.get_filename() in systemCalendars:
-                    pythonutils.showMessage( dialog, Gtk.MessageType.INFO, _( "The calendar is part of your system\nand is already included." ), INDICATOR_NAME )
+                    self.showMessage( dialog, Gtk.MessageType.INFO, _( "The calendar is part of your system\nand is already included." ), INDICATOR_NAME )
+
                 else:
                     calendarFile.set_text( dialog.get_filename() )
                     break
+
             else:
                 break
 
         dialog.destroy()
 
 
-    def loadConfig( self ):
-        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
-
+    def loadConfig( self, config ):
         self.calendars = config.get( IndicatorOnThisDay.CONFIG_CALENDARS, [ IndicatorOnThisDay.DEFAULT_CALENDAR ] )
         self.copyToClipboard = config.get( IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD, True )
-        self.lines = config.get( IndicatorOnThisDay.CONFIG_LINES, pythonutils.getMenuItemsGuess() )
+        self.lines = config.get( IndicatorOnThisDay.CONFIG_LINES, self.getMenuItemsGuess() )
         self.notify = config.get( IndicatorOnThisDay.CONFIG_NOTIFY, True )
         self.searchURL = config.get( IndicatorOnThisDay.CONFIG_SEARCH_URL, IndicatorOnThisDay.SEARCH_URL_DEFAULT )
 
 
     def saveConfig( self ):
-        config = {
+        return {
             IndicatorOnThisDay.CONFIG_CALENDARS: self.calendars,
             IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD: self.copyToClipboard,
             IndicatorOnThisDay.CONFIG_LINES: self.lines,
@@ -557,7 +495,5 @@ class IndicatorOnThisDay:
             IndicatorOnThisDay.CONFIG_SEARCH_URL: self.searchURL,
         }
 
-        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
-
-if __name__ == "__main__": IndicatorOnThisDay().main()
+IndicatorOnThisDay().main()
