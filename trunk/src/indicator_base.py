@@ -25,6 +25,8 @@
 #     http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 
 
+#TODO Rename all indicators to use _ instead of -?
+
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
