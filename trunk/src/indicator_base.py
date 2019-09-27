@@ -51,6 +51,7 @@ class IndicatorBase:
     JSON_EXTENSION = ".json"
     LOGGING_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     LOGGING_LEVEL = logging.DEBUG
+    URL_TIMEOUT_IN_SECONDS = 2
     USER_DIRECTORY_CACHE = ".cache"
     USER_DIRECTORY_CONFIG = ".config"
     XDG_KEY_CACHE = "XDG_CACHE_HOME"
@@ -253,6 +254,19 @@ class IndicatorBase:
         grid.set_margin_top( spacing )
         grid.set_margin_bottom( spacing )
         return grid
+
+
+    # Provides indent spacing for menu items,
+    # given Ubuntu 16.04 (Unity) and Ubuntu 18.04+ (GNOME Shell) differences.
+    def indent( self, indentUnity, indentGnomeShell ):
+        INDENT = "      "
+        if self.isUbuntu1604():
+            indent = INDENT * indentUnity
+
+        else:
+            indent = INDENT * indentGnomeShell
+
+        return indent
 
 
     def isAutoStart( self ):
