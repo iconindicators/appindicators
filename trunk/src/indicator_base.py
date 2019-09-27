@@ -29,8 +29,9 @@ import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
+gi.require_version( "Notify", "0.7" )
 
-from gi.repository import AppIndicator3, GLib, Gtk
+from gi.repository import AppIndicator3, GLib, Gtk, Notify
 import datetime, gzip, json, logging.handlers, os, shutil, subprocess, threading
 
 
@@ -63,9 +64,11 @@ class IndicatorBase:
         self.artwork = artwork if artwork else self.authors
         self.creditz = creditz
 
-        logging.basicConfig( format = IndicatorBase.LOGGING_FORMAT, level = IndicatorBase.LOGGING_LEVEL, handlers = [ TruncatedFileHandler( self.log ) ] )
         self.lock = threading.Lock()
         self.updateTimerID = None
+
+        logging.basicConfig( format = IndicatorBase.LOGGING_FORMAT, level = IndicatorBase.LOGGING_LEVEL, handlers = [ TruncatedFileHandler( self.log ) ] )
+        Notify.init( self.indicatorName )
 
         self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
