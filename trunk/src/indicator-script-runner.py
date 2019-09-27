@@ -19,40 +19,22 @@
 # Application indicator allowing a user to run a terminal command or script.
 
 
-# References:
-#  http://developer.gnome.org/pygobject
-#  http://developer.gnome.org/gtk3
-#  http://python-gtk-3-tutorial.readthedocs.org
-#  http://wiki.gnome.org/Projects/PyGObject/Threading
-#  http://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
-#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "GLib", "2.0" )
+gi.require_version( "Gtk", "3.0" )
 
-from gi.repository import AppIndicator3, GLib, Gtk
+from gi.repository import GLib, Gtk
 from script import Info
 from threading import Thread
-import copy, logging, os, pythonutils, threading
+
+import copy, indicator_base
 
 
-class IndicatorScriptRunner:
-
-    AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.11"
-    ICON = INDICATOR_NAME
-    COPYRIGHT_START_YEAR = "2016"
-    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
-    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
-    COMMENTS = _( "Run a terminal command or script from an indicator." )
+class IndicatorScriptRunner( indicator_base.IndicatorBase ):
 
     CONFIG_HIDE_GROUPS = "hideGroups"
     CONFIG_SCRIPT_GROUP_DEFAULT = "scriptGroupDefault"
@@ -61,31 +43,22 @@ class IndicatorScriptRunner:
     CONFIG_SHOW_SCRIPTS_IN_SUBMENUS = "showScriptsInSubmenus"
 
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
-    COMMAND_NOTIFY = "notify-send -i " + ICON + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + _( "...has completed." ) + "\""
+    COMMAND_NOTIFY = "notify-send -i " + INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + _( "...has completed." ) + "\""
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
 
     def __init__( self ):
-        logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorScriptRunner.LOG ) ] )
-        self.lock = threading.Lock()
-
-        self.loadConfig()
-
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorScriptRunner.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
-        self.buildMenu()
+        super().__init__(
+            indicatorName = INDICATOR_NAME,
+            version = "1.0.11",
+            copyrightStartYear = "2016",
+            comments = _( "Run a terminal command or script from an indicator." ) )
 
 
-    def main( self ): Gtk.main()
-
-
-    def buildMenu( self ):
-        menu = Gtk.Menu()
-
+    def update( self, menu ):
         if self.showScriptsInSubmenus:
             scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
-            indent = pythonutils.indent( 0, 1 )
+            indent = self.indent( 0, 1 )
             for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
                 menuItem = Gtk.MenuItem( group )
                 menu.append( menuItem )
@@ -99,14 +72,10 @@ class IndicatorScriptRunner:
 
             else:
                 scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
-                indent = pythonutils.indent( 1, 1 )
+                indent = self.indent( 1, 1 )
                 for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
                     menu.append( Gtk.MenuItem( group + "..." ) )
                     self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
-
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, len( self.scripts ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
-        self.indicator.set_menu( menu )
-        menu.show_all()
 
 
     def addScriptsToMenu( self, scripts, group, menu, indent ):
@@ -120,8 +89,8 @@ class IndicatorScriptRunner:
 
 
     def onScript( self, widget, script ):
-        terminal = pythonutils.getTerminal()
-        terminalExecutionFlag = pythonutils.getTerminalExecutionFlag( terminal )
+        terminal = self.getTerminal()
+        terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
 
         command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
 
@@ -140,43 +109,10 @@ class IndicatorScriptRunner:
             command += "; ${SHELL}"
 
         command += "'"
-        Thread( target = pythonutils.processCall, args = ( command, ) ).start()
+        Thread( target = self.processCall, args = ( command, ) ).start()
 
 
-    def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            pythonutils.showAboutDialog(
-                [ IndicatorScriptRunner.AUTHOR + " " + IndicatorScriptRunner.WEBSITE ],
-                [ IndicatorScriptRunner.AUTHOR + " " + IndicatorScriptRunner.WEBSITE ],
-                IndicatorScriptRunner.COMMENTS,
-                IndicatorScriptRunner.AUTHOR,
-                IndicatorScriptRunner.COPYRIGHT_START_YEAR,
-                [ ],
-                "",
-                Gtk.License.GPL_3_0,
-                IndicatorScriptRunner.ICON,
-                INDICATOR_NAME,
-                IndicatorScriptRunner.WEBSITE,
-                IndicatorScriptRunner.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ),
-                IndicatorScriptRunner.LOG,
-                _( "View the" ),
-                _( "text file." ),
-                _( "error log" ) )
-
-            self.lock.release()
-
-
-    def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            self._onPreferences( widget )
-            self.lock.release()
-
-
-    def _onPreferences( self, widget ):
+    def onPreferences( self ):
         self.defaultScriptGroupCurrent = self.scriptGroupDefault
         self.defaultScriptNameCurrent = self.scriptNameDefault
 
@@ -184,7 +120,7 @@ class IndicatorScriptRunner:
         notebook = Gtk.Notebook()
 
         # User scripts.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -304,7 +240,7 @@ class IndicatorScriptRunner:
         notebook.append_page( grid, Gtk.Label( _( "Scripts" ) ) )
 
         # General settings.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         label = Gtk.Label( _( "Display" ) )
         label.set_halign( Gtk.Align.START )
@@ -313,19 +249,19 @@ class IndicatorScriptRunner:
         radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show scripts in submenus" ) )
         radioShowScriptsSubmenu.set_tooltip_text( _( "Scripts of the same group are shown in submenus." ) )
         radioShowScriptsSubmenu.set_active( self.showScriptsInSubmenus )
-        radioShowScriptsSubmenu.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        radioShowScriptsSubmenu.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioShowScriptsSubmenu, 0, 1, 1, 1 )
 
         radioShowScriptsIndented = Gtk.RadioButton.new_with_label_from_widget( radioShowScriptsSubmenu, _( "Show scripts grouped" ) )
         radioShowScriptsIndented.set_tooltip_text( _( "Scripts are shown within their respective group." ) )
         radioShowScriptsIndented.set_active( not self.showScriptsInSubmenus )
-        radioShowScriptsIndented.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        radioShowScriptsIndented.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioShowScriptsIndented, 0, 2, 1, 1 )
 
         hideGroupsCheckbox = Gtk.CheckButton( _( "Hide groups" ) )
         hideGroupsCheckbox.set_active( self.hideGroups )
         hideGroupsCheckbox.set_sensitive( not self.showScriptsInSubmenus )
-        hideGroupsCheckbox.set_margin_left( pythonutils.INDENT_WIDGET_LEFT * 2 )
+        hideGroupsCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT * 2 )
         hideGroupsCheckbox.set_tooltip_text( _(
             "If checked, only script names are displayed.\n\n" + \
             "Otherwise, script names are indented within each group." ) )
@@ -337,7 +273,7 @@ class IndicatorScriptRunner:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorScriptRunner.DESKTOP_FILE, logging ) )
+        autostartCheckbox.set_active( self.isAutoStart() )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
@@ -360,13 +296,13 @@ class IndicatorScriptRunner:
             if len( self.scripts ) == 0:
                 self.scriptGroupDefault = ""
                 self.scriptNameDefault = ""
+
             else:
                 self.scriptGroupDefault = self.defaultScriptGroupCurrent
                 self.scriptNameDefault = self.defaultScriptNameCurrent
 
-            self.saveConfig()
-            pythonutils.setAutoStart( IndicatorScriptRunner.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.idle_add( self.buildMenu )
+            self.setAutoStart( autostartCheckbox.get_active() )
+            GLib.idle_add( self.requestSaveConfig() )
 
         dialog.destroy()
 
@@ -427,7 +363,7 @@ class IndicatorScriptRunner:
             scriptName = model[ treeiter ][ 0 ]
             script = self.getScript( scripts, scriptGroup, scriptName )
 
-            grid = pythonutils.createGrid()
+            grid = self.createGrid()
 
             box = Gtk.Box( spacing = 6 )
 
@@ -469,17 +405,17 @@ class IndicatorScriptRunner:
                 dialog.show_all()
                 if dialog.run() == Gtk.ResponseType.OK:
                     if scriptGroupCombo.get_active_text().strip() == "":
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The group cannot be empty." ), INDICATOR_NAME )
+                        self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The group cannot be empty." ), INDICATOR_NAME )
                         scriptGroupCombo.grab_focus()
                         continue
 
                     if scriptNameEntry.get_text().strip() == "":
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The name cannot be empty." ), INDICATOR_NAME )
+                        self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The name cannot be empty." ), INDICATOR_NAME )
                         scriptNameEntry.grab_focus()
                         continue
 
                     if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ) is not None:
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
+                        self.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
                         scriptGroupCombo.grab_focus()
                         continue
 
@@ -506,7 +442,7 @@ class IndicatorScriptRunner:
         if scriptGroup is not None and treeiter is not None:
             scriptName = model[ treeiter ][ 0 ]
             theScript = self.getScript( scripts, scriptGroup, scriptName )
-            if pythonutils.showOKCancel( None, _( "Remove the selected script?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+            if self.showOKCancel( None, _( "Remove the selected script?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
                 i = 0
                 for script in scripts:
                     if script.getGroup() == scriptGroup and script.getName() == scriptName:
@@ -542,7 +478,7 @@ class IndicatorScriptRunner:
 
 
     def addEditScript( self, script, scripts, scriptGroupComboBox, scriptNameTreeView ):
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -652,28 +588,28 @@ class IndicatorScriptRunner:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
                 if scriptGroupCombo.get_active_text().strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The group cannot be empty." ), INDICATOR_NAME )
+                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The group cannot be empty." ), INDICATOR_NAME )
                     scriptGroupCombo.grab_focus()
                     continue
 
                 if scriptNameEntry.get_text().strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The name cannot be empty." ), INDICATOR_NAME )
+                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The name cannot be empty." ), INDICATOR_NAME )
                     scriptNameEntry.grab_focus()
                     continue
 
-                if pythonutils.getTextViewText( commandTextView ).strip() == "":
-                    pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The command cannot be empty." ), INDICATOR_NAME )
+                if self.getTextViewText( commandTextView ).strip() == "":
+                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The command cannot be empty." ), INDICATOR_NAME )
                     commandTextView.grab_focus()
                     continue
 
                 if script.getGroup() == "": # Adding a new script - check for duplicate.
                     if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ) is not None:
-                        pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
+                        self.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
                         scriptGroupCombo.grab_focus()
                         continue
 
                 else: # Editing an existing script.
-                    if script.isIdentical( Info( scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip(), scriptDirectoryEntry.get_text().strip(), pythonutils.getTextViewText( commandTextView ).strip(), terminalCheckbox.get_active() ) ):
+                    if script.isIdentical( Info( scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip(), scriptDirectoryEntry.get_text().strip(), self.getTextViewText( commandTextView ).strip(), terminalCheckbox.get_active() ) ):
                         pass # No change to the script, so should exit, but continue to handle the default script checkbox.
 
                     elif scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
@@ -688,7 +624,7 @@ class IndicatorScriptRunner:
                                     break
 
                         if duplicate:
-                            pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
+                            self.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
                             scriptGroupCombo.grab_focus()
                             continue
 
@@ -706,7 +642,7 @@ class IndicatorScriptRunner:
                 newScript = Info( scriptGroupCombo.get_active_text().strip(),
                                   scriptNameEntry.get_text().strip(), 
                                   scriptDirectoryEntry.get_text().strip(),
-                                  pythonutils.getTextViewText( commandTextView ).strip(),
+                                  self.getTextViewText( commandTextView ).strip(),
                                   terminalCheckbox.get_active() )
 
                 newScript.setPlaySound( soundCheckbox.get_active() )
@@ -717,6 +653,7 @@ class IndicatorScriptRunner:
                 if defaultScriptCheckbox.get_active():
                     self.defaultScriptGroupCurrent = scriptGroupCombo.get_active_text().strip()
                     self.defaultScriptNameCurrent = scriptNameEntry.get_text().strip()
+
                 else:
                     if self.defaultScriptGroupCurrent == scriptGroupCombo.get_active_text().strip() and self.defaultScriptNameCurrent == scriptNameEntry.get_text().strip():
                         self.defaultScriptGroupCurrent = ""
@@ -749,10 +686,12 @@ class IndicatorScriptRunner:
         if scriptGroup is None:
             groupIndex = 0
             scriptIndex = 0
+
         else:
             if scriptName is None:
                 groupIndex = groups.index( scriptGroup )
                 scriptIndex = 0
+
             else:
                 groupIndex = groups.index( scriptGroup )
                 scriptNames = [ ]
@@ -778,10 +717,9 @@ class IndicatorScriptRunner:
         return scriptsGroupedByName
 
 
-    def loadConfig( self ):
+    def loadConfig( self, config ):
         self.scripts = [ ]
-        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
-        if len( config ) > 0:
+        if len( config ) > 0: #TODO Why need to do this check?
             self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
             self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, "" )
             self.scriptNameDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT, "" )
@@ -821,7 +759,7 @@ class IndicatorScriptRunner:
         for script in self.scripts:
             scripts.append( [ script.getGroup(), script.getName(), script.getDirectory(), script.getCommand(), script.isTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
 
-        config = {
+        return {
             IndicatorScriptRunner.CONFIG_HIDE_GROUPS: self.hideGroups,
             IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT: self.scriptGroupDefault,
             IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT: self.scriptNameDefault,
@@ -829,7 +767,5 @@ class IndicatorScriptRunner:
             IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS: self.showScriptsInSubmenus
         }
 
-        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
-
-if __name__ == "__main__": IndicatorScriptRunner().main()
+IndicatorScriptRunner().main()
