@@ -65,6 +65,7 @@ class IndicatorBase:
 
         logging.basicConfig( format = IndicatorBase.LOGGING_FORMAT, level = IndicatorBase.LOGGING_LEVEL, handlers = [ TruncatedFileHandler( self.log ) ] )
         self.lock = threading.Lock()
+        self.updateTimerID = None
 
         self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
@@ -82,7 +83,8 @@ class IndicatorBase:
             menu = Gtk.Menu()
             nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
             self.__finaliseMenu( menu )
-            self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
+            if nextUpdateInSeconds: # Some indicators don't return a next update time.
+                self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
 
 
     def requestUpdate( self ): self.__update()
@@ -119,7 +121,8 @@ class IndicatorBase:
 
     def __onAbout( self, widget ):
         if self.lock.acquire( blocking = False ):
-            GLib.source_remove( self.updateTimerID )
+            if self.updateTimerID:
+                GLib.source_remove( self.updateTimerID )
 
             aboutDialog = Gtk.AboutDialog()
             aboutDialog.set_artists( self.artwork )
@@ -179,7 +182,9 @@ class IndicatorBase:
 
     def __onPreferences( self, widget ):
         if self.lock.acquire( blocking = False ):
-            GLib.source_remove( self.updateTimerID )
+            if self.updateTimerID:
+                GLib.source_remove( self.updateTimerID )
+
             self.onPreferences() # Call to implementation in indicator.
             self.lock.release()
             GLib.idle_add( self.__update )
