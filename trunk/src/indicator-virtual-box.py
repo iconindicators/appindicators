@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -19,47 +19,23 @@
 # Application indicator for VirtualBox™ virtual machines.
 
 
-# References:
-#  http://developer.gnome.org/pygobject
-#  http://developer.gnome.org/gtk3
-#  http://developer.gnome.org/gnome-devel-demos
-#  http://python-gtk-3-tutorial.readthedocs.org
-#  http://wiki.gnome.org/Projects/PyGObject/Threading
-#  http://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
-#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-
-
 INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "Gdk", "3.0" )
+gi.require_version( "GLib", "2.0" )
+gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
+from gi.repository import Gdk, GLib, Gtk, Notify
 from threading import Thread
-import datetime, logging, os, pythonutils, threading, time, virtualmachine
+
+import indicator_base, datetime, os, time, virtualmachine
 
 
-class IndicatorVirtualBox:
-
-    AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.62"
-    ICON = INDICATOR_NAME
-    COPYRIGHT_START_YEAR = "2012"
-    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
-    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
-    COMMENTS = _( "Shows VirtualBox™ virtual machines and allows them to be started." )
-
-    VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
-    VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
-    VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION = "4.3" # Configuration file location and format changed at this version (https://www.virtualbox.org/manual/ch10.html#idp99351072).
-
-    VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
+class IndicatorVirtualBox( indicator_base.IndicatorBase ):
 
     CONFIG_DELAY_BETWEEN_AUTO_START = "delayBetweenAutoStartInSeconds"
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
@@ -67,83 +43,78 @@ class IndicatorVirtualBox:
     CONFIG_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
     CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME = "virtualboxManagerWindowName"
 
+    VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
+    VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
+    VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION = "4.3" # Configuration file location and format changed at this version (https://www.virtualbox.org/manual/ch10.html#idp99351072).
+
+    VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
+
     NOTIFICATION_DELAY_IN_SECONDS = 10
 
 
     def __init__( self ):
-        logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorVirtualBox.LOG ) ] )
-        self.dialogLock = threading.Lock()
+        super().__init__(
+            indicatorName = INDICATOR_NAME,
+            version = "1.0.62",
+            copyrightStartYear = "2012",
+            comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
+
         self.scrollDirectionIsUp = True
         self.scrollUUID = None
-
-        Notify.init( INDICATOR_NAME )
         self.dateTimeOfLastNotification = datetime.datetime.now()
 
-        self.loadConfig()
-
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorVirtualBox.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-        self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
-
-        self.update( True )
-        Thread( target = self.autoStartVirtualMachines ).start()
+        self.requestMouseWheelScrollEvents()
+        self.firstRun = True
 
 
-    def main( self ): Gtk.main()
+    def update( self, menu ):
+        if self.firstRun and self.isVBoxManageInstalled():
+            Thread( target = self.autoStartVirtualMachines ).start()
+            self.firstRun = False
 
-
-    def update( self, scheduled ):
-        with threading.Lock():
-            if not scheduled:
-                GLib.source_remove( self.updateTimerID )
-
-            self.buildMenu()
-            self.updateTimerID = GLib.timeout_add_seconds( int( 60 * self.refreshIntervalInMinutes ), self.update, True )
-
-
-    def buildMenu( self ):
-        menu = Gtk.Menu()
         if self.isVBoxManageInstalled():
-            virtualMachines = self.getVirtualMachines()
-            if len( virtualMachines ) == 0:
-                menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
-            else:
-                runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
-                if self.showSubmenu:
-                    stack = [ ]
-                    currentMenu = menu
-                    for virtualMachine in virtualMachines:
-                        while virtualMachine.getIndent() < len( stack ):
-                            currentMenu = stack.pop()
-
-                        if virtualMachine.isGroup():
-                            menuItem = Gtk.MenuItem( pythonutils.indent( 0, virtualMachine.getIndent() ) + virtualMachine.getGroupName() )
-                            currentMenu.append( menuItem )
-                            subMenu = Gtk.Menu()
-                            menuItem.set_submenu( subMenu )
-                            stack.append( currentMenu )
-                            currentMenu = subMenu
-                        else:
-                            currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, pythonutils.indent( 0, virtualMachine.getIndent() ), virtualMachine.getUUID() in runningVMUUIDs ) )
-                else:
-                    for virtualMachine in virtualMachines:
-                        indent = pythonutils.indent( virtualMachine.getIndent(), virtualMachine.getIndent() )
-                        if virtualMachine.isGroup():
-                            menu.append( Gtk.MenuItem( indent + virtualMachine.getGroupName() ) )
-                        else:
-                            menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, virtualMachine.getUUID() in runningVMUUIDs ) )
-
-            menu.append( Gtk.SeparatorMenuItem() )
-            menuItem = Gtk.MenuItem( _( "Launch VirtualBox™ Manager" ) )
-            menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
-            menu.append( menuItem )
+            self.buildMenu( menu )
 
         else:
             menu.insert( Gtk.MenuItem( _( "(VirtualBox™ is not installed)" ) ), 0 )
+            
+        return int( 60 * self.refreshIntervalInMinutes )
 
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, False, self.onPreferences, self.onAbout, Gtk.main_quit )
-        self.indicator.set_menu( menu )
-        menu.show_all()
+
+    def buildMenu( self, menu ):
+        virtualMachines = self.getVirtualMachines()
+        if len( virtualMachines ) == 0:
+            menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
+        else:
+            runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
+            if self.showSubmenu:
+                stack = [ ]
+                currentMenu = menu
+                for virtualMachine in virtualMachines:
+                    while virtualMachine.getIndent() < len( stack ):
+                        currentMenu = stack.pop()
+
+                    if virtualMachine.isGroup():
+                        menuItem = Gtk.MenuItem( self.indent( 0, virtualMachine.getIndent() ) + virtualMachine.getGroupName() )
+                        currentMenu.append( menuItem )
+                        subMenu = Gtk.Menu()
+                        menuItem.set_submenu( subMenu )
+                        stack.append( currentMenu )
+                        currentMenu = subMenu
+                    else:
+                        currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, self.indent( 0, virtualMachine.getIndent() ), virtualMachine.getUUID() in runningVMUUIDs ) )
+            else:
+                for virtualMachine in virtualMachines:
+                    indent = self.indent( virtualMachine.getIndent(), virtualMachine.getIndent() )
+                    if virtualMachine.isGroup():
+                        menu.append( Gtk.MenuItem( indent + virtualMachine.getGroupName() ) )
+                    else:
+                        menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, virtualMachine.getUUID() in runningVMUUIDs ) )
+
+        menu.append( Gtk.SeparatorMenuItem() )
+        menuItem = Gtk.MenuItem( _( "Launch VirtualBox™ Manager" ) )
+        menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
+        menu.append( menuItem )
 
 
     def createMenuItemForVirtualMachine( self, virtualMachine, indent, isRunning ):
@@ -170,29 +141,29 @@ class IndicatorVirtualBox:
         if uuid in runningVMUUIDs:
             self.bringWindowToFront( runningVMNames[ runningVMUUIDs.index( uuid ) ] )
         else:
-            result = pythonutils.processGet( "VBoxManage list vms | grep " + uuid )
+            result = self.processGet( "VBoxManage list vms | grep " + uuid )
             if result is None or uuid not in result:
                 message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
                 Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
             else:
-                pythonutils.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
+                self.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
                 delay = 10 # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
 
-        GLib.timeout_add_seconds( delay, self.update, False )
+        GLib.timeout_add_seconds( delay, self.requestUpdate )
 
 
     def bringWindowToFront( self, virtualMachineName ):
-        numberOfWindowsWithTheSameName = pythonutils.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
+        numberOfWindowsWithTheSameName = self.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
         if numberOfWindowsWithTheSameName == "0":
             message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtualMachineName )
             summary = _( "Warning" )
             self.sendNotificationWithDelay( summary, message )
 
         elif numberOfWindowsWithTheSameName == "1":
-            for line in pythonutils.processGet( "wmctrl -l" ).splitlines():
+            for line in self.processGet( "wmctrl -l" ).splitlines():
                 if virtualMachineName in line:
                     windowID = line[ 0 : line.find( " " ) ]
-                    pythonutils.processCall( "wmctrl -i -a " + windowID )
+                    self.processCall( "wmctrl -i -a " + windowID )
                     break
         else:
             message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window of the same name." ).format( virtualMachineName )
@@ -230,28 +201,28 @@ class IndicatorVirtualBox:
     def onLaunchVirtualBoxManager( self, widget ):
         # The executable VirtualBox may exist in different locations, depending on how it was installed.
         # No need to check for a None value as this function will never be called if VBoxManage (VirtualBox) is not installed.
-        virtualBoxExecutable = pythonutils.processGet( "which VirtualBox" ).strip()
+        virtualBoxExecutable = self.processGet( "which VirtualBox" ).strip()
 
         # The executable for VirtualBox manager was not always appearing in the process list
         # because the executable might be a script which calls another executable.
         # So using processes to find the window kept failing.
         # Instead, now have the user type in the title of the window into the preferences and find the window by that.
-        result = pythonutils.processGet( "wmctrl -l | grep \"" + self.virtualboxManagerWindowName + "\"" )
+        result = self.processGet( "wmctrl -l | grep \"" + self.virtualboxManagerWindowName + "\"" )
         windowID = None
         if result is not None:
             windowID = result.split()[ 0 ]
 
         if windowID is None or windowID == "":
-            pythonutils.processCall( virtualBoxExecutable + " &" )
+            self.processCall( virtualBoxExecutable + " &" )
         else:
-            pythonutils.processCall( "wmctrl -ia " + windowID )
+            self.processCall( "wmctrl -ia " + windowID )
 
 
     # Returns a list of running VM names and list of corresponding running VM UUIDs.
     def getRunningVirtualMachines( self ):
         names = [ ]
         uuids = [ ]
-        result = pythonutils.processGet( "VBoxManage list runningvms" )
+        result = self.processGet( "VBoxManage list runningvms" )
         if result is not None:
             for line in result.splitlines():
                 try:
@@ -297,7 +268,7 @@ class IndicatorVirtualBox:
     # Safe to call without checking if VBoxManage is installed.
     def getVirtualMachinesFromVBoxManage( self ):
         virtualMachines = [ ]
-        result = pythonutils.processGet( "VBoxManage list vms" )
+        result = self.processGet( "VBoxManage list vms" )
         if result is not None: # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
             for line in result.splitlines():
                 try:
@@ -312,14 +283,14 @@ class IndicatorVirtualBox:
 
     def getVirtualMachinesFromConfigPriorTo4dot3( self ):
         virtualMachines = [ ]
-        line = pythonutils.processGet( "grep GUI/SelectorVMPositions " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 )
+        line = self.processGet( "grep GUI/SelectorVMPositions " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 )
         try:
             uuids = list( line.rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
             for uuid in uuids:
                 virtualMachines.append( virtualmachine.Info( "", False, uuid, 0 ) )                
 
         except Exception as e:
-            logging.exception( e )
+            self.getLogging().exception( e )
             virtualMachines = [ ] # The VM order has never been altered giving an empty result (and exception).
 
         return virtualMachines
@@ -380,7 +351,7 @@ class IndicatorVirtualBox:
                     i += 1
 
             except Exception as e:
-                logging.exception( e )
+                self.getLogging().exception( e )
                 virtualMachines = [ ]
 
         return virtualMachines
@@ -389,7 +360,7 @@ class IndicatorVirtualBox:
     # Returns the version number as a string or None if no version could be determined.
     # Safe to call without checking if VBoxManage is installed.
     def getVirtualBoxVersion( self ):
-        result = pythonutils.processGet( "VBoxManage --version" )
+        result = self.processGet( "VBoxManage --version" )
         if result is None: # If a VM is corrupt/missing, VBoxManage may return a spurious (None) result.
             version = None
         else:
@@ -403,7 +374,7 @@ class IndicatorVirtualBox:
 
     def isVBoxManageInstalled( self ): 
         isInstalled = False
-        result = pythonutils.processGet( "which VBoxManage" )
+        result = self.processGet( "which VBoxManage" )
         if result is not None:
             isInstalled = result.find( "VBoxManage" ) > -1
 
@@ -420,40 +391,7 @@ class IndicatorVirtualBox:
     def isAutostart( self, uuid ): return uuid in self.virtualMachinePreferences and self.virtualMachinePreferences[ uuid ][ 0 ]
 
 
-    def onAbout( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
-            pythonutils.showAboutDialog(
-                [ IndicatorVirtualBox.AUTHOR + " " + IndicatorVirtualBox.WEBSITE ],
-                [ IndicatorVirtualBox.AUTHOR + " " + IndicatorVirtualBox.WEBSITE ],
-                IndicatorVirtualBox.COMMENTS,
-                IndicatorVirtualBox.AUTHOR,
-                IndicatorVirtualBox.COPYRIGHT_START_YEAR,
-                [ ],
-                "",
-                Gtk.License.GPL_3_0,
-                IndicatorVirtualBox.ICON,
-                INDICATOR_NAME,
-                IndicatorVirtualBox.WEBSITE,
-                IndicatorVirtualBox.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ),
-                IndicatorVirtualBox.LOG,
-                _( "View the" ),
-                _( "text file." ),
-                _( "error log" ) )
-
-            self.dialogLock.release()
-
-
-    def onPreferences( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
-            self._onPreferences( widget )
-            self.dialogLock.release()
-
-
-    def _onPreferences( self, widget ):
+    def onPreferences( self ):
         notebook = Gtk.Notebook()
 
         # List of VMs.
@@ -495,7 +433,7 @@ class IndicatorVirtualBox:
         notebook.append_page( scrolledWindow, Gtk.Label( _( "Virtual Machines" ) ) )
 
         # General settings.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
         box.set_hexpand( True )
@@ -556,7 +494,7 @@ class IndicatorVirtualBox:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorVirtualBox.DESKTOP_FILE, logging ) )
+        autostartCheckbox.set_active( self.isAutoStart() )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, row, 1, 1 )
 
@@ -565,7 +503,7 @@ class IndicatorVirtualBox:
         dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorVirtualBox.ICON )
+#         dialog.set_icon_name( IndicatorVirtualBox.ICON )# TODO
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -575,9 +513,8 @@ class IndicatorVirtualBox:
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.virtualMachinePreferences.clear()
             self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
-            pythonutils.setAutoStart( IndicatorVirtualBox.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            self.saveConfig()
-            GLib.idle_add( self.update, False )
+            self.setAutoStart( autostartCheckbox.get_active() )
+            GLib.idle_add( self.requestSaveConfig() )
 
         dialog.destroy()
 
@@ -604,7 +541,7 @@ class IndicatorVirtualBox:
 
 
     def editVirtualMachine( self, model, treeiter ):
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         label = Gtk.Label( _( "Start Command" ) )
         label.set_halign( Gtk.Align.START )
@@ -642,12 +579,12 @@ class IndicatorVirtualBox:
                 break
 
             if startCommand.get_text().strip() == "":
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command cannot be empty." ), INDICATOR_NAME )
+                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command cannot be empty." ), INDICATOR_NAME )
                 startCommand.grab_focus()
                 continue
 
             if not "%VM%" in startCommand.get_text().strip():
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command must contain %VM% which is substituted for the virtual machine name/id." ), INDICATOR_NAME )
+                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command must contain %VM% which is substituted for the virtual machine name/id." ), INDICATOR_NAME )
                 startCommand.grab_focus()
                 continue
 
@@ -674,9 +611,7 @@ class IndicatorVirtualBox:
         dialog.destroy()
 
 
-    def loadConfig( self ):
-        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
-
+    def loadConfig( self, config ):
         self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START, 10 )
         self.refreshIntervalInMinutes = config.get( IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES, 15 )
         self.showSubmenu = config.get( IndicatorVirtualBox.CONFIG_SHOW_SUBMENU, False )
@@ -685,7 +620,7 @@ class IndicatorVirtualBox:
 
 
     def saveConfig( self ):
-        config = {
+        return {
             IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START: self.delayBetweenAutoStartInSeconds,
             IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
             IndicatorVirtualBox.CONFIG_SHOW_SUBMENU: self.showSubmenu,
@@ -693,7 +628,5 @@ class IndicatorVirtualBox:
             IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME: self.virtualboxManagerWindowName
         }
 
-        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
-
-if __name__ == "__main__": IndicatorVirtualBox().main()
+IndicatorVirtualBox().main()
