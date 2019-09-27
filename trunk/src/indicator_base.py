@@ -27,6 +27,11 @@
 
 #TODO Rename all indicators to use _ instead of -?
 
+
+#TODO Search for
+# is not None
+# and see if we can replace with 'if x' rather than 'if x is not None'. 
+
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
@@ -34,12 +39,13 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
-import datetime, gzip, json, logging.handlers, os, shutil, subprocess, threading
+import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess, threading
 
 
 class IndicatorBase:
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+    CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
     DESKTOP_PATH = "/usr/share/applications/"
     INDENT_WIDGET_LEFT = 20
     JSON_EXTENSION = ".json"
@@ -221,7 +227,6 @@ class IndicatorBase:
     def isUbuntu1604( self ): return self.processGet( "lsb_release -sc" ).strip() == "xenial"
 
 
-
     # Makes a guess at how many menu items will fit into an indicator menu. 
     #
     # By experiment under Unity, a screen height of 900 pixels accommodates 37 menu items before a scroll bar appears.
@@ -284,7 +289,7 @@ class IndicatorBase:
 
     # Read a dictionary of configuration from a JSON text file.
     def __loadConfig( self ):
-        configFile = self.__getConfigFile( self.indicatorName, self.indicatorName )
+        configFile = self.__getConfigFile( self.indicatorName )
         config = { }
         if os.path.isfile( configFile ):
             try:
@@ -309,7 +314,7 @@ class IndicatorBase:
     # Write a dictionary of user configuration to a JSON text file.
     def __saveConfig( self ):
         config = self.saveConfig() # Call to implementation in indicator.
-        configFile = self.__getConfigFile( self.indicatorName, self.indicatorName )
+        configFile = self.__getConfigFile( self.indicatorName )
         success = True
         try:
             with open( configFile, "w" ) as f:
@@ -327,8 +332,8 @@ class IndicatorBase:
     #
     # applicationBaseDirectory: The directory path used as the final part of the overall path.
     # configBaseFile: The file name (without extension).
-    def __getConfigFile( self, applicationBaseDirectory, configBaseFile ):
-        return self.__getUserDirectory( IndicatorBase.XDG_KEY_CONFIG, IndicatorBase.USER_DIRECTORY_CONFIG, applicationBaseDirectory ) + \
+    def __getConfigFile( self, configBaseFile ):
+        return self.__getUserDirectory( IndicatorBase.XDG_KEY_CONFIG, IndicatorBase.USER_DIRECTORY_CONFIG, self.indicatorName ) + \
                "/" + \
                configBaseFile + \
                IndicatorBase.JSON_EXTENSION
@@ -350,11 +355,101 @@ class IndicatorBase:
     #     ${XDGKey}/applicationBaseDirectory/fileName
     # or
     #     ~/.cache/applicationBaseDirectory/fileName
-    def removeFileFromCache( self, applicationBaseDirectory, fileName ):
-        cacheDirectory = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, applicationBaseDirectory )
+    def removeFileFromCache( self, fileName ):
+        cacheDirectory = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
         for file in os.listdir( cacheDirectory ):
             if file == fileName:
                 os.remove( cacheDirectory + "/" + file )
+
+
+    # Removes out of date cache files.
+    #
+    # applicationBaseDirectory: The directory used as the final part of the overall path.
+    # baseName: The text used to form the file name, typically the name of the calling application.
+    # cacheMaximumAgeInHours: Anything older than the maximum age (hours) is deleted.
+    #
+    # Any file in the cache directory matching the pattern
+    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    # or
+    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    # and is older than the cache maximum age is discarded.
+    def removeOldFilesFromCache( self, baseName, cacheMaximumAgeInHours ):
+        cacheDirectory = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
+        cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = cacheMaximumAgeInHours )
+        for file in os.listdir( cacheDirectory ):
+            if file.startswith( baseName ):
+                fileDateTime = datetime.datetime.strptime( file[ len( baseName ) : ], IndicatorBase.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )            
+                if fileDateTime < cacheMaximumAgeDateTime:
+                    os.remove( cacheDirectory + "/" + file )
+
+
+    # Read the most recent binary object from the cache.
+    #
+    # applicationBaseDirectory: The directory used as the final part of the overall path.
+    # baseName: The text used to form the file name, typically the name of the calling application.
+    # logging: A valid logger, used on error.
+    #
+    # All files in cache directory are filtered based on the pattern
+    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    # or
+    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #
+    # For example, for an application 'apple', the first file will pass through, whilst the second is filtered out
+    #    ~/.cache/fred/apple-20170629174950
+    #    ~/.cache/fred/orange-20170629174951
+    #
+    # Files which pass the filter are sorted by date/time and the most recent file is read.
+    #
+    # Returns the binary object; None when no suitable cache file exists; None on error and logs.
+    def readCacheBinary( self, baseName ):
+        cacheDirectory = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
+        data = None
+        theFile = ""
+        for file in os.listdir( cacheDirectory ):
+            if file.startswith( baseName ) and file > theFile:
+                theFile = file
+
+        if theFile: # A value of "" evaluates to False.
+            filename = cacheDirectory + "/" + theFile
+            try:
+                with open( filename, "rb" ) as f:
+                    data = pickle.load( f )
+
+            except Exception as e:
+                data = None
+                logging.exception( e )
+                logging.error( "Error reading from cache: " + filename )
+
+        return data
+
+
+    # Writes an object as a binary file.
+    #
+    # binaryData: The object to write.
+    # applicationBaseDirectory: The directory used as the final part of the overall path.
+    # baseName: The text used to form the file name, typically the name of the calling application.
+    # logging: A valid logger, used on error.
+    #
+    # The object will be written to the cache directory using the pattern
+    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    # or
+    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #
+    # Returns True on success; False otherwise.
+    def writeCacheBinary( self, binaryData, baseName ):
+        success = True
+        cacheDirectory = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
+        filename = cacheDirectory + "/" + baseName + datetime.datetime.utcnow().strftime( IndicatorBase.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+        try:
+            with open( filename, "wb" ) as f:
+                pickle.dump( binaryData, f )
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing to cache: " + filename )
+            success = False
+
+        return success
 
 
     # Read a text file from the cache.
@@ -364,8 +459,8 @@ class IndicatorBase:
     # logging: A valid logger, used on error.
     #
     # Returns the text contents or None on error.
-    def readCacheText( self, applicationBaseDirectory, fileName ):
-        cacheFile = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
+    def readCacheText( self, fileName ):
+        cacheFile = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName ) + "/" + fileName
         text = None
         if os.path.isfile( cacheFile ):
             try:
@@ -389,9 +484,9 @@ class IndicatorBase:
     # fileName: The file name of the text file.
     # text: The text to write.
     # logging: A valid logger, used on error.
-    def writeCacheText( self, applicationBaseDirectory, fileName, text ):
+    def writeCacheText( self, fileName, text ):
         success = True
-        cacheFile = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, applicationBaseDirectory ) + "/" + fileName
+        cacheFile = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName ) + "/" + fileName
         try:
             with open( cacheFile, "w" ) as f:
                 f.write( text )
