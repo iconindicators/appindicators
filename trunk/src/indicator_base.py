@@ -90,6 +90,10 @@ class IndicatorBase:
                 self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
 
 
+#TODO SHould this be wrapped in
+#             GLib.idle_add( self.requestUpdate )
+# as is with request to save config.
+# Look at the calls using timeout too.
     def requestUpdate( self ): self.__update()
 
 
@@ -211,7 +215,27 @@ class IndicatorBase:
         dialog.destroy()
         return response
 
-    
+
+    def isUbuntu1604( self ): return self.processGet( "lsb_release -sc" ).strip() == "xenial"
+
+
+
+    # Makes a guess at how many menu items will fit into an indicator menu. 
+    #
+    # By experiment under Unity, a screen height of 900 pixels accommodates 37 menu items before a scroll bar appears.
+    # For an initial guess, compute a divisor: 900 / 37 = 25.
+    #
+    # For GNOME Shell, the equivalent divisor is 36.
+    def getMenuItemsGuess( self ): 
+        if self.isUbuntu1604():
+            guess = Gtk.Window().get_screen().get_height() / 25
+
+        else:
+            guess = Gtk.Window().get_screen().get_height() / 36
+
+        return guess
+
+
     def createGrid( self ):
         spacing = 10
         grid = Gtk.Grid()
@@ -273,6 +297,10 @@ class IndicatorBase:
         self.loadConfig( config ) # Call to implementation in indicator.
 
 
+#TODO Maybe wrap this into 
+#             GLib.idle_add( self.requestSaveConfig() )
+# so callers don't need to worry?
+# Look at the calls using timeout too.
     def requestSaveConfig( self ): self.__saveConfig()
 
 
@@ -302,6 +330,13 @@ class IndicatorBase:
                "/" + \
                configBaseFile + \
                IndicatorBase.JSON_EXTENSION
+
+
+    # Obtain the full path to a cache file, creating if necessary the underlying path.
+    #
+    # filename: The file name.
+    def getCachePathname( self, filename ):
+        return self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName ) + "/" + filename
 
 
     # Remove a file from the cache.
