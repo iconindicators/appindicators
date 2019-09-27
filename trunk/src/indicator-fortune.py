@@ -59,9 +59,8 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
-#TODO Which of these should/can go into the base class?
-        self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )
-        Notify.init( INDICATOR_NAME )
+        Notify.init( INDICATOR_NAME )  #TODO Put into baseclass somehow?
+        self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )  #TODO Put into baseclass somehow?
         self.removeFileFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
 
 
