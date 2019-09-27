@@ -51,7 +51,6 @@ class IndicatorPunycode( indicator_base.IndicatorBase ):
             comments = _( "Convert domain names between Unicode and ASCII." ),
             artwork = [ "Oleg Moiseichuk" ] )
 
-        Notify.init( INDICATOR_NAME ) #TODO Put into baseclass somehow?
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
 
 
