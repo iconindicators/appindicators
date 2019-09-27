@@ -5,7 +5,7 @@
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.         
+# (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,46 +19,22 @@
 # Application indicator which displays tidal information.
 
 
-# References:
-#  http://developer.gnome.org/pygobject
-#  http://developer.gnome.org/gtk3
-#  http://developer.gnome.org/gnome-devel-demos
-#  http://python-gtk-3-tutorial.readthedocs.org
-#  http://wiki.gnome.org/Projects/PyGObject/Threading
-#  http://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
-#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-#  http://www.ukho.gov.uk/easytide
-
-
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "GLib", "2.0" )
+gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import AppIndicator3, GLib, Gtk, Notify
+from gi.repository import GLib, Gtk, Notify
 from urllib.request import urlopen
-import datetime, locale, logging, os, ports, pythonutils, re, threading, tide, webbrowser
+
+import datetime, indicator_base, locale, ports, re, tide, webbrowser
 
 
-class IndicatorTide:
-
-    AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.17"
-    ICON = INDICATOR_NAME
-    COPYRIGHT_START_YEAR = "2015"
-    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
-    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
-    COMMENTS = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() )
-
-    CREDIT_UKHO_COPYRIGHT = _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. http://www.GOV.uk/UKHO" )
-    CREDIT_UKHO_ON_CLICK = _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." )
-    CREDITS = [ CREDIT_UKHO_COPYRIGHT, CREDIT_UKHO_ON_CLICK ]
+class IndicatorTide( indicator_base.IndicatorBase ):
 
     CONFIG_MENU_ITEM_DATE_FORMAT = "menuItemDateFormat"
     CONFIG_MENU_ITEM_TIDE_FORMAT = "menuItemTideFormat"
@@ -79,17 +55,17 @@ class IndicatorTide:
 
 
     def __init__( self ):
-        logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorTide.LOG ) ] )
-        self.dialogLock = threading.Lock()
+        super().__init__(
+            indicatorName = INDICATOR_NAME,
+            version = "1.0.17",
+            copyrightStartYear = "2015",
+            comments = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() ),
+            creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. http://www.GOV.uk/UKHO" ),
+                        _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." ) ] )
 
-        Notify.init( INDICATOR_NAME )
-        self.loadConfig()
 
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorTide.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
-        self.update()
+#TODO Needed?
+#         self.indicator.set_menu( Gtk.Menu() ) # Set an empty menu to get things rolling!
 
         if ports.isExpired():
             message = _(
@@ -97,106 +73,103 @@ class IndicatorTide:
                 "Until you upgrade to the latest version of the indicator, only UK ports will be available." )
 
             Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
-            logging.warning( message )
+            self.getLogging().warning( message )
 
 
-    def main( self ): Gtk.main()
-
-
-    def update( self, scheduled = True ):
-        with threading.Lock():
-            if not scheduled:
-                GLib.source_remove( self.updateTimerID )
-
-            tidalReadings = self.getTidalData( self.portID )
-            self.buildMenu( tidalReadings )
-            if tidalReadings:
-                summary = _( "Tidal data ready" )
-                message = _( "Tidal data is presented in the time zone of the port." )
-                if self.tidalReadingsAreAllDateTimes( tidalReadings ):
-                    message = _( "Tidal data is presented in your local time zone." )
-
-            else:
-                summary = _( "Error" )
-                message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
-                logging.error( message )
-
-            Notify.Notification.new( summary, message, IndicatorTide.ICON ).show()
-
-            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds( tidalReadings ), self.update )
-
-
-    def buildMenu( self, tidalReadings ):
-        menu = Gtk.Menu()
+    def update( self, menu ):
+        tidalReadings = self.getTidalData( self.portID )
         if tidalReadings:
-            menuItemText = _( "{0}, {1}" ).format( ports.getPortName( self.portID ), ports.getCountry( self.portID ) )
-            self.createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
-            allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
-            previousMonth = -1
-            previousDay = -1
-            firstTidalReading = True # Used for subMenu build.
-            for tidalReading in tidalReadings:
-                if allDateTimes:
-                    tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
-                else:
-                    tidalDateTimeLocal = tidalReading.getDateTime() # There may or may not be a time component; the result will be in port local.
-
-                if self.showAsSubMenus and firstTidalReading:
-                    firstMonth = tidalDateTimeLocal.month
-                    firstDay = tidalDateTimeLocal.day
-                    firstTidalReading = False
-
-                if not( tidalDateTimeLocal.month == previousMonth and tidalDateTimeLocal.day == previousDay ):
-                    menuItemText = pythonutils.indent( 1, 1 ) + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
-                    if self.showAsSubMenus:
-                        if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
-                            self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
-                        else:
-                            subMenu = Gtk.Menu()
-                            self.createAndAppendMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
-                    else:
-                        self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
-
-                if isinstance( tidalDateTimeLocal, datetime.datetime ):
-                    menuItemText = tidalDateTimeLocal.strftime( self.menuItemTideFormat )
-                else:
-                    menuItemText = self.menuItemTideFormatSansTime
-
-                if tidalReading.getType() == tide.Type.H:
-                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
-                else: # The type must be either H or L - cannot be anything else.
-                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "L" ) )
-
-                if tidalReading.getLevelInMetres() is None:
-                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, "" )
-                else:
-                    menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tidalReading.getLevelInMetres() ) + " m" )
-
-                if self.showAsSubMenus:
-                    if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
-                        self.createAndAppendMenuItem( menu, pythonutils.indent( 2, 2 ) + menuItemText, tidalReading.getURL() )
-                    else:
-                        self.createAndAppendMenuItem( subMenu, pythonutils.indent( 0, 2 ) + menuItemText, tidalReading.getURL() )
-                else:
-                    self.createAndAppendMenuItem( menu, pythonutils.indent( 2, 2 ) + menuItemText, tidalReading.getURL() )
-
-                previousMonth = tidalDateTimeLocal.month
-                previousDay = tidalDateTimeLocal.day
+            self.buildMenu( menu, tidalReadings )
 
         else:
             menu.append( Gtk.MenuItem( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
 
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
-        self.indicator.set_menu( menu )
-        menu.show_all()
+        if tidalReadings:
+            summary = _( "Tidal data ready" )
+            message = _( "Tidal data is presented in the time zone of the port." )
+            if self.tidalReadingsAreAllDateTimes( tidalReadings ):
+                message = _( "Tidal data is presented in your local time zone." )
+
+        else:
+            summary = _( "Error" )
+            message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
+            self.getLogging().error( message )
+
+        Notify.Notification.new( summary, message, self.icon ).show()
+
+        return self.getNextUpdateTimeInSeconds( tidalReadings )
+
+
+    def buildMenu( self, menu, tidalReadings ):
+        menuItemText = _( "{0}, {1}" ).format( ports.getPortName( self.portID ), ports.getCountry( self.portID ) )
+        self.createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
+        allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
+        previousMonth = -1
+        previousDay = -1
+        firstTidalReading = True # Used for subMenu build.
+        for tidalReading in tidalReadings:
+            if allDateTimes:
+                tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
+
+            else:
+                tidalDateTimeLocal = tidalReading.getDateTime() # There may or may not be a time component; the result will be in port local.
+
+            if self.showAsSubMenus and firstTidalReading:
+                firstMonth = tidalDateTimeLocal.month
+                firstDay = tidalDateTimeLocal.day
+                firstTidalReading = False
+
+            if not( tidalDateTimeLocal.month == previousMonth and tidalDateTimeLocal.day == previousDay ):
+                menuItemText = self.indent( 1, 1 ) + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
+                if self.showAsSubMenus:
+                    if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
+                        self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
+
+                    else:
+                        subMenu = Gtk.Menu()
+                        self.createAndAppendMenuItem( menu, menuItemText, None ).set_submenu( subMenu )
+
+                else:
+                    self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
+
+            if isinstance( tidalDateTimeLocal, datetime.datetime ):
+                menuItemText = tidalDateTimeLocal.strftime( self.menuItemTideFormat )
+
+            else:
+                menuItemText = self.menuItemTideFormatSansTime
+
+            if tidalReading.getType() == tide.Type.H:
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
+
+            else: # The type must be either H or L - cannot be anything else.
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "L" ) )
+
+            if tidalReading.getLevelInMetres() is None:
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, "" )
+
+            else:
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tidalReading.getLevelInMetres() ) + " m" )
+
+            if self.showAsSubMenus:
+                if self.showAsSubMenusExceptFirstDay and firstMonth == tidalDateTimeLocal.month and firstDay == tidalDateTimeLocal.day:
+                    self.createAndAppendMenuItem( menu, self.indent( 2, 2 ) + menuItemText, tidalReading.getURL() )
+
+                else:
+                    self.createAndAppendMenuItem( subMenu, self.indent( 0, 2 ) + menuItemText, tidalReading.getURL() )
+
+            else:
+                self.createAndAppendMenuItem( menu, self.indent( 2, 2 ) + menuItemText, tidalReading.getURL() )
+
+            previousMonth = tidalDateTimeLocal.month
+            previousDay = tidalDateTimeLocal.day
 
 
     def createAndAppendMenuItem( self, menu, menuItemText, url ):
         menuItem = Gtk.MenuItem( menuItemText )
         menu.append( menuItem )
 
-        if url is not None:
-            menuItem.connect( "activate", lambda widget: webbrowser.open( widget.props.name ) ) # This returns a boolean indicating success or failure - showing the user a message on a false return value causes a dialog lock up!
+        if url:
+            menuItem.connect( "activate", lambda widget: webbrowser.open( widget.props.name ) )
             menuItem.set_name( url )
 
         return menuItem
@@ -231,44 +204,11 @@ class IndicatorTide:
         return nextUpdateTimeInSeconds
 
 
-    def onAbout( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
-            pythonutils.showAboutDialog(
-                [ IndicatorTide.AUTHOR + " " + IndicatorTide.WEBSITE ],
-                [ IndicatorTide.AUTHOR + " " + IndicatorTide.WEBSITE ],
-                IndicatorTide.COMMENTS,
-                IndicatorTide.AUTHOR,
-                IndicatorTide.COPYRIGHT_START_YEAR,
-                IndicatorTide.CREDITS,
-                _( "Credits" ),
-                Gtk.License.GPL_3_0,
-                IndicatorTide.ICON,
-                INDICATOR_NAME,
-                IndicatorTide.WEBSITE,
-                IndicatorTide.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ),
-                IndicatorTide.LOG,
-                _( "View the" ),
-                _( "text file." ),
-                _( "error log" ) )
-
-            self.dialogLock.release()
-
-
-    def onPreferences( self, widget ):
-        if self.dialogLock.acquire( blocking = False ):
-            self._onPreferences( widget )
-            self.dialogLock.release()
-
-
-    def _onPreferences( self, widget ):
+    def onPreferences( self ):
         notebook = Gtk.Notebook()
 
         # Port settings.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -306,7 +246,7 @@ class IndicatorTide:
         notebook.append_page( grid, Gtk.Label( _( "Ports" ) ) )
 
         # General settings.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show as submenus" ) )
         showAsSubmenusCheckbox.set_active( self.showAsSubMenus )
@@ -317,7 +257,7 @@ class IndicatorTide:
         showAsSubmenusExceptFirstDayCheckbox = Gtk.CheckButton( _( "Except first day" ) )
         showAsSubmenusExceptFirstDayCheckbox.set_sensitive( showAsSubmenusCheckbox.get_active() )
         showAsSubmenusExceptFirstDayCheckbox.set_active( self.showAsSubMenusExceptFirstDay )
-        showAsSubmenusExceptFirstDayCheckbox.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        showAsSubmenusExceptFirstDayCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         showAsSubmenusExceptFirstDayCheckbox.set_tooltip_text( _( "Show the first day's tide in full." ) )
 
         grid.attach( showAsSubmenusExceptFirstDayCheckbox, 0, 1, 1, 1 )
@@ -347,7 +287,7 @@ class IndicatorTide:
         grid.attach( label, 0, 3, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        box.set_margin_left( self.INDENT_WIDGET_LEFT )
 
         box.pack_start( Gtk.Label( _( "Default" ) ), False, False, 0 )
 
@@ -365,7 +305,7 @@ class IndicatorTide:
         grid.attach( box, 0, 4, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        box.set_margin_left( self.INDENT_WIDGET_LEFT )
 
         box.pack_start( Gtk.Label( _( "Missing time" ) ), False, False, 0 )
 
@@ -383,7 +323,7 @@ class IndicatorTide:
         grid.attach( box, 0, 5, 1, 1 )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorTide.DESKTOP_FILE, logging ) )
+        autostartCheckbox.set_active( self.isAutoStart() )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
@@ -393,7 +333,7 @@ class IndicatorTide:
         dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorTide.ICON )
+#         dialog.set_icon_name( IndicatorTide.ICON ) #TODO
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -406,9 +346,8 @@ class IndicatorTide:
             self.menuItemDateFormat = dateFormat.get_text()
             self.menuItemTideFormat = tideFormat.get_text()
             self.menuItemTideFormatSansTime = tideFormatSansTime.get_text()
-            self.saveConfig()
-            pythonutils.setAutoStart( IndicatorTide.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.idle_add( self.update, False )
+            self.setAutoStart( autostartCheckbox.get_active() )
+            GLib.idle_add( self.requestSaveConfig() )
 
         dialog.destroy()
 
@@ -431,9 +370,7 @@ class IndicatorTide:
     def onShowAsSubmenusCheckbox( self, source, showAsSubmenusExceptFirstDayCheckbox ): showAsSubmenusExceptFirstDayCheckbox.set_sensitive( source.get_active() )
 
 
-    def loadConfig( self ):
-        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
-
+    def loadConfig( self, config ):
         self.menuItemDateFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT, IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT )
         self.menuItemTideFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT, IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT )
         self.menuItemTideFormatSansTime = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME, IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME )
@@ -444,12 +381,12 @@ class IndicatorTide:
         # Validate the port...
         if not ports.isValidPortID( self.portID ):
             try: # Set a geographically sensible default...
-                timezone = pythonutils.processGet( "cat /etc/timezone" )
+                timezone = self.processGet( "cat /etc/timezone" )
                 country = timezone[ 0 : timezone.find( "/" ) ]
 
             except Exception as e:
-                logging.exception( e )
-                logging.error( "Error getting country/city from timezone." )
+                self.getLogging().exception( e )
+                self.getLogging().error( "Error getting country/city from timezone." )
                 country = ""
 
             self.portID = ports.getPortIDForCountry( country )
@@ -458,7 +395,7 @@ class IndicatorTide:
 
 
     def saveConfig( self ):
-        config = {
+        return {
             IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
             IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
             IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME: self.menuItemTideFormatSansTime,
@@ -467,29 +404,28 @@ class IndicatorTide:
             IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY: self.showAsSubMenusExceptFirstDay
         }
 
-        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
-
 
     def getTidalData( self, portID ):
         tidalReadings = [ ]
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
-        tidalReadings = pythonutils.readCacheBinary( INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, logging ) # Either valid or None; empty data is never cached.
+        self.removeOldFilesFromCache( IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
+        tidalReadings = self.readCacheBinary( IndicatorTide.CACHE_BASENAME ) # Either valid or None; empty data is never cached.
         if tidalReadings is not None:
             tidalReadings = self.removeTidalReadingsPriorToToday( tidalReadings )
             if not tidalReadings:
                 tidalReadings = None
-        
+
         if tidalReadings is None: # There was no cached version or the cached version was stale; either way, need to do a download.
-            tidalReadings = self.removeTidalReadingsPriorToToday( self._getTidalDataFromUnitedKingdomHydrographicOffice( portID ) ) # Either empty or non-empty.
+            tidalReadings = self.removeTidalReadingsPriorToToday( self.__getTidalDataFromUnitedKingdomHydrographicOffice( portID ) ) # Either empty or non-empty.
             if tidalReadings:
-                pythonutils.writeCacheBinary( tidalReadings, INDICATOR_NAME, IndicatorTide.CACHE_BASENAME, logging )
+                self.writeCacheBinary( tidalReadings, IndicatorTide.CACHE_BASENAME )
 
         return tidalReadings
 
 
-    def _getTidalDataFromUnitedKingdomHydrographicOffice( self, portID ):
+    def __getTidalDataFromUnitedKingdomHydrographicOffice( self, portID ):
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
+
         else:
             portIDForURL = portID.rjust( 4, "0" )
 
@@ -514,7 +450,7 @@ class IndicatorTide:
             levelPositivePattern = re.compile( "^[0-9]\.[0-9]" )
             levelNegativePattern = re.compile( "^-?[0-9]\.[0-9]" )
             hourMinutePattern = re.compile( "^[0-9][0-9]:[0-9][0-9]" )
-            lines = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+            lines = urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for index, line in enumerate( lines ): # The tidal data is presented in date/time order.
 
                 if "Port predictions" in line: # Tidal dateTimes are in the standard local time of the port - need to obtain the UTC offset for the port in the format +HHMM or -HHMM.
@@ -525,6 +461,7 @@ class IndicatorTide:
                         utcOffset = line[ line.index( "are" ) + 4 : line.index( "hour" ) - 1 ]
                         if len( utcOffset ) == 3: # "Port predictions (Standard Local Time) are +10 hours from UTC"
                             utcOffset += "00"
+
                         else:
                             utcOffset = utcOffset[ 0 ] + "0" + utcOffset[ 1 ] + "00" # "Port predictions (Standard Local Time) are -3 hours from UTC"
 
@@ -557,8 +494,10 @@ class IndicatorTide:
                         if len( item.strip() ) > 0:
                             if item[ 0 ] == "H":
                                 types.append( tide.Type.H )
+
                             elif item[ 0 ] == "L":
                                 types.append( tide.Type.L )
+
                             else:
                                 raise ValueError( "Unknown type '" + item[ 0 ] + "' in " + url )
 
@@ -569,6 +508,7 @@ class IndicatorTide:
                             hourMinute = item.strip()[ 0 : 5 ]
                             if hourMinutePattern.match( hourMinute ):
                                 dateTimes.append( datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" ) )
+
                             else:
                                 dateTimes.append( datetime.date( int( year ), int( month ), int( dayOfMonth ) ) ) # When no time is present, just add the date.
 
@@ -578,8 +518,10 @@ class IndicatorTide:
                         if len( item.strip() ) > 0:
                             if levelPositivePattern.match( item ):
                                 levels.append( float( item[ 0 : 3 ] ) )
+
                             elif levelNegativePattern.match( item ):
                                 levels.append( float( item[ 0 : 4 ] ) )
+
                             else:
                                 levels.append( None )
 
@@ -591,12 +533,13 @@ class IndicatorTide:
                         # can only store date/time in the port local timezone (rather than say, UTC).
                         if isinstance( dateTimes[ index ], datetime.datetime ):
                             tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, dateTimes[ index ].tzname()[ 3 : 6 ] + dateTimes[ index ].tzname()[ 7 : ], levels[ index ], tideType, url ) )
+
                         else:
                             tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, None, None, None, levels[ index ], tideType, url ) )
 
         except Exception as e:
-            logging.exception( e )
-            logging.error( "Error retrieving/parsing tidal data from " + str( url ) )
+            self.getLogging().exception( e )
+            self.getLogging().error( "Error retrieving/parsing tidal data from " + str( url ) )
             tidalReadings = [ ]
 
         locale.setlocale( locale.LC_TIME, defaultLocale )
@@ -615,11 +558,13 @@ class IndicatorTide:
             for tidalReading in list( tidalReadings ):
                 if tidalReading.getDateTime().astimezone() < todayLocalMidnight:
                     tidalReadings.remove( tidalReading )
+
         else:
             utcMidnightDate = datetime.datetime.utcnow().replace( hour = 0, minute = 0, second = 0 ).date()
             for tidalReading in list( tidalReadings ):
                 if isinstance( tidalReading.getDateTime(), datetime.datetime ):
                     theDate = tidalReading.getDateTime().date()
+
                 else:
                     theDate = tidalReading.getDateTime()
 
@@ -629,4 +574,4 @@ class IndicatorTide:
         return tidalReadings
 
 
-if __name__ == "__main__": IndicatorTide().main()
+IndicatorTide().main()
