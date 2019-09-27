@@ -24,12 +24,11 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "Gdk", "3.0" )
 gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import Gdk, GLib, Gtk, Notify
+from gi.repository import GLib, Gtk, Notify
 
 import indicator_base, os
 
@@ -59,8 +58,6 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
-        Notify.init( INDICATOR_NAME )  #TODO Put into baseclass somehow?
-        self.clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD )  #TODO Put into baseclass somehow?
         self.removeFileFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
 
 
@@ -79,7 +76,7 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
             self.indicator.set_secondary_activate_target( menuItem )
 
         menuItem = Gtk.MenuItem( _( "Copy Last Fortune" ) )
-        menuItem.connect( "activate", lambda widget: self.clipboard.set_text( self.fortune, -1 ) )
+        menuItem.connect( "activate", lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ) )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
             self.indicator.set_secondary_activate_target( menuItem )
