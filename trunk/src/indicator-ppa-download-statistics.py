@@ -122,6 +122,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
                     for publishedBinary in publishedBinaries:
                         self.createMenuItemForPublishedBinary( subMenu, indent, ppa, publishedBinary )
                         menuItem.set_submenu( subMenu )
+
                 else:
                     self.createMenuItemForStatusMessage( subMenu, indent, ppa )
                     menuItem.set_submenu( subMenu )
@@ -137,6 +138,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
                     publishedBinaries = ppa.getPublishedBinaries()
                     for publishedBinary in publishedBinaries:
                         self.createMenuItemForPublishedBinary( menu, indent, ppa, publishedBinary )
+
                 else:
                     self.createMenuItemForStatusMessage( menu, indent, ppa )
 
@@ -149,6 +151,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
         label = indent + publishedBinary.getPackageName()
         if publishedBinary.getPackageVersion() is None:
             label += ":  " + str( publishedBinary.getDownloadCount() )
+
         else:
             label += " " + publishedBinary.getPackageVersion() + ":  " + str( publishedBinary.getDownloadCount() )
 
@@ -161,12 +164,16 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
     def createMenuItemForStatusMessage( self, menu, indent, ppa ):
         if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
+
         elif ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
             message = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
+
         elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
+
         elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
+
         else:
             message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
@@ -183,8 +190,10 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
             if key in combinedPPAs:
                 if ppa.getStatus() == combinedPPAs[ key ].getStatus():
                     combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() )
+
                 elif combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
                     combinedPPAs[ key ].setStatus( ppa.getStatus() ) # The current PPA has an error, so that becomes the new status.
+
                 else:
                     combinedPPAs[ key ].setStatus( PPA.STATUS_MULTIPLE_ERRORS ) # The combined PPA and the current PPA have different errors, so set a combined error.
 
@@ -237,6 +246,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
             # This is a combined PPA...
             ppaName = widget.props.name[ firstPipe + 1 : ].strip()
             url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName
+
         else:
             ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
             thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
@@ -477,6 +487,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is None:
             self.showMessage( None, Gtk.MessageType.ERROR, _( "No PPA has been selected for removal." ), INDICATOR_NAME )
+
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
             if self.showOKCancel( None, _( "Remove the selected PPA?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
@@ -552,6 +563,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
 
         if rowNumber is not None:
             series.set_active( IndicatorPPADownloadStatistics.SERIES.index( model[ treeiter ][ 2 ] ) )
+
         else:
             series.set_active( 0 )
 
@@ -567,6 +579,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
 
         if rowNumber is not None:
             architectures.set_active( IndicatorPPADownloadStatistics.ARCHITECTURES.index( model[ treeiter ][ 3 ] ) )
+
         else:
             architectures.set_active( 0 )
 
@@ -587,6 +600,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
                 if len( model ) > 0:
                     ppaUserValue = ppaUser.get_active_text().strip()
                     ppaNameValue = ppaName.get_active_text().strip()
+
                 else:
                     ppaUserValue = ppaUser.get_text().strip()
                     ppaNameValue = ppaName.get_text().strip()
@@ -606,6 +620,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
                     # Doing an add and there's at least one PPA OR doing an edit and there's at least two PPAs...
                     if rowNumber is None: # Doing an add, so data has changed.
                         dataHasBeenChanged = True
+
                     else: # Doing an edit, so check to see if there the data has actually been changed...
                         dataHasBeenChanged = not ( \
                             ppaUserValue == model[ treeiter ][ 0 ] and \
@@ -644,6 +659,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is None:
             self.showMessage( None, Gtk.MessageType.ERROR, _( "No filter has been selected for removal." ), INDICATOR_NAME )
+
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
             if self.showOKCancel( None, _( "Remove the selected filter?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
@@ -654,6 +670,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
     def onFilterAdd( self, button, filterTree, ppaTree ):
         if len( ppaTree.get_model() ) == 0:
             self.showMessage( None, Gtk.MessageType.ERROR, _( "Please add a PPA first!" ), INDICATOR_NAME )
+
         else:
             # If the number of filters equals the number of PPA User/Names, cannot add a filter!
             ppaUsersNames = [ ]
@@ -664,6 +681,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
 
             if len( filterTree.get_model() ) == len( ppaUsersNames ):
                 self.showMessage( None, Gtk.MessageType.INFO, _( "Only one filter per PPA User/Name." ), INDICATOR_NAME )
+
             else:
                 self.onFilterDoubleClick( filterTree, None, None, ppaTree )
 
@@ -863,12 +881,15 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
                 if len( ppa.getPublishedBinaries() ) == 0:
                     if filters[ 0 ] == "": # No filtering was used for this PPA.
                         ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+
                     else:
                         ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+
                 else:
                     ppa.setStatus( PPA.STATUS_OK )
 
-#         GLib.idle_add( self.buildMenu ) #TODO Handle
+#         GLib.idle_add( self.buildMenu ) #TODO Cannot call to build the menu here as the menu is instantiated
+# and finised off by the base class...need to think about this.
 
         if self.ppasPrevious != self.ppas:
             Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
