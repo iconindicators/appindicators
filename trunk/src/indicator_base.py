@@ -538,10 +538,19 @@ class IndicatorBase:
         return directory
 
 
+    def processCall( self, command ):
+        try:
+            subprocess.call( command, shell = True )
+
+        except subprocess.CalledProcessError:
+            pass
+
+
     # Returns the result of calling the command.  On exception, returns None.
     def processGet( self, command ):
         try:
             return subprocess.check_output( command, shell = True, universal_newlines = True )
+
         except subprocess.CalledProcessError:
             return None
 
