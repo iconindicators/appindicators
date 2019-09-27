@@ -1,5 +1,7 @@
 indicator-virtual-box (1.0.62-1) xenial; urgency=low
 
+  * Bug fix: Locking between About/Preferences and show fortune now locks!
+  * Now uses a base class to share functionality amongst indicators.
   * About dialog now shows copyright, artists and corrected URL for website.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Sep 2019 16:03:19 +1000
