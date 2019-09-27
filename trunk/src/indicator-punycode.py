@@ -16,19 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator to let a user select a domain name, by either highlight or clipboard, and convert between Unicode and ASCII.
-
-
-# References:
-#  http://developer.gnome.org/pygobject
-#  http://developer.gnome.org/gtk3
-#  http://developer.gnome.org/gnome-devel-demos
-#  http://python-gtk-3-tutorial.readthedocs.org
-#  http://wiki.gnome.org/Projects/PyGObject/Threading
-#  http://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
-#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
+# Application indicator to let a user select a domain name,
+# either by text highlight or clipboard, then convert between Unicode and ASCII.
 
 
 INDICATOR_NAME = "indicator-punycode"
@@ -36,24 +25,17 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "Gdk", "3.0" )
+gi.require_version( "GLib", "2.0" )
+gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import AppIndicator3, Gdk, GLib, Gtk, Notify
-import encodings.idna, json, logging, os, pythonutils, re, threading
+from gi.repository import Gdk, GLib, Gtk, Notify
+
+import indicator_base, encodings.idna, re
 
 
-class IndicatorPunycode:
-
-    AUTHOR = "Bernard Giannetti"
-    ARTIST = "Oleg Moiseichuk"
-    VERSION = "1.0.8"
-    ICON = INDICATOR_NAME
-    COPYRIGHT_START_YEAR = "2016"
-    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
-    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
-    COMMENTS = _( "Convert domain names between Unicode and ASCII." )
+class IndicatorPunycode( indicator_base.IndicatorBase ):
 
     CONFIG_DROP_PATH_QUERY = "dropPathQuery"
     CONFIG_INPUT_CLIPBOARD = "inputClipboard"
@@ -62,25 +44,18 @@ class IndicatorPunycode:
 
 
     def __init__( self ):
-        logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorPunycode.LOG ) ] )
-        self.lock = threading.Lock()
+        super().__init__(
+            indicatorName = INDICATOR_NAME,
+            version = "1.0.8",
+            copyrightStartYear = "2016",
+            comments = _( "Convert domain names between Unicode and ASCII." ),
+            artwork = [ "Oleg Moiseichuk" ] )
+
+        Notify.init( INDICATOR_NAME ) #TODO Put into baseclass somehow?
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
 
-        Notify.init( INDICATOR_NAME )
-        self.loadConfig()
 
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPunycode.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
-        self.buildMenu()
-
-
-    def main( self ): Gtk.main()
-
-
-    def buildMenu( self ):
-        menu = Gtk.Menu()
-
+    def update( self, menu ):
         menuItem = Gtk.MenuItem( _( "Convert" ) )
         menuItem.connect( "activate", self.onConvert )
         menu.append( menuItem )
@@ -98,10 +73,6 @@ class IndicatorPunycode:
             menuItem.connect( "activate", self.pasteToClipboard, result[ 1 ] )
             menu.append( menuItem )
 
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, True, self.onPreferences, self.onAbout, Gtk.main_quit )
-        self.indicator.set_menu( menu )
-        menu.show_all()
-
 
     def onConvert( self, widget ): Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( self.doConversion, None )
 
@@ -113,10 +84,12 @@ class IndicatorPunycode:
         if text is None:
             if self.inputClipboard:
                 message = _( "No text is in the clipboard." )
+
             else:
                 message = _( "No text is highlighted/selected." )
 
             Notify.Notification.new( _( "Nothing to convert..." ), message, IndicatorPunycode.ICON ).show()
+
         else:
             protocol = ""
             result = re.split( r"(^.*//)", text )
@@ -140,6 +113,7 @@ class IndicatorPunycode:
 
                     convertedText = str( b'.'.join( labels ), "utf-8" )
                     result = [ protocol + text + pathQuery, protocol + convertedText + pathQuery ]
+
                 else:
                     for label in text.split( "." ):    
                         convertedText += encodings.idna.ToUnicode( encodings.idna.nameprep( label ) ) + "."
@@ -156,7 +130,7 @@ class IndicatorPunycode:
                     self.results = self.results[ : self.resultHistoryLength ]
 
                 GLib.idle_add( self.pasteToClipboard, None, protocol + convertedText + pathQuery )
-                GLib.idle_add( self.buildMenu )
+                GLib.idle_add( self.requestUpdate )
 
             except Exception as e:
                 logging.exception( e )
@@ -168,48 +142,17 @@ class IndicatorPunycode:
         if self.outputBoth:
             Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
+
         else:
             if self.inputClipboard:
                Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
+
             else:
                 Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
 
 
-    def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            pythonutils.showAboutDialog(
-                [ IndicatorPunycode.AUTHOR + " " + IndicatorPunycode.WEBSITE ],
-                [ IndicatorPunycode.ARTIST ],
-                IndicatorPunycode.COMMENTS,
-                IndicatorPunycode.AUTHOR,
-                IndicatorPunycode.COPYRIGHT_START_YEAR,
-                [ ],
-                "",
-                Gtk.License.GPL_3_0,
-                IndicatorPunycode.ICON,
-                INDICATOR_NAME,
-                IndicatorPunycode.WEBSITE,
-                IndicatorPunycode.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ),
-                IndicatorPunycode.LOG,
-                _( "View the" ),
-                _( "text file." ),
-                _( "error log" ) )
-
-            self.lock.release()
-
-
-    def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            self._onPreferences( widget )
-            self.lock.release()
-
-
-    def _onPreferences( self, widget ):
-        grid = pythonutils.createGrid()
+    def onPreferences( self ):
+        grid = self.createGrid()
 
         label = Gtk.Label( _( "Input source" ) )
         label.set_halign( Gtk.Align.START )
@@ -220,7 +163,7 @@ class IndicatorPunycode:
             "Input is taken from the clipboard after\n" + \
             "a CTRL-X or CTRL-C (or equivalent)." ) )
         inputClipboardRadio.set_active( self.inputClipboard )
-        inputClipboardRadio.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        inputClipboardRadio.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( inputClipboardRadio, 0, 1, 1, 1 )
 
         inputPrimaryRadio = Gtk.RadioButton.new_with_label_from_widget( inputClipboardRadio, _( "Primary" ) )
@@ -229,7 +172,7 @@ class IndicatorPunycode:
             "selected text after a middle mouse\n" + \
             "click of the indicator icon." ) )
         inputPrimaryRadio.set_active( not self.inputClipboard )
-        inputPrimaryRadio.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        inputPrimaryRadio.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( inputPrimaryRadio, 0, 2, 1, 1 )
 
         outputBothCheckbox = Gtk.CheckButton( _( "Output to clipboard and primary" ) )
@@ -270,14 +213,15 @@ class IndicatorPunycode:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorPunycode.DESKTOP_FILE, logging ) )
+        autostartCheckbox.set_active( self.isAutoStart() )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
+#TODO Put into baseclass?
         dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.get_content_area().add( grid )
         dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorPunycode.ICON )
+#         dialog.set_icon_name( IndicatorPunycode.ICON )#TODO Needed?
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -285,16 +229,13 @@ class IndicatorPunycode:
             self.outputBoth = outputBothCheckbox.get_active()
             self.dropPathQuery = dropPathQueryCheckbox.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
-            self.saveConfig()
-            pythonutils.setAutoStart( IndicatorPunycode.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
-            GLib.idle_add( self.buildMenu )
+            self.requestSaveConfig()
+            self.setAutoStart( IndicatorPunycode.DESKTOP_FILE, autostartCheckbox.get_active() )
 
         dialog.destroy()
 
 
-    def loadConfig( self ):
-        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
-
+    def loadConfig( self, config ):
         self.dropPathQuery = config.get( IndicatorPunycode.CONFIG_DROP_PATH_QUERY, False )
         self.inputClipboard = config.get( IndicatorPunycode.CONFIG_INPUT_CLIPBOARD, False )
         self.outputBoth = config.get( IndicatorPunycode.CONFIG_OUTPUT_BOTH, False )
@@ -302,14 +243,12 @@ class IndicatorPunycode:
 
 
     def saveConfig( self ):
-        config = {
+        return {
             IndicatorPunycode.CONFIG_DROP_PATH_QUERY: self.dropPathQuery,
             IndicatorPunycode.CONFIG_INPUT_CLIPBOARD: self.inputClipboard,
             IndicatorPunycode.CONFIG_OUTPUT_BOTH: self.outputBoth,
             IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH: self.resultHistoryLength
         }
 
-        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
-
-if __name__ == "__main__": IndicatorPunycode().main()
+IndicatorPunycode().main()
