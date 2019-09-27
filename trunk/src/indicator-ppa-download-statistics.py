@@ -20,18 +20,9 @@
 
 
 # References:
-#  http://developer.gnome.org/pygobject
-#  http://developer.gnome.org/gtk3
-#  http://developer.gnome.org/gnome-devel-demos
-#  http://python-gtk-3-tutorial.readthedocs.org
-#  http://wiki.gnome.org/Projects/PyGObject/Threading
-#  http://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
-#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-#  http://launchpad.net/+apidoc
-#  http://help.launchpad.net/API/launchpadlib
-#  http://help.launchpad.net/API/Hacking
+#     http://launchpad.net/+apidoc
+#     http://help.launchpad.net/API/launchpadlib
+#     http://help.launchpad.net/API/Hacking
 
 
 INDICATOR_NAME = "indicator-ppa-download-statistics"
@@ -39,27 +30,28 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "GLib", "2.0" )
+gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from copy import deepcopy
-from gi.repository import AppIndicator3, GLib, Gtk, Notify
+from gi.repository import GLib, Gtk, Notify
 from ppa import PPA, PublishedBinary
 from threading import Thread
 from urllib.request import urlopen
+
 import concurrent.futures, json, locale, logging, operator, os, pythonutils, tempfile, threading, webbrowser
 
 
-class IndicatorPPADownloadStatistics:
+class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
 
-    AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.67"
-    ICON = INDICATOR_NAME
-    COPYRIGHT_START_YEAR = "2012"
-    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
-    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
-    COMMENTS = _( "Display the total downloads of PPAs." )
+    CONFIG_COMBINE_PPAS = "combinePPAs"
+    CONFIG_FILTERS = "filters"
+    CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC = "ignoreVersionArchitectureSpecific"
+    CONFIG_PPAS = "ppas"
+    CONFIG_SHOW_SUBMENU = "showSubmenu"
+    CONFIG_SORT_BY_DOWNLOAD = "sortByDownload"
+    CONFIG_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
 
     SERIES = [ "eoan",
                "disco", "cosmic", "bionic", "artful", "zesty",
@@ -71,14 +63,6 @@ class IndicatorPPADownloadStatistics:
 
     ARCHITECTURES = [ "amd64", "i386" ]
 
-    CONFIG_COMBINE_PPAS = "combinePPAs"
-    CONFIG_FILTERS = "filters"
-    CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC = "ignoreVersionArchitectureSpecific"
-    CONFIG_PPAS = "ppas"
-    CONFIG_SHOW_SUBMENU = "showSubmenu"
-    CONFIG_SORT_BY_DOWNLOAD = "sortByDownload"
-    CONFIG_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
-
     MESSAGE_DOWNLOADING_DATA = _( "(downloading data...)" )
     MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
     MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE = _( "(multiple messages - uncombine PPAs)" )
@@ -87,17 +71,18 @@ class IndicatorPPADownloadStatistics:
 
 
     def __init__( self ):
-        logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorPPADownloadStatistics.LOG ) ] )
-        self.lock = threading.Lock()
-        Notify.init( INDICATOR_NAME )
-        self.loadConfig()
+        super().__init__(
+            indicatorName = INDICATOR_NAME,
+            version = "1.0.67",
+            copyrightStartYear = "2012",
+            comments = _( "Display the total downloads of PPAs." ) )
 
         # On Ubuntu 16.04 (and other Unity based versions), the icon "text" does not behave as does label text of other indicators.
         # When clicked, label text becomes bolder, whereas the icon "text" remains the same.
         # On Ubuntu 18.04 (and other GNOME Shell versions), the label text becomes bolder on mouse over and mouse click.
         # Ideally, use a label for the text of "PPA" and a dummy/empty icon, but alas, this does not work under GNOME Shell.
         # Inspiration from https://github.com/fossfreedom/indicator-sysmonitor.
-        if pythonutils.isUbuntu1604():
+        if self.isUbuntu1604():
             fileHandle, icon = tempfile.mkstemp( suffix = ".svg" )
             with open( icon, "w" ) as f:
                 svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> \
@@ -106,18 +91,11 @@ class IndicatorPPADownloadStatistics:
                 f.write( svg )
                 f.close()
 
-            self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, icon, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+#             self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, icon, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+            self.set_icon_full( icon, None ) #TODO Check this works!
             self.indicator.set_label( "PPA", "" )
-            self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
-        else:
-            self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorPPADownloadStatistics.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-            self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.update()
-
-
-    def main( self ): Gtk.main()
 
 
     def update( self ):
