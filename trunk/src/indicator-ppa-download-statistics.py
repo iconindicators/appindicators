@@ -920,6 +920,9 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
               "&exact_match=false&ordered=false&binary_name=" + filter
 
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/bionic/amd64&status=Published&exact_match=false&ordered=false&binary_name=
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/xenial/amd64&status=Published&exact_match=false&ordered=false&binary_name=
+
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
         publishedBinaryCounter = 0
