@@ -95,19 +95,19 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
             self.indicator.set_icon_full( icon, "" ) #TODO Check this works!
             self.indicator.set_label( "PPA", "" )
             
-        self.buildMenuAndDownload = True
+        self.doDownload = True
 
 
 #TODO Think about each case below when and by whom is the updateTimerID to be removed?    
+#TODO Because the download happens in a thread, ensure somehow we do it with a lock, to stop the about/preferencs from being opened.
     def update( self, menu ):
 
-        if self.buildMenuAndDownload: # On intialisation and when the timer says to do so:
-            self.buildMenu( menu )
+        self.buildMenu( menu )
+        if self.doDownload: # On intialisation and when the timer says to do so:
             Thread( target = self.getPPADownloadStatistics ).start()
 
         else: # After download:
-            self.buildMenu( menu )
-            self.buildMenuAndDownload = True
+            self.doDownload = True
             return 6 * 60 * 60 # Auto update every six hours.
         
 #         self.buildMenu( menu )
@@ -901,7 +901,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
                 else:
                     ppa.setStatus( PPA.STATUS_OK )
 
-        self.buildMenuAndDownload = False
+        self.doDownload = False
         GLib.idle_add( self.requestUpdate )
 
         if self.ppasPrevious != self.ppas:
