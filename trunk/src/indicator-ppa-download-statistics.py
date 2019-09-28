@@ -94,12 +94,25 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
 #             self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, icon, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
             self.indicator.set_icon_full( icon, "" ) #TODO Check this works!
             self.indicator.set_label( "PPA", "" )
+            
+        self.buildMenuAndDownload = True
 
 
+#TODO Think about each case below when and by whom is the updateTimerID to be removed?    
     def update( self, menu ):
-        self.buildMenu( menu )
-        Thread( target = self.getPPADownloadStatistics ).start()
-        return 6 * 60 * 60 # Auto update every six hours.
+
+        if self.buildMenuAndDownload: # On intialisation and when the timer says to do so:
+            self.buildMenu( menu )
+            Thread( target = self.getPPADownloadStatistics ).start()
+
+        else: # After download:
+            self.buildMenu( menu )
+            self.buildMenuAndDownload = True
+            return 6 * 60 * 60 # Auto update every six hours.
+        
+#         self.buildMenu( menu )
+#         Thread( target = self.getPPADownloadStatistics ).start()
+#         return 6 * 60 * 60 # Auto update every six hours.
 
 
     def buildMenu( self, menu ):
@@ -888,8 +901,8 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
                 else:
                     ppa.setStatus( PPA.STATUS_OK )
 
-#         GLib.idle_add( self.buildMenu ) #TODO Cannot call to build the menu here as the menu is instantiated
-# and finised off by the base class...need to think about this.
+        self.buildMenuAndDownload = False
+        GLib.idle_add( self.requestUpdate )
 
         if self.ppasPrevious != self.ppas:
             Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
