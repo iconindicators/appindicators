@@ -28,6 +28,12 @@
 #TODO Rename all indicators to use _ instead of -?
 
 
+#Pylint
+# https://pythonspeed.com/articles/pylint/
+# https://pylint.readthedocs.io/en/latest/technical_reference/features.html
+# https://github.com/datawire/quark/blob/master/.pylintrc
+
+
 #TODO Search for
 # is not None
 # and see if we can replace with 'if x' rather than 'if x is not None'. 
