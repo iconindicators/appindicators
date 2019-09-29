@@ -91,11 +91,10 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
                 f.write( svg )
                 f.close()
 
-#             self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, icon, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-            self.indicator.set_icon_full( icon, "" ) #TODO Check this works!
+            self.indicator.set_icon_full( icon, "" )
             self.indicator.set_label( "PPA", "" )
-            
-        self.doDownload = True
+
+        self.doDownload = True #TODO May not be needed.
 
 
 #TODO Think about each case below when and by whom is the updateTimerID to be removed?    
