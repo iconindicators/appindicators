@@ -94,24 +94,27 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
             self.indicator.set_icon_full( icon, "" )
             self.indicator.set_label( "PPA", "" )
 
-        self.doDownload = True #TODO May not be needed.
-
 
 #TODO Think about each case below when and by whom is the updateTimerID to be removed?    
 #TODO Because the download happens in a thread, ensure somehow we do it with a lock, to stop the about/preferencs from being opened.
     def update( self, menu ):
+        needsDownload = False
+        for ppa in ppas:
+            if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
+                needsDownload = True
+                break
 
-        self.buildMenu( menu )
-        if self.doDownload: # On intialisation and when the timer says to do so:
+        timeToNextUpdateInSeconds = None
+        if needsDownload:
+            menuItem = Gtk.MenuItem( ppa.getKey() )
+            menu.append( Gtk.MenuItem( _( "Downloading..." ) ) )
             Thread( target = self.getPPADownloadStatistics ).start()
 
-        else: # After download:
-            self.doDownload = True
-            return 6 * 60 * 60 # Auto update every six hours.
-        
-#         self.buildMenu( menu )
-#         Thread( target = self.getPPADownloadStatistics ).start()
-#         return 6 * 60 * 60 # Auto update every six hours.
+        else:
+            self.buildMenu( menu )
+            timeToNextUpdateInSeconds = 6 * 60 * 60 # Auto update every six hours.
+
+        return timeToNextUpdateInSeconds
 
 
     def buildMenu( self, menu ):
@@ -177,7 +180,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
         if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
 
-        elif ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
+        elif ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: #TODO May not need this...if not change this code...but make sure we don't use a blind else clause.
             message = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
 
         elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
@@ -883,13 +886,13 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
             if key in self.filters:
                 filters = self.filters.get( key )
 
-            ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
+#             ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )#TODO Don't need this if it is done by the caller, correct?  But maybe do it here again anyway and comment on the fact of "just in case".
             for filter in filters:
                 self.getPublishedBinaries( ppa, filter )
                 if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                     break # No point continuing...
 
-            if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # No error occurred, so set the final status...
+            if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # No error occurred, so set the final status...                
                 if len( ppa.getPublishedBinaries() ) == 0:
                     if filters[ 0 ] == "": # No filtering was used for this PPA.
                         ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
@@ -900,7 +903,6 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
                 else:
                     ppa.setStatus( PPA.STATUS_OK )
 
-        self.doDownload = False
         GLib.idle_add( self.requestUpdate )
 
         if self.ppasPrevious != self.ppas:
@@ -919,9 +921,8 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
               "&exact_match=false&ordered=false&binary_name=" + filter
 
+#TODO might need this for testing.
 # https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/bionic/amd64&status=Published&exact_match=false&ordered=false&binary_name=
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/xenial/amd64&status=Published&exact_match=false&ordered=false&binary_name=
-#TODO Try "sta" in the filter just to see if both startdate and statistics come back together.
 
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
