@@ -946,6 +946,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
             if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
+#TODO Maybe make the maxworkers at most 5?
             maxWorkers = 10 if totalPublishedBinaries < 10 else 5 # If the total is fewer than 10, grab all in one batch, otherwise limit to 5 concurrent requests.
             with concurrent.futures.ThreadPoolExecutor( max_workers = maxWorkers ) as executor:
                 { executor.submit( getDownloadCount, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
