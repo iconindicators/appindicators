@@ -111,14 +111,14 @@ class IndicatorOnThisDay( indicator_base.IndicatorBase ):
                 content += "#include <" +calendar + ">\n"
 
         x = INDICATOR_NAME
-        y = self.getCachePathname( "calendars" )
-#         self.writeCacheText( INDICATOR_NAME, self.getCachePathname( "calendars" ), content )# TODO This is wrong...I think it should be...
+        y = self.getCachePath( "calendars" )
+#         self.writeCacheText( INDICATOR_NAME, self.getCachePath( "calendars" ), content )# TODO This is wrong...I think it should be...
         #...this:
         self.writeCacheText( "calendars", content )
 
         # Run the calendar command and parse the results, one event per line, sometimes...
         events = [ ]
-        command = "calendar -f " + self.getCachePathname( "calendars" ) + " -A 366"
+        command = "calendar -f " + self.getCachePath( "calendars" ) + " -A 366"
         for line in self.processGet( command ).splitlines():
             if( line is None or len( line.strip() ) == 0 ):
                 continue # Ubuntu 17.04 inserts an empty line between events.
