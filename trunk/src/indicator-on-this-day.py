@@ -33,11 +33,11 @@ from event import Event
 from datetime import date, datetime, timedelta
 from gi.repository import Gdk, GLib, Gtk, Notify
 
-import indicator_base, encodings.idna, re
+import indicatorbase, encodings.idna, re
 import fnmatch, os, webbrowser
 
 
-class IndicatorOnThisDay( indicator_base.IndicatorBase ):
+class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
     CONFIG_CALENDARS = "calendars"
     CONFIG_COPY_TO_CLIPBOARD = "copyToClipboard"
