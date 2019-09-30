@@ -157,7 +157,7 @@ class IndicatorOnThisDay( indicator_base.IndicatorBase ):
         return sortedEventsWithoutDuplicates
 
 
-    def onPreferences( self ):
+    def onPreferences( self, dialog ):
         notebook = Gtk.Notebook()
 
         # Calendar file settings.
@@ -299,10 +299,7 @@ class IndicatorOnThisDay( indicator_base.IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( notebook, True, True, 0 )
-        dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorOnThisDay.ICON )
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -321,8 +318,6 @@ class IndicatorOnThisDay( indicator_base.IndicatorBase ):
             self.notify = notifyCheckbox.get_active()
             self.setAutoStart( autostartCheckbox.get_active() )
             GLib.idle_add( self.requestSaveConfig() )
-
-        dialog.destroy()
 
 
     def onEventClickRadio( self, source, radioCopyToClipboard, radioInternetSearch, searchEngineEntry ):
