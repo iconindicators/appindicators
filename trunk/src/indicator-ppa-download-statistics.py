@@ -40,10 +40,10 @@ from ppa import PPA, PublishedBinary
 from threading import Thread
 from urllib.request import urlopen
 
-import concurrent.futures, indicator_base, json, locale, operator, os, tempfile, webbrowser
+import concurrent.futures, indicatorbase, json, locale, operator, os, tempfile, webbrowser
 
 
-class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
+class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
     CONFIG_COMBINE_PPAS = "combinePPAs"
     CONFIG_FILTERS = "filters"
