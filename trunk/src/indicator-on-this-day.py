@@ -110,7 +110,11 @@ class IndicatorOnThisDay( indicator_base.IndicatorBase ):
             if os.path.isfile( calendar ):
                 content += "#include <" +calendar + ">\n"
 
-        self.writeCacheText( INDICATOR_NAME, self.getCachePathname( "calendars" ), content )
+        x = INDICATOR_NAME
+        y = self.getCachePathname( "calendars" )
+#         self.writeCacheText( INDICATOR_NAME, self.getCachePathname( "calendars" ), content )# TODO This is wrong...I think it should be...
+        #...this:
+        self.writeCacheText( "calendars", content )
 
         # Run the calendar command and parse the results, one event per line, sometimes...
         events = [ ]
