@@ -106,17 +106,23 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
 
         timeToNextUpdateInSeconds = None
         if needsDownload:
-            menuItem = Gtk.MenuItem( ppa.getKey() )
             menu.append( Gtk.MenuItem( _( "Downloading..." ) ) )
+
+#TODO I think we need to use the self.lock in the thread, but in the way about/prefs uses,
+# so we don't block.
+# If we kick off the thread and build the menu, the user can then load the prefs which is not good.            
             Thread( target = self.getPPADownloadStatistics ).start()
 
         else:
             self.buildMenu( menu )
             timeToNextUpdateInSeconds = 6 * 60 * 60 # Auto update every six hours.
+            for ppa in ppas:
+                ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD ) # Ensures the next update will do a download.
 
         return timeToNextUpdateInSeconds
 
 
+#TODO Look at all times when/why we copy the ppas.
     def buildMenu( self, menu ):
         ppas = deepcopy( self.ppas ) # Leave the original download data as is - makes dynamic (user) changes faster (don't have to re-download).
 
