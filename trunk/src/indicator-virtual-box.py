@@ -391,7 +391,7 @@ class IndicatorVirtualBox( indicator_base.IndicatorBase ):
     def isAutostart( self, uuid ): return uuid in self.virtualMachinePreferences and self.virtualMachinePreferences[ uuid ][ 0 ]
 
 
-    def onPreferences( self ):
+    def onPreferences( self, dialog ):
         notebook = Gtk.Notebook()
 
         # List of VMs.
@@ -500,10 +500,7 @@ class IndicatorVirtualBox( indicator_base.IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( notebook, True, True, 0 )
-        dialog.set_border_width( 5 )
-#         dialog.set_icon_name( IndicatorVirtualBox.ICON )# TODO
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -515,8 +512,6 @@ class IndicatorVirtualBox( indicator_base.IndicatorBase ):
             self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
             self.setAutoStart( autostartCheckbox.get_active() )
             GLib.idle_add( self.requestSaveConfig() )
-
-        dialog.destroy()
 
 
     def updateVirtualMachinePreferences( self, store, treeiter ):
