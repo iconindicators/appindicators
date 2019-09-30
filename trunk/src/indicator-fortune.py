@@ -30,10 +30,10 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import GLib, Gtk, Notify
 
-import indicator_base, os
+import indicatorbase, os
 
 
-class IndicatorFortune( indicator_base.IndicatorBase ):
+class IndicatorFortune( indicatorbase.IndicatorBase ):
 
     CONFIG_FORTUNES = "fortunes"
     CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
