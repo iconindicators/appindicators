@@ -59,8 +59,6 @@ class IndicatorBase:
     DESKTOP_PATH = "/usr/share/applications/"
     INDENT_WIDGET_LEFT = 20
     JSON_EXTENSION = ".json"
-    LOGGING_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    LOGGING_LEVEL = logging.DEBUG
     URL_TIMEOUT_IN_SECONDS = 2
     USER_DIRECTORY_CACHE = ".cache"
     USER_DIRECTORY_CONFIG = ".config"
@@ -87,10 +85,16 @@ class IndicatorBase:
         self.lockAboutDialog = threading.Lock()
         self.updateTimerID = None
 
-        logging.basicConfig( format = IndicatorBase.LOGGING_FORMAT, level = IndicatorBase.LOGGING_LEVEL, handlers = [ TruncatedFileHandler( self.log ) ] )
+        logging.basicConfig( 
+            format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", 
+            level = logging.DEBUG, 
+            handlers = [ TruncatedFileHandler( self.log ) ] )
         Notify.init( self.indicatorName )
 
-        self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = AppIndicator3.Indicator.new(
+            self.indicatorName, 
+            self.indicatorName, 
+            AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.__loadConfig()
