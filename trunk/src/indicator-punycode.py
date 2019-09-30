@@ -32,10 +32,10 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gdk, GLib, Gtk, Notify
 
-import indicator_base, encodings.idna, re
+import indicatorbase, encodings.idna, re
 
 
-class IndicatorPunycode( indicator_base.IndicatorBase ):
+class IndicatorPunycode( indicatorbase.IndicatorBase ):
 
     CONFIG_DROP_PATH_QUERY = "dropPathQuery"
     CONFIG_INPUT_CLIPBOARD = "inputClipboard"
