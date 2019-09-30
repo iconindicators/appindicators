@@ -200,7 +200,7 @@ class IndicatorTide( indicator_base.IndicatorBase ):
         return nextUpdateTimeInSeconds
 
 
-    def onPreferences( self ):
+    def onPreferences( self, dialog ):
         notebook = Gtk.Notebook()
 
         # Port settings.
@@ -326,10 +326,7 @@ class IndicatorTide( indicator_base.IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( notebook, True, True, 0 )
-        dialog.set_border_width( 5 )
-#         dialog.set_icon_name( IndicatorTide.ICON ) #TODO
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -344,8 +341,6 @@ class IndicatorTide( indicator_base.IndicatorBase ):
             self.menuItemTideFormatSansTime = tideFormatSansTime.get_text()
             self.setAutoStart( autostartCheckbox.get_active() )
             GLib.idle_add( self.requestSaveConfig() )
-
-        dialog.destroy()
 
 
     def onCountry( self, countriesComboBox, portsListStore, portsTree ):
