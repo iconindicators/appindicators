@@ -34,6 +34,9 @@
 # https://github.com/datawire/quark/blob/master/.pylintrc
 
 
+#TODO Rename back to indicator-base?  Ask Oleg how strict I shoud be.
+
+
 #TODO Search for
 # is not None
 # and see if we can replace with 'if x' rather than 'if x is not None'. 
@@ -184,7 +187,7 @@ class IndicatorBase:
             aboutDialog.hide()
 
             self.lock.release()
-            GLib.idle_add( self.__update )
+            GLib.idle_add( self.__update ) #TODO Why do an update?  Which indicator needs this?
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, rightText, anchorText ):
