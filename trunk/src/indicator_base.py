@@ -25,7 +25,8 @@
 #     http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 
 
-#TODO Rename all indicators to use _ instead of -?
+#TODO Rename all indicators to use _ instead of -?   As Oleg.
+#Means the config files will also need to be renamed.
 
 
 #Pylint
@@ -38,7 +39,7 @@
 
 
 #TODO Search for
-# is not None
+#         is not None
 # and see if we can replace with 'if x' rather than 'if x is not None'. 
 
 import gi
@@ -83,6 +84,7 @@ class IndicatorBase:
         self.creditz = creditz
 
         self.lock = threading.Lock()
+        self.lockAboutDialog = threading.Lock()
         self.updateTimerID = None
 
         logging.basicConfig( format = IndicatorBase.LOGGING_FORMAT, level = IndicatorBase.LOGGING_LEVEL, handlers = [ TruncatedFileHandler( self.log ) ] )
@@ -145,24 +147,20 @@ class IndicatorBase:
 
 
     def __onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            if self.updateTimerID:
-                GLib.source_remove( self.updateTimerID )
-
+        if self.lockAboutDialog.acquire(): # Use a separate lock because background updates should not be interrupted.
             aboutDialog = Gtk.AboutDialog()
             aboutDialog.set_artists( self.artwork )
             aboutDialog.set_authors( self.authors )
             aboutDialog.set_comments( self.comments )
 
             copyrightText = "Copyright \xa9 " + \
-                self.copyrightStartYear + \
-                "-" + \
-                str( datetime.datetime.now().year ) + \
-                " " + \
-                self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
+                            self.copyrightStartYear + \
+                            "-" + \
+                            str( datetime.datetime.now().year ) + \
+                            " " + \
+                            self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
 
             aboutDialog.set_copyright( copyrightText )
-            if self.creditz: aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
             aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
             aboutDialog.set_logo_icon_name( self.indicatorName )
             aboutDialog.set_program_name( self.indicatorName )
@@ -170,6 +168,9 @@ class IndicatorBase:
             aboutDialog.set_version( self.version )
             aboutDialog.set_website( self.website )
             aboutDialog.set_website_label( self.website )
+
+            if self.creditz:
+                aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
 
             changeLog = "/tmp/" + self.indicatorName + ".changelog"
             if os.path.isfile( changeLog ):
@@ -186,8 +187,7 @@ class IndicatorBase:
             aboutDialog.run()
             aboutDialog.hide()
 
-            self.lock.release()
-            GLib.idle_add( self.__update ) #TODO Why do an update?  Which indicator needs this?
+            self.lockAboutDialog.release()
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, rightText, anchorText ):
@@ -195,6 +195,7 @@ class IndicatorBase:
             notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
             if type( notebookOrStack ).__name__ == "Notebook":
                 notebookOrStack = notebookOrStack.get_nth_page( 0 )
+
             else: # Stack
                 notebookOrStack = notebookOrStack.get_children()[ 0 ]
 
@@ -331,6 +332,7 @@ class IndicatorBase:
 #             GLib.idle_add( self.requestSaveConfig() )
 # so callers don't need to worry?
 # Look at the calls using timeout too.
+#Hang on...why does a save need GLib.idel_add?  It's NOT an update to the graphics but a background save.
     def requestSaveConfig( self ): self.__saveConfig()
 
 
@@ -353,7 +355,6 @@ class IndicatorBase:
 
     # Obtain the path to the user configuration JSON file, creating if necessary the underlying path.
     #
-    # applicationBaseDirectory: The directory path used as the final part of the overall path.
     # configBaseFile: The file name (without extension).
     def __getConfigFile( self, configBaseFile ):
         return self.__getUserDirectory( IndicatorBase.XDG_KEY_CONFIG, IndicatorBase.USER_DIRECTORY_CONFIG, self.indicatorName ) + \
@@ -367,11 +368,12 @@ class IndicatorBase:
     # filename: The file name.
     def getCachePathname( self, filename ):
         return self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName ) + "/" + filename
-
+#TODO This function I think is only used in the indicator on this day.
+#But can we call this function in the functions below to save building the path each time?
+#Maybe rename this function as it returns a path and file?
 
     # Remove a file from the cache.
     #
-    # applicationBaseDirectory: The directory used as the final part of the overall path.
     # fileName: The file to remove.
     #
     # The file removed will be either
@@ -387,7 +389,6 @@ class IndicatorBase:
 
     # Removes out of date cache files.
     #
-    # applicationBaseDirectory: The directory used as the final part of the overall path.
     # baseName: The text used to form the file name, typically the name of the calling application.
     # cacheMaximumAgeInHours: Anything older than the maximum age (hours) is deleted.
     #
@@ -408,9 +409,7 @@ class IndicatorBase:
 
     # Read the most recent binary object from the cache.
     #
-    # applicationBaseDirectory: The directory used as the final part of the overall path.
     # baseName: The text used to form the file name, typically the name of the calling application.
-    # logging: A valid logger, used on error.
     #
     # All files in cache directory are filtered based on the pattern
     #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
@@ -449,9 +448,7 @@ class IndicatorBase:
     # Writes an object as a binary file.
     #
     # binaryData: The object to write.
-    # applicationBaseDirectory: The directory used as the final part of the overall path.
     # baseName: The text used to form the file name, typically the name of the calling application.
-    # logging: A valid logger, used on error.
     #
     # The object will be written to the cache directory using the pattern
     #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
@@ -461,15 +458,16 @@ class IndicatorBase:
     # Returns True on success; False otherwise.
     def writeCacheBinary( self, binaryData, baseName ):
         success = True
-        cacheDirectory = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
-        filename = cacheDirectory + "/" + baseName + datetime.datetime.utcnow().strftime( IndicatorBase.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+        cacheFile = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName ) + cacheDirectory + "/" + \
+                    baseName + datetime.datetime.utcnow().strftime( IndicatorBase.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+
         try:
-            with open( filename, "wb" ) as f:
+            with open( cacheFile, "wb" ) as f:
                 pickle.dump( binaryData, f )
 
         except Exception as e:
             logging.exception( e )
-            logging.error( "Error writing to cache: " + filename )
+            logging.error( "Error writing to cache: " + cacheFile )
             success = False
 
         return success
@@ -477,9 +475,7 @@ class IndicatorBase:
 
     # Read a text file from the cache.
     #
-    # applicationBaseDirectory: The directory used as the final part of the overall path.
     # fileName: The file name of the text file.
-    # logging: A valid logger, used on error.
     #
     # Returns the text contents or None on error.
     def readCacheText( self, fileName ):
@@ -503,10 +499,8 @@ class IndicatorBase:
 
     # Write a text file to the cache.
     #
-    # applicationBaseDirectory: The directory used as the final part of the overall path.
     # fileName: The file name of the text file.
     # text: The text to write.
-    # logging: A valid logger, used on error.
     def writeCacheText( self, fileName, text ):
         success = True
         cacheFile = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName ) + "/" + fileName
@@ -570,7 +564,8 @@ class IndicatorBase:
 #     http://stackoverflow.com/questions/24157278/limit-python-log-file
 #     http://svn.python.org/view/python/trunk/Lib/logging/handlers.py?view=markup
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
-    def __init__( self, filename, maxBytes = 10000 ): super().__init__( filename, "a", maxBytes, 0, None, True )
+    def __init__( self, filename, maxBytes = 10000 ):
+        super().__init__( filename, "a", maxBytes, 0, None, True )
 
 
     def doRollover( self ):
