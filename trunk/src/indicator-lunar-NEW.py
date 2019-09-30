@@ -136,6 +136,7 @@ class IndicatorLunar:
 #TODO Put back to 5
     START_UP_DELAY_IN_SECONDS = 1 # Used to delay the update function which potentially takes a long time.
 
+#TODO Instead of this temp dir thing...just use the user cache?
     ICON_BASE_PATH = tempfile.gettempdir()
     ICON_BASE_NAME = ICON_BASE_PATH + "/." + INDICATOR_NAME
     ICON_FULL_MOON = ICON_BASE_NAME + "-fullmoon-icon" + ".svg" # Dynamically created in the temporary directory (typically /tmp).
