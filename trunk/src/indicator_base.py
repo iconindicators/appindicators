@@ -215,7 +215,16 @@ class IndicatorBase:
             if self.updateTimerID:
                 GLib.source_remove( self.updateTimerID )
 
-            self.onPreferences() # Call to implementation in indicator.
+            dialog = Gtk.Dialog( 
+                        _( "Preferences" ), 
+                        None, 
+                        Gtk.DialogFlags.MODAL, 
+                        ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+ 
+            dialog.set_border_width( 5 )
+            dialog.set_icon_name( self.icon ) #TODO Not sure if needed...test on both Ubuntu 16.04 and 18.04
+            self.onPreferences( dialog ) # Call to implementation in indicator.
+            dialog.destroy()
             self.lock.release()
             GLib.idle_add( self.__update )
 
