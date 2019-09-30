@@ -363,8 +363,7 @@ class IndicatorBase:
 
 
     # Return the full directory path to the user config directory for the current indicator.
-    def __getConfigDirectory( self ):
-        return self.__getUserDirectory( "XDG_CONFIG_HOME", ".config", self.indicatorName )
+    def __getConfigDirectory( self ): return self.__getUserDirectory( "XDG_CONFIG_HOME", ".config", self.indicatorName )
 
 
     # Obtain the full path to a cache file, creating the underlying path if necessary.
@@ -520,8 +519,7 @@ class IndicatorBase:
 
 
     # Return the full directory path to the user cache directory for the current indicator.
-    def __getCacheDirectory( self ):
-        return self.__getUserDirectory( "XDG_CACHE_HOME", ".cache", self.indicatorName )
+    def __getCacheDirectory( self ): return self.__getUserDirectory( "XDG_CACHE_HOME", ".cache", self.indicatorName )
 
 
     # Obtain (and create if not present) the directory for configuration, cache or similar.
@@ -549,6 +547,7 @@ class IndicatorBase:
         return directory
 
 
+    # Calls the command in a new process; quietly fails.
     def processCall( self, command ):
         try:
             subprocess.call( command, shell = True )
