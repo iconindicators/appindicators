@@ -99,7 +99,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
 #TODO Because the download happens in a thread, ensure somehow we do it with a lock, to stop the about/preferencs from being opened.
     def update( self, menu ):
         needsDownload = False
-        for ppa in ppas:
+        for ppa in self.ppas:
             if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
                 needsDownload = True
                 break
@@ -116,7 +116,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
         else:
             self.buildMenu( menu )
             timeToNextUpdateInSeconds = 6 * 60 * 60 # Auto update every six hours.
-            for ppa in ppas:
+            for ppa in self.ppas:
                 ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD ) # Ensures the next update will do a download.
 
         return timeToNextUpdateInSeconds
@@ -260,19 +260,20 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
 
 
     def onPPA( self, widget ):
+        url = "http://launchpad.net/~"
         firstPipe = str.find( widget.props.name, "|" )
         ppaUser = widget.props.name[ 0 : firstPipe ].strip()
         secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
         if secondPipe == -1:
             # This is a combined PPA...
             ppaName = widget.props.name[ firstPipe + 1 : ].strip()
-            url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName
+            url += ppaUser + "/+archive/" + ppaName
 
         else:
             ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
             thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
             series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
-            url = "http://launchpad.net/~" + ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
+            url += ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
 
         webbrowser.open( url ) # This returns a boolean indicating success or failure; showing the user a message on a false return value causes a lock up!
 
@@ -836,8 +837,8 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
             ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
         return {
-            IndicatorPPADownloadStatistics.CONFIG_FILTERS: self.filters,
             IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS: self.combinePPAs,
+            IndicatorPPADownloadStatistics.CONFIG_FILTERS: self.filters,
             IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
             IndicatorPPADownloadStatistics.CONFIG_PPAS: ppas,
             IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU: self.showSubmenu,
@@ -932,6 +933,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
         while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+
             except Exception as e:
                 self.getLogging().exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
