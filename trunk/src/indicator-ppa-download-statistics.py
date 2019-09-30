@@ -277,7 +277,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
         webbrowser.open( url ) # This returns a boolean indicating success or failure; showing the user a message on a false return value causes a lock up!
 
 
-    def onPreferences( self ):
+    def onPreferences( self, dialog ):
         self.ppasOrFiltersModified = False
 
         notebook = Gtk.Notebook()
@@ -460,10 +460,7 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( notebook, True, True, 0 )
-        dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -492,8 +489,6 @@ class IndicatorPPADownloadStatistics( indicator_base.IndicatorBase ):
 
             self.setAutoStart( autostartCheckbox.get_active() )
             GLib.idle_add( self.requestSaveConfig )
-
-        dialog.destroy()
 
 
     def onCombinePPAsCheckbox( self, source, checkbox ): checkbox.set_sensitive( source.get_active() )
