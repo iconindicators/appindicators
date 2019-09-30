@@ -56,14 +56,9 @@ class IndicatorBase:
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
-    DESKTOP_PATH = "/usr/share/applications/"
     INDENT_WIDGET_LEFT = 20
     JSON_EXTENSION = ".json"
     URL_TIMEOUT_IN_SECONDS = 2
-    USER_DIRECTORY_CACHE = ".cache"
-    USER_DIRECTORY_CONFIG = ".config"
-    XDG_KEY_CACHE = "XDG_CACHE_HOME"
-    XDG_KEY_CONFIG = "XDG_CONFIG_HOME"
 
 
     def __init__( self, indicatorName, version, copyrightStartYear, comments, artwork = None, creditz = None ):
@@ -295,8 +290,9 @@ class IndicatorBase:
     def isAutoStart( self ):
         autoStart = False
         try:
-            autoStart = os.path.exists( IndicatorBase.AUTOSTART_PATH + self.desktopFile ) and \
-                        "X-GNOME-Autostart-enabled=true" in open( IndicatorBase.AUTOSTART_PATH + self.desktopFile ).read()
+            autoStart = \
+                os.path.exists( IndicatorBase.AUTOSTART_PATH + self.desktopFile ) and \
+                "X-GNOME-Autostart-enabled=true" in open( IndicatorBase.AUTOSTART_PATH + self.desktopFile ).read()
 
         except Exception as e:
             logging.exception( e )
@@ -311,7 +307,7 @@ class IndicatorBase:
 
         try:
             if isSet:
-                shutil.copy( IndicatorBase.DESKTOP_PATH + self.desktopFile, IndicatorBase.AUTOSTART_PATH + self.desktopFile )
+                shutil.copy( "/usr/share/applications/" + self.desktopFile, IndicatorBase.AUTOSTART_PATH + self.desktopFile )
 
             else:
                 if os.path.exists( IndicatorBase.AUTOSTART_PATH + self.desktopFile ):
@@ -368,7 +364,7 @@ class IndicatorBase:
 
     # Return the full directory path to the user config directory for the current indicator.
     def __getConfigDirectory( self ):
-        return self.__getUserDirectory( IndicatorBase.XDG_KEY_CONFIG, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
+        return self.__getUserDirectory( "XDG_CONFIG_HOME", ".config", self.indicatorName )
 
 
     # Obtain the full path to a cache file, creating the underlying path if necessary.
@@ -525,7 +521,7 @@ class IndicatorBase:
 
     # Return the full directory path to the user cache directory for the current indicator.
     def __getCacheDirectory( self ):
-        return self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
+        return self.__getUserDirectory( "XDG_CACHE_HOME", ".cache", self.indicatorName )
 
 
     # Obtain (and create if not present) the directory for configuration, cache or similar.
