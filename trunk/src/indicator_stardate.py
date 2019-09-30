@@ -29,10 +29,10 @@ gi.require_version( "Gtk", "3.0" )
 
 from gi.repository import GLib, Gtk
 
-import datetime, indicator_base, stardate
+import datetime, indicatorbase, stardate
 
 
-class IndicatorStardate( indicator_base.IndicatorBase ):
+class IndicatorStardate( indicatorbase.IndicatorBase ):
 
     CONFIG_PAD_INTEGER = "padInteger"
     CONFIG_SHOW_CLASSIC = "showClassic"

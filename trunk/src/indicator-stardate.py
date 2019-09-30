@@ -19,40 +19,20 @@
 # Application indicator which displays the current Star Trek™ stardate.
 
 
-# References:
-#  http://developer.gnome.org/pygobject
-#  http://developer.gnome.org/gtk3
-#  http://developer.gnome.org/gnome-devel-demos
-#  http://python-gtk-3-tutorial.readthedocs.org
-#  http://wiki.gnome.org/Projects/PyGObject/Threading
-#  http://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
-#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-
-
 INDICATOR_NAME = "indicator-stardate"
 import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "GLib", "2.0" )
+gi.require_version( "Gtk", "3.0" )
 
-from gi.repository import AppIndicator3, GLib, Gtk
-import datetime, json, logging, os, pythonutils, stardate, threading
+from gi.repository import GLib, Gtk
+
+import datetime, indicatorbase, stardate
 
 
-class IndicatorStardate:
-
-    AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.38"
-    ICON = INDICATOR_NAME
-    COPYRIGHT_START_YEAR = "2012"
-    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
-    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
-    COMMENTS = _( "Shows the current Star Trek™ stardate." )
-    CREDITS = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ]
+class IndicatorStardate( indicatorbase.IndicatorBase ):
 
     CONFIG_PAD_INTEGER = "padInteger"
     CONFIG_SHOW_CLASSIC = "showClassic"
@@ -60,141 +40,91 @@ class IndicatorStardate:
 
 
     def __init__( self ):
-        logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorStardate.LOG ) ] )
-        self.lock = threading.Lock()
+        super().__init__(
+            indicatorName = INDICATOR_NAME,
+            version = "1.0.38",
+            copyrightStartYear = "2012",
+            comments = _( "Shows the current Star Trek™ stardate." ),
+            creditz = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ] )
+
+        self.requestMouseWheelScrollEvents()
         self.saveConfigTimerID = None
 
-        self.loadConfig()
 
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorStardate.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-        self.indicator.connect( "scroll-event", self.onMouseWheelScroll )
+    def update( self, menu ):
+        # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
+        if self.showClassic:
+            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.Stardate().getStardateClassic( datetime.datetime.utcnow() )
 
-        self.buildMenu()
-        self.update()
+            # WHEN the stardate calculation is performed is NOT necessarily synchronised with WHEN the stardate actually changes.
+            # Therefore update at a faster rate, say at one tenth of the period, but at most once per minute.
+#TODO Can we actually figure out when the next update should happen with some accuracy?
+            numberOfSecondsToNextUpdate = int( fractionalPeriod / 10 )
+            if numberOfSecondsToNextUpdate < 60:
+                numberOfSecondsToNextUpdate = 60
 
+        else:
+            stardateIssue = None
+            stardateInteger, stardateFraction, fractionalPeriod = stardate.Stardate().getStardate2009Revised( datetime.datetime.utcnow() )
 
-    def main( self ): Gtk.main()
+            # For '2009 revised' the rollover only happens at midnight...so use that for the timer!        
+            now = datetime.datetime.utcnow()
+            oneSecondAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
+            numberOfSecondsToNextUpdate = int( ( oneSecondAfterMidnight - now ).total_seconds() )
 
-
-    def buildMenu( self ):
-        menu = Gtk.Menu()
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, False, self.onPreferences, self.onAbout, Gtk.main_quit )
-        menu.show_all()
-        self.indicator.set_menu( menu )
-
-
-    def update( self ):
-        with self.lock:
-            # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
-            if self.showClassic:
-                stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
-
-                # WHEN the stardate calculation is performed is NOT necessarily synchronised with WHEN the stardate actually changes.
-                # Therefore update at a faster rate, say at one tenth of the period, but at most once per minute.
-                numberOfSecondsToNextUpdate = int( fractionalPeriod / 10 )
-                if numberOfSecondsToNextUpdate < 60:
-                    numberOfSecondsToNextUpdate = 60
-
-            else:
-                stardateIssue = None
-                stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardate2009Revised( datetime.datetime.utcnow() )
-
-                # For '2009 revised' the rollover only happens at midnight...so use that for the timer!        
-                now = datetime.datetime.utcnow()
-                oneSecondAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
-                numberOfSecondsToNextUpdate = int( ( oneSecondAfterMidnight - now ).total_seconds() )
-
-            self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
-            self.updateTimerID = GLib.timeout_add_seconds( numberOfSecondsToNextUpdate, self.update )
+        self.indicator.set_label( stardate.Stardate().toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
+        return numberOfSecondsToNextUpdate
 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        with self.lock:
-            # Based on the mouse wheel scroll event (irrespective of direction),
-            # cycle through the possible combinations of options for display in the stardate.
-            # If showing a 'classic' stardate and padding is not require, ignore the padding option.
-            if self.showClassic:
-                stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
-                paddingRequired = stardate.requiresPadding( stardateIssue, stardateInteger )
-                if paddingRequired:
-                    if self.showIssue and self.padInteger:
-                        self.showIssue = True
-                        self.padInteger = False
+        # Based on the mouse wheel scroll event (irrespective of direction),
+        # cycle through the possible combinations of options for display in the stardate.
+        # If showing a 'classic' stardate and padding is not required, ignore the padding option.
+        if self.showClassic:
+            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.Stardate().getStardateClassic( datetime.datetime.utcnow() )
+            paddingRequired = stardate.Stardate().requiresPadding( stardateIssue, stardateInteger )
+            if paddingRequired:
+                if self.showIssue and self.padInteger:
+                    self.showIssue = True
+                    self.padInteger = False
 
-                    elif self.showIssue and not self.padInteger:
-                        self.showIssue = False
-                        self.padInteger = True
+                elif self.showIssue and not self.padInteger:
+                    self.showIssue = False
+                    self.padInteger = True
 
-                    elif not self.showIssue and self.padInteger:
-                        self.showIssue = False
-                        self.padInteger = False
-
-                    else:
-                        self.showIssue = True
-                        self.padInteger = True
-                        self.showClassic = False # Shown all possible 'classic' options (when padding is required)...now move on to '2009 revised'.
+                elif not self.showIssue and self.padInteger:
+                    self.showIssue = False
+                    self.padInteger = False
 
                 else:
-                    if self.showIssue:
-                        self.showIssue = False
-
-                    else:
-                        self.showIssue = True
-                        self.showClassic = False # Shown all possible 'classic' options (when padding is not required)...now move on to '2009 revised'.
+                    self.showIssue = True
+                    self.padInteger = True
+                    self.showClassic = False # Shown all possible 'classic' options (when padding is required)...now move on to '2009 revised'.
 
             else:
-                self.showIssue = True
-                self.padInteger = True
-                self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
+                if self.showIssue:
+                    self.showIssue = False
 
-            GLib.idle_add( self.update )
+                else:
+                    self.showIssue = True
+                    self.showClassic = False # Shown all possible 'classic' options (when padding is not required)...now move on to '2009 revised'.
 
-            if self.saveConfigTimerID is not None:
-                GLib.source_remove( self.saveConfigTimerID )
+        else:
+            self.showIssue = True
+            self.padInteger = True
+            self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
-            self.saveConfigTimerID = GLib.timeout_add_seconds( 5, self.saveConfig ) # Defer the save to five seconds in the future - no point doing lots of saves when scrolling the mouse wheel like crazy!
+        GLib.idle_add( self.requestUpdate )
 
+        if self.saveConfigTimerID:
+            GLib.source_remove( self.saveConfigTimerID )
 
-    def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            GLib.source_remove( self.updateTimerID )
-            pythonutils.showAboutDialog(
-                [ IndicatorStardate.AUTHOR + " " + IndicatorStardate.WEBSITE ],
-                [ IndicatorStardate.AUTHOR + " " + IndicatorStardate.WEBSITE ],
-                IndicatorStardate.COMMENTS,
-                IndicatorStardate.AUTHOR,
-                IndicatorStardate.COPYRIGHT_START_YEAR,
-                IndicatorStardate.CREDITS,
-                _( "Credits" ),
-                Gtk.License.GPL_3_0,
-                IndicatorStardate.ICON,
-                INDICATOR_NAME,
-                IndicatorStardate.WEBSITE,
-                IndicatorStardate.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ),
-                IndicatorStardate.LOG,
-                _( "View the" ),
-                _( "text file." ),
-                _( "error log" ) )
-
-            self.lock.release()
-            GLib.idle_add( self.update )
+        # Defer the save; this avoids multiple saves when scrolling the mouse wheel like crazy!
+        self.saveConfigTimerID = GLib.timeout_add_seconds( 5, self.requestSaveConfig )
 
 
-    def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            GLib.source_remove( self.updateTimerID )
-            self._onPreferences( widget )
-            self.lock.release()
-            GLib.idle_add( self.update )
-
-
-    def _onPreferences( self, widget ):
-        grid = pythonutils.createGrid()
+    def onPreferences( self, dialog ):
+        grid = self.createGrid()
 
         showClassicCheckbox = Gtk.CheckButton( _( "Show stardate 'classic'" ) )
         showClassicCheckbox.set_active( self.showClassic )
@@ -209,39 +139,38 @@ class IndicatorStardate:
         showIssueCheckbox = Gtk.CheckButton( _( "Show ISSUE" ) )
         showIssueCheckbox.set_active( self.showIssue )
         showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
-        showIssueCheckbox.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        showIssueCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         showIssueCheckbox.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
         grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
 
         padIntegerCheckbox = Gtk.CheckButton( _( "Pad INTEGER" ) )
         padIntegerCheckbox.set_active( self.padInteger )
         padIntegerCheckbox.set_sensitive( showClassicCheckbox.get_active() )
-        padIntegerCheckbox.set_margin_left( pythonutils.INDENT_WIDGET_LEFT )
+        padIntegerCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
         grid.attach( padIntegerCheckbox, 0, 2, 1, 1 )
 
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorStardate.DESKTOP_FILE, logging ) )
+        autostartCheckbox.set_active( self.isAutoStart() )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 3, 1, 1 )
 
-        dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
-        dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorStardate.ICON )
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
             self.padInteger = padIntegerCheckbox.get_active()
             self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
-            self.saveConfig() # A save timer could still be in force, but let it run as the same global values will just be re-saved.
-            pythonutils.setAutoStart( IndicatorStardate.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+            self.setAutoStart( autostartCheckbox.get_active() )
 
-        dialog.destroy()
+            if self.saveConfigTimerID: # There may be a scheduled save from a recent mouse wheel scroll event.
+                GLib.source_remove( self.saveConfigTimerID )
+
+            GLib.idle_add( self.requestSaveConfig() )
 
 
     def onShowClassicCheckbox( self, source, showIssueCheckbox, padIntegerCheckbox ):
@@ -249,9 +178,7 @@ class IndicatorStardate:
         showIssueCheckbox.set_sensitive( source.get_active() )
 
 
-    def loadConfig( self ):
-        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
-
+    def loadConfig( self, config ):
         self.padInteger = config.get( IndicatorStardate.CONFIG_PAD_INTEGER, True )
         self.showClassic = config.get( IndicatorStardate.CONFIG_SHOW_CLASSIC, True )
         self.showIssue = config.get( IndicatorStardate.CONFIG_SHOW_ISSUE, True )
@@ -260,13 +187,11 @@ class IndicatorStardate:
     def saveConfig( self ):
         self.saveConfigTimerID = None # Reset the timer ID.
 
-        config = {
+        return {
             IndicatorStardate.CONFIG_PAD_INTEGER: self.padInteger,
             IndicatorStardate.CONFIG_SHOW_CLASSIC: self.showClassic,
             IndicatorStardate.CONFIG_SHOW_ISSUE: self.showIssue
         }
 
-        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
-
-if __name__ == "__main__": IndicatorStardate().main()
+IndicatorStardate().main()
