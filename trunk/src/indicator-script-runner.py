@@ -31,10 +31,10 @@ from gi.repository import GLib, Gtk
 from script import Info
 from threading import Thread
 
-import copy, indicator_base
+import copy, indicatorbase
 
 
-class IndicatorScriptRunner( indicator_base.IndicatorBase ):
+class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     CONFIG_HIDE_GROUPS = "hideGroups"
     CONFIG_SCRIPT_GROUP_DEFAULT = "scriptGroupDefault"
