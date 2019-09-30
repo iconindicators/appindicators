@@ -150,7 +150,7 @@ class IndicatorPunycode( indicator_base.IndicatorBase ):
                 Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
 
 
-    def onPreferences( self ):
+    def onPreferences( self, dialog ):
         grid = self.createGrid()
 
         label = Gtk.Label( _( "Input source" ) )
@@ -216,11 +216,7 @@ class IndicatorPunycode( indicator_base.IndicatorBase ):
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
-#TODO Put into baseclass?
-        dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.get_content_area().add( grid )
-        dialog.set_border_width( 5 )
-#         dialog.set_icon_name( IndicatorPunycode.ICON )#TODO Needed?
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -230,8 +226,6 @@ class IndicatorPunycode( indicator_base.IndicatorBase ):
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
             self.setAutoStart( IndicatorPunycode.DESKTOP_FILE, autostartCheckbox.get_active() )
             GLib.idle_add( self.requestSaveConfig() )
-
-        dialog.destroy()
 
 
     def loadConfig( self, config ):
