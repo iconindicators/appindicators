@@ -311,9 +311,17 @@ class IndicatorBase:
     def getLogging( self ): return logging
 
 
+#TODO Maybe wrap this into 
+#             GLib.idle_add( self.requestSaveConfig() )
+# so callers don't need to worry?
+# Look at the calls using timeout too.
+#Hang on...why does a save need GLib.idel_add?  It's NOT an update to the graphics but a background save.
+    def requestSaveConfig( self ): self.__saveConfig()
+
+
     # Read a dictionary of configuration from a JSON text file.
     def __loadConfig( self ):
-        configFile = self.__getConfigFile( self.indicatorName )
+        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.JSON_EXTENSION
         config = { }
         if os.path.isfile( configFile ):
             try:
@@ -328,18 +336,10 @@ class IndicatorBase:
         self.loadConfig( config ) # Call to implementation in indicator.
 
 
-#TODO Maybe wrap this into 
-#             GLib.idle_add( self.requestSaveConfig() )
-# so callers don't need to worry?
-# Look at the calls using timeout too.
-#Hang on...why does a save need GLib.idel_add?  It's NOT an update to the graphics but a background save.
-    def requestSaveConfig( self ): self.__saveConfig()
-
-
     # Write a dictionary of user configuration to a JSON text file.
     def __saveConfig( self ):
         config = self.saveConfig() # Call to implementation in indicator.
-        configFile = self.__getConfigFile( self.indicatorName )
+        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.JSON_EXTENSION
         success = True
         try:
             with open( configFile, "w" ) as f:
@@ -353,24 +353,16 @@ class IndicatorBase:
         return success
 
 
-    # Obtain the path to the user configuration JSON file, creating if necessary the underlying path.
-    #
-    # configBaseFile: The file name (without extension).
-    def __getConfigFile( self, configBaseFile ):
-        return self.__getUserDirectory( IndicatorBase.XDG_KEY_CONFIG, IndicatorBase.USER_DIRECTORY_CONFIG, self.indicatorName ) + \
-               "/" + \
-               configBaseFile + \
-               IndicatorBase.JSON_EXTENSION
+    # Return the full directory path to the user config directory for the current indicator.
+    def __getConfigDirectory( self ):
+        return self.__getUserDirectory( IndicatorBase.XDG_KEY_CONFIG, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
 
 
-    # Obtain the full path to a cache file, creating if necessary the underlying path.
+    # Obtain the full path to a cache file, creating the underlying path if necessary.
     #
     # filename: The file name.
-    def getCachePathname( self, filename ):
-        return self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName ) + "/" + filename
-#TODO This function I think is only used in the indicator on this day.
-#But can we call this function in the functions below to save building the path each time?
-#Maybe rename this function as it returns a path and file?
+    def getCachePath( self, filename ): return self.__getCacheDirectory() + filename
+
 
     # Remove a file from the cache.
     #
@@ -381,7 +373,7 @@ class IndicatorBase:
     # or
     #     ~/.cache/applicationBaseDirectory/fileName
     def removeFileFromCache( self, fileName ):
-        cacheDirectory = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
+        cacheDirectory = self.__getCacheDirectory()
         for file in os.listdir( cacheDirectory ):
             if file == fileName:
                 os.remove( cacheDirectory + "/" + file )
@@ -398,7 +390,7 @@ class IndicatorBase:
     #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     # and is older than the cache maximum age is discarded.
     def removeOldFilesFromCache( self, baseName, cacheMaximumAgeInHours ):
-        cacheDirectory = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
+        cacheDirectory = self.__getCacheDirectory()
         cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = cacheMaximumAgeInHours )
         for file in os.listdir( cacheDirectory ):
             if file.startswith( baseName ):
@@ -424,7 +416,7 @@ class IndicatorBase:
     #
     # Returns the binary object; None when no suitable cache file exists; None on error and logs.
     def readCacheBinary( self, baseName ):
-        cacheDirectory = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
+        cacheDirectory = self.__getCacheDirectory()
         data = None
         theFile = ""
         for file in os.listdir( cacheDirectory ):
@@ -458,8 +450,10 @@ class IndicatorBase:
     # Returns True on success; False otherwise.
     def writeCacheBinary( self, binaryData, baseName ):
         success = True
-        cacheFile = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName ) + cacheDirectory + "/" + \
-                    baseName + datetime.datetime.utcnow().strftime( IndicatorBase.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+        cacheFile = \
+            self.__getCacheDirectory() + \
+            baseName + \
+            datetime.datetime.utcnow().strftime( IndicatorBase.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
 
         try:
             with open( cacheFile, "wb" ) as f:
@@ -479,7 +473,7 @@ class IndicatorBase:
     #
     # Returns the text contents or None on error.
     def readCacheText( self, fileName ):
-        cacheFile = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName ) + "/" + fileName
+        cacheFile = self.__getCacheDirectory() + fileName
         text = None
         if os.path.isfile( cacheFile ):
             try:
@@ -503,7 +497,7 @@ class IndicatorBase:
     # text: The text to write.
     def writeCacheText( self, fileName, text ):
         success = True
-        cacheFile = self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName ) + "/" + fileName
+        cacheFile = self.__getCacheDirectory() + fileName
         try:
             with open( cacheFile, "w" ) as f:
                 f.write( text )
@@ -514,6 +508,11 @@ class IndicatorBase:
             success = False
 
         return success
+
+
+    # Return the full directory path to the user cache directory for the current indicator.
+    def __getCacheDirectory( self ):
+        return self.__getUserDirectory( IndicatorBase.XDG_KEY_CACHE, IndicatorBase.USER_DIRECTORY_CACHE, self.indicatorName )
 
 
     # Obtain (and create if not present) the directory for configuration, cache or similar.
@@ -530,10 +529,10 @@ class IndicatorBase:
     #    ~/.userBaseDirectory/applicationBaseDirectory
     def __getUserDirectory( self, XDGKey, userBaseDirectory, applicationBaseDirectory ):
         if XDGKey in os.environ:
-            directory = os.environ[ XDGKey ] + "/" + applicationBaseDirectory
+            directory = os.environ[ XDGKey ] + "/" + applicationBaseDirectory + "/"
 
         else:
-            directory = os.path.expanduser( "~" ) + "/" + userBaseDirectory + "/" + applicationBaseDirectory
+            directory = os.path.expanduser( "~" ) + "/" + userBaseDirectory + "/" + applicationBaseDirectory + "/"
 
         if not os.path.isdir( directory ):
             os.mkdir( directory )
@@ -551,11 +550,14 @@ class IndicatorBase:
 
     # Returns the result of calling the command.  On exception, returns None.
     def processGet( self, command ):
+        result = None
         try:
-            return subprocess.check_output( command, shell = True, universal_newlines = True )
+            result = subprocess.check_output( command, shell = True, universal_newlines = True )
 
         except subprocess.CalledProcessError:
-            return None
+            result = None
+
+        return result
 
 
 # Log file handler which truncates the file when the file size limit is reached.
