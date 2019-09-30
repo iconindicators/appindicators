@@ -65,6 +65,7 @@ def processGet( command ):
         return None
 
 
+#TODO STILL NEEDED?
 # Returns True if a number; False otherwise.
 def isNumber( numberAsString ):
     try:
@@ -74,6 +75,7 @@ def isNumber( numberAsString ):
         return False
 
 
+#TODO STILL NEEDED?
 # Return the full path and name of the executable for the current terminal; None on failure.
 def getTerminal():
     terminal = processGet( "which " + TERMINAL_GNOME )
@@ -92,6 +94,7 @@ def getTerminal():
     return terminal
 
 
+#TODO STILL NEEDED?
 # Return the execution flag for the given terminal; None on failure. 
 def getTerminalExecutionFlag( terminal ): 
     executionFlag = None
@@ -150,16 +153,19 @@ def showOKCancel( parent, message, title ):
     return response
 
 
+#TODO STILL NEEDED?
 # Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
 def getTextViewText( textView ): return textView.get_buffer().get_text( textView.get_buffer().get_start_iter(), textView.get_buffer().get_end_iter(), True )
 
 
+#TODO STILL NEEDED?
 # Listens to checkbox events and toggles the visibility of the widgets.
 def onCheckbox( self, *widgets ):
     for widget in widgets:
         widget.set_sensitive( self.get_active() )
 
 
+#TODO STILL NEEDED?
 # Listens to radio events and toggles the visibility of the widgets.
 def onRadio( self, *widgets ):
     for widget in widgets:
@@ -195,9 +201,11 @@ def createPreferencesAboutQuitMenuItems( menu, prependSeparator, onPreferencesHa
     menu.append( menuItem )
 
 
+#TODO STILL NEEDED?
 def getThemeName(): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
+#TODO STILL NEEDED?
 #TODO Verify this works for indicator lunar still.  
 #TODO Need a header comment specifying the expectation that a tag with the colour is present in the SVG file.
 def getThemeColour( iconName, logging ):
