@@ -112,7 +112,7 @@ class IndicatorScriptRunner( indicator_base.IndicatorBase ):
         Thread( target = self.processCall, args = ( command, ) ).start()
 
 
-    def onPreferences( self ):
+    def onPreferences( self, dialog ):
         self.defaultScriptGroupCurrent = self.scriptGroupDefault
         self.defaultScriptNameCurrent = self.scriptNameDefault
 
@@ -283,10 +283,7 @@ class IndicatorScriptRunner( indicator_base.IndicatorBase ):
         scriptNameTreeView.get_selection().connect( "changed", self.onScriptName, scriptGroupComboBox, directoryEntry, commandTextView, copyOfScripts )
         self.populateScriptGroupCombo( copyOfScripts, scriptGroupComboBox, scriptNameTreeView, None, None )
 
-        dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( notebook, True, True, 0 )
-        dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorScriptRunner.ICON )
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -303,8 +300,6 @@ class IndicatorScriptRunner( indicator_base.IndicatorBase ):
 
             self.setAutoStart( autostartCheckbox.get_active() )
             GLib.idle_add( self.requestSaveConfig() )
-
-        dialog.destroy()
 
 
     def onDisplayCheckboxes( self, source, radioShowScriptsSubmenu, hideGroupsCheckbox ):
