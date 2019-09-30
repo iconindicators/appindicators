@@ -123,7 +123,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         self.saveConfigTimerID = GLib.timeout_add_seconds( 5, self.requestSaveConfig )
 
 
-    def onPreferences( self ):
+    def onPreferences( self, dialog ):
         grid = self.createGrid()
 
         showClassicCheckbox = Gtk.CheckButton( _( "Show stardate 'classic'" ) )
@@ -158,11 +158,7 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 3, 1, 1 )
 
-#TODO Can this stuff be created in the base class and then passed in? 
-        dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
-        dialog.set_border_width( 5 )
-#         dialog.set_icon_name( self.icon ) #TODO Need to set an icon?
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -175,8 +171,6 @@ class IndicatorStardate( indicator_base.IndicatorBase ):
                 GLib.source_remove( self.saveConfigTimerID )
 
             GLib.idle_add( self.requestSaveConfig() )
-
-        dialog.destroy()
 
 
     def onShowClassicCheckbox( self, source, showIssueCheckbox, padIntegerCheckbox ):
