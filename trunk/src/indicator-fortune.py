@@ -130,7 +130,7 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
         Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), self.icon ).show()
 
 
-    def onPreferences( self ):
+    def onPreferences( self, dialog ):
         notebook = Gtk.Notebook()
 
         # Fortune file.
@@ -274,11 +274,7 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-#TODO Can this stuff be created in the base class and then passed in? 
-        dialog = Gtk.Dialog( _( "Preferences" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( notebook, True, True, 0 )
-        dialog.set_border_width( 5 )
-#         dialog.set_icon_name( self.icon ) #TODO Need to set an icon?
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -305,8 +301,6 @@ class IndicatorFortune( indicator_base.IndicatorBase ):
 
             self.setAutoStart( autostartCheckbox.get_active() )
             GLib.idle_add( self.requestSaveConfig() )
-
-        dialog.destroy()
 
 
     def onFortuneReset( self, button, treeview ):
