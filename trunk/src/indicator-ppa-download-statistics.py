@@ -923,9 +923,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
               "&exact_match=false&ordered=false&binary_name=" + filter
 
-#TODO might need this for testing.
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/bionic/amd64&status=Published&exact_match=false&ordered=false&binary_name=
-
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
         publishedBinaryCounter = 0
@@ -949,35 +946,33 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
-#TODO Maybe make the maxworkers at most 5?
-            maxWorkers = 10 if totalPublishedBinaries < 10 else 5 # If the total is fewer than 10, grab all in one batch, otherwise limit to 5 concurrent requests.
-            with concurrent.futures.ThreadPoolExecutor( max_workers = maxWorkers ) as executor:
-                { executor.submit( getDownloadCount, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
+            with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
+                { executor.submit( self.getDownloadCount, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
 
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
 
 
-def getDownloadCount( ppa, publishedBinaries, i ):
-    if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # Use the status to cancel downloads if an error occurred.
-        try:
-            indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
-            packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
-            url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
+    def getDownloadCount( self, ppa, publishedBinaries, i ):
+        if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # Use the status to cancel downloads if an error occurred.
+            try:
+                indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
+                packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
+                url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
 
-            downloadCount = json.loads( urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
-            if str( downloadCount ).isnumeric():
-                packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
-                packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
-                architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
-                ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
+                downloadCount = json.loads( urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+                if str( downloadCount ).isnumeric():
+                    packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
+                    packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
+                    architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
+                    ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
 
-            else:
+                else:
+                    ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+
+            except Exception as e:
+                self.getLogging().exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-
-        except Exception as e:
-            self.getLogging().exception( e )
-            ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
 
 IndicatorPPADownloadStatistics().main()
