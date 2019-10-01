@@ -642,7 +642,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             utcNow = datetime.datetime.utcnow() #TODO Test
     
             # Update frontend.
-            self.updateMenu()
+            self.updateMenu( menu )
             self.updateIconAndLabel()
     
     #TODO Testing
@@ -672,7 +672,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     #
     # Returns a dictionary (may be empty).
     def updateData( self, cacheBaseName, cacheMaximumAgeHours, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
-        data = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Either valid or None.
+        data = self.readCacheBinary( cacheBaseName ) # Either valid or None.
 
 #TODO Start of temporary hack...
 # Cache data formats changed between version 80 and 81.
@@ -690,11 +690,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # End of hack!
 
         if data is None:
-            data = downloadDataFunction( dataURL, logging )
+            data = downloadDataFunction( dataURL, self.getLogging() )
             if magnitudeFilterFunction is not None:
                 data = magnitudeFilterFunction( data, astroPyephem.MAGNITUDE_MAXIMUM )
 
-            pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBaseName, logging )
+            self.writeCacheBinary( data, cacheBaseName )
 
         return data
 
@@ -728,9 +728,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.Comet )
         self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
         self.updateMenuSatellites( menu )
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
-        self.indicator.set_menu( menu )
-        menu.show_all()
 
 
     def updateIconAndLabel( self ):
@@ -865,8 +862,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
+            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
+            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Next Phases" ) ) )
 
             # Determine which phases occur by date rather than using the phase calculated.
             # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
@@ -877,7 +874,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_NEW, ) ], _( "New: " ), key + ( astroPyephem.DATA_NEW, ) ] )
 
             nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
-            indent = pythonutils.indent( 1, 2 )
+            indent = self.indent( 1, 2 )
             for dateTime, displayText, key in nextPhases:
                 subMenu.append( Gtk.MenuItem( indent + displayText + self.getDisplayData( key ) ) )
 
@@ -897,12 +894,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def updateEclipseMenu( self, menu, astronomicalBodyType, nameTag ):
         key = ( astronomicalBodyType, nameTag )
-        menu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Eclipse" ) ) )
-        menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_DATE_TIME, ) ) ) )
+        menu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Eclipse" ) ) )
+        menu.append( Gtk.MenuItem( self.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_DATE_TIME, ) ) ) )
         latitude = self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_LATITUDE, ) )
         longitude = self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_LONGITUDE, ) )
-        menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
-        menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_TYPE, ) ) ) )
+        menu.append( Gtk.MenuItem( self.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
+        menu.append( Gtk.MenuItem( self.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_TYPE, ) ) ) )
 
 
     def updateMenuPlanets( self, menu ):
@@ -917,7 +914,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name, translatedName in planets:
-                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
+                subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + translatedName ) )
                 self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 1, 2 )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator ) 
@@ -938,7 +935,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menuItem.set_submenu( subMenu )
             for name, translatedName in stars:
                 url = IndicatorLunar.STAR_SEARCH_URL + str( IndicatorLunar.STARS_TO_HIPPARCOS_IDENTIFIER[ name ] )
-                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
+                menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + translatedName )
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
                 self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Star, name, 1, 2, url )
@@ -964,7 +961,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menuItem.set_submenu( subMenu )
             for name in sorted( bodies ):
                 url = self.getCometMinorPlanetOnClickURL( name, astronomicalBodyType )
-                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name )
+                menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + name )
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
                 self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2, url )
@@ -1012,7 +1009,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def updateCommonMenu( self, menu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
         key = ( astronomicalBodyType, nameTag )
-        indent = pythonutils.indent( indentUnity, indentGnomeShell )
+        indent = self.indent( indentUnity, indentGnomeShell )
 
         if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
             self.createMenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), onClickURL, menu )
@@ -1079,25 +1076,25 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                   replace( IndicatorLunar.SATELLITE_TAG_NUMBER, number ). \
                   replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() )
 
-            menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + menuText )
+            menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + menuText )
             menuItem.set_name( url )
             subMenu.append( menuItem )
 
             key = ( astroPyephem.AstronomicalBodyType.Satellite, number )
             if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data and key + ( astroPyephem.DATA_RISE_AZIMUTH, ) in self.data:
-                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Rise" ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Set" ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 1, 2 ) + _( "Rise" ), url, subMenu )
+                self.createMenuItem( self.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 1, 2 ) + _( "Set" ), url, subMenu )
+                self.createMenuItem( self.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ), url, subMenu )
 
             elif key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
 
             else:
-                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 1, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ), url, subMenu )
 
             separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator ) 
@@ -1185,7 +1182,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         if displayData is None:
             displayData = "" # Better to show nothing than let None slip through and crash.
-            logging.error( "Unknown key: " + key )
+            self.getLogging().error( "Unknown key: " + key )
 
         return displayData
 
@@ -1207,7 +1204,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         width = 100
         height = 100
         radius = float( width / 2 ) * 0.8 # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
-        colour = pythonutils.getThemeColour( IndicatorLunar.ICON, logging )
+        colour = self.getThemeColour( self.icon )
 
         if illuminationPercentage == 0 or illuminationPercentage == 100:
             svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
@@ -1242,15 +1239,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 f.close()
 
         except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing: " + svgFilename )
+            self.getLogging().exception( e )
+            self.getLogging().error( "Error writing: " + svgFilename )
 
 
     def onPreferences( self, dialgo ):
         notebook = Gtk.Notebook()
 
         # Icon.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -1331,7 +1328,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         notebook.append_page( grid, Gtk.Label( _( "Icon" ) ) )
 
         # Menu.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         hideBodiesBelowTheHorizonCheckbox = Gtk.CheckButton( _( "Hide bodies below the horizon" ) )
         hideBodiesBelowTheHorizonCheckbox.set_active( self.hideBodiesBelowHorizon )
@@ -1521,7 +1518,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # OSD (satellite and full moon).
         notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         showSatelliteNotificationCheckbox = Gtk.CheckButton( _( "Satellite rise" ) )
         showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
@@ -1529,7 +1526,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         grid.attach( showSatelliteNotificationCheckbox, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+        box.set_margin_left( self.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Summary" ) )
         label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
@@ -1553,10 +1550,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( satelliteNotificationSummaryText, True, True, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
-        showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteNotificationSummaryText )
+        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, label, satelliteNotificationSummaryText )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+        box.set_margin_left( self.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Message" ) + "\n \n \n \n \n " ) # Padding to ensure the textview for the message text is not too small.  
         label.set_valign( Gtk.Align.START )
@@ -1585,7 +1582,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( scrolledWindow, True, True, 0 )
         grid.attach( box, 0, 2, 1, 1 )
 
-        showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, scrolledWindow )
+        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, label, scrolledWindow )
 
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
@@ -1597,7 +1594,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             "mock text." ) )
         grid.attach( test, 0, 3, 1, 1 )
 
-        showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
+        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, test, test )
 
         showWerewolfWarningCheckbox = Gtk.CheckButton( _( "Werewolf warning" ) )
         showWerewolfWarningCheckbox.set_margin_top( 10 )
@@ -1606,7 +1603,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         grid.attach( showWerewolfWarningCheckbox, 0, 4, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+        box.set_margin_left( self.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Summary" ) )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
@@ -1619,10 +1616,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( werewolfNotificationSummaryText, True, True, 0 )
         grid.attach( box, 0, 5, 1, 1 )
 
-        showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationSummaryText )
+        showWerewolfWarningCheckbox.connect( "toggled", self.onCheckbox, label, werewolfNotificationSummaryText )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+        box.set_margin_left( self.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Message" ) + "\n \n " ) # Padding to ensure the textview for the message text is not too small.   
         label.set_valign( Gtk.Align.START )
@@ -1641,7 +1638,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( scrolledWindow, True, True, 0 )
         grid.attach( box, 0, 6, 1, 1 )
 
-        showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationMessageText )
+        showWerewolfWarningCheckbox.connect( "toggled", self.onCheckbox, label, werewolfNotificationMessageText )
 
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
@@ -1650,12 +1647,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         test.set_tooltip_text( _( "Show the notification using the current summary/message." ) )
         grid.attach( test, 0, 7, 1, 1 )
 
-        showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
+        showWerewolfWarningCheckbox.connect( "toggled", self.onCheckbox, test, test )
 
         notebook.append_page( grid, Gtk.Label( _( "Notifications" ) ) )
 
         # Location.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -1709,7 +1706,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorLunar.DESKTOP_FILE, logging ) )
+        autostartCheckbox.set_active( self.isAutoStart() )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
@@ -1725,28 +1722,28 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             cityValue = city.get_active_text()
             if cityValue == "":
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ), INDICATOR_NAME )
+                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
-            if latitudeValue == "" or not pythonutils.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Latitude must be a number between 90 and -90 inclusive." ), INDICATOR_NAME )
+            if latitudeValue == "" or not self.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
+                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "Latitude must be a number between 90 and -90 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
-            if longitudeValue == "" or not pythonutils.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Longitude must be a number between 180 and -180 inclusive." ), INDICATOR_NAME )
+            if longitudeValue == "" or not self.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
+                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "Longitude must be a number between 180 and -180 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
-            if elevationValue == "" or not pythonutils.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number between 0 and 10000 inclusive." ), INDICATOR_NAME )
+            if elevationValue == "" or not self.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
+                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number between 0 and 10000 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 elevation.grab_focus()
                 continue
@@ -1790,18 +1787,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
-            self.satelliteNotificationMessage = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, pythonutils.getTextViewText( satelliteNotificationMessageText ) )
+            self.satelliteNotificationMessage = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, self.getTextViewText( satelliteNotificationMessageText ) )
 
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningSummary = werewolfNotificationSummaryText.get_text()
-            self.werewolfWarningMessage = pythonutils.getTextViewText( werewolfNotificationMessageText )
+            self.werewolfWarningMessage = self.getTextViewText( werewolfNotificationMessageText )
 
             self.city = cityValue
             self.latitude = float( latitudeValue )
             self.longitude = float( longitudeValue )
             self.elevation = float( elevationValue )
 
-            pythonutils.setAutoStart( IndicatorLunar.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+            self.setAutoStart( autostartCheckbox.get_active() )
             GLib.idle_add( self.requestSaveConfig )
             break
 
@@ -1972,7 +1969,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def onTestNotificationClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
         summary = summaryEntry.get_text()
-        message = pythonutils.getTextViewText( messageTextView )
+        message = self.getTextViewText( messageTextView )
 
         if isFullMoon:
             if not os.path.exists( IndicatorLunar.ICON_FULL_MOON ):
@@ -2032,7 +2029,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def getDefaultCity( self ):
         try:
-            timezone = pythonutils.processGet( "cat /etc/timezone" )
+            timezone = self.processGet( "cat /etc/timezone" )
             theCity = None
             cities = astroPyephem.getCities()
             for city in cities:
@@ -2044,8 +2041,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 theCity = cities[ 0 ]
 
         except Exception as e:
-            logging.exception( e )
-            logging.error( "Error getting default city." )
+            self.getLogging().exception( e )
+            self.getLogging().error( "Error getting default city." )
             theCity = cities[ 0 ]
 
         return theCity
