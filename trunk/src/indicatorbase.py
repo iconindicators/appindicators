@@ -243,6 +243,12 @@ class IndicatorBase:
         return response
 
 
+    # Listens to checkbox events and toggles the visibility of the widgets.
+    def onCheckbox( self, *widgets ):
+        for widget in widgets:
+            widget.set_sensitive( self.get_active() )
+
+ 
     def isUbuntu1604( self ): return self.processGet( "lsb_release -sc" ).strip() == "xenial"
 
 
@@ -315,6 +321,27 @@ class IndicatorBase:
 
         except Exception as e:
             logging.exception( e )
+
+
+    def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
+
+
+#TODO Verify this works for indicator lunar still.  
+#TODO Need a header comment specifying the expectation that a tag with the colour is present in the SVG file.
+    def getThemeColour( self, iconName ):
+        iconFilenameForCurrentTheme = "/usr/share/icons/" + self.getThemeName() + "/scalable/apps/" + iconName + ".svg"
+        try:
+            with open( iconFilenameForCurrentTheme, "r" ) as file:
+                data = file.read()
+                index = data.find( "style=\"fill:#" )
+                themeColour = data[ index + 13 : index + 19 ]
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error reading SVG icon: " + iconFilenameForCurrentTheme )
+            themeColour = "fff200" # Default to hicolor.
+
+        return themeColour
 
 
     def getLogging( self ): return logging

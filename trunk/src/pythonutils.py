@@ -158,7 +158,6 @@ def showOKCancel( parent, message, title ):
 def getTextViewText( textView ): return textView.get_buffer().get_text( textView.get_buffer().get_start_iter(), textView.get_buffer().get_end_iter(), True )
 
 
-#TODO STILL NEEDED?
 # Listens to checkbox events and toggles the visibility of the widgets.
 def onCheckbox( self, *widgets ):
     for widget in widgets:
@@ -201,11 +200,9 @@ def createPreferencesAboutQuitMenuItems( menu, prependSeparator, onPreferencesHa
     menu.append( menuItem )
 
 
-#TODO STILL NEEDED?
 def getThemeName(): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
-#TODO STILL NEEDED?
 #TODO Verify this works for indicator lunar still.  
 #TODO Need a header comment specifying the expectation that a tag with the colour is present in the SVG file.
 def getThemeColour( iconName, logging ):
