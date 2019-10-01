@@ -628,15 +628,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             # Update backend.  Returned object is a dictionary:
             #    Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             #    Value is the calculated astronomical data as a string.
-            self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
-                                                          self.latitude, self.longitude, self.elevation,
-                                                          self.planets,
-                                                          self.stars,
-                                                          self.satellites, self.satelliteData,
-                                                          self.comets, self.cometData,
-                                                          self.minorPlanets, self.minorPlanetData,
-                                                          self.magnitude,
-                                                          self.hideBodiesBelowHorizon )
+            self.data = astroPyephem.getAstronomicalInformation(
+                datetime.datetime.utcnow(),
+                self.latitude, self.longitude, self.elevation,
+                self.planets,
+                self.stars,
+                self.satellites, self.satelliteData,
+                self.comets, self.cometData,
+                self.minorPlanets, self.minorPlanetData,
+                self.magnitude,
+                self.hideBodiesBelowHorizon )
     
             print( "Update backend:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
             utcNow = datetime.datetime.utcnow() #TODO Test
@@ -2123,16 +2124,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def saveConfig( self ):
         if self.cometsAddNew:
             comets = [ ]
+
         else:
             comets = self.comets # Only write out the list of comets if the user elects to not add new.
 
         if self.minorPlanetsAddNew:
             minorPlanets = [ ]
+
         else:
             minorPlanets = self.minorPlanets # Only write out the list of minor planets if the user elects to not add new.
 
         if self.satellitesAddNew:
             satellites = [ ]
+
         else:
             satellites = self.satellites # Only write out the list of satellites if the user elects to not add new.
 
