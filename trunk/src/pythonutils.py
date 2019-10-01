@@ -65,7 +65,6 @@ def processGet( command ):
         return None
 
 
-#TODO STILL NEEDED?
 # Returns True if a number; False otherwise.
 def isNumber( numberAsString ):
     try:
@@ -153,7 +152,6 @@ def showOKCancel( parent, message, title ):
     return response
 
 
-#TODO STILL NEEDED?
 # Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
 def getTextViewText( textView ): return textView.get_buffer().get_text( textView.get_buffer().get_start_iter(), textView.get_buffer().get_end_iter(), True )
 
