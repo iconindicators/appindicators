@@ -25,17 +25,17 @@
 #     http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 
 
-#TODO Rename all indicators to use _ instead of -?   As Oleg.
-#Means the config files will also need to be renamed.
-
-
-#Pylint
+# TODO Consider using Pylint from a script.
 # https://pythonspeed.com/articles/pylint/
 # https://pylint.readthedocs.io/en/latest/technical_reference/features.html
 # https://github.com/datawire/quark/blob/master/.pylintrc
-
-
-#TODO Rename back to indicator-base?  Ask Oleg how strict I shoud be.
+# https://stackoverflow.com/questions/4341746/how-do-i-disable-a-pylint-warning
+# https://pep8.readthedocs.io/en/release-1.7.x/intro.html#error-codes
+# https://stackoverflow.com/questions/43948647/pylint-configuration-to-disable-certain-warnings
+# https://docs.pylint.org/en/1.6.0/faq.html
+# http://pylint.pycqa.org/en/latest/technical_reference/features.html#pylint-checkers-options-and-switches
+# http://pylint.pycqa.org/en/latest/index.html
+# http://pylint.pycqa.org/en/latest/tutorial.html#the-next-step
 
 
 #TODO Search for
