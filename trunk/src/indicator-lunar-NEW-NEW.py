@@ -111,8 +111,7 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import GLib, Gtk, Notify
-from threading import Timer
-import astroPyephem, datetime, eclipse, indicatorbase, glob, locale, math, orbitalelement, os, re, tempfile, threading, twolineelement, webbrowser
+import astroPyephem, datetime, eclipse, indicatorbase, glob, locale, math, orbitalelement, os, re, tempfile, twolineelement, webbrowser
 
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
@@ -141,7 +140,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
 #TODO Put back to 5
-    START_UP_DELAY_IN_SECONDS = 1 # Used to delay the update function which potentially takes a long time.
+    START_UP_DELAY_IN_SECONDS = 1 # Used to delay the update function which must start AFTER the indicator has fully initialised.
 
 #TODO Instead of this temp dir thing...just use the user cache?
     ICON_BASE_PATH = tempfile.gettempdir()
