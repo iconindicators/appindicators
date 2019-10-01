@@ -68,7 +68,7 @@ class IndicatorBase:
         self.comments = comments
 
         self.desktopFile = self.indicatorName + ".py.desktop"
-        self.icon = self.indicatorName
+        self.icon = self.indicatorName # Located in /usr/share/icons
         self.log = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
         self.website = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
 
