@@ -25,10 +25,6 @@
 #     http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 
 
-#TODO Search for
-#         is not None
-# and see if we can replace with 'if x' rather than 'if x is not None'. 
-
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
