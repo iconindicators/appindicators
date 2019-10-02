@@ -170,7 +170,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             if self.saveConfigTimerID: # There may be a scheduled save from a recent mouse wheel scroll event.
                 GLib.source_remove( self.saveConfigTimerID )
 
-            GLib.idle_add( self.requestSaveConfig() )
+            self.requestSaveConfig()
 
 
     def onShowClassicCheckbox( self, source, showIssueCheckbox, padIntegerCheckbox ):
