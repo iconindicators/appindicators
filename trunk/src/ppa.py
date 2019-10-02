@@ -79,9 +79,12 @@ class PPA( object ):
     # Returns a key of the form 'PPA User | PPA Name | Series | Architecture' or 'PPA User | PPA Name' if series/architecture are undefined. 
     def getKey( self ):
         if self.series is None or self.architecture is None:
-            return str( self.user ) + " | " + str( self.name )
+            key = str( self.user ) + " | " + str( self.name )
 
-        return str( self.user ) + " | " + str( self.name ) + " | " + str( self.series ) + " | " + str( self.architecture )
+        else:
+            key = str( self.user ) + " | " + str( self.name ) + " | " + str( self.series ) + " | " + str( self.architecture )
+
+        return key
 
 
     def addPublishedBinary( self, publishedBinary ): self.publishedBinaries.append( publishedBinary )
