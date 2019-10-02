@@ -64,20 +64,20 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         self.dateTimeOfLastNotification = datetime.datetime.now()
 
         self.requestMouseWheelScrollEvents()
-        self.firstRun = True
 
 
     def update( self, menu ):
-        if self.firstRun and self.isVBoxManageInstalled():
+        if self.startingUp and self.isVBoxManageInstalled():
             Thread( target = self.autoStartVirtualMachines ).start()
-            self.firstRun = False
 
         if self.isVBoxManageInstalled():
             self.buildMenu( menu )
 
         else:
-            menu.insert( Gtk.MenuItem( _( "(VirtualBox™ is not installed)" ) ), 0 )
-            
+            menu.append( Gtk.MenuItem( _( "(VirtualBox™ is not installed)" ) ) )
+
+        utcNow = datetime.datetime.utcnow() #TODO Test
+
         return int( 60 * self.refreshIntervalInMinutes )
 
 
@@ -511,7 +511,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             self.virtualMachinePreferences.clear()
             self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
             self.setAutoStart( autostartCheckbox.get_active() )
-            GLib.idle_add( self.requestSaveConfig() )
+            GLib.idle_add( self.requestSaveConfig )
 
 
     def updateVirtualMachinePreferences( self, store, treeiter ):
