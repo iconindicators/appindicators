@@ -329,11 +329,6 @@ class IndicatorBase:
     def getLogging( self ): return logging
 
 
-#TODO Maybe wrap this into 
-#             GLib.idle_add( self.requestSaveConfig() )
-# so callers don't need to worry?
-# Look at the calls using timeout too.
-#Hang on...why does a save need GLib.idel_add?  It's NOT an update to the graphics but a background save.
     def requestSaveConfig( self ): self.__saveConfig()
 
 
