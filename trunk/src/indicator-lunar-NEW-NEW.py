@@ -1799,7 +1799,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.elevation = float( elevationValue )
 
             self.setAutoStart( autostartCheckbox.get_active() )
-            GLib.idle_add( self.requestSaveConfig )
+            self.requestSaveConfig()
             break
 
 
