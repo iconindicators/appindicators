@@ -19,12 +19,6 @@
 # Application indicator which displays PPA download statistics.
 
 
-# References:
-#     http://launchpad.net/+apidoc
-#     http://help.launchpad.net/API/launchpadlib
-#     http://help.launchpad.net/API/Hacking
-
-
 INDICATOR_NAME = "indicator-ppa-download-statistics"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -881,6 +875,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #    {
     #    ,... 
     #}
+    #
+    # References:
+    #     http://launchpad.net/+apidoc
+    #     http://help.launchpad.net/API/launchpadlib
+    #     http://help.launchpad.net/API/Hacking
     def getPPADownloadStatistics( self ):
         for ppa in self.ppas:
             filters = [ "" ] # To match all published binary names an empty string can be used.
