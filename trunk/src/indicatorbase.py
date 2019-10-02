@@ -41,6 +41,9 @@ class IndicatorBase:
     CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
     INDENT_WIDGET_LEFT = 20
     JSON_EXTENSION = ".json"
+    TERMINAL_GNOME = "gnome-terminal"
+    TERMINAL_LXDE = "lxterminal"
+    TERMINAL_XFCE = "xfce4-terminal"
     URL_TIMEOUT_IN_SECONDS = 2
 
 
@@ -328,6 +331,40 @@ class IndicatorBase:
 
 
     def getLogging( self ): return logging
+
+
+    # Return the full path and name of the executable for the current terminal; None on failure.
+    def getTerminal( self ):
+        terminal = self.processGet( "which " + IndicatorBase.TERMINAL_GNOME )
+        if terminal is None:
+            terminal = self.processGet( "which " + IndicatorBase.TERMINAL_LXDE )
+
+            if terminal is None:
+                terminal = self.processGet( "which " + IndicatorBase.TERMINAL_XFCE )
+
+        if terminal is not None:
+            terminal = terminal.strip()
+
+        if terminal == "":
+            terminal = None
+
+        return terminal
+
+
+    # Return the execution flag for the given terminal; None on failure. 
+    def getTerminalExecutionFlag( self, terminal ): 
+        executionFlag = None
+        if terminal is not None:
+            if terminal.endswith( IndicatorBase.TERMINAL_GNOME ):
+                executionFlag = "--"
+
+            elif terminal.endswith( IndicatorBase.TERMINAL_LXDE ):
+                executionFlag = "-e"
+
+            elif terminal.endswith( IndicatorBase.TERMINAL_XFCE ):
+                executionFlag = "-x"
+
+        return executionFlag
 
 
     def requestSaveConfig( self ): self.__saveConfig()
