@@ -340,7 +340,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             self.menuItemTideFormat = tideFormat.get_text()
             self.menuItemTideFormatSansTime = tideFormatSansTime.get_text()
             self.setAutoStart( autostartCheckbox.get_active() )
-            GLib.idle_add( self.requestSaveConfig() )
+            self.requestSaveConfig()
 
 
     def onCountry( self, countriesComboBox, portsListStore, portsTree ):
