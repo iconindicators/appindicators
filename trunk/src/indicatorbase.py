@@ -84,12 +84,10 @@ class IndicatorBase:
             format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", 
             level = logging.DEBUG, 
             handlers = [ TruncatedFileHandler( self.log ) ] )
+
         Notify.init( self.indicatorName )
 
-        self.indicator = AppIndicator3.Indicator.new(
-            self.indicatorName, 
-            self.indicatorName, 
-            AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName,  AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.__loadConfig()
@@ -136,8 +134,7 @@ class IndicatorBase:
         self.indicator.set_menu( menu )
 
 
-    def requestMouseWheelScrollEvents( self ):
-        self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
+    def requestMouseWheelScrollEvents( self ): self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
 
 
     def __onMouseWheelScroll( self, indicator, delta, scrollDirection ):
