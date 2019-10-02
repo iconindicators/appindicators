@@ -67,16 +67,14 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
-        if self.startingUp and self.isVBoxManageInstalled():
-            Thread( target = self.autoStartVirtualMachines ).start()
-
         if self.isVBoxManageInstalled():
             self.buildMenu( menu )
 
         else:
             menu.append( Gtk.MenuItem( _( "(VirtualBox™ is not installed)" ) ) )
 
-        utcNow = datetime.datetime.utcnow() #TODO Test
+        if self.startingUp and self.isVBoxManageInstalled():
+            Thread( target = self.autoStartVirtualMachines ).start()
 
         return int( 60 * self.refreshIntervalInMinutes )
 
@@ -85,6 +83,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         virtualMachines = self.getVirtualMachines()
         if len( virtualMachines ) == 0:
             menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
+
         else:
             runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
             if self.showSubmenu:
@@ -101,13 +100,16 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                         menuItem.set_submenu( subMenu )
                         stack.append( currentMenu )
                         currentMenu = subMenu
+
                     else:
                         currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, self.indent( 0, virtualMachine.getIndent() ), virtualMachine.getUUID() in runningVMUUIDs ) )
+
             else:
                 for virtualMachine in virtualMachines:
                     indent = self.indent( virtualMachine.getIndent(), virtualMachine.getIndent() )
                     if virtualMachine.isGroup():
                         menu.append( Gtk.MenuItem( indent + virtualMachine.getGroupName() ) )
+
                     else:
                         menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, virtualMachine.getUUID() in runningVMUUIDs ) )
 
@@ -121,6 +123,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         if isRunning:
             menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
             menuItem.set_active( True )
+
         else:
             menuItem = Gtk.MenuItem( indent + virtualMachine.getName() )
 
@@ -140,11 +143,13 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
         if uuid in runningVMUUIDs:
             self.bringWindowToFront( runningVMNames[ runningVMUUIDs.index( uuid ) ] )
+
         else:
             result = self.processGet( "VBoxManage list vms | grep " + uuid )
             if result is None or uuid not in result:
                 message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
                 Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+
             else:
                 self.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
                 delay = 10 # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
@@ -165,6 +170,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                     windowID = line[ 0 : line.find( " " ) ]
                     self.processCall( "wmctrl -i -a " + windowID )
                     break
+
         else:
             message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window of the same name." ).format( virtualMachineName )
             summary = _( "Warning" )
@@ -190,6 +196,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 index = ( runningVMUUIDs.index( self.scrollUUID ) + 1 ) % len( runningVMUUIDs )
                 self.scrollUUID = runningVMUUIDs[ index ]
                 self.scrollDirectionIsUp = True
+
             else:
                 index = ( runningVMUUIDs.index( self.scrollUUID ) - 1 ) % len( runningVMUUIDs )
                 self.scrollUUID = runningVMUUIDs[ index ]
@@ -214,6 +221,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         if windowID is None or windowID == "":
             self.processCall( virtualBoxExecutable + " &" )
+
         else:
             self.processCall( "wmctrl -ia " + windowID )
 
@@ -229,6 +237,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                     info = line[ 1 : -1 ].split( "\" {" )
                     names.append( info[ 0 ] )
                     uuids.append( info[ 1 ] )
+
                 except:
                     pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
@@ -243,6 +252,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             if version:
                 if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
                     virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPriorTo4dot3()
+
                 else:
                     virtualMachinesFromConfig = self.getVirtualMachinesFromConfig4dot3OrGreater()
 
@@ -275,6 +285,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                     info = line[ 1 : -1 ].split( "\" {" )
                     virtualMachine = virtualmachine.Info( info[ 0 ], False, info[ 1 ], 0 )
                     virtualMachines.append( virtualMachine )
+
                 except:
                     pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
@@ -302,6 +313,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         configFile = None
         if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER ):
             configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER
+
         elif os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 ):
             configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3
 
@@ -326,6 +338,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                     for value in values:
                         if value.startswith( "go=" ):
                             virtualMachines.insert( i, virtualmachine.Info( key + value.replace( "go=", "" ), True, "", 0 ) )
+
                         else:
                             virtualMachines.insert( i, virtualmachine.Info( "", False, value.replace( "m=", "" ), 0 ) )
     
@@ -343,6 +356,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                         for value in values:
                             if value.startswith( "go=" ):
                                 virtualMachines.insert( j, virtualmachine.Info( key + "/" + value.replace( "go=", "" ), True, "", indent ) )
+
                             else:
                                 virtualMachines.insert( j, virtualmachine.Info( "", False, value.replace( "m=", "" ), indent ) )
 
@@ -363,6 +377,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         result = self.processGet( "VBoxManage --version" )
         if result is None: # If a VM is corrupt/missing, VBoxManage may return a spurious (None) result.
             version = None
+
         else:
             for line in result.splitlines():
                 if len( line ) > 0 and line[ 0 ].isdigit(): # The result may include compile warnings in addition to the actual version number or even empty lines.
@@ -408,6 +423,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 groupsExist = True
                 stack.append( parent )
                 parent = store.append( parent, [ virtualMachine.getGroupName(), None, "", virtualMachine.getUUID() ] )
+
             else:
                 autoStart = None
                 if self.isAutostart( virtualMachine.getUUID() ):
@@ -511,7 +527,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             self.virtualMachinePreferences.clear()
             self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
             self.setAutoStart( autostartCheckbox.get_active() )
-            GLib.idle_add( self.requestSaveConfig )
+            self.requestSaveConfig()
 
 
     def updateVirtualMachinePreferences( self, store, treeiter ):
@@ -597,6 +613,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             if autostartCheckbox.get_active():
                 model.set_value( treeiter, 1, Gtk.STOCK_APPLY )
                 model[ treeiter ][ 2 ] = startCommand.get_text().strip()
+
             else:
                 model.insert_after( None, treeiter, [ model[ treeiter ][ 0 ], None, startCommand.get_text().strip(), model[ treeiter ][ 3 ] ] )
                 model.remove( treeiter )
