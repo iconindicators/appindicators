@@ -71,7 +71,7 @@ class IndicatorBase:
 
         Notify.init( self.indicatorName )
 
-        self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName,  AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.__loadConfig()
@@ -134,12 +134,13 @@ class IndicatorBase:
             aboutDialog.set_authors( self.authors )
             aboutDialog.set_comments( self.comments )
 
-            copyrightText = "Copyright \xa9 " + \
-                            self.copyrightStartYear + \
-                            "-" + \
-                            str( datetime.datetime.now().year ) + \
-                            " " + \
-                            self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
+            copyrightText = \
+                "Copyright \xa9 " + \
+                self.copyrightStartYear + \
+                "-" + \
+                str( datetime.datetime.now().year ) + \
+                " " + \
+                self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
 
             aboutDialog.set_copyright( copyrightText )
             aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
@@ -230,7 +231,7 @@ class IndicatorBase:
         for widget in widgets:
             widget.set_sensitive( self.get_active() )
 
- 
+
     def isUbuntu1604( self ): return self.processGet( "lsb_release -sc" ).strip() == "xenial"
 
 
