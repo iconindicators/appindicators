@@ -225,7 +225,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
             self.dropPathQuery = dropPathQueryCheckbox.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
             self.setAutoStart( IndicatorPunycode.DESKTOP_FILE, autostartCheckbox.get_active() )
-            GLib.idle_add( self.requestSaveConfig() )
+            self.requestSaveConfig()
 
 
     def loadConfig( self, config ):
