@@ -589,41 +589,40 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             os.remove( oldIcon )
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
-        self.startingUp = True
 
 
     def update( self, menu ):
         if self.startingUp:
             menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
-            self.startingUp = False
-#             self.requestUpdate() #TODO Wrap in GLib stuff...or check the TODO in base class.
+#TODO Wrap in GLib stuff?
+# ...or check the TODO in base class.
             GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.requestUpdate )
 
         else:
             utcNow = datetime.datetime.utcnow() #TODO Test
-    
+
             # Update comet, minor planet and satellite data.
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
             if self.cometsAddNew:
                 self.addNewBodies( self.cometData, self.comets )
-    
+
             self.minorPlanetData = { }
             for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
                 minorPlanetData = self.updateData( baseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, url, astroPyephem.getOrbitalElementsLessThanMagnitude )
                 for key in minorPlanetData:
                     if key not in self.minorPlanetData:
                         self.minorPlanetData[ key ] = minorPlanetData[ key ]
-    
+
             if self.minorPlanetsAddNew:
                 self.addNewBodies( self.minorPlanetData, self.minorPlanets )
-    
+
             self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, None )
             if self.satellitesAddNew:
                 self.addNewBodies( self.satelliteData, self.satellites )
-    
+
             print( "Update data:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
             utcNow = datetime.datetime.utcnow() #TODO Test
-    
+
             # Update backend.  Returned object is a dictionary:
             #    Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             #    Value is the calculated astronomical data as a string.
@@ -637,24 +636,24 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 self.minorPlanets, self.minorPlanetData,
                 self.magnitude,
                 self.hideBodiesBelowHorizon )
-    
+
             print( "Update backend:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
             utcNow = datetime.datetime.utcnow() #TODO Test
-    
+
             # Update frontend.
             self.updateMenu( menu )
             self.updateIconAndLabel()
-    
+
             if self.showWerewolfWarning:
                 self.notificationFullMoon()
-    
+
     #TODO Uncomment when all done...don't forget to test!
     #             if self.showSatelliteNotification:
     #                 self.notificationSatellites()
-    
+
             print( "Update frontend:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
     #             utcNow = datetime.datetime.utcnow() #TODO Test
-    
+
             return self.getNextUpdateTimeInSeconds()
 
 
