@@ -652,14 +652,14 @@ def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
 
 def __isSatellitePassValid( satellitePass ):
     return \
-        satellitePass is not None and \
+        satellitePass and \
         len( satellitePass ) == 6 and \
-        satellitePass[ 0 ] is not None and \
-        satellitePass[ 1 ] is not None and \
-        satellitePass[ 2 ] is not None and \
-        satellitePass[ 3 ] is not None and \
-        satellitePass[ 4 ] is not None and \
-        satellitePass[ 5 ] is not None
+        satellitePass[ 0 ] and \
+        satellitePass[ 1 ] and \
+        satellitePass[ 2 ] and \
+        satellitePass[ 3 ] and \
+        satellitePass[ 4 ] and \
+        satellitePass[ 5 ]
 
 
 # Determine if a satellite pass is visible.

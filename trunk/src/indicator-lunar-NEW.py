@@ -706,14 +706,14 @@ class IndicatorLunar:
 # Comets will successfully read in because their objects (dictionary, tuple string) are valid.
 # Comets are still stored in a dictionary using a string as key but now with a new OE object as the value, which must be handled.
 # This check can be removed in version 82.
-        if data is not None and cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME:
+        if data and cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME:
             if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ): # Check that the object loaded from cache matches the new OE object.
                 data = None
 # End of hack!
 
         if data is None:
             data = downloadDataFunction( dataURL, logging )
-            if magnitudeFilterFunction is not None:
+            if magnitudeFilterFunction:
                 data = magnitudeFilterFunction( data, astroPyephem.MAGNITUDE_MAXIMUM )
 
             pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBaseName, logging )
@@ -1969,7 +1969,7 @@ class IndicatorLunar:
         tags = re.findall( "\[([^\[^\]]+)\]", translatedText )
         for tag in tags:
             iter = tagsStore.get_iter_first()
-            while iter is not None:
+            while iter:
                 row = tagsStore[ iter ]
                 if row[ i ] == tag:
                     translatedText = translatedText.replace( "[" + tag + "]", "[" + row[ j ] + "]" )

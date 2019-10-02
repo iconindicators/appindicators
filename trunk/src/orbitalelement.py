@@ -57,12 +57,12 @@ def download( url, logging = None ):
                 oe = OE( data[ i ].strip() )
                 oeData[ oe.getName().upper() ] = oe
 
-        if not oeData and logging is not None:
+        if not oeData and logging:
             logging.error( "No OE data found at " + str( url ) )
 
     except Exception as e:
         oeData = { }
-        if logging is not None:
+        if logging:
             logging.error( "Error retrieving OE data from " + str( url ) )
             logging.exception( e )
 

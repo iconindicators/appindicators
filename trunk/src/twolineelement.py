@@ -76,12 +76,12 @@ def download( url, logging = None ):
             tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
             tleData[ ( tle.getNumber() ) ] = tle
 
-        if not tleData and logging is not None:
+        if not tleData and logging:
             logging.error( "No TLE data found at " + str( url ) )
 
     except Exception as e:
         tleData = { }
-        if logging is not None:
+        if logging:
             logging.error( "Error retrieving TLE data from " + str( url ) )
             logging.exception( e )
 
