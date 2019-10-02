@@ -317,7 +317,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             self.searchURL = searchEngineEntry.get_text().strip()
             self.notify = notifyCheckbox.get_active()
             self.setAutoStart( autostartCheckbox.get_active() )
-            GLib.idle_add( self.requestSaveConfig() )
+            self.requestSaveConfig()
 
 
     def onEventClickRadio( self, source, radioCopyToClipboard, radioInternetSearch, searchEngineEntry ):
