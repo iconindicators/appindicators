@@ -19,10 +19,6 @@
 # Application indicator which displays lunar, solar, planetary, star, comet and satellite information.
 
 
-# TODO What is this?  Can we put it somewhere other than here?
-#  http://www.flaticon.com/search/satellite
-
-
 # TODO Attributes in currently released indicator which have been culled in the development version
 #  and why they should or should not be put back, assuming no performance degradation:
 # 
