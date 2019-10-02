@@ -299,7 +299,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptNameDefault = self.defaultScriptNameCurrent
 
             self.setAutoStart( autostartCheckbox.get_active() )
-            GLib.idle_add( self.requestSaveConfig() )
+            self.requestSaveConfig()
 
 
     def onDisplayCheckboxes( self, source, radioShowScriptsSubmenu, hideGroupsCheckbox ):
