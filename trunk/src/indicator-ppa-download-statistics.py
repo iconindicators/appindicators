@@ -483,7 +483,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     treeiter = filterStore.iter_next( treeiter )
 
             self.setAutoStart( autostartCheckbox.get_active() )
-            GLib.idle_add( self.requestSaveConfig )
+            self.requestSaveConfig()
 
 
     def onCombinePPAsCheckbox( self, source, checkbox ): checkbox.set_sensitive( source.get_active() )
