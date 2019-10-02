@@ -300,7 +300,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                 treeiter = store.iter_next( treeiter )
 
             self.setAutoStart( autostartCheckbox.get_active() )
-            GLib.idle_add( self.requestSaveConfig() )
+            self.requestSaveConfig()
 
 
     def onFortuneReset( self, button, treeview ):
