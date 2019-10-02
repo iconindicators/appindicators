@@ -46,7 +46,7 @@
 # 
 #     Solstice/Equinox - Interesting information about the sun.
 # 
-#     Saturn: Earth Tilt, Sun Tilt - Interesting information.
+#     Saturn: Earth Tilt, Sun Tilt - Interesting information.http://www.flaticon.com/search/satellite
 # 
 #     Planet Moons:
 #         Az/Alt, RA/Dec - Essentially identical to that of the parent planet.
@@ -57,9 +57,6 @@
 # which are NOT needed for finding the sun/moon.
 # So maybe adding solstice/equinox back in is okay.
 # Ditto for dawn/dusk.
-
-
-#TODO Maybe time the duration of each update and use that to ensure the next scheduled update is not before that amount of time elapses.
 
 
 #TODO Update screen shot
@@ -572,6 +569,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satelliteNotifications = { }
 
 #         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH ) #TODO Needed?  Maybe needed when setting the icon.
+        self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
         # Flush comet, minor planet and satellite caches.
         self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
@@ -584,8 +582,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for oldIcon in oldIcons:
             os.remove( oldIcon )
 
-        self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
-
 
     def update( self, menu ):
         if self.startingUp:
@@ -595,7 +591,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.requestUpdate )
 
         else:
-            utcNow = datetime.datetime.utcnow() #TODO Test
+            utcNow = datetime.datetime.utcnow()
 
             # Update comet, minor planet and satellite data.
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
@@ -616,9 +612,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             if self.satellitesAddNew:
                 self.addNewBodies( self.satelliteData, self.satellites )
 
-            print( "Update data:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
-            utcNow = datetime.datetime.utcnow() #TODO Test
-
             # Update backend.  Returned object is a dictionary:
             #    Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             #    Value is the calculated astronomical data as a string.
@@ -633,9 +626,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 self.magnitude,
                 self.hideBodiesBelowHorizon )
 
-            print( "Update backend:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
-            utcNow = datetime.datetime.utcnow() #TODO Test
-
             # Update frontend.
             self.updateMenu( menu )
             self.updateIconAndLabel()
@@ -647,10 +637,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     #             if self.showSatelliteNotification:
     #                 self.notificationSatellites()
 
-            print( "Update frontend:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
-    #             utcNow = datetime.datetime.utcnow() #TODO Test
-
-            return self.getNextUpdateTimeInSeconds()
+            return self.getNextUpdateTimeInSeconds( utcNow )
 
 
     # Get the data from the cache, or if stale, download from the source.
@@ -684,9 +671,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return data
 
 
-    def getNextUpdateTimeInSeconds( self ):
+    def getNextUpdateTimeInSeconds( self, startDateTime ):
         utcNow = datetime.datetime.utcnow()
-        utcNowPlusOneMinute = utcNow + datetime.timedelta( minutes = 1 )
+        durationOfLastRunInSeconds = ( utcNow - startDateTime ).total_seconds()
+        utcNowPlusLastRun = utcNow + datetime.timedelta( seconds = durationOfLastRunInSeconds )
         nextUpdateTime = utcNow + datetime.timedelta( hours = 1000 ) # Set a bogus date/time in the future.
         for key in self.data:
             if key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
@@ -696,13 +684,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                key[ 2 ] == astroPyephem.DATA_RISE_DATE_TIME or \
                key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
                key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
+#TODO If we add solstice, equinox, dawn, dusk, add them here too.
 
                 dateTime = datetime.datetime.strptime( self.data[ key ], astroPyephem.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
-                if dateTime > utcNowPlusOneMinute and dateTime < nextUpdateTime:
+                if dateTime > utcNowPlusLastRun and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
-        print( datetime.datetime.now() + datetime.timedelta( seconds = int( ( nextUpdateTime - utcNow ).total_seconds() ) + 10 ) )
-        return int( ( nextUpdateTime - utcNow ).total_seconds() ) + 10 # Add some fat to ensure we don't do an update and leave in an item which as more or less set.
+        return int( ( nextUpdateTime - utcNow ).total_seconds() )
 
 
     def updateMenu( self, menu ):
