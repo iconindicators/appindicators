@@ -308,7 +308,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             self.calendars = [ ]
             treeiter = store.get_iter_first()
             while treeiter != None:
-                if store[ treeiter ][ 1 ] is not None:
+                if store[ treeiter ][ 1 ]:
                     self.calendars.append( store[ treeiter ][ 0 ] )
 
                 treeiter = store.iter_next( treeiter )
@@ -381,7 +381,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         fileEntry = Gtk.Entry()
         fileEntry.set_editable( False )
 
-        if rowNumber is not None: # This is an edit.
+        if rowNumber: # This is an edit.
             fileEntry.set_text( model[ treeiter ][ 0 ] )
             fileEntry.set_width_chars( len( fileEntry.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
@@ -442,7 +442,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
                     fileEntry.grab_focus()
                     continue
 
-                if rowNumber is not None:
+                if rowNumber:
                     model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value and append new value.  
     
                 model.get_model().append( [ fileEntry.get_text().strip(), Gtk.STOCK_APPLY if enabledCheckbox.get_active() else None ] )
