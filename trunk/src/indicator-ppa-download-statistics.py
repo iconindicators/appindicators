@@ -530,7 +530,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             for item in ppaUsers:
                 ppaUser.append_text( item )
 
-            if rowNumber is not None:
+            if rowNumber:
                 ppaUser.set_active( ppaUsers.index( model[ treeiter ][ 0 ] ) ) # This is an edit.
 
         else:
@@ -556,7 +556,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             for item in ppaNames:
                 ppaName.append_text( item )
 
-            if rowNumber is not None:
+            if rowNumber:
                 ppaName.set_active( ppaNames.index( model[ treeiter ][ 1 ] ) ) # This is an edit.
 
         else:
@@ -572,7 +572,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         for item in IndicatorPPADownloadStatistics.SERIES:
             series.append_text( item )
 
-        if rowNumber is not None:
+        if rowNumber:
             series.set_active( IndicatorPPADownloadStatistics.SERIES.index( model[ treeiter ][ 2 ] ) )
 
         else:
@@ -588,7 +588,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         for item in IndicatorPPADownloadStatistics.ARCHITECTURES:
             architectures.append_text( item )
 
-        if rowNumber is not None:
+        if rowNumber:
             architectures.set_active( IndicatorPPADownloadStatistics.ARCHITECTURES.index( model[ treeiter ][ 3 ] ) )
 
         else:
@@ -627,7 +627,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     continue
 
                 # Ensure there is no duplicate...
-                if ( rowNumber is None and len( model ) > 0 ) or ( rowNumber is not None and len( model ) > 1 ):
+                if ( rowNumber is None and len( model ) > 0 ) or ( rowNumber and len( model ) > 1 ):
                     # Doing an add and there's at least one PPA OR doing an edit and there's at least two PPAs...
                     if rowNumber is None: # Doing an add, so data has changed.
                         dataHasBeenChanged = True
@@ -655,7 +655,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                             continue
 
                 # Update the model...
-                if rowNumber is not None:
+                if rowNumber:
                     model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
 
                 model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
@@ -750,7 +750,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             "Regular expressions and wild\n" + \
             "cards are not accepted!" ) )
 
-        if rowNumber is not None:
+        if rowNumber:
             textview.get_buffer().set_text( filterTreeModel[ filterTreeIter ][ 1 ] ) # This is an edit.
 
         scrolledwindow = Gtk.ScrolledWindow()
@@ -781,7 +781,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     continue
 
                 # Update the model...
-                if rowNumber is not None:
+                if rowNumber:
                     filterTreeModel.remove( filterTreeIter ) # This is an edit...remove the old value and append new value.  
 
                 filterTreeModel.append( [ ppaUsersNames.get_active_text(), filterText ] ) 
