@@ -336,7 +336,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         fortuneFileDirectory.set_editable( False )
         fortuneFileDirectory.set_hexpand( True )
 
-        if rowNumber is not None: # This is an edit.
+        if rowNumber: # This is an edit.
             fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
             fortuneFileDirectory.set_width_chars( len( fortuneFileDirectory.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
@@ -429,7 +429,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                     fortuneFileDirectory.grab_focus()
                     continue
 
-                if rowNumber is not None:
+                if rowNumber:
                     model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value.
 
                 model.get_model().append( [ fortuneFileDirectory.get_text().strip(), Gtk.STOCK_APPLY if enabledCheckbox.get_active() else None ] )
