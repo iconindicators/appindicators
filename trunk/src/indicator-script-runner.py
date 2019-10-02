@@ -343,10 +343,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def onScriptName( self, scriptNameTreeSelection, scriptGroupComboBox, directoryEntry, commandTextView, scripts ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeSelection.get_selected()
-        if treeiter is not None:
+        if treeiter:
             scriptName = model[ treeiter ][ 0 ]
             theScript = self.getScript( scripts, scriptGroup, scriptName )
-            if theScript is not None:
+            if theScript:
                 directoryEntry.set_text( theScript.getDirectory() )
                 commandTextView.get_buffer().set_text( theScript.getCommand() )
 
@@ -354,7 +354,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def onScriptCopy( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeView.get_selection().get_selected()
-        if scriptGroup is not None and treeiter is not None:
+        if scriptGroup and treeiter:
             scriptName = model[ treeiter ][ 0 ]
             script = self.getScript( scripts, scriptGroup, scriptName )
 
@@ -409,7 +409,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         scriptNameEntry.grab_focus()
                         continue
 
-                    if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ) is not None:
+                    if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
                         self.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
                         scriptGroupCombo.grab_focus()
                         continue
@@ -434,7 +434,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def onScriptRemove( self, button, scripts, scriptGroupComboBox, scriptNameTreeView, directoryEntry, commandTextView ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeView.get_selection().get_selected()
-        if scriptGroup is not None and treeiter is not None:
+        if scriptGroup and treeiter:
             scriptName = model[ treeiter ][ 0 ]
             theScript = self.getScript( scripts, scriptGroup, scriptName )
             if self.showOKCancel( None, _( "Remove the selected script?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
@@ -466,7 +466,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def onScriptEdit( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeView.get_selection().get_selected()
-        if scriptGroup is not None and treeiter is not None:
+        if scriptGroup and treeiter:
             scriptName = model[ treeiter ][ 0 ]
             theScript = self.getScript( scripts, scriptGroup, scriptName )
             self.addEditScript( theScript, scripts, scriptGroupComboBox, scriptNameTreeView )
@@ -598,7 +598,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     continue
 
                 if script.getGroup() == "": # Adding a new script - check for duplicate.
-                    if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ) is not None:
+                    if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
                         self.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
                         scriptGroupCombo.grab_focus()
                         continue
