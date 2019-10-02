@@ -342,7 +342,7 @@ class IndicatorBase:
             if terminal is None:
                 terminal = self.processGet( "which " + IndicatorBase.TERMINAL_XFCE )
 
-        if terminal is not None:
+        if terminal:
             terminal = terminal.strip()
 
         if terminal == "":
@@ -354,7 +354,7 @@ class IndicatorBase:
     # Return the execution flag for the given terminal; None on failure. 
     def getTerminalExecutionFlag( self, terminal ): 
         executionFlag = None
-        if terminal is not None:
+        if terminal:
             if terminal.endswith( IndicatorBase.TERMINAL_GNOME ):
                 executionFlag = "--"
 

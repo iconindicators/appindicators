@@ -74,7 +74,7 @@ def isNumber( numberAsString ):
         return False
 
 
-#TODO STILL NEEDED?
+
 # Return the full path and name of the executable for the current terminal; None on failure.
 def getTerminal():
     terminal = processGet( "which " + TERMINAL_GNOME )
@@ -93,7 +93,6 @@ def getTerminal():
     return terminal
 
 
-#TODO STILL NEEDED?
 # Return the execution flag for the given terminal; None on failure. 
 def getTerminalExecutionFlag( terminal ): 
     executionFlag = None
