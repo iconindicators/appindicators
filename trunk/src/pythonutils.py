@@ -161,7 +161,6 @@ def onCheckbox( self, *widgets ):
         widget.set_sensitive( self.get_active() )
 
 
-#TODO STILL NEEDED?
 # Listens to radio events and toggles the visibility of the widgets.
 def onRadio( self, *widgets ):
     for widget in widgets:

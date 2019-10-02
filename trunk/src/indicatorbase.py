@@ -235,6 +235,13 @@ class IndicatorBase:
             widget.set_sensitive( self.get_active() )
 
 
+#TODO May not be needed...
+    # Listens to radio events and toggles the visibility of the widgets.
+    def onRadio( self, *widgets ):
+        for widget in widgets:
+            widget.set_sensitive( self.get_active() )
+
+
     def isUbuntu1604( self ): return self.processGet( "lsb_release -sc" ).strip() == "xenial"
 
 
