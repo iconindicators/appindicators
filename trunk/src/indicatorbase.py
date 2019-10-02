@@ -62,6 +62,7 @@ class IndicatorBase:
         self.lock = threading.Lock()
         self.lockAboutDialog = threading.Lock()
         self.updateTimerID = None
+        self.startingUp = True
 
         logging.basicConfig( 
             format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", 
@@ -78,6 +79,7 @@ class IndicatorBase:
 
     def main( self ): 
         self.__update()
+        self.startingUp = False
         Gtk.main()
 
 
