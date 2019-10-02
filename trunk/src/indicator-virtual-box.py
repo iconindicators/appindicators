@@ -209,7 +209,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         # Instead, now have the user type in the title of the window into the preferences and find the window by that.
         result = self.processGet( "wmctrl -l | grep \"" + self.virtualboxManagerWindowName + "\"" )
         windowID = None
-        if result is not None:
+        if result:
             windowID = result.split()[ 0 ]
 
         if windowID is None or windowID == "":
@@ -223,7 +223,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         names = [ ]
         uuids = [ ]
         result = self.processGet( "VBoxManage list runningvms" )
-        if result is not None:
+        if result:
             for line in result.splitlines():
                 try:
                     info = line[ 1 : -1 ].split( "\" {" )
@@ -240,7 +240,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         virtualMachines = [ ]
         if self.isVBoxManageInstalled():
             version = self.getVirtualBoxVersion()
-            if version is not None:
+            if version:
                 if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
                     virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPriorTo4dot3()
                 else:
@@ -269,7 +269,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def getVirtualMachinesFromVBoxManage( self ):
         virtualMachines = [ ]
         result = self.processGet( "VBoxManage list vms" )
-        if result is not None: # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
+        if result: # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
             for line in result.splitlines():
                 try:
                     info = line[ 1 : -1 ].split( "\" {" )
@@ -306,7 +306,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3
 
         virtualMachines = [ ]
-        if configFile is not None:
+        if configFile:
             try:
                 with open( configFile, "r" ) as f:
                     content = f.readlines()
@@ -375,7 +375,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def isVBoxManageInstalled( self ): 
         isInstalled = False
         result = self.processGet( "which VBoxManage" )
-        if result is not None:
+        if result:
             isInstalled = result.find( "VBoxManage" ) > -1
 
         return isInstalled
@@ -515,7 +515,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def updateVirtualMachinePreferences( self, store, treeiter ):
-        while treeiter is not None:
+        while treeiter:
             isVirtualMachine = store[ treeiter ][ 3 ] != "" # UUID is not empty, so this is a VM and not a group.
             isAutostart = store[ treeiter ][ 1 ] == "gtk-apply"
             isDefaultStartCommand = store[ treeiter ][ 2 ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
@@ -531,7 +531,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     def onVirtualMachineDoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
-        if treeiter is not None and model[ treeiter ][ 3 ] != "":
+        if treeiter and model[ treeiter ][ 3 ] != "":
             self.editVirtualMachine( model, treeiter )
 
 
@@ -544,7 +544,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         startCommand = Gtk.Entry()
         startCommand.set_width_chars( 20 )
-        if model[ treeiter ][ 2 ] is not None:
+        if model[ treeiter ][ 2 ]:
             startCommand.set_text( model[ treeiter ][ 2 ] )
             startCommand.set_width_chars( len( model[ treeiter ][ 2 ] ) * 5 / 4 ) # Sometimes the length is shorter than specified due to packing, so make it longer.
 
@@ -558,7 +558,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the virtual machine when the indicator starts." ) )
-        autostartCheckbox.set_active( model[ treeiter ][ 1 ] is not None and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
+        autostartCheckbox.set_active( model[ treeiter ][ 1 ] and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
         # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
