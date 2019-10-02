@@ -2,25 +2,28 @@
 # -*- coding: utf-8 -*-
 
 
-# Iterate through the changelogs specified below and report any bad dates of if dates are out of sequence. 
+# Iterate through the changelogs specified below and report:
+#     Bad dates
+#     Dates out of sequence
+
+#TODO Add check for version numbers that increase and have no gaps. 
 
 
 from datetime import datetime
 
 
-basePath = "/home/bernard/Programming/"
+basePath = "../../"
 changeLogPath = "/packaging/debian/changelog"
 changeLogs = [
-                "IndicatorFortune",
-                "IndicatorLunar",
-                "IndicatorOnThisDay",
-                "IndicatorPPADownloadStatistics",
-                "IndicatorPunycode",
-                "IndicatorScriptRunner",
-                "IndicatorStardate",
-                "IndicatorTide",
-                "IndicatorVirtualBox"
-              ]
+    "IndicatorFortune",
+    "IndicatorLunar",
+    "IndicatorOnThisDay",
+    "IndicatorPPADownloadStatistics",
+    "IndicatorPunycode",
+    "IndicatorScriptRunner",
+    "IndicatorStardate",
+    "IndicatorTide",
+    "IndicatorVirtualBox" ]
 
 dateTimeFormat = "%a, %d %b %Y %H:%M:%S %z"
 for changeLog in changeLogs:
