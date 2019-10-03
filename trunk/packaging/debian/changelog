@@ -30,6 +30,7 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
     a redundant duplicate in the installation directory.
   * About dialog now shows copyright, artists and corrected URL for website.
   * Bug fix: Locking between About/Preferences and background update now locks!
+  * Now uses a base class to share functionality amongst indicators.
   * Removed old eclipse information.
   * Update release to xenial as trusty is end of life.
   * Update debian/control Standards-Version to 3.9.7.
