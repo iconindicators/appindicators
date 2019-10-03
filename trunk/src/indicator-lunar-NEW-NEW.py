@@ -19,46 +19,6 @@
 # Application indicator which displays lunar, solar, planetary, star, comet and satellite information.
 
 
-# TODO Attributes in currently released indicator which have been culled in the development version
-#  and why they should or should not be put back, assuming no performance degradation:
-# 
-#     Illumination - Still calculated for internal use (draw the moon icon).  
-#                    Applies to moon and planets.
-# 
-#     Bright Limb - Still calculated for internal use (draw the moon icon).  
-#                   Applies to moon and planets.
-# 
-#     Magnitude - Still calculated for internal use (filter out bodies).  
-#                 Applies to moon, sun, planets, stars and comets.
-# 
-#     Constellation - Perhaps helpful for a user to find a star in lieu of using the Az/Alt.  
-#                     However, constellations themselves are arbitrary and not based on science.
-#                     Applies to moon, sun, planets, stars and comets.
-# 
-#     Tropical Sign - Used by astrologers and was put in as a kind favour.  
-#                     Not based on science.
-#                     Applies to moon, sun, planets, stars. 
-# 
-#     Distance to Earth, Distance to Sun - Not useful unless you have an Aluminum Falcon, https://www.youtube.com/watch?v=3F1d3QWsyk0.
-#                                          Applies to moon, sun, planets.
-# 
-#     RA/Dec - Az/Alt is much easier to use.
-# 
-#     Solstice/Equinox - Interesting information about the sun.
-# 
-#     Saturn: Earth Tilt, Sun Tilt - Interesting information.http://www.flaticon.com/search/satellite
-# 
-#     Planet Moons:
-#         Az/Alt, RA/Dec - Essentially identical to that of the parent planet.
-#         Earth Visible - May be visible from Earth, but chances are you ain't gonna actually see it!
-#         Offset from Planet, X, Y, Z - Useful if you have a big enough telescope.
-#
-# Further, the sun/moon have eclipse information and the moon has phase information
-# which are NOT needed for finding the sun/moon.
-# So maybe adding solstice/equinox back in is okay.
-# Ditto for dawn/dusk.
-
-
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
 
