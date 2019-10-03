@@ -131,6 +131,8 @@ PLANET_PLUTO = "PLUTO"
 
 PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
+#TODO Can we somehow unify the stars between Pyephem and Skyfield to make it simpler for the indicator to switch between the two?
+
 # From ephem/stars.py
 # Star names are capitalised, whereas Pyephem uses titled strings.
 # At the API we accept capitalised star names, but internally we title them to satisfy Pyephem.
