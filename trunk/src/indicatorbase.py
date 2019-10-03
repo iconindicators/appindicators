@@ -39,6 +39,7 @@ class IndicatorBase:
 
     AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+    INDENT_TEXT_LEFT = 25
     INDENT_WIDGET_LEFT = 20
     JSON_EXTENSION = ".json"
     TERMINAL_GNOME = "gnome-terminal"
