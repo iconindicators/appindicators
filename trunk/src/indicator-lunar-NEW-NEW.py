@@ -151,6 +151,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         astroPyephem.DATA_ECLIPSE_LATITUDE     : _( "ECLIPSE LATITUDE" ),
         astroPyephem.DATA_ECLIPSE_LONGITUDE    : _( "ECLIPSE LONGITUDE" ),
         astroPyephem.DATA_ECLIPSE_TYPE         : _( "ECLIPSE TYPE" ),
+        astroPyephem.DATA_EQUINOX              : _( "EQUINOX" ),
         astroPyephem.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
         astroPyephem.DATA_FULL                 : _( "FULL" ),
         astroPyephem.DATA_NEW                  : _( "NEW" ),
@@ -159,6 +160,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         astroPyephem.DATA_RISE_DATE_TIME       : _( "RISE DATE TIME" ),
         astroPyephem.DATA_SET_AZIMUTH          : _( "SET AZIMUTH" ),
         astroPyephem.DATA_SET_DATE_TIME        : _( "SET DATE TIME" ),
+        astroPyephem.DATA_SOLSTICE             : _( "SOLSTICE" ),
         astroPyephem.DATA_THIRD_QUARTER        : _( "THIRD QUARTER" ) }
 
     MOON_TAG_TRANSLATION = { astroPyephem.NAME_TAG_MOON : _( "MOON" ) }
@@ -1216,7 +1218,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.getLogging().error( "Error writing: " + svgFilename )
 
 
-    def onPreferences( self, dialgo ):
+    def onPreferences( self, dialog ):
         notebook = Gtk.Notebook()
 
         # Icon.
@@ -1285,7 +1287,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         tree.append_column( treeViewColumn )
 
         tree.set_tooltip_text( _(
-            "Double click to add a tag to the icon text.\n" + \
+            "Double click to add a tag to the icon text.\n\n" + \
             "A tag with no value arises if a body is dropped\n" + \
             "due to exceeding magnitude, or below the horizon\n" + \
             "(no set date/time and no azimuth/altitude),\n" + \
