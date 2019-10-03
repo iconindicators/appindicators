@@ -680,13 +680,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         nextUpdateTime = utcNow + datetime.timedelta( hours = 1000 ) # Set a bogus date/time in the future.
         for key in self.data:
             if key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
+               key[ 2 ] == astroPyephem.DATA_EQUINOX or \
                key[ 2 ] == astroPyephem.DATA_FIRST_QUARTER or \
                key[ 2 ] == astroPyephem.DATA_FULL or \
                key[ 2 ] == astroPyephem.DATA_NEW or \
                key[ 2 ] == astroPyephem.DATA_RISE_DATE_TIME or \
                key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
+               key[ 2 ] == astroPyephem.DATA_SOLSTICE or \
                key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
-#TODO If we add solstice, equinox, dawn, dusk, add them here too.
 
                 dateTime = datetime.datetime.strptime( self.data[ key ], astroPyephem.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
                 if dateTime > utcNowPlusLastRun and dateTime < nextUpdateTime:
