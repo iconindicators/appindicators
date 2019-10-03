@@ -862,17 +862,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1 )
-
-#TODO Add to the menu...can we just always add in dawn/dusk or do we need to take into account if the sun is below the horizon?
-            try:
-                print( "Equinox ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_EQUINOX ) ) )
-                print( "Solstice ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_SOLSTICE ) ) )
-                print( "Dawn ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_DAWN ) ) )
-                print( "Dusk ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_DUSK ) ) )
-    
-            except Exception as e:
-                print( e )
-
+            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Equinox: " ) + self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_EQUINOX ) ) ) )
+            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Solstice: " ) + self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_SOLSTICE ) ) ) )
             self.updateEclipseMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
 
 
@@ -1112,9 +1103,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
            key[ 2 ] == astroPyephem.DATA_SET_AZIMUTH:
             displayData = str( round( math.degrees( float( self.data[ key ] ) ) ) ) + "°"
 
-        elif key[ 2 ] == astroPyephem.DATA_DUSK or \
-             key[ 2 ] == astroPyephem.DATA_DAWN or \
-             key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
+        elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
              key[ 2 ] == astroPyephem.DATA_EQUINOX or \
              key[ 2 ] == astroPyephem.DATA_FIRST_QUARTER or \
              key[ 2 ] == astroPyephem.DATA_FULL or \

@@ -33,8 +33,6 @@ class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, S
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
 DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
-DATA_DAWN = "DAWN"
-DATA_DUSK = "DUSK"
 DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
 DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
 DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
@@ -107,8 +105,6 @@ DATA_STAR = [
 DATA_SUN = [
     DATA_ALTITUDE,
     DATA_AZIMUTH,
-    DATA_DAWN,
-    DATA_DUSK,
     DATA_ECLIPSE_DATE_TIME,
     DATA_ECLIPSE_LATITUDE,
     DATA_ECLIPSE_LONGITUDE,
@@ -441,19 +437,6 @@ def __calculateSun( ephemNow, data, hideIfBelowHorizon ):
         solstice = ephem.next_solstice( ephemNow )
         data[ key + ( DATA_EQUINOX, ) ] = __toDateTimeString( equinox.datetime() )
         data[ key + ( DATA_SOLSTICE, ) ] = __toDateTimeString( solstice.datetime() )
-
-        try:
-            # Dawn/Dusk.
-            city = __getCity( data, ephemNow )
-            city.horizon = '-6' # -6 = civil twilight, -12 = nautical, -18 = astronomical (http://stackoverflow.com/a/18622944/2156453)
-            sun = ephem.Sun()
-            dawn = city.next_rising( sun, use_center = True )
-            dusk = city.next_setting( sun, use_center = True )
-            data[ key + ( DATA_DAWN, ) ] = __toDateTimeString( dawn.datetime() )
-            data[ key + ( DATA_DUSK, ) ] = __toDateTimeString( dusk.datetime() )
-
-        except ( ephem.AlwaysUpError, ephem.NeverUpError ):
-            pass
 
 
 # Calculate next eclipse for either the Sun or Moon.
