@@ -955,7 +955,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # https://www.iau.org/public/themes/naming
     # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
     def getCometMinorPlanetOnClickURL( self, name, astronomicalBodyType ):
-        url = IndicatorLunar.MINOR_PLANET_CENTER_SEARCH_URL
         if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
             if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
                 id = name[ : name.find( "(" ) ].strip()
@@ -982,7 +981,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             else: # 229762 G!kunll'homdima
                 id = components[ 0 ] 
 
-        return url + id.replace( "/", "%2F" ).replace( " ", "+" )
+        return IndicatorLunar.MINOR_PLANET_CENTER_SEARCH_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
 
 
     def updateCommonMenu( self, menu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
@@ -998,7 +997,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             self.createMenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ), onClickURL, menu )
             self.createMenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ), onClickURL, menu )
-
 
 
 #TODO Test each clause...will have to adjust date/time and lat/long.
