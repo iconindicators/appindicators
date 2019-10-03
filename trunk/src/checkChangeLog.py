@@ -5,8 +5,7 @@
 # Iterate through the changelogs specified below and report:
 #     Bad dates
 #     Dates out of sequence
-
-#TODO Add check for version numbers that increase and have no gaps. 
+#     Release numbers out of sequence
 
 
 from datetime import datetime
@@ -22,25 +21,33 @@ changeLogs = [
     "IndicatorPunycode",
     "IndicatorScriptRunner",
     "IndicatorStardate",
-    "IndicatorTide",
+     "IndicatorTide",
     "IndicatorVirtualBox" ]
 
-dateTimeFormat = "%a, %d %b %Y %H:%M:%S %z"
 for changeLog in changeLogs:
-    changeLog = basePath + changeLog + changeLogPath
-    print( changeLog )
+    errors = [ ]
     dates = [ ]
-    with open( changeLog ) as f:
+    releaseNumbers = [ ]
+    with open( basePath + changeLog + changeLogPath ) as f:
         content = f.readlines()
         for line in content:
             if line.startswith( " -- " ):
                 dateTime = line[ line.find( ">" ) + 1 : ].strip()
-                dateTimeObject = datetime.strptime( dateTime, dateTimeFormat )
-                dateTimeObjectAsString = dateTimeObject.strftime( dateTimeFormat ).replace( " 0", " " )
-                if dateTime != dateTimeObjectAsString:
-                    print( dateTime, "\t!=\t", dateTimeObjectAsString )
-
+                dateTimeObject = datetime.strptime( dateTime, "%a, %d %b %Y %H:%M:%S %z" )
                 dates.append( dateTimeObject )
 
+            if line.startswith( "indicator-" ):
+                releaseNumbers.append( line.split( '(' )[ 1 ].split( ')' )[ 0 ] )
+
+    releaseNumbersUnsorted = releaseNumbers.copy()
+    releaseNumbers.sort( key = lambda x: int( ''.join( filter( str.isdigit, x ) ) ), reverse = True )
+    if releaseNumbersUnsorted != releaseNumbers:
+        errors.append( "\tRelease numbers out of order!" )
+
     if dates != sorted( dates, reverse = True ):
-        print( "Dates out of order!" )
+        errors.append( "\tDates out of order!" )
+
+    if errors:
+        print( changeLog )
+        for error in errors:
+            print( error )
