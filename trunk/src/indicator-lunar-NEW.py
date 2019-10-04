@@ -19,61 +19,6 @@
 # Application indicator which displays lunar, solar, planetary, star, comet and satellite information.
 
 
-# References:
-#  http://developer.gnome.org/pygobject
-#  http://developer.gnome.org/gtk3
-#  http://python-gtk-3-tutorial.readthedocs.org
-#  http://wiki.gnome.org/Projects/PyGObject/Threading
-#  http://wiki.ubuntu.com/NotifyOSD
-#  http://lazka.github.io/pgi-docs/AppIndicator3-0.1
-#  http://developer.ubuntu.com/api/devel/ubuntu-12.04/python/AppIndicator3-0.1.html
-#  http://developer.ubuntu.com/api/devel/ubuntu-13.10/c/AppIndicator3-0.1.html
-#  http://www.flaticon.com/search/satellite
-
-
-# TODO Attributes in currently released indicator which have been culled in the development version
-#  and why they should or should not be put back, assuming no performance degradation:
-# 
-#     Illumination - Still calculated for internal use (draw the moon icon).  
-#                    Applies to moon and planets.
-# 
-#     Bright Limb - Still calculated for internal use (draw the moon icon).  
-#                   Applies to moon and planets.
-# 
-#     Magnitude - Still calculated for internal use (filter out bodies).  
-#                 Applies to moon, sun, planets, stars and comets.
-# 
-#     Constellation - Perhaps helpful for a user to find a star in lieu of using the Az/Alt.  
-#                     However, constellations themselves are arbitrary and not based on science.
-#                     Applies to moon, sun, planets, stars and comets.
-# 
-#     Tropical Sign - Used by astrologers and was put in as a kind favour.  
-#                     Not based on science.
-#                     Applies to moon, sun, planets, stars. 
-# 
-#     Distance to Earth, Distance to Sun - Not useful unless you have an Aluminum Falcon, https://www.youtube.com/watch?v=3F1d3QWsyk0.
-#                                          Applies to moon, sun, planets.
-# 
-#     RA/Dec - Az/Alt is much easier to use.
-# 
-#     Solstice/Equinox - Interesting information about the sun.
-# 
-#     Saturn: Earth Tilt, Sun Tilt - Interesting information.
-# 
-#     Planet Moons:
-#         Az/Alt, RA/Dec - Essentially identical to that of the parent planet.
-#         Earth Visible - May be visible from Earth, but chances are you ain't gonna actually see it!
-#         Offset from Planet, X, Y, Z - Useful if you have a big enough telescope.
-#
-# Further, the sun/moon have eclipse information and the moon has phase information
-# which are NOT needed for finding the sun/moon.
-# So maybe adding solstice/equinox back in is okay.
-# Ditto for dawn/dusk.
-
-
-#TODO Maybe time the duration of each update and use that to ensure the next scheduled update is not before that amount of time elapses.
-
-
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
 
@@ -114,42 +59,15 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "AppIndicator3", "0.1" )
+gi.require_version( "GLib", "2.0" )
+gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import AppIndicator3, GLib, Gtk, Notify
-from threading import Timer
-import astroPyephem, datetime, eclipse, glob, locale, logging, math, orbitalelement, os, pythonutils, re, tempfile, threading, twolineelement, webbrowser
+from gi.repository import GLib, Gtk, Notify
+import astroPyephem, datetime, eclipse, indicatorbase, glob, locale, math, orbitalelement, os, re, tempfile, twolineelement, webbrowser
 
 
-class IndicatorLunar:
-
-    AUTHOR = "Bernard Giannetti"
-    VERSION = "1.0.81"
-    ICON = INDICATOR_NAME # Located in /usr/share/icons
-    COPYRIGHT_START_YEAR = "2012"
-    DESKTOP_FILE = INDICATOR_NAME + ".py.desktop"
-    LOG = os.getenv( "HOME" ) + "/" + INDICATOR_NAME + ".log"
-    WEBSITE = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
-
-#TODO Put back to 5
-    START_UP_DELAY_IN_SECONDS = 1 # Used to delay the update function which potentially takes a long time.
-
-#TODO Instead of this temp dir thing...just use the user cache?
-    ICON_BASE_PATH = tempfile.gettempdir()
-    ICON_BASE_NAME = ICON_BASE_PATH + "/." + INDICATOR_NAME
-    ICON_FULL_MOON = ICON_BASE_NAME + "-fullmoon-icon" + ".svg" # Dynamically created in the temporary directory (typically /tmp).
-    ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
-
-    COMMENTS = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." )
-    CREDIT_ECLIPSE = _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" )
-    CREDIT_PYEPHEM = _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
-    CREDIT_COMET_AND_MINOR_PLANETS = _( "Comet and Minor Planet OE data by Minor Planet Center. http://www.minorplanetcenter.net" )
-    CREDIT_SATELLITES = _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" )
-    CREDITS = [ CREDIT_PYEPHEM, CREDIT_ECLIPSE, CREDIT_SATELLITES, CREDIT_COMET_AND_MINOR_PLANETS ]
-
-    DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
+class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
@@ -174,6 +92,18 @@ class IndicatorLunar:
     CONFIG_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
+#TODO Put back to 5
+    START_UP_DELAY_IN_SECONDS = 1 # Used to delay the update function which must start AFTER the indicator has fully initialised.
+
+#TODO Instead of this temp dir thing...just use the user cache?
+    ICON_BASE_PATH = tempfile.gettempdir()
+    ICON_BASE_NAME = ICON_BASE_PATH + "/." + INDICATOR_NAME
+    ICON_FULL_MOON = ICON_BASE_NAME + "-fullmoon-icon" + ".svg" # Dynamically created in the temporary directory (typically /tmp).
+    ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
+
+    DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
+
     DATA_TAGS_TRANSLATIONS = {
         astroPyephem.DATA_ALTITUDE             : _( "ALTITUDE" ),
         astroPyephem.DATA_AZIMUTH              : _( "AZIMUTH" ),
@@ -181,6 +111,7 @@ class IndicatorLunar:
         astroPyephem.DATA_ECLIPSE_LATITUDE     : _( "ECLIPSE LATITUDE" ),
         astroPyephem.DATA_ECLIPSE_LONGITUDE    : _( "ECLIPSE LONGITUDE" ),
         astroPyephem.DATA_ECLIPSE_TYPE         : _( "ECLIPSE TYPE" ),
+        astroPyephem.DATA_EQUINOX              : _( "EQUINOX" ),
         astroPyephem.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
         astroPyephem.DATA_FULL                 : _( "FULL" ),
         astroPyephem.DATA_NEW                  : _( "NEW" ),
@@ -189,6 +120,7 @@ class IndicatorLunar:
         astroPyephem.DATA_RISE_DATE_TIME       : _( "RISE DATE TIME" ),
         astroPyephem.DATA_SET_AZIMUTH          : _( "SET AZIMUTH" ),
         astroPyephem.DATA_SET_DATE_TIME        : _( "SET DATE TIME" ),
+        astroPyephem.DATA_SOLSTICE             : _( "SOLSTICE" ),
         astroPyephem.DATA_THIRD_QUARTER        : _( "THIRD QUARTER" ) }
 
     MOON_TAG_TRANSLATION = { astroPyephem.NAME_TAG_MOON : _( "MOON" ) }
@@ -500,7 +432,7 @@ class IndicatorLunar:
         "VEGA"              :   91262,
         "VINDEMIATRIX"      :   63608,
         "WEZEN"             :   34444,
-        "ZAURAK"            :	18543 }
+        "ZAURAK"            :    18543 }
 
     BODY_TAGS_TRANSLATIONS = dict(
         list( MOON_TAG_TRANSLATION.items() ) +
@@ -583,46 +515,45 @@ class IndicatorLunar:
 
 
     def __init__( self ):
+        super().__init__(
+            indicatorName = INDICATOR_NAME,
+            version = "1.0.81",
+            copyrightStartYear = "2012",
+            comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
+            creditz = [ _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" ),
+                        _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" ),
+                        _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" ),
+                        _( "Comet and Minor Planet OE data by Minor Planet Center. http://www.minorplanetcenter.net" ) ] )
+
         self.cometData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.minorPlanetData = { } # Key: minor planet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satelliteNotifications = { }
 
-        logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( IndicatorLunar.LOG ) ] )
-
-        self.indicator = AppIndicator3.Indicator.new( INDICATOR_NAME, IndicatorLunar.ICON, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH )
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
-        menu = Gtk.Menu()
-        menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
-        self.indicator.set_menu( menu )
-        menu.show_all()
+#         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH ) #TODO Needed?  Maybe needed when setting the icon.
+        self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
         # Flush comet, minor planet and satellite caches.
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
-        pythonutils.removeOldFilesFromCache( INDICATOR_NAME, IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
         for cacheBaseName in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
-            pythonutils.removeOldFilesFromCache( INDICATOR_NAME, cacheBaseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+            self.removeOldFilesFromCache( cacheBaseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
 
         # Remove old icons.
         oldIcons = glob.glob( IndicatorLunar.ICON_BASE_NAME + "*" )
         for oldIcon in oldIcons:
             os.remove( oldIcon )
 
-        Notify.init( INDICATOR_NAME )
-        self.lock = threading.Lock()
-        self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
-        self.loadConfig()
-        GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.update )
 
+    def update( self, menu ):
+        if self.startingUp:
+            menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
+#TODO Wrap in GLib stuff?
+# ...or check the TODO in base class.
+            GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.requestUpdate )
 
-    def main( self ): Gtk.main()
-
-
-    def update( self ):
-        with self.lock:
-            utcNow = datetime.datetime.utcnow() #TODO Test
+        else:
+            utcNow = datetime.datetime.utcnow()
 
             # Update comet, minor planet and satellite data.
             self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
@@ -643,57 +574,39 @@ class IndicatorLunar:
             if self.satellitesAddNew:
                 self.addNewBodies( self.satelliteData, self.satellites )
 
-            print( "Update data:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
-            utcNow = datetime.datetime.utcnow() #TODO Test
-
             # Update backend.  Returned object is a dictionary:
             #    Key is a tuple of AstronomicalBodyType, a name tag and data tag.
             #    Value is the calculated astronomical data as a string.
-            self.data = astroPyephem.getAstronomicalInformation( datetime.datetime.utcnow(),
-                                                          self.latitude, self.longitude, self.elevation,
-                                                          self.planets,
-                                                          self.stars,
-                                                          self.satellites, self.satelliteData,
-                                                          self.comets, self.cometData,
-                                                          self.minorPlanets, self.minorPlanetData,
-                                                          self.magnitude,
-                                                          self.hideBodiesBelowHorizon )
-
-            print( "Update backend:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
-            utcNow = datetime.datetime.utcnow() #TODO Test
+            self.data = astroPyephem.getAstronomicalInformation(
+                datetime.datetime.utcnow(),
+                self.latitude, self.longitude, self.elevation,
+                self.planets,
+                self.stars,
+                self.satellites, self.satelliteData,
+                self.comets, self.cometData,
+                self.minorPlanets, self.minorPlanetData,
+                self.magnitude,
+                self.hideBodiesBelowHorizon )
 
             # Update frontend.
-            self.updateMenu()
+            self.updateMenu( menu )
             self.updateIconAndLabel()
-
-#TODO Testing
-            try:
-                print( "Equinox ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_EQUINOX ) ) )
-                print( "Solstice ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_SOLSTICE ) ) )
-                print( "Dawn ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_DAWN ) ) )
-                print( "Dusk ", self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_DUSK ) ) )
-
-            except Exception as e:
-                print( e )
 
             if self.showWerewolfWarning:
                 self.notificationFullMoon()
 
-#TODO Uncomment when all done...don't forget to test!
-#             if self.showSatelliteNotification:
-#                 self.notificationSatellites()
+    #TODO Uncomment when all done...don't forget to test!
+    #             if self.showSatelliteNotification:
+    #                 self.notificationSatellites()
 
-            print( "Update frontend:", int( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) ) #TODO
-#             utcNow = datetime.datetime.utcnow() #TODO Test
-
-            self.updateTimerID = GLib.timeout_add_seconds( self.getNextUpdateTimeInSeconds(), self.update )
+            return self.getNextUpdateTimeInSeconds( utcNow )
 
 
     # Get the data from the cache, or if stale, download from the source.
     #
     # Returns a dictionary (may be empty).
     def updateData( self, cacheBaseName, cacheMaximumAgeHours, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
-        data = pythonutils.readCacheBinary( INDICATOR_NAME, cacheBaseName, logging ) # Either valid or None.
+        data = self.readCacheBinary( cacheBaseName ) # Either valid or None.
 
 #TODO Start of temporary hack...
 # Cache data formats changed between version 80 and 81.
@@ -711,38 +624,39 @@ class IndicatorLunar:
 # End of hack!
 
         if data is None:
-            data = downloadDataFunction( dataURL, logging )
+            data = downloadDataFunction( dataURL, self.getLogging() )
             if magnitudeFilterFunction:
                 data = magnitudeFilterFunction( data, astroPyephem.MAGNITUDE_MAXIMUM )
 
-            pythonutils.writeCacheBinary( data, INDICATOR_NAME, cacheBaseName, logging )
+            self.writeCacheBinary( data, cacheBaseName )
 
         return data
 
 
-    def getNextUpdateTimeInSeconds( self ):
+    def getNextUpdateTimeInSeconds( self, startDateTime ):
         utcNow = datetime.datetime.utcnow()
-        utcNowPlusOneMinute = utcNow + datetime.timedelta( minutes = 1 )
+        durationOfLastRunInSeconds = ( utcNow - startDateTime ).total_seconds()
+        utcNowPlusLastRun = utcNow + datetime.timedelta( seconds = durationOfLastRunInSeconds )
         nextUpdateTime = utcNow + datetime.timedelta( hours = 1000 ) # Set a bogus date/time in the future.
         for key in self.data:
             if key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
+               key[ 2 ] == astroPyephem.DATA_EQUINOX or \
                key[ 2 ] == astroPyephem.DATA_FIRST_QUARTER or \
                key[ 2 ] == astroPyephem.DATA_FULL or \
                key[ 2 ] == astroPyephem.DATA_NEW or \
                key[ 2 ] == astroPyephem.DATA_RISE_DATE_TIME or \
                key[ 2 ] == astroPyephem.DATA_SET_DATE_TIME or \
+               key[ 2 ] == astroPyephem.DATA_SOLSTICE or \
                key[ 2 ] == astroPyephem.DATA_THIRD_QUARTER:
 
                 dateTime = datetime.datetime.strptime( self.data[ key ], astroPyephem.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
-                if dateTime > utcNowPlusOneMinute and dateTime < nextUpdateTime:
+                if dateTime > utcNowPlusLastRun and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
-        print( datetime.datetime.now() + datetime.timedelta( seconds = int( ( nextUpdateTime - utcNow ).total_seconds() ) + 10 ) )
-        return int( ( nextUpdateTime - utcNow ).total_seconds() ) + 10 # Add some fat to ensure we don't do an update and leave in an item which as more or less set.
+        return int( ( nextUpdateTime - utcNow ).total_seconds() )
 
 
-    def updateMenu( self ):
-        menu = Gtk.Menu()
+    def updateMenu( self, menu ):
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
         self.updateMenuPlanets( menu )
@@ -750,9 +664,6 @@ class IndicatorLunar:
         self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.Comet )
         self.updateMenuCometsMinorPlanets( menu, astroPyephem.AstronomicalBodyType.MinorPlanet )
         self.updateMenuSatellites( menu )
-        pythonutils.createPreferencesAboutQuitMenuItems( menu, len( menu.get_children() ) > 0, self.onPreferences, self.onAbout, Gtk.main_quit )
-        self.indicator.set_menu( menu )
-        menu.show_all()
 
 
     def updateIconAndLabel( self ):
@@ -887,8 +798,8 @@ class IndicatorLunar:
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
-            subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Next Phases" ) ) )
+            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astroPyephem.DATA_PHASE, ) ) ) )
+            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Next Phases" ) ) )
 
             # Determine which phases occur by date rather than using the phase calculated.
             # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
@@ -899,7 +810,7 @@ class IndicatorLunar:
             nextPhases.append( [ self.data[ key + ( astroPyephem.DATA_NEW, ) ], _( "New: " ), key + ( astroPyephem.DATA_NEW, ) ] )
 
             nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
-            indent = pythonutils.indent( 1, 2 )
+            indent = self.indent( 1, 2 )
             for dateTime, displayText, key in nextPhases:
                 subMenu.append( Gtk.MenuItem( indent + displayText + self.getDisplayData( key ) ) )
 
@@ -914,17 +825,19 @@ class IndicatorLunar:
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, 0, 1 )
+            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Equinox: " ) + self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_EQUINOX ) ) ) )
+            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Solstice: " ) + self.getDisplayData( ( astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN, astroPyephem.DATA_SOLSTICE ) ) ) )
             self.updateEclipseMenu( subMenu, astroPyephem.AstronomicalBodyType.Sun, astroPyephem.NAME_TAG_SUN )
 
 
     def updateEclipseMenu( self, menu, astronomicalBodyType, nameTag ):
         key = ( astronomicalBodyType, nameTag )
-        menu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + _( "Eclipse" ) ) )
-        menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_DATE_TIME, ) ) ) )
+        menu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Eclipse" ) ) )
+        menu.append( Gtk.MenuItem( self.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_DATE_TIME, ) ) ) )
         latitude = self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_LATITUDE, ) )
         longitude = self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_LONGITUDE, ) )
-        menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
-        menu.append( Gtk.MenuItem( pythonutils.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_TYPE, ) ) ) )
+        menu.append( Gtk.MenuItem( self.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
+        menu.append( Gtk.MenuItem( self.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ECLIPSE_TYPE, ) ) ) )
 
 
     def updateMenuPlanets( self, menu ):
@@ -939,7 +852,7 @@ class IndicatorLunar:
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name, translatedName in planets:
-                subMenu.append( Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName ) )
+                subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + translatedName ) )
                 self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Planet, name, 1, 2 )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator ) 
@@ -960,7 +873,7 @@ class IndicatorLunar:
             menuItem.set_submenu( subMenu )
             for name, translatedName in stars:
                 url = IndicatorLunar.STAR_SEARCH_URL + str( IndicatorLunar.STARS_TO_HIPPARCOS_IDENTIFIER[ name ] )
-                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + translatedName )
+                menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + translatedName )
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
                 self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Star, name, 1, 2, url )
@@ -986,7 +899,7 @@ class IndicatorLunar:
             menuItem.set_submenu( subMenu )
             for name in sorted( bodies ):
                 url = self.getCometMinorPlanetOnClickURL( name, astronomicalBodyType )
-                menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + name )
+                menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + name )
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
                 self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2, url )
@@ -1002,7 +915,6 @@ class IndicatorLunar:
     # https://www.iau.org/public/themes/naming
     # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
     def getCometMinorPlanetOnClickURL( self, name, astronomicalBodyType ):
-        url = IndicatorLunar.MINOR_PLANET_CENTER_SEARCH_URL
         if astronomicalBodyType == astroPyephem.AstronomicalBodyType.Comet:
             if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
                 id = name[ : name.find( "(" ) ].strip()
@@ -1029,12 +941,12 @@ class IndicatorLunar:
             else: # 229762 G!kunll'homdima
                 id = components[ 0 ] 
 
-        return url + id.replace( "/", "%2F" ).replace( " ", "+" )
+        return IndicatorLunar.MINOR_PLANET_CENTER_SEARCH_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
 
 
     def updateCommonMenu( self, menu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
         key = ( astronomicalBodyType, nameTag )
-        indent = pythonutils.indent( indentUnity, indentGnomeShell )
+        indent = self.indent( indentUnity, indentGnomeShell )
 
         if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
             self.createMenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), onClickURL, menu )
@@ -1045,7 +957,6 @@ class IndicatorLunar:
 
             self.createMenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ), onClickURL, menu )
             self.createMenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ), onClickURL, menu )
-
 
 
 #TODO Test each clause...will have to adjust date/time and lat/long.
@@ -1101,25 +1012,25 @@ class IndicatorLunar:
                   replace( IndicatorLunar.SATELLITE_TAG_NUMBER, number ). \
                   replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() )
 
-            menuItem = Gtk.MenuItem( pythonutils.indent( 0, 1 ) + menuText )
+            menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + menuText )
             menuItem.set_name( url )
             subMenu.append( menuItem )
 
             key = ( astroPyephem.AstronomicalBodyType.Satellite, number )
             if key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data and key + ( astroPyephem.DATA_RISE_AZIMUTH, ) in self.data:
-                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Rise" ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Set" ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 1, 2 ) + _( "Rise" ), url, subMenu )
+                self.createMenuItem( self.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_AZIMUTH, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 1, 2 ) + _( "Set" ), url, subMenu )
+                self.createMenuItem( self.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_DATE_TIME, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_SET_AZIMUTH, ) ), url, subMenu )
 
             elif key + ( astroPyephem.DATA_RISE_DATE_TIME, ) in self.data:
-                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astroPyephem.DATA_RISE_DATE_TIME, ) ), url, subMenu )
 
             else:
-                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ), url, subMenu )
-                self.createMenuItem( pythonutils.indent( 1, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astroPyephem.DATA_AZIMUTH, ) ), url, subMenu )
+                self.createMenuItem( self.indent( 1, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astroPyephem.DATA_ALTITUDE, ) ), url, subMenu )
 
             separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator ) 
@@ -1153,9 +1064,7 @@ class IndicatorLunar:
            key[ 2 ] == astroPyephem.DATA_SET_AZIMUTH:
             displayData = str( round( math.degrees( float( self.data[ key ] ) ) ) ) + "°"
 
-        elif key[ 2 ] == astroPyephem.DATA_DUSK or \
-             key[ 2 ] == astroPyephem.DATA_DAWN or \
-             key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
+        elif key[ 2 ] == astroPyephem.DATA_ECLIPSE_DATE_TIME or \
              key[ 2 ] == astroPyephem.DATA_EQUINOX or \
              key[ 2 ] == astroPyephem.DATA_FIRST_QUARTER or \
              key[ 2 ] == astroPyephem.DATA_FULL or \
@@ -1207,7 +1116,7 @@ class IndicatorLunar:
 
         if displayData is None:
             displayData = "" # Better to show nothing than let None slip through and crash.
-            logging.error( "Unknown key: " + key )
+            self.getLogging().error( "Unknown key: " + key )
 
         return displayData
 
@@ -1229,7 +1138,7 @@ class IndicatorLunar:
         width = 100
         height = 100
         radius = float( width / 2 ) * 0.8 # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
-        colour = pythonutils.getThemeColour( IndicatorLunar.ICON, logging )
+        colour = self.getThemeColour( self.icon )
 
         if illuminationPercentage == 0 or illuminationPercentage == 100:
             svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
@@ -1264,53 +1173,15 @@ class IndicatorLunar:
                 f.close()
 
         except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing: " + svgFilename )
+            self.getLogging().exception( e )
+            self.getLogging().error( "Error writing: " + svgFilename )
 
 
-    def onAbout( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            GLib.source_remove( self.updateTimerID )
-            pythonutils.showAboutDialog(
-                [ IndicatorLunar.AUTHOR + " " + IndicatorLunar.WEBSITE ],
-                [ IndicatorLunar.AUTHOR + " " + IndicatorLunar.WEBSITE ],
-                IndicatorLunar.COMMENTS,
-                IndicatorLunar.AUTHOR,
-                IndicatorLunar.COPYRIGHT_START_YEAR,
-                IndicatorLunar.CREDITS,
-                _( "Credits" ),
-                Gtk.License.GPL_3_0,
-                IndicatorLunar.ICON,
-                INDICATOR_NAME,
-                IndicatorLunar.WEBSITE,
-                IndicatorLunar.VERSION,
-                _( "translator-credits" ),
-                _( "View the" ),
-                _( "text file." ),
-                _( "changelog" ),
-                IndicatorLunar.LOG,
-                _( "View the" ),
-                _( "text file." ),
-                _( "error log" ) )
-
-            self.lock.release()
-            GLib.idle_add( self.update )
-
-
-#TODO Do this for all other indicators.
-    def onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            GLib.source_remove( self.updateTimerID )
-            self._onPreferences( widget )
-            self.lock.release()
-            GLib.idle_add( self.update )
-
-
-    def _onPreferences( self, widget ):
+    def onPreferences( self, dialog ):
         notebook = Gtk.Notebook()
 
         # Icon.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -1375,7 +1246,7 @@ class IndicatorLunar:
         tree.append_column( treeViewColumn )
 
         tree.set_tooltip_text( _(
-            "Double click to add a tag to the icon text.\n" + \
+            "Double click to add a tag to the icon text.\n\n" + \
             "A tag with no value arises if a body is dropped\n" + \
             "due to exceeding magnitude, or below the horizon\n" + \
             "(no set date/time and no azimuth/altitude),\n" + \
@@ -1391,7 +1262,7 @@ class IndicatorLunar:
         notebook.append_page( grid, Gtk.Label( _( "Icon" ) ) )
 
         # Menu.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         hideBodiesBelowTheHorizonCheckbox = Gtk.CheckButton( _( "Hide bodies below the horizon" ) )
         hideBodiesBelowTheHorizonCheckbox.set_active( self.hideBodiesBelowHorizon )
@@ -1581,7 +1452,7 @@ class IndicatorLunar:
         # OSD (satellite and full moon).
         notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         showSatelliteNotificationCheckbox = Gtk.CheckButton( _( "Satellite rise" ) )
         showSatelliteNotificationCheckbox.set_active( self.showSatelliteNotification )
@@ -1589,7 +1460,7 @@ class IndicatorLunar:
         grid.attach( showSatelliteNotificationCheckbox, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+        box.set_margin_left( self.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Summary" ) )
         label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
@@ -1613,10 +1484,10 @@ class IndicatorLunar:
         box.pack_start( satelliteNotificationSummaryText, True, True, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
-        showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, satelliteNotificationSummaryText )
+        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, label, satelliteNotificationSummaryText )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+        box.set_margin_left( self.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Message" ) + "\n \n \n \n \n " ) # Padding to ensure the textview for the message text is not too small.  
         label.set_valign( Gtk.Align.START )
@@ -1645,7 +1516,7 @@ class IndicatorLunar:
         box.pack_start( scrolledWindow, True, True, 0 )
         grid.attach( box, 0, 2, 1, 1 )
 
-        showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, label, scrolledWindow )
+        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, label, scrolledWindow )
 
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
@@ -1657,7 +1528,7 @@ class IndicatorLunar:
             "mock text." ) )
         grid.attach( test, 0, 3, 1, 1 )
 
-        showSatelliteNotificationCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
+        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, test, test )
 
         showWerewolfWarningCheckbox = Gtk.CheckButton( _( "Werewolf warning" ) )
         showWerewolfWarningCheckbox.set_margin_top( 10 )
@@ -1666,7 +1537,7 @@ class IndicatorLunar:
         grid.attach( showWerewolfWarningCheckbox, 0, 4, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+        box.set_margin_left( self.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Summary" ) )
         label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
@@ -1679,10 +1550,10 @@ class IndicatorLunar:
         box.pack_start( werewolfNotificationSummaryText, True, True, 0 )
         grid.attach( box, 0, 5, 1, 1 )
 
-        showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationSummaryText )
+        showWerewolfWarningCheckbox.connect( "toggled", self.onCheckbox, label, werewolfNotificationSummaryText )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( pythonutils.INDENT_TEXT_LEFT )
+        box.set_margin_left( self.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Message" ) + "\n \n " ) # Padding to ensure the textview for the message text is not too small.   
         label.set_valign( Gtk.Align.START )
@@ -1701,7 +1572,7 @@ class IndicatorLunar:
         box.pack_start( scrolledWindow, True, True, 0 )
         grid.attach( box, 0, 6, 1, 1 )
 
-        showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, label, werewolfNotificationMessageText )
+        showWerewolfWarningCheckbox.connect( "toggled", self.onCheckbox, label, werewolfNotificationMessageText )
 
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
@@ -1710,12 +1581,12 @@ class IndicatorLunar:
         test.set_tooltip_text( _( "Show the notification using the current summary/message." ) )
         grid.attach( test, 0, 7, 1, 1 )
 
-        showWerewolfWarningCheckbox.connect( "toggled", pythonutils.onCheckbox, test, test )
+        showWerewolfWarningCheckbox.connect( "toggled", self.onCheckbox, test, test )
 
         notebook.append_page( grid, Gtk.Label( _( "Notifications" ) ) )
 
         # Location.
-        grid = pythonutils.createGrid()
+        grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -1769,46 +1640,44 @@ class IndicatorLunar:
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( pythonutils.isAutoStart( IndicatorLunar.DESKTOP_FILE, logging ) )
+        autostartCheckbox.set_active( self.isAutoStart() )
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
-        dialog = Gtk.Dialog( _( "Preferences" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( notebook, True, True, 0 )
-        dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorLunar.ICON )
         dialog.show_all()
 
+#TODO Need a loop still?
         while True:
             if dialog.run() != Gtk.ResponseType.OK:
                 break
 
             cityValue = city.get_active_text()
             if cityValue == "":
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ), INDICATOR_NAME )
+                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
-            if latitudeValue == "" or not pythonutils.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Latitude must be a number between 90 and -90 inclusive." ), INDICATOR_NAME )
+            if latitudeValue == "" or not self.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
+                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "Latitude must be a number between 90 and -90 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
-            if longitudeValue == "" or not pythonutils.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Longitude must be a number between 180 and -180 inclusive." ), INDICATOR_NAME )
+            if longitudeValue == "" or not self.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
+                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "Longitude must be a number between 180 and -180 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
-            if elevationValue == "" or not pythonutils.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
-                pythonutils.showMessage( dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number between 0 and 10000 inclusive." ), INDICATOR_NAME )
+            if elevationValue == "" or not self.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
+                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number between 0 and 10000 inclusive." ), INDICATOR_NAME )
                 notebook.set_current_page( TAB_GENERAL )
                 elevation.grab_focus()
                 continue
@@ -1852,27 +1721,21 @@ class IndicatorLunar:
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             self.satelliteNotificationSummary = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
-            self.satelliteNotificationMessage = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, pythonutils.getTextViewText( satelliteNotificationMessageText ) )
+            self.satelliteNotificationMessage = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, self.getTextViewText( satelliteNotificationMessageText ) )
 
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningSummary = werewolfNotificationSummaryText.get_text()
-            self.werewolfWarningMessage = pythonutils.getTextViewText( werewolfNotificationMessageText )
+            self.werewolfWarningMessage = self.getTextViewText( werewolfNotificationMessageText )
 
             self.city = cityValue
             self.latitude = float( latitudeValue )
             self.longitude = float( longitudeValue )
             self.elevation = float( elevationValue )
 
-            self.saveConfig()
-            pythonutils.setAutoStart( IndicatorLunar.DESKTOP_FILE, autostartCheckbox.get_active(), logging )
+            self.setAutoStart( autostartCheckbox.get_active() )
+            self.requestSaveConfig()
             break
 
-#TODO Debug
-        print( "Preferences still in state of flux; may not save properly." )
-        print( "Indicator text is busted." )
-        print( "Modify the .json if need be." )
-
-        dialog.destroy()
 
 #TODO Satellites now have ':' between name, number and intl desig.  
 #Check this doesn't break the double click adding to the indicator text.
@@ -2040,7 +1903,7 @@ class IndicatorLunar:
 
     def onTestNotificationClicked( self, button, summaryEntry, messageTextView, isFullMoon ):
         summary = summaryEntry.get_text()
-        message = pythonutils.getTextViewText( messageTextView )
+        message = self.getTextViewText( messageTextView )
 
         if isFullMoon:
             if not os.path.exists( IndicatorLunar.ICON_FULL_MOON ):
@@ -2100,7 +1963,7 @@ class IndicatorLunar:
 
     def getDefaultCity( self ):
         try:
-            timezone = pythonutils.processGet( "cat /etc/timezone" )
+            timezone = self.processGet( "cat /etc/timezone" )
             theCity = None
             cities = astroPyephem.getCities()
             for city in cities:
@@ -2112,16 +1975,14 @@ class IndicatorLunar:
                 theCity = cities[ 0 ]
 
         except Exception as e:
-            logging.exception( e )
-            logging.error( "Error getting default city." )
+            self.getLogging().exception( e )
+            self.getLogging().error( "Error getting default city." )
             theCity = cities[ 0 ]
 
         return theCity
 
 
-    def loadConfig( self ):
-        config = pythonutils.loadConfig( INDICATOR_NAME, INDICATOR_NAME, logging )
-
+    def loadConfig( self, config ):
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME ) # Returns None if the key is not found.
         if self.city is None:
             self.city = self.getDefaultCity()
@@ -2186,27 +2047,30 @@ class IndicatorLunar:
 
                 self.satellites = tmp
 
-        self.saveConfig()
+        self.saveConfig() #TODO Need to do a request here to save.
 # End of hack!
 
 
     def saveConfig( self ):
         if self.cometsAddNew:
             comets = [ ]
+
         else:
             comets = self.comets # Only write out the list of comets if the user elects to not add new.
 
         if self.minorPlanetsAddNew:
             minorPlanets = [ ]
+
         else:
             minorPlanets = self.minorPlanets # Only write out the list of minor planets if the user elects to not add new.
 
         if self.satellitesAddNew:
             satellites = [ ]
+
         else:
             satellites = self.satellites # Only write out the list of satellites if the user elects to not add new.
 
-        config = {
+        return {
             IndicatorLunar.CONFIG_CITY_ELEVATION: self.elevation,
             IndicatorLunar.CONFIG_CITY_LATITUDE: self.latitude,
             IndicatorLunar.CONFIG_CITY_LONGITUDE: self.longitude,
@@ -2231,7 +2095,5 @@ class IndicatorLunar:
             IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY: self.werewolfWarningSummary
         }
 
-        pythonutils.saveConfig( config, INDICATOR_NAME, INDICATOR_NAME, logging )
 
-
-if __name__ == "__main__": IndicatorLunar().main()
+IndicatorLunar().main()
