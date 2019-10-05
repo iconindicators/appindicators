@@ -149,7 +149,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             result = self.processGet( "VBoxManage list vms | grep " + uuid )
             if result is None or uuid not in result:
                 message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
-                Notify.Notification.new( _( "Error" ), message, IndicatorVirtualBox.ICON ).show()
+                Notify.Notification.new( _( "Error" ), message, self.icon ).show()
 
             else:
                 self.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
@@ -182,7 +182,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     # Prevent notifications from appearing until a set time has elapsed since the previous notification.
     def sendNotificationWithDelay( self, summary, message ):
         if( self.dateTimeOfLastNotification + datetime.timedelta( seconds = IndicatorVirtualBox.NOTIFICATION_DELAY_IN_SECONDS ) < datetime.datetime.now() ):
-            Notify.Notification.new( summary, message, IndicatorVirtualBox.ICON ).show()
+            Notify.Notification.new( summary, message, self.icon ).show()
             self.dateTimeOfLastNotification = datetime.datetime.now()
 
 
@@ -582,7 +582,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         dialog = Gtk.Dialog( _( "Virtual Machine Properties" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorVirtualBox.ICON )
 
         while True:
             dialog.show_all()
