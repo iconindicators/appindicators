@@ -68,7 +68,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
                 "The license for non-UK ports has expired. " + 
                 "Until you upgrade to the latest version of the indicator, only UK ports will be available." )
 
-            Notify.Notification.new( _( "Warning" ), message, IndicatorTide.ICON ).show()
+            Notify.Notification.new( _( "Warning" ), message, self.icon ).show()
             self.getLogging().warning( message )
 
 
@@ -361,41 +361,6 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
     def onShowAsSubmenusCheckbox( self, source, showAsSubmenusExceptFirstDayCheckbox ): showAsSubmenusExceptFirstDayCheckbox.set_sensitive( source.get_active() )
 
 
-    def loadConfig( self, config ):
-        self.menuItemDateFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT, IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT )
-        self.menuItemTideFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT, IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT )
-        self.menuItemTideFormatSansTime = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME, IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME )
-        self.portID = config.get( IndicatorTide.CONFIG_PORT_ID, None )
-        self.showAsSubMenus = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS, True )
-        self.showAsSubMenusExceptFirstDay = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, True )
-
-        # Validate the port...
-        if not ports.isValidPortID( self.portID ):
-            try: # Set a geographically sensible default...
-                timezone = self.processGet( "cat /etc/timezone" )
-                country = timezone[ 0 : timezone.find( "/" ) ]
-
-            except Exception as e:
-                self.getLogging().exception( e )
-                self.getLogging().error( "Error getting country/city from timezone." )
-                country = ""
-
-            self.portID = ports.getPortIDForCountry( country )
-            if self.portID is None:
-                self.portID = ports.getFirstPortID()
-
-
-    def saveConfig( self ):
-        return {
-            IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
-            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
-            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME: self.menuItemTideFormatSansTime,
-            IndicatorTide.CONFIG_PORT_ID: self.portID,
-            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS: self.showAsSubMenus,
-            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY: self.showAsSubMenusExceptFirstDay
-        }
-
-
     def getTidalData( self, portID ):
         tidalReadings = [ ]
         self.removeOldFilesFromCache( IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
@@ -563,6 +528,41 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
                     tidalReadings.remove( tidalReading )
 
         return tidalReadings
+
+
+    def loadConfig( self, config ):
+        self.menuItemDateFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT, IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT )
+        self.menuItemTideFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT, IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT )
+        self.menuItemTideFormatSansTime = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME, IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME )
+        self.portID = config.get( IndicatorTide.CONFIG_PORT_ID, None )
+        self.showAsSubMenus = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS, True )
+        self.showAsSubMenusExceptFirstDay = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, True )
+
+        # Validate the port...
+        if not ports.isValidPortID( self.portID ):
+            try: # Set a geographically sensible default...
+                timezone = self.processGet( "cat /etc/timezone" )
+                country = timezone[ 0 : timezone.find( "/" ) ]
+
+            except Exception as e:
+                self.getLogging().exception( e )
+                self.getLogging().error( "Error getting country/city from timezone." )
+                country = ""
+
+            self.portID = ports.getPortIDForCountry( country )
+            if self.portID is None:
+                self.portID = ports.getFirstPortID()
+
+
+    def saveConfig( self ):
+        return {
+            IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
+            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
+            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME: self.menuItemTideFormatSansTime,
+            IndicatorTide.CONFIG_PORT_ID: self.portID,
+            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS: self.showAsSubMenus,
+            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY: self.showAsSubMenusExceptFirstDay
+        }
 
 
 IndicatorTide().main()
