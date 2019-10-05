@@ -1,27 +1,27 @@
 indicator-lunar (1.0.81-1) xenial; urgency=low
 
   * Under GNOME Shell, the indicator grinds to a halt and menu items beyond
-    the bottom of the screen are truncated.
+    the bottom of the screen do not scroll properly.
     Consequently, any item/attribute/preference not directly assisting the
     home astronomer to locate an object has been removed.
-  * Removed right ascension and declination from all items;
-    azimuth/altitude are sufficient.
+    Items such as moon phase, eclipse, solstice/equinox remain.
+  * Removed right ascension and declination; azimuth/altitude are sufficient.
   * Removed decimal degrees from azimuth/altitude.
-  * Removed planetary moons;
-    each effectively has the same azimuth/altitude as the parent planet.
+  * Removed planetary moons; each effectively has the same azimuth/altitude
+    as the parent planet.
   * Removed werewolf warning percentage from preferences and fixed at 99%.
   * Removed date/time format from preferences; uses ISO 8601 without seconds.
-  * Preferences no longer allows user configurable TLE/OE data files;
-    code became too complicated to manage; defaults work well enough.
+  * TLE/OE data files are no longer configurable; the code was becoming too
+    difficult to manage and the defaults are more than adequate.
   * On startup, the indicator shows the single menu item "Initialising...".
     Once the indicator is ready, the full menu is displayed.
-  * Bodies which are 'never up' are no longer displayed.
-  * Bodies which are 'always up' display their current azimuth/altitude.
-  * Bodies below the horizon display a rise date/time.
-  * Bodies above the horizon display a set date/time and azimuth/altitude.
-  * Only visible satellite passes (dawn/dusk) are shown.
+  * Bodies which are 'never up' are not displayed.
+  * Bodies which are 'always up' only display azimuth/altitude.
+  * Bodies below the horizon display the rise date/time.
+  * Bodies above the horizon display the set date/time and azimuth/altitude.
+  * Only visible satellite passes (at dawn/dusk) are shown.
   * Added minor planets, courtesy of the Minor Planet Center.
-  * Added filtering by magnitude to planets and stars. 
+  * Magnitude filtering extended to include planets and stars.
   * Added on-click URL for minor planets and stars.
   * Added hyperlink to the About dialog which links to the error log text file
     (only visible if the underlying file is present).
