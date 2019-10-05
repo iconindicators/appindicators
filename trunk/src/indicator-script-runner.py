@@ -394,7 +394,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             dialog = Gtk.Dialog( _( "Copy Script" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
             dialog.vbox.pack_start( grid, True, True, 0 )
             dialog.set_border_width( 5 )
-            dialog.set_icon_name( IndicatorScriptRunner.ICON )
 
             while True:
                 dialog.show_all()
@@ -577,7 +576,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorScriptRunner.ICON )
 
         while True:
             dialog.show_all()
@@ -713,13 +711,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def loadConfig( self, config ):
-        self.scripts = [ ]
-        if len( config ) > 0: #TODO Why need to do this check?
-            self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
-            self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, "" )
-            self.scriptNameDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT, "" )
-            self.showScriptsInSubmenus = config.get( IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, False )
+        self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
+        self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, "" )
+        self.scriptNameDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT, "" )
+        self.showScriptsInSubmenus = config.get( IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, False )
 
+        self.scripts = [ ]
+        if config:
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
             defaultScriptFound = False
             for script in scripts:
@@ -738,10 +736,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptNameDefault = ""
 
         else:
-            self.scripts = [ ]
             self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 3 www.google.com", False ) )
-            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + IndicatorScriptRunner.ICON + " \"Public IP address: $(wget http://ipinfo.io/ip -qO -)\"", False ) )
-            self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + IndicatorScriptRunner.ICON + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False ) )
+            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + self.icon + " \"Public IP address: $(wget http://ipinfo.io/ip -qO -)\"", False ) )
+            self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False ) )
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
