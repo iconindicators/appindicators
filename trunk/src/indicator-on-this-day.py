@@ -71,7 +71,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             today = self.processGet( "date +'%b %d'" ).strip() # It is assumed/hoped the dates in the calendar result are short date format.
             for event in events:
                 if today == event.getDate():
-                    Notify.Notification.new( _( "On this day..." ), event.getDescription(), IndicatorOnThisDay.ICON ).show()
+                    Notify.Notification.new( _( "On this day..." ), event.getDescription(), self.icon ).show()
 
 
     def buildMenu( self, menu, events ):
@@ -423,7 +423,6 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorOnThisDay.ICON )
 
         # Need to set these here as the dialog had not been created at the point the buttons were defined.
         browseButton.connect( "clicked", self.onBrowseCalendar, dialog, fileEntry )
