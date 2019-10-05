@@ -117,6 +117,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
 #TODO Look at all times when/why we copy the ppas.
+#Maybe don't need this...just always download.
+#Check what silliness the preferences implement to avoid a download.
     def buildMenu( self, menu ):
         ppas = deepcopy( self.ppas ) # Leave the original download data as is - makes dynamic (user) changes faster (don't have to re-download).
 
@@ -603,7 +605,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
 
         while True:
             dialog.show_all()
@@ -764,10 +765,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if rowNumber is None:
             title = _( "Add Filter" )
 
+#TODO Find all places in all indicators where we create a dialog...and make a generic call to set some defaults.
         dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorPPADownloadStatistics.ICON )
         dialog.set_default_size( -1, 350 ) # Set a height otherwise the textview is only a couple of lines high.
 
         while True:
@@ -793,11 +794,22 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def loadConfig( self, config ):
-        self.ppas = [ ]
-        self.ppasPrevious = [ ] # Used to hold the most recent download for comparison.
-        self.filters = { }
+        self.combinePPAs = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, False )
+        self.filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, { } )
+        self.ignoreVersionArchitectureSpecific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, True )
+        self.showSubmenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, False )
+        self.sortByDownload = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
+        self.sortByDownloadAmount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, 5 )
 
-        if len( config ) == 0: #TODO CHeck another way?  not config?  Or reverse test and do the else clause first?
+        self.ppas = [ ]
+        if config:
+            ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
+            for ppa in ppas:
+                self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
+
+            self.ppas.sort( key = operator.methodcaller( "getKey" ) )
+
+        else:
             self.ppas.append( PPA( "thebernmeister", "ppa", "bionic", "amd64" ) )
             self.filters[ 'thebernmeister | ppa' ] = [ 
                 "indicator-fortune",
@@ -809,20 +821,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 "indicator-stardate",
                 "indicator-tide",
                 "indicator-virtual-box" ]
-
-        else:
-            ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
-            for ppa in ppas:
-                self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
-
-            self.ppas.sort( key = operator.methodcaller( "getKey" ) )
-
-            self.combinePPAs = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, False )
-            self.filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, { } )
-            self.ignoreVersionArchitectureSpecific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, True )
-            self.showSubmenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, False )
-            self.sortByDownload = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
-            self.sortByDownloadAmount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, 5 )
 
 
     def saveConfig( self ):
@@ -881,6 +879,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #     http://help.launchpad.net/API/launchpadlib
     #     http://help.launchpad.net/API/Hacking
     def getPPADownloadStatistics( self ):
+        ppasPrevious = deepcopy( self.ppas )
         for ppa in self.ppas:
             filters = [ "" ] # To match all published binary names an empty string can be used.
             key = ppa.getUser() + " | " + ppa.getName()
@@ -906,10 +905,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         GLib.idle_add( self.requestUpdate )
 
-        if self.ppasPrevious != self.ppas:
+        if ppasPrevious != self.ppas:
             Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
-
-        self.ppasPrevious = deepcopy( self.ppas ) # Take a copy to be used for comparison on the next download.
 
 
     # Use a thread pool executer to get the download counts for each published binary.
