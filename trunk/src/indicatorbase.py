@@ -204,7 +204,6 @@ class IndicatorBase:
                         ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
  
             dialog.set_border_width( 5 )
-            dialog.set_icon_name( self.icon ) #TODO Not sure if needed...test on both Ubuntu 16.04 and 18.04
             self.onPreferences( dialog ) # Call to implementation in indicator.
             dialog.destroy()
             self.lock.release()
@@ -236,7 +235,6 @@ class IndicatorBase:
             widget.set_sensitive( self.get_active() )
 
 
-#TODO May not be needed...
     # Listens to radio events and toggles the visibility of the widgets.
     def onRadio( self, *widgets ):
         for widget in widgets:
