@@ -134,6 +134,7 @@ class IndicatorBase:
     def __onAbout( self, widget ):
         if self.lockAboutDialog.acquire(): # Use a separate lock because background updates should not be interrupted.
             aboutDialog = Gtk.AboutDialog()
+            aboutDialog.set_transient_for( widget.get_parent().get_parent() )
             aboutDialog.set_artists( self.artwork )
             aboutDialog.set_authors( self.authors )
             aboutDialog.set_comments( self.comments )
@@ -199,7 +200,7 @@ class IndicatorBase:
 
             dialog = Gtk.Dialog( 
                         _( "Preferences" ), 
-                        None, 
+                        widget.get_parent().get_parent(),
                         Gtk.DialogFlags.MODAL, 
                         ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
  
