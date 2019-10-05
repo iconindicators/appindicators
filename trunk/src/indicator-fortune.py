@@ -415,7 +415,6 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.set_border_width( 5 )
-        dialog.set_icon_name( IndicatorFortune.ICON )
 
         browseFileButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, True )
         browseDirectoryButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, False )
