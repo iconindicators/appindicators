@@ -87,7 +87,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
             else:
                 message = _( "No text is highlighted/selected." )
 
-            Notify.Notification.new( _( "Nothing to convert..." ), message, IndicatorPunycode.ICON ).show()
+            Notify.Notification.new( _( "Nothing to convert..." ), message, self.icon ).show()
 
         else:
             protocol = ""
@@ -134,7 +134,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
             except Exception as e:
                 logging.exception( e )
                 logging.error( "Error converting '" + protocol + text + pathQuery + "'." )
-                Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), IndicatorPunycode.ICON ).show()
+                Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), self.icon ).show()
 
 
     def pasteToClipboard( self, widget, text ):
