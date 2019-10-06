@@ -91,6 +91,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
     def refreshFortune( self ):
         if len( self.fortunes ) == 0:
             self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No fortunes are enabled!" )
+
         else:
             locations = " "
             for location, enabled in self.fortunes:
@@ -103,6 +104,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
             if locations == " ": # Despite one or more fortunes enabled, none seem to be valid paths/files...
                 self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No enabled fortunes have a valid location!" )
+
             else:
                 while True:
                     self.fortune = self.processGet( "fortune" + locations )
@@ -122,6 +124,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
     def showFortune( self ):
         if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
             notificationSummary = _( "WARNING. . ." )
+
         else:
             notificationSummary = self.notificationSummary
             if notificationSummary == "":
@@ -372,6 +375,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                 "This fortune is part of\n" + \
                 "your system and cannot be\n" + \
                 "modified." ) )
+
         else:
             browseFileButton.set_tooltip_text( _( 
                 "Choose a fortune .dat file.\n\n" + \
@@ -442,13 +446,11 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
 
     def onBrowseFortune( self, fileOrDirectoryButton, addEditDialog, fortuneFileDirectory, isFile ):
+        title = _( "Choose a directory containing a fortune .dat file(s)" )
+        action = Gtk.FileChooserAction.SELECT_FOLDER
         if isFile:
             title = _( "Choose a fortune .dat file" )
             action = Gtk.FileChooserAction.OPEN
-
-        else:
-            title = _( "Choose a directory containing a fortune .dat file(s)" )
-            action = Gtk.FileChooserAction.SELECT_FOLDER
 
 #TODO Look for all other dialogs and see how to add parent.
         dialog = Gtk.FileChooserDialog( title, addEditDialog, action, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
