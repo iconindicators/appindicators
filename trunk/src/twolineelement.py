@@ -21,7 +21,7 @@
 
 from urllib.request import urlopen
 
-import pythonutils
+import indicatorbase
 
 
 class TLE:
@@ -72,7 +72,7 @@ class TLE:
 def download( url, logging = None ):
     tleData = { }
     try:
-        data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+        data = urlopen( url, timeout = indicatorbase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
         for i in range( 0, len( data ), 3 ):
             tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
             tleData[ ( tle.getNumber() ) ] = tle
