@@ -602,7 +602,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if rowNumber:
             title = _( "Edit PPA" )
 
-        dialog = self.createDialog( title, grid )
+        dialog = self.createDialog( title, grid, self.getParent( tree ) )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -771,7 +771,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if rowNumber is None:
             title = _( "Add Filter" )
 
-        dialog = self.createDialog( title, grid )
+        dialog = self.createDialog( title, grid, self.getParent( filterTree ) )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
