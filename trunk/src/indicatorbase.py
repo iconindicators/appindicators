@@ -198,10 +198,10 @@ class IndicatorBase:
             if self.updateTimerID:
                 GLib.source_remove( self.updateTimerID )
 
-            dialog = Gtk.Dialog( 
-                        _( "Preferences" ), 
-                        widget.get_parent().get_parent(),
-                        Gtk.DialogFlags.MODAL, 
+            dialog = Gtk.Dialog(
+                        _( "Preferences" ),
+                        self.getParent( widget ),
+                        Gtk.DialogFlags.MODAL,
                         ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
  
             dialog.set_border_width( 5 )
@@ -211,14 +211,25 @@ class IndicatorBase:
             GLib.idle_add( self.__update )
 
 
-#TODO Need to somehow add in a parent...from where?
-    def createDialog( self, title, grid = None ):
-        dialog = Gtk.Dialog( title, None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+    def createDialog( self, title, grid = None, parent = None ): # TODO Maybe change parent to be possibleParent...
+#         and call getParent from here so the callers don't need to call getParent?
+        dialog = Gtk.Dialog( title, parent, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.set_border_width( 5 )
         if grid:
             dialog.vbox.pack_start( grid, True, True, 0 )
 
         return dialog
+
+#TODO Roll out to all indicators!
+    def getParent( self, widget ):
+        parent = widget.get_parent()
+        while( parent is not None ):
+            if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
+                break
+
+            parent = parent.get_parent()
+
+        return parent
 
 
     # Shows a message dialog.
