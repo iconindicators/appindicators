@@ -135,7 +135,8 @@ class IndicatorBase:
 
 
     def __onAbout( self, widget ):
-        if self.lockAboutDialog.acquire(): # Use a separate lock because background updates should not be interrupted.
+        if self.lock.acquire( blocking = False ):
+#         if self.lockAboutDialog.acquire(): # Use a separate lock because background updates should not be interrupted.
             aboutDialog = Gtk.AboutDialog()
             aboutDialog.set_transient_for( widget.get_parent().get_parent() )
             aboutDialog.set_artists( self.artwork )
@@ -181,19 +182,18 @@ class IndicatorBase:
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, rightText, anchorText ):
-        if os.path.exists( filePath ):
-            notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
-            if type( notebookOrStack ).__name__ == "Notebook":
-                notebookOrStack = notebookOrStack.get_nth_page( 0 )
+        notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
+        if type( notebookOrStack ).__name__ == "Notebook":
+            notebookOrStack = notebookOrStack.get_nth_page( 0 )
 
-            else: # Stack
-                notebookOrStack = notebookOrStack.get_children()[ 0 ]
+        else: # Stack
+            notebookOrStack = notebookOrStack.get_children()[ 0 ]
 
-            toolTip = "file://" + filePath
-            label = Gtk.Label()
-            label.set_markup( leftText + " <a href=\'" + "file://" + filePath + "\' title=\'" + toolTip + "\'>" + anchorText + "</a> " + rightText )
-            label.show()
-            notebookOrStack.add( label )
+        toolTip = "file://" + filePath
+        label = Gtk.Label()
+        label.set_markup( leftText + " <a href=\'" + "file://" + filePath + "\' title=\'" + toolTip + "\'>" + anchorText + "</a> " + rightText )
+        label.show()
+        notebookOrStack.add( label )
 
 
     def __onPreferences( self, widget ):
