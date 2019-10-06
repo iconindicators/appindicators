@@ -224,6 +224,7 @@ class IndicatorBase:
 
         return dialog
 
+
     def __getParent( self, widget ):
         parent = widget.get_parent()
         while( parent is not None ):
