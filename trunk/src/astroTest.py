@@ -56,26 +56,28 @@ for key in tleData:
     satellites.append( key )
 
 print( "Running Skyfield..." )
-resultsSkyfield = astroSkyfield.getAstronomicalInformation( utcNow,
-                                                            latitude, longitude, elevation,
-                                                            astroSkyfield.PLANETS,
-                                                            astroSkyfield.STARS,
-                                                            [], [], #satellites, tleData,
-                                                            [], [],
-                                                            [], [],
-                                                            magnitude,
-                                                          hideIfBelowHorizon )
+resultsSkyfield = astroSkyfield.getAstronomicalInformation(
+    utcNow,
+    latitude, longitude, elevation,
+    astroSkyfield.PLANETS,
+    astroSkyfield.STARS,
+    [], [], #satellites, tleData,
+    [], [],
+    [], [],
+    magnitude,
+    hideIfBelowHorizon )
 
 print( "Running Pyephem..." )
-resultsPyephem = astroPyephem.getAstronomicalInformation( utcNow,
-                                                          latitude, longitude, elevation,
-                                                          astroPyephem.PLANETS,
-                                                          astroPyephem.STARS,
-                                                          satellites, tleData,
-                                                          [], [],
-                                                          [], [],
-                                                          magnitude,
-                                                          hideIfBelowHorizon )
+resultsPyephem = astroPyephem.getAstronomicalInformation( 
+    utcNow,
+    latitude, longitude, elevation,
+    astroPyephem.PLANETS,
+    astroPyephem.STARS,
+    satellites, tleData,
+    [], [],
+    [], [],
+    magnitude,
+    hideIfBelowHorizon )
 
 print( "Crunching results..." )
 compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, astroSkyfield.NAME_TAG_MOON, astroPyephem.DATA_MOON, astroSkyfield.DATA_MOON )
