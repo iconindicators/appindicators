@@ -216,7 +216,9 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
-        dialog.get_content_area().add( grid )
+#TODO Getting a parent error again...why?
+        dialog.vbox.pack_start( grid, True, True, 0 )#TODO COpied this from indicator-stardate...is this valid...?
+#         dialog.get_content_area().add( grid )#This was the original line.
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
@@ -224,7 +226,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
             self.outputBoth = outputBothCheckbox.get_active()
             self.dropPathQuery = dropPathQueryCheckbox.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
-            self.setAutoStart( IndicatorPunycode.DESKTOP_FILE, autostartCheckbox.get_active() )
+            self.setAutoStart( autostartCheckbox.get_active() )
             self.requestSaveConfig()
 
 
