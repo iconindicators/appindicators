@@ -24,11 +24,10 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import GLib, Gtk, Notify
+from gi.repository import Gtk, Notify
 from urllib.request import urlopen
 
 import datetime, indicatorbase, locale, ports, re, tide, webbrowser
