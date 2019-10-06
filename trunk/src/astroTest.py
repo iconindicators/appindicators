@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-import astroPyephem, astroSkyfield, datetime, logging, orbitalelement, pythonutils, twolineelement
+import astroPyephem, astroSkyfield, datetime, indicatorbase, logging, orbitalelement, twolineelement
 
 
 def compareResults( resultsPyephem, resultsSkyfield, astronomicalBodyType, nameTagPyephem, nameTagSkyfield, dataTagsPyephem, dataTagsSkyfield ):
@@ -39,8 +39,7 @@ def compareResults( resultsPyephem, resultsSkyfield, astronomicalBodyType, nameT
             keySkyfield = ( astronomicalBodyType, nameTagSkyfield, dataTag )
             print( "\t", dataTag, resultsPyephem[ keyPyephem ], resultsSkyfield[ keySkyfield ] )
 
-
-logging.basicConfig( format = pythonutils.LOGGING_BASIC_CONFIG_FORMAT, level = pythonutils.LOGGING_BASIC_CONFIG_LEVEL, handlers = [ pythonutils.TruncatedFileHandler( "astroTest.log" ) ] )
+logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ TruncatedFileHandler( "astroTest.log" ) ] )
 utcNow = datetime.datetime.utcnow()
 latitude = -33.8599722
 longitude = 151.2111111
