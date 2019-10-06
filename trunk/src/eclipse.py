@@ -16,7 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Lunar/solar eclipse tables from 2014 to 2099 - courtesy of Fred Espenak and Jean Meeus.
+# Lunar/solar eclipse tables from 2014 to 2099.
+# Courtesy of Fred Espenak and Jean Meeus.
 
 
 import datetime
@@ -28,6 +29,7 @@ ECLIPSE_TYPE_HYBRID = "H"
 ECLIPSE_TYPE_PARTIAL = "P"
 ECLIPSE_TYPE_PENUMBRAL = "N"
 ECLIPSE_TYPE_TOTAL = "T"
+
 
 # Gets the upcoming eclipse, lunar or solar.
 #
@@ -41,9 +43,10 @@ ECLIPSE_TYPE_TOTAL = "T"
 #    longitude (east is negative).
 def getEclipseForUTC( dateTimeUTC, isLunar ):
     if isLunar:
-        eclipseData = _lunarEclipseData
+        eclipseData = __lunarEclipseData
+
     else:
-        eclipseData = _solarEclipseData
+        eclipseData = __solarEclipseData
 
     eclipseInfo = None
     for eclipse in eclipseData:
@@ -74,7 +77,7 @@ def getEclipseForUTC( dateTimeUTC, isLunar ):
 # Date: 2011 May 23
 # 
 #      Year   Month  Day   HH:MM:SS    DT   Type  Lat   Long
-_lunarEclipseData = [
+__lunarEclipseData = [
     [ "2020", "01", "10", "19:11:11", "72", "N", "23N", "74E" ],
     [ "2020", "06", "05", "19:26:14", "72", "N", "21S", "69E" ],
     [ "2020", "07", "05", "04:31:12", "72", "N", "24S", "66W" ],
@@ -270,7 +273,7 @@ _lunarEclipseData = [
 # Date: 2008 10 07
 #
 #      Year   Month  Day   HH:MM:SS    DT   Type  Lat      Long
-_solarEclipseData = [
+__solarEclipseData = [
     [ "2019", "12", "26", "05:18:53", "72", "A", "1.0N", "102.3E" ],
     [ "2020", "06", "21", "06:41:15", "72", "A", "30.5N", "79.7E" ],
     [ "2020", "12", "14", "16:14:39", "72", "T", "40.3S", "67.9W" ],
