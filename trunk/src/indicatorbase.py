@@ -64,10 +64,6 @@ class IndicatorBase:
         self.creditz = creditz
 
         self.lock = threading.Lock()
-        self.lockAboutDialog = threading.Lock() #TODO If prefs are opened then about, the prefs cannot be clicked/used...
-#so maybe go back to the single lock for about?  
-#Before making this change, ensure background updates are not blocked,
-#because if we show the about dialog, the update timer is removed...but why do this in the About dialog?      
         self.updateTimerID = None
         self.startingUp = True
 
@@ -136,7 +132,9 @@ class IndicatorBase:
 
     def __onAbout( self, widget ):
         if self.lock.acquire( blocking = False ):
-#         if self.lockAboutDialog.acquire(): # Use a separate lock because background updates should not be interrupted.
+            if self.updateTimerID:
+                GLib.source_remove( self.updateTimerID )
+
             aboutDialog = Gtk.AboutDialog()
             aboutDialog.set_transient_for( widget.get_parent().get_parent() )
             aboutDialog.set_artists( self.artwork )
@@ -178,7 +176,8 @@ class IndicatorBase:
             aboutDialog.run()
             aboutDialog.hide()
 
-            self.lockAboutDialog.release()
+            self.lock.release()
+            GLib.idle_add( self.__update )
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, rightText, anchorText ):
