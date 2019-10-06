@@ -575,7 +575,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the virtual machine when the indicator starts." ) )
-#         autostartCheckbox.set_active( model[ treeiter ][ 1 ] and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )#TODO Fix
+        autostartCheckbox.set_active( model[ treeiter ][ 1 ] is not None and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
         dialog = self.createDialog( tree, _( "Virtual Machine Properties" ), grid )
