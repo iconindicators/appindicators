@@ -211,7 +211,6 @@ class IndicatorBase:
             GLib.idle_add( self.__update )
 
 
-#TODO Find all places in all indicators where we create a dialog...and make a generic call to set some defaults.
 #TODO Need to somehow add in a parent...from where?
     def createDialog( self, title, grid = None ):
         dialog = Gtk.Dialog( title, None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
