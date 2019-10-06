@@ -549,10 +549,10 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def onVirtualMachineDoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter and model[ treeiter ][ 3 ] != "":
-            self.editVirtualMachine( model, treeiter )
+            self.editVirtualMachine( tree, model, treeiter )
 
 
-    def editVirtualMachine( self, model, treeiter ):
+    def editVirtualMachine( self, tree, model, treeiter ):
         grid = self.createGrid()
 
         label = Gtk.Label( _( "Start Command" ) )
@@ -578,8 +578,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 #         autostartCheckbox.set_active( model[ treeiter ][ 1 ] and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )#TODO Fix
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
-#TODO Need to find a way to pass in a parent widget.
-        dialog = self.createDialog( _( "Virtual Machine Properties" ), grid )
+        dialog = self.createDialog( tree, _( "Virtual Machine Properties" ), grid )
         while True:
             dialog.show_all()
 
