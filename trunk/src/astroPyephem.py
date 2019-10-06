@@ -118,6 +118,9 @@ NAME_TAG_CITY = "CITY"
 NAME_TAG_MOON = "MOON"
 NAME_TAG_SUN = "SUN"
 
+#TODO Can we somehow unify the planets between Pyephem and Skyfield to make it simpler for the indicator to switch between the two?
+
+
 # Planet names are capitalised, whereas Pyephem uses titled strings.
 # At the API we accept capitalised planet names, but internally we title them to satisfy Pyephem.
 PLANET_MERCURY = "MERCURY"
