@@ -575,14 +575,10 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the virtual machine when the indicator starts." ) )
-        autostartCheckbox.set_active( model[ treeiter ][ 1 ] and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
+#         autostartCheckbox.set_active( model[ treeiter ][ 1 ] and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )#TODO Fix
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
-        # Would be nice to be able to bring this dialog to front (like the others)...but too much mucking around for little gain!
-        dialog = Gtk.Dialog( _( "Virtual Machine Properties" ), None, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        dialog.vbox.pack_start( grid, True, True, 0 )
-        dialog.set_border_width( 5 )
-
+        dialog = self.createDialog( _( "Virtual Machine Properties" ), grid )
         while True:
             dialog.show_all()
 
