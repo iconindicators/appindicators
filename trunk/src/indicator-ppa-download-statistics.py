@@ -499,11 +499,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def onPPARemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is None:
-            self.showMessage( None, Gtk.MessageType.ERROR, _( "No PPA has been selected for removal." ), INDICATOR_NAME )
+            self.showMessage( tree, Gtk.MessageType.ERROR, _( "No PPA has been selected for removal." ), INDICATOR_NAME )
 
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            if self.showOKCancel( None, _( "Remove the selected PPA?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+            if self.showOKCancel( tree, _( "Remove the selected PPA?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
                 self.ppasOrFiltersModified = True
 
@@ -602,7 +602,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if rowNumber:
             title = _( "Edit PPA" )
 
-        dialog = self.createDialog( title, grid, self.getParent( tree ) )
+        dialog = self.createDialog( title, grid, tree )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -667,18 +667,18 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def onFilterRemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is None:
-            self.showMessage( None, Gtk.MessageType.ERROR, _( "No filter has been selected for removal." ), INDICATOR_NAME )
+            self.showMessage( tree, Gtk.MessageType.ERROR, _( "No filter has been selected for removal." ), INDICATOR_NAME )
 
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            if self.showOKCancel( None, _( "Remove the selected filter?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+            if self.showOKCancel( tree, _( "Remove the selected filter?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
                 self.ppasOrFiltersModified = True
 
 
     def onFilterAdd( self, button, filterTree, ppaTree ):
         if len( ppaTree.get_model() ) == 0:
-            self.showMessage( None, Gtk.MessageType.ERROR, _( "Please add a PPA first!" ), INDICATOR_NAME )
+            self.showMessage( filterTree, Gtk.MessageType.ERROR, _( "Please add a PPA first!" ), INDICATOR_NAME )
 
         else:
             # If the number of filters equals the number of PPA User/Names, cannot add a filter!
@@ -689,7 +689,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     ppaUsersNames.append( ppaUserName )
 
             if len( filterTree.get_model() ) == len( ppaUsersNames ):
-                self.showMessage( None, Gtk.MessageType.INFO, _( "Only one filter per PPA User/Name." ), INDICATOR_NAME )
+                self.showMessage( filterTree, Gtk.MessageType.INFO, _( "Only one filter per PPA User/Name." ), INDICATOR_NAME )
 
             else:
                 self.onFilterDoubleClick( filterTree, None, None, ppaTree )
@@ -771,7 +771,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if rowNumber is None:
             title = _( "Add Filter" )
 
-        dialog = self.createDialog( title, grid, self.getParent( filterTree ) )
+        dialog = self.createDialog( title, grid, filterTree )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
