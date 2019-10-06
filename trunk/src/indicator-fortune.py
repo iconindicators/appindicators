@@ -412,9 +412,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         else:
             title = _( "Edit Fortune" )
 
-        dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        dialog.vbox.pack_start( grid, True, True, 0 )
-        dialog.set_border_width( 5 )
+        dialog = self.createDialog( title, grid )
 
         browseFileButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, True )
         browseDirectoryButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, False )
