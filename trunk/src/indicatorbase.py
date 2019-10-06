@@ -365,6 +365,16 @@ class IndicatorBase:
     def getLogging( self ): return logging
 
 
+    # Returns True if a number; False otherwise.
+    def isNumber( self, numberAsString ):
+        try:
+            float( numberAsString )
+            return True
+
+        except ValueError:
+            return False
+
+
     # Return the full path and name of the executable for the current terminal; None on failure.
     def getTerminal( self ):
         terminal = self.processGet( "which " + IndicatorBase.TERMINAL_GNOME )
