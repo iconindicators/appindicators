@@ -794,7 +794,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.display( astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON ):
             menuItem = Gtk.MenuItem( _( "Moon" ) )
             menu.append( menuItem )
-            menu.append( menuItem )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             self.updateCommonMenu( subMenu, astroPyephem.AstronomicalBodyType.Moon, astroPyephem.NAME_TAG_MOON, 0, 1 )
