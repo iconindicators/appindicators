@@ -28,7 +28,7 @@ gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import GLib, Gtk, Notify
+from gi.repository import Gtk, Notify
 
 import indicatorbase, os
 
