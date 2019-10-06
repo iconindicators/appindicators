@@ -64,7 +64,10 @@ class IndicatorBase:
         self.creditz = creditz
 
         self.lock = threading.Lock()
-        self.lockAboutDialog = threading.Lock()
+        self.lockAboutDialog = threading.Lock() #TODO If prefs are opened then about, the prefs cannot be clicked/used...
+#so maybe go back to the single lock for about?  
+#Before making this change, ensure background updates are not blocked,
+#because if we show the about dialog, the update timer is removed...but why do this in the About dialog?      
         self.updateTimerID = None
         self.startingUp = True
 
