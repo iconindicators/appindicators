@@ -598,14 +598,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         grid.attach( architectures, 1, 3, 1, 1 )
 
-        title = _( "Edit PPA" )
-        if rowNumber is None:
-            title = _( "Add PPA" )
+        title = _( "Add PPA" )
+        if rowNumber:
+            title = _( "Edit PPA" )
 
-        dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        dialog.vbox.pack_start( grid, True, True, 0 )
-        dialog.set_border_width( 5 )
-
+        dialog = self.createDialog( title, grid )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -739,6 +736,14 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 2, 1 )
 
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( self.INDENT_TEXT_LEFT )
+
+#TODO Don't like how the textview is now indented a bit...can this be fixed?
+        label = Gtk.Label( "\n\n\n\n\n" ) # Padding to ensure the textview for the message text is not too small.  
+        label.set_valign( Gtk.Align.START )
+        box.pack_start( label, False, False, 0 )
+
         textview = Gtk.TextView()
         textview.set_tooltip_text( _(
             "Each line of text is a single\n" + \
@@ -754,23 +759,19 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if rowNumber:
             textview.get_buffer().set_text( filterTreeModel[ filterTreeIter ][ 1 ] ) # This is an edit.
 
-        scrolledwindow = Gtk.ScrolledWindow()
-        scrolledwindow.add( textview )
-        scrolledwindow.set_hexpand( True )
-        scrolledwindow.set_vexpand( True )
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.add( textview )
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+        box.pack_start( scrolledWindow, True, True, 0 )
 
-        grid.attach( scrolledwindow, 0, 3, 2, 1 )
+        grid.attach( box, 0, 3, 2, 1 )
 
         title = _( "Edit Filter" )
         if rowNumber is None:
             title = _( "Add Filter" )
 
-#TODO Find all places in all indicators where we create a dialog...and make a generic call to set some defaults.
-        dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        dialog.vbox.pack_start( grid, True, True, 0 )
-        dialog.set_border_width( 5 )
-        dialog.set_default_size( -1, 350 ) # Set a height otherwise the textview is only a couple of lines high.
-
+        dialog = self.createDialog( title, grid )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
