@@ -58,7 +58,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
-        self.removeFileFromCache( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
+        self.removeFileFromCache( IndicatorFortune.HISTORY_FILE )
 
 
     def update( self, menu ):
@@ -111,11 +111,11 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                         break
 
                     elif len( self.fortune ) <= self.skipFortuneCharacterCount: # If the fortune is within the character limit keep it...
-                        history = self.readCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE )
+                        history = self.readCacheText( IndicatorFortune.HISTORY_FILE )
                         if history is None:
                             history = ""
 
-                        self.writeCacheText( INDICATOR_NAME, IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n" )
+                        self.writeCacheText( IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n" )
                         break
 
 
@@ -140,6 +140,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         for location, enabled in self.fortunes:
             if os.path.isfile( location ) or os.path.isdir( location ):
                 store.append( [ location, Gtk.STOCK_APPLY if enabled else None ] )
+
             else:
                 store.append( [ location, Gtk.STOCK_DIALOG_ERROR ] )
 
@@ -280,8 +281,10 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         if dialog.run() == Gtk.ResponseType.OK:
             if radioMiddleMouseClickNewFortune.get_active():
                 self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
+
             elif radioMiddleMouseClickCopyLastFortune.get_active():
                 self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST
+
             else:
                 self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
 
@@ -294,6 +297,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             while treeiter != None:
                 if store[ treeiter ][ 1 ] == Gtk.STOCK_APPLY:
                     self.fortunes.append( [ store[ treeiter ][ 0 ], True ] )
+
                 else:
                     self.fortunes.append( [ store[ treeiter ][ 0 ], False ] )
 
@@ -303,28 +307,31 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             self.requestSaveConfig()
 
 
-    def onFortuneReset( self, button, treeview ):
-        if self.showOKCancel( None, _( "Reset fortunes to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
-            listStore = treeview.get_model().get_model()
+    def onFortuneReset( self, button, treeView ):
+        if self.showOKCancel( self.getParent( treeView ), _( "Reset fortunes to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+            listStore = treeView.get_model().get_model()
             listStore.clear()
             listStore.append( [ IndicatorFortune.DEFAULT_FORTUNE, Gtk.STOCK_APPLY ]  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
 
 
-    def onFortuneRemove( self, button, treeview ):
-        model, treeiter = treeview.get_selection().get_selected()
+    def onFortuneRemove( self, button, treeView ):
+        model, treeiter = treeView.get_selection().get_selected()
+        parent = self.getParent( treeView )
         if treeiter is None:
-            self.showMessage( None, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ), INDICATOR_NAME )
+            self.showMessage( parent, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ), INDICATOR_NAME )
+
         elif model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE:
-            self.showMessage( None, Gtk.MessageType.WARNING, _( "This is the default fortune and cannot be deleted." ), INDICATOR_NAME )
-        elif self.showOKCancel( None, _( "Remove the selected fortune?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+            self.showMessage( parent, Gtk.MessageType.WARNING, _( "This is the default fortune and cannot be deleted." ), INDICATOR_NAME )
+
+        elif self.showOKCancel( parent, _( "Remove the selected fortune?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
-    def onFortuneAdd( self, button, treeview ): self.onFortuneDoubleClick( treeview, None, None )
+    def onFortuneAdd( self, button, treeView ): self.onFortuneDoubleClick( treeView, None, None )
 
 
-    def onFortuneDoubleClick( self, treeview, rowNumber, treeViewColumn ):
-        model, treeiter = treeview.get_selection().get_selected()
+    def onFortuneDoubleClick( self, treeView, rowNumber, treeViewColumn ):
+        model, treeiter = treeView.get_selection().get_selected()
 
         grid = self.createGrid()
 
@@ -354,9 +361,8 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_homogeneous( True )
 
-        if rowNumber is None: # This is an add.
-            isSystemFortune = False
-        else: # This is an edit.
+        isSystemFortune = False # This is an add.
+        if rowNumber: # This is an edit.
             isSystemFortune = model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE
 
         browseFileButton = Gtk.Button( _( "File" ) )
@@ -381,6 +387,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                 "This fortune is part of\n" + \
                 "your system and cannot be\n" + \
                 "modified." ) )
+
         else:
             browseDirectoryButton.set_tooltip_text( _( 
                 "Choose a directory containing\n" + \
@@ -400,19 +407,17 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             "works by running through 'fortune'\n" + \
             "in a terminal." ) )
 
-        if rowNumber is None: # This is an add.
-            enabledCheckbox.set_active( True )
-        else:
+        enabledCheckbox.set_active( True ) # This is an add.
+        if rowNumber: # This is an edit.
             enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabledCheckbox, 0, 2, 1, 1 )
 
-        if rowNumber is None:
-            title = _( "Add Fortune" )
-        else:
+        title = _( "Add Fortune" )
+        if rowNumber:
             title = _( "Edit Fortune" )
 
-        dialog = self.createDialog( title, grid )
+        dialog = self.createDialog( title, grid, self.getParent( treeView ) )
 
         browseFileButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, True )
         browseDirectoryButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, False )
@@ -440,10 +445,12 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         if isFile:
             title = _( "Choose a fortune .dat file" )
             action = Gtk.FileChooserAction.OPEN
+
         else:
             title = _( "Choose a directory containing a fortune .dat file(s)" )
             action = Gtk.FileChooserAction.SELECT_FOLDER
 
+#TODO Look for all other dialogs and see how to add parent.
         dialog = Gtk.FileChooserDialog( title, addEditDialog, action, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
         dialog.set_modal( True ) # On Ubuntu 14.04 the underlying add/edit dialog is still clickable, but behaves in Ubuntu 16.04/17.04.
         dialog.set_filename( fortuneFileDirectory.get_text() )
@@ -452,9 +459,11 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             if response == Gtk.ResponseType.OK:
                 if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ 0 ] ):
                     self.showMessage( dialog, Gtk.MessageType.INFO, _( "The fortune is part of your system and is already included." ), INDICATOR_NAME )
+
                 else:
                     fortuneFileDirectory.set_text( dialog.get_filename() )
                     break
+
             else:
                 break
 
