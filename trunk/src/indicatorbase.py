@@ -211,16 +211,20 @@ class IndicatorBase:
             GLib.idle_add( self.__update )
 
 
-    def createDialog( self, title, grid = None, parent = None ):
-        dialog = Gtk.Dialog( title, parent, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+    def createDialog( self, parentWidget, title, grid = None):
+        dialog = Gtk.Dialog(
+            title,
+            self.__getParent( parentWidget ),
+            0,
+            ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+
         dialog.set_border_width( 5 )
         if grid:
             dialog.vbox.pack_start( grid, True, True, 0 )
 
         return dialog
 
-#TODO Roll out to all indicators!
-    def getParent( self, widget ):
+    def __getParent( self, widget ):
         parent = widget.get_parent()
         while( parent is not None ):
             if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
@@ -234,16 +238,16 @@ class IndicatorBase:
     # Shows a message dialog.
     #
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
-    def showMessage( self, parent, messageType, message, title ):
-        dialog = Gtk.MessageDialog( parent, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
+    def showMessage( self, parentWidget, messageType, message, title ):
+        dialog = Gtk.MessageDialog( self.__getParent( parentWidget ), Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
         dialog.set_title( title )
         dialog.run()
         dialog.destroy()
 
 
     # Shows and OK/Cancel dialog prompt and returns either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
-    def showOKCancel( self, parent, message, title ):
-        dialog = Gtk.MessageDialog( parent, Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, message )
+    def showOKCancel( self, parentWidget, message, title ):
+        dialog = Gtk.MessageDialog( self.__getParent( parentWidget ), Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, message )
         dialog.set_title( title )
         response = dialog.run()
         dialog.destroy()

@@ -136,16 +136,16 @@ def setAutoStart( desktopFile, isSet, logging, autoStartPath = AUTOSTART_PATH, d
 
 # Shows a message dialog.
 #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
-def showMessage( parent, messageType, message, title ):
-    dialog = Gtk.MessageDialog( parent, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
+def showMessage( parentWidget, messageType, message, title ):
+    dialog = Gtk.MessageDialog( parentWidget, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
     dialog.set_title( title )
     dialog.run()
     dialog.destroy()
 
 
 # Shows and OK/Cancel dialog prompt and returns either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
-def showOKCancel( parent, message, title ):
-    dialog = Gtk.MessageDialog( parent, Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, message )
+def showOKCancel( parentWidget, message, title ):
+    dialog = Gtk.MessageDialog( parentWidget, Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, message )
     dialog.set_title( title )
     response = dialog.run()
     dialog.destroy()
