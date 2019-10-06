@@ -200,7 +200,7 @@ class IndicatorBase:
 
             dialog = Gtk.Dialog(
                         _( "Preferences" ),
-                        self.getParent( widget ),
+                        self.__getParent( widget ),
                         Gtk.DialogFlags.MODAL,
                         ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
  
