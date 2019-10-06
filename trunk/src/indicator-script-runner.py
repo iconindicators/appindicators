@@ -391,7 +391,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
             grid.attach( box, 0, 1, 1, 1 )
 
-            dialog = self.createDialog( _( "Copy Script" ), grid )
+            dialog = self.createDialog( _( "Copy Script" ), grid, self.getParent( scriptNameTreeView ) )
             while True:
                 dialog.show_all()
                 if dialog.run() == Gtk.ResponseType.OK:
@@ -570,7 +570,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if script.getGroup() == "":
             title = _( "Add Script" )
 
-        dialog = self.createDialog( title, grid )
+        dialog = self.createDialog( title, grid, self.getParent( scriptNameTreeView ) )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
