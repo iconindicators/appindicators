@@ -21,7 +21,7 @@
 
 from urllib.request import urlopen
 
-import pythonutils, re
+import indicatorbase, re
 
 
 class OE:
@@ -52,7 +52,7 @@ class OE:
 def download( url, logging = None ):
     oeData = { }
     try:
-        data = urlopen( url, timeout = pythonutils.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+        data = urlopen( url, timeout = indicatorbase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
         for i in range( 0, len( data ) ):
             if not data[ i ].startswith( "#" ):
                 oe = OE( data[ i ].strip() )
