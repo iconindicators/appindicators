@@ -336,9 +336,9 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         return calendars
 
 
-    def onCalendarReset( self, button, treeview ):
+    def onCalendarReset( self, button, treeView ):
         if self.showOKCancel( None, _( "Reset calendars to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
-            listStore = treeview.get_model().get_model()
+            listStore = treeView.get_model().get_model()
             listStore.clear()
             for calendar in self.getCalendars():
                 if calendar == IndicatorOnThisDay.DEFAULT_CALENDAR:
@@ -348,8 +348,8 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
                     listStore.append( [ calendar, None ] )
 
 
-    def onCalendarRemove( self, button, treeview ):
-        model, treeiter = treeview.get_selection().get_selected()
+    def onCalendarRemove( self, button, treeView ):
+        model, treeiter = treeView.get_selection().get_selected()
         if treeiter is None:
             self.showMessage( None, Gtk.MessageType.ERROR, _( "No calendar has been selected." ), INDICATOR_NAME )
 
@@ -360,11 +360,11 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
-    def onCalendarAdd( self, button, treeview ): self.onCalendarDoubleClick( treeview, None, None )
+    def onCalendarAdd( self, button, treeView ): self.onCalendarDoubleClick( treeView, None, None )
 
 
-    def onCalendarDoubleClick( self, treeview, rowNumber, treeViewColumn ):
-        model, treeiter = treeview.get_selection().get_selected()
+    def onCalendarDoubleClick( self, treeView, rowNumber, treeViewColumn ):
+        model, treeiter = treeView.get_selection().get_selected()
 
         if rowNumber is None: # This is an add.
             isSystemCalendar = False
@@ -418,7 +418,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         if rowNumber:
             title = _( "Edit Calendar" )
 
-        dialog = self.createDialog( title, grid )
+        dialog = self.createDialog( title, grid, self.getParent( treeView ) )
 
         # Need to set these here as the dialog had not been created at the point the buttons were defined.
         browseButton.connect( "clicked", self.onBrowseCalendar, dialog, fileEntry )
