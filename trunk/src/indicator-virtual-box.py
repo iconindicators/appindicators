@@ -578,6 +578,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 #         autostartCheckbox.set_active( model[ treeiter ][ 1 ] and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )#TODO Fix
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
+#TODO Need to find a way to pass in a parent widget.
         dialog = self.createDialog( _( "Virtual Machine Properties" ), grid )
         while True:
             dialog.show_all()
