@@ -211,8 +211,7 @@ class IndicatorBase:
             GLib.idle_add( self.__update )
 
 
-    def createDialog( self, title, grid = None, parent = None ): # TODO Maybe change parent to be possibleParent...
-#         and call getParent from here so the callers don't need to call getParent?
+    def createDialog( self, title, grid = None, parent = None ):
         dialog = Gtk.Dialog( title, parent, 0, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
         dialog.set_border_width( 5 )
         if grid:
