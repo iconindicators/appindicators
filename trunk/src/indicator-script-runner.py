@@ -391,10 +391,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
             grid.attach( box, 0, 1, 1, 1 )
 
-            dialog = Gtk.Dialog( _( "Copy Script" ), None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-            dialog.vbox.pack_start( grid, True, True, 0 )
-            dialog.set_border_width( 5 )
-
+            dialog = self.createDialog( _( "Copy Script" ), grid )
             while True:
                 dialog.show_all()
                 if dialog.run() == Gtk.ResponseType.OK:
@@ -573,10 +570,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if script.getGroup() == "":
             title = _( "Add Script" )
 
-        dialog = Gtk.Dialog( title, None, Gtk.DialogFlags.MODAL, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-        dialog.vbox.pack_start( grid, True, True, 0 )
-        dialog.set_border_width( 5 )
-
+        dialog = self.createDialog( title, grid )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
