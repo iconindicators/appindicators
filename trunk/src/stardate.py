@@ -47,13 +47,13 @@
 # Stardate [0]0000.0 commenced on midnight 4/1/2162.  
 # The stardate rate from this date to 26/1/2270 was 5 units per day.
 #
-# Between 26/1/2270 and 5/10/2283 ([19]7340.0 and [19]7840.0, respectively)
+# Between 2270/1/26 and 2283/10/5 ([19]7340.0 and [19]7840.0, respectively)
 # the rate changes to 0.1 units per day.
 #
-# Between 5/10/2283 to 1/1/2323 ([19]7840.0 and [20]5006.0, respectively),
+# Between 2283/10/5 to 2323/1/1 ([19]7840.0 and [20]5006.0, respectively),
 # the rate changes to 0.5 units per day.
 #
-# From 1/1/2323 ([20]5006.0) the rate changed to 1000 units per mean solar year (365.2425 days).  
+# From 2323/1/1 ([20]5006.0) the rate changed to 1000 units per mean solar year.  
 # Also, stardate [20]5006.0 becomes [21]00000.0.
 #
 #
