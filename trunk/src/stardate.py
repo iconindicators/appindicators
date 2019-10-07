@@ -67,7 +67,7 @@ import datetime, math
 
 
 # The Gregorian dates which reflect the start date for each rate in the 'classic' stardate era.
-# For example, an index of 3 (Gregorian date of 5/10/2283) corresponds to the rate of 0.5 stardate units per day.
+# For example, an index of 3 (Gregorian date of 2283/10/5) corresponds to the rate of 0.5 stardate units per day.
 # The month is one-based (January = 1).
 __gregorianDates = [
     datetime.datetime( 2162, 1, 4, ),
