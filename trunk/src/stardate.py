@@ -81,7 +81,7 @@ __gregorianDates = [
 __stardateRates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
 
 
-def getVersion(): return "Version 4.0 (2017-04-28)"
+def getVersion(): return "Version 5.0 (2019-10-07)"
 
 
 # Convert a Gregorian datetime.datetime in UTC to a 'classic' stardate.
@@ -172,8 +172,8 @@ def getStardate2009Revised( gregorianDateTime ):
     return stardateInteger, stardateFraction
 
 
-# Converts the date/time to the corresponding stardate and determines how many
-# seconds will elapse until that stardate will change.
+# Converts the date/time to the corresponding stardate and determines
+# how many seconds will elapse until that stardate will change.
 #
 #  gregorianDateTime A Gregorian datetime.datetime in UTC (1900 <= year <= 9500).
 #  isClassic If True, the class stardate will be calculated; otherwise '2009 revised'.
