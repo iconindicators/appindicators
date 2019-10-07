@@ -1,7 +1,9 @@
 indicator-stardate (1.0.38-1) xenial; urgency=low
 
   * Bug fix: Locking between About/Preferences and show fortune now locks!
+  * Bug fix: Dialogs now have a parent specified.
   * Now uses a base class to share functionality amongst indicators.
+  * The stardate library now computes when the next update will occur.
   * About dialog now shows copyright, artists and corrected URL for website.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 23 Sep 2019 16:00:50 +1000
