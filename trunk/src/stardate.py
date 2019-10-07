@@ -205,7 +205,7 @@ def getNextUpdateInSeconds( gregorianDateTime, isClassic ):
         oneSecondAfterMidnight = ( gregorianDateTime + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
         numberOfSecondsToNextUpdate = int( ( oneSecondAfterMidnight - gregorianDateTime ).total_seconds() )
 
-    return numberOfSecondsToNextUpdate
+    return numberOfSecondsToNextUpdate + 1 # Add in a bit of safety. 
 
 
 # Convert a 'classic' stardate to a Gregorian datetime.datetime.
