@@ -17,7 +17,7 @@
 
 
 # Application indicator to let a user select a domain name,
-# either by text highlight or clipboard, then convert between Unicode and ASCII.
+# by text highlight or clipboard, then convert between Unicode and ASCII.
 
 
 INDICATOR_NAME = "indicator-punycode"
@@ -64,11 +64,11 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
 
-            menuItem = Gtk.MenuItem( indent + _( "Unicode:  " ) + result [ 0 ] )
+            menuItem = Gtk.MenuItem( indent + _( "Unicode:  " ) + result[ 0 ] )
             menuItem.connect( "activate", self.pasteToClipboard, result[ 0 ] )
             menu.append( menuItem )
 
-            menuItem = Gtk.MenuItem( indent + _( "ASCII:  " ) + result [ 1 ] )
+            menuItem = Gtk.MenuItem( indent + _( "ASCII:  " ) + result[ 1 ] )
             menuItem.connect( "activate", self.pasteToClipboard, result[ 1 ] )
             menu.append( menuItem )
 
@@ -216,9 +216,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         autostartCheckbox.set_margin_top( 10 )
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
-#TODO Getting a parent error again...why?
-        dialog.vbox.pack_start( grid, True, True, 0 )#TODO COpied this from indicator-stardate...is this valid...?
-#         dialog.get_content_area().add( grid )#This was the original line.
+        dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
 
         if dialog.run() == Gtk.ResponseType.OK:
