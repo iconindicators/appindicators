@@ -24,10 +24,11 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
+gi.require_version( "Gdk", "3.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import Gtk, Notify
+from gi.repository import Gdk, Gtk, Notify
 
 import indicatorbase, os
 
@@ -62,14 +63,13 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
     def update( self, menu ):
         self.buildMenu( menu )
-        self.refreshFortune()
-        self.showFortune()
+        self.refreshAndShowFortune()
         return int( self.refreshIntervalInMinutes ) * 60
 
 
     def buildMenu( self, menu ):
         menuItem = Gtk.MenuItem( _( "New Fortune" ) )
-        menuItem.connect( "activate", lambda widget: self.showNewFortune() )
+        menuItem.connect( "activate", lambda widget: self.refreshAndShowFortune() )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
             self.indicator.set_secondary_activate_target( menuItem )
@@ -130,6 +130,11 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                 notificationSummary = " "
 
         Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), self.icon ).show()
+
+
+    def refreshAndShowFortune( self ):
+        self.refreshFortune()
+        self.showFortune()
 
 
     def onPreferences( self, dialog ):
