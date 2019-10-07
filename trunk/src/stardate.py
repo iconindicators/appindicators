@@ -109,7 +109,7 @@ def getStardateClassic( gregorianDateTime ):
     month = gregorianDateTime.month # Month is one-based.
     day = gregorianDateTime.day
     if ( year < 2162 ) or ( year == 2162 and month == 1 and day < 4 ):
-        # Pre-stardate (pre 4/1/2162)...do the conversion here because a negative time is generated and throws out all other cases.          
+        # Pre-stardate (pre 2162/1/4)...do the conversion here because a negative time is generated and throws out all other cases.          
         index = 0
         numberOfSeconds = ( __gregorianDates[ index ] - gregorianDateTime ).total_seconds()
         numberOfDays = numberOfSeconds / 60.0 / 60.0 / 24.0
@@ -193,7 +193,7 @@ def getNextUpdateInSeconds( gregorianDateTime, isClassic ):
         stardateFractionNext = stardateFraction + 1
         if stardateFractionNext == 10:
             stardateFractionNext = 0
-            stardateIntegerNext = stardateInteger + 1
+            stardateIntegerNext += 1
             if stardateIntegerNext == 10000:
                 stardateIntegerNext = 0
                 stardateIssueNext += 1
@@ -238,7 +238,7 @@ def getGregorianFromStardateClassic( stardateIssue, stardateInteger, stardateFra
     fractionLength = len( str( stardateFraction ) )
     fractionDivisor = math.pow( 10.0, fractionLength )
     index = -1
-    if stardateIssue < 0: # Pre-stardate (pre 4/1/2162).
+    if stardateIssue < 0: # Pre-stardate (pre 2162/1/4).
         index = 0
         units = stardateIssue * 10000.0 + stardateInteger + stardateFraction / fractionDivisor
 
