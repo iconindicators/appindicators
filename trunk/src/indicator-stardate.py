@@ -58,14 +58,11 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, True )
 
         else:
-#TODO May need to check the fractional part: if a single digit/character, add a preceeding zero.
-#Or maybe have the requires padding kick in here.
             stardateIssue = None
             stardateInteger, stardateFraction = stardate.getStardate2009Revised( now )
             numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, False )
 
         self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
-        print( numberOfSecondsToNextUpdate )
         return numberOfSecondsToNextUpdate
 
 
