@@ -89,6 +89,7 @@ class IndicatorBase:
     def __update( self ):
         with self.lock:
             menu = Gtk.Menu()
+            self.indicator.set_menu( menu )
             nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
             self.__finaliseMenu( menu )
             if nextUpdateInSeconds: # Some indicators don't return a next update time.
@@ -119,7 +120,6 @@ class IndicatorBase:
         menu.append( menuItem )
 
         menu.show_all()
-        self.indicator.set_menu( menu )
 
 
     def requestMouseWheelScrollEvents( self ): self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
