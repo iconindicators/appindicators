@@ -52,27 +52,20 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
-        # Calculate the current stardate and determine when next to update the stardate based on the stardate fractional period.
+        now = datetime.datetime.utcnow()
         if self.showClassic:
-            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
-
-            # WHEN the stardate calculation is performed is NOT necessarily synchronised with WHEN the stardate actually changes.
-            # Therefore update at a faster rate, say at one tenth of the period, but at most once per minute.
-#TODO Can we actually figure out when the next update should happen with some accuracy?
-            numberOfSecondsToNextUpdate = int( fractionalPeriod / 10 )
-            if numberOfSecondsToNextUpdate < 60:
-                numberOfSecondsToNextUpdate = 60
+            stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( now )
+            numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, True )
 
         else:
+#TODO May need to check the fractional part: if a single digit/character, add a preceeding zero.
+#Or maybe have the requires padding kick in here.
             stardateIssue = None
-            stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardate2009Revised( datetime.datetime.utcnow() )
-
-            # For '2009 revised' the rollover only happens at midnight...so use that for the timer!        
-            now = datetime.datetime.utcnow()
-            oneSecondAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
-            numberOfSecondsToNextUpdate = int( ( oneSecondAfterMidnight - now ).total_seconds() )
+            stardateInteger, stardateFraction = stardate.getStardate2009Revised( now )
+            numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, False )
 
         self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
+        print( numberOfSecondsToNextUpdate )
         return numberOfSecondsToNextUpdate
 
 
@@ -81,7 +74,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
         # cycle through the possible combinations of options for display in the stardate.
         # If showing a 'classic' stardate and padding is not required, ignore the padding option.
         if self.showClassic:
-            stardateIssue, stardateInteger, stardateFraction, fractionalPeriod = stardate.getStardateClassic( datetime.datetime.utcnow() )
+            stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( datetime.datetime.utcnow() )
             paddingRequired = stardate.requiresPadding( stardateIssue, stardateInteger )
             if paddingRequired:
                 if self.showIssue and self.padInteger:
