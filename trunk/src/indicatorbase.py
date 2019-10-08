@@ -258,6 +258,10 @@ class IndicatorBase:
         return response
 
 
+    # Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
+    def getTextViewText( self, textView ): return textView.get_buffer().get_text( textView.get_buffer().get_start_iter(), textView.get_buffer().get_end_iter(), True )
+
+
     # Listens to checkbox events and toggles the visibility of the widgets.
     def onCheckbox( self, *widgets ):
         for widget in widgets:
