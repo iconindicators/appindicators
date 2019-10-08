@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-on-this-day 1.0.5\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2018-08-13 19:17+1000\n"
+"POT-Creation-Date: 2019-10-08 14:18+1100\n"
 "PO-Revision-Date: 2018-08-13 12:42+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -18,107 +18,92 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: indicator-on-this-day.py:56
-msgid "Calls the 'calendar' program and displays events in the menu."
-msgstr "Вызывает программу 'calendar' и показывает события в меню."
-
-#: indicator-on-this-day.py:63
+#: indicator-on-this-day.py:49
 msgid "EVENT"
 msgstr "СОБЫТИЕ"
 
-#: indicator-on-this-day.py:106
+#: indicator-on-this-day.py:58
+msgid "Calls the 'calendar' program and displays events in the menu."
+msgstr "Вызывает программу 'calendar' и показывает события в меню."
+
+#: indicator-on-this-day.py:74
 msgid "On this day..."
 msgstr "В этот день..."
 
-#: indicator-on-this-day.py:208
-msgid "translator-credits"
-msgstr "Олег Мойсейчук"
-
-#: indicator-on-this-day.py:209
-msgid "View the"
-msgstr "Просмотреть"
-
-#: indicator-on-this-day.py:210
-msgid "text file."
-msgstr "."
-
-#: indicator-on-this-day.py:211
-msgid "changelog"
-msgstr "список изменений"
-
-#: indicator-on-this-day.py:253
+#: indicator-on-this-day.py:186
 msgid "Calendar"
 msgstr "Календарь"
 
-#: indicator-on-this-day.py:257 indicator-on-this-day.py:489
+#: indicator-on-this-day.py:190 indicator-on-this-day.py:408
 msgid "Enabled"
 msgstr "Включен"
 
-#: indicator-on-this-day.py:263
+#: indicator-on-this-day.py:196
 msgid "Double click to edit a calendar."
 msgstr "Щёлкните дважды, чтобы отредактировать календарь."
 
-#: indicator-on-this-day.py:274
+#: indicator-on-this-day.py:207
 msgid "Add"
 msgstr "Добавить"
 
-#: indicator-on-this-day.py:275
+#: indicator-on-this-day.py:208
 msgid "Add a new calendar."
 msgstr "Добавить новый календарь."
 
-#: indicator-on-this-day.py:279
+#: indicator-on-this-day.py:212
 msgid "Remove"
 msgstr "Удалить"
 
-#: indicator-on-this-day.py:280
+#: indicator-on-this-day.py:213
 msgid "Remove the selected calendar."
 msgstr "Удалить выбранный календарь."
 
-#: indicator-on-this-day.py:284
+#: indicator-on-this-day.py:217
 msgid "Reset"
 msgstr "Сбросить"
 
-#: indicator-on-this-day.py:285
+#: indicator-on-this-day.py:218
 msgid "Reset to factory default."
 msgstr "Сбросить к начальным настройкам."
 
-#: indicator-on-this-day.py:292
+#: indicator-on-this-day.py:225
 msgid "Calendars"
 msgstr "Календари"
 
-#: indicator-on-this-day.py:305
+#: indicator-on-this-day.py:232
 msgid "Lines"
 msgstr "Строки"
 
-#: indicator-on-this-day.py:310
+#: indicator-on-this-day.py:237
 msgid "The number of menu items available for display."
 msgstr "Количество строк событий, отображаемых в меню."
 
-#: indicator-on-this-day.py:316
+#: indicator-on-this-day.py:243
 msgid "On event click"
 msgstr "При щелчке по событию"
 
-#: indicator-on-this-day.py:321
+#: indicator-on-this-day.py:248
 msgid "Copy event to clipboard"
 msgstr "Скопировать событие в буфер"
 
-#: indicator-on-this-day.py:322
+#: indicator-on-this-day.py:249
 msgid "Copy the event text and date to the clipboard."
 msgstr "Скопировать событие и его дату в буфер обмена."
 
-#: indicator-on-this-day.py:327
+#: indicator-on-this-day.py:254
 msgid "Search event on the internet"
 msgstr "Искать событие в Интернет"
 
-#: indicator-on-this-day.py:328
+#: indicator-on-this-day.py:255
 msgid "Open the default web browser and search for the event."
 msgstr "Открыть обозреватель по умолчанию и искать событие."
 
-#: indicator-on-this-day.py:337
+#: indicator-on-this-day.py:264
 msgid "URL"
 msgstr "Ссылка"
 
-#: indicator-on-this-day.py:343
+#: indicator-on-this-day.py:270
+#, python-brace-format
 msgid ""
 "The URL to search for the event.\n"
 "\n"
@@ -142,11 +127,11 @@ msgstr ""
 "Если ссылка пустая, и задана опция \"Скопировать\",\n"
 "то будет восстановлена ссылка по умолчанию."
 
-#: indicator-on-this-day.py:359
+#: indicator-on-this-day.py:286
 msgid "Notify"
 msgstr "Уведомлять"
 
-#: indicator-on-this-day.py:361
+#: indicator-on-this-day.py:288
 msgid ""
 "On startup or when saving preferences,\n"
 "show a notification for each of today's events."
@@ -154,31 +139,27 @@ msgstr ""
 "При запуске или сохранении настроек показывать\n"
 "уведомление о всех событиях текущего дня."
 
-#: indicator-on-this-day.py:367
+#: indicator-on-this-day.py:294
 msgid "Autostart"
 msgstr "Автозапуск"
 
-#: indicator-on-this-day.py:368
+#: indicator-on-this-day.py:295
 msgid "Run the indicator automatically."
 msgstr "Запускать индикатор автоматически."
 
-#: indicator-on-this-day.py:373
+#: indicator-on-this-day.py:300
 msgid "General"
 msgstr "Общие"
 
-#: indicator-on-this-day.py:375
-msgid "Preferences"
-msgstr "Параметры"
-
-#: indicator-on-this-day.py:420
+#: indicator-on-this-day.py:340
 msgid "Reset calendars to factory default?"
 msgstr "Сбросить календари к начальным настройкам?"
 
-#: indicator-on-this-day.py:433
+#: indicator-on-this-day.py:354
 msgid "No calendar has been selected."
 msgstr "Ни один календарь не выбран."
 
-#: indicator-on-this-day.py:435
+#: indicator-on-this-day.py:357
 msgid ""
 "This calendar is part of your system\n"
 "and cannot be removed."
@@ -186,23 +167,23 @@ msgstr ""
 "Этот календарь является системным\n"
 "и не может быть удалён."
 
-#: indicator-on-this-day.py:436
+#: indicator-on-this-day.py:359
 msgid "Remove the selected calendar?"
 msgstr "Удалить выбранный календарь?"
 
-#: indicator-on-this-day.py:461
+#: indicator-on-this-day.py:379
 msgid "Calendar file"
 msgstr "Файл календаря"
 
-#: indicator-on-this-day.py:470
+#: indicator-on-this-day.py:388
 msgid "The path to a calendar file."
 msgstr "Путь к файлу календаря."
 
-#: indicator-on-this-day.py:473
+#: indicator-on-this-day.py:391
 msgid "Browse"
 msgstr "Обзор"
 
-#: indicator-on-this-day.py:477
+#: indicator-on-this-day.py:395
 msgid ""
 "This calendar is part of your\n"
 "system and cannot be modified."
@@ -210,7 +191,7 @@ msgstr ""
 "Этот календарь является системным\n"
 "и не может быть изменён."
 
-#: indicator-on-this-day.py:481
+#: indicator-on-this-day.py:400
 msgid ""
 "Choose a calendar file.\n"
 "\n"
@@ -224,27 +205,27 @@ msgstr ""
 "правильный формат, запустив его\n"
 "с помощью команды 'calendar' в терминале."
 
-#: indicator-on-this-day.py:498
+#: indicator-on-this-day.py:417
 msgid "Add Calendar"
 msgstr "Добавить календарь"
 
-#: indicator-on-this-day.py:500
+#: indicator-on-this-day.py:419
 msgid "Edit Calendar"
 msgstr "Изменить календарь"
 
-#: indicator-on-this-day.py:515
+#: indicator-on-this-day.py:431
 msgid "The calendar path cannot be empty."
 msgstr "Путь к файлу календаря не может быть пустым."
 
-#: indicator-on-this-day.py:520
+#: indicator-on-this-day.py:436
 msgid "The calendar path does not exist."
 msgstr "Путь к календарю не существует."
 
-#: indicator-on-this-day.py:536
+#: indicator-on-this-day.py:452
 msgid "Choose a calendar file"
 msgstr "Выберите файл календаря"
 
-#: indicator-on-this-day.py:543
+#: indicator-on-this-day.py:459
 msgid ""
 "The calendar is part of your system\n"
 "and is already included."
