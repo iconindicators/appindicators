@@ -1,9 +1,9 @@
 indicator-lunar.py.desktop usr/share/applications
 src/astroPyephem.py usr/share/indicator-lunar
 src/eclipse.py usr/share/indicator-lunar
+src/indicatorbase.py usr/share/indicator-lunar
 src/indicator-lunar.py usr/share/indicator-lunar
 src/orbitalelement.py usr/share/indicator-lunar
-src/pythonutils.py usr/share/indicator-lunar
 src/twolineelement.py usr/share/indicator-lunar
 icons/hicolor/indicator-lunar.svg usr/share/icons/hicolor/scalable/apps
 icons/hicolor/indicator-lunar.svg usr/share/icons/hicolor/apps/16
