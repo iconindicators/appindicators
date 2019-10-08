@@ -168,11 +168,11 @@ class IndicatorBase:
             with gzip.open( changeLogGzipped, 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
                 shutil.copyfileobj( fileIn, fileOut )
 
-            self.__addHyperlinkLabel( aboutDialog, changeLog, _( "View the" ), _( "text file." ), _( "changelog" ) )
+            self.__addHyperlinkLabel( aboutDialog, changeLog, _( "View the" ), _( "changelog" ), _( "text file." ) )
 
             errorLog = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
             if os.path.exists( errorLog ):
-                self.__addHyperlinkLabel( aboutDialog, errorLog, _( "View the" ), _( "text file." ), _( "error log" ) )
+                self.__addHyperlinkLabel( aboutDialog, errorLog, _( "View the" ), _( "error log" ), _( "text file." ) )
 
             aboutDialog.run()
             aboutDialog.hide()
@@ -183,7 +183,7 @@ class IndicatorBase:
             GLib.idle_add( self.__update )
 
 
-    def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, rightText, anchorText ):
+    def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
         notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
         if type( notebookOrStack ).__name__ == "Notebook":
             notebookOrStack = notebookOrStack.get_nth_page( 0 )
