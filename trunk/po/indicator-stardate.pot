@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-stardate 1.0.38\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-09-15 07:59+1000\n"
+"POT-Creation-Date: 2019-10-08 09:40+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,39 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicator-stardate.py:53
+#: indicator-stardate.py:47
 msgid "Shows the current Star Trek™ stardate."
 msgstr ""
 
-#: indicator-stardate.py:54
+#: indicator-stardate.py:48
 msgid "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main."
 msgstr ""
 
-#: indicator-stardate.py:168
-msgid "Credits"
-msgstr ""
-
-#: indicator-stardate.py:174
-msgid "translator-credits"
-msgstr ""
-
-#: indicator-stardate.py:175
-msgid "View the"
-msgstr ""
-
-#: indicator-stardate.py:176
-msgid "text file."
-msgstr ""
-
-#: indicator-stardate.py:177
-msgid "changelog"
-msgstr ""
-
-#: indicator-stardate.py:197
+#: indicator-stardate.py:119
 msgid "Show stardate 'classic'"
 msgstr ""
 
-#: indicator-stardate.py:200
+#: indicator-stardate.py:122
 msgid ""
 "If checked, show stardate 'classic' based on\n"
 "\n"
@@ -62,30 +42,26 @@ msgid ""
 "\thttp://en.wikipedia.org/wiki/Stardate"
 msgstr ""
 
-#: indicator-stardate.py:207
+#: indicator-stardate.py:129
 msgid "Show ISSUE"
 msgstr ""
 
-#: indicator-stardate.py:211
+#: indicator-stardate.py:133
 msgid "Show the ISSUE of the stardate 'classic'."
 msgstr ""
 
-#: indicator-stardate.py:214
+#: indicator-stardate.py:136
 msgid "Pad INTEGER"
 msgstr ""
 
-#: indicator-stardate.py:218
+#: indicator-stardate.py:140
 msgid "Pad the INTEGER part of the stardate 'classic' with leading zeros."
 msgstr ""
 
-#: indicator-stardate.py:223
+#: indicator-stardate.py:145
 msgid "Autostart"
 msgstr ""
 
-#: indicator-stardate.py:225
+#: indicator-stardate.py:147
 msgid "Run the indicator automatically."
-msgstr ""
-
-#: indicator-stardate.py:229
-msgid "Preferences"
 msgstr ""
