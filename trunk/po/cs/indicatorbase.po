@@ -1,7 +1,7 @@
 # Czech translation for indicatorbase.
 # Copyright (C) 2017-2019 Bernard Giannetti
 # This file is distributed under the same license as the indicatorbase package.
-# Pavel Rehak <pavel-rehak@email.cz>, 2017.
+# Pavel Rehak <pavel-rehak@email.cz>, 2017-2019.
 #
 msgid ""
 msgstr ""
@@ -31,7 +31,7 @@ msgstr "Ukončit"
 
 #: indicatorbase.py:156
 msgid "translator-credits"
-msgstr ""
+msgstr "Pavel Řehák <pavel-rehak@email.cz>"
 
 #: indicatorbase.py:162
 msgid "Credits"
@@ -39,15 +39,15 @@ msgstr ""
 
 #: indicatorbase.py:173 indicatorbase.py:174
 msgid "View the"
-msgstr ""
+msgstr "Zobrazit"
 
 #: indicatorbase.py:173 indicatorbase.py:174
 msgid "text file."
-msgstr ""
+msgstr "jako textový soubor."
 
 #: indicatorbase.py:173
 msgid "changelog"
-msgstr ""
+msgstr "přehled změn"
 
 #: indicatorbase.py:174
 msgid "error log"

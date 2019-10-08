@@ -1,7 +1,7 @@
 # Russian translation for indicatorbase.
 # Copyright (C) 2017-2019 Bernard Giannetti
 # This file is distributed under the same license as the indicatorbase package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2019.
+# Oleg Moiseichuk <berroll@mail.ru>, 2017-2019.
 #
 msgid ""
 msgstr ""
@@ -32,23 +32,23 @@ msgstr "Выход"
 
 #: indicatorbase.py:156
 msgid "translator-credits"
-msgstr ""
+msgstr "Олег Мойсейчук"
 
 #: indicatorbase.py:162
 msgid "Credits"
-msgstr ""
+msgstr "Благодарность"
 
 #: indicatorbase.py:173 indicatorbase.py:174
 msgid "View the"
-msgstr ""
+msgstr "Просмотреть"
 
 #: indicatorbase.py:173 indicatorbase.py:174
 msgid "text file."
-msgstr ""
+msgstr "."
 
 #: indicatorbase.py:173
 msgid "changelog"
-msgstr ""
+msgstr "список изменений"
 
 #: indicatorbase.py:174
 msgid "error log"
