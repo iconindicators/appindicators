@@ -87,6 +87,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             self.indicator.set_secondary_activate_target( menuItem )
 
 
+#TODO Maybe remove the warning stuff...maybe log?
     def refreshFortune( self ):
         if len( self.fortunes ) == 0:
             self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No fortunes are enabled!" )
