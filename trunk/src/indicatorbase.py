@@ -161,10 +161,7 @@ class IndicatorBase:
             if self.creditz:
                 aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
 
-            changeLog = "/tmp/" + self.indicatorName + ".changelog"
-            if os.path.isfile( changeLog ):
-                os.remove( changeLog )
-
+            changeLog = self.__getCacheDirectory() + self.indicatorName + ".changelog"
             changeLogGzipped = "/usr/share/doc/" + self.indicatorName + "/changelog.Debian.gz"
             with gzip.open( changeLogGzipped, 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
                 shutil.copyfileobj( fileIn, fileOut )
@@ -177,6 +174,8 @@ class IndicatorBase:
 
             aboutDialog.run()
             aboutDialog.hide()
+
+            os.remove( changeLog )
 
             self.lock.release()
             GLib.idle_add( self.__update )
