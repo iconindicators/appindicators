@@ -188,7 +188,7 @@ class IndicatorBase:
         if type( notebookOrStack ).__name__ == "Notebook":
             notebookOrStack = notebookOrStack.get_nth_page( 0 )
 
-        else: # Stack
+        else:
             notebookOrStack = notebookOrStack.get_children()[ 0 ]
 
         toolTip = "file://" + filePath
