@@ -1,6 +1,6 @@
 indicator-script-runner.py.desktop usr/share/applications
+src/indicatorbase.py usr/share/indicator-script-runner
 src/indicator-script-runner.py usr/share/indicator-script-runner
-src/pythonutils.py usr/share/indicator-script-runner
 src/script.py usr/share/indicator-script-runner
 icons/hicolor/indicator-script-runner.svg usr/share/icons/hicolor/scalable/apps
 icons/hicolor/indicator-script-runner.svg usr/share/icons/hicolor/apps/16
