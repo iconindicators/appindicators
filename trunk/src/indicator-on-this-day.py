@@ -418,7 +418,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         if rowNumber:
             title = _( "Edit Calendar" )
 
-        dialog = self.createDialog( title, grid, treeView )
+        dialog = self.createDialog( treeView, title, grid )
 
         # Need to set these here as the dialog had not been created at the point the buttons were defined.
         browseButton.connect( "clicked", self.onBrowseCalendar, dialog, fileEntry )
