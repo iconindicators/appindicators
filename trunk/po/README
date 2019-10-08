@@ -24,15 +24,6 @@ If a variable needs to be included in the text, use the format function:
 
     _( "Your lucky number is {0}!" ).format( 7 )
 
-If the About dialog from pythonutils is used, ensure that the 'translator' parameter is set to:
-
-	_( "translator-credits" )
-
-to allow a translator to add their name(s) in the target PO translation file:
-
-	msgid "translator-credits"
-	msgstr "John Smith"
-
 Create the file POTFILES.in containing a list of source files which require translation.
 
 Create the file LINGUAS and add each language/locale code, separated by whitespace, on a single line.
