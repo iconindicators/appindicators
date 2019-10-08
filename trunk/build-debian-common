@@ -1,5 +1,6 @@
 #!/bin/bash
-#
+
+
 # Common code for the build-debian script for all indicators.
 #
 # Install the packages:
@@ -13,6 +14,28 @@
 #
 #	gpg --import secring.skr 
 #
+# References for building a Debian package for PPA...
+#    http://askubuntu.com/questions/27715/create-a-deb-package-from-scripts-or-binaries
+#    http://askubuntu.com/questions/28562/how-do-i-create-a-ppa-for-a-working-program
+#    http://askubuntu.com/questions/90764/how-do-i-create-a-deb-package-for-a-single-python-script
+#    http://blog.garethj.com/2009/06/02/building-deb-packages-for-python-applications
+#    http://developer.ubuntu.com/packaging/html/debian-dir-overview.html
+#    http://help.launchpad.net/Packaging/PPA/Uploading
+#    http://help.ubuntu.com/community/PythonRecipes/DebianPackage
+#    http://savetheions.com/2010/01/20/packaging-python-applicationsmodules-for-debian
+#    http://shallowsky.com/blog/programming/packaging-launchpad-ppas.html
+#    http://ubuntulinuxtipstricks.blogspot.com.au/2010/08/is-packaging-new-software-hard.html
+#    http://wiki.debian.org/Python/Packaging
+#    http://wiki.ubuntu.com/MOTU/School/PackagingWithoutCompiling
+#    http://wiki.ubuntu.com/PackagingGuide/HandsOn
+#    http://wiki.ubuntu.com/PackagingGuide/Python
+#    http://www.debian.org/doc/manuals/maint-guide
+#    http://www.debian.org/doc/packaging-manuals/python-policy
+#    http://www.debian-administration.org/articles/336
+#    http://news.softpedia.com/news/How-to-Repack-Deb-Files-on-Debian-and-Ubuntu-404930.shtml
+#    http://blog.packagecloud.io/debian/debuild/packaging/2015/06/08/buildling-deb-packages-with-debuild
+#    https://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
+#    https://developer.gnome.org/icon-theme-spec/
 
 
 # Python Utils contains Python/build scripts common to all indicators.
@@ -54,7 +77,7 @@ copyTopLevelAndSource()
   cp $NAME.py.desktop build/$NAME-$VERSION
 
   mkdir -p build/$NAME-$VERSION/src
-  cp $PYTHON_UTILS/src/pythonutils.py build/$NAME-$VERSION/src
+  cp $PYTHON_UTILS/src/indicatorbase.py build/$NAME-$VERSION/src
 
   for item in "${_source[@]}"; do
     cp src/"$item" build/$NAME-$VERSION/src
@@ -99,17 +122,17 @@ copyPOCreateMO()
   # Copy README from pythonutils.
   cp $PYTHON_UTILS/po/README build/$NAME-$VERSION/po
 
-  # Append translations from pythonutils to POT.
-  msgcat --use-first build/$NAME-$VERSION/po/$NAME.pot $PYTHON_UTILS/po/pythonutils.pot --output-file=build/$NAME-$VERSION/po/$NAME.pot
+  # Append translations from indicatorbase to POT.
+  msgcat --use-first build/$NAME-$VERSION/po/$NAME.pot $PYTHON_UTILS/po/indicatorbase.pot --output-file=build/$NAME-$VERSION/po/$NAME.pot
 
-  # Append translations from pythonutils to PO files.
+  # Append translations from indicatorbase to PO files.
   for PO_FILE in $(find build/$NAME-$VERSION/po -type f -name '*.po') ; do
 
     # Get the language code.  Split the PO_FILE into an array using / as the delimiter.
     array=(`echo $PO_FILE | sed 's/\//\n/g'`)
     languageCode=${array[${#array[@]}-2]}
 
-    msgcat --use-first $PO_FILE $PYTHON_UTILS/po/$languageCode/pythonutils.po --output-file=$PO_FILE
+    msgcat --use-first $PO_FILE $PYTHON_UTILS/po/$languageCode/indicatorbase.po --output-file=$PO_FILE
   done
 
   # Create .mo files.
@@ -215,27 +238,3 @@ cleanUp()
   echo -e "\nTo upload to LaunchPad, change to the 'build' directory and run:\n"
   echo -e "    dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes\n"
 }
-
-
-# References for building a Debian package for PPA...
-# http://askubuntu.com/questions/27715/create-a-deb-package-from-scripts-or-binaries
-# http://askubuntu.com/questions/28562/how-do-i-create-a-ppa-for-a-working-program
-# http://askubuntu.com/questions/90764/how-do-i-create-a-deb-package-for-a-single-python-script
-# http://blog.garethj.com/2009/06/02/building-deb-packages-for-python-applications
-# http://developer.ubuntu.com/packaging/html/debian-dir-overview.html
-# http://help.launchpad.net/Packaging/PPA/Uploading
-# http://help.ubuntu.com/community/PythonRecipes/DebianPackage
-# http://savetheions.com/2010/01/20/packaging-python-applicationsmodules-for-debian
-# http://shallowsky.com/blog/programming/packaging-launchpad-ppas.html
-# http://ubuntulinuxtipstricks.blogspot.com.au/2010/08/is-packaging-new-software-hard.html
-# http://wiki.debian.org/Python/Packaging
-# http://wiki.ubuntu.com/MOTU/School/PackagingWithoutCompiling
-# http://wiki.ubuntu.com/PackagingGuide/HandsOn
-# http://wiki.ubuntu.com/PackagingGuide/Python
-# http://www.debian.org/doc/manuals/maint-guide
-# http://www.debian.org/doc/packaging-manuals/python-policy
-# http://www.debian-administration.org/articles/336
-# http://news.softpedia.com/news/How-to-Repack-Deb-Files-on-Debian-and-Ubuntu-404930.shtml
-# http://blog.packagecloud.io/debian/debuild/packaging/2015/06/08/buildling-deb-packages-with-debuild
-# https://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
-# https://developer.gnome.org/icon-theme-spec/
