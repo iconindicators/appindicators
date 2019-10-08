@@ -87,38 +87,33 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             self.indicator.set_secondary_activate_target( menuItem )
 
 
-#TODO Maybe remove the warning stuff...maybe log?
     def refreshFortune( self ):
-        if len( self.fortunes ) == 0:
-            self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No fortunes are enabled!" )
+        locations = " "
+        for location, enabled in self.fortunes:
+            if enabled:
+                if os.path.isdir( location ):
+                    locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
+
+                elif os.path.isfile( location ):
+                    locations += "'" + location.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
+
+        if locations == " ": # Despite one or more fortunes enabled, none seem to be valid paths/files...
+            self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No enabled fortunes have a valid location!" )
 
         else:
-            locations = " "
-            for location, enabled in self.fortunes:
-                if enabled:
-                    if os.path.isdir( location ):
-                        locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
+            while True:
+                self.fortune = self.processGet( "fortune" + locations )
+                if self.fortune is None: # Occurs when no fortune data is found...
+                    self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "Ensure enabled fortunes contain fortune data!" )
+                    break
 
-                    elif os.path.isfile( location ):
-                        locations += "'" + location.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
+                elif len( self.fortune ) <= self.skipFortuneCharacterCount: # If the fortune is within the character limit keep it...
+                    history = self.readCacheText( IndicatorFortune.HISTORY_FILE )
+                    if history is None:
+                        history = ""
 
-            if locations == " ": # Despite one or more fortunes enabled, none seem to be valid paths/files...
-                self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No enabled fortunes have a valid location!" )
-
-            else:
-                while True:
-                    self.fortune = self.processGet( "fortune" + locations )
-                    if self.fortune is None: # Occurs when no fortune data is found...
-                        self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "Ensure enabled fortunes contain fortune data!" )
-                        break
-
-                    elif len( self.fortune ) <= self.skipFortuneCharacterCount: # If the fortune is within the character limit keep it...
-                        history = self.readCacheText( IndicatorFortune.HISTORY_FILE )
-                        if history is None:
-                            history = ""
-
-                        self.writeCacheText( IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n" )
-                        break
+                    self.writeCacheText( IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n" )
+                    break
 
 
     def showFortune( self ):
