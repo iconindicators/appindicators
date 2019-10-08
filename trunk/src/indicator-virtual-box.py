@@ -35,6 +35,9 @@ from threading import Thread
 import indicatorbase, datetime, os, time, virtualmachine
 
 
+#TODO When a VM is auto started (and perhaps manually)
+#the preferences locks up.
+
 class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     CONFIG_DELAY_BETWEEN_AUTO_START = "delayBetweenAutoStartInSeconds"
