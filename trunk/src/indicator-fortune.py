@@ -420,7 +420,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         if rowNumber:
             title = _( "Edit Fortune" )
 
-        dialog = self.createDialog( title, grid, treeView )
+        dialog = self.createDialog( treeView, title, grid )
 
         browseFileButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, True )
         browseDirectoryButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, False )
