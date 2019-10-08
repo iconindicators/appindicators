@@ -130,6 +130,8 @@ class IndicatorBase:
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
+#TODO Don't like how an update happens...
+#...work out why we have to cancel and why we have to do an update.
     def __onAbout( self, widget ):
         if self.lock.acquire( blocking = False ):
             if self.updateTimerID:
