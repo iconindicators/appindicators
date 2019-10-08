@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-fortune 1.0.30\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-09-14 19:44+1000\n"
+"POT-Creation-Date: 2019-10-08 22:41+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,69 +17,49 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicator-fortune.py:54
+#: indicator-fortune.py:50
+msgid "Fortune. . ."
+msgstr ""
+
+#: indicator-fortune.py:59
 msgid ""
 "Calls the 'fortune' program displaying the result in the on-screen "
 "notification."
 msgstr ""
 
-#: indicator-fortune.py:59
-msgid "Fortune. . ."
-msgstr ""
-
-#: indicator-fortune.py:95
+#: indicator-fortune.py:71
 msgid "New Fortune"
 msgstr ""
 
-#: indicator-fortune.py:101
+#: indicator-fortune.py:77
 msgid "Copy Last Fortune"
 msgstr ""
 
-#: indicator-fortune.py:107
+#: indicator-fortune.py:83
 msgid "Show Last Fortune"
 msgstr ""
 
-#: indicator-fortune.py:130
-msgid "WARNING. . ."
-msgstr ""
-
-#: indicator-fortune.py:141
-msgid "No fortunes are enabled!"
-msgstr ""
-
-#: indicator-fortune.py:153
+#: indicator-fortune.py:101
 msgid "No enabled fortunes have a valid location!"
 msgstr ""
 
-#: indicator-fortune.py:158
+#: indicator-fortune.py:107
 msgid "Ensure enabled fortunes contain fortune data!"
 msgstr ""
 
-#: indicator-fortune.py:182
-msgid "translator-credits"
+#: indicator-fortune.py:121
+msgid "WARNING. . ."
 msgstr ""
 
-#: indicator-fortune.py:183
-msgid "View the"
-msgstr ""
-
-#: indicator-fortune.py:184
-msgid "text file."
-msgstr ""
-
-#: indicator-fortune.py:185
-msgid "changelog"
-msgstr ""
-
-#: indicator-fortune.py:223
+#: indicator-fortune.py:158
 msgid "Fortune File/Directory"
 msgstr ""
 
-#: indicator-fortune.py:227 indicator-fortune.py:485
+#: indicator-fortune.py:162 indicator-fortune.py:407
 msgid "Enabled"
 msgstr ""
 
-#: indicator-fortune.py:234
+#: indicator-fortune.py:169
 msgid ""
 "Double click to edit a fortune.\n"
 "\n"
@@ -91,55 +71,55 @@ msgid ""
 "native language."
 msgstr ""
 
-#: indicator-fortune.py:250
+#: indicator-fortune.py:185
 msgid "Add"
 msgstr ""
 
-#: indicator-fortune.py:251
+#: indicator-fortune.py:186
 msgid "Add a new fortune location."
 msgstr ""
 
-#: indicator-fortune.py:255
+#: indicator-fortune.py:190
 msgid "Remove"
 msgstr ""
 
-#: indicator-fortune.py:256
+#: indicator-fortune.py:191
 msgid "Remove the selected fortune location."
 msgstr ""
 
-#: indicator-fortune.py:260
+#: indicator-fortune.py:195
 msgid "Reset"
 msgstr ""
 
-#: indicator-fortune.py:261
+#: indicator-fortune.py:196
 msgid "Reset to factory default."
 msgstr ""
 
-#: indicator-fortune.py:268
+#: indicator-fortune.py:203
 msgid "Fortunes"
 msgstr ""
 
-#: indicator-fortune.py:281
+#: indicator-fortune.py:210
 msgid "Refresh interval (minutes)"
 msgstr ""
 
-#: indicator-fortune.py:286
+#: indicator-fortune.py:215
 msgid "How often a fortune is displayed."
 msgstr ""
 
-#: indicator-fortune.py:294
+#: indicator-fortune.py:223
 msgid "Notification summary"
 msgstr ""
 
-#: indicator-fortune.py:298
+#: indicator-fortune.py:227
 msgid "The summary text for the notification."
 msgstr ""
 
-#: indicator-fortune.py:307
+#: indicator-fortune.py:236
 msgid "Message character limit"
 msgstr ""
 
-#: indicator-fortune.py:313
+#: indicator-fortune.py:242
 msgid ""
 "If the fortune exceeds the limit,\n"
 "a new fortune is created.\n"
@@ -150,63 +130,59 @@ msgid ""
 "'fortune' program."
 msgstr ""
 
-#: indicator-fortune.py:323
+#: indicator-fortune.py:252
 msgid "Middle mouse click of the icon"
 msgstr ""
 
-#: indicator-fortune.py:324
+#: indicator-fortune.py:253
 msgid "Not supported on all versions/derivatives of Ubuntu."
 msgstr ""
 
-#: indicator-fortune.py:329
+#: indicator-fortune.py:258
 msgid "Show a new fortune"
 msgstr ""
 
-#: indicator-fortune.py:334
+#: indicator-fortune.py:263
 msgid "Copy current fortune to clipboard"
 msgstr ""
 
-#: indicator-fortune.py:339
+#: indicator-fortune.py:268
 msgid "Show current fortune"
 msgstr ""
 
-#: indicator-fortune.py:344
+#: indicator-fortune.py:273
 msgid "Autostart"
 msgstr ""
 
-#: indicator-fortune.py:345
+#: indicator-fortune.py:274
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicator-fortune.py:350
+#: indicator-fortune.py:279
 msgid "General"
 msgstr ""
 
-#: indicator-fortune.py:352
-msgid "Preferences"
-msgstr ""
-
-#: indicator-fortune.py:389
+#: indicator-fortune.py:314
 msgid "Reset fortunes to factory default?"
 msgstr ""
 
-#: indicator-fortune.py:398
+#: indicator-fortune.py:323
 msgid "No fortune has been selected for removal."
 msgstr ""
 
-#: indicator-fortune.py:400
+#: indicator-fortune.py:326
 msgid "This is the default fortune and cannot be deleted."
 msgstr ""
 
-#: indicator-fortune.py:401
+#: indicator-fortune.py:328
 msgid "Remove the selected fortune?"
 msgstr ""
 
-#: indicator-fortune.py:421
+#: indicator-fortune.py:342
 msgid "Fortune file/directory"
 msgstr ""
 
-#: indicator-fortune.py:432
+#: indicator-fortune.py:353
 msgid ""
 "The path to a fortune .dat file,\n"
 "or a directory containing\n"
@@ -216,18 +192,18 @@ msgid ""
 "fortune text file(s) is present."
 msgstr ""
 
-#: indicator-fortune.py:450
+#: indicator-fortune.py:370
 msgid "File"
 msgstr ""
 
-#: indicator-fortune.py:454 indicator-fortune.py:469
+#: indicator-fortune.py:374 indicator-fortune.py:390
 msgid ""
 "This fortune is part of\n"
 "your system and cannot be\n"
 "modified."
 msgstr ""
 
-#: indicator-fortune.py:459
+#: indicator-fortune.py:380
 msgid ""
 "Choose a fortune .dat file.\n"
 "\n"
@@ -235,11 +211,11 @@ msgid ""
 "file is present."
 msgstr ""
 
-#: indicator-fortune.py:465
+#: indicator-fortune.py:386
 msgid "Directory"
 msgstr ""
 
-#: indicator-fortune.py:474
+#: indicator-fortune.py:396
 msgid ""
 "Choose a directory containing\n"
 "a fortune .dat file(s).\n"
@@ -248,33 +224,33 @@ msgid ""
 "file is present."
 msgstr ""
 
-#: indicator-fortune.py:487
+#: indicator-fortune.py:409
 msgid ""
 "Ensure the fortune file/directory\n"
 "works by running through 'fortune'\n"
 "in a terminal."
 msgstr ""
 
-#: indicator-fortune.py:499
+#: indicator-fortune.py:419
 msgid "Add Fortune"
 msgstr ""
 
-#: indicator-fortune.py:501
+#: indicator-fortune.py:421
 msgid "Edit Fortune"
 msgstr ""
 
-#: indicator-fortune.py:516
+#: indicator-fortune.py:433
 msgid "The fortune path cannot be empty."
 msgstr ""
 
-#: indicator-fortune.py:532
-msgid "Choose a fortune .dat file"
-msgstr ""
-
-#: indicator-fortune.py:535
+#: indicator-fortune.py:448
 msgid "Choose a directory containing a fortune .dat file(s)"
 msgstr ""
 
-#: indicator-fortune.py:545
+#: indicator-fortune.py:451
+msgid "Choose a fortune .dat file"
+msgstr ""
+
+#: indicator-fortune.py:461
 msgid "The fortune is part of your system and is already included."
 msgstr ""
