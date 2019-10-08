@@ -44,7 +44,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     CONFIG_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
-    DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", True ]
+    DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", Gtk.STOCK_APPLY ]
     HISTORY_FILE = "fortune-history"
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
@@ -319,7 +319,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         if self.showOKCancel( treeView, _( "Reset fortunes to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
             listStore = treeView.get_model().get_model()
             listStore.clear()
-            listStore.append( [ IndicatorFortune.DEFAULT_FORTUNE, Gtk.STOCK_APPLY ]  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
+            listStore.append( IndicatorFortune.DEFAULT_FORTUNE  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
 
 
     def onFortuneRemove( self, button, treeView ):
