@@ -169,9 +169,11 @@ class IndicatorBase:
             with gzip.open( changeLogGzipped, 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
                 shutil.copyfileobj( fileIn, fileOut )
 
-            errorLog = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
             self.__addHyperlinkLabel( aboutDialog, changeLog, _( "View the" ), _( "text file." ), _( "changelog" ) )
-            self.__addHyperlinkLabel( aboutDialog, errorLog, _( "View the" ), _( "text file." ), _( "error log" ) )
+
+            errorLog = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
+            if os.path.exists( errorLog ):
+                self.__addHyperlinkLabel( aboutDialog, errorLog, _( "View the" ), _( "text file." ), _( "error log" ) )
 
             aboutDialog.run()
             aboutDialog.hide()
