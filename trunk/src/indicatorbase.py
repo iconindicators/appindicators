@@ -185,6 +185,25 @@ class IndicatorBase:
 # about it all.  However I suspect now having a base class makes it so
 # much easier to roll out changes like this to all indicators in one go.
 
+
+# When a refresh happens, disable the Preferences menu item.
+# When the refresh finishes, enable the Preferences menu item.
+#
+# When the About is selected, disable About and Preferences.
+# When About is closed, enable About.
+# Only enable Preferences if update is not running.
+#
+# When Preferences is selected, disable About and Preferences.
+# Also disable refresh timer.
+# When Preferences is closed, enable About.
+# If Preferences OK was selected, do a refresh.
+# What if we don't disable the refresh timer, but only if OK was pressed
+# do we remove the existing timer and kick off a new refresh?
+# This fixes the refresh when cancel problem.
+
+
+
+
     def __onAbout( self, widget ):
         if self.lock.acquire( blocking = False ):
             if self.updateTimerID:
