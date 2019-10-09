@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Punycode Indicator
+Name[ru]=Индикатор Punycode-конвертер
 Icon=indicator-punycode
 Exec=/usr/share/indicator-punycode/indicator-punycode.py
 Categories=Utility;
