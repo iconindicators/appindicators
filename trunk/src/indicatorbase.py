@@ -133,14 +133,58 @@ class IndicatorBase:
 #TODO Don't like how an update happens...
 #...work out why we have to cancel and why we have to do an update.
 # 
+#
+# Currently I have two situations that I have solved, but has the side
+# effect you have just mentioned.
 # 
+# Situation 1: Only allow one of the About OR Preferences to display at a
+# time; never simultaneously.  If we allow both to display, the second
+# dialog to display grabs the focus from the first dialog to display.
 # 
+# Situation 2: Most indicators use a timer to run a periodic refresh (of
+# the internals and then menu build).  Indicator Lunar is a great
+# example.  All indicators except Punycode and Script Runner have
+# update/refresh loops.  Now if a user runs the Preferences, I want to
+# disable the refresh from happening and then kick off a refresh when the
+# Preferences is closed.
 # 
+# I use a single thread lock to handle both situations, but there are side
+# effects:
 # 
+# Side Effect 1: When the Preferences is closed, if the user clicked
+# Cancel, the refresh still kicks off (only refresh if the user changed
+# something).
 # 
+# Side Effect 2: Because of the single thread lock, the About dialog also
+# kicks off a refresh when closed.
 # 
+# So I am rethinking the situation...
 # 
+# My initial thoughts (scrambled up and unclear at this stage) are:
 # 
+# 1) I could grey-out (deactivate) the About and Preferences menu items
+# when either the About or Preferences is displayed.   This stops the user
+# from running the other dialog.  When the dialog is closed, re-enable
+# those menu items.
+# 
+# 2) When the Preferences is opened, disable the update timer (which kicks
+# off the refresh).  I think regardless of the user hitting the OK or
+# Cancel, I would have to run the update no matter what (too difficult to
+# figure out when the update would have occurred in the future).  Maybe I
+# can get GTK to give me information about when the update timer was due
+# to run.
+# 
+# 3) If the About dialog is displayed, the update timer can stay in
+# place.  So the About dialog is independent of updates.
+# 
+# 4) If an update is underway (could take a minute or so on my old laptop
+# for Indicator Lunar), the Preferences will not display (not sure if I
+# should disable Preferences menu item during the update).
+# 
+# Not sure if the above yet makes sense; only just today started thinking
+# about it all.  However I suspect now having a base class makes it so
+# much easier to roll out changes like this to all indicators in one go.
+
     def __onAbout( self, widget ):
         if self.lock.acquire( blocking = False ):
             if self.updateTimerID:
