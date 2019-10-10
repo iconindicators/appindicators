@@ -194,12 +194,8 @@ class IndicatorBase:
 # Only enable Preferences if update is not running.
 #
 # When Preferences is selected, disable About and Preferences.
-# Also disable refresh timer.
 # When Preferences is closed, enable About.
-# If Preferences OK was selected, do a refresh.
-# What if we don't disable the refresh timer, but only if OK was pressed
-# do we remove the existing timer and kick off a new refresh?
-# This fixes the refresh when cancel problem.
+# If Preferences OK was selected, remove any existing timer and do a refresh.
 
 
 
