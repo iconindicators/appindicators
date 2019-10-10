@@ -97,11 +97,14 @@ class IndicatorBase:
 
 
     def __update( self ):
-#         menu = self.indicator.get_menu()
-#         if not self.startingUp:
-#             menuItems = menu.get_children()
-#             menuItems[ -2 ].set_sensitive( False )
-#             menuItems[ -3 ].set_sensitive( False )
+#TODO Testing
+        if not self.startingUp:
+            print( "__update not starting up")
+            menu = self.indicator.get_menu()
+            menuItems = menu.get_children()
+            menuItem = menuItems[ -2 ]
+            menuItems[ -2 ].set_sensitive( False )
+            menuItems[ -3 ].set_sensitive( False )
 
         menu = Gtk.Menu()
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
@@ -282,6 +285,7 @@ class IndicatorBase:
 
 
     def __onPreferences( self, widget ):
+        print( "__onPreferences")#TODO Testing
         if self.lock.acquire( blocking = False ):
             if self.updateTimerID:
                 GLib.source_remove( self.updateTimerID )
