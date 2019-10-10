@@ -86,7 +86,7 @@ class IndicatorBase:
         Gtk.main()
 
 
-    def __update( self ):
+    def __updateORIG( self ):
         with self.lock:
             menu = Gtk.Menu()
             self.indicator.set_menu( menu )
@@ -94,6 +94,20 @@ class IndicatorBase:
             self.__finaliseMenu( menu )
             if nextUpdateInSeconds: # Some indicators don't return a next update time.
                 self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
+
+
+    def __update( self ):
+#         menu = self.indicator.get_menu()
+#         if not self.startingUp:
+#             menuItems = menu.get_children()
+#             menuItems[ -2 ].set_sensitive( False )
+#             menuItems[ -3 ].set_sensitive( False )
+
+        menu = Gtk.Menu()
+        nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
+        self.__finaliseMenu( menu )
+        if nextUpdateInSeconds: # Some indicators don't return a next update time.
+            self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
 
 
 #TODO SHould this be wrapped in
@@ -119,6 +133,7 @@ class IndicatorBase:
         menuItem.connect( "activate", Gtk.main_quit )
         menu.append( menuItem )
 
+        self.indicator.set_menu( menu )
         menu.show_all()
 
 
