@@ -62,15 +62,11 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             copyrightStartYear = "2012",
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
-        utcNow = datetime.datetime.utcnow() #TODO Testing
-
         self.scrollDirectionIsUp = True
         self.scrollUUID = None
         self.dateTimeOfLastNotification = datetime.datetime.now()
 
         self.requestMouseWheelScrollEvents()
-
-        print( "init", ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) #TODO Testing
 
 
     def update( self, menu ):
@@ -87,15 +83,11 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def buildMenu( self, menu ):
-        utcNow = datetime.datetime.utcnow()#TODO Testing
         virtualMachines = self.getVirtualMachines()
-        print( "getVMs", ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) #TODO Testing
         if len( virtualMachines ) == 0:
             menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
 
         else:
-            utcNow = datetime.datetime.utcnow() #TODO Testing
-
             runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
             if self.showSubmenu:
                 stack = [ ]
@@ -124,8 +116,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                     else:
                         menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, virtualMachine.getUUID() in runningVMUUIDs ) )
 
-            print( "buildmenu", ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) #TODO Testing
-        
         menu.append( Gtk.SeparatorMenuItem() )
         menuItem = Gtk.MenuItem( _( "Launch VirtualBox™ Manager" ) )
         menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
