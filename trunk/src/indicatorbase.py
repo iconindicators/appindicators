@@ -96,6 +96,7 @@ class IndicatorBase:
                 self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
 
 
+#TODO If we disable About/Preferences...can we still Quit (during startup for Lunar) or refresh for any indicator?
     def __update( self ):
 #TODO Testing
         if not self.startingUp:
@@ -111,6 +112,10 @@ class IndicatorBase:
         self.__finaliseMenu( menu )
         if nextUpdateInSeconds: # Some indicators don't return a next update time.
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
+
+        menuItems = menu.get_children()
+        menuItems[ -2 ].set_sensitive( False )
+        menuItems[ -3 ].set_sensitive( False )
 
 
 #TODO SHould this be wrapped in
