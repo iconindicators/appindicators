@@ -653,7 +653,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if dateTime > utcNowPlusLastRun and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
-        return int( ( nextUpdateTime - utcNow ).total_seconds() )
+        print("updated")
+        return 10
+#         return int( ( nextUpdateTime - utcNow ).total_seconds() )
 
 
     def updateMenu( self, menu ):
