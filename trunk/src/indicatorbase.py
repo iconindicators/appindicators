@@ -116,6 +116,9 @@ class IndicatorBase:
 #                 menuItems[ -2 ].set_sensitive( False ) # About
 #                 menuItems[ -3 ].set_sensitive( False ) # Preferences
 
+            if not self.startingUp:
+                self.__toggleAboutPreferencesSensitivity( False )
+
             menu = Gtk.Menu()
             nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
             self.__finaliseMenu( menu )
@@ -239,16 +242,21 @@ class IndicatorBase:
 
 
 
+#TODO In Punycode, when items are disabled,
+# convert is enabled...should I really disable all menu items?
+# Best check every indicator!
+    def __toggleAboutPreferencesSensitivity( self, toggle ):
+        menuItems = self.indicator.get_menu().get_children()
+        menuItems[ -2 ].set_sensitive( toggle ) # About
+        menuItems[ -3 ].set_sensitive( toggle ) # Preferences
+
 
     def __onAbout( self, widget ):
         if self.lock.acquire( blocking = False ):
 #             if self.updateTimerID:
 #                 GLib.source_remove( self.updateTimerID )
 
-            menu = self.indicator.get_menu()
-            menuItems = menu.get_children()
-            menuItems[ -2 ].set_sensitive( False ) # About
-            menuItems[ -3 ].set_sensitive( False ) # Preferences
+            self.__toggleAboutPreferencesSensitivity( False )
 
             aboutDialog = Gtk.AboutDialog()
             aboutDialog.set_transient_for( widget.get_parent().get_parent() )
@@ -292,8 +300,7 @@ class IndicatorBase:
 
             os.remove( changeLog )
 
-            menuItems[ -2 ].set_sensitive( True ) # About
-            menuItems[ -3 ].set_sensitive( True ) # Preferences
+            self.__toggleAboutPreferencesSensitivity( True )
 
             self.lock.release()
 #             GLib.idle_add( self.__update )
@@ -371,6 +378,8 @@ class IndicatorBase:
             if self.updateTimerID:
                 GLib.source_remove( self.updateTimerID )
 
+            self.__toggleAboutPreferencesSensitivity( False )
+
             dialog = Gtk.Dialog(
                         _( "Preferences" ),
                         self.__getParent( widget ),
@@ -380,6 +389,7 @@ class IndicatorBase:
             dialog.set_border_width( 5 )
             self.onPreferences( dialog ) # Call to implementation in indicator.
             dialog.destroy()
+            self.__toggleAboutPreferencesSensitivity( True )
             self.lock.release()
             GLib.idle_add( self.__update )
 
