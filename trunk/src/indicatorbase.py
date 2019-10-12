@@ -367,7 +367,7 @@ class IndicatorBase:
 
     def __onPreferences( self, widget ):
         print( "__onPreferences")#TODO Testing
-        if self.lock.acquire( blocking = False ):
+        if self.lock.acquire( blocking = False ): #TODO May not need the locking any more???
             if self.updateTimerID:
                 GLib.source_remove( self.updateTimerID )
 
