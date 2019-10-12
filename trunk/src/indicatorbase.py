@@ -112,7 +112,7 @@ class IndicatorBase:
 #             if not self.startingUp:
 #                 print( "__update not starting up")
 #                 menu = self.indicator.get_menu()
-#                 menuItems = menu.get_children()
+#                 menuItems = menu.get_children()#         GLib.idle_add( self.internal, toggle )
 #                 menuItems[ -2 ].set_sensitive( False ) # About
 #                 menuItems[ -3 ].set_sensitive( False ) # Preferences
 
@@ -248,13 +248,6 @@ class IndicatorBase:
 # convert is enabled...should I really disable all menu items?
 # Best check every indicator!
     def __toggleAboutPreferencesSensitivity( self, toggle ):
-
-        self.internal( toggle )
-#         GLib.idle_add( self.internal, toggle )
-
-
-
-    def internal( self, toggle ):
         menuItems = self.indicator.get_menu().get_children()
         menuItems[ -2 ].set_sensitive( toggle ) # About
         menuItems[ -3 ].set_sensitive( toggle ) # Preferences
