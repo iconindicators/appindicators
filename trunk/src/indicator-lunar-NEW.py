@@ -546,6 +546,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
+        print( "Lunar update:", datetime.datetime.utcnow() )
         if self.startingUp:
             menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
 #TODO Wrap in GLib stuff?
@@ -599,8 +600,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     #             if self.showSatelliteNotification:
     #                 self.notificationSatellites()
 
-            return self.getNextUpdateTimeInSeconds( utcNow )
+            x = self.getNextUpdateTimeInSeconds( utcNow )
+            print( "Next update at:", x )
+            return x
+#             return self.getNextUpdateTimeInSeconds( utcNow )
 
+
+        print( "Lunar update done")
 
     # Get the data from the cache, or if stale, download from the source.
     #
@@ -653,9 +659,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if dateTime > utcNowPlusLastRun and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
-        print("updated")
-        return 10 #TODO
-#         return int( ( nextUpdateTime - utcNow ).total_seconds() )
+        return int( ( nextUpdateTime - utcNow ).total_seconds() )
 
 
     def updateMenu( self, menu ):
