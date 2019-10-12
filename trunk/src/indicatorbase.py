@@ -99,24 +99,35 @@ class IndicatorBase:
 #TODO If we disable About/Preferences...can we still Quit (during startup for Lunar) or refresh for any indicator?
     def __update( self ):
 #TODO Testing
-        if not self.startingUp:
-            print( "__update not starting up")
-            menu = self.indicator.get_menu()
-            menuItems = menu.get_children()
-            menuItem = menuItems[ -2 ]
-            menuItems[ -2 ].set_sensitive( False )
-            menuItems[ -3 ].set_sensitive( False )
+#         if self.startingUp:
+#             print( "__update starting up")
+#             menu = Gtk.Menu()
+#             menu = self.indicator.get_menu()
+#             menuItems = menu.get_children()
+#             menuItem = menuItems[ -2 ]
+#             menuItems[ -2 ].set_sensitive( False )
+#             menuItems[ -3 ].set_sensitive( False )
 
-        menu = Gtk.Menu()
-        nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
-        self.__finaliseMenu( menu )
-        if nextUpdateInSeconds: # Some indicators don't return a next update time.
-            self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
+        with self.lock:
+#             if not self.startingUp:
+#                 print( "__update not starting up")
+#                 menu = self.indicator.get_menu()
+#                 menuItems = menu.get_children()
+#                 menuItems[ -2 ].set_sensitive( False ) # About
+#                 menuItems[ -3 ].set_sensitive( False ) # Preferences
 
-        menuItems = menu.get_children()
-        menuItems[ -2 ].set_sensitive( False )
-        menuItems[ -3 ].set_sensitive( False )
+            menu = Gtk.Menu()
+            nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
+            self.__finaliseMenu( menu )
+            if nextUpdateInSeconds: # Some indicators don't return a next update time.
+                self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
+                self.nextUpdateTime = datetime.datetime.utcnow() + datetime.timedelta( seconds = nextUpdateInSeconds )
 
+            else:
+                self.nextUpdateTime = None
+
+            print( nextUpdateInSeconds )                
+            print( self.nextUpdateTime )
 
 #TODO SHould this be wrapped in
 #             GLib.idle_add( self.requestUpdate )
@@ -132,10 +143,16 @@ class IndicatorBase:
         menuItem = Gtk.MenuItem.new_with_label( _( "Preferences" ) )
         menuItem.connect( "activate", self.__onPreferences )
         menu.append( menuItem )
+#TODO Testing
+#         if self.startingUp:
+#             menuItem.set_sensitive( False )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "About" ) )
         menuItem.connect( "activate", self.__onAbout )
         menu.append( menuItem )
+#TODO Testing
+#         if self.startingUp:
+#             menuItem.set_sensitive( False )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "Quit" ) )
         menuItem.connect( "activate", Gtk.main_quit )
@@ -225,6 +242,65 @@ class IndicatorBase:
 
     def __onAbout( self, widget ):
         if self.lock.acquire( blocking = False ):
+#             if self.updateTimerID:
+#                 GLib.source_remove( self.updateTimerID )
+
+            menu = self.indicator.get_menu()
+            menuItems = menu.get_children()
+            menuItems[ -2 ].set_sensitive( False ) # About
+            menuItems[ -3 ].set_sensitive( False ) # Preferences
+
+            aboutDialog = Gtk.AboutDialog()
+            aboutDialog.set_transient_for( widget.get_parent().get_parent() )
+            aboutDialog.set_artists( self.artwork )
+            aboutDialog.set_authors( self.authors )
+            aboutDialog.set_comments( self.comments )
+
+            copyrightText = \
+                "Copyright \xa9 " + \
+                self.copyrightStartYear + \
+                "-" + \
+                str( datetime.datetime.now().year ) + \
+                " " + \
+                self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
+
+            aboutDialog.set_copyright( copyrightText )
+            aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
+            aboutDialog.set_logo_icon_name( self.indicatorName )
+            aboutDialog.set_program_name( self.indicatorName )
+            aboutDialog.set_translator_credits( _( "translator-credits" ) )
+            aboutDialog.set_version( self.version )
+            aboutDialog.set_website( self.website )
+            aboutDialog.set_website_label( self.website )
+
+            if self.creditz:
+                aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
+
+            changeLog = self.__getCacheDirectory() + self.indicatorName + ".changelog"
+            changeLogGzipped = "/usr/share/doc/" + self.indicatorName + "/changelog.Debian.gz"
+            with gzip.open( changeLogGzipped, 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
+                shutil.copyfileobj( fileIn, fileOut )
+
+            self.__addHyperlinkLabel( aboutDialog, changeLog, _( "View the" ), _( "changelog" ), _( "text file." ) )
+
+            errorLog = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
+            if os.path.exists( errorLog ):
+                self.__addHyperlinkLabel( aboutDialog, errorLog, _( "View the" ), _( "error log" ), _( "text file." ) )
+
+            aboutDialog.run()
+            aboutDialog.hide()
+
+            os.remove( changeLog )
+
+            menuItems[ -2 ].set_sensitive( True ) # About
+            menuItems[ -3 ].set_sensitive( True ) # Preferences
+
+            self.lock.release()
+#             GLib.idle_add( self.__update )
+
+
+    def __onAboutORIG( self, widget ):
+        if self.lock.acquire( blocking = False ):
             if self.updateTimerID:
                 GLib.source_remove( self.updateTimerID )
 
@@ -290,6 +366,25 @@ class IndicatorBase:
 
 
     def __onPreferences( self, widget ):
+        print( "__onPreferences")#TODO Testing
+        if self.lock.acquire( blocking = False ):
+            if self.updateTimerID:
+                GLib.source_remove( self.updateTimerID )
+
+            dialog = Gtk.Dialog(
+                        _( "Preferences" ),
+                        self.__getParent( widget ),
+                        Gtk.DialogFlags.MODAL,
+                        ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+ 
+            dialog.set_border_width( 5 )
+            self.onPreferences( dialog ) # Call to implementation in indicator.
+            dialog.destroy()
+            self.lock.release()
+            GLib.idle_add( self.__update )
+
+
+    def __onPreferencesORIG( self, widget ):
         print( "__onPreferences")#TODO Testing
         if self.lock.acquire( blocking = False ):
             if self.updateTimerID:
