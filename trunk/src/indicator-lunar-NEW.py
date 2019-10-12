@@ -654,7 +654,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     nextUpdateTime = dateTime
 
         print("updated")
-        return 10
+        return 10 #TODO
 #         return int( ( nextUpdateTime - utcNow ).total_seconds() )
 
 
