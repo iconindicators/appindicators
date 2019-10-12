@@ -49,6 +49,12 @@ class IndicatorBase:
 
 
     def __init__( self, indicatorName, version, copyrightStartYear, comments, artwork = None, creditz = None ):
+
+#TODO Check out https://wiki.gnome.org/Projects/PyGObject/Threading
+# and run the code on the laptop to see the version and compare against 3.10.2 to see if 
+# we need to call threads_init
+        print( "Gtk Major:", Gtk.MAJOR_VERSION, ", Gtk Minor:", Gtk.MINOR_VERSION, ", Gtk Micro:", Gtk.MICRO_VERSION ) #TODO Debug
+        
         self.indicatorName = indicatorName
         self.version = version
         self.copyrightStartYear = copyrightStartYear
