@@ -86,7 +86,7 @@ class IndicatorBase:
         self.__loadConfig()
 
 
-    def main( self ): 
+    def main( self ):
         self.__update()
         self.startingUp = False
         Gtk.main()
