@@ -551,7 +551,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
 #TODO Wrap in GLib stuff?
 # ...or check the TODO in base class.
-            GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.requestUpdate )
+            GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS + 5, self.requestUpdate )
 
         else:
             utcNow = datetime.datetime.utcnow()
