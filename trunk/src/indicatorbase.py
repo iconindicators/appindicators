@@ -84,9 +84,11 @@ class IndicatorBase:
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
         self.__loadConfig()
+        print( "init thread:", threading.get_ident() )
 
 
     def main( self ):
+        print( "main thread:", threading.get_ident() )
         self.__update()
         self.startingUp = False
         Gtk.main()
@@ -114,11 +116,12 @@ class IndicatorBase:
 #             menuItems[ -2 ].set_sensitive( False )
 #             menuItems[ -3 ].set_sensitive( False )
 
-        if not self.startingUp:
-            self.__setAboutPreferencesSensitivity( False )
+        print( "__update thread:", threading.get_ident() )
 
-#TODO Not sure if the lock is delaying/preventing the change in the about/prefs sensitivity.
         with self.lock:
+            if not self.startingUp:
+                self.__setAboutPreferencesSensitivity( False )
+#                 return #TODO If we return then the about/prefs get disabled.  This means the code below is so intensive, the disabling takes too long to take effect.
 #             if not self.startingUp:
 #                 print( "__update not starting up")
 #                 menu = self.indicator.get_menu()
@@ -261,7 +264,9 @@ class IndicatorBase:
 
 
     def __onAbout( self, widget ):
+        print( "__onAbout thread:", threading.get_ident() )
         if self.lock.acquire( blocking = False ):
+            print( "__onAbout lock thread:", threading.get_ident() )
 #             if self.updateTimerID:
 #                 GLib.source_remove( self.updateTimerID )
 
