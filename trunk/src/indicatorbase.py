@@ -120,7 +120,10 @@ class IndicatorBase:
 
         with self.lock:
             if not self.startingUp:
-                self.__setAboutPreferencesSensitivity( False )
+#                 self.__setAboutPreferencesSensitivity( False )
+                GLib.idle_add( self.__setAboutPreferencesSensitivity, False )
+                import time
+                time.sleep( 5 )
 #                 return #TODO If we return then the about/prefs get disabled.  This means the code below is so intensive, the disabling takes too long to take effect.
 #             if not self.startingUp:
 #                 print( "__update not starting up")
@@ -261,6 +264,13 @@ class IndicatorBase:
         menuItems = self.indicator.get_menu().get_children()
         menuItems[ -2 ].set_sensitive( toggle ) # About
         menuItems[ -3 ].set_sensitive( toggle ) # Preferences
+
+#TODO Testing
+        print( "Sensitive toggle:", toggle )
+        print( "About:", menuItems[ -2 ].is_sensitive() )
+        print( "Preferecnes:", menuItems[ -3 ].is_sensitive() )
+
+
 
 
     def __onAbout( self, widget ):
