@@ -122,10 +122,10 @@ class IndicatorBase:
 #                 menuItems[ -2 ].set_sensitive( False ) # About
 #                 menuItems[ -3 ].set_sensitive( False ) # Preferences
 
-            print( "Starting up:", self.startingUp)
+#             print( "Starting up:", self.startingUp)
 
-            if not self.startingUp:
-                self.__toggleAboutPreferencesSensitivity( False )
+#             if not self.startingUp:
+#                 self.__setAboutPreferencesSensitivity( False )
 
             menu = Gtk.Menu()
             nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
@@ -137,8 +137,8 @@ class IndicatorBase:
             else:
                 self.nextUpdateTime = None
 
-            print( nextUpdateInSeconds )                
-            print( self.nextUpdateTime )
+            print( "Next update in seconds:", nextUpdateInSeconds )                
+            print( "Next update time:", self.nextUpdateTime )
 
 #TODO SHould this be wrapped in
 #             GLib.idle_add( self.requestUpdate )
@@ -253,7 +253,7 @@ class IndicatorBase:
 #TODO In Punycode, when items are disabled,
 # convert is enabled...should I really disable all menu items?
 # Best check every indicator!
-    def __toggleAboutPreferencesSensitivity( self, toggle ):
+    def __setAboutPreferencesSensitivity( self, toggle ):
         menuItems = self.indicator.get_menu().get_children()
         menuItems[ -2 ].set_sensitive( toggle ) # About
         menuItems[ -3 ].set_sensitive( toggle ) # Preferences
@@ -264,7 +264,7 @@ class IndicatorBase:
 #             if self.updateTimerID:
 #                 GLib.source_remove( self.updateTimerID )
 
-            self.__toggleAboutPreferencesSensitivity( False )
+            self.__setAboutPreferencesSensitivity( False )
 
             aboutDialog = Gtk.AboutDialog()
             aboutDialog.set_transient_for( widget.get_parent().get_parent() )
@@ -308,7 +308,7 @@ class IndicatorBase:
 
             os.remove( changeLog )
 
-            self.__toggleAboutPreferencesSensitivity( True )
+            self.__setAboutPreferencesSensitivity( True )
 
             self.lock.release()
 #             GLib.idle_add( self.__update )
@@ -381,12 +381,11 @@ class IndicatorBase:
 
 
     def __onPreferences( self, widget ):
-        print( "__onPreferences")#TODO Testing
         if self.lock.acquire( blocking = False ): #TODO May not need the locking any more???
             if self.updateTimerID:
                 GLib.source_remove( self.updateTimerID )
 
-            self.__toggleAboutPreferencesSensitivity( False )
+            self.__setAboutPreferencesSensitivity( False )
 
             dialog = Gtk.Dialog(
                         _( "Preferences" ),
@@ -397,7 +396,7 @@ class IndicatorBase:
             dialog.set_border_width( 5 )
             self.onPreferences( dialog ) # Call to implementation in indicator.
             dialog.destroy()
-            self.__toggleAboutPreferencesSensitivity( True )
+            self.__setAboutPreferencesSensitivity( True )
             self.lock.release()
             GLib.idle_add( self.__update )
 
