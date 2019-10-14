@@ -109,6 +109,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         else:
             self.buildMenu( menu )
+#TODO If the status is error, then maybe set the update to be in 10 minutes time?
             timeToNextUpdateInSeconds = 6 * 60 * 60 # Auto update every six hours.
             for ppa in self.ppas:
                 ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD ) # Ensures the next update will do a download.
@@ -191,7 +192,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
 
-        else:
+        else: #TODO What would this case be?  How does this come to pass?  Is this status multiple errors?
             message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
         menuItem = Gtk.MenuItem( indent + message )
