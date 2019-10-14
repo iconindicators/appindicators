@@ -114,6 +114,10 @@ class IndicatorBase:
 #             menuItems[ -2 ].set_sensitive( False )
 #             menuItems[ -3 ].set_sensitive( False )
 
+        if not self.startingUp:
+            self.__setAboutPreferencesSensitivity( False )
+
+#TODO Not sure if the lock is delaying/preventing the change in the about/prefs sensitivity.
         with self.lock:
 #             if not self.startingUp:
 #                 print( "__update not starting up")
@@ -123,9 +127,6 @@ class IndicatorBase:
 #                 menuItems[ -3 ].set_sensitive( False ) # Preferences
 
 #             print( "Starting up:", self.startingUp)
-
-#             if not self.startingUp:
-#                 self.__setAboutPreferencesSensitivity( False )
 
             menu = Gtk.Menu()
             nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
