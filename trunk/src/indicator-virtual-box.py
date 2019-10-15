@@ -77,6 +77,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             menu.append( Gtk.MenuItem( _( "(VirtualBox™ is not installed)" ) ) )
 
 #TODO Put this back!
+#TODO May need to use GLib instead because the indicator hangs if the VM doesn't start/exist?
 #         if self.startingUp and self.isVBoxManageInstalled():
 #             Thread( target = self.autoStartVirtualMachines ).start()
 
