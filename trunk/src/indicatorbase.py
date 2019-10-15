@@ -87,7 +87,10 @@ class IndicatorBase:
 
 
     def main( self ):
-        GLib.timeout_add_seconds( 1, self.__update )
+#         GLib.timeout_add_seconds( 1, self.__update )
+#TODO Test this on the laptop and ensure things still work...
+        GLib.idle_add( self.__update )
+
 #         self.__update()
 #         self.startingUp = False
         Gtk.main()
