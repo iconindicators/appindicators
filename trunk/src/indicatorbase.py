@@ -98,8 +98,10 @@ class IndicatorBase:
                 self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
 
 
-#TODO If we disable About/Preferences...can we still Quit (during startup for Lunar) or refresh for any indicator?
     def __update( self ):
+        # Convoluted way to allow the About/Preferences menu items to be disabled during an update.
+        # If the update was to take place in a single function, the menu items would only be disabled when the function returns.
+        # Therefore, do the disable and return immediately (finishing off the update slightly delayed).
         if self.startingUp:
             self.__updateFinalisation()
 
@@ -110,8 +112,27 @@ class IndicatorBase:
 
     def __updateFinalisation( self ):
         menu = Gtk.Menu()
+
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
-        self.__finaliseMenu( menu )
+
+        if len( menu.get_children() ) > 0:
+            menu.append( Gtk.SeparatorMenuItem() )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Preferences" ) )
+        menuItem.connect( "activate", self.__onPreferences )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "About" ) )
+        menuItem.connect( "activate", self.__onAbout )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Quit" ) )
+        menuItem.connect( "activate", Gtk.main_quit )
+        menu.append( menuItem )
+
+        self.indicator.set_menu( menu )
+        menu.show_all()
+        
         if nextUpdateInSeconds: # Some indicators don't return a next update time.
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
             self.nextUpdateTime = datetime.datetime.utcnow() + datetime.timedelta( seconds = nextUpdateInSeconds )
@@ -181,16 +202,10 @@ class IndicatorBase:
         menuItem = Gtk.MenuItem.new_with_label( _( "Preferences" ) )
         menuItem.connect( "activate", self.__onPreferences )
         menu.append( menuItem )
-#TODO Testing
-#         if self.startingUp:
-#             menuItem.set_sensitive( False )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "About" ) )
         menuItem.connect( "activate", self.__onAbout )
         menu.append( menuItem )
-#TODO Testing
-#         if self.startingUp:
-#             menuItem.set_sensitive( False )
 
         menuItem = Gtk.MenuItem.new_with_label( _( "Quit" ) )
         menuItem.connect( "activate", Gtk.main_quit )
