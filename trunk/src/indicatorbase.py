@@ -307,17 +307,6 @@ class IndicatorBase:
 # If Preferences OK was selected, remove any existing timer and do a refresh.
 
 
-
-#TODO In Punycode, when items are disabled,
-# convert is enabled...should I really disable all menu items?
-# Best check every indicator!
-    def __setAboutPreferencesSensitivity( self, toggle ):
-        menuItems = self.indicator.get_menu().get_children()
-        if len( menuItems ) > 1:  #TODO Add comment for why we do this check.
-            menuItems[ -2 ].set_sensitive( toggle ) # About
-            menuItems[ -3 ].set_sensitive( toggle ) # Preferences
-
-
     def __onAbout( self, widget ):
         self.__setAboutPreferencesSensitivity( False )
 #         GLib.timeout_add_seconds( 1, self.__onAboutInternal, widget )
@@ -433,9 +422,11 @@ class IndicatorBase:
         notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
         if type( notebookOrStack ).__name__ == "Notebook":
             notebookOrStack = notebookOrStack.get_nth_page( 0 )
+            print( "Notebook")#TODO Remvoe if not used on both laptop and desktop
 
         else:
             notebookOrStack = notebookOrStack.get_children()[ 0 ]
+            print("Stack") #TODO Remvoe if not used on both laptop and desktop (desktop uses stack).
 
         toolTip = "file://" + filePath
         label = Gtk.Label()
@@ -454,7 +445,7 @@ class IndicatorBase:
     def __onPreferencesInternal( self, widget ):
 #         if self.lock.acquire( blocking = False ): #TODO May not need the locking any more???
         if self.updateTimerID: #TODO Still need this?  If we remove the lock it is possible the update could kick off whilst we are open...that's bad!
-            GLib.source_remove( self.updateTimerID ) #TODO Maybe do this in the function above?
+            GLib.source_remove( self.updateTimerID ) #TODO Maybe do this in the function above?  If so, make it the first thing to do.
 
         dialog = self.createDialog( widget, _( "Preferences" ) )
         self.onPreferences( dialog ) # Call to implementation in indicator.
@@ -481,6 +472,16 @@ class IndicatorBase:
             dialog.destroy()
             self.lock.release()
             GLib.idle_add( self.__update )
+
+
+#TODO In Punycode, when items are disabled,
+# convert is enabled...should I really disable all menu items?
+# Best check every indicator!
+    def __setAboutPreferencesSensitivity( self, toggle ):
+        menuItems = self.indicator.get_menu().get_children()
+        if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
+            menuItems[ -2 ].set_sensitive( toggle ) # About
+            menuItems[ -3 ].set_sensitive( toggle ) # Preferences
 
 
     def createDialog( self, parentWidget, title, grid = None ):
