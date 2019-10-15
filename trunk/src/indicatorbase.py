@@ -100,8 +100,8 @@ class IndicatorBase:
 
     def __update( self ):
         # Convoluted way to allow the About/Preferences menu items to be disabled during an update.
-        # If the update was to take place in a single function, the menu items would only be disabled when the function returns.
-        # Therefore, do the disable and return immediately (finishing off the update slightly delayed).
+        # If the update takes place in a single function, the menu items would only be disabled when the function returns.
+        # Therefore, do the disable and return immediately, then finish off the update slightly delayed.
         if self.startingUp:
             self.__updateFinalisation()
 
