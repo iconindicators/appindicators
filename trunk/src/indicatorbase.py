@@ -330,8 +330,6 @@ class IndicatorBase:
 #             if self.updateTimerID:
 #                 GLib.source_remove( self.updateTimerID )
 
-        self.__setAboutPreferencesSensitivity( False )
-
         aboutDialog = Gtk.AboutDialog()
         aboutDialog.set_transient_for( widget.get_parent().get_parent() )
         aboutDialog.set_artists( self.artwork )
@@ -456,7 +454,7 @@ class IndicatorBase:
     def __onPreferencesInternal( self, widget ):
 #         if self.lock.acquire( blocking = False ): #TODO May not need the locking any more???
         if self.updateTimerID: #TODO Still need this?  If we remove the lock it is possible the update could kick off whilst we are open...that's bad!
-            GLib.source_remove( self.updateTimerID )
+            GLib.source_remove( self.updateTimerID ) #TODO Maybe do this in the function above?
 
         dialog = self.createDialog( widget, _( "Preferences" ) )
         self.onPreferences( dialog ) # Call to implementation in indicator.
