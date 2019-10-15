@@ -493,18 +493,7 @@ class IndicatorBase:
         return dialog
 
 
-    def __getParent( self, widget ):
-        parent = widget.get_parent()
-        while( parent is not None ):
-            if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
-                break
-
-            parent = parent.get_parent()
-
-        return parent
-
-
-    # Shows a message dialog.
+    # Show a message dialog.
     #
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
     def showMessage( self, parentWidget, messageType, message, title ):
@@ -514,13 +503,24 @@ class IndicatorBase:
         dialog.destroy()
 
 
-    # Shows and OK/Cancel dialog prompt and returns either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
+    # Show OK/Cancel dialog prompt.  Return either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
     def showOKCancel( self, parentWidget, message, title ):
         dialog = Gtk.MessageDialog( self.__getParent( parentWidget ), Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, message )
         dialog.set_title( title )
         response = dialog.run()
         dialog.destroy()
         return response
+
+
+    def __getParent( self, widget ):
+        parent = widget.get_parent()
+        while( parent is not None ):
+            if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
+                break
+
+            parent = parent.get_parent()
+
+        return parent
 
 
     # Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
