@@ -116,20 +116,17 @@ class IndicatorBase:
 
 
     def __update( self ):
-        # Convoluted way to allow the About/Preferences menu items to be disabled during an update.
-        # If the update takes place in a single function, the menu items would only be disabled when the function returns.
-        # Therefore, do the disable and return immediately, then finish off the update slightly delayed.
+        # Despite disabling the About/Preferences menu items before the update kicks off,
+        # the user interface will not actually update until this function completes.
+        # Therefore, disable the About/Preferences menu items and run the remaining update in a new and delayed thread.
         self.__setAboutPreferencesSensitivity( False )
         GLib.timeout_add_seconds( 1, self.__updateInternal )
 
 
     def __updateInternal( self ):
         utcNow = datetime.datetime.utcnow() #TODO Remove
-
         menu = Gtk.Menu()
-
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
-
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
@@ -320,7 +317,9 @@ class IndicatorBase:
 
     def __onAbout( self, widget ):
         self.__setAboutPreferencesSensitivity( False )
-        GLib.timeout_add_seconds( 1, self.__onAboutInternal, widget )
+#         GLib.timeout_add_seconds( 1, self.__onAboutInternal, widget )
+#TODO Test this on the laptop and ensure the menu items are disabled in time!
+        GLib.idle_add( self.__onAboutInternal, widget )
 
 
     def __onAboutInternal( self, widget ):
@@ -368,7 +367,7 @@ class IndicatorBase:
             self.__addHyperlinkLabel( aboutDialog, errorLog, _( "View the" ), _( "error log" ), _( "text file." ) )
 
         aboutDialog.run()
-        aboutDialog.hide()
+        aboutDialog.destroy()
 
         os.remove( changeLog )
 
@@ -446,7 +445,9 @@ class IndicatorBase:
 
     def __onPreferences( self, widget ):
         self.__setAboutPreferencesSensitivity( False )
-        GLib.timeout_add_seconds( 1, self.__onPreferencesInternal, widget )
+#         GLib.timeout_add_seconds( 1, self.__onPreferencesInternal, widget )
+#TODO Test this on the laptop and ensure the menu items are disabled in time!
+        GLib.idle_add( self.__onPreferencesInternal, widget )
 
 
     def __onPreferencesInternal( self, widget ):
