@@ -546,71 +546,54 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
-        print( "Lunar update:", datetime.datetime.utcnow() )
-        if False and self.startingUp:
-            menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
-#TODO Wrap in GLib stuff?
-# ...or check the TODO in base class.
-            GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS, self.requestUpdate )
-#             GLib.timeout_add_seconds( IndicatorLunar.START_UP_DELAY_IN_SECONDS + 5, self.requestUpdate )  #TODO Instead could do...
-# 1) Put the GLib call in the request update function
-# 2) Take an optional time parameter rather than do it here. 
-# 3) Or not call requestUpdate but return a value of 1 s so an update is scheduled for us.
+        utcNow = datetime.datetime.utcnow()
 
-        else:
-            utcNow = datetime.datetime.utcnow()
+        # Update comet, minor planet and satellite data.
+        self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
+        if self.cometsAddNew:
+            self.addNewBodies( self.cometData, self.comets )
 
-            # Update comet, minor planet and satellite data.
-            self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astroPyephem.getOrbitalElementsLessThanMagnitude )
-            if self.cometsAddNew:
-                self.addNewBodies( self.cometData, self.comets )
+        self.minorPlanetData = { }
+        for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
+            minorPlanetData = self.updateData( baseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, url, astroPyephem.getOrbitalElementsLessThanMagnitude )
+            for key in minorPlanetData:
+                if key not in self.minorPlanetData:
+                    self.minorPlanetData[ key ] = minorPlanetData[ key ]
 
-            self.minorPlanetData = { }
-            for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
-                minorPlanetData = self.updateData( baseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, url, astroPyephem.getOrbitalElementsLessThanMagnitude )
-                for key in minorPlanetData:
-                    if key not in self.minorPlanetData:
-                        self.minorPlanetData[ key ] = minorPlanetData[ key ]
+        if self.minorPlanetsAddNew:
+            self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
-            if self.minorPlanetsAddNew:
-                self.addNewBodies( self.minorPlanetData, self.minorPlanets )
+        self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, None )
+        if self.satellitesAddNew:
+            self.addNewBodies( self.satelliteData, self.satellites )
 
-            self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, None )
-            if self.satellitesAddNew:
-                self.addNewBodies( self.satelliteData, self.satellites )
+        # Update backend.  Returned object is a dictionary:
+        #    Key is a tuple of AstronomicalBodyType, a name tag and data tag.
+        #    Value is the calculated astronomical data as a string.
+        self.data = astroPyephem.getAstronomicalInformation(
+            datetime.datetime.utcnow(),
+            self.latitude, self.longitude, self.elevation,
+            self.planets,
+            self.stars,
+            self.satellites, self.satelliteData,
+            self.comets, self.cometData,
+            self.minorPlanets, self.minorPlanetData,
+            self.magnitude,
+            self.hideBodiesBelowHorizon )
 
-            # Update backend.  Returned object is a dictionary:
-            #    Key is a tuple of AstronomicalBodyType, a name tag and data tag.
-            #    Value is the calculated astronomical data as a string.
-            self.data = astroPyephem.getAstronomicalInformation(
-                datetime.datetime.utcnow(),
-                self.latitude, self.longitude, self.elevation,
-                self.planets,
-                self.stars,
-                self.satellites, self.satelliteData,
-                self.comets, self.cometData,
-                self.minorPlanets, self.minorPlanetData,
-                self.magnitude,
-                self.hideBodiesBelowHorizon )
+        # Update frontend.
+        self.updateMenu( menu )
+        self.updateIconAndLabel()
 
-            # Update frontend.
-            self.updateMenu( menu )
-            self.updateIconAndLabel()
+        if self.showWerewolfWarning:
+            self.notificationFullMoon()
 
-            if self.showWerewolfWarning:
-                self.notificationFullMoon()
+#TODO Uncomment when all done...don't forget to test!
+#             if self.showSatelliteNotification:
+#                 self.notificationSatellites()
 
-    #TODO Uncomment when all done...don't forget to test!
-    #             if self.showSatelliteNotification:
-    #                 self.notificationSatellites()
+        return self.getNextUpdateTimeInSeconds( utcNow )
 
-            x = self.getNextUpdateTimeInSeconds( utcNow )
-            print( "Next update at:", x )
-            return x
-#             return self.getNextUpdateTimeInSeconds( utcNow )
-
-
-        print( "Lunar update done")
 
     # Get the data from the cache, or if stale, download from the source.
     #
