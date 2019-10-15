@@ -78,6 +78,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 #TODO Put this back!
 #TODO May need to use GLib instead because the indicator hangs if the VM doesn't start/exist?
+#TODO Maybe put into init instead?
 #         if self.startingUp and self.isVBoxManageInstalled():
 #             Thread( target = self.autoStartVirtualMachines ).start()
 
