@@ -107,11 +107,11 @@ class IndicatorBase:
         # If the update takes place in a single function, the menu items would only be disabled when the function returns.
         # Therefore, do the disable and return immediately, then finish off the update slightly delayed.
         if self.startingUp:
-            self.__updateFinalisation()
+            self.__updateInternal()
 
         else:
             self.__setAboutPreferencesSensitivity( False )
-            GLib.idle_add( self.__updateFinalisation )
+            GLib.idle_add( self.__updateInternal )
 
 
     def __update( self ):
@@ -119,10 +119,10 @@ class IndicatorBase:
         # If the update takes place in a single function, the menu items would only be disabled when the function returns.
         # Therefore, do the disable and return immediately, then finish off the update slightly delayed.
         self.__setAboutPreferencesSensitivity( False )
-        GLib.idle_add( self.__updateFinalisation )
+        GLib.timeout_add_seconds( 1, self.__updateInternal )
 
 
-    def __updateFinalisation( self ):
+    def __updateInternal( self ):
         menu = Gtk.Menu()
 
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
@@ -307,7 +307,7 @@ class IndicatorBase:
 # Best check every indicator!
     def __setAboutPreferencesSensitivity( self, toggle ):
         menuItems = self.indicator.get_menu().get_children()
-        if len( menuItems ) > 1:
+        if len( menuItems ) > 1:  #TODO Add comment for why we do this check.
             menuItems[ -2 ].set_sensitive( toggle ) # About
             menuItems[ -3 ].set_sensitive( toggle ) # Preferences
 
@@ -318,57 +318,57 @@ class IndicatorBase:
 
 
     def __onAboutInternal( self, widget ):
-        if self.lock.acquire( blocking = False ):
+#         if self.lock.acquire( blocking = False ):
 #             if self.updateTimerID:
 #                 GLib.source_remove( self.updateTimerID )
 
-            self.__setAboutPreferencesSensitivity( False )
+        self.__setAboutPreferencesSensitivity( False )
 
-            aboutDialog = Gtk.AboutDialog()
-            aboutDialog.set_transient_for( widget.get_parent().get_parent() )
-            aboutDialog.set_artists( self.artwork )
-            aboutDialog.set_authors( self.authors )
-            aboutDialog.set_comments( self.comments )
+        aboutDialog = Gtk.AboutDialog()
+        aboutDialog.set_transient_for( widget.get_parent().get_parent() )
+        aboutDialog.set_artists( self.artwork )
+        aboutDialog.set_authors( self.authors )
+        aboutDialog.set_comments( self.comments )
 
-            copyrightText = \
-                "Copyright \xa9 " + \
-                self.copyrightStartYear + \
-                "-" + \
-                str( datetime.datetime.now().year ) + \
-                " " + \
-                self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
+        copyrightText = \
+            "Copyright \xa9 " + \
+            self.copyrightStartYear + \
+            "-" + \
+            str( datetime.datetime.now().year ) + \
+            " " + \
+            self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
 
-            aboutDialog.set_copyright( copyrightText )
-            aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
-            aboutDialog.set_logo_icon_name( self.indicatorName )
-            aboutDialog.set_program_name( self.indicatorName )
-            aboutDialog.set_translator_credits( _( "translator-credits" ) )
-            aboutDialog.set_version( self.version )
-            aboutDialog.set_website( self.website )
-            aboutDialog.set_website_label( self.website )
+        aboutDialog.set_copyright( copyrightText )
+        aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
+        aboutDialog.set_logo_icon_name( self.indicatorName )
+        aboutDialog.set_program_name( self.indicatorName )
+        aboutDialog.set_translator_credits( _( "translator-credits" ) )
+        aboutDialog.set_version( self.version )
+        aboutDialog.set_website( self.website )
+        aboutDialog.set_website_label( self.website )
 
-            if self.creditz:
-                aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
+        if self.creditz:
+            aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
 
-            changeLog = self.__getCacheDirectory() + self.indicatorName + ".changelog"
-            changeLogGzipped = "/usr/share/doc/" + self.indicatorName + "/changelog.Debian.gz"
-            with gzip.open( changeLogGzipped, 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
-                shutil.copyfileobj( fileIn, fileOut )
+        changeLog = self.__getCacheDirectory() + self.indicatorName + ".changelog"
+        changeLogGzipped = "/usr/share/doc/" + self.indicatorName + "/changelog.Debian.gz"
+        with gzip.open( changeLogGzipped, 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
+            shutil.copyfileobj( fileIn, fileOut )
 
-            self.__addHyperlinkLabel( aboutDialog, changeLog, _( "View the" ), _( "changelog" ), _( "text file." ) )
+        self.__addHyperlinkLabel( aboutDialog, changeLog, _( "View the" ), _( "changelog" ), _( "text file." ) )
 
-            errorLog = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
-            if os.path.exists( errorLog ):
-                self.__addHyperlinkLabel( aboutDialog, errorLog, _( "View the" ), _( "error log" ), _( "text file." ) )
+        errorLog = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
+        if os.path.exists( errorLog ):
+            self.__addHyperlinkLabel( aboutDialog, errorLog, _( "View the" ), _( "error log" ), _( "text file." ) )
 
-            aboutDialog.run()
-            aboutDialog.hide()
+        aboutDialog.run()
+        aboutDialog.hide()
 
-            os.remove( changeLog )
+        os.remove( changeLog )
 
-            self.__setAboutPreferencesSensitivity( True )
+        self.__setAboutPreferencesSensitivity( True )
 
-            self.lock.release()
+#         self.lock.release()
 #             GLib.idle_add( self.__update )
 
 
@@ -445,9 +445,10 @@ class IndicatorBase:
 
     def __onPreferencesInternal( self, widget ):
 #         if self.lock.acquire( blocking = False ): #TODO May not need the locking any more???
-       if self.updateTimerID:
+       if self.updateTimerID: #TODO Still need this?  If we remove the lock it is possible the update could kick off whilst we are open...that's bad!
            GLib.source_remove( self.updateTimerID )
 
+#TODO Can we just call create dialog from below?
        dialog = Gtk.Dialog(
                    _( "Preferences" ),
                    self.__getParent( widget ),
@@ -458,8 +459,8 @@ class IndicatorBase:
        self.onPreferences( dialog ) # Call to implementation in indicator.
        dialog.destroy()
        self.__setAboutPreferencesSensitivity( True )
-       self.lock.release()
-       GLib.idle_add( self.__update )
+#        self.lock.release()
+       GLib.idle_add( self.__update ) #TODO Work out if we hit OK and only then do we call update.
 
 
     def __onPreferencesORIG( self, widget ):
