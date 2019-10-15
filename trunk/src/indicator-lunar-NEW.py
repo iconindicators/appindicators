@@ -547,7 +547,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def update( self, menu ):
         print( "Lunar update:", datetime.datetime.utcnow() )
-        if self.startingUp:
+        if False and self.startingUp:
             menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
 #TODO Wrap in GLib stuff?
 # ...or check the TODO in base class.
