@@ -119,8 +119,8 @@ class IndicatorBase:
 
 
     def __update( self ):
-        # Despite disabling the About/Preferences menu items before the update kicks off,
-        # the user interface will not actually update until this function completes.
+        # If the About/Preferences menu items are disabled as the update kicks off,
+        # the user interface will not reflect the change until the update completes.
         # Therefore, disable the About/Preferences menu items and run the remaining update in a new and delayed thread.
         self.__setAboutPreferencesSensitivity( False )
         GLib.timeout_add_seconds( 1, self.__updateInternal )
