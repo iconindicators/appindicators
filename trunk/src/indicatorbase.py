@@ -77,13 +77,17 @@ class IndicatorBase:
         self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
 
+        menu = Gtk.Menu()
+        menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
+        menu.show_all()
+        self.indicator.set_menu( menu )
+
         self.__loadConfig()
-        print( "init thread:", threading.get_ident() )
 
 
     def main( self ):
-        print( "main thread:", threading.get_ident() )
-        self.__update()
+        GLib.timeout_add_seconds( 1, self.__update )
+#         self.__update()
         self.startingUp = False
         Gtk.main()
 
@@ -98,7 +102,7 @@ class IndicatorBase:
                 self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
 
 
-    def __update( self ):
+    def __updateORIG( self ):
         # Convoluted way to allow the About/Preferences menu items to be disabled during an update.
         # If the update takes place in a single function, the menu items would only be disabled when the function returns.
         # Therefore, do the disable and return immediately, then finish off the update slightly delayed.
@@ -108,6 +112,14 @@ class IndicatorBase:
         else:
             self.__setAboutPreferencesSensitivity( False )
             GLib.idle_add( self.__updateFinalisation )
+
+
+    def __update( self ):
+        # Convoluted way to allow the About/Preferences menu items to be disabled during an update.
+        # If the update takes place in a single function, the menu items would only be disabled when the function returns.
+        # Therefore, do the disable and return immediately, then finish off the update slightly delayed.
+        self.__setAboutPreferencesSensitivity( False )
+        GLib.idle_add( self.__updateFinalisation )
 
 
     def __updateFinalisation( self ):
@@ -132,7 +144,7 @@ class IndicatorBase:
 
         self.indicator.set_menu( menu )
         menu.show_all()
-        
+
         if nextUpdateInSeconds: # Some indicators don't return a next update time.
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
             self.nextUpdateTime = datetime.datetime.utcnow() + datetime.timedelta( seconds = nextUpdateInSeconds )
@@ -155,8 +167,6 @@ class IndicatorBase:
 #             menuItem = menuItems[ -2 ]
 #             menuItems[ -2 ].set_sensitive( False )
 #             menuItems[ -3 ].set_sensitive( False )
-
-        print( "__update thread:", threading.get_ident() )
 
         with self.lock:
             if not self.startingUp:
@@ -297,21 +307,18 @@ class IndicatorBase:
 # Best check every indicator!
     def __setAboutPreferencesSensitivity( self, toggle ):
         menuItems = self.indicator.get_menu().get_children()
-        menuItems[ -2 ].set_sensitive( toggle ) # About
-        menuItems[ -3 ].set_sensitive( toggle ) # Preferences
-
-#TODO Testing
-        print( "Sensitive toggle:", toggle )
-        print( "About:", menuItems[ -2 ].is_sensitive() )
-        print( "Preferecnes:", menuItems[ -3 ].is_sensitive() )
-
-
+        if len( menuItems ) > 1:
+            menuItems[ -2 ].set_sensitive( toggle ) # About
+            menuItems[ -3 ].set_sensitive( toggle ) # Preferences
 
 
     def __onAbout( self, widget ):
-        print( "__onAbout thread:", threading.get_ident() )
+        self.__setAboutPreferencesSensitivity( False )
+        GLib.timeout_add_seconds( 1, self.__onAboutInternal, widget )
+
+
+    def __onAboutInternal( self, widget ):
         if self.lock.acquire( blocking = False ):
-            print( "__onAbout lock thread:", threading.get_ident() )
 #             if self.updateTimerID:
 #                 GLib.source_remove( self.updateTimerID )
 
@@ -432,24 +439,27 @@ class IndicatorBase:
 
 
     def __onPreferences( self, widget ):
-        if self.lock.acquire( blocking = False ): #TODO May not need the locking any more???
-            if self.updateTimerID:
-                GLib.source_remove( self.updateTimerID )
+        self.__setAboutPreferencesSensitivity( False )
+        GLib.timeout_add_seconds( 1, self.__onPreferencesInternal, widget )
 
-            self.__setAboutPreferencesSensitivity( False )
 
-            dialog = Gtk.Dialog(
-                        _( "Preferences" ),
-                        self.__getParent( widget ),
-                        Gtk.DialogFlags.MODAL,
-                        ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
- 
-            dialog.set_border_width( 5 )
-            self.onPreferences( dialog ) # Call to implementation in indicator.
-            dialog.destroy()
-            self.__setAboutPreferencesSensitivity( True )
-            self.lock.release()
-            GLib.idle_add( self.__update )
+    def __onPreferencesInternal( self, widget ):
+#         if self.lock.acquire( blocking = False ): #TODO May not need the locking any more???
+       if self.updateTimerID:
+           GLib.source_remove( self.updateTimerID )
+
+       dialog = Gtk.Dialog(
+                   _( "Preferences" ),
+                   self.__getParent( widget ),
+                   Gtk.DialogFlags.MODAL,
+                   ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+
+       dialog.set_border_width( 5 )
+       self.onPreferences( dialog ) # Call to implementation in indicator.
+       dialog.destroy()
+       self.__setAboutPreferencesSensitivity( True )
+       self.lock.release()
+       GLib.idle_add( self.__update )
 
 
     def __onPreferencesORIG( self, widget ):
@@ -463,7 +473,7 @@ class IndicatorBase:
                         self.__getParent( widget ),
                         Gtk.DialogFlags.MODAL,
                         ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
- 
+
             dialog.set_border_width( 5 )
             self.onPreferences( dialog ) # Call to implementation in indicator.
             dialog.destroy()
