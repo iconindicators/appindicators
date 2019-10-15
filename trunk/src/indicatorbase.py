@@ -106,6 +106,31 @@ class IndicatorBase:
 
 #TODO If we disable About/Preferences...can we still Quit (during startup for Lunar) or refresh for any indicator?
     def __update( self ):
+        if self.startingUp:
+            self.__updateFinalisation()
+
+        else:
+            self.__setAboutPreferencesSensitivity( False )
+            GLib.idle_add( self.__updateFinalisation )
+
+
+    def __updateFinalisation( self ):
+        menu = Gtk.Menu()
+        nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
+        self.__finaliseMenu( menu )
+        if nextUpdateInSeconds: # Some indicators don't return a next update time.
+            self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
+            self.nextUpdateTime = datetime.datetime.utcnow() + datetime.timedelta( seconds = nextUpdateInSeconds )
+
+        else:
+            self.nextUpdateTime = None
+
+        print( "Next update in seconds:", nextUpdateInSeconds )                
+        print( "Next update time:", self.nextUpdateTime )
+
+
+#TODO If we disable About/Preferences...can we still Quit (during startup for Lunar) or refresh for any indicator?
+    def __updateNEW( self ):
 #TODO Testing
 #         if self.startingUp:
 #             print( "__update starting up")
@@ -146,6 +171,7 @@ class IndicatorBase:
 
             print( "Next update in seconds:", nextUpdateInSeconds )                
             print( "Next update time:", self.nextUpdateTime )
+
 
 #TODO SHould this be wrapped in
 #             GLib.idle_add( self.requestUpdate )
