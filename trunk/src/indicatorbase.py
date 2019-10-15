@@ -74,12 +74,12 @@ class IndicatorBase:
 
         Notify.init( self.indicatorName )
 
-        self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
-
         menu = Gtk.Menu()
         menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
         menu.show_all()
+
+        self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
@@ -88,7 +88,7 @@ class IndicatorBase:
     def main( self ):
         GLib.timeout_add_seconds( 1, self.__update )
 #         self.__update()
-        self.startingUp = False
+#         self.startingUp = False
         Gtk.main()
 
 
@@ -123,6 +123,8 @@ class IndicatorBase:
 
 
     def __updateInternal( self ):
+        utcNow = datetime.datetime.utcnow() #TODO Remove
+
         menu = Gtk.Menu()
 
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
@@ -152,6 +154,7 @@ class IndicatorBase:
         else:
             self.nextUpdateTime = None
 
+        print( "Update duration:", ( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) )
         print( "Next update in seconds:", nextUpdateInSeconds )                
         print( "Next update time:", self.nextUpdateTime )
 
