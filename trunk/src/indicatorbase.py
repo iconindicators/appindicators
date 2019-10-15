@@ -449,22 +449,15 @@ class IndicatorBase:
 
     def __onPreferencesInternal( self, widget ):
 #         if self.lock.acquire( blocking = False ): #TODO May not need the locking any more???
-       if self.updateTimerID: #TODO Still need this?  If we remove the lock it is possible the update could kick off whilst we are open...that's bad!
-           GLib.source_remove( self.updateTimerID )
+        if self.updateTimerID: #TODO Still need this?  If we remove the lock it is possible the update could kick off whilst we are open...that's bad!
+            GLib.source_remove( self.updateTimerID )
 
-#TODO Can we just call create dialog from below?
-       dialog = Gtk.Dialog(
-                   _( "Preferences" ),
-                   self.__getParent( widget ),
-                   Gtk.DialogFlags.MODAL,
-                   ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-
-       dialog.set_border_width( 5 )
-       self.onPreferences( dialog ) # Call to implementation in indicator.
-       dialog.destroy()
-       self.__setAboutPreferencesSensitivity( True )
+        dialog = self.createDialog( widget, _( "Preferences" ) )
+        self.onPreferences( dialog ) # Call to implementation in indicator.
+        dialog.destroy()
+        self.__setAboutPreferencesSensitivity( True )
 #        self.lock.release()
-       GLib.idle_add( self.__update ) #TODO Work out if we hit OK and only then do we call update.
+        GLib.idle_add( self.__update ) #TODO Work out if we hit OK and only then do we call update.
 
 
     def __onPreferencesORIG( self, widget ):
@@ -486,11 +479,11 @@ class IndicatorBase:
             GLib.idle_add( self.__update )
 
 
-    def createDialog( self, parentWidget, title, grid = None):
+    def createDialog( self, parentWidget, title, grid = None ):
         dialog = Gtk.Dialog(
             title,
             self.__getParent( parentWidget ),
-            0,
+            Gtk.DialogFlags.MODAL,
             ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
 
         dialog.set_border_width( 5 )
