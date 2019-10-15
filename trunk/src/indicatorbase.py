@@ -75,6 +75,7 @@ class IndicatorBase:
         Notify.init( self.indicatorName )
 
         menu = Gtk.Menu()
+#TODO Need to regenerate the POT file and have Oleg translate the string below.
         menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
         menu.show_all()
 
@@ -154,6 +155,7 @@ class IndicatorBase:
         else:
             self.nextUpdateTime = None
 
+#TODO Testing
         print( "Update duration:", ( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) )
         print( "Next update in seconds:", nextUpdateInSeconds )                
         print( "Next update time:", self.nextUpdateTime )
