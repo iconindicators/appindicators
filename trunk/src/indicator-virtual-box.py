@@ -76,8 +76,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         else:
             menu.append( Gtk.MenuItem( _( "(VirtualBox™ is not installed)" ) ) )
 
-        if self.startingUp and self.isVBoxManageInstalled():
-            Thread( target = self.autoStartVirtualMachines ).start()
+#TODO Put this back!
+#         if self.startingUp and self.isVBoxManageInstalled():
+#             Thread( target = self.autoStartVirtualMachines ).start()
 
         return int( 60 * self.refreshIntervalInMinutes )
 
