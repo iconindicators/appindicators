@@ -232,6 +232,7 @@ class IndicatorBase:
 
 
     def __onMouseWheelScroll( self, indicator, delta, scrollDirection ):
+#TODO Why do we have a lock here?
         with self.lock:
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
