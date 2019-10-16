@@ -66,7 +66,7 @@ class IndicatorBase:
         self.secondaryActiveTarget = None
         self.updateTimerID = None
 
-        logging.basicConfig( 
+        logging.basicConfig(
             format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", 
             level = logging.DEBUG, 
             handlers = [ TruncatedFileHandler( self.log ) ] )
@@ -74,7 +74,6 @@ class IndicatorBase:
         Notify.init( self.indicatorName )
 
         menu = Gtk.Menu()
-#TODO Need to regenerate the POT file and have Oleg translate the string below.
         menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
         menu.show_all()
 
