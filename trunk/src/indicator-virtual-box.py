@@ -115,7 +115,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         menuItem = Gtk.MenuItem( _( "Launch VirtualBox™ Manager" ) )
         menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
         menu.append( menuItem )
-        self.setSecondaryActivateTarget( menuItem )
+        self.secondaryActivateTarget = menuItem
 
 
     def createMenuItemForVirtualMachine( self, virtualMachine, indent, isRunning ):
