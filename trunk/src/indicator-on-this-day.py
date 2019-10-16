@@ -318,7 +318,6 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             self.searchURL = searchEngineEntry.get_text().strip()
             self.notify = notifyCheckbox.get_active()
             self.setAutoStart( autostartCheckbox.get_active() )
-            self.requestSaveConfig()
 
         return responseType
 
