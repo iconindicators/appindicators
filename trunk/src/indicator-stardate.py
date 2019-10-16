@@ -104,7 +104,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             self.padInteger = True
             self.showClassic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
-        GLib.idle_add( self.requestUpdate )
+        self.requestUpdate()
 
         if self.saveConfigTimerID:
             GLib.source_remove( self.saveConfigTimerID )
