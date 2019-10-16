@@ -285,7 +285,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
-        if dialog.run() == Gtk.ResponseType.OK:
+        responseType = dialog.run()
+        if responseType == Gtk.ResponseType.OK:
             self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
             self.hideGroups = hideGroupsCheckbox.get_active()
             self.scripts = copyOfScripts
@@ -298,7 +299,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptNameDefault = self.defaultScriptNameCurrent
 
             self.setAutoStart( autostartCheckbox.get_active() )
-            self.requestSaveConfig()
+
+        return responseType
 
 
     def onDisplayCheckboxes( self, source, radioShowScriptsSubmenu, hideGroupsCheckbox ):
