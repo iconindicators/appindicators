@@ -63,9 +63,8 @@ class IndicatorBase:
         self.artwork = artwork if artwork else self.authors
         self.creditz = creditz
 
-        self.lock = threading.Lock()
+        self.secondaryActiveTarget = None
         self.updateTimerID = None
-        self.startingUp = True
 
         logging.basicConfig( 
             format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", 
@@ -102,6 +101,7 @@ class IndicatorBase:
     def __updateInternal( self ):
         utcNow = datetime.datetime.utcnow() #TODO Remove
         menu = Gtk.Menu()
+        self.secondaryActivateTarget = None
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
@@ -120,6 +120,9 @@ class IndicatorBase:
 
         self.indicator.set_menu( menu )
         menu.show_all()
+
+        if self.secondaryActivateTarget:
+            self.indicator.set_secondary_activate_target( self.secondaryActivateTarget )
 
         if nextUpdateInSeconds: # Some indicators don't return a next update time.
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
