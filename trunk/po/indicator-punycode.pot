@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-punycode 1.0.8\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-08 13:18+1100\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -113,12 +113,4 @@ msgid ""
 "Selecting a menu item which\n"
 "contains a result will copy\n"
 "the result to the output."
-msgstr ""
-
-#: indicator-punycode.py:213
-msgid "Autostart"
-msgstr ""
-
-#: indicator-punycode.py:214
-msgid "Run the indicator automatically."
 msgstr ""

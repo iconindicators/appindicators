@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-punycode 1.0.8\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-08 13:18+1100\n"
-"PO-Revision-Date: 2017-07-07 15:38+0300\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"PO-Revision-Date: 2019-10-17 09:48+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -133,11 +133,3 @@ msgstr ""
 "Нажатие на пункт меню, который\n"
 "содержит результат, поместит\n"
 "этот результат в буфер обмена."
-
-#: indicator-punycode.py:213
-msgid "Autostart"
-msgstr "Автозапуск"
-
-#: indicator-punycode.py:214
-msgid "Run the indicator automatically."
-msgstr "Запускать индикатор автоматически."
