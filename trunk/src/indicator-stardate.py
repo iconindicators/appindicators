@@ -110,7 +110,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             GLib.source_remove( self.saveConfigTimerID )
 
         # Defer the save; this avoids multiple saves when scrolling the mouse wheel like crazy!
-        self.saveConfigTimerID = GLib.timeout_add_seconds( 10, self.requestSaveConfig )
+        self.saveConfigTimerID = self.requestSaveConfig( 10 )
 
 
     def onPreferences( self, dialog ):
