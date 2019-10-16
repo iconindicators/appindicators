@@ -91,28 +91,6 @@ class IndicatorBase:
         Gtk.main()
 
 
-    def __updateORIG( self ):
-        with self.lock:
-            menu = Gtk.Menu()
-            self.indicator.set_menu( menu )
-            nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
-            self.__finaliseMenu( menu )
-            if nextUpdateInSeconds: # Some indicators don't return a next update time.
-                self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
-
-
-    def __updateORIG( self ):
-        # Convoluted way to allow the About/Preferences menu items to be disabled during an update.
-        # If the update takes place in a single function, the menu items would only be disabled when the function returns.
-        # Therefore, do the disable and return immediately, then finish off the update slightly delayed.
-        if self.startingUp:
-            self.__updateInternal()
-
-        else:
-            self.__setAboutPreferencesSensitivity( False )
-            GLib.idle_add( self.__updateInternal )
-
-
     def __update( self ):
         # If the About/Preferences menu items are disabled as the update kicks off,
         # the user interface will not reflect the change until the update completes.
@@ -156,73 +134,11 @@ class IndicatorBase:
         print( "Next update time:", self.nextUpdateTime )
 
 
-#TODO If we disable About/Preferences...can we still Quit (during startup for Lunar) or refresh for any indicator?
-    def __updateNEW( self ):
-#TODO Testing
-#         if self.startingUp:
-#             print( "__update starting up")
-#             menu = Gtk.Menu()
-#             menu = self.indicator.get_menu()
-#             menuItems = menu.get_children()
-#             menuItem = menuItems[ -2 ]
-#             menuItems[ -2 ].set_sensitive( False )
-#             menuItems[ -3 ].set_sensitive( False )
-
-        with self.lock:
-            if not self.startingUp:
-#                 self.__setAboutPreferencesSensitivity( False )
-                GLib.idle_add( self.__setAboutPreferencesSensitivity, False )
-                import time
-                time.sleep( 5 )
-#                 return #TODO If we return then the about/prefs get disabled.  This means the code below is so intensive, the disabling takes too long to take effect.
-#             if not self.startingUp:
-#                 print( "__update not starting up")
-#                 menu = self.indicator.get_menu()
-#                 menuItems = menu.get_children()#         GLib.idle_add( self.internal, toggle )
-#                 menuItems[ -2 ].set_sensitive( False ) # About
-#                 menuItems[ -3 ].set_sensitive( False ) # Preferences
-
-#             print( "Starting up:", self.startingUp)
-
-            menu = Gtk.Menu()
-            nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
-            self.__finaliseMenu( menu )
-            if nextUpdateInSeconds: # Some indicators don't return a next update time.
-                self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
-                self.nextUpdateTime = datetime.datetime.utcnow() + datetime.timedelta( seconds = nextUpdateInSeconds )
-
-            else:
-                self.nextUpdateTime = None
-
-            print( "Next update in seconds:", nextUpdateInSeconds )                
-            print( "Next update time:", self.nextUpdateTime )
-
-
 #TODO SHould this be wrapped in
 #             GLib.idle_add( self.requestUpdate )
 # as is with request to save config.
 # Look at the calls using timeout too.
     def requestUpdate( self ): self.__update()
-
-
-    def __finaliseMenu( self, menu ):
-        if len( menu.get_children() ) > 0:
-            menu.append( Gtk.SeparatorMenuItem() )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Preferences" ) )
-        menuItem.connect( "activate", self.__onPreferences )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "About" ) )
-        menuItem.connect( "activate", self.__onAbout )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Quit" ) )
-        menuItem.connect( "activate", Gtk.main_quit )
-        menu.append( menuItem )
-
-        self.indicator.set_menu( menu )
-        menu.show_all()
 
 
     def requestMouseWheelScrollEvents( self ): self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
@@ -234,84 +150,12 @@ class IndicatorBase:
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
-#TODO Don't like how an update happens...
-#...work out why we have to cancel and why we have to do an update.
-# 
-#
-# Currently I have two situations that I have solved, but has the side
-# effect you have just mentioned.
-# 
-# Situation 1: Only allow one of the About OR Preferences to display at a
-# time; never simultaneously.  If we allow both to display, the second
-# dialog to display grabs the focus from the first dialog to display.
-# 
-# Situation 2: Most indicators use a timer to run a periodic refresh (of
-# the internals and then menu build).  Indicator Lunar is a great
-# example.  All indicators except Punycode and Script Runner have
-# update/refresh loops.  Now if a user runs the Preferences, I want to
-# disable the refresh from happening and then kick off a refresh when the
-# Preferences is closed.
-# 
-# I use a single thread lock to handle both situations, but there are side
-# effects:
-# 
-# Side Effect 1: When the Preferences is closed, if the user clicked
-# Cancel, the refresh still kicks off (only refresh if the user changed
-# something).
-# 
-# Side Effect 2: Because of the single thread lock, the About dialog also
-# kicks off a refresh when closed.
-# 
-# So I am rethinking the situation...
-# 
-# My initial thoughts (scrambled up and unclear at this stage) are:
-# 
-# 1) I could grey-out (deactivate) the About and Preferences menu items
-# when either the About or Preferences is displayed.   This stops the user
-# from running the other dialog.  When the dialog is closed, re-enable
-# those menu items.
-# 
-# 2) When the Preferences is opened, disable the update timer (which kicks
-# off the refresh).  I think regardless of the user hitting the OK or
-# Cancel, I would have to run the update no matter what (too difficult to
-# figure out when the update would have occurred in the future).  Maybe I
-# can get GTK to give me information about when the update timer was due
-# to run.
-# 
-# 3) If the About dialog is displayed, the update timer can stay in
-# place.  So the About dialog is independent of updates.
-# 
-# 4) If an update is underway (could take a minute or so on my old laptop
-# for Indicator Lunar), the Preferences will not display (not sure if I
-# should disable Preferences menu item during the update).
-# 
-# Not sure if the above yet makes sense; only just today started thinking
-# about it all.  However I suspect now having a base class makes it so
-# much easier to roll out changes like this to all indicators in one go.
-
-
-# When a refresh happens, disable the Preferences menu item.
-# When the refresh finishes, enable the Preferences menu item.
-#
-# When the About is selected, disable About and Preferences.
-# When About is closed, enable About.
-# Only enable Preferences if update is not running.
-#
-# When Preferences is selected, disable About and Preferences.
-# When Preferences is closed, enable About.
-# If Preferences OK was selected, remove any existing timer and do a refresh.
-
-
     def __onAbout( self, widget ):
         self.__setAboutPreferencesSensitivity( False )
         GLib.idle_add( self.__onAboutInternal, widget )
 
 
     def __onAboutInternal( self, widget ):
-#         if self.lock.acquire( blocking = False ):
-#             if self.updateTimerID:
-#                 GLib.source_remove( self.updateTimerID )
-
         aboutDialog = Gtk.AboutDialog()
         aboutDialog.set_transient_for( widget.get_parent().get_parent() )
         aboutDialog.set_artists( self.artwork )
@@ -351,64 +195,8 @@ class IndicatorBase:
 
         aboutDialog.run()
         aboutDialog.destroy()
-
         os.remove( changeLog )
-
         self.__setAboutPreferencesSensitivity( True )
-
-#         self.lock.release()
-#             GLib.idle_add( self.__update )
-
-
-    def __onAboutORIG( self, widget ):
-        if self.lock.acquire( blocking = False ):
-            if self.updateTimerID:
-                GLib.source_remove( self.updateTimerID )
-
-            aboutDialog = Gtk.AboutDialog()
-            aboutDialog.set_transient_for( widget.get_parent().get_parent() )
-            aboutDialog.set_artists( self.artwork )
-            aboutDialog.set_authors( self.authors )
-            aboutDialog.set_comments( self.comments )
-
-            copyrightText = \
-                "Copyright \xa9 " + \
-                self.copyrightStartYear + \
-                "-" + \
-                str( datetime.datetime.now().year ) + \
-                " " + \
-                self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
-
-            aboutDialog.set_copyright( copyrightText )
-            aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
-            aboutDialog.set_logo_icon_name( self.indicatorName )
-            aboutDialog.set_program_name( self.indicatorName )
-            aboutDialog.set_translator_credits( _( "translator-credits" ) )
-            aboutDialog.set_version( self.version )
-            aboutDialog.set_website( self.website )
-            aboutDialog.set_website_label( self.website )
-
-            if self.creditz:
-                aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
-
-            changeLog = self.__getCacheDirectory() + self.indicatorName + ".changelog"
-            changeLogGzipped = "/usr/share/doc/" + self.indicatorName + "/changelog.Debian.gz"
-            with gzip.open( changeLogGzipped, 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
-                shutil.copyfileobj( fileIn, fileOut )
-
-            self.__addHyperlinkLabel( aboutDialog, changeLog, _( "View the" ), _( "changelog" ), _( "text file." ) )
-
-            errorLog = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
-            if os.path.exists( errorLog ):
-                self.__addHyperlinkLabel( aboutDialog, errorLog, _( "View the" ), _( "error log" ), _( "text file." ) )
-
-            aboutDialog.run()
-            aboutDialog.hide()
-
-            os.remove( changeLog )
-
-            self.lock.release()
-            GLib.idle_add( self.__update )
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
@@ -425,7 +213,6 @@ class IndicatorBase:
 
 
     def __onPreferencesInternal( self, widget ):
-#         if self.lock.acquire( blocking = False ): #TODO May not need the locking any more???
         if self.updateTimerID: #TODO Still need this?  If we remove the lock it is possible the update could kick off whilst we are open...that's bad!
             GLib.source_remove( self.updateTimerID ) #TODO Maybe do this in the function above?  If so, make it the first thing to do.
 
@@ -433,27 +220,7 @@ class IndicatorBase:
         self.onPreferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
         self.__setAboutPreferencesSensitivity( True )
-#        self.lock.release()
         GLib.idle_add( self.__update ) #TODO Work out if we hit OK and only then do we call update.
-
-
-    def __onPreferencesORIG( self, widget ):
-        print( "__onPreferences")#TODO Testing
-        if self.lock.acquire( blocking = False ):
-            if self.updateTimerID:
-                GLib.source_remove( self.updateTimerID )
-
-            dialog = Gtk.Dialog(
-                        _( "Preferences" ),
-                        self.__getParent( widget ),
-                        Gtk.DialogFlags.MODAL,
-                        ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
-
-            dialog.set_border_width( 5 )
-            self.onPreferences( dialog ) # Call to implementation in indicator.
-            dialog.destroy()
-            self.lock.release()
-            GLib.idle_add( self.__update )
 
 
 #TODO In Punycode, when items are disabled,
