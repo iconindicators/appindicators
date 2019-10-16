@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-virtual-box 1.0.62\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-08 14:31+1100\n"
-"PO-Revision-Date: 2019-07-30 16:35+0300\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"PO-Revision-Date: 2019-10-17 09:48+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -72,11 +72,6 @@ msgstr ""
 msgid "Virtual Machine"
 msgstr "Виртуальная машина"
 
-#: indicator-virtual-box.py:440 indicator-virtual-box.py:512
-#: indicator-virtual-box.py:576
-msgid "Autostart"
-msgstr "Автозапуск"
-
 #: indicator-virtual-box.py:441 indicator-virtual-box.py:558
 msgid "Start Command"
 msgstr "Команда запуска"
@@ -137,10 +132,6 @@ msgid ""
 msgstr ""
 "Интервал времени после автоматического запуска\n"
 "одной виртуальной машины до запуска следующей."
-
-#: indicator-virtual-box.py:513
-msgid "Run the indicator automatically."
-msgstr "Запускать индикатор автоматически."
 
 #: indicator-virtual-box.py:518
 msgid "General"
