@@ -63,7 +63,7 @@ class IndicatorBase:
         self.artwork = artwork if artwork else self.authors
         self.creditz = creditz
 
-        self.secondaryActiveTarget = None
+        self.secondaryActivateTarget = None
         self.updateTimerID = None
 
         logging.basicConfig(
@@ -137,9 +137,6 @@ class IndicatorBase:
 
 
     def requestUpdate( self, delay = 0 ): GLib.timeout_add_seconds( delay, self.__update )
-
-
-    def setSecondaryActivateTarget( self, menuItem ): self.secondaryActivateTarget = menuItem
 
 
     def requestMouseWheelScrollEvents( self ): self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
