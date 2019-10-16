@@ -224,7 +224,7 @@ class IndicatorBase:
             self.__saveConfig()
             GLib.idle_add( self.__update )
 
-        else:
+        elif self.nextUpdateTime: # Cancelled, so only kick off an update if one was scheduled...
 #TODO Need to somehow test this!            
             utcNow = datetime.datetime.utcnow()
             timeToNextUpdate = ( utcNow - self.nextUpdateTime ).total_seconds()
