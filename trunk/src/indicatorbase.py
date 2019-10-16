@@ -32,7 +32,8 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
-import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess, threading
+
+import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
 
 
 class IndicatorBase:
