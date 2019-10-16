@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-ppa-download-statistics 1.0.67\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-08 14:22+1100\n"
-"PO-Revision-Date: 2017-10-20 22:45+0200\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"PO-Revision-Date: 2019-10-17 09:48+1100\n"
 "Last-Translator: Pavel Rehak <pavel-rehak@email.cz>\n"
 "Language-Team: \n"
 "Language: cs\n"
@@ -200,14 +200,6 @@ msgid ""
 "when sorting by download.\n"
 "\n"
 "A value of zero will not clip."
-msgstr ""
-
-#: indicator-ppa-download-statistics.py:452
-msgid "Autostart"
-msgstr "Automatické spouštění"
-
-#: indicator-ppa-download-statistics.py:454
-msgid "Run the indicator automatically."
 msgstr ""
 
 #: indicator-ppa-download-statistics.py:458

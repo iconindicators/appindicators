@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-ppa-download-statistics 1.0.67\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-08 14:22+1100\n"
-"PO-Revision-Date: 2017-09-19 19:12+0300\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"PO-Revision-Date: 2019-10-17 09:48+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -243,14 +243,6 @@ msgstr ""
 "при сортировке по количеству закачек.\n"
 "\n"
 "Нулевое значение отключает ограничение."
-
-#: indicator-ppa-download-statistics.py:452
-msgid "Autostart"
-msgstr "Автозапуск"
-
-#: indicator-ppa-download-statistics.py:454
-msgid "Run the indicator automatically."
-msgstr "Запускать индикатор автоматически."
 
 #: indicator-ppa-download-statistics.py:458
 msgid "General"
