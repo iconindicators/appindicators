@@ -1643,7 +1643,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO Need a loop still?
         while True:
-            if dialog.run() != Gtk.ResponseType.OK:
+            responseType = dialog.run()
+            if responseType != Gtk.ResponseType.OK:
                 break
 
             cityValue = city.get_active_text()
@@ -1725,8 +1726,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.elevation = float( elevationValue )
 
             self.setAutoStart( autostartCheckbox.get_active() )
-            self.requestSaveConfig()
             break
+
+        return responseType
 
 
 #TODO Satellites now have ':' between name, number and intl desig.  
