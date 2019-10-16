@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-script-runner 1.0.11\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-08 14:26+1100\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -149,14 +149,6 @@ msgid ""
 "If checked, only script names are displayed.\n"
 "\n"
 "Otherwise, script names are indented within each group."
-msgstr ""
-
-#: indicator-script-runner.py:273
-msgid "Autostart"
-msgstr ""
-
-#: indicator-script-runner.py:274
-msgid "Run the indicator automatically."
 msgstr ""
 
 #: indicator-script-runner.py:279
