@@ -141,8 +141,10 @@ class IndicatorBase:
 
 
     def __onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-#TODO Why do we have a lock here?
-        with self.lock:
+        # Need to ignore events when Preferences is open or an update is underway.
+        # Do so by checking the sensitivity of the Preferences menu item.
+        # A side effect is the event will be ignored when About is showing...oh well.
+        if self.__getAboutPreferencesSensitivity():
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
@@ -230,6 +232,15 @@ class IndicatorBase:
         if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
             menuItems[ -2 ].set_sensitive( toggle ) # About
             menuItems[ -3 ].set_sensitive( toggle ) # Preferences
+
+
+    def __getAboutPreferencesSensitivity( self ):
+        sensitive = False
+        menuItems = self.indicator.get_menu().get_children()
+        if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
+            sensitive = menuItems[ -2 ].get_sensitive() # About (no need to check for Preferencs as both should be the same).
+
+        return sensitive
 
 
     def createDialog( self, parentWidget, title, grid = None ):
