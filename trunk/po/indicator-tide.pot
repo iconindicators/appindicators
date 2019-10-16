@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-tide 1.0.16\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-08 14:28+1100\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -164,14 +164,6 @@ msgid ""
 "\n"
 "This format is used when there is no time\n"
 "component in a tide reading."
-msgstr ""
-
-#: indicator-tide.py:320
-msgid "Autostart"
-msgstr ""
-
-#: indicator-tide.py:322
-msgid "Run the indicator automatically."
 msgstr ""
 
 #: indicator-tide.py:326
