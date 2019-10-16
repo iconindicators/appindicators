@@ -134,11 +134,7 @@ class IndicatorBase:
         print( "Next update time:", self.nextUpdateTime )
 
 
-#TODO SHould this be wrapped in
-#             GLib.idle_add( self.requestUpdate )
-# as is with request to save config.
-# Look at the calls using timeout too.
-    def requestUpdate( self ): self.__update()
+    def requestUpdate( self, delay = 0 ): GLib.timeout_add_seconds( delay, self.__update )
 
 
     def requestMouseWheelScrollEvents( self ): self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
@@ -208,19 +204,22 @@ class IndicatorBase:
 
 
     def __onPreferences( self, widget ):
+        if self.updateTimerID:
+            GLib.source_remove( self.updateTimerID )
+
         self.__setAboutPreferencesSensitivity( False )
         GLib.idle_add( self.__onPreferencesInternal, widget )
 
 
     def __onPreferencesInternal( self, widget ):
-        if self.updateTimerID: #TODO Still need this?  If we remove the lock it is possible the update could kick off whilst we are open...that's bad!
-            GLib.source_remove( self.updateTimerID ) #TODO Maybe do this in the function above?  If so, make it the first thing to do.
-
         dialog = self.createDialog( widget, _( "Preferences" ) )
         self.onPreferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
         self.__setAboutPreferencesSensitivity( True )
         GLib.idle_add( self.__update ) #TODO Work out if we hit OK and only then do we call update.
+
+        #TODO If OK returned, then call an update.
+        #TODO If cancel returned, put the timer back in place (might need utcNow set and subtract that from when the timer would have fired).
 
 
 #TODO In Punycode, when items are disabled,
