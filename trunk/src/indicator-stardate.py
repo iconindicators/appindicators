@@ -151,16 +151,18 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
 
-        if dialog.run() == Gtk.ResponseType.OK:
+        responseType = dialog.run()
+        if responseType == Gtk.ResponseType.OK:
             self.padInteger = padIntegerCheckbox.get_active()
             self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
             self.setAutoStart( autostartCheckbox.get_active() )
 
+#TODO Maybe just let the save happen?
             if self.saveConfigTimerID: # There may be a scheduled save from a recent mouse wheel scroll event.
                 GLib.source_remove( self.saveConfigTimerID )
 
-            self.requestSaveConfig()
+        return responseType
 
 
     def onShowClassicCheckbox( self, source, showIssueCheckbox, padIntegerCheckbox ):
