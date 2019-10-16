@@ -129,7 +129,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
                     self.results = self.results[ : self.resultHistoryLength ]
 
                 GLib.idle_add( self.pasteToClipboard, None, protocol + convertedText + pathQuery )
-                GLib.idle_add( self.requestUpdate )
+                self.requestUpdate()
 
             except Exception as e:
                 logging.exception( e )
@@ -219,13 +219,16 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
 
-        if dialog.run() == Gtk.ResponseType.OK:
+        responseType = dialog.run()
+        if responseType == Gtk.ResponseType.OK:
             self.inputClipboard = inputClipboardRadio.get_active()
             self.outputBoth = outputBothCheckbox.get_active()
             self.dropPathQuery = dropPathQueryCheckbox.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
             self.setAutoStart( autostartCheckbox.get_active() )
             self.requestSaveConfig()
+
+        return responseType
 
 
     def loadConfig( self, config ):
