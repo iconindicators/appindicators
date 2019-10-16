@@ -19,6 +19,11 @@
 # Application indicator which displays lunar, solar, planetary, star, comet and satellite information.
 
 
+#TODO Look into this
+# (indicator-lunar-NEW.py:4242): libappindicator-WARNING **: 09:14:30.474: Using '/tmp' paths in SNAP environment will lead to unreadable resources
+# Might get resolved if we use the user cache for icons and not /tmp.
+
+
 #TODO Is there a problem with setting the minimum update time (using the last update of say 2 minutes)
 # and then because the user turns off stuff, the update now becomes one minute.
 # Does this make sense?
