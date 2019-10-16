@@ -142,10 +142,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
 
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
 
-        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_active( self.isAutoStart() )
-        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_margin_top( 10 )
+        autostartCheckbox = self.createAutostartCheckbox() 
         grid.attach( autostartCheckbox, 0, 3, 1, 1 )
 
         dialog.vbox.pack_start( grid, True, True, 0 )
