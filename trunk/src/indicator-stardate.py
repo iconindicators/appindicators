@@ -110,7 +110,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             GLib.source_remove( self.saveConfigTimerID )
 
         # Defer the save; this avoids multiple saves when scrolling the mouse wheel like crazy!
-        self.saveConfigTimerID = GLib.timeout_add_seconds( 5, self.requestSaveConfig )
+        self.saveConfigTimerID = GLib.timeout_add_seconds( 10, self.requestSaveConfig )
 
 
     def onPreferences( self, dialog ):
@@ -157,10 +157,6 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
             self.setAutoStart( autostartCheckbox.get_active() )
-
-#TODO Maybe just let the save happen?
-            if self.saveConfigTimerID: # There may be a scheduled save from a recent mouse wheel scroll event.
-                GLib.source_remove( self.saveConfigTimerID )
 
         return responseType
 
