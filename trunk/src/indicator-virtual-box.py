@@ -30,13 +30,9 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gdk, GLib, Gtk, Notify
-from threading import Thread
 
 import indicatorbase, datetime, os, time, virtualmachine
 
-
-#TODO When a VM is auto started (and perhaps manually)
-#the preferences locks up.
 
 class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
@@ -52,8 +48,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
 
-    NOTIFICATION_DELAY_IN_SECONDS = 10
-
 
     def __init__( self ):
         super().__init__(
@@ -68,6 +62,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         self.requestMouseWheelScrollEvents()
 
+#         if self.isVBoxManageInstalled():
+#             GLib.timeout_add_seconds( 10, self.autoStartVirtualMachines )
+
 
     def update( self, menu ):
         if self.isVBoxManageInstalled():
@@ -75,12 +72,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         else:
             menu.append( Gtk.MenuItem( _( "(VirtualBox™ is not installed)" ) ) )
-
-#TODO Put this back!
-#TODO May need to use GLib instead because the indicator hangs if the VM doesn't start/exist?
-#TODO Maybe put into init instead?
-#         if self.startingUp and self.isVBoxManageInstalled():
-#             Thread( target = self.autoStartVirtualMachines ).start()
 
         return int( 60 * self.refreshIntervalInMinutes )
 
@@ -120,10 +111,11 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                         menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, virtualMachine.getUUID() in runningVMUUIDs ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
+
         menuItem = Gtk.MenuItem( _( "Launch VirtualBox™ Manager" ) )
         menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
-        self.indicator.set_secondary_activate_target( menuItem )
         menu.append( menuItem )
+        self.secondaryActivateTarget = menuItem
 
 
     def createMenuItemForVirtualMachine( self, virtualMachine, indent, isRunning ):
@@ -187,7 +179,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     # Zealous mouse wheel scrolling can cause too many notifications, subsequently popping the graphics stack!
     # Prevent notifications from appearing until a set time has elapsed since the previous notification.
     def sendNotificationWithDelay( self, summary, message ):
-        if( self.dateTimeOfLastNotification + datetime.timedelta( seconds = IndicatorVirtualBox.NOTIFICATION_DELAY_IN_SECONDS ) < datetime.datetime.now() ):
+        if( self.dateTimeOfLastNotification + datetime.timedelta( seconds = 10 ) < datetime.datetime.now() ):
             Notify.Notification.new( summary, message, self.icon ).show()
             self.dateTimeOfLastNotification = datetime.datetime.now()
 
