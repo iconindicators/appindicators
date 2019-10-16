@@ -215,13 +215,23 @@ class IndicatorBase:
 
     def __onPreferencesInternal( self, widget ):
         dialog = self.createDialog( widget, _( "Preferences" ) )
-        self.onPreferences( dialog ) # Call to implementation in indicator.
+        responseType = self.onPreferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
         self.__setAboutPreferencesSensitivity( True )
-        GLib.idle_add( self.__update ) #TODO Work out if we hit OK and only then do we call update.
 
-        #TODO If OK returned, then call an update.
-        #TODO If cancel returned, put the timer back in place (might need utcNow set and subtract that from when the timer would have fired).
+        if responseType == Gtk.ResponseType.OK:
+            self.__saveConfig()
+            GLib.idle_add( self.__update )
+
+        else:
+#TODO Need to somehow test this!            
+            utcNow = datetime.datetime.utcnow()
+            timeToNextUpdate = ( utcNow - self.nextUpdateTime ).total_seconds()
+            if timeToNextUpdate >= 0: # Scheduled update would have happened, so kick one off now.
+                GLib.idle_add( self.__update )
+
+            else:
+                GLib.timeout_add_seconds( ( self.nextUpdateTime - utcNow  ).total_seconds(), self.__update )
 
 
 #TODO In Punycode, when items are disabled,
@@ -445,7 +455,7 @@ class IndicatorBase:
         return executionFlag
 
 
-    def requestSaveConfig( self ): self.__saveConfig()
+    def requestSaveConfig( self, delay = 0 ): return GLib.timeout_add_seconds( delay, self.__saveConfig )
 
 
     # Read a dictionary of configuration from a JSON text file.
