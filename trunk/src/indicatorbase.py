@@ -87,12 +87,7 @@ class IndicatorBase:
 
 
     def main( self ):
-#         GLib.timeout_add_seconds( 1, self.__update )
-#TODO Test this on the laptop and ensure things still work...
         GLib.idle_add( self.__update )
-
-#         self.__update()
-#         self.startingUp = False
         Gtk.main()
 
 
@@ -309,8 +304,6 @@ class IndicatorBase:
 
     def __onAbout( self, widget ):
         self.__setAboutPreferencesSensitivity( False )
-#         GLib.timeout_add_seconds( 1, self.__onAboutInternal, widget )
-#TODO Test this on the laptop and ensure the menu items are disabled in time!
         GLib.idle_add( self.__onAboutInternal, widget )
 
 
@@ -428,8 +421,6 @@ class IndicatorBase:
 
     def __onPreferences( self, widget ):
         self.__setAboutPreferencesSensitivity( False )
-#         GLib.timeout_add_seconds( 1, self.__onPreferencesInternal, widget )
-#TODO Test this on the laptop and ensure the menu items are disabled in time!
         GLib.idle_add( self.__onPreferencesInternal, widget )
 
 
