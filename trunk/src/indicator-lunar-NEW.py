@@ -19,6 +19,11 @@
 # Application indicator which displays lunar, solar, planetary, star, comet and satellite information.
 
 
+#TODO Is there a problem with setting the minimum update time (using the last update of say 2 minutes)
+# and then because the user turns off stuff, the update now becomes one minute.
+# Does this make sense?
+
+
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
 
