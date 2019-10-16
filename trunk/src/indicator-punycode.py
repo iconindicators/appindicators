@@ -226,7 +226,6 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
             self.dropPathQuery = dropPathQueryCheckbox.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
             self.setAutoStart( autostartCheckbox.get_active() )
-            self.requestSaveConfig()
 
         return responseType
 
