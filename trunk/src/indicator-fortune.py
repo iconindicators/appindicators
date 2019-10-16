@@ -281,7 +281,8 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
-        if dialog.run() == Gtk.ResponseType.OK:
+        responseType = dialog.run()
+        if responseType == Gtk.ResponseType.OK:
             if radioMiddleMouseClickNewFortune.get_active():
                 self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
 
@@ -307,7 +308,8 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                 treeiter = store.iter_next( treeiter )
 
             self.setAutoStart( autostartCheckbox.get_active() )
-            self.requestSaveConfig()
+
+        return responseType
 
 
     def onFortuneReset( self, button, treeView ):
