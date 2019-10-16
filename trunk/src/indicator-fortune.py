@@ -454,7 +454,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             action = Gtk.FileChooserAction.OPEN
 
         dialog = Gtk.FileChooserDialog( title, addEditDialog, action, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
-        dialog.set_modal( True ) # On Ubuntu 14.04 the underlying add/edit dialog is still clickable, but behaves in Ubuntu 16.04/17.04.
+        dialog.set_transient_for( addEditDialog )
         dialog.set_filename( fortuneFileDirectory.get_text() )
         while( True ):
             response = dialog.run()
