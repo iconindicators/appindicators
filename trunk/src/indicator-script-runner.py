@@ -84,7 +84,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             menuItem.connect( "activate", self.onScript, script )
             menu.append( menuItem )
             if group == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
-                self.indicator.set_secondary_activate_target( menuItem )
+                self.secondaryActivateTarget = menuItem
 
 
     def onScript( self, widget, script ):
