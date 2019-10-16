@@ -270,10 +270,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         radioMiddleMouseClickShowLastFortune.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 1, 1 )
 
-        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
-        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( self.isAutoStart() )
-        autostartCheckbox.set_margin_top( 10 )
+        autostartCheckbox = self.createAutostartCheckbox() 
         grid.attach( autostartCheckbox, 0, 7, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
