@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-on-this-day 1.0.5\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-08 14:18+1100\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -124,14 +124,6 @@ msgstr ""
 msgid ""
 "On startup or when saving preferences,\n"
 "show a notification for each of today's events."
-msgstr ""
-
-#: indicator-on-this-day.py:294
-msgid "Autostart"
-msgstr ""
-
-#: indicator-on-this-day.py:295
-msgid "Run the indicator automatically."
 msgstr ""
 
 #: indicator-on-this-day.py:300

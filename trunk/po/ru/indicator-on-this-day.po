@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-on-this-day 1.0.5\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-08 14:18+1100\n"
-"PO-Revision-Date: 2018-08-13 12:42+0300\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"PO-Revision-Date: 2019-10-17 09:48+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -138,14 +138,6 @@ msgid ""
 msgstr ""
 "При запуске или сохранении настроек показывать\n"
 "уведомление о всех событиях текущего дня."
-
-#: indicator-on-this-day.py:294
-msgid "Autostart"
-msgstr "Автозапуск"
-
-#: indicator-on-this-day.py:295
-msgid "Run the indicator automatically."
-msgstr "Запускать индикатор автоматически."
 
 #: indicator-on-this-day.py:300
 msgid "General"
