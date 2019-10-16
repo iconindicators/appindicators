@@ -162,7 +162,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         # When only one PPA is present, enable middle mouse click on the icon to open the PPA in the browser.
         if len( ppas ) == 1:
-            self.indicator.set_secondary_activate_target( menuItem )
+            self.secondaryActivateTarget = menuItem
 
 
     def createMenuItemForPublishedBinary( self, menu, indent, ppa, publishedBinary ):
