@@ -47,7 +47,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     CONFIG_SORT_BY_DOWNLOAD = "sortByDownload"
     CONFIG_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
 
-    SERIES = [ "eoan",
+    SERIES = [ "focal", "eoan",
                "disco", "cosmic", "bionic", "artful", "zesty",
                "yakkety", "xenial", "wily", "vivid", "utopic",
                "trusty", "saucy", "raring", "quantal", "precise",
