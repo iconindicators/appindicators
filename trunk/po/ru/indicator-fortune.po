@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-fortune 1.0.30\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-08 22:41+1100\n"
-"PO-Revision-Date: 2017-07-04 16:43+0300\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"PO-Revision-Date: 2019-10-17 09:48+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -168,14 +168,6 @@ msgstr "Скопировать последнее изречение в буфе
 #: indicator-fortune.py:268
 msgid "Show current fortune"
 msgstr "Показать последнее изречение"
-
-#: indicator-fortune.py:273
-msgid "Autostart"
-msgstr "Автозапуск"
-
-#: indicator-fortune.py:274
-msgid "Run the indicator automatically."
-msgstr "Запускать индикатор автоматически."
 
 #: indicator-fortune.py:279
 msgid "General"
