@@ -905,7 +905,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 else:
                     ppa.setStatus( PPA.STATUS_OK )
 
-        GLib.idle_add( self.requestUpdate )
+        self.requestUpdate()
 
         if ppasPrevious != self.ppas:
             Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
