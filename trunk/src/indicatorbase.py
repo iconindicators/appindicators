@@ -419,20 +419,11 @@ class IndicatorBase:
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
-        notebookOrStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
-        if type( notebookOrStack ).__name__ == "Notebook":
-            notebookOrStack = notebookOrStack.get_nth_page( 0 )
-            print( "Notebook")#TODO Remvoe if not used on both laptop and desktop
-
-        else:
-            notebookOrStack = notebookOrStack.get_children()[ 0 ]
-            print("Stack") #TODO Remvoe if not used on both laptop and desktop (desktop uses stack).
-
         toolTip = "file://" + filePath
         label = Gtk.Label()
         label.set_markup( leftText + " <a href=\'" + "file://" + filePath + "\' title=\'" + toolTip + "\'>" + anchorText + "</a> " + rightText )
         label.show()
-        notebookOrStack.add( label )
+        aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].add( label )
 
 
     def __onPreferences( self, widget ):
