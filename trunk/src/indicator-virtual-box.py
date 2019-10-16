@@ -526,7 +526,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
-        if dialog.run() == Gtk.ResponseType.OK:
+        responseType = dialog.run()
+        if responseType == Gtk.ResponseType.OK:
             self.virtualboxManagerWindowName = windowName.get_text().strip()
             self.delayBetweenAutoStartInSeconds = spinnerDelay.get_value_as_int()
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
@@ -534,7 +535,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             self.virtualMachinePreferences.clear()
             self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
             self.setAutoStart( autostartCheckbox.get_active() )
-            self.requestSaveConfig()
+
+        return responseType
 
 
     def updateVirtualMachinePreferences( self, store, treeiter ):
