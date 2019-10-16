@@ -3,8 +3,8 @@ indicator-fortune (1.0.30-1) xenial; urgency=low
   * Bug fix: Default fortune would cause a crash on a reset.
   * Bug fix: Dialogs now have a parent specified.
   * Now uses a base class to share functionality amongst indicators.
-  * On startup, a single menu item "Initialising..." is displayed.
-    After an update, the menu proper is then shown.
+  * Whilst starting up, a single menu item "Initialising..." is displayed.
+    Once fully initialised, the menu proper is shown.
   * When an update is underway or the About/Preferences dialogs are displayed,
     the About/Preference menu items are disabled.
   * About dialog now shows copyright, artists and corrected URL for website.
