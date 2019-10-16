@@ -302,7 +302,8 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
-        if dialog.run() == Gtk.ResponseType.OK:
+        responseType = dialog.run()
+        if responseType == Gtk.ResponseType.OK:
             self.lines = spinner.get_value_as_int()
 
             self.calendars = [ ]
@@ -318,6 +319,8 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             self.notify = notifyCheckbox.get_active()
             self.setAutoStart( autostartCheckbox.get_active() )
             self.requestSaveConfig()
+
+        return responseType
 
 
     def onEventClickRadio( self, source, radioCopyToClipboard, radioInternetSearch, searchEngineEntry ):
