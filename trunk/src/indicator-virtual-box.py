@@ -161,7 +161,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 self.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
                 delay = 10 # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
 
-        GLib.timeout_add_seconds( delay, self.requestUpdate )
+        self.requestUpdate( delay )
 
 
     def bringWindowToFront( self, virtualMachineName ):
