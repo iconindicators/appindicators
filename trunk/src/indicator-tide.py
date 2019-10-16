@@ -328,7 +328,8 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
-        if dialog.run() == Gtk.ResponseType.OK:
+        responseType = dialog.run()
+        if responseType == Gtk.ResponseType.OK:
             country = countriesComboBox.get_active_text()
             model, treeiter = portsTree.get_selection().get_selected()
             port = model[ treeiter ][ 0 ]
@@ -339,7 +340,8 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             self.menuItemTideFormat = tideFormat.get_text()
             self.menuItemTideFormatSansTime = tideFormatSansTime.get_text()
             self.setAutoStart( autostartCheckbox.get_active() )
-            self.requestSaveConfig()
+
+        return responseType
 
 
     def onCountry( self, countriesComboBox, portsListStore, portsTree ):
