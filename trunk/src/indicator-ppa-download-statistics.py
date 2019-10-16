@@ -461,7 +461,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
-        if dialog.run() == Gtk.ResponseType.OK:
+        responseType = dialog.run()
+        if responseType == Gtk.ResponseType.OK:
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
@@ -486,7 +487,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     treeiter = filterStore.iter_next( treeiter )
 
             self.setAutoStart( autostartCheckbox.get_active() )
-            self.requestSaveConfig()
+
+        return responseType
 
 
     def onCombinePPAsCheckbox( self, source, checkbox ): checkbox.set_sensitive( source.get_active() )
