@@ -58,7 +58,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         menuItem = Gtk.MenuItem( _( "Convert" ) )
         menu.append( menuItem )
         menuItem.connect( "activate", self.onConvert )
-        self.secondaryActivateTarget = menuItem
+        self.setSecondaryActivateTarget( menuItem )
 
         indent = "    "
         for result in self.results:
