@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorbase 1.0.0\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-07 23:02+1100\n"
-"PO-Revision-Date: 2019-10-08 11:16+0300\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"PO-Revision-Date: 2019-10-17 09:48+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -53,3 +53,11 @@ msgstr "список изменений"
 #: indicatorbase.py:174
 msgid "error log"
 msgstr "журнал ошибок"
+
+#: indicatorbase.py:275
+msgid "Autostart"
+msgstr "Автозапуск"
+
+#: indicatorbase.py:276
+msgid "Run the indicator automatically."
+msgstr "Запускать индикатор автоматически."

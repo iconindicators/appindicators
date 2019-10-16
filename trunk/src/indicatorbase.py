@@ -271,6 +271,14 @@ class IndicatorBase:
         return dialog
 
 
+    def createAutostartCheckbox( self ):
+        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
+        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
+        autostartCheckbox.set_active( self.isAutoStart() )
+        autostartCheckbox.set_margin_top( 10 )
+        return autostartCheckbox
+
+
     # Show a message dialog.
     #
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
