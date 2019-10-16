@@ -72,19 +72,19 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         menuItem.connect( "activate", lambda widget: self.refreshAndShowFortune() )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
-            self.indicator.set_secondary_activate_target( menuItem )
+            self.secondaryActivateTarget = menuItem
 
         menuItem = Gtk.MenuItem( _( "Copy Last Fortune" ) )
         menuItem.connect( "activate", lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ) )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
-            self.indicator.set_secondary_activate_target( menuItem )
+            self.secondaryActivateTarget = menuItem
 
         menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
         menuItem.connect( "activate", lambda widget: self.showFortune() )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
-            self.indicator.set_secondary_activate_target( menuItem )
+            self.secondaryActivateTarget = menuItem
 
 
     def refreshFortune( self ):
