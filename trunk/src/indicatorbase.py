@@ -208,6 +208,7 @@ class IndicatorBase:
     def __onPreferences( self, widget ):
         if self.updateTimerID:
             GLib.source_remove( self.updateTimerID )
+            self.updateTimerID = None
 
         self.__setAboutPreferencesSensitivity( False )
         GLib.idle_add( self.__onPreferencesInternal, widget )
