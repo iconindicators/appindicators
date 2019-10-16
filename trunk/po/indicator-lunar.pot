@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-lunar 1.0.80\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2017-10-10 20:21+1100\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2405,14 +2405,6 @@ msgstr ""
 
 #: indicator-lunar.py:3122
 msgid "Height in metres above sea level."
-msgstr ""
-
-#: indicator-lunar.py:3130
-msgid "Autostart"
-msgstr ""
-
-#: indicator-lunar.py:3131
-msgid "Run the indicator automatically."
 msgstr ""
 
 #: indicator-lunar.py:3136
