@@ -2,8 +2,8 @@ indicator-virtual-box (1.0.62-1) xenial; urgency=low
 
   * Bug fix: Dialogs now have a parent specified.
   * Now uses a base class to share functionality amongst indicators.
-  * On startup, a single menu item "Initialising..." is displayed.
-    After an update, the menu proper is then shown.
+  * Whilst starting up, a single menu item "Initialising..." is displayed.
+    Once fully initialised, the menu proper is shown.
   * When an update is underway or the About/Preferences dialogs are displayed,
     the About/Preference menu items are disabled.
   * About dialog now shows copyright, artists and corrected URL for website.
