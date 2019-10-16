@@ -452,7 +452,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
     def onBrowseCalendar( self, button, addEditDialog, calendarFile ):
         systemCalendars = self.getCalendars()
         dialog = Gtk.FileChooserDialog( _( "Choose a calendar file" ), addEditDialog, Gtk.FileChooserAction.OPEN, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
-        dialog.set_modal( True ) # In Ubuntu 14.04 the underlying add/edit dialog is still clickable, but behaves in Ubuntu 16.04/17.04.
+        dialog.set_transient_for( addEditDialog )
         dialog.set_filename( calendarFile.get_text() )
         while( True ):
             response = dialog.run()
