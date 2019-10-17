@@ -227,15 +227,14 @@ class IndicatorBase:
             self.__saveConfig()
             GLib.idle_add( self.__update )
 
-        elif self.nextUpdateTime: # Cancelled, so only kick off an update if one was scheduled...
-#TODO Need to somehow test this!            
-            utcNow = datetime.datetime.utcnow()
-            timeToNextUpdate = ( utcNow - self.nextUpdateTime ).total_seconds()
-            if timeToNextUpdate >= 0: # Scheduled update would have happened, so kick one off now.
-                GLib.idle_add( self.__update )
+        elif self.nextUpdateTime: # Cancelled...
+#TODO Need to somehow test this!
+            secondsToNextUpdate = ( self.nextUpdateTime - datetime.datetime.utcnow() ).total_seconds()
+            if secondsToNextUpdate > 0: # Scheduled update is still in the future, so reschedule...
+                GLib.timeout_add_seconds( int( secondsToNextUpdate ), self.__update )
 
-            else:
-                GLib.timeout_add_seconds( ( self.nextUpdateTime - utcNow  ).total_seconds(), self.__update )
+            else: # Scheduled update would have already happened, so kick one off now.
+                GLib.idle_add( self.__update )
 
 
 #TODO In Punycode, when items are disabled,
