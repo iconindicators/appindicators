@@ -88,8 +88,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.indicator.set_label( "PPA", "" )
 
 
-#TODO Think about each case below when and by whom is the updateTimerID to be removed?    
-#TODO Because the download happens in a thread, ensure somehow we do it with a lock, to stop the about/preferencs from being opened.
     def update( self, menu ):
         needsDownload = False
         for ppa in self.ppas:
@@ -100,10 +98,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         timeToNextUpdateInSeconds = None
         if needsDownload:
             menu.append( Gtk.MenuItem( _( "Downloading..." ) ) )
-
-#TODO I think we need to use the self.lock in the thread, but in the way about/prefs uses,
-# so we don't block.
-# If we kick off the thread and build the menu, the user can then load the prefs which is not good.            
             Thread( target = self.getPPADownloadStatistics ).start()
 
         else:
@@ -120,17 +114,15 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 #Maybe don't need this...just always download.
 #Check what silliness the preferences implement to avoid a download.
     def buildMenu( self, menu ):
-        ppas = deepcopy( self.ppas ) # Leave the original download data as is - makes dynamic (user) changes faster (don't have to re-download).
-
         if self.combinePPAs:
-            self.combine( ppas )
+            self.combine( self.ppas )
 
         if self.sortByDownload:
-            self.sortByDownloadAndClip( ppas )
+            self.sortByDownloadAndClip( self.ppas )
 
         if self.showSubmenu:
             indent = self.indent( 0, 1 )
-            for ppa in ppas:
+            for ppa in self.ppas:
                 menuItem = Gtk.MenuItem( ppa.getKey() )
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
@@ -146,7 +138,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         else:
             indent = self.indent( 1, 1 )
-            for ppa in ppas:
+            for ppa in self.ppas:
                 menuItem = Gtk.MenuItem( ppa.getKey() )
                 menu.append( menuItem )
                 menuItem.set_name( ppa.getKey() )
@@ -160,7 +152,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     self.createMenuItemForStatusMessage( menu, indent, ppa )
 
         # When only one PPA is present, enable middle mouse click on the icon to open the PPA in the browser.
-        if len( ppas ) == 1:
+        if len( self.ppas ) == 1:
             self.secondaryActivateTarget = menuItem
 
 
@@ -198,11 +190,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         menu.append( menuItem )
 
 
-    def combine( self, ppas ):
+    def combine( self ):
         combinedPPAs = { } # Key is the PPA simple key; value is the combined ppa (the series/architecture are set to None).
 
         # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
-        for ppa in ppas:
+        for ppa in self.ppas:
             key = ppa.getUser() + " | " + ppa.getName()
             if key in combinedPPAs:
                 if ppa.getStatus() == combinedPPAs[ key ].getStatus():
@@ -222,7 +214,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         # The combined ppas either have:
         #    An error status (and no published binaries) or,
         #    An OK status are a concatenation of all published binaries from ppas with the same PPA User/Name.
-        del ppas[ : ] # Remove all elements (and keep reference to original variable).
+        self.ppas = [ ]
         for ppa in combinedPPAs.values():
             temp = { }
             for publishedBinary in ppa.getPublishedBinaries():
@@ -245,13 +237,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             if ppa.getStatus() == PPA.STATUS_OK:
                 ppa.setStatus( PPA.STATUS_OK ) # This will force the published binaries to be sorted.
 
-            ppas.append( ppa  )
+            self.ppas.append( ppa  )
 
-        ppas.sort( key = operator.methodcaller( "getKey" ) )
+        self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
 
-    def sortByDownloadAndClip( self, ppas ):
-        for ppa in ppas:
+    def sortByDownloadAndClip( self ):
+        for ppa in self.ppas:
             ppa.sortPublishedBinariesByDownloadCountAndClip( self.sortByDownloadAmount )
 
 
@@ -877,13 +869,12 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             if key in self.filters:
                 filters = self.filters.get( key )
 
-#             ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )#TODO Don't need this if it is done by the caller, correct?  
-# But maybe do it here again anyway and comment on the fact of "just in case".
             for filter in filters:
                 self.getPublishedBinaries( ppa, filter )
                 if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                     break # No point continuing...
 
+#TODO Check the logic of the code below, including what the two functions below do.
             if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # No error occurred, so set the final status...                
                 if len( ppa.getPublishedBinaries() ) == 0:
                     if filters[ 0 ] == "": # No filtering was used for this PPA.
