@@ -310,7 +310,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
 
     def onFortuneReset( self, button, treeView ):
-        if self.showOKCancel( treeView, _( "Reset fortunes to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+        if self.showOKCancel( treeView, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
             listStore = treeView.get_model().get_model()
             listStore.clear()
             listStore.append( IndicatorFortune.DEFAULT_FORTUNE  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
@@ -319,12 +319,12 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
     def onFortuneRemove( self, button, treeView ):
         model, treeiter = treeView.get_selection().get_selected()
         if treeiter is None:
-            self.showMessage( treeView, Gtk.MessageType.ERROR, _( "No fortune has been selected for removal." ), INDICATOR_NAME )
+            self.showMessage( treeView, _( "No fortune has been selected for removal." ) )
 
         elif model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE:
-            self.showMessage( treeView, Gtk.MessageType.WARNING, _( "This is the default fortune and cannot be deleted." ), INDICATOR_NAME )
+            self.showMessage( treeView, _( "This is the default fortune and cannot be deleted." ), Gtk.MessageType.WARNING )
 
-        elif self.showOKCancel( treeView, _( "Remove the selected fortune?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+        elif self.showOKCancel( treeView, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK:
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
@@ -429,7 +429,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             if dialog.run() == Gtk.ResponseType.OK:
 
                 if fortuneFileDirectory.get_text().strip() == "": # Will occur if the user does a browse, cancels the browse and hits okay.
-                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The fortune path cannot be empty." ), INDICATOR_NAME )
+                    self.showMessage( dialog, _( "The fortune path cannot be empty." ) )
                     fortuneFileDirectory.grab_focus()
                     continue
 
@@ -457,7 +457,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ 0 ] ):
-                    self.showMessage( dialog, Gtk.MessageType.INFO, _( "The fortune is part of your system and is already included." ), INDICATOR_NAME )
+                    self.showMessage( dialog, _( "The fortune is part of your system and is already included." ), Gtk.MessageType.INFO )
 
                 else:
                     fortuneFileDirectory.set_text( dialog.get_filename() )
