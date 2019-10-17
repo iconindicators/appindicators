@@ -33,7 +33,7 @@ from ppa import PPA, PublishedBinary
 from threading import Thread
 from urllib.request import urlopen
 
-import concurrent.futures, indicatorbase, json, locale, operator, os, tempfile, webbrowser
+import concurrent.futures, indicatorbase, json, locale, operator, tempfile, webbrowser
 
 
 class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
