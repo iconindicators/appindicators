@@ -97,7 +97,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         timeToNextUpdateInSeconds = None
         if needsDownload:
-            menu.append( Gtk.MenuItem( _( "Downloading..." ) ) )
+            menu.append( Gtk.MenuItem( _( "Downloading..." ) ) ) #TODO This does not appear immediately...maybe use GLib for the thread (or instead of the thread)?
             Thread( target = self.getPPADownloadStatistics ).start()
 
         else:
