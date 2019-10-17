@@ -281,17 +281,30 @@ class IndicatorBase:
     # Show a message dialog.
     #
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
-    def showMessage( self, parentWidget, messageType, message, title ):
+    #    title: If None, will default to the indicator name.
+    def showMessage( self, parentWidget, message, messageType = Gtk.MessageType.ERROR, title = None ):
         dialog = Gtk.MessageDialog( self.__getParent( parentWidget ), Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
-        dialog.set_title( title )
+        if title is None:
+            dialog.set_title( self.indicatorName )
+        else:
+            dialog.set_title( title )
+
         dialog.run()
         dialog.destroy()
 
 
-    # Show OK/Cancel dialog prompt.  Return either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
-    def showOKCancel( self, parentWidget, message, title ):
+    # Show OK/Cancel dialog prompt.
+    #
+    #    title: If None, will default to the indicator name.
+    #
+    # Return either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
+    def showOKCancel( self, parentWidget, message, title = None ):
         dialog = Gtk.MessageDialog( self.__getParent( parentWidget ), Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, message )
-        dialog.set_title( title )
+        if title is None:
+            dialog.set_title( self.indicatorName )
+        else:
+            dialog.set_title( title )
+
         response = dialog.run()
         dialog.destroy()
         return response
