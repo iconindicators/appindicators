@@ -275,8 +275,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def onPreferences( self, dialog ):
-        self.ppasOrFiltersModified = False
-
         notebook = Gtk.Notebook()
 
         # PPAs.
@@ -465,22 +463,19 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.sortByDownload = sortByDownloadCheckbox.get_active()
             self.sortByDownloadAmount = spinner.get_value_as_int()
 
-            if self.ppasOrFiltersModified:
-                # Only save the PPAs/filters if modified - avoids a re-download.
-                # On a PPA remove, a re-download really doesn't need to occur...but it's a PITA to sort that one out!
-                self.ppas = [ ]
-                treeiter = ppaStore.get_iter_first()
-                while treeiter != None:
-                    self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
-                    treeiter = ppaStore.iter_next( treeiter )
+            self.ppas = [ ]
+            treeiter = ppaStore.get_iter_first()
+            while treeiter != None:
+                self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
+                treeiter = ppaStore.iter_next( treeiter )
 
-                self.ppas.sort( key = operator.methodcaller( "getKey" ) )
+            self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
-                self.filters = { }
-                treeiter = filterStore.get_iter_first()
-                while treeiter != None:
-                    self.filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
-                    treeiter = filterStore.iter_next( treeiter )
+            self.filters = { }
+            treeiter = filterStore.get_iter_first()
+            while treeiter != None:
+                self.filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
+                treeiter = filterStore.iter_next( treeiter )
 
             self.setAutoStart( autostartCheckbox.get_active() )
 
@@ -504,7 +499,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
             if self.showOKCancel( tree, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
-                self.ppasOrFiltersModified = True
 
 
     def onPPAAdd( self, button, tree ): self.onPPADoubleClick( tree, None, None )
@@ -656,7 +650,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
 
                 model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
-                self.ppasOrFiltersModified = True
 
             break
 
@@ -672,7 +665,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
             if self.showOKCancel( tree, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
-                self.ppasOrFiltersModified = True
 
 
     def onFilterAdd( self, button, filterTree, ppaTree ):
@@ -786,7 +778,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     filterTreeModel.remove( filterTreeIter ) # This is an edit...remove the old value and append new value.  
 
                 filterTreeModel.append( [ ppaUsersNames.get_active_text(), filterText ] ) 
-                self.ppasOrFiltersModified = True
 
             break
 
@@ -886,7 +877,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             if key in self.filters:
                 filters = self.filters.get( key )
 
-#             ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )#TODO Don't need this if it is done by the caller, correct?  But maybe do it here again anyway and comment on the fact of "just in case".
+#             ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )#TODO Don't need this if it is done by the caller, correct?  
+# But maybe do it here again anyway and comment on the fact of "just in case".
             for filter in filters:
                 self.getPublishedBinaries( ppa, filter )
                 if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
