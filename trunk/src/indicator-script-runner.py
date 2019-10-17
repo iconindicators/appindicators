@@ -394,17 +394,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 dialog.show_all()
                 if dialog.run() == Gtk.ResponseType.OK:
                     if scriptGroupCombo.get_active_text().strip() == "":
-                        self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The group cannot be empty." ), INDICATOR_NAME )
+                        self.showMessage( dialog, _( "The group cannot be empty." ) )
                         scriptGroupCombo.grab_focus()
                         continue
 
                     if scriptNameEntry.get_text().strip() == "":
-                        self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The name cannot be empty." ), INDICATOR_NAME )
+                        self.showMessage( dialog, _( "The name cannot be empty." ) )
                         scriptNameEntry.grab_focus()
                         continue
 
                     if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
-                        self.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
+                        self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
                         scriptGroupCombo.grab_focus()
                         continue
 
@@ -431,7 +431,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if scriptGroup and treeiter:
             scriptName = model[ treeiter ][ 0 ]
             theScript = self.getScript( scripts, scriptGroup, scriptName )
-            if self.showOKCancel( scriptNameTreeView, _( "Remove the selected script?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+            if self.showOKCancel( scriptNameTreeView, _( "Remove the selected script?" ) ) == Gtk.ResponseType.OK:
                 i = 0
                 for script in scripts:
                     if script.getGroup() == scriptGroup and script.getName() == scriptName:
@@ -573,23 +573,23 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
                 if scriptGroupCombo.get_active_text().strip() == "":
-                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The group cannot be empty." ), INDICATOR_NAME )
+                    self.showMessage( dialog, _( "The group cannot be empty." ) )
                     scriptGroupCombo.grab_focus()
                     continue
 
                 if scriptNameEntry.get_text().strip() == "":
-                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The name cannot be empty." ), INDICATOR_NAME )
+                    self.showMessage( dialog, _( "The name cannot be empty." ) )
                     scriptNameEntry.grab_focus()
                     continue
 
                 if self.getTextViewText( commandTextView ).strip() == "":
-                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The command cannot be empty." ), INDICATOR_NAME )
+                    self.showMessage( dialog, _( "The command cannot be empty." ) )
                     commandTextView.grab_focus()
                     continue
 
                 if script.getGroup() == "": # Adding a new script - check for duplicate.
                     if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
-                        self.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
+                        self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
                         scriptGroupCombo.grab_focus()
                         continue
 
@@ -609,7 +609,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                                     break
 
                         if duplicate:
-                            self.showMessage( dialog, Gtk.MessageType.ERROR, _( "A script of the same group and name already exists." ), INDICATOR_NAME )
+                            self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
                             scriptGroupCombo.grab_focus()
                             continue
 
