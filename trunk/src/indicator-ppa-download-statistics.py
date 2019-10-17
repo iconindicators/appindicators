@@ -499,11 +499,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def onPPARemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is None:
-            self.showMessage( tree, Gtk.MessageType.ERROR, _( "No PPA has been selected for removal." ), INDICATOR_NAME )
+            self.showMessage( tree, _( "No PPA has been selected for removal." ) )
 
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            if self.showOKCancel( tree, _( "Remove the selected PPA?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+            if self.showOKCancel( tree, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
                 self.ppasOrFiltersModified = True
 
@@ -615,12 +615,12 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     ppaNameValue = ppaName.get_text().strip()
 
                 if ppaUserValue == "":
-                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "PPA user cannot be empty." ), INDICATOR_NAME )
+                    self.showMessage( dialog, _( "PPA user cannot be empty." )  )
                     ppaUser.grab_focus()
                     continue
 
                 if ppaNameValue == "":
-                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "PPA name cannot be empty." ), INDICATOR_NAME )
+                    self.showMessage( dialog, _( "PPA name cannot be empty." ) )
                     ppaName.grab_focus()
                     continue
 
@@ -649,7 +649,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                                 break
 
                         if duplicate:
-                            self.showMessage( dialog, Gtk.MessageType.ERROR, _( "Duplicates disallowed - there is an identical PPA!" ), INDICATOR_NAME )
+                            self.showMessage( dialog, _( "Duplicates disallowed - there is an identical PPA!" ) )
                             continue
 
                 # Update the model...
@@ -667,18 +667,18 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def onFilterRemove( self, button, tree ):
         model, treeiter = tree.get_selection().get_selected()
         if treeiter is None:
-            self.showMessage( tree, Gtk.MessageType.ERROR, _( "No filter has been selected for removal." ), INDICATOR_NAME )
+            self.showMessage( tree, _( "No filter has been selected for removal." ) )
 
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            if self.showOKCancel( tree, _( "Remove the selected filter?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+            if self.showOKCancel( tree, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
                 self.ppasOrFiltersModified = True
 
 
     def onFilterAdd( self, button, filterTree, ppaTree ):
         if len( ppaTree.get_model() ) == 0:
-            self.showMessage( filterTree, Gtk.MessageType.ERROR, _( "Please add a PPA first!" ), INDICATOR_NAME )
+            self.showMessage( filterTree, _( "Please add a PPA first!" ) )
 
         else:
             # If the number of filters equals the number of PPA User/Names, cannot add a filter!
@@ -689,7 +689,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     ppaUsersNames.append( ppaUserName )
 
             if len( filterTree.get_model() ) == len( ppaUsersNames ):
-                self.showMessage( filterTree, Gtk.MessageType.INFO, _( "Only one filter per PPA User/Name." ), INDICATOR_NAME )
+                self.showMessage( filterTree, _( "Only one filter per PPA User/Name." ), Gtk.MessageType.INFO )
 
             else:
                 self.onFilterDoubleClick( filterTree, None, None, ppaTree )
@@ -779,7 +779,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 filterText = buffer.get_text( buffer.get_start_iter(), buffer.get_end_iter(), False )
                 filterText = "\n".join( filterText.split() )
                 if len( filterText ) == 0:
-                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "Please enter filter text!" ), INDICATOR_NAME )
+                    self.showMessage( dialog, _( "Please enter filter text!" ) )
                     continue
 
                 # Update the model...
