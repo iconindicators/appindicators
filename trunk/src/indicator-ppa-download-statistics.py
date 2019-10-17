@@ -171,20 +171,18 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def createMenuItemForStatusMessage( self, menu, indent, ppa ):
+        # STATUS_OK and STATUS_NEEDS_DOWNLOAD cannot appear at this stage, so no point in checking for them.
         if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
 
-        elif ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: #TODO May not need this...if not change this code...but make sure we don't use a blind else clause.
-            message = IndicatorPPADownloadStatistics.MESSAGE_DOWNLOADING_DATA
+        elif ppa.getStatus() == PPA.STATUS_MULTIPLE_ERRORS:
+            message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
         elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
 
         elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
-
-        else: #TODO What would this case be?  How does this come to pass?  Is this status multiple errors?
-            message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
 
         menuItem = Gtk.MenuItem( indent + message )
         menu.append( menuItem )
