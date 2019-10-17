@@ -1656,28 +1656,28 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             cityValue = city.get_active_text()
             if cityValue == "":
-                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "City cannot be empty." ), INDICATOR_NAME )
+                self.showMessage( dialog, _( "City cannot be empty." ) )
                 notebook.set_current_page( TAB_GENERAL )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
             if latitudeValue == "" or not self.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
-                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "Latitude must be a number between 90 and -90 inclusive." ), INDICATOR_NAME )
+                self.showMessage( dialog, _( "Latitude must be a number between 90 and -90 inclusive." ) )
                 notebook.set_current_page( TAB_GENERAL )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
             if longitudeValue == "" or not self.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
-                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "Longitude must be a number between 180 and -180 inclusive." ), INDICATOR_NAME )
+                self.showMessage( dialog, _( "Longitude must be a number between 180 and -180 inclusive." ) )
                 notebook.set_current_page( TAB_GENERAL )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
             if elevationValue == "" or not self.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
-                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "Elevation must be a number between 0 and 10000 inclusive." ), INDICATOR_NAME )
+                self.showMessage( dialog, _( "Elevation must be a number between 0 and 10000 inclusive." ) )
                 notebook.set_current_page( TAB_GENERAL )
                 elevation.grab_focus()
                 continue
