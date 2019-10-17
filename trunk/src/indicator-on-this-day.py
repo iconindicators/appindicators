@@ -336,7 +336,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
 
     def onCalendarReset( self, button, treeView ):
-        if self.showOKCancel( treeView, _( "Reset calendars to factory default?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK:
+        if self.showOKCancel( treeView, _( "Reset calendars to factory default?" ) ) == Gtk.ResponseType.OK:
             listStore = treeView.get_model().get_model()
             listStore.clear()
             for calendar in self.getCalendars():
@@ -350,12 +350,12 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
     def onCalendarRemove( self, button, treeView ):
         model, treeiter = treeView.get_selection().get_selected()
         if treeiter is None:
-            self.showMessage( treeView, Gtk.MessageType.ERROR, _( "No calendar has been selected." ), INDICATOR_NAME )
+            self.showMessage( treeView, _( "No calendar has been selected." ) )
 
         elif model[ treeiter ][ 0 ] in self.getCalendars():
-            self.showMessage( treeView, Gtk.MessageType.WARNING, _( "This calendar is part of your system\nand cannot be removed." ), INDICATOR_NAME )
+            self.showMessage( treeView, _( "This calendar is part of your system\nand cannot be removed." ), Gtk.MessageType.WARNING )
 
-        elif self.showOKCancel( treeView, _( "Remove the selected calendar?" ), INDICATOR_NAME ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+        elif self.showOKCancel( treeView, _( "Remove the selected calendar?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
@@ -427,12 +427,12 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             if dialog.run() == Gtk.ResponseType.OK:
 
                 if not isSystemCalendar and fileEntry.get_text().strip() == "":
-                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The calendar path cannot be empty." ), INDICATOR_NAME )
+                    self.showMessage( dialog, _( "The calendar path cannot be empty." ) )
                     fileEntry.grab_focus()
                     continue
     
                 if not isSystemCalendar and not os.path.exists( fileEntry.get_text().strip() ):
-                    self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The calendar path does not exist." ), INDICATOR_NAME )
+                    self.showMessage( dialog, _( "The calendar path does not exist." ) )
                     fileEntry.grab_focus()
                     continue
 
@@ -455,7 +455,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 if dialog.get_filename() in systemCalendars:
-                    self.showMessage( dialog, Gtk.MessageType.INFO, _( "The calendar is part of your system\nand is already included." ), INDICATOR_NAME )
+                    self.showMessage( dialog, _( "The calendar is part of your system\nand is already included." ), Gtk.MessageType.INFO )
 
                 else:
                     calendarFile.set_text( dialog.get_filename() )
