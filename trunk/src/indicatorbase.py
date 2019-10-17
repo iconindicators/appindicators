@@ -38,14 +38,17 @@ import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
 
 class IndicatorBase:
 
-    AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
-    CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+    # Private
+    __AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+    __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+    __JSON_EXTENSION = ".json"
+    __TERMINAL_GNOME = "gnome-terminal"
+    __TERMINAL_LXDE = "lxterminal"
+    __TERMINAL_XFCE = "xfce4-terminal"
+
+    # Public
     INDENT_TEXT_LEFT = 25
     INDENT_WIDGET_LEFT = 20
-    JSON_EXTENSION = ".json"
-    TERMINAL_GNOME = "gnome-terminal"
-    TERMINAL_LXDE = "lxterminal"
-    TERMINAL_XFCE = "xfce4-terminal"
     URL_TIMEOUT_IN_SECONDS = 2
 
 
@@ -385,8 +388,8 @@ class IndicatorBase:
         autoStart = False
         try:
             autoStart = \
-                os.path.exists( IndicatorBase.AUTOSTART_PATH + self.desktopFile ) and \
-                "X-GNOME-Autostart-enabled=true" in open( IndicatorBase.AUTOSTART_PATH + self.desktopFile ).read()
+                os.path.exists( IndicatorBase.__AUTOSTART_PATH + self.desktopFile ) and \
+                "X-GNOME-Autostart-enabled=true" in open( IndicatorBase.__AUTOSTART_PATH + self.desktopFile ).read()
 
         except Exception as e:
             logging.exception( e )
@@ -396,16 +399,16 @@ class IndicatorBase:
 
 
     def setAutoStart( self, isSet ):
-        if not os.path.exists( IndicatorBase.AUTOSTART_PATH ):
-            os.makedirs( IndicatorBase.AUTOSTART_PATH )
+        if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
+            os.makedirs( IndicatorBase.__AUTOSTART_PATH )
 
         try:
             if isSet:
-                shutil.copy( "/usr/share/applications/" + self.desktopFile, IndicatorBase.AUTOSTART_PATH + self.desktopFile )
+                shutil.copy( "/usr/share/applications/" + self.desktopFile, IndicatorBase.__AUTOSTART_PATH + self.desktopFile )
 
             else:
-                if os.path.exists( IndicatorBase.AUTOSTART_PATH + self.desktopFile ):
-                    os.remove( IndicatorBase.AUTOSTART_PATH + self.desktopFile )
+                if os.path.exists( IndicatorBase.__AUTOSTART_PATH + self.desktopFile ):
+                    os.remove( IndicatorBase.__AUTOSTART_PATH + self.desktopFile )
 
         except Exception as e:
             logging.exception( e )
@@ -447,12 +450,12 @@ class IndicatorBase:
 
     # Return the full path and name of the executable for the current terminal; None on failure.
     def getTerminal( self ):
-        terminal = self.processGet( "which " + IndicatorBase.TERMINAL_GNOME )
+        terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_GNOME )
         if terminal is None:
-            terminal = self.processGet( "which " + IndicatorBase.TERMINAL_LXDE )
+            terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_LXDE )
 
             if terminal is None:
-                terminal = self.processGet( "which " + IndicatorBase.TERMINAL_XFCE )
+                terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_XFCE )
 
         if terminal:
             terminal = terminal.strip()
@@ -467,13 +470,13 @@ class IndicatorBase:
     def getTerminalExecutionFlag( self, terminal ): 
         executionFlag = None
         if terminal:
-            if terminal.endswith( IndicatorBase.TERMINAL_GNOME ):
+            if terminal.endswith( IndicatorBase.__TERMINAL_GNOME ):
                 executionFlag = "--"
 
-            elif terminal.endswith( IndicatorBase.TERMINAL_LXDE ):
+            elif terminal.endswith( IndicatorBase.__TERMINAL_LXDE ):
                 executionFlag = "-e"
 
-            elif terminal.endswith( IndicatorBase.TERMINAL_XFCE ):
+            elif terminal.endswith( IndicatorBase.__TERMINAL_XFCE ):
                 executionFlag = "-x"
 
         return executionFlag
@@ -484,7 +487,7 @@ class IndicatorBase:
 
     # Read a dictionary of configuration from a JSON text file.
     def __loadConfig( self ):
-        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.JSON_EXTENSION
+        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__JSON_EXTENSION
         config = { }
         if os.path.isfile( configFile ):
             try:
@@ -502,7 +505,7 @@ class IndicatorBase:
     # Write a dictionary of user configuration to a JSON text file.
     def __saveConfig( self ):
         config = self.saveConfig() # Call to implementation in indicator.
-        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.JSON_EXTENSION
+        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__JSON_EXTENSION
         success = True
         try:
             with open( configFile, "w" ) as f:
@@ -556,7 +559,7 @@ class IndicatorBase:
         cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = cacheMaximumAgeInHours )
         for file in os.listdir( cacheDirectory ):
             if file.startswith( baseName ):
-                fileDateTime = datetime.datetime.strptime( file[ len( baseName ) : ], IndicatorBase.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )            
+                fileDateTime = datetime.datetime.strptime( file[ len( baseName ) : ], IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )            
                 if fileDateTime < cacheMaximumAgeDateTime:
                     os.remove( cacheDirectory + "/" + file )
 
@@ -615,7 +618,7 @@ class IndicatorBase:
         cacheFile = \
             self.__getCacheDirectory() + \
             baseName + \
-            datetime.datetime.utcnow().strftime( IndicatorBase.CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
 
         try:
             with open( cacheFile, "wb" ) as f:
