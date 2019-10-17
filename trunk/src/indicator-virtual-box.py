@@ -583,12 +583,12 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 break
 
             if startCommand.get_text().strip() == "":
-                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command cannot be empty." ), INDICATOR_NAME )
+                self.showMessage( dialog, _( "The start command cannot be empty." ) )
                 startCommand.grab_focus()
                 continue
 
             if not "%VM%" in startCommand.get_text().strip():
-                self.showMessage( dialog, Gtk.MessageType.ERROR, _( "The start command must contain %VM% which is substituted for the virtual machine name/id." ), INDICATOR_NAME )
+                self.showMessage( dialog, _( "The start command must contain %VM% which is substituted for the virtual machine name/id." ) )
                 startCommand.grab_focus()
                 continue
 
