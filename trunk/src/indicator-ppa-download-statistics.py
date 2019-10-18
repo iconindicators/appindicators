@@ -471,17 +471,19 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
                 treeiter = filterStore.iter_next( treeiter )
 
-            self.ppas = [ ]
-            self.filters = { }
-
             # Determine if the changes, if any, warrant a download.
 #TODO Test!
             if ( self.ppas != ppas ) or ( self.filters != filters ):
+                self.ppas = ppas
+                self.filters = filters
                 for ppa in self.ppas:
                     ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD ) # Ensures the next update will do a download.
 
-            self.ppas = ppas
-            self.filters = filters
+            else:
+                pass
+                #TODO The update timer will have been cancelled and then put back.
+                # But the last menu build / update will have erased the status and set to needs download...
+                # ...how to get around this as those statuses are now gone?
 
         return responseType
 
