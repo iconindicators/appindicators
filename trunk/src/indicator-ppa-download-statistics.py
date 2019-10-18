@@ -450,50 +450,38 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
 
-#TODO Is it feasible to see if the checkboxes were flipped and/or 
-# the ppas were modified 
-# and/or filters were modified
-# to determine if a download is needed?            
-            # Determine if the changes, if any, warrant a download.
-            needsDownload = False
-
-#             needsDownload |= self.showSubmenu != showAsSubmenusCheckbox.get_active()
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
-
-#             needsDownload |= self.combinePPAs != combinePPAsCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
-
-#             needsDownload |= self.ignoreVersionArchitectureSpecific != ignoreVersionArchitectureSpecificCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
-
-#             needsDownload |= self.sortByDownload != sortByDownloadCheckbox.get_active()
             self.sortByDownload = sortByDownloadCheckbox.get_active()
-
-#             needsDownload |= self.sortByDownloadAmount != spinner.get_value_as_int()
             self.sortByDownloadAmount = spinner.get_value_as_int()
+            self.setAutoStart( autostartCheckbox.get_active() )
 
             ppas = [ ]
             treeiter = ppaStore.get_iter_first()
             while treeiter != None:
-                self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
+                ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
                 treeiter = ppaStore.iter_next( treeiter )
 
             ppas.sort( key = operator.methodcaller( "getKey" ) )
 
-
-
             filters = { }
             treeiter = filterStore.get_iter_first()
             while treeiter != None:
-                self.filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
+                filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
                 treeiter = filterStore.iter_next( treeiter )
 
             self.ppas = [ ]
             self.filters = { }
 
-            needsDownload = ( self.ppas != ppas ) or ( self.filters != filters )
+            # Determine if the changes, if any, warrant a download.
+#TODO Test!
+            if ( self.ppas != ppas ) or ( self.filters != filters ):
+                for ppa in self.ppas:
+                    ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD ) # Ensures the next update will do a download.
 
-            self.setAutoStart( autostartCheckbox.get_active() )
+            self.ppas = ppas
+            self.filters = filters
 
         return responseType
 
