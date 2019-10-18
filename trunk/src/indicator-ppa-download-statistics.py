@@ -24,11 +24,12 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
+gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from copy import deepcopy
-from gi.repository import Gtk, Notify
+from gi.repository import GLib, Gtk, Notify
 from ppa import PPA, PublishedBinary
 from threading import Thread
 from urllib.request import urlopen
@@ -97,12 +98,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         timeToNextUpdateInSeconds = None
         if needsDownload:
-            menu.append( Gtk.MenuItem( _( "Downloading..." ) ) ) #TODO This does not appear immediately...maybe use GLib for the thread (or instead of the thread)?
-            Thread( target = self.getPPADownloadStatistics ).start()
+            menu.append( Gtk.MenuItem( _( "Downloading..." ) ) )
+            GLib.idle_add( self.getPPADownloadStatistics )
 
         else:
             self.buildMenu( menu )
 #TODO If the status is error, then maybe set the update to be in 10 minutes time?
+#If we do this, show a notification telling the user a retry will happen in 10 minutes.
             timeToNextUpdateInSeconds = 6 * 60 * 60 # Auto update every six hours.
             for ppa in self.ppas:
                 ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD ) # Ensures the next update will do a download.
@@ -110,15 +112,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         return timeToNextUpdateInSeconds
 
 
-#TODO Look at all times when/why we copy the ppas.
-#Maybe don't need this...just always download.
-#Check what silliness the preferences implement to avoid a download.
     def buildMenu( self, menu ):
-        if self.combinePPAs:
-            self.combine( self.ppas )
+#TODO Check and test
+#         if self.combinePPAs:
+#             self.combine()
 
         if self.sortByDownload:
-            self.sortByDownloadAndClip( self.ppas )
+            self.sortByDownloadAndClip()
 
         if self.showSubmenu:
             indent = self.indent( 0, 1 )
@@ -447,6 +447,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
+
+#TODO Is it feasible to see if the checkboxes were flipped and/or 
+# the ppas were modified 
+# and/or filters were modified
+# to determine if a download is needed?            
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
@@ -791,7 +796,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
         else:
-            self.ppas.append( PPA( "thebernmeister", "ppa", "focal", "amd64" ) )
+#TODO Put focal back in ONLY if it appears on Launchpad.            
+            self.ppas.append( PPA( "thebernmeister", "ppa", "bionic", "amd64" ) )
             self.filters[ 'thebernmeister | ppa' ] = [ 
                 "indicator-fortune",
                 "indicator-lunar",
@@ -862,6 +868,39 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def getPPADownloadStatistics( self ):
         ppasPrevious = deepcopy( self.ppas )
         for ppa in self.ppas:
+            key = ppa.getUser() + " | " + ppa.getName()
+            if key in self.filters:
+                for filter in self.filters.get( key ):
+                    self.getPublishedBinaries( ppa, filter )
+                    if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                        break # No point continuing...
+
+            else:
+                self.getPublishedBinaries( ppa, "" )
+
+            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                continue
+
+            if len( ppa.getPublishedBinaries() ) == 0:
+                if key in self.filters:
+                    ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+
+                else:
+                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+
+            else:
+                ppa.setStatus( PPA.STATUS_OK )
+
+        self.requestUpdate()
+
+        if ppasPrevious != self.ppas:
+            Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
+
+
+#TODO Hopefully gone.
+    def getPPADownloadStatisticsORIG( self ):
+        ppasPrevious = deepcopy( self.ppas )
+        for ppa in self.ppas:
             filters = [ "" ] # To match all published binary names an empty string can be used.
             key = ppa.getUser() + " | " + ppa.getName()
             if key in self.filters:
@@ -909,6 +948,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
 
             except Exception as e:
+                self.getLogging().error( "Problem with " + url + "&ws.start=" + str( publishedBinaryCounter ) )
                 self.getLogging().exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
                 publishedBinaryCounter = totalPublishedBinaries
@@ -948,6 +988,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
             except Exception as e:
+                self.getLogging().error( "Problem with " + url )
                 self.getLogging().exception( e )
                 ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
