@@ -98,8 +98,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         timeToNextUpdateInSeconds = None
         if needsDownload:
+#TODO Rethink this ... can we have 'downloading' only?            
+#The About/Prefs don't disable in time...seem to flicker.
             menu.append( Gtk.MenuItem( _( "Downloading..." ) ) )
-            GLib.idle_add( self.getPPADownloadStatistics )
+            GLib.timeout_add_seconds( 2, self.getPPADownloadStatistics )
 
         else:
             self.buildMenu( menu )
@@ -452,25 +454,44 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 # the ppas were modified 
 # and/or filters were modified
 # to determine if a download is needed?            
+            # Determine if the changes, if any, warrant a download.
+            needsDownload = False
+
+#             needsDownload |= self.showSubmenu != showAsSubmenusCheckbox.get_active()
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
+
+#             needsDownload |= self.combinePPAs != combinePPAsCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
+
+#             needsDownload |= self.ignoreVersionArchitectureSpecific != ignoreVersionArchitectureSpecificCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
+
+#             needsDownload |= self.sortByDownload != sortByDownloadCheckbox.get_active()
             self.sortByDownload = sortByDownloadCheckbox.get_active()
+
+#             needsDownload |= self.sortByDownloadAmount != spinner.get_value_as_int()
             self.sortByDownloadAmount = spinner.get_value_as_int()
 
-            self.ppas = [ ]
+            ppas = [ ]
             treeiter = ppaStore.get_iter_first()
             while treeiter != None:
                 self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
                 treeiter = ppaStore.iter_next( treeiter )
 
-            self.ppas.sort( key = operator.methodcaller( "getKey" ) )
+            ppas.sort( key = operator.methodcaller( "getKey" ) )
 
-            self.filters = { }
+
+
+            filters = { }
             treeiter = filterStore.get_iter_first()
             while treeiter != None:
                 self.filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
                 treeiter = filterStore.iter_next( treeiter )
+
+            self.ppas = [ ]
+            self.filters = { }
+
+            needsDownload = ( self.ppas != ppas ) or ( self.filters != filters )
 
             self.setAutoStart( autostartCheckbox.get_active() )
 
