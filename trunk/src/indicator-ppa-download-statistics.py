@@ -822,8 +822,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
         else:
-#TODO Put focal back in ONLY if it appears on Launchpad.            
-            self.ppas.append( PPA( "thebernmeister", "ppa", "bionic", "amd64" ) )
+            self.ppas.append( PPA( "thebernmeister", "ppa", "focal", "amd64" ) )
             self.filters[ 'thebernmeister | ppa' ] = [ 
                 "indicator-fortune",
                 "indicator-lunar",
