@@ -100,6 +100,32 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if needsDownload:
 #TODO Rethink this ... can we have 'downloading' only?            
 #The About/Prefs don't disable in time...seem to flicker.
+#             menu.append( Gtk.MenuItem( _( "Downloading..." ) ) )
+#             GLib.timeout_add_seconds( 2, self.getPPADownloadStatistics )
+            self.getPPADownloadStatistics()
+
+        else:
+            self.buildMenu( menu )
+#TODO If the status is error, then maybe set the update to be in 10 minutes time?
+#If we do this, show a notification telling the user a retry will happen in 10 minutes.
+            timeToNextUpdateInSeconds = 6 * 60 * 60 # Auto update every six hours.
+            for ppa in self.ppas:
+                ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD ) # Ensures the next update will do a download.
+
+        return timeToNextUpdateInSeconds
+
+
+    def updateORIG( self, menu ):
+        needsDownload = False
+        for ppa in self.ppas:
+            if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD:
+                needsDownload = True
+                break
+
+        timeToNextUpdateInSeconds = None
+        if needsDownload:
+#TODO Rethink this ... can we have 'downloading' only?            
+#The About/Prefs don't disable in time...seem to flicker.
             menu.append( Gtk.MenuItem( _( "Downloading..." ) ) )
             GLib.timeout_add_seconds( 2, self.getPPADownloadStatistics )
 
@@ -916,8 +942,9 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             else:
                 ppa.setStatus( PPA.STATUS_OK )
 
-        self.requestUpdate()
+#         self.requestUpdate()
 
+#TODO Could move this to caller.
         if ppasPrevious != self.ppas:
             Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
 
