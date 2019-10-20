@@ -315,7 +315,7 @@ class IndicatorBase:
 
 
     def __getParent( self, widget ):
-        parent = widget.get_parent()
+        parent = widget # Sometimes the widget itself is a Dialog/Window, so no need to get the parent.
         while( parent is not None ):
             if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
                 break
