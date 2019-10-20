@@ -316,10 +316,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def getPublishedBinaries( self, ppa, filter ):
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
-              "&exact_match=false&ordered=false&binary_name=" + filter
-              
-#TODO Verify the "" for filter gives all results and "SOME FILTER TEXT LIKE da" gives just stardate and onthisday.
-#Then add a comment about this at the end of the line!              
+              "&exact_match=false&ordered=false&binary_name=" + filter # A filter of "" equates to no filter.
 
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
