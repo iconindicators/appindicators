@@ -90,15 +90,18 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
-        self.getPPADownloadStatistics()
+        ppas = self.getPPADownloadStatistics()
+
+#TODO Need a proper comparison that takes into account download numbers, packages and the statuses.
+#         if ppas != self.ppas:
+#             Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
+
+        self.ppas = ppas
+
         self.buildMenu( menu )
+
+#TODO Maybe if there was an error in the status of any PPA, schedule a download in 10 minutes?
         timeToNextUpdateInSeconds = 6 * 60 * 60 # Auto update every six hours.
-
-#TODO Is this needed?
-#Need to check the download stuff...maybe it can return the PPA object (and no need then for a global).
-        for ppa in self.ppas:
-            ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD ) # Ensures the next update will do a download.
-
         return timeToNextUpdateInSeconds
 
 
@@ -294,9 +297,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #     http://help.launchpad.net/API/launchpadlib
     #     http://help.launchpad.net/API/Hacking
     def getPPADownloadStatistics( self ):
-#TODO Maybe pass in the ppas and so we remove the global?        
-        ppasPrevious = deepcopy( self.ppas )
-        for ppa in self.ppas:
+        ppas = deepcopy( self.ppas )
+        for ppa in ppas:
             key = ppa.getUser() + " | " + ppa.getName()
             if key in self.filters:
                 for filter in self.filters.get( key ):
@@ -320,11 +322,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             else:
                 ppa.setStatus( PPA.STATUS_OK )
 
-#         self.requestUpdate()
-
-#TODO Could move this to caller.
-        if ppasPrevious != self.ppas:
-            Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
+        return ppas
 
 
 #TODO Hopefully gone.
@@ -369,6 +367,9 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
               "&exact_match=false&ordered=false&binary_name=" + filter
+              
+#TODO Verify the "" for filter gives all results and "SOME FILTER TEXT LIKE da" gives just stardate and onthisday.
+#Then add a comment about this at the end of the line!              
 
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
