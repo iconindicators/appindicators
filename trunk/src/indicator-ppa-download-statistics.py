@@ -254,6 +254,175 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         webbrowser.open( url ) # This returns a boolean indicating success or failure; showing the user a message on a false return value causes a lock up!
 
 
+    # Get a list of the published binaries for each PPA.
+    # From that extract the ID for each binary which is then used to get the download count for each binary.
+    # The ID is the number at the end of self_link.
+    # The published binary object looks like this...
+    #{
+    #    "total_size": 4, 
+    #    "start": 0, 
+    #    "entries": [
+    #    {
+    #        "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386", 
+    #        "removal_comment": null, 
+    #        "display_name": "indicator-lunar 1.0.9-1 in precise i386", 
+    #        "date_made_pending": null, 
+    #        "date_superseded": null, 
+    #        "priority_name": "OPTIONAL", 
+    #        "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"", 
+    #        "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302", 
+    #        "binary_package_version": "1.0.9-1", 
+    #        "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history", 
+    #        "component_name": "main", 
+    #        "status": "Published", 
+    #        "date_removed": null, 
+    #        "pocket": "Release", 
+    #        "date_published": "2012-08-09T10:30:49.572656+00:00", 
+    #        "removed_by_link": null, "section_name": "python", 
+    #        "date_created": "2012-08-09T10:27:31.762212+00:00", 
+    #        "binary_package_name": "indicator-lunar", 
+    #        "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa", 
+    #        "architecture_specific": false, 
+    #        "scheduled_deletion_date": null
+    #    }
+    #    {
+    #    ,... 
+    #}
+    #
+    # References:
+    #     http://launchpad.net/+apidoc
+    #     http://help.launchpad.net/API/launchpadlib
+    #     http://help.launchpad.net/API/Hacking
+    def getPPADownloadStatistics( self ):
+        ppasPrevious = deepcopy( self.ppas )
+        for ppa in self.ppas:
+            key = ppa.getUser() + " | " + ppa.getName()
+            if key in self.filters:
+                for filter in self.filters.get( key ):
+                    self.getPublishedBinaries( ppa, filter )
+                    if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                        break # No point continuing...
+
+            else:
+                self.getPublishedBinaries( ppa, "" )
+
+            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                continue
+
+            if len( ppa.getPublishedBinaries() ) == 0:
+                if key in self.filters:
+                    ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+
+                else:
+                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+
+            else:
+                ppa.setStatus( PPA.STATUS_OK )
+
+#         self.requestUpdate()
+
+#TODO Could move this to caller.
+        if ppasPrevious != self.ppas:
+            Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
+
+
+#TODO Hopefully gone.
+    def getPPADownloadStatisticsORIG( self ):
+        ppasPrevious = deepcopy( self.ppas )
+        for ppa in self.ppas:
+            filters = [ "" ] # To match all published binary names an empty string can be used.
+            key = ppa.getUser() + " | " + ppa.getName()
+            if key in self.filters:
+                filters = self.filters.get( key )
+
+            for filter in filters:
+                self.getPublishedBinaries( ppa, filter )
+                if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                    break # No point continuing...
+
+#TODO Check the logic of the code below, including what the two functions below do.
+            if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # No error occurred, so set the final status...                
+                if len( ppa.getPublishedBinaries() ) == 0:
+                    if filters[ 0 ] == "": # No filtering was used for this PPA.
+                        ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+
+                    else:
+                        ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+
+                else:
+                    ppa.setStatus( PPA.STATUS_OK )
+
+        self.requestUpdate()
+
+#TODO I think this won't work now...the data comparison is fine, but the status could be different.
+        if ppasPrevious != self.ppas:
+            Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
+
+
+    # Use a thread pool executer to get the download counts for each published binary.
+    # References:
+    #    https://docs.python.org/3/library/concurrent.futures.html
+    #    https://pymotw.com/3/concurrent.futures
+    #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
+    def getPublishedBinaries( self, ppa, filter ):
+        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
+              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
+              "&exact_match=false&ordered=false&binary_name=" + filter
+
+        pageNumber = 1
+        publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
+        publishedBinaryCounter = 0
+        totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
+        while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
+            try:
+                publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+
+            except Exception as e:
+                self.getLogging().error( "Problem with " + url + "&ws.start=" + str( publishedBinaryCounter ) )
+                self.getLogging().exception( e )
+                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                publishedBinaryCounter = totalPublishedBinaries
+                continue
+
+            totalPublishedBinaries = publishedBinaries[ "total_size" ]
+            if totalPublishedBinaries == 0:
+                publishedBinaryCounter = totalPublishedBinaries
+                continue
+
+            numberPublishedBinariesCurrentPage = publishedBinariesPerPage
+            if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
+                numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
+
+            with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
+                { executor.submit( self.getDownloadCount, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
+
+            publishedBinaryCounter += publishedBinariesPerPage
+            pageNumber += 1
+
+
+    def getDownloadCount( self, ppa, publishedBinaries, i ):
+        if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # Use the status to cancel downloads if an error occurred.
+            try:
+                indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
+                packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
+                url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
+
+                downloadCount = json.loads( urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+                if str( downloadCount ).isnumeric():
+                    packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
+                    packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
+                    architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
+                    ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
+
+                else:
+                    ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+
+            except Exception as e:
+                self.getLogging().error( "Problem with " + url )
+                self.getLogging().exception( e )
+                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+
+
     def onPreferences( self, dialog ):
         notebook = Gtk.Notebook()
 
@@ -838,175 +1007,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD: self.sortByDownload,
             IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT: self.sortByDownloadAmount
         }
-
-
-    # Get a list of the published binaries for each PPA.
-    # From that extract the ID for each binary which is then used to get the download count for each binary.
-    # The ID is the number at the end of self_link.
-    # The published binary object looks like this...
-    #{
-    #    "total_size": 4, 
-    #    "start": 0, 
-    #    "entries": [
-    #    {
-    #        "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386", 
-    #        "removal_comment": null, 
-    #        "display_name": "indicator-lunar 1.0.9-1 in precise i386", 
-    #        "date_made_pending": null, 
-    #        "date_superseded": null, 
-    #        "priority_name": "OPTIONAL", 
-    #        "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"", 
-    #        "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302", 
-    #        "binary_package_version": "1.0.9-1", 
-    #        "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history", 
-    #        "component_name": "main", 
-    #        "status": "Published", 
-    #        "date_removed": null, 
-    #        "pocket": "Release", 
-    #        "date_published": "2012-08-09T10:30:49.572656+00:00", 
-    #        "removed_by_link": null, "section_name": "python", 
-    #        "date_created": "2012-08-09T10:27:31.762212+00:00", 
-    #        "binary_package_name": "indicator-lunar", 
-    #        "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa", 
-    #        "architecture_specific": false, 
-    #        "scheduled_deletion_date": null
-    #    }
-    #    {
-    #    ,... 
-    #}
-    #
-    # References:
-    #     http://launchpad.net/+apidoc
-    #     http://help.launchpad.net/API/launchpadlib
-    #     http://help.launchpad.net/API/Hacking
-    def getPPADownloadStatistics( self ):
-        ppasPrevious = deepcopy( self.ppas )
-        for ppa in self.ppas:
-            key = ppa.getUser() + " | " + ppa.getName()
-            if key in self.filters:
-                for filter in self.filters.get( key ):
-                    self.getPublishedBinaries( ppa, filter )
-                    if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
-                        break # No point continuing...
-
-            else:
-                self.getPublishedBinaries( ppa, "" )
-
-            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
-                continue
-
-            if len( ppa.getPublishedBinaries() ) == 0:
-                if key in self.filters:
-                    ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
-
-                else:
-                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
-
-            else:
-                ppa.setStatus( PPA.STATUS_OK )
-
-#         self.requestUpdate()
-
-#TODO Could move this to caller.
-        if ppasPrevious != self.ppas:
-            Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
-
-
-#TODO Hopefully gone.
-    def getPPADownloadStatisticsORIG( self ):
-        ppasPrevious = deepcopy( self.ppas )
-        for ppa in self.ppas:
-            filters = [ "" ] # To match all published binary names an empty string can be used.
-            key = ppa.getUser() + " | " + ppa.getName()
-            if key in self.filters:
-                filters = self.filters.get( key )
-
-            for filter in filters:
-                self.getPublishedBinaries( ppa, filter )
-                if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
-                    break # No point continuing...
-
-#TODO Check the logic of the code below, including what the two functions below do.
-            if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # No error occurred, so set the final status...                
-                if len( ppa.getPublishedBinaries() ) == 0:
-                    if filters[ 0 ] == "": # No filtering was used for this PPA.
-                        ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
-
-                    else:
-                        ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
-
-                else:
-                    ppa.setStatus( PPA.STATUS_OK )
-
-        self.requestUpdate()
-
-#TODO I think this won't work now...the data comparison is fine, but the status could be different.
-        if ppasPrevious != self.ppas:
-            Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
-
-
-    # Use a thread pool executer to get the download counts for each published binary.
-    # References:
-    #    https://docs.python.org/3/library/concurrent.futures.html
-    #    https://pymotw.com/3/concurrent.futures
-    #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
-    def getPublishedBinaries( self, ppa, filter ):
-        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
-              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
-              "&exact_match=false&ordered=false&binary_name=" + filter
-
-        pageNumber = 1
-        publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
-        publishedBinaryCounter = 0
-        totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
-        while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
-            try:
-                publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
-
-            except Exception as e:
-                self.getLogging().error( "Problem with " + url + "&ws.start=" + str( publishedBinaryCounter ) )
-                self.getLogging().exception( e )
-                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-                publishedBinaryCounter = totalPublishedBinaries
-                continue
-
-            totalPublishedBinaries = publishedBinaries[ "total_size" ]
-            if totalPublishedBinaries == 0:
-                publishedBinaryCounter = totalPublishedBinaries
-                continue
-
-            numberPublishedBinariesCurrentPage = publishedBinariesPerPage
-            if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
-                numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
-
-            with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
-                { executor.submit( self.getDownloadCount, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
-
-            publishedBinaryCounter += publishedBinariesPerPage
-            pageNumber += 1
-
-
-    def getDownloadCount( self, ppa, publishedBinaries, i ):
-        if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # Use the status to cancel downloads if an error occurred.
-            try:
-                indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
-                packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
-                url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
-
-                downloadCount = json.loads( urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
-                if str( downloadCount ).isnumeric():
-                    packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
-                    packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
-                    architectureSpecific = publishedBinaries[ "entries" ][ i ][ "architecture_specific" ]
-                    ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
-
-                else:
-                    ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-
-            except Exception as e:
-                self.getLogging().error( "Problem with " + url )
-                self.getLogging().exception( e )
-                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
 
 IndicatorPPADownloadStatistics().main()
