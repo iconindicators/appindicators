@@ -286,7 +286,6 @@ class IndicatorBase:
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
     #    title: If None, will default to the indicator name.
     def showMessage( self, parentWidget, message, messageType = Gtk.MessageType.ERROR, title = None ):
-#TODO The parent doesn't seem to be legit....debug.
         dialog = Gtk.MessageDialog( self.__getParent( parentWidget ), Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
         if title is None:
             dialog.set_title( self.indicatorName )
