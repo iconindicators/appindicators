@@ -294,6 +294,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #     http://help.launchpad.net/API/launchpadlib
     #     http://help.launchpad.net/API/Hacking
     def getPPADownloadStatistics( self ):
+#TODO Maybe pass in the ppas and so we remove the global?        
         ppasPrevious = deepcopy( self.ppas )
         for ppa in self.ppas:
             key = ppa.getUser() + " | " + ppa.getName()
