@@ -57,7 +57,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
     ARCHITECTURES = [ "amd64", "i386" ]
 
-    MESSAGE_DOWNLOADING_DATA = _( "(downloading data...)" )
     MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
     MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE = _( "(multiple messages - uncombine PPAs)" )
     MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
@@ -90,19 +89,9 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
-        ppas = self.getPPADownloadStatistics()
-
-#TODO Need a proper comparison that takes into account download numbers, packages and the statuses.
-#         if ppas != self.ppas:
-#             Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
-
-        self.ppas = ppas
-
+        self.downloadPPAStatistics()
         self.buildMenu( menu )
-
-#TODO Maybe if there was an error in the status of any PPA, schedule a download in 10 minutes?
-        timeToNextUpdateInSeconds = 6 * 60 * 60 # Auto update every six hours.
-        return timeToNextUpdateInSeconds
+        return 6 * 60 * 60 # Auto update every six hours.
 
 
     def buildMenu( self, menu ):
@@ -296,9 +285,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #     http://launchpad.net/+apidoc
     #     http://help.launchpad.net/API/launchpadlib
     #     http://help.launchpad.net/API/Hacking
-    def getPPADownloadStatistics( self ):
-        ppas = deepcopy( self.ppas )
-        for ppa in ppas:
+    def downloadPPAStatistics( self ):
+        for ppa in self.ppas:
             key = ppa.getUser() + " | " + ppa.getName()
             if key in self.filters:
                 for filter in self.filters.get( key ):
@@ -321,41 +309,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             else:
                 ppa.setStatus( PPA.STATUS_OK )
-
-        return ppas
-
-
-#TODO Hopefully gone.
-    def getPPADownloadStatisticsORIG( self ):
-        ppasPrevious = deepcopy( self.ppas )
-        for ppa in self.ppas:
-            filters = [ "" ] # To match all published binary names an empty string can be used.
-            key = ppa.getUser() + " | " + ppa.getName()
-            if key in self.filters:
-                filters = self.filters.get( key )
-
-            for filter in filters:
-                self.getPublishedBinaries( ppa, filter )
-                if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
-                    break # No point continuing...
-
-#TODO Check the logic of the code below, including what the two functions below do.
-            if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # No error occurred, so set the final status...                
-                if len( ppa.getPublishedBinaries() ) == 0:
-                    if filters[ 0 ] == "": # No filtering was used for this PPA.
-                        ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
-
-                    else:
-                        ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
-
-                else:
-                    ppa.setStatus( PPA.STATUS_OK )
-
-        self.requestUpdate()
-
-#TODO I think this won't work now...the data comparison is fine, but the status could be different.
-        if ppasPrevious != self.ppas:
-            Notify.Notification.new( _( "Statistics downloaded!" ), "", self.icon ).show()
 
 
     # Use a thread pool executer to get the download counts for each published binary.
