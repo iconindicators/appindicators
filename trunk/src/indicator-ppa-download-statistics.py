@@ -95,11 +95,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         timeToNextUpdateInSeconds = 6 * 60 * 60 # Auto update every six hours.
 
 #TODO Is this needed?
+#Need to check the download stuff...maybe it can return the PPA object (and no need then for a global).
         for ppa in self.ppas:
             ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD ) # Ensures the next update will do a download.
 
-#         return timeToNextUpdateInSeconds
-        return 100
+        return timeToNextUpdateInSeconds
 
 
     def updateORIG( self, menu ):
