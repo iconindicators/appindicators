@@ -855,10 +855,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 2, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( self.INDENT_TEXT_LEFT )
+        box = Gtk.Box( spacing = 0 )
 
-#TODO Don't like how the textview is now indented a bit...can this be fixed?
         label = Gtk.Label( "\n\n\n\n\n" ) # Padding to ensure the textview for the message text is not too small.  
         label.set_valign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
