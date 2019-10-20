@@ -989,17 +989,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             satellites = sorted( satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
 
         if satellites:
-            self.__updateSatellitesMenu( menu, _( "Satellites" ), satellites )
+            self.__updateMenuSatellites( menu, _( "Satellites" ), satellites )
 
         if satellitesCircumpolar:
-            self.__updateSatellitesMenu( menu, _( "Satellites (Circumpolar)" ), satellitesCircumpolar )
+            self.__updateMenuSatellites( menu, _( "Satellites (Circumpolar)" ), satellitesCircumpolar )
 
 
 #TODO Test each clause...will have to adjust date/time and lat/long.
 # Circumpolar: Az/Alt
 # Yet to rise (more than 5 minutes away): rise date/time
 # Yet to rise (less than 5 minutes away) or in transit: rise date/time, set date/time, az/alt.
-    def __updateSatellitesMenu( self, menu, label, satellites ):
+    def __updateMenuSatellites( self, menu, label, satellites ):
         menuItem = Gtk.MenuItem( _( label ) )
         menu.append( menuItem )
         subMenu = Gtk.Menu()
