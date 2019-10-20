@@ -24,14 +24,10 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
-gi.require_version( "Notify", "0.7" )
 
-from copy import deepcopy
-from gi.repository import GLib, Gtk, Notify
+from gi.repository import Gtk
 from ppa import PPA, PublishedBinary
-from threading import Thread
 from urllib.request import urlopen
 
 import concurrent.futures, indicatorbase, json, locale, operator, tempfile, webbrowser
