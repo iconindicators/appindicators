@@ -89,9 +89,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def buildMenu( self, menu ):
-#TODO Check and test
-#         if self.combinePPAs:
-#             self.combine()
+        if self.combinePPAs:
+            self.combine()
 
         if self.sortByDownload:
             self.sortByDownloadAndClip()
