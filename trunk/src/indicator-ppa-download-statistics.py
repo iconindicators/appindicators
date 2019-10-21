@@ -72,7 +72,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         # Ideally, use a label for the text of "PPA" and a dummy/empty icon, but alas, this does not work under GNOME Shell.
         # Inspiration from https://github.com/fossfreedom/indicator-sysmonitor.
         if self.isUbuntu1604():
-#TODO Why doesn't this give a snap/tmp warning on Ubuntu 18.04 as it does in Indicator Lunar?            
             fileHandle, icon = tempfile.mkstemp( suffix = ".svg" )
             with open( icon, "w" ) as f:
                 svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> \
@@ -88,7 +87,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def update( self, menu ):
         self.downloadPPAStatistics()
         self.buildMenu( menu )
-        return 6 * 60 * 60 # Auto update every six hours.
+        return 6 * 60 * 60 # Update every six hours.
 
 
     def buildMenu( self, menu ):
