@@ -341,7 +341,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
             with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
-                { executor.submit( self.getDownloadCount, ppa, publishedBinaries, i ): i for i in range( numberPublishedBinariesCurrentPage ) }
+                {
+                    executor.submit( self.getDownloadCount, ppa, publishedBinaries, i ):
+                        i for i in range( numberPublishedBinariesCurrentPage )
+                }
 
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
