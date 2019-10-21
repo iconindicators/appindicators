@@ -66,10 +66,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             copyrightStartYear = "2012",
             comments = _( "Display the total downloads of PPAs." ) )
 
-        # On Ubuntu 16.04 (and other Unity based versions), the icon "text" does not behave as does label text of other indicators.
-        # When clicked, label text becomes bolder, whereas the icon "text" remains the same.
-        # On Ubuntu 18.04 (and other GNOME Shell versions), the label text becomes bolder on mouse over and mouse click.
-        # Ideally, use a label for the text of "PPA" and a dummy/empty icon, but alas, this does not work under GNOME Shell.
+        # On Ubuntu 16.04 (Unity), create an empty icon and set the label text to "PPA".
+        # Ubuntu 18.04+ (GNOME Shell) does not support empty icons, so use the PPA icon and no label.
         # Inspiration from https://github.com/fossfreedom/indicator-sysmonitor.
         if self.isUbuntu1604():
             fileHandle, icon = tempfile.mkstemp( suffix = ".svg" )
