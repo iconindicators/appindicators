@@ -81,10 +81,7 @@ class IndicatorBase:
         menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
         menu.show_all()
 
-        self.indicator = AppIndicator3.Indicator.new(
-                            self.indicatorName, 
-                            self.indicatorName, 
-                            AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
 
