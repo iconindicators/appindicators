@@ -168,6 +168,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         combinedPPAs = { } # Key is the PPA simple key; value is the combined ppa (the series/architecture are set to None).
 
         # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
+# PPA.STATUS_ERROR_RETRIEVING_PPA
+# PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED
+# PPA.STATUS_NO_PUBLISHED_BINARIES
+# PPA.STATUS_OK
         for ppa in self.ppas:
             key = ppa.getUser() + " | " + ppa.getName()
             if key in combinedPPAs:
