@@ -284,6 +284,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #     http://help.launchpad.net/API/Hacking
     def downloadPPAStatistics( self ):
         for ppa in self.ppas:
+            ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
             key = ppa.getUser() + " | " + ppa.getName()
             if key in self.filters:
                 for filter in self.filters.get( key ):
@@ -555,7 +556,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
-
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
@@ -563,49 +563,19 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.sortByDownloadAmount = spinner.get_value_as_int()
             self.setAutoStart( autostartCheckbox.get_active() )
 
-            ppas = [ ]
+            self.ppas = [ ]
             treeiter = ppaStore.get_iter_first()
             while treeiter != None:
-                ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
+                self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
                 treeiter = ppaStore.iter_next( treeiter )
 
-            ppas.sort( key = operator.methodcaller( "getKey" ) )
+            self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
-            filters = { }
+            self.filters = { }
             treeiter = filterStore.get_iter_first()
             while treeiter != None:
-                filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
+                self.filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
                 treeiter = filterStore.iter_next( treeiter )
-
-            # Determine if the changes, if any, warrant a download.
-#TODO Test!
-#TODO Problem with comparing PPAs is the status could be different possibly?
-            if ( self.ppas == ppas ) and ( self.filters == filters ):
-                
-                self.ppas = ppas
-                self.filters = filters
-                for ppa in self.ppas:
-                    ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD ) # Ensures the next update will do a download.
-
-            else:
-                pass
-                #TODO The update timer will have been cancelled and then put back.
-                # But the last menu build / update will have erased the status and set to needs download...
-                # ...how to get around this as those statuses are now gone?
-
-
-            
-            if ( self.ppas != ppas ) or ( self.filters != filters ):
-                self.ppas = ppas
-                self.filters = filters
-                for ppa in self.ppas:
-                    ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD ) # Ensures the next update will do a download.
-
-            else:
-                pass
-                #TODO The update timer will have been cancelled and then put back.
-                # But the last menu build / update will have erased the status and set to needs download...
-                # ...how to get around this as those statuses are now gone?
 
         return responseType
 
