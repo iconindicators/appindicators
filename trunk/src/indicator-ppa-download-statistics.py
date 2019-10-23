@@ -185,7 +185,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             else:
                 # No previous match for this PPA.
-                ppa.nullifyArchitectureSeries()
+                ppa.nullifyArchitectureSeries() #TODO Need to actually do this?  Is the arch/series used in the menu build ever?
                 combinedPPAs[ key ] = ppa
 
         # The combined ppas either have:
@@ -285,6 +285,33 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def downloadPPAStatistics( self ):
         for ppa in self.ppas:
             ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
+            for filter in self.filters:
+            if key in self.filters:
+                for filter in self.filters.get( key ):
+                    self.getPublishedBinaries( ppa, filter )
+                    if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                        break # No point continuing...
+
+            else:
+                self.getPublishedBinaries( ppa, "" )
+
+            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                continue
+
+            if len( ppa.getPublishedBinaries() ) == 0:
+                if key in self.filters:
+                    ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+
+                else:
+                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+
+            else:
+                ppa.setStatus( PPA.STATUS_OK )
+
+
+    def downloadPPAStatisticsORIG( self ):
+        for ppa in self.ppas:
+            ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
             key = ppa.getUser() + " | " + ppa.getName()
             if key in self.filters:
                 for filter in self.filters.get( key ):
@@ -368,6 +395,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     ppa.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) )
 
                 else:
+                    self.getLogging().error( "The download count at the URL was not numeric: " + url )
                     ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
 
             except Exception as e:
@@ -901,7 +929,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         else:
             self.ppas.append( PPA( "thebernmeister", "ppa", "focal", "amd64" ) )
-            self.filters[ 'thebernmeister | ppa' ] = [ 
+            filterText = [
                 "indicator-fortune",
                 "indicator-lunar",
                 "indicator-on-this-day",
@@ -912,6 +940,21 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 "indicator-tide",
                 "indicator-virtual-box" ]
 
+            filter = Filter( "thebernmeister", "ppa", filterText )
+            self.filters = { }
+            self.filters[ filter.getKey(), filter ]
+#TODO Old
+#             self.filters[ self.createFilterKey( "thebernmeister", "ppa" ) ] = [
+#                 "indicator-fortune",
+#                 "indicator-lunar",
+#                 "indicator-on-this-day",
+#                 "indicator-ppa-download-statistics",
+#                 "indicator-punycode",
+#                 "indicator-script-runner",
+#                 "indicator-stardate",
+#                 "indicator-tide",
+#                 "indicator-virtual-box" ]
+
 
     def saveConfig( self ):
         ppas = [ ]
@@ -920,7 +963,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         return {
             IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS: self.combinePPAs,
-            IndicatorPPADownloadStatistics.CONFIG_FILTERS: self.filters,
+            IndicatorPPADownloadStatistics.CONFIG_FILTERS: self.filters, #TODO Can we just write this out as is...maybe follow the ppa method above.
             IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
             IndicatorPPADownloadStatistics.CONFIG_PPAS: ppas,
             IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU: self.showSubmenu,

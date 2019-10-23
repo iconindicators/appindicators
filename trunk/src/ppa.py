@@ -49,6 +49,7 @@ class PPA( object ):
 
 
     def setStatus( self, status ):
+#TODO Need to do the other stuff?  Maybe just set the status only?        
         if status == PPA.STATUS_OK:
             self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
 
@@ -80,6 +81,7 @@ class PPA( object ):
         self.series = None
 
 
+#TODO Who uses this?
     # Returns a key of the form 'PPA User | PPA Name | Series | Architecture' or 'PPA User | PPA Name' if series/architecture are undefined. 
     def getKey( self ):
         if self.series is None or self.architecture is None:
@@ -147,6 +149,27 @@ class PublishedBinary( object ):
 
 
     def __str__( self ): return str( self.packageName ) + " | " + str( self.packageVersion ) + " | " + str( self.downloadCount ) + " | " + str( self.architectureSpecific )
+
+
+    def __repr__( self ): return self.__str__()
+
+
+    def __eq__( self, other ): return self.__dict__ == other.__dict__
+
+
+#TODO Not sure if this will stay.
+class Filter( object ):
+
+    def __init__( self, user, name, filterText = [ ] ):
+        self.user = user
+        self.name = name
+        self.filterText = filterText
+
+
+    def getKey( self ): return self.user + " | " + self.name
+
+
+    def __str__( self ): return str( self.user ) + " | " + str( self.name )
 
 
     def __repr__( self ): return self.__str__()
