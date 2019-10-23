@@ -19,7 +19,7 @@
 # Script information.
 
 
-class Info:
+class Info( object ):
 
     # Group to which a script belongs.
     # Name of script.
