@@ -24,7 +24,7 @@ from urllib.request import urlopen
 import indicatorbase, re
 
 
-class OE:
+class OE( object ):
     def __init__( self, data ):
         self.data = data
         self.name = re.sub( "\s\s+", "", self.data[ 0 : self.data.index( "," ) ] ) # The name can have multiple whitespace, so remove.

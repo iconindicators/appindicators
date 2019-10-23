@@ -24,7 +24,7 @@ from urllib.request import urlopen
 import indicatorbase
 
 
-class TLE:
+class TLE( object ):
     def __init__( self, title, line1, line2 ):
         self.title = title
         self.line1 = line1
