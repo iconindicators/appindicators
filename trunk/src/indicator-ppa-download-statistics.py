@@ -243,6 +243,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         webbrowser.open( url ) # This returns a boolean indicating success or failure; showing the user a message on a false return value causes a lock up!
 
 
+#TODO Why do filters only use the user name and ppa (and not series, etc)?
+
     # Get a list of the published binaries for each PPA.
     # From that extract the ID for each binary which is then used to get the download count for each binary.
     # The ID is the number at the end of self_link.
@@ -544,6 +546,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             "The version number is retained only\n" + \
             "if it is identical across ALL\n" + \
             "instances of a published binary." ) )
+#TODO Don't understand the last paragraph.  Might need to reword the whole lot.
+#TODO Need to add 'version' to the     different version 'number' part above.        
         ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
         grid.attach( ignoreVersionArchitectureSpecificCheckbox, 0, 2, 1, 1 )
