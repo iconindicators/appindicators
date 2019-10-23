@@ -19,7 +19,7 @@
 # Virtual Machine information.
 
 
-class Info:
+class Info( object ):
 
     # Name of VM or Group.
     # True if a group; False is a VM.
