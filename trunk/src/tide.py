@@ -22,7 +22,7 @@ import datetime
 class Type: H, L = range( 2 )
 
 
-class Reading:
+class Reading( object ):
     # portID: ID of the port/location (string).
     # year, month, day: numerical date components for when the tide occurs (integer).
     # hour, minute: numerical time components for when the tide occurs (integer), or optionally both None.
