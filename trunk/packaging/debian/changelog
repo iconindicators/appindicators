@@ -396,7 +396,7 @@ indicator-ppa-download-statistics (1.0.26-1) precise; urgency=low
 indicator-ppa-download-statistics (1.0.25-1) precise; urgency=low
 
   * Added a new message type when PPAs are combined.  When anything other
-    than statistics appear in the resultset, write out a warning message to
+    than statistics appear in the results, write out a warning message to
     the user so the user can uncombine PPAs to see individual messages.
   * Added all series of Ubuntu (including those no longer supported).
   * Only create the log file when needed.
