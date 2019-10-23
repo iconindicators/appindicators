@@ -22,6 +22,9 @@
 import operator
 
 
+#TODO Find each 'set' function and determine why it is needed.
+#Surely we only need the constructor and getters.
+
 class PPA( object ):
 
     STATUS_ERROR_RETRIEVING_PPA = "ERROR RETRIEVING PPA"
