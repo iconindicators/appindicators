@@ -547,7 +547,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             "if it is identical across ALL\n" + \
             "instances of a published binary." ) )
 #TODO Don't understand the last paragraph.  Might need to reword the whole lot.
-#TODO Need to add 'version' to the     different version 'number' part above.        
         ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
         grid.attach( ignoreVersionArchitectureSpecificCheckbox, 0, 2, 1, 1 )
