@@ -81,7 +81,10 @@ class IndicatorBase:
         menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
         menu.show_all()
 
-        self.indicator = AppIndicator3.Indicator.new( self.indicatorName, self.indicatorName, AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = AppIndicator3.Indicator.new(
+                            self.indicatorName, 
+                            self.indicatorName, 
+                            AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
 
@@ -206,7 +209,8 @@ class IndicatorBase:
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
         toolTip = "file://" + filePath
         label = Gtk.Label()
-        label.set_markup( leftText + " <a href=\'" + "file://" + filePath + "\' title=\'" + toolTip + "\'>" + anchorText + "</a> " + rightText )
+        markup = leftText + " <a href=\'" + "file://" + filePath + "\' title=\'" + toolTip + "\'>" + anchorText + "</a> " + rightText
+        label.set_markup( markup )
         label.show()
         aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].add( label )
 
@@ -302,7 +306,13 @@ class IndicatorBase:
     #
     # Return either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
     def showOKCancel( self, parentWidget, message, title = None ):
-        dialog = Gtk.MessageDialog( self.__getParent( parentWidget ), Gtk.DialogFlags.MODAL, Gtk.MessageType.QUESTION, Gtk.ButtonsType.OK_CANCEL, message )
+        dialog = Gtk.MessageDialog( 
+                    self.__getParent( parentWidget ), 
+                    Gtk.DialogFlags.MODAL, 
+                    Gtk.MessageType.QUESTION, 
+                    Gtk.ButtonsType.OK_CANCEL, 
+                    message )
+
         if title is None:
             dialog.set_title( self.indicatorName )
         else:
@@ -325,7 +335,9 @@ class IndicatorBase:
 
 
     # Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
-    def getTextViewText( self, textView ): return textView.get_buffer().get_text( textView.get_buffer().get_start_iter(), textView.get_buffer().get_end_iter(), True )
+    def getTextViewText( self, textView ):
+        textViewBuffer = textView.get_buffer()
+        return textViewBuffer.get_text( textViewBuffer.get_start_iter(), textViewBuffer.get_end_iter(), True )
 
 
     # Listens to checkbox events and toggles the visibility of the widgets.
