@@ -287,15 +287,16 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def downloadPPAStatistics( self ):
         for ppa in self.ppas:
             ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
-            for filter in self.filters:
-            if key in self.filters:
-                for filter in self.filters.get( key ):
-                    self.getPublishedBinaries( ppa, filter )
-                    if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
-                        break # No point continuing...
-
-            else:
-                self.getPublishedBinaries( ppa, "" )
+#             for filter in self.filters:
+#             if key in self.filters:
+#                 for filter in self.filters.get( key ):
+#                     self.getPublishedBinaries( ppa, filter )
+#                     if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+#                         break # No point continuing...
+# 
+#             else:
+#                 self.getPublishedBinaries( ppa, "" )
+            self.getPublishedBinaries( ppa, "" )
 
             if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                 continue
