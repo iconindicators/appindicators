@@ -180,7 +180,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                     #TODO Add in new ppa.  If new ppa is ok or filtered or empty, status will still be okay.  Same in reverse.
 
-                elif ppa.getStatus() == combinedPPAs[ key ].getStatus(): # Both are filtered or have no published binaries.
+                elif ppa.getStatus() == combinedPPAs[ key ].getStatus(): # Both are filtered or both have no published binaries.
                     pass #TODO What to do?  Ensure there is no underlying data.  Pass is probably all that is needed here.
 
                 else:
