@@ -165,6 +165,39 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
     def combine( self ):
         combinedPPAs = { } # Key is the PPA simple key; value is the combined ppa (the series/architecture are set to None).
+        for ppa in self.ppas:
+            key = ppa.getUser() + " | " + ppa.getName()
+            if key in combinedPPAs:
+                if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA or combinedPPAs[ key ].getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                    #TODO Do we need MULTIPLE ERRORS?  Maybe just use the STATUS_ERROR_RETRIEVING_PPA?
+                    combinedPPAs[ key ].setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+#                     combinedPPAs[ key ].setStatus( PPA.STATUS_MULTIPLE_ERRORS )
+
+                    #TODO Need to erase stats as they may exist either in combined data or new data going in.
+
+                elif ppa.getStatus() == PPA.STATUS_OK or combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
+                    combinedPPAs[ key ].setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+
+                    #TODO Add in new ppa.  If new ppa is ok or filtered or empty, status will still be okay.  Same in reverse.
+
+                else:
+                    pass #TODO Handle filter and no binaries.
+
+#                 if ppa.getStatus() == combinedPPAs[ key ].getStatus():
+#                     combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() )
+# 
+#                 elif combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
+#                     combinedPPAs[ key ].setStatus( ppa.getStatus() ) # The current PPA has an error, so that becomes the new status.
+# 
+#                 else:
+#                     combinedPPAs[ key ].setStatus( PPA.STATUS_MULTIPLE_ERRORS ) # The combined PPA and the current PPA have different errors, so set a combined error.
+
+            else:
+                # No previous match for this PPA.
+#                 ppa.nullifyArchitectureSeries() #TODO Need to actually do this?  Is the arch/series used in the menu build ever?
+                combinedPPAs[ key ] = ppa
+
+
 
         # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
 # PPA.STATUS_ERROR_RETRIEVING_PPA
