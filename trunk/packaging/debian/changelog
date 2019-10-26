@@ -4,7 +4,7 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
     the bottom of the screen do not scroll properly.
     Consequently, any item/attribute/preference not directly assisting the
     home astronomer to locate an object has been removed.
-    Items such as moon phase, eclipse, solstice/equinox remain.
+    The attributes moon phase, eclipse, solstice/equinox remain.
   * Removed right ascension and declination; azimuth/altitude are sufficient.
   * Removed decimal degrees from azimuth/altitude.
   * Removed planetary moons; each effectively has the same azimuth/altitude
