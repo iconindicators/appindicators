@@ -147,12 +147,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def createMenuItemForStatusMessage( self, menu, indent, ppa ):
-        # STATUS_OK and STATUS_NEEDS_DOWNLOAD cannot appear at this stage, so no point in checking for them.
         if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
 
-        elif ppa.getStatus() == PPA.STATUS_MULTIPLE_ERRORS:
-            message = IndicatorPPADownloadStatistics.MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE
+        elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES_AND_OR_NO_COMPLETELY_FILTERED:
+            message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES_AND_OR_NO_COMPLETELY_FILTERED
 
         elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
@@ -165,60 +164,34 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def combine( self ):
+        # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
         combinedPPAs = { } # Key is the PPA simple key; value is the combined ppa (the series/architecture are set to None).
         for ppa in self.ppas:
             key = ppa.getUser() + " | " + ppa.getName()
             if key in combinedPPAs:
                 if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA or combinedPPAs[ key ].getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
-                    #TODO Do we need MULTIPLE ERRORS?  Maybe just use the STATUS_ERROR_RETRIEVING_PPA?
                     combinedPPAs[ key ].setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-#                     combinedPPAs[ key ].setStatus( PPA.STATUS_MULTIPLE_ERRORS )
-
                     #TODO Need to erase stats as they may exist either in combined data or new data going in.
 
                 elif ppa.getStatus() == PPA.STATUS_OK or combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
-                    combinedPPAs[ key ].setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-
+                    combinedPPAs[ key ].setStatus( PPA.STATUS_OK )
                     #TODO Add in new ppa.  If new ppa is ok or filtered or empty, status will still be okay.  Same in reverse.
 
                 elif ppa.getStatus() == combinedPPAs[ key ].getStatus(): # Both are filtered or both have no published binaries.
-                    pass #TODO What to do?  Ensure there is no underlying data.  Pass is probably all that is needed here.
+                    pass #TODO Ensure there is no underlying data.
 
                 else:
-                    pass #TODO One is filtered and one is no published binaries.  Now what?  Use a new status?
+                    combinedPPAs[ key ].setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES_AND_OR_NO_COMPLETELY_FILTERED )
+                    #TODO Ensure there is no underlying data.
 
             else:
                 # No previous match for this PPA.
 #                 ppa.nullifyArchitectureSeries() #TODO Need to actually do this?  Is the arch/series used in the menu build ever?
                 combinedPPAs[ key ] = ppa
 
-
-
-        # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
-# PPA.STATUS_ERROR_RETRIEVING_PPA
-# PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED
-# PPA.STATUS_NO_PUBLISHED_BINARIES
-# PPA.STATUS_OK
-        for ppa in self.ppas:
-            key = ppa.getUser() + " | " + ppa.getName()
-            if key in combinedPPAs:
-                if ppa.getStatus() == combinedPPAs[ key ].getStatus():
-                    combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() )
-
-                elif combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
-                    combinedPPAs[ key ].setStatus( ppa.getStatus() ) # The current PPA has an error, so that becomes the new status.
-
-                else:
-                    combinedPPAs[ key ].setStatus( PPA.STATUS_MULTIPLE_ERRORS ) # The combined PPA and the current PPA have different errors, so set a combined error.
-
-            else:
-                # No previous match for this PPA.
-                ppa.nullifyArchitectureSeries() #TODO Need to actually do this?  Is the arch/series used in the menu build ever?
-                combinedPPAs[ key ] = ppa
-
         # The combined ppas either have:
-        #    An error status (and no published binaries) or,
-        #    An OK status are a concatenation of all published binaries from ppas with the same PPA User/Name.
+        #    A status of error or are filtered or no published binaries or,
+        #    A status of OK with a concatenation of all published binaries from ppas with the same PPA User/Name.
         self.ppas = [ ]
         for ppa in combinedPPAs.values():
             temp = { }
