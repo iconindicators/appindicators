@@ -180,17 +180,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                     #TODO Add in new ppa.  If new ppa is ok or filtered or empty, status will still be okay.  Same in reverse.
 
-                else:
-                    pass #TODO Handle filter and no binaries.
+                elif ppa.getStatus() == combinedPPAs[ key ].getStatus(): # Both are filtered or have no published binaries.
+                    pass #TODO What to do?  Ensure there is no underlying data.  Pass is probably all that is needed here.
 
-#                 if ppa.getStatus() == combinedPPAs[ key ].getStatus():
-#                     combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() )
-# 
-#                 elif combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
-#                     combinedPPAs[ key ].setStatus( ppa.getStatus() ) # The current PPA has an error, so that becomes the new status.
-# 
-#                 else:
-#                     combinedPPAs[ key ].setStatus( PPA.STATUS_MULTIPLE_ERRORS ) # The combined PPA and the current PPA have different errors, so set a combined error.
+                else:
+                    pass #TODO One is filtered and one is no published binaries.  Now what?  Use a new status?
 
             else:
                 # No previous match for this PPA.
