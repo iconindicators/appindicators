@@ -190,8 +190,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 combinedPPAs[ key ] = ppa
 
         # The combined ppas either have:
-        #    A status of error or are filtered or no published binaries or,
-        #    A status of OK with a concatenation of all published binaries from ppas with the same PPA User/Name.
+        #    A status of error, or completely filtered, or no published binaries or,
+        #    a status of OK with a concatenation of all published binaries from ppas with the same PPA user/name.
         self.ppas = [ ]
         for ppa in combinedPPAs.values():
             temp = { }
