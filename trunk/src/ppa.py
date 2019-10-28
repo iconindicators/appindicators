@@ -48,7 +48,8 @@ class PPA( object ):
 
 
     def setStatus( self, status ):
-#TODO Need to do the other stuff?  Maybe just set the status only?        
+#TODO Need to do the other stuff?  Maybe just set the status only? 
+#What calls setStatus?       
         if status == PPA.STATUS_OK:
             self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
 
