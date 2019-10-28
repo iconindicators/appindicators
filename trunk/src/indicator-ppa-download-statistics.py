@@ -165,24 +165,24 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
     def combine( self ):
         # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
-        combinedPPAs = { } # Key is the PPA simple key; value is the combined ppa (the series/architecture are set to None).
+        combinedPPAs = { } # Key is the PPA user/name; value is the combined ppa (the series/architecture are set to None). #TODO Is this comment correct?
         for ppa in self.ppas:
             key = ppa.getUser() + " | " + ppa.getName()
             if key in combinedPPAs:
                 if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA or combinedPPAs[ key ].getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
                     combinedPPAs[ key ].setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
-                    #TODO Need to erase stats as they may exist either in combined data or new data going in.
+                    combinedPPAs[ key ].resetPublishedBinaries()
 
                 elif ppa.getStatus() == PPA.STATUS_OK or combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
                     combinedPPAs[ key ].setStatus( PPA.STATUS_OK )
-                    #TODO Add in new ppa.  If new ppa is ok or filtered or empty, status will still be okay.  Same in reverse.
+                    combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() )
 
                 elif ppa.getStatus() == combinedPPAs[ key ].getStatus(): # Both are filtered or both have no published binaries.
-                    pass #TODO Ensure there is no underlying data.
+                    combinedPPAs[ key ].resetPublishedBinaries()
 
-                else:
+                else: # Combination of completely filtered and no published binaries.
                     combinedPPAs[ key ].setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES_AND_OR_NO_COMPLETELY_FILTERED )
-                    #TODO Ensure there is no underlying data.
+                    combinedPPAs[ key ].resetPublishedBinaries()
 
             else:
                 # No previous match for this PPA.
