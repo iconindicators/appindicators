@@ -150,7 +150,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
 
-        elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES_AND_OR_NO_COMPLETELY_FILTERED:
+        elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES_AND_OR_NO_COMPLETELY_FILTERED
 
         elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
@@ -181,7 +181,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     combinedPPAs[ key ].resetPublishedBinaries()
 
                 else: # Combination of completely filtered and no published binaries.
-                    combinedPPAs[ key ].setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES_AND_OR_NO_COMPLETELY_FILTERED )
+                    combinedPPAs[ key ].setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED )
                     combinedPPAs[ key ].resetPublishedBinaries()
 
             else:
@@ -192,6 +192,35 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         # The combined ppas either have:
         #    A status of error, or completely filtered, or no published binaries or,
         #    a status of OK with a concatenation of all published binaries from ppas with the same PPA user/name.
+        self.ppas = [ ]
+        for ppa in combinedPPAs.values():
+            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA or \
+               ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES or \
+               ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED or \
+               ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+
+                self.ppas.append( ppa )
+
+#TODO...
+            else:
+                temp = { }
+                for publishedBinary in ppa.getPublishedBinaries():
+                    key = publishedBinary.getPackageName() + " | " + publishedBinary.getPackageVersion()
+                    if publishedBinary.isArchitectureSpecific():
+                        if self.ignoreVersionArchitectureSpecific:
+                            pass #TODO
+
+                        else:
+                            pass #TODO
+
+                    else:
+                        if key not in temp:
+                            temp[ key ] = publishedBinary
+
+
+
+
+
         self.ppas = [ ]
         for ppa in combinedPPAs.values():
             temp = { }
