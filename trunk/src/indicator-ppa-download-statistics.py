@@ -94,7 +94,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.combine()
 
         if self.sortByDownload:
-            self.sortByDownloadAndClip()
+            for ppa in self.ppas:
+                ppa.sortPublishedBinariesByDownloadCountAndClip( self.sortByDownloadAmount )
 
         if self.showSubmenu:
             indent = self.indent( 0, 1 )
@@ -247,11 +248,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.ppas.append( ppa  )
 
         self.ppas.sort( key = operator.methodcaller( "getKey" ) )
-
-
-    def sortByDownloadAndClip( self ):
-        for ppa in self.ppas:
-            ppa.sortPublishedBinariesByDownloadCountAndClip( self.sortByDownloadAmount )
 
 
     def onPPA( self, widget ):
