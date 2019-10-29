@@ -166,7 +166,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
     def combine( self ):
         # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
-        combinedPPAs = { } # Key is the PPA user/name; value is the combined ppa (the series/architecture are set to None). #TODO Is this comment correct?
+        combinedPPAs = { } # Key is the PPA user/name; value is the combined PPA (the series/architecture are set to None). #TODO Is this comment correct?
         for ppa in self.ppas:
             key = ppa.getUser() + " | " + ppa.getName()
             if key in combinedPPAs:
@@ -190,9 +190,9 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 #                 ppa.nullifyArchitectureSeries() #TODO Need to actually do this?  Is the arch/series used in the menu build ever?
                 combinedPPAs[ key ] = ppa
 
-        # The combined ppas either have:
+        # The combined PPAs either have:
         #    A status of error, or completely filtered, or no published binaries or,
-        #    a status of OK with a concatenation of all published binaries from ppas with the same PPA user/name.
+        #    a status of OK with a concatenation of all published binaries from PPAs with the same PPA user/name.
         self.ppas = [ ]
         for ppa in combinedPPAs.values():
             if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA or \
