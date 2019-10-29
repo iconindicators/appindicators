@@ -39,7 +39,7 @@ def compareResults( resultsPyephem, resultsSkyfield, astronomicalBodyType, nameT
             keySkyfield = ( astronomicalBodyType, nameTagSkyfield, dataTag )
             print( "\t", dataTag, resultsPyephem[ keyPyephem ], resultsSkyfield[ keySkyfield ] )
 
-logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ TruncatedFileHandler( "astroTest.log" ) ] )
+logging.basicConfig( format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", level = logging.DEBUG, handlers = [ indicatorbase.TruncatedFileHandler( "astroTest.log" ) ] )
 utcNow = datetime.datetime.utcnow()
 latitude = -33.8599722
 longitude = 151.2111111
