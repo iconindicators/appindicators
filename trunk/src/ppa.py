@@ -19,6 +19,8 @@
 # Store a PPA's details and published binaries.
 
 
+from enum import Enum
+
 import operator
 
 
@@ -27,15 +29,17 @@ import operator
 
 class PPA( object ):
 
-    STATUS_ERROR_RETRIEVING_PPA = "ERROR RETRIEVING PPA"
-    STATUS_NO_PUBLISHED_BINARIES = "NO PUBLISHED BINARIES"
-    STATUS_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED = "NO PUBLISHED BINARIES AND OR COMPLETELY FILTERED" 
-    STATUS_OK = "OK"
-    STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED = "PUBLISHED BINARIES COMPLETELY FILTERED"
+    class Status( Enum ):
+        ERROR_RETRIEVING_PPA = 0
+        NEEDS_DOWNLOAD = 1
+        NO_PUBLISHED_BINARIES = 2
+        NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED = 3
+        OK = 4
+        PUBLISHED_BINARIES_COMPLETELY_FILTERED = 5
 
 
     def __init__( self, user, name, series, architecture ):
-        self.status = PPA.STATUS_NEEDS_DOWNLOAD
+        self.status = PPA.Status.NEEDS_DOWNLOAD
         self.publishedBinaries = [ ]
 
         self.user = user
@@ -50,14 +54,14 @@ class PPA( object ):
     def setStatus( self, status ):
 #TODO Need to do the other stuff?  Maybe just set the status only? 
 #What calls setStatus?       
-        if status == PPA.STATUS_OK:
+        if status == PPA.Status.OK:
             self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
 
-        if status == PPA.STATUS_ERROR_RETRIEVING_PPA or \
-           status == PPA.STATUS_NEEDS_DOWNLOAD or \
-           status == PPA.STATUS_NO_PUBLISHED_BINARIES or \
-           status == PPA.STATUD_NO_PUBLISHED_BINARIES_AND_OR_NO_COMPLETELY_FILTERED or \
-           status == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+        if status == PPA.Status.ERROR_RETRIEVING_PPA or \
+           status == PPA.Status.NEEDS_DOWNLOAD or \
+           status == PPA.Status.NO_PUBLISHED_BINARIES or \
+           status == PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_NO_COMPLETELY_FILTERED or \
+           status == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             self.publishedBinaries = [ ]
 
         self.status = status

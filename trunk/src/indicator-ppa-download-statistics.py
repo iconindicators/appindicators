@@ -103,7 +103,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 menuItem = Gtk.MenuItem( ppa.getKey() )
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
-                if ppa.getStatus() == PPA.STATUS_OK:
+                if ppa.getStatus() == PPA.Status.OK:
                     publishedBinaries = ppa.getPublishedBinaries()
                     for publishedBinary in publishedBinaries:
                         self.createMenuItemForPublishedBinary( subMenu, indent, ppa, publishedBinary )
@@ -120,7 +120,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 menu.append( menuItem )
                 menuItem.set_name( ppa.getKey() )
                 menuItem.connect( "activate", self.onPPA )
-                if ppa.getStatus() == PPA.STATUS_OK:
+                if ppa.getStatus() == PPA.Status.OK:
                     publishedBinaries = ppa.getPublishedBinaries()
                     for publishedBinary in publishedBinaries:
                         self.createMenuItemForPublishedBinary( menu, indent, ppa, publishedBinary )
@@ -148,16 +148,16 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def createMenuItemForStatusMessage( self, menu, indent, ppa ):
-        if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+        if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
 
-        elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED:
+        elif ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED
 
-        elif ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES:
+        elif ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
 
-        elif ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+        elif ppa.getStatus() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
 
         menuItem = Gtk.MenuItem( indent + message )
@@ -170,19 +170,19 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         for ppa in self.ppas:
             key = ppa.getUser() + " | " + ppa.getName()
             if key in combinedPPAs:
-                if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA or combinedPPAs[ key ].getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
-                    combinedPPAs[ key ].setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA or combinedPPAs[ key ].getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
+                    combinedPPAs[ key ].setStatus( PPA.Status.ERROR_RETRIEVING_PPA )
                     combinedPPAs[ key ].resetPublishedBinaries()
 
-                elif ppa.getStatus() == PPA.STATUS_OK or combinedPPAs[ key ].getStatus() == PPA.STATUS_OK:
-                    combinedPPAs[ key ].setStatus( PPA.STATUS_OK )
+                elif ppa.getStatus() == PPA.Status.OK or combinedPPAs[ key ].getStatus() == PPA.Status.OK:
+                    combinedPPAs[ key ].setStatus( PPA.Status.OK )
                     combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() )
 
                 elif ppa.getStatus() == combinedPPAs[ key ].getStatus(): # Both are filtered or both have no published binaries.
                     combinedPPAs[ key ].resetPublishedBinaries()
 
                 else: # Combination of completely filtered and no published binaries.
-                    combinedPPAs[ key ].setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED )
+                    combinedPPAs[ key ].setStatus( PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED )
                     combinedPPAs[ key ].resetPublishedBinaries()
 
             else:
@@ -195,10 +195,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         #    a status of OK with a concatenation of all published binaries from PPAs with the same PPA user/name.
         self.ppas = [ ]
         for ppa in combinedPPAs.values():
-            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA or \
-               ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES or \
-               ppa.getStatus() == PPA.STATUS_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED or \
-               ppa.getStatus() == PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+            if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA or \
+               ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES or \
+               ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED or \
+               ppa.getStatus() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
 
                 self.ppas.append( ppa )
 
@@ -318,7 +318,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #     http://help.launchpad.net/API/Hacking
     def downloadPPAStatistics( self ):
         for ppa in self.ppas:
-            ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
+            ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD ) #TODO Put in a comment as to why we do this.
 #             for filter in self.filters:
 #             if key in self.filters:
 #                 for filter in self.filters.get( key ):
@@ -330,45 +330,45 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 #                 self.getPublishedBinaries( ppa, "" )
             self.getPublishedBinaries( ppa, "" )
 
-            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+            if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
                 continue
 
             if len( ppa.getPublishedBinaries() ) == 0:
                 if key in self.filters:
-                    ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+                    ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
 
                 else:
-                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+                    ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
 
             else:
-                ppa.setStatus( PPA.STATUS_OK )
+                ppa.setStatus( PPA.Status.OK )
 
 
     def downloadPPAStatisticsORIG( self ):
         for ppa in self.ppas:
-            ppa.setStatus( PPA.STATUS_NEEDS_DOWNLOAD )
+            ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD )
             key = ppa.getUser() + " | " + ppa.getName()
             if key in self.filters:
                 for filter in self.filters.get( key ):
                     self.getPublishedBinaries( ppa, filter )
-                    if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+                    if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
                         break # No point continuing...
 
             else:
                 self.getPublishedBinaries( ppa, "" )
 
-            if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
+            if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
                 continue
 
             if len( ppa.getPublishedBinaries() ) == 0:
                 if key in self.filters:
-                    ppa.setStatus( PPA.STATUS_PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+                    ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
 
                 else:
-                    ppa.setStatus( PPA.STATUS_NO_PUBLISHED_BINARIES )
+                    ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
 
             else:
-                ppa.setStatus( PPA.STATUS_OK )
+                ppa.setStatus( PPA.Status.OK )
 
 
     # Use a thread pool executer to get the download counts for each published binary.
@@ -385,14 +385,14 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
         publishedBinaryCounter = 0
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
-        while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
+        while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.Status.NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
 
             except Exception as e:
                 self.getLogging().error( "Problem with " + url + "&ws.start=" + str( publishedBinaryCounter ) )
                 self.getLogging().exception( e )
-                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                ppa.setStatus( PPA.Status.ERROR_RETRIEVING_PPA )
                 publishedBinaryCounter = totalPublishedBinaries
                 continue
 
@@ -416,7 +416,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def getDownloadCount( self, ppa, publishedBinaries, i ):
-        if ppa.getStatus() == PPA.STATUS_NEEDS_DOWNLOAD: # Use the status to cancel downloads if an error occurred.
+        if ppa.getStatus() == PPA.Status.NEEDS_DOWNLOAD: # Use the status to cancel downloads if an error occurred.
             try:
                 indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
                 packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
@@ -431,12 +431,12 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                 else:
                     self.getLogging().error( "The download count at the URL was not numeric: " + url )
-                    ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                    ppa.setStatus( PPA.Status.ERROR_RETRIEVING_PPA )
 
             except Exception as e:
                 self.getLogging().error( "Problem with " + url )
                 self.getLogging().exception( e )
-                ppa.setStatus( PPA.STATUS_ERROR_RETRIEVING_PPA )
+                ppa.setStatus( PPA.Status.ERROR_RETRIEVING_PPA )
 
 
     def onPreferences( self, dialog ):
