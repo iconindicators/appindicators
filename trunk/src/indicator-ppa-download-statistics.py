@@ -202,7 +202,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                 self.ppas.append( ppa )
 
-#TODO...
             else:
                 temp = { }
                 for publishedBinary in ppa.getPublishedBinaries():
@@ -213,39 +212,46 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                                 temp[ key ] = publishedBinary
 
                         else:
-#TODO Add up the download count from each published binary of the same key (package name and package version).
-                            pass
+                            # Add up the download count from each published binary of the same key (package name and package version).
+                            if key in temp:
+                                temp[ key ].setDownloadCount( temp[ key ] + publishedBinary.getDownloadCount() )
+
+                            else:
+                                temp[ key ] = publishedBinary
 
                     else:
                         if key not in temp: # Don't add the download count!
                             temp[ key ] = publishedBinary
 
-
-
-        self.ppas = [ ]
-        for ppa in combinedPPAs.values():
-            temp = { }
-            for publishedBinary in ppa.getPublishedBinaries():
-                key = publishedBinary.getPackageName() + " | " + publishedBinary.getPackageVersion()
-                if publishedBinary.isArchitectureSpecific() and self.ignoreVersionArchitectureSpecific:
-                    key = publishedBinary.getPackageName() # The key for architecture specific drops the version number.
-                    publishedBinary.setPackageVersion( None )
-
-                if not key in temp:
-                    temp[ key ] = publishedBinary
-                    continue
-
-                if publishedBinary.isArchitectureSpecific():
-                    temp[ key ].setDownloadCount( temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount() ) # Append the download count.
-
             ppa.resetPublishedBinaries()
             for key in temp:
                 ppa.addPublishedBinary( temp[ key ] )
 
-            if ppa.getStatus() == PPA.STATUS_OK:
-                ppa.setStatus( PPA.STATUS_OK ) # This will force the published binaries to be sorted.
 
-            self.ppas.append( ppa  )
+#         self.ppas = [ ]
+#         for ppa in combinedPPAs.values():
+#             temp = { }
+#             for publishedBinary in ppa.getPublishedBinaries():
+#                 key = publishedBinary.getPackageName() + " | " + publishedBinary.getPackageVersion()
+#                 if publishedBinary.isArchitectureSpecific() and self.ignoreVersionArchitectureSpecific:
+#                     key = publishedBinary.getPackageName() # The key for architecture specific drops the version number.
+#                     publishedBinary.setPackageVersion( None )
+# 
+#                 if not key in temp:
+#                     temp[ key ] = publishedBinary
+#                     continue
+# 
+#                 if publishedBinary.isArchitectureSpecific():
+#                     temp[ key ].setDownloadCount( temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount() ) # Append the download count.
+# 
+#             ppa.resetPublishedBinaries()
+#             for key in temp:
+#                 ppa.addPublishedBinary( temp[ key ] )
+# 
+#             if ppa.getStatus() == PPA.STATUS_OK:
+#                 ppa.setStatus( PPA.STATUS_OK ) # This will force the published binaries to be sorted.
+# 
+#             self.ppas.append( ppa  )
 
         self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
