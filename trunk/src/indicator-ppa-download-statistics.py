@@ -209,16 +209,16 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     key = publishedBinary.getPackageName() + " | " + publishedBinary.getPackageVersion()
                     if publishedBinary.isArchitectureSpecific():
                         if self.ignoreVersionArchitectureSpecific:
-                            pass #TODO
+                            if key not in temp: # Don't add the download count!
+                                temp[ key ] = publishedBinary
 
                         else:
-                            pass #TODO
+#TODO Add up the download count from each published binary of the same key (package name and package version).
+                            pass
 
                     else:
-                        if key not in temp:
+                        if key not in temp: # Don't add the download count!
                             temp[ key ] = publishedBinary
-
-
 
 
 
