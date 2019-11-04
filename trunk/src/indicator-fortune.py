@@ -33,6 +33,22 @@ from gi.repository import Gdk, Gtk, Notify
 import indicatorbase, os
 
 
+#TODO Revisit the issue of characters/glyphs not rendering in the OSD.
+# Requires finding a fortune which presents this problem!
+#
+# Original work to investigate:
+#     http://192.168.0.9/indicator-fortune/trunk/src/indicator-fortune.py?p=140
+#
+# Original post:
+#     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
+#
+# Possible helpful stuff/solutions:
+#     https://stackoverflow.com/questions/4458696/finding-out-what-characters-a-given-font-supports/19438403#19438403
+#     https://stackoverflow.com/questions/36344711/python3-check-if-unicode-character-is-not-present?noredirect=1&lq=1
+#     https://stackoverflow.com/questions/51418976/could-not-install-harf-buzz-text-shaping-engine
+#     https://stackoverflow.com/questions/56501666/harfbuzz-language-from-string-python-introspection-method-doesnt-accept-str
+
+
 class IndicatorFortune( indicatorbase.IndicatorBase ):
 
     CONFIG_FORTUNES = "fortunes"
