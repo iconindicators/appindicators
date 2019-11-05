@@ -52,19 +52,13 @@ class PPA( object ):
 
 
     def setStatus( self, status ):
-#TODO Need to do the other stuff?  Maybe just set the status only? 
-#What calls setStatus?       
+        self.status = status
+
         if status == PPA.Status.OK:
             self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
 
-        if status == PPA.Status.ERROR_RETRIEVING_PPA or \
-           status == PPA.Status.NEEDS_DOWNLOAD or \
-           status == PPA.Status.NO_PUBLISHED_BINARIES or \
-           status == PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_NO_COMPLETELY_FILTERED or \
-           status == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+        else: # Any other status implies the underlying published binaries are invalid.
             self.publishedBinaries = [ ]
-
-        self.status = status
 
 
     def getUser( self ): return self.user
@@ -76,10 +70,17 @@ class PPA( object ):
     def getSeries( self ): return self.series
 
 
+    def setSeries( self, value ): self.series = value
+
+
     def getArchitecture( self ): return self.architecture
 
 
+    def setArchitecture( self, value ): self.architecture = value
+
+
     # Used for combined PPAs.
+#TODO Maybe remove?  If we want no arch/series, then create a PPA with those params.    
     def nullifyArchitectureSeries( self ):
         self.architecture = None
         self.series = None
@@ -113,6 +114,7 @@ class PPA( object ):
             del self.publishedBinaries[ clipAmount : ]
 
 
+#TODO Who uses this and why?
     def resetPublishedBinaries( self ): self.publishedBinaries = [ ]
 
 

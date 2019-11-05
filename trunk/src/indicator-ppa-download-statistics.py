@@ -166,28 +166,24 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
     def combine( self ):
         # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
-        combinedPPAs = { } # Key is the PPA user/name; value is the combined PPA (the series/architecture are set to None). #TODO Is this comment correct?
+        combinedPPAs = { } # Key is the PPA user/name; value is a list of published binaries for all PPAs of the same user/name.
         for ppa in self.ppas:
             key = ppa.getUser() + " | " + ppa.getName()
             if key in combinedPPAs:
                 if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA or combinedPPAs[ key ].getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
                     combinedPPAs[ key ].setStatus( PPA.Status.ERROR_RETRIEVING_PPA )
-                    combinedPPAs[ key ].resetPublishedBinaries()
 
                 elif ppa.getStatus() == PPA.Status.OK or combinedPPAs[ key ].getStatus() == PPA.Status.OK:
+                    combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() ) #TODO Use the single add version in a loop.
                     combinedPPAs[ key ].setStatus( PPA.Status.OK )
-                    combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() )
 
                 elif ppa.getStatus() == combinedPPAs[ key ].getStatus(): # Both are filtered or both have no published binaries.
-                    combinedPPAs[ key ].resetPublishedBinaries()
+                    pass # Nothing to do.
 
-                else: # Combination of completely filtered and no published binaries.
+                else: # One is completely filtered and the other has no published binaries.
                     combinedPPAs[ key ].setStatus( PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED )
-                    combinedPPAs[ key ].resetPublishedBinaries()
 
-            else:
-                # No previous match for this PPA.
-#                 ppa.nullifyArchitectureSeries() #TODO Need to actually do this?  Is the arch/series used in the menu build ever?
+            else: # No previous match for this PPA.
                 combinedPPAs[ key ] = ppa
 
         # The combined PPAs either have:
@@ -200,15 +196,41 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED or \
                ppa.getStatus() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
 
-                self.ppas.append( ppa )
+                self.ppas.append( PPA( ppa.getUser(), ppa.getName(), None, None ) )
+                self.ppas[ -1 ].setStatus( ppa.getStatus() )
 
             else:
                 temp = { }
                 for publishedBinary in ppa.getPublishedBinaries():
-                    key = publishedBinary.getPackageName() + " | " + publishedBinary.getPackageVersion()
+                    key = publishedBinary.getPackageName()# + " | " + publishedBinary.getPackageVersion()
+                    if key in temp:
+                        if publishedBinary.isArchitectureSpecific():
+                            if self.ignoreVersionArchitectureSpecific:  #TODO Does this option even make sense?  Pyephem will have the same package name but different versions, so how can they be combined?
+                                if key not in temp:
+                                    temp[ key ] = publishedBinary
+    
+                            else:
+                                # Add up the download count from each published binary of the same key (package name and package version).
+                                if key in temp:
+                                    temp[ key ].setDownloadCount( temp[ key ] + publishedBinary.getDownloadCount() )
+    
+                                else:
+                                    temp[ key ] = publishedBinary
+    
+                    else:
+                        temp[ key ] = publishedBinary
+                        if publishedBinary.isArchitectureSpecific() and self.ignoreVersionArchitectureSpecific:
+                            temp[ key ].setPackageVersion( None )
+#TODO Probably need an API to set the arch-specific to None as well. Do this if the above line makes sense!
+                    
+                    
+                    
+                    
+                    
+                    
                     if publishedBinary.isArchitectureSpecific():
-                        if self.ignoreVersionArchitectureSpecific:
-                            if key not in temp: # Don't add the download count!
+                        if self.ignoreVersionArchitectureSpecific:  #TODO Does this option even make sense?  Pyephem will have the same package name but different versions, so how can they be combined?
+                            if key not in temp:
                                 temp[ key ] = publishedBinary
 
                         else:
@@ -220,12 +242,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                                 temp[ key ] = publishedBinary
 
                     else:
-                        if key not in temp: # Don't add the download count!
+                        if key not in temp:
                             temp[ key ] = publishedBinary
 
-            ppa.resetPublishedBinaries()
-            for key in temp:
-                ppa.addPublishedBinary( temp[ key ] )
+                self.ppas.append( PPA( ppa.getUser(), ppa.getName(), None, None ) )
+                self.ppas[ -1 ].setStatus( PPA.Status.OK )
+                for key in temp:
+                    self.ppas[ -1 ].addPublishedBinary( temp[ key ] )
 
 
 #         self.ppas = [ ]
@@ -318,7 +341,9 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #     http://help.launchpad.net/API/Hacking
     def downloadPPAStatistics( self ):
         for ppa in self.ppas:
-            ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD ) #TODO Put in a comment as to why we do this.
+            ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD ) # Need to erase underlying published binaries; also use this status as the initial flag for other statuses.
+
+#TODO Fix filtering.  Maybe use ppa name/user/arch/series rather than just name/user?
 #             for filter in self.filters:
 #             if key in self.filters:
 #                 for filter in self.filters.get( key ):
@@ -333,8 +358,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
                 continue
 
-            if len( ppa.getPublishedBinaries() ) == 0:
-                if key in self.filters:
+            if len( ppa.getPublishedBinaries() ) == 0: #TODO Can this be a reverse check (and checks for non zero length)?
+                if key in self.filters: #TODO Double check this when filtering is fixed.
                     ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
 
                 else:
@@ -344,6 +369,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 ppa.setStatus( PPA.Status.OK )
 
 
+#TODO Eventually remove.
     def downloadPPAStatisticsORIG( self ):
         for ppa in self.ppas:
             ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD )
