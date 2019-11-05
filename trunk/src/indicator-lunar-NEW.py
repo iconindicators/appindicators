@@ -19,6 +19,12 @@
 # Application indicator which displays lunar, solar, planetary, star, comet and satellite information.
 
 
+#TODO In indicatorbase for the function
+#     def getThemeColour( self, iconName ):
+# Verify the function still works as intended.
+# Add header comment specifying the expectation that a tag with the colour is present in the SVG file.
+
+
 #TODO Look into this
 # (indicator-lunar-NEW.py:4242): libappindicator-WARNING **: 09:14:30.474: Using '/tmp' paths in SNAP environment will lead to unreadable resources
 # Might get resolved if we use the user cache for icons and not /tmp.
