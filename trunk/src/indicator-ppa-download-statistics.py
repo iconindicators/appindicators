@@ -202,34 +202,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             else:
                 temp = { }
                 for publishedBinary in ppa.getPublishedBinaries():
-                    key = publishedBinary.getPackageName()# + " | " + publishedBinary.getPackageVersion()
-                    if key in temp:
-                        if publishedBinary.isArchitectureSpecific():
-                            if self.ignoreVersionArchitectureSpecific:  #TODO Does this option even make sense?  Pyephem will have the same package name but different versions, so how can they be combined?
-                                if key not in temp:
-                                    temp[ key ] = publishedBinary
-    
-                            else:
-                                # Add up the download count from each published binary of the same key (package name and package version).
-                                if key in temp:
-                                    temp[ key ].setDownloadCount( temp[ key ] + publishedBinary.getDownloadCount() )
-    
-                                else:
-                                    temp[ key ] = publishedBinary
-    
-                    else:
-                        temp[ key ] = publishedBinary
-                        if publishedBinary.isArchitectureSpecific() and self.ignoreVersionArchitectureSpecific:
-                            temp[ key ].setPackageVersion( None )
-#TODO Probably need an API to set the arch-specific to None as well. Do this if the above line makes sense!
-                    
-                    
-                    
-                    
-                    
-                    
+                    key = publishedBinary.getPackageName() + " | " + publishedBinary.getPackageVersion()
                     if publishedBinary.isArchitectureSpecific():
                         if self.ignoreVersionArchitectureSpecific:  #TODO Does this option even make sense?  Pyephem will have the same package name but different versions, so how can they be combined?
+#TODO Cannot use the key with package name and package version...need to drop version from the key somehow.
                             if key not in temp:
                                 temp[ key ] = publishedBinary
 
