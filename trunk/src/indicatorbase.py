@@ -429,8 +429,6 @@ class IndicatorBase:
     def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
-#TODO Verify this works for indicator lunar still.  
-#TODO Need a header comment specifying the expectation that a tag with the colour is present in the SVG file.
     def getThemeColour( self, iconName ):
         iconFilenameForCurrentTheme = "/usr/share/icons/" + self.getThemeName() + "/scalable/apps/" + iconName + ".svg"
         try:
