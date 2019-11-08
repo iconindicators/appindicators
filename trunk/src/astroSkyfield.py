@@ -26,6 +26,9 @@
 #     sudo pip3 install --upgrade pytz
 #     sudo pip3 install --upgrade pandas
 
+#TODO Maybe include twilight?
+# https://github.com/skyfielders/python-skyfield/issues/225
+
 
 from datetime import timedelta
 

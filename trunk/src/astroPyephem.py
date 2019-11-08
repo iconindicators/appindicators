@@ -30,6 +30,10 @@ class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, S
 #TODO Need to test with a lat/long such that bodies rise/set, always up and never up.
 
 
+#TODO Maybe include twilight if astroSkyfield can do it?
+# https://github.com/skyfielders/python-skyfield/issues/225
+
+
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
 DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
