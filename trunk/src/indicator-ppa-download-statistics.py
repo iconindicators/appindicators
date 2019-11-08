@@ -21,6 +21,48 @@
 
 #TODO For GNOME Shell, how to handle when scrolling off the edge?
 
+#TODO Test with no .json file.
+
+#TODO Test using focal as a series...maybe remove it until released?
+
+#TODO Test with a ppa (testing/ trusty) that is known to have no published binaries.
+
+
+
+
+
+
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/bionic/amd64&status=Published&exact_match=false&ordered=false&binary_name=
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689752?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689261?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689255?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689243?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689237?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689231?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130688721?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/129985504?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/118581709?ws.op=getDownloadCount
+# 
+# 
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/bionic/amd64&status=Published&exact_match=false&ordered=false&binary_name=
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/133389298?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132512672?ws.op=getDownloadCount
+# 
+# 
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/bionic/i386&status=Published&exact_match=false&ordered=false&binary_name=
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/133389301?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132512671?ws.op=getDownloadCount
+# 
+# 
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/xenial/amd64&status=Published&exact_match=false&ordered=false&binary_name=
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132674510?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132512674?ws.op=getDownloadCount
+# 
+# 
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/xenial/i386&status=Published&exact_match=false&ordered=false&binary_name=
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132674513?ws.op=getDownloadCount
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132512673?ws.op=getDownloadCount
+
 
 INDICATOR_NAME = "indicator-ppa-download-statistics"
 import gettext
@@ -29,6 +71,7 @@ gettext.install( INDICATOR_NAME )
 import gi
 gi.require_version( "Gtk", "3.0" )
 
+from copy import deepcopy
 from gi.repository import Gtk
 from ppa import PPA, PublishedBinary
 from urllib.request import urlopen
@@ -93,16 +136,18 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def buildMenu( self, menu ):
+        ppas = deepcopy( self.ppas ) # Take a copy as the combine mechanism can alter the PPA series/architecture.
+
         if self.combinePPAs:
-            self.combine()
+            self.combine( ppas )
 
         if self.sortByDownload:
-            for ppa in self.ppas:
+            for ppa in ppas:
                 ppa.sortPublishedBinariesByDownloadCountAndClip( self.sortByDownloadAmount )
 
         if self.showSubmenu:
             indent = self.indent( 0, 1 )
-            for ppa in self.ppas:
+            for ppa in ppas:
                 menuItem = Gtk.MenuItem( ppa.getKey() )
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
@@ -118,7 +163,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         else:
             indent = self.indent( 1, 1 )
-            for ppa in self.ppas:
+            for ppa in ppas:
                 menuItem = Gtk.MenuItem( ppa.getKey() )
                 menu.append( menuItem )
                 menuItem.set_name( ppa.getKey() )
@@ -132,7 +177,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     self.createMenuItemForStatusMessage( menu, indent, ppa )
 
         # When only one PPA is present, enable middle mouse click on the icon to open the PPA in the browser.
-        if len( self.ppas ) == 1:
+        if len( ppas ) == 1:
             self.secondaryActivateTarget = menuItem
 
 
@@ -167,17 +212,17 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         menu.append( menuItem )
 
 
-    def combine( self ):
+    def combine( self, ppas ):
         # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
-        combinedPPAs = { } # Key is the PPA user/name; value is a list of published binaries for all PPAs of the same user/name.
-        for ppa in self.ppas:
+        combinedPPAs = { }
+        for ppa in ppas:
             key = ppa.getUser() + " | " + ppa.getName()
             if key in combinedPPAs:
                 if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA or combinedPPAs[ key ].getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
                     combinedPPAs[ key ].setStatus( PPA.Status.ERROR_RETRIEVING_PPA )
 
                 elif ppa.getStatus() == PPA.Status.OK or combinedPPAs[ key ].getStatus() == PPA.Status.OK:
-                    combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() ) #TODO Use the single add version in a loop.
+                    combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() ) #TODO maybe use the single add version in a loop?  Or remove the single add version altogether?
                     combinedPPAs[ key ].setStatus( PPA.Status.OK )
 
                 elif ppa.getStatus() == combinedPPAs[ key ].getStatus(): # Both are filtered or both have no published binaries.
@@ -192,42 +237,39 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         # The combined PPAs either have:
         #    A status of error, or completely filtered, or no published binaries or,
         #    a status of OK with a concatenation of all published binaries from PPAs with the same PPA user/name.
-        self.ppas = [ ]
+        ppas = [ ]
         for ppa in combinedPPAs.values():
             if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA or \
                ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES or \
                ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED or \
                ppa.getStatus() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
 
-                self.ppas.append( PPA( ppa.getUser(), ppa.getName(), None, None ) )
-                self.ppas[ -1 ].setStatus( ppa.getStatus() )
+                ppas.append( PPA( ppa.getUser(), ppa.getName(), None, None ) )
+                ppas[ -1 ].setStatus( ppa.getStatus() )
 
             else:
                 temp = { }
                 for publishedBinary in ppa.getPublishedBinaries():
                     key = publishedBinary.getPackageName() + " | " + publishedBinary.getPackageVersion()
                     if publishedBinary.isArchitectureSpecific():
-                        if self.ignoreVersionArchitectureSpecific:  #TODO Does this option even make sense?  Pyephem will have the same package name but different versions, so how can they be combined?
-#TODO Cannot use the key with package name and package version...need to drop version from the key somehow.
-                            if key not in temp:
-                                temp[ key ] = publishedBinary
+                        if self.ignoreVersionArchitectureSpecific:
+                            key = publishedBinary.getPackageName() # Key only contains name.
+
+                        # Add up the download count from each published binary of the same key (package name OR package name and package version).
+                        if key in temp:
+                            temp[ key ].setDownloadCount( temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount() )
 
                         else:
-                            # Add up the download count from each published binary of the same key (package name and package version).
-                            if key in temp:
-                                temp[ key ].setDownloadCount( temp[ key ] + publishedBinary.getDownloadCount() )
-
-                            else:
-                                temp[ key ] = publishedBinary
+                            temp[ key ] = publishedBinary
 
                     else:
                         if key not in temp:
                             temp[ key ] = publishedBinary
 
-                self.ppas.append( PPA( ppa.getUser(), ppa.getName(), None, None ) )
-                self.ppas[ -1 ].setStatus( PPA.Status.OK )
+                ppas.append( PPA( ppa.getUser(), ppa.getName(), None, None ) )
+                ppas[ -1 ].setStatus( PPA.Status.OK )
                 for key in temp:
-                    self.ppas[ -1 ].addPublishedBinary( temp[ key ] )
+                    ppas[ -1 ].addPublishedBinary( temp[ key ] )
 
 
 #         self.ppas = [ ]
@@ -255,7 +297,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 # 
 #             self.ppas.append( ppa  )
 
-        self.ppas.sort( key = operator.methodcaller( "getKey" ) )
+        ppas.sort( key = operator.methodcaller( "getKey" ) )
 
 
     def onPPA( self, widget ):
@@ -320,6 +362,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #     http://help.launchpad.net/API/Hacking
     def downloadPPAStatistics( self ):
         for ppa in self.ppas:
+            print() #TODO Testing
+            print() #TODO Testing
             ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD ) # Need to erase underlying published binaries; also use this status as the initial flag for other statuses.
 
 #TODO Fix filtering.  Maybe use ppa name/user/arch/series rather than just name/user?
@@ -338,11 +382,12 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 continue
 
             if len( ppa.getPublishedBinaries() ) == 0: #TODO Can this be a reverse check (and checks for non zero length)?
-                if key in self.filters: #TODO Double check this when filtering is fixed.
-                    ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
-
-                else:
-                    ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
+#                 if key in self.filters: #TODO Double check this when filtering is fixed.
+#                     ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+# 
+#                 else:
+#                     ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
+                ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
 
             else:
                 ppa.setStatus( PPA.Status.OK )
@@ -386,6 +431,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
               "&exact_match=false&ordered=false&binary_name=" + filter # A filter of "" equates to no filter.
 
+        print( url ) #TODO Testing
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
         publishedBinaryCounter = 0
@@ -426,6 +472,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
                 packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
                 url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
+                print( url ) #TODO Testing
 
                 downloadCount = json.loads( urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
                 if str( downloadCount ).isnumeric():
@@ -969,7 +1016,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
         else:
-            self.ppas.append( PPA( "thebernmeister", "ppa", "focal", "amd64" ) )
+            self.ppas.append( PPA( "thebernmeister", "ppa", "bionic", "amd64" ) )
             filterText = [
                 "indicator-fortune",
                 "indicator-lunar",
@@ -981,9 +1028,9 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 "indicator-tide",
                 "indicator-virtual-box" ]
 
-            filter = Filter( "thebernmeister", "ppa", filterText )
+#             filter = Filter( "thebernmeister", "ppa", filterText )
             self.filters = { }
-            self.filters[ filter.getKey(), filter ]
+#             self.filters[ filter.getKey(), filter ]
 #TODO Old
 #             self.filters[ self.createFilterKey( "thebernmeister", "ppa" ) ] = [
 #                 "indicator-fortune",
