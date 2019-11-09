@@ -274,7 +274,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     ppas[ -1 ].addPublishedBinary( temp[ key ] )
 
 #TODO Needed?
-        ppas.sort( key = operator.methodcaller( "getKey" ) )
+#         ppas.sort( key = operator.methodcaller( "getKey" ) )
         return ppas
 
 
@@ -662,6 +662,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
                 treeiter = ppaStore.iter_next( treeiter )
 
+#TODO Needed
             self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
             self.filters = { }
@@ -987,7 +988,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             for ppa in ppas:
                 self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
 
-            self.ppas.sort( key = operator.methodcaller( "getKey" ) )
+#TODO Needed
+            self.ppas.sort( key = operator.methodcaller( "getKey" ) ) 
 
         else:
             self.ppas.append( PPA( "thebernmeister", "ppa", "bionic", "amd64" ) )
