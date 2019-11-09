@@ -55,7 +55,7 @@ class PPA( object ):
         self.status = status
 
         if status == PPA.Status.OK:
-            self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
+            self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )  #TODO Maybe instead call the sort after the add?  Or do on demand during the get?
 
         else: # Any other status implies the underlying published binaries are invalid.
             self.publishedBinaries = [ ]
