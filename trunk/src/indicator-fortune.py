@@ -49,6 +49,9 @@ import indicatorbase, os
 #     https://stackoverflow.com/questions/56501666/harfbuzz-language-from-string-python-introspection-method-doesnt-accept-str
 
 
+#TODO See if we can put in a call to pip3 to install FontTools or something.  Maybe pyephem?
+
+
 class IndicatorFortune( indicatorbase.IndicatorBase ):
 
     CONFIG_FORTUNES = "fortunes"
