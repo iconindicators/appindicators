@@ -79,6 +79,22 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         self.removeFileFromCache( IndicatorFortune.HISTORY_FILE )
 
+        #TODO Testing fonts et al...
+        def fontTesting():        
+            # https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
+            # https://askubuntu.com/questions/530486/how-to-locate-font-files-given-the-font-family-name
+            # https://askubuntu.com/questions/552979/how-can-i-determine-which-fonts-are-installed-from-the-command-line-and-what-is
+            # https://unix.stackexchange.com/questions/42228/how-to-find-out-how-fc-match-matches
+            # https://stackoverflow.com/questions/4458696/finding-out-what-characters-a-given-font-supports
+            # https://eev.ee/blog/2015/05/20/i-stared-into-the-fontconfig-and-the-fontconfig-stared-back-at-me/
+            # https://repolinux.wordpress.com/2013/03/10/find-out-fallback-font-used-by-fontconfig-for-a-certain-character/
+            
+            from gi.repository import Gio
+            fontName = Gio.Settings( "org.gnome.desktop.interface" ).get_string( "font-name" )
+            print( "Font name:", fontName )
+
+        fontTesting()
+
 
     def update( self, menu ):
         self.buildMenu( menu )
