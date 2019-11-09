@@ -139,7 +139,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         ppas = deepcopy( self.ppas ) # Take a copy as the combine mechanism can alter the PPA series/architecture.
 
         if self.combinePPAs:
-            self.combine( ppas )
+            ppas = self.combine( ppas )
 
         if self.sortByDownload:
             for ppa in ppas:
@@ -261,6 +261,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                         else:
                             temp[ key ] = publishedBinary
+                            if self.ignoreVersionArchitectureSpecific:
+                                temp[ key ].setPackageVersion( None )
 
                     else:
                         if key not in temp:
@@ -271,33 +273,9 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 for key in temp:
                     ppas[ -1 ].addPublishedBinary( temp[ key ] )
 
-
-#         self.ppas = [ ]
-#         for ppa in combinedPPAs.values():
-#             temp = { }
-#             for publishedBinary in ppa.getPublishedBinaries():
-#                 key = publishedBinary.getPackageName() + " | " + publishedBinary.getPackageVersion()
-#                 if publishedBinary.isArchitectureSpecific() and self.ignoreVersionArchitectureSpecific:
-#                     key = publishedBinary.getPackageName() # The key for architecture specific drops the version number.
-#                     publishedBinary.setPackageVersion( None )
-# 
-#                 if not key in temp:
-#                     temp[ key ] = publishedBinary
-#                     continue
-# 
-#                 if publishedBinary.isArchitectureSpecific():
-#                     temp[ key ].setDownloadCount( temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount() ) # Append the download count.
-# 
-#             ppa.resetPublishedBinaries()
-#             for key in temp:
-#                 ppa.addPublishedBinary( temp[ key ] )
-# 
-#             if ppa.getStatus() == PPA.STATUS_OK:
-#                 ppa.setStatus( PPA.STATUS_OK ) # This will force the published binaries to be sorted.
-# 
-#             self.ppas.append( ppa  )
-
+#TODO Needed?
         ppas.sort( key = operator.methodcaller( "getKey" ) )
+        return ppas
 
 
     def onPPA( self, widget ):
@@ -362,8 +340,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #     http://help.launchpad.net/API/Hacking
     def downloadPPAStatistics( self ):
         for ppa in self.ppas:
-            print() #TODO Testing
-            print() #TODO Testing
             ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD ) # Need to erase underlying published binaries; also use this status as the initial flag for other statuses.
 
 #TODO Fix filtering.  Maybe use ppa name/user/arch/series rather than just name/user?
@@ -431,7 +407,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
               "&exact_match=false&ordered=false&binary_name=" + filter # A filter of "" equates to no filter.
 
-        print( url ) #TODO Testing
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
         publishedBinaryCounter = 0
@@ -472,7 +447,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
                 packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
                 url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
-                print( url ) #TODO Testing
 
                 downloadCount = json.loads( urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
                 if str( downloadCount ).isnumeric():
