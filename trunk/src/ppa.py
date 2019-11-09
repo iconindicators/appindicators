@@ -70,20 +70,7 @@ class PPA( object ):
     def getSeries( self ): return self.series
 
 
-    def setSeries( self, value ): self.series = value
-
-
     def getArchitecture( self ): return self.architecture
-
-
-    def setArchitecture( self, value ): self.architecture = value
-
-
-    # Used for combined PPAs.
-#TODO Maybe remove?  If we want no arch/series, then create a PPA with those params.    
-    def nullifyArchitectureSeries( self ):
-        self.architecture = None
-        self.series = None
 
 
 #TODO Who uses this?
@@ -112,10 +99,6 @@ class PPA( object ):
         self.publishedBinaries.sort( key = operator.methodcaller( "getDownloadCount" ), reverse = True )
         if clipAmount > 0:
             del self.publishedBinaries[ clipAmount : ]
-
-
-#TODO Who uses this and why?
-    def resetPublishedBinaries( self ): self.publishedBinaries = [ ]
 
 
     def __str__( self ): return str( self.__dict__ )
