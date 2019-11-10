@@ -100,7 +100,7 @@ class IndicatorBase:
         # If the About/Preferences menu items are disabled as the update kicks off,
         # the user interface will not reflect the change until the update completes.
         # Therefore, disable the About/Preferences menu items and run the remaining update in a new and delayed thread.
-        self.__setAboutPreferencesSensitivity( False )
+        self.__setAboutPreferencesQuitSensitivity( False )
         GLib.timeout_add_seconds( 1, self.__updateInternal )
 
 
@@ -158,7 +158,7 @@ class IndicatorBase:
 
 
     def __onAbout( self, widget ):
-        self.__setAboutPreferencesSensitivity( False )
+        self.__setAboutPreferencesQuitSensitivity( False )
         GLib.idle_add( self.__onAboutInternal, widget )
 
 
@@ -203,7 +203,7 @@ class IndicatorBase:
         aboutDialog.run()
         aboutDialog.destroy()
         os.remove( changeLog )
-        self.__setAboutPreferencesSensitivity( True )
+        self.__setAboutPreferencesQuitSensitivity( True )
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
@@ -220,7 +220,7 @@ class IndicatorBase:
             GLib.source_remove( self.updateTimerID )
             self.updateTimerID = None
 
-        self.__setAboutPreferencesSensitivity( False )
+        self.__setAboutPreferencesQuitSensitivity( False )
         GLib.idle_add( self.__onPreferencesInternal, widget )
 
 
@@ -228,7 +228,7 @@ class IndicatorBase:
         dialog = self.createDialog( widget, _( "Preferences" ) )
         responseType = self.onPreferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
-        self.__setAboutPreferencesSensitivity( True )
+        self.__setAboutPreferencesQuitSensitivity( True )
 
         if responseType == Gtk.ResponseType.OK:
             self.__saveConfig()
@@ -247,9 +247,10 @@ class IndicatorBase:
 #TODO In Punycode, when items are disabled,
 # convert is enabled...should I really disable all menu items?
 # Best check every indicator!
-    def __setAboutPreferencesSensitivity( self, toggle ):
+    def __setAboutPreferencesQuitSensitivity( self, toggle ):
         menuItems = self.indicator.get_menu().get_children()
         if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
+            menuItems[ -1 ].set_sensitive( toggle ) # Quit
             menuItems[ -2 ].set_sensitive( toggle ) # About
             menuItems[ -3 ].set_sensitive( toggle ) # Preferences
 
@@ -258,7 +259,7 @@ class IndicatorBase:
         sensitive = False
         menuItems = self.indicator.get_menu().get_children()
         if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
-            sensitive = menuItems[ -2 ].get_sensitive() # About (no need to check for Preferencs as both should be the same).
+            sensitive = menuItems[ -1 ].get_sensitive() # Quit menu item; no need to check for About/Preferences.
 
         return sensitive
 
