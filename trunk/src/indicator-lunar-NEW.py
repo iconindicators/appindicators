@@ -1279,17 +1279,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         cometsAddNewCheckbox = Gtk.CheckButton( _( "Add new comets" ) )
         cometsAddNewCheckbox.set_margin_top( 10 )
         cometsAddNewCheckbox.set_active( self.cometsAddNew )
-        cometsAddNewCheckbox.set_tooltip_text( _(
-            "If checked, all comets are added\n" + \
-            "to the list of checked comets." ) )
+        cometsAddNewCheckbox.set_tooltip_text( _( "If checked, all comets are added." ) )
         grid.attach( cometsAddNewCheckbox, 0, 1, 1, 1 )
 
         minorPlanetsAddNewCheckbox = Gtk.CheckButton( _( "Add new minor planets" ) )
         minorPlanetsAddNewCheckbox.set_margin_top( 10 )
         minorPlanetsAddNewCheckbox.set_active( self.minorPlanetsAddNew )
-        minorPlanetsAddNewCheckbox.set_tooltip_text( _(
-            "If checked, all minor planets are added\n" + \
-            "to the list of checked minor planets." ) )
+        minorPlanetsAddNewCheckbox.set_tooltip_text( _( "If checked, all minor planets are added." ) )
         grid.attach( minorPlanetsAddNewCheckbox, 0, 2, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -1312,9 +1308,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         satellitesAddNewCheckbox = Gtk.CheckButton( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
-        satellitesAddNewCheckbox.set_tooltip_text( _(
-            "If checked all satellites are added\n" + \
-            "to the list of checked satellites." ) )
+        satellitesAddNewCheckbox.set_tooltip_text( _( "If checked all satellites are added." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 4, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
