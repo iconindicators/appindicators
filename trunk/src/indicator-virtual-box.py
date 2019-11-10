@@ -62,6 +62,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         self.requestMouseWheelScrollEvents()
 
+#TODO Sort this out!!!
 #         if self.isVBoxManageInstalled():
 #             GLib.timeout_add_seconds( 10, self.autoStartVirtualMachines )
 
