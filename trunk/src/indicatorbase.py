@@ -100,18 +100,18 @@ class IndicatorBase:
         # If the About/Preferences menu items are disabled as the update kicks off,
         # the user interface will not reflect the change until the update completes.
         # Therefore, disable the About/Preferences menu items and run the remaining update in a new and delayed thread.
-        self.__setAboutPreferencesQuitSensitivity( False )
+        self.__setCommonMenuSensitivity( False )
         GLib.timeout_add_seconds( 1, self.__updateInternal )
 
 
     def __updateInternal( self ):
-        utcNow = datetime.datetime.utcnow() #TODO Remove
         menu = Gtk.Menu()
         self.secondaryActivateTarget = None
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
+        # Add in common menu items.
         menuItem = Gtk.MenuItem.new_with_label( _( "Preferences" ) )
         menuItem.connect( "activate", self.__onPreferences )
         menu.append( menuItem )
@@ -137,11 +137,6 @@ class IndicatorBase:
         else:
             self.nextUpdateTime = None
 
-#TODO Testing
-        print( "Update duration:", ( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) )
-        print( "Next update in seconds:", nextUpdateInSeconds )                
-        print( "Next update time:", self.nextUpdateTime )
-
 
     def requestUpdate( self, delay = 0 ): GLib.timeout_add_seconds( delay, self.__update )
 
@@ -153,12 +148,12 @@ class IndicatorBase:
         # Need to ignore events when Preferences is open or an update is underway.
         # Do so by checking the sensitivity of the Preferences menu item.
         # A side effect is the event will be ignored when About is showing...oh well.
-        if self.__getAboutPreferencesSensitivity():
+        if self.__getCommonMenuSensitivity():
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
     def __onAbout( self, widget ):
-        self.__setAboutPreferencesQuitSensitivity( False )
+        self.__setCommonMenuSensitivity( False )
         GLib.idle_add( self.__onAboutInternal, widget )
 
 
@@ -203,7 +198,7 @@ class IndicatorBase:
         aboutDialog.run()
         aboutDialog.destroy()
         os.remove( changeLog )
-        self.__setAboutPreferencesQuitSensitivity( True )
+        self.__setCommonMenuSensitivity( True )
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
@@ -220,7 +215,7 @@ class IndicatorBase:
             GLib.source_remove( self.updateTimerID )
             self.updateTimerID = None
 
-        self.__setAboutPreferencesQuitSensitivity( False )
+        self.__setCommonMenuSensitivity( False )
         GLib.idle_add( self.__onPreferencesInternal, widget )
 
 
@@ -228,7 +223,7 @@ class IndicatorBase:
         dialog = self.createDialog( widget, _( "Preferences" ) )
         responseType = self.onPreferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
-        self.__setAboutPreferencesQuitSensitivity( True )
+        self.__setCommonMenuSensitivity( True )
 
         if responseType == Gtk.ResponseType.OK:
             self.__saveConfig()
@@ -247,7 +242,7 @@ class IndicatorBase:
 #TODO In Punycode, when items are disabled,
 # convert is enabled...should I really disable all menu items?
 # Best check every indicator!
-    def __setAboutPreferencesQuitSensitivity( self, toggle ):
+    def __setCommonMenuSensitivity( self, toggle ):
         menuItems = self.indicator.get_menu().get_children()
         if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
             menuItems[ -1 ].set_sensitive( toggle ) # Quit
@@ -255,7 +250,7 @@ class IndicatorBase:
             menuItems[ -3 ].set_sensitive( toggle ) # Preferences
 
 
-    def __getAboutPreferencesSensitivity( self ):
+    def __getCommonMenuSensitivity( self ):
         sensitive = False
         menuItems = self.indicator.get_menu().get_children()
         if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
