@@ -988,7 +988,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             for ppa in ppas:
                 self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
 
-#TODO Needed
+#TODO Needed?  
             self.ppas.sort( key = operator.methodcaller( "getKey" ) ) 
 
         else:
