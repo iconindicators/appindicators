@@ -5,7 +5,7 @@ indicator-stardate (1.0.38-1) xenial; urgency=low
   * Whilst starting up, a single menu item "Initialising..." is displayed.
     Once fully initialised, the menu proper is shown.
   * When an update is underway or the About/Preferences dialogs are displayed,
-    the About/Preference menu items are disabled.
+    the About/Preferences/Quit menu items are disabled.
   * The stardate library now computes when the next update will occur.
   * About dialog now shows copyright, artists and corrected URL for website.
   * Update debian/compat to 9.
