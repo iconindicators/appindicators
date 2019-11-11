@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from _ast import With
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -24,6 +25,15 @@
 
 #TODO How to reset any format preference to default? 
 
+#TODO
+# Comparing
+# http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=6037&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7
+# with
+# https://tides.willyweather.com.au/nsw/sydney/fort-denison.html
+# the daylight savings is not shown on the UKHO site, but is taken into account in the display in the menu.
+# How is the menu made to be correct?
+# Can we adjust the link to the UKHO (for the on click) to adjust for daylight savings?
+ 
 
 INDICATOR_NAME = "indicator-tide"
 import gettext
