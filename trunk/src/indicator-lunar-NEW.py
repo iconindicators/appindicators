@@ -1941,6 +1941,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if summary == "":
             summary = " " # The notification summary text must not be empty (at least on Unity).
 
+#TODO Hit test for werewolf warning and all good.
+#Did it a second time and got an error that svgFile was invalid.
         Notify.Notification.new( summary, message, svgFile ).show()
 
 
