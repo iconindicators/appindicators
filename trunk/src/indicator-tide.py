@@ -425,16 +425,16 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
 #TODO Check logic of this and maybe find more ports for testing...could be other dodgy ports out there.
                 if "Port predictions" in line: # Tidal dateTimes are in the standard local time of the port - need to obtain the UTC offset for the port in the format +HHMM or -HHMM.
-                    if "equal to UTC" in line: # "Port predictions (Standard Local Time) are equal to UTC"
+                    if "equal to UTC" in line: # Example: "Port predictions (Standard Local Time) are equal to UTC"
                         utcOffset = "+0000"
 
                     elif "hour from UTC" in line or "hours from UTC" in line:
                         utcOffset = line[ line.index( "are" ) + 4 : line.index( "hour" ) - 1 ]
-                        if len( utcOffset ) == 3: # "Port predictions (Standard Local Time) are +10 hours from UTC"
+                        if len( utcOffset ) == 3: # Example: "Port predictions (Standard Local Time) are +10 hours from UTC"
                             utcOffset += "00"
 
                         else:
-                            utcOffset = utcOffset[ 0 ] + "0" + utcOffset[ 1 ] + "00" # "Port predictions (Standard Local Time) are -3 hours from UTC"
+                            utcOffset = utcOffset[ 0 ] + "0" + utcOffset[ 1 ] + "00" # Example: "Port predictions (Standard Local Time) are -3 hours from UTC"
 
                     elif "mins from UTC" in line:
                         hours = line[ line.index( "are" ) + 4 : line.index( "hours" ) - 1 ] 
