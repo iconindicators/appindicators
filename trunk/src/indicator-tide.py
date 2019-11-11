@@ -423,6 +423,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             lines = urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
             for index, line in enumerate( lines ): # The tidal data is presented in date/time order.
 
+#TODO Check logic of this and maybe find more ports for testing...could be other dodgy ports out there.
                 if "Port predictions" in line: # Tidal dateTimes are in the standard local time of the port - need to obtain the UTC offset for the port in the format +HHMM or -HHMM.
                     if "equal to UTC" in line: # "Port predictions (Standard Local Time) are equal to UTC"
                         utcOffset = "+0000"
