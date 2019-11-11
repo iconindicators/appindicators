@@ -1943,6 +1943,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO Hit test for werewolf warning and all good.
 #Did it a second time and got an error that svgFile was invalid.
+# local variable 'svgFile' referenced before assignment
         Notify.Notification.new( summary, message, svgFile ).show()
 
 
