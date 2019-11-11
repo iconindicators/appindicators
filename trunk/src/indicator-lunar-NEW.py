@@ -2004,7 +2004,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.minorPlanets = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS, [ ] )
         self.minorPlanetsAddNew = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW, False )
 
-        self.magnitude = config.get( IndicatorLunar.CONFIG_MAGNITUDE, 6 ) # More or less what's visible with the naked eye or binoculars.
+        self.magnitude = config.get( IndicatorLunar.CONFIG_MAGNITUDE, 4 ) # Although a value of 6 is visible with the naked eye, that gives too many minor planets initially.
 
         self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, astroPyephem.PLANETS[ : 6 ] ) # Drop Neptune and Pluto as not visible with naked eye.
 
