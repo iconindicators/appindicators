@@ -19,6 +19,10 @@
 # Application indicator which displays lunar, solar, planetary, star, comet and satellite information.
 
 
+#In the notifications, there is a tooltip for each the summary and message about formatting.
+# Why is this mentioned?  Did the tags (say moon phase) originally get parsed in the notifications?
+
+
 #TODO In indicatorbase for the function
 #     def getThemeColour( self, iconName ):
 # Verify the function still works as intended.
