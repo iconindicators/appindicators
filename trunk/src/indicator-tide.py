@@ -22,6 +22,9 @@
 # What happens to the time format ([TYPE]    %I:%M %p    [LEVEL])?
 
 
+#TODO How to reset any format preference to default? 
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
