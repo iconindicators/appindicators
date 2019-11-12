@@ -146,17 +146,18 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def autoStartVirtualMachines( self ):
         for virtualMachine in self.getVirtualMachines():
             if self.isAutostart( virtualMachine.getUUID() ):
-                self.startVirtualMachine( None, virtualMachine.getUUID() )
+                self.startVirtualMachine( None, virtualMachine.getUUID(), False )
                 print( "starting VM", virtualMachine.getUUID() )#TODO Testing
                 time.sleep( self.delayBetweenAutoStartInSeconds )
                 print( "awake")#TODO Testing
 
 
-    def startVirtualMachine( self, widget, uuid ):
+    def startVirtualMachine( self, widget, uuid, requiresUpdate = True ):
         runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
         if uuid in runningVMUUIDs:
             self.bringWindowToFront( runningVMNames[ runningVMUUIDs.index( uuid ) ] )
-            self.requestUpdate()
+            if requiresUpdate:
+                self.requestUpdate()
 
         else:
             result = self.processGet( "VBoxManage list vms | grep " + uuid )
@@ -166,7 +167,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
             else:
                 self.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
-                self.requestUpdate( 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
+                if requiresUpdate:
+                    self.requestUpdate( 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
 
 
     def bringWindowToFront( self, virtualMachineName ):
@@ -630,7 +632,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def loadConfig( self, config ):
-        self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START, 10 )
+        self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START, 5 )
         self.refreshIntervalInMinutes = config.get( IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES, 15 )
         self.showSubmenu = config.get( IndicatorVirtualBox.CONFIG_SHOW_SUBMENU, False )
         self.virtualMachinePreferences = config.get( IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES, { } ) # Store information about VMs (not groups). Key is VM UUID; value is [ autostart (bool), start command (str) ]
