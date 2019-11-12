@@ -33,14 +33,15 @@ from gi.repository import Gdk, Gtk, Notify
 import indicatorbase, os
 
 
-#TODO Revisit the issue of characters/glyphs not rendering in the OSD.
-# Requires finding a fortune which presents this problem!
+#TODO Revisit the issue
 #
-# Original work to investigate:
-#     http://192.168.0.9/indicator-fortune/trunk/src/indicator-fortune.py?p=140
-#
-# Original post:
 #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
+#
+# in which characters/glyphs not rendering in the OSD.
+# Requires finding a fortune which presents this problem!
+# Initial investigations can be found at
+#
+#     http://192.168.0.9/indicator-fortune/trunk/src/indicator-fortune.py?p=140
 #
 # Possible helpful stuff/solutions:
 #     https://stackoverflow.com/questions/4458696/finding-out-what-characters-a-given-font-supports/19438403#19438403
