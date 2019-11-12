@@ -702,7 +702,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
 
-        self.indicator.set_label( parsedOutput, "" ) # Second parameter is a label-guide: http://developer.ubuntu.com/api/ubuntu-12.10/python/AppIndicator3-0.1.html
+        self.indicator.set_label( parsedOutput, "" )
+        self.indicator.set_title( parsedOutput ) # Needed for Lubuntu/Xubuntu.
 
         # Ideally should be able to create the icon with the same name each time.
         # Due to a bug, the icon name must change between calls to setting the icon.
