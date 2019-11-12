@@ -62,18 +62,30 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         self.requestMouseWheelScrollEvents()
 
-#TODO Sort this out!!!
+#TODO Not sure why this is commented out.
+# Test that autostart works and does not lock up the indicator, or cause delays.
+# Also test with a VM that is just a dummy (no actually underlying VM) and so it hands on boot...does this hang the indicator?
 #         if self.isVBoxManageInstalled():
+#             GLib.idle_add( self.autoStartVirtualMachines )
 #             GLib.timeout_add_seconds( 10, self.autoStartVirtualMachines )
+#             self.autoStartVirtualMachines()
+        self.autoStartRequired = True
+        print( "Leaving init" ) #TODO Remove
 
 
     def update( self, menu ):
+        print( "Doing an update") #TODO Remove
         if self.isVBoxManageInstalled():
+            if self.autoStartRequired:
+                self.autoStartRequired = False
+                self.autoStartVirtualMachines()  #TODO Test this with a dud VM...does it cause the indicator to hang?
+
             self.buildMenu( menu )
 
         else:
             menu.append( Gtk.MenuItem( _( "(VirtualBox™ is not installed)" ) ) )
 
+        print( "Update complete")#TODO Testing
         return int( 60 * self.refreshIntervalInMinutes )
 
 
@@ -135,14 +147,16 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         for virtualMachine in self.getVirtualMachines():
             if self.isAutostart( virtualMachine.getUUID() ):
                 self.startVirtualMachine( None, virtualMachine.getUUID() )
+                print( "starting VM", virtualMachine.getUUID() )#TODO Testing
                 time.sleep( self.delayBetweenAutoStartInSeconds )
+                print( "awake")#TODO Testing
 
 
     def startVirtualMachine( self, widget, uuid ):
-        delay = 0 # Time to delay before refreshing the menu.
         runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
         if uuid in runningVMUUIDs:
             self.bringWindowToFront( runningVMNames[ runningVMUUIDs.index( uuid ) ] )
+            self.requestUpdate()
 
         else:
             result = self.processGet( "VBoxManage list vms | grep " + uuid )
@@ -152,9 +166,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
             else:
                 self.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
-                delay = 10 # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
-
-        self.requestUpdate( delay )
+                self.requestUpdate( 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
 
 
     def bringWindowToFront( self, virtualMachineName ):
