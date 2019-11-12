@@ -78,7 +78,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         if self.isVBoxManageInstalled():
             if self.autoStartRequired:
                 self.autoStartRequired = False
-                self.autoStartVirtualMachines()  #TODO Test this with a dud VM...does it cause the indicator to hang?
+                self.autoStartVirtualMachines()  #TODO Test this on laptop with a dud VM...does it cause the indicator to hang?
 
             self.buildMenu( menu )
 
