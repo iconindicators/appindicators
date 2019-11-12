@@ -21,7 +21,7 @@
 
 #TODO Test to see if this indicator works on 
 # Lubuntu 18.04 - indicator runs and label displays.
-# Lubuntu 19.10
+# Lubuntu 19.10 - indicator runs, but no label.  Workaround is to use set_title and that creates a tooltip.
 # Xubuntu 18.04 - indicator runs, but no label.  Workaround is to use set_title and that creates a tooltip.
 # Xubuntu 19.10 - indicator runs, but no label.  Workaround is to use set_title and that creates a tooltip.
 # in regards to actually running and whether the label appears (and if not, add a menu item).
