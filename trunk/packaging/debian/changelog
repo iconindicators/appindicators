@@ -1,5 +1,6 @@
 indicator-ppa-download-statistics (1.0.67-1) xenial; urgency=low
 
+  * Bug fix: When no config was present, some variables were not initialised.
   * Bug fix: Dialogs now have a parent specified.
   * Removed somewhat redundant notification.
   * Now uses a base class to share functionality amongst indicators.
