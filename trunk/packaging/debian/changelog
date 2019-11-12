@@ -1,5 +1,7 @@
 indicator-stardate (1.0.38-1) xenial; urgency=low
 
+  * Bug fix: On some variants of Lubuntu/Xubuntu, the icon label is absent.
+    As a workaround, show the stardate in the mouse hover tooltip.
   * Bug fix: Dialogs now have a parent specified.
   * Now uses a base class to share functionality amongst indicators.
   * Whilst starting up, a single menu item "Initialising..." is displayed.

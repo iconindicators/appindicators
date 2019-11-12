@@ -19,20 +19,6 @@
 # Application indicator which displays the current Star Trek™ stardate.
 
 
-#TODO Test to see if this indicator works on 
-# Lubuntu 18.04 - indicator runs and label displays.
-# Lubuntu 19.10 - indicator runs, but no label.  Workaround is to use set_title and that creates a tooltip.
-# Xubuntu 18.04 - indicator runs, but no label.  Workaround is to use set_title and that creates a tooltip.
-# Xubuntu 19.10 - indicator runs, but no label.  Workaround is to use set_title and that creates a tooltip.
-# in regards to actually running and whether the label appears (and if not, add a menu item).
-#
-# Don't want to have an option if possible to add the menu item; rather add automagically.
-#     https://askubuntu.com/questions/452182/is-it-possible-to-know-which-recognized-flavor-i-am-running-using-terminal
-#     https://unix.stackexchange.com/questions/116539/how-to-detect-the-desktop-environment-in-a-bash-script
-#     https://www.howtogeek.com/351361/how-to-check-which-version-of-ubuntu-you-have-installed/
-#     https://itsfoss.com/how-to-know-ubuntu-unity-version/
-
-
 INDICATOR_NAME = "indicator-stardate"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -77,6 +63,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, False )
 
         self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
+        self.indicator.set_title( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ) )
         return numberOfSecondsToNextUpdate
 
 
