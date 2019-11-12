@@ -126,7 +126,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 f.close()
 
             self.indicator.set_icon_full( icon, "" )
-            self.indicator.set_label( "PPA", "" )
+            self.indicator.set_label( "PPA", "PPA" )
 
 
     def update( self, menu ):
