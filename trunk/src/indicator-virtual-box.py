@@ -263,12 +263,12 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             version = self.getVirtualBoxVersion()
             if version:
                 if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
-                    virtualMachinesFromConfig = self.getVirtualMachinesFromConfigPriorTo4dot3()
+                    virtualMachinesFromConfig = self.__getVirtualMachinesFromConfigPriorTo4dot3()
 
                 else:
-                    virtualMachinesFromConfig = self.getVirtualMachinesFromConfig4dot3OrGreater()
+                    virtualMachinesFromConfig = self.__getVirtualMachinesFromConfig4dot3OrGreater()
 
-                virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage() # Contains no group information, nor sort order.
+                virtualMachinesFromVBoxManage = self.__getVirtualMachinesFromVBoxManage() # Contains no group information, nor sort order.
                 if len( virtualMachinesFromConfig ) == 0: # If the user did not modify VM sort order, there will be no list of VMs in the config file, so use the result from VBoxManage.
                     virtualMachinesFromConfig = virtualMachinesFromVBoxManage
 
@@ -288,7 +288,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     # The returned list of virtualmachine.Info objects does not include any groups (if present) nor any order set by the user in the GUI.
     # Safe to call without checking if VBoxManage is installed.
-    def getVirtualMachinesFromVBoxManage( self ):
+    def __getVirtualMachinesFromVBoxManage( self ):
         virtualMachines = [ ]
         result = self.processGet( "VBoxManage list vms" )
         if result: # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
@@ -304,7 +304,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         return virtualMachines
 
 
-    def getVirtualMachinesFromConfigPriorTo4dot3( self ):
+    def __getVirtualMachinesFromConfigPriorTo4dot3( self ):
         virtualMachines = [ ]
         line = self.processGet( "grep GUI/SelectorVMPositions " + IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 )
         try:
@@ -319,7 +319,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         return virtualMachines
 
 
-    def getVirtualMachinesFromConfig4dot3OrGreater( self ):
+    def __getVirtualMachinesFromConfig4dot3OrGreater( self ):
         # The config file may exist in one of two places, particularly if the user has done an upgrade or uses an older version of Ubuntu.
         # https://www.virtualbox.org/manual/ch10.html
         configFile = None
