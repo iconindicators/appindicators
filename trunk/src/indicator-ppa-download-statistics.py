@@ -114,7 +114,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             comments = _( "Display the total downloads of PPAs." ) )
 
         # On Ubuntu 16.04 (Unity), create an empty icon and set the label text to "PPA".
-        # Ubuntu 18.04+ (GNOME Shell) does not support empty icons, so use the PPA icon and no label.
+        # Ubuntu 18.04+ (GNOME Shell) does not support empty icons, so the default icon will be used without label.
         # Inspiration from https://github.com/fossfreedom/indicator-sysmonitor.
         if self.isUbuntu1604():
             fileHandle, icon = tempfile.mkstemp( suffix = ".svg" )
