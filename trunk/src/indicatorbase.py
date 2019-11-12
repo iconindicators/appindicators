@@ -422,6 +422,7 @@ class IndicatorBase:
             logging.exception( e )
 
 
+#TODO Maybe move these two functions into indicator lunar for now?
     def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
