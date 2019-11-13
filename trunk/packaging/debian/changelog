@@ -1,5 +1,6 @@
 indicator-virtual-box (1.0.62-1) xenial; urgency=low
 
+  * Bug fix: When a VM hangs during boot the indicator would also hang.
   * Bug fix: Dialogs now have a parent specified.
   * Now uses a base class to share functionality amongst indicators.
   * Whilst starting up, a single menu item "Initialising..." is displayed.
