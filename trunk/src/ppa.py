@@ -51,10 +51,7 @@ class PPA( object ):
     def setStatus( self, status ):
         self.status = status
 
-        if status == PPA.Status.OK:
-            self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )  #TODO Maybe instead call the sort after the add?  Or do on demand during the get?
-
-        else: # Any other status implies the underlying published binaries are reset.
+        if not ( status == PPA.Status.OK ): # Any other status implies the underlying published binaries are reset.
             self.publishedBinaries = [ ]
 
 
@@ -89,7 +86,7 @@ class PPA( object ):
 
     def getPublishedBinaries( self, sort = False ):
         if sort:
-            self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) ) #TODO Does this work if the package version is set to None (when combining)?
+            self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
 
         return self.publishedBinaries
 
