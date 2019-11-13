@@ -87,7 +87,11 @@ class PPA( object ):
     def addPublishedBinaries( self, publishedBinaries ): self.publishedBinaries.extend( publishedBinaries )
 
 
-    def getPublishedBinaries( self ): return self.publishedBinaries  #TODO Do a sort of published binaries here?
+    def getPublishedBinaries( self, sort = False ):
+        if sort:
+            self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) ) #TODO Does this work if the package version is set to None (when combining)?
+
+        return self.publishedBinaries
 
 
     def sortPublishedBinariesByDownloadCountAndClip( self, clipAmount ):

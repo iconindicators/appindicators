@@ -152,7 +152,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
                 if ppa.getStatus() == PPA.Status.OK:
-                    publishedBinaries = ppa.getPublishedBinaries()
+                    publishedBinaries = ppa.getPublishedBinaries( True )
                     for publishedBinary in publishedBinaries:
                         self.createMenuItemForPublishedBinary( subMenu, indent, ppa, publishedBinary )
                         menuItem.set_submenu( subMenu )
@@ -169,7 +169,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 menuItem.set_name( ppa.getKey() )
                 menuItem.connect( "activate", self.onPPA )
                 if ppa.getStatus() == PPA.Status.OK:
-                    publishedBinaries = ppa.getPublishedBinaries()
+                    publishedBinaries = ppa.getPublishedBinaries( True )
                     for publishedBinary in publishedBinaries:
                         self.createMenuItemForPublishedBinary( menu, indent, ppa, publishedBinary )
 
