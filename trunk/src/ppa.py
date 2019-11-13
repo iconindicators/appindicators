@@ -97,13 +97,15 @@ class PPA( object ):
             del self.publishedBinaries[ clipAmount : ]
 
 
-    def __str__( self ): return str( self.__dict__ )
+    def __str__( self ):
+        return str( self.user ) + " | " + \
+               str( self.name ) + " | " + \
+               str( self.series ) + " | " + \
+               str( self.architecture ) + " | " + \
+               str( self.publishedBinaries )
 
 
     def __repr__( self ): return self.__str__()
-
-
-    def __eq__( self, other ): return self.__dict__ == other.__dict__
 
 
 class PublishedBinary( object ):
@@ -133,32 +135,50 @@ class PublishedBinary( object ):
     def isArchitectureSpecific( self ): return self.architectureSpecific
 
 
-    def __str__( self ): return str( self.packageName ) + " | " + str( self.packageVersion ) + " | " + str( self.downloadCount ) + " | " + str( self.architectureSpecific )
+    def __str__( self ):
+        return str( self.packageName ) + " | " + \
+               str( self.packageVersion ) + " | " + \
+               str( self.downloadCount ) + " | " + \
+               str( self.architectureSpecific )
 
 
     def __repr__( self ): return self.__str__()
 
 
-    def __eq__( self, other ): return self.__dict__ == other.__dict__
-
-
-#TODO Not sure if this will stay.
-#If filters need to map to a full PPA, not just user/name, need to pass in series and architecture to the constructor.
 class Filter( object ):
 
-    def __init__( self, user, name, filterText = [ ] ):
+    def __init__( self, user, name, series, architecture, filterText = [ ] ):
         self.user = user
         self.name = name
+        self.series = series
+        self.architecture = architecture
         self.filterText = filterText
+
+
+    def getUser( self ): return self.user
+
+
+    def getName( self ): return self.name
+
+
+    def getSeries( self ): return self.series
+
+
+    def getArchitecture( self ): return self.architecture
+
+
+    def getFilterText( self ): return self.filterText
 
 
     def getKey( self ): return self.user + " | " + self.name
 
 
-    def __str__( self ): return str( self.user ) + " | " + str( self.name )
+    def __str__( self ):
+        return str( self.user ) + " | " + \
+               str( self.name ) + " | " + \
+               str( self.series ) + " | " + \
+               str( self.architecture ) + " | " + \
+               str( self.filterText )
 
 
     def __repr__( self ): return self.__str__()
-
-
-    def __eq__( self, other ): return self.__dict__ == other.__dict__

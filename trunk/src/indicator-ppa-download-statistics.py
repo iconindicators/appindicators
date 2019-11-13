@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from builtins import None
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -339,20 +340,18 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #     http://help.launchpad.net/API/Hacking
     def downloadPPAStatistics( self ):
         for ppa in self.ppas:
-            ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD ) # Need to erase underlying published binaries; also use this status as the initial flag for other statuses.
+            ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD )
 
-#TODO Fix filtering.  Maybe use ppa name/user/arch/series rather than just name/user?
-#             for filter in self.filters:
-#             if key in self.filters:
-#                 for filter in self.filters.get( key ):
-#                     self.getPublishedBinaries( ppa, filter )
-#                     if ppa.getStatus() == PPA.STATUS_ERROR_RETRIEVING_PPA:
-#                         break # No point continuing...
-# 
-#             else:
-#                 self.getPublishedBinaries( ppa, "" )
-            self.getPublishedBinaries( ppa, "" )
+            filterText = ""
+            for filter in self.filters:
+                if filter.getUser() == ppa.getUser() and \
+                   filter.getName() == ppa.getName() and \
+                   filter.getSeries() == ppa.getSeries() and \
+                   filter.getArchitecture() == ppa.getArchitecture():
+                    filterText = filter.getFilterText()
+                    break
 
+            self.getPublishedBinaries( ppa, filterText )
             if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
                 continue
 
@@ -401,10 +400,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #    https://docs.python.org/3/library/concurrent.futures.html
     #    https://pymotw.com/3/concurrent.futures
     #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
-    def getPublishedBinaries( self, ppa, filter ):
+    def getPublishedBinaries( self, ppa, filterText ):
         url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
-              "&exact_match=false&ordered=false&binary_name=" + filter # A filter of "" equates to no filter.
+              "&exact_match=false&ordered=false&binary_name=" + filterText # A filterText of "" equates to no filterText.
 
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
@@ -973,8 +972,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def loadConfig( self, config ):
+#TODO If/when the filters change from dict to list, need a transition from the old way to the new for existing release?        
+        
         self.combinePPAs = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, False )
-        self.filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, { } )
+#         self.filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, { } ) #TODO May/will need to be an empty list.
         self.ignoreVersionArchitectureSpecific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, True )
         self.showSubmenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, False )
         self.sortByDownload = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
@@ -1001,20 +1002,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 "indicator-tide",
                 "indicator-virtual-box" ]
 
-#             filter = Filter( "thebernmeister", "ppa", filterText )
-            self.filters = { }  #TODO If the ppas are a list (and use a key to sort), maybe filters could do the same, rather than use a dict?
-#             self.filters[ filter.getKey(), filter ]
-#TODO Old
-#             self.filters[ self.createFilterKey( "thebernmeister", "ppa" ) ] = [
-#                 "indicator-fortune",
-#                 "indicator-lunar",
-#                 "indicator-on-this-day",
-#                 "indicator-ppa-download-statistics",
-#                 "indicator-punycode",
-#                 "indicator-script-runner",
-#                 "indicator-stardate",
-#                 "indicator-tide",
-#                 "indicator-virtual-box" ]
+            self.filters = [ ]
+            self.filters.append( Filter( "thebernmeister", "ppa", "bionic", "amd64", filterText ) )
 
 
     def saveConfig( self ):
@@ -1022,9 +1011,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         for ppa in self.ppas:
             ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
+        filters = [ ]
+        for filter in self.filters:
+            filters.append( [ filter.getUser(), filter.getName(), filter.getSeries(), filter.getArchitecture() ] )
+
         return {
             IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS: self.combinePPAs,
-            IndicatorPPADownloadStatistics.CONFIG_FILTERS: self.filters, #TODO Can we just write this out as is...maybe follow the ppa method above.
+            IndicatorPPADownloadStatistics.CONFIG_FILTERS: self.filters,
             IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
             IndicatorPPADownloadStatistics.CONFIG_PPAS: ppas,
             IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU: self.showSubmenu,
