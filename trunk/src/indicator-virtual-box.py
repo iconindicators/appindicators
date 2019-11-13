@@ -56,25 +56,16 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             copyrightStartYear = "2012",
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
+        self.autoStartRequired = True
+        self.dateTimeOfLastNotification = datetime.datetime.now()
         self.scrollDirectionIsUp = True
         self.scrollUUID = None
-        self.dateTimeOfLastNotification = datetime.datetime.now()
 
         self.requestMouseWheelScrollEvents()
 
-#TODO Not sure why this is commented out.
-# Test that autostart works and does not lock up the indicator, or cause delays.
-# Also test with a VM that is just a dummy (no actually underlying VM) and so it hands on boot...does this hang the indicator?
-#         if self.isVBoxManageInstalled():
-#             GLib.idle_add( self.autoStartVirtualMachines )
-#             GLib.timeout_add_seconds( 10, self.autoStartVirtualMachines )
-#             self.autoStartVirtualMachines()
-        self.autoStartRequired = True
-        print( "Leaving init" ) #TODO Remove
 
 
     def update( self, menu ):
-        print( "Doing an update") #TODO Remove
         if self.autoStartRequired and self.isVBoxManageInstalled():
             self.autoStartRequired = False
             self.autoStartVirtualMachines()  #TODO Test this on laptop with a dud VM...does it cause the indicator to hang?
@@ -85,7 +76,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         else:
             menu.append( Gtk.MenuItem( _( "(VirtualBox™ is not installed)" ) ) )
 
-        print( "Update complete")#TODO Testing
         return int( 60 * self.refreshIntervalInMinutes )
 
 
@@ -147,9 +137,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         for virtualMachine in self.getVirtualMachines():
             if self.isAutostart( virtualMachine.getUUID() ):
                 self.startVirtualMachine( None, virtualMachine.getUUID(), False )
-                print( "starting VM", virtualMachine.getUUID() )#TODO Testing
                 time.sleep( self.delayBetweenAutoStartInSeconds )
-                print( "awake")#TODO Testing
 
 
     def startVirtualMachine( self, widget, uuid, requiresUpdate = True ):
