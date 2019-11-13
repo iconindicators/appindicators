@@ -222,7 +222,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     combinedPPAs[ key ].setStatus( PPA.Status.ERROR_RETRIEVING_PPA )
 
                 elif ppa.getStatus() == PPA.Status.OK or combinedPPAs[ key ].getStatus() == PPA.Status.OK:
-                    combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() ) #TODO maybe use the single add version in a loop?  Or remove the single add version altogether?
+                    combinedPPAs[ key ].addPublishedBinaries( ppa.getPublishedBinaries() )
                     combinedPPAs[ key ].setStatus( PPA.Status.OK )
 
                 elif ppa.getStatus() == combinedPPAs[ key ].getStatus(): # Both are filtered or both have no published binaries.
@@ -273,9 +273,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 for key in temp:
                     ppas[ -1 ].addPublishedBinary( temp[ key ] )
 
-#TODO Needed?
-# Sorting the ppas by user/name/series/architecture is different to sorting the published binaries.
-#         ppas.sort( key = operator.methodcaller( "getKey" ) )
+        ppas.sort( key = operator.methodcaller( "getKey" ) )
         return ppas
 
 
@@ -295,7 +293,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
             url += ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
 
-        webbrowser.open( url ) # This returns a boolean indicating success or failure; showing the user a message on a false return value causes a lock up!
+        webbrowser.open( url )
 
 
 #TODO Why do filters only use the user name and ppa (and not series, etc)?
@@ -606,7 +604,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             "The version number is retained only\n" + \
             "if it is identical across ALL\n" + \
             "instances of a published binary." ) )
-#TODO Don't understand the last paragraph.  Might need to reword the whole lot.
         ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
         grid.attach( ignoreVersionArchitectureSpecificCheckbox, 0, 2, 1, 1 )
@@ -663,9 +660,9 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
                 treeiter = ppaStore.iter_next( treeiter )
 
-#TODO Needed
             self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
+#TODO If filters use a list too as per PPA, will need to sort them too?  Or only sort when showing in the preferences?
             self.filters = { }
             treeiter = filterStore.get_iter_first()
             while treeiter != None:
@@ -989,7 +986,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             for ppa in ppas:
                 self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
 
-#TODO Needed?  
             self.ppas.sort( key = operator.methodcaller( "getKey" ) ) 
 
         else:
@@ -1006,7 +1002,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 "indicator-virtual-box" ]
 
 #             filter = Filter( "thebernmeister", "ppa", filterText )
-            self.filters = { }
+            self.filters = { }  #TODO If the ppas are a list (and use a key to sort), maybe filters could do the same, rather than use a dict?
 #             self.filters[ filter.getKey(), filter ]
 #TODO Old
 #             self.filters[ self.createFilterKey( "thebernmeister", "ppa" ) ] = [

@@ -24,9 +24,6 @@ from enum import Enum
 import operator
 
 
-#TODO Find each 'set' function and determine why it is needed.
-#Surely we only need the constructor and getters.
-
 class PPA( object ):
 
     class Status( Enum ):
@@ -57,7 +54,7 @@ class PPA( object ):
         if status == PPA.Status.OK:
             self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )  #TODO Maybe instead call the sort after the add?  Or do on demand during the get?
 
-        else: # Any other status implies the underlying published binaries are invalid.
+        else: # Any other status implies the underlying published binaries are reset.
             self.publishedBinaries = [ ]
 
 
@@ -73,7 +70,6 @@ class PPA( object ):
     def getArchitecture( self ): return self.architecture
 
 
-#TODO Who uses this?
     # Returns a key of the form 'PPA User | PPA Name | Series | Architecture' or 'PPA User | PPA Name' if series/architecture are undefined. 
     def getKey( self ):
         if self.series is None or self.architecture is None:
@@ -88,7 +84,6 @@ class PPA( object ):
     def addPublishedBinary( self, publishedBinary ): self.publishedBinaries.append( publishedBinary )
 
 
-    # Used for combined PPAs.
     def addPublishedBinaries( self, publishedBinaries ): self.publishedBinaries.extend( publishedBinaries )
 
 
