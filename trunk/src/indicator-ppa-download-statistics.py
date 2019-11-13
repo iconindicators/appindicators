@@ -19,7 +19,7 @@
 # Application indicator which displays PPA download statistics.
 
 
-#TODO For GNOME Shell, how to handle when scrolling off the edge?
+#TODO For GNOME Shell, how to handle when scrolling off the edge/bottom?
 
 #TODO Test with no .json file.
 
