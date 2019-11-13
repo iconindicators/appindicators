@@ -92,7 +92,7 @@ class PPA( object ):
     def addPublishedBinaries( self, publishedBinaries ): self.publishedBinaries.extend( publishedBinaries )
 
 
-    def getPublishedBinaries( self ): return self.publishedBinaries
+    def getPublishedBinaries( self ): return self.publishedBinaries  #TODO Do a sort of published binaries here?
 
 
     def sortPublishedBinariesByDownloadCountAndClip( self, clipAmount ):
@@ -147,6 +147,7 @@ class PublishedBinary( object ):
 
 
 #TODO Not sure if this will stay.
+#If filters need to map to a full PPA, not just user/name, need to pass in series and architecture to the constructor.
 class Filter( object ):
 
     def __init__( self, user, name, filterText = [ ] ):

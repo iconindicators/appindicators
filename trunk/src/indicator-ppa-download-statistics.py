@@ -274,6 +274,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     ppas[ -1 ].addPublishedBinary( temp[ key ] )
 
 #TODO Needed?
+# Sorting the ppas by user/name/series/architecture is different to sorting the published binaries.
 #         ppas.sort( key = operator.methodcaller( "getKey" ) )
         return ppas
 
