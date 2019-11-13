@@ -24,6 +24,7 @@ import eclipse, ephem, locale, math, orbitalelement, twolineelement
 from ephem.cities import _city_data
 
 
+#TODO Can this be an enum as per the PPA class?
 class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
 
 
