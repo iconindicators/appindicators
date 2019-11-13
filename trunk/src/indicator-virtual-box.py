@@ -75,11 +75,11 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     def update( self, menu ):
         print( "Doing an update") #TODO Remove
-        if self.isVBoxManageInstalled():
-            if self.autoStartRequired:
-                self.autoStartRequired = False
-                self.autoStartVirtualMachines()  #TODO Test this on laptop with a dud VM...does it cause the indicator to hang?
+        if self.autoStartRequired and self.isVBoxManageInstalled():
+            self.autoStartRequired = False
+            self.autoStartVirtualMachines()  #TODO Test this on laptop with a dud VM...does it cause the indicator to hang?
 
+        if self.isVBoxManageInstalled():
             self.buildMenu( menu )
 
         else:
