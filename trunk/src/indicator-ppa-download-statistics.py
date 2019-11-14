@@ -355,44 +355,15 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
                 continue
 
-            if len( ppa.getPublishedBinaries() ) == 0: #TODO Can this be a reverse check (and checks for non zero length)?
-#                 if key in self.filters: #TODO Double check this when filtering is fixed.
-#                     ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
-# 
-#                 else:
-#                     ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
-                ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
-
-            else:
+            if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
                 ppa.setStatus( PPA.Status.OK )
 
-
-#TODO Eventually remove.
-    def downloadPPAStatisticsORIG( self ):
-        for ppa in self.ppas:
-            ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD )
-            key = ppa.getUser() + " | " + ppa.getName()
-            if key in self.filters:
-                for filter in self.filters.get( key ):
-                    self.getPublishedBinaries( ppa, filter )
-                    if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
-                        break # No point continuing...
-
             else:
-                self.getPublishedBinaries( ppa, "" )
-
-            if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
-                continue
-
-            if len( ppa.getPublishedBinaries() ) == 0:
-                if key in self.filters:
+                if filterText:
                     ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
 
                 else:
                     ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
-
-            else:
-                ppa.setStatus( PPA.Status.OK )
 
 
     # Use a thread pool executer to get the download counts for each published binary.
