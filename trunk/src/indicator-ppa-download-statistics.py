@@ -297,8 +297,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         webbrowser.open( url )
 
 
-#TODO Why do filters only use the user name and ppa (and not series, etc)?
-
     # Get a list of the published binaries for each PPA.
     # From that extract the ID for each binary which is then used to get the download count for each binary.
     # The ID is the number at the end of self_link.
@@ -482,10 +480,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         # Filters.
         grid = self.createGrid()
 
-        filterStore = Gtk.ListStore( str, str ) # 'PPA User | PPA Name', filter text.
+        filterStore = Gtk.ListStore( str, str ) # 'PPA User | PPA Name | Series | Architecture', filter text.
         filterStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
-        for key in sorted( self.filters ):
-            filterStore.append( [ key, "\n".join( self.filters[ key ] ) ] )
+        for filter in self.filters:
+            filterStore.append( [ filter.getUser() + " | " + filter.getName() + " | " + filter.getSeries() + " | " + filter.getArchitecture(), filter.getFilterText() ] )
 
         filterTree = Gtk.TreeView( filterStore )
         filterTree.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
@@ -632,10 +630,12 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
-#TODO If filters use a list too as per PPA, will need to sort them too?  Or only sort when showing in the preferences?
-            self.filters = { }
+#TODO Maybe use a class for storing all filters, not just one filter?
+            self.filters = [ ]
             treeiter = filterStore.get_iter_first()
             while treeiter != None:
+                self.filters.append( Filter( filterStore[ treeiter ][ 0 ], filterStore[ treeiter ][ 1 ], filterStore[ treeiter ][ 2 ], filterStore[ treeiter ][ 3 ] ) )
+
                 self.filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
                 treeiter = filterStore.iter_next( treeiter )
 
@@ -944,7 +944,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
     def loadConfig( self, config ):
 #TODO If/when the filters change from dict to list, need a transition from the old way to the new for existing release?        
-        
+#TODO When reading in the filters (after the hack for dict to list) read in filter text too!
         self.combinePPAs = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, False )
 #         self.filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, { } ) #TODO May/will need to be an empty list.
         self.ignoreVersionArchitectureSpecific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, True )
@@ -982,6 +982,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         for ppa in self.ppas:
             ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
+#TODO Not quite done here...need to save off the filter text!
         filters = [ ]
         for filter in self.filters:
             filters.append( [ filter.getUser(), filter.getName(), filter.getSeries(), filter.getArchitecture() ] )
