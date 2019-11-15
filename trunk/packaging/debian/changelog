@@ -3,6 +3,7 @@ indicator-ppa-download-statistics (1.0.67-1) xenial; urgency=low
   * Bug fix: When no config was present, some variables were not initialised.
   * Bug fix: Dialogs now have a parent specified.
   * Removed somewhat redundant notification.
+  * Filters now match to a full PPA (user, name, series and architecture).
   * Now uses a base class to share functionality amongst indicators.
   * Whilst starting up, a single menu item "Initialising..." is displayed.
     Once fully initialised, the menu proper is shown.
