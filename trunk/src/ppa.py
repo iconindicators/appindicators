@@ -154,18 +154,6 @@ class Filters( object ):
     def addFilter( self, user, name, series, architecture, text = [ ] ): self.filters[ self.__getKey( user, name, series, architecture ) ] = text
 
 
-#TODO May not be needed.
-#     def removeFilter( self, user, name, series, architecture ): del self.filters[ self.__getKey( user, name, series, architecture ) ]
-
-
-#     def getFilterKeys( self ): return self.filters.keys()
-
-
-#     def getUserNameSeriesArchitecture( self, key ):
-#         keyComponents = key.split( " | " )
-#         return keyComponents[ 0 ], keyComponents[ 1 ], keyComponents[ 2 ], keyComponents[ 3 ]
-
-
     def getFilterText( self, user, name, series, architecture ): return self.filters[ self.__getKey( user, name, series, architecture ) ]
 
 
