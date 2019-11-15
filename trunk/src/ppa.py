@@ -72,10 +72,10 @@ class PPA( object ):
 #TODO Rethink exposing the key.  If the outside world wants a format using the |, they can implement it!
     def getKey( self ):
         if self.series is None or self.architecture is None:
-            key = str( self.user ) + " | " + str( self.name )
+            key = self.user + " | " + self.name
 
         else:
-            key = str( self.user ) + " | " + str( self.name ) + " | " + str( self.series ) + " | " + str( self.architecture )
+            key = self.user + " | " + self.name + " | " + self.series + " | " + self.architecture
 
         return key
 
@@ -100,11 +100,11 @@ class PPA( object ):
 
 
     def __str__( self ):
-        return str( self.user ) + " | " + \
-               str( self.name ) + " | " + \
-               str( self.series ) + " | " + \
-               str( self.architecture ) + " | " + \
-               str( self.publishedBinaries )
+        return self.user + " | " + \
+               self.name + " | " + \
+               self.series + " | " + \
+               self.architecture + " | " + \
+               self.publishedBinaries
 
 
     def __repr__( self ): return self.__str__()
@@ -138,10 +138,10 @@ class PublishedBinary( object ):
 
 
     def __str__( self ):
-        return str( self.packageName ) + " | " + \
-               str( self.packageVersion ) + " | " + \
-               str( self.downloadCount ) + " | " + \
-               str( self.architectureSpecific )
+        return self.packageName + " | " + \
+               self.packageVersion + " | " + \
+               self.downloadCount + " | " + \
+               self.architectureSpecific
 
 
     def __repr__( self ): return self.__str__()
